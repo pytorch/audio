@@ -1,4 +1,4 @@
-Load Audio files directly from PyTorch's Tensors
+Load Audio files directly into PyTorch Tensors
 ================================================
 
 Audio library for PyTorch
