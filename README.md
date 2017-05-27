@@ -54,7 +54,7 @@ torchaudio.save
 ```
 saves a tensor into an audio file. The extension of the given path is used as the saving format.
 audio.save(
-    string, # path to file
+	string, # path to file
 	tensor, # NSamples x NChannels 2D tensor
 	number, # sample_rate of the audio to be saved as
 )
