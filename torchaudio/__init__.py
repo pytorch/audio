@@ -1,3 +1,5 @@
+import os
+
 import torch
 
 from cffi import FFI
@@ -30,3 +32,27 @@ def load(filename, out=None):
     func(bytes(filename), out, sample_rate_p)
     sample_rate = sample_rate_p[0]
     return out, sample_rate
+
+
+def save(filepath, src, sample_rate):
+    assert torch.is_tensor(src)
+    assert not src.is_cuda
+
+    filename, extension = os.path.splitext(filepath)
+    assert type(sample_rate) == int
+
+    if isinstance(src, torch.FloatTensor):
+        func = th_sox.libthsox_Float_write_audio_file
+    elif isinstance(src, torch.DoubleTensor):
+        func = th_sox.libthsox_Double_write_audio_file
+    elif isinstance(src, torch.ByteTensor):
+        func = th_sox.libthsox_Byte_write_audio_file
+    elif isinstance(src, torch.CharTensor):
+        func = th_sox.libthsox_Char_write_audio_file
+    elif isinstance(src, torch.ShortTensor):
+        func = th_sox.libthsox_Short_write_audio_file
+    elif isinstance(src, torch.IntTensor):
+        func = th_sox.libthsox_Int_write_audio_file
+    elif isinstance(src, torch.LongTensor):
+        func = th_sox.libthsox_Long_write_audio_file
+    func(bytes(filepath), src, extension.replace('.', ''), sample_rate)

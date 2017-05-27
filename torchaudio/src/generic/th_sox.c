@@ -44,4 +44,55 @@ void libthsox_(read_audio_file)(const char *file_name, THTensor* tensor, int* sa
   sox_close(fd);
 }
 
+void libthsox_(write_audio)(sox_format_t *fd, THTensor* src,
+			  const char *extension, int sample_rate)
+{
+  long nchannels = src->size[1];
+  long nsamples = src->size[0];
+  real* data = THTensor_(data)(src);
+
+  // convert audio to dest tensor
+  int x,k;
+  for (x=0; x<nsamples; x++) {
+    for (k=0; k<nchannels; k++) {
+      int32_t sample = (int32_t)(data[x*nchannels+k]);
+      size_t samples_written = sox_write(fd, &sample, 1);
+      if (samples_written != 1)
+	THError("[write_audio_file] write failed in sox_write");
+    }
+  }
+}
+
+void libthsox_(write_audio_file)(const char *file_name, THTensor* src,
+			       const char *extension, int sample_rate)
+{
+  if (THTensor_(isContiguous)(src) == 0)
+    THError("[write_audio_file] Input should be contiguous tensors");
+
+  long nchannels = src->size[1];
+  long nsamples = src->size[0];
+
+  sox_format_t *fd;
+
+  // Create sox objects and write into int32_t buffer
+  sox_signalinfo_t sinfo;
+  sinfo.rate = sample_rate;
+  sinfo.channels = nchannels;
+  sinfo.length = nsamples * nchannels;
+  sinfo.precision = sizeof(int32_t) * 8; /* precision in bits */
+#if SOX_LIB_VERSION_CODE >= 918272 // >= 14.3.0
+  sinfo.mult = NULL;
+#endif
+  fd = sox_open_write(file_name, &sinfo, NULL, extension, NULL, NULL);
+  if (fd == NULL)
+    THError("[write_audio_file] Failure to open file for writing");
+
+  libthsox_(write_audio)(fd, src, extension, sample_rate);
+
+  // free buffer and sox structures
+  sox_close(fd);
+
+  return;
+}
+
 #endif
