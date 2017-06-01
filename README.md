@@ -36,6 +36,7 @@ Quick Usage
 ```python
 import torchaudio
 sound, sample_rate = torchaudio.load('foo.mp3')
+torchaudio.save('foo_save.mp3', sound, sample_rate) # saves tensor to file
 ```
 
 API Reference
@@ -46,6 +47,16 @@ loads an audio file into a Tensor
 audio.load(
 	string,  # path to file
 	out=None, # optionally pass output Tensor (any CPU Tensor type)
+)
+```
+
+torchaudio.save
+```
+saves a tensor into an audio file. The extension of the given path is used as the saving format.
+audio.save(
+	string, # path to file
+	tensor, # NSamples x NChannels 2D tensor
+	number, # sample_rate of the audio to be saved as
 )
 ```
 

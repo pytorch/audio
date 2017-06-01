@@ -3,4 +3,5 @@
 #else
 
 void libthsox_(read_audio_file)(const char *file_name, THTensor* tensor, int* sample_rate);
+void libthsox_(write_audio_file)(const char *file_name, THTensor* src, const char *extension, int sample_rate);
 #endif
