@@ -23,7 +23,7 @@ def load(filename, out=None):
     typename = type(out).__name__.replace('Tensor', '')
     func = getattr(th_sox, 'libthsox_{}_read_audio_file'.format(typename))
     sample_rate_p = ffi.new('int*')
-    func(bytes(filename), out, sample_rate_p)
+    func(bytes(filename, "ascii"), out, sample_rate_p)
     sample_rate = sample_rate_p[0]
     return out, sample_rate
 
@@ -37,4 +37,4 @@ def save(filepath, src, sample_rate):
     typename = type(src).__name__.replace('Tensor', '')
     func = getattr(th_sox, 'libthsox_{}_write_audio_file'.format(typename))
 
-    func(bytes(filepath), src, extension[1:], sample_rate)
+    func(bytes(filepath, "ascii"), src, extension[1:], sample_rate)
