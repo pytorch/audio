@@ -27,7 +27,7 @@ Installation
 ------------
 
 ```bash
-sudo pip install cffi
+pip install cffi
 python setup.py install
 ```
 
