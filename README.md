@@ -27,6 +27,7 @@ Installation
 ------------
 
 ```bash
+pip install cffi
 python setup.py install
 ```
 
