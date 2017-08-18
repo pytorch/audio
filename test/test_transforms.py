@@ -50,7 +50,7 @@ class Tester(unittest.TestCase):
 
 
     def test_downmix_mono(self):
-        
+
         audio_L = self.sig.clone()
         audio_R = self.sig.clone()
         R_idx = int(audio_R.size(0) * 0.1)

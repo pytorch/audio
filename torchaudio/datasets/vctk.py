@@ -36,9 +36,9 @@ def read_audio(fp, downsample=True):
     if downsample:
         # 48khz -> 16 khz
         if sig.size(0) % 3 == 0:
-            sig = sig.view(3, -1, sig.size(1)).mean(0)
+            sig = sig[::3].contiguous()
         else:
-            sig = sig[:-(sig.size(0) % 3)].view(3, -1, sig.size(1)).mean(0)
+            sig = sig[:-(sig.size(0) % 3):3].contiguous()
     return sig, sr
 
 def load_txts(dir):
