@@ -7,6 +7,8 @@ from cffi import FFI
 ffi = FFI()
 from ._ext import th_sox
 
+from torchaudio import transforms
+from torchaudio import datasets
 
 def check_input(src):
     if not torch.is_tensor(src):
@@ -23,7 +25,7 @@ def load(filename, out=None):
     typename = type(out).__name__.replace('Tensor', '')
     func = getattr(th_sox, 'libthsox_{}_read_audio_file'.format(typename))
     sample_rate_p = ffi.new('int*')
-    func(str(filename).encode("ascii"), out, sample_rate_p)
+    func(str(filename).encode("utf-8"), out, sample_rate_p)
     sample_rate = sample_rate_p[0]
     return out, sample_rate
 
@@ -37,4 +39,4 @@ def save(filepath, src, sample_rate):
     typename = type(src).__name__.replace('Tensor', '')
     func = getattr(th_sox, 'libthsox_{}_write_audio_file'.format(typename))
 
-    func(bytes(filepath, "ascii"), src, extension[1:], sample_rate)
+    func(bytes(filepath, "utf-8"), src, bytes(extension[1:], "utf-8"), sample_rate)
