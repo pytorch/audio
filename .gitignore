@@ -69,7 +69,7 @@ docs/_build/
 target/
 
 # Jupyter Notebook
-.ipynb_checkpoints
+.ipynb_checkpoints/
 
 # pyenv
 .python-version
@@ -101,5 +101,5 @@ ENV/
 # mypy
 .mypy_cache/
 
-# Jupyter Notebooks
-.ipynb_checkpoints/
+# Generated Files
+test/assets/sinewave.wav

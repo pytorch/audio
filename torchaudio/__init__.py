@@ -7,6 +7,8 @@ from cffi import FFI
 ffi = FFI()
 from ._ext import th_sox
 
+from torchaudio import transforms
+from torchaudio import datasets
 
 def check_input(src):
     if not torch.is_tensor(src):
