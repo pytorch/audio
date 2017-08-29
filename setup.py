@@ -12,10 +12,10 @@ this_file = os.path.dirname(__file__)
 setup(
     name="torchaudio",
     version="0.1",
-    description="An example project using PyTorch FFI",
-    url="https://github.com/pytorch/ffi-examples",
-    author="XYZ",
-    author_email="author@email.com",
+    description="An audio package for PyTorch",
+    url="https://github.com/pytorch/audio",
+    author="Soumith Chintala, David Pollack, Sean Naren",
+    author_email="soumith@pytorch.org",
     # Require cffi.
     install_requires=["cffi>=1.0.0"],
     setup_requires=["cffi>=1.0.0"],
