@@ -4,8 +4,6 @@ import torchaudio.transforms as transforms
 import numpy as np
 import unittest
 
-STEAM_TRAIN = "assets/steam-train-whistle-daniel_simon.mp3"
-
 class Tester(unittest.TestCase):
 
     sr = 16000
@@ -20,13 +18,13 @@ class Tester(unittest.TestCase):
         audio_orig = self.sig.clone()
         result = transforms.Scale()(audio_orig)
         self.assertTrue(result.min() >= -1. and result.max() <= 1.,
-                        "min: {}, max: {}".format(result.min(), result.max()))
+                        print("min: {}, max: {}".format(result.min(), result.max())))
 
         maxminmax = np.abs([audio_orig.min(), audio_orig.max()]).max().astype(np.float)
         result = transforms.Scale(factor=maxminmax)(audio_orig)
         self.assertTrue((result.min() == -1. or result.max() == 1.) and
                         result.min() >= -1. and result.max() <= 1.,
-                        "min: {}, max: {}".format(result.min(), result.max()))
+                        print("min: {}, max: {}".format(result.min(), result.max())))
 
     def test_pad_trim(self):
 
@@ -37,7 +35,7 @@ class Tester(unittest.TestCase):
         result = transforms.PadTrim(max_len=length_new)(audio_orig)
 
         self.assertTrue(result.size(0) == length_new,
-                        "old size: {}, new size: {}".format(audio_orig.size(0), result.size(0)))
+                        print("old size: {}, new size: {}".format(audio_orig.size(0), result.size(0))))
 
         audio_orig = self.sig.clone()
         length_orig = audio_orig.size(0)
@@ -46,7 +44,7 @@ class Tester(unittest.TestCase):
         result = transforms.PadTrim(max_len=length_new)(audio_orig)
 
         self.assertTrue(result.size(0) == length_new,
-                        "old size: {}, new size: {}".format(audio_orig.size(0), result.size(0)))
+                        print("old size: {}, new size: {}".format(audio_orig.size(0), result.size(0))))
 
 
     def test_downmix_mono(self):
@@ -63,6 +61,22 @@ class Tester(unittest.TestCase):
         result = transforms.DownmixMono()(audio_Stereo)
 
         self.assertTrue(result.size(1) == 1)
+
+    def test_lc2cl(self):
+
+        audio = self.sig.clone()
+        result = transforms.LC2CL()(audio)
+        self.assertTrue(result.size()[::-1] == audio.size())
+
+    def test_mel(self):
+
+        audio = self.sig.clone()
+        audio = transforms.Scale()(audio)
+        self.assertTrue(len(audio.size()) == 2)
+        result = transforms.MEL()(audio)
+        self.assertTrue(len(result.size()) == 3)
+        result = transforms.BLC2CBL()(result)
+        self.assertTrue(len(result.size()) == 3)
 
     def test_compose(self):
 
