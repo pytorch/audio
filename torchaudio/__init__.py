@@ -1,4 +1,5 @@
 import os
+import sys
 
 import torch
 
@@ -9,6 +10,11 @@ from ._ext import th_sox
 
 from torchaudio import transforms
 from torchaudio import datasets
+
+if sys.version_info >= (3, 0):
+    _bytes = bytes
+else:
+    _bytes = lambda s, e: s.encode(e)
 
 def check_input(src):
     if not torch.is_tensor(src):
@@ -64,4 +70,4 @@ def save(filepath, src, sample_rate):
     check_input(src)
     typename = type(src).__name__.replace('Tensor', '')
     func = getattr(th_sox, 'libthsox_{}_write_audio_file'.format(typename))
-    func(bytes(filepath, "utf-8"), src, bytes(extension[1:], "utf-8"), sample_rate)
+    func(_bytes(filepath, "utf-8"), src, _bytes(extension[1:], "utf-8"), sample_rate)
