@@ -6,15 +6,48 @@ import os
 
 class Test_LoadSave(unittest.TestCase):
     test_dirpath = os.path.dirname(os.path.realpath(__file__))
-    test_filepath = os.path.join(test_dirpath, "assets", "steam-train-whistle-daniel_simon.mp3")
+    test_mp3_filepath = os.path.join(test_dirpath, "assets", "steam-train-whistle-daniel_simon.mp3")
+    test_wav_filepath = os.path.join(test_dirpath, "assets", "16kwav.wav")
+
+    def test_get_info(self):
+        info = torchaudio.get_info(self.test_mp3_filepath)
+        self.assertEqual(info, {'bits_per_sample': 16, 'nframes': 278756, 'sample_rate': 44100, 'nchannels': 2})
+
+        info = torchaudio.get_info(self.test_wav_filepath)
+        self.assertEqual(info, {'bits_per_sample': 16, 'nframes': 320000, 'sample_rate': 16000, 'nchannels': 1})
+
     def test_load(self):
         # check normal loading
-        x, sr = torchaudio.load(self.test_filepath)
+        x, sr = torchaudio.load(self.test_mp3_filepath)
         self.assertEqual(sr, 44100)
         self.assertEqual(x.size(), (278756,2))
 
-        # check normalizing
-        x, sr = torchaudio.load(self.test_filepath, normalization=True)
+        # check offset and nframes
+
+        whole_audio, sr = torchaudio.load(self.test_wav_filepath)
+        self.assertEqual(sr, 16000)
+        self.assertEqual(whole_audio.size(), (320000, 1))
+
+        x, sr = torchaudio.load(self.test_wav_filepath, offset=100)
+        self.assertEqual(x.size(), (320000 - 100, 1))
+
+        x, sr = torchaudio.load(self.test_wav_filepath, offset=100, nframes=100)
+        self.assertEqual(x.size(), (100, 1))
+
+        x, sr = torchaudio.load(self.test_wav_filepath, offset=319999, nframes=100)
+        self.assertEqual(x.size(), (1, 1))
+
+        x, sr = torchaudio.load(self.test_wav_filepath, offset=320000, nframes=100)
+        # Maybe it would be better if we returned a Tensor of size (0,1), however PyTorch in general doesn't handle
+        # Tensors where one of the dimensions is 0 as one might expect, so not sure if it would really help to have
+        # different behavior
+        self.assertEqual(x.size(), ())
+
+        with self.assertRaises(IndexError):
+            x, sr = torchaudio.load(self.test_wav_filepath, offset=320001, nframes=100)
+
+        # check scaling
+        x, sr = torchaudio.load(self.test_mp3_filepath)
         self.assertTrue(x.min() >= -1.0)
         self.assertTrue(x.max() <= 1.0)
 
@@ -28,7 +61,7 @@ class Test_LoadSave(unittest.TestCase):
 
     def test_save(self):
         # load signal
-        x, sr = torchaudio.load(self.test_filepath)
+        x, sr = torchaudio.load(self.test_mp3_filepath)
 
         # check save
         new_filepath = os.path.join(self.test_dirpath, "test.wav")

@@ -1,3 +1,5 @@
+from __future__ import division
+
 import os
 import sys
 
@@ -22,7 +24,36 @@ def check_input(src):
     if not src.__module__ == 'torch':
         raise TypeError('Expected a CPU based tensor, got %s' % type(src))
 
-def load(filepath, out=None, normalization=None):
+def get_info(filepath):
+    """Returns a dict of information about the audio file at filepath.
+    """
+    bits_per_sample_p = ffi.new('int *')
+    length_p = ffi.new('unsigned long *')
+    sample_rate_p = ffi.new('unsigned int *')
+    nchannels_p = ffi.new('unsigned int *')
+    th_sox.libthsox_get_info(str(filepath).encode("utf-8"), bits_per_sample_p, length_p,
+                            sample_rate_p, nchannels_p)
+    return dict(bits_per_sample=bits_per_sample_p[0],
+                nframes=length_p[0] // nchannels_p[0],
+                sample_rate=sample_rate_p[0],
+                nchannels=nchannels_p[0])
+
+
+def load(filepath, out=None, offset=0, nframes=None):
+    """Read audio from a file into a Tensor
+
+    Args:
+      filepath (string): path of audio file to read
+      out (Tensor, optional): the result Tensor
+      offset (int, optional): offset in frames at which to begin reading.  Must be less than number of frames in file
+      nframes (int, optional): number of frames to read.  Fewer frames may be returned if the file is not long enough
+    Returns:
+      output (Tensor), sample rate (int)
+
+    Notes:
+      The use of offsets and nframes does not give exact results when used with mp3 files; these features are best
+      used with wavs.
+    """
     # check if valid file
     if not os.path.isfile(filepath):
         raise OSError("{} not found or is a directory".format(filepath))
@@ -31,17 +62,24 @@ def load(filepath, out=None, normalization=None):
         check_input(out)
     else:
         out = torch.FloatTensor()
+    if offset < 0:
+        raise TypeError('Expected a non-negative integer, got {}'.format(offset))
+    if nframes is None:
+        nframes = -1
+    elif type(nframes) != int or nframes < 0:
+        raise TypeError('Expected None or a non-negative integer, got {}'.format(nframes))
+
     # load audio signal
     typename = type(out).__name__.replace('Tensor', '')
     func = getattr(th_sox, 'libthsox_{}_read_audio_file'.format(typename))
     sample_rate_p = ffi.new('int*')
-    func(str(filepath).encode("utf-8"), out, sample_rate_p)
+    total_frames_p = ffi.new('unsigned long*')
+    func(str(filepath).encode("utf-8"), out, sample_rate_p, total_frames_p, offset, nframes)
+    if offset > total_frames_p[0]:
+        raise IndexError
     sample_rate = sample_rate_p[0]
-    # normalize if needed
-    if isinstance(normalization, bool) and normalization:
-        out /= 1 << 31 # assuming 16-bit depth
-    elif isinstance(normalization, (float, int)):
-        out /= normalization # normalize with custom value
+    # scale to [-1,1]
+    out /= 1 << 31
     return out, sample_rate
 
 def save(filepath, src, sample_rate):
