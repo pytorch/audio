@@ -2,12 +2,15 @@ Load Audio files directly into PyTorch Tensors
 ================================================
 
 Audio library for PyTorch
- * Support audio I/O (Load files)
 
-Load the following formats into a torch Tensor
- * mp3, wav, aac, ogg, flac, avr, cdda, cvs/vms,
- * aiff, au, amr, mp2, mp4, ac3, avi, wmv,
- * mpeg, ircam and any other format supported by libsox.
+- [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/)
+  - Load the following formats into a torch Tensor
+    - mp3, wav, aac, ogg, flac, avr, cdda, cvs/vms,
+    - aiff, au, amr, mp2, mp4, ac3, avi, wmv,
+    - mpeg, ircam and any other format supported by libsox.
+- [Dataloaders for common audio datasets (VCTK, YesNo)](http://pytorch.org/audio/datasets.html)
+- Common audio transforms
+  - [Scale, PadTrim, DownmixMono, LC2CL, BLC2CBL, MuLawEncoding, MuLawExpanding](http://pytorch.org/audio/transforms.html)
 
 Dependencies
 ------------
@@ -42,22 +45,5 @@ torchaudio.save('foo_save.mp3', sound, sample_rate) # saves tensor to file
 
 API Reference
 -----------
-torchaudio.load
-```
-loads an audio file into a Tensor
-audio.load(
-	string,  # path to file
-	out=None, # optionally pass output Tensor (any CPU Tensor type)
-)
-```
 
-torchaudio.save
-```
-saves a tensor into an audio file. The extension of the given path is used as the saving format.
-audio.save(
-	string, # path to file
-	tensor, # NSamples x NChannels 2D tensor
-	number, # sample_rate of the audio to be saved as
-)
-```
-
+API Reference is located here: http://pytorch.org/audio/
