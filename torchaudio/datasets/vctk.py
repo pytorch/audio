@@ -12,8 +12,10 @@ AUDIO_EXTENSIONS = [
     '.WAV', '.MP3', '.FLAC', '.SPH', '.OGG', '.OPUS',
 ]
 
+
 def is_audio_file(filename):
     return any(filename.endswith(extension) for extension in AUDIO_EXTENSIONS)
+
 
 def make_manifest(dir):
     audios = []
@@ -31,6 +33,7 @@ def make_manifest(dir):
                     audios.append(item)
     return audios
 
+
 def read_audio(fp, downsample=True):
     sig, sr = torchaudio.load(fp)
     if downsample:
@@ -40,6 +43,7 @@ def read_audio(fp, downsample=True):
         else:
             sig = sig[:-(sig.size(0) % 3):3].contiguous()
     return sig, sr
+
 
 def load_txts(dir):
     """Create a dictionary with all the text of the audio transcriptions."""
@@ -55,11 +59,11 @@ def load_txts(dir):
             for fname in fnames:
                 if fname.endswith(".txt"):
                     with open(os.path.join(root, fname), "r") as f:
-                        fname_no_ext = os.path.basename(fname).rsplit(".", 1)[0]
+                        fname_no_ext = os.path.basename(
+                            fname).rsplit(".", 1)[0]
                         utterences[fname_no_ext] = f.readline()
-                        #utterences += f.readlines()
-    #utterences = dict([tuple(u.strip().split(" ", 1)) for u in utterences])
     return utterences
+
 
 class VCTK(data.Dataset):
     """`VCTK <http://homepages.inf.ed.ac.uk/jyamagis/page3/page58/page58.html>`_ Dataset.
@@ -103,7 +107,8 @@ class VCTK(data.Dataset):
             raise RuntimeError('Dataset not found.' +
                                ' You can use download=True to download it')
         self._read_info()
-        self.data, self.labels = torch.load(os.path.join(self.root, self.processed_folder, "vctk_{:04d}.pt".format(self.cached_pt)))
+        self.data, self.labels = torch.load(os.path.join(
+            self.root, self.processed_folder, "vctk_{:04d}.pt".format(self.cached_pt)))
 
     def __getitem__(self, index):
         """
@@ -115,7 +120,8 @@ class VCTK(data.Dataset):
         """
         if self.cached_pt != index // self.chunk_size:
             self.cached_pt = int(index // self.chunk_size)
-            self.data, self.labels = torch.load(os.path.join(self.root, self.processed_folder, "vctk_{:04d}.pt".format(self.cached_pt)))
+            self.data, self.labels = torch.load(os.path.join(
+                self.root, self.processed_folder, "vctk_{:04d}.pt".format(self.cached_pt)))
         index = index % self.chunk_size
         audio, target = self.data[index], self.labels[index]
 
@@ -134,13 +140,15 @@ class VCTK(data.Dataset):
         return os.path.exists(os.path.join(self.root, self.processed_folder, "vctk_info.txt"))
 
     def _write_info(self, num_items):
-        info_path = os.path.join(self.root, self.processed_folder, "vctk_info.txt")
+        info_path = os.path.join(
+            self.root, self.processed_folder, "vctk_info.txt")
         with open(info_path, "w") as f:
             f.write("num_samples,{}\n".format(num_items))
             f.write("max_len,{}\n".format(self.max_len))
 
     def _read_info(self):
-        info_path = os.path.join(self.root, self.processed_folder, "vctk_info.txt")
+        info_path = os.path.join(
+            self.root, self.processed_folder, "vctk_info.txt")
         with open(info_path, "r") as f:
             self.num_samples = int(f.readline().split(",")[1])
             self.max_len = int(f.readline().split(",")[1])
@@ -155,7 +163,8 @@ class VCTK(data.Dataset):
 
         raw_abs_dir = os.path.join(self.root, self.raw_folder)
         processed_abs_dir = os.path.join(self.root, self.processed_folder)
-        dset_abs_path = os.path.join(self.root, self.raw_folder, self.dset_path)
+        dset_abs_path = os.path.join(
+            self.root, self.raw_folder, self.dset_path)
 
         # download files
         try:
@@ -192,7 +201,8 @@ class VCTK(data.Dataset):
         audios = make_manifest(dset_abs_path)
         utterences = load_txts(dset_abs_path)
         self.max_len = 0
-        print("Found {} audio files and {} utterences".format(len(audios), len(utterences)))
+        print("Found {} audio files and {} utterences".format(
+            len(audios), len(utterences)))
         for n in range(len(audios) // self.chunk_size + 1):
             tensors = []
             labels = []
@@ -207,9 +217,11 @@ class VCTK(data.Dataset):
                     tensors.append(sig)
                     lengths.append(sig.size(0))
                     labels.append(utterences[f_rel_no_ext])
-                    self.max_len = sig.size(0) if sig.size(0) > self.max_len else self.max_len
+                    self.max_len = sig.size(0) if sig.size(
+                        0) > self.max_len else self.max_len
             # sort sigs/labels: longest -> shortest
-            tensors, labels = zip(*[(b, c) for (a,b,c) in sorted(zip(lengths, tensors, labels), key=lambda x: x[0], reverse=True)])
+            tensors, labels = zip(*[(b, c) for (a, b, c) in sorted(
+                zip(lengths, tensors, labels), key=lambda x: x[0], reverse=True)])
             data = (tensors, labels)
             torch.save(
                 data,
@@ -219,7 +231,7 @@ class VCTK(data.Dataset):
                     "vctk_{:04d}.pt".format(n)
                 )
             )
-        self._write_info((n*self.chunk_size)+i+1)
+        self._write_info((n * self.chunk_size) + i + 1)
         if not self.dev_mode:
             shutil.rmtree(raw_abs_dir, ignore_errors=True)
 

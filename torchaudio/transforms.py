@@ -6,6 +6,7 @@ try:
 except ImportError:
     librosa = None
 
+
 class Compose(object):
     """Composes several transforms together.
 
@@ -26,6 +27,7 @@ class Compose(object):
         for t in self.transforms:
             audio = t(audio)
         return audio
+
 
 class Scale(object):
     """Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
@@ -55,6 +57,7 @@ class Scale(object):
 
         return tensor / self.factor
 
+
 class PadTrim(object):
     """Pad/Trim a 1d-Tensor (Signal or Labels)
 
@@ -76,7 +79,7 @@ class PadTrim(object):
 
         """
         if self.max_len > tensor.size(0):
-            pad = torch.ones((self.max_len-tensor.size(0),
+            pad = torch.ones((self.max_len - tensor.size(0),
                               tensor.size(1))) * self.fill_value
             pad = pad.type_as(tensor)
             tensor = torch.cat((tensor, pad), dim=0)
@@ -106,6 +109,7 @@ class DownmixMono(object):
         if tensor.size(1) > 1:
             tensor = torch.mean(tensor.float(), 1, True)
         return tensor
+
 
 class LC2CL(object):
     """Permute a 2d tensor from samples (Length) x Channels to Channels x
@@ -153,13 +157,15 @@ class MEL(object):
             return tensor
         L = []
         for i in range(tensor.size(1)):
-            nparr = tensor[:, i].numpy() # (samples, )
-            sgram = librosa.feature.melspectrogram(nparr, **self.kwargs) # (n_mels, hops)
+            nparr = tensor[:, i].numpy()  # (samples, )
+            sgram = librosa.feature.melspectrogram(
+                nparr, **self.kwargs)  # (n_mels, hops)
             L.append(sgram)
-        L = np.stack(L, 2) # (n_mels, hops, channels)
+        L = np.stack(L, 2)  # (n_mels, hops, channels)
         tensor = torch.from_numpy(L).type_as(tensor)
 
         return tensor
+
 
 class BLC2CBL(object):
     """Permute a 3d tensor from Bands x samples (Length) x Channels to Channels x
@@ -178,6 +184,7 @@ class BLC2CBL(object):
         """
 
         return tensor.permute(2, 0, 1).contiguous()
+
 
 class MuLawEncoding(object):
     """Encode signal based on mu-law companding.  For more info see the
@@ -212,9 +219,11 @@ class MuLawEncoding(object):
             if isinstance(x, torch.LongTensor):
                 x = x.float()
             mu = torch.FloatTensor([mu])
-            x_mu = torch.sign(x) * torch.log1p(mu * torch.abs(x)) / torch.log1p(mu)
+            x_mu = torch.sign(x) * torch.log1p(mu *
+                                               torch.abs(x)) / torch.log1p(mu)
             x_mu = ((x_mu + 1) / 2 * mu + 0.5).long()
         return x_mu
+
 
 class MuLawExpanding(object):
     """Decode mu-law encoded signal.  For more info see the

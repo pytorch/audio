@@ -5,14 +5,15 @@ import torchaudio.transforms as transforms
 import numpy as np
 import unittest
 
+
 class Tester(unittest.TestCase):
 
     sr = 16000
     freq = 440
     volume = 0.3
-    sig = (torch.cos(2*np.pi*torch.arange(0, 4*sr) * freq/sr)).float()
+    sig = (torch.cos(2 * np.pi * torch.arange(0, 4 * sr) * freq / sr)).float()
     sig.unsqueeze_(1)
-    sig = (sig*volume*2**31).long()
+    sig = (sig * volume * 2**31).long()
 
     def test_scale(self):
 
@@ -21,7 +22,8 @@ class Tester(unittest.TestCase):
         self.assertTrue(result.min() >= -1. and result.max() <= 1.,
                         print("min: {}, max: {}".format(result.min(), result.max())))
 
-        maxminmax = np.abs([audio_orig.min(), audio_orig.max()]).max().astype(np.float)
+        maxminmax = np.abs(
+            [audio_orig.min(), audio_orig.max()]).max().astype(np.float)
         result = transforms.Scale(factor=maxminmax)(audio_orig)
         self.assertTrue((result.min() == -1. or result.max() == 1.) and
                         result.min() >= -1. and result.max() <= 1.,
@@ -46,7 +48,6 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(result.size(0) == length_new,
                         print("old size: {}, new size: {}".format(audio_orig.size(0), result.size(0))))
-
 
     def test_downmix_mono(self):
 
@@ -84,7 +85,8 @@ class Tester(unittest.TestCase):
         audio_orig = self.sig.clone()
         length_orig = audio_orig.size(0)
         length_new = int(length_orig * 1.2)
-        maxminmax = np.abs([audio_orig.min(), audio_orig.max()]).max().astype(np.float)
+        maxminmax = np.abs(
+            [audio_orig.min(), audio_orig.max()]).max().astype(np.float)
 
         tset = (transforms.Scale(factor=maxminmax),
                 transforms.PadTrim(max_len=length_new))
@@ -109,10 +111,6 @@ class Tester(unittest.TestCase):
         sig_exp = transforms.MuLawExpanding(quantization_channels)(sig_mu)
         self.assertTrue(sig_exp.min() >= -1. and sig_exp.max() <= 1.)
 
-        #diff = sig - sig_exp
-        #mse = np.linalg.norm(diff) / diff.shape[0]
-        #self.assertTrue(mse, np.isclose(mse, 0., atol=1e-4)) # not always true
-
         sig = self.sig.clone()
         sig = sig / torch.abs(sig).max()
         self.assertTrue(sig.min() >= -1. and sig.max() <= 1.)
@@ -122,6 +120,7 @@ class Tester(unittest.TestCase):
 
         sig_exp = transforms.MuLawExpanding(quantization_channels)(sig_mu)
         self.assertTrue(sig_exp.min() >= -1. and sig_exp.max() <= 1.)
+
 
 if __name__ == '__main__':
     unittest.main()

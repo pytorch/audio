@@ -7,6 +7,7 @@ import errno
 import torch
 import torchaudio
 
+
 class YESNO(data.Dataset):
     """`YesNo Hebrew <http://www.openslr.org/1/>`_ Dataset.
 
@@ -45,7 +46,8 @@ class YESNO(data.Dataset):
         if not self._check_exists():
             raise RuntimeError('Dataset not found.' +
                                ' You can use download=True to download it')
-        self.data, self.labels = torch.load(os.path.join(self.root, self.processed_folder, self.processed_file))
+        self.data, self.labels = torch.load(os.path.join(
+            self.root, self.processed_folder, self.processed_file))
 
     def __getitem__(self, index):
         """
@@ -81,7 +83,8 @@ class YESNO(data.Dataset):
 
         raw_abs_dir = os.path.join(self.root, self.raw_folder)
         processed_abs_dir = os.path.join(self.root, self.processed_folder)
-        dset_abs_path = os.path.join(self.root, self.raw_folder, self.dset_path)
+        dset_abs_path = os.path.join(
+            self.root, self.raw_folder, self.dset_path)
 
         # download files
         try:
@@ -130,7 +133,8 @@ class YESNO(data.Dataset):
             lengths.append(sig.size(0))
             labels.append(os.path.basename(f).split(".", 1)[0].split("_"))
         # sort sigs/labels: longest -> shortest
-        tensors, labels = zip(*[(b, c) for (a,b,c) in sorted(zip(lengths, tensors, labels), key=lambda x: x[0], reverse=True)])
+        tensors, labels = zip(*[(b, c) for (a, b, c) in sorted(
+            zip(lengths, tensors, labels), key=lambda x: x[0], reverse=True)])
         self.max_len = tensors[0].size(0)
         torch.save(
             (tensors, labels),
