@@ -1,7 +1,5 @@
-Load Audio files directly into PyTorch Tensors
+torchaudio: an audio library for PyTorch
 ================================================
-
-Audio library for PyTorch
 
 - [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/)
   - Load the following formats into a torch Tensor
