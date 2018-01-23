@@ -28,6 +28,14 @@ class Compose(object):
             audio = t(audio)
         return audio
 
+    def __repr__(self):
+        format_string = self.__class__.__name__ + '('
+        for t in self.transforms:
+            format_string += '\n'
+            format_string += '    {0}'.format(t)
+        format_string += '\n)'
+        return format_string
+
 
 class Scale(object):
     """Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
@@ -56,6 +64,9 @@ class Scale(object):
             tensor = tensor.float()
 
         return tensor / self.factor
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
 
 
 class PadTrim(object):
@@ -87,6 +98,9 @@ class PadTrim(object):
             tensor = tensor[:self.max_len, :]
         return tensor
 
+    def __repr__(self):
+        return self.__class__.__name__ + '(max_len={0})'.format(self.max_len)
+
 
 class DownmixMono(object):
     """Downmix any stereo signals to mono
@@ -110,6 +124,9 @@ class DownmixMono(object):
             tensor = torch.mean(tensor.float(), 1, True)
         return tensor
 
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
+
 
 class LC2CL(object):
     """Permute a 2d tensor from samples (Length) x Channels to Channels x
@@ -128,6 +145,9 @@ class LC2CL(object):
         """
 
         return tensor.transpose(0, 1).contiguous()
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
 
 
 class MEL(object):
@@ -166,6 +186,9 @@ class MEL(object):
 
         return tensor
 
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
+
 
 class BLC2CBL(object):
     """Permute a 3d tensor from Bands x samples (Length) x Channels to Channels x
@@ -184,6 +207,9 @@ class BLC2CBL(object):
         """
 
         return tensor.permute(2, 0, 1).contiguous()
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
 
 
 class MuLawEncoding(object):
@@ -224,6 +250,9 @@ class MuLawEncoding(object):
             x_mu = ((x_mu + 1) / 2 * mu + 0.5).long()
         return x_mu
 
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
+
 
 class MuLawExpanding(object):
     """Decode mu-law encoded signal.  For more info see the
@@ -261,3 +290,6 @@ class MuLawExpanding(object):
             x = ((x_mu) / mu) * 2 - 1.
             x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.) / mu
         return x
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
