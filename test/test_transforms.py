@@ -29,6 +29,9 @@ class Tester(unittest.TestCase):
                         result.min() >= -1. and result.max() <= 1.,
                         print("min: {}, max: {}".format(result.min(), result.max())))
 
+        repr_test = transforms.Scale()
+        repr_test.__repr__()
+
     def test_pad_trim(self):
 
         audio_orig = self.sig.clone()
@@ -49,6 +52,9 @@ class Tester(unittest.TestCase):
         self.assertTrue(result.size(0) == length_new,
                         print("old size: {}, new size: {}".format(audio_orig.size(0), result.size(0))))
 
+        repr_test = transforms.PadTrim(max_len=length_new)
+        repr_test.__repr__()
+
     def test_downmix_mono(self):
 
         audio_L = self.sig.clone()
@@ -64,11 +70,17 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(result.size(1) == 1)
 
+        repr_test = transforms.DownmixMono()
+        repr_test.__repr__()
+
     def test_lc2cl(self):
 
         audio = self.sig.clone()
         result = transforms.LC2CL()(audio)
         self.assertTrue(result.size()[::-1] == audio.size())
+
+        repr_test = transforms.LC2CL()
+        repr_test.__repr__()
 
     def test_mel(self):
 
@@ -79,6 +91,11 @@ class Tester(unittest.TestCase):
         self.assertTrue(len(result.size()) == 3)
         result = transforms.BLC2CBL()(result)
         self.assertTrue(len(result.size()) == 3)
+
+        repr_test = transforms.MEL()
+        repr_test.__repr__()
+        repr_test = transforms.BLC2CBL()
+        repr_test.__repr__()
 
     def test_compose(self):
 
@@ -95,6 +112,9 @@ class Tester(unittest.TestCase):
         self.assertTrue(np.abs([result.min(), result.max()]).max() == 1.)
 
         self.assertTrue(result.size(0) == length_new)
+
+        repr_test = transforms.Compose(tset)
+        repr_test.__repr__()
 
     def test_mu_law_companding(self):
 
@@ -120,6 +140,11 @@ class Tester(unittest.TestCase):
 
         sig_exp = transforms.MuLawExpanding(quantization_channels)(sig_mu)
         self.assertTrue(sig_exp.min() >= -1. and sig_exp.max() <= 1.)
+
+        repr_test = transforms.MuLawEncoding(quantization_channels)
+        repr_test.__repr__()
+        repr_test = transforms.MuLawExpanding(quantization_channels)
+        repr_test.__repr__()
 
 
 if __name__ == '__main__':
