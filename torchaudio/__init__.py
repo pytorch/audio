@@ -1,21 +1,10 @@
-import os
-import sys
+import os.path
 
 import torch
-
-from cffi import FFI
-
-ffi = FFI()
-from ._ext import th_sox
+import _torch_sox
 
 from torchaudio import transforms
 from torchaudio import datasets
-
-if sys.version_info >= (3, 0):
-    _bytes = bytes
-else:
-    def _bytes(s, e):
-        return s.encode(e)
 
 
 def get_tensor_type_name(tensor):
@@ -55,22 +44,20 @@ def load(filepath, out=None, normalization=None):
     # check if valid file
     if not os.path.isfile(filepath):
         raise OSError("{} not found or is a directory".format(filepath))
+
     # initialize output tensor
     if out is not None:
         check_input(out)
     else:
         out = torch.FloatTensor()
-    # load audio signal
-    typename = get_tensor_type_name(out)
-    func = getattr(th_sox, 'libthsox_{}_read_audio_file'.format(typename))
-    sample_rate_p = ffi.new('int*')
-    func(str(filepath).encode("utf-8"), out, sample_rate_p)
-    sample_rate = sample_rate_p[0]
+
+    sample_rate = _torch_sox.read_audio_file(filepath, out)
     # normalize if needed
     if isinstance(normalization, bool) and normalization:
         out /= 1 << 31  # assuming 16-bit depth
     elif isinstance(normalization, (float, int)):
         out /= normalization  # normalize with custom value
+
     return out, sample_rate
 
 
@@ -111,9 +98,6 @@ def save(filepath, src, sample_rate):
         src = src * (1 << 31)  # assuming 16-bit depth
         src = src.long()
     # save data to file
-    filename, extension = os.path.splitext(filepath)
+    extension = os.path.splitext(filepath)[1]
     check_input(src)
-    typename = get_tensor_type_name(src)
-    func = getattr(th_sox, 'libthsox_{}_write_audio_file'.format(typename))
-    func(_bytes(filepath, "utf-8"), src,
-         _bytes(extension[1:], "utf-8"), sample_rate)
+    _torch_sox.write_audio_file(filepath, src, extension[1:], sample_rate)
