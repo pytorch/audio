@@ -10,8 +10,9 @@ class Tester(unittest.TestCase):
 
     sr = 16000
     freq = 440
-    volume = 0.3
+    volume = .3
     sig = (torch.cos(2 * np.pi * torch.arange(0, 4 * sr) * freq / sr)).float()
+    # sig = (torch.cos((1+torch.arange(0, 4 * sr) * 2) / sr * 2 * np.pi * torch.arange(0, 4 * sr) * freq / sr)).float()
     sig.unsqueeze_(1)
     sig = (sig * volume * 2**31).long()
 
@@ -86,11 +87,11 @@ class Tester(unittest.TestCase):
 
         audio = self.sig.clone()
         audio = transforms.Scale()(audio)
-        self.assertTrue(len(audio.size()) == 2)
+        self.assertTrue(audio.dim() == 2)
         result = transforms.MEL()(audio)
-        self.assertTrue(len(result.size()) == 3)
+        self.assertTrue(result.dim() == 3)
         result = transforms.BLC2CBL()(result)
-        self.assertTrue(len(result.size()) == 3)
+        self.assertTrue(result.dim() == 3)
 
         repr_test = transforms.MEL()
         repr_test.__repr__()
@@ -146,6 +147,13 @@ class Tester(unittest.TestCase):
         repr_test = transforms.MuLawExpanding(quantization_channels)
         repr_test.__repr__()
 
+    def test_mel2(self):
+        audio_orig = self.sig.clone()  # (16000, 1)
+        audio_scaled = transforms.Scale()(audio_orig)  # (16000, 1)
+        audio_scaled = transforms.LC2CL()(audio_scaled)  # (1, 16000)
+        spectrogram_torch = transforms.MEL2()(audio_scaled)  # (1, 319, 40)
+        self.assertTrue(spectrogram_torch.dim() == 3)
+        self.assertTrue(spectrogram_torch.max() <= 0.)
 
 if __name__ == '__main__':
     unittest.main()
