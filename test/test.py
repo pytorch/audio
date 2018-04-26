@@ -15,8 +15,6 @@ class Test_LoadSave(unittest.TestCase):
         x, sr = torchaudio.load(self.test_filepath)
         self.assertEqual(sr, 44100)
         self.assertEqual(x.size(), (278756, 2))
-        self.assertGreater(x.sum(), 0)
-        print
 
         # check normalizing
         x, sr = torchaudio.load(self.test_filepath, normalization=True)
