@@ -38,7 +38,7 @@ int read_audio_file(const std::string& file_name, at::Tensor output) {
   output.resize_({samples_read / number_of_channels, number_of_channels});
   output = output.contiguous();
 
-  AT_DISPATCH_ALL_TYPES(output.type(), "read_audio_buffer", [&] {
+  AT_DISPATCH_ALL_TYPES(output.type(), "write_audio_buffer", [&] {
     auto* data = output.data<scalar_t>();
     std::copy(buffer.begin(), buffer.begin() + samples_read, data);
   });
