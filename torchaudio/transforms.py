@@ -213,7 +213,7 @@ class SPECTROGRAM(object):
         assert sig.dim() == 2
 
         spec_f = torch.stft(sig, self.ws, self.hop, self.n_fft,
-                            True, self.window, self.pad)  # (c, l, n_fft, 2)
+                            True, True, self.window, self.pad)  # (c, l, n_fft, 2)
         spec_f /= self.window.pow(2).sum().sqrt()
         spec_f = spec_f.pow(2).sum(-1)  # get power of "complex" tensor (c, l, n_fft)
         return spec_f if is_variable else spec_f.data
@@ -250,9 +250,9 @@ class F2M(object):
 
         fb = torch.zeros(n_fft, self.n_mels)
         for m in range(1, self.n_mels + 1):
-            f_m_minus = bins[m - 1]
-            f_m = bins[m]
-            f_m_plus = bins[m + 1]
+            f_m_minus = bins[m - 1].item()
+            f_m = bins[m].item()
+            f_m_plus = bins[m + 1].item()
 
             if f_m_minus != f_m:
                 fb[f_m_minus:f_m, m - 1] = (torch.arange(f_m_minus, f_m) - f_m_minus) / (f_m - f_m_minus)
