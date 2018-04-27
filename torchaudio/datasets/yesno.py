@@ -101,9 +101,7 @@ class YESNO(data.Dataset):
         filename = url.rpartition('/')[2]
         file_path = os.path.join(self.root, self.raw_folder, filename)
         if not os.path.isfile(file_path):
-            data = urllib.request.urlopen(url)
-            with open(file_path, 'wb') as f:
-                f.write(data.read())
+            urllib.request.urlretrieve(url, file_path)
         else:
             print("Tar file already downloaded")
         if not os.path.exists(dset_abs_path):
