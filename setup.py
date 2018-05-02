@@ -17,8 +17,8 @@ setup(
     author="Soumith Chintala, David Pollack, Sean Naren",
     author_email="soumith@pytorch.org",
     # Require cffi.
-    install_requires=["cffi>=1.0.0"],
-    setup_requires=["cffi>=1.0.0"],
+    install_requires=["cffi>=1.0.0", "torch>=0.4"],
+    setup_requires=["cffi>=1.0.0", "torch>=0.4"],
     # Exclude the build files.
     packages=find_packages(exclude=["build"]),
     # Package where to put the extensions. Has to be a prefix of build.py.
