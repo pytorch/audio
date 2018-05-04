@@ -105,7 +105,7 @@ void write_audio_file(
 }
 }} // namespace torch::audio
 
-PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+PYBIND11_MODULE(_torch_sox, m) {
   m.def(
       "read_audio_file",
       &torch::audio::read_audio_file,
