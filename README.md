@@ -28,7 +28,11 @@ Installation
 ------------
 
 ```bash
+# Linux
 python setup.py install
+
+# OSX 
+MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
 ```
 
 Quick Usage
