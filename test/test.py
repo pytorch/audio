@@ -92,7 +92,7 @@ class Test_LoadSave(unittest.TestCase):
         volume = 0.3
 
         y = (torch.cos(
-            2 * math.pi * torch.arange(0, 4 * sr) * freq / sr)).float()
+            2 * math.pi * torch.arange(0, 4 * sr).float() * freq / sr))
         y.unsqueeze_(1)
         # y is between -1 and 1, so must scale
         y = (y * volume * 2**31).long()

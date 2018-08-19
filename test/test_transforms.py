@@ -11,7 +11,7 @@ class Tester(unittest.TestCase):
     sr = 16000
     freq = 440
     volume = .3
-    sig = (torch.cos(2 * np.pi * torch.arange(0, 4 * sr) * freq / sr)).float()
+    sig = (torch.cos(2 * np.pi * torch.arange(0, 4 * sr).float() * freq / sr))
     # sig = (torch.cos((1+torch.arange(0, 4 * sr) * 2) / sr * 2 * np.pi * torch.arange(0, 4 * sr) * freq / sr)).float()
     sig.unsqueeze_(1)
     sig = (sig * volume * 2**31).long()
