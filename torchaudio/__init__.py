@@ -18,7 +18,7 @@ def check_input(src):
         raise TypeError('Expected a CPU based tensor, got %s' % type(src))
 
 
-def load(filepath, out=None, normalization=None):
+def load(filepath, out=None, normalization=None, num_frames=-1, offset=0):
     """Loads an audio file from disk into a Tensor
 
     Args:
@@ -27,6 +27,8 @@ def load(filepath, out=None, normalization=None):
         normalization (bool or number, optional): If boolean `True`, then output is divided by `1 << 31`
                                                   (assumes 16-bit depth audio, and normalizes to `[0, 1]`.
                                                   If `number`, then output is divided by that number
+        num_frames (int, optional): number of frames to load.  -1 to load everything after the offset.
+        offset (int, optional): number of frames from the start of the file to begin data loading.
 
     Returns: tuple(Tensor, int)
        - Tensor: output Tensor of size `[L x C]` where L is the number of audio frames, C is the number of channels
@@ -51,7 +53,12 @@ def load(filepath, out=None, normalization=None):
     else:
         out = torch.FloatTensor()
 
-    sample_rate = _torch_sox.read_audio_file(filepath, out)
+    if num_frames < -1:
+        raise ValueError("Expected value for num_samples -1 (entire file) or >=0")
+    if offset < 0:
+        raise ValueError("Expected positive offset value")
+    sample_rate = _torch_sox.read_audio_file(filepath, out, num_frames, offset)
+
     # normalize if needed
     if isinstance(normalization, bool) and normalization:
         out /= 1 << 31  # assuming 16-bit depth
@@ -61,7 +68,7 @@ def load(filepath, out=None, normalization=None):
     return out, sample_rate
 
 
-def save(filepath, src, sample_rate):
+def save(filepath, src, sample_rate, precision=32):
     """Saves a Tensor with audio signal to disk as a standard format like mp3, wav, etc.
 
     Args:
@@ -69,6 +76,7 @@ def save(filepath, src, sample_rate):
         src (Tensor): an input 2D Tensor of shape `[L x C]` where L is
                       the number of audio frames, C is the number of channels
         sample_rate (int): the sample-rate of the audio to be saved
+        precision (int, optional): the bit-precision of the audio to be saved
 
     Example::
 
@@ -93,6 +101,12 @@ def save(filepath, src, sample_rate):
             sample_rate = int(sample_rate)
         else:
             raise TypeError('Sample rate should be a integer')
+    # check if bit_rate is an integer
+    if not isinstance(precision, int):
+        if int(precision) == precision:
+            precision = int(precision)
+        else:
+            raise TypeError('Bit precision should be a integer')
     # programs such as librosa normalize the signal, unnormalize if detected
     if src.min() >= -1.0 and src.max() <= 1.0:
         src = src * (1 << 31)  # assuming 16-bit depth
@@ -100,4 +114,23 @@ def save(filepath, src, sample_rate):
     # save data to file
     extension = os.path.splitext(filepath)[1]
     check_input(src)
-    _torch_sox.write_audio_file(filepath, src, extension[1:], sample_rate)
+    _torch_sox.write_audio_file(filepath, src, extension[1:], sample_rate, precision)
+
+
+def info(filepath):
+    """Gets metadata from an audio file without loading the signal.
+
+     Args:
+        filepath (string): path to audio file
+
+     Returns: tuple(C, L, sr, precision)
+       - C (int): number of audio channels
+       - L (int): length of each channel in frames (samples / channels)
+       - sr (int): sample rate i.e. samples per second
+       - precision (float): bit precision i.e. 32-bit or 16-bit audio
+
+     Example::
+         >>> num_channels, length, sample_rate, precision = torchaudio.info('foo.wav')
+     """
+    C, L, sr, bp = _torch_sox.get_info(filepath)
+    return C, L, sr, bp

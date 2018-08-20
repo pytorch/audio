@@ -35,8 +35,12 @@ void read_audio(
     SoxDescriptor& fd,
     at::Tensor output,
     int64_t number_of_channels,
-    int64_t buffer_length) {
+    int64_t buffer_length,
+    int64_t offset) {
   std::vector<sox_sample_t> buffer(buffer_length);
+  if (sox_seek(fd.get(), offset, 0) == SOX_EOF) {
+    throw std::runtime_error("sox_seek reached EOF, try reducing offset or num_samples");
+  }
   const int64_t samples_read = sox_read(fd.get(), buffer.data(), buffer_length);
   if (samples_read == 0) {
     throw std::runtime_error(
@@ -67,7 +71,11 @@ int64_t write_audio(SoxDescriptor& fd, at::Tensor tensor) {
 }
 } // namespace
 
-int read_audio_file(const std::string& file_name, at::Tensor output) {
+int read_audio_file(
+    const std::string& file_name,
+    at::Tensor output,
+    int64_t nframes,
+    int64_t offset) {
   SoxDescriptor fd(sox_open_read(
       file_name.c_str(),
       /*signal=*/nullptr,
@@ -79,12 +87,26 @@ int read_audio_file(const std::string& file_name, at::Tensor output) {
 
   const int64_t number_of_channels = fd->signal.channels;
   const int sample_rate = fd->signal.rate;
-  const int64_t buffer_length = fd->signal.length;
-  if (buffer_length == 0) {
+  const int64_t total_length = fd->signal.length;
+  if (total_length == 0) {
     throw std::runtime_error("Error reading audio file: unknown length");
   }
 
-  read_audio(fd, output, number_of_channels, buffer_length);
+  // calculate buffer length
+  int64_t buffer_length = total_length;
+  if (offset > 0 && offset < total_length) {
+      buffer_length -= offset;
+  }
+  if (nframes != -1 && buffer_length > nframes) {
+      // get requested number of frames
+      buffer_length = nframes;
+  }
+
+  // buffer length and offset need to be multipled by the number of channels
+  buffer_length *= number_of_channels;
+  offset *= number_of_channels;
+
+  read_audio(fd, output, number_of_channels, buffer_length, offset);
 
   return sample_rate;
 }
@@ -93,7 +115,8 @@ void write_audio_file(
     const std::string& file_name,
     at::Tensor tensor,
     const std::string& extension,
-    int sample_rate) {
+    int sample_rate,
+    int precision) {
   if (!tensor.is_contiguous()) {
     throw std::runtime_error(
         "Error writing audio file: input tensor must be contiguous");
@@ -103,7 +126,7 @@ void write_audio_file(
   signal.rate = sample_rate;
   signal.channels = tensor.size(1);
   signal.length = tensor.numel();
-  signal.precision = 32; // precision in bits
+  signal.precision = precision; // precision in bits
 
 #if SOX_LIB_VERSION_CODE >= 918272 // >= 14.3.0
   signal.mult = nullptr;
@@ -129,6 +152,24 @@ void write_audio_file(
         "Error writing audio file: could not write entire buffer");
   }
 }
+
+std::tuple<int64_t, int64_t, int64_t, int64_t> get_info(
+    const std::string& file_name
+  ) {
+  SoxDescriptor fd(sox_open_read(
+      file_name.c_str(),
+      /*signal=*/nullptr,
+      /*encoding=*/nullptr,
+      /*filetype=*/nullptr));
+  if (fd.get() == nullptr) {
+    throw std::runtime_error("Error opening audio file");
+  }
+  int64_t nchannels = fd->signal.channels;
+  int64_t length = fd->signal.length;
+  int64_t sample_rate = fd->signal.rate;
+  int64_t precision = fd->signal.precision;
+  return std::make_tuple(nchannels, length, sample_rate, precision);
+}
 } // namespace audio
 } // namespace torch
 
@@ -141,4 +182,8 @@ PYBIND11_MODULE(_torch_sox, m) {
       "write_audio_file",
       &torch::audio::write_audio_file,
       "Writes data from a tensor into an audio file");
+  m.def(
+      "get_info",
+      &torch::audio::get_info,
+      "Gets information about an audio file");
 }
