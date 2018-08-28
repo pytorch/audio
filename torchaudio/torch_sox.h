@@ -11,26 +11,53 @@ namespace torch { namespace audio {
 /// Throws `std::runtime_error` if the audio file could not be opened, or an
 /// error ocurred during reading of the audio data.
 int read_audio_file(
-    const std::string& path,
+    const std::string& file_name,
     at::Tensor output,
-    int64_t number_of_samples,
-    int64_t offset);
+    bool ch_first,
+    int64_t nframes,
+    int64_t offset,
+    sox_signalinfo_t* si,
+    sox_encodinginfo_t* ei,
+    const char* ft)
 
 /// Writes the data of a `Tensor` into an audio file at the given `path`, with
 /// a certain extension (e.g. `wav`or `mp3`) and sample rate.
 /// Throws `std::runtime_error` when the audio file could not be opened for
 /// writing, or an error ocurred during writing of the audio data.
 void write_audio_file(
-    const std::string& path,
+    const std::string& file_name,
     at::Tensor tensor,
-    const std::string& extension,
-    int sample_rate,
-    int precision);
+    bool ch_first,
+    sox_signalinfo_t* si,
+    sox_encodinginfo_t* ei,
+    const char* extension)
 
- /// Reads an audio file from the given `path` and returns a tuple of
-/// the number of channels, length in samples, sample rate, and bits / sec.
+/// Reads an audio file from the given `path` and returns a tuple of
+/// sox_signalinfo_t and sox_encodinginfo_t, which contain information about
+/// the audio file such as sample rate, length, bit precision, encoding and more.
 /// Throws `std::runtime_error` if the audio file could not be opened, or an
 /// error ocurred during reading of the audio data.
-std::tuple<int64_t, int64_t, int64_t, int64_t> get_info(
+std::tuple<sox_signalinfo_t, sox_encodinginfo_t> get_info(
     const std::string& file_name);
+
+// get names of all sox effects
+std::vector<std::string> get_effect_names();
+
+// Initialize and Shutdown SoX effects chain.  These functions should only be run once.
+int initialize_sox();
+int shutdown_sox();
+
+/// Build a SoX chain, flow the effects, and capture the results in a tensor.
+/// An audio file from the given `path` flows through an effects chain given
+/// by a list of effects and effect options to an output buffer which is encoded
+/// into memory to a target signal type and target signal encoding.  The resulting
+/// buffer is then placed into a tensor.  This function returns the output tensor
+/// and the sample rate of the output tensor.
+int build_flow_effects(const std::string& file_name,
+                       at::Tensor otensor,
+                       sox_signalinfo_t* target_signal,
+                       sox_encodinginfo_t* target_encoding,
+                       const char* file_type,
+                       std::vector<SoxEffect> pyeffs,
+                       int max_num_eopts);
 }} // namespace torch::audio
