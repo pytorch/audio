@@ -82,11 +82,29 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(sr, 44100)
         self.assertEqual(x.size(), (2, 278756))
 
-        # check normalizing
-        x, sr = torchaudio.load(self.test_filepath, normalization=True)
-        self.assertEqual(x.dtype, torch.float32)
-        self.assertTrue(x.min() >= -1.0)
-        self.assertTrue(x.max() <= 1.0)
+        # check no normalizing
+        x, _ = torchaudio.load(self.test_filepath, normalization=False)
+        self.assertTrue(x.min() <= -1.0)
+        self.assertTrue(x.max() >= 1.0)
+
+        # check offset
+        offset = 15
+        x, _ = torchaudio.load(self.test_filepath)
+        x_offset, _ = torchaudio.load(self.test_filepath, offset=offset)
+        self.assertTrue(x[:,offset:].allclose(x_offset))
+
+        # check number of frames
+        n = 201
+        x, _ = torchaudio.load(self.test_filepath, num_frames=n)
+        self.assertTrue(x.size(), (2, n))
+
+        # check channels first
+        x, _ = torchaudio.load(self.test_filepath, channels_first=False)
+        self.assertEqual(x.size(), (278756, 2))
+
+        # check different input tensor type
+        x, _ = torchaudio.load(self.test_filepath, torch.LongTensor(), normalization=False)
+        self.assertTrue(isinstance(x, torch.LongTensor))
 
         # check raising errors
         with self.assertRaises(OSError):
@@ -108,8 +126,8 @@ class Test_LoadSave(unittest.TestCase):
         os.unlink(output_path)
 
     def test_4_load_partial(self):
-        num_frames = 100
-        offset = 200
+        num_frames = 101
+        offset = 201
         # load entire mono sinewave wav file, load a partial copy and then compare
         input_sine_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
         x_sine_full, sr_sine = torchaudio.load(input_sine_path)

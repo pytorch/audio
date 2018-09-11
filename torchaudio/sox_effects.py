@@ -1,67 +1,37 @@
+from __future__ import division, print_function
 import torch
 import _torch_sox
 
 import torchaudio
 
-EFFECT_NAMES = set(_torch_sox.get_effect_names())
 
-"""
-Notes:
+def effect_names():
+    """Gets list of valid sox effect names
 
-sox_signalinfo_t {
-  sox_rate_t       rate;         /**< samples per second, 0 if unknown */
-  unsigned         channels;     /**< number of sound channels, 0 if unknown */
-  unsigned         precision;    /**< bits per sample, 0 if unknown */
-  sox_uint64_t     length;       /**< samples * chans in file, 0 if unspecified, -1 if unknown */
-  double           * mult;       /**< Effects headroom multiplier; may be null */
-}
+    Returns: list[str]
 
-typedef struct sox_encodinginfo_t {
-  sox_encoding_t encoding; /**< format of sample numbers */
-  unsigned bits_per_sample;  /**< 0 if unknown or variable; uncompressed value if lossless; compressed value if lossy */
-  double compression;      /**< compression factor (where applicable) */
-  sox_option_t reverse_bytes;  /** use sox_option_default */
-  sox_option_t reverse_nibbles;  /** use sox_option_default */
-  sox_option_t reverse_bits;  /** use sox_option_default */
-  sox_bool opposite_endian;  /** use sox_false */
-}
-
-sox_encodings_t = {
-  "SOX_ENCODING_UNKNOWN",
-  "SOX_ENCODING_SIGN2",
-  "SOX_ENCODING_UNSIGNED",
-  "SOX_ENCODING_FLOAT",
-  "SOX_ENCODING_FLOAT_TEXT",
-  "SOX_ENCODING_FLAC",
-  "SOX_ENCODING_HCOM",
-  "SOX_ENCODING_WAVPACK",
-  "SOX_ENCODING_WAVPACKF",
-  "SOX_ENCODING_ULAW",
-  "SOX_ENCODING_ALAW",
-  "SOX_ENCODING_G721",
-  "SOX_ENCODING_G723",
-  "SOX_ENCODING_CL_ADPCM",
-  "SOX_ENCODING_CL_ADPCM16",
-  "SOX_ENCODING_MS_ADPCM",
-  "SOX_ENCODING_IMA_ADPCM",
-  "SOX_ENCODING_OKI_ADPCM",
-  "SOX_ENCODING_DPCM",
-  "SOX_ENCODING_DWVW",
-  "SOX_ENCODING_DWVWN",
-  "SOX_ENCODING_GSM",
-  "SOX_ENCODING_MP3",
-  "SOX_ENCODING_VORBIS",
-  "SOX_ENCODING_AMR_WB",
-  "SOX_ENCODING_AMR_NB",
-  "SOX_ENCODING_CVSD",
-  "SOX_ENCODING_LPC10",
-  "SOX_ENCODING_OPUS",
-  "SOX_ENCODINGS"
-}
-"""
+    Example::
+        >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
+    """
+    return _torch_sox.get_effect_names()
 
 
-class SoxEffects(object):
+def SoxEffect():
+    """Create an object for passing sox effect information between python and c++
+
+    Returns: SoxEffect(object)
+      - ename (str), name of effect
+      - eopts (list[str]), list of effect options
+    """
+    return _torch_sox.SoxEffect()
+
+
+class SoxEffectsChain(object):
+    """SoX effects chain class.
+    """
+
+    EFFECTS_AVAILABLE = set(effect_names())
+    EFFECTS_UNIMPLEMENTED = set(["spectrogram", "splice", "noiseprof", "fir"])
 
     def __init__(self, normalization=True, channels_first=True, out_siginfo=None, out_encinfo=None, filetype="raw"):
         self.input_file = None
@@ -73,15 +43,12 @@ class SoxEffects(object):
         self.normalization = normalization
         self.channels_first = channels_first
 
-    def sox_check_effect(self, e):
-        if e.lower() not in EFFECT_NAMES:
-            raise LookupError("Effect name, {}, not valid".format(e.lower()))
-        return e.lower()
-
-    def sox_append_effect_to_chain(self, ename, eargs=None):
-        e = torchaudio.SoxEffect()
+    def append_effect_to_chain(self, ename, eargs=None):
+        """Append effect to a sox effects chain.
+        """
+        e = SoxEffect()
         # check if we have a valid effect
-        ename = self.sox_check_effect(ename)
+        ename = self._check_effect(ename)
         if eargs is None or eargs == []:
             eargs = [""]
         elif not isinstance(eargs, list):
@@ -96,13 +63,15 @@ class SoxEffects(object):
         self.chain.append(e)
 
     def sox_build_flow_effects(self, out=None):
+        """Build effects chain and flow effects from input file to output tensor
+        """
         # initialize output tensor
         if out is not None:
             torchaudio.check_input(out)
         else:
             out = torch.FloatTensor()
         if not len(self.chain):
-            e = torchaudio.SoxEffect()
+            e = SoxEffect()
             e.ename = "no_effects"
             e.eopts = [""]
             self.chain.append(e)
@@ -122,10 +91,21 @@ class SoxEffects(object):
         return out, sr
 
     def clear_chain(self):
+        """Clear effects chain in python
+        """
         self.chain = []
 
     def set_input_file(self, input_file):
+        """Set input file for input of chain
+        """
         self.input_file = input_file
+
+    def _check_effect(self, e):
+        if e.lower() in self.EFFECTS_UNIMPLEMENTED:
+            raise NotImplementedError("This effect ({}) is not implement in torchaudio".format(e))
+        elif e.lower() not in self.EFFECTS_AVAILABLE:
+            raise LookupError("Effect name, {}, not valid".format(e.lower()))
+        return e.lower()
 
     # https://stackoverflow.com/questions/12472338/flattening-a-list-recursively
     # convenience function to flatten list recursively

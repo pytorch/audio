@@ -16,10 +16,10 @@ class TORCHAUDIODS(Dataset):
         self.data = [os.path.join(self.asset_dirpath, fn) for fn in os.listdir(self.asset_dirpath)]
         self.si, self.ei = torchaudio.info(os.path.join(self.asset_dirpath, "sinewave.wav"))
         self.si.precision = 16
-        self.E = torchaudio.sox_effects.SoxEffects()
-        self.E.sox_append_effect_to_chain("rate", [self.si.rate])  # resample to 16000hz
-        self.E.sox_append_effect_to_chain("channels", [self.si.channels])  # mono singal
-        self.E.sox_append_effect_to_chain("trim", [0, 1])  # first sec of audio
+        self.E = torchaudio.sox_effects.SoxEffectsChain()
+        self.E.append_effect_to_chain("rate", [self.si.rate])  # resample to 16000hz
+        self.E.append_effect_to_chain("channels", [self.si.channels])  # mono singal
+        self.E.append_effect_to_chain("trim", [0, "16000s"])  # first 16000 samples of audio
 
     def __getitem__(self, index):
         fn = self.data[index]

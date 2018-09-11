@@ -128,12 +128,12 @@ class YESNO(data.Dataset):
             full_path = os.path.join(dset_abs_path, f)
             sig, sr = torchaudio.load(full_path)
             tensors.append(sig)
-            lengths.append(sig.size(0))
+            lengths.append(sig.size(1))
             labels.append(os.path.basename(f).split(".", 1)[0].split("_"))
         # sort sigs/labels: longest -> shortest
         tensors, labels = zip(*[(b, c) for (a, b, c) in sorted(
             zip(lengths, tensors, labels), key=lambda x: x[0], reverse=True)])
-        self.max_len = tensors[0].size(0)
+        self.max_len = tensors[0].size(1)
         torch.save(
             (tensors, labels),
             os.path.join(
