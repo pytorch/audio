@@ -35,13 +35,18 @@ def make_manifest(dir):
 
 
 def read_audio(fp, downsample=True):
-    sig, sr = torchaudio.load(fp)
     if downsample:
-        # 48khz -> 16 khz
-        if sig.size(0) % 3 == 0:
-            sig = sig[::3].contiguous()
-        else:
-            sig = sig[:-(sig.size(0) % 3):3].contiguous()
+        E = torchaudio.sox_effects.SoxEffects()
+        E.set_input_file(fp)
+        E.sox_append_effect_to_chain("gain", ["-h"])
+        E.sox_append_effect_to_chain("channels", [1])
+        E.sox_append_effect_to_chain("rate", [16000])
+        E.sox_append_effect_to_chain("gain", ["-rh"])
+        E.sox_append_effect_to_chain("dither", ["-s"])
+        sig, sr = E.sox_build_flow_effects()
+    else:
+        sig, sr = torchaudio.load(fp)
+    sig = sig.contiguous()
     return sig, sr
 
 
@@ -168,8 +173,8 @@ class VCTK(data.Dataset):
 
         # download files
         try:
-            os.makedirs(os.path.join(self.root, self.raw_folder))
             os.makedirs(os.path.join(self.root, self.processed_folder))
+            os.makedirs(os.path.join(self.root, self.raw_folder))
         except OSError as e:
             if e.errno == errno.EEXIST:
                 pass
@@ -191,6 +196,7 @@ class VCTK(data.Dataset):
             os.unlink(file_path)
 
         # process and save as torch files
+        torchaudio.initialize_sox()
         print('Processing...')
         shutil.copyfile(
             os.path.join(dset_abs_path, "COPYING"),
@@ -213,10 +219,10 @@ class VCTK(data.Dataset):
                     f_rel_no_ext = os.path.basename(f).rsplit(".", 1)[0]
                     sig = read_audio(f, downsample=self.downsample)[0]
                     tensors.append(sig)
-                    lengths.append(sig.size(0))
+                    lengths.append(sig.size(1))
                     labels.append(utterences[f_rel_no_ext])
-                    self.max_len = sig.size(0) if sig.size(
-                        0) > self.max_len else self.max_len
+                    self.max_len = sig.size(1) if sig.size(
+                        1) > self.max_len else self.max_len
             # sort sigs/labels: longest -> shortest
             tensors, labels = zip(*[(b, c) for (a, b, c) in sorted(
                 zip(lengths, tensors, labels), key=lambda x: x[0], reverse=True)])
@@ -232,5 +238,5 @@ class VCTK(data.Dataset):
         self._write_info((n * self.chunk_size) + i + 1)
         if not self.dev_mode:
             shutil.rmtree(raw_abs_dir, ignore_errors=True)
-
+        torchaudio.shutdown_sox()
         print('Done!')

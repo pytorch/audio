@@ -1,15 +1,16 @@
+from __future__ import division, print_function
 import os.path
 
 import torch
 import _torch_sox
 
-from torchaudio import save as save_new, load as load_new
+import torchaudio
 
 
-def load(filepath, out=None, normalization=None, num_frames=-1, offset=0):
+def load(filepath, out=None, normalization=None, num_frames=0, offset=0):
     """Loads an audio file from disk into a Tensor.  The default options have
-       changed as of torchaudio 0.2 and this function maintains option defaults
-       from version 0.1.
+    changed as of torchaudio 0.2 and this function maintains option defaults
+    from version 0.1.
 
     Args:
         filepath (string): path to audio file
@@ -26,20 +27,20 @@ def load(filepath, out=None, normalization=None, num_frames=-1, offset=0):
 
     Example::
 
-        >>> data, sample_rate = torchaudio.load('foo.mp3')
+        >>> data, sample_rate = torchaudio.legacy.load('foo.mp3')
         >>> print(data.size())
         torch.Size([278756, 2])
         >>> print(sample_rate)
         44100
 
     """
-    return load_new(filepath, out, normalization, False, num_frames, offset)
+    return torchaudio.load(filepath, out, normalization, False, num_frames, offset)
 
 
 def save(filepath, src, sample_rate, precision=32):
     """Saves a Tensor with audio signal to disk as a standard format like mp3, wav, etc.
-       The default options have changed as of torchaudio 0.2 and this function maintains
-       option defaults from version 0.1.
+    The default options have changed as of torchaudio 0.2 and this function maintains
+    option defaults from version 0.1.
 
     Args:
         filepath (string): path to audio file
@@ -50,8 +51,8 @@ def save(filepath, src, sample_rate, precision=32):
 
     Example::
 
-        >>> data, sample_rate = torchaudio.load('foo.mp3')
-        >>> torchaudio.save('foo.wav', data, sample_rate)
+        >>> data, sample_rate = torchaudio.legacy.load('foo.mp3')
+        >>> torchaudio.legacy.save('foo.wav', data, sample_rate)
 
     """
-    save_new(filepath, src, sample_rate, precision, False)
+    torchaudio.save(filepath, src, sample_rate, precision, False)

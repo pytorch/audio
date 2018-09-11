@@ -109,18 +109,21 @@ int read_audio_file(
     sox_encodinginfo_t* ei,
     const char* ft) {
 
-  SoxDescriptor fd(sox_open_read(
-      file_name.c_str(),
-      /*signal=*/si,
-      /*encoding=*/ei,
-      /*filetype=*/ft));
+  SoxDescriptor fd(sox_open_read(file_name.c_str(), si, ei, ft));
   if (fd.get() == nullptr) {
     throw std::runtime_error("Error opening audio file");
   }
 
+  // signal info
+
   const int number_of_channels = fd->signal.channels;
   const int sample_rate = fd->signal.rate;
   const int64_t total_length = fd->signal.length;
+
+  // multiply offset and number of frames by number of channels
+  offset *= number_of_channels;
+  nframes *= number_of_channels;
+
   if (total_length == 0) {
     throw std::runtime_error("Error reading audio file: unknown length");
   }
@@ -133,13 +136,9 @@ int read_audio_file(
   if (offset > 0) {
       buffer_length -= offset;
   }
-  if (nframes != -1 && buffer_length > nframes) {
+  if (nframes > 0 && buffer_length > nframes) {
       buffer_length = nframes;
   }
-
-  // buffer length and offset need to be multipled by the number of channels
-  buffer_length *= number_of_channels;
-  offset *= number_of_channels;
 
   // seek to offset point before reading data
   if (sox_seek(fd.get(), offset, 0) == SOX_EOF) {
@@ -149,6 +148,7 @@ int read_audio_file(
   // read data and fill output tensor
   read_audio(fd, output, buffer_length);
 
+  // L x C -> C x L, if desired
   if (ch_first) {
     output.transpose_(1, 0);
   }
@@ -167,7 +167,6 @@ void write_audio_file(
         "Error writing audio file: input tensor must be contiguous");
   }
 
-// remove ?
 #if SOX_LIB_VERSION_CODE >= 918272 // >= 14.3.0
   si->mult = nullptr;
 #endif
@@ -248,20 +247,12 @@ int build_flow_effects(const std::string& file_name,
     target_encoding->opposite_endian = sox_false; // Reverse endianness
   }
 
-  // set target precision / bits_per_sample if it's still 0
-  //if (target_signal->precision == 0)
-  //  target_signal->precision = input->signal.precision;
-  //if (target_encoding->bits_per_sample == 0)
-  //  target_encoding->bits_per_sample = input->signal.precision;
-
   // check for rate or channels effect and change the output signalinfo accordingly
   for (SoxEffect se : pyeffs) {
     if (se.ename == "rate") {
       target_signal->rate = std::stod(se.eopts[0]);
-      //se.eopts[0] = "";
     } else if (se.ename == "channels") {
       target_signal->channels = std::stoi(se.eopts[0]);
-      //se.eopts[0] = "";
     }
   }
 
@@ -271,7 +262,6 @@ int build_flow_effects(const std::string& file_name,
   // create buffer and buffer_size for output in memwrite
   char* buffer;
   size_t buffer_size;
-  //const char* otype = (file_type.empty()) ? (const char*) "raw" : file_type.c_str();
 #ifdef __APPLE__
   // According to Mozilla Deepspeech sox_open_memstream_write doesn't work
   // with OSX
@@ -287,7 +277,9 @@ int build_flow_effects(const std::string& file_name,
                                                   target_encoding,
                                                   file_type, nullptr);
 #endif
-  assert(output);
+  if (output == nullptr) {
+    throw std::runtime_error("Error opening output memstream/temporary file");
+  }
   // Setup the effects chain to decode/resample
   sox_effects_chain_t* chain =
     sox_create_effects_chain(&input->encoding, &output->encoding);
@@ -307,11 +299,12 @@ int build_flow_effects(const std::string& file_name,
     } else {
       int num_opts = tae.eopts.size();
       char* sox_args[max_num_eopts];
-      //for(std::string s : tae.eopts) {
       for(std::vector<std::string>::size_type i = 0; i != tae.eopts.size(); i++) {
         sox_args[i] = (char*) tae.eopts[i].c_str();
       }
-      sox_effect_options(e, num_opts, sox_args);
+      if(sox_effect_options(e, num_opts, sox_args) != SOX_SUCCESS) {
+        throw std::runtime_error("invalid effect options, see SoX docs for details");
+      }
     }
     sox_add_effect(chain, e, &interm_signal, &input->signal);
     free(e);
@@ -331,9 +324,21 @@ int build_flow_effects(const std::string& file_name,
   sox_close(output);
   sox_close(input);
 
-  // Resize output tensor to desired dimensions
-  int nc = interm_signal.channels;
-  int ns = interm_signal.length;
+  // Resize output tensor to desired dimensions, different effects result in output->signal.length,
+  // interm_signal.length and buffer size being inconsistent with the result of the file output.
+  // We prioritize in the order: output->signal.length > interm_signal.length > buffer_size
+  int nc, ns;
+  if (output->signal.length == 0) {
+    if (interm_signal.length > (buffer_size * 10)) {
+      ns = buffer_size / 2;
+    } else {
+      ns = interm_signal.length;
+    }
+    nc = interm_signal.channels;
+  } else {
+    nc = output->signal.channels;
+    ns = output->signal.length;
+  }
   otensor.resize_({ns/nc, nc});
   otensor = otensor.contiguous();
 

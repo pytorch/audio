@@ -27,7 +27,6 @@ int read_audio_file(
 void write_audio_file(
     const std::string& file_name,
     at::Tensor tensor,
-    bool ch_first,
     sox_signalinfo_t* si,
     sox_encodinginfo_t* ei,
     const char* extension)
@@ -55,6 +54,7 @@ int shutdown_sox();
 /// and the sample rate of the output tensor.
 int build_flow_effects(const std::string& file_name,
                        at::Tensor otensor,
+                       bool ch_first,
                        sox_signalinfo_t* target_signal,
                        sox_encodinginfo_t* target_encoding,
                        const char* file_type,
