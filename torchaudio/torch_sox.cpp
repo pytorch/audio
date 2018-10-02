@@ -259,17 +259,18 @@ int build_flow_effects(const std::string& file_name,
   // create interm_signal for effects, intermediate steps change this in-place
   sox_signalinfo_t interm_signal = input->signal;
 
-  // create buffer and buffer_size for output in memwrite
-  char* buffer;
-  size_t buffer_size;
 #ifdef __APPLE__
   // According to Mozilla Deepspeech sox_open_memstream_write doesn't work
   // with OSX
-  char* tmp_name = tmpnam(NULL);
-  assert(tmp_name);
-  sox_format_t* output = sox_open_write(tmp_name, &target_signal,
-                                        &target_encoding, file_type, nullptr, nullptr);
+  char tmp_name[] = "/tmp/fileXXXXXX";
+  int tmp_fd = mkstemp(tmp_name);
+  close(tmp_fd);
+  sox_format_t* output = sox_open_write(tmp_name, target_signal,
+                                        target_encoding, file_type, nullptr, nullptr);
 #else
+  // create buffer and buffer_size for output in memwrite
+  char* buffer;
+  size_t buffer_size;
   // in-memory descriptor (this may not work for OSX)
   sox_format_t* output = sox_open_memstream_write(&buffer,
                                                   &buffer_size,
@@ -303,10 +304,13 @@ int build_flow_effects(const std::string& file_name,
         sox_args[i] = (char*) tae.eopts[i].c_str();
       }
       if(sox_effect_options(e, num_opts, sox_args) != SOX_SUCCESS) {
+#ifdef __APPLE__
+        unlink(tmp_name);
+#endif
         throw std::runtime_error("invalid effect options, see SoX docs for details");
       }
     }
-    sox_add_effect(chain, e, &interm_signal, &input->signal);
+    sox_add_effect(chain, e, &interm_signal, &output->signal);
     free(e);
   }
 
@@ -324,6 +328,24 @@ int build_flow_effects(const std::string& file_name,
   sox_close(output);
   sox_close(input);
 
+  int sr;
+  // Read the in-memory audio buffer or temp file that we just wrote.
+#ifdef __APPLE__
+  if (target_signal->length > 0) {
+    if (target_signal->channels != output->signal.channels) {
+      //std::cout << "output: " << output->signal.channels << "|" << output->signal.length << "\n";
+      //std::cout << "target: " << target_signal->channels << "|" << target_signal->length << "\n";
+      unlink(tmp_name);
+      throw std::runtime_error("unexpected number of audio channels");
+    }
+    sr = read_audio_file(tmp_name, otensor, ch_first, 0, 0,
+                         &output->signal, &output->encoding, file_type);
+  } else {
+    sr = read_audio_file(tmp_name, otensor, ch_first, 0, 0,
+                         target_signal, target_encoding, file_type);
+  }
+  unlink(tmp_name);
+#else
   // Resize output tensor to desired dimensions, different effects result in output->signal.length,
   // interm_signal.length and buffer size being inconsistent with the result of the file output.
   // We prioritize in the order: output->signal.length > interm_signal.length > buffer_size
@@ -341,14 +363,7 @@ int build_flow_effects(const std::string& file_name,
   }
   otensor.resize_({ns/nc, nc});
   otensor = otensor.contiguous();
-
-  // Read the in-memory audio buffer or temp file that we just wrote.
-#ifdef __APPLE__
-  buffer_size = (size_t) ns * 2;  // sizeof(char)? dependent on bit precision?
-  input = sox_open_read(tmp_name, target_signal, target_encoding, file_type);
-#else
   input = sox_open_mem_read(buffer, buffer_size, target_signal, target_encoding, file_type);
-#endif
   std::vector<sox_sample_t> samples(buffer_size);
   const int64_t samples_read = sox_read(input, samples.data(), buffer_size);
   // buffer size is twice signal length, but half the buffer is empty so correct
@@ -358,19 +373,17 @@ int build_flow_effects(const std::string& file_name,
     auto* data = otensor.data<scalar_t>();
     std::copy(samples.begin(), samples.begin() + samples_read, data);
   });
-
-  // free buffer and quit sox
   sox_close(input);
-#ifdef __APPLE__
-  unlink(tmp_name)
-#endif
-  free(buffer);
-
   if (ch_first) {
     otensor.transpose_(1, 0);
   }
+  sr = target_signal->rate;
 
-  return (int) target_signal->rate;
+  // free buffer
+  free(buffer);
+#endif
+
+  return sr;
 }
 } // namespace audio
 } // namespace torch

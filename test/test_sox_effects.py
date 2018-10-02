@@ -46,35 +46,35 @@ class Test_SoxEffectsChain(unittest.TestCase):
     def test_ulaw_and_siginfo(self):
         si_out = torchaudio.sox_signalinfo_t()
         ei_out = torchaudio.sox_encodinginfo_t()
-        si_out.rate = 16000
-        si_out.channels = 1
         si_out.precision = 8
         ei_out.encoding = torchaudio.get_sox_encoding_t(9)
         ei_out.bits_per_sample = 8
         si_in, ei_in = torchaudio.info(self.test_filepath)
+        si_out.rate = 44100
+        si_out.channels = 2
         E = torchaudio.sox_effects.SoxEffectsChain(out_siginfo=si_out, out_encinfo=ei_out)
         E.set_input_file(self.test_filepath)
         x, sr = E.sox_build_flow_effects()
-        # Note: the sample rate is reported as "changed", but no downsampling occured
-        #       also the number of channels has not changed.  Run rate and channels effects
-        #       to make those changes.  However, the output was encoded into ulaw because the
+        # Note: the output was encoded into ulaw because the
         #       number of unique values in the output is less than 256.
         self.assertLess(x.unique().size(0), 2**8)
-        self.assertEqual(x.size(0), si_in.channels)
-        self.assertEqual(sr, si_out.rate)
         self.assertEqual(x.numel(), si_in.length)
 
     def test_band_chorus(self):
         si_in, ei_in = torchaudio.info(self.test_filepath)
+        ei_in.encoding = torchaudio.get_sox_encoding_t(1)
         E = torchaudio.sox_effects.SoxEffectsChain(out_encinfo=ei_in, out_siginfo=si_in)
         E.set_input_file(self.test_filepath)
         E.append_effect_to_chain("band", ["-n", "10k", "3.5k"])
         E.append_effect_to_chain("chorus", [.5, .7, 55, 0.4, .25, 2, '-s'])
+        E.append_effect_to_chain("rate", [si_in.rate])
+        E.append_effect_to_chain("channels", [si_in.channels])
         x, sr = E.sox_build_flow_effects()
         #print(x.size(), sr)
 
     def test_synth(self):
         si_in, ei_in = torchaudio.info(self.test_filepath)
+        ei_in.encoding = torchaudio.get_sox_encoding_t(1)
         E = torchaudio.sox_effects.SoxEffectsChain(out_encinfo=ei_in, out_siginfo=si_in)
         E.set_input_file(self.test_filepath)
         E.append_effect_to_chain("synth", ["1", "pinknoise", "mix"])
