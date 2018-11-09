@@ -118,20 +118,23 @@ class VCTK(data.Dataset):
         Returns:
             tuple: (image, target) where target is index of the target class.
         """
-        if self.cached_pt != index // self.chunk_size:
-            self.cached_pt = int(index // self.chunk_size)
-            self.data, self.labels = torch.load(os.path.join(
-                self.root, self.processed_folder, "vctk_{:04d}.pt".format(self.cached_pt)))
-        index = index % self.chunk_size
-        audio, target = self.data[index], self.labels[index]
+        try :
+            if self.cached_pt != index // self.chunk_size:
+                self.cached_pt = int(index // self.chunk_size)
+                self.data, self.labels = torch.load(os.path.join(
+                    self.root, self.processed_folder, "vctk_{:04d}.pt".format(self.cached_pt)))
+            index = index % self.chunk_size
+            audio, target = self.data[index], self.labels[index]
 
-        if self.transform is not None:
-            audio = self.transform(audio)
+            if self.transform is not None:
+                audio = self.transform(audio)
 
-        if self.target_transform is not None:
-            target = self.target_transform(target)
+            if self.target_transform is not None:
+                target = self.target_transform(target)
 
-        return audio, target
+            return audio, target
+        except IndexError :
+            return self.__getitem__()
 
     def __len__(self):
         return self.num_samples
