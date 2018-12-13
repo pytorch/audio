@@ -1,4 +1,4 @@
-#include <torch/torch.h>
+#include <torch/extension.h>
 
 #include <sox.h>
 
@@ -266,7 +266,7 @@ int build_flow_effects(const std::string& file_name,
   int tmp_fd = mkstemp(tmp_name);
   close(tmp_fd);
   sox_format_t* output = sox_open_write(tmp_name, target_signal,
-                                        target_encoding, file_type, nullptr, nullptr);
+                                        target_encoding, "wav", nullptr, nullptr);
 #else
   // create buffer and buffer_size for output in memwrite
   char* buffer;
@@ -331,24 +331,27 @@ int build_flow_effects(const std::string& file_name,
   int sr;
   // Read the in-memory audio buffer or temp file that we just wrote.
 #ifdef __APPLE__
+  /*  certain effects will result in a target signal length of 0.
   if (target_signal->length > 0) {
     if (target_signal->channels != output->signal.channels) {
-      //std::cout << "output: " << output->signal.channels << "|" << output->signal.length << "\n";
-      //std::cout << "target: " << target_signal->channels << "|" << target_signal->length << "\n";
+      std::cout << "output: " << output->signal.channels << "|" << output->signal.length << "\n";
+      std::cout << "interm: " << interm_signal.channels << "|" << interm_signal.length << "\n";
+      std::cout << "target: " << target_signal->channels << "|" << target_signal->length << "\n";
       unlink(tmp_name);
       throw std::runtime_error("unexpected number of audio channels");
     }
-    sr = read_audio_file(tmp_name, otensor, ch_first, 0, 0,
-                         &output->signal, &output->encoding, file_type);
-  } else {
-    sr = read_audio_file(tmp_name, otensor, ch_first, 0, 0,
-                         target_signal, target_encoding, file_type);
   }
+  */
+  // read_audio_file reads the temporary file and returns the sr and otensor
+  sr = read_audio_file(tmp_name, otensor, ch_first, 0, 0,
+                       target_signal, target_encoding, "wav");
+  // delete temporary audio file
   unlink(tmp_name);
 #else
   // Resize output tensor to desired dimensions, different effects result in output->signal.length,
   // interm_signal.length and buffer size being inconsistent with the result of the file output.
   // We prioritize in the order: output->signal.length > interm_signal.length > buffer_size
+  // Could be related to: https://sourceforge.net/p/sox/bugs/314/
   int nc, ns;
   if (output->signal.length == 0) {
     if (interm_signal.length > (buffer_size * 10)) {
@@ -382,7 +385,7 @@ int build_flow_effects(const std::string& file_name,
   // free buffer
   free(buffer);
 #endif
-
+  // return sample rate, output tensor modified in-place
   return sr;
 }
 } // namespace audio
