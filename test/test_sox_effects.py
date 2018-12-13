@@ -71,7 +71,8 @@ class Test_SoxEffectsChain(unittest.TestCase):
         E.append_effect_to_chain("channels", [si_in.channels])
         x, sr = E.sox_build_flow_effects()
         # The chorus effect will make the output file longer than the input
-        self.assertGreater(x.size(1) * x.size(0), si_in.length)
+        self.assertEqual(x.size(0), si_in.channels)
+        self.assertGreaterEqual(x.size(1) * x.size(0), si_in.length)
 
     def test_synth(self):
         si_in, ei_in = torchaudio.info(self.test_filepath)
@@ -83,6 +84,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
         E.append_effect_to_chain("rate", [44100])
         E.append_effect_to_chain("channels", [2])
         x, sr = E.sox_build_flow_effects()
+        self.assertEqual(x.size(0), si_in.channels)
         self.assertEqual(si_in.length, x.size(0) * x.size(1))
 
     def test_gain(self):
