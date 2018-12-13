@@ -70,18 +70,20 @@ class Test_SoxEffectsChain(unittest.TestCase):
         E.append_effect_to_chain("rate", [si_in.rate])
         E.append_effect_to_chain("channels", [si_in.channels])
         x, sr = E.sox_build_flow_effects()
-        #print(x.size(), sr)
+        # The chorus effect will make the output file longer than the input
+        self.assertGreater(x.size(1) * x.size(0), si_in.length)
 
     def test_synth(self):
         si_in, ei_in = torchaudio.info(self.test_filepath)
+        len_in_seconds = si_in.length / si_in.channels / si_in.rate
         ei_in.encoding = torchaudio.get_sox_encoding_t(1)
         E = torchaudio.sox_effects.SoxEffectsChain(out_encinfo=ei_in, out_siginfo=si_in)
         E.set_input_file(self.test_filepath)
-        E.append_effect_to_chain("synth", ["1", "pinknoise", "mix"])
+        E.append_effect_to_chain("synth", [str(len_in_seconds), "pinknoise", "mix"])
         E.append_effect_to_chain("rate", [44100])
         E.append_effect_to_chain("channels", [2])
         x, sr = E.sox_build_flow_effects()
-        #print(x.size(), sr)
+        self.assertEqual(si_in.length, x.size(0) * x.size(1))
 
     def test_gain(self):
         E = torchaudio.sox_effects.SoxEffectsChain()
@@ -120,7 +122,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
         x_orig, _ = torchaudio.load(self.test_filepath)
         offset = "10000s"
         offset_int = int(offset[:-1])
-        num_frames = "200s"
+        num_frames = "20000s"
         num_frames_int = int(num_frames[:-1])
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(self.test_filepath)
