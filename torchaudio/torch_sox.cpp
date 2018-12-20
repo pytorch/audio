@@ -295,6 +295,7 @@ int build_flow_effects(const std::string& file_name,
   for(SoxEffect tae : pyeffs) {
     if(tae.ename == "no_effects") break;
     e = sox_create_effect(sox_find_effect(tae.ename.c_str()));
+    e->global_info->global_info->verbosity = 1;
     if(tae.eopts[0] == "") {
       sox_effect_options(e, 0, nullptr);
     } else {
@@ -354,6 +355,8 @@ int build_flow_effects(const std::string& file_name,
   // Could be related to: https://sourceforge.net/p/sox/bugs/314/
   int nc, ns;
   if (output->signal.length == 0) {
+    // sometimes interm_signal length is extremely large, but the buffer_size
+    // is double the length of the output signal
     if (interm_signal.length > (buffer_size * 10)) {
       ns = buffer_size / 2;
     } else {
@@ -366,24 +369,24 @@ int build_flow_effects(const std::string& file_name,
   }
   otensor.resize_({ns/nc, nc});
   otensor = otensor.contiguous();
+
   input = sox_open_mem_read(buffer, buffer_size, target_signal, target_encoding, file_type);
   std::vector<sox_sample_t> samples(buffer_size);
   const int64_t samples_read = sox_read(input, samples.data(), buffer_size);
-  // buffer size is twice signal length, but half the buffer is empty so correct
-  // number of samples should be read
   assert(samples_read != nc * ns && samples_read != 0);
   AT_DISPATCH_ALL_TYPES(otensor.type(), "effects_buffer", [&] {
     auto* data = otensor.data<scalar_t>();
     std::copy(samples.begin(), samples.begin() + samples_read, data);
   });
+  // free buffer and close mem_read
   sox_close(input);
+  free(buffer);
+
   if (ch_first) {
     otensor.transpose_(1, 0);
   }
   sr = target_signal->rate;
 
-  // free buffer
-  free(buffer);
 #endif
   // return sample rate, output tensor modified in-place
   return sr;
