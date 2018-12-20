@@ -57,7 +57,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
         x, sr = E.sox_build_flow_effects()
         # Note: the output was encoded into ulaw because the
         #       number of unique values in the output is less than 256.
-        self.assertLess(x.unique().size(0), 2**8)
+        self.assertLess(x.unique().size(0), 2**8 + 1)
         self.assertEqual(x.numel(), si_in.length)
 
     def test_band_chorus(self):
@@ -110,7 +110,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
         E.clear_chain()
         self.assertLess(x.abs().max().item(), 1.)
 
-    def test_tempo(self):
+    def test_tempo_or_speed(self):
         tempo = .8
         si, _ = torchaudio.info(self.test_filepath)
         E = torchaudio.sox_effects.SoxEffectsChain()
@@ -118,7 +118,30 @@ class Test_SoxEffectsChain(unittest.TestCase):
         E.append_effect_to_chain("tempo", ["-s", tempo])
         x, sr = E.sox_build_flow_effects()
         # check if effect worked
-        self.assertEqual(x.size(1), int((si.length / si.channels) / tempo))
+        self.assertAlmostEqual(x.size(1), math.ceil((si.length / si.channels) / tempo), delta=1)
+        # tempo > 1
+        E.clear_chain()
+        tempo = 1.2
+        E.append_effect_to_chain("tempo", ["-s", tempo])
+        x, sr = E.sox_build_flow_effects()
+        # check if effect worked
+        self.assertAlmostEqual(x.size(1), math.ceil((si.length / si.channels) / tempo), delta=1)
+        # tempo > 1
+        E.clear_chain()
+        speed = 1.2
+        E.append_effect_to_chain("speed", [speed])
+        E.append_effect_to_chain("rate", [si.rate])
+        x, sr = E.sox_build_flow_effects()
+        # check if effect worked
+        self.assertAlmostEqual(x.size(1), math.ceil((si.length / si.channels) / speed), delta=1)
+        # speed < 1
+        E.clear_chain()
+        speed = 0.8
+        E.append_effect_to_chain("speed", [speed])
+        E.append_effect_to_chain("rate", [si.rate])
+        x, sr = E.sox_build_flow_effects()
+        # check if effect worked
+        self.assertAlmostEqual(x.size(1), math.ceil((si.length / si.channels) / speed), delta=1)
 
     def test_trim(self):
         x_orig, _ = torchaudio.load(self.test_filepath)
