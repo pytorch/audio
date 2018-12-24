@@ -28,6 +28,48 @@ def SoxEffect():
 
 class SoxEffectsChain(object):
     """SoX effects chain class.
+
+    Args:
+        normalization (bool, number, or callable, optional): If boolean `True`, then output is divided by `1 << 31`
+                                                             (assumes signed 32-bit audio), and normalizes to `[0, 1]`.
+                                                             If `number`, then output is divided by that number
+                                                             If `callable`, then the output is passed as a parameter
+                                                             to the given function, then the output is divided by
+                                                             the result.
+        channels_first (bool, optional): Set channels first or length first in result.  Default: ``True``
+        out_siginfo (sox_signalinfo_t, optional): a sox_signalinfo_t type, which could be helpful if the
+                                                  audio type cannot be automatically determined
+        out_encinfo (sox_encodinginfo_t, optional): a sox_encodinginfo_t type, which could be set if the
+                                                    audio type cannot be automatically determined
+        filetype (str, optional): a filetype or extension to be set if sox cannot determine it automatically
+
+    Returns: tuple(Tensor, int)
+       - Tensor: output Tensor of size `[C x L]` or `[L x C]` where L is the number of audio frames, C is the number of channels
+       - int: the sample rate of the audio (as listed in the metadata of the file)
+
+    Example::
+
+        class MyDataset(Dataset):
+            def __init__(self, audiodir_path):
+                self.data = [fn for fn in os.listdir(audiodir_path)]
+                self.E = torchaudio.sox_effects.SoxEffectsChain()
+                self.E.append_effect_to_chain("rate", [16000])  # resample to 16000hz
+                self.E.append_effect_to_chain("channels", ["1"])  # mono signal
+            def __getitem__(self, index):
+                fn = self.data[index]
+                self.E.set_input_file(fn)
+                x, sr = self.E.sox_build_flow_effects()
+                return x, sr
+
+            def __len__(self):
+                return len(self.data)
+
+        >>> torchaudio.initialize_sox()
+        >>> ds = MyDataset(path_to_audio_files)
+        >>> for sig, sr in ds:
+        >>>   [do something here]
+        >>> torchaudio.shutdown_sox()
+
     """
 
     EFFECTS_AVAILABLE = set(effect_names())

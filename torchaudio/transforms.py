@@ -20,12 +20,6 @@ def _check_is_variable(tensor):
     return tensor, is_variable
 
 
-def _tlog10(x):
-    """Pytorch Log10
-    """
-    return torch.log(x) / torch.log(x.new([10]))
-
-
 class Compose(object):
     """Composes several transforms together.
 
@@ -92,29 +86,35 @@ class PadTrim(object):
     """Pad/Trim a 1d-Tensor (Signal or Labels)
 
     Args:
-        tensor (Tensor): Tensor of audio of size (Samples x Channels)
+        tensor (Tensor): Tensor of audio of size (n x c) or (c x n)
         max_len (int): Length to which the tensor will be padded
+        channels_first (bool): Pad for channels first tensors.  Default: `True`
 
     """
 
-    def __init__(self, max_len, fill_value=0):
+    def __init__(self, max_len, fill_value=0, channels_first=True):
         self.max_len = max_len
         self.fill_value = fill_value
+        self.len_dim, self.ch_dim = int(channels_first), int(not channels_first)
 
     def __call__(self, tensor):
         """
 
         Returns:
-            Tensor: (max_len x Channels)
+            Tensor: (c x Ln or (n x c)
 
         """
-        if self.max_len > tensor.size(0):
-            pad = torch.ones((self.max_len - tensor.size(0),
-                              tensor.size(1))) * self.fill_value
-            pad = pad.type_as(tensor)
-            tensor = torch.cat((tensor, pad), dim=0)
-        elif self.max_len < tensor.size(0):
-            tensor = tensor[:self.max_len, :]
+        assert tensor.size(self.ch_dim) < 128, \
+               "Too many channels ({}) detected, look at channels_first param.".format(tensor.size(self.ch_dim))
+        if self.max_len > tensor.size(self.len_dim):
+
+            padding_size = [self.max_len - tensor.size(self.len_dim) if i == self.len_dim
+                            else tensor.size(self.ch_dim)
+                            for i in range(2)]
+            pad = torch.empty(padding_size, dtype=tensor.dtype).fill_(self.fill_value)
+            tensor = torch.cat((tensor, pad), dim=self.len_dim)
+        elif self.max_len < tensor.size(self.len_dim):
+            tensor = tensor.narrow(self.len_dim, 0, self.max_len)
         return tensor
 
     def __repr__(self):
@@ -122,25 +122,26 @@ class PadTrim(object):
 
 
 class DownmixMono(object):
-    """Downmix any stereo signals to mono
+    """Downmix any stereo signals to mono.  Consider using a `SoxEffectsChain` with
+       the `channels` effect instead of this transformation.
 
     Inputs:
-        tensor (Tensor): Tensor of audio of size (Samples x Channels)
+        tensor (Tensor): Tensor of audio of size (c x n) or (n x c)
+        channels_first (bool): Downmix across channels dimension.  Default: `True`
 
     Returns:
         tensor (Tensor) (Samples x 1):
 
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, channels_first=None):
+        self.ch_dim = int(not channels_first)
 
     def __call__(self, tensor):
         if isinstance(tensor, (torch.LongTensor, torch.IntTensor)):
             tensor = tensor.float()
 
-        if tensor.size(1) > 1:
-            tensor = torch.mean(tensor.float(), 1, True)
+        tensor = torch.mean(tensor, self.ch_dim, True)
         return tensor
 
     def __repr__(self):
@@ -148,8 +149,7 @@ class DownmixMono(object):
 
 
 class LC2CL(object):
-    """Permute a 2d tensor from samples (Length) x Channels to Channels x
-       samples (Length)
+    """Permute a 2d tensor from samples (n x c) to (c x n)
     """
 
     def __call__(self, tensor):
@@ -162,7 +162,6 @@ class LC2CL(object):
             tensor (Tensor): Tensor of audio signal with shape (CxL)
 
         """
-
         return tensor.transpose(0, 1).contiguous()
 
     def __repr__(self):
@@ -292,7 +291,7 @@ class SPEC2DB(object):
     def __call__(self, spec):
 
         spec, is_variable = _check_is_variable(spec)
-        spec_db = self.multiplier * _tlog10(spec / spec.max())  # power -> dB
+        spec_db = self.multiplier * torch.log10(spec / spec.max())  # power -> dB
         if self.top_db is not None:
             spec_db = torch.max(spec_db, spec_db.new([self.top_db]))
         return spec_db if is_variable else spec_db.data
@@ -320,7 +319,6 @@ class MEL2(object):
 
     Example:
         >>> sig, sr = torchaudio.load("test.wav", normalization=True)
-        >>> sig = transforms.LC2CL()(sig)  # (n, c) -> (c, n)
         >>> spec_mel = transforms.MEL2(sr)(sig)  # (c, l, m)
     """
     def __init__(self, sr=16000, ws=400, hop=None, n_fft=None,
@@ -406,8 +404,8 @@ class MEL(object):
 
 
 class BLC2CBL(object):
-    """Permute a 3d tensor from Bands x samples (Length) x Channels to Channels x
-       Bands x samples (Length)
+    """Permute a 3d tensor from Bands x Sample length x Channels to Channels x
+       Bands x Samples length
     """
 
     def __call__(self, tensor):
