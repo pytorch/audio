@@ -20,15 +20,13 @@ class Tester(unittest.TestCase):
 
         audio_orig = self.sig.clone()
         result = transforms.Scale()(audio_orig)
-        self.assertTrue(result.min() >= -1. and result.max() <= 1.,
-                        print("min: {}, max: {}".format(result.min(), result.max())))
+        self.assertTrue(result.min() >= -1. and result.max() <= 1.)
 
         maxminmax = np.abs(
             [audio_orig.min(), audio_orig.max()]).max().astype(np.float)
         result = transforms.Scale(factor=maxminmax)(audio_orig)
         self.assertTrue((result.min() == -1. or result.max() == 1.) and
-                        result.min() >= -1. and result.max() <= 1.,
-                        print("min: {}, max: {}".format(result.min(), result.max())))
+                        result.min() >= -1. and result.max() <= 1.)
 
         repr_test = transforms.Scale()
         repr_test.__repr__()
@@ -39,21 +37,19 @@ class Tester(unittest.TestCase):
         length_orig = audio_orig.size(0)
         length_new = int(length_orig * 1.2)
 
-        result = transforms.PadTrim(max_len=length_new)(audio_orig)
+        result = transforms.PadTrim(max_len=length_new, channels_first=False)(audio_orig)
 
-        self.assertTrue(result.size(0) == length_new,
-                        print("old size: {}, new size: {}".format(audio_orig.size(0), result.size(0))))
+        self.assertEqual(result.size(0), length_new)
 
         audio_orig = self.sig.clone()
         length_orig = audio_orig.size(0)
         length_new = int(length_orig * 0.8)
 
-        result = transforms.PadTrim(max_len=length_new)(audio_orig)
+        result = transforms.PadTrim(max_len=length_new, channels_first=False)(audio_orig)
 
-        self.assertTrue(result.size(0) == length_new,
-                        print("old size: {}, new size: {}".format(audio_orig.size(0), result.size(0))))
+        self.assertEqual(result.size(0), length_new)
 
-        repr_test = transforms.PadTrim(max_len=length_new)
+        repr_test = transforms.PadTrim(max_len=length_new, channels_first=False)
         repr_test.__repr__()
 
     def test_downmix_mono(self):
@@ -67,11 +63,11 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(audio_Stereo.size(1) == 2)
 
-        result = transforms.DownmixMono()(audio_Stereo)
+        result = transforms.DownmixMono(channels_first=False)(audio_Stereo)
 
         self.assertTrue(result.size(1) == 1)
 
-        repr_test = transforms.DownmixMono()
+        repr_test = transforms.DownmixMono(channels_first=False)
         repr_test.__repr__()
 
     def test_lc2cl(self):
@@ -107,7 +103,7 @@ class Tester(unittest.TestCase):
             [audio_orig.min(), audio_orig.max()]).max().astype(np.float)
 
         tset = (transforms.Scale(factor=maxminmax),
-                transforms.PadTrim(max_len=length_new))
+                transforms.PadTrim(max_len=length_new, channels_first=False))
         result = transforms.Compose(tset)(audio_orig)
 
         self.assertTrue(np.abs([result.min(), result.max()]).max() == 1.)

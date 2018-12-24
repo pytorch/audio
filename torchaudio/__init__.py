@@ -34,17 +34,18 @@ def load(filepath,
                                                              If `callable`, then the output is passed as a parameter
                                                              to the given function, then the output is divided by
                                                              the result.
+        channels_first (bool): Set channels first or length first in result.  Default: ``True``
         num_frames (int, optional): number of frames to load.  0 to load everything after the offset.
         offset (int, optional): number of frames from the start of the file to begin data loading.
         signalinfo (sox_signalinfo_t, optional): a sox_signalinfo_t type, which could be helpful if the
-                                                 audio type cannot be automatically determine
+                                                 audio type cannot be automatically determined
         encodinginfo (sox_encodinginfo_t, optional): a sox_encodinginfo_t type, which could be set if the
                                                      audio type cannot be automatically determined
         filetype (str, optional): a filetype or extension to be set if sox cannot determine it automatically
 
     Returns: tuple(Tensor, int)
        - Tensor: output Tensor of size `[C x L]` or `[L x C]` where L is the number of audio frames, C is the number of channels
-       - int: the sample-rate of the audio (as listed in the metadata of the file)
+       - int: the sample rate of the audio (as listed in the metadata of the file)
 
     Example::
 
@@ -113,8 +114,9 @@ def save_encinfo(filepath,
         filepath (string): path to audio file
         src (Tensor): an input 2D Tensor of shape `[C x L]` or `[L x C]` where L is
                       the number of audio frames, C is the number of channels
+        channels_first (bool): Set channels first or length first in result.  Default: ``True``
         signalinfo (sox_signalinfo_t): a sox_signalinfo_t type, which could be helpful if the
-                                       audio type cannot be automatically determine
+                                       audio type cannot be automatically determined
         encodinginfo (sox_encodinginfo_t, optional): a sox_encodinginfo_t type, which could be set if the
                                                      audio type cannot be automatically determined
         filetype (str, optional): a filetype or extension to be set if sox cannot determine it automatically
