@@ -1,22 +1,12 @@
 
 
+
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <script type="text/javascript">
-
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-90545585-1']);
-      _gaq.push(['_trackPageview']);
-
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-    </script>
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>torchaudio.transforms &mdash; Torchaudio master documentation</title>
@@ -35,74 +25,111 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-  
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  
-  
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" type="text/css" />
-  
-    <link rel="stylesheet" href="_static/css/pytorch_theme.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Torchaudio master documentation" href="index.html"/>
-        <link rel="prev" title="torchaudio.datasets" href="datasets.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="torchaudio.legacy" href="legacy.html" />
+    <link rel="prev" title="torchaudio.datasets" href="datasets.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/features">Features</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+
+  </div>
+</div>
+
+
+<body class="pytorch-body">
 
    
-  <div class="wy-grid-for-nav">
 
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
 
-          
-            <a href="index.html">
-          
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
 
-          
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
             
-            <img src="_static/pytorch-logo-dark.svg" class="logo" />
-          
-          </a>
 
-          
             
+              
+              
+                <div class="version">
+                  master 
+                </div>
+              
             
-              <div class="version">
-                master 
-              </div>
-            
-          
 
-          
+            
+
+
+  
+
+
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search Docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
 
-          
-        </div>
+            
+          </div>
 
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
             
@@ -111,12 +138,10 @@
             
               <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#vctk">VCTK</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datasets.html#yesno">YESNO</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="legacy.html">torchaudio.legacy</a></li>
 </ul>
 
             
@@ -125,22 +150,9 @@
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Torchaudio</a>
-        
-      </nav>
-
-
-      
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
           
 
 
@@ -159,17 +171,24 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
 
-  <ul class="wy-breadcrumbs">
+  <ul class="pytorch-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li>
+        <a href="index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
         
       <li>torchaudio.transforms</li>
     
     
-      <li class="wy-breadcrumbs-aside">
+      <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="_sources/transforms.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/transforms.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -177,14 +196,25 @@
   </ul>
 
   
-  <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
   <div class="section" id="torchaudio-transforms">
 <h1>torchaudio.transforms<a class="headerlink" href="#torchaudio-transforms" title="Permalink to this headline">¶</a></h1>
-<p>Transforms are common audio transforms. They can be chained together using <a class="reference internal" href="#torchaudio.transforms.Compose" title="torchaudio.transforms.Compose"><code class="xref py py-class docutils literal"><span class="pre">Compose</span></code></a></p>
+<p>Transforms are common audio transforms. They can be chained together using <a class="reference internal" href="#torchaudio.transforms.Compose" title="torchaudio.transforms.Compose"><code class="xref py py-class docutils literal notranslate"><span class="pre">Compose</span></code></a></p>
 <dl class="class">
 <dt id="torchaudio.transforms.Compose">
 <em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">Compose</code><span class="sig-paren">(</span><em>transforms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Compose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Compose" title="Permalink to this definition">¶</a></dt>
@@ -193,12 +223,12 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transforms</strong> (list of <code class="docutils literal"><span class="pre">Transform</span></code> objects) &#8211; list of transforms to compose.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transforms</strong> (list of <code class="docutils literal notranslate"><span class="pre">Transform</span></code> objects) – list of transforms to compose.</td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Example</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">transforms</span><span class="o">.</span><span class="n">Scale</span><span class="p">(),</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">transforms</span><span class="o">.</span><span class="n">PadTrim</span><span class="p">(</span><span class="n">max_len</span><span class="o">=</span><span class="mi">16000</span><span class="p">),</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">])</span>
@@ -211,12 +241,12 @@
 <em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">Scale</code><span class="sig-paren">(</span><em>factor=2147483648</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Scale" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
 to a floating point number between -1.0 and 1.0.  Note the 16-bit number is
-called the &#8220;bit depth&#8221; or &#8220;precision&#8221;, not to be confused with &#8220;bit rate&#8221;.</p>
+called the “bit depth” or “precision”, not to be confused with “bit rate”.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>factor</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; maximum value of input tensor. default: 16-bit depth</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>factor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – maximum value of input tensor. default: 16-bit depth</td>
 </tr>
 </tbody>
 </table>
@@ -224,15 +254,16 @@ called the &#8220;bit depth&#8221; or &#8220;precision&#8221;, not to be confuse
 
 <dl class="class">
 <dt id="torchaudio.transforms.PadTrim">
-<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">PadTrim</code><span class="sig-paren">(</span><em>max_len</em>, <em>fill_value=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#PadTrim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.PadTrim" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">PadTrim</code><span class="sig-paren">(</span><em>max_len</em>, <em>fill_value=0</em>, <em>channels_first=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#PadTrim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.PadTrim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pad/Trim a 1d-Tensor (Signal or Labels)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tensor</strong> (<em>Tensor</em>) &#8211; Tensor of audio of size (Samples x Channels)</li>
-<li><strong>max_len</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Length to which the tensor will be padded</li>
+<li><strong>tensor</strong> (<em>Tensor</em>) – Tensor of audio of size (n x c) or (c x n)</li>
+<li><strong>max_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Length to which the tensor will be padded</li>
+<li><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Pad for channels first tensors.  Default: <cite>True</cite></li>
 </ul>
 </td>
 </tr>
@@ -242,11 +273,13 @@ called the &#8220;bit depth&#8221; or &#8220;precision&#8221;, not to be confuse
 
 <dl class="class">
 <dt id="torchaudio.transforms.DownmixMono">
-<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">DownmixMono</code><a class="reference internal" href="_modules/torchaudio/transforms.html#DownmixMono"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.DownmixMono" title="Permalink to this definition">¶</a></dt>
-<dd><p>Downmix any stereo signals to mono</p>
-<dl class="docutils">
+<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">DownmixMono</code><span class="sig-paren">(</span><em>channels_first=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#DownmixMono"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.DownmixMono" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Downmix any stereo signals to mono.  Consider using a <cite>SoxEffectsChain</cite> with</dt>
+<dd>the <cite>channels</cite> effect instead of this transformation.</dd>
 <dt>Inputs:</dt>
-<dd>tensor (Tensor): Tensor of audio of size (Samples x Channels)</dd>
+<dd>tensor (Tensor): Tensor of audio of size (c x n) or (n x c)
+channels_first (bool): Downmix across channels dimension.  Default: <cite>True</cite></dd>
 </dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -263,8 +296,7 @@ called the &#8220;bit depth&#8221; or &#8220;precision&#8221;, not to be confuse
 <dl class="class">
 <dt id="torchaudio.transforms.LC2CL">
 <em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">LC2CL</code><a class="reference internal" href="_modules/torchaudio/transforms.html#LC2CL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.LC2CL" title="Permalink to this definition">¶</a></dt>
-<dd><p>Permute a 2d tensor from samples (Length) x Channels to Channels x
-samples (Length)</p>
+<dd><p>Permute a 2d tensor from samples (n x c) to (c x n)</p>
 </dd></dl>
 
 <dl class="class">
@@ -280,8 +312,8 @@ samples (Length)</p>
 <dl class="class">
 <dt id="torchaudio.transforms.BLC2CBL">
 <em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">BLC2CBL</code><a class="reference internal" href="_modules/torchaudio/transforms.html#BLC2CBL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.BLC2CBL" title="Permalink to this definition">¶</a></dt>
-<dd><p>Permute a 3d tensor from Bands x samples (Length) x Channels to Channels x
-Bands x samples (Length)</p>
+<dd><p>Permute a 3d tensor from Bands x Sample length x Channels to Channels x
+Bands x Samples length</p>
 </dd></dl>
 
 <dl class="class">
@@ -295,7 +327,7 @@ returns a signal encoded with values from 0 to quantization_channels - 1</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Number of channels. default: 256</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of channels. default: 256</td>
 </tr>
 </tbody>
 </table>
@@ -312,7 +344,7 @@ and returns a signal scaled between -1 and 1.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Number of channels. default: 256</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of channels. default: 256</td>
 </tr>
 </tbody>
 </table>
@@ -321,17 +353,17 @@ and returns a signal scaled between -1 and 1.</p>
 </div>
 
 
-           </div>
-           <div class="articleComments">
-            
-           </div>
-          </div>
-          <footer>
+             </article>
+             
+            </div>
+            <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="legacy.html" class="btn btn-neutral float-right" title="torchaudio.legacy" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
-        <a href="datasets.html" class="btn btn-neutral" title="torchaudio.datasets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="datasets.html" class="btn btn-neutral" title="torchaudio.datasets" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -340,56 +372,239 @@ and returns a signal scaled between -1 and 1.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Torch Contributors.
+        &copy; Copyright 2018, Torchaudio Contributors.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
+          </div>
         </div>
-      </div>
 
-    </section>
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">torchaudio.transforms</a></li>
+</ul>
 
-  </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'master',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
 
   
+
+     
+       <script type="text/javascript">
+           var DOCUMENTATION_OPTIONS = {
+               URL_ROOT:'./',
+               VERSION:'master',
+               LANGUAGE:'None',
+               COLLAPSE_INDEX:false,
+               FILE_SUFFIX:'.html',
+               HAS_SOURCE:  true,
+               SOURCELINK_SUFFIX: '.txt'
+           };
+       </script>
+         <script type="text/javascript" src="_static/jquery.js"></script>
+         <script type="text/javascript" src="_static/underscore.js"></script>
+         <script type="text/javascript" src="_static/doctools.js"></script>
+         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js"></script>
+         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js"></script>
+         <script type="text/javascript" src="_static/katex_autorenderer.js"></script>
+     
+
   
+
+  <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://pytorch.org/resources">Resources</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/support">Support</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Follow Us</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="#">Get Started</a>
+          </li>
+
+          <li>
+            <a href="#">Features</a>
+          </li>
+
+          <li>
+            <a href="#">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
 </body>
 </html>
