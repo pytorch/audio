@@ -1,23 +1,10 @@
 from __future__ import division, print_function
 import torch
-from torch.autograd import Variable
 import numpy as np
 try:
     import librosa
 except ImportError:
     librosa = None
-
-
-def _check_is_variable(tensor):
-    if isinstance(tensor, torch.Tensor):
-        is_variable = False
-        tensor = Variable(tensor, requires_grad=False)
-    elif isinstance(tensor, Variable):
-        is_variable = True
-    else:
-        raise TypeError("tensor should be a Variable or Tensor, but is {}".format(type(tensor)))
-
-    return tensor, is_variable
 
 
 class Compose(object):
@@ -73,8 +60,8 @@ class Scale(object):
             Tensor: Scaled by the scale factor. (default between -1.0 and 1.0)
 
         """
-        if isinstance(tensor, (torch.LongTensor, torch.IntTensor)):
-            tensor = tensor.float()
+        if not tensor.is_floating_point():
+            tensor = tensor.to(torch.float32)
 
         return tensor / self.factor
 
@@ -101,18 +88,18 @@ class PadTrim(object):
         """
 
         Returns:
-            Tensor: (c x Ln or (n x c)
+            Tensor: (c x n) or (n x c)
 
         """
         assert tensor.size(self.ch_dim) < 128, \
-               "Too many channels ({}) detected, look at channels_first param.".format(tensor.size(self.ch_dim))
+            "Too many channels ({}) detected, see channels_first param.".format(tensor.size(self.ch_dim))
         if self.max_len > tensor.size(self.len_dim):
-
-            padding_size = [self.max_len - tensor.size(self.len_dim) if i == self.len_dim
-                            else tensor.size(self.ch_dim)
-                            for i in range(2)]
-            pad = torch.empty(padding_size, dtype=tensor.dtype).fill_(self.fill_value)
-            tensor = torch.cat((tensor, pad), dim=self.len_dim)
+            padding = [self.max_len - tensor.size(self.len_dim)
+                       if (i % 2 == 1) and (i // 2 != self.len_dim)
+                       else 0
+                       for i in range(4)]
+            with torch.no_grad():
+                tensor = torch.nn.functional.pad(tensor, padding, "constant", self.fill_value)
         elif self.max_len < tensor.size(self.len_dim):
             tensor = tensor.narrow(self.len_dim, 0, self.max_len)
         return tensor
@@ -138,8 +125,8 @@ class DownmixMono(object):
         self.ch_dim = int(not channels_first)
 
     def __call__(self, tensor):
-        if isinstance(tensor, (torch.LongTensor, torch.IntTensor)):
-            tensor = tensor.float()
+        if not tensor.is_floating_point():
+            tensor = tensor.to(torch.float32)
 
         tensor = torch.mean(tensor, self.ch_dim, True)
         return tensor
@@ -182,12 +169,8 @@ class SPECTROGRAM(object):
 
     """
     def __init__(self, sr=16000, ws=400, hop=None, n_fft=None,
-                 pad=0, window=torch.hann_window, wkwargs=None):
-        if isinstance(window, Variable):
-            self.window = window
-        else:
-            self.window = window(ws) if wkwargs is None else window(ws, **wkwargs)
-            self.window = Variable(self.window, volatile=True)
+                 pad=0, window_fn=torch.hann_window, wkwargs=None):
+        self.window = window_fn(ws) if wkwargs is None else window_fn(ws, **wkwargs)
         self.sr = sr
         self.ws = ws
         self.hop = hop if hop is not None else ws // 2
@@ -200,33 +183,27 @@ class SPECTROGRAM(object):
     def __call__(self, sig):
         """
         Args:
-            sig (Tensor or Variable): Tensor of audio of size (c, n)
+            sig (Tensor): Tensor of audio of size (c, n)
 
         Returns:
-            spec_f (Tensor or Variable): channels x hops x n_fft (c, l, f), where channels
+            spec_f (Tensor): channels x hops x n_fft (c, l, f), where channels
                 is unchanged, hops is the number of hops, and n_fft is the
                 number of fourier bins, which should be the window size divided
                 by 2 plus 1.
 
         """
-        sig, is_variable = _check_is_variable(sig)
-
         assert sig.dim() == 2
 
         if self.pad > 0:
-            c, n = sig.size()
-            new_sig = sig.new_empty(c, n + self.pad * 2)
-            new_sig[:, :self.pad].zero_()
-            new_sig[:, -self.pad:].zero_()
-            new_sig.narrow(1, self.pad, n).copy_(sig)
-            sig = new_sig
+            with torch.no_grad():
+                sig = torch.nn.functional.pad(sig, (self.pad, self.pad), "constant")
 
         spec_f = torch.stft(sig, self.n_fft, self.hop, self.ws,
                             self.window, center=False,
                             normalized=True, onesided=True).transpose(1, 2)
         spec_f /= self.window.pow(2).sum().sqrt()
         spec_f = spec_f.pow(2).sum(-1)  # get power of "complex" tensor (c, l, n_fft)
-        return spec_f if is_variable else spec_f.data
+        return spec_f
 
 
 class F2M(object):
@@ -247,7 +224,6 @@ class F2M(object):
 
     def __call__(self, spec_f):
 
-        spec_f, is_variable = _check_is_variable(spec_f)
         n_fft = spec_f.size(2)
 
         m_min = 0. if self.f_min == 0 else 2595 * np.log10(1. + (self.f_min / 700))
@@ -269,9 +245,8 @@ class F2M(object):
             if f_m != f_m_plus:
                 fb[f_m:f_m_plus, m - 1] = (f_m_plus - torch.arange(f_m, f_m_plus)) / (f_m_plus - f_m)
 
-        fb = Variable(fb)
         spec_m = torch.matmul(spec_f, fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
-        return spec_m if is_variable else spec_m.data
+        return spec_m
 
 
 class SPEC2DB(object):
@@ -290,11 +265,10 @@ class SPEC2DB(object):
 
     def __call__(self, spec):
 
-        spec, is_variable = _check_is_variable(spec)
         spec_db = self.multiplier * torch.log10(spec / spec.max())  # power -> dB
         if self.top_db is not None:
             spec_db = torch.max(spec_db, spec_db.new([self.top_db]))
-        return spec_db if is_variable else spec_db.data
+        return spec_db
 
 
 class MEL2(object):
@@ -322,9 +296,8 @@ class MEL2(object):
         >>> spec_mel = transforms.MEL2(sr)(sig)  # (c, l, m)
     """
     def __init__(self, sr=16000, ws=400, hop=None, n_fft=None,
-                 pad=0, n_mels=40, window=torch.hann_window, wkwargs=None):
-        self.window = window(ws) if wkwargs is None else window(ws, **wkwargs)
-        self.window = Variable(self.window, requires_grad=False)
+                 pad=0, n_mels=40, window_fn=torch.hann_window, wkwargs=None):
+        self.window_fn = window_fn
         self.sr = sr
         self.ws = ws
         self.hop = hop if hop is not None else ws // 2
@@ -348,18 +321,16 @@ class MEL2(object):
 
         """
 
-        sig, is_variable = _check_is_variable(sig)
-
         transforms = Compose([
             SPECTROGRAM(self.sr, self.ws, self.hop, self.n_fft,
-                        self.pad, self.window),
+                        self.pad, self.window_fn, self.wkwargs),
             F2M(self.n_mels, self.sr, self.f_max, self.f_min),
             SPEC2DB("power", self.top_db),
         ])
 
         spec_mel_db = transforms(sig)
 
-        return spec_mel_db if is_variable else spec_mel_db.data
+        return spec_mel_db
 
 
 class MEL(object):
@@ -454,10 +425,10 @@ class MuLawEncoding(object):
         if isinstance(x, np.ndarray):
             x_mu = np.sign(x) * np.log1p(mu * np.abs(x)) / np.log1p(mu)
             x_mu = ((x_mu + 1) / 2 * mu + 0.5).astype(int)
-        elif isinstance(x, (torch.Tensor, torch.LongTensor)):
-            if isinstance(x, torch.LongTensor):
-                x = x.float()
-            mu = torch.FloatTensor([mu])
+        elif isinstance(x, torch.Tensor):
+            if not x.is_floating_point():
+                x = x.to(torch.float)
+            mu = torch.tensor(mu, dtype=x.dtype)
             x_mu = torch.sign(x) * torch.log1p(mu *
                                                torch.abs(x)) / torch.log1p(mu)
             x_mu = ((x_mu + 1) / 2 * mu + 0.5).long()
@@ -496,10 +467,10 @@ class MuLawExpanding(object):
         if isinstance(x_mu, np.ndarray):
             x = ((x_mu) / mu) * 2 - 1.
             x = np.sign(x) * (np.exp(np.abs(x) * np.log1p(mu)) - 1.) / mu
-        elif isinstance(x_mu, (torch.Tensor, torch.LongTensor)):
-            if isinstance(x_mu, torch.LongTensor):
-                x_mu = x_mu.float()
-            mu = torch.FloatTensor([mu])
+        elif isinstance(x_mu, torch.Tensor):
+            if not x_mu.is_floating_point():
+                x_mu = x_mu.to(torch.float)
+            mu = torch.tensor(mu, dtype=x_mu.dtype)
             x = ((x_mu) / mu) * 2 - 1.
             x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.) / mu
         return x

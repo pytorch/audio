@@ -158,7 +158,7 @@ int read_audio_file(
 
 void write_audio_file(
     const std::string& file_name,
-    at::Tensor tensor,
+    const at::Tensor& tensor,
     sox_signalinfo_t* si,
     sox_encodinginfo_t* ei,
     const char* file_type) {
@@ -332,16 +332,9 @@ int build_flow_effects(const std::string& file_name,
   int sr;
   // Read the in-memory audio buffer or temp file that we just wrote.
 #ifdef __APPLE__
-  /*  certain effects will result in a target signal length of 0.
-  if (target_signal->length > 0) {
-    if (target_signal->channels != output->signal.channels) {
-      std::cout << "output: " << output->signal.channels << "|" << output->signal.length << "\n";
-      std::cout << "interm: " << interm_signal.channels << "|" << interm_signal.length << "\n";
-      std::cout << "target: " << target_signal->channels << "|" << target_signal->length << "\n";
-      unlink(tmp_name);
-      throw std::runtime_error("unexpected number of audio channels");
-    }
-  }
+  /*
+     Temporary filetype must have a valid header.  Wav seems to work here while
+     raw does not.  Certain effects like chorus caused strange behavior on the mac.
   */
   // read_audio_file reads the temporary file and returns the sr and otensor
   sr = read_audio_file(tmp_name, otensor, ch_first, 0, 0,

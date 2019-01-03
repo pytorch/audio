@@ -120,7 +120,7 @@ class Test_LoadSave(unittest.TestCase):
         input_sine_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
         x_sine_full, sr_sine = load(input_sine_path)
         x_sine_part, _ = load(input_sine_path, num_frames=num_frames, offset=offset)
-        l1_error = x_sine_full[offset:(num_frames+offset)].sub(x_sine_part).abs().sum().item()
+        l1_error = x_sine_full[offset:(num_frames + offset)].sub(x_sine_part).abs().sum().item()
         # test for the correct number of samples and that the correct portion was loaded
         self.assertEqual(x_sine_part.size(0), num_frames)
         self.assertEqual(l1_error, 0.)
@@ -137,7 +137,7 @@ class Test_LoadSave(unittest.TestCase):
         # test with two channel mp3
         x_2ch_full, sr_2ch = load(self.test_filepath, normalization=True)
         x_2ch_part, _ = load(self.test_filepath, normalization=True, num_frames=num_frames, offset=offset)
-        l1_error = x_2ch_full[offset:(offset+num_frames)].sub(x_2ch_part).abs().sum().item()
+        l1_error = x_2ch_full[offset:(offset + num_frames)].sub(x_2ch_part).abs().sum().item()
         self.assertEqual(x_2ch_part.size(0), num_frames)
         self.assertEqual(l1_error, 0.)
 

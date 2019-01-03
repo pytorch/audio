@@ -44,7 +44,8 @@ def load(filepath,
         filetype (str, optional): a filetype or extension to be set if sox cannot determine it automatically
 
     Returns: tuple(Tensor, int)
-       - Tensor: output Tensor of size `[C x L]` or `[L x C]` where L is the number of audio frames, C is the number of channels
+       - Tensor: output Tensor of size `[C x L]` or `[L x C]` where L is the number of audio frames and
+                 C is the number of channels
        - int: the sample rate of the audio (as listed in the metadata of the file)
 
     Example::
@@ -127,8 +128,7 @@ def save_encinfo(filepath,
         >>> torchaudio.save('foo.wav', data, sample_rate)
 
     """
-    ch_idx = 0 if channels_first else 1
-    len_idx = 1 if channels_first else 0
+    ch_idx, len_idx = (0, 1) if channels_first else (1, 0)
 
     # check if save directory exists
     abs_dirpath = os.path.dirname(os.path.abspath(filepath))

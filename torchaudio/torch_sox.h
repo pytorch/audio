@@ -26,10 +26,10 @@ int read_audio_file(
 /// writing, or an error ocurred during writing of the audio data.
 void write_audio_file(
     const std::string& file_name,
-    at::Tensor tensor,
+    at::Tensor& tensor,
     sox_signalinfo_t* si,
     sox_encodinginfo_t* ei,
-    const char* extension)
+    const char* file_type)
 
 /// Reads an audio file from the given `path` and returns a tuple of
 /// sox_signalinfo_t and sox_encodinginfo_t, which contain information about
@@ -45,6 +45,13 @@ std::vector<std::string> get_effect_names();
 // Initialize and Shutdown SoX effects chain.  These functions should only be run once.
 int initialize_sox();
 int shutdown_sox();
+
+// Struct for build_flow_effects function
+struct SoxEffect {
+  SoxEffect() : ename(""), eopts({""})  { }
+  std::string ename;
+  std::vector<std::string> eopts;
+};
 
 /// Build a SoX chain, flow the effects, and capture the results in a tensor.
 /// An audio file from the given `path` flows through an effects chain given

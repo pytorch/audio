@@ -30,13 +30,14 @@ class TORCHAUDIODS(Dataset):
     def __len__(self):
         return len(self.data)
 
+
 class Test_DataLoader(unittest.TestCase):
     def test_1(self):
         expected_size = (2, 1, 16000)
         ds = TORCHAUDIODS()
         dl = DataLoader(ds, batch_size=2)
         for x in dl:
-            #print(x.size())
+            # print(x.size())
             continue
 
         self.assertTrue(x.size() == expected_size)
