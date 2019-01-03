@@ -44,7 +44,8 @@ class SoxEffectsChain(object):
         filetype (str, optional): a filetype or extension to be set if sox cannot determine it automatically
 
     Returns: tuple(Tensor, int)
-       - Tensor: output Tensor of size `[C x L]` or `[L x C]` where L is the number of audio frames, C is the number of channels
+       - Tensor: output Tensor of size `[C x L]` or `[L x C]` where L is the number of audio frames and
+                 C is the number of channels
        - int: the sample rate of the audio (as listed in the metadata of the file)
 
     Example::

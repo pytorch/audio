@@ -27,7 +27,6 @@ class Test_LoadSave(unittest.TestCase):
         os.unlink(new_filepath)
 
         # test save 1d tensor
-        #x = x[:, 0]  # get mono signal
         x = x[0, :]  # get mono signal
         x.squeeze_()  # remove channel dim
         torchaudio.save(new_filepath, x, sr)
@@ -91,7 +90,7 @@ class Test_LoadSave(unittest.TestCase):
         offset = 15
         x, _ = torchaudio.load(self.test_filepath)
         x_offset, _ = torchaudio.load(self.test_filepath, offset=offset)
-        self.assertTrue(x[:,offset:].allclose(x_offset))
+        self.assertTrue(x[:, offset:].allclose(x_offset))
 
         # check number of frames
         n = 201
@@ -132,7 +131,7 @@ class Test_LoadSave(unittest.TestCase):
         input_sine_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
         x_sine_full, sr_sine = torchaudio.load(input_sine_path)
         x_sine_part, _ = torchaudio.load(input_sine_path, num_frames=num_frames, offset=offset)
-        l1_error = x_sine_full[:, offset:(num_frames+offset)].sub(x_sine_part).abs().sum().item()
+        l1_error = x_sine_full[:, offset:(num_frames + offset)].sub(x_sine_part).abs().sum().item()
         # test for the correct number of samples and that the correct portion was loaded
         self.assertEqual(x_sine_part.size(1), num_frames)
         self.assertEqual(l1_error, 0.)
@@ -148,7 +147,7 @@ class Test_LoadSave(unittest.TestCase):
         # test with two channel mp3
         x_2ch_full, sr_2ch = torchaudio.load(self.test_filepath, normalization=True)
         x_2ch_part, _ = torchaudio.load(self.test_filepath, normalization=True, num_frames=num_frames, offset=offset)
-        l1_error = x_2ch_full[:, offset:(offset+num_frames)].sub(x_2ch_part).abs().sum().item()
+        l1_error = x_2ch_full[:, offset:(offset + num_frames)].sub(x_2ch_part).abs().sum().item()
         self.assertEqual(x_2ch_part.size(1), num_frames)
         self.assertEqual(l1_error, 0.)
 

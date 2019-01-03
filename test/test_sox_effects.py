@@ -17,7 +17,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
         E.append_effect_to_chain("echos", [0.8, 0.7, 40, 0.25, 63, 0.3])
         x, sr = E.sox_build_flow_effects()
         # check if effects worked
-        #print(x.size())
+        # print(x.size())
 
     def test_rate_channels(self):
         target_rate = 16000
@@ -154,7 +154,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
         E.append_effect_to_chain("trim", [offset, num_frames])
         x, sr = E.sox_build_flow_effects()
         # check if effect worked
-        self.assertTrue(x.allclose(x_orig[:,offset_int:(offset_int+num_frames_int)], rtol=1e-4, atol=1e-4))
+        self.assertTrue(x.allclose(x_orig[:, offset_int:(offset_int + num_frames_int)], rtol=1e-4, atol=1e-4))
 
     def test_silence_contrast(self):
         si, _ = torchaudio.info(self.test_filepath)
@@ -183,13 +183,14 @@ class Test_SoxEffectsChain(unittest.TestCase):
         E.append_effect_to_chain("fade", ["q", "0.25", "0", "0.33"])
         x, _ = E.sox_build_flow_effects()
         # check if effect worked
-        #print(x.size())
+        # print(x.size())
 
     def test_biquad_delay(self):
         si, _ = torchaudio.info(self.test_filepath)
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(self.test_filepath)
-        E.append_effect_to_chain("biquad", ["0.25136437", "0.50272873", "0.25136437", "1.0", "-0.17123075", "0.17668821"])
+        E.append_effect_to_chain("biquad", ["0.25136437", "0.50272873", "0.25136437",
+                                            "1.0", "-0.17123075", "0.17668821"])
         E.append_effect_to_chain("delay", ["15000s"])
         x, _ = E.sox_build_flow_effects()
         # check if effect worked

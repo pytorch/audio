@@ -38,8 +38,10 @@ class Tester(unittest.TestCase):
         length_new = int(length_orig * 1.2)
 
         result = transforms.PadTrim(max_len=length_new, channels_first=False)(audio_orig)
-
         self.assertEqual(result.size(0), length_new)
+
+        result = transforms.PadTrim(max_len=length_new, channels_first=True)(audio_orig.transpose(0, 1))
+        self.assertEqual(result.size(1), length_new)
 
         audio_orig = self.sig.clone()
         length_orig = audio_orig.size(0)
@@ -147,7 +149,7 @@ class Tester(unittest.TestCase):
         audio_orig = self.sig.clone()  # (16000, 1)
         audio_scaled = transforms.Scale()(audio_orig)  # (16000, 1)
         audio_scaled = transforms.LC2CL()(audio_scaled)  # (1, 16000)
-        spectrogram_torch = transforms.MEL2()(audio_scaled)  # (1, 319, 40)
+        spectrogram_torch = transforms.MEL2(window_fn=torch.hamming_window, pad=10)(audio_scaled)  # (1, 319, 40)
         self.assertTrue(spectrogram_torch.dim() == 3)
         self.assertTrue(spectrogram_torch.max() <= 0.)
 
