@@ -60,7 +60,7 @@ class Scale(object):
             Tensor: Scaled by the scale factor. (default between -1.0 and 1.0)
 
         """
-        if not tensor.is_floating_point():
+        if not tensor.dtype.is_floating_point:
             tensor = tensor.to(torch.float32)
 
         return tensor / self.factor
@@ -125,7 +125,7 @@ class DownmixMono(object):
         self.ch_dim = int(not channels_first)
 
     def __call__(self, tensor):
-        if not tensor.is_floating_point():
+        if not tensor.dtype.is_floating_point:
             tensor = tensor.to(torch.float32)
 
         tensor = torch.mean(tensor, self.ch_dim, True)
@@ -169,8 +169,8 @@ class SPECTROGRAM(object):
 
     """
     def __init__(self, sr=16000, ws=400, hop=None, n_fft=None,
-                 pad=0, window_fn=torch.hann_window, wkwargs=None):
-        self.window = window_fn(ws) if wkwargs is None else window_fn(ws, **wkwargs)
+                 pad=0, window=torch.hann_window, wkwargs=None):
+        self.window = window(ws) if wkwargs is None else window(ws, **wkwargs)
         self.sr = sr
         self.ws = ws
         self.hop = hop if hop is not None else ws // 2
@@ -197,7 +197,6 @@ class SPECTROGRAM(object):
         if self.pad > 0:
             with torch.no_grad():
                 sig = torch.nn.functional.pad(sig, (self.pad, self.pad), "constant")
-
         spec_f = torch.stft(sig, self.n_fft, self.hop, self.ws,
                             self.window, center=False,
                             normalized=True, onesided=True).transpose(1, 2)
@@ -215,16 +214,28 @@ class F2M(object):
         sr (int): sample rate of audio signal
         f_max (float, optional): maximum frequency. default: sr // 2
         f_min (float): minimum frequency. default: 0
+        n_fft (int, optional): number of filter banks from stft. Calculated from first input
+            if `None` is given.
     """
-    def __init__(self, n_mels=40, sr=16000, f_max=None, f_min=0.):
+    def __init__(self, n_mels=40, sr=16000, f_max=None, f_min=0., n_fft=None):
         self.n_mels = n_mels
         self.sr = sr
         self.f_max = f_max if f_max is not None else sr // 2
         self.f_min = f_min
+        self.fb = self._create_fb_matrix(n_fft) if n_fft is not None else n_fft
 
     def __call__(self, spec_f):
+        if self.fb is None:
+            self.fb = self._create_fb_matrix(spec_f.size(2))
+        spec_m = torch.matmul(spec_f, self.fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
+        return spec_m
 
-        n_fft = spec_f.size(2)
+    def _create_fb_matrix(self, n_fft):
+        """ Create a frequency bin conversion matrix.
+
+        Args:
+            n_fft (int): number of filter banks from spectrogram
+        """
 
         m_min = 0. if self.f_min == 0 else 2595 * np.log10(1. + (self.f_min / 700))
         m_max = 2595 * np.log10(1. + (self.f_max / 700))
@@ -234,19 +245,12 @@ class F2M(object):
 
         bins = torch.floor(((n_fft - 1) * 2) * f_pts / self.sr).long()
 
-        fb = torch.zeros(n_fft, self.n_mels)
+        fb = torch.zeros(n_fft, self.n_mels, dtype=torch.float)
         for m in range(1, self.n_mels + 1):
             f_m_minus = bins[m - 1].item()
-            f_m = bins[m].item()
             f_m_plus = bins[m + 1].item()
-
-            if f_m_minus != f_m:
-                fb[f_m_minus:f_m, m - 1] = (torch.arange(f_m_minus, f_m) - f_m_minus) / (f_m - f_m_minus)
-            if f_m != f_m_plus:
-                fb[f_m:f_m_plus, m - 1] = (f_m_plus - torch.arange(f_m, f_m_plus)) / (f_m_plus - f_m)
-
-        spec_m = torch.matmul(spec_f, fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
-        return spec_m
+            fb[f_m_minus:f_m_plus, m - 1] = torch.bartlett_window(f_m_plus - f_m_minus)
+        return fb
 
 
 class SPEC2DB(object):
@@ -267,7 +271,7 @@ class SPEC2DB(object):
 
         spec_db = self.multiplier * torch.log10(spec / spec.max())  # power -> dB
         if self.top_db is not None:
-            spec_db = torch.max(spec_db, spec_db.new([self.top_db]))
+            spec_db = torch.max(spec_db, torch.tensor(self.top_db, dtype=spec_db.dtype))
         return spec_db
 
 
@@ -296,8 +300,8 @@ class MEL2(object):
         >>> spec_mel = transforms.MEL2(sr)(sig)  # (c, l, m)
     """
     def __init__(self, sr=16000, ws=400, hop=None, n_fft=None,
-                 pad=0, n_mels=40, window_fn=torch.hann_window, wkwargs=None):
-        self.window_fn = window_fn
+                 pad=0, n_mels=40, window=torch.hann_window, wkwargs=None):
+        self.window = window
         self.sr = sr
         self.ws = ws
         self.hop = hop if hop is not None else ws // 2
@@ -308,6 +312,13 @@ class MEL2(object):
         self.top_db = -80.
         self.f_max = None
         self.f_min = 0.
+        self.spec = SPECTROGRAM(self.sr, self.ws, self.hop, self.n_fft,
+                                self.pad, self.window, self.wkwargs)
+        self.fm = F2M(self.n_mels, self.sr, self.f_max, self.f_min, self.n_fft)
+        self.s2db = SPEC2DB("power", self.top_db)
+        self.transforms = Compose([
+            self.spec, self.fm, self.s2db,
+        ])
 
     def __call__(self, sig):
         """
@@ -320,15 +331,7 @@ class MEL2(object):
                 number of mel bins.
 
         """
-
-        transforms = Compose([
-            SPECTROGRAM(self.sr, self.ws, self.hop, self.n_fft,
-                        self.pad, self.window_fn, self.wkwargs),
-            F2M(self.n_mels, self.sr, self.f_max, self.f_min),
-            SPEC2DB("power", self.top_db),
-        ])
-
-        spec_mel_db = transforms(sig)
+        spec_mel_db = self.transforms(sig)
 
         return spec_mel_db
 
@@ -426,7 +429,7 @@ class MuLawEncoding(object):
             x_mu = np.sign(x) * np.log1p(mu * np.abs(x)) / np.log1p(mu)
             x_mu = ((x_mu + 1) / 2 * mu + 0.5).astype(int)
         elif isinstance(x, torch.Tensor):
-            if not x.is_floating_point():
+            if not x.dtype.is_floating_point:
                 x = x.to(torch.float)
             mu = torch.tensor(mu, dtype=x.dtype)
             x_mu = torch.sign(x) * torch.log1p(mu *
@@ -468,7 +471,7 @@ class MuLawExpanding(object):
             x = ((x_mu) / mu) * 2 - 1.
             x = np.sign(x) * (np.exp(np.abs(x) * np.log1p(mu)) - 1.) / mu
         elif isinstance(x_mu, torch.Tensor):
-            if not x_mu.is_floating_point():
+            if not x_mu.dtype.is_floating_point:
                 x_mu = x_mu.to(torch.float)
             mu = torch.tensor(mu, dtype=x_mu.dtype)
             x = ((x_mu) / mu) * 2 - 1.

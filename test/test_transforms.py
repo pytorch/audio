@@ -1,4 +1,5 @@
 from __future__ import print_function
+import os
 import torch
 import torchaudio
 import torchaudio.transforms as transforms
@@ -8,13 +9,17 @@ import unittest
 
 class Tester(unittest.TestCase):
 
+    # create a sinewave signal for testing
     sr = 16000
     freq = 440
     volume = .3
     sig = (torch.cos(2 * np.pi * torch.arange(0, 4 * sr).float() * freq / sr))
-    # sig = (torch.cos((1+torch.arange(0, 4 * sr) * 2) / sr * 2 * np.pi * torch.arange(0, 4 * sr) * freq / sr)).float()
-    sig.unsqueeze_(1)
+    sig.unsqueeze_(1)  # (64000, 1)
     sig = (sig * volume * 2**31).long()
+    # file for stereo stft test
+    test_dirpath = os.path.dirname(os.path.realpath(__file__))
+    test_filepath = os.path.join(test_dirpath, "assets",
+                                 "steam-train-whistle-daniel_simon.mp3")
 
     def test_scale(self):
 
@@ -29,7 +34,7 @@ class Tester(unittest.TestCase):
                         result.min() >= -1. and result.max() <= 1.)
 
         repr_test = transforms.Scale()
-        repr_test.__repr__()
+        self.assertTrue(repr_test.__repr__())
 
     def test_pad_trim(self):
 
@@ -52,7 +57,7 @@ class Tester(unittest.TestCase):
         self.assertEqual(result.size(0), length_new)
 
         repr_test = transforms.PadTrim(max_len=length_new, channels_first=False)
-        repr_test.__repr__()
+        self.assertTrue(repr_test.__repr__())
 
     def test_downmix_mono(self):
 
@@ -70,7 +75,7 @@ class Tester(unittest.TestCase):
         self.assertTrue(result.size(1) == 1)
 
         repr_test = transforms.DownmixMono(channels_first=False)
-        repr_test.__repr__()
+        self.assertTrue(repr_test.__repr__())
 
     def test_lc2cl(self):
 
@@ -79,7 +84,7 @@ class Tester(unittest.TestCase):
         self.assertTrue(result.size()[::-1] == audio.size())
 
         repr_test = transforms.LC2CL()
-        repr_test.__repr__()
+        self.assertTrue(repr_test.__repr__())
 
     def test_mel(self):
 
@@ -92,9 +97,10 @@ class Tester(unittest.TestCase):
         self.assertTrue(result.dim() == 3)
 
         repr_test = transforms.MEL()
-        repr_test.__repr__()
+        self.assertTrue(repr_test.__repr__())
+
         repr_test = transforms.BLC2CBL()
-        repr_test.__repr__()
+        self.assertTrue(repr_test.__repr__())
 
     def test_compose(self):
 
@@ -113,7 +119,7 @@ class Tester(unittest.TestCase):
         self.assertTrue(result.size(0) == length_new)
 
         repr_test = transforms.Compose(tset)
-        repr_test.__repr__()
+        self.assertTrue(repr_test.__repr__())
 
     def test_mu_law_companding(self):
 
@@ -141,17 +147,28 @@ class Tester(unittest.TestCase):
         self.assertTrue(sig_exp.min() >= -1. and sig_exp.max() <= 1.)
 
         repr_test = transforms.MuLawEncoding(quantization_channels)
-        repr_test.__repr__()
+        self.assertTrue(repr_test.__repr__())
         repr_test = transforms.MuLawExpanding(quantization_channels)
-        repr_test.__repr__()
+        self.assertTrue(repr_test.__repr__())
 
     def test_mel2(self):
         audio_orig = self.sig.clone()  # (16000, 1)
         audio_scaled = transforms.Scale()(audio_orig)  # (16000, 1)
         audio_scaled = transforms.LC2CL()(audio_scaled)  # (1, 16000)
-        spectrogram_torch = transforms.MEL2(window_fn=torch.hamming_window, pad=10)(audio_scaled)  # (1, 319, 40)
+        mel_transform = transforms.MEL2(window=torch.hamming_window, pad=10)
+        spectrogram_torch = mel_transform(audio_scaled)  # (1, 319, 40)
         self.assertTrue(spectrogram_torch.dim() == 3)
-        self.assertTrue(spectrogram_torch.max() <= 0.)
+        self.assertTrue(spectrogram_torch.le(0.).all())
+        self.assertTrue(spectrogram_torch.ge(mel_transform.top_db).all())
+        self.assertEqual(spectrogram_torch.size(-1), mel_transform.n_mels)
+        # load stereo file
+        x_stereo, sr_stereo = torchaudio.load(self.test_filepath)
+        spectrogram_stereo = mel_transform(x_stereo)
+        self.assertTrue(spectrogram_stereo.dim() == 3)
+        self.assertTrue(spectrogram_stereo.size(0) == 2)
+        self.assertTrue(spectrogram_stereo.le(0.).all())
+        self.assertTrue(spectrogram_stereo.ge(mel_transform.top_db).all())
+        self.assertEqual(spectrogram_stereo.size(-1), mel_transform.n_mels)
 
 if __name__ == '__main__':
     unittest.main()
