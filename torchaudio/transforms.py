@@ -160,23 +160,22 @@ class SPECTROGRAM(object):
 
     Args:
         sr (int): sample rate of audio signal
-        ws (int): window size, often called the fft size as well
+        ws (int): window size
         hop (int, optional): length of hop between STFT windows. default: ws // 2
-        n_fft (int, optional): number of fft bins. default: ws // 2 + 1
+        n_fft (int, optional): size of fft, creates n_fft // 2 + 1 bins. default: ws
         pad (int): two sided padding of signal
         window (torch windowing function): default: torch.hann_window
         wkwargs (dict, optional): arguments for window function
 
     """
-    def __init__(self, sr=16000, ws=400, hop=None, n_fft=None,
+    def __init__(self, ws=400, hop=None, n_fft=None,
                  pad=0, window=torch.hann_window, wkwargs=None):
         self.window = window(ws) if wkwargs is None else window(ws, **wkwargs)
-        self.sr = sr
         self.ws = ws
         self.hop = hop if hop is not None else ws // 2
         # number of fft bins. the returned STFT result will have n_fft // 2 + 1
         # number of frequecies due to onesided=True in torch.stft
-        self.n_fft = (n_fft - 1) * 2 if n_fft is not None else ws
+        self.n_fft = n_fft if n_fft is not None else ws
         self.pad = pad
         self.wkwargs = wkwargs
 
@@ -212,17 +211,17 @@ class F2M(object):
     Args:
         n_mels (int): number of MEL bins
         sr (int): sample rate of audio signal
-        f_max (float, optional): maximum frequency. default: sr // 2
+        f_max (float, optional): maximum frequency. default: `sr` // 2
         f_min (float): minimum frequency. default: 0
-        n_fft (int, optional): number of filter banks from stft. Calculated from first input
-            if `None` is given.
+        n_stft (int, optional): number of filter banks from stft. Calculated from first input
+            if `None` is given.  See `n_fft` in `SPECTROGRAM`.
     """
-    def __init__(self, n_mels=40, sr=16000, f_max=None, f_min=0., n_fft=None):
+    def __init__(self, n_mels=40, sr=16000, f_max=None, f_min=0., n_stft=None):
         self.n_mels = n_mels
         self.sr = sr
         self.f_max = f_max if f_max is not None else sr // 2
         self.f_min = f_min
-        self.fb = self._create_fb_matrix(n_fft) if n_fft is not None else n_fft
+        self.fb = self._create_fb_matrix(n_stft) if n_stft is not None else n_stft
 
     def __call__(self, spec_f):
         if self.fb is None:
@@ -230,27 +229,35 @@ class F2M(object):
         spec_m = torch.matmul(spec_f, self.fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
         return spec_m
 
-    def _create_fb_matrix(self, n_fft):
+    def _create_fb_matrix(self, n_stft):
         """ Create a frequency bin conversion matrix.
 
         Args:
-            n_fft (int): number of filter banks from spectrogram
+            n_stft (int): number of filter banks from spectrogram
         """
 
-        m_min = 0. if self.f_min == 0 else 2595 * np.log10(1. + (self.f_min / 700))
-        m_max = 2595 * np.log10(1. + (self.f_max / 700))
-
+        # get stft freq bins
+        stft_freqs = torch.linspace(self.f_min, self.f_max, n_stft)
+        # calculate mel freq bins
+        m_min = 0. if self.f_min == 0 else self._hertz_to_mel(self.f_min)
+        m_max = self._hertz_to_mel(self.f_max)
         m_pts = torch.linspace(m_min, m_max, self.n_mels + 2)
-        f_pts = (700 * (10**(m_pts / 2595) - 1))
-
-        bins = torch.floor(((n_fft - 1) * 2) * f_pts / self.sr).long()
-
-        fb = torch.zeros(n_fft, self.n_mels, dtype=torch.float)
-        for m in range(1, self.n_mels + 1):
-            f_m_minus = bins[m - 1].item()
-            f_m_plus = bins[m + 1].item()
-            fb[f_m_minus:f_m_plus, m - 1] = torch.bartlett_window(f_m_plus - f_m_minus)
+        f_pts = self._mel_to_hertz(m_pts)
+        # calculate the difference between each mel point and each stft freq point in hertz
+        f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
+        slopes = f_pts.unsqueeze(0) - stft_freqs.unsqueeze(1)  # (n_stft, n_mels + 2)
+        # create overlapping triangles
+        z = torch.tensor(0.)
+        down_slopes = (-1. * slopes[:, :-2]) / f_diff[:-1]  # (n_stft, n_mels)
+        up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_stft, n_mels)
+        fb = torch.max(z, torch.min(down_slopes, up_slopes))
         return fb
+
+    def _hertz_to_mel(self, f):
+        return 2595. * torch.log10(torch.tensor(1.) + (f / 700.))
+
+    def _mel_to_hertz(self, mel):
+        return 700. * (10**(mel / 2595.) - 1.)
 
 
 class SPEC2DB(object):
@@ -287,12 +294,12 @@ class MEL2(object):
 
     Args:
         sr (int): sample rate of audio signal
-        ws (int): window size, often called the fft size as well
-        hop (int, optional): length of hop between STFT windows. default: ws // 2
-        n_fft (int, optional): number of fft bins. default: ws // 2 + 1
+        ws (int): window size
+        hop (int, optional): length of hop between STFT windows. default: `ws` // 2
+        n_fft (int, optional): number of fft bins. default: `ws` // 2 + 1
         pad (int): two sided padding of signal
         n_mels (int): number of MEL bins
-        window (torch windowing function): default: torch.hann_window
+        window (torch windowing function): default: `torch.hann_window`
         wkwargs (dict, optional): arguments for window function
 
     Example:
@@ -312,9 +319,9 @@ class MEL2(object):
         self.top_db = -80.
         self.f_max = None
         self.f_min = 0.
-        self.spec = SPECTROGRAM(self.sr, self.ws, self.hop, self.n_fft,
+        self.spec = SPECTROGRAM(self.ws, self.hop, self.n_fft,
                                 self.pad, self.window, self.wkwargs)
-        self.fm = F2M(self.n_mels, self.sr, self.f_max, self.f_min, self.n_fft)
+        self.fm = F2M(self.n_mels, self.sr, self.f_max, self.f_min)
         self.s2db = SPEC2DB("power", self.top_db)
         self.transforms = Compose([
             self.spec, self.fm, self.s2db,
