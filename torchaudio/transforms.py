@@ -306,7 +306,7 @@ class MEL2(object):
         >>> sig, sr = torchaudio.load("test.wav", normalization=True)
         >>> spec_mel = transforms.MEL2(sr)(sig)  # (c, l, m)
     """
-    def __init__(self, sr=16000, ws=400, hop=None, n_fft=None,
+    def __init__(self, sr=16000, ws=400, hop=None, n_fft=None, fmin=0., fmax=None,
                  pad=0, n_mels=40, window=torch.hann_window, wkwargs=None):
         self.window = window
         self.sr = sr
@@ -317,8 +317,8 @@ class MEL2(object):
         self.n_mels = n_mels  # number of mel frequency bins
         self.wkwargs = wkwargs
         self.top_db = -80.
-        self.f_max = None
-        self.f_min = 0.
+        self.f_max = fmax
+        self.f_min = fmin
         self.spec = SPECTROGRAM(self.ws, self.hop, self.n_fft,
                                 self.pad, self.window, self.wkwargs)
         self.fm = F2M(self.n_mels, self.sr, self.f_max, self.f_min)
