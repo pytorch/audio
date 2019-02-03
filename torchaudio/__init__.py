@@ -26,7 +26,7 @@ def load(filepath,
     """Loads an audio file from disk into a Tensor
 
     Args:
-        filepath (string): path to audio file
+        filepath (string or pathlib.Path): path to audio file
         out (Tensor, optional): an output Tensor to use instead of creating one
         normalization (bool, number, or callable, optional): If boolean `True`, then output is divided by `1 << 31`
                                                              (assumes signed 32-bit audio), and normalizes to `[0, 1]`.
@@ -60,6 +60,8 @@ def load(filepath,
         1.
 
     """
+    # stringify if `pathlib.Path` (noop if already `str`)
+    filepath = str(filepath)
     # check if valid file
     if not os.path.isfile(filepath):
         raise OSError("{} not found or is a directory".format(filepath))
