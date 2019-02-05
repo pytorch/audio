@@ -1,11 +1,6 @@
 from __future__ import division, print_function
 import torch
 import numpy as np
-try:
-    import librosa
-except ImportError:
-    librosa = None
-
 
 class Compose(object):
     """Composes several transforms together.
@@ -155,7 +150,7 @@ class LC2CL(object):
         return self.__class__.__name__ + '()'
 
 
-class SPECTROGRAM(object):
+class Spectrogram(object):
     """Create a spectrogram from a raw audio signal
 
     Args:
@@ -205,17 +200,17 @@ class SPECTROGRAM(object):
         return spec_f
 
 
-class F2M(object):
-    """This turns a normal STFT into a MEL Frequency STFT, using a conversion
+class MelScale(object):
+    """This turns a normal STFT into a mel frequency STFT, using a conversion
        matrix.  This uses triangular filter banks.
 
     Args:
-        n_mels (int): number of MEL bins
+        n_mels (int): number of mel bins
         sr (int): sample rate of audio signal
         f_max (float, optional): maximum frequency. default: `sr` // 2
         f_min (float): minimum frequency. default: 0
         n_stft (int, optional): number of filter banks from stft. Calculated from first input
-            if `None` is given.  See `n_fft` in `SPECTROGRAM`.
+            if `None` is given.  See `n_fft` in `Spectrogram`.
     """
     def __init__(self, n_mels=40, sr=16000, f_max=None, f_min=0., n_stft=None):
         self.n_mels = n_mels
@@ -261,7 +256,7 @@ class F2M(object):
         return 700. * (10**(mel / 2595.) - 1.)
 
 
-class SPEC2DB(object):
+class SpectogramToDB(object):
     """Turns a spectrogram from the power/amplitude scale to the decibel scale.
 
     Args:
@@ -285,10 +280,9 @@ class SPEC2DB(object):
         return spec_db
 
 
-class MEL2(object):
+class MelSpectrogram(object):
     """Create MEL Spectrograms from a raw audio signal using the stft
-       function in PyTorch.  Hopefully this solves the speed issue of using
-       librosa.
+       function in PyTorch.
 
     Sources:
         * https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe
@@ -300,6 +294,8 @@ class MEL2(object):
         ws (int): window size
         hop (int, optional): length of hop between STFT windows. default: `ws` // 2
         n_fft (int, optional): number of fft bins. default: `ws` // 2 + 1
+        f_max (float, optional): maximum frequency. default: `sr` // 2
+        f_min (float): minimum frequency. default: 0
         pad (int): two sided padding of signal
         n_mels (int): number of MEL bins
         window (torch windowing function): default: `torch.hann_window`
@@ -307,9 +303,9 @@ class MEL2(object):
 
     Example:
         >>> sig, sr = torchaudio.load("test.wav", normalization=True)
-        >>> spec_mel = transforms.MEL2(sr)(sig)  # (c, l, m)
+        >>> spec_mel = transforms.MelSpectrogram(sr)(sig)  # (c, l, m)
     """
-    def __init__(self, sr=16000, ws=400, hop=None, n_fft=None, fmin=0., fmax=None,
+    def __init__(self, sr=16000, ws=400, hop=None, n_fft=None, f_min=0., f_max=None,
                  pad=0, n_mels=40, window=torch.hann_window, wkwargs=None):
         self.window = window
         self.sr = sr
@@ -322,10 +318,10 @@ class MEL2(object):
         self.top_db = -80.
         self.f_max = fmax
         self.f_min = fmin
-        self.spec = SPECTROGRAM(self.ws, self.hop, self.n_fft,
+        self.spec = Spectrogram(self.ws, self.hop, self.n_fft,
                                 self.pad, self.window, self.wkwargs)
-        self.fm = F2M(self.n_mels, self.sr, self.f_max, self.f_min)
-        self.s2db = SPEC2DB("power", self.top_db)
+        self.fm = MelScale(self.n_mels, self.sr, self.f_max, self.f_min)
+        self.s2db = SpectogramToDB("power", self.top_db)
         self.transforms = Compose([
             self.spec, self.fm, self.s2db,
         ])
@@ -344,48 +340,6 @@ class MEL2(object):
         spec_mel_db = self.transforms(sig)
 
         return spec_mel_db
-
-
-class MEL(object):
-    """Create MEL Spectrograms from a raw audio signal. Relatively pretty slow.
-
-       Usage (see librosa.feature.melspectrogram docs):
-           MEL(sr=16000, n_fft=1600, hop_length=800, n_mels=64)
-    """
-
-    def __init__(self, **kwargs):
-        self.kwargs = kwargs
-
-    def __call__(self, tensor):
-        """
-
-        Args:
-            tensor (Tensor): Tensor of audio of size (samples [n] x channels [c])
-
-        Returns:
-            tensor (Tensor): n_mels x hops x channels (BxLxC), where n_mels is
-                the number of mel bins, hops is the number of hops, and channels
-                is unchanged.
-
-        """
-
-        if librosa is None:
-            print("librosa not installed, cannot create spectrograms")
-            return tensor
-        L = []
-        for i in range(tensor.size(1)):
-            nparr = tensor[:, i].numpy()  # (samples, )
-            sgram = librosa.feature.melspectrogram(
-                nparr, **self.kwargs)  # (n_mels, hops)
-            L.append(sgram)
-        L = np.stack(L, 2)  # (n_mels, hops, channels)
-        tensor = torch.from_numpy(L).type_as(tensor)
-
-        return tensor
-
-    def __repr__(self):
-        return self.__class__.__name__ + '()'
-
 
 class BLC2CBL(object):
     """Permute a 3d tensor from Bands x Sample length x Channels to Channels x
