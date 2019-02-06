@@ -316,8 +316,8 @@ class MelSpectrogram(object):
         self.n_mels = n_mels  # number of mel frequency bins
         self.wkwargs = wkwargs
         self.top_db = -80.
-        self.f_max = fmax
-        self.f_min = fmin
+        self.f_max = f_max
+        self.f_min = f_min
         self.spec = Spectrogram(self.ws, self.hop, self.n_fft,
                                 self.pad, self.window, self.wkwargs)
         self.fm = MelScale(self.n_mels, self.sr, self.f_max, self.f_min)
