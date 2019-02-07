@@ -86,22 +86,6 @@ class Tester(unittest.TestCase):
         repr_test = transforms.LC2CL()
         self.assertTrue(repr_test.__repr__())
 
-    def test_mel(self):
-
-        audio = self.sig.clone()
-        audio = transforms.Scale()(audio)
-        self.assertTrue(audio.dim() == 2)
-        result = transforms.MEL()(audio)
-        self.assertTrue(result.dim() == 3)
-        result = transforms.BLC2CBL()(result)
-        self.assertTrue(result.dim() == 3)
-
-        repr_test = transforms.MEL()
-        self.assertTrue(repr_test.__repr__())
-
-        repr_test = transforms.BLC2CBL()
-        self.assertTrue(repr_test.__repr__())
-
     def test_compose(self):
 
         audio_orig = self.sig.clone()
@@ -155,7 +139,7 @@ class Tester(unittest.TestCase):
         audio_orig = self.sig.clone()  # (16000, 1)
         audio_scaled = transforms.Scale()(audio_orig)  # (16000, 1)
         audio_scaled = transforms.LC2CL()(audio_scaled)  # (1, 16000)
-        mel_transform = transforms.MEL2()
+        mel_transform = transforms.MelSpectrogram()
         # check defaults
         spectrogram_torch = mel_transform(audio_scaled)  # (1, 319, 40)
         self.assertTrue(spectrogram_torch.dim() == 3)
@@ -166,7 +150,7 @@ class Tester(unittest.TestCase):
         self.assertTrue(mel_transform.fm.fb.sum(1).le(1.).all())
         self.assertTrue(mel_transform.fm.fb.sum(1).ge(0.).all())
         # check options
-        mel_transform2 = transforms.MEL2(window=torch.hamming_window, pad=10, ws=500, hop=125, n_fft=800, n_mels=50)
+        mel_transform2 = transforms.MelSpectrogram(window=torch.hamming_window, pad=10, ws=500, hop=125, n_fft=800, n_mels=50)
         spectrogram2_torch = mel_transform2(audio_scaled)  # (1, 506, 50)
         self.assertTrue(spectrogram2_torch.dim() == 3)
         self.assertTrue(spectrogram2_torch.le(0.).all())
@@ -183,7 +167,7 @@ class Tester(unittest.TestCase):
         self.assertTrue(spectrogram_stereo.ge(mel_transform.top_db).all())
         self.assertEqual(spectrogram_stereo.size(-1), mel_transform.n_mels)
         # check filterbank matrix creation
-        fb_matrix_transform = transforms.F2M(n_mels=100, sr=16000, f_max=None, f_min=0., n_stft=400)
+        fb_matrix_transform = transforms.MelScale(n_mels=100, sr=16000, f_max=None, f_min=0., n_stft=400)
         self.assertTrue(fb_matrix_transform.fb.sum(1).le(1.).all())
         self.assertTrue(fb_matrix_transform.fb.sum(1).ge(0.).all())
         self.assertEqual(fb_matrix_transform.fb.size(), (400, 100))
