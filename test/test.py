@@ -175,11 +175,13 @@ class Test_LoadSave(unittest.TestCase):
             import scipy
         except:
             return
+
+        cuda8 = torch.device('cuda:8')
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
         sound, sample_rate = torchaudio.load(input_path)
         sound_librosa = sound.cpu().numpy().squeeze().T # squeeze batch and channel first
-
-
+            
+        sound = sound.to(cuda8)
         n_fft = 400
         hop_length = 200
         power = 2.0
@@ -191,7 +193,7 @@ class Test_LoadSave(unittest.TestCase):
         spect_transform = torchaudio.transforms.Spectrogram(n_fft=n_fft, hop=hop_length, power=2)
         out_librosa, _ = librosa.core.spectrum._spectrogram(y=sound_librosa, n_fft=n_fft, hop_length=hop_length, power=2)
 
-        out_torch = spect_transform(sound).squeeze().numpy().T
+        out_torch = spect_transform(sound).squeeze().cpu().numpy().T
         self.assertTrue(np.allclose(out_torch, out_librosa, atol=1e-5))
 
         # test mel spectrogram
@@ -200,7 +202,7 @@ class Test_LoadSave(unittest.TestCase):
         librosa_mel = librosa.feature.melspectrogram(y=sound_librosa, sr=sample_rate,
                                                      n_fft=n_fft, hop_length=hop_length, n_mels=n_mels, 
                                                      htk=True,norm=None)
-        torch_mel = melspect_transform(sound).squeeze().numpy().T
+        torch_mel = melspect_transform(sound).squeeze().cpu().numpy().T
 
         # lower tolerance, think it's double vs. float 
         self.assertTrue(np.allclose(torch_mel, librosa_mel, atol=5e-3))
@@ -209,12 +211,12 @@ class Test_LoadSave(unittest.TestCase):
         # test s2db
 
         db_transform = torchaudio.transforms.SpectrogramToDB("power", 80.)
-        db_torch = db_transform(spect_transform(sound)).squeeze().numpy().T
+        db_torch = db_transform(spect_transform(sound)).squeeze().cpu().numpy().T
         db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
 
         self.assertTrue(np.allclose(db_torch, db_librosa, atol=5e-3))
         
-        db_torch = db_transform(melspect_transform(sound)).squeeze().numpy().T
+        db_torch = db_transform(melspect_transform(sound)).squeeze().cpu().numpy().T
         db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
     
         self.assertTrue(np.allclose(db_torch, db_librosa, atol=5e-3))
@@ -243,10 +245,9 @@ class Test_LoadSave(unittest.TestCase):
                                             # n_mels=n_mels)
 
         librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm='ortho')[:n_mfcc]
-        torch_mfcc = mfcc_transform(sound).squeeze().numpy().T
+        torch_mfcc = mfcc_transform(sound).squeeze().cpu().numpy().T
 
         self.assertTrue(np.allclose(torch_mfcc, librosa_mfcc, atol=5e-3))
-
 
 if __name__ == '__main__':
     unittest.main()

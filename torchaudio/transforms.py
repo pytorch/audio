@@ -245,7 +245,7 @@ class MelScale(object):
             self.fb = self._create_fb_matrix(spec_f.size(2)).to(spec_f.device)
         else:
             # need to ensure same device for dot product
-            self.fb.to(spec_f.device)
+            self.fb = self.fb.to(spec_f.device)
         spec_m = torch.matmul(spec_f, self.fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
         return spec_m
 
@@ -282,7 +282,7 @@ class MelScale(object):
 
 
 
-class SpectogramToDB(object):
+class SpectrogramToDB(object):
     """Turns a spectrogram from the power/amplitude scale to the decibel scale.
 
     Args:
@@ -295,15 +295,15 @@ class SpectogramToDB(object):
         self.stype = stype
         self.top_db = top_db
         self.multiplier = 10. if stype == "power" else 20.
-
         self.amin = torch.tensor([1e-10])
         self.ref_value = torch.tensor([1.0])
 
     def __call__(self, spec):
 
         # numerically stable implementation from librosa
+        # https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
         spec_db = self.multiplier * torch.log10(torch.max(self.amin.to(spec.device), spec))
-        spec_db -= self.multiplier * torch.log10(torch.max(self.amin.to(spec.device), self.ref_value))
+        spec_db -= self.multiplier * torch.log10(torch.max(self.amin.to(spec.device), self.ref_value.to(spec.device)))
 
         if self.top_db is not None:
             spec_db = torch.max(spec_db, spec_db.new_full((1,), spec_db.max() - self.top_db))
