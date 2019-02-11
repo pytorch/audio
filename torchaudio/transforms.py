@@ -160,18 +160,23 @@ class Spectrogram(object):
         n_fft (int, optional): size of fft, creates n_fft // 2 + 1 bins. default: ws
         pad (int): two sided padding of signal
         window (torch windowing function): default: torch.hann_window
+        power (int > 0 ) : Exponent for the magnitude spectrogram,
+                        e.g., 1 for energy, 2 for power, etc.
+        normalize (bool) : whether to normalize by magnitude after stft
         wkwargs (dict, optional): arguments for window function
-
     """
-    def __init__(self, ws=400, hop=None, n_fft=None,
-                 pad=0, window=torch.hann_window, wkwargs=None):
-        self.window = window(ws) if wkwargs is None else window(ws, **wkwargs)
-        self.ws = ws
-        self.hop = hop if hop is not None else ws // 2
+    def __init__(self, n_fft=400, ws=None, hop=None, 
+                 pad=0, window=torch.hann_window,
+                 power=2, normalize=False, wkwargs=None):
+        self.n_fft = n_fft
         # number of fft bins. the returned STFT result will have n_fft // 2 + 1
         # number of frequecies due to onesided=True in torch.stft
-        self.n_fft = n_fft if n_fft is not None else ws
+        self.ws = ws if ws is not None else n_fft
+        self.hop = hop if hop is not None else self.ws // 2
+        self.window = window(self.ws) if wkwargs is None else window(self.ws, **wkwargs)
         self.pad = pad
+        self.power = power
+        self.normalize = normalize
         self.wkwargs = wkwargs
 
     def __call__(self, sig):
@@ -192,11 +197,15 @@ class Spectrogram(object):
             with torch.no_grad():
                 sig = torch.nn.functional.pad(sig, (self.pad, self.pad), "constant")
         self.window = self.window.to(sig.device)
+
+        # default values are consistent with librosa.core.spectrum._spectrogram
         spec_f = torch.stft(sig, self.n_fft, self.hop, self.ws,
-                            self.window, center=False,
-                            normalized=True, onesided=True).transpose(1, 2)
-        spec_f /= self.window.pow(2).sum().sqrt()
-        spec_f = spec_f.pow(2).sum(-1)  # get power of "complex" tensor (c, l, n_fft)
+                            self.window, center=True,
+                            normalized=False, onesided=True,
+                            pad_mode='reflect').transpose(1, 2)
+        if self.normalize: 
+            spec_f /= self.window.pow(2).sum().sqrt()
+        spec_f = spec_f.pow(self.power).sum(-1)  # get power of "complex" tensor (c, l, n_fft)
         return spec_f
 
 
@@ -212,7 +221,7 @@ class MelScale(object):
         n_stft (int, optional): number of filter banks from stft. Calculated from first input
             if `None` is given.  See `n_fft` in `Spectrogram`.
     """
-    def __init__(self, n_mels=40, sr=16000, f_max=None, f_min=0., n_stft=None):
+    def __init__(self, n_mels=128, sr=16000, f_max=None, f_min=0., n_stft=None):
         self.n_mels = n_mels
         self.sr = sr
         self.f_max = f_max if f_max is not None else sr // 2
@@ -222,6 +231,9 @@ class MelScale(object):
     def __call__(self, spec_f):
         if self.fb is None:
             self.fb = self._create_fb_matrix(spec_f.size(2)).to(spec_f.device)
+        else:
+            # need to ensure same device for dot product
+            self.fb.to(spec_f.device)
         spec_m = torch.matmul(spec_f, self.fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
         return spec_m
 
@@ -256,7 +268,7 @@ class MelScale(object):
         return 700. * (10**(mel / 2595.) - 1.)
 
 
-class SpectogramToDB(object):
+class SpectrogramToDB(object):
     """Turns a spectrogram from the power/amplitude scale to the decibel scale.
 
     Args:
@@ -267,18 +279,61 @@ class SpectogramToDB(object):
     """
     def __init__(self, stype="power", top_db=None):
         self.stype = stype
-        if top_db is not None and top_db > 0:
-            top_db = -top_db
         self.top_db = top_db
         self.multiplier = 10. if stype == "power" else 20.
 
+        self.amin = torch.tensor([1e-10])
+        self.ref_value = torch.tensor([1.0])
+
     def __call__(self, spec):
 
-        spec_db = self.multiplier * torch.log10(spec / spec.max())  # power -> dB
+        # numerically stable implementation from librosa
+        spec_db = self.multiplier * torch.log10(torch.max(self.amin.to(spec.device), spec))
+        spec_db -= self.multiplier * torch.log10(torch.max(self.amin.to(spec.device), self.ref_value))
+
         if self.top_db is not None:
-            spec_db = torch.max(spec_db, spec_db.new_full((1,),self.top_db))
+            spec_db = torch.max(spec_db, spec_db.new_full((1,), spec_db.max() - self.top_db))
         return spec_db
 
+
+class MFCC(object):
+    """Create the Mel-frequency cepstrum coefficients from an audio signal
+
+        Args:
+        sr (int) : sample rate of audio signal
+        n_mfcc (int) : number of mfc coefficients to retain
+        dct_type (int) : type of DCT (discrete cosine transform) to use
+        norm (string) : norm to use
+        melkwargs (dict, optional): arguments for MelSpectrogram
+    """
+    def __init__(self, sr=16000, n_mfcc=40, dct_type=2, norm='ortho', melkwargs=None):
+
+        supported_dct_types = [2]
+        if dct_type not in supported_dct_types:
+            raise ValueError('DCT type not supported'.format(dct_type))
+        self.sr = sr
+        self.n_mfcc = n_mfcc
+        self.dct_type = dct_type
+        self.norm = norm
+        self.melkwargs = melkwargs
+        self.top_db = 80.
+        self.s2db = SpectrogramToDB("power", self.top_db)
+        self.MelSpectrogram = MelSpectrogram(sr=self.sr, **melkwargs) if melkwargs is not None else MelSpectrogram(sr=self.sr)
+
+    def __call__(self, sig):
+        """
+        Args:
+            sig (Tensor): Tensor of audio of size (channels [c], samples [n])
+
+        Returns:
+            spec_mel_db (Tensor): channels x hops x n_mels (c, l, m), where channels
+                is unchanged, hops is the number of hops, and n_mels is the
+                number of mel bins.
+
+        """
+        mel_spect_db = self.s2db(self.MelSpectrogram(sig))
+        mfcc = dct(mel_spect_db, norm=self.norm)[:, :, :self.n_mfcc]
+        return mfcc
 
 class MelSpectrogram(object):
     """Create MEL Spectrograms from a raw audio signal using the stft
@@ -305,30 +360,29 @@ class MelSpectrogram(object):
         >>> sig, sr = torchaudio.load("test.wav", normalization=True)
         >>> spec_mel = transforms.MelSpectrogram(sr)(sig)  # (c, l, m)
     """
-    def __init__(self, sr=16000, ws=400, hop=None, n_fft=None, f_min=0., f_max=None,
-                 pad=0, n_mels=40, window=torch.hann_window, wkwargs=None):
+    def __init__(self, sr=16000, n_fft=400, ws=None, hop=None, f_min=0., f_max=None,
+                 pad=0, n_mels=128, window=torch.hann_window, wkwargs=None):
         self.window = window
         self.sr = sr
-        self.ws = ws
-        self.hop = hop if hop is not None else ws // 2
-        self.n_fft = n_fft  # number of fourier bins (ws // 2 + 1 by default)
+        self.n_fft = n_fft
+        self.ws = ws if ws is not None else n_fft
+        self.hop = hop if hop is not None else self.ws // 2
         self.pad = pad
         self.n_mels = n_mels  # number of mel frequency bins
         self.wkwargs = wkwargs
-        self.top_db = -80.
         self.f_max = f_max
         self.f_min = f_min
-        self.spec = Spectrogram(self.ws, self.hop, self.n_fft,
-                                self.pad, self.window, self.wkwargs)
+        self.spec = Spectrogram(n_fft=self.n_fft, ws=self.ws, hop=self.hop,
+                                pad=self.pad, window=self.window, power=2,
+                                normalize=False, wkwargs=self.wkwargs)
         self.fm = MelScale(self.n_mels, self.sr, self.f_max, self.f_min)
-        self.s2db = SpectogramToDB("power", self.top_db)
         self.transforms = Compose([
-            self.spec, self.fm, self.s2db,
+            self.spec, self.fm
         ])
 
     def __call__(self, sig):
         """
-        Args:
+        Args: 
             sig (Tensor): Tensor of audio of size (channels [c], samples [n])
 
         Returns:
@@ -444,3 +498,36 @@ class MuLawExpanding(object):
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
+
+
+def dct(x, norm=None):
+    """
+    from https://github.com/zh217/torch-dct/blob/master/torch_dct/_dct.py
+    Discrete Cosine Transform, Type II (a.k.a. the DCT)
+    For the meaning of the parameter `norm`, see:
+    https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.fftpack.dct.html
+    :param x: the input signal
+    :param norm: the normalization, None or 'ortho'
+    :return: the DCT-II of the signal over the last dimension
+    """
+    x_shape = x.shape
+    N = x_shape[-1]
+    x = x.contiguous().view(-1, N)
+
+    v = torch.cat([x[:, ::2], x[:, 1::2].flip([1])], dim=1)
+
+    Vc = torch.rfft(v, 1, onesided=False)
+
+    k = - torch.arange(N, dtype=x.dtype, device=x.device)[None, :] * np.pi / (2 * N)
+    W_r = torch.cos(k)
+    W_i = torch.sin(k)
+
+    V = Vc[:, :, 0] * W_r - Vc[:, :, 1] * W_i
+
+    if norm == 'ortho':
+        V[:, 0] /= np.sqrt(N) * 2
+        V[:, 1:] /= np.sqrt(N / 2) * 2
+
+    V = 2 * V.view(*x_shape)
+
+    return V
