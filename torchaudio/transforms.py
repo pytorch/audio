@@ -1,6 +1,8 @@
 from __future__ import division, print_function
+from warnings import warn
 import torch
 import numpy as np
+
 
 class Compose(object):
     """Composes several transforms together.
@@ -150,6 +152,11 @@ class LC2CL(object):
         return self.__class__.__name__ + '()'
 
 
+def SPECTROGRAM(*args, **kwargs):
+    warn("SPECTROGRAM has been renamed to Spectrogram")
+    return Spectrogram(*args, **kwargs)
+
+
 class Spectrogram(object):
     """Create a spectrogram from a raw audio signal
 
@@ -207,6 +214,11 @@ class Spectrogram(object):
             spec_f /= self.window.pow(2).sum().sqrt()
         spec_f = spec_f.pow(self.power).sum(-1)  # get power of "complex" tensor (c, l, n_fft)
         return spec_f
+
+
+def F2M(*args, **kwargs):
+    warn("F2M has been renamed to MelScale")
+    return MelScale(*args, **kwargs)
 
 
 class MelScale(object):
@@ -268,7 +280,9 @@ class MelScale(object):
         return 700. * (10**(mel / 2595.) - 1.)
 
 
-class SpectrogramToDB(object):
+
+
+class SpectogramToDB(object):
     """Turns a spectrogram from the power/amplitude scale to the decibel scale.
 
     Args:
@@ -335,6 +349,7 @@ class MFCC(object):
         mfcc = dct(mel_spect_db, norm=self.norm)[:, :, :self.n_mfcc]
         return mfcc
 
+
 class MelSpectrogram(object):
     """Create MEL Spectrograms from a raw audio signal using the stft
        function in PyTorch.
@@ -394,6 +409,11 @@ class MelSpectrogram(object):
         spec_mel_db = self.transforms(sig)
 
         return spec_mel_db
+
+
+def MEL(*args, **kwargs):
+    raise DeprecationWarning("MEL has been removed from the library please use MelSpectrogram or librosa")
+
 
 class BLC2CBL(object):
     """Permute a 3d tensor from Bands x Sample length x Channels to Channels x
