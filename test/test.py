@@ -176,12 +176,10 @@ class Test_LoadSave(unittest.TestCase):
         except:
             return
 
-        cuda8 = torch.device('cuda:8')
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
         sound, sample_rate = torchaudio.load(input_path)
         sound_librosa = sound.cpu().numpy().squeeze().T # squeeze batch and channel first
             
-        sound = sound.to(cuda8)
         n_fft = 400
         hop_length = 200
         power = 2.0
