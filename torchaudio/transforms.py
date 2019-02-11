@@ -1,6 +1,8 @@
 from __future__ import division, print_function
+from warnings import warn
 import torch
 import numpy as np
+
 
 class Compose(object):
     """Composes several transforms together.
@@ -150,6 +152,11 @@ class LC2CL(object):
         return self.__class__.__name__ + '()'
 
 
+def SPECTROGRAM(*args, **kwargs):
+    warn("SPECTROGRAM has been renamed to Spectrogram")
+    return Spectrogram(*args, **kwargs)
+
+
 class Spectrogram(object):
     """Create a spectrogram from a raw audio signal
 
@@ -198,6 +205,11 @@ class Spectrogram(object):
         spec_f /= self.window.pow(2).sum().sqrt()
         spec_f = spec_f.pow(2).sum(-1)  # get power of "complex" tensor (c, l, n_fft)
         return spec_f
+
+
+def F2M(*args, **kwargs):
+    warn("F2M has been renamed to MelScale")
+    return MelScale(*args, **kwargs)
 
 
 class MelScale(object):
@@ -256,6 +268,11 @@ class MelScale(object):
         return 700. * (10**(mel / 2595.) - 1.)
 
 
+def SPEC2DB(*args, **kwargs):
+    warn("SPEC2DB has been renamed to SpectogramToDB, please update your program")
+    return SpectogramToDB(*args, **kwargs)
+
+
 class SpectogramToDB(object):
     """Turns a spectrogram from the power/amplitude scale to the decibel scale.
 
@@ -276,8 +293,13 @@ class SpectogramToDB(object):
 
         spec_db = self.multiplier * torch.log10(spec / spec.max())  # power -> dB
         if self.top_db is not None:
-            spec_db = torch.max(spec_db, spec_db.new_full((1,),self.top_db))
+            spec_db = torch.max(spec_db, spec_db.new_full((1,), self.top_db))
         return spec_db
+
+
+def MEL2(*args, **kwargs):
+    warn("MEL2 has been renamed to MelSpectrogram")
+    return MelSpectrogram(*args, **kwargs)
 
 
 class MelSpectrogram(object):
@@ -340,6 +362,11 @@ class MelSpectrogram(object):
         spec_mel_db = self.transforms(sig)
 
         return spec_mel_db
+
+
+def MEL(*args, **kwargs):
+    raise DeprecationWarning("MEL has been removed from the library please use MelSpectrogram or librosa")
+
 
 class BLC2CBL(object):
     """Permute a 3d tensor from Bands x Sample length x Channels to Channels x

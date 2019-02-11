@@ -150,7 +150,8 @@ class Tester(unittest.TestCase):
         self.assertTrue(mel_transform.fm.fb.sum(1).le(1.).all())
         self.assertTrue(mel_transform.fm.fb.sum(1).ge(0.).all())
         # check options
-        mel_transform2 = transforms.MelSpectrogram(window=torch.hamming_window, pad=10, ws=500, hop=125, n_fft=800, n_mels=50)
+        kwargs = {"window": torch.hamming_window, "pad": 10, "ws": 500, "hop": 125, "n_fft": 800, "n_mels": 50}
+        mel_transform2 = transforms.MelSpectrogram(**kwargs)
         spectrogram2_torch = mel_transform2(audio_scaled)  # (1, 506, 50)
         self.assertTrue(spectrogram2_torch.dim() == 3)
         self.assertTrue(spectrogram2_torch.le(0.).all())
