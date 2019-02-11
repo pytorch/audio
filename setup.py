@@ -36,4 +36,6 @@ setup(
             extra_compile_args=eca,
             extra_link_args=ela),
     ],
-    cmdclass={'build_ext': BuildExtension})
+    cmdclass={'build_ext': BuildExtension},
+    install_requires=['torch']
+)
