@@ -201,7 +201,7 @@ class Tester(unittest.TestCase):
         # check norms work correctly
         mfcc_transform_norm_none = torchaudio.transforms.MFCC(sr=sample_rate,
                                                               n_mfcc=n_mfcc,
-                                                              norm='None')
+                                                              norm=None)
         torch_mfcc_norm_none = mfcc_transform_norm_none(audio_scaled)
 
         norm_check = torch_mfcc.clone()
