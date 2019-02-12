@@ -172,7 +172,7 @@ class Spectrogram(object):
         normalize (bool) : whether to normalize by magnitude after stft
         wkwargs (dict, optional): arguments for window function
     """
-    def __init__(self, n_fft=400, ws=None, hop=None, 
+    def __init__(self, n_fft=400, ws=None, hop=None,
                  pad=0, window=torch.hann_window,
                  power=2, normalize=False, wkwargs=None):
         self.n_fft = n_fft
@@ -210,7 +210,7 @@ class Spectrogram(object):
                             self.window, center=True,
                             normalized=False, onesided=True,
                             pad_mode='reflect').transpose(1, 2)
-        if self.normalize: 
+        if self.normalize:
             spec_f /= self.window.pow(2).sum().sqrt()
         spec_f = spec_f.pow(self.power).sum(-1)  # get power of "complex" tensor (c, l, n_fft)
         return spec_f
@@ -280,8 +280,6 @@ class MelScale(object):
         return 700. * (10**(mel / 2595.) - 1.)
 
 
-
-
 class SpectrogramToDB(object):
     """Turns a spectrogram from the power/amplitude scale to the decibel scale.
 
@@ -332,7 +330,11 @@ class MFCC(object):
         self.melkwargs = melkwargs
         self.top_db = 80.
         self.s2db = SpectrogramToDB("power", self.top_db)
-        self.MelSpectrogram = MelSpectrogram(sr=self.sr, **melkwargs) if melkwargs is not None else MelSpectrogram(sr=self.sr)
+
+        if melkwargs is not None:
+            self.MelSpectrogram = MelSpectrogram(sr=self.sr, **melkwargs)
+        else:
+            self.MelSpectrogram = MelSpectrogram(sr=self.sr)
 
     def __call__(self, sig):
         """
@@ -397,7 +399,7 @@ class MelSpectrogram(object):
 
     def __call__(self, sig):
         """
-        Args: 
+        Args:
             sig (Tensor): Tensor of audio of size (channels [c], samples [n])
 
         Returns:

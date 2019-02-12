@@ -3,7 +3,7 @@ import torch
 import torchaudio
 import math
 import os
-import numpy as np
+
 
 class Test_LoadSave(unittest.TestCase):
     test_dirpath = os.path.dirname(os.path.realpath(__file__))
@@ -168,86 +168,6 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(si.length, samples)
         self.assertEqual(si.rate, rate)
         self.assertEqual(ei.bits_per_sample, precision)
-
-    def test_6_librosa_consistency(self):
-        try:
-            import librosa
-            import scipy
-        except:
-            return
-
-        cuda8 = torch.device('cuda:8')
-        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
-        sound, sample_rate = torchaudio.load(input_path)
-        sound_librosa = sound.cpu().numpy().squeeze().T # squeeze batch and channel first
-            
-        sound = sound.to(cuda8)
-        n_fft = 400
-        hop_length = 200
-        power = 2.0
-        n_mels = 128
-        n_mfcc = 40
-        sample_rate = 16000
-
-        # test core spectrogram 
-        spect_transform = torchaudio.transforms.Spectrogram(n_fft=n_fft, hop=hop_length, power=2)
-        out_librosa, _ = librosa.core.spectrum._spectrogram(y=sound_librosa, n_fft=n_fft, hop_length=hop_length, power=2)
-
-        out_torch = spect_transform(sound).squeeze().cpu().numpy().T
-        self.assertTrue(np.allclose(out_torch, out_librosa, atol=1e-5))
-
-        # test mel spectrogram
-        melspect_transform = torchaudio.transforms.MelSpectrogram(sr=sample_rate,window=torch.hann_window,
-                                                        hop=hop_length, n_mels=n_mels, n_fft=n_fft)
-        librosa_mel = librosa.feature.melspectrogram(y=sound_librosa, sr=sample_rate,
-                                                     n_fft=n_fft, hop_length=hop_length, n_mels=n_mels, 
-                                                     htk=True,norm=None)
-        torch_mel = melspect_transform(sound).squeeze().cpu().numpy().T
-
-        # lower tolerance, think it's double vs. float 
-        self.assertTrue(np.allclose(torch_mel, librosa_mel, atol=5e-3))
-
-
-        # test s2db
-
-        db_transform = torchaudio.transforms.SpectrogramToDB("power", 80.)
-        db_torch = db_transform(spect_transform(sound)).squeeze().cpu().numpy().T
-        db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
-
-        self.assertTrue(np.allclose(db_torch, db_librosa, atol=5e-3))
-        
-        db_torch = db_transform(melspect_transform(sound)).squeeze().cpu().numpy().T
-        db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
-    
-        self.assertTrue(np.allclose(db_torch, db_librosa, atol=5e-3))
-
-
-        # test MFCC
-        melkwargs = {'hop': hop_length, 'n_fft': n_fft}
-        mfcc_transform = torchaudio.transforms.MFCC(sr=sample_rate,
-                                                    n_mfcc=n_mfcc,
-                                                    norm='ortho',
-                                                    melkwargs=melkwargs)
-       
-
-        # librosa.feature.mfcc doesn't pass kwargs properly since some of the
-        # kwargs for melspectrogram and mfcc are the same. We just follow the
-        # function body in https://librosa.github.io/librosa/_modules/librosa/feature/spectral.html#melspectrogram
-        # to mirror this:
-
-#         librosa_mfcc = librosa.feature.mfcc(y=sound_librosa,
-                                            # sr=sample_rate,
-                                            # n_mfcc = n_mfcc,
-                                            # hop_length=hop_length,
-                                            # n_fft=n_fft,
-                                            # htk=True,
-                                            # norm=None,
-                                            # n_mels=n_mels)
-
-        librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm='ortho')[:n_mfcc]
-        torch_mfcc = mfcc_transform(sound).squeeze().cpu().numpy().T
-
-        self.assertTrue(np.allclose(torch_mfcc, librosa_mfcc, atol=5e-3))
 
 if __name__ == '__main__':
     unittest.main()
