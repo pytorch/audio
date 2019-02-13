@@ -336,6 +336,43 @@ class MFCC(object):
         else:
             self.MelSpectrogram = MelSpectrogram(sr=self.sr)
 
+    def dct(self, x, norm=None):
+        """
+        Discrete Cosine Transform, Type II (a.k.a. the DCT)
+        For the meaning of the parameter `norm`, see:
+        https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.fftpack.dct.html
+        :param x: the input signal
+        :param norm: the normalization, None or 'ortho'
+        :return: the DCT-II of the signal over the last dimension
+        """
+        x_shape = x.size()
+        l = x.new_tensor(x_shape[-1])
+
+        slices_base = [slice(x_shape_i) for x_shape_i in x_shape[:-1]]
+        v = torch.cat((x[slices_base + [slice(0, None, 2)]],
+                       x[slices_base + [slice(1, None, 2)]].flip([-1])),
+                      dim=-1)  # (*, l)
+        Vc = torch.rfft(v, 1, onesided=False)  # (*, l, 2)
+
+        k = -torch.arange(l, dtype=x.dtype, device=x.device) * np.pi / (2 * l)
+        for _ in range(Vc.dim() - 2):
+            k.unsqueeze_(0)
+        W_r, W_i = k.cos(), k.sin()  # (1,..., l)
+
+        # V is (*, l)
+        V = Vc.narrow(-1, 0, 1).squeeze(-1) * W_r - Vc.narrow(-1, 1, 1).squeeze(-1) * W_i
+
+        if norm == 'ortho':
+            V_ndim_0 = V.narrow(-1, 0, 1)
+            V_ndim_rest = V.narrow(-1, 1, x_shape[-1] - 1)
+
+            V_ndim_0.div_(torch.sqrt(l) * 2)
+            V_ndim_rest.div_(torch.sqrt(l / 2) * 2)
+
+        V.mul_(2.)
+
+        return V
+
     def __call__(self, sig):
         """
         Args:
@@ -348,7 +385,7 @@ class MFCC(object):
 
         """
         mel_spect_db = self.s2db(self.MelSpectrogram(sig))
-        mfcc = dct(mel_spect_db, norm=self.norm)[:, :, :self.n_mfcc]
+        mfcc = self.dct(mel_spect_db, norm=self.norm)[:, :, :self.n_mfcc]
         return mfcc
 
 
@@ -520,36 +557,3 @@ class MuLawExpanding(object):
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
-
-
-def dct(x, norm=None):
-    """
-    from https://github.com/zh217/torch-dct/blob/master/torch_dct/_dct.py
-    Discrete Cosine Transform, Type II (a.k.a. the DCT)
-    For the meaning of the parameter `norm`, see:
-    https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.fftpack.dct.html
-    :param x: the input signal
-    :param norm: the normalization, None or 'ortho'
-    :return: the DCT-II of the signal over the last dimension
-    """
-    x_shape = x.shape
-    N = x_shape[-1]
-    x = x.contiguous().view(-1, N)
-
-    v = torch.cat([x[:, ::2], x[:, 1::2].flip([1])], dim=1)
-
-    Vc = torch.rfft(v, 1, onesided=False)
-
-    k = - torch.arange(N, dtype=x.dtype, device=x.device)[None, :] * np.pi / (2 * N)
-    W_r = torch.cos(k)
-    W_i = torch.sin(k)
-
-    V = Vc[:, :, 0] * W_r - Vc[:, :, 1] * W_i
-
-    if norm == 'ortho':
-        V[:, 0] /= np.sqrt(N) * 2
-        V[:, 1:] /= np.sqrt(N / 2) * 2
-
-    V = 2 * V.view(*x_shape)
-
-    return V
