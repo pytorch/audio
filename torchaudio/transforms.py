@@ -315,6 +315,10 @@ class SpectrogramToDB(object):
 class MFCC(object):
     """Create the Mel-frequency cepstrum coefficients from an audio signal
 
+        By default, this calculates the MFCC on the DB-scaled Mel spectrogram.
+        This is not the textbook implementation, but is implemented here to
+        give consistency with librosa.
+
         This output depends on the maximum value in the input spectrogram, and so
         may return different values for an audio clip split into snippets vs. a
         a full clip.
@@ -324,9 +328,11 @@ class MFCC(object):
         n_mfcc (int) : number of mfc coefficients to retain
         dct_type (int) : type of DCT (discrete cosine transform) to use
         norm (string) : norm to use
+        log_mels (bool) : whether to use log-mel spectrograms instead of db-scaled
         melkwargs (dict, optional): arguments for MelSpectrogram
     """
-    def __init__(self, sr=16000, n_mfcc=40, dct_type=2, norm='ortho', melkwargs=None):
+    def __init__(self, sr=16000, n_mfcc=40, dct_type=2, norm='ortho', log_mels=False,
+                 melkwargs=None):
 
         supported_dct_types = [2]
         if dct_type not in supported_dct_types:
@@ -347,6 +353,7 @@ class MFCC(object):
         if self.n_mfcc > self.MelSpectrogram.n_mels:
             raise ValueError('Cannot select more MFCC coefficients than # mel bins')
         self.dct_mat = self.create_dct()
+        self.log_mels = log_mels
 
     def create_dct(self):
         """
@@ -378,8 +385,13 @@ class MFCC(object):
                 is unchanged, hops is the number of hops, and n_mels is the
                 number of mel bins.
         """
-        mel_spect_db = self.s2db(self.MelSpectrogram(sig))
-        mfcc = torch.matmul(mel_spect_db, self.dct_mat.to(mel_spect_db.device))
+        mel_spect = self.MelSpectrogram(sig)
+        if self.log_mels:
+            log_offset = 1e-6
+            mel_spect = torch.log(mel_spect + log_offset)
+        else:
+            mel_spect = self.s2db(mel_spect)
+        mfcc = torch.matmul(mel_spect, self.dct_mat.to(mel_spect.device))
         return mfcc
 
 
