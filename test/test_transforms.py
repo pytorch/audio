@@ -214,7 +214,7 @@ class Tester(unittest.TestCase):
         try:
             import librosa
             import scipy
-        except:
+        except ImportError:
             return
 
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')

@@ -144,7 +144,6 @@ class LC2CL(object):
 
         Returns:
             tensor (Tensor): Tensor of audio signal with shape (CxL)
-
         """
         return tensor.transpose(0, 1).contiguous()
 
@@ -283,25 +282,31 @@ class MelScale(object):
 class SpectrogramToDB(object):
     """Turns a spectrogram from the power/amplitude scale to the decibel scale.
 
+    This output depends on the maximum value in the input spectrogram, and so
+    may return different values for an audio clip split into snippets vs. a
+    a full clip.
+
     Args:
         stype (str): scale of input spectrogram ("power" or "magnitude").  The
             power being the elementwise square of the magnitude. default: "power"
         top_db (float, optional): minimum negative cut-off in decibels.  A reasonable number
-            is -80.
+            is 80.
     """
     def __init__(self, stype="power", top_db=None):
         self.stype = stype
+        if top_db < 0:
+            raise ValueError('top_db must be positive value')
         self.top_db = top_db
         self.multiplier = 10. if stype == "power" else 20.
-        self.amin = torch.tensor([1e-10])
-        self.ref_value = torch.tensor([1.0])
+        self.amin = 1e-10
+        self.ref_value = 1.
+        self.db_multiplier = np.log10(np.maximum(self.amin, self.ref_value))
 
     def __call__(self, spec):
-
         # numerically stable implementation from librosa
         # https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
-        spec_db = self.multiplier * torch.log10(torch.max(self.amin.to(spec.device), spec))
-        spec_db -= self.multiplier * torch.log10(torch.max(self.amin.to(spec.device), self.ref_value.to(spec.device)))
+        spec_db = self.multiplier * torch.log10(torch.clamp(spec, min=self.amin))
+        spec_db -= self.multiplier * self.db_multiplier
 
         if self.top_db is not None:
             spec_db = torch.max(spec_db, spec_db.new_full((1,), spec_db.max() - self.top_db))
@@ -310,6 +315,10 @@ class SpectrogramToDB(object):
 
 class MFCC(object):
     """Create the Mel-frequency cepstrum coefficients from an audio signal
+
+        This output depends on the maximum value in the input spectrogram, and so
+        may return different values for an audio clip split into snippets vs. a
+        a full clip.
 
         Args:
         sr (int) : sample rate of audio signal
@@ -336,42 +345,31 @@ class MFCC(object):
         else:
             self.MelSpectrogram = MelSpectrogram(sr=self.sr)
 
-    def dct(self, x, norm=None):
+        if self.n_mfcc > self.MelSpectrogram.n_mels:
+            raise ValueError('Cannot select more MFCC coefficients than # mel bins')
+        self.dct_mat = self.create_dct()
+
+    def create_dct(self):
         """
-        Discrete Cosine Transform, Type II (a.k.a. the DCT)
-        For the meaning of the parameter `norm`, see:
-        https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.fftpack.dct.html
-        :param x: the input signal
-        :param norm: the normalization, None or 'ortho'
-        :return: the DCT-II of the signal over the last dimension
+        Creates a DCT transformation matrix.
+        @param dim: Dimensionality of input data to transform
+        @param outdim: If given, create a matrix for the first 'outdim' DCT
+            coefficients only. If omitted, create a full (squared) DCT matrix.
+        @param orthogonal: If given, makes the transform orthogonal
+        @return The transformation matrix, to be right-multiplied to row-wise data.
         """
-        x_shape = x.size()
-        l = x.new_tensor(x_shape[-1])
-
-        slices_base = [slice(x_shape_i) for x_shape_i in x_shape[:-1]]
-        v = torch.cat((x[slices_base + [slice(0, None, 2)]],
-                       x[slices_base + [slice(1, None, 2)]].flip([-1])),
-                      dim=-1)  # (*, l)
-        Vc = torch.rfft(v, 1, onesided=False)  # (*, l, 2)
-
-        k = -torch.arange(l, dtype=x.dtype, device=x.device) * np.pi / (2 * l)
-        for _ in range(Vc.dim() - 2):
-            k.unsqueeze_(0)
-        W_r, W_i = k.cos(), k.sin()  # (1,..., l)
-
-        # V is (*, l)
-        V = Vc.narrow(-1, 0, 1).squeeze(-1) * W_r - Vc.narrow(-1, 1, 1).squeeze(-1) * W_i
-
-        if norm == 'ortho':
-            V_ndim_0 = V.narrow(-1, 0, 1)
-            V_ndim_rest = V.narrow(-1, 1, x_shape[-1] - 1)
-
-            V_ndim_0.div_(torch.sqrt(l) * 2)
-            V_ndim_rest.div_(torch.sqrt(l / 2) * 2)
-
-        V.mul_(2.)
-
-        return V
+        outdim = self.n_mfcc
+        dim = self.MelSpectrogram.n_mels
+        # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
+        n = np.arange(dim)
+        k = np.arange(outdim)[:, np.newaxis]
+        dct = np.cos(np.pi / dim * (n + 0.5) * k)
+        if self.norm == 'ortho':
+            dct[0] *= 1.0 / np.sqrt(2)
+            dct *= np.sqrt(2.0 / dim)
+        else:
+            dct *= 2
+        return torch.Tensor(dct.T)
 
     def __call__(self, sig):
         """
@@ -385,7 +383,7 @@ class MFCC(object):
 
         """
         mel_spect_db = self.s2db(self.MelSpectrogram(sig))
-        mfcc = self.dct(mel_spect_db, norm=self.norm)[:, :, :self.n_mfcc]
+        mfcc = torch.matmul(mel_spect_db, self.dct_mat)
         return mfcc
 
 
@@ -440,14 +438,14 @@ class MelSpectrogram(object):
             sig (Tensor): Tensor of audio of size (channels [c], samples [n])
 
         Returns:
-            spec_mel_db (Tensor): channels x hops x n_mels (c, l, m), where channels
+            spec_mel (Tensor): channels x hops x n_mels (c, l, m), where channels
                 is unchanged, hops is the number of hops, and n_mels is the
                 number of mel bins.
 
         """
-        spec_mel_db = self.transforms(sig)
+        spec_mel = self.transforms(sig)
 
-        return spec_mel_db
+        return spec_mel
 
 
 def MEL(*args, **kwargs):
