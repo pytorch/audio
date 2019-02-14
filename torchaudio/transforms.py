@@ -379,7 +379,7 @@ class MFCC(object):
                 number of mel bins.
         """
         mel_spect_db = self.s2db(self.MelSpectrogram(sig))
-        mfcc = torch.matmul(mel_spect_db, self.dct_mat.to(sig.device))
+        mfcc = torch.matmul(mel_spect_db, self.dct_mat.to(mel_spect_db.device))
         return mfcc
 
 
