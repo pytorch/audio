@@ -350,11 +350,8 @@ class MFCC(object):
 
     def create_dct(self):
         """
-        Creates a DCT transformation matrix.
-        @param dim: Dimensionality of input data to transform
-        @param outdim: If given, create a matrix for the first 'outdim' DCT
-            coefficients only. If omitted, create a full (squared) DCT matrix.
-        @param orthogonal: If given, makes the transform orthogonal
+        Creates a DCT transformation matrix with shape (num_mels, num_mfcc),
+        normalized depending on self.norm
         @return The transformation matrix, to be right-multiplied to row-wise data.
         """
         outdim = self.n_mfcc
