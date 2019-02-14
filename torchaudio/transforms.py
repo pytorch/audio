@@ -160,10 +160,9 @@ class Spectrogram(object):
     """Create a spectrogram from a raw audio signal
 
     Args:
-        sr (int): sample rate of audio signal
-        ws (int): window size
+        n_fft (int, optional): size of fft, creates n_fft // 2 + 1 bins
+        ws (int): window size. default: n_fft
         hop (int, optional): length of hop between STFT windows. default: ws // 2
-        n_fft (int, optional): size of fft, creates n_fft // 2 + 1 bins. default: ws
         pad (int): two sided padding of signal
         window (torch windowing function): default: torch.hann_window
         power (int > 0 ) : Exponent for the magnitude spectrogram,
