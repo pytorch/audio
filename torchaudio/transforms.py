@@ -352,7 +352,8 @@ class MFCC(object):
         """
         Creates a DCT transformation matrix with shape (num_mels, num_mfcc),
         normalized depending on self.norm
-        @return The transformation matrix, to be right-multiplied to row-wise data.
+        Returns:
+            The transformation matrix, to be right-multiplied to row-wise data.
         """
         outdim = self.n_mfcc
         dim = self.MelSpectrogram.n_mels
@@ -376,7 +377,6 @@ class MFCC(object):
             spec_mel_db (Tensor): channels x hops x n_mels (c, l, m), where channels
                 is unchanged, hops is the number of hops, and n_mels is the
                 number of mel bins.
-
         """
         mel_spect_db = self.s2db(self.MelSpectrogram(sig))
         mfcc = torch.matmul(mel_spect_db, self.dct_mat)
