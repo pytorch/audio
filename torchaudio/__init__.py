@@ -200,7 +200,7 @@ def sox_signalinfo_t():
       - rate (float), sample rate as a float, practically will likely be an integer float
       - channel (int), number of audio channels
       - precision (int), bit precision
-      - length (int), length of audio, 0 for unspecified and -1 for unknown
+      - length (int), length of audio in samples * channels, 0 for unspecified and -1 for unknown
       - mult (float, optional), headroom multiplier for effects and None for no multiplier
 
     Example::
