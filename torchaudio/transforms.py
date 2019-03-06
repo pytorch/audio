@@ -293,7 +293,7 @@ class SpectrogramToDB(object):
     """
     def __init__(self, stype="power", top_db=None):
         self.stype = stype
-        if top_db < 0:
+        if top_db is not None and top_db < 0:
             raise ValueError('top_db must be positive value')
         self.top_db = top_db
         self.multiplier = 10. if stype == "power" else 20.
