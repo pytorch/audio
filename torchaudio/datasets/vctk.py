@@ -80,7 +80,7 @@ class VCTK(data.Dataset):
         download (bool, optional): If true, downloads the dataset from the internet and
             puts it in root directory. If dataset is already downloaded, it is not
             downloaded again.
-        transform (callable, optional): A function/transform that  takes in an PIL image
+        transform (callable, optional): A function/transform that  takes in an raw audio
             and returns a transformed version. E.g, ``transforms.Scale``
         target_transform (callable, optional): A function/transform that takes in the
             target and transforms it.
