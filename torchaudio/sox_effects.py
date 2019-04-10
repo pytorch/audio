@@ -52,7 +52,7 @@ class SoxEffectsChain(object):
 
         class MyDataset(Dataset):
             def __init__(self, audiodir_path):
-                self.data = [fn for fn in os.listdir(audiodir_path)]
+                self.data = [os.path.join(audiodir_path, fn) for fn in os.listdir(audiodir_path)]
                 self.E = torchaudio.sox_effects.SoxEffectsChain()
                 self.E.append_effect_to_chain("rate", [16000])  # resample to 16000hz
                 self.E.append_effect_to_chain("channels", ["1"])  # mono signal
