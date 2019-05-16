@@ -1,5 +1,5 @@
+import numpy as np
 import torch
-
 
 def scale(tensor, factor):
     # type: (Tensor, int) -> Tensor
@@ -34,7 +34,7 @@ def downmix_mono(tensor, ch_dim):
     return tensor
 
 
-def lc2cl(tensor):
+def LC2CL(tensor):
     # type: (Tensor) -> Tensor
     return tensor.transpose(0, 1).contiguous()
 
@@ -104,9 +104,79 @@ def mel_scale(spec_f, f_min, f_max, n_mels, fb=None):
 
 
 def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db):
+    # type: (Tensor, float, float, float, Optional[float]) -> Tensor
     spec_db = multiplier * torch.log10(torch.clamp(spec, min=amin))
     spec_db -= multiplier * db_multiplier
 
     if top_db is not None:
         spec_db = torch.max(spec_db, spec_db.new_full((1,), spec_db.max() - top_db))
     return spec_db
+
+
+def create_dct(n_mfcc, n_mels, norm):
+    # type: (int, int, string) -> Tensor
+    """
+    Creates a DCT transformation matrix with shape (num_mels, num_mfcc),
+    normalized depending on norm
+    Returns:
+        The transformation matrix, to be right-multiplied to row-wise data.
+    """
+    outdim = n_mfcc
+    dim = n_mels
+    # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
+    n = np.arange(dim)
+    k = np.arange(outdim)[:, np.newaxis]
+    dct = np.cos(np.pi / dim * (n + 0.5) * k)
+    if norm == 'ortho':
+        dct[0] *= 1.0 / np.sqrt(2)
+        dct *= np.sqrt(2.0 / dim)
+    else:
+        dct *= 2
+    return torch.Tensor(dct.T)
+
+
+def MFCC(sig, mel_spect, log_mels, s2db, dct_mat):
+    # type: (Tensor, MelSpectrogram, bool, SpectrogramToDB, Tensor) -> Tensor
+    if log_mels:
+        log_offset = 1e-6
+        mel_spect = torch.log(mel_spect + log_offset)
+    else:
+        mel_spect = s2db(mel_spect)
+    mfcc = torch.matmul(mel_spect, dct_mat.to(mel_spect.device))
+    return mfcc
+
+
+def BLC2CBL(tensor):
+    # type: (Tensor) -> Tensor
+    return tensor.permute(2, 0, 1).contiguous()
+
+
+def mu_law_encoding(x, qc):
+    # type: (Tensor/ndarray, int) -> Tensor/ndarray
+    mu = qc - 1.
+    if isinstance(x, np.ndarray):
+        x_mu = np.sign(x) * np.log1p(mu * np.abs(x)) / np.log1p(mu)
+        x_mu = ((x_mu + 1) / 2 * mu + 0.5).astype(int)
+    elif isinstance(x, torch.Tensor):
+        if not x.dtype.is_floating_point:
+            x = x.to(torch.float)
+        mu = torch.tensor(mu, dtype=x.dtype)
+        x_mu = torch.sign(x) * torch.log1p(mu *
+                                           torch.abs(x)) / torch.log1p(mu)
+        x_mu = ((x_mu + 1) / 2 * mu + 0.5).long()
+    return x_mu
+
+
+def mu_law_expanding(x, qc):
+    # type: (Tensor/ndarray, int) -> Tensor/ndarray
+    mu = qc - 1.
+    if isinstance(x_mu, np.ndarray):
+        x = ((x_mu) / mu) * 2 - 1.
+        x = np.sign(x) * (np.exp(np.abs(x) * np.log1p(mu)) - 1.) / mu
+    elif isinstance(x_mu, torch.Tensor):
+        if not x_mu.dtype.is_floating_point:
+            x_mu = x_mu.to(torch.float)
+        mu = torch.tensor(mu, dtype=x_mu.dtype)
+        x = ((x_mu) / mu) * 2 - 1.
+        x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.) / mu
+    return x

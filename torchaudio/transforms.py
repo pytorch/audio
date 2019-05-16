@@ -128,7 +128,7 @@ class LC2CL(object):
         Returns:
             tensor (Tensor): Tensor of audio signal with shape (CxL)
         """
-        return F.lc2cl(tensor)
+        return F.LC2CL(tensor)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
@@ -282,28 +282,8 @@ class MFCC(object):
 
         if self.n_mfcc > self.MelSpectrogram.n_mels:
             raise ValueError('Cannot select more MFCC coefficients than # mel bins')
-        self.dct_mat = self.create_dct()
+        self.dct_mat = F.create_dct(self.n_mfcc, self.MelSpectrogram.n_mels, self.norm)
         self.log_mels = log_mels
-
-    def create_dct(self):
-        """
-        Creates a DCT transformation matrix with shape (num_mels, num_mfcc),
-        normalized depending on self.norm
-        Returns:
-            The transformation matrix, to be right-multiplied to row-wise data.
-        """
-        outdim = self.n_mfcc
-        dim = self.MelSpectrogram.n_mels
-        # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
-        n = np.arange(dim)
-        k = np.arange(outdim)[:, np.newaxis]
-        dct = np.cos(np.pi / dim * (n + 0.5) * k)
-        if self.norm == 'ortho':
-            dct[0] *= 1.0 / np.sqrt(2)
-            dct *= np.sqrt(2.0 / dim)
-        else:
-            dct *= 2
-        return torch.Tensor(dct.T)
 
     def __call__(self, sig):
         """
@@ -315,14 +295,7 @@ class MFCC(object):
                 is unchanged, hops is the number of hops, and n_mels is the
                 number of mel bins.
         """
-        mel_spect = self.MelSpectrogram(sig)
-        if self.log_mels:
-            log_offset = 1e-6
-            mel_spect = torch.log(mel_spect + log_offset)
-        else:
-            mel_spect = self.s2db(mel_spect)
-        mfcc = torch.matmul(mel_spect, self.dct_mat.to(mel_spect.device))
-        return mfcc
+        return F.MFCC(sig, self.MelSpectrogram(sig), self.log_mels, self.s2db, self.dct_mat)
 
 
 class MelSpectrogram(object):
@@ -405,8 +378,7 @@ class BLC2CBL(object):
             tensor (Tensor): Tensor of spectrogram with shape (CxBxL)
 
         """
-
-        return tensor.permute(2, 0, 1).contiguous()
+        return F.BLC2CBL(tensor)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
@@ -437,18 +409,7 @@ class MuLawEncoding(object):
             x_mu (LongTensor or ndarray)
 
         """
-        mu = self.qc - 1.
-        if isinstance(x, np.ndarray):
-            x_mu = np.sign(x) * np.log1p(mu * np.abs(x)) / np.log1p(mu)
-            x_mu = ((x_mu + 1) / 2 * mu + 0.5).astype(int)
-        elif isinstance(x, torch.Tensor):
-            if not x.dtype.is_floating_point:
-                x = x.to(torch.float)
-            mu = torch.tensor(mu, dtype=x.dtype)
-            x_mu = torch.sign(x) * torch.log1p(mu *
-                                               torch.abs(x)) / torch.log1p(mu)
-            x_mu = ((x_mu + 1) / 2 * mu + 0.5).long()
-        return x_mu
+        return self.mu_law_encoding(x, self.qc)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
@@ -479,17 +440,7 @@ class MuLawExpanding(object):
             x (FloatTensor or ndarray)
 
         """
-        mu = self.qc - 1.
-        if isinstance(x_mu, np.ndarray):
-            x = ((x_mu) / mu) * 2 - 1.
-            x = np.sign(x) * (np.exp(np.abs(x) * np.log1p(mu)) - 1.) / mu
-        elif isinstance(x_mu, torch.Tensor):
-            if not x_mu.dtype.is_floating_point:
-                x_mu = x_mu.to(torch.float)
-            mu = torch.tensor(mu, dtype=x_mu.dtype)
-            x = ((x_mu) / mu) * 2 - 1.
-            x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.) / mu
-        return x
+        return F.mu_law_expanding(x, self.qc)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
