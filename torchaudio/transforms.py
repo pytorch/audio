@@ -65,7 +65,7 @@ class Scale(object):
 
 
 class PadTrim(object):
-    """Pad/Trim a 1d-Tensor (Signal or Labels)
+    """Pad/Trim a 2d-Tensor (Signal or Labels)
 
     Args:
         tensor (Tensor): Tensor of audio of size (n x c) or (c x n)
