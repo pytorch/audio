@@ -2,8 +2,7 @@ from __future__ import division, print_function
 from warnings import warn
 import torch
 import numpy as np
-import functional as F
-
+from . import functional as F
 
 class Compose(object):
     """Composes several transforms together.
@@ -58,7 +57,7 @@ class Scale(object):
             Tensor: Scaled by the scale factor. (default between -1.0 and 1.0)
 
         """
-        return F.scale(tensor, factor)
+        return F.scale(tensor, self.factor)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
@@ -409,7 +408,7 @@ class MuLawEncoding(object):
             x_mu (LongTensor or ndarray)
 
         """
-        return self.mu_law_encoding(x, self.qc)
+        return F.mu_law_encoding(x, self.qc)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
@@ -440,7 +439,7 @@ class MuLawExpanding(object):
             x (FloatTensor or ndarray)
 
         """
-        return F.mu_law_expanding(x, self.qc)
+        return F.mu_law_expanding(x_mu, self.qc)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'

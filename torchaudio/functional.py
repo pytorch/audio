@@ -2,6 +2,22 @@ import numpy as np
 import torch
 
 
+__all__ = [
+    'scale',
+    'pad_trim',
+    'downmix_mono',
+    'LC2CL',
+    'spectrogram',
+    'create_fb_matrix',
+    'mel_scale',
+    'spectrogram_to_DB',
+    'create_dct',
+    'MFCC',
+    'BLC2CBL',
+    'mu_law_encoding',
+    'mu_law_expanding'
+]
+
 def scale(tensor, factor):
     # type: (Tensor, int) -> Tensor
     """Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
@@ -34,7 +50,6 @@ def pad_trim(tensor, ch_dim, max_len, len_dim, fill_value):
 
     Outputs:
         Tensor: Padded/trimmed tensor
-
     """
     assert tensor.size(ch_dim) < 128, \
         "Too many channels ({}) detected, see channels_first param.".format(tensor.size(ch_dim))
@@ -316,7 +331,7 @@ def mu_law_encoding(x, qc):
     return x_mu
 
 
-def mu_law_expanding(x, qc):
+def mu_law_expanding(x_mu, qc):
     # type: (Tensor/ndarray, int) -> Tensor/ndarray
     """Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
@@ -325,7 +340,7 @@ def mu_law_expanding(x, qc):
     and returns a signal scaled between -1 and 1.
 
     Inputs:
-        x (Tensor): Input tensor
+        x_mu (Tensor): Input tensor
         qc (int): Number of channels (i.e. quantization channels)
 
     Outputs:
