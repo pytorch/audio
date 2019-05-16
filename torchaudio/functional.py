@@ -18,6 +18,7 @@ __all__ = [
     'mu_law_expanding'
 ]
 
+
 def scale(tensor, factor):
     # type: (Tensor, int) -> Tensor
     """Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
@@ -26,10 +27,10 @@ def scale(tensor, factor):
 
     Inputs:
         tensor (Tensor): Tensor of audio of size (Samples x Channels)
-        factor (int): Maximum value of input tensor. default: 16-bit depth
+        factor (int): Maximum value of input tensor
 
     Outputs:
-        Tensor: Scaled by the scale factor. (default between -1.0 and 1.0)
+        Tensor: Scaled by the scale factor
     """
     if not tensor.dtype.is_floating_point:
         tensor = tensor.to(torch.float32)
@@ -51,8 +52,6 @@ def pad_trim(tensor, ch_dim, max_len, len_dim, fill_value):
     Outputs:
         Tensor: Padded/trimmed tensor
     """
-    assert tensor.size(ch_dim) < 128, \
-        "Too many channels ({}) detected, see channels_first param.".format(tensor.size(ch_dim))
     if max_len > tensor.size(len_dim):
         # tuple of (padding_left, padding_right, padding_top, padding_bottom)
         # so pad similar to append (aka only right/bottom) and do not pad
@@ -109,7 +108,7 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
         window (Tensor): window_tensor
         n_fft (int): size of fft
         hop (int): length of hop between STFT windows
-        ws (int): window size. default: n_fft
+        ws (int): window size
         power (int > 0 ) : Exponent for the magnitude spectrogram,
                         e.g., 1 for energy, 2 for power, etc.
         normalize (bool) : whether to normalize by magnitude after stft

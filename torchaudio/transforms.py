@@ -4,6 +4,7 @@ import torch
 import numpy as np
 from . import functional as F
 
+
 class Compose(object):
     """Composes several transforms together.
 
