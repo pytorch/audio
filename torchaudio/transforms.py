@@ -205,46 +205,12 @@ class MelScale(object):
         self.sr = sr
         self.f_max = f_max if f_max is not None else sr // 2
         self.f_min = f_min
-        self.fb = self._create_fb_matrix(n_stft) if n_stft is not None else n_stft
+        self.fb = F.create_fb_matrix(
+            n_stft, self.f_min, self.f_max, self.n_mels) if n_stft is not None else n_stft
 
     def __call__(self, spec_f):
-        if self.fb is None:
-            self.fb = self._create_fb_matrix(spec_f.size(2)).to(spec_f.device)
-        else:
-            # need to ensure same device for dot product
-            self.fb = self.fb.to(spec_f.device)
-        spec_m = torch.matmul(spec_f, self.fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
+        self.fb, spec_m = F.mel_scale(spec_f, self.f_min, self.f_max, self.n_mels, self.fb)
         return spec_m
-
-    def _create_fb_matrix(self, n_stft):
-        """ Create a frequency bin conversion matrix.
-
-        Args:
-            n_stft (int): number of filter banks from spectrogram
-        """
-
-        # get stft freq bins
-        stft_freqs = torch.linspace(self.f_min, self.f_max, n_stft)
-        # calculate mel freq bins
-        m_min = 0. if self.f_min == 0 else self._hertz_to_mel(self.f_min)
-        m_max = self._hertz_to_mel(self.f_max)
-        m_pts = torch.linspace(m_min, m_max, self.n_mels + 2)
-        f_pts = self._mel_to_hertz(m_pts)
-        # calculate the difference between each mel point and each stft freq point in hertz
-        f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
-        slopes = f_pts.unsqueeze(0) - stft_freqs.unsqueeze(1)  # (n_stft, n_mels + 2)
-        # create overlapping triangles
-        z = torch.tensor(0.)
-        down_slopes = (-1. * slopes[:, :-2]) / f_diff[:-1]  # (n_stft, n_mels)
-        up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_stft, n_mels)
-        fb = torch.max(z, torch.min(down_slopes, up_slopes))
-        return fb
-
-    def _hertz_to_mel(self, f):
-        return 2595. * torch.log10(torch.tensor(1.) + (f / 700.))
-
-    def _mel_to_hertz(self, mel):
-        return 700. * (10**(mel / 2595.) - 1.)
 
 
 class SpectrogramToDB(object):
@@ -273,12 +239,7 @@ class SpectrogramToDB(object):
     def __call__(self, spec):
         # numerically stable implementation from librosa
         # https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
-        spec_db = self.multiplier * torch.log10(torch.clamp(spec, min=self.amin))
-        spec_db -= self.multiplier * self.db_multiplier
-
-        if self.top_db is not None:
-            spec_db = torch.max(spec_db, spec_db.new_full((1,), spec_db.max() - self.top_db))
-        return spec_db
+        return F.spectrogram_to_DB(spec, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
 
 class MFCC(object):
