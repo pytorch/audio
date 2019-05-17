@@ -2,6 +2,7 @@ from __future__ import division, print_function
 from warnings import warn
 import torch
 import numpy as np
+from . import functional as F
 
 
 class Compose(object):
@@ -57,17 +58,14 @@ class Scale(object):
             Tensor: Scaled by the scale factor. (default between -1.0 and 1.0)
 
         """
-        if not tensor.dtype.is_floating_point:
-            tensor = tensor.to(torch.float32)
-
-        return tensor / self.factor
+        return F.scale(tensor, self.factor)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
 
 
 class PadTrim(object):
-    """Pad/Trim a 1d-Tensor (Signal or Labels)
+    """Pad/Trim a 2d-Tensor (Signal or Labels)
 
     Args:
         tensor (Tensor): Tensor of audio of size (n x c) or (c x n)
@@ -88,18 +86,7 @@ class PadTrim(object):
             Tensor: (c x n) or (n x c)
 
         """
-        assert tensor.size(self.ch_dim) < 128, \
-            "Too many channels ({}) detected, see channels_first param.".format(tensor.size(self.ch_dim))
-        if self.max_len > tensor.size(self.len_dim):
-            padding = [self.max_len - tensor.size(self.len_dim)
-                       if (i % 2 == 1) and (i // 2 != self.len_dim)
-                       else 0
-                       for i in range(4)]
-            with torch.no_grad():
-                tensor = torch.nn.functional.pad(tensor, padding, "constant", self.fill_value)
-        elif self.max_len < tensor.size(self.len_dim):
-            tensor = tensor.narrow(self.len_dim, 0, self.max_len)
-        return tensor
+        return F.pad_trim(tensor, self.ch_dim, self.max_len, self.len_dim, self.fill_value)
 
     def __repr__(self):
         return self.__class__.__name__ + '(max_len={0})'.format(self.max_len)
@@ -122,11 +109,7 @@ class DownmixMono(object):
         self.ch_dim = int(not channels_first)
 
     def __call__(self, tensor):
-        if not tensor.dtype.is_floating_point:
-            tensor = tensor.to(torch.float32)
-
-        tensor = torch.mean(tensor, self.ch_dim, True)
-        return tensor
+        return F.downmix_mono(tensor, self.ch_dim)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
@@ -145,7 +128,7 @@ class LC2CL(object):
         Returns:
             tensor (Tensor): Tensor of audio signal with shape (CxL)
         """
-        return tensor.transpose(0, 1).contiguous()
+        return F.LC2CL(tensor)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
@@ -196,22 +179,8 @@ class Spectrogram(object):
                 by 2 plus 1.
 
         """
-        assert sig.dim() == 2
-
-        if self.pad > 0:
-            with torch.no_grad():
-                sig = torch.nn.functional.pad(sig, (self.pad, self.pad), "constant")
-        self.window = self.window.to(sig.device)
-
-        # default values are consistent with librosa.core.spectrum._spectrogram
-        spec_f = torch.stft(sig, self.n_fft, self.hop, self.ws,
-                            self.window, center=True,
-                            normalized=False, onesided=True,
-                            pad_mode='reflect').transpose(1, 2)
-        if self.normalize:
-            spec_f /= self.window.pow(2).sum().sqrt()
-        spec_f = spec_f.pow(self.power).sum(-1)  # get power of "complex" tensor (c, l, n_fft)
-        return spec_f
+        return F.spectrogram(sig, self.pad, self.window, self.n_fft, self.hop,
+                             self.ws, self.power, self.normalize)
 
 
 def F2M(*args, **kwargs):
@@ -236,46 +205,12 @@ class MelScale(object):
         self.sr = sr
         self.f_max = f_max if f_max is not None else sr // 2
         self.f_min = f_min
-        self.fb = self._create_fb_matrix(n_stft) if n_stft is not None else n_stft
+        self.fb = F.create_fb_matrix(
+            n_stft, self.f_min, self.f_max, self.n_mels) if n_stft is not None else n_stft
 
     def __call__(self, spec_f):
-        if self.fb is None:
-            self.fb = self._create_fb_matrix(spec_f.size(2)).to(spec_f.device)
-        else:
-            # need to ensure same device for dot product
-            self.fb = self.fb.to(spec_f.device)
-        spec_m = torch.matmul(spec_f, self.fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
+        self.fb, spec_m = F.mel_scale(spec_f, self.f_min, self.f_max, self.n_mels, self.fb)
         return spec_m
-
-    def _create_fb_matrix(self, n_stft):
-        """ Create a frequency bin conversion matrix.
-
-        Args:
-            n_stft (int): number of filter banks from spectrogram
-        """
-
-        # get stft freq bins
-        stft_freqs = torch.linspace(self.f_min, self.f_max, n_stft)
-        # calculate mel freq bins
-        m_min = 0. if self.f_min == 0 else self._hertz_to_mel(self.f_min)
-        m_max = self._hertz_to_mel(self.f_max)
-        m_pts = torch.linspace(m_min, m_max, self.n_mels + 2)
-        f_pts = self._mel_to_hertz(m_pts)
-        # calculate the difference between each mel point and each stft freq point in hertz
-        f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
-        slopes = f_pts.unsqueeze(0) - stft_freqs.unsqueeze(1)  # (n_stft, n_mels + 2)
-        # create overlapping triangles
-        z = torch.tensor(0.)
-        down_slopes = (-1. * slopes[:, :-2]) / f_diff[:-1]  # (n_stft, n_mels)
-        up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_stft, n_mels)
-        fb = torch.max(z, torch.min(down_slopes, up_slopes))
-        return fb
-
-    def _hertz_to_mel(self, f):
-        return 2595. * torch.log10(torch.tensor(1.) + (f / 700.))
-
-    def _mel_to_hertz(self, mel):
-        return 700. * (10**(mel / 2595.) - 1.)
 
 
 class SpectrogramToDB(object):
@@ -304,12 +239,7 @@ class SpectrogramToDB(object):
     def __call__(self, spec):
         # numerically stable implementation from librosa
         # https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
-        spec_db = self.multiplier * torch.log10(torch.clamp(spec, min=self.amin))
-        spec_db -= self.multiplier * self.db_multiplier
-
-        if self.top_db is not None:
-            spec_db = torch.max(spec_db, spec_db.new_full((1,), spec_db.max() - self.top_db))
-        return spec_db
+        return F.spectrogram_to_DB(spec, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
 
 class MFCC(object):
@@ -352,28 +282,8 @@ class MFCC(object):
 
         if self.n_mfcc > self.MelSpectrogram.n_mels:
             raise ValueError('Cannot select more MFCC coefficients than # mel bins')
-        self.dct_mat = self.create_dct()
+        self.dct_mat = F.create_dct(self.n_mfcc, self.MelSpectrogram.n_mels, self.norm)
         self.log_mels = log_mels
-
-    def create_dct(self):
-        """
-        Creates a DCT transformation matrix with shape (num_mels, num_mfcc),
-        normalized depending on self.norm
-        Returns:
-            The transformation matrix, to be right-multiplied to row-wise data.
-        """
-        outdim = self.n_mfcc
-        dim = self.MelSpectrogram.n_mels
-        # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
-        n = np.arange(dim)
-        k = np.arange(outdim)[:, np.newaxis]
-        dct = np.cos(np.pi / dim * (n + 0.5) * k)
-        if self.norm == 'ortho':
-            dct[0] *= 1.0 / np.sqrt(2)
-            dct *= np.sqrt(2.0 / dim)
-        else:
-            dct *= 2
-        return torch.Tensor(dct.T)
 
     def __call__(self, sig):
         """
@@ -385,14 +295,7 @@ class MFCC(object):
                 is unchanged, hops is the number of hops, and n_mels is the
                 number of mel bins.
         """
-        mel_spect = self.MelSpectrogram(sig)
-        if self.log_mels:
-            log_offset = 1e-6
-            mel_spect = torch.log(mel_spect + log_offset)
-        else:
-            mel_spect = self.s2db(mel_spect)
-        mfcc = torch.matmul(mel_spect, self.dct_mat.to(mel_spect.device))
-        return mfcc
+        return F.MFCC(sig, self.MelSpectrogram(sig), self.log_mels, self.s2db, self.dct_mat)
 
 
 class MelSpectrogram(object):
@@ -475,8 +378,7 @@ class BLC2CBL(object):
             tensor (Tensor): Tensor of spectrogram with shape (CxBxL)
 
         """
-
-        return tensor.permute(2, 0, 1).contiguous()
+        return F.BLC2CBL(tensor)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
@@ -507,18 +409,7 @@ class MuLawEncoding(object):
             x_mu (LongTensor or ndarray)
 
         """
-        mu = self.qc - 1.
-        if isinstance(x, np.ndarray):
-            x_mu = np.sign(x) * np.log1p(mu * np.abs(x)) / np.log1p(mu)
-            x_mu = ((x_mu + 1) / 2 * mu + 0.5).astype(int)
-        elif isinstance(x, torch.Tensor):
-            if not x.dtype.is_floating_point:
-                x = x.to(torch.float)
-            mu = torch.tensor(mu, dtype=x.dtype)
-            x_mu = torch.sign(x) * torch.log1p(mu *
-                                               torch.abs(x)) / torch.log1p(mu)
-            x_mu = ((x_mu + 1) / 2 * mu + 0.5).long()
-        return x_mu
+        return F.mu_law_encoding(x, self.qc)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
@@ -549,17 +440,7 @@ class MuLawExpanding(object):
             x (FloatTensor or ndarray)
 
         """
-        mu = self.qc - 1.
-        if isinstance(x_mu, np.ndarray):
-            x = ((x_mu) / mu) * 2 - 1.
-            x = np.sign(x) * (np.exp(np.abs(x) * np.log1p(mu)) - 1.) / mu
-        elif isinstance(x_mu, torch.Tensor):
-            if not x_mu.dtype.is_floating_point:
-                x_mu = x_mu.to(torch.float)
-            mu = torch.tensor(mu, dtype=x_mu.dtype)
-            x = ((x_mu) / mu) * 2 - 1.
-            x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.) / mu
-        return x
+        return F.mu_law_expanding(x_mu, self.qc)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
