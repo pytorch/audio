@@ -107,18 +107,7 @@ class Tester(unittest.TestCase):
 
     def test_mu_law_companding(self):
 
-        sig = self.sig.clone()
-
         quantization_channels = 256
-        sig = self.sig.numpy()
-        sig = sig / np.abs(sig).max()
-        self.assertTrue(sig.min() >= -1. and sig.max() <= 1.)
-
-        sig_mu = transforms.MuLawEncoding(quantization_channels)(sig)
-        self.assertTrue(sig_mu.min() >= 0. and sig.max() <= quantization_channels)
-
-        sig_exp = transforms.MuLawExpanding(quantization_channels)(sig_mu)
-        self.assertTrue(sig_exp.min() >= -1. and sig_exp.max() <= 1.)
 
         sig = self.sig.clone()
         sig = sig / torch.abs(sig).max()

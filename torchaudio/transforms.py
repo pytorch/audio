@@ -1,7 +1,7 @@
 from __future__ import division, print_function
 from warnings import warn
+import math
 import torch
-import numpy as np
 from . import functional as F
 
 
@@ -234,7 +234,7 @@ class SpectrogramToDB(object):
         self.multiplier = 10. if stype == "power" else 20.
         self.amin = 1e-10
         self.ref_value = 1.
-        self.db_multiplier = np.log10(np.maximum(self.amin, self.ref_value))
+        self.db_multiplier = math.log10(max(self.amin, self.ref_value))
 
     def __call__(self, spec):
         # numerically stable implementation from librosa
@@ -403,10 +403,10 @@ class MuLawEncoding(object):
         """
 
         Args:
-            x (FloatTensor/LongTensor or ndarray)
+            x (FloatTensor/LongTensor)
 
         Returns:
-            x_mu (LongTensor or ndarray)
+            x_mu (LongTensor)
 
         """
         return F.mu_law_encoding(x, self.qc)
@@ -434,10 +434,10 @@ class MuLawExpanding(object):
         """
 
         Args:
-            x_mu (FloatTensor/LongTensor or ndarray)
+            x_mu (Tensor)
 
         Returns:
-            x (FloatTensor or ndarray)
+            x (Tensor)
 
         """
         return F.mu_law_expanding(x_mu, self.qc)
