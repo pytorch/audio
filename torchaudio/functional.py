@@ -1,4 +1,4 @@
-import numpy as np
+import math
 import torch
 
 
@@ -245,15 +245,15 @@ def create_dct(n_mfcc, n_mels, norm):
     outdim = n_mfcc
     dim = n_mels
     # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
-    n = np.arange(dim)
-    k = np.arange(outdim)[:, np.newaxis]
-    dct = np.cos(np.pi / dim * (n + 0.5) * k)
+    n = torch.arange(dim, dtype=torch.float32)
+    k = torch.arange(outdim, dtype=torch.float32)[:, None]
+    dct = torch.cos(math.pi / dim * (n + 0.5) * k)
     if norm == 'ortho':
-        dct[0] *= 1.0 / np.sqrt(2)
-        dct *= np.sqrt(2.0 / dim)
+        dct[0] *= 1.0 / math.sqrt(2.0)
+        dct *= math.sqrt(2.0 / dim)
     else:
         dct *= 2
-    return torch.Tensor(dct.T)
+    return dct.t()
 
 
 def MFCC(sig, mel_spect, log_mels, s2db, dct_mat):
@@ -302,7 +302,7 @@ def BLC2CBL(tensor):
 
 
 def mu_law_encoding(x, qc):
-    # type: (Tensor/ndarray, int) -> Tensor/ndarray
+    # type: (Tensor, int) -> Tensor
     """Encode signal based on mu-law companding.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
@@ -317,21 +317,17 @@ def mu_law_encoding(x, qc):
         Tensor: Input after mu-law companding
     """
     mu = qc - 1.
-    if isinstance(x, np.ndarray):
-        x_mu = np.sign(x) * np.log1p(mu * np.abs(x)) / np.log1p(mu)
-        x_mu = ((x_mu + 1) / 2 * mu + 0.5).astype(int)
-    elif isinstance(x, torch.Tensor):
-        if not x.dtype.is_floating_point:
-            x = x.to(torch.float)
-        mu = torch.tensor(mu, dtype=x.dtype)
-        x_mu = torch.sign(x) * torch.log1p(mu *
-                                           torch.abs(x)) / torch.log1p(mu)
-        x_mu = ((x_mu + 1) / 2 * mu + 0.5).long()
+    if not x.dtype.is_floating_point:
+        x = x.to(torch.float)
+    mu = torch.tensor(mu, dtype=x.dtype)
+    x_mu = torch.sign(x) * torch.log1p(mu *
+                                       torch.abs(x)) / torch.log1p(mu)
+    x_mu = ((x_mu + 1) / 2 * mu + 0.5).long()
     return x_mu
 
 
 def mu_law_expanding(x_mu, qc):
-    # type: (Tensor/ndarray, int) -> Tensor/ndarray
+    # type: (Tensor, int) -> Tensor
     """Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
@@ -346,13 +342,9 @@ def mu_law_expanding(x_mu, qc):
         Tensor: Input after decoding
     """
     mu = qc - 1.
-    if isinstance(x_mu, np.ndarray):
-        x = ((x_mu) / mu) * 2 - 1.
-        x = np.sign(x) * (np.exp(np.abs(x) * np.log1p(mu)) - 1.) / mu
-    elif isinstance(x_mu, torch.Tensor):
-        if not x_mu.dtype.is_floating_point:
-            x_mu = x_mu.to(torch.float)
-        mu = torch.tensor(mu, dtype=x_mu.dtype)
-        x = ((x_mu) / mu) * 2 - 1.
-        x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.) / mu
+    if not x_mu.dtype.is_floating_point:
+        x_mu = x_mu.to(torch.float)
+    mu = torch.tensor(mu, dtype=x_mu.dtype)
+    x = ((x_mu) / mu) * 2 - 1.
+    x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.) / mu
     return x
