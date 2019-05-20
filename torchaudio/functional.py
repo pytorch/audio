@@ -316,6 +316,7 @@ def mu_law_encoding(x, qc):
     Outputs:
         Tensor: Input after mu-law companding
     """
+    assert(isinstance(x, torch.Tensor)), 'mu_law_encoding expects a Tensor'
     mu = qc - 1.
     if not x.dtype.is_floating_point:
         x = x.to(torch.float)
@@ -341,6 +342,7 @@ def mu_law_expanding(x_mu, qc):
     Outputs:
         Tensor: Input after decoding
     """
+    assert(isinstance(x_mu, torch.Tensor)), 'mu_law_expanding expects a Tensor'
     mu = qc - 1.
     if not x_mu.dtype.is_floating_point:
         x_mu = x_mu.to(torch.float)
