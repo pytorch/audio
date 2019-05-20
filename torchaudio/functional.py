@@ -323,7 +323,7 @@ def mu_law_encoding(x, qc):
     mu = torch.tensor(mu, dtype=x.dtype)
     x_mu = torch.sign(x) * torch.log1p(mu *
                                        torch.abs(x)) / torch.log1p(mu)
-    x_mu = ((x_mu + 1) / 2 * mu + 0.5).long()
+    x_mu = ((x_mu + 1) / 2 * mu + 0.5).to(torch.int64)
     return x_mu
 
 

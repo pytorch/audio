@@ -434,10 +434,10 @@ class MuLawExpanding(object):
         """
 
         Args:
-            x_mu (FloatTensor/LongTensor)
+            x_mu (Tensor)
 
         Returns:
-            x (FloatTensor)
+            x (Tensor)
 
         """
         return F.mu_law_expanding(x_mu, self.qc)
