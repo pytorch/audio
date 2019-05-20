@@ -245,8 +245,8 @@ def create_dct(n_mfcc, n_mels, norm):
     outdim = n_mfcc
     dim = n_mels
     # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
-    n = torch.arange(dim, dtype=torch.float32)
-    k = torch.arange(outdim, dtype=torch.float32)[:, None]
+    n = torch.arange(dim, dtype=torch.get_default_dtype())
+    k = torch.arange(outdim, dtype=torch.get_default_dtype())[:, None]
     dct = torch.cos(math.pi / dim * (n + 0.5) * k)
     if norm == 'ortho':
         dct[0] *= 1.0 / math.sqrt(2.0)
