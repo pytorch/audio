@@ -6,6 +6,7 @@ torchaudio: an audio library for PyTorch
     - mp3, wav, aac, ogg, flac, avr, cdda, cvs/vms,
     - aiff, au, amr, mp2, mp4, ac3, avi, wmv,
     - mpeg, ircam and any other format supported by libsox.
+    - [Kaldi (arc/scp)](http://pytorch.org/audio/kaldi_io.html)
 - [Dataloaders for common audio datasets (VCTK, YesNo)](http://pytorch.org/audio/datasets.html)
 - Common audio transforms
   - [Scale, PadTrim, DownmixMono, LC2CL, BLC2CBL, MuLawEncoding, MuLawExpanding](http://pytorch.org/audio/transforms.html)
