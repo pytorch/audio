@@ -202,6 +202,7 @@ class Tester(unittest.TestCase):
             import librosa
             import scipy
         except ImportError:
+            self.skipTest("Ensure that librosa and scipy are installed")
             return
 
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
@@ -234,7 +235,7 @@ class Tester(unittest.TestCase):
         torch_mel = melspect_transform(sound).squeeze().cpu().t()
 
         # lower tolerance, think it's double vs. float
-        self.assertTrue(torch.allclose(torch_mel.type(torch.DoubleTensor), torch.from_numpy(librosa_mel), atol=5e-3))
+        self.assertTrue(torch.allclose(torch_mel.type(torch.double), torch.from_numpy(librosa_mel), atol=5e-3))
 
         # test s2db
 
@@ -246,7 +247,7 @@ class Tester(unittest.TestCase):
         db_torch = db_transform(melspect_transform(sound)).squeeze().cpu().t()
         db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
 
-        self.assertTrue(torch.allclose(db_torch.type(torch.DoubleTensor), torch.from_numpy(db_librosa), atol=5e-3))
+        self.assertTrue(torch.allclose(db_torch.type(torch.double), torch.from_numpy(db_librosa), atol=5e-3))
 
         # test MFCC
         melkwargs = {'hop': hop_length, 'n_fft': n_fft}
@@ -272,7 +273,7 @@ class Tester(unittest.TestCase):
         librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm='ortho')[:n_mfcc]
         torch_mfcc = mfcc_transform(sound).squeeze().cpu().t()
 
-        self.assertTrue(torch.allclose(torch_mfcc.type(torch.DoubleTensor), torch.from_numpy(librosa_mfcc), atol=5e-3))
+        self.assertTrue(torch.allclose(torch_mfcc.type(torch.double), torch.from_numpy(librosa_mfcc), atol=5e-3))
 
 
 if __name__ == '__main__':
