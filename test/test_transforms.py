@@ -197,7 +197,7 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(torch_mfcc_norm_none.allclose(norm_check))
 
-    def test_librosa_consistency(self):
+    def _test_librosa_consistency_helper(self, n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
         try:
             import librosa
             import scipy
@@ -208,13 +208,6 @@ class Tester(unittest.TestCase):
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
         sound, sample_rate = torchaudio.load(input_path)
         sound_librosa = sound.cpu().numpy().squeeze().T  # squeeze batch and channel first
-
-        n_fft = 400
-        hop_length = 200
-        power = 2.0
-        n_mels = 128
-        n_mfcc = 40
-        sample_rate = 16000
 
         # test core spectrogram
         spect_transform = torchaudio.transforms.Spectrogram(n_fft=n_fft, hop=hop_length, power=2)
@@ -274,6 +267,38 @@ class Tester(unittest.TestCase):
         torch_mfcc = mfcc_transform(sound).squeeze().cpu().t()
 
         self.assertTrue(torch.allclose(torch_mfcc.type(torch.double), torch.from_numpy(librosa_mfcc), atol=5e-3))
+
+    def test_(self):
+        kwargs1 = {
+            'n_fft': 400,
+            'hop_length': 200,
+            'power': 2.0,
+            'n_mels': 128,
+            'n_mfcc': 40,
+            'sample_rate': 16000
+        }
+
+        kwargs2 = {
+            'n_fft': 600,
+            'hop_length': 100,
+            'power': 2.0,
+            'n_mels': 128,
+            'n_mfcc': 20,
+            'sample_rate': 16000
+        }
+
+        kwargs3 = {
+            'n_fft': 200,
+            'hop_length': 50,
+            'power': 2.0,
+            'n_mels': 128,
+            'n_mfcc': 40,
+            'sample_rate': 16000
+        }
+
+        self._test_librosa_consistency_helper(**kwargs1)
+        self._test_librosa_consistency_helper(**kwargs2)
+        self._test_librosa_consistency_helper(**kwargs3)
 
 
 if __name__ == '__main__':
