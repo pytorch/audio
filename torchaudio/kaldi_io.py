@@ -12,7 +12,9 @@ def default_not_imported_method():
 def wrap_method(fn, convert_contiguous=False):
     # type: (Function, bool) -> Function
     """ Takes a method with the signature (file name/descriptor) -> generator(string, ndarray)
-    and converts it to (file name/descriptor) -> generator(string, Tensor)
+    and converts it to (file name/descriptor) -> generator(string, Tensor).
+    convert_contiguous determines whether the array should be converted into a
+    contiguous layout.
     """
     def wrapped_fn(file_or_fd):
         for key, np_arr in fn(file_or_fd):
