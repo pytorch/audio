@@ -1,9 +1,9 @@
 from __future__ import print_function
+import math
 import os
 import torch
 import torchaudio
 import torchaudio.transforms as transforms
-import numpy as np
 import unittest
 
 
@@ -13,7 +13,7 @@ class Tester(unittest.TestCase):
     sr = 16000
     freq = 440
     volume = .3
-    sig = (torch.cos(2 * np.pi * torch.arange(0, 4 * sr).float() * freq / sr))
+    sig = (torch.cos(2 * math.pi * torch.arange(0, 4 * sr).float() * freq / sr))
     sig.unsqueeze_(1)  # (64000, 1)
     sig = (sig * volume * 2**31).long()
     # file for stereo stft test
@@ -27,8 +27,7 @@ class Tester(unittest.TestCase):
         result = transforms.Scale()(audio_orig)
         self.assertTrue(result.min() >= -1. and result.max() <= 1.)
 
-        maxminmax = np.abs(
-            [audio_orig.min(), audio_orig.max()]).max().astype(np.float)
+        maxminmax = float(max(abs(audio_orig.min()), abs(audio_orig.max())))
         result = transforms.Scale(factor=maxminmax)(audio_orig)
         self.assertTrue((result.min() == -1. or result.max() == 1.) and
                         result.min() >= -1. and result.max() <= 1.)
@@ -91,14 +90,13 @@ class Tester(unittest.TestCase):
         audio_orig = self.sig.clone()
         length_orig = audio_orig.size(0)
         length_new = int(length_orig * 1.2)
-        maxminmax = np.abs(
-            [audio_orig.min(), audio_orig.max()]).max().astype(np.float)
+        maxminmax = float(max(abs(audio_orig.min()), abs(audio_orig.max())))
 
         tset = (transforms.Scale(factor=maxminmax),
                 transforms.PadTrim(max_len=length_new, channels_first=False))
         result = transforms.Compose(tset)(audio_orig)
 
-        self.assertTrue(np.abs([result.min(), result.max()]).max() == 1.)
+        self.assertTrue(max(abs(result.min()), abs(result.max())) == 1.)
 
         self.assertTrue(result.size(0) == length_new)
 
@@ -194,8 +192,8 @@ class Tester(unittest.TestCase):
         torch_mfcc_norm_none = mfcc_transform_norm_none(audio_scaled)
 
         norm_check = torch_mfcc.clone()
-        norm_check[:, :, 0] *= np.sqrt(n_mels) * 2
-        norm_check[:, :, 1:] *= np.sqrt(n_mels / 2) * 2
+        norm_check[:, :, 0] *= math.sqrt(n_mels) * 2
+        norm_check[:, :, 1:] *= math.sqrt(n_mels / 2) * 2
 
         self.assertTrue(torch_mfcc_norm_none.allclose(norm_check))
 
@@ -224,8 +222,8 @@ class Tester(unittest.TestCase):
                                                             hop_length=hop_length,
                                                             power=2)
 
-        out_torch = spect_transform(sound).squeeze().cpu().numpy().T
-        self.assertTrue(np.allclose(out_torch, out_librosa, atol=1e-5))
+        out_torch = spect_transform(sound).squeeze().cpu().t()
+        self.assertTrue(torch.allclose(out_torch, torch.from_numpy(out_librosa), atol=1e-5))
 
         # test mel spectrogram
         melspect_transform = torchaudio.transforms.MelSpectrogram(sr=sample_rate, window=torch.hann_window,
@@ -233,22 +231,22 @@ class Tester(unittest.TestCase):
         librosa_mel = librosa.feature.melspectrogram(y=sound_librosa, sr=sample_rate,
                                                      n_fft=n_fft, hop_length=hop_length, n_mels=n_mels,
                                                      htk=True, norm=None)
-        torch_mel = melspect_transform(sound).squeeze().cpu().numpy().T
+        torch_mel = melspect_transform(sound).squeeze().cpu().t()
 
         # lower tolerance, think it's double vs. float
-        self.assertTrue(np.allclose(torch_mel, librosa_mel, atol=5e-3))
+        self.assertTrue(torch.allclose(torch_mel.type(torch.DoubleTensor), torch.from_numpy(librosa_mel), atol=5e-3))
 
         # test s2db
 
         db_transform = torchaudio.transforms.SpectrogramToDB("power", 80.)
-        db_torch = db_transform(spect_transform(sound)).squeeze().cpu().numpy().T
+        db_torch = db_transform(spect_transform(sound)).squeeze().cpu().t()
         db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
-        self.assertTrue(np.allclose(db_torch, db_librosa, atol=5e-3))
+        self.assertTrue(torch.allclose(db_torch, torch.from_numpy(db_librosa), atol=5e-3))
 
-        db_torch = db_transform(melspect_transform(sound)).squeeze().cpu().numpy().T
+        db_torch = db_transform(melspect_transform(sound)).squeeze().cpu().t()
         db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
 
-        self.assertTrue(np.allclose(db_torch, db_librosa, atol=5e-3))
+        self.assertTrue(torch.allclose(db_torch.type(torch.DoubleTensor), torch.from_numpy(db_librosa), atol=5e-3))
 
         # test MFCC
         melkwargs = {'hop': hop_length, 'n_fft': n_fft}
@@ -272,9 +270,9 @@ class Tester(unittest.TestCase):
 #                                             n_mels=n_mels)
 
         librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm='ortho')[:n_mfcc]
-        torch_mfcc = mfcc_transform(sound).squeeze().cpu().numpy().T
+        torch_mfcc = mfcc_transform(sound).squeeze().cpu().t()
 
-        self.assertTrue(np.allclose(torch_mfcc, librosa_mfcc, atol=5e-3))
+        self.assertTrue(torch.allclose(torch_mfcc.type(torch.DoubleTensor), torch.from_numpy(librosa_mfcc), atol=5e-3))
 
 
 if __name__ == '__main__':
