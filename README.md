@@ -12,6 +12,7 @@ torchaudio: an audio library for PyTorch
 
 Dependencies
 ------------
+* vesis84/kaldi-io-for-python commit cb46cb1f44318a5d04d4941cf39084c5b021241e or above
 * libsox v14.3.2 or above
 
 Quick install on
@@ -31,7 +32,7 @@ Installation
 # Linux
 python setup.py install
 
-# OSX 
+# OSX
 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
 ```
 
