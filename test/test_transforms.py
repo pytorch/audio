@@ -1,10 +1,17 @@
 from __future__ import print_function
 import math
 import os
+from common_utils import TEST_LIBROSA, TEST_SCIPY
 import torch
 import torchaudio
 import torchaudio.transforms as transforms
 import unittest
+
+if TEST_LIBROSA:
+    import librosa
+
+if TEST_SCIPY:
+    import scipy
 
 
 class Tester(unittest.TestCase):
@@ -197,78 +204,72 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(torch_mfcc_norm_none.allclose(norm_check))
 
-    def _test_librosa_consistency_helper(self, n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
-        try:
-            import librosa
-            import scipy
-        except ImportError:
-            self.skipTest("Ensure that librosa and scipy are installed")
-            return
+    @unittest.skipIf(not TEST_LIBROSA or not TEST_SCIPY, 'Librosa and scipy are not available')
+    def test_librosa_consistency(self):
+        def _test_librosa_consistency_helper(n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
+            input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+            sound, sample_rate = torchaudio.load(input_path)
+            sound_librosa = sound.cpu().numpy().squeeze().T  # squeeze batch and channel first
 
-        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
-        sound, sample_rate = torchaudio.load(input_path)
-        sound_librosa = sound.cpu().numpy().squeeze().T  # squeeze batch and channel first
+            # test core spectrogram
+            spect_transform = torchaudio.transforms.Spectrogram(n_fft=n_fft, hop=hop_length, power=2)
+            out_librosa, _ = librosa.core.spectrum._spectrogram(y=sound_librosa,
+                                                                n_fft=n_fft,
+                                                                hop_length=hop_length,
+                                                                power=2)
 
-        # test core spectrogram
-        spect_transform = torchaudio.transforms.Spectrogram(n_fft=n_fft, hop=hop_length, power=2)
-        out_librosa, _ = librosa.core.spectrum._spectrogram(y=sound_librosa,
-                                                            n_fft=n_fft,
-                                                            hop_length=hop_length,
-                                                            power=2)
+            out_torch = spect_transform(sound).squeeze().cpu().t()
+            self.assertTrue(torch.allclose(out_torch, torch.from_numpy(out_librosa), atol=1e-5))
 
-        out_torch = spect_transform(sound).squeeze().cpu().t()
-        self.assertTrue(torch.allclose(out_torch, torch.from_numpy(out_librosa), atol=1e-5))
+            # test mel spectrogram
+            melspect_transform = torchaudio.transforms.MelSpectrogram(sr=sample_rate, window=torch.hann_window,
+                                                                      hop=hop_length, n_mels=n_mels, n_fft=n_fft)
+            librosa_mel = librosa.feature.melspectrogram(y=sound_librosa, sr=sample_rate,
+                                                         n_fft=n_fft, hop_length=hop_length, n_mels=n_mels,
+                                                         htk=True, norm=None)
+            torch_mel = melspect_transform(sound).squeeze().cpu().t()
 
-        # test mel spectrogram
-        melspect_transform = torchaudio.transforms.MelSpectrogram(sr=sample_rate, window=torch.hann_window,
-                                                                  hop=hop_length, n_mels=n_mels, n_fft=n_fft)
-        librosa_mel = librosa.feature.melspectrogram(y=sound_librosa, sr=sample_rate,
-                                                     n_fft=n_fft, hop_length=hop_length, n_mels=n_mels,
-                                                     htk=True, norm=None)
-        torch_mel = melspect_transform(sound).squeeze().cpu().t()
+            # lower tolerance, think it's double vs. float
+            self.assertTrue(torch.allclose(torch_mel.type(torch.double), torch.from_numpy(librosa_mel), atol=5e-3))
 
-        # lower tolerance, think it's double vs. float
-        self.assertTrue(torch.allclose(torch_mel.type(torch.double), torch.from_numpy(librosa_mel), atol=5e-3))
+            # test s2db
 
-        # test s2db
+            db_transform = torchaudio.transforms.SpectrogramToDB("power", 80.)
+            db_torch = db_transform(spect_transform(sound)).squeeze().cpu().t()
+            db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
+            self.assertTrue(torch.allclose(db_torch, torch.from_numpy(db_librosa), atol=5e-3))
 
-        db_transform = torchaudio.transforms.SpectrogramToDB("power", 80.)
-        db_torch = db_transform(spect_transform(sound)).squeeze().cpu().t()
-        db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
-        self.assertTrue(torch.allclose(db_torch, torch.from_numpy(db_librosa), atol=5e-3))
+            db_torch = db_transform(melspect_transform(sound)).squeeze().cpu().t()
+            db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
 
-        db_torch = db_transform(melspect_transform(sound)).squeeze().cpu().t()
-        db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
+            self.assertTrue(torch.allclose(db_torch.type(torch.double), torch.from_numpy(db_librosa), atol=5e-3))
 
-        self.assertTrue(torch.allclose(db_torch.type(torch.double), torch.from_numpy(db_librosa), atol=5e-3))
+            # test MFCC
+            melkwargs = {'hop': hop_length, 'n_fft': n_fft}
+            mfcc_transform = torchaudio.transforms.MFCC(sr=sample_rate,
+                                                        n_mfcc=n_mfcc,
+                                                        norm='ortho',
+                                                        melkwargs=melkwargs)
 
-        # test MFCC
-        melkwargs = {'hop': hop_length, 'n_fft': n_fft}
-        mfcc_transform = torchaudio.transforms.MFCC(sr=sample_rate,
-                                                    n_mfcc=n_mfcc,
-                                                    norm='ortho',
-                                                    melkwargs=melkwargs)
+            # librosa.feature.mfcc doesn't pass kwargs properly since some of the
+            # kwargs for melspectrogram and mfcc are the same. We just follow the
+            # function body in https://librosa.github.io/librosa/_modules/librosa/feature/spectral.html#melspectrogram
+            # to mirror this function call with correct args:
 
-        # librosa.feature.mfcc doesn't pass kwargs properly since some of the
-        # kwargs for melspectrogram and mfcc are the same. We just follow the
-        # function body in https://librosa.github.io/librosa/_modules/librosa/feature/spectral.html#melspectrogram
-        # to mirror this function call with correct args:
+    #         librosa_mfcc = librosa.feature.mfcc(y=sound_librosa,
+    #                                             sr=sample_rate,
+    #                                             n_mfcc = n_mfcc,
+    #                                             hop_length=hop_length,
+    #                                             n_fft=n_fft,
+    #                                             htk=True,
+    #                                             norm=None,
+    #                                             n_mels=n_mels)
 
-#         librosa_mfcc = librosa.feature.mfcc(y=sound_librosa,
-#                                             sr=sample_rate,
-#                                             n_mfcc = n_mfcc,
-#                                             hop_length=hop_length,
-#                                             n_fft=n_fft,
-#                                             htk=True,
-#                                             norm=None,
-#                                             n_mels=n_mels)
+            librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm='ortho')[:n_mfcc]
+            torch_mfcc = mfcc_transform(sound).squeeze().cpu().t()
 
-        librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm='ortho')[:n_mfcc]
-        torch_mfcc = mfcc_transform(sound).squeeze().cpu().t()
+            self.assertTrue(torch.allclose(torch_mfcc.type(torch.double), torch.from_numpy(librosa_mfcc), atol=5e-3))
 
-        self.assertTrue(torch.allclose(torch_mfcc.type(torch.double), torch.from_numpy(librosa_mfcc), atol=5e-3))
-
-    def test_(self):
         kwargs1 = {
             'n_fft': 400,
             'hop_length': 200,
@@ -292,13 +293,13 @@ class Tester(unittest.TestCase):
             'hop_length': 50,
             'power': 2.0,
             'n_mels': 128,
-            'n_mfcc': 40,
-            'sample_rate': 16000
+            'n_mfcc': 50,
+            'sample_rate': 24000
         }
 
-        self._test_librosa_consistency_helper(**kwargs1)
-        self._test_librosa_consistency_helper(**kwargs2)
-        self._test_librosa_consistency_helper(**kwargs3)
+        _test_librosa_consistency_helper(**kwargs1)
+        _test_librosa_consistency_helper(**kwargs2)
+        _test_librosa_consistency_helper(**kwargs3)
 
 
 if __name__ == '__main__':
