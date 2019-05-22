@@ -28,7 +28,8 @@ def _check_module_exists(name):
         spec = importlib.util.find_spec(name)
         return spec is not None
 
-
+IMPORT_NUMPY = _check_module_exists('numpy')
+IMPORT_KALDI_IO = _check_module_exists('kaldi_io')
 IMPORT_SCIPY = _check_module_exists('scipy')
 
 # On Py2, importing librosa 0.6.1 triggers a TypeError (if using newest joblib)
