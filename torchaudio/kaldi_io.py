@@ -15,7 +15,7 @@ __all__ = [
 
 
 def _default_not_imported_method():
-    raise ImportError('Could not import kaldi_io')
+    raise ImportError('Could not import kaldi_io. Did you install it?')
 
 
 def _wrap_method(fn, convert_contiguous=False):
