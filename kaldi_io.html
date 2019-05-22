@@ -221,69 +221,129 @@
 This is a light wrapper around <code class="docutils literal notranslate"><span class="pre">kaldi_io</span></code> that returns <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensors</span></code>.</p>
 <div class="section" id="vectors">
 <h2>Vectors<a class="headerlink" href="#vectors" title="Permalink to this headline">¶</a></h2>
-<dl class="data">
+<div class="section" id="read-vec-int-ark">
+<h3><span class="hidden-section">read_vec_int_ark</span><a class="headerlink" href="#read-vec-int-ark" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
 <dt id="torchaudio.kaldi_io.read_vec_int_ark">
-<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_vec_int_ark</code><em class="property"> = &lt;function _wrap_method.&lt;locals&gt;._wrapped_fn&gt;</em><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_int_ark" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_vec_int_ark</code><span class="sig-paren">(</span><em>file_or_fd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/kaldi_io.html#read_vec_int_ark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_int_ark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create generator of (key,vector&lt;int&gt;) tuples, which reads from the ark file/stream.</p>
-<p>file_or_fd : ark, gzipped ark, pipe or opened file descriptor.</p>
-<p>Example, read ark to a ‘dictionary’:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># generator(key,vec) = torchaudio.kaldi_io.read_vec_int_ark(file_or_fd)</span>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_or_fd</strong> (<em>string/File Descriptor</em>) – ark, gzipped ark, pipe or opened file descriptor.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">generator[key (string), vec (Tensor)]</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read ark to a &#39;dictionary&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_int_ark</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<dl class="data">
+</div>
+<div class="section" id="read-vec-flt-scp">
+<h3><span class="hidden-section">read_vec_flt_scp</span><a class="headerlink" href="#read-vec-flt-scp" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
 <dt id="torchaudio.kaldi_io.read_vec_flt_scp">
-<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_vec_flt_scp</code><em class="property"> = &lt;function _wrap_method.&lt;locals&gt;._wrapped_fn&gt;</em><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_flt_scp" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_vec_flt_scp</code><span class="sig-paren">(</span><em>file_or_fd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/kaldi_io.html#read_vec_flt_scp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_flt_scp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create generator of (key,vector&lt;float32/float64&gt;) tuples, read according to kaldi scp.</p>
-<p>file_or_fd : scp, gzipped scp, pipe or opened file descriptor.</p>
-<p>Example, read scp to a ‘dictionary’:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># generator(key,vec) = torchaudio.kaldi_io.read_vec_flt_scp(file_or_fd)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_flt_scp</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_or_fd</strong> (<em>string/File Descriptor</em>) – scp, gzipped scp, pipe or opened file descriptor.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">generator[key (string), vec (Tensor)]</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read scp to a &#39;dictionary&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_scp(file) }</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<dl class="data">
+</div>
+<div class="section" id="read-vec-flt-ark">
+<h3><span class="hidden-section">read_vec_flt_ark</span><a class="headerlink" href="#read-vec-flt-ark" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
 <dt id="torchaudio.kaldi_io.read_vec_flt_ark">
-<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_vec_flt_ark</code><em class="property"> = &lt;function _wrap_method.&lt;locals&gt;._wrapped_fn&gt;</em><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_flt_ark" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_vec_flt_ark</code><span class="sig-paren">(</span><em>file_or_fd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/kaldi_io.html#read_vec_flt_ark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_flt_ark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create generator of (key,vector&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</p>
-<p>file_or_fd : ark, gzipped ark, pipe or opened file descriptor.</p>
-<p>Example, read ark to a ‘dictionary’:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># generator(key,vec) = torchaudio.kaldi_io.read_vec_flt_ark(file_or_fd)</span>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_or_fd</strong> (<em>string/File Descriptor</em>) – ark, gzipped ark, pipe or opened file descriptor.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">generator[key (string), vec (Tensor)]</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read ark to a &#39;dictionary&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_flt_ark</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
 </pre></div>
 </div>
 </dd></dl>
 
 </div>
+</div>
 <div class="section" id="matrices">
 <h2>Matrices<a class="headerlink" href="#matrices" title="Permalink to this headline">¶</a></h2>
-<dl class="data">
+<div class="section" id="read-mat-scp">
+<h3><span class="hidden-section">read_mat_scp</span><a class="headerlink" href="#read-mat-scp" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
 <dt id="torchaudio.kaldi_io.read_mat_scp">
-<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_mat_scp</code><em class="property"> = &lt;function _wrap_method.&lt;locals&gt;._wrapped_fn&gt;</em><a class="headerlink" href="#torchaudio.kaldi_io.read_mat_scp" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_mat_scp</code><span class="sig-paren">(</span><em>file_or_fd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/kaldi_io.html#read_mat_scp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.kaldi_io.read_mat_scp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create generator of (key,matrix&lt;float32/float64&gt;) tuples, read according to kaldi scp.</p>
-<p>file_or_fd : scp, gzipped scp, pipe or opened file descriptor.</p>
-<p>Example, read scp to a ‘dictionary’:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># generator(key,mat) = torchaudio.kaldi_io.read_mat_scp(file_or_fd)</span>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_or_fd</strong> (<em>string/File Descriptor</em>) – scp, gzipped scp, pipe or opened file descriptor.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">generator[key (string), mat (Tensor)]</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read scp to a &#39;dictionary&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_scp</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<dl class="data">
+</div>
+<div class="section" id="read-mat-ark">
+<h3><span class="hidden-section">read_mat_ark</span><a class="headerlink" href="#read-mat-ark" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
 <dt id="torchaudio.kaldi_io.read_mat_ark">
-<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_mat_ark</code><em class="property"> = &lt;function _wrap_method.&lt;locals&gt;._wrapped_fn&gt;</em><a class="headerlink" href="#torchaudio.kaldi_io.read_mat_ark" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_mat_ark</code><span class="sig-paren">(</span><em>file_or_fd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/kaldi_io.html#read_mat_ark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.kaldi_io.read_mat_ark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create generator of (key,matrix&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</p>
-<p>file_or_fd : ark, gzipped ark, pipe or opened file descriptor.</p>
-<p>Example, read ark to a ‘dictionary’:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># generator(key,mat) = torchaudio.kaldi_io.read_mat_ark(file_or_fd)</span>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_or_fd</strong> (<em>string/File Descriptor</em>) – ark, gzipped ark, pipe or opened file descriptor.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">generator[key (string), mat (Tensor)]</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read ark to a &#39;dictionary&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_ark</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
 </pre></div>
 </div>
 </dd></dl>
 
+</div>
 </div>
 </div>
 
@@ -331,8 +391,17 @@ This is a light wrapper around <code class="docutils literal notranslate"><span 
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">torchaudio.kaldi_io</a><ul>
-<li><a class="reference internal" href="#vectors">Vectors</a></li>
-<li><a class="reference internal" href="#matrices">Matrices</a></li>
+<li><a class="reference internal" href="#vectors">Vectors</a><ul>
+<li><a class="reference internal" href="#read-vec-int-ark"><span class="hidden-section">read_vec_int_ark</span></a></li>
+<li><a class="reference internal" href="#read-vec-flt-scp"><span class="hidden-section">read_vec_flt_scp</span></a></li>
+<li><a class="reference internal" href="#read-vec-flt-ark"><span class="hidden-section">read_vec_flt_ark</span></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#matrices">Matrices</a><ul>
+<li><a class="reference internal" href="#read-mat-scp"><span class="hidden-section">read_mat_scp</span></a></li>
+<li><a class="reference internal" href="#read-mat-ark"><span class="hidden-section">read_mat_ark</span></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

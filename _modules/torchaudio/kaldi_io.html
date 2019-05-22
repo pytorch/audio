@@ -217,8 +217,14 @@
 <span></span><span class="c1"># To use this file, the dependency (https://github.com/vesis84/kaldi-io-for-python)</span>
 <span class="c1"># needs to be installed. This is a light wrapper around kaldi_io that returns</span>
 <span class="c1"># torch.Tensors.</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torchaudio.common_utils</span> <span class="k">import</span> <span class="n">IMPORT_KALDI_IO</span><span class="p">,</span> <span class="n">IMPORT_NUMPY</span>
+
+<span class="k">if</span> <span class="n">IMPORT_NUMPY</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">if</span> <span class="n">IMPORT_KALDI_IO</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">kaldi_io</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
@@ -230,89 +236,114 @@
 <span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_default_not_imported_method</span><span class="p">():</span>
-    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;Could not import kaldi_io. Did you install it?&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_convert_method_output_to_tensor</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">convert_contiguous</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Takes a method invokes it. The output is converted to a tensor.</span>
 
+<span class="sd">    Arguments:</span>
+<span class="sd">        file_or_fd (string/File Descriptor): file name or file descriptor.</span>
+<span class="sd">        fn (Function): function that has the signature (file name/descriptor) -&gt; generator(string, ndarray)</span>
+<span class="sd">            and converts it to (file name/descriptor) -&gt; generator(string, Tensor).</span>
+<span class="sd">        convert_contiguous (bool): determines whether the array should be converted into a</span>
+<span class="sd">            contiguous layout.</span>
 
-<span class="k">def</span> <span class="nf">_wrap_method</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">convert_contiguous</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="c1"># type: (Function, bool) -&gt; Function</span>
-    <span class="sd">&quot;&quot;&quot; Takes a method with the signature (file name/descriptor) -&gt; generator(string, ndarray)</span>
-<span class="sd">    and converts it to (file name/descriptor) -&gt; generator(string, Tensor).</span>
-<span class="sd">    convert_contiguous determines whether the array should be converted into a</span>
-<span class="sd">    contiguous layout.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        generator[key (string), vec/mat (Tensor)]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">_wrapped_fn</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">np_arr</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">convert_contiguous</span><span class="p">:</span>
-                <span class="n">np_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">np_arr</span><span class="p">)</span>
-            <span class="k">yield</span> <span class="n">key</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np_arr</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_wrapped_fn</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">IMPORT_KALDI_IO</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;Could not import kaldi_io. Did you install it?&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">np_arr</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">convert_contiguous</span><span class="p">:</span>
+            <span class="n">np_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">np_arr</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">key</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np_arr</span><span class="p">)</span>
 
 
-<span class="c1">#: Create generator of (key,vector&lt;int&gt;) tuples, which reads from the ark file/stream.</span>
-<span class="c1">#:</span>
-<span class="c1">#: file_or_fd : ark, gzipped ark, pipe or opened file descriptor.</span>
-<span class="c1">#:</span>
-<span class="c1">#: Example, read ark to a &#39;dictionary&#39;:</span>
-<span class="c1">#:</span>
-<span class="c1">#: &gt;&gt;&gt; # generator(key,vec) = torchaudio.kaldi_io.read_vec_int_ark(file_or_fd)</span>
-<span class="c1">#: &gt;&gt;&gt; d = { u:d for u,d in torchaudio.kaldi_io.read_vec_int_ark(file) }</span>
-<span class="n">read_vec_int_ark</span> <span class="o">=</span> <span class="n">_default_not_imported_method</span>
+<div class="viewcode-block" id="read_vec_int_ark"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_vec_int_ark">[docs]</a><span class="k">def</span> <span class="nf">read_vec_int_ark</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create generator of (key,vector&lt;int&gt;) tuples, which reads from the ark file/stream.</span>
 
-<span class="c1">#: Create generator of (key,vector&lt;float32/float64&gt;) tuples, read according to kaldi scp.</span>
-<span class="c1">#:</span>
-<span class="c1">#: file_or_fd : scp, gzipped scp, pipe or opened file descriptor.</span>
-<span class="c1">#:</span>
-<span class="c1">#: Example, read scp to a &#39;dictionary&#39;:</span>
-<span class="c1">#:</span>
-<span class="c1">#: &gt;&gt;&gt; # generator(key,vec) = torchaudio.kaldi_io.read_vec_flt_scp(file_or_fd)</span>
-<span class="c1">#: &gt;&gt;&gt; d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_scp(file) }</span>
-<span class="n">read_vec_flt_scp</span> <span class="o">=</span> <span class="n">_default_not_imported_method</span>
-<span class="c1">#: Create generator of (key,vector&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</span>
-<span class="c1">#:</span>
-<span class="c1">#: file_or_fd : ark, gzipped ark, pipe or opened file descriptor.</span>
-<span class="c1">#:</span>
-<span class="c1">#: Example, read ark to a &#39;dictionary&#39;:</span>
-<span class="c1">#:</span>
-<span class="c1">#: &gt;&gt;&gt; # generator(key,vec) = torchaudio.kaldi_io.read_vec_flt_ark(file_or_fd)</span>
-<span class="c1">#: &gt;&gt;&gt; d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_ark(file) }</span>
-<span class="n">read_vec_flt_ark</span> <span class="o">=</span> <span class="n">_default_not_imported_method</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        file_or_fd (string/File Descriptor): ark, gzipped ark, pipe or opened file descriptor.</span>
 
-<span class="c1">#: Create generator of (key,matrix&lt;float32/float64&gt;) tuples, read according to kaldi scp.</span>
-<span class="c1">#:</span>
-<span class="c1">#: file_or_fd : scp, gzipped scp, pipe or opened file descriptor.</span>
-<span class="c1">#:</span>
-<span class="c1">#: Example, read scp to a &#39;dictionary&#39;:</span>
-<span class="c1">#:</span>
-<span class="c1">#: &gt;&gt;&gt; # generator(key,mat) = torchaudio.kaldi_io.read_mat_scp(file_or_fd)</span>
-<span class="c1">#: &gt;&gt;&gt; d = { u:d for u,d in torchaudio.kaldi_io.read_mat_scp(file) }</span>
-<span class="n">read_mat_scp</span> <span class="o">=</span> <span class="n">_default_not_imported_method</span>
-<span class="c1">#: Create generator of (key,matrix&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</span>
-<span class="c1">#:</span>
-<span class="c1">#: file_or_fd : ark, gzipped ark, pipe or opened file descriptor.</span>
-<span class="c1">#:</span>
-<span class="c1">#: Example, read ark to a &#39;dictionary&#39;:</span>
-<span class="c1">#:</span>
-<span class="c1">#: &gt;&gt;&gt; # generator(key,mat) = torchaudio.kaldi_io.read_mat_ark(file_or_fd)</span>
-<span class="c1">#: &gt;&gt;&gt; d = { u:d for u,d in torchaudio.kaldi_io.read_mat_ark(file) }</span>
-<span class="n">read_mat_ark</span> <span class="o">=</span> <span class="n">_default_not_imported_method</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        generator[key (string), vec (Tensor)]</span>
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">kaldi_io</span>
+<span class="sd">    Example::</span>
 
-    <span class="c1"># Overwrite methods</span>
-    <span class="c1"># Elements from int32 vector are sored in tuples: (sizeof(int32), value)</span>
-    <span class="c1"># so strides are (5,) instead of (4,) which will throw an error in from_numpy</span>
-    <span class="c1"># as it expects strides to be a multiple of 4 (int32).</span>
-    <span class="n">read_vec_int_ark</span> <span class="o">=</span> <span class="n">_wrap_method</span><span class="p">(</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_int_ark</span><span class="p">,</span> <span class="n">convert_contiguous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="sd">        &gt;&gt;&gt; # read ark to a &#39;dictionary&#39;</span>
+<span class="sd">        &gt;&gt;&gt; d = { u:d for u,d in torchaudio.kaldi_io.read_vec_int_ark(file) }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Requires convert_contiguous to be True because elements from int32 vector are</span>
+    <span class="c1"># sored in tuples: (sizeof(int32), value) so strides are (5,) instead of (4,) which will throw an error</span>
+    <span class="c1"># in from_numpy as it expects strides to be a multiple of 4 (int32).</span>
+    <span class="k">return</span> <span class="n">_convert_method_output_to_tensor</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">,</span> <span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_int_ark</span><span class="p">,</span> <span class="n">convert_contiguous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
-    <span class="n">read_vec_flt_scp</span> <span class="o">=</span> <span class="n">_wrap_method</span><span class="p">(</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_flt_scp</span><span class="p">)</span>
-    <span class="n">read_vec_flt_ark</span> <span class="o">=</span> <span class="n">_wrap_method</span><span class="p">(</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_flt_ark</span><span class="p">)</span>
 
-    <span class="n">read_mat_scp</span> <span class="o">=</span> <span class="n">_wrap_method</span><span class="p">(</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_scp</span><span class="p">)</span>
-    <span class="n">read_mat_ark</span> <span class="o">=</span> <span class="n">_wrap_method</span><span class="p">(</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_ark</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="k">pass</span>
+<div class="viewcode-block" id="read_vec_flt_scp"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_vec_flt_scp">[docs]</a><span class="k">def</span> <span class="nf">read_vec_flt_scp</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create generator of (key,vector&lt;float32/float64&gt;) tuples, read according to kaldi scp.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        file_or_fd (string/File Descriptor): scp, gzipped scp, pipe or opened file descriptor.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        generator[key (string), vec (Tensor)]</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        &gt;&gt;&gt; # read scp to a &#39;dictionary&#39;</span>
+<span class="sd">        &gt;&gt;&gt; # d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_scp(file) }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_convert_method_output_to_tensor</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">,</span> <span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_flt_scp</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_vec_flt_ark"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_vec_flt_ark">[docs]</a><span class="k">def</span> <span class="nf">read_vec_flt_ark</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create generator of (key,vector&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        file_or_fd (string/File Descriptor): ark, gzipped ark, pipe or opened file descriptor.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        generator[key (string), vec (Tensor)]</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        &gt;&gt;&gt; # read ark to a &#39;dictionary&#39;</span>
+<span class="sd">        &gt;&gt;&gt; d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_ark(file) }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_convert_method_output_to_tensor</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">,</span> <span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_flt_ark</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_mat_scp"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_mat_scp">[docs]</a><span class="k">def</span> <span class="nf">read_mat_scp</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create generator of (key,matrix&lt;float32/float64&gt;) tuples, read according to kaldi scp.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        file_or_fd (string/File Descriptor): scp, gzipped scp, pipe or opened file descriptor.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        generator[key (string), mat (Tensor)]</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        &gt;&gt;&gt; # read scp to a &#39;dictionary&#39;</span>
+<span class="sd">        &gt;&gt;&gt; d = { u:d for u,d in torchaudio.kaldi_io.read_mat_scp(file) }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_convert_method_output_to_tensor</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">,</span> <span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_scp</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_mat_ark"><a class="viewcode-back" href="../../kaldi_io.html#torchaudio.kaldi_io.read_mat_ark">[docs]</a><span class="k">def</span> <span class="nf">read_mat_ark</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create generator of (key,matrix&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        file_or_fd (string/File Descriptor): ark, gzipped ark, pipe or opened file descriptor.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        generator[key (string), mat (Tensor)]</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        &gt;&gt;&gt; # read ark to a &#39;dictionary&#39;</span>
+<span class="sd">        &gt;&gt;&gt; d = { u:d for u,d in torchaudio.kaldi_io.read_mat_ark(file) }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_convert_method_output_to_tensor</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">,</span> <span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_ark</span><span class="p">)</span></div>
 </pre></div>
 
              </article>
