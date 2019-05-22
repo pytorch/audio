@@ -26,6 +26,20 @@ setup(
     url="https://github.com/pytorch/audio",
     author="Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough",
     author_email="soumith@pytorch.org",
+    classifiers=[
+        "Environment :: Plugins",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: BSD License",
+        "Operating System :: MacOS :: MacOS X",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX",
+        "Programming Language :: C++",
+        "Programming Language :: Python 3",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Topic :: Multimedia :: Sound/Audio",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence"
+    ],
     # Exclude the build files.
     packages=find_packages(exclude=["build"]),
     ext_modules=[

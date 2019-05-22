@@ -6,6 +6,7 @@ torchaudio: an audio library for PyTorch
     - mp3, wav, aac, ogg, flac, avr, cdda, cvs/vms,
     - aiff, au, amr, mp2, mp4, ac3, avi, wmv,
     - mpeg, ircam and any other format supported by libsox.
+    - [Kaldi (ark/scp)](http://pytorch.org/audio/kaldi_io.html)
 - [Dataloaders for common audio datasets (VCTK, YesNo)](http://pytorch.org/audio/datasets.html)
 - Common audio transforms
   - [Scale, PadTrim, DownmixMono, LC2CL, BLC2CBL, MuLawEncoding, MuLawExpanding](http://pytorch.org/audio/transforms.html)
@@ -13,6 +14,7 @@ torchaudio: an audio library for PyTorch
 Dependencies
 ------------
 * libsox v14.3.2 or above
+* [optional] vesis84/kaldi-io-for-python commit cb46cb1f44318a5d04d4941cf39084c5b021241e or above
 
 Quick install on
 OSX (Homebrew):
@@ -31,7 +33,7 @@ Installation
 # Linux
 python setup.py install
 
-# OSX 
+# OSX
 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
 ```
 
