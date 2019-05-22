@@ -1,16 +1,17 @@
 from __future__ import print_function
 import math
 import os
-from common_utils import TEST_LIBROSA, TEST_SCIPY
+
 import torch
 import torchaudio
+from torchaudio.common_utils import IMPORT_LIBROSA, IMPORT_SCIPY
 import torchaudio.transforms as transforms
 import unittest
 
-if TEST_LIBROSA:
+if IMPORT_LIBROSA:
     import librosa
 
-if TEST_SCIPY:
+if IMPORT_SCIPY:
     import scipy
 
 
@@ -204,7 +205,7 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(torch_mfcc_norm_none.allclose(norm_check))
 
-    @unittest.skipIf(not TEST_LIBROSA or not TEST_SCIPY, 'Librosa and scipy are not available')
+    @unittest.skipIf(not IMPORT_LIBROSA or not IMPORT_SCIPY, 'Librosa and scipy are not available')
     def test_librosa_consistency(self):
         def _test_librosa_consistency_helper(n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
             input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')

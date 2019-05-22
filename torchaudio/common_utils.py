@@ -29,9 +29,9 @@ def _check_module_exists(name):
         return spec is not None
 
 
-TEST_SCIPY = _check_module_exists('scipy')
+IMPORT_SCIPY = _check_module_exists('scipy')
 
 # On Py2, importing librosa 0.6.1 triggers a TypeError (if using newest joblib)
 # see librosa/librosa#729.
 # TODO: allow Py2 when librosa 0.6.2 releases
-TEST_LIBROSA = _check_module_exists('librosa') and PY3
+IMPORT_LIBROSA = _check_module_exists('librosa') and PY3
