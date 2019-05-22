@@ -138,6 +138,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../legacy.html">torchaudio.legacy</a></li>
 </ul>
@@ -202,6 +203,8 @@
 
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
+
+        
           
           <div class="rst-content">
           
@@ -237,7 +240,7 @@
     <span class="sd">&quot;&quot;&quot;Loads an audio file from disk into a Tensor</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filepath (string): path to audio file</span>
+<span class="sd">        filepath (string or pathlib.Path): path to audio file</span>
 <span class="sd">        out (Tensor, optional): an output Tensor to use instead of creating one</span>
 <span class="sd">        normalization (bool, number, or callable, optional): If boolean `True`, then output is divided by `1 &lt;&lt; 31`</span>
 <span class="sd">                                                             (assumes signed 32-bit audio), and normalizes to `[0, 1]`.</span>
@@ -255,7 +258,8 @@
 <span class="sd">        filetype (str, optional): a filetype or extension to be set if sox cannot determine it automatically</span>
 
 <span class="sd">    Returns: tuple(Tensor, int)</span>
-<span class="sd">       - Tensor: output Tensor of size `[C x L]` or `[L x C]` where L is the number of audio frames, C is the number of channels</span>
+<span class="sd">       - Tensor: output Tensor of size `[C x L]` or `[L x C]` where L is the number of audio frames and</span>
+<span class="sd">                 C is the number of channels</span>
 <span class="sd">       - int: the sample rate of the audio (as listed in the metadata of the file)</span>
 
 <span class="sd">    Example::</span>
@@ -270,6 +274,8 @@
 <span class="sd">        1.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># stringify if `pathlib.Path` (noop if already `str`)</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="c1"># check if valid file</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> not found or is a directory&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
@@ -338,8 +344,7 @@
 <span class="sd">        &gt;&gt;&gt; torchaudio.save(&#39;foo.wav&#39;, data, sample_rate)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ch_idx</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">channels_first</span> <span class="k">else</span> <span class="mi">1</span>
-    <span class="n">len_idx</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">channels_first</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">ch_idx</span><span class="p">,</span> <span class="n">len_idx</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">channels_first</span> <span class="k">else</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
     <span class="c1"># check if save directory exists</span>
     <span class="n">abs_dirpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
@@ -409,7 +414,7 @@
 <span class="sd">      - rate (float), sample rate as a float, practically will likely be an integer float</span>
 <span class="sd">      - channel (int), number of audio channels</span>
 <span class="sd">      - precision (int), bit precision</span>
-<span class="sd">      - length (int), length of audio, 0 for unspecified and -1 for unknown</span>
+<span class="sd">      - length (int), length of audio in samples * channels, 0 for unspecified and -1 for unknown</span>
 <span class="sd">      - mult (float, optional), headroom multiplier for effects and None for no multiplier</span>
 
 <span class="sd">    Example::</span>
@@ -549,7 +554,11 @@
             <footer>
   
 
-  <hr/>
+  
+
+    <hr>
+
+  
 
   <div role="contentinfo">
     <p>
@@ -557,7 +566,11 @@
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
 
 </footer>
 
@@ -580,20 +593,11 @@
   
 
      
-       <script type="text/javascript">
-           var DOCUMENTATION_OPTIONS = {
-               URL_ROOT:'../',
-               VERSION:'master',
-               LANGUAGE:'None',
-               COLLAPSE_INDEX:false,
-               FILE_SUFFIX:'.html',
-               HAS_SOURCE:  true,
-               SOURCELINK_SUFFIX: '.txt'
-           };
-       </script>
+       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script type="text/javascript" src="../_static/jquery.js"></script>
          <script type="text/javascript" src="../_static/underscore.js"></script>
          <script type="text/javascript" src="../_static/doctools.js"></script>
+         <script type="text/javascript" src="../_static/language_data.js"></script>
          <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js"></script>
          <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js"></script>
          <script type="text/javascript" src="../_static/katex_autorenderer.js"></script>
@@ -711,6 +715,13 @@
       </div>
     </div>
   </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/images/pytorch-x.svg">
+  </div>
+</div>
 
   <!-- End Footer -->
 

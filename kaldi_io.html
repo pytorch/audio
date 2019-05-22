@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.legacy &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.kaldi_io &mdash; Torchaudio master documentation</title>
   
 
   
@@ -32,7 +32,8 @@
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="torchaudio.transforms" href="transforms.html" /> 
+    <link rel="next" title="torchaudio.transforms" href="transforms.html" />
+    <link rel="prev" title="torchaudio.datasets" href="datasets.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -139,9 +140,9 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.legacy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="legacy.html">torchaudio.legacy</a></li>
 </ul>
 
             
@@ -182,13 +183,13 @@
       </li>
 
         
-      <li>torchaudio.legacy</li>
+      <li>torchaudio.kaldi_io</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="_sources/legacy.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+            <a href="_sources/kaldi_io.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -214,78 +215,76 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchaudio-legacy">
-<h1>torchaudio.legacy<a class="headerlink" href="#torchaudio-legacy" title="Permalink to this headline">¶</a></h1>
-<p>Legacy loading and save functions.</p>
-<span class="target" id="module-torchaudio.legacy"></span><dl class="function">
-<dt id="torchaudio.legacy.load">
-<code class="descclassname">torchaudio.legacy.</code><code class="descname">load</code><span class="sig-paren">(</span><em>filepath</em>, <em>out=None</em>, <em>normalization=None</em>, <em>num_frames=0</em>, <em>offset=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/legacy.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.legacy.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads an audio file from disk into a Tensor.  The default options have
-changed as of torchaudio 0.2 and this function maintains option defaults
-from version 0.1.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filepath</strong> (<em>string</em>) – path to audio file</li>
-<li><strong>out</strong> (<em>Tensor</em><em>, </em><em>optional</em>) – an output Tensor to use instead of creating one</li>
-<li><strong>normalization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em> or </em><em>number</em><em>, </em><em>optional</em>) – If boolean <cite>True</cite>, then output is divided by <cite>1 &lt;&lt; 31</cite>
-(assumes 16-bit depth audio, and normalizes to <cite>[0, 1]</cite>.
-If <cite>number</cite>, then output is divided by that number</li>
-<li><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – number of frames to load.  -1 to load everything after the offset.</li>
-<li><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – number of frames from the start of the file to begin data loading.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Returns: tuple(Tensor, int)</dt>
-<dd><ul class="first last simple">
-<li>Tensor: output Tensor of size <cite>[L x C]</cite> where L is the number of audio frames, C is the number of channels</li>
-<li>int: the sample-rate of the audio (as listed in the metadata of the file)</li>
-</ul>
-</dd>
-</dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
-<span class="go">torch.Size([278756, 2])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)</span>
-<span class="go">44100</span>
+  <div class="section" id="torchaudio-kaldi-io">
+<h1>torchaudio.kaldi_io<a class="headerlink" href="#torchaudio-kaldi-io" title="Permalink to this headline">¶</a></h1>
+<p>To use this module, the dependency <a class="reference external" href="https://github.com/vesis84/kaldi-io-for-python">kaldi_io</a> needs to be installed.
+This is a light wrapper around <code class="docutils literal notranslate"><span class="pre">kaldi_io</span></code> that returns <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensors</span></code>.</p>
+<div class="section" id="vectors">
+<h2>Vectors<a class="headerlink" href="#vectors" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="torchaudio.kaldi_io.read_vec_int_ark">
+<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_vec_int_ark</code><em class="property"> = &lt;function _wrap_method.&lt;locals&gt;._wrapped_fn&gt;</em><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_int_ark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create generator of (key,vector&lt;int&gt;) tuples, which reads from the ark file/stream.</p>
+<p>file_or_fd : ark, gzipped ark, pipe or opened file descriptor.</p>
+<p>Example, read ark to a ‘dictionary’:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># generator(key,vec) = torchaudio.kaldi_io.read_vec_int_ark(file_or_fd)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_int_ark</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<dl class="function">
-<dt id="torchaudio.legacy.save">
-<code class="descclassname">torchaudio.legacy.</code><code class="descname">save</code><span class="sig-paren">(</span><em>filepath</em>, <em>src</em>, <em>sample_rate</em>, <em>precision=32</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/legacy.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.legacy.save" title="Permalink to this definition">¶</a></dt>
-<dd><p>Saves a Tensor with audio signal to disk as a standard format like mp3, wav, etc.
-The default options have changed as of torchaudio 0.2 and this function maintains
-option defaults from version 0.1.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filepath</strong> (<em>string</em>) – path to audio file</li>
-<li><strong>src</strong> (<em>Tensor</em>) – an input 2D Tensor of shape <cite>[L x C]</cite> where L is
-the number of audio frames, C is the number of channels</li>
-<li><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the sample-rate of the audio to be saved</li>
-<li><strong>precision</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – the bit-precision of the audio to be saved</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;foo.wav&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+<dl class="data">
+<dt id="torchaudio.kaldi_io.read_vec_flt_scp">
+<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_vec_flt_scp</code><em class="property"> = &lt;function _wrap_method.&lt;locals&gt;._wrapped_fn&gt;</em><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_flt_scp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create generator of (key,vector&lt;float32/float64&gt;) tuples, read according to kaldi scp.</p>
+<p>file_or_fd : scp, gzipped scp, pipe or opened file descriptor.</p>
+<p>Example, read scp to a ‘dictionary’:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># generator(key,vec) = torchaudio.kaldi_io.read_vec_flt_scp(file_or_fd)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_flt_scp</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
 </pre></div>
 </div>
 </dd></dl>
 
+<dl class="data">
+<dt id="torchaudio.kaldi_io.read_vec_flt_ark">
+<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_vec_flt_ark</code><em class="property"> = &lt;function _wrap_method.&lt;locals&gt;._wrapped_fn&gt;</em><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_flt_ark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create generator of (key,vector&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</p>
+<p>file_or_fd : ark, gzipped ark, pipe or opened file descriptor.</p>
+<p>Example, read ark to a ‘dictionary’:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># generator(key,vec) = torchaudio.kaldi_io.read_vec_flt_ark(file_or_fd)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_flt_ark</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="matrices">
+<h2>Matrices<a class="headerlink" href="#matrices" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="torchaudio.kaldi_io.read_mat_scp">
+<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_mat_scp</code><em class="property"> = &lt;function _wrap_method.&lt;locals&gt;._wrapped_fn&gt;</em><a class="headerlink" href="#torchaudio.kaldi_io.read_mat_scp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create generator of (key,matrix&lt;float32/float64&gt;) tuples, read according to kaldi scp.</p>
+<p>file_or_fd : scp, gzipped scp, pipe or opened file descriptor.</p>
+<p>Example, read scp to a ‘dictionary’:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># generator(key,mat) = torchaudio.kaldi_io.read_mat_scp(file_or_fd)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_scp</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="torchaudio.kaldi_io.read_mat_ark">
+<code class="descclassname">torchaudio.kaldi_io.</code><code class="descname">read_mat_ark</code><em class="property"> = &lt;function _wrap_method.&lt;locals&gt;._wrapped_fn&gt;</em><a class="headerlink" href="#torchaudio.kaldi_io.read_mat_ark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create generator of (key,matrix&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</p>
+<p>file_or_fd : ark, gzipped ark, pipe or opened file descriptor.</p>
+<p>Example, read ark to a ‘dictionary’:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># generator(key,mat) = torchaudio.kaldi_io.read_mat_ark(file_or_fd)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_ark</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -296,8 +295,10 @@ the number of audio frames, C is the number of channels</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="transforms.html" class="btn btn-neutral float-right" title="torchaudio.transforms" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
-        <a href="transforms.html" class="btn btn-neutral" title="torchaudio.transforms" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+        <a href="datasets.html" class="btn btn-neutral" title="torchaudio.datasets" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -329,7 +330,11 @@ the number of audio frames, C is the number of channels</li>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">torchaudio.legacy</a></li>
+<li><a class="reference internal" href="#">torchaudio.kaldi_io</a><ul>
+<li><a class="reference internal" href="#vectors">Vectors</a></li>
+<li><a class="reference internal" href="#matrices">Matrices</a></li>
+</ul>
+</li>
 </ul>
 
             </div>

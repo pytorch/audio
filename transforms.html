@@ -33,7 +33,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="torchaudio.legacy" href="legacy.html" />
-    <link rel="prev" title="torchaudio.datasets" href="datasets.html" /> 
+    <link rel="prev" title="torchaudio.kaldi_io" href="kaldi_io.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -140,6 +140,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="legacy.html">torchaudio.legacy</a></li>
 </ul>
@@ -206,6 +207,8 @@
 
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
+
+        
           
           <div class="rst-content">
           
@@ -255,7 +258,7 @@ called the “bit depth” or “precision”, not to be confused with “bit ra
 <dl class="class">
 <dt id="torchaudio.transforms.PadTrim">
 <em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">PadTrim</code><span class="sig-paren">(</span><em>max_len</em>, <em>fill_value=0</em>, <em>channels_first=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#PadTrim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.PadTrim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pad/Trim a 1d-Tensor (Signal or Labels)</p>
+<dd><p>Pad/Trim a 2d-Tensor (Signal or Labels)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -301,13 +304,8 @@ channels_first (bool): Downmix across channels dimension.  Default: <cite>True</
 
 <dl class="class">
 <dt id="torchaudio.transforms.MEL">
-<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">MEL</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MEL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MEL" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create MEL Spectrograms from a raw audio signal. Relatively pretty slow.</p>
-<dl class="docutils">
-<dt>Usage (see librosa.feature.melspectrogram docs):</dt>
-<dd>MEL(sr=16000, n_fft=1600, hop_length=800, n_mels=64)</dd>
-</dl>
-</dd></dl>
+<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">MEL</code><a class="reference internal" href="_modules/torchaudio/transforms.html#MEL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MEL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="class">
 <dt id="torchaudio.transforms.BLC2CBL">
@@ -363,12 +361,16 @@ and returns a signal scaled between -1 and 1.</p>
         <a href="legacy.html" class="btn btn-neutral float-right" title="torchaudio.legacy" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="datasets.html" class="btn btn-neutral" title="torchaudio.datasets" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="kaldi_io.html" class="btn btn-neutral" title="torchaudio.kaldi_io" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
 
-  <hr/>
+  
+
+    <hr>
+
+  
 
   <div role="contentinfo">
     <p>
@@ -376,7 +378,11 @@ and returns a signal scaled between -1 and 1.</p>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
 
 </footer>
 
@@ -402,20 +408,11 @@ and returns a signal scaled between -1 and 1.</p>
   
 
      
-       <script type="text/javascript">
-           var DOCUMENTATION_OPTIONS = {
-               URL_ROOT:'./',
-               VERSION:'master',
-               LANGUAGE:'None',
-               COLLAPSE_INDEX:false,
-               FILE_SUFFIX:'.html',
-               HAS_SOURCE:  true,
-               SOURCELINK_SUFFIX: '.txt'
-           };
-       </script>
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
          <script type="text/javascript" src="_static/jquery.js"></script>
          <script type="text/javascript" src="_static/underscore.js"></script>
          <script type="text/javascript" src="_static/doctools.js"></script>
+         <script type="text/javascript" src="_static/language_data.js"></script>
          <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js"></script>
          <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js"></script>
          <script type="text/javascript" src="_static/katex_autorenderer.js"></script>
@@ -533,6 +530,13 @@ and returns a signal scaled between -1 and 1.</p>
       </div>
     </div>
   </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="_static/images/pytorch-x.svg">
+  </div>
+</div>
 
   <!-- End Footer -->
 

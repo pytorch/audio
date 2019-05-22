@@ -32,7 +32,7 @@
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="torchaudio.transforms" href="transforms.html" />
+    <link rel="next" title="torchaudio.kaldi_io" href="kaldi_io.html" />
     <link rel="prev" title="torchaudio.sox_effects" href="sox_effects.html" /> 
 
   
@@ -140,6 +140,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="legacy.html">torchaudio.legacy</a></li>
 </ul>
@@ -206,6 +207,8 @@
 
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
+
+        
           
           <div class="rst-content">
           
@@ -253,7 +256,7 @@ and  <code class="docutils literal notranslate"><span class="pre">processed/test
 <li><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If true, downloads the dataset from the internet and
 puts it in root directory. If dataset is already downloaded, it is not
 downloaded again.</li>
-<li><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that  takes in an PIL image
+<li><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that  takes in an raw audio
 and returns a transformed version. E.g, <code class="docutils literal notranslate"><span class="pre">transforms.Scale</span></code></li>
 <li><strong>target_transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that takes in the
 target and transforms it.</li>
@@ -341,7 +344,7 @@ files.  Useful to keep raw audio and transcriptions.</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="transforms.html" class="btn btn-neutral float-right" title="torchaudio.transforms" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="kaldi_io.html" class="btn btn-neutral float-right" title="torchaudio.kaldi_io" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="sox_effects.html" class="btn btn-neutral" title="torchaudio.sox_effects" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -349,7 +352,11 @@ files.  Useful to keep raw audio and transcriptions.</li>
     </div>
   
 
-  <hr/>
+  
+
+    <hr>
+
+  
 
   <div role="contentinfo">
     <p>
@@ -357,7 +364,11 @@ files.  Useful to keep raw audio and transcriptions.</li>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
 
 </footer>
 
@@ -387,20 +398,11 @@ files.  Useful to keep raw audio and transcriptions.</li>
   
 
      
-       <script type="text/javascript">
-           var DOCUMENTATION_OPTIONS = {
-               URL_ROOT:'./',
-               VERSION:'master',
-               LANGUAGE:'None',
-               COLLAPSE_INDEX:false,
-               FILE_SUFFIX:'.html',
-               HAS_SOURCE:  true,
-               SOURCELINK_SUFFIX: '.txt'
-           };
-       </script>
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
          <script type="text/javascript" src="_static/jquery.js"></script>
          <script type="text/javascript" src="_static/underscore.js"></script>
          <script type="text/javascript" src="_static/doctools.js"></script>
+         <script type="text/javascript" src="_static/language_data.js"></script>
          <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js"></script>
          <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js"></script>
          <script type="text/javascript" src="_static/katex_autorenderer.js"></script>
@@ -518,6 +520,13 @@ files.  Useful to keep raw audio and transcriptions.</li>
       </div>
     </div>
   </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="_static/images/pytorch-x.svg">
+  </div>
+</div>
 
   <!-- End Footer -->
 

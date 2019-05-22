@@ -140,6 +140,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="legacy.html">torchaudio.legacy</a></li>
 </ul>
@@ -206,6 +207,8 @@
 
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
+
+        
           
           <div class="rst-content">
           
@@ -258,7 +261,11 @@ audio type cannot be automatically determined</li>
 <dl class="docutils">
 <dt>Returns: tuple(Tensor, int)</dt>
 <dd><ul class="first last simple">
-<li>Tensor: output Tensor of size <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is the number of audio frames, C is the number of channels</li>
+<li><dl class="first docutils">
+<dt>Tensor: output Tensor of size <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is the number of audio frames and</dt>
+<dd>C is the number of channels</dd>
+</dl>
+</li>
 <li>int: the sample rate of the audio (as listed in the metadata of the file)</li>
 </ul>
 </dd>
@@ -266,7 +273,7 @@ audio type cannot be automatically determined</li>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audiodir_path</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">fn</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">audiodir_path</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">audiodir_path</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">audiodir_path</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">SoxEffectsChain</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">.</span><span class="n">append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">16000</span><span class="p">])</span>  <span class="c1"># resample to 16000hz</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">.</span><span class="n">append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;channels&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">])</span>  <span class="c1"># mono signal</span>
@@ -330,7 +337,11 @@ audio type cannot be automatically determined</li>
     </div>
   
 
-  <hr/>
+  
+
+    <hr>
+
+  
 
   <div role="contentinfo">
     <p>
@@ -338,7 +349,11 @@ audio type cannot be automatically determined</li>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
 
 </footer>
 
@@ -364,20 +379,11 @@ audio type cannot be automatically determined</li>
   
 
      
-       <script type="text/javascript">
-           var DOCUMENTATION_OPTIONS = {
-               URL_ROOT:'./',
-               VERSION:'master',
-               LANGUAGE:'None',
-               COLLAPSE_INDEX:false,
-               FILE_SUFFIX:'.html',
-               HAS_SOURCE:  true,
-               SOURCELINK_SUFFIX: '.txt'
-           };
-       </script>
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
          <script type="text/javascript" src="_static/jquery.js"></script>
          <script type="text/javascript" src="_static/underscore.js"></script>
          <script type="text/javascript" src="_static/doctools.js"></script>
+         <script type="text/javascript" src="_static/language_data.js"></script>
          <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js"></script>
          <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js"></script>
          <script type="text/javascript" src="_static/katex_autorenderer.js"></script>
@@ -495,6 +501,13 @@ audio type cannot be automatically determined</li>
       </div>
     </div>
   </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="_static/images/pytorch-x.svg">
+  </div>
+</div>
 
   <!-- End Footer -->
 
