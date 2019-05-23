@@ -1,12 +1,14 @@
 import os
 import torch
-import torchaudio.kaldi_io as kio
 import unittest
 
 
 class KaldiIOTest(unittest.TestCase):
     def test_nothing(self):
-        pass
+        try:
+            import torchaudio.kaldi_io as kio
+        except Exception as e:
+            self.assertTrue(False, str(e))
     # data1 = [[1, 2, 3], [11, 12, 13], [21, 22, 23]]
     # data2 = [[31, 32, 33], [41, 42, 43], [51, 52, 53]]
     # test_dirpath = os.path.dirname(os.path.realpath(__file__))
