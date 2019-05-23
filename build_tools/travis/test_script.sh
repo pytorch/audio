@@ -9,10 +9,13 @@ set -e
 python --version
 
 run_tests() {
+    # -v it's a short --verbose
+    # -s means 'disable all capturing'
+    # --durations determines how many of the slowest test times to display
     if [[ "$RUN_SLOW" == "true" ]]; then
-        TEST_CMD="py.test --runslow -s -vv --cov=torchaudio --durations=20"
+        TEST_CMD="py.test --runslow -s -v --cov=torchaudio --durations=20"
     else
-        TEST_CMD="py.test -s -vv --cov=torchaudio --durations=20"
+        TEST_CMD="py.test -s -v --cov=torchaudio --durations=20"
     fi
     $TEST_CMD
 }
