@@ -18,6 +18,5 @@ pytest-cov
 codecov
 
 # Used for comparison of outputs in tests
-numpy
 librosa
 scipy

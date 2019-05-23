@@ -54,5 +54,7 @@ pip install -r requirements.txt
 if [[ "$SKIP_TESTS" != "true" ]]; then
     # PyTorch
     conda install --yes pytorch -c pytorch
+
+    # TorchAudio CPP Extension
     pip install .
 fi
