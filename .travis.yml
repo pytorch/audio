@@ -7,24 +7,21 @@ cache:
   - /home/travis/download
   - /home/travis/.cache/pip
 
-# This matrix tests that the code works on Python 2.7,
-# 2.7.8, 3.5, 3.6, and passes lint.
+# This matrix tests that the code works on Python 3.5, 3.6, and passes lint.
 matrix:
   fast_finish: true
   include:
-    - env: PYTHON_VERSION="2.7" COVERAGE="true"
-    - env: PYTHON_VERSION="2.7.8" COVERAGE="true"
     - env: PYTHON_VERSION="3.5" COVERAGE="true"
     - env: PYTHON_VERSION="3.6" COVERAGE="true"
-    - env: PYTHON_VERSION="2.7" RUN_FLAKE8="true" SKIP_TESTS="true"
+    - env: PYTHON_VERSION="3.5" RUN_FLAKE8="true" SKIP_TESTS="true"
 
 addons:
-    apt:
-        packages:
-            sox
-            libsox-dev
-            libsox-fmt-all
-            libpython3.5-dev
+  apt:
+    packages:
+      sox
+      libsox-dev
+      libsox-fmt-all
+      libpython3.5-dev
 
 notifications:
   email: false
