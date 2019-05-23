@@ -1,11 +1,11 @@
-dist: trusty
+dist: xenial
 
 language: python
 
-cache:
-  directories:
-  - /home/travis/download
-  - /home/travis/.cache/pip
+# cache:
+#   directories:
+#   - /home/travis/download
+#   - /home/travis/.cache/pip
 
 # This matrix tests that the code works on Python 3.5, 3.6, and passes lint.
 matrix:
