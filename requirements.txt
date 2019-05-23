@@ -20,3 +20,9 @@ codecov
 numpy
 librosa
 scipy
+
+
+sox
+libsox-dev
+libsox-fmt-all
+libpython3.5-dev
