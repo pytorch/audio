@@ -48,11 +48,11 @@ popd
 source activate testenv
 
 # Install requirements via pip in our conda environment
-# pip install -r requirements.txt
-pip install .
+pip install -r requirements.txt
 
 # Install the following only if running tests
 if [[ "$SKIP_TESTS" != "true" ]]; then
     # PyTorch
     conda install --yes pytorch -c pytorch
+    pip install .
 fi
