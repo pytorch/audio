@@ -10,9 +10,9 @@ python --version
 
 run_tests() {
     if [[ "$RUN_SLOW" == "true" ]]; then
-        TEST_CMD="py.test --runslow -s -vv --cov=torchaudio --durations=10"
+        TEST_CMD="py.test --runslow -s -vv --cov=torchaudio --durations=20"
     else
-        TEST_CMD="py.test -vv --cov=torchaudio --durations=10"
+        TEST_CMD="py.test -s -vv --cov=torchaudio --durations=20"
     fi
     $TEST_CMD
 }
