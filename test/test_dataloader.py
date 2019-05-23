@@ -39,8 +39,8 @@ class Test_DataLoader(unittest.TestCase):
         ds = TORCHAUDIODS()
         dl = DataLoader(ds, batch_size=2)
         # for x in dl:
-            # pass
-            # self.assertTrue(x.size() == expected_size)
+        #     pass
+        #     self.assertTrue(x.size() == expected_size)
 
 if __name__ == '__main__':
     torchaudio.initialize_sox()
