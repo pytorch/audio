@@ -38,15 +38,10 @@
 #         expected_size = (2, 1, 16000)
 #         ds = TORCHAUDIODS()
 #         dl = DataLoader(ds, batch_size=2)
-#         # for x in dl:
-#         #     pass
-#         #     self.assertTrue(x.size() == expected_size)
+#         for x in dl:
+#             self.assertTrue(x.size() == expected_size)
 #
 # if __name__ == '__main__':
 #     torchaudio.initialize_sox()
 #     unittest.main()
 #     torchaudio.shutdown_sox()
-
-import unittest
-if __name__ == '__main__':
-    unittest.main()
