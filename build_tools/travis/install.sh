@@ -55,6 +55,6 @@ if [[ "$SKIP_TESTS" != "true" ]]; then
     # PyTorch
     conda install --yes pytorch -c pytorch
 
-    # TorchAudio CPP Extension
+    # TorchAudio CPP Extensions
     pip install .
 fi
