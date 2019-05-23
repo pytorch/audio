@@ -15,13 +15,13 @@ matrix:
     - env: PYTHON_VERSION="3.6" COVERAGE="true"
     - env: PYTHON_VERSION="3.5" RUN_FLAKE8="true" SKIP_TESTS="true"
 
-# addons:
-#   apt:
-#     packages:
-      # sox
-      # libsox-dev
-      # libsox-fmt-all
-      # libpython3.5-dev
+addons:
+  apt:
+    packages:
+      sox
+      libsox-dev
+      libsox-fmt-all
+      libpython3.5-dev
 
 notifications:
   email: false
