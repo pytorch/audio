@@ -119,7 +119,7 @@ class SoxEffectsChain(object):
             e.eopts = [""]
             self.chain.append(e)
 
-        # print("effect options:", [x.eopts for x in self.chain])
+        print("effect options:", [x.eopts for x in self.chain])
         sr = _torch_sox.build_flow_effects(self.input_file,
                                            out,
                                            self.channels_first,

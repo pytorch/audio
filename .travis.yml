@@ -1,8 +1,23 @@
+dist: trusty
+
 language: python
-dist: xenial
+
+cache:
+  directories:
+  - /home/travis/download
+  - /home/travis/.cache/pip
+
+# This matrix tests that the code works on Python 2.7,
+# 2.7.8, 3.5, 3.6, and passes lint.
 matrix:
+  fast_finish: true
   include:
-    - python: "3.5"
+    - env: PYTHON_VERSION="2.7" COVERAGE="true"
+    - env: PYTHON_VERSION="2.7.8" COVERAGE="true"
+    - env: PYTHON_VERSION="3.5" COVERAGE="true"
+    - env: PYTHON_VERSION="3.6" COVERAGE="true"
+    - env: PYTHON_VERSION="2.7" RUN_FLAKE8="true" SKIP_TESTS="true"
+
 addons:
     apt:
         packages:
@@ -10,8 +25,10 @@ addons:
             libsox-dev
             libsox-fmt-all
             libpython3.5-dev
-install:
-  - pip install torch
-  - python setup.py install
-script:
-  - python -m unittest
+
+notifications:
+  email: false
+
+install: source build_tools/travis/install.sh
+script: bash build_tools/travis/test_script.sh
+after_success: source build_tools/travis/after_success.sh

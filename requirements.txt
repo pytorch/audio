@@ -1,0 +1,22 @@
+# Optional for torchaudio.kaldi_io
+kaldi_io
+
+# Required for tests only:
+
+# Style-checking for PEP8
+flake8
+
+# Run unit tests
+pytest
+
+# Lets pytest find our code by automatically modifying PYTHONPATH
+pytest-pythonpath
+
+# Coverage statistics
+pytest-cov
+codecov
+
+# Used for comparison of outputs in tests
+numpy
+librosa
+scipy
