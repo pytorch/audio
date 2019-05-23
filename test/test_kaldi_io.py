@@ -1,6 +1,6 @@
 import os
 import torch
-# import torchaudio.kaldi_io as kio
+import torchaudio.kaldi_io as kio
 import unittest
 
 
