@@ -15,7 +15,7 @@ run_tests() {
     if [[ "$RUN_SLOW" == "true" ]]; then
         TEST_CMD="py.test --runslow -s -v --cov=torchaudio --durations=20"
     else
-        TEST_CMD="py.test -s -v --cov=torchaudio --durations=20"
+        TEST_CMD="py.test --fulltrace -s -v --cov=torchaudio --durations=20"
     fi
     $TEST_CMD
 }
