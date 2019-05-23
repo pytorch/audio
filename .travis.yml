@@ -33,4 +33,3 @@ after_success: source build_tools/travis/after_success.sh
 branches:
   only:
     - master
-    - travis
