@@ -1,4 +1,5 @@
 # Optional for torchaudio.kaldi_io
+numpy
 kaldi_io
 
 # Required for tests only:
