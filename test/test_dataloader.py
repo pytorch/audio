@@ -13,8 +13,8 @@ class TORCHAUDIODS(Dataset):
 
     def __init__(self):
         self.asset_dirpath = os.path.join(self.test_dirpath, "assets")
-        self.data = [os.path.join(self.asset_dirpath, fn) for fn in os.listdir(self.asset_dirpath)]
-        self.si, self.ei = torchaudio.info(os.path.join(self.asset_dirpath, "sinewave.wav"))
+        sound_files = list(filter(lambda x: '.wav' in x or '.mp3' in x, os.listdir(self.asset_dirpath)))
+        self.data = [os.path.join(self.asset_dirpath, fn) for fn in sound_files]
         self.si.precision = 16
         self.E = torchaudio.sox_effects.SoxEffectsChain()
         self.E.append_effect_to_chain("rate", [self.si.rate])  # resample to 16000hz
@@ -32,17 +32,20 @@ class TORCHAUDIODS(Dataset):
 
 
 class Test_DataLoader(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        torchaudio.initialize_sox()
+
+    @classmethod
+    def tearDownClass(cls):
+        torchaudio.shutdown_sox()
+
     def test_1(self):
         expected_size = (2, 1, 16000)
         ds = TORCHAUDIODS()
         dl = DataLoader(ds, batch_size=2)
         for x in dl:
-            # print(x.size())
-            continue
-
-        self.assertTrue(x.size() == expected_size)
+            self.assertTrue(x.size() == expected_size)
 
 if __name__ == '__main__':
-    torchaudio.initialize_sox()
     unittest.main()
-    torchaudio.shutdown_sox()

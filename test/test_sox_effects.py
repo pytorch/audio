@@ -10,6 +10,15 @@ class Test_SoxEffectsChain(unittest.TestCase):
     test_filepath = os.path.join(test_dirpath, "assets",
                                  "steam-train-whistle-daniel_simon.mp3")
 
+    @classmethod
+    def setUpClass(cls):
+        torchaudio.initialize_sox()
+
+    @classmethod
+    def tearDownClass(cls):
+        torchaudio.shutdown_sox()
+
+
     def test_single_channel(self):
         fn_sine = os.path.join(self.test_dirpath, "assets", "sinewave.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
@@ -220,6 +229,4 @@ class Test_SoxEffectsChain(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    torchaudio.initialize_sox()
     unittest.main()
-    torchaudio.shutdown_sox()

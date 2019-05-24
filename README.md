@@ -1,6 +1,8 @@
 torchaudio: an audio library for PyTorch
 ================================================
 
+[![Build Status](https://travis-ci.org/pytorch/audio.svg?branch=master)](https://travis-ci.org/pytorch/audio)
+
 - [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/)
   - Load the following formats into a torch Tensor
     - mp3, wav, aac, ogg, flac, avr, cdda, cvs/vms,
