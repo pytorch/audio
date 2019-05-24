@@ -18,7 +18,6 @@ class Test_SoxEffectsChain(unittest.TestCase):
     def tearDownClass(cls):
         torchaudio.shutdown_sox()
 
-
     def test_single_channel(self):
         fn_sine = os.path.join(self.test_dirpath, "assets", "sinewave.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
