@@ -1,4 +1,5 @@
 import unittest
+import test.common_utils
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
@@ -9,7 +10,7 @@ import os
 
 class TORCHAUDIODS(Dataset):
 
-    test_dirpath = os.path.dirname(os.path.realpath(__file__))
+    test_dirpath, test_dir = test.common_utils.create_temp_assets_dir()
 
     def __init__(self):
         self.asset_dirpath = os.path.join(self.test_dirpath, "assets")

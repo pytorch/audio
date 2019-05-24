@@ -23,6 +23,7 @@ run_tests() {
     EXIT_STATUS="$(($EXIT_STATUS+STATUS))"
   done
 
+  echo "Done, exit status: $EXIT_STATUS"
   exit $EXIT_STATUS
 }
 
