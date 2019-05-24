@@ -20,3 +20,6 @@ codecov
 # Used for comparison of outputs in tests
 librosa
 scipy
+
+# Parallel tests
+pytest-forked

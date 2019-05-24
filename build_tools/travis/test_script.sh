@@ -11,13 +11,10 @@ python --version
 run_tests() {
     # -v it's a short --verbose
     # -s means 'disable all capturing'
+    # --forked is to run each test in separate process which is important for C/C++ extensions
+    # -cov is for code coverage
     # --durations determines how many of the slowest test times to display
-    if [[ "$RUN_SLOW" == "true" ]]; then
-        TEST_CMD="py.test --runslow -s -v --cov=torchaudio --durations=20"
-    else
-        TEST_CMD="py.test -s -v --cov=torchaudio --durations=20"
-    fi
-    $TEST_CMD
+    py.test -s -v --forked --cov=torchaudio --durations=20
 }
 
 if [[ "$RUN_FLAKE8" == "true" ]]; then
