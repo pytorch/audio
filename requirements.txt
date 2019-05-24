@@ -1,0 +1,12 @@
+# Optional for torchaudio.kaldi_io
+numpy
+kaldi_io
+
+# Required for tests only:
+
+# Style-checking for PEP8
+flake8
+
+# Used for comparison of outputs in tests
+librosa
+scipy
