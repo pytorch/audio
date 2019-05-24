@@ -23,7 +23,6 @@ class TORCHAUDIODS(Dataset):
         self.E.append_effect_to_chain("trim", [0, "16000s"])  # first 16000 samples of audio
 
     def __getitem__(self, index):
-
         fn = self.data[index]
         self.E.set_input_file(fn)
         x, sr = self.E.sox_build_flow_effects()
