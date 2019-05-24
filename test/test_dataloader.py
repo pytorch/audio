@@ -15,6 +15,7 @@ class TORCHAUDIODS(Dataset):
         self.asset_dirpath = os.path.join(self.test_dirpath, "assets")
         sound_files = list(filter(lambda x: '.wav' in x or '.mp3' in x, os.listdir(self.asset_dirpath)))
         self.data = [os.path.join(self.asset_dirpath, fn) for fn in sound_files]
+        self.si, self.ei = torchaudio.info(os.path.join(self.asset_dirpath, "sinewave.wav"))
         self.si.precision = 16
         self.E = torchaudio.sox_effects.SoxEffectsChain()
         self.E.append_effect_to_chain("rate", [self.si.rate])  # resample to 16000hz
