@@ -34,7 +34,7 @@ def scale(tensor, factor):
     Outputs:
         Tensor: Scaled by the scale factor
     """
-    if not tensor.dtype.is_floating_point:
+    if not tensor.is_floating_point():
         tensor = tensor.to(torch.float32)
 
     return tensor / factor
