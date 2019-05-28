@@ -2,10 +2,11 @@ from __future__ import division, print_function
 from warnings import warn
 import math
 import torch
+from torch import nn
 from . import functional as F
 
 
-class Compose(object):
+class Compose(nn.Module):
     """Composes several transforms together.
 
     Args:
@@ -21,7 +22,7 @@ class Compose(object):
     def __init__(self, transforms):
         self.transforms = transforms
 
-    def __call__(self, audio):
+    def forward(self, audio):
         for t in self.transforms:
             audio = t(audio)
         return audio
@@ -35,7 +36,7 @@ class Compose(object):
         return format_string
 
 
-class Scale(object):
+class Scale(nn.Module):
     """Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
     to a floating point number between -1.0 and 1.0.  Note the 16-bit number is
     called the "bit depth" or "precision", not to be confused with "bit rate".
@@ -48,7 +49,7 @@ class Scale(object):
     def __init__(self, factor=2**31):
         self.factor = factor
 
-    def __call__(self, tensor):
+    def forward(self, tensor):
         """
 
         Args:
@@ -64,7 +65,7 @@ class Scale(object):
         return self.__class__.__name__ + '()'
 
 
-class PadTrim(object):
+class PadTrim(nn.Module):
     """Pad/Trim a 2d-Tensor (Signal or Labels)
 
     Args:
@@ -79,7 +80,7 @@ class PadTrim(object):
         self.fill_value = fill_value
         self.len_dim, self.ch_dim = int(channels_first), int(not channels_first)
 
-    def __call__(self, tensor):
+    def forward(self, tensor):
         """
 
         Returns:
@@ -92,7 +93,7 @@ class PadTrim(object):
         return self.__class__.__name__ + '(max_len={0})'.format(self.max_len)
 
 
-class DownmixMono(object):
+class DownmixMono(nn.Module):
     """Downmix any stereo signals to mono.  Consider using a `SoxEffectsChain` with
        the `channels` effect instead of this transformation.
 
@@ -108,18 +109,18 @@ class DownmixMono(object):
     def __init__(self, channels_first=None):
         self.ch_dim = int(not channels_first)
 
-    def __call__(self, tensor):
+    def forward(self, tensor):
         return F.downmix_mono(tensor, self.ch_dim)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
 
 
-class LC2CL(object):
+class LC2CL(nn.Module):
     """Permute a 2d tensor from samples (n x c) to (c x n)
     """
 
-    def __call__(self, tensor):
+    def forward(self, tensor):
         """
 
         Args:
@@ -139,7 +140,7 @@ def SPECTROGRAM(*args, **kwargs):
     return Spectrogram(*args, **kwargs)
 
 
-class Spectrogram(object):
+class Spectrogram(nn.Module):
     """Create a spectrogram from a raw audio signal
 
     Args:
@@ -167,7 +168,7 @@ class Spectrogram(object):
         self.normalize = normalize
         self.wkwargs = wkwargs
 
-    def __call__(self, sig):
+    def forward(self, sig):
         """
         Args:
             sig (Tensor): Tensor of audio of size (c, n)
@@ -188,7 +189,7 @@ def F2M(*args, **kwargs):
     return MelScale(*args, **kwargs)
 
 
-class MelScale(object):
+class MelScale(nn.Module):
     """This turns a normal STFT into a mel frequency STFT, using a conversion
        matrix.  This uses triangular filter banks.
 
@@ -208,12 +209,12 @@ class MelScale(object):
         self.fb = F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels) if n_stft is not None else n_stft
 
-    def __call__(self, spec_f):
+    def forward(self, spec_f):
         self.fb, spec_m = F.mel_scale(spec_f, self.f_min, self.f_max, self.n_mels, self.fb)
         return spec_m
 
 
-class SpectrogramToDB(object):
+class SpectrogramToDB(nn.Module):
     """Turns a spectrogram from the power/amplitude scale to the decibel scale.
 
     This output depends on the maximum value in the input spectrogram, and so
@@ -236,13 +237,13 @@ class SpectrogramToDB(object):
         self.ref_value = 1.
         self.db_multiplier = math.log10(max(self.amin, self.ref_value))
 
-    def __call__(self, spec):
+    def forward(self, spec):
         # numerically stable implementation from librosa
         # https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
         return F.spectrogram_to_DB(spec, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
 
-class MFCC(object):
+class MFCC(nn.Module):
     """Create the Mel-frequency cepstrum coefficients from an audio signal
 
         By default, this calculates the MFCC on the DB-scaled Mel spectrogram.
@@ -285,7 +286,7 @@ class MFCC(object):
         self.dct_mat = F.create_dct(self.n_mfcc, self.MelSpectrogram.n_mels, self.norm)
         self.log_mels = log_mels
 
-    def __call__(self, sig):
+    def forward(self, sig):
         """
         Args:
             sig (Tensor): Tensor of audio of size (channels [c], samples [n])
@@ -298,7 +299,7 @@ class MFCC(object):
         return F.MFCC(sig, self.MelSpectrogram(sig), self.log_mels, self.s2db, self.dct_mat)
 
 
-class MelSpectrogram(object):
+class MelSpectrogram(nn.Module):
     """Create MEL Spectrograms from a raw audio signal using the stft
        function in PyTorch.
 
@@ -343,7 +344,7 @@ class MelSpectrogram(object):
             self.spec, self.fm
         ])
 
-    def __call__(self, sig):
+    def forward(self, sig):
         """
         Args:
             sig (Tensor): Tensor of audio of size (channels [c], samples [n])
@@ -363,12 +364,12 @@ def MEL(*args, **kwargs):
     raise DeprecationWarning("MEL has been removed from the library please use MelSpectrogram or librosa")
 
 
-class BLC2CBL(object):
+class BLC2CBL(nn.Module):
     """Permute a 3d tensor from Bands x Sample length x Channels to Channels x
        Bands x Samples length
     """
 
-    def __call__(self, tensor):
+    def forward(self, tensor):
         """
 
         Args:
@@ -384,7 +385,7 @@ class BLC2CBL(object):
         return self.__class__.__name__ + '()'
 
 
-class MuLawEncoding(object):
+class MuLawEncoding(nn.Module):
     """Encode signal based on mu-law companding.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
@@ -399,7 +400,7 @@ class MuLawEncoding(object):
     def __init__(self, quantization_channels=256):
         self.qc = quantization_channels
 
-    def __call__(self, x):
+    def forward(self, x):
         """
 
         Args:
@@ -415,7 +416,7 @@ class MuLawEncoding(object):
         return self.__class__.__name__ + '()'
 
 
-class MuLawExpanding(object):
+class MuLawExpanding(nn.Module):
     """Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
@@ -430,7 +431,7 @@ class MuLawExpanding(object):
     def __init__(self, quantization_channels=256):
         self.qc = quantization_channels
 
-    def __call__(self, x_mu):
+    def forward(self, x_mu):
         """
 
         Args:
