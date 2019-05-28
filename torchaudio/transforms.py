@@ -4,8 +4,10 @@ import math
 import torch
 from torch import nn
 from . import functional as F
+from torch._jit_internal import weak_module, weak_script_method
 
 
+@weak_module
 class Compose(nn.Module):
     """Composes several transforms together.
 
@@ -20,8 +22,10 @@ class Compose(nn.Module):
     """
 
     def __init__(self, transforms):
+        super(Compose, self).__init__()
         self.transforms = transforms
 
+    @weak_script_method
     def forward(self, audio):
         for t in self.transforms:
             audio = t(audio)
@@ -36,6 +40,7 @@ class Compose(nn.Module):
         return format_string
 
 
+@weak_module
 class Scale(nn.Module):
     """Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
     to a floating point number between -1.0 and 1.0.  Note the 16-bit number is
@@ -47,8 +52,10 @@ class Scale(nn.Module):
     """
 
     def __init__(self, factor=2**31):
+        super(Scale, self).__init__()
         self.factor = factor
 
+    @weak_script_method
     def forward(self, tensor):
         """
 
@@ -65,6 +72,7 @@ class Scale(nn.Module):
         return self.__class__.__name__ + '()'
 
 
+@weak_module
 class PadTrim(nn.Module):
     """Pad/Trim a 2d-Tensor (Signal or Labels)
 
@@ -76,10 +84,12 @@ class PadTrim(nn.Module):
     """
 
     def __init__(self, max_len, fill_value=0, channels_first=True):
+        super(PadTrim, self).__init__()
         self.max_len = max_len
         self.fill_value = fill_value
         self.len_dim, self.ch_dim = int(channels_first), int(not channels_first)
 
+    @weak_script_method
     def forward(self, tensor):
         """
 
@@ -93,6 +103,7 @@ class PadTrim(nn.Module):
         return self.__class__.__name__ + '(max_len={0})'.format(self.max_len)
 
 
+@weak_module
 class DownmixMono(nn.Module):
     """Downmix any stereo signals to mono.  Consider using a `SoxEffectsChain` with
        the `channels` effect instead of this transformation.
@@ -107,8 +118,10 @@ class DownmixMono(nn.Module):
     """
 
     def __init__(self, channels_first=None):
+        super(DownmixMono, self).__init__()
         self.ch_dim = int(not channels_first)
 
+    @weak_script_method
     def forward(self, tensor):
         return F.downmix_mono(tensor, self.ch_dim)
 
@@ -116,10 +129,15 @@ class DownmixMono(nn.Module):
         return self.__class__.__name__ + '()'
 
 
+@weak_module
 class LC2CL(nn.Module):
     """Permute a 2d tensor from samples (n x c) to (c x n)
     """
 
+    def __init__(self, channels_first=None):
+        super(LC2CL, self).__init__()
+
+    @weak_script_method
     def forward(self, tensor):
         """
 
@@ -140,6 +158,7 @@ def SPECTROGRAM(*args, **kwargs):
     return Spectrogram(*args, **kwargs)
 
 
+@weak_module
 class Spectrogram(nn.Module):
     """Create a spectrogram from a raw audio signal
 
@@ -157,6 +176,7 @@ class Spectrogram(nn.Module):
     def __init__(self, n_fft=400, ws=None, hop=None,
                  pad=0, window=torch.hann_window,
                  power=2, normalize=False, wkwargs=None):
+        super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of fft bins. the returned STFT result will have n_fft // 2 + 1
         # number of frequecies due to onesided=True in torch.stft
@@ -168,6 +188,7 @@ class Spectrogram(nn.Module):
         self.normalize = normalize
         self.wkwargs = wkwargs
 
+    @weak_script_method
     def forward(self, sig):
         """
         Args:
@@ -189,6 +210,7 @@ def F2M(*args, **kwargs):
     return MelScale(*args, **kwargs)
 
 
+@weak_module
 class MelScale(nn.Module):
     """This turns a normal STFT into a mel frequency STFT, using a conversion
        matrix.  This uses triangular filter banks.
@@ -202,6 +224,7 @@ class MelScale(nn.Module):
             if `None` is given.  See `n_fft` in `Spectrogram`.
     """
     def __init__(self, n_mels=128, sr=16000, f_max=None, f_min=0., n_stft=None):
+        super(MelScale, self).__init__()
         self.n_mels = n_mels
         self.sr = sr
         self.f_max = f_max if f_max is not None else sr // 2
@@ -209,11 +232,13 @@ class MelScale(nn.Module):
         self.fb = F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels) if n_stft is not None else n_stft
 
+    @weak_script_method
     def forward(self, spec_f):
         self.fb, spec_m = F.mel_scale(spec_f, self.f_min, self.f_max, self.n_mels, self.fb)
         return spec_m
 
 
+@weak_module
 class SpectrogramToDB(nn.Module):
     """Turns a spectrogram from the power/amplitude scale to the decibel scale.
 
@@ -228,6 +253,7 @@ class SpectrogramToDB(nn.Module):
             is 80.
     """
     def __init__(self, stype="power", top_db=None):
+        super(SpectrogramToDB, self).__init__()
         self.stype = stype
         if top_db is not None and top_db < 0:
             raise ValueError('top_db must be positive value')
@@ -237,12 +263,14 @@ class SpectrogramToDB(nn.Module):
         self.ref_value = 1.
         self.db_multiplier = math.log10(max(self.amin, self.ref_value))
 
+    @weak_script_method
     def forward(self, spec):
         # numerically stable implementation from librosa
         # https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
         return F.spectrogram_to_DB(spec, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
 
+@weak_module
 class MFCC(nn.Module):
     """Create the Mel-frequency cepstrum coefficients from an audio signal
 
@@ -264,7 +292,7 @@ class MFCC(nn.Module):
     """
     def __init__(self, sr=16000, n_mfcc=40, dct_type=2, norm='ortho', log_mels=False,
                  melkwargs=None):
-
+        super(MFCC, self).__init__()
         supported_dct_types = [2]
         if dct_type not in supported_dct_types:
             raise ValueError('DCT type not supported'.format(dct_type))
@@ -286,6 +314,7 @@ class MFCC(nn.Module):
         self.dct_mat = F.create_dct(self.n_mfcc, self.MelSpectrogram.n_mels, self.norm)
         self.log_mels = log_mels
 
+    @weak_script_method
     def forward(self, sig):
         """
         Args:
@@ -299,6 +328,7 @@ class MFCC(nn.Module):
         return F.MFCC(sig, self.MelSpectrogram(sig), self.log_mels, self.s2db, self.dct_mat)
 
 
+@weak_module
 class MelSpectrogram(nn.Module):
     """Create MEL Spectrograms from a raw audio signal using the stft
        function in PyTorch.
@@ -326,6 +356,7 @@ class MelSpectrogram(nn.Module):
     """
     def __init__(self, sr=16000, n_fft=400, ws=None, hop=None, f_min=0., f_max=None,
                  pad=0, n_mels=128, window=torch.hann_window, wkwargs=None):
+        super(MelSpectrogram, self).__init__()
         self.window = window
         self.sr = sr
         self.n_fft = n_fft
@@ -344,6 +375,7 @@ class MelSpectrogram(nn.Module):
             self.spec, self.fm
         ])
 
+    @weak_script_method
     def forward(self, sig):
         """
         Args:
@@ -364,11 +396,16 @@ def MEL(*args, **kwargs):
     raise DeprecationWarning("MEL has been removed from the library please use MelSpectrogram or librosa")
 
 
+@weak_module
 class BLC2CBL(nn.Module):
     """Permute a 3d tensor from Bands x Sample length x Channels to Channels x
        Bands x Samples length
     """
 
+    def __init__(self):
+        super(BLC2CBL, self).__init__()
+
+    @weak_script_method
     def forward(self, tensor):
         """
 
@@ -385,6 +422,7 @@ class BLC2CBL(nn.Module):
         return self.__class__.__name__ + '()'
 
 
+@weak_module
 class MuLawEncoding(nn.Module):
     """Encode signal based on mu-law companding.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
@@ -398,8 +436,10 @@ class MuLawEncoding(nn.Module):
     """
 
     def __init__(self, quantization_channels=256):
+        super(MuLawEncoding, self).__init__()
         self.qc = quantization_channels
 
+    @weak_script_method
     def forward(self, x):
         """
 
@@ -416,6 +456,7 @@ class MuLawEncoding(nn.Module):
         return self.__class__.__name__ + '()'
 
 
+@weak_module
 class MuLawExpanding(nn.Module):
     """Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
@@ -429,8 +470,10 @@ class MuLawExpanding(nn.Module):
     """
 
     def __init__(self, quantization_channels=256):
+        super(MuLawExpanding, self).__init__()
         self.qc = quantization_channels
 
+    @weak_script_method
     def forward(self, x_mu):
         """
 
