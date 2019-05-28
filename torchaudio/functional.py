@@ -159,23 +159,15 @@ def create_fb_matrix(n_stft, f_min, f_max, n_mels):
         Tensor: triangular filter banks (fb matrix)
 
     """
-    @weak_script
-    def _hertz_to_mel(f):
-        # type: (float) -> Tensor
-        return 2595. * torch.log10(torch.tensor(1.) + (f / 700.))
-
-    @weak_script
-    def _mel_to_hertz(mel):
-        # type: (Tensor) -> Tensor
-        return 700. * (10**(mel / 2595.) - 1.)
-
     # get stft freq bins
     stft_freqs = torch.linspace(f_min, f_max, n_stft)
     # calculate mel freq bins
-    m_min = 0. if f_min == 0 else _hertz_to_mel(f_min)
-    m_max = _hertz_to_mel(f_max)
+    # hertz to mel(f) is 2595. * torch.log10(torch.tensor(1.) + (f / 700.))
+    m_min = 0. if f_min == 0 else 2595. * torch.log10(torch.tensor(1.) + (f_min / 700.))
+    m_max = 2595. * torch.log10(torch.tensor(1.) + (f_max / 700.))
     m_pts = torch.linspace(m_min, m_max, n_mels + 2)
-    f_pts = _mel_to_hertz(m_pts)
+    # mel to hertz(mel) is 700. * (10**(mel / 2595.) - 1.)
+    f_pts = 700. * (10**(m_pts / 2595.) - 1.)
     # calculate the difference between each mel point and each stft freq point in hertz
     f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
     slopes = f_pts.unsqueeze(0) - stft_freqs.unsqueeze(1)  # (n_stft, n_mels + 2)
@@ -188,26 +180,20 @@ def create_fb_matrix(n_stft, f_min, f_max, n_mels):
 
 
 @weak_script
-def mel_scale(spec_f, f_min, f_max, n_mels, fb=None):
-    # type: (Tensor, float, float, int, Optional[Tensor]) -> Tuple[Tensor, Tensor]
+def mel_scale(spec_f, fb):
+    # type: (Tensor, Tensor) -> Tuple[Tensor, Tensor]
     """ This turns a normal STFT into a mel frequency STFT, using a conversion
     matrix.  This uses triangular filter banks.
 
     Inputs:
         spec_f (Tensor): normal STFT
-        f_min (float): minimum frequency
-        f_max (float): maximum frequency
-        n_mels (int): number of mel bins
-        fb (Optional[Tensor]): triangular filter banks (fb matrix)
+        fb (Tensor): triangular filter banks (fb matrix)
 
     Outputs:
         Tuple[Tensor, Tensor]: triangular filter banks (fb matrix) and mel frequency STFT
     """
-    if fb is None:
-        fb = create_fb_matrix(spec_f.size(2), f_min, f_max, n_mels).to(spec_f.device)
-    else:
-        # need to ensure same device for dot product
-        fb = fb.to(spec_f.device)
+    # need to ensure same device for dot product
+    fb = fb.to(spec_f.device)
     spec_m = torch.matmul(spec_f, fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
     return fb, spec_m
 

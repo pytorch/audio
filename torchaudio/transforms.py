@@ -234,7 +234,7 @@ class MelScale(nn.Module):
 
     @weak_script_method
     def forward(self, spec_f):
-        self.fb, spec_m = F.mel_scale(spec_f, self.f_min, self.f_max, self.n_mels, self.fb)
+        self.fb, spec_m = F.mel_scale(spec_f, self.fb)
         return spec_m
 
 
