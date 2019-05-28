@@ -62,7 +62,7 @@ def pad_trim(tensor, ch_dim, max_len, len_dim, fill_value):
         padding = [max_len - tensor.size(len_dim)
                    if (i % 2 == 1) and (i // 2 != len_dim)
                    else 0
-                   for i in [0,1,2,3]]
+                   for i in [0, 1, 2, 3]]
         tensor = torch.nn.functional.pad(tensor, padding, "constant", fill_value)
     elif max_len < tensor.size(len_dim):
         tensor = tensor.narrow(len_dim, 0, max_len)
@@ -81,7 +81,7 @@ def downmix_mono(tensor, ch_dim):
     Outputs:
         Tensor: Mono signal
     """
-    if not tensor.dtype.is_floating_point:
+    if not tensor.is_floating_point():
         tensor = tensor.to(torch.float32)
 
     tensor = torch.mean(tensor, ch_dim, True)
