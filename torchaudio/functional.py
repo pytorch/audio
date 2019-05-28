@@ -56,15 +56,14 @@ def pad_trim(tensor, ch_dim, max_len, len_dim, fill_value):
         Tensor: Padded/trimmed tensor
     """
     if max_len > tensor.size(len_dim):
-        # tuple of (padding_left, padding_right, padding_top, padding_bottom)
+        # array of [padding_left, padding_right, padding_top, padding_bottom]
         # so pad similar to append (aka only right/bottom) and do not pad
         # the length dimension. assumes equal sizes of padding.
         padding = [max_len - tensor.size(len_dim)
                    if (i % 2 == 1) and (i // 2 != len_dim)
                    else 0
-                   for i in range(4)]
-        with torch.no_grad():
-            tensor = torch.nn.functional.pad(tensor, padding, "constant", fill_value)
+                   for i in [0,1,2,3]]
+        tensor = torch.nn.functional.pad(tensor, padding, "constant", fill_value)
     elif max_len < tensor.size(len_dim):
         tensor = tensor.narrow(len_dim, 0, max_len)
     return tensor

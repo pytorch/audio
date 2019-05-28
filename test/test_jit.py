@@ -10,15 +10,14 @@ print('Run test with cuda:', RUN_CUDA)
 class Test_ScaleJIT(unittest.TestCase):
     def test_torchscript_scale(self):
         @torch.jit.script
-        def jit_scale(tensor, factor):
+        def jit_method(tensor, factor):
             # type: (Tensor, int) -> Tensor
             return F.scale(tensor, factor)
 
-        n = 10
-        tensor = torch.rand((n, 1))
+        tensor = torch.rand((10, 1))
         factor = 2
 
-        jit_out = jit_scale(tensor, factor)
+        jit_out = jit_method(tensor, factor)
         py_out = F.scale(tensor, factor)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
@@ -38,8 +37,7 @@ class Test_ScaleJIT(unittest.TestCase):
             def forward(self, tensor):
                 return self.module(tensor)
 
-        n = 10
-        tensor = torch.rand((n, 1), device="cuda")
+        tensor = torch.rand((10, 1), device="cuda")
         factor = 2
         model = MyModule(tensor, factor).cuda()
 
@@ -52,16 +50,18 @@ class Test_ScaleJIT(unittest.TestCase):
 class Test_PadTrimJIT(unittest.TestCase):
     def test_torchscript_pad_trim(self):
         @torch.jit.script
-        def jit_pad_trim(tensor, factor):
-            # type: (Tensor, int) -> Tensor
-            return F.scale(tensor, factor)
+        def jit_method(tensor, ch_dim, max_len, len_dim, fill_value):
+            # type: (Tensor, int, int, int, float) -> Tensor
+            return F.pad_trim(tensor, ch_dim, max_len, len_dim, fill_value)
 
-        n = 10
-        tensor = torch.rand((n, 1))
-        factor = 2
+        tensor = torch.rand((10, 1))
+        ch_dim = 1
+        max_len = 5
+        len_dim = 0
+        fill_value = 3.
 
-        jit_out = jit_scale(tensor, factor)
-        py_out = F.scale(tensor, factor)
+        jit_out = jit_method(tensor, ch_dim, max_len, len_dim, fill_value)
+        py_out = F.pad_trim(tensor, ch_dim, max_len, len_dim, fill_value)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
@@ -69,9 +69,10 @@ class Test_PadTrimJIT(unittest.TestCase):
     def test_scriptmodule_pad_trim(self):
 
         class MyModule(torch.jit.ScriptModule):
-            def __init__(self, tensor, factor):
+            def __init__(self, tensor, ch_dim, max_len, len_dim, fill_value):
                 super(MyModule, self).__init__()
-                module = transforms.Scale(factor)
+                channels_first = ch_dim == 0
+                module = transforms.PadTrim(max_len, fill_value, channels_first=channels_first)
                 module.eval()
 
                 self.module = torch.jit.trace(module, (tensor))
@@ -80,13 +81,15 @@ class Test_PadTrimJIT(unittest.TestCase):
             def forward(self, tensor):
                 return self.module(tensor)
 
-        n = 10
-        tensor = torch.rand((n, 1), device="cuda")
-        factor = 2
-        model = MyModule(tensor, factor).cuda()
+        tensor = torch.rand((10, 1), device="cuda")
+        ch_dim = 1
+        max_len = 5
+        len_dim = 0
+        fill_value = 3.
+        model = MyModule(tensor, ch_dim, max_len, len_dim, fill_value).cuda()
 
         jit_out = model(tensor)
-        py_out = F.scale(tensor, factor)
+        py_out = F.pad_trim(tensor, factor, tensor, ch_dim, max_len, len_dim, fill_value)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
