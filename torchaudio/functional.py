@@ -1,5 +1,6 @@
 import math
 import torch
+from torch._jit_internal import weak_script
 
 
 __all__ = [
@@ -19,6 +20,7 @@ __all__ = [
 ]
 
 
+@weak_script
 def scale(tensor, factor):
     # type: (Tensor, int) -> Tensor
     """Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
@@ -38,6 +40,7 @@ def scale(tensor, factor):
     return tensor / factor
 
 
+@weak_script
 def pad_trim(tensor, ch_dim, max_len, len_dim, fill_value):
     # type: (Tensor, int, int, int, float) -> Tensor
     """Pad/Trim a 2d-Tensor (Signal or Labels)
@@ -67,6 +70,7 @@ def pad_trim(tensor, ch_dim, max_len, len_dim, fill_value):
     return tensor
 
 
+@weak_script
 def downmix_mono(tensor, ch_dim):
     # type: (Tensor, int) -> Tensor
     """Downmix any stereo signals to mono.
@@ -85,6 +89,7 @@ def downmix_mono(tensor, ch_dim):
     return tensor
 
 
+@weak_script
 def LC2CL(tensor):
     # type: (Tensor) -> Tensor
     """Permute a 2d tensor from samples (n x c) to (c x n)
@@ -98,6 +103,7 @@ def LC2CL(tensor):
     return tensor.transpose(0, 1).contiguous()
 
 
+@weak_script
 def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
     # type: (Tensor, int, Tensor, int, int, int, int, bool) -> Tensor
     """Create a spectrogram from a raw audio signal
@@ -138,6 +144,7 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
     return spec_f
 
 
+@weak_script
 def create_fb_matrix(n_stft, f_min, f_max, n_mels):
     # type: (int, float, float, int) -> Tensor
     """ Create a frequency bin conversion matrix.
@@ -150,11 +157,14 @@ def create_fb_matrix(n_stft, f_min, f_max, n_mels):
 
     Outputs:
         Tensor: triangular filter banks (fb matrix)
+
     """
+    @weak_script
     def _hertz_to_mel(f):
         # type: (float) -> Tensor
         return 2595. * torch.log10(torch.tensor(1.) + (f / 700.))
 
+    @weak_script
     def _mel_to_hertz(mel):
         # type: (Tensor) -> Tensor
         return 700. * (10**(mel / 2595.) - 1.)
@@ -177,6 +187,7 @@ def create_fb_matrix(n_stft, f_min, f_max, n_mels):
     return fb
 
 
+@weak_script
 def mel_scale(spec_f, f_min, f_max, n_mels, fb=None):
     # type: (Tensor, float, float, int, Optional[Tensor]) -> Tuple[Tensor, Tensor]
     """ This turns a normal STFT into a mel frequency STFT, using a conversion
@@ -201,6 +212,7 @@ def mel_scale(spec_f, f_min, f_max, n_mels, fb=None):
     return fb, spec_m
 
 
+@weak_script
 def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
     # type: (Tensor, float, float, float, Optional[float]) -> Tensor
     """Turns a spectrogram from the power/amplitude scale to the decibel scale.
@@ -228,6 +240,7 @@ def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
     return spec_db
 
 
+@weak_script
 def create_dct(n_mfcc, n_mels, norm):
     # type: (int, int, string) -> Tensor
     """
@@ -256,6 +269,7 @@ def create_dct(n_mfcc, n_mels, norm):
     return dct.t()
 
 
+@weak_script
 def MFCC(sig, mel_spect, log_mels, s2db, dct_mat):
     # type: (Tensor, MelSpectrogram, bool, SpectrogramToDB, Tensor) -> Tensor
     """Create the Mel-frequency cepstrum coefficients from an audio signal
@@ -287,6 +301,7 @@ def MFCC(sig, mel_spect, log_mels, s2db, dct_mat):
     return mfcc
 
 
+@weak_script
 def BLC2CBL(tensor):
     # type: (Tensor) -> Tensor
     """Permute a 3d tensor from Bands x Sample length x Channels to Channels x
@@ -301,6 +316,7 @@ def BLC2CBL(tensor):
     return tensor.permute(2, 0, 1).contiguous()
 
 
+@weak_script
 def mu_law_encoding(x, qc):
     # type: (Tensor, int) -> Tensor
     """Encode signal based on mu-law companding.  For more info see the
@@ -327,6 +343,7 @@ def mu_law_encoding(x, qc):
     return x_mu
 
 
+@weak_script
 def mu_law_expanding(x_mu, qc):
     # type: (Tensor, int) -> Tensor
     """Decode mu-law encoded signal.  For more info see the
