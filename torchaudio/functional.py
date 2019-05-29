@@ -174,7 +174,7 @@ def create_fb_matrix(n_stft, f_min, f_max, n_mels):
     stft_freqs = torch.linspace(f_min, f_max, n_stft)
     # calculate mel freq bins
     # hertz to mel(f) is 2595. * torch.log10(torch.tensor(1.) + (f / 700.))
-    m_min = 0. if f_min == 0 else 2595. * torch.log10(torch.tensor(1.) + (f_min / 700.))
+    m_min = torch.tensor(0.) if f_min == 0 else 2595. * torch.log10(torch.tensor(1.) + (f_min / 700.))
     m_max = 2595. * torch.log10(torch.tensor(1.) + (f_max / 700.))
     m_pts = torch.linspace(m_min, m_max, n_mels + 2)
     # mel to hertz(mel) is 700. * (10**(mel / 2595.) - 1.)

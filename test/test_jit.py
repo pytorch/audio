@@ -192,7 +192,6 @@ class Test_SpectrogramJIT(unittest.TestCase):
         jit_out = jit_method(tensor, pad, window, n_fft, hop, ws, power, normalize)
         py_out = F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
 
-        print(jit_out.shape, py_out.shape)
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
@@ -227,6 +226,47 @@ class Test_SpectrogramJIT(unittest.TestCase):
         py_out = F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+
+# class Test_MelScaleJIT(unittest.TestCase):
+#     def test_torchscript_create_fb_matrix(self):
+#         @torch.jit.script
+#         def jit_method(n_stft, f_min, f_max, n_mels):
+#             # type: (int, float, float, int) -> Tensor
+#             return F.create_fb_matrix(n_stft, f_min, f_max, n_mels)
+#
+#         n_stft = 100
+#         f_min = 0.
+#         f_max = 20.
+#         n_mels = 10
+#
+#         # jit_out = jit_method(n_stft, f_min, f_max, n_mels)
+#         py_out = F.create_fb_matrix(n_stft, f_min, f_max, n_mels)
+        # self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+    # @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    # def test_scriptmodule_@(self):
+    #
+    #     class MyModule(torch.jit.ScriptModule):
+    #         def __init__(self, @):
+    #             super(MyModule, self).__init__()
+    #             @
+    #             module = transforms.MelScale(@)
+    #             module.eval()
+    #
+    #             self.module = torch.jit.trace(module, (tensor))
+    #
+    #         @torch.jit.script_method
+    #         def forward(self, @):
+    #             return self.module(@)
+    #
+    #     tensor = torch.rand((10, 1), device="cuda")@
+    #     model = MyModule(@).cuda()
+    #
+    #     jit_out = model(tensor)
+    #     py_out = F.@(tensor, ch_dim)
+    #
+    #     self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
 if __name__ == '__main__':
     unittest.main()

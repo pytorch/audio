@@ -53,7 +53,7 @@ pip install -r requirements.txt
  # Install the following only if running tests
 if [[ "$SKIP_TESTS" != "true" ]]; then
     # PyTorch
-    conda install --yes pytorch -c pytorch
+    conda install --yes pytorch-cpu torchvision-cpu -c pytorch
 
      # TorchAudio CPP Extensions
     pip install .
