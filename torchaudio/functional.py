@@ -173,17 +173,18 @@ def create_fb_matrix(n_stft, f_min, f_max, n_mels):
     # get stft freq bins
     stft_freqs = torch.linspace(f_min, f_max, n_stft)
     # calculate mel freq bins
-    # hertz to mel(f) is 2595. * torch.log10(torch.tensor(1.) + (f / 700.))
-    m_min = torch.tensor(0.) if f_min == 0 else 2595. * torch.log10(torch.tensor(1.) + (f_min / 700.))
-    m_max = 2595. * torch.log10(torch.tensor(1.) + (f_max / 700.))
+    # hertz to mel(f) is 2595. * math.log10(1. + (f / 700.))
+    m_min = 0. if f_min == 0 else 2595. * math.log10(1. + (f_min / 700.))
+    m_max = 2595. * math.log10(1. + (f_max / 700.))
     m_pts = torch.linspace(m_min, m_max, n_mels + 2)
     # mel to hertz(mel) is 700. * (10**(mel / 2595.) - 1.)
+    # print(torch.get_default_dtype(), m_pts.dtype, torch.tensor(1.).dtype, m_min.dtype, m_max.dtype)
     f_pts = 700. * (10**(m_pts / 2595.) - 1.)
     # calculate the difference between each mel point and each stft freq point in hertz
     f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
     slopes = f_pts.unsqueeze(0) - stft_freqs.unsqueeze(1)  # (n_stft, n_mels + 2)
     # create overlapping triangles
-    z = torch.tensor(0.)
+    z = torch.zeros(1)
     down_slopes = (-1. * slopes[:, :-2]) / f_diff[:-1]  # (n_stft, n_mels)
     up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_stft, n_mels)
     fb = torch.max(z, torch.min(down_slopes, up_slopes))
