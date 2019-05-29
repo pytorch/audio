@@ -229,11 +229,13 @@ class MelScale(nn.Module):
         self.sr = sr
         self.f_max = f_max if f_max is not None else sr // 2
         self.f_min = f_min
-        self.fb = F.create_fb_matrix(
-            n_stft, self.f_min, self.f_max, self.n_mels) if n_stft is not None else n_stft
+        self.fb = None if n_stft is None else F.create_fb_matrix(
+            n_stft, self.f_min, self.f_max, self.n_mels)
 
     @weak_script_method
     def forward(self, spec_f):
+        if self.fb is None:
+            self.fb = F.create_fb_matrix(spec_f.size(2), self.f_min, self.f_max, self.n_mels)
         self.fb, spec_m = F.mel_scale(spec_f, self.fb)
         return spec_m
 

@@ -134,5 +134,43 @@ class Test_DownmixMonoJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
+
+class Test_LC2CLJIT(unittest.TestCase):
+    def test_torchscript_LC2CL(self):
+        @torch.jit.script
+        def jit_method(tensor):
+            # type: (Tensor) -> Tensor
+            return F.LC2CL(tensor)
+
+        tensor = torch.rand((10, 1))
+
+        jit_out = jit_method(tensor)
+        py_out = F.LC2CL(tensor)
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_LC2CL(self):
+
+        class MyModule(torch.jit.ScriptModule):
+            def __init__(self, tensor):
+                super(MyModule, self).__init__()
+                module = transforms.LC2CL(tensor)
+                module.eval()
+
+                self.module = torch.jit.trace(module, (tensor))
+
+            @torch.jit.script_method
+            def forward(self, tensor):
+                return self.module(tensor)
+
+        tensor = torch.rand((10, 1), device="cuda")
+        model = MyModule(tensor).cuda()
+
+        jit_out = model(tensor)
+        py_out = F.LC2CL(tensor)
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
 if __name__ == '__main__':
     unittest.main()
