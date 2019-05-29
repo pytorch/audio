@@ -102,6 +102,20 @@ def LC2CL(tensor):
     return tensor.transpose(0, 1).contiguous()
 
 
+def _stft(input, n_fft, hop_length=None, win_length=None, window=None,
+          center=True, pad_mode='reflect', normalized=False, onesided=True):
+    # type: (Tensor, int, Optional[int], Optional[int], Optional[Tensor], bool, str, bool, bool) -> Tensor
+    """ Based on torch.stft
+    """
+    if center:
+        signal_dim = input.dim()
+        extended_shape = [1] * (3 - signal_dim) + list(input.size())
+        pad = int(n_fft // 2)
+        input = torch.nn.functional.pad(input.view(extended_shape), (pad, pad), pad_mode)
+        input = input.view(input.shape[-signal_dim:])
+    return torch._C._VariableFunctions.stft(input, n_fft, hop_length, win_length, window, normalized, onesided)
+
+
 @weak_script
 def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
     # type: (Tensor, int, Tensor, int, int, int, int, bool) -> Tensor
@@ -128,15 +142,13 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
     assert sig.dim() == 2
 
     if pad > 0:
-        with torch.no_grad():
-            sig = torch.nn.functional.pad(sig, (pad, pad), "constant")
+        sig = torch.nn.functional.pad(sig, (pad, pad), "constant")
     window = window.to(sig.device)
 
     # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = torch.stft(sig, n_fft, hop, ws,
-                        window, center=True,
-                        normalized=False, onesided=True,
-                        pad_mode='reflect').transpose(1, 2)
+    spec_f = _stft(sig, n_fft, hop, ws, window,
+                   True, 'reflect', False, True).transpose(1, 2)
+
     if normalize:
         spec_f /= window.pow(2).sum().sqrt()
     spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor (c, l, n_fft)

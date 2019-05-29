@@ -172,5 +172,61 @@ class Test_LC2CLJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
+
+class Test_SpectrogramJIT(unittest.TestCase):
+    def test_torchscript_spectrogram(self):
+        @torch.jit.script
+        def jit_method(sig, pad, window, n_fft, hop, ws, power, normalize):
+            # type: (Tensor, int, Tensor, int, int, int, int, bool) -> Tensor
+            return F.spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize)
+
+        tensor = torch.rand((1, 1000))
+        n_fft = 400
+        ws = 400
+        hop = 200
+        pad = 0
+        window = torch.hann_window(ws)
+        power = 2
+        normalize = False
+
+        jit_out = jit_method(tensor, pad, window, n_fft, hop, ws, power, normalize)
+        py_out = F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
+
+        print(jit_out.shape, py_out.shape)
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_Spectrogram(self):
+
+        class MyModule(torch.jit.ScriptModule):
+            def __init__(self, tensor, pad, n_fft, hop, ws, power, normalize):
+                super(MyModule, self).__init__()
+                module = transforms.Spectrogram(
+                    n_fft=n_fft, ws=ws, hop=hop,
+                    pad=pad, window=torch.hann_window,
+                    power=power, normalize=normalize, wkwargs=None)
+                module.eval()
+
+                self.module = torch.jit.trace(module, (tensor))
+
+            @torch.jit.script_method
+            def forward(self, tensor):
+                return self.module(tensor)
+
+        tensor = torch.rand((1, 1000), device="cuda")
+        n_fft = 400
+        ws = 400
+        hop = 200
+        pad = 0
+        window = torch.hann_window(ws)
+        power = 2
+        normalize = False
+        model = MyModule(tensor, pad, n_fft, hop, ws, power, normalize).cuda()
+
+        jit_out = model(tensor)
+        py_out = F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
 if __name__ == '__main__':
     unittest.main()
