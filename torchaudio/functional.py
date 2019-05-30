@@ -61,6 +61,7 @@ def pad_trim(tensor, ch_dim, max_len, len_dim, fill_value):
                    if (i % 2 == 1) and (i // 2 != len_dim)
                    else 0
                    for i in [0, 1, 2, 3]]
+        # TODO add "with torch.no_grad():" back when JIT supports it
         tensor = torch.nn.functional.pad(tensor, padding, "constant", fill_value)
     elif max_len < tensor.size(len_dim):
         tensor = tensor.narrow(len_dim, 0, max_len)
@@ -140,6 +141,7 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
     assert sig.dim() == 2
 
     if pad > 0:
+        # TODO add "with torch.no_grad():" back when JIT supports it
         sig = torch.nn.functional.pad(sig, (pad, pad), "constant")
     window = window.to(sig.device)
 

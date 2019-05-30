@@ -252,27 +252,27 @@ class Test_MelScaleJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-    # @unittest.skipIf(not RUN_CUDA, "no CUDA")
-    # def test_scriptmodule_MelScale(self):
-    #     class MyModule(torch.jit.ScriptModule):
-    #         def __init__(self, spec_f):
-    #             super(MyModule, self).__init__()
-    #             module = transforms.MelScale2()
-    #             module.eval()
-    #             print('begin')
-    #             self.module = torch.jit.trace(module, (spec_f))
-    #
-    #         @torch.jit.script_method
-    #         def forward(self, spec_f):
-    #             return self.module(spec_f)
-    #
-    #     spec_f = torch.rand((1, 6, 201), device="cuda")
-    #     model = MyModule(spec_f).cuda()
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_MelScale(self):
+        class MyModule(torch.jit.ScriptModule):
+            def __init__(self, spec_f):
+                super(MyModule, self).__init__()
+                module = transforms.MelScale2()
+                module.eval()
+                print('begin')
+                self.module = torch.jit.trace(module, (spec_f))
 
-        # jit_out = model(spec_f)
-        # py_out = F.mel_scale(spec_f, F.create_fb_matrix(spec_f.size(2), 0., 8000., 128))[0]
-        #
-        # self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+            @torch.jit.script_method
+            def forward(self, spec_f):
+                return self.module(spec_f)
+
+        spec_f = torch.rand((1, 6, 201), device="cuda")
+        model = MyModule(spec_f).cuda()
+
+        jit_out = model(spec_f)
+        py_out = F.mel_scale(spec_f, F.create_fb_matrix(spec_f.size(2), 0., 8000., 128))[0]
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
 if __name__ == '__main__':
     unittest.main()
