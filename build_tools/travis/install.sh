@@ -52,7 +52,7 @@ pip install -r requirements.txt
 
  # Install the following only if running tests
 if [[ "$SKIP_TESTS" != "true" ]]; then
-    # PyTorch
+    # PyTorch (nightly as 1.1 does not have Optional for type annotations)
     conda install --yes pytorch-nightly-cpu -c pytorch
 
      # TorchAudio CPP Extensions

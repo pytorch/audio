@@ -3,12 +3,11 @@ from warnings import warn
 import math
 import torch
 from torch import nn
+from typing import List, Dict, Optional, Tuple
 from . import functional as F
-from torch._jit_internal import weak_module, weak_script_method
 
 
-@weak_module
-class Compose(nn.Module):
+class Compose(torch.jit.ScriptModule):
     """Composes several transforms together.
 
     Args:
@@ -20,12 +19,11 @@ class Compose(nn.Module):
         >>>     transforms.PadTrim(max_len=16000),
         >>> ])
     """
-
     def __init__(self, transforms):
         super(Compose, self).__init__()
-        self.transforms = transforms
+        self.transforms = torch.jit.Attribute(transforms, List[torch.jit.ScriptModule])
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, audio):
         for t in self.transforms:
             audio = t(audio)
@@ -40,8 +38,7 @@ class Compose(nn.Module):
         return format_string
 
 
-@weak_module
-class Scale(nn.Module):
+class Scale(torch.jit.ScriptModule):
     """Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
     to a floating point number between -1.0 and 1.0.  Note the 16-bit number is
     called the "bit depth" or "precision", not to be confused with "bit rate".
@@ -50,12 +47,13 @@ class Scale(nn.Module):
         factor (int): maximum value of input tensor. default: 16-bit depth
 
     """
+    __constants__ = ['factor']
 
     def __init__(self, factor=2**31):
         super(Scale, self).__init__()
         self.factor = factor
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, tensor):
         """
 
@@ -72,8 +70,7 @@ class Scale(nn.Module):
         return self.__class__.__name__ + '()'
 
 
-@weak_module
-class PadTrim(nn.Module):
+class PadTrim(torch.jit.ScriptModule):
     """Pad/Trim a 2d-Tensor (Signal or Labels)
 
     Args:
@@ -82,6 +79,7 @@ class PadTrim(nn.Module):
         channels_first (bool): Pad for channels first tensors.  Default: `True`
 
     """
+    __constants__ = ['max_len', 'fill_value', 'len_dim', 'ch_dim']
 
     def __init__(self, max_len, fill_value=0, channels_first=True):
         super(PadTrim, self).__init__()
@@ -89,7 +87,7 @@ class PadTrim(nn.Module):
         self.fill_value = fill_value
         self.len_dim, self.ch_dim = int(channels_first), int(not channels_first)
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, tensor):
         """
 
@@ -103,8 +101,7 @@ class PadTrim(nn.Module):
         return self.__class__.__name__ + '(max_len={0})'.format(self.max_len)
 
 
-@weak_module
-class DownmixMono(nn.Module):
+class DownmixMono(torch.jit.ScriptModule):
     """Downmix any stereo signals to mono.  Consider using a `SoxEffectsChain` with
        the `channels` effect instead of this transformation.
 
@@ -116,12 +113,13 @@ class DownmixMono(nn.Module):
         tensor (Tensor) (Samples x 1):
 
     """
+    __constants__ = ['ch_dim']
 
     def __init__(self, channels_first=None):
         super(DownmixMono, self).__init__()
         self.ch_dim = int(not channels_first)
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, tensor):
         return F.downmix_mono(tensor, self.ch_dim)
 
@@ -129,15 +127,14 @@ class DownmixMono(nn.Module):
         return self.__class__.__name__ + '()'
 
 
-@weak_module
-class LC2CL(nn.Module):
+class LC2CL(torch.jit.ScriptModule):
     """Permute a 2d tensor from samples (n x c) to (c x n)
     """
 
-    def __init__(self, channels_first=None):
+    def __init__(self):
         super(LC2CL, self).__init__()
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, tensor):
         """
 
@@ -158,8 +155,7 @@ def SPECTROGRAM(*args, **kwargs):
     return Spectrogram(*args, **kwargs)
 
 
-@weak_module
-class Spectrogram(nn.Module):
+class Spectrogram(torch.jit.ScriptModule):
     """Create a spectrogram from a raw audio signal
 
     Args:
@@ -173,6 +169,8 @@ class Spectrogram(nn.Module):
         normalize (bool) : whether to normalize by magnitude after stft
         wkwargs (dict, optional): arguments for window function
     """
+    __constants__ = ['n_fft', 'ws', 'hop', 'pad', 'power', 'normalize', 'wkargs']
+
     def __init__(self, n_fft=400, ws=None, hop=None,
                  pad=0, window=torch.hann_window,
                  power=2, normalize=False, wkwargs=None):
@@ -182,13 +180,13 @@ class Spectrogram(nn.Module):
         # number of frequecies due to onesided=True in torch.stft
         self.ws = ws if ws is not None else n_fft
         self.hop = hop if hop is not None else self.ws // 2
-        self.window = window(self.ws) if wkwargs is None else window(self.ws, **wkwargs)
+        window = window(self.ws) if wkwargs is None else window(self.ws, **wkwargs)
+        self.window = torch.jit.Attribute(window, torch.Tensor)
         self.pad = pad
         self.power = power
         self.normalize = normalize
-        self.wkwargs = wkwargs
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, sig):
         """
         Args:
@@ -210,8 +208,7 @@ def F2M(*args, **kwargs):
     return MelScale(*args, **kwargs)
 
 
-@weak_module
-class MelScale(nn.Module):
+class MelScale(torch.jit.ScriptModule):
     """This turns a normal STFT into a mel frequency STFT, using a conversion
        matrix.  This uses triangular filter banks.
 
@@ -223,16 +220,19 @@ class MelScale(nn.Module):
         n_stft (int, optional): number of filter banks from stft. Calculated from first input
             if `None` is given.  See `n_fft` in `Spectrogram`.
     """
+    __constants__ = ['n_mels', 'sr', 'f_max', 'f_min']
+
     def __init__(self, n_mels=128, sr=16000, f_max=None, f_min=0., n_stft=None):
         super(MelScale, self).__init__()
         self.n_mels = n_mels
         self.sr = sr
         self.f_max = f_max if f_max is not None else sr // 2
         self.f_min = f_min
-        self.fb = None if n_stft is None else F.create_fb_matrix(
+        fb = None if n_stft is None else F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels)
+        self.fb = torch.jit.Attribute(fb, Optional[torch.Tensor])
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, spec_f):
         if self.fb is None:
             self.fb = F.create_fb_matrix(spec_f.size(2), self.f_min, self.f_max, self.n_mels)
@@ -240,8 +240,7 @@ class MelScale(nn.Module):
         return spec_m
 
 
-@weak_module
-class SpectrogramToDB(nn.Module):
+class SpectrogramToDB(torch.jit.ScriptModule):
     """Turns a spectrogram from the power/amplitude scale to the decibel scale.
 
     This output depends on the maximum value in the input spectrogram, and so
@@ -254,26 +253,27 @@ class SpectrogramToDB(nn.Module):
         top_db (float, optional): minimum negative cut-off in decibels.  A reasonable number
             is 80.
     """
+    __constants__ = ['multiplier', 'amin', 'ref_value', 'db_multiplier']
+
     def __init__(self, stype="power", top_db=None):
         super(SpectrogramToDB, self).__init__()
-        self.stype = stype
+        self.stype = torch.jit.Attribute(stype, str)
         if top_db is not None and top_db < 0:
             raise ValueError('top_db must be positive value')
-        self.top_db = top_db
+        self.top_db = torch.jit.Attribute(top_db, Optional[float])
         self.multiplier = 10. if stype == "power" else 20.
         self.amin = 1e-10
         self.ref_value = 1.
         self.db_multiplier = math.log10(max(self.amin, self.ref_value))
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, spec):
         # numerically stable implementation from librosa
         # https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
         return F.spectrogram_to_DB(spec, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
 
-@weak_module
-class MFCC(nn.Module):
+class MFCC(torch.jit.ScriptModule):
     """Create the Mel-frequency cepstrum coefficients from an audio signal
 
         By default, this calculates the MFCC on the DB-scaled Mel spectrogram.
@@ -292,6 +292,8 @@ class MFCC(nn.Module):
         log_mels (bool) : whether to use log-mel spectrograms instead of db-scaled
         melkwargs (dict, optional): arguments for MelSpectrogram
     """
+    __constants__ = ['sr', 'n_mfcc', 'dct_type', 'norm', 'top_db', 'log_mels']
+
     def __init__(self, sr=16000, n_mfcc=40, dct_type=2, norm='ortho', log_mels=False,
                  melkwargs=None):
         super(MFCC, self).__init__()
@@ -302,7 +304,6 @@ class MFCC(nn.Module):
         self.n_mfcc = n_mfcc
         self.dct_type = dct_type
         self.norm = norm
-        self.melkwargs = melkwargs
         self.top_db = 80.
         self.s2db = SpectrogramToDB("power", self.top_db)
 
@@ -313,10 +314,11 @@ class MFCC(nn.Module):
 
         if self.n_mfcc > self.MelSpectrogram.n_mels:
             raise ValueError('Cannot select more MFCC coefficients than # mel bins')
-        self.dct_mat = F.create_dct(self.n_mfcc, self.MelSpectrogram.n_mels, self.norm)
+        dct_mat = F.create_dct(self.n_mfcc, self.MelSpectrogram.n_mels, self.norm)
+        self.dct_mat = torch.jit.Attribute(dct_mat, torch.Tensor)
         self.log_mels = log_mels
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, sig):
         """
         Args:
@@ -327,11 +329,17 @@ class MFCC(nn.Module):
                 is unchanged, hops is the number of hops, and n_mels is the
                 number of mel bins.
         """
-        return F.MFCC(sig, self.MelSpectrogram(sig), self.log_mels, self.s2db, self.dct_mat)
+        mel_spect = self.MelSpectrogram(sig)
+        if self.log_mels:
+            log_offset = 1e-6
+            mel_spect = torch.log(mel_spect + log_offset)
+        else:
+            mel_spect = self.s2db(mel_spect)
+        mfcc = torch.matmul(mel_spect, self.dct_mat.to(mel_spect.device))
+        return mfcc
 
 
-@weak_module
-class MelSpectrogram(nn.Module):
+class MelSpectrogram(torch.jit.ScriptModule):
     """Create MEL Spectrograms from a raw audio signal using the stft
        function in PyTorch.
 
@@ -356,28 +364,28 @@ class MelSpectrogram(nn.Module):
         >>> sig, sr = torchaudio.load("test.wav", normalization=True)
         >>> spec_mel = transforms.MelSpectrogram(sr)(sig)  # (c, l, m)
     """
+    __constants__ = ['sr', 'n_fft', 'ws', 'hop', 'pad', 'n_mels', 'f_max', 'f_min']
+
     def __init__(self, sr=16000, n_fft=400, ws=None, hop=None, f_min=0., f_max=None,
                  pad=0, n_mels=128, window=torch.hann_window, wkwargs=None):
         super(MelSpectrogram, self).__init__()
-        self.window = window
         self.sr = sr
         self.n_fft = n_fft
         self.ws = ws if ws is not None else n_fft
         self.hop = hop if hop is not None else self.ws // 2
         self.pad = pad
         self.n_mels = n_mels  # number of mel frequency bins
-        self.wkwargs = wkwargs
         self.f_max = f_max
         self.f_min = f_min
         self.spec = Spectrogram(n_fft=self.n_fft, ws=self.ws, hop=self.hop,
-                                pad=self.pad, window=self.window, power=2,
-                                normalize=False, wkwargs=self.wkwargs)
+                                pad=self.pad, window=window, power=2,
+                                normalize=False, wkwargs=wkwargs)
         self.fm = MelScale(self.n_mels, self.sr, self.f_max, self.f_min)
         self.transforms = Compose([
             self.spec, self.fm
         ])
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, sig):
         """
         Args:
@@ -398,8 +406,7 @@ def MEL(*args, **kwargs):
     raise DeprecationWarning("MEL has been removed from the library please use MelSpectrogram or librosa")
 
 
-@weak_module
-class BLC2CBL(nn.Module):
+class BLC2CBL(torch.jit.ScriptModule):
     """Permute a 3d tensor from Bands x Sample length x Channels to Channels x
        Bands x Samples length
     """
@@ -407,7 +414,7 @@ class BLC2CBL(nn.Module):
     def __init__(self):
         super(BLC2CBL, self).__init__()
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, tensor):
         """
 
@@ -424,8 +431,7 @@ class BLC2CBL(nn.Module):
         return self.__class__.__name__ + '()'
 
 
-@weak_module
-class MuLawEncoding(nn.Module):
+class MuLawEncoding(torch.jit.ScriptModule):
     """Encode signal based on mu-law companding.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
@@ -436,12 +442,13 @@ class MuLawEncoding(nn.Module):
         quantization_channels (int): Number of channels. default: 256
 
     """
+    __constants__ = ['qc']
 
     def __init__(self, quantization_channels=256):
         super(MuLawEncoding, self).__init__()
         self.qc = quantization_channels
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, x):
         """
 
@@ -458,8 +465,7 @@ class MuLawEncoding(nn.Module):
         return self.__class__.__name__ + '()'
 
 
-@weak_module
-class MuLawExpanding(nn.Module):
+class MuLawExpanding(torch.jit.ScriptModule):
     """Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
@@ -470,12 +476,13 @@ class MuLawExpanding(nn.Module):
         quantization_channels (int): Number of channels. default: 256
 
     """
+    __constants__ = ['qc']
 
     def __init__(self, quantization_channels=256):
         super(MuLawExpanding, self).__init__()
         self.qc = quantization_channels
 
-    @weak_script_method
+    @torch.jit.script_method
     def forward(self, x_mu):
         """
 

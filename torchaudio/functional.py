@@ -1,6 +1,5 @@
 import math
 import torch
-from torch._jit_internal import weak_script
 
 
 __all__ = [
@@ -13,14 +12,13 @@ __all__ = [
     'mel_scale',
     'spectrogram_to_DB',
     'create_dct',
-    'MFCC',
     'BLC2CBL',
     'mu_law_encoding',
     'mu_law_expanding'
 ]
 
 
-@weak_script
+@torch.jit.script
 def scale(tensor, factor):
     # type: (Tensor, int) -> Tensor
     """Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
@@ -40,7 +38,7 @@ def scale(tensor, factor):
     return tensor / factor
 
 
-@weak_script
+@torch.jit.script
 def pad_trim(tensor, ch_dim, max_len, len_dim, fill_value):
     # type: (Tensor, int, int, int, float) -> Tensor
     """Pad/Trim a 2d-Tensor (Signal or Labels)
@@ -69,7 +67,7 @@ def pad_trim(tensor, ch_dim, max_len, len_dim, fill_value):
     return tensor
 
 
-@weak_script
+@torch.jit.script
 def downmix_mono(tensor, ch_dim):
     # type: (Tensor, int) -> Tensor
     """Downmix any stereo signals to mono.
@@ -88,7 +86,7 @@ def downmix_mono(tensor, ch_dim):
     return tensor
 
 
-@weak_script
+@torch.jit.script
 def LC2CL(tensor):
     # type: (Tensor) -> Tensor
     """Permute a 2d tensor from samples (n x c) to (c x n)
@@ -116,7 +114,7 @@ def _stft(input, n_fft, hop_length=None, win_length=None, window=None,
     return torch._C._VariableFunctions.stft(input, n_fft, hop_length, win_length, window, normalized, onesided)
 
 
-@weak_script
+@torch.jit.script
 def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
     # type: (Tensor, int, Tensor, int, int, int, int, bool) -> Tensor
     """Create a spectrogram from a raw audio signal
@@ -155,7 +153,7 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
     return spec_f
 
 
-@weak_script
+@torch.jit.script
 def create_fb_matrix(n_stft, f_min, f_max, n_mels):
     # type: (int, float, float, int) -> Tensor
     """ Create a frequency bin conversion matrix.
@@ -178,7 +176,6 @@ def create_fb_matrix(n_stft, f_min, f_max, n_mels):
     m_max = 2595. * math.log10(1. + (f_max / 700.))
     m_pts = torch.linspace(m_min, m_max, n_mels + 2)
     # mel to hertz(mel) is 700. * (10**(mel / 2595.) - 1.)
-    # print(torch.get_default_dtype(), m_pts.dtype, torch.tensor(1.).dtype, m_min.dtype, m_max.dtype)
     f_pts = 700. * (10**(m_pts / 2595.) - 1.)
     # calculate the difference between each mel point and each stft freq point in hertz
     f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
@@ -191,7 +188,7 @@ def create_fb_matrix(n_stft, f_min, f_max, n_mels):
     return fb
 
 
-@weak_script
+@torch.jit.script
 def mel_scale(spec_f, fb):
     # type: (Tensor, Tensor) -> Tuple[Tensor, Tensor]
     """ This turns a normal STFT into a mel frequency STFT, using a conversion
@@ -210,7 +207,7 @@ def mel_scale(spec_f, fb):
     return fb, spec_m
 
 
-@weak_script
+@torch.jit.script
 def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
     # type: (Tensor, float, float, float, Optional[float]) -> Tensor
     """Turns a spectrogram from the power/amplitude scale to the decibel scale.
@@ -234,13 +231,15 @@ def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
     spec_db -= multiplier * db_multiplier
 
     if top_db is not None:
-        spec_db = torch.max(spec_db, spec_db.new_full((1,), spec_db.max() - top_db))
+        spec_db = torch.max(
+            spec_db,
+            torch.full((1,), spec_db.max() - top_db, dtype=spec_db.dtype, device=spec_db.device))
     return spec_db
 
 
-@weak_script
+@torch.jit.script
 def create_dct(n_mfcc, n_mels, norm):
-    # type: (int, int, string) -> Tensor
+    # type: (int, int, str) -> Tensor
     """
     Creates a DCT transformation matrix with shape (num_mels, num_mfcc),
     normalized depending on norm
@@ -248,7 +247,7 @@ def create_dct(n_mfcc, n_mels, norm):
     Inputs:
         n_mfcc (int) : number of mfc coefficients to retain
         n_mels (int): number of MEL bins
-        norm (string) : norm to use
+        norm (str) : norm to use
 
     Outputs:
         Tensor: The transformation matrix, to be right-multiplied to row-wise data.
@@ -256,50 +255,18 @@ def create_dct(n_mfcc, n_mels, norm):
     outdim = n_mfcc
     dim = n_mels
     # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
-    n = torch.arange(dim, dtype=torch.get_default_dtype())
-    k = torch.arange(outdim, dtype=torch.get_default_dtype())[:, None]
-    dct = torch.cos(math.pi / dim * (n + 0.5) * k)
+    n = torch.arange(dim)
+    k = torch.arange(outdim)[:, None]
+    dct = torch.cos(math.pi / float(dim) * (n + 0.5) * k)
     if norm == 'ortho':
         dct[0] *= 1.0 / math.sqrt(2.0)
-        dct *= math.sqrt(2.0 / dim)
+        dct *= math.sqrt(2.0 / float(dim))
     else:
-        dct *= 2
+        dct *= 2.0
     return dct.t()
 
 
-@weak_script
-def MFCC(sig, mel_spect, log_mels, s2db, dct_mat):
-    # type: (Tensor, MelSpectrogram, bool, SpectrogramToDB, Tensor) -> Tensor
-    """Create the Mel-frequency cepstrum coefficients from an audio signal
-
-    By default, this calculates the MFCC on the DB-scaled Mel spectrogram.
-    This is not the textbook implementation, but is implemented here to
-    give consistency with librosa.
-
-    This output depends on the maximum value in the input spectrogram, and so
-    may return different values for an audio clip split into snippets vs. a
-    a full clip.
-
-    Inputs:
-        sig (Tensor): Tensor of audio of size (channels [c], samples [n])
-        mel_spect (MelSpectrogram): melspectrogram of sig
-        log_mels (bool): whether to use log-mel spectrograms instead of db-scaled
-        s2db (SpectrogramToDB): a SpectrogramToDB instance
-        dct_mat (Tensor): The transformation matrix (dct matrix), to be
-            right-multiplied to row-wise data
-    Outputs:
-        Tensor: Mel-frequency cepstrum coefficients
-    """
-    if log_mels:
-        log_offset = 1e-6
-        mel_spect = torch.log(mel_spect + log_offset)
-    else:
-        mel_spect = s2db(mel_spect)
-    mfcc = torch.matmul(mel_spect, dct_mat.to(mel_spect.device))
-    return mfcc
-
-
-@weak_script
+@torch.jit.script
 def BLC2CBL(tensor):
     # type: (Tensor) -> Tensor
     """Permute a 3d tensor from Bands x Sample length x Channels to Channels x
@@ -314,7 +281,7 @@ def BLC2CBL(tensor):
     return tensor.permute(2, 0, 1).contiguous()
 
 
-@weak_script
+@torch.jit.script
 def mu_law_encoding(x, qc):
     # type: (Tensor, int) -> Tensor
     """Encode signal based on mu-law companding.  For more info see the
@@ -332,7 +299,7 @@ def mu_law_encoding(x, qc):
     """
     assert isinstance(x, torch.Tensor), 'mu_law_encoding expects a Tensor'
     mu = qc - 1.
-    if not x.dtype.is_floating_point:
+    if not x.is_floating_point():
         x = x.to(torch.float)
     mu = torch.tensor(mu, dtype=x.dtype)
     x_mu = torch.sign(x) * torch.log1p(mu *
@@ -341,7 +308,7 @@ def mu_law_encoding(x, qc):
     return x_mu
 
 
-@weak_script
+@torch.jit.script
 def mu_law_expanding(x_mu, qc):
     # type: (Tensor, int) -> Tensor
     """Decode mu-law encoded signal.  For more info see the
@@ -359,7 +326,7 @@ def mu_law_expanding(x_mu, qc):
     """
     assert isinstance(x_mu, torch.Tensor), 'mu_law_expanding expects a Tensor'
     mu = qc - 1.
-    if not x_mu.dtype.is_floating_point:
+    if not x_mu.is_floating_point():
         x_mu = x_mu.to(torch.float)
     mu = torch.tensor(mu, dtype=x_mu.dtype)
     x = ((x_mu) / mu) * 2 - 1.

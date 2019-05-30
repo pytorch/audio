@@ -26,12 +26,10 @@ class Test_ScaleJIT(unittest.TestCase):
     def test_scriptmodule_scale(self):
 
         class MyModule(torch.jit.ScriptModule):
-            def __init__(self, tensor, factor):
+            def __init__(self, factor):
                 super(MyModule, self).__init__()
-                module = transforms.Scale(factor)
-                module.eval()
-
-                self.module = torch.jit.trace(module, (tensor))
+                self.module = transforms.Scale(factor)
+                self.module.eval()
 
             @torch.jit.script_method
             def forward(self, tensor):
@@ -39,7 +37,7 @@ class Test_ScaleJIT(unittest.TestCase):
 
         tensor = torch.rand((10, 1), device="cuda")
         factor = 2
-        model = MyModule(tensor, factor).cuda()
+        model = MyModule(factor).cuda()
 
         jit_out = model(tensor)
         py_out = F.scale(tensor, factor)
@@ -69,13 +67,10 @@ class Test_PadTrimJIT(unittest.TestCase):
     def test_scriptmodule_pad_trim(self):
 
         class MyModule(torch.jit.ScriptModule):
-            def __init__(self, tensor, ch_dim, max_len, len_dim, fill_value):
+            def __init__(self, ch_dim, max_len, len_dim, fill_value):
                 super(MyModule, self).__init__()
-                channels_first = ch_dim == 0
-                module = transforms.PadTrim(max_len, fill_value, channels_first=channels_first)
-                module.eval()
-
-                self.module = torch.jit.trace(module, (tensor))
+                self.module = transforms.PadTrim(max_len, fill_value, channels_first=(ch_dim == 0))
+                self.module.eval()
 
             @torch.jit.script_method
             def forward(self, tensor):
@@ -86,7 +81,7 @@ class Test_PadTrimJIT(unittest.TestCase):
         max_len = 5
         len_dim = 0
         fill_value = 3.
-        model = MyModule(tensor, ch_dim, max_len, len_dim, fill_value).cuda()
+        model = MyModule(ch_dim, max_len, len_dim, fill_value).cuda()
 
         jit_out = model(tensor)
         py_out = F.pad_trim(tensor, ch_dim, max_len, len_dim, fill_value)
@@ -113,13 +108,10 @@ class Test_DownmixMonoJIT(unittest.TestCase):
     def test_scriptmodule_downmix_mono(self):
 
         class MyModule(torch.jit.ScriptModule):
-            def __init__(self, tensor, ch_dim):
+            def __init__(self, ch_dim):
                 super(MyModule, self).__init__()
-                channels_first = ch_dim == 0
-                module = transforms.DownmixMono(channels_first)
-                module.eval()
-
-                self.module = torch.jit.trace(module, (tensor))
+                self.module = transforms.DownmixMono(ch_dim == 0)
+                self.module.eval()
 
             @torch.jit.script_method
             def forward(self, tensor):
@@ -127,7 +119,7 @@ class Test_DownmixMonoJIT(unittest.TestCase):
 
         tensor = torch.rand((10, 1), device="cuda")
         ch_dim = 1
-        model = MyModule(tensor, ch_dim).cuda()
+        model = MyModule(ch_dim).cuda()
 
         jit_out = model(tensor)
         py_out = F.downmix_mono(tensor, ch_dim)
@@ -153,19 +145,17 @@ class Test_LC2CLJIT(unittest.TestCase):
     def test_scriptmodule_LC2CL(self):
 
         class MyModule(torch.jit.ScriptModule):
-            def __init__(self, tensor):
+            def __init__(self):
                 super(MyModule, self).__init__()
-                module = transforms.LC2CL(tensor)
-                module.eval()
-
-                self.module = torch.jit.trace(module, (tensor))
+                self.module = transforms.LC2CL()
+                self.module.eval()
 
             @torch.jit.script_method
             def forward(self, tensor):
                 return self.module(tensor)
 
         tensor = torch.rand((10, 1), device="cuda")
-        model = MyModule(tensor).cuda()
+        model = MyModule().cuda()
 
         jit_out = model(tensor)
         py_out = F.LC2CL(tensor)
@@ -198,18 +188,21 @@ class Test_SpectrogramJIT(unittest.TestCase):
     def test_scriptmodule_Spectrogram(self):
 
         class MyModule(torch.jit.ScriptModule):
-            def __init__(self, tensor, pad, n_fft, hop, ws, power, normalize):
+            def __init__(self, pad, n_fft, hop, ws, power, normalize):
                 super(MyModule, self).__init__()
-                module = transforms.Spectrogram(
+                # self.words = torch.jit.Attribute([], List[str])
+                # self.some_dict = torch.jit.Attribute({}, Dict[str, int])
+                self.module = transforms.Spectrogram(
                     n_fft=n_fft, ws=ws, hop=hop,
                     pad=pad, window=torch.hann_window,
                     power=power, normalize=normalize, wkwargs=None)
-                module.eval()
-
-                self.module = torch.jit.trace(module, (tensor))
+                self.module.eval()
 
             @torch.jit.script_method
             def forward(self, tensor):
+                # self.words.append('a')
+                # c  = self.some_dict['b']
+                # return torch.rand(10)
                 return self.module(tensor)
 
         tensor = torch.rand((1, 1000), device="cuda")
@@ -220,7 +213,7 @@ class Test_SpectrogramJIT(unittest.TestCase):
         window = torch.hann_window(ws)
         power = 2
         normalize = False
-        model = MyModule(tensor, pad, n_fft, hop, ws, power, normalize).cuda()
+        model = MyModule(pad, n_fft, hop, ws, power, normalize).cuda()
 
         jit_out = model(tensor)
         py_out = F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
@@ -242,31 +235,44 @@ class Test_MelScaleJIT(unittest.TestCase):
 
         jit_out = jit_method(n_stft, f_min, f_max, n_mels)
         py_out = F.create_fb_matrix(n_stft, f_min, f_max, n_mels)
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+    def test_torchscript_mel_scale(self):
+        @torch.jit.script
+        def jit_method(spec_f, fb):
+            # type: (Tensor, Tensor) -> Tuple[Tensor, Tensor]
+            return F.mel_scale(spec_f, fb)
+
+        spec_f = torch.rand((1, 6, 201))
+        fb = torch.rand((201, 10))
+
+        jit_out = jit_method(spec_f, fb)[1]
+        py_out = F.mel_scale(spec_f, fb)[1]
+
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
     # @unittest.skipIf(not RUN_CUDA, "no CUDA")
-    # def test_scriptmodule_@(self):
-    #
+    # def test_scriptmodule_MelScale(self):
     #     class MyModule(torch.jit.ScriptModule):
-    #         def __init__(self, @):
+    #         def __init__(self, spec_f):
     #             super(MyModule, self).__init__()
-    #             @
-    #             module = transforms.MelScale(@)
+    #             module = transforms.MelScale2()
     #             module.eval()
-    #
-    #             self.module = torch.jit.trace(module, (tensor))
+    #             print('begin')
+    #             self.module = torch.jit.trace(module, (spec_f))
     #
     #         @torch.jit.script_method
-    #         def forward(self, @):
-    #             return self.module(@)
+    #         def forward(self, spec_f):
+    #             return self.module(spec_f)
     #
-    #     tensor = torch.rand((10, 1), device="cuda")@
-    #     model = MyModule(@).cuda()
-    #
-    #     jit_out = model(tensor)
-    #     py_out = F.@(tensor, ch_dim)
-    #
-    #     self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+    #     spec_f = torch.rand((1, 6, 201), device="cuda")
+    #     model = MyModule(spec_f).cuda()
+
+        # jit_out = model(spec_f)
+        # py_out = F.mel_scale(spec_f, F.create_fb_matrix(spec_f.size(2), 0., 8000., 128))[0]
+        #
+        # self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
 if __name__ == '__main__':
     unittest.main()
