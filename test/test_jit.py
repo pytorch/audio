@@ -210,7 +210,7 @@ class Test_SpectrogramJIT(unittest.TestCase):
         ws = 400
         hop = 200
         pad = 0
-        window = torch.hann_window(ws)
+        window = torch.hann_window(ws).to(tensor.device)
         power = 2
         normalize = False
         model = MyModule(pad, n_fft, hop, ws, power, normalize).cuda()
@@ -241,7 +241,7 @@ class Test_MelScaleJIT(unittest.TestCase):
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
     def test_scriptmodule_MelScale(self):
         class MyModule(torch.jit.ScriptModule):
-            def __init__(self, spec_f):
+            def __init__(self):
                 super(MyModule, self).__init__()
                 self.module = transforms.MelScale()
                 self.module.eval()
@@ -251,12 +251,11 @@ class Test_MelScaleJIT(unittest.TestCase):
                 return self.module(spec_f)
 
         spec_f = torch.rand((1, 6, 201), device="cuda")
-        fb = F.create_fb_matrix(spec_f.size(2), 0., 8000., 128)
-        fb = fb.to(spec_f.device)
 
-        model = MyModule(spec_f).cuda()
+        model = MyModule().cuda()
 
         jit_out = model(spec_f)
+        fb = F.create_fb_matrix(spec_f.size(2), 0., 8000., 128).to(spec_f.device)
         py_out = torch.matmul(spec_f, fb)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))

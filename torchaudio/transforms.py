@@ -7,7 +7,8 @@ from typing import List, Dict, Optional, Tuple
 from . import functional as F
 
 
-class Compose(torch.jit.ScriptModule):
+# TODO remove this class
+class Compose(object):
     """Composes several transforms together.
 
     Args:
@@ -20,11 +21,9 @@ class Compose(torch.jit.ScriptModule):
         >>> ])
     """
     def __init__(self, transforms):
-        super(Compose, self).__init__()
-        self.transforms = torch.jit.Attribute(transforms, List[torch.jit.ScriptModule])
+        self.transforms = transforms
 
-    @torch.jit.script_method
-    def forward(self, audio):
+    def __call__(self, audio):
         for t in self.transforms:
             audio = t(audio)
         return audio
@@ -81,7 +80,7 @@ class PadTrim(torch.jit.ScriptModule):
     """
     __constants__ = ['max_len', 'fill_value', 'len_dim', 'ch_dim']
 
-    def __init__(self, max_len, fill_value=0, channels_first=True):
+    def __init__(self, max_len, fill_value=0., channels_first=True):
         super(PadTrim, self).__init__()
         self.max_len = max_len
         self.fill_value = fill_value
@@ -277,7 +276,6 @@ class SpectrogramToDB(torch.jit.ScriptModule):
         # https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
         return F.spectrogram_to_DB(spec, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
-
 class MFCC(torch.jit.ScriptModule):
     """Create the Mel-frequency cepstrum coefficients from an audio signal
 
@@ -323,7 +321,7 @@ class MFCC(torch.jit.ScriptModule):
         self.dct_mat = torch.jit.Attribute(dct_mat, torch.Tensor)
         self.log_mels = log_mels
 
-    @torch.jit.script_method
+    # @torch.jit.script_method
     def forward(self, sig):
         """
         Args:
@@ -386,9 +384,6 @@ class MelSpectrogram(torch.jit.ScriptModule):
                                 pad=self.pad, window=window, power=2,
                                 normalize=False, wkwargs=wkwargs)
         self.fm = MelScale(self.n_mels, self.sr, self.f_max, self.f_min)
-        self.transforms = Compose([
-            self.spec, self.fm
-        ])
 
     @torch.jit.script_method
     def forward(self, sig):
@@ -402,8 +397,8 @@ class MelSpectrogram(torch.jit.ScriptModule):
                 number of mel bins.
 
         """
-        spec_mel = self.transforms(sig)
-
+        spec = self.spec(sig)
+        spec_mel = self.fm(spec)
         return spec_mel
 
 

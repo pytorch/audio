@@ -142,7 +142,6 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
     if pad > 0:
         # TODO add "with torch.no_grad():" back when JIT supports it
         sig = torch.nn.functional.pad(sig, (pad, pad), "constant")
-    window = window.to(sig.device)
 
     # default values are consistent with librosa.core.spectrum._spectrogram
     spec_f = _stft(sig, n_fft, hop, ws, window,
@@ -215,13 +214,14 @@ def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
     if top_db is not None:
         spec_db = torch.max(
             spec_db,
-            torch.full((1,), spec_db.max() - top_db, dtype=spec_db.dtype, device=spec_db.device))
+            torch.tensor(float(spec_db.max()) - top_db, dtype=spec_db.dtype, device=spec_db.device))
+
     return spec_db
 
 
 @torch.jit.script
 def create_dct(n_mfcc, n_mels, norm):
-    # type: (int, int, str) -> Tensor
+    # type: (int, int, Optional[str]) -> Tensor
     """
     Creates a DCT transformation matrix with shape (num_mels, num_mfcc),
     normalized depending on norm
@@ -229,7 +229,7 @@ def create_dct(n_mfcc, n_mels, norm):
     Inputs:
         n_mfcc (int) : number of mfc coefficients to retain
         n_mels (int): number of MEL bins
-        norm (str) : norm to use
+        norm (Optional[str]) : norm to use (either 'ortho' or None)
 
     Outputs:
         Tensor: The transformation matrix, to be right-multiplied to row-wise data.
@@ -240,11 +240,12 @@ def create_dct(n_mfcc, n_mels, norm):
     n = torch.arange(dim)
     k = torch.arange(outdim)[:, None]
     dct = torch.cos(math.pi / float(dim) * (n + 0.5) * k)
-    if norm == 'ortho':
+    if norm is None:
+        dct *= 2.0
+    else:
+        assert norm == 'ortho'
         dct[0] *= 1.0 / math.sqrt(2.0)
         dct *= math.sqrt(2.0 / float(dim))
-    else:
-        dct *= 2.0
     return dct.t()
 
 
