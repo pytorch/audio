@@ -9,7 +9,6 @@ __all__ = [
     'LC2CL',
     'spectrogram',
     'create_fb_matrix',
-    'mel_scale',
     'spectrogram_to_DB',
     'create_dct',
     'BLC2CBL',
@@ -188,25 +187,6 @@ def create_fb_matrix(n_stft, f_min, f_max, n_mels):
     up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_stft, n_mels)
     fb = torch.max(z, torch.min(down_slopes, up_slopes))
     return fb
-
-
-@torch.jit.script
-def mel_scale(spec_f, fb):
-    # type: (Tensor, Tensor) -> Tuple[Tensor, Tensor]
-    """ This turns a normal STFT into a mel frequency STFT, using a conversion
-    matrix.  This uses triangular filter banks.
-
-    Inputs:
-        spec_f (Tensor): normal STFT
-        fb (Tensor): triangular filter banks (fb matrix)
-
-    Outputs:
-        Tuple[Tensor, Tensor]: triangular filter banks (fb matrix) and mel frequency STFT
-    """
-    # need to ensure same device for dot product
-    fb = fb.to(spec_f.device)
-    spec_m = torch.matmul(spec_f, fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
-    return fb, spec_m
 
 
 @torch.jit.script

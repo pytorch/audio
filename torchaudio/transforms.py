@@ -212,6 +212,8 @@ class MelScale(torch.jit.ScriptModule):
     """This turns a normal STFT into a mel frequency STFT, using a conversion
        matrix.  This uses triangular filter banks.
 
+       User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).
+
     Args:
         n_mels (int): number of mel bins
         sr (int): sample rate of audio signal
@@ -226,17 +228,20 @@ class MelScale(torch.jit.ScriptModule):
         super(MelScale, self).__init__()
         self.n_mels = n_mels
         self.sr = sr
-        self.f_max = f_max if f_max is not None else sr // 2
+        self.f_max = f_max if f_max is not None else float(sr // 2)
         self.f_min = f_min
-        fb = None if n_stft is None else F.create_fb_matrix(
+        fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels)
-        self.fb = torch.jit.Attribute(fb, Optional[torch.Tensor])
+        self.fb = torch.jit.Attribute(fb, torch.Tensor)
 
     @torch.jit.script_method
     def forward(self, spec_f):
-        if self.fb is None:
-            self.fb = F.create_fb_matrix(spec_f.size(2), self.f_min, self.f_max, self.n_mels)
-        self.fb, spec_m = F.mel_scale(spec_f, self.fb)
+        if self.fb.numel() == 0:
+            tmp_fb = F.create_fb_matrix(spec_f.size(2), self.f_min, self.f_max, self.n_mels)
+            # TODO figure out how to reassign attributes cleanly
+            self.fb.resize_(tmp_fb.size())
+            self.fb.copy_(tmp_fb)
+        spec_m = torch.matmul(spec_f, self.fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
         return spec_m
 
 

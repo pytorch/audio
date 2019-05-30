@@ -238,39 +238,26 @@ class Test_MelScaleJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-    def test_torchscript_mel_scale(self):
-        @torch.jit.script
-        def jit_method(spec_f, fb):
-            # type: (Tensor, Tensor) -> Tuple[Tensor, Tensor]
-            return F.mel_scale(spec_f, fb)
-
-        spec_f = torch.rand((1, 6, 201))
-        fb = torch.rand((201, 10))
-
-        jit_out = jit_method(spec_f, fb)[1]
-        py_out = F.mel_scale(spec_f, fb)[1]
-
-        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
-
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
     def test_scriptmodule_MelScale(self):
         class MyModule(torch.jit.ScriptModule):
             def __init__(self, spec_f):
                 super(MyModule, self).__init__()
-                module = transforms.MelScale2()
-                module.eval()
-                print('begin')
-                self.module = torch.jit.trace(module, (spec_f))
+                self.module = transforms.MelScale()
+                self.module.eval()
 
             @torch.jit.script_method
             def forward(self, spec_f):
                 return self.module(spec_f)
 
         spec_f = torch.rand((1, 6, 201), device="cuda")
+        fb = F.create_fb_matrix(spec_f.size(2), 0., 8000., 128)
+        fb = fb.to(spec_f.device)
+
         model = MyModule(spec_f).cuda()
 
         jit_out = model(spec_f)
-        py_out = F.mel_scale(spec_f, F.create_fb_matrix(spec_f.size(2), 0., 8000., 128))[0]
+        py_out = torch.matmul(spec_f, fb)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
