@@ -103,7 +103,7 @@ def LC2CL(tensor):
 def _stft(input, n_fft, hop_length=None, win_length=None, window=None,
           center=True, pad_mode='reflect', normalized=False, onesided=True):
     # type: (Tensor, int, Optional[int], Optional[int], Optional[Tensor], bool, str, bool, bool) -> Tensor
-    """ Based on torch.stft
+    """ Based on torch.stft, just with a type annotation.
     """
     if center:
         signal_dim = input.dim()

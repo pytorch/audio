@@ -276,6 +276,7 @@ class SpectrogramToDB(torch.jit.ScriptModule):
         # https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
         return F.spectrogram_to_DB(spec, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
+
 class MFCC(torch.jit.ScriptModule):
     """Create the Mel-frequency cepstrum coefficients from an audio signal
 
