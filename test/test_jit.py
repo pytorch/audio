@@ -26,9 +26,9 @@ class Test_ScaleJIT(unittest.TestCase):
     def test_scriptmodule_scale(self):
 
         class MyModule(torch.jit.ScriptModule):
-            def __init__(self, factor):
+            def __init__(self):
                 super(MyModule, self).__init__()
-                self.module = transforms.Scale(factor)
+                self.module = transforms.Scale()
                 self.module.eval()
 
             @torch.jit.script_method
@@ -36,11 +36,9 @@ class Test_ScaleJIT(unittest.TestCase):
                 return self.module(tensor)
 
         tensor = torch.rand((10, 1), device="cuda")
-        factor = 2
-        model = MyModule(factor).cuda()
 
-        jit_out = model(tensor)
-        py_out = F.scale(tensor, factor)
+        jit_out = MyModule().cuda()(tensor)
+        py_out = transforms.Scale().cuda()(tensor)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
@@ -67,24 +65,20 @@ class Test_PadTrimJIT(unittest.TestCase):
     def test_scriptmodule_pad_trim(self):
 
         class MyModule(torch.jit.ScriptModule):
-            def __init__(self, ch_dim, max_len, len_dim, fill_value):
+            def __init__(self, max_len):
                 super(MyModule, self).__init__()
-                self.module = transforms.PadTrim(max_len, fill_value, channels_first=(ch_dim == 0))
+                self.module = transforms.PadTrim(max_len)
                 self.module.eval()
 
             @torch.jit.script_method
             def forward(self, tensor):
                 return self.module(tensor)
 
-        tensor = torch.rand((10, 1), device="cuda")
-        ch_dim = 1
+        tensor = torch.rand((1, 10), device="cuda")
         max_len = 5
-        len_dim = 0
-        fill_value = 3.
-        model = MyModule(ch_dim, max_len, len_dim, fill_value).cuda()
 
-        jit_out = model(tensor)
-        py_out = F.pad_trim(tensor, ch_dim, max_len, len_dim, fill_value)
+        jit_out = MyModule(max_len).cuda()(tensor)
+        py_out = transforms.PadTrim(max_len).cuda()(tensor)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
@@ -108,21 +102,19 @@ class Test_DownmixMonoJIT(unittest.TestCase):
     def test_scriptmodule_downmix_mono(self):
 
         class MyModule(torch.jit.ScriptModule):
-            def __init__(self, ch_dim):
+            def __init__(self):
                 super(MyModule, self).__init__()
-                self.module = transforms.DownmixMono(ch_dim == 0)
+                self.module = transforms.DownmixMono()
                 self.module.eval()
 
             @torch.jit.script_method
             def forward(self, tensor):
                 return self.module(tensor)
 
-        tensor = torch.rand((10, 1), device="cuda")
-        ch_dim = 1
-        model = MyModule(ch_dim).cuda()
+        tensor = torch.rand((1, 10), device="cuda")
 
-        jit_out = model(tensor)
-        py_out = F.downmix_mono(tensor, ch_dim)
+        jit_out = MyModule().cuda()(tensor)
+        py_out = transforms.DownmixMono().cuda()(tensor)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
@@ -155,10 +147,9 @@ class Test_LC2CLJIT(unittest.TestCase):
                 return self.module(tensor)
 
         tensor = torch.rand((10, 1), device="cuda")
-        model = MyModule().cuda()
 
-        jit_out = model(tensor)
-        py_out = F.LC2CL(tensor)
+        jit_out = MyModule().cuda()(tensor)
+        py_out = transforms.LC2CL()(tensor)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
@@ -188,14 +179,9 @@ class Test_SpectrogramJIT(unittest.TestCase):
     def test_scriptmodule_Spectrogram(self):
 
         class MyModule(torch.jit.ScriptModule):
-            def __init__(self, pad, n_fft, hop, ws, power, normalize):
+            def __init__(self):
                 super(MyModule, self).__init__()
-                # self.words = torch.jit.Attribute([], List[str])
-                # self.some_dict = torch.jit.Attribute({}, Dict[str, int])
-                self.module = transforms.Spectrogram(
-                    n_fft=n_fft, ws=ws, hop=hop,
-                    pad=pad, window=torch.hann_window,
-                    power=power, normalize=normalize, wkwargs=None)
+                self.module = transforms.Spectrogram()
                 self.module.eval()
 
             @torch.jit.script_method
@@ -203,17 +189,9 @@ class Test_SpectrogramJIT(unittest.TestCase):
                 return self.module(tensor)
 
         tensor = torch.rand((1, 1000), device="cuda")
-        n_fft = 400
-        ws = 400
-        hop = 200
-        pad = 0
-        window = torch.hann_window(ws).to(tensor.device)
-        power = 2
-        normalize = False
-        model = MyModule(pad, n_fft, hop, ws, power, normalize).cuda()
 
-        jit_out = model(tensor)
-        py_out = F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
+        jit_out = MyModule().cuda()(tensor)
+        py_out = transforms.Spectrogram().cuda()(tensor)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
@@ -249,11 +227,9 @@ class Test_MelScaleJIT(unittest.TestCase):
                 return self.module(spec_f)
 
         spec_f = torch.rand((1, 6, 201), device="cuda")
-        fb = F.create_fb_matrix(spec_f.size(2), 16000, 0., 8000., 128).to(spec_f.device)
-        model = MyModule().cuda()
 
-        jit_out = model(spec_f)
-        py_out = torch.matmul(spec_f, fb)
+        jit_out = MyModule().cuda()(spec_f)
+        py_out = transforms.MelScale().cuda()(spec_f)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
@@ -280,9 +256,9 @@ class Test_SpectrogramToDBJIT(unittest.TestCase):
     def test_scriptmodule_SpectrogramToDB(self):
 
         class MyModule(torch.jit.ScriptModule):
-            def __init__(self, top_db):
+            def __init__(self):
                 super(MyModule, self).__init__()
-                self.module = transforms.SpectrogramToDB(top_db=top_db)
+                self.module = transforms.SpectrogramToDB()
                 self.module.eval()
 
             @torch.jit.script_method
@@ -290,14 +266,9 @@ class Test_SpectrogramToDBJIT(unittest.TestCase):
                 return self.module(spec)
 
         spec = torch.rand((10, 1), device="cuda")
-        multiplier = 10.
-        amin = 1e-10
-        db_multiplier = 0.
-        top_db = 80.
-        model = MyModule(top_db).cuda()
 
-        jit_out = model(spec)
-        py_out = F.spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db)
+        jit_out = MyModule().cuda()(spec)
+        py_out = transforms.SpectrogramToDB()(spec)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
@@ -332,13 +303,9 @@ class Test_MFCCJIT(unittest.TestCase):
                 return self.module(tensor)
 
         tensor = torch.rand((1, 1000), device="cuda")
-        mel_spect = transforms.MelSpectrogram().cuda()
-        s2db = transforms.SpectrogramToDB("power", 80.).cuda()
-        dct_mat = F.create_dct(40, 128, 'ortho').to(tensor.device)
-        model = MyModule().cuda()
 
-        jit_out = model(tensor)
-        py_out = torch.matmul(s2db(mel_spect(tensor)), dct_mat)
+        jit_out = MyModule().cuda()(tensor)
+        py_out = transforms.MFCC().cuda()(tensor)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
@@ -358,14 +325,9 @@ class Test_MelSpectrogramJIT(unittest.TestCase):
                 return self.module(tensor)
 
         tensor = torch.rand((1, 1000), device="cuda")
-        spec = transforms.Spectrogram(n_fft=400, ws=400, hop=200,
-                                      pad=0, window=torch.hann_window, power=2,
-                                      normalize=False, wkwargs=None).cuda()
-        fm = transforms.MelScale(n_mels=128, sr=16000, f_max=None, f_min=0.).cuda()
-        model = MyModule().cuda()
 
-        jit_out = model(tensor)
-        py_out = fm(spec(tensor))
+        jit_out = MyModule().cuda()(tensor)
+        py_out = transforms.MelSpectrogram().cuda()(tensor)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
@@ -398,10 +360,9 @@ class Test_BLC2CBLJIT(unittest.TestCase):
                 return self.module(tensor)
 
         tensor = torch.rand((10, 1000, 1), device="cuda")
-        model = MyModule().cuda()
 
-        jit_out = model(tensor)
-        py_out = F.BLC2CBL(tensor)
+        jit_out = MyModule().cuda()(tensor)
+        py_out = transforms.BLC2CBL()(tensor)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
@@ -435,11 +396,9 @@ class Test_MuLawEncodingJIT(unittest.TestCase):
                 return self.module(tensor)
 
         tensor = torch.rand((10, 1), device="cuda")
-        qc = 256
-        model = MyModule().cuda()
 
-        jit_out = model(tensor)
-        py_out = F.mu_law_encoding(tensor, qc)
+        jit_out = MyModule().cuda()(tensor)
+        py_out = transforms.MuLawEncoding().cuda()(tensor)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
@@ -473,11 +432,9 @@ class Test_MuLawExpandingJIT(unittest.TestCase):
                 return self.module(tensor)
 
         tensor = torch.rand((10, 1), device="cuda")
-        qc = 256
-        model = MyModule().cuda()
 
-        jit_out = model(tensor)
-        py_out = F.mu_law_expanding(tensor, qc)
+        jit_out = MyModule().cuda()(tensor)
+        py_out = transforms.MuLawExpanding().cuda()(tensor)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
