@@ -322,7 +322,7 @@ class MFCC(torch.jit.ScriptModule):
         self.dct_mat = torch.jit.Attribute(dct_mat, torch.Tensor)
         self.log_mels = log_mels
 
-    # @torch.jit.script_method
+    @torch.jit.script_method
     def forward(self, sig):
         """
         Args:
@@ -339,7 +339,7 @@ class MFCC(torch.jit.ScriptModule):
             mel_spect = torch.log(mel_spect + log_offset)
         else:
             mel_spect = self.s2db(mel_spect)
-        mfcc = torch.matmul(mel_spect, self.dct_mat.to(mel_spect.device))
+        mfcc = torch.matmul(mel_spect, self.dct_mat)
         return mfcc
 
 

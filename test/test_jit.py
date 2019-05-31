@@ -249,11 +249,10 @@ class Test_MelScaleJIT(unittest.TestCase):
                 return self.module(spec_f)
 
         spec_f = torch.rand((1, 6, 201), device="cuda")
-
+        fb = F.create_fb_matrix(spec_f.size(2), 16000, 0., 8000., 128).to(spec_f.device)
         model = MyModule().cuda()
 
         jit_out = model(spec_f)
-        fb = F.create_fb_matrix(spec_f.size(2), 16000, 0., 8000., 128).to(spec_f.device)
         py_out = torch.matmul(spec_f, fb)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
@@ -302,6 +301,7 @@ class Test_SpectrogramToDBJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
+
 class Test_MelSpectrogramJIT(unittest.TestCase):
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
     def test_scriptmodule_MelSpectrogram(self):
@@ -317,14 +317,167 @@ class Test_MelSpectrogramJIT(unittest.TestCase):
                 return self.module(tensor)
 
         tensor = torch.rand((1, 1000), device="cuda")
-        model = MyModule().cuda()
-
-        jit_out = model(tensor)
         spec = transforms.Spectrogram(n_fft=400, ws=400, hop=200,
                                       pad=0, window=torch.hann_window, power=2,
                                       normalize=False, wkwargs=None).cuda()
         fm = transforms.MelScale(n_mels=128, sr=16000, f_max=None, f_min=0.).cuda()
+        model = MyModule().cuda()
+
+        jit_out = model(tensor)
         py_out = fm(spec(tensor))
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+
+class Test_MFCCJIT(unittest.TestCase):
+    def test_torchscript_create_dct(self):
+        @torch.jit.script
+        def jit_method(n_mfcc, n_mels, norm):
+            # type: (int, int, Optional[str]) -> Tensor
+            return F.create_dct(n_mfcc, n_mels, norm)
+
+        n_mfcc = 40
+        n_mels = 128
+        norm = 'ortho'
+
+        jit_out = jit_method(n_mfcc, n_mels, norm)
+        py_out = F.create_dct(n_mfcc, n_mels, norm)
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_MFCC(self):
+
+        class MyModule(torch.jit.ScriptModule):
+            def __init__(self):
+                super(MyModule, self).__init__()
+                self.module = transforms.MFCC()
+                self.module.eval()
+
+            @torch.jit.script_method
+            def forward(self, tensor):
+                return self.module(tensor)
+
+        tensor = torch.rand((1, 1000), device="cuda")
+        mel_spect = transforms.MelSpectrogram().cuda()
+        s2db = transforms.SpectrogramToDB("power", 80.).cuda()
+        dct_mat = F.create_dct(40, 128, 'ortho').to(tensor.device)
+        model = MyModule().cuda()
+
+        jit_out = model(tensor)
+        py_out = torch.matmul(s2db(mel_spect(tensor)), dct_mat)
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+
+class Test_BLC2CBLJIT(unittest.TestCase):
+    def test_torchscript_BLC2CBL(self):
+        @torch.jit.script
+        def jit_method(tensor):
+            # type: (Tensor) -> Tensor
+            return F.BLC2CBL(tensor)
+
+        tensor = torch.rand((10, 1000, 1))
+
+        jit_out = jit_method(tensor)
+        py_out = F.BLC2CBL(tensor)
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_BLC2CBL(self):
+
+        class MyModule(torch.jit.ScriptModule):
+            def __init__(self):
+                super(MyModule, self).__init__()
+                self.module = transforms.BLC2CBL()
+                self.module.eval()
+
+            @torch.jit.script_method
+            def forward(self, tensor):
+                return self.module(tensor)
+
+        tensor = torch.rand((10, 1000, 1), device="cuda")
+        model = MyModule().cuda()
+
+        jit_out = model(tensor)
+        py_out = F.BLC2CBL(tensor)
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+
+class Test_MuLawEncodingJIT(unittest.TestCase):
+    def test_torchscript_mu_law_encoding(self):
+        @torch.jit.script
+        def jit_method(tensor, qc):
+            # type: (Tensor, int) -> Tensor
+            return F.mu_law_encoding(tensor, qc)
+
+        tensor = torch.rand((10, 1))
+        qc = 256
+
+        jit_out = jit_method(tensor, qc)
+        py_out = F.mu_law_encoding(tensor, qc)
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_MuLawEncoding(self):
+
+        class MyModule(torch.jit.ScriptModule):
+            def __init__(self):
+                super(MyModule, self).__init__()
+                self.module = transforms.MuLawEncoding()
+                self.module.eval()
+
+            @torch.jit.script_method
+            def forward(self, tensor):
+                return self.module(tensor)
+
+        tensor = torch.rand((10, 1), device="cuda")
+        qc = 256
+        model = MyModule().cuda()
+
+        jit_out = model(tensor)
+        py_out = F.mu_law_encoding(tensor, qc)
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+
+class Test_MuLawExpandingJIT(unittest.TestCase):
+    def test_torchscript_mu_law_expanding(self):
+        @torch.jit.script
+        def jit_method(tensor, qc):
+            # type: (Tensor, int) -> Tensor
+            return F.mu_law_expanding(tensor, qc)
+
+        tensor = torch.rand((10, 1))
+        qc = 256
+
+        jit_out = jit_method(tensor, qc)
+        py_out = F.mu_law_expanding(tensor, qc)
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_MuLawExpanding(self):
+
+        class MyModule(torch.jit.ScriptModule):
+            def __init__(self):
+                super(MyModule, self).__init__()
+                self.module = transforms.MuLawExpanding()
+                self.module.eval()
+
+            @torch.jit.script_method
+            def forward(self, tensor):
+                return self.module(tensor)
+
+        tensor = torch.rand((10, 1), device="cuda")
+        qc = 256
+        model = MyModule().cuda()
+
+        jit_out = model(tensor)
+        py_out = F.mu_law_expanding(tensor, qc)
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
