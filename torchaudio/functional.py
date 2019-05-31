@@ -162,7 +162,7 @@ def create_fb_matrix(n_stft, sr, f_min, f_max, n_mels):
         n_stft (int): number of filter banks from spectrogram
         sr (int): sample rate of audio signal
         f_min (float): minimum frequency
-        f_max (float, optional): maximum frequency. default: `sr` // 2
+        f_max (Optional[float]): maximum frequency. If None, it will use `sr` // 2
         n_mels (int): number of mel bins
 
     Outputs:
