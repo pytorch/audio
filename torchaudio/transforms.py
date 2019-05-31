@@ -2,7 +2,6 @@ from __future__ import division, print_function
 from warnings import warn
 import math
 import torch
-from torch import nn
 from typing import List, Dict, Optional, Tuple
 from . import functional as F
 
@@ -168,7 +167,7 @@ class Spectrogram(torch.jit.ScriptModule):
         normalize (bool) : whether to normalize by magnitude after stft
         wkwargs (dict, optional): arguments for window function
     """
-    __constants__ = ['n_fft', 'ws', 'hop', 'pad', 'power', 'normalize', 'wkargs']
+    __constants__ = ['n_fft', 'ws', 'hop', 'pad', 'power', 'normalize']
 
     def __init__(self, n_fft=400, ws=None, hop=None,
                  pad=0, window=torch.hann_window,
@@ -237,7 +236,7 @@ class MelScale(torch.jit.ScriptModule):
     def forward(self, spec_f):
         if self.fb.numel() == 0:
             tmp_fb = F.create_fb_matrix(spec_f.size(2), self.sr, self.f_min, self.f_max, self.n_mels)
-            # TODO figure out how to reassign attributes cleanly
+            # Attributes cannot be reassigned outside __init__ so workaround
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)
         spec_m = torch.matmul(spec_f, self.fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
@@ -292,11 +291,11 @@ class MFCC(torch.jit.ScriptModule):
         sr (int) : sample rate of audio signal
         n_mfcc (int) : number of mfc coefficients to retain
         dct_type (int) : type of DCT (discrete cosine transform) to use
-        norm (string) : norm to use
+        norm (string, optional) : norm to use
         log_mels (bool) : whether to use log-mel spectrograms instead of db-scaled
         melkwargs (dict, optional): arguments for MelSpectrogram
     """
-    __constants__ = ['sr', 'n_mfcc', 'dct_type', 'norm', 'top_db', 'log_mels']
+    __constants__ = ['sr', 'n_mfcc', 'dct_type', 'top_db', 'log_mels']
 
     def __init__(self, sr=16000, n_mfcc=40, dct_type=2, norm='ortho', log_mels=False,
                  melkwargs=None):
@@ -307,7 +306,7 @@ class MFCC(torch.jit.ScriptModule):
         self.sr = sr
         self.n_mfcc = n_mfcc
         self.dct_type = dct_type
-        self.norm = norm
+        self.norm = torch.jit.Attribute(norm, Optional[str])
         self.top_db = 80.
         self.s2db = SpectrogramToDB("power", self.top_db)
 
