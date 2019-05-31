@@ -302,33 +302,6 @@ class Test_SpectrogramToDBJIT(unittest.TestCase):
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
 
-class Test_MelSpectrogramJIT(unittest.TestCase):
-    @unittest.skipIf(not RUN_CUDA, "no CUDA")
-    def test_scriptmodule_MelSpectrogram(self):
-
-        class MyModule(torch.jit.ScriptModule):
-            def __init__(self):
-                super(MyModule, self).__init__()
-                self.module = transforms.MelSpectrogram()
-                self.module.eval()
-
-            @torch.jit.script_method
-            def forward(self, tensor):
-                return self.module(tensor)
-
-        tensor = torch.rand((1, 1000), device="cuda")
-        spec = transforms.Spectrogram(n_fft=400, ws=400, hop=200,
-                                      pad=0, window=torch.hann_window, power=2,
-                                      normalize=False, wkwargs=None).cuda()
-        fm = transforms.MelScale(n_mels=128, sr=16000, f_max=None, f_min=0.).cuda()
-        model = MyModule().cuda()
-
-        jit_out = model(tensor)
-        py_out = fm(spec(tensor))
-
-        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
-
-
 class Test_MFCCJIT(unittest.TestCase):
     def test_torchscript_create_dct(self):
         @torch.jit.script
@@ -366,6 +339,33 @@ class Test_MFCCJIT(unittest.TestCase):
 
         jit_out = model(tensor)
         py_out = torch.matmul(s2db(mel_spect(tensor)), dct_mat)
+
+        self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
+
+
+class Test_MelSpectrogramJIT(unittest.TestCase):
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_MelSpectrogram(self):
+
+        class MyModule(torch.jit.ScriptModule):
+            def __init__(self):
+                super(MyModule, self).__init__()
+                self.module = transforms.MelSpectrogram()
+                self.module.eval()
+
+            @torch.jit.script_method
+            def forward(self, tensor):
+                return self.module(tensor)
+
+        tensor = torch.rand((1, 1000), device="cuda")
+        spec = transforms.Spectrogram(n_fft=400, ws=400, hop=200,
+                                      pad=0, window=torch.hann_window, power=2,
+                                      normalize=False, wkwargs=None).cuda()
+        fm = transforms.MelScale(n_mels=128, sr=16000, f_max=None, f_min=0.).cuda()
+        model = MyModule().cuda()
+
+        jit_out = model(tensor)
+        py_out = fm(spec(tensor))
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
