@@ -221,22 +221,22 @@ class MelScale(torch.jit.ScriptModule):
         n_stft (int, optional): number of filter banks from stft. Calculated from first input
             if `None` is given.  See `n_fft` in `Spectrogram`.
     """
-    __constants__ = ['n_mels', 'sr', 'f_max', 'f_min']
+    __constants__ = ['n_mels', 'sr', 'f_min']
 
     def __init__(self, n_mels=128, sr=16000, f_max=None, f_min=0., n_stft=None):
         super(MelScale, self).__init__()
         self.n_mels = n_mels
         self.sr = sr
-        self.f_max = f_max if f_max is not None else float(sr // 2)
+        self.f_max = torch.jit.Attribute(f_max, Optional[float])
         self.f_min = f_min
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
-            n_stft, self.f_min, self.f_max, self.n_mels)
+            n_stft, self.sr, self.f_min, self.f_max, self.n_mels)
         self.fb = torch.jit.Attribute(fb, torch.Tensor)
 
     @torch.jit.script_method
     def forward(self, spec_f):
         if self.fb.numel() == 0:
-            tmp_fb = F.create_fb_matrix(spec_f.size(2), self.f_min, self.f_max, self.n_mels)
+            tmp_fb = F.create_fb_matrix(spec_f.size(2), self.sr, self.f_min, self.f_max, self.n_mels)
             # TODO figure out how to reassign attributes cleanly
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)
@@ -368,7 +368,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
         >>> sig, sr = torchaudio.load("test.wav", normalization=True)
         >>> spec_mel = transforms.MelSpectrogram(sr)(sig)  # (c, l, m)
     """
-    __constants__ = ['sr', 'n_fft', 'ws', 'hop', 'pad', 'n_mels', 'f_max', 'f_min']
+    __constants__ = ['sr', 'n_fft', 'ws', 'hop', 'pad', 'n_mels', 'f_min']
 
     def __init__(self, sr=16000, n_fft=400, ws=None, hop=None, f_min=0., f_max=None,
                  pad=0, n_mels=128, window=torch.hann_window, wkwargs=None):
@@ -379,7 +379,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
         self.hop = hop if hop is not None else self.ws // 2
         self.pad = pad
         self.n_mels = n_mels  # number of mel frequency bins
-        self.f_max = f_max
+        self.f_max = torch.jit.Attribute(f_max, Optional[float])
         self.f_min = f_min
         self.spec = Spectrogram(n_fft=self.n_fft, ws=self.ws, hop=self.hop,
                                 pad=self.pad, window=window, power=2,

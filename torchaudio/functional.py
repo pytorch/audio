@@ -154,20 +154,22 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
 
 
 @torch.jit.script
-def create_fb_matrix(n_stft, f_min, f_max, n_mels):
-    # type: (int, float, float, int) -> Tensor
+def create_fb_matrix(n_stft, sr, f_min, f_max, n_mels):
+    # type: (int, int, float, Optional[float], int) -> Tensor
     """ Create a frequency bin conversion matrix.
 
     Inputs:
         n_stft (int): number of filter banks from spectrogram
+        sr (int): sample rate of audio signal
         f_min (float): minimum frequency
-        f_max (float): maximum frequency
+        f_max (float, optional): maximum frequency. default: `sr` // 2
         n_mels (int): number of mel bins
 
     Outputs:
         Tensor: triangular filter banks (fb matrix)
 
     """
+    f_max = f_max if f_max is not None else float(sr // 2)
     # get stft freq bins
     stft_freqs = torch.linspace(f_min, f_max, n_stft)
     # calculate mel freq bins
