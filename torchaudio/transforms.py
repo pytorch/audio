@@ -2,7 +2,7 @@ from __future__ import division, print_function
 from warnings import warn
 import math
 import torch
-from typing import List, Dict, Optional, Tuple
+from typing import Optional
 from . import functional as F
 
 
