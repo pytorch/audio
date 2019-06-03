@@ -7,7 +7,7 @@ RUN_CUDA = torch.cuda.is_available()
 print('Run test with cuda:', RUN_CUDA)
 
 
-class Test_ScaleJIT(unittest.TestCase):
+class Test_JIT(unittest.TestCase):
     def test_torchscript_scale(self):
         @torch.jit.script
         def jit_method(tensor, factor):
@@ -42,8 +42,6 @@ class Test_ScaleJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-
-class Test_PadTrimJIT(unittest.TestCase):
     def test_torchscript_pad_trim(self):
         @torch.jit.script
         def jit_method(tensor, ch_dim, max_len, len_dim, fill_value):
@@ -82,8 +80,6 @@ class Test_PadTrimJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-
-class Test_DownmixMonoJIT(unittest.TestCase):
     def test_torchscript_downmix_mono(self):
         @torch.jit.script
         def jit_method(tensor, ch_dim):
@@ -118,8 +114,6 @@ class Test_DownmixMonoJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-
-class Test_LC2CLJIT(unittest.TestCase):
     def test_torchscript_LC2CL(self):
         @torch.jit.script
         def jit_method(tensor):
@@ -153,8 +147,6 @@ class Test_LC2CLJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-
-class Test_SpectrogramJIT(unittest.TestCase):
     def test_torchscript_spectrogram(self):
         @torch.jit.script
         def jit_method(sig, pad, window, n_fft, hop, ws, power, normalize):
@@ -195,8 +187,6 @@ class Test_SpectrogramJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-
-class Test_MelScaleJIT(unittest.TestCase):
     def test_torchscript_create_fb_matrix(self):
         @torch.jit.script
         def jit_method(n_stft, sr, f_min, f_max, n_mels):
@@ -233,8 +223,6 @@ class Test_MelScaleJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-
-class Test_SpectrogramToDBJIT(unittest.TestCase):
     def test_torchscript_spectrogram_to_DB(self):
         @torch.jit.script
         def jit_method(spec, multiplier, amin, db_multiplier, top_db):
@@ -272,8 +260,6 @@ class Test_SpectrogramToDBJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-
-class Test_MFCCJIT(unittest.TestCase):
     def test_torchscript_create_dct(self):
         @torch.jit.script
         def jit_method(n_mfcc, n_mels, norm):
@@ -309,8 +295,6 @@ class Test_MFCCJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-
-class Test_MelSpectrogramJIT(unittest.TestCase):
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
     def test_scriptmodule_MelSpectrogram(self):
 
@@ -331,8 +315,6 @@ class Test_MelSpectrogramJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-
-class Test_BLC2CBLJIT(unittest.TestCase):
     def test_torchscript_BLC2CBL(self):
         @torch.jit.script
         def jit_method(tensor):
@@ -366,8 +348,6 @@ class Test_BLC2CBLJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-
-class Test_MuLawEncodingJIT(unittest.TestCase):
     def test_torchscript_mu_law_encoding(self):
         @torch.jit.script
         def jit_method(tensor, qc):
@@ -402,8 +382,6 @@ class Test_MuLawEncodingJIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out, atol=5e-4, rtol=1e-4))
 
-
-class Test_MuLawExpandingJIT(unittest.TestCase):
     def test_torchscript_mu_law_expanding(self):
         @torch.jit.script
         def jit_method(tensor, qc):
