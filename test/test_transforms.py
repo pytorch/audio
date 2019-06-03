@@ -37,7 +37,10 @@ class Tester(unittest.TestCase):
         self.assertTrue(result.min() >= -1. and result.max() <= 1.)
 
         maxminmax = int(max(abs(audio_orig.min()), abs(audio_orig.max())))
+        print(audio_orig.min(), audio_orig.max())
         result = transforms.Scale(factor=maxminmax)(audio_orig)
+        print(audio_orig.min(), audio_orig.max())
+
         self.assertTrue((result.min() == -1. or result.max() == 1.) and
                         result.min() >= -1. and result.max() <= 1.)
 
