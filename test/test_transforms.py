@@ -36,10 +36,8 @@ class Tester(unittest.TestCase):
         result = transforms.Scale()(audio_orig)
         self.assertTrue(result.min() >= -1. and result.max() <= 1.)
 
-        maxminmax = int(max(abs(audio_orig.min()), abs(audio_orig.max())))
-        print(audio_orig.min(), audio_orig.max())
+        maxminmax = max(abs(audio_orig.min()), abs(audio_orig.max())).item()
         result = transforms.Scale(factor=maxminmax)(audio_orig)
-        print(audio_orig.min(), audio_orig.max())
 
         self.assertTrue((result.min() == -1. or result.max() == 1.) and
                         result.min() >= -1. and result.max() <= 1.)
@@ -102,7 +100,7 @@ class Tester(unittest.TestCase):
         audio_orig = self.sig.clone()
         length_orig = audio_orig.size(0)
         length_new = int(length_orig * 1.2)
-        maxminmax = int(max(abs(audio_orig.min()), abs(audio_orig.max())))
+        maxminmax = max(abs(audio_orig.min()), abs(audio_orig.max())).item()
 
         tset = (transforms.Scale(factor=maxminmax),
                 transforms.PadTrim(max_len=length_new, channels_first=False))
