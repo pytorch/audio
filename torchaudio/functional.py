@@ -100,18 +100,9 @@ def LC2CL(tensor):
     return tensor.transpose(0, 1).contiguous()
 
 
-def _stft(input, n_fft, hop_length=None, win_length=None, window=None,
-          center=True, pad_mode='reflect', normalized=False, onesided=True):
+def _stft(input, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided):
     # type: (Tensor, int, Optional[int], Optional[int], Optional[Tensor], bool, str, bool, bool) -> Tensor
-    """ Based on torch.stft, just with a type annotation.
-    """
-    if center:
-        signal_dim = input.dim()
-        extended_shape = [1] * (3 - signal_dim) + list(input.size())
-        pad = int(n_fft // 2)
-        input = torch.nn.functional.pad(input.view(extended_shape), (pad, pad), pad_mode)
-        input = input.view(input.shape[-signal_dim:])
-    return torch._C._VariableFunctions.stft(input, n_fft, hop_length, win_length, window, normalized, onesided)
+    return torch.stft(input, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided)
 
 
 @torch.jit.script
