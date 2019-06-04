@@ -229,7 +229,7 @@ class MelScale(torch.jit.ScriptModule):
         self.f_max = f_max if f_max is not None else float(sr // 2)
         self.f_min = f_min
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
-            n_stft, self.sr, self.f_min, self.f_max, self.n_mels)
+            n_stft, self.f_min, self.f_max, self.n_mels)
         self.fb = torch.jit.Attribute(fb, torch.Tensor)
 
     @torch.jit.script_method
