@@ -141,18 +141,17 @@ class Test_JIT(unittest.TestCase):
 
     def test_torchscript_create_fb_matrix(self):
         @torch.jit.script
-        def jit_method(n_stft, sr, f_min, f_max, n_mels):
-            # type: (int, int, float, Optional[float], int) -> Tensor
-            return F.create_fb_matrix(n_stft, sr, f_min, f_max, n_mels)
+        def jit_method(n_stft, f_min, f_max, n_mels):
+            # type: (int, float, float, int) -> Tensor
+            return F.create_fb_matrix(n_stft, f_min, f_max, n_mels)
 
         n_stft = 100
-        sr = 16000
         f_min = 0.
         f_max = 20.
         n_mels = 10
 
-        jit_out = jit_method(n_stft, sr, f_min, f_max, n_mels)
-        py_out = F.create_fb_matrix(n_stft, sr, f_min, f_max, n_mels)
+        jit_out = jit_method(n_stft, f_min, f_max, n_mels)
+        py_out = F.create_fb_matrix(n_stft, f_min, f_max, n_mels)
 
         self.assertTrue(torch.allclose(jit_out, py_out))
 

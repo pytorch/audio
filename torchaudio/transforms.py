@@ -220,13 +220,13 @@ class MelScale(torch.jit.ScriptModule):
         n_stft (int, optional): number of filter banks from stft. Calculated from first input
             if `None` is given.  See `n_fft` in `Spectrogram`.
     """
-    __constants__ = ['n_mels', 'sr', 'f_min']
+    __constants__ = ['n_mels', 'sr', 'f_min', 'f_max']
 
     def __init__(self, n_mels=128, sr=16000, f_max=None, f_min=0., n_stft=None):
         super(MelScale, self).__init__()
         self.n_mels = n_mels
         self.sr = sr
-        self.f_max = torch.jit.Attribute(f_max, Optional[float])
+        self.f_max = f_max if f_max is not None else float(sr // 2)
         self.f_min = f_min
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
             n_stft, self.sr, self.f_min, self.f_max, self.n_mels)
@@ -235,7 +235,7 @@ class MelScale(torch.jit.ScriptModule):
     @torch.jit.script_method
     def forward(self, spec_f):
         if self.fb.numel() == 0:
-            tmp_fb = F.create_fb_matrix(spec_f.size(2), self.sr, self.f_min, self.f_max, self.n_mels)
+            tmp_fb = F.create_fb_matrix(spec_f.size(2), self.f_min, self.f_max, self.n_mels)
             # Attributes cannot be reassigned outside __init__ so workaround
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)
