@@ -205,9 +205,8 @@ def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
     spec_db -= multiplier * db_multiplier
 
     if top_db is not None:
-        spec_db = torch.max(
-            spec_db,
-            torch.tensor(float(spec_db.max()) - top_db, dtype=spec_db.dtype, device=spec_db.device))
+        new_spec_db_max = torch.tensor(float(spec_db.max()) - top_db, dtype=spec_db.dtype, device=spec_db.device)
+        spec_db = torch.max(spec_db, new_spec_db_max)
 
     return spec_db
 
