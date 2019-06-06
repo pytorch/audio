@@ -100,6 +100,11 @@ def LC2CL(tensor):
     return tensor.transpose(0, 1).contiguous()
 
 
+def _stft(input, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided):
+    # type: (Tensor, int, Optional[int], Optional[int], Optional[Tensor], bool, str, bool, bool) -> Tensor
+    return torch.stft(input, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided)
+
+
 @torch.jit.script
 def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
     # type: (Tensor, int, Tensor, int, int, int, int, bool) -> Tensor
@@ -130,8 +135,8 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
         sig = torch.nn.functional.pad(sig, (pad, pad), "constant")
 
     # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = torch.stft(sig, n_fft, hop, ws, window,
-                        True, 'reflect', False, True).transpose(1, 2)
+    spec_f = _stft(sig, n_fft, hop, ws, window,
+                   True, 'reflect', False, True).transpose(1, 2)
 
     if normalize:
         spec_f /= window.pow(2).sum().sqrt()
