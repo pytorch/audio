@@ -5,7 +5,7 @@ import unittest
 import test.common_utils
 
 
-class KaldiIOTest(unittest.TestCase):
+class Test_KaldiIO(unittest.TestCase):
     data1 = [[1, 2, 3], [11, 12, 13], [21, 22, 23]]
     data2 = [[31, 32, 33], [41, 42, 43], [51, 52, 53]]
     test_dirpath, test_dir = test.common_utils.create_temp_assets_dir()

@@ -4,7 +4,7 @@ import os.path
 import torch
 import _torch_sox
 
-from torchaudio import transforms, datasets, sox_effects, legacy
+from torchaudio import transforms, datasets, kaldi_io, sox_effects, legacy
 
 
 def check_input(src):
