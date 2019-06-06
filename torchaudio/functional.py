@@ -135,7 +135,7 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
         sig = torch.nn.functional.pad(sig, (pad, pad), "constant")
 
     # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = _stft(sig, n_fft, hop, ws, window,
+    spec_f = torch.stft(sig, n_fft, hop, ws, window,
                    True, 'reflect', False, True).transpose(1, 2)
 
     if normalize:
@@ -143,6 +143,14 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
     spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor (c, l, n_fft)
     return spec_f
 
+
+def Kaldi_spectrogram(sig, allow_downsample = False, allow_upsample = False,
+    blackman_coeff = 0.42, channel = -1, dither = 1, energy_floor = 0, frame_length = 25,
+    frame_shift = 10, max_feature_vectors = -1, min_duration = 0, output_format = "kaldi",
+    preemphasis_coefficient = 0.97, raw_energy = True, remove_dc_offset = True,
+    round_to_power_of_two = True, sample_frequency = 16000, snip_edges = True, subtract_mean = False, window_type = "povey"):
+    sig.stft()
+    return sig
 
 @torch.jit.script
 def create_fb_matrix(n_stft, f_min, f_max, n_mels):
