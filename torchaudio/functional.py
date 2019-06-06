@@ -135,7 +135,7 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
         sig = torch.nn.functional.pad(sig, (pad, pad), "constant")
 
     # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = torch.stft(sig, n_fft, hop, ws, window,
+    spec_f = _stft(sig, n_fft, hop, ws, window,
                    True, 'reflect', False, True).transpose(1, 2)
 
     if normalize:
@@ -143,6 +143,11 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
     spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor (c, l, n_fft)
     return spec_f
 
+
+def next_power_of_2(x):
+    """ Returns the smallest power of 2 that is greater than x
+    """
+    return 1 if x == 0 else 2**(x - 1).bit_length()
 
 def Kaldi_spectrogram(sig, allow_downsample = False, allow_upsample = False,
     blackman_coeff = 0.42, channel = -1, dither = 1.0, energy_floor = 0.0, frame_length = 25.0,
@@ -154,39 +159,55 @@ def Kaldi_spectrogram(sig, allow_downsample = False, allow_upsample = False,
 
     Inputs:
         sig (Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
-        allow-downsample (bool): If True, allow the input waveform to have a higher frequency than the specified
-            `sample-frequency` (and we'll downsample). (default = False)
-        allow-upsample (bool): If True, allow the input waveform to have a lower frequency than the specified
-            `sample-frequency` (and we'll upsample). (default = False)
-        blackman-coeff (float): Constant coefficient for generalized Blackman window. (default = 0.42)
+        blackman_coeff (float): Constant coefficient for generalized Blackman window. (default = 0.42)
         channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (default = -1)
         dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
-            the energy-floor option, e.g. to 1.0 or 0.1 (default = 1.0)
-        energy-floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
+            the energy_floor option, e.g. to 1.0 or 0.1 (default = 1.0)
+        energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
             this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
             individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (default = 0.0)
-        frame-length (float): Frame length in milliseconds (default = 25.0)
-        frame-shift (float): Frame shift in milliseconds (default = 10.0)
-        min-duration (float): Minimum duration of segments to process (in seconds). (default = 0.0)
-        preemphasis-coefficient (float): Coefficient for use in signal preemphasis (default = 0.97)
-        raw-energy (bool): If True, compute energy before preemphasis and windowing (default = True)
-        remove-dc-offset: Subtract mean from waveform on each frame (default = True)
-        round-to-power-of-two (bool): If True, round window size to power of two by zero-padding input
+        frame_length (float): Frame length in milliseconds (default = 25.0)
+        frame_shift (float): Frame shift in milliseconds (default = 10.0)
+        min_duration (float): Minimum duration of segments to process (in seconds). (default = 0.0)
+        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (default = 0.97)
+        raw_energy (bool): If True, compute energy before preemphasis and windowing (default = True)
+        remove_dc_offset: Subtract mean from waveform on each frame (default = True)
+        round_to_power_of_two (bool): If True, round window size to power of two by zero-padding input
             to FFT. (default = True)
-        sample-frequency (float): Waveform data sample frequency (must match the waveform file, if
+        sample_frequency (float): Waveform data sample frequency (must match the waveform file, if
             specified there) (default = 16000.0)
-        snip-edges (bool): If True, end effects will be handled by outputting only frames that completely fit
-            in the file, and the number of frames depends on the frame-length.  If False, the number of frames
-            depends only on the frame-shift, and we reflect the data at the ends. (default = true)
-        subtract-mean (bool): Subtract mean of each feature file [CMS]; not recommended to do it this way.  (default = False)
-        window-type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackmann') (default = 'povey')
+        snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit
+            in the file, and the number of frames depends on the frame_length.  If False, the number of frames
+            depends only on the frame_shift, and we reflect the data at the ends. (default = true)
+        subtract_mean (bool): Subtract mean of each feature file [CMS]; not recommended to do it this way.  (default = False)
+        window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackmann') (default = 'povey')
 
     Not used Inputs:
-        max-feature-vectors (int): Memory optimization. If larger than 0, periodically remove feature vectors so
+        allow_downsample (bool): If True, allow the input waveform to have a higher frequency than the specified
+            `sample_frequency` (and we'll downsample). (default = False)
+        allow_upsample (bool): If True, allow the input waveform to have a lower frequency than the specified
+            `sample_frequency` (and we'll upsample). (default = False)
+        max_feature_vectors (int): Memory optimization. If larger than 0, periodically remove feature vectors so
             that only this number of the latest feature vectors is retained. (default = -1)
-        output-format (str): Format of the output files [kaldi, htk] (default = 'kaldi')
+        output_format (str): Format of the output files [kaldi, htk] (default = 'kaldi')
+
+    Outputs:
+        Tensor: a spectrogram identical to what Kaldi would output. The shape is (, `padded_window_size` // 2 + 1)
     """
-    sig.stft()
+    waveform = sig[max(channel, 0), :] # size (n)
+    window_shift = int(sample_frequency * 0.001 * frame_shift)
+    window_size = int(sample_frequency * 0.001 * frame_length)
+    padded_window_size = next_power_of_2(window_size) if round_to_power_of_two else window_size
+
+    assert len(waveform)/sample_frequency >= min_duration, 'signal is too short'
+
+    n_fft = padded_window_size
+    hop_length = window_shift
+    win_length = padded_window_size
+    window =
+    normalized = False
+    onesided = True
+    waveform.stft(n_fft, hop_length, win_length, window, normalized, onesided)
     return sig
 
 @torch.jit.script
