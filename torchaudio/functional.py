@@ -145,10 +145,47 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
 
 
 def Kaldi_spectrogram(sig, allow_downsample = False, allow_upsample = False,
-    blackman_coeff = 0.42, channel = -1, dither = 1, energy_floor = 0, frame_length = 25,
-    frame_shift = 10, max_feature_vectors = -1, min_duration = 0, output_format = "kaldi",
+    blackman_coeff = 0.42, channel = -1, dither = 1.0, energy_floor = 0.0, frame_length = 25.0,
+    frame_shift = 10.0, max_feature_vectors = -1, min_duration = 0.0, output_format = 'kaldi',
     preemphasis_coefficient = 0.97, raw_energy = True, remove_dc_offset = True,
-    round_to_power_of_two = True, sample_frequency = 16000, snip_edges = True, subtract_mean = False, window_type = "povey"):
+    round_to_power_of_two = True, sample_frequency = 16000.0, snip_edges = True, subtract_mean = False, window_type = 'povey'):
+    """Create a spectrogram from a raw audio signal. This matches the input/output of Kaldi's
+    compute-spectrogram-feats.
+
+    Inputs:
+        sig (Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
+        allow-downsample (bool): If True, allow the input waveform to have a higher frequency than the specified
+            `sample-frequency` (and we'll downsample). (default = False)
+        allow-upsample (bool): If True, allow the input waveform to have a lower frequency than the specified
+            `sample-frequency` (and we'll upsample). (default = False)
+        blackman-coeff (float): Constant coefficient for generalized Blackman window. (default = 0.42)
+        channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (default = -1)
+        dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
+            the energy-floor option, e.g. to 1.0 or 0.1 (default = 1.0)
+        energy-floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
+            this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
+            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (default = 0.0)
+        frame-length (float): Frame length in milliseconds (default = 25.0)
+        frame-shift (float): Frame shift in milliseconds (default = 10.0)
+        min-duration (float): Minimum duration of segments to process (in seconds). (default = 0.0)
+        preemphasis-coefficient (float): Coefficient for use in signal preemphasis (default = 0.97)
+        raw-energy (bool): If True, compute energy before preemphasis and windowing (default = True)
+        remove-dc-offset: Subtract mean from waveform on each frame (default = True)
+        round-to-power-of-two (bool): If True, round window size to power of two by zero-padding input
+            to FFT. (default = True)
+        sample-frequency (float): Waveform data sample frequency (must match the waveform file, if
+            specified there) (default = 16000.0)
+        snip-edges (bool): If True, end effects will be handled by outputting only frames that completely fit
+            in the file, and the number of frames depends on the frame-length.  If False, the number of frames
+            depends only on the frame-shift, and we reflect the data at the ends. (default = true)
+        subtract-mean (bool): Subtract mean of each feature file [CMS]; not recommended to do it this way.  (default = False)
+        window-type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackmann') (default = 'povey')
+
+    Not used Inputs:
+        max-feature-vectors (int): Memory optimization. If larger than 0, periodically remove feature vectors so
+            that only this number of the latest feature vectors is retained. (default = -1)
+        output-format (str): Format of the output files [kaldi, htk] (default = 'kaldi')
+    """
     sig.stft()
     return sig
 
