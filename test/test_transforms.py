@@ -303,6 +303,37 @@ class Tester(unittest.TestCase):
         _test_librosa_consistency_helper(**kwargs2)
         _test_librosa_consistency_helper(**kwargs3)
 
+    def test_random_opposite(self):
+        audio_orig = self.sig.clone()
+
+        audio_flipped = transforms.RandomOpposite(probability=0)(audio_orig)
+        self.assertTrue(torch.allclose(audio_flipped, -audio_orig, atol=5e-3))
+
+        audio_flipped = transforms.RandomOpposite(probability=1)(audio_orig)
+        self.assertTrue(torch.allclose(audio_flipped, audio_orig, atol=5e-3))
+
+    def test_random_strech(self):
+        audio_orig = self.sig.clone().transpose(0, 1)
+
+        audio_streched = transforms.RandomStrech(max_factor=1)(audio_orig)
+        self.assertTrue(torch.allclose(audio_streched, audio_orig, atol=5e-3))
+
+        audio_streched = transforms.RandomStrech(max_factor=2)(audio_orig)
+        self.assertNotEqual(audio_streched.size(1), audio_orig.size(1))
+        # False if random resturns one... Unlikely
+
+    def test_random_crop(self):
+        audio_orig = self.sig.clone().transpose(0, 1)
+
+        croped_audio = transforms.RandomCrop(200)(audio_orig)
+        self.assertEqual(croped_audio.size(1), 200)
+
+    def test_pad(self):
+        audio_orig = self.sig.clone().transpose(0, 1)
+
+        padded_audio = transforms.Pad(200, 0)(audio_orig)
+        self.assertEqual(padded_audio.size(1), audio_orig.size(1) + 200 * 2)
+
 
 if __name__ == '__main__':
     unittest.main()

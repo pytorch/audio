@@ -15,7 +15,13 @@ __all__ = [
     'MFCC',
     'BLC2CBL',
     'mu_law_encoding',
-    'mu_law_expanding'
+    'mu_law_expanding',
+    'crop_in_between',
+    'random_crop',
+    'strech',
+    'random_strech',
+    'opposite',
+    'random_opposite'
 ]
 
 
@@ -350,3 +356,120 @@ def mu_law_expanding(x_mu, qc):
     x = ((x_mu) / mu) * 2 - 1.
     x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.) / mu
     return x
+
+
+def crop_in_between(tensor, start, end, ch_dim):
+    """Crops a piece of tensor
+
+    Args:
+        tensor (Tensor): Tensor of audio of size (NxC) or (CxN)
+        start (int): Starting point of crop
+        end (int): Ending point of crop
+        ch_dim (int): Dimension of channel (not size)
+
+    Returns:
+        Tensor: a piece of the tensor
+    """
+    if ch_dim == 1:
+        tensor = tensor.transpose(0, 1)
+
+    tensor = tensor[:, start: end]
+
+    if ch_dim == 1:
+        tensor = tensor.transpose(0, 1)
+
+    return tensor
+
+
+def random_crop(tensor, size, ch_dim):
+    """Randomly crops a piece of tensor
+
+    Args:
+        tensor (Tensor): Tensor of audio of size (NxC) or (CxN)
+        start (int): Starting point of crop
+        end (int): Ending point of crop
+        ch_dim (int): Dimension of channel (not size)
+
+    Returns:
+        Tensor: a piece of the tensor
+    """
+    orig_size = tensor.size(1 - ch_dim)
+    start = torch.randint(0, orig_size - size, (1,))
+    end = start + size
+    return crop_in_between(tensor, start.item(), end.item(), ch_dim)
+
+
+def strech(tensor, factor, interpolate, ch_dim):
+    """Strech a tensor on the time dimention (not the channel one) with
+    the given factor.
+
+    Args:
+        tensor (Tensor): Tensor of audio of size (n x c) or (c x n)
+        factor (Tensor, float): Streching factor of the tensor
+        interpolate (str): mode of interpolation for the generated audio
+            points (linear or nearest)
+        ch_dim (int): Dimension of channel (not size)
+
+    Returns:
+        Tensor : the streched tensor
+    """
+    type_orig = tensor.type()
+    if ch_dim == 1:
+        tensor = tensor.transpose(0, 1)
+
+    # Generate list of factor indexes
+    output_size = (tensor.size(1) * factor).float()
+    ref = torch.arange(output_size.item()) / factor
+
+    # Select interpolation type
+    if interpolate.lower() == 'linear':
+        ref1 = ref.int().float()
+        ref2 = torch.clamp_max(ref1 + 1, tensor.size(1) - 1)
+        r = (ref - ref1).type(type_orig)  # Ratio of sound[ref] to use
+        streched_sound = (tensor[:, ref1.long()] * (1 - r) +
+                          tensor[:, ref2.long()] * r)
+    elif interpolate.lower() == 'nearest':
+        ref = ref.int()  # Nearest index
+        streched_sound = tensor[ref.long()]
+    else:
+        raise Exception('Invalid interpolation mode {}'.format(
+            interpolate))
+
+    if ch_dim == 1:
+        streched_sound = streched_sound.transpose(0, 1)
+
+    return streched_sound
+
+
+def random_strech(tensor, max_factor, interpolate, ch_dim):
+    """Strech a tensor on the time dimention (not the channel one) with
+    a random factor.
+
+    Args:
+        tensor (Tensor): Tensor of audio of size (n x c) or (c x n)
+        max_factor (float): Max streching factor of the tensor
+        interpolate (str): Mode of interpolation for the generated audio
+            points (linear or nearest)
+        ch_dim (int): Dimension of channel (not size)
+
+    Returns:
+        Tensor : the streched tensor
+    """
+    factor = max_factor ** (torch.rand(1) * 2 - 1)
+    return strech(tensor, factor, interpolate, ch_dim)
+
+
+def opposite(tensor):
+    """Returns the opposite value of the tensor
+    """
+    return -tensor
+
+
+def random_opposite(tensor, probability):
+    """Ramdomly return the opposite values of the tensor
+    """
+    do_it = (torch.rand(1) >= probability)
+    if do_it:
+        tensor = opposite(tensor)
+
+    return tensor

@@ -444,3 +444,102 @@ class MuLawExpanding(object):
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
+
+
+class Pad(object):
+    """Pad the given tensor on all sides with specified padding fill value
+
+    Args:
+        padding (int or tuple): Padding on each border. If a single int is
+            provided this is used to pad all borders. If tuple of length 2
+            is provided this is the padding on left/right.
+        fill: fill value.
+        channels_first (bool): Channel is first and time second. Default: `True`
+    """
+    def __init__(self, padding, fill=0, channel_first=True):
+        self.padding = padding
+        self.fill = fill
+        self.ch_dim = int(not channel_first)
+
+    def __call__(self, tensor):
+        """
+        Args:
+            tensor (Tensor): Audio of size (Samples x Channels) or (C x S)
+
+        Returns:
+            tensor (Tensor): A tensor padded right and/or left with fill value
+        """
+        if self.ch_dim == 1:
+            tensor = tensor.transpose(0, 1)
+
+        tensor = torch.nn.ConstantPad1d(self.padding, self.fill)(tensor)
+
+        if self.ch_dim == 1:
+            tensor = tensor.transpose(0, 1)
+
+        return tensor
+
+
+class RandomCrop(object):
+    """Randomly crops a piece of tensor
+
+    Args:
+        size (int): size of the crop to retrieve
+        channels_first (bool): Channel is first and time second.  Default: `True`
+    """
+    def __init__(self, size, channel_first=True):
+        self.size = size
+        self.ch_dim = int(not channel_first)
+
+    def __call__(self, tensor):
+        """
+        Args:
+            tensor (Tensor): Audio of size (SxC) or (CxS)
+
+        Returns:
+            Tensor: A tensor randomly steched by a factor on the sample axis.
+        """
+        return F.random_crop(tensor, self.size, self.ch_dim)
+
+
+class RandomStrech(object):
+    """Randomly strech or shrink audio
+
+    Args:
+        max_factor (float): Streching factor of the audio
+        interpolate (str): mode of interpolation for the generated audio
+            points (linear or nearest)
+        channels_first (bool): Channel is first and time second.  Default: `True`
+    """
+    def __init__(self, max_factor=1.3, interpolate='Linear', channel_first=True):
+        self.max_factor = max_factor
+        self.interpolate = interpolate
+        self.ch_dim = int(not channel_first)
+
+    def __call__(self, tensor):
+        """
+        Args:
+            tensor (Tensor): Audio of size (Samples x Channels) or (C x S)
+
+        Returns:
+            Tensor: A tensor randomly steched by a factor on the sample axis.
+        """
+        return F.random_strech(tensor,
+                               self.max_factor,
+                               self.interpolate,
+                               self.ch_dim)
+
+
+class RandomOpposite(object):
+    """Randomly retrive the opposite values of $tensor$
+
+    Args:
+        tensor (Tensor): signal tensor with shape (size, channels)
+        probability (float): Probability for a flip to happen.
+
+    """
+    def __init__(self, probability=0.5):
+        self.probability = probability
+
+    def __call__(self, tensor):
+        return F.random_opposite(tensor, self.probability)
