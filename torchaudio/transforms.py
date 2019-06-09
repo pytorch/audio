@@ -5,6 +5,14 @@ import torch
 from . import functional as F
 
 
+def _check_audio(tensor):
+    if not isinstance(tensor, nn.Tensor):
+        raise TypeError('tensor should be a torch tensor')
+    if len(tensor.size()) > 2:
+        raise TypeError(('tensor representing audio should be at most ',
+                        '2Dimentional'))
+
+
 class Compose(object):
     """Composes several transforms together.
 
@@ -502,11 +510,11 @@ class RandomCrop(object):
         return F.random_crop(tensor, self.size, self.ch_dim)
 
 
-class RandomStrech(object):
-    """Randomly strech or shrink audio
+class RandomStretch(object):
+    """Randomly stretch or shrink audio
 
     Args:
-        max_factor (float): Streching factor of the audio
+        max_factor (float): Stretching factor of the audio
         interpolate (str): mode of interpolation for the generated audio
             points (linear or nearest)
         channels_first (bool): Channel is first and time second.  Default: `True`
@@ -522,12 +530,12 @@ class RandomStrech(object):
             tensor (Tensor): Audio of size (Samples x Channels) or (C x S)
 
         Returns:
-            Tensor: A tensor randomly steched by a factor on the sample axis.
+            Tensor: A tensor randomly stetched by a factor on the sample axis.
         """
-        return F.random_strech(tensor,
-                               self.max_factor,
-                               self.interpolate,
-                               self.ch_dim)
+        return F.random_stretch(tensor,
+                                self.max_factor,
+                                self.interpolate,
+                                self.ch_dim)
 
 
 class RandomOpposite(object):

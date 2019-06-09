@@ -312,14 +312,14 @@ class Tester(unittest.TestCase):
         audio_flipped = transforms.RandomOpposite(probability=1)(audio_orig)
         self.assertTrue(torch.allclose(audio_flipped, audio_orig, atol=5e-3))
 
-    def test_random_strech(self):
+    def test_random_stretch(self):
         audio_orig = self.sig.clone().transpose(0, 1)
 
-        audio_streched = transforms.RandomStrech(max_factor=1)(audio_orig)
-        self.assertTrue(torch.allclose(audio_streched, audio_orig, atol=5e-3))
+        audio_stretched = transforms.RandomStrech(max_factor=1)(audio_orig)
+        self.assertTrue(torch.allclose(audio_stretched, audio_orig, atol=5e-3))
 
-        audio_streched = transforms.RandomStrech(max_factor=2)(audio_orig)
-        self.assertNotEqual(audio_streched.size(1), audio_orig.size(1))
+        audio_stretched = transforms.RandomStrech(max_factor=2)(audio_orig)
+        self.assertNotEqual(audio_stretched.size(1), audio_orig.size(1))
         # False if random resturns one... Unlikely
 
     def test_random_crop(self):

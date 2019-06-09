@@ -18,8 +18,8 @@ __all__ = [
     'mu_law_expanding',
     'crop_in_between',
     'random_crop',
-    'strech',
-    'random_strech',
+    'stretch',
+    'random_stretch',
     'opposite',
     'random_opposite'
 ]
@@ -399,7 +399,7 @@ def random_crop(tensor, size, ch_dim):
     return crop_in_between(tensor, start.item(), end.item(), ch_dim)
 
 
-def strech(tensor, factor, interpolate, ch_dim):
+def stretch(tensor, factor, interpolate, ch_dim):
     """Strech a tensor on the time dimention (not the channel one) with
     the given factor.
 
@@ -411,7 +411,7 @@ def strech(tensor, factor, interpolate, ch_dim):
         ch_dim (int): Dimension of channel (not size)
 
     Returns:
-        Tensor : the streched tensor
+        Tensor : the stretched tensor
     """
     type_orig = tensor.type()
     if ch_dim == 1:
@@ -426,37 +426,37 @@ def strech(tensor, factor, interpolate, ch_dim):
         ref1 = ref.int().float()
         ref2 = torch.clamp_max(ref1 + 1, tensor.size(1) - 1)
         r = (ref - ref1).type(type_orig)  # Ratio of sound[ref] to use
-        streched_sound = (tensor[:, ref1.long()] * (1 - r) +
-                          tensor[:, ref2.long()] * r)
+        stretched_sound = (tensor[:, ref1.long()] * (1 - r) +
+                           tensor[:, ref2.long()] * r)
     elif interpolate.lower() == 'nearest':
         ref = ref.int()  # Nearest index
-        streched_sound = tensor[ref.long()]
+        stretched_sound = tensor[ref.long()]
     else:
         raise Exception('Invalid interpolation mode {}'.format(
             interpolate))
 
     if ch_dim == 1:
-        streched_sound = streched_sound.transpose(0, 1)
+        stretched_sound = stretched_sound.transpose(0, 1)
 
-    return streched_sound
+    return stretched_sound
 
 
-def random_strech(tensor, max_factor, interpolate, ch_dim):
+def random_stretch(tensor, max_factor, interpolate, ch_dim):
     """Strech a tensor on the time dimention (not the channel one) with
     a random factor.
 
     Args:
         tensor (Tensor): Tensor of audio of size (n x c) or (c x n)
-        max_factor (float): Max streching factor of the tensor
+        max_factor (float): Max stretching factor of the tensor
         interpolate (str): Mode of interpolation for the generated audio
             points (linear or nearest)
         ch_dim (int): Dimension of channel (not size)
 
     Returns:
-        Tensor : the streched tensor
+        Tensor : the stretched tensor
     """
     factor = max_factor ** (torch.rand(1) * 2 - 1)
-    return strech(tensor, factor, interpolate, ch_dim)
+    return stretch(tensor, factor, interpolate, ch_dim)
 
 
 def opposite(tensor):
