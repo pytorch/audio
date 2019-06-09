@@ -543,3 +543,37 @@ class RandomOpposite(object):
 
     def __call__(self, tensor):
         return F.random_opposite(tensor, self.probability)
+
+
+class AddChannelDimension(object):
+    """Add a channel dimension if missing. This result in a two dimensional
+    Tensor
+
+    Args:
+        tensor (Tensor): signal tensor with shape (size, channels)
+        channels_first (bool): Channel is first and time second.  Default: `True`
+    """
+    def __init__(self, channel_first):
+        self.ch_dim = int(not channel_first)
+
+    def __call__(self, tensor):
+        if len(tensor.shape) == 1:
+            tensor = tensor.unsqueeze(self.ch_dim)
+        return tensor
+
+
+class AddDimension(object):
+    """Add a dimension to a Tensor to fit desired model.
+    eg: add dimension to fit 2D and 3D convolutions.
+    Tensor
+
+    Args:
+        tensor (Tensor): signal tensor with shape (size, channels)
+        dimension (int): The dimesion to create
+    """
+    def __init__(self, dimension):
+        self.dim = int(dimension)
+
+    def __call__(self, tensor):
+        tensor = tensor.unsqueeze(self.dim)
+        return tensor
