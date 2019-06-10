@@ -13,11 +13,11 @@ def _next_power_of_2(x):
 
 
 def _get_strided(waveform, window_size, window_shift, snip_edges):
-    """ Given a waveform (1D tensor of size n), it returns a 2D tensor representing
-    how the window is shifted along the waveform. Each row is a frame.
+    """ Given a waveform (1D tensor of size num_samples), it returns a 2D tensor (m, window_size)
+    representing how the window is shifted along the waveform. Each row is a frame.
 
     Inputs:
-        sig (Tensor): Tensor of size n
+        sig (Tensor): Tensor of size num_samples
         window_size (int): Frame length
         window_shift (int): Frame shift
         snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit
@@ -25,9 +25,26 @@ def _get_strided(waveform, window_size, window_shift, snip_edges):
             depends only on the frame_shift, and we reflect the data at the ends.
 
     Output:
-        Tensor: 2D tensor where each row is a frame
+        Tensor: 2D tensor of size (m, window_size) where each row is a frame
     """
-    return waveform
+    assert waveform.dim() == 1
+    num_samples = waveform.size(0)
+    strides = (window_shift * waveform.stride(0), waveform.stride(0))
+
+    if snip_edges:
+        if num_samples < window_size:
+            return torch.empty((0, 0))
+        else:
+            m = 1 + (num_samples - window_size) // window_shift
+    else:
+        m = (num_samples + (window_shift // 2)) // window_shift
+        pad = window_size // 2
+
+        waveform = torch.nn.functional.pad(
+            waveform.view((1, 1, num_samples)), (pad, pad), 'reflect')
+
+    sizes = (m, window_size)
+    return waveform.as_strided(sizes, strides)
 
 
 def spectrogram(
