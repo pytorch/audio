@@ -37,11 +37,18 @@ def _get_strided(waveform, window_size, window_shift, snip_edges):
         else:
             m = 1 + (num_samples - window_size) // window_shift
     else:
+        reversed_waveform = torch.flip(waveform, [0])
         m = (num_samples + (window_shift // 2)) // window_shift
-        pad = window_size // 2
-
-        waveform = torch.nn.functional.pad(
-            waveform.view((1, 1, num_samples)), (pad, pad), 'reflect')
+        pad = window_size // 2 - window_shift // 2
+        pad_right = reversed_waveform
+        if pad > 0:
+            # torch.nn.functional.pad returns [2,1,0,1,2] for 'reflect'
+            # but we want [2, 1, 0, 0, 1, 2]
+            pad_left = reversed_waveform[-pad:]
+            waveform = torch.cat((pad_left, waveform, pad_right), dim=0)
+        else:
+            # pad is negative so we want to trim the waveform at the front
+            waveform = torch.cat((waveform[-pad:], pad_right), dim=0)
 
     sizes = (m, window_size)
     return waveform.as_strided(sizes, strides)

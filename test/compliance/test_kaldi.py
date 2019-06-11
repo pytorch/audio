@@ -41,7 +41,6 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
 
 class Test_Kaldi(unittest.TestCase):
     def _test_get_strided_helper(self, num_samples, window_size, window_shift, snip_edges):
-        print(num_samples, window_size, window_shift, snip_edges)
         waveform = torch.arange(num_samples).float()
         output = kaldi._get_strided(waveform, window_size, window_shift, snip_edges)
 
@@ -59,18 +58,15 @@ class Test_Kaldi(unittest.TestCase):
 
         for r in range(m):
             extract_window(window, waveform, r, window_size, window_shift, snip_edges)
-        # print(window)
-        # print(output)
         self.assertTrue(torch.allclose(window, output))
 
     def test_get_strided(self):
         # generate any combination where 0 < window_size <= num_samples and
         # 0 < window_shift.
-
         for num_samples in range(1, 20):
             for window_size in range(1, num_samples + 1):
                 for window_shift in range(1, 2 * num_samples + 1):
-                    for snip_edges in range(1, 2):
+                    for snip_edges in range(0, 2):
                         self._test_get_strided_helper(num_samples, window_size, window_shift, snip_edges)
 
 
