@@ -1,3 +1,5 @@
+import math
+import random
 import torch
 
 
@@ -54,6 +56,27 @@ def _get_strided(waveform, window_size, window_shift, snip_edges):
     return waveform.as_strided(sizes, strides)
 
 
+def _feature_window_function(window_type, window_size, blackman_coeff):
+    """ Returns a window function with the given type and size
+    """
+    if window_type == 'rectangular':
+        return torch.ones(window_size, dtype=torch.get_default_dtype())
+
+    a = 2 * math.pi / (window_size - 1)
+    window_function = torch.arange(window_size, dtype=torch.get_default_dtype())
+    if window_type == 'hanning':
+        return 0.5 - 0.5 * torch.cos(a * window_function)
+    elif window_type == 'hamming':
+        return 0.54 - 0.46 * torch.cos(a * window_function)
+    elif window_type == 'povey':
+        # like hamming but goes to zero at edges
+        return (0.5 - 0.5 * torch.cos(a * window_function)).pow(0.85)
+    elif window_type == 'blackman':
+        return blackman_coeff - 0.5 * torch.cos(a * window_function) + \
+            (0.5 - blackman_coeff) * torch.cos(2 * a * window_function)
+    else:
+        raise Exception('Invalid window type ' + window_type)
+
 def spectrogram(
         sig, allow_downsample=False, allow_upsample=False,
         blackman_coeff=0.42, channel=-1, dither=1.0, energy_floor=0.0, frame_length=25.0,
@@ -102,23 +125,67 @@ def spectrogram(
     Outputs:
         Tensor: a spectrogram identical to what Kaldi would output. The shape is (, `padded_window_size` // 2 + 1)
     """
-    epsilon = 1e-7
+    epsilon = float(1e-9)
+    int_max = float(1e9)
+
     waveform = sig[max(channel, 0), :]  # size (n)
     window_shift = int(sample_frequency * 0.001 * frame_shift)
     window_size = int(sample_frequency * 0.001 * frame_length)
     padded_window_size = _next_power_of_2(window_size) if round_to_power_of_two else window_size
+    log_energy_floor = int_max if energy_floor == 0.0 else math.log(energy_floor)
+    signal_log_energy = log_energy_floor
 
-    assert len(waveform) >= min_duration * sample_frequency, 'signal is too short'
-    assert window_size <= len(waveform), 'window size is too long. decrease window size'
+    if len(waveform) < min_duration * sample_frequency:
+        # signal is too short
+        return torch.empty(0)
+
+    assert 0 < window_size <= len(waveform), 'choose a window size that is 0 < window_size < len(waveform)'
+    assert 0 < window_shift, 'window shift must be greater than 0'
     assert padded_window_size % 2 == 0, 'the padded ' \
         'window size must be divisible by two. use `round_to_power_of_two` or change `frame_length`'
 
-    n_fft = padded_window_size
-    hop_length = window_shift
-    win_length = padded_window_size
-    return None
-    # window =
-    # normalized = False
-    # onesided = True
-    # waveform.stft(n_fft, hop_length, win_length, window, normalized, onesided)
-    # return sig
+    # size (m, window_size)
+    strided_input = _get_strided(waveform, window_size, window_shift, snip_edges)
+
+    if dither != 0.0:
+        # Returns a random number strictly between 0 and 1
+        x = torch.max(epsilon, torch.rand(strided_input.shape))
+        rand_gauss = torch.sqrt(-2 * x.log()) * cos(2 * math.pi * x)
+        strided_input += rand_gauss * dither
+
+    if remove_dc_offset:
+        # Subtract each row/frame by its mean
+        row_means = torch.mean(strided_input, dim=1).unsqueeze(1)  # size (m, 1)
+        strided_input -= row_means
+
+    if raw_energy:
+        # Compute the log energy of each row/frame before applying preemphasis and
+        # window function
+        log_energy_pre_window = math.log(max(strided_input.pow(2).sum(1), epsilon))
+        signal_log_energy = min(signal_log_energy, log_energy_pre_window)
+
+    if preemphasis_coefficient != 0.0:
+        pass
+
+    # Apply window_function to each row/frame
+    window_function = _feature_window_function(
+        window_type, window_size, blackman_coeff).unsqueeze(0)  # size (1, window_size)
+    strided_input *= window_function  # size (m, window_size)
+
+    # Pad columns with zero until we reach size (m, padded_window_size)
+    if padded_window_size != window_size:
+        strided_input = torch.nn.functional.pad(
+            strided_input, (0, padded_window_size - window_size), mode='constant', value=0)
+
+    # Compute energy after window function (not the raw one)
+    if not raw_energy:
+        log_energy_post_window = math.log(max(strided_input.pow(2).sum(1), epsilon))
+        signal_log_energy = min(signal_log_energy, log_energy_post_window)
+
+    # size (m, padded_window_size // 2 + 1, 2)
+    fft = torch.rfft(strided_input, 1, normalized=False, onesided=True)
+
+    # Convert the FFT into a power spectrum
+    power_spectrum = torch.max(fft.pow(2).sum(2), epsilon).log()  # size (m, padded_window_size // 2 + 1)
+    power_spectrum[0,:] =
+    return power_spectrum

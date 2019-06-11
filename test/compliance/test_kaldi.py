@@ -26,7 +26,7 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
     wave_start = start_sample - sample_offset
     wave_end = wave_start + frame_length
     if wave_start >= 0 and wave_end <= wave.size(0):
-        window[f,:] = wave[wave_start:(wave_start + frame_length)]
+        window[f, :] = wave[wave_start:(wave_start + frame_length)]
     else:
         wave_dim = wave.size(0)
         for s in range(frame_length):
