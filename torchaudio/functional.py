@@ -423,7 +423,7 @@ def stretch(tensor, factor, interpolate, ch_dim):
 
     # Select interpolation type
     if interpolate.lower() == 'linear':
-        ref1 = ref.int().float()
+        ref1 = ref.floor().float()
         ref2 = torch.clamp_max(ref1 + 1, tensor.size(1) - 1)
         r = (ref - ref1).type(type_orig)  # Ratio of sound[ref] to use
         stretched_sound = (tensor[:, ref1.long()] * (1 - r) +
