@@ -143,7 +143,6 @@ def spectrogram(
     window_shift = int(sample_frequency * 0.001 * frame_shift)
     window_size = int(sample_frequency * 0.001 * frame_length)
     padded_window_size = _next_power_of_2(window_size) if round_to_power_of_two else window_size
-    log_energy_floor = int_max if energy_floor == 0.0 else math.log(energy_floor)
 
     if len(waveform) < min_duration * sample_frequency:
         # signal is too short
@@ -160,7 +159,7 @@ def spectrogram(
     if dither != 0.0:
         # Returns a random number strictly between 0 and 1
         x = torch.max(epsilon, torch.rand(strided_input.shape))
-        rand_gauss = torch.sqrt(-2 * x.log()) * cos(2 * math.pi * x)
+        rand_gauss = torch.sqrt(-2 * x.log()) * torch.cos(2 * math.pi * x)
         strided_input += rand_gauss * dither
 
     if remove_dc_offset:
@@ -177,7 +176,7 @@ def spectrogram(
         # strided_input[i,j] -= preemphasis_coefficient * strided_input[i, max(0, j-1)] for all i,j
         offset_strided_input = torch.nn.functional.pad(
             strided_input.unsqueeze(0), (1, 0), mode='replicate').squeeze(0)  # size (m, window_size + 1)
-        strided_input -= preemphasis_coefficient * offset_strided_input[:, -1]
+        strided_input -= preemphasis_coefficient * offset_strided_input[:, :-1]
 
     # Apply window_function to each row/frame
     window_function = _feature_window_function(
@@ -199,5 +198,10 @@ def spectrogram(
 
     # Convert the FFT into a power spectrum
     power_spectrum = torch.max(fft.pow(2).sum(2), epsilon).log()  # size (m, padded_window_size // 2 + 1)
-    power_spectrum[0, :] = signal_log_energy
+    power_spectrum[:, 0] = signal_log_energy
+
+    if subtract_mean:
+        col_means = torch.mean(power_spectrum, dim=0).unsqueeze(0)  # size (1, padded_window_size // 2 + 1)
+        power_spectrum -= col_means
+
     return power_spectrum

@@ -171,7 +171,6 @@ def save_encinfo(filepath,
         src = src.transpose(1, 0)
     # save data to file
     src = src.contiguous()
-    print(src)
     _torch_sox.write_audio_file(filepath, src, signalinfo, encodinginfo, filetype)
 
 

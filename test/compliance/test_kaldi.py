@@ -1,5 +1,9 @@
-import torchaudio.compliance.kaldi as kaldi
+import math
+import os
+import test.common_utils
 import torch
+import torchaudio
+import torchaudio.compliance.kaldi as kaldi
 import unittest
 
 
@@ -40,6 +44,9 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
 
 
 class Test_Kaldi(unittest.TestCase):
+    test_dirpath, test_dir = test.common_utils.create_temp_assets_dir()
+    test_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file.wav')
+
     def _test_get_strided_helper(self, num_samples, window_size, window_shift, snip_edges):
         waveform = torch.arange(num_samples).float()
         output = kaldi._get_strided(waveform, window_size, window_shift, snip_edges)
@@ -61,6 +68,7 @@ class Test_Kaldi(unittest.TestCase):
         self.assertTrue(torch.allclose(window, output))
 
     def test_get_strided(self):
+        return
         # generate any combination where 0 < window_size <= num_samples and
         # 0 < window_shift.
         for num_samples in range(1, 20):
@@ -68,6 +76,57 @@ class Test_Kaldi(unittest.TestCase):
                 for window_shift in range(1, 2 * num_samples + 1):
                     for snip_edges in range(0, 2):
                         self._test_get_strided_helper(num_samples, window_size, window_shift, snip_edges)
+
+    def _create_data_set(self):
+        # used to generate the dataset to test on. this is not used in testing (offline procedure)
+        test_dirpath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        test_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file.wav')
+        sr = 16000
+        x = torch.arange(0, 4 * sr).float()
+        # between [-6,6]
+        y = torch.cos(2 * math.pi * x) + 3 * torch.sin(math.pi * x) + 2 * torch.cos(x)
+        # between [-2^30, 2^30]
+        y = (y / 6 * (1 << 30)).long()
+        # clear the last 16 bits because they aren't used anyways
+        y = ((y >> 16) << 16).float()
+        torchaudio.save(test_filepath, y, sr)
+        sound, sample_rate = torchaudio.load(test_filepath, normalization=False)
+        self.assertTrue(sample_rate == sr)
+        self.assertTrue(torch.allclose(y, sound))
+
+    def test_spectrogram(self):
+        sound, sample_rate = torchaudio.load(self.test_filepath, normalization=(1 << 16))
+        kaldi_output_dir = os.path.join(self.test_dirpath, 'assets', 'kaldi')
+
+        for f in os.listdir(kaldi_output_dir):
+            kaldi_output_path = os.path.join(kaldi_output_dir, f)
+            kaldi_output_dict = {k: v for k, v in torchaudio.kaldi_io.read_mat_ark(kaldi_output_path)}
+            assert len(kaldi_output_dict) == 1 and 'my_id' in kaldi_output_dict, 'invalid test kaldi ark file'
+            kaldi_output = kaldi_output_dict['my_id']
+
+            args = f.split('-')
+            args[-1] = os.path.splitext(args[-1])[0]
+            assert len(args) == 12, 'invalid test kaldi file name'
+
+            spec_output = kaldi.spectrogram(
+                sound,
+                blackman_coeff=float(args[0]),
+                dither=float(args[1]),
+                energy_floor=float(args[2]),
+                frame_length=float(args[3]),
+                frame_shift=float(args[4]),
+                preemphasis_coefficient=float(args[5]),
+                raw_energy=args[6] == 'true',
+                remove_dc_offset=args[7] == 'true',
+                round_to_power_of_two=args[8] == 'true',
+                snip_edges=args[9] == 'true',
+                subtract_mean=args[10] == 'true',
+                window_type=args[11])
+
+            mse = (spec_output - kaldi_output).sum()
+            print(mse)
+            self.assertTrue(spec_output.shape, kaldi_output.shape)
+            # self.assertTrue(torch.allclose(spec_output, kaldi_output))
 
 
 if __name__ == '__main__':
