@@ -127,7 +127,7 @@ class Test_Kaldi(unittest.TestCase):
 
             error = spec_output - kaldi_output
             mse = error.pow(2).sum() / spec_output.numel()
-            max_error = torch.max(error)
+            max_error = torch.max(error.abs())
             print(f)
             print('mse:', mse.item(), 'max_error:', max_error.item())
 
