@@ -82,7 +82,7 @@ class Test_Kaldi(unittest.TestCase):
         test_dirpath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
         test_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file.wav')
         sr = 16000
-        x = torch.arange(0, 4 * sr).float()
+        x = torch.arange(0, 10).float()
         # between [-6,6]
         y = torch.cos(2 * math.pi * x) + 3 * torch.sin(math.pi * x) + 2 * torch.cos(x)
         # between [-2^30, 2^30]
@@ -91,22 +91,24 @@ class Test_Kaldi(unittest.TestCase):
         y = ((y >> 16) << 16).float()
         torchaudio.save(test_filepath, y, sr)
         sound, sample_rate = torchaudio.load(test_filepath, normalization=False)
+        print(y >> 16)
         self.assertTrue(sample_rate == sr)
         self.assertTrue(torch.allclose(y, sound))
 
     def test_spectrogram(self):
         sound, sample_rate = torchaudio.load(self.test_filepath, normalization=(1 << 16))
         kaldi_output_dir = os.path.join(self.test_dirpath, 'assets', 'kaldi')
+        print('Results:')
 
         for f in os.listdir(kaldi_output_dir):
             kaldi_output_path = os.path.join(kaldi_output_dir, f)
             kaldi_output_dict = {k: v for k, v in torchaudio.kaldi_io.read_mat_ark(kaldi_output_path)}
-            assert len(kaldi_output_dict) == 1 and 'my_id' in kaldi_output_dict, 'invalid test kaldi ark file'
+            assert len(kaldi_output_dict) == 1 and 'my_id' in kaldi_output_dict, 'invalid test kaldi ark file: ' + f
             kaldi_output = kaldi_output_dict['my_id']
 
             args = f.split('-')
             args[-1] = os.path.splitext(args[-1])[0]
-            assert len(args) == 12, 'invalid test kaldi file name'
+            assert len(args) == 12, 'invalid test kaldi file name: ' + f
 
             spec_output = kaldi.spectrogram(
                 sound,
@@ -123,8 +125,10 @@ class Test_Kaldi(unittest.TestCase):
                 subtract_mean=args[10] == 'true',
                 window_type=args[11])
 
-            mse = (spec_output - kaldi_output).sum()
-            print(mse)
+            mse = (spec_output - kaldi_output).pow(2).sum()/spec_output.numel()
+            print(f, mse)
+            print('spec', spec_output)
+            print('kaldi', kaldi_output)
             self.assertTrue(spec_output.shape, kaldi_output.shape)
             # self.assertTrue(torch.allclose(spec_output, kaldi_output))
 

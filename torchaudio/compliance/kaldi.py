@@ -85,7 +85,7 @@ def _get_log_energy(strided_input, epsilon, energy_floor):
     if energy_floor == 0.0:
         return log_energy
     else:
-        return torch.min(log_energy,
+        return torch.max(log_energy,
                          torch.tensor(math.log(energy_floor), dtype=torch.get_default_dtype()))
 
 
@@ -123,7 +123,7 @@ def spectrogram(
             depends only on the frame_shift, and we reflect the data at the ends. (default = true)
         subtract_mean (bool): Subtract mean of each feature file [CMS]; not recommended to do
             it this way.  (default = False)
-        window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackmann') (default = 'povey')
+        window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (default = 'povey')
 
     Not used Inputs:
         allow_downsample (bool): If True, allow the input waveform to have a higher frequency than the specified
@@ -137,7 +137,7 @@ def spectrogram(
     Outputs:
         Tensor: a spectrogram identical to what Kaldi would output. The shape is (, `padded_window_size` // 2 + 1)
     """
-    epsilon = torch.tensor(1e-9, dtype=torch.get_default_dtype())
+    epsilon = torch.tensor(1e-11, dtype=torch.get_default_dtype())
 
     waveform = sig[max(channel, 0), :]  # size (n)
     window_shift = int(sample_frequency * 0.001 * frame_shift)
@@ -148,10 +148,11 @@ def spectrogram(
         # signal is too short
         return torch.empty(0)
 
-    assert 0 < window_size <= len(waveform), 'choose a window size that is 0 < window_size < len(waveform)'
-    assert 0 < window_shift, 'window shift must be greater than 0'
+    assert 2 <= window_size <= len(waveform), 'choose a window size that is 2 <= `window_size` <= len(waveform)'
+    assert 0 < window_shift, '`window_shift` must be greater than 0'
     assert padded_window_size % 2 == 0, 'the padded ' \
-        'window size must be divisible by two. use `round_to_power_of_two` or change `frame_length`'
+        '`window_size` must be divisible by two. use `round_to_power_of_two` or change `frame_length`'
+    assert 0. <= preemphasis_coefficient <= 1.0, '`preemphasis_coefficient` must be between [0,1]'
 
     # size (m, window_size)
     strided_input = _get_strided(waveform, window_size, window_shift, snip_edges)
@@ -176,7 +177,7 @@ def spectrogram(
         # strided_input[i,j] -= preemphasis_coefficient * strided_input[i, max(0, j-1)] for all i,j
         offset_strided_input = torch.nn.functional.pad(
             strided_input.unsqueeze(0), (1, 0), mode='replicate').squeeze(0)  # size (m, window_size + 1)
-        strided_input -= preemphasis_coefficient * offset_strided_input[:, :-1]
+        strided_input = strided_input - preemphasis_coefficient * offset_strided_input[:, :-1]
 
     # Apply window_function to each row/frame
     window_function = _feature_window_function(
