@@ -68,7 +68,6 @@ class Test_Kaldi(unittest.TestCase):
         self.assertTrue(torch.allclose(window, output))
 
     def test_get_strided(self):
-        return
         # generate any combination where 0 < window_size <= num_samples and
         # 0 < window_shift.
         for num_samples in range(1, 20):
