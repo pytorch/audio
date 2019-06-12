@@ -161,12 +161,12 @@ def spectrogram(
         # Returns a random number strictly between 0 and 1
         x = torch.max(epsilon, torch.rand(strided_input.shape))
         rand_gauss = torch.sqrt(-2 * x.log()) * torch.cos(2 * math.pi * x)
-        strided_input += rand_gauss * dither
+        strided_input = strided_input + rand_gauss * dither
 
     if remove_dc_offset:
         # Subtract each row/frame by its mean
         row_means = torch.mean(strided_input, dim=1).unsqueeze(1)  # size (m, 1)
-        strided_input -= row_means
+        strided_input = strided_input - row_means
 
     if raw_energy:
         # Compute the log energy of each row/frame before applying preemphasis and
@@ -182,7 +182,7 @@ def spectrogram(
     # Apply window_function to each row/frame
     window_function = _feature_window_function(
         window_type, window_size, blackman_coeff).unsqueeze(0)  # size (1, window_size)
-    strided_input *= window_function  # size (m, window_size)
+    strided_input = strided_input * window_function  # size (m, window_size)
 
     # Pad columns with zero until we reach size (m, padded_window_size)
     if padded_window_size != window_size:
@@ -203,6 +203,6 @@ def spectrogram(
 
     if subtract_mean:
         col_means = torch.mean(power_spectrum, dim=0).unsqueeze(0)  # size (1, padded_window_size // 2 + 1)
-        power_spectrum -= col_means
+        power_spectrum = power_spectrum - col_means
 
     return power_spectrum

@@ -125,12 +125,15 @@ class Test_Kaldi(unittest.TestCase):
                 subtract_mean=args[10] == 'true',
                 window_type=args[11])
 
-            mse = (spec_output - kaldi_output).pow(2).sum()/spec_output.numel()
-            print(f, mse)
-            print('spec', spec_output)
-            print('kaldi', kaldi_output)
+            error = spec_output - kaldi_output
+            mse = error.pow(2).sum() / spec_output.numel()
+            max_error = torch.max(error)
+            print(f)
+            print('mse:', mse.item(), 'max_error:', max_error.item())
+            # print('spec', spec_output)
+            # print('kaldi', kaldi_output)
             self.assertTrue(spec_output.shape, kaldi_output.shape)
-            # self.assertTrue(torch.allclose(spec_output, kaldi_output))
+            self.assertTrue(torch.allclose(spec_output, kaldi_output, atol=1e-4, rtol=0))
 
 
 if __name__ == '__main__':
