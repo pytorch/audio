@@ -130,8 +130,7 @@ class Test_Kaldi(unittest.TestCase):
             max_error = torch.max(error)
             print(f)
             print('mse:', mse.item(), 'max_error:', max_error.item())
-            # print('spec', spec_output)
-            # print('kaldi', kaldi_output)
+
             self.assertTrue(spec_output.shape, kaldi_output.shape)
             self.assertTrue(torch.allclose(spec_output, kaldi_output, atol=1e-4, rtol=0))
 
