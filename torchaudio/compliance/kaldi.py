@@ -149,7 +149,7 @@ def spectrogram(
         # signal is too short
         return torch.empty(0)
 
-    assert 2 <= window_size <= len(waveform), ('choose a window size %d that is [2, %d] ' % (window_size, len(waveform)))
+    assert 2 <= window_size <= len(waveform), ('choose a window size %d that is [2, %d]' % (window_size, len(waveform)))
     assert 0 < window_shift, '`window_shift` must be greater than 0'
     assert padded_window_size % 2 == 0, 'the padded ' \
         '`window_size` must be divisible by two. use `round_to_power_of_two` or change `frame_length`'
