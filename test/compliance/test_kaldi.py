@@ -81,7 +81,7 @@ class Test_Kaldi(unittest.TestCase):
         test_dirpath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
         test_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file.wav')
         sr = 16000
-        x = torch.arange(0, 10).float()
+        x = torch.arange(0, 20).float()
         # between [-6,6]
         y = torch.cos(2 * math.pi * x) + 3 * torch.sin(math.pi * x) + 2 * torch.cos(x)
         # between [-2^30, 2^30]
@@ -97,17 +97,20 @@ class Test_Kaldi(unittest.TestCase):
     def test_spectrogram(self):
         sound, sample_rate = torchaudio.load(self.test_filepath, normalization=(1 << 16))
         kaldi_output_dir = os.path.join(self.test_dirpath, 'assets', 'kaldi')
-        print('Results:')
+        files = os.listdir(kaldi_output_dir)
+        print('Results:', len(files))
 
-        for f in os.listdir(kaldi_output_dir):
+        for f in files:
+            print(f)
             kaldi_output_path = os.path.join(kaldi_output_dir, f)
             kaldi_output_dict = {k: v for k, v in torchaudio.kaldi_io.read_mat_ark(kaldi_output_path)}
-            assert len(kaldi_output_dict) == 1 and 'my_id' in kaldi_output_dict, 'invalid test kaldi ark file: ' + f
+
+            assert len(kaldi_output_dict) == 1 and 'my_id' in kaldi_output_dict, 'invalid test kaldi ark file'
             kaldi_output = kaldi_output_dict['my_id']
 
             args = f.split('-')
             args[-1] = os.path.splitext(args[-1])[0]
-            assert len(args) == 12, 'invalid test kaldi file name: ' + f
+            assert len(args) == 12, 'invalid test kaldi file name'
 
             spec_output = kaldi.spectrogram(
                 sound,
@@ -127,11 +130,10 @@ class Test_Kaldi(unittest.TestCase):
             error = spec_output - kaldi_output
             mse = error.pow(2).sum() / spec_output.numel()
             max_error = torch.max(error.abs())
-            print(f)
-            print('mse:', mse.item(), 'max_error:', max_error.item())
 
+            print('mse:', mse.item(), 'max_error:', max_error.item())
             self.assertTrue(spec_output.shape, kaldi_output.shape)
-            self.assertTrue(torch.allclose(spec_output, kaldi_output, atol=1e-4, rtol=0))
+            self.assertTrue(torch.allclose(spec_output, kaldi_output, atol=1e-3, rtol=0))
 
 
 if __name__ == '__main__':

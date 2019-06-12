@@ -137,7 +137,8 @@ def spectrogram(
     Outputs:
         Tensor: a spectrogram identical to what Kaldi would output. The shape is (, `padded_window_size` // 2 + 1)
     """
-    epsilon = torch.tensor(1e-11, dtype=torch.get_default_dtype())
+    # TODO figure out how numeric_limits<float>::epsilon() is implemented
+    epsilon = torch.tensor(1.19209e-07, dtype=torch.get_default_dtype())
 
     waveform = sig[max(channel, 0), :]  # size (n)
     window_shift = int(sample_frequency * 0.001 * frame_shift)
@@ -148,7 +149,7 @@ def spectrogram(
         # signal is too short
         return torch.empty(0)
 
-    assert 2 <= window_size <= len(waveform), 'choose a window size that is 2 <= `window_size` <= len(waveform)'
+    assert 2 <= window_size <= len(waveform), ('choose a window size %d that is [2, %d] ' % (window_size, len(waveform)))
     assert 0 < window_shift, '`window_shift` must be greater than 0'
     assert padded_window_size % 2 == 0, 'the padded ' \
         '`window_size` must be divisible by two. use `round_to_power_of_two` or change `frame_length`'
