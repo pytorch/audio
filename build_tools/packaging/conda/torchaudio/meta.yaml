@@ -1,0 +1,51 @@
+package:
+  name: torchaudio{{ environ.get('TORCHAUDIO_PACKAGE_SUFFIX') }}
+  version: "{{ environ.get('TORCHAUDIO_BUILD_VERSION') }}"
+
+source:
+  git_rev: v{{ environ.get('TORCHAUDIO_BUILD_VERSION') }}
+  git_url: https://github.com/pytorch/audio.git
+
+requirements:
+  build:
+    - {{ compiler('c') }} # [win]
+    - {{ compiler('cxx') }} # [win]
+
+  host:
+    - python
+    - setuptools
+    - pytorch{{ environ.get('TORCHAUDIO_PACKAGE_SUFFIX') }} >=1.1.0
+
+  run:
+    - python
+    - pytorch{{ environ.get('TORCHAUDIO_PACKAGE_SUFFIX') }} >=1.1.0
+    - librosa >=0.4.3
+    - scipy
+
+build:
+  number: {{ environ.get('TORCHAUDIO_BUILD_NUMBER') }}
+  string: py{{py}}_{{environ.get('TORCHAUDIO_BUILD_NUMBER')}}
+  script: python setup.py install --single-version-externally-managed --record=record.txt # [not win]
+
+test:
+  imports:
+    - torchaudio
+    - torchaudio.datasets
+    - torchaudio.kaldi_io
+    - torchaudio.legacy
+    - torchaudio.sox_effects
+    - torchaudio.transforms
+
+  source_files:
+    - test
+
+  requires:
+    - pytest
+    - librosa >=0.4.3
+    - scipy
+
+about:
+  home: https://github.com/pytorch/audio
+  license: BSD
+  license_file: LICENSE
+  summary: 'simple audio I/O for pytorch'
