@@ -95,7 +95,7 @@ class Test_Kaldi(unittest.TestCase):
         self.assertTrue(torch.allclose(y, sound))
 
     def test_spectrogram(self):
-        sound, sample_rate = torchaudio.load(self.test_filepath, normalization=(1 << 16))
+        sound, sample_rate = torchaudio.load_wav(self.test_filepath)
         kaldi_output_dir = os.path.join(self.test_dirpath, 'assets', 'kaldi')
         files = os.listdir(kaldi_output_dir)
         print('Results:', len(files))

@@ -92,6 +92,14 @@ def load(filepath,
     return out, sample_rate
 
 
+def load_wav(filepath, **kwargs):
+    """ Loads a wave file. It assumes that the wav file uses 16 bit per sample that needs normalization by shifting
+    the input right by 16 bits.
+    """
+    kwargs['normalization'] = 1 << 16
+    return load(filepath, **kwargs)
+
+
 def save(filepath, src, sample_rate, precision=16, channels_first=True):
     """Convenience function for `save_encinfo`.
 
