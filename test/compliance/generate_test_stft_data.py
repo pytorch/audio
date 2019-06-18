@@ -45,7 +45,7 @@ def run():
             'window_type': generate_rand_window_type()
         }
 
-        fn = '-'.join(list(inputs.values()))
+        fn = 'spec-' + ('-'.join(list(inputs.values())))
 
         arg = [
             EXE_PATH,

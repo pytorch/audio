@@ -97,7 +97,7 @@ class Test_Kaldi(unittest.TestCase):
     def test_spectrogram(self):
         sound, sample_rate = torchaudio.load_wav(self.test_filepath)
         kaldi_output_dir = os.path.join(self.test_dirpath, 'assets', 'kaldi')
-        files = os.listdir(kaldi_output_dir)
+        files = list(filter(lambda x: x.startswith('spec'), os.listdir(kaldi_output_dir)))
         print('Results:', len(files))
 
         for f in files:
@@ -110,22 +110,22 @@ class Test_Kaldi(unittest.TestCase):
 
             args = f.split('-')
             args[-1] = os.path.splitext(args[-1])[0]
-            assert len(args) == 12, 'invalid test kaldi file name'
+            assert len(args) == 13, 'invalid test kaldi file name'
 
             spec_output = kaldi.spectrogram(
                 sound,
-                blackman_coeff=float(args[0]),
-                dither=float(args[1]),
-                energy_floor=float(args[2]),
-                frame_length=float(args[3]),
-                frame_shift=float(args[4]),
-                preemphasis_coefficient=float(args[5]),
-                raw_energy=args[6] == 'true',
-                remove_dc_offset=args[7] == 'true',
-                round_to_power_of_two=args[8] == 'true',
-                snip_edges=args[9] == 'true',
-                subtract_mean=args[10] == 'true',
-                window_type=args[11])
+                blackman_coeff=float(args[1]),
+                dither=float(args[2]),
+                energy_floor=float(args[3]),
+                frame_length=float(args[4]),
+                frame_shift=float(args[5]),
+                preemphasis_coefficient=float(args[6]),
+                raw_energy=args[7] == 'true',
+                remove_dc_offset=args[8] == 'true',
+                round_to_power_of_two=args[9] == 'true',
+                snip_edges=args[10] == 'true',
+                subtract_mean=args[11] == 'true',
+                window_type=args[12])
 
             error = spec_output - kaldi_output
             mse = error.pow(2).sum() / spec_output.numel()
