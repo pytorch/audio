@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import platform
+import sys
 
 from setuptools import setup, find_packages
 from torch.utils.cpp_extension import BuildExtension, CppExtension
