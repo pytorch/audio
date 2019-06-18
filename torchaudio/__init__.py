@@ -4,7 +4,7 @@ import os.path
 import torch
 import _torch_sox
 
-from torchaudio import transforms, datasets, kaldi_io, sox_effects, legacy
+from torchaudio import transforms, datasets, kaldi_io, sox_effects, legacy, compliance
 
 
 def check_input(src):
@@ -90,6 +90,14 @@ def load(filepath,
     _audio_normalization(out, normalization)
 
     return out, sample_rate
+
+
+def load_wav(filepath, **kwargs):
+    """ Loads a wave file. It assumes that the wav file uses 16 bit per sample that needs normalization by shifting
+    the input right by 16 bits.
+    """
+    kwargs['normalization'] = 1 << 16
+    return load(filepath, **kwargs)
 
 
 def save(filepath, src, sample_rate, precision=16, channels_first=True):
