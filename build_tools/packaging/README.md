@@ -9,9 +9,7 @@ nvidia-docker run -it --ipc=host --rm -v $(pwd):/remote soumith/conda-cuda bash
 pushd remote/conda
 conda config --add channels pytorch
 conda config --add channels conda-forge
-yum -y install sox sox-devel llvm
-ln -s /usr/include/sox/sox.h /usr/include/sox.h
-./build_audio.sh cpu
+./build_audio.sh
 ```
 
 To install bz2,
@@ -33,7 +31,7 @@ cd packaging/conda
 conda install -y conda-build anaconda-client
 conda config --add channels pytorch
 conda config --add channels conda-forge
-./build_audio.sh cpu
+./build_audio.sh
 ```
 
 To install bz2,

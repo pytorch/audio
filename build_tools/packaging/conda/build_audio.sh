@@ -10,13 +10,6 @@ retry () {
     $*  || (sleep 1 && $*) || (sleep 2 && $*) || (sleep 4 && $*) || (sleep 8 && $*)
 }
 
-if [ "$#" -ne 1 ]; then
-    echo "Illegal number of parameters. Pass cuda version"
-    echo "CUDA version should be M.m with no dot, e.g. '8.0' or 'cpu'"
-    exit 1
-fi
-desired_cuda="$1"
-
 export TORCHAUDIO_BUILD_VERSION="0.2.0"
 export TORCHAUDIO_BUILD_NUMBER=1
 
@@ -62,26 +55,13 @@ fi
 ANACONDA_USER=pytorch
 conda config --set anaconda_upload no
 
+# "$desired_cuda" == 'cpu'
 export TORCHAUDIO_PACKAGE_SUFFIX=""
-if [[ "$desired_cuda" == 'cpu' ]]; then
-    export CONDA_CUDATOOLKIT_CONSTRAINT=""
-    export CUDA_VERSION="None"
-    if [[ "$OSTYPE" != "darwin"* ]]; then
-        export TORCHAUDIO_PACKAGE_SUFFIX="-cpu"
-    fi
+export CONDA_CUDATOOLKIT_CONSTRAINT=""
+export CUDA_VERSION="None"
+if [[ "$OSTYPE" != "darwin"* ]]; then
+    export TORCHAUDIO_PACKAGE_SUFFIX="-cpu"
 else
-    . ./switch_cuda_version.sh $desired_cuda
-    if [[ "$desired_cuda" == "10.0" ]]; then
-      export CONDA_CUDATOOLKIT_CONSTRAINT="    - cudatoolkit >=10.0,<10.1 # [not osx]"
-    elif [[ "$desired_cuda" == "9.0" ]]; then
-      export CONDA_CUDATOOLKIT_CONSTRAINT="    - cudatoolkit >=9.0,<9.1 # [not osx]"
-    else
-      echo "unhandled desired_cuda: $desired_cuda"
-      exit 1
-    fi
-fi
-
-if [[ "$OSTYPE" == "darwin"* ]]; then
   export MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++
 fi
 

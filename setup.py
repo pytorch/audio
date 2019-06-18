@@ -19,6 +19,11 @@ if DEBUG:
         eca += ['-O0', '-g']
         ela += ['-O0', '-g']
 
+# We want $PREFIX/include for conda (for sox.h)
+python_path = os.path.dirname(sys.executable)
+include_path = os.path.join(os.path.dirname(python_path), 'include')
+include_dirs = [include_path]
+
 setup(
     name="torchaudio",
     version="0.2",
@@ -47,6 +52,7 @@ setup(
             '_torch_sox',
             ['torchaudio/torch_sox.cpp'],
             libraries=['sox'],
+            include_dirs=include_dirs,
             extra_compile_args=eca,
             extra_link_args=ela),
     ],
