@@ -15,6 +15,10 @@ conda config --add channels conda-forge
 To install bz2,
 ```bash
 cd /opt/conda/conda-bld/linux-64/
+# install dependencies
+conda install pytorch-cpu=1.1.0
+conda install sox
+# install torchaudio
 conda install /opt/conda/conda-bld/linux-64/torchaudio-cpu-0.2.0-py27_1.tar.bz2
 ```
 
@@ -39,9 +43,13 @@ To install bz2,
 cd /Users/jamarshon/anaconda3/conda-bld/osx-64/
 # activate conda env (e.g
 conda info --envs
-conda activate /Users/jamarshon/minconda_wheel_env_tmp/envs/env3.5
+conda activate /Users/jamarshon/minconda_wheel_env_tmp/envs/env2.7
+# install dependencies
+conda install pytorch-cpu=1.1.0
+conda install sox
+# install torchaudio
 # and then try installing (e.g
-conda install /Users/jamarshon/anaconda3/conda-bld/osx-64/torchaudio-0.2.0-py35_1.tar.bz2
+conda install /Users/jamarshon/anaconda3/conda-bld/osx-64/torchaudio-0.2.0-py27_1.tar.bz2
 ```
 
 To upload bz2,
@@ -83,7 +91,7 @@ To install wheels,
 ```bash
 cd ~/torchaudio_wheels
 conda activate /Users/jamarshon/minconda_wheel_env_tmp/envs/env2.7
-/Users/jamarshon/minconda_wheel_env_tmp/envs/env2.7/bin/python -m pip install torchaudio-0.2-cp27-cp27m-macosx_10_6_x86_64.whl
+pip install torchaudio-0.2-cp27-cp27m-macosx_10_6_x86_64.whl
 ```
 
 To upload wheels,

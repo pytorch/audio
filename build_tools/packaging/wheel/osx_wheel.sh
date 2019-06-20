@@ -9,8 +9,7 @@ wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh &
     ./Miniconda3-latest-MacOSX-x86_64.sh -b -p ~/minconda_wheel_env_tmp && \
     rm Miniconda3-latest-MacOSX-x86_64.sh
 
- . ~/minconda_wheel_env_tmp/bin/activate
-
+. ~/minconda_wheel_env_tmp/bin/activate
 
 export TORCHAUDIO_BUILD_VERSION="0.2.0"
 export TORCHAUDIO_BUILD_NUMBER="1"
@@ -18,12 +17,19 @@ export OUT_DIR=~/torchaudio_wheels
 
 export MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++
 
-pushd /tmp
+# TODO remove when pytorch is good https://github.com/pytorch/pytorch/issues/20030
+brew install libomp
+CURR_PATH=$(pwd)
+
+cd /tmp
 rm -rf audio
 git clone https://github.com/pytorch/audio -b v${TORCHAUDIO_BUILD_VERSION}
-pushd audio
+mkdir audio/third_party
 
-brew install sox libomp
+export PREFIX="/tmp"
+. $CURR_PATH/build_from_source.sh
+
+cd /tmp/audio
 
 desired_pythons=( "2.7" "3.5" "3.6" "3.7" )
 # for each python
@@ -37,10 +43,8 @@ do
      # install torchaudio dependencies
     pip install -r requirements.txt
 
-    python setup.py clean
-    python setup.py bdist_wheel
+    IS_WHEEL=1 python setup.py clean
+    IS_WHEEL=1 python setup.py bdist_wheel
     mkdir -p $OUT_DIR
     cp dist/*.whl $OUT_DIR/
 done
-popd
-popd
