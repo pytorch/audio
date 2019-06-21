@@ -122,7 +122,7 @@ def _get_waveform_and_window_properties(sig, channel, sample_frequency, frame_sh
 
 def _get_window(waveform, padded_window_size, window_size, window_shift, window_type, blackman_coeff,
                 snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient):
-    """Gets a window and it's log energy
+    """Gets a window and its log energy
     """
     # size (m, window_size)
     strided_input = _get_strided(waveform, window_size, window_shift, snip_edges)
@@ -231,6 +231,53 @@ def spectrogram(
     return power_spectrum
 
 
+def inverse_mel_scale(mel_freq):
+    # type: (float) -> float
+    return 700.0 * (math.exp(mel_freq / 1127.0) - 1.0)
+
+
+def mel_scale(freq):
+    # type: (float) -> float
+    return 1127.0 * math.log(1.0 + freq / 700.0)
+
+
+def get_mel_banks(num_bins, window_length_padded, samp_freq,
+                  low_freq, high_freq, vtln_low, vtln_high, vtln_warp_factor):
+    # type: (int, int, float, float, float, float, float)
+    """
+    Outputs:
+        bins (Tensor): melbank of size (num_bins, num_fft_bins)
+        center_freqs (Tensor): center frequencies of bins of size (num_bins)
+    """
+    assert num_bins > 3, 'Must have at least 3 mel bins'
+    assert window_length_padded % 2 == 0
+    num_fft_bins = window_length_padded / 2
+    nyquist = 0.5 * sample_freq
+
+    if high_freq <= 0.0:
+        high_freq += nyquist
+
+    assert (0.0 <= low_freq < nyquist) and (0.0 < high_freq <= nyquist) and (low_freq < high_freq), \
+        ('Bad values in options: low-freq %f and high-freq %f vs. nyquist %f' % (low_freq, high_freq, nyquist))
+
+    # fft-bin width [think of it as Nyquist-freq / half-window-length]
+    fft_bin_width = sample_freq / window_length_padded
+    mel_low_freq = mel_scale(low_freq)
+    mel_high_freq = mel_scale(high_freq)
+
+    # divide by num_bins+1 in next line because of end-effects where the bins
+    # spread out to the sides.
+    mel_freq_delta = (mel_high_freq - mel_low_freq) / (num_bins + 1)
+
+    if vtln_high < 0.0:
+        vtln_high += nyquist
+
+    assert vtln_warp_factor == 1.0 or ((low_freq < vtln_low < high_freq) and
+                                       (0.0 < vtln_high < high_freq) and (vtln_low < vtln_high)), \
+        ('Bad values in options: vtln-low %f and vtln-high %f, versus low-freq %f and high-freq %f' %
+            (vtln_low, vtln_high, low_freq, high_freq))
+
+
 def fbank(
         sig, blackman_coeff=0.42, channel=-1, debug_mel=False, dither=1.0, energy_floor=0.0,
         frame_length=25.0, frame_shift=10.0, high_freq=0.0, htk_compat=False, low_freq=20.0,
@@ -281,7 +328,8 @@ def fbank(
         window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (default = 'povey')
 
     Outputs:
-        Tensor: a fbank identical to what Kaldi would output. The shape is ...
+        Tensor: a fbank identical to what Kaldi would output. The shape is (m, `num_mel_bins`)
+            where m is calculated in _get_strided
     """
     waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
         sig, channel, sample_frequency, frame_shift, frame_length, round_to_power_of_two, preemphasis_coefficient)
@@ -305,4 +353,7 @@ def fbank(
     # mel_energies = ()
     # power_spectrum = torch.max(, EPSILON).log()  # size (m, padded_window_size // 2 + 1)
 
+    # Copy energy as first value (or the last, if htk_compat == true).
+    if use_energy:
+        pass
     return torch.rand((2, 2))
