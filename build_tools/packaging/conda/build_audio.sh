@@ -15,17 +15,7 @@ export TORCHAUDIO_BUILD_NUMBER=1
 
 SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-if [[ -z "$WIN_PACKAGE_WORK_DIR" ]]; then
-    WIN_PACKAGE_WORK_DIR="$(echo $(pwd -W) | tr '/' '\\')\\tmp_conda_$(date +%H%M%S)"
-fi
-
-if [[ "$OSTYPE" == "msys" ]]; then
-    mkdir -p "$WIN_PACKAGE_WORK_DIR" || true
-    audio_rootdir="$(realpath ${WIN_PACKAGE_WORK_DIR})/torchaudio-src"
-    git config --system core.longpaths true
-else
-    audio_rootdir="$(pwd)/torchaudio-src"
-fi
+audio_rootdir="$(pwd)/torchaudio-src"
 
 if [[ ! -d "$audio_rootdir" ]]; then
     rm -rf "$audio_rootdir"
@@ -35,22 +25,7 @@ if [[ ! -d "$audio_rootdir" ]]; then
     popd
 fi
 
- cd "$SOURCE_DIR"
-
- if [[ "$OSTYPE" == "msys" ]]; then
-    export tmp_conda="${WIN_PACKAGE_WORK_DIR}\\conda"
-    export miniconda_exe="${WIN_PACKAGE_WORK_DIR}\\miniconda.exe"
-    rm -rf "$tmp_conda"
-    rm -f "$miniconda_exe"
-    curl -sSk https://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86_64.exe -o "$miniconda_exe"
-    "$SOURCE_DIR/install_conda.bat" && rm "$miniconda_exe"
-    pushd $tmp_conda
-    export PATH="$(pwd):$(pwd)/Library/usr/bin:$(pwd)/Library/bin:$(pwd)/Scripts:$(pwd)/bin:$PATH"
-    popd
-    # We have to skip 3.17 because of the following bug.
-    # https://github.com/conda/conda-build/issues/3285
-    retry conda install -yq conda-build
-fi
+cd "$SOURCE_DIR"
 
 ANACONDA_USER=pytorch
 conda config --set anaconda_upload no
@@ -65,12 +40,7 @@ else
   export MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++
 fi
 
-if [[ "$OSTYPE" == "msys" ]]; then
-    time conda build -c $ANACONDA_USER --no-anaconda-upload vs2017
-else
-    time conda build -c $ANACONDA_USER --no-anaconda-upload --python 2.7 torchaudio
-fi
-
+time conda build -c $ANACONDA_USER --no-anaconda-upload --python 2.7 torchaudio
 time conda build -c $ANACONDA_USER --no-anaconda-upload --python 3.5 torchaudio
 time conda build -c $ANACONDA_USER --no-anaconda-upload --python 3.6 torchaudio
 time conda build -c $ANACONDA_USER --no-anaconda-upload --python 3.7 torchaudio
