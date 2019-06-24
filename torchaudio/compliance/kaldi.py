@@ -312,7 +312,7 @@ def vtln_warp_freq(vtln_low_cutoff, vtln_high_cutoff, low_freq, high_freq,
     # slope of right part of the 3-piece linear function
     scale_right = (high_freq - Fh) / (high_freq - h)
 
-    res = torch.empty_like(freq.shape)
+    res = torch.empty_like(freq)
 
     outside_low_high_freq = torch.lt(freq, low_freq) | torch.gt(freq, high_freq)  # freq < low_freq || freq > high_freq
     before_l = torch.lt(freq, l)  # freq < l
@@ -345,7 +345,7 @@ def vtln_warp_mel_freq(vtln_low_cutoff, vtln_high_cutoff, low_freq, high_freq,
                                     vtln_warp_factor, inverse_mel_scale(mel_freq)))
 
 
-def get_mel_banks(num_bins, window_length_padded, samp_freq,
+def get_mel_banks(num_bins, window_length_padded, sample_freq,
                   low_freq, high_freq, vtln_low, vtln_high, vtln_warp_factor):
     # type: (int, int, float, float, float, float, float)
     """
@@ -405,7 +405,7 @@ def get_mel_banks(num_bins, window_length_padded, samp_freq,
 
 
 def fbank(
-        sig, blackman_coeff=0.42, channel=-1, debug_mel=False, dither=1.0, energy_floor=0.0,
+        sig, blackman_coeff=0.42, channel=-1, dither=1.0, energy_floor=0.0,
         frame_length=25.0, frame_shift=10.0, high_freq=0.0, htk_compat=False, low_freq=20.0,
         min_duration=0.0, num_mel_bins=23, preemphasis_coefficient=0.97, raw_energy=True,
         remove_dc_offset=True, round_to_power_of_two=True, sample_frequency=16000.0,
@@ -418,7 +418,6 @@ def fbank(
         sig (Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
         blackman_coeff (float): Constant coefficient for generalized Blackman window. (default = 0.42)
         channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (default = -1)
-        debug_mel (bool): Print out debugging information for mel bin computation (default = False)
         dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
             the energy_floor option, e.g. to 1.0 or 0.1 (default = 1.0)
         energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
@@ -477,8 +476,8 @@ def fbank(
         power_spectrum = power_spectrum.pow(0.5)
 
     # size (num_mel_bins, padded_window_size // 2)
-    mel_energies = get_mel_banks(num_mel_bins, padded_window_size, sample_frequency,
-                                 low_freq, high_freq, vtln_low, vtln_high, vtln_warp)
+    mel_energies, _ = get_mel_banks(num_mel_bins, padded_window_size, sample_frequency,
+                                    low_freq, high_freq, vtln_low, vtln_high, vtln_warp)
 
     # pad right column with zeros and add dimension, size (1, num_mel_bins, padded_window_size // 2 + 1)
     mel_energies = torch.nn.functional.pad(mel_energies, (0, 1), mode='constant', value=0).unsqueeze(0)
