@@ -5,6 +5,11 @@ import torch
 
 __all__ = [
     'fbank',
+    'get_mel_banks',
+    'inverse_mel_scale',
+    'inverse_mel_scale_scalar',
+    'mel_scale',
+    'mel_scale_scalar',
     'spectrogram'
 ]
 
@@ -123,6 +128,9 @@ def _get_waveform_and_window_properties(sig, channel, sample_frequency, frame_sh
 def _get_window(waveform, padded_window_size, window_size, window_shift, window_type, blackman_coeff,
                 snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient):
     """Gets a window and its log energy
+    Outputs:
+        strided_input (Tensor): size (m, padded_window_size)
+        signal_log_energy (Tensor): size (m)
     """
     # size (m, window_size)
     strided_input = _get_strided(waveform, window_size, window_shift, snip_edges)
@@ -231,14 +239,22 @@ def spectrogram(
     return power_spectrum
 
 
-def inverse_mel_scale(mel_freq):
+def inverse_mel_scale_scalar(mel_freq):
     # type: (float) -> float
     return 700.0 * (math.exp(mel_freq / 1127.0) - 1.0)
 
 
-def mel_scale(freq):
+def inverse_mel_scale(mel_freq):
+    return 700.0 * ((mel_freq / 1127.0) - 1.0).exp()
+
+
+def mel_scale_scalar(freq):
     # type: (float) -> float
     return 1127.0 * math.log(1.0 + freq / 700.0)
+
+
+def mel_scale(freq):
+    return 1127.0 * (1.0 + freq / 700.0).log()
 
 
 def get_mel_banks(num_bins, window_length_padded, samp_freq,
@@ -262,8 +278,8 @@ def get_mel_banks(num_bins, window_length_padded, samp_freq,
 
     # fft-bin width [think of it as Nyquist-freq / half-window-length]
     fft_bin_width = sample_freq / window_length_padded
-    mel_low_freq = mel_scale(low_freq)
-    mel_high_freq = mel_scale(high_freq)
+    mel_low_freq = mel_scale_scalar(low_freq)
+    mel_high_freq = mel_scale_scalar(high_freq)
 
     # divide by num_bins+1 in next line because of end-effects where the bins
     # spread out to the sides.
@@ -276,6 +292,26 @@ def get_mel_banks(num_bins, window_length_padded, samp_freq,
                                        (0.0 < vtln_high < high_freq) and (vtln_low < vtln_high)), \
         ('Bad values in options: vtln-low %f and vtln-high %f, versus low-freq %f and high-freq %f' %
             (vtln_low, vtln_high, low_freq, high_freq))
+
+    bin = torch.arange(num_bins, dtype=torch.get_default_dtype()).unsqueeze(1)
+    left_mel = mel_low_freq + bin * mel_freq_delta  # size(num_bins, 1)
+    center_mel = mel_low_freq + (bin + 1.0) * mel_freq_delta  # size(num_bins, 1)
+    right_mel = mel_low_freq + (bin + 2.0) * mel_freq_delta  # size(num_bins, 1)
+
+    if vtln_warp_factor != 1.0:
+        pass
+
+    center_freqs = inverse_mel_scale(center_mel)  # size (num_bins)
+    # size(1, num_fft_bins)
+    mel = mel_scale(fft_bin_width * torch.arange(num_fft_bins, dtype=torch.get_default_dtype())).unsqueeze(0)
+
+    # size (num_bins, num_fft_bins)
+    up_slope = (mel - left_mel) / (center_mel - left_mel)
+    down_slope = (right_mel - mel) / (right_mel - center_mel)
+
+    bins = torch.max(torch.zeros(1), torch.min(up_slope, down_slope))
+
+    return bins, center_freqs
 
 
 def fbank(
@@ -328,7 +364,7 @@ def fbank(
         window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (default = 'povey')
 
     Outputs:
-        Tensor: a fbank identical to what Kaldi would output. The shape is (m, `num_mel_bins`)
+        Tensor: a fbank identical to what Kaldi would output. The shape is (m, `num_mel_bins` + `use_energy`)
             where m is calculated in _get_strided
     """
     waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
@@ -338,6 +374,7 @@ def fbank(
         # signal is too short
         return torch.empty(0)
 
+    # strided_input, size (m, padded_window_size) and signal_log_energy, size (m)
     strided_input, signal_log_energy = _get_window(
         waveform, padded_window_size, window_size, window_shift, window_type, blackman_coeff,
         snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient)
@@ -345,15 +382,30 @@ def fbank(
     # size (m, padded_window_size // 2 + 1, 2)
     fft = torch.rfft(strided_input, 1, normalized=False, onesided=True)
 
-    power_spectrum = fft.pow(2).sum(2)
+    power_spectrum = fft.pow(2).sum(2).unsqueeze(1)  # size (m, 1, padded_window_size // 2 + 1)
     if not use_power:
         power_spectrum = power_spectrum.pow(0.5)
 
-    mel_offset = 1 if use_energy and not htk_compat else 0
-    # mel_energies = ()
-    # power_spectrum = torch.max(, EPSILON).log()  # size (m, padded_window_size // 2 + 1)
+    # size (num_mel_bins, padded_window_size // 2)
+    mel_energies = get_mel_banks(num_mel_bins, padded_window_size, sample_frequency,
+                                 low_freq, high_freq, vtln_low, vtln_high, vtln_warp)
 
-    # Copy energy as first value (or the last, if htk_compat == true).
+    # pad right column with zeros and add dimension, size (1, num_mel_bins, padded_window_size // 2 + 1)
+    mel_energies = torch.nn.functional.pad(mel_energies, (0, 1), mode='constant', value=0).unsqueeze(0)
+
+    # sum with mel fiterbanks over the power spectrum, size (m, num_mel_bins)
+    mel_energies = (power_spectrum * mel_energies).sum(dim=2)
+    if use_log_fbank:
+        # avoid log of zero (which should be prevented anyway by dithering)
+        mel_energies = torch.max(mel_energies, EPSILON).log()
+
+    # if use_energy then add it as the first column for htk_compat == true else last column
     if use_energy:
-        pass
-    return torch.rand((2, 2))
+        signal_log_energy = signal_log_energy.unsqueeze(1)  # size (m, 1)
+        # returns size (m, num_mel_bins + 1)
+        if htk_compat:
+            mel_energies = torch.cat((mel_energies, signal_log_energy), dim=1)
+        else:
+            mel_energies = torch.cat((signal_log_energy, mel_energies), dim=1)
+
+    return mel_energies
