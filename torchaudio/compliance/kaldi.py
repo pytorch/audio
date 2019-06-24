@@ -10,7 +10,9 @@ __all__ = [
     'inverse_mel_scale_scalar',
     'mel_scale',
     'mel_scale_scalar',
-    'spectrogram'
+    'spectrogram',
+    'vtln_warp_freq',
+    'vtln_warp_mel_freq',
 ]
 
 # numeric_limits<float>::epsilon() 1.1920928955078125e-07
@@ -257,6 +259,92 @@ def mel_scale(freq):
     return 1127.0 * (1.0 + freq / 700.0).log()
 
 
+def vtln_warp_freq(vtln_low_cutoff, vtln_high_cutoff, low_freq, high_freq,
+                   vtln_warp_factor, freq):
+    """
+    This computes a VTLN warping function that is not the same as HTK's one,
+    but has similar inputs (this function has the advantage of never producing
+    empty bins).
+
+    This function computes a warp function F(freq), defined between low_freq
+    and high_freq inclusive, with the following properties:
+        F(low_freq) == low_freq
+        F(high_freq) == high_freq
+    The function is continuous and piecewise linear with two inflection
+        points.
+    The lower inflection point (measured in terms of the unwarped
+        frequency) is at frequency l, determined as described below.
+    The higher inflection point is at a frequency h, determined as
+        described below.
+    If l <= f <= h, then F(f) = f/vtln_warp_factor.
+    If the higher inflection point (measured in terms of the unwarped
+        frequency) is at h, then max(h, F(h)) == vtln_high_cutoff.
+        Since (by the last point) F(h) == h/vtln_warp_factor, then
+        max(h, h/vtln_warp_factor) == vtln_high_cutoff, so
+        h = vtln_high_cutoff / max(1, 1/vtln_warp_factor).
+          = vtln_high_cutoff * min(1, vtln_warp_factor).
+    If the lower inflection point (measured in terms of the unwarped
+        frequency) is at l, then min(l, F(l)) == vtln_low_cutoff
+        This implies that l = vtln_low_cutoff / min(1, 1/vtln_warp_factor)
+                            = vtln_low_cutoff * max(1, vtln_warp_factor)
+    Inputs:
+        vtln_low_cutoff (float): lower frequency cutoffs for VTLN
+        vtln_high_cutoff (float): upper frequency cutoffs for VTLN
+        low_freq (float): lower frequency cutoffs in mel computation
+        high_freq (float): upper frequency cutoffs in mel computation
+        vtln_warp_factor (float): Vtln warp factor
+        freq (Tensor): given frequency in Hz
+    Outputs:
+        Tensor: freq after vtln warp
+    """
+    assert vtln_low_cutoff > low_freq, 'be sure to set the vtln_low option higher than low_freq'
+    assert vtln_high_cutoff < high_freq, 'be sure to set the vtln_high option lower than high_freq [or negative]'
+    l = vtln_low_cutoff * max(1.0, vtln_warp_factor)
+    h = vtln_high_cutoff * min(1.0, vtln_warp_factor)
+    scale = 1.0 / vtln_warp_factor
+    Fl = scale * l  # F(l)
+    Fh = scale * h  # F(h)
+    assert l > low_freq and h < high_freq
+    # slope of left part of the 3-piece linear function
+    scale_left = (Fl - low_freq) / (l - low_freq)
+    # [slope of center part is just "scale"]
+
+    # slope of right part of the 3-piece linear function
+    scale_right = (high_freq - Fh) / (high_freq - h)
+
+    res = torch.empty_like(freq.shape)
+
+    outside_low_high_freq = torch.lt(freq, low_freq) | torch.gt(freq, high_freq)  # freq < low_freq || freq > high_freq
+    before_l = torch.lt(freq, l)  # freq < l
+    before_h = torch.lt(freq, h)  # freq < h
+    after_h = torch.ge(freq, h)  # freq >= h
+
+    # order of operations matter here (since there is overlapping frequency regions)
+    res[after_h] = high_freq + scale_right * (freq[after_h] - high_freq)
+    res[before_h] = scale * freq[before_h]
+    res[before_l] = low_freq + scale_left * (freq[before_l] - low_freq)
+    res[outside_low_high_freq] = freq[outside_low_high_freq]
+
+    return res
+
+
+def vtln_warp_mel_freq(vtln_low_cutoff, vtln_high_cutoff, low_freq, high_freq,
+                       vtln_warp_factor, mel_freq):
+    """
+    Inputs:
+        vtln_low_cutoff (float): lower frequency cutoffs for VTLN
+        vtln_high_cutoff (float): upper frequency cutoffs for VTLN
+        low_freq (float): lower frequency cutoffs in mel computation
+        high_freq (float): upper frequency cutoffs in mel computation
+        vtln_warp_factor (float): Vtln warp factor
+        mel_freq (Tensor): given frequency in Mel
+    Outputs:
+        Tensor: mel_freq after vtln warp
+    """
+    return mel_scale(vtln_warp_freq(vtln_low_cutoff, vtln_high_cutoff, low_freq, high_freq,
+                                    vtln_warp_factor, inverse_mel_scale(mel_freq)))
+
+
 def get_mel_banks(num_bins, window_length_padded, samp_freq,
                   low_freq, high_freq, vtln_low, vtln_high, vtln_warp_factor):
     # type: (int, int, float, float, float, float, float)
@@ -299,7 +387,9 @@ def get_mel_banks(num_bins, window_length_padded, samp_freq,
     right_mel = mel_low_freq + (bin + 2.0) * mel_freq_delta  # size(num_bins, 1)
 
     if vtln_warp_factor != 1.0:
-        pass
+        left_mel = vtln_warp_mel_freq(vtln_low, vtln_high, low_freq, high_freq, vtln_warp_factor, left_mel)
+        center_mel = vtln_warp_mel_freq(vtln_low, vtln_high, low_freq, high_freq, vtln_warp_factor, center_mel)
+        right_mel = vtln_warp_mel_freq(vtln_low, vtln_high, low_freq, high_freq, vtln_warp_factor, right_mel)
 
     center_freqs = inverse_mel_scale(center_mel)  # size (num_bins)
     # size(1, num_fft_bins)
