@@ -498,4 +498,8 @@ def fbank(
         else:
             mel_energies = torch.cat((signal_log_energy, mel_energies), dim=1)
 
+    if subtract_mean:
+        col_means = torch.mean(mel_energies, dim=0).unsqueeze(0)  # size (1, num_mel_bins + use_energy)
+        mel_energies = mel_energies - col_means
+
     return mel_energies
