@@ -26,6 +26,7 @@ HANNING = 'hanning'
 POVEY = 'povey'
 RECTANGULAR = 'rectangular'
 BLACKMAN = 'blackman'
+WINDOWS = [HAMMING, HANNING, POVEY, RECTANGULAR, BLACKMAN]
 
 
 def _next_power_of_2(x):
@@ -247,7 +248,7 @@ def inverse_mel_scale_scalar(mel_freq):
 
 
 def inverse_mel_scale(mel_freq):
-    return 700.0 * ((mel_freq / 1127.0) - 1.0).exp()
+    return 700.0 * ((mel_freq / 1127.0).exp() - 1.0)
 
 
 def mel_scale_scalar(freq):
