@@ -151,10 +151,6 @@ class Test_Kaldi(unittest.TestCase):
             kaldi_output_path = os.path.join(self.kaldi_output_dir, f)
             kaldi_output_dict = {k: v for k, v in torchaudio.kaldi_io.read_mat_ark(kaldi_output_path)}
 
-            if not (len(kaldi_output_dict) == 1 and 'my_id' in kaldi_output_dict):
-                os.remove('/scratch/jamarshon/audio/test/assets/kaldi/' + f)
-                continue
-
             assert len(kaldi_output_dict) == 1 and 'my_id' in kaldi_output_dict, 'invalid test kaldi ark file'
             kaldi_output = kaldi_output_dict['my_id']
 
@@ -218,7 +214,7 @@ class Test_Kaldi(unittest.TestCase):
                 window_type=args[21])
             return output
 
-        self._compliance_test_helper('fbank', 19, 22, get_output_fn)
+        self._compliance_test_helper('fbank', 97, 22, get_output_fn)
 
 
 if __name__ == '__main__':
