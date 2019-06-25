@@ -77,7 +77,7 @@ class Test_Kaldi(unittest.TestCase):
             extract_window(window, waveform, r, window_size, window_shift, snip_edges)
         self.assertTrue(torch.allclose(window, output))
 
-    def a_test_get_strided(self):
+    def test_get_strided(self):
         # generate any combination where 0 < window_size <= num_samples and
         # 0 < window_shift.
         for num_samples in range(1, 20):
@@ -163,10 +163,10 @@ class Test_Kaldi(unittest.TestCase):
             output = get_output_fn(sound, args)
 
             self._print_diagnostic(output, kaldi_output)
-            # self.assertTrue(output.shape, kaldi_output.shape)
-            # self.assertTrue(torch.allclose(output, kaldi_output, atol=1e-3, rtol=0))
+            self.assertTrue(output.shape, kaldi_output.shape)
+            self.assertTrue(torch.allclose(output, kaldi_output, atol=1e-3, rtol=1e-1))
 
-    def a_test_spectrogram(self):
+    def test_spectrogram(self):
         def get_output_fn(sound, args):
             output = kaldi.spectrogram(
                 sound,

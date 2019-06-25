@@ -407,7 +407,7 @@ def get_mel_banks(num_bins, window_length_padded, sample_freq,
         # warping can move the order of left_mel, center_mel, right_mel anywhere
         bins = torch.zeros_like(up_slope)
         up_idx = torch.gt(mel, left_mel) & torch.le(mel, center_mel)  # left_mel < mel <= center_mel
-        down_idx = torch.gt(mel, center_mel) & torch.lt(mel, right_mel) # center_mel < mel < right_mel
+        down_idx = torch.gt(mel, center_mel) & torch.lt(mel, right_mel)  # center_mel < mel < right_mel
         bins[up_idx] = up_slope[up_idx]
         bins[down_idx] = down_slope[down_idx]
 
