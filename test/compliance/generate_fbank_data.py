@@ -43,7 +43,7 @@ def run():
             vtln_warp_factor = random.uniform(0.0, 10.0) if random.random() < 0.3 else 1.0
 
         except Exception:
-            pass
+            continue
 
         if not ((0.0 <= low_freq < nyquist) and (0.0 < high_freq <= nyquist) and (low_freq < high_freq)):
             continue
@@ -77,33 +77,10 @@ def run():
 
         fn = 'fbank-' + ('-'.join(list(inputs.values())))
         out_fn = OUTPUT_DIR + fn + '.ark'
-        arg = [
-            EXE_PATH,
-            '--blackman-coeff=' + inputs['blackman_coeff'],
-            '--dither=0.0',
-            '--energy-floor=' + inputs['energy_floor'],
-            '--frame-length=' + inputs['frame_length'],
-            '--frame-shift=' + inputs['frame_shift'],
-            '--high-freq=' + inputs['high_freq'],
-            '--htk-compat=' + inputs['htk_compat'],
-            '--low-freq=' + inputs['low_freq'],
-            '--num-mel-bins=' + inputs['num_mel_bins'],
-            '--preemphasis-coefficient=' + inputs['preemphasis_coefficient'],
-            '--raw-energy=' + inputs['raw_energy'],
-            '--remove-dc-offset=' + inputs['remove_dc_offset'],
-            '--round-to-power-of-two=' + inputs['round_to_power_of_two'],
-            '--snip-edges=' + inputs['snip_edges'],
-            '--subtract-mean=' + inputs['subtract_mean'],
-            '--use-energy=' + inputs['use_energy'],
-            '--use-log-fbank=' + inputs['use_log_fbank'],
-            '--use-power=' + inputs['use_power'],
-            '--vtln-high=' + inputs['vtln_high'],
-            '--vtln-low=' + inputs['vtln_low'],
-            '--vtln-warp=' + inputs['vtln_warp'],
-            '--window-type=' + inputs['window_type'],
-            SCP_PATH,
-            out_fn
-        ]
+
+        arg = [EXE_PATH]
+        arg += ['--' + k.replace('_', '-') + '=' + inputs[k] for k in inputs]
+        arg += ['--dither=0.0', SCP_PATH, out_fn]
 
         print(fn)
         print(inputs)
@@ -114,8 +91,6 @@ def run():
                 subprocess.call(arg)
             else:
                 subprocess.call(arg, stderr=open(os.devnull, 'wb'), stdout=open(os.devnull, 'wb'))
-            # kaldi_output_dict = {k: v for k, v in torchaudio.kaldi_io.read_mat_ark(out_fn)}
-            # print(kaldi_output_dict)
             print('success')
         except Exception:
             if os.path.exists(out_fn):
