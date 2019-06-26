@@ -18,6 +18,8 @@ WAV_LEN = 20
 # How many output files should be generated.
 NUMBER_OF_OUTPUTS = 100
 
+VERBOSE = False
+
 
 def generate_rand_boolean():
     # Generates a random boolean ('true', 'false')
