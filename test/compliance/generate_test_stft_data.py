@@ -1,4 +1,7 @@
+import os
 import random
+import subprocess
+import torchaudio
 
 # Path to the compute-spectrogram-feats executable.
 EXE_PATH = '/scratch/jamarshon/kaldi/src/featbin/compute-spectrogram-feats'
@@ -15,8 +18,6 @@ WAV_LEN = 20
 # How many output files should be generated.
 NUMBER_OF_OUTPUTS = 100
 
-WINDOWS = ['hamming', 'hanning', 'povey', 'rectangular', 'blackman']
-
 
 def generate_rand_boolean():
     # Generates a random boolean ('true', 'false')
@@ -25,7 +26,7 @@ def generate_rand_boolean():
 
 def generate_rand_window_type():
     # Generates a random window type
-    return WINDOWS[random.randint(0, len(WINDOWS) - 1)]
+    return torchaudio.compliance.kaldi.WINDOWS[random.randint(0, len(torchaudio.compliance.kaldi.WINDOWS) - 1)]
 
 
 def run():
@@ -47,33 +48,25 @@ def run():
 
         fn = 'spec-' + ('-'.join(list(inputs.values())))
 
-        arg = [
-            EXE_PATH,
-            '--blackman-coeff=' + inputs['blackman_coeff'],
-            '--dither=' + inputs['dither'],
-            '--energy-floor=' + inputs['energy_floor'],
-            '--frame-length=' + inputs['frame_length'],
-            '--frame-shift=' + inputs['frame_shift'],
-            '--preemphasis-coefficient=' + inputs['preemphasis_coefficient'],
-            '--raw-energy=' + inputs['raw_energy'],
-            '--remove-dc-offset=' + inputs['remove_dc_offset'],
-            '--round-to-power-of-two=' + inputs['round_to_power_of_two'],
-            '--sample-frequency=16000',
-            '--snip-edges=' + inputs['snip_edges'],
-            '--subtract-mean=' + inputs['subtract_mean'],
-            '--window-type=' + inputs['window_type'],
-            SCP_PATH,
-            OUTPUT_DIR + fn + '.ark'
-        ]
+        out_fn = OUTPUT_DIR + fn + '.ark'
+
+        arg = [EXE_PATH]
+        arg += ['--' + k.replace('_', '-') + '=' + inputs[k] for k in inputs]
+        arg += [SCP_PATH, out_fn]
 
         print(fn)
         print(inputs)
         print(' '.join(arg))
 
         try:
-            subprocess.call(arg)
+            if VERBOSE:
+                subprocess.call(arg)
+            else:
+                subprocess.call(arg, stderr=open(os.devnull, 'wb'), stdout=open(os.devnull, 'wb'))
+            print('success')
         except Exception:
-            pass
+            if os.path.exists(out_fn):
+                os.remove(out_fn)
 
 
 if __name__ == '__main__':
