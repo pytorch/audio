@@ -1,6 +1,7 @@
 import math
 import os
 import test.common_utils
+import test.compliance.utils
 import torch
 import torchaudio
 import torchaudio.compliance.kaldi as kaldi
@@ -104,19 +105,6 @@ class Test_Kaldi(unittest.TestCase):
         self.assertTrue(sample_rate == sr)
         self.assertTrue(torch.allclose(y, sound))
 
-    def _parse_arg(self, arg):
-        # converts an arg extracted from filepath to its corresponding python type
-        if arg == 'true':
-            return True
-        elif arg == 'false':
-            return False
-        elif arg in kaldi.WINDOWS or arg in self.test_filepaths:
-            return arg
-        elif '.' in arg:
-            return float(arg)
-        else:
-            return int(arg)
-
     def _print_diagnostic(self, output, expect_output):
         # given an output and expected output, it will print the absolute/relative errors (max and mean squared)
         abs_error = output - expect_output
@@ -158,7 +146,7 @@ class Test_Kaldi(unittest.TestCase):
             args = f.split('-')
             args[-1] = os.path.splitext(args[-1])[0]
             assert len(args) == expected_num_args, 'invalid test kaldi file name'
-            args = [self._parse_arg(arg) for arg in args]
+            args = [test.compliance.utils.parse(arg) for arg in args]
 
             output = get_output_fn(sound, args)
 
