@@ -4,11 +4,19 @@ import torch
 
 
 __all__ = [
-    'spectrogram'
+    'fbank',
+    'get_mel_banks',
+    'inverse_mel_scale',
+    'inverse_mel_scale_scalar',
+    'mel_scale',
+    'mel_scale_scalar',
+    'spectrogram',
+    'vtln_warp_freq',
+    'vtln_warp_mel_freq',
 ]
 
-# numeric_limits<float>::epsilon()
-EPSILON = torch.tensor(1.19209290e-07, dtype=torch.get_default_dtype())
+# numeric_limits<float>::epsilon() 1.1920928955078125e-07
+EPSILON = torch.tensor(torch.finfo(torch.float).eps, dtype=torch.get_default_dtype())
 # 1 milliseconds = 0.001 seconds
 MILLISECONDS_TO_SECONDS = 0.001
 
@@ -18,6 +26,7 @@ HANNING = 'hanning'
 POVEY = 'povey'
 RECTANGULAR = 'rectangular'
 BLACKMAN = 'blackman'
+WINDOWS = [HAMMING, HANNING, POVEY, RECTANGULAR, BLACKMAN]
 
 
 def _next_power_of_2(x):
@@ -101,43 +110,9 @@ def _get_log_energy(strided_input, epsilon, energy_floor):
                          torch.tensor(math.log(energy_floor), dtype=torch.get_default_dtype()))
 
 
-def spectrogram(
-        sig, blackman_coeff=0.42, channel=-1, dither=1.0, energy_floor=0.0,
-        frame_length=25.0, frame_shift=10.0, min_duration=0.0,
-        preemphasis_coefficient=0.97, raw_energy=True, remove_dc_offset=True,
-        round_to_power_of_two=True, sample_frequency=16000.0, snip_edges=True,
-        subtract_mean=False, window_type=POVEY):
-    """Create a spectrogram from a raw audio signal. This matches the input/output of Kaldi's
-    compute-spectrogram-feats.
-
-    Inputs:
-        sig (Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
-        blackman_coeff (float): Constant coefficient for generalized Blackman window. (default = 0.42)
-        channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (default = -1)
-        dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
-            the energy_floor option, e.g. to 1.0 or 0.1 (default = 1.0)
-        energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
-            this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
-            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (default = 0.0)
-        frame_length (float): Frame length in milliseconds (default = 25.0)
-        frame_shift (float): Frame shift in milliseconds (default = 10.0)
-        min_duration (float): Minimum duration of segments to process (in seconds). (default = 0.0)
-        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (default = 0.97)
-        raw_energy (bool): If True, compute energy before preemphasis and windowing (default = True)
-        remove_dc_offset: Subtract mean from waveform on each frame (default = True)
-        round_to_power_of_two (bool): If True, round window size to power of two by zero-padding input
-            to FFT. (default = True)
-        sample_frequency (float): Waveform data sample frequency (must match the waveform file, if
-            specified there) (default = 16000.0)
-        snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit
-            in the file, and the number of frames depends on the frame_length.  If False, the number of frames
-            depends only on the frame_shift, and we reflect the data at the ends. (default = true)
-        subtract_mean (bool): Subtract mean of each feature file [CMS]; not recommended to do
-            it this way.  (default = False)
-        window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (default = 'povey')
-
-    Outputs:
-        Tensor: a spectrogram identical to what Kaldi would output. The shape is (, `padded_window_size` // 2 + 1)
+def _get_waveform_and_window_properties(sig, channel, sample_frequency, frame_shift,
+                                        frame_length, round_to_power_of_two, preemphasis_coefficient):
+    """Gets the waveform and window properties
     """
     waveform = sig[max(channel, 0), :]  # size (n)
     window_shift = int(sample_frequency * frame_shift * MILLISECONDS_TO_SECONDS)
@@ -150,11 +125,16 @@ def spectrogram(
         '`window_size` must be divisible by two. use `round_to_power_of_two` or change `frame_length`'
     assert 0. <= preemphasis_coefficient <= 1.0, '`preemphasis_coefficient` must be between [0,1]'
     assert sample_frequency > 0, '`sample_frequency` must be greater than zero'
+    return waveform, window_shift, window_size, padded_window_size
 
-    if len(waveform) < min_duration * sample_frequency:
-        # signal is too short
-        return torch.empty(0)
 
+def _get_window(waveform, padded_window_size, window_size, window_shift, window_type, blackman_coeff,
+                snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient):
+    """Gets a window and its log energy
+    Outputs:
+        strided_input (Tensor): size (m, padded_window_size)
+        signal_log_energy (Tensor): size (m)
+    """
     # size (m, window_size)
     strided_input = _get_strided(waveform, window_size, window_shift, snip_edges)
 
@@ -195,6 +175,59 @@ def spectrogram(
     if not raw_energy:
         signal_log_energy = _get_log_energy(strided_input, EPSILON, energy_floor)  # size (m)
 
+    return strided_input, signal_log_energy
+
+
+def spectrogram(
+        sig, blackman_coeff=0.42, channel=-1, dither=1.0, energy_floor=0.0,
+        frame_length=25.0, frame_shift=10.0, min_duration=0.0,
+        preemphasis_coefficient=0.97, raw_energy=True, remove_dc_offset=True,
+        round_to_power_of_two=True, sample_frequency=16000.0, snip_edges=True,
+        subtract_mean=False, window_type=POVEY):
+    """Create a spectrogram from a raw audio signal. This matches the input/output of Kaldi's
+    compute-spectrogram-feats.
+
+    Inputs:
+        sig (Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
+        blackman_coeff (float): Constant coefficient for generalized Blackman window. (default = 0.42)
+        channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (default = -1)
+        dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
+            the energy_floor option, e.g. to 1.0 or 0.1 (default = 1.0)
+        energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
+            this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
+            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (default = 0.0)
+        frame_length (float): Frame length in milliseconds (default = 25.0)
+        frame_shift (float): Frame shift in milliseconds (default = 10.0)
+        min_duration (float): Minimum duration of segments to process (in seconds). (default = 0.0)
+        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (default = 0.97)
+        raw_energy (bool): If True, compute energy before preemphasis and windowing (default = True)
+        remove_dc_offset: Subtract mean from waveform on each frame (default = True)
+        round_to_power_of_two (bool): If True, round window size to power of two by zero-padding input
+            to FFT. (default = True)
+        sample_frequency (float): Waveform data sample frequency (must match the waveform file, if
+            specified there) (default = 16000.0)
+        snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit
+            in the file, and the number of frames depends on the frame_length.  If False, the number of frames
+            depends only on the frame_shift, and we reflect the data at the ends. (default = True)
+        subtract_mean (bool): Subtract mean of each feature file [CMS]; not recommended to do
+            it this way.  (default = False)
+        window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (default = 'povey')
+
+    Outputs:
+        Tensor: a spectrogram identical to what Kaldi would output. The shape is (m, `padded_window_size` // 2 + 1)
+            where m is calculated in _get_strided
+    """
+    waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
+        sig, channel, sample_frequency, frame_shift, frame_length, round_to_power_of_two, preemphasis_coefficient)
+
+    if len(waveform) < min_duration * sample_frequency:
+        # signal is too short
+        return torch.empty(0)
+
+    strided_input, signal_log_energy = _get_window(
+        waveform, padded_window_size, window_size, window_shift, window_type, blackman_coeff,
+        snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient)
+
     # size (m, padded_window_size // 2 + 1, 2)
     fft = torch.rfft(strided_input, 1, normalized=False, onesided=True)
 
@@ -207,3 +240,275 @@ def spectrogram(
         power_spectrum = power_spectrum - col_means
 
     return power_spectrum
+
+
+def inverse_mel_scale_scalar(mel_freq):
+    # type: (float) -> float
+    return 700.0 * (math.exp(mel_freq / 1127.0) - 1.0)
+
+
+def inverse_mel_scale(mel_freq):
+    return 700.0 * ((mel_freq / 1127.0).exp() - 1.0)
+
+
+def mel_scale_scalar(freq):
+    # type: (float) -> float
+    return 1127.0 * math.log(1.0 + freq / 700.0)
+
+
+def mel_scale(freq):
+    return 1127.0 * (1.0 + freq / 700.0).log()
+
+
+def vtln_warp_freq(vtln_low_cutoff, vtln_high_cutoff, low_freq, high_freq,
+                   vtln_warp_factor, freq):
+    """
+    This computes a VTLN warping function that is not the same as HTK's one,
+    but has similar inputs (this function has the advantage of never producing
+    empty bins).
+
+    This function computes a warp function F(freq), defined between low_freq
+    and high_freq inclusive, with the following properties:
+        F(low_freq) == low_freq
+        F(high_freq) == high_freq
+    The function is continuous and piecewise linear with two inflection
+        points.
+    The lower inflection point (measured in terms of the unwarped
+        frequency) is at frequency l, determined as described below.
+    The higher inflection point is at a frequency h, determined as
+        described below.
+    If l <= f <= h, then F(f) = f/vtln_warp_factor.
+    If the higher inflection point (measured in terms of the unwarped
+        frequency) is at h, then max(h, F(h)) == vtln_high_cutoff.
+        Since (by the last point) F(h) == h/vtln_warp_factor, then
+        max(h, h/vtln_warp_factor) == vtln_high_cutoff, so
+        h = vtln_high_cutoff / max(1, 1/vtln_warp_factor).
+          = vtln_high_cutoff * min(1, vtln_warp_factor).
+    If the lower inflection point (measured in terms of the unwarped
+        frequency) is at l, then min(l, F(l)) == vtln_low_cutoff
+        This implies that l = vtln_low_cutoff / min(1, 1/vtln_warp_factor)
+                            = vtln_low_cutoff * max(1, vtln_warp_factor)
+    Inputs:
+        vtln_low_cutoff (float): lower frequency cutoffs for VTLN
+        vtln_high_cutoff (float): upper frequency cutoffs for VTLN
+        low_freq (float): lower frequency cutoffs in mel computation
+        high_freq (float): upper frequency cutoffs in mel computation
+        vtln_warp_factor (float): Vtln warp factor
+        freq (Tensor): given frequency in Hz
+    Outputs:
+        Tensor: freq after vtln warp
+    """
+    assert vtln_low_cutoff > low_freq, 'be sure to set the vtln_low option higher than low_freq'
+    assert vtln_high_cutoff < high_freq, 'be sure to set the vtln_high option lower than high_freq [or negative]'
+    l = vtln_low_cutoff * max(1.0, vtln_warp_factor)
+    h = vtln_high_cutoff * min(1.0, vtln_warp_factor)
+    scale = 1.0 / vtln_warp_factor
+    Fl = scale * l  # F(l)
+    Fh = scale * h  # F(h)
+    assert l > low_freq and h < high_freq
+    # slope of left part of the 3-piece linear function
+    scale_left = (Fl - low_freq) / (l - low_freq)
+    # [slope of center part is just "scale"]
+
+    # slope of right part of the 3-piece linear function
+    scale_right = (high_freq - Fh) / (high_freq - h)
+
+    res = torch.empty_like(freq)
+
+    outside_low_high_freq = torch.lt(freq, low_freq) | torch.gt(freq, high_freq)  # freq < low_freq || freq > high_freq
+    before_l = torch.lt(freq, l)  # freq < l
+    before_h = torch.lt(freq, h)  # freq < h
+    after_h = torch.ge(freq, h)  # freq >= h
+
+    # order of operations matter here (since there is overlapping frequency regions)
+    res[after_h] = high_freq + scale_right * (freq[after_h] - high_freq)
+    res[before_h] = scale * freq[before_h]
+    res[before_l] = low_freq + scale_left * (freq[before_l] - low_freq)
+    res[outside_low_high_freq] = freq[outside_low_high_freq]
+
+    return res
+
+
+def vtln_warp_mel_freq(vtln_low_cutoff, vtln_high_cutoff, low_freq, high_freq,
+                       vtln_warp_factor, mel_freq):
+    """
+    Inputs:
+        vtln_low_cutoff (float): lower frequency cutoffs for VTLN
+        vtln_high_cutoff (float): upper frequency cutoffs for VTLN
+        low_freq (float): lower frequency cutoffs in mel computation
+        high_freq (float): upper frequency cutoffs in mel computation
+        vtln_warp_factor (float): Vtln warp factor
+        mel_freq (Tensor): given frequency in Mel
+    Outputs:
+        Tensor: mel_freq after vtln warp
+    """
+    return mel_scale(vtln_warp_freq(vtln_low_cutoff, vtln_high_cutoff, low_freq, high_freq,
+                                    vtln_warp_factor, inverse_mel_scale(mel_freq)))
+
+
+def get_mel_banks(num_bins, window_length_padded, sample_freq,
+                  low_freq, high_freq, vtln_low, vtln_high, vtln_warp_factor):
+    # type: (int, int, float, float, float, float, float)
+    """
+    Outputs:
+        bins (Tensor): melbank of size (num_bins, num_fft_bins)
+        center_freqs (Tensor): center frequencies of bins of size (num_bins)
+    """
+    assert num_bins > 3, 'Must have at least 3 mel bins'
+    assert window_length_padded % 2 == 0
+    num_fft_bins = window_length_padded / 2
+    nyquist = 0.5 * sample_freq
+
+    if high_freq <= 0.0:
+        high_freq += nyquist
+
+    assert (0.0 <= low_freq < nyquist) and (0.0 < high_freq <= nyquist) and (low_freq < high_freq), \
+        ('Bad values in options: low-freq %f and high-freq %f vs. nyquist %f' % (low_freq, high_freq, nyquist))
+
+    # fft-bin width [think of it as Nyquist-freq / half-window-length]
+    fft_bin_width = sample_freq / window_length_padded
+    mel_low_freq = mel_scale_scalar(low_freq)
+    mel_high_freq = mel_scale_scalar(high_freq)
+
+    # divide by num_bins+1 in next line because of end-effects where the bins
+    # spread out to the sides.
+    mel_freq_delta = (mel_high_freq - mel_low_freq) / (num_bins + 1)
+
+    if vtln_high < 0.0:
+        vtln_high += nyquist
+
+    assert vtln_warp_factor == 1.0 or ((low_freq < vtln_low < high_freq) and
+                                       (0.0 < vtln_high < high_freq) and (vtln_low < vtln_high)), \
+        ('Bad values in options: vtln-low %f and vtln-high %f, versus low-freq %f and high-freq %f' %
+            (vtln_low, vtln_high, low_freq, high_freq))
+
+    bin = torch.arange(num_bins, dtype=torch.get_default_dtype()).unsqueeze(1)
+    left_mel = mel_low_freq + bin * mel_freq_delta  # size(num_bins, 1)
+    center_mel = mel_low_freq + (bin + 1.0) * mel_freq_delta  # size(num_bins, 1)
+    right_mel = mel_low_freq + (bin + 2.0) * mel_freq_delta  # size(num_bins, 1)
+
+    if vtln_warp_factor != 1.0:
+        left_mel = vtln_warp_mel_freq(vtln_low, vtln_high, low_freq, high_freq, vtln_warp_factor, left_mel)
+        center_mel = vtln_warp_mel_freq(vtln_low, vtln_high, low_freq, high_freq, vtln_warp_factor, center_mel)
+        right_mel = vtln_warp_mel_freq(vtln_low, vtln_high, low_freq, high_freq, vtln_warp_factor, right_mel)
+
+    center_freqs = inverse_mel_scale(center_mel)  # size (num_bins)
+    # size(1, num_fft_bins)
+    mel = mel_scale(fft_bin_width * torch.arange(num_fft_bins, dtype=torch.get_default_dtype())).unsqueeze(0)
+
+    # size (num_bins, num_fft_bins)
+    up_slope = (mel - left_mel) / (center_mel - left_mel)
+    down_slope = (right_mel - mel) / (right_mel - center_mel)
+
+    if vtln_warp_factor == 1.0:
+        # left_mel < center_mel < right_mel so we can min the two slopes and clamp negative values
+        bins = torch.max(torch.zeros(1), torch.min(up_slope, down_slope))
+    else:
+        # warping can move the order of left_mel, center_mel, right_mel anywhere
+        bins = torch.zeros_like(up_slope)
+        up_idx = torch.gt(mel, left_mel) & torch.le(mel, center_mel)  # left_mel < mel <= center_mel
+        down_idx = torch.gt(mel, center_mel) & torch.lt(mel, right_mel)  # center_mel < mel < right_mel
+        bins[up_idx] = up_slope[up_idx]
+        bins[down_idx] = down_slope[down_idx]
+
+    return bins, center_freqs
+
+
+def fbank(
+        sig, blackman_coeff=0.42, channel=-1, dither=1.0, energy_floor=0.0,
+        frame_length=25.0, frame_shift=10.0, high_freq=0.0, htk_compat=False, low_freq=20.0,
+        min_duration=0.0, num_mel_bins=23, preemphasis_coefficient=0.97, raw_energy=True,
+        remove_dc_offset=True, round_to_power_of_two=True, sample_frequency=16000.0,
+        snip_edges=True, subtract_mean=False, use_energy=False, use_log_fbank=True, use_power=True,
+        vtln_high=-500.0, vtln_low=100.0, vtln_warp=1.0, window_type='povey'):
+    """Create a fbank from a raw audio signal. This matches the input/output of Kaldi's
+    compute-fbank-feats.
+
+    Inputs:
+        sig (Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
+        blackman_coeff (float): Constant coefficient for generalized Blackman window. (default = 0.42)
+        channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (default = -1)
+        dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
+            the energy_floor option, e.g. to 1.0 or 0.1 (default = 1.0)
+        energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
+            this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
+            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (default = 0.0)
+        frame_length (float): Frame length in milliseconds (default = 25.0)
+        frame_shift (float): Frame shift in milliseconds (default = 10.0)
+        high_freq (float): High cutoff frequency for mel bins (if <= 0, offset from Nyquist) (default = 0.0)
+        htk_compat (bool): If true, put energy last.  Warning: not sufficient to get HTK compatible features (need
+            to change other parameters). (default = False)
+        low_freq (float): Low cutoff frequency for mel bins (default = 20.0)
+        min_duration (float): Minimum duration of segments to process (in seconds). (default = 0.0)
+        num_mel_bins (int): Number of triangular mel-frequency bins (default = 23)
+        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (default = 0.97)
+        raw_energy (bool): If True, compute energy before preemphasis and windowing (default = True)
+        remove_dc_offset: Subtract mean from waveform on each frame (default = True)
+        round_to_power_of_two (bool): If True, round window size to power of two by zero-padding input
+            to FFT. (default = True)
+        sample_frequency (float): Waveform data sample frequency (must match the waveform file, if
+            specified there) (default = 16000.0)
+        snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit
+            in the file, and the number of frames depends on the frame_length.  If False, the number of frames
+            depends only on the frame_shift, and we reflect the data at the ends. (default = True)
+        subtract_mean (bool): Subtract mean of each feature file [CMS]; not recommended to do
+            it this way.  (default = False)
+        use_energy (bool): Add an extra dimension with energy to the FBANK output. (default = False)
+        use_log_fbank (bool):If true, produce log-filterbank, else produce linear. (default = True)
+        use_power (bool): If true, use power, else use magnitude. (default = True)
+        vtln_high (float): High inflection point in piecewise linear VTLN warping function (if
+            negative, offset from high-mel-freq (default = -500.0)
+        vtln_low (float): Low inflection point in piecewise linear VTLN warping function (float, default = 100.0)
+        vtln_warp (float): Vtln warp factor (only applicable if vtln_map not specified) (float, default = 1.0)
+        window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (default = 'povey')
+
+    Outputs:
+        Tensor: a fbank identical to what Kaldi would output. The shape is (m, `num_mel_bins` + `use_energy`)
+            where m is calculated in _get_strided
+    """
+    waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
+        sig, channel, sample_frequency, frame_shift, frame_length, round_to_power_of_two, preemphasis_coefficient)
+
+    if len(waveform) < min_duration * sample_frequency:
+        # signal is too short
+        return torch.empty(0)
+
+    # strided_input, size (m, padded_window_size) and signal_log_energy, size (m)
+    strided_input, signal_log_energy = _get_window(
+        waveform, padded_window_size, window_size, window_shift, window_type, blackman_coeff,
+        snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient)
+
+    # size (m, padded_window_size // 2 + 1, 2)
+    fft = torch.rfft(strided_input, 1, normalized=False, onesided=True)
+
+    power_spectrum = fft.pow(2).sum(2).unsqueeze(1)  # size (m, 1, padded_window_size // 2 + 1)
+    if not use_power:
+        power_spectrum = power_spectrum.pow(0.5)
+
+    # size (num_mel_bins, padded_window_size // 2)
+    mel_energies, _ = get_mel_banks(num_mel_bins, padded_window_size, sample_frequency,
+                                    low_freq, high_freq, vtln_low, vtln_high, vtln_warp)
+
+    # pad right column with zeros and add dimension, size (1, num_mel_bins, padded_window_size // 2 + 1)
+    mel_energies = torch.nn.functional.pad(mel_energies, (0, 1), mode='constant', value=0).unsqueeze(0)
+
+    # sum with mel fiterbanks over the power spectrum, size (m, num_mel_bins)
+    mel_energies = (power_spectrum * mel_energies).sum(dim=2)
+    if use_log_fbank:
+        # avoid log of zero (which should be prevented anyway by dithering)
+        mel_energies = torch.max(mel_energies, EPSILON).log()
+
+    # if use_energy then add it as the first column for htk_compat == true else last column
+    if use_energy:
+        signal_log_energy = signal_log_energy.unsqueeze(1)  # size (m, 1)
+        # returns size (m, num_mel_bins + 1)
+        if htk_compat:
+            mel_energies = torch.cat((mel_energies, signal_log_energy), dim=1)
+        else:
+            mel_energies = torch.cat((signal_log_energy, mel_energies), dim=1)
+
+    if subtract_mean:
+        col_means = torch.mean(mel_energies, dim=0).unsqueeze(0)  # size (1, num_mel_bins + use_energy)
+        mel_energies = mel_energies - col_means
+
+    return mel_energies

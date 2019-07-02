@@ -1,6 +1,7 @@
 import math
 import os
 import test.common_utils
+import test.compliance.utils
 import torch
 import torchaudio
 import torchaudio.compliance.kaldi as kaldi
@@ -46,6 +47,16 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
 class Test_Kaldi(unittest.TestCase):
     test_dirpath, test_dir = test.common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file.wav')
+    kaldi_output_dir = os.path.join(test_dirpath, 'assets', 'kaldi')
+    test_filepaths = {'spec': [], 'fbank': []}
+
+    # separating test files by their types (e.g 'spec', 'fbank', etc.)
+    for f in os.listdir(kaldi_output_dir):
+        dash_idx = f.find('-')
+        assert f.endswith('.ark') and dash_idx != -1
+        key = f[:dash_idx]
+        assert key in test_filepaths
+        test_filepaths[key].append(f)
 
     def _test_get_strided_helper(self, num_samples, window_size, window_shift, snip_edges):
         waveform = torch.arange(num_samples).float()
@@ -94,46 +105,104 @@ class Test_Kaldi(unittest.TestCase):
         self.assertTrue(sample_rate == sr)
         self.assertTrue(torch.allclose(y, sound))
 
-    def test_spectrogram(self):
+    def _print_diagnostic(self, output, expect_output):
+        # given an output and expected output, it will print the absolute/relative errors (max and mean squared)
+        abs_error = output - expect_output
+        abs_mse = abs_error.pow(2).sum() / output.numel()
+        abs_max_error = torch.max(abs_error.abs())
+
+        relative_error = abs_error / expect_output
+        relative_mse = relative_error.pow(2).sum() / output.numel()
+        relative_max_error = torch.max(relative_error.abs())
+
+        print('abs_mse:', abs_mse.item(), 'abs_max_error:', abs_max_error.item())
+        print('relative_mse:', relative_mse.item(), 'relative_max_error:', relative_max_error.item())
+
+    def _compliance_test_helper(self, filepath_key, expected_num_files, expected_num_args, get_output_fn):
+        """
+        Inputs:
+            filepath_key (str): A key to `test_filepaths` which matches which files to use
+            expected_num_files (int): The expected number of kaldi files to read
+            expected_num_args (int): The expected number of arguments used in a kaldi configuration
+            get_output_fn (Callable[[Tensor, List], Tensor]): A function that takes in a sound signal
+                and a configuration and returns an output
+        """
         sound, sample_rate = torchaudio.load_wav(self.test_filepath)
-        kaldi_output_dir = os.path.join(self.test_dirpath, 'assets', 'kaldi')
-        files = list(filter(lambda x: x.startswith('spec'), os.listdir(kaldi_output_dir)))
-        print('Results:', len(files))
+        files = self.test_filepaths[filepath_key]
+
+        assert len(files) == expected_num_files, ('number of kaldi %s file changed to %d' % (filepath_key, len(files)))
 
         for f in files:
             print(f)
-            kaldi_output_path = os.path.join(kaldi_output_dir, f)
+
+            # Read kaldi's output from file
+            kaldi_output_path = os.path.join(self.kaldi_output_dir, f)
             kaldi_output_dict = {k: v for k, v in torchaudio.kaldi_io.read_mat_ark(kaldi_output_path)}
 
             assert len(kaldi_output_dict) == 1 and 'my_id' in kaldi_output_dict, 'invalid test kaldi ark file'
             kaldi_output = kaldi_output_dict['my_id']
 
+            # Construct the same configuration used by kaldi
             args = f.split('-')
             args[-1] = os.path.splitext(args[-1])[0]
-            assert len(args) == 13, 'invalid test kaldi file name'
+            assert len(args) == expected_num_args, 'invalid test kaldi file name'
+            args = [test.compliance.utils.parse(arg) for arg in args]
 
-            spec_output = kaldi.spectrogram(
+            output = get_output_fn(sound, args)
+
+            self._print_diagnostic(output, kaldi_output)
+            self.assertTrue(output.shape, kaldi_output.shape)
+            self.assertTrue(torch.allclose(output, kaldi_output, atol=1e-3, rtol=1e-1))
+
+    def test_spectrogram(self):
+        def get_output_fn(sound, args):
+            output = kaldi.spectrogram(
                 sound,
-                blackman_coeff=float(args[1]),
-                dither=float(args[2]),
-                energy_floor=float(args[3]),
-                frame_length=float(args[4]),
-                frame_shift=float(args[5]),
-                preemphasis_coefficient=float(args[6]),
-                raw_energy=args[7] == 'true',
-                remove_dc_offset=args[8] == 'true',
-                round_to_power_of_two=args[9] == 'true',
-                snip_edges=args[10] == 'true',
-                subtract_mean=args[11] == 'true',
+                blackman_coeff=args[1],
+                dither=args[2],
+                energy_floor=args[3],
+                frame_length=args[4],
+                frame_shift=args[5],
+                preemphasis_coefficient=args[6],
+                raw_energy=args[7],
+                remove_dc_offset=args[8],
+                round_to_power_of_two=args[9],
+                snip_edges=args[10],
+                subtract_mean=args[11],
                 window_type=args[12])
+            return output
 
-            error = spec_output - kaldi_output
-            mse = error.pow(2).sum() / spec_output.numel()
-            max_error = torch.max(error.abs())
+        self._compliance_test_helper('spec', 131, 13, get_output_fn)
 
-            print('mse:', mse.item(), 'max_error:', max_error.item())
-            self.assertTrue(spec_output.shape, kaldi_output.shape)
-            self.assertTrue(torch.allclose(spec_output, kaldi_output, atol=1e-3, rtol=0))
+    def test_fbank(self):
+        def get_output_fn(sound, args):
+            output = kaldi.fbank(
+                sound,
+                blackman_coeff=args[1],
+                dither=0.0,
+                energy_floor=args[2],
+                frame_length=args[3],
+                frame_shift=args[4],
+                high_freq=args[5],
+                htk_compat=args[6],
+                low_freq=args[7],
+                num_mel_bins=args[8],
+                preemphasis_coefficient=args[9],
+                raw_energy=args[10],
+                remove_dc_offset=args[11],
+                round_to_power_of_two=args[12],
+                snip_edges=args[13],
+                subtract_mean=args[14],
+                use_energy=args[15],
+                use_log_fbank=args[16],
+                use_power=args[17],
+                vtln_high=args[18],
+                vtln_low=args[19],
+                vtln_warp=args[20],
+                window_type=args[21])
+            return output
+
+        self._compliance_test_helper('fbank', 97, 22, get_output_fn)
 
 
 if __name__ == '__main__':
