@@ -106,11 +106,41 @@ def _stft(input, n_fft, hop_length, win_length, window, center, pad_mode, normal
     return torch.stft(input, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided)
 
 
-def istft(stft_matrix, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided):
-    # type: (Tensor, int, Optional[int], Optional[int], Optional[Tensor], bool, str, bool, bool) -> Tensor
+def istft(stft_matrix,  # type: Tensor
+          n_fft,        # type: int
+          hop_length,   # type: Optional[int]
+          win_length,   # type: Optional[int]
+          window,       # type: Optional[Tensor]
+          center,       # type: bool
+          pad_mode,     # type: str
+          normalized,   # type: bool
+          onesided,     # type: bool
+          length        # type: Optional[int]
+          ):
+    # type: (...) -> Tensor
     r""" Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.
-    It has the same parameters and it should return the least squares estimation of the original signal.
-    The algorithm will check using the NOLA condition.
+    It has the same parameters (+ additional optional parameter of :attr:`length`) and it should return the
+    least squares estimation of the original signal. The algorithm will check using the NOLA condition (
+    nonzero overlap).
+
+    Important consideration in the parameters :attr:`window` and :attr:`center` so that the envelop
+    created by the summation of all the windows is never zero at certain point in time. Specifically,
+    :math:`\sum_{t=-\ infty}^{\ infty} w^2[n-t\times hop\_length] \neq 0`.
+
+    Since stft discards elements at the end of the signal if they do not fit in a frame, the
+    istft may return a shorter signal than the original signal (can occur if :attr:`center` is False
+    since the signal isn't padded).
+
+    If :attr:`center` is True, then there will be padding e.g. 'constant', 'reflect', etc. Left padding
+    can be trimmed off exactly because they can be calculated but right padding cannot be calculated
+    without additional information.
+
+    Example: Suppose the last window is:
+    [17, 18, 0, 0, 0] vs [18, 0, 0, 0, 0]
+    The n_frames, hop_length, win_length are all the same which prevents the calculation of right padding.
+
+    These additional values could be zeros or a reflection of the signal so providing :attr:`length`
+    could be useful. If :attr:`length` is None then padding will be aggressively removed (some loss of signal).
 
     [1] D. W. Griffin and J. S. Lim, “Signal estimation from modified short-time Fourier transform,”
     IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
@@ -127,6 +157,7 @@ def istft(stft_matrix, n_fft, hop_length, win_length, window, center, pad_mode, 
         pad_mode (str): controls the padding method used when :attr:`center` is ``True``
         normalized (bool): whether the STFT was normalized
         onesided (bool): whether the STFT is onesided
+        length (Optional[int]): the amount to trim the signal by (i.e. the original signal length)
 
     Outputs:
         Tensor: least squares estimation of the original signal of size (batch, signal_length)
@@ -154,7 +185,7 @@ def istft(stft_matrix, n_fft, hop_length, win_length, window, center, pad_mode, 
     if win_length != n_fft:
         # center window with pad left and right zeros
         left = (n_fft - win_length) // 2
-        window = torch.nn.pad(window, (left, n_fft - window_length - left))
+        window = torch.nn.functional.pad(window, (left, n_fft - win_length - left))
         assert window.size(0) == n_fft
     # win_length and n_fft are synonymous from here on
 
@@ -189,14 +220,13 @@ def istft(stft_matrix, n_fft, hop_length, win_length, window, center, pad_mode, 
     assert y.size(2) == expected_signal_len
     assert window_envelop.size(2) == expected_signal_len
 
-    if center:
-        # we need to trim the padding away
-        # since n_frames = 1 + (len + n_fft// 2 + n_fft//2 - n_fft) / hop_length
-        # we get expected_signal_len -= 2 * (n_fft // 2)
-        # and since the signal starts at (n_fft // 2) then the end must be -(n_fft // 2)
-        half_n_fft = n_fft // 2
-        y = y[:, :, half_n_fft:-half_n_fft]
-        window_envelop = window_envelop[:, :, half_n_fft:-half_n_fft]
+    half_n_fft = n_fft // 2
+    # we need to trim the front padding away if center
+    start = half_n_fft if center else 0
+    end = -half_n_fft if length is None else start + length
+
+    y = y[:, :, start:end]
+    window_envelop = window_envelop[:, :, start:end]
 
     # check NOLA non-zero overlap condition
     assert window_envelop.min() > 1e-11, ('window overlap add min: %f' % (window_envelop.min()))
