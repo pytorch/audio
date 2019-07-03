@@ -22,14 +22,9 @@ class TestFunctional(unittest.TestCase):
         estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
 
         # trim sound for case when constructed signal is shorter than original
-        # print(sound)
-        # print(estimate)
         sound = sound[:, :estimate.size(1)]
 
         self.assertTrue(sound.shape == estimate.shape, (sound.shape, estimate.shape))
-
-        # print((sound-estimate))
-        # print((sound-estimate).abs().max())
         self.assertTrue(torch.allclose(sound, estimate, atol=1e-4))
 
     def test_istft(self):
