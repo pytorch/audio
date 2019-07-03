@@ -1,11 +1,13 @@
 import argparse
+import logging
 import os
 import random
 import subprocess
 import utils
 
 
-def run(exe_path, scp_path, out_dir, wave_len, num_outputs, verbose):
+def run(exe_path, scp_path, out_dir, wave_len, num_outputs, remove_files, log_level):
+    logging.basicConfig(level=log_level)
     for i in range(num_outputs):
         inputs = {
             'blackman_coeff': '%.4f' % (random.random() * 5),
@@ -30,18 +32,18 @@ def run(exe_path, scp_path, out_dir, wave_len, num_outputs, verbose):
         arg += ['--' + k.replace('_', '-') + '=' + inputs[k] for k in inputs]
         arg += [scp_path, out_fn]
 
-        print(fn)
-        print(inputs)
-        print(' '.join(arg))
+        logging.info(fn)
+        logging.info(inputs)
+        logging.info(' '.join(arg))
 
         try:
-            if verbose:
+            if log_level == 'INFO':
                 subprocess.call(arg)
             else:
                 subprocess.call(arg, stderr=open(os.devnull, 'wb'), stdout=open(os.devnull, 'wb'))
-            print('success')
+            logging.info('success')
         except Exception:
-            if os.path.exists(out_fn):
+            if remove_files and os.path.exists(out_fn):
                 os.remove(out_fn)
 
 
@@ -63,7 +65,11 @@ if __name__ == '__main__':
     parser.add_argument('--wave_len', type=int, default=20,
                         help='The number of samples inside the input wave file read from `scp_path`')
     parser.add_argument('--num_outputs', type=int, default=100, help='How many output files should be generated.')
-    parser.add_argument('--verbose', type=bool, default=False, help='Whether to print information.')
+    parser.add_argument('--remove_files', type=bool, default=False,
+                        help='Whether to remove files generated from exception')
+    parser.add_argument('--log_level', type=str, default='WARNING',
+                        help='Log level (DEBUG|INFO|WARNING|ERROR|CRITICAL)')
 
     args = parser.parse_args()
-    run(args.exe_path, args.scp_path, args.out_dir, args.wave_len, args.num_outputs, args.verbose)
+    run(args.exe_path, args.scp_path, args.out_dir, args.wave_len, args.num_outputs,
+        args.remove_files, args.log_level)
