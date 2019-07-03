@@ -304,8 +304,10 @@ class Tester(unittest.TestCase):
         _test_librosa_consistency_helper(**kwargs2)
         _test_librosa_consistency_helper(**kwargs3)
 
+
 import pytest
 import numpy as np
+import torchaudio.functional as F
 xfail = pytest.mark.xfail
 
 
@@ -328,12 +330,12 @@ def test_stft(waveform, fft_length, hop_length, pad_mode):
     """
     pad = fft_length // 2
     window = torch.hann_window(fft_length)
-    complex_spec = transforms.stft(waveform,
-                                   fft_length=fft_length,
-                                   hop_length=hop_length,
-                                   window=window,
-                                   pad_mode=pad_mode)
-    mag_spec, phase_spec = magphase(complex_spec)
+    complex_spec = F.stft(waveform,
+                          fft_length=fft_length,
+                          hop_length=hop_length,
+                          window=window,
+                          pad_mode=pad_mode)
+    mag_spec, phase_spec = F.magphase(complex_spec)
 
     # == Test shape
     expected_size = list(waveform.size()[:-1])
@@ -380,7 +382,7 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
         complex_specgrams = complex_specgrams.type(torch.get_default_dtype())
 
         phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-3])[..., None]
-        complex_specgrams_stretch = transforms.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
+        complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
 
         # == Test shape
         expected_size = list(complex_specgrams.size())
@@ -413,7 +415,7 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
 @pytest.mark.parametrize('power', [1, 2, 0.7])
 def test_complex_norm(complex_tensor, power):
     expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
-    norm_tensor = transforms.complex_norm(complex_tensor, power)
+    norm_tensor = F.complex_norm(complex_tensor, power)
 
     assert test.common_utils._approx_all_equal(expected_norm_tensor, norm_tensor, atol=1e-5)
 

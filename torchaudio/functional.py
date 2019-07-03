@@ -397,6 +397,16 @@ def angle(complex_tensor):
     return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
 
 
+def magphase(complex_tensor, power=1.):
+    """
+    Separate a complex-valued spectrogram with shape (*,2)
+    into its magnitude and phase.
+    """
+    mag = complex_norm(complex_tensor, power)
+    phase = angle(complex_tensor)
+    return mag, phase
+
+
 def phase_vocoder(complex_specgrams, rate, phase_advance):
     """
     Phase vocoder. Given a STFT tensor, speed up in time
