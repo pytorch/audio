@@ -7,6 +7,7 @@ __all__ = [
     'pad_trim',
     'downmix_mono',
     'LC2CL',
+    'istft',
     'spectrogram',
     'create_fb_matrix',
     'spectrogram_to_DB',
@@ -103,6 +104,104 @@ def LC2CL(tensor):
 def _stft(input, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided):
     # type: (Tensor, int, Optional[int], Optional[int], Optional[Tensor], bool, str, bool, bool) -> Tensor
     return torch.stft(input, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided)
+
+
+def istft(stft_matrix, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided):
+    # type: (Tensor, int, Optional[int], Optional[int], Optional[Tensor], bool, str, bool, bool) -> Tensor
+    r""" Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.
+    It has the same parameters and it should return the least squares estimation of the original signal.
+
+    [1] D. W. Griffin and J. S. Lim, “Signal estimation from modified short-time Fourier transform,”
+    IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
+
+    Inputs:
+        stft_matrix (Tensor): output of stft where each row of a batch is a frequency and each column is
+            a window. it has a shape of (batch, fft_size, n_frames, 2)
+        n_fft (int): size of Fourier transform
+        hop_length (Optional[int]): the distance between neighboring sliding window frames
+        win_length (Optional[int]): the size of window frame and STFT filter
+        window (Optional[Tensor]): the optional window function
+        center (bool): whether :attr:`input` was padded on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`
+        pad_mode (str): controls the padding method used when :attr:`center` is ``True``
+        normalized (bool): whether the STFT was normalized
+        onesided (bool): whether the STFT is onesided
+
+    Outputs:
+        Tensor: least squares estimation of the original signal of size (batch, signal_length)
+    """
+    device = stft_matrix.device
+    fft_size = stft_matrix.size(1)
+    assert (onesided and n_fft // 2 + 1 == fft_size) or (not onesided and n_fft == fft_size)
+
+    # use stft defaults for Optionals
+    if win_length is None:
+        win_length = n_fft
+
+    if hop_length is None:
+        hop_length = int(win_length // 4)
+
+    # There must be overlap
+    assert 0 < hop_length <= win_length
+    assert 0 < win_length <= n_fft
+
+    if window is None:
+        window = torch.ones(win_length)
+
+    assert window.dim() == 1 and window.size(0) == win_length
+
+    if win_length != n_fft:
+        # center window with pad left and right zeros
+        left = (n_fft - win_length) // 2
+        window = torch.nn.pad(window, (left, n_fft - window_length - left))
+        assert window.size(0) == n_fft
+    # win_length and n_fft are synonymous from here on
+
+    # size (batch, n_frames, fft_size, 2)
+    stft_matrix = stft_matrix.transpose(1, 2)
+    # size (batch, n_frames, n_fft)
+    stft_matrix = torch.irfft(stft_matrix, 1, normalized, onesided, signal_sizes=(n_fft,))
+
+    assert stft_matrix.size(2) == n_fft
+    n_frames = stft_matrix.size(1)
+
+    # size (batch, n_frames, n_fft)
+    ytmp = stft_matrix * window.view(1, 1, n_fft)
+    # each column of a batch is a frame which needs to be overlap added at the right place
+    ytmp = ytmp.transpose(1, 2)  # size (batch, n_fft, n_frames)
+
+    # size (n_fft, 1, n_fft)
+    eye = torch.eye(n_fft, requires_grad=False, device=device).unsqueeze(1)
+
+    # this does overlap add where the frames of ytmp are added such that the i'th frame of
+    # ytmp is added starting at i*hop_length in the output
+    # size (batch, 1, expected_signal_len)
+    y = torch.nn.functional.conv_transpose1d(ytmp, eye, stride=hop_length, padding=0)
+
+    # do the same for the window function
+    # size (1, n_fft, n_frames)
+    window_sq = window.pow(2).view(n_fft, 1).repeat((1, n_frames)).unsqueeze(0)
+    # size (1, 1, expected_signal_len)
+    window_envelop = torch.nn.functional.conv_transpose1d(window_sq, eye, stride=hop_length, padding=0)
+
+    expected_signal_len = n_fft + hop_length * (n_frames - 1)
+    assert y.size(2) == expected_signal_len
+    assert window_envelop.size(2) == expected_signal_len
+
+    if center:
+        # we need to trim the padding away
+        # since n_frames = 1 + (len + n_fft// 2 + n_fft//2 - n_fft) / hop_length
+        # we get expected_signal_len -= 2 * (n_fft // 2)
+        # and since the signal starts at (n_fft // 2) then the end must be -(n_fft // 2)
+        half_n_fft = n_fft // 2
+        y = y[half_n_fft:-half_n_fft]
+        window_envelop = window_envelop[:, :, half_n_fft:-half_n_fft]
+
+    # check NOLA non-zero overlap condition
+    assert window_envelop.min() > 1e-11, ('window overlap add min: %f' % (window_envelop.min()))
+
+    # size (batch, expected_signal_len)
+    return (y / window_envelop).unsqueeze(1)
 
 
 @torch.jit.script
