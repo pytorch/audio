@@ -110,6 +110,7 @@ def istft(stft_matrix, n_fft, hop_length, win_length, window, center, pad_mode, 
     # type: (Tensor, int, Optional[int], Optional[int], Optional[Tensor], bool, str, bool, bool) -> Tensor
     r""" Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.
     It has the same parameters and it should return the least squares estimation of the original signal.
+    The algorithm will check using the NOLA condition.
 
     [1] D. W. Griffin and J. S. Lim, “Signal estimation from modified short-time Fourier transform,”
     IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
@@ -194,14 +195,14 @@ def istft(stft_matrix, n_fft, hop_length, win_length, window, center, pad_mode, 
         # we get expected_signal_len -= 2 * (n_fft // 2)
         # and since the signal starts at (n_fft // 2) then the end must be -(n_fft // 2)
         half_n_fft = n_fft // 2
-        y = y[half_n_fft:-half_n_fft]
+        y = y[:, :, half_n_fft:-half_n_fft]
         window_envelop = window_envelop[:, :, half_n_fft:-half_n_fft]
 
     # check NOLA non-zero overlap condition
     assert window_envelop.min() > 1e-11, ('window overlap add min: %f' % (window_envelop.min()))
 
     # size (batch, expected_signal_len)
-    return (y / window_envelop).unsqueeze(1)
+    return (y / window_envelop).squeeze(1)
 
 
 @torch.jit.script
