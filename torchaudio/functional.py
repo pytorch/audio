@@ -229,7 +229,8 @@ def istft(stft_matrix,  # type: Tensor
     window_envelop = window_envelop[:, :, start:end]
 
     # check NOLA non-zero overlap condition
-    assert window_envelop.min() > 1e-11, ('window overlap add min: %f' % (window_envelop.min()))
+    window_envelop_lowest = window_envelop.abs().min()
+    assert window_envelop_lowest > 1e-11, ('window overlap add min: %f' % (window_envelop_lowest))
 
     # size (batch, expected_signal_len)
     return (y / window_envelop).squeeze(1)
