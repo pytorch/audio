@@ -7,7 +7,7 @@ import test.common_utils
 
 
 class TestFunctional(unittest.TestCase):
-    data_sizes = (2,20)
+    data_sizes = (2, 20)
     number_of_trials = 10
 
     def _test_istft_helper(self, sound, kwargs):
