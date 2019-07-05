@@ -536,5 +536,16 @@ def resample_waveform(wave, orig_freq, new_freq):
     assert lowpass_cutoff * 2 <= min_freq
 
     base_freq = math.gcd(int(orig_freq), int(new_freq))
-    input_samples_in_unit_ = int(orig_freq) // base_freq
-    output_samples_in_unit_ = int(new_freq) // base_freq
+    input_samples_in_unit = int(orig_freq) // base_freq
+    output_samples_in_unit = int(new_freq) // base_freq
+
+    # LinearResample::SetIndexesAndWeights
+    window_width = lowpass_filter_width / (2.0 * lowpass_cutoff)
+
+    output_t = torch.range(0, output_samples_in_unit) / new_freq
+    min_t = output_t - window_width
+    max_t = output_t + window_width
+
+    min_input_index = torch.ceil(min_t * orig_freq)  # size(output_samples_in_unit)
+    max_input_index = torch.floor(max_t * orig_freq)  # size(output_samples_in_unit)
+    num_indices = max_input_index - min_input_index + 1  # size(output_samples_in_unit)
