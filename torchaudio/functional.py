@@ -106,16 +106,16 @@ def _stft(input, n_fft, hop_length, win_length, window, center, pad_mode, normal
     return torch.stft(input, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided)
 
 
-def istft(stft_matrix,  # type: Tensor
-          n_fft,        # type: int
-          hop_length,   # type: Optional[int]
-          win_length,   # type: Optional[int]
-          window,       # type: Optional[Tensor]
-          center,       # type: bool
-          pad_mode,     # type: str
-          normalized,   # type: bool
-          onesided,     # type: bool
-          length        # type: Optional[int]
+def istft(stft_matrix,          # type: Tensor
+          n_fft,                # type: int
+          hop_length=None,      # type: Optional[int]
+          win_length=None,      # type: Optional[int]
+          window=None,          # type: Optional[Tensor]
+          center=True,          # type: bool
+          pad_mode='reflect',   # type: str
+          normalized=False,     # type: bool
+          onesided=True,        # type: bool
+          length=None           # type: Optional[int]
           ):
     # type: (...) -> Tensor
     r""" Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.
@@ -147,7 +147,7 @@ def istft(stft_matrix,  # type: Tensor
 
     Inputs:
         stft_matrix (Tensor): output of stft where each row of a batch is a frequency and each column is
-            a window. it has a shape of (batch, fft_size, n_frames, 2)
+            a window. it has a shape of either (batch, fft_size, n_frames, 2) or (fft_size, n_frames, 2)
         n_fft (int): size of Fourier transform
         hop_length (Optional[int]): the distance between neighboring sliding window frames. (Default: win_length // 4)
         win_length (Optional[int]): the size of window frame and STFT filter. (Default: n_fft)
@@ -161,8 +161,15 @@ def istft(stft_matrix,  # type: Tensor
             original signal length). (Default: whole signal)
 
     Outputs:
-        Tensor: least squares estimation of the original signal of size (batch, signal_length)
+        Tensor: least squares estimation of the original signal of size (batch, signal_length) or (signal_length)
     """
+    stft_matrix_dim = stft_matrix.dim()
+    assert 3 <= stft_matrix_dim <= 4, ('Incorrect stft dimension: %d' % (stft_matrix_dim))
+
+    if stft_matrix_dim == 3:
+        # add a batch dimension
+        stft_matrix = stft_matrix.unsqueeze(0)
+
     device = stft_matrix.device
     fft_size = stft_matrix.size(1)
     assert (onesided and n_fft // 2 + 1 == fft_size) or (not onesided and n_fft == fft_size), (
@@ -236,7 +243,11 @@ def istft(stft_matrix,  # type: Tensor
     assert window_envelop_lowest > 1e-11, ('window overlap add min: %f' % (window_envelop_lowest))
 
     # size (batch, expected_signal_len)
-    return (y / window_envelop).squeeze(1)
+    y = (y / window_envelop).squeeze(1)
+
+    if stft_matrix_dim == 3:  # remove the batch dimension
+        y = y.squeeze(0)
+    return y
 
 
 @torch.jit.script

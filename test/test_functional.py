@@ -10,15 +10,18 @@ class TestFunctional(unittest.TestCase):
     data_sizes = (2, 20)
     number_of_trials = 10
 
+    def _compare_estimate(self, sound, estimate):
+        # trim sound for case when constructed signal is shorter than original
+        sound = sound[..., :estimate.size(-1)]
+
+        self.assertTrue(sound.shape == estimate.shape, (sound.shape, estimate.shape))
+        self.assertTrue(torch.allclose(sound, estimate, atol=1e-4))
+
     def _test_istft_helper(self, sound, kwargs):
         stft = torch.stft(sound, **kwargs)
         estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
 
-        # trim sound for case when constructed signal is shorter than original
-        sound = sound[:, :estimate.size(1)]
-
-        self.assertTrue(sound.shape == estimate.shape, (sound.shape, estimate.shape))
-        self.assertTrue(torch.allclose(sound, estimate, atol=1e-4))
+        self._compare_estimate(sound, estimate)
 
     def test_istft1(self):
         # hann_window, centered, normalized, onesided
@@ -106,6 +109,24 @@ class TestFunctional(unittest.TestCase):
         for i in range(self.number_of_trials):
             test_data = torch.rand(self.data_sizes)
             self._test_istft_helper(test_data, kwargs5)
+
+    def test_istft6(self):
+        # stft = torch.stft(torch.ones(4), 4)
+        stft = torch.tensor([
+            [[4., 0.], [4., 0.], [4., 0.], [4., 0.], [4., 0.]],
+            [[0., 0.], [0., 0.], [0., 0.], [0., 0.], [0., 0.]],
+            [[0., 0.], [0., 0.], [0., 0.], [0., 0.], [0., 0.]]
+        ])
+
+        estimate = torchaudio.functional.istft(stft, n_fft=4, length=4)
+        self._compare_estimate(torch.ones(4), estimate)
+
+    def test_istft7(self):
+        # stft = torch.stft(torch.zeros(4), 4)
+        stft = torch.zeros((3, 5, 2))
+
+        estimate = torchaudio.functional.istft(stft, n_fft=4, length=4)
+        self._compare_estimate(torch.zeros(4), estimate)
 
 
 if __name__ == '__main__':
