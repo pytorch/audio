@@ -512,3 +512,29 @@ def fbank(
         mel_energies = mel_energies - col_means
 
     return mel_energies
+
+
+def resample_waveform(wave, orig_freq, new_freq):
+    """Resamples the wave at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
+    which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
+    a signal).
+
+    Inputs:
+        wave (Tensor): the input signal
+        orig_freq (float): the original frequency of the signal
+        new_freq (float): the desired frequency
+
+    Outputs:
+        Tensor: the signal at the new frequency
+    """
+    assert orig_freq > 0.0 and new_freq > 0.0
+
+    min_freq = min(orig_freq, new_freq)
+    lowpass_cutoff = 0.99 * 0.5 * min_freq
+    lowpass_filter_width = 6
+
+    assert lowpass_cutoff * 2 <= min_freq
+
+    base_freq = math.gcd(int(orig_freq), int(new_freq))
+    input_samples_in_unit_ = int(orig_freq) // base_freq
+    output_samples_in_unit_ = int(new_freq) // base_freq
