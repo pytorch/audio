@@ -149,15 +149,16 @@ def istft(stft_matrix,  # type: Tensor
         stft_matrix (Tensor): output of stft where each row of a batch is a frequency and each column is
             a window. it has a shape of (batch, fft_size, n_frames, 2)
         n_fft (int): size of Fourier transform
-        hop_length (Optional[int]): the distance between neighboring sliding window frames
-        win_length (Optional[int]): the size of window frame and STFT filter
-        window (Optional[Tensor]): the optional window function
+        hop_length (Optional[int]): the distance between neighboring sliding window frames. (Default: win_length // 4)
+        win_length (Optional[int]): the size of window frame and STFT filter. (Default: n_fft)
+        window (Optional[Tensor]): the optional window function. (Default: torch.ones(win_length))
         center (bool): whether :attr:`input` was padded on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`
         pad_mode (str): controls the padding method used when :attr:`center` is ``True``
         normalized (bool): whether the STFT was normalized
         onesided (bool): whether the STFT is onesided
-        length (Optional[int]): the amount to trim the signal by (i.e. the original signal length)
+        length (Optional[int]): the amount to trim the signal by (i.e. the
+            original signal length). (Default: whole signal)
 
     Outputs:
         Tensor: least squares estimation of the original signal of size (batch, signal_length)
