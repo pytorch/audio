@@ -165,7 +165,9 @@ def istft(stft_matrix,  # type: Tensor
     """
     device = stft_matrix.device
     fft_size = stft_matrix.size(1)
-    assert (onesided and n_fft // 2 + 1 == fft_size) or (not onesided and n_fft == fft_size)
+    assert (onesided and n_fft // 2 + 1 == fft_size) or (not onesided and n_fft == fft_size), (
+        'one_sided implies that n_fft // 2 + 1 == fft_size and not one_sided implies n_fft == fft_size. '
+        + 'Given values were onesided: %s, n_fft: %d, fft_size: %d' % ('True' if onesided else False, n_fft, fft_size))
 
     # use stft defaults for Optionals
     if win_length is None:
