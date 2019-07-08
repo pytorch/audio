@@ -549,3 +549,9 @@ def resample_waveform(wave, orig_freq, new_freq):
     min_input_index = torch.ceil(min_t * orig_freq)  # size(output_samples_in_unit)
     max_input_index = torch.floor(max_t * orig_freq)  # size(output_samples_in_unit)
     num_indices = max_input_index - min_input_index + 1  # size(output_samples_in_unit)
+
+    max_weight_width = num_indices.max()
+    # create a group of weights of size (output_samples_in_unit, max_weight_width)
+    j = torch.arange(max_weight_width).unsqueeze(0)
+    input_index = min_input_index.unsqueeze(1) + j
+    delta_t = (input_index / samp_rate_in_) - output_t
