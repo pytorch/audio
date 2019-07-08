@@ -122,29 +122,22 @@ def istft(stft_matrix,          # type: Tensor
     It has the same parameters (+ additional optional parameter of :attr:`length`) and it should return the
     least squares estimation of the original signal. The algorithm will check using the NOLA condition (
     nonzero overlap).
-
     Important consideration in the parameters :attr:`window` and :attr:`center` so that the envelop
     created by the summation of all the windows is never zero at certain point in time. Specifically,
     :math:`\sum_{t=-\ infty}^{\ infty} w^2[n-t\times hop\_length] \neq 0`.
-
     Since stft discards elements at the end of the signal if they do not fit in a frame, the
     istft may return a shorter signal than the original signal (can occur if :attr:`center` is False
     since the signal isn't padded).
-
     If :attr:`center` is True, then there will be padding e.g. 'constant', 'reflect', etc. Left padding
     can be trimmed off exactly because they can be calculated but right padding cannot be calculated
     without additional information.
-
     Example: Suppose the last window is:
     [17, 18, 0, 0, 0] vs [18, 0, 0, 0, 0]
     The n_frames, hop_length, win_length are all the same which prevents the calculation of right padding.
-
     These additional values could be zeros or a reflection of the signal so providing :attr:`length`
     could be useful. If :attr:`length` is None then padding will be aggressively removed (some loss of signal).
-
     [1] D. W. Griffin and J. S. Lim, “Signal estimation from modified short-time Fourier transform,”
     IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
-
     Inputs:
         stft_matrix (Tensor): output of stft where each row of a batch is a frequency and each column is
             a window. it has a shape of either (batch, fft_size, n_frames, 2) or (fft_size, n_frames, 2)
@@ -159,7 +152,6 @@ def istft(stft_matrix,          # type: Tensor
         onesided (bool): whether the STFT is onesided
         length (Optional[int]): the amount to trim the signal by (i.e. the
             original signal length). (Default: whole signal)
-
     Outputs:
         Tensor: least squares estimation of the original signal of size (batch, signal_length) or (signal_length)
     """
@@ -199,10 +191,9 @@ def istft(stft_matrix,          # type: Tensor
         assert window.size(0) == n_fft
     # win_length and n_fft are synonymous from here on
 
-    # size (batch, n_frames, fft_size, 2)
-    stft_matrix = stft_matrix.transpose(1, 2)
-    # size (batch, n_frames, n_fft)
-    stft_matrix = torch.irfft(stft_matrix, 1, normalized, onesided, signal_sizes=(n_fft,))
+    stft_matrix = stft_matrix.transpose(1, 2)  # size (batch, n_frames, fft_size, 2)
+    stft_matrix = torch.irfft(stft_matrix, 1, normalized,
+                              onesided, signal_sizes=(n_fft,))  # size (batch, n_frames, n_fft)
 
     assert stft_matrix.size(2) == n_fft
     n_frames = stft_matrix.size(1)

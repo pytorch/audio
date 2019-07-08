@@ -1,3 +1,4 @@
+import math
 import os
 
 import torch
@@ -10,12 +11,12 @@ class TestFunctional(unittest.TestCase):
     data_sizes = (2, 20)
     number_of_trials = 100
 
-    def _compare_estimate(self, sound, estimate):
+    def _compare_estimate(self, sound, estimate, atol=1e-6):
         # trim sound for case when constructed signal is shorter than original
         sound = sound[..., :estimate.size(-1)]
 
         self.assertTrue(sound.shape == estimate.shape, (sound.shape, estimate.shape))
-        self.assertTrue(torch.allclose(sound, estimate, atol=1e-6))
+        self.assertTrue(torch.allclose(sound, estimate, atol=atol))
 
     def _test_istft_is_inverse_of_stft(self, kwargs):
         # generates a random sound signal for each tril and then does the stft/istft
@@ -147,6 +148,21 @@ class TestFunctional(unittest.TestCase):
         # throw an error.
         torchaudio.functional.istft(stft, **kwargs_ok)
         self.assertRaises(AssertionError, torchaudio.functional.istft, stft, **kwargs_not_ok)
+
+    def test_istft_of_sine(self):
+        # stft of 123*sin(2*pi/5*x) with the hop length and window size equaling the period of L = 5
+        x = torch.arange(10, dtype=torch.get_default_dtype())
+        L = 5
+        amplitude = 123
+        sound = amplitude * torch.sin(2 * math.pi / L * x)
+        # stft = torch.stft(sound, L, hop_length=L, win_length=L,
+        #                   window=torch.ones(L), center=False, normalized=False)
+        stft = torch.zeros((3, 2, 2))
+        stft[1, :, 1] = -(amplitude * L) / 2.0
+
+        estimate = torchaudio.functional.istft(stft, L, hop_length=L, win_length=L,
+                                               window=torch.ones(L), center=False, normalized=False)
+        self._compare_estimate(sound, estimate, atol=1e-4)
 
 
 if __name__ == '__main__':
