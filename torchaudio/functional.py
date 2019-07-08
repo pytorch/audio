@@ -198,13 +198,12 @@ def istft(stft_matrix,          # type: Tensor
     assert stft_matrix.size(2) == n_fft
     n_frames = stft_matrix.size(1)
 
-    # size (batch, n_frames, n_fft)
-    ytmp = stft_matrix * window.view(1, 1, n_fft)
+    ytmp = stft_matrix * window.view(1, 1, n_fft)  # size (batch, n_frames, n_fft)
     # each column of a batch is a frame which needs to be overlap added at the right place
     ytmp = ytmp.transpose(1, 2)  # size (batch, n_fft, n_frames)
 
-    # size (n_fft, 1, n_fft)
-    eye = torch.eye(n_fft, requires_grad=False, device=device).unsqueeze(1)
+    eye = torch.eye(n_fft, requires_grad=False,
+                    device=device).unsqueeze(1)  # size (n_fft, 1, n_fft)
 
     # this does overlap add where the frames of ytmp are added such that the i'th frame of
     # ytmp is added starting at i*hop_length in the output
