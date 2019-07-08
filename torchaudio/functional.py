@@ -207,14 +207,13 @@ def istft(stft_matrix,          # type: Tensor
 
     # this does overlap add where the frames of ytmp are added such that the i'th frame of
     # ytmp is added starting at i*hop_length in the output
-    # size (batch, 1, expected_signal_len)
-    y = torch.nn.functional.conv_transpose1d(ytmp, eye, stride=hop_length, padding=0)
+    y = torch.nn.functional.conv_transpose1d(
+        ytmp, eye, stride=hop_length, padding=0)  # size (batch, 1, expected_signal_len)
 
     # do the same for the window function
-    # size (1, n_fft, n_frames)
-    window_sq = window.pow(2).view(n_fft, 1).repeat((1, n_frames)).unsqueeze(0)
-    # size (1, 1, expected_signal_len)
-    window_envelop = torch.nn.functional.conv_transpose1d(window_sq, eye, stride=hop_length, padding=0)
+    window_sq = window.pow(2).view(n_fft, 1).repeat((1, n_frames)).unsqueeze(0)  # size (1, n_fft, n_frames)
+    window_envelop = torch.nn.functional.conv_transpose1d(
+        window_sq, eye, stride=hop_length, padding=0)  # size (1, 1, expected_signal_len)
 
     expected_signal_len = n_fft + hop_length * (n_frames - 1)
     assert y.size(2) == expected_signal_len
@@ -232,8 +231,7 @@ def istft(stft_matrix,          # type: Tensor
     window_envelop_lowest = window_envelop.abs().min()
     assert window_envelop_lowest > 1e-11, ('window overlap add min: %f' % (window_envelop_lowest))
 
-    # size (batch, expected_signal_len)
-    y = (y / window_envelop).squeeze(1)
+    y = (y / window_envelop).squeeze(1)  # size (batch, expected_signal_len)
 
     if stft_matrix_dim == 3:  # remove the batch dimension
         y = y.squeeze(0)
