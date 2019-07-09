@@ -1,5 +1,4 @@
 import math
-import os
 
 import torch
 import torchaudio
@@ -26,7 +25,7 @@ class TestFunctional(unittest.TestCase):
         # generates a random sound signal for each tril and then does the stft/istft
         # operation to check whether we can reconstruct signal
         for data_size in self.data_sizes:
-            for i in range(self.number_of_trials):
+            for _ in range(self.number_of_trials):
                 sound = torch.rand(data_size)
 
                 stft = torch.stft(sound, **kwargs)
