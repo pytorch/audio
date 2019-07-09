@@ -149,20 +149,28 @@ class TestFunctional(unittest.TestCase):
         torchaudio.functional.istft(stft, **kwargs_ok)
         self.assertRaises(AssertionError, torchaudio.functional.istft, stft, **kwargs_not_ok)
 
-    def test_istft_of_sine(self):
-        # stft of 123*sin(2*pi/5*x) with the hop length and window size equaling the period of L = 5
-        x = torch.arange(10, dtype=torch.get_default_dtype())
-        L = 5
-        amplitude = 123
+    def _test_istft_of_sine(self, amplitude, L, n):
+        # stft of amplitude*sin(2*pi/L*n*x) with the hop length and window size equaling L
+        x = torch.arange(2 * L, dtype=torch.get_default_dtype())
         sound = amplitude * torch.sin(2 * math.pi / L * x)
         # stft = torch.stft(sound, L, hop_length=L, win_length=L,
-        #                   window=torch.ones(L), center=False, normalized=False)
-        stft = torch.zeros((3, 2, 2))
+                          # window=torch.ones(L), center=False, normalized=False)
+        stft = torch.zeros((L // 2 + 1, 2, 2))
         stft[1, :, 1] = -(amplitude * L) / 2.0
 
         estimate = torchaudio.functional.istft(stft, L, hop_length=L, win_length=L,
                                                window=torch.ones(L), center=False, normalized=False)
         self._compare_estimate(sound, estimate, atol=1e-4)
+
+    def test_istft_of_sine(self):
+        self._test_istft_of_sine(amplitude=123, L=5, n=1)
+        self._test_istft_of_sine(amplitude=234, L=5, n=2)
+        self._test_istft_of_sine(amplitude=345, L=5, n=3)
+        self._test_istft_of_sine(amplitude=111, L=6, n=3)
+        self._test_istft_of_sine(amplitude=222, L=7, n=4)
+        self._test_istft_of_sine(amplitude=100, L=8, n=5)
+        self._test_istft_of_sine(amplitude=315, L=9, n=6)
+        self._test_istft_of_sine(amplitude=410, L=10, n=7)
 
 
 if __name__ == '__main__':
