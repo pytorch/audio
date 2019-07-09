@@ -8,7 +8,7 @@ import test.common_utils
 
 
 class TestFunctional(unittest.TestCase):
-    data_sizes = (2, 20)
+    data_sizes = [(2, 20), (3, 15)]
     number_of_trials = 100
 
     def setUp(self):
@@ -25,13 +25,14 @@ class TestFunctional(unittest.TestCase):
     def _test_istft_is_inverse_of_stft(self, kwargs):
         # generates a random sound signal for each tril and then does the stft/istft
         # operation to check whether we can reconstruct signal
-        for i in range(self.number_of_trials):
-            sound = torch.rand(self.data_sizes)
+        for data_size in self.data_sizes:
+            for i in range(self.number_of_trials):
+                sound = torch.rand(data_size)
 
-            stft = torch.stft(sound, **kwargs)
-            estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
+                stft = torch.stft(sound, **kwargs)
+                estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
 
-            self._compare_estimate(sound, estimate)
+                self._compare_estimate(sound, estimate)
 
     def test_istft_is_inverse_of_stft1(self):
         # hann_window, centered, normalized, onesided
