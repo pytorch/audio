@@ -37,9 +37,11 @@ then
              -O miniconda.sh
     fi
     chmod +x miniconda.sh && ./miniconda.sh -b -f
+    echo "jasonb"
     conda update --yes conda
     echo "Creating environment to run tests in."
     conda create -n testenv --yes python="$PYTHON_VERSION"
+    echo "jasonc"
 fi
 cd ..
 popd
@@ -47,6 +49,7 @@ popd
  # Activate the python environment we created.
 source activate testenv
 
+echo "jasona"
  # Install requirements via pip in our conda environment
 pip install -r requirements.txt
 
