@@ -9,10 +9,25 @@ import test.common_utils
 class TestFunctional(unittest.TestCase):
     data_sizes = [(2, 20), (3, 15)]
     number_of_trials = 100
+    stored_rand_data = []
+    fixed_precision = int(1e10)
 
     def setUp(self):
         # we want to make sure that the random values are reproducible
+        self.stored_rand_data.clear()
         torch.manual_seed(0)
+        for data_size in self.data_sizes:
+            rand_data1 = torch.randint(low=-self.fixed_precision, high=self.fixed_precision, size=data_size)
+            rand_data2 = torch.randint(low=-self.fixed_precision, high=self.fixed_precision, size=data_size)
+            self.stored_rand_data.append([rand_data1, rand_data2])
+
+    def _get_random_tensor(self, i):
+        # gets a random tensor of size data_sizes[i]. adds to previous tensors and then mods it.
+        rand_data = self.stored_rand_data[i]
+        rand_data3 = (rand_data[0] + rand_data[1]) % self.fixed_precision
+        rand_data.pop(0)
+        rand_data.append(rand_data3)
+        return rand_data3.float() / self.fixed_precision
 
     def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
         # trim sound for case when constructed signal is shorter than original
@@ -24,9 +39,9 @@ class TestFunctional(unittest.TestCase):
     def _test_istft_is_inverse_of_stft(self, kwargs):
         # generates a random sound signal for each tril and then does the stft/istft
         # operation to check whether we can reconstruct signal
-        for data_size in self.data_sizes:
+        for i in range(len(self.data_sizes)):
             for _ in range(self.number_of_trials):
-                sound = torch.rand(data_size)
+                sound = self._get_random_tensor(i)
 
                 stft = torch.stft(sound, **kwargs)
                 estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
@@ -170,6 +185,7 @@ class TestFunctional(unittest.TestCase):
 
         estimate = torchaudio.functional.istft(stft, L, hop_length=L, win_length=L,
                                                window=torch.ones(L), center=False, normalized=False)
+        # There is a larger error due to the scaling of amplitude
         self._compare_estimate(sound, estimate, atol=1e-3)
 
     def test_istft_of_sine(self):
