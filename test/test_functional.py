@@ -11,12 +11,12 @@ class TestFunctional(unittest.TestCase):
     data_sizes = (2, 20)
     number_of_trials = 100
 
-    def _compare_estimate(self, sound, estimate, atol=1e-6):
+    def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
         # trim sound for case when constructed signal is shorter than original
         sound = sound[..., :estimate.size(-1)]
 
         self.assertTrue(sound.shape == estimate.shape, (sound.shape, estimate.shape))
-        self.assertTrue(torch.allclose(sound, estimate, atol=atol))
+        self.assertTrue(torch.allclose(sound, estimate, atol=atol, rtol=rtol))
 
     def _test_istft_is_inverse_of_stft(self, kwargs):
         # generates a random sound signal for each tril and then does the stft/istft
@@ -152,25 +152,30 @@ class TestFunctional(unittest.TestCase):
     def _test_istft_of_sine(self, amplitude, L, n):
         # stft of amplitude*sin(2*pi/L*n*x) with the hop length and window size equaling L
         x = torch.arange(2 * L, dtype=torch.get_default_dtype())
-        sound = amplitude * torch.sin(2 * math.pi / L * x)
+        sound = amplitude * torch.sin(2 * math.pi / L * x * n)
         # stft = torch.stft(sound, L, hop_length=L, win_length=L,
         #                   window=torch.ones(L), center=False, normalized=False)
         stft = torch.zeros((L // 2 + 1, 2, 2))
-        stft[1, :, 1] = -(amplitude * L) / 2.0
+        stft_largest_val = (amplitude * L) / 2.0
+        if n < stft.size(0):
+            stft[n, :, 1] = -stft_largest_val
+
+        if 0 <= L - n < stft.size(0):
+            # symmetric about L // 2
+            stft[L - n, :, 1] = stft_largest_val
 
         estimate = torchaudio.functional.istft(stft, L, hop_length=L, win_length=L,
                                                window=torch.ones(L), center=False, normalized=False)
-        self._compare_estimate(sound, estimate, atol=1e-4)
+        self._compare_estimate(sound, estimate, atol=1e-3)
 
     def test_istft_of_sine(self):
         self._test_istft_of_sine(amplitude=123, L=5, n=1)
-        self._test_istft_of_sine(amplitude=234, L=5, n=2)
-        self._test_istft_of_sine(amplitude=345, L=5, n=3)
-        self._test_istft_of_sine(amplitude=111, L=6, n=3)
-        self._test_istft_of_sine(amplitude=222, L=7, n=4)
-        self._test_istft_of_sine(amplitude=100, L=8, n=5)
-        self._test_istft_of_sine(amplitude=315, L=9, n=6)
-        self._test_istft_of_sine(amplitude=410, L=10, n=7)
+        self._test_istft_of_sine(amplitude=150, L=5, n=2)
+        self._test_istft_of_sine(amplitude=111, L=5, n=3)
+        self._test_istft_of_sine(amplitude=160, L=7, n=4)
+        self._test_istft_of_sine(amplitude=145, L=8, n=5)
+        self._test_istft_of_sine(amplitude=80, L=9, n=6)
+        self._test_istft_of_sine(amplitude=99, L=10, n=7)
 
 
 if __name__ == '__main__':
