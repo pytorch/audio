@@ -11,6 +11,10 @@ class TestFunctional(unittest.TestCase):
     data_sizes = (2, 20)
     number_of_trials = 100
 
+    def setUp(self):
+        # we want to make sure that the random values are reproducible
+        torch.manual_seed(0)
+
     def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
         # trim sound for case when constructed signal is shorter than original
         sound = sound[..., :estimate.size(-1)]
