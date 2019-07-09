@@ -5,6 +5,7 @@ import torch
 
 __all__ = [
     'fbank',
+    'get_LR_indices_and_weights',
     'get_mel_banks',
     'inverse_mel_scale',
     'inverse_mel_scale_scalar',
@@ -514,6 +515,50 @@ def fbank(
     return mel_energies
 
 
+def get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, window_width,
+                               lowpass_cutoff, lowpass_filter_width):
+    """Based on LinearResample::SetIndexesAndWeights where it retrieves the weights for
+    resampling as well as the indices in which they are valid.
+
+    Inputs:
+        orig_freq (float): the original frequency of the signal
+        new_freq (float): the desired frequency
+        output_samples_in_unit (int): the number of output samples in the smallest repeating unit:
+            num_samp_out = new_freq / Gcd(orig_freq, new_freq)
+        window_width (float): the width of the window which is nonzero
+        lowpass_cutoff (float): the filter cutoff in Hz
+        lowpass_filter_width (int): controls the sharpness of the filter, more == sharper but less
+            efficient. We suggest around 4 to 10 for normal use
+    """
+    output_t = torch.range(0, output_samples_in_unit) / new_freq
+    min_t = output_t - window_width
+    max_t = output_t + window_width
+
+    min_input_index = torch.ceil(min_t * orig_freq)  # size(output_samples_in_unit)
+    max_input_index = torch.floor(max_t * orig_freq)  # size(output_samples_in_unit)
+    num_indices = max_input_index - min_input_index + 1  # size(output_samples_in_unit)
+
+    max_weight_width = num_indices.max()
+    # create a group of weights of size (output_samples_in_unit, max_weight_width)
+    j = torch.arange(max_weight_width).unsqueeze(0)
+    input_index = min_input_index.unsqueeze(1) + j
+    delta_t = (input_index / samp_rate_in_) - output_t
+
+    weights = torch.zeros_like(delta_t)
+    inside_window_indices = delta_t.abs().lt(window_width)
+    weights[inside_window_indices] = 0.5 * (1 + torch.cos(2 * math.pi * lowpass_cutoff /
+                                            lowpass_filter_width * delta_t[inside_window_indices]))
+    t_eq_zero_indices = delta_t.eq(0.0)
+    t_not_eq_zero_indices = ~t_eq_zero_indices
+    weights[t_not_eq_zero_indices] *= torch.sin(
+        2 * math.pi * lowpass_cutoff * delta_t[t_not_eq_zero_indices]) / (2 * math.pi * delta_t[t_not_eq_zero_indices])
+    # limit of the function at t = 0
+    weights[t_eq_zero_indices] *= 2 * lowpass_cutoff
+
+    weights /= orig_freq  # size (output_samples_in_unit, max_weight_width)
+    return min_t, weights
+
+
 def resample_waveform(wave, orig_freq, new_freq):
     """Resamples the wave at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
@@ -539,19 +584,10 @@ def resample_waveform(wave, orig_freq, new_freq):
     input_samples_in_unit = int(orig_freq) // base_freq
     output_samples_in_unit = int(new_freq) // base_freq
 
-    # LinearResample::SetIndexesAndWeights
     window_width = lowpass_filter_width / (2.0 * lowpass_cutoff)
+    first_index, weights = get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit,
+                                                      window_width, lowpass_cutoff, lowpass_filter_width)
 
-    output_t = torch.range(0, output_samples_in_unit) / new_freq
-    min_t = output_t - window_width
-    max_t = output_t + window_width
-
-    min_input_index = torch.ceil(min_t * orig_freq)  # size(output_samples_in_unit)
-    max_input_index = torch.floor(max_t * orig_freq)  # size(output_samples_in_unit)
-    num_indices = max_input_index - min_input_index + 1  # size(output_samples_in_unit)
-
-    max_weight_width = num_indices.max()
-    # create a group of weights of size (output_samples_in_unit, max_weight_width)
-    j = torch.arange(max_weight_width).unsqueeze(0)
-    input_index = min_input_index.unsqueeze(1) + j
-    delta_t = (input_index / samp_rate_in_) - output_t
+    for i in range(weights.size(0)):
+        pass
+    return first_index, weights
