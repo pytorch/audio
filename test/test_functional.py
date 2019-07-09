@@ -151,7 +151,7 @@ class TestFunctional(unittest.TestCase):
 
     def _test_istft_of_sine(self, amplitude, L, n):
         # stft of amplitude*sin(2*pi/L*n*x) with the hop length and window size equaling L
-        x = torch.arange(2 * L, dtype=torch.get_default_dtype())
+        x = torch.arange(2 * L + 1, dtype=torch.get_default_dtype())
         sound = amplitude * torch.sin(2 * math.pi / L * x * n)
         # stft = torch.stft(sound, L, hop_length=L, win_length=L,
         #                   window=torch.ones(L), center=False, normalized=False)
