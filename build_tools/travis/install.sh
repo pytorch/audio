@@ -38,7 +38,7 @@ then
     fi
     chmod +x miniconda.sh && ./miniconda.sh -b -f
     echo "jasonb"
-    conda update --yes conda
+    # conda update --yes conda
     echo "Creating environment to run tests in."
     conda create -n testenv --yes python="$PYTHON_VERSION"
     echo "jasonc"
