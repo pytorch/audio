@@ -530,7 +530,7 @@ def get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, wind
         lowpass_filter_width (int): controls the sharpness of the filter, more == sharper but less
             efficient. We suggest around 4 to 10 for normal use
     """
-    output_t = torch.range(0, output_samples_in_unit) / new_freq
+    output_t = torch.arange(0, output_samples_in_unit, dtype=torch.get_default_dtype()) / new_freq
     min_t = output_t - window_width
     max_t = output_t + window_width
 
@@ -542,21 +542,26 @@ def get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, wind
     # create a group of weights of size (output_samples_in_unit, max_weight_width)
     j = torch.arange(max_weight_width).unsqueeze(0)
     input_index = min_input_index.unsqueeze(1) + j
-    delta_t = (input_index / samp_rate_in_) - output_t
+    delta_t = (input_index / orig_freq) - output_t.unsqueeze(1)
 
     weights = torch.zeros_like(delta_t)
     inside_window_indices = delta_t.abs().lt(window_width)
     weights[inside_window_indices] = 0.5 * (1 + torch.cos(2 * math.pi * lowpass_cutoff /
                                             lowpass_filter_width * delta_t[inside_window_indices]))
+
     t_eq_zero_indices = delta_t.eq(0.0)
     t_not_eq_zero_indices = ~t_eq_zero_indices
     weights[t_not_eq_zero_indices] *= torch.sin(
         2 * math.pi * lowpass_cutoff * delta_t[t_not_eq_zero_indices]) / (2 * math.pi * delta_t[t_not_eq_zero_indices])
+    a = torch.sin(
+        2 * math.pi * lowpass_cutoff * delta_t[t_not_eq_zero_indices]) / (2 * math.pi * delta_t[t_not_eq_zero_indices])
+    print(a)
     # limit of the function at t = 0
     weights[t_eq_zero_indices] *= 2 * lowpass_cutoff
 
+    print(weights)
     weights /= orig_freq  # size (output_samples_in_unit, max_weight_width)
-    return min_t, weights
+    return min_input_index, weights
 
 
 def resample_waveform(wave, orig_freq, new_freq):
@@ -591,3 +596,8 @@ def resample_waveform(wave, orig_freq, new_freq):
     for i in range(weights.size(0)):
         pass
     return first_index, weights
+
+a,b = resample_waveform(torch.rand(100), 1600, 1200)
+print(a)
+torch.set_printoptions(precision=3, sci_mode=True)
+print(b)
