@@ -37,7 +37,6 @@ then
              -O miniconda.sh
     fi
     chmod +x miniconda.sh && ./miniconda.sh -b -f
-    conda update --yes conda
     echo "Creating environment to run tests in."
     conda create -n testenv --yes python="$PYTHON_VERSION"
 fi
