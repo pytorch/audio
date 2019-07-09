@@ -154,7 +154,7 @@ class TestFunctional(unittest.TestCase):
         x = torch.arange(2 * L, dtype=torch.get_default_dtype())
         sound = amplitude * torch.sin(2 * math.pi / L * x)
         # stft = torch.stft(sound, L, hop_length=L, win_length=L,
-                          # window=torch.ones(L), center=False, normalized=False)
+        #                   window=torch.ones(L), center=False, normalized=False)
         stft = torch.zeros((L // 2 + 1, 2, 2))
         stft[1, :, 1] = -(amplitude * L) / 2.0
 
