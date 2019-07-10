@@ -127,7 +127,7 @@ class TestFunctional(unittest.TestCase):
 
     def test_istft_requires_overlap_windows(self):
         # the window is size 1 but it hops 20 so there is a gap which throw an error
-        stft = test.common_utils.RandomTensorGenerator(seed=0, size=(3, 5, 2)).rand_float_tensor()
+        stft = torch.zeros((3, 5, 2))
         self.assertRaises(AssertionError, torchaudio.functional.istft, stft, n_fft=4,
                           hop_length=20, win_length=1, window=torch.ones(1))
 
