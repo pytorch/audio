@@ -206,7 +206,7 @@ class Test_Kaldi(unittest.TestCase):
 
         self._compliance_test_helper(self.test_filepath, 'fbank', 97, 22, get_output_fn)
 
-    def test_resample(self):
+    def test_resample_waveform(self):
         def get_output_fn(sound, args):
             pass
 
