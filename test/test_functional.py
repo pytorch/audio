@@ -9,25 +9,17 @@ import test.common_utils
 class TestFunctional(unittest.TestCase):
     data_sizes = [(2, 20), (3, 15)]
     number_of_trials = 100
-    stored_rand_data = []
-    fixed_precision = int(1e10)
+    random_tensor_generators = []
 
     def setUp(self):
-        # we want to make sure that the random values are reproducible
-        self.stored_rand_data.clear()
-        torch.manual_seed(0)
+        self.random_tensor_generators.clear()
         for data_size in self.data_sizes:
-            rand_data1 = torch.randint(low=-self.fixed_precision, high=self.fixed_precision, size=data_size)
-            rand_data2 = torch.randint(low=-self.fixed_precision, high=self.fixed_precision, size=data_size)
-            self.stored_rand_data.append([rand_data1, rand_data2])
+            rtg = test.common_utils.RandomTensorGenerator(seed=0, size=data_size)
+            self.random_tensor_generators.append(rtg)
 
     def _get_random_tensor(self, i):
-        # gets a random tensor of size data_sizes[i]. adds to previous tensors and then mods it.
-        rand_data = self.stored_rand_data[i]
-        rand_data3 = (rand_data[0] + rand_data[1]) % self.fixed_precision
-        rand_data.pop(0)
-        rand_data.append(rand_data3)
-        return rand_data3.float() / self.fixed_precision
+        # gets a random tensor of size data_sizes[i]
+        return self.random_tensor_generators[i].rand_float_tensor()
 
     def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
         # trim sound for case when constructed signal is shorter than original
@@ -145,7 +137,7 @@ class TestFunctional(unittest.TestCase):
 
     def test_istft_requires_overlap_windows(self):
         # the window is size 1 but it hops 20 so there is a gap which throw an error
-        stft = torch.rand((3, 5, 2))
+        stft = self._get_random_tensor(0)
         self.assertRaises(AssertionError, torchaudio.functional.istft, stft, n_fft=4,
                           hop_length=20, win_length=1, window=torch.ones(1))
 
