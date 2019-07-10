@@ -7,7 +7,7 @@ import test.common_utils
 
 
 class TestFunctional(unittest.TestCase):
-    data_sizes = [(2, 20), (3, 15)]
+    data_sizes = [(2, 20), (3, 15), (4, 10)]
     number_of_trials = 100
 
     def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
