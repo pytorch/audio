@@ -529,14 +529,19 @@ def get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, wind
         lowpass_cutoff (float): the filter cutoff in Hz
         lowpass_filter_width (int): controls the sharpness of the filter, more == sharper but less
             efficient. We suggest around 4 to 10 for normal use
+
+    Outputs:
+        min_input_index (Tensor): the minimum indices where the window is valid. size (output_samples_in_unit)
+        weights (Tensor): the weights which correspond with min_input_index. size (
+            output_samples_in_unit, max_weight_width)
     """
     output_t = torch.arange(0, output_samples_in_unit, dtype=torch.get_default_dtype()) / new_freq
     min_t = output_t - window_width
     max_t = output_t + window_width
 
-    min_input_index = torch.ceil(min_t * orig_freq)  # size(output_samples_in_unit)
-    max_input_index = torch.floor(max_t * orig_freq)  # size(output_samples_in_unit)
-    num_indices = max_input_index - min_input_index + 1  # size(output_samples_in_unit)
+    min_input_index = torch.ceil(min_t * orig_freq)  # size (output_samples_in_unit)
+    max_input_index = torch.floor(max_t * orig_freq)  # size (output_samples_in_unit)
+    num_indices = max_input_index - min_input_index + 1  # size (output_samples_in_unit)
 
     max_weight_width = num_indices.max()
     # create a group of weights of size (output_samples_in_unit, max_weight_width)
@@ -552,14 +557,10 @@ def get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, wind
     t_eq_zero_indices = delta_t.eq(0.0)
     t_not_eq_zero_indices = ~t_eq_zero_indices
     weights[t_not_eq_zero_indices] *= torch.sin(
-        2 * math.pi * lowpass_cutoff * delta_t[t_not_eq_zero_indices]) / (2 * math.pi * delta_t[t_not_eq_zero_indices])
-    a = torch.sin(
-        2 * math.pi * lowpass_cutoff * delta_t[t_not_eq_zero_indices]) / (2 * math.pi * delta_t[t_not_eq_zero_indices])
-    print(a)
+        2 * math.pi * lowpass_cutoff * delta_t[t_not_eq_zero_indices]) / (math.pi * delta_t[t_not_eq_zero_indices])
     # limit of the function at t = 0
     weights[t_eq_zero_indices] *= 2 * lowpass_cutoff
 
-    print(weights)
     weights /= orig_freq  # size (output_samples_in_unit, max_weight_width)
     return min_input_index, weights
 
@@ -570,7 +571,7 @@ def resample_waveform(wave, orig_freq, new_freq):
     a signal).
 
     Inputs:
-        wave (Tensor): the input signal
+        wave (Tensor): the input signal of size (c, n)
         orig_freq (float): the original frequency of the signal
         new_freq (float): the desired frequency
 
@@ -590,14 +591,36 @@ def resample_waveform(wave, orig_freq, new_freq):
     output_samples_in_unit = int(new_freq) // base_freq
 
     window_width = lowpass_filter_width / (2.0 * lowpass_cutoff)
-    first_index, weights = get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit,
+    first_indices, weights = get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit,
                                                       window_width, lowpass_cutoff, lowpass_filter_width)
 
-    for i in range(weights.size(0)):
-        pass
-    return first_index, weights
+    assert first_indices.dim() == 1
+    # TODO figure a better way to do this. conv1d reaches every element i*stride + padding
+    # all the weights have the same stride but have different padding.
+    stride = input_samples_in_unit
+    num_channels, wave_len = wave.size()
+    window_size = weights.size(1)
+    eye = torch.eye(num_channels).unsqueeze(2)  # size (num_channels, num_channels, 1)
+    for i in range(first_indices.size(0)):
+        wave_to_conv = wave
+        # pad the right of the signal to allow partial convolutions
+        right_padding = window_size - (wave_len - ((wave_len - 1) // stride) * stride)
 
-a,b = resample_waveform(torch.rand(100), 1600, 1200)
+        first_index = int(first_indices[i].item())
+        if first_index >= 0:
+            # trim the signal as the filter will be applied before the first_index
+            wave_to_conv = wave_to_conv[..., first_index:]
+
+        if right_padding > 0:
+            left_padding = -first_index if first_index < 0 else 0
+            wave_to_conv = torch.nn.functional.pad(wave_to_conv, (left_padding, right_padding))
+
+        conv_wave = torch.nn.functional.conv1d(
+            wave_to_conv.unsqueeze(0), weights[i].view(1, 1, window_size), stride=stride)
+        # we want conv_wave[i, :] to be at output[i + n*input_samples_in_unit]
+        conv_wave = torch.nn.functional.conv_tranpose1d(conv_wave.unsqueeze(0), eye, stride=stride)
+
+
+a = resample_waveform(torch.rand((1,100)), 1600, 1200)
+torch.set_printoptions(precision=16, sci_mode=False)
 print(a)
-torch.set_printoptions(precision=3, sci_mode=True)
-print(b)
