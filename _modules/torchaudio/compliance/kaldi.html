@@ -138,7 +138,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../legacy.html">torchaudio.legacy</a></li>
@@ -395,7 +395,7 @@
     <span class="k">return</span> <span class="n">strided_input</span><span class="p">,</span> <span class="n">signal_log_energy</span>
 
 
-<div class="viewcode-block" id="spectrogram"><a class="viewcode-back" href="../../../kaldi.html#torchaudio.compliance.kaldi.spectrogram">[docs]</a><span class="k">def</span> <span class="nf">spectrogram</span><span class="p">(</span>
+<div class="viewcode-block" id="spectrogram"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.spectrogram">[docs]</a><span class="k">def</span> <span class="nf">spectrogram</span><span class="p">(</span>
         <span class="n">sig</span><span class="p">,</span> <span class="n">blackman_coeff</span><span class="o">=</span><span class="mf">0.42</span><span class="p">,</span> <span class="n">channel</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dither</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">energy_floor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">frame_length</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span> <span class="n">frame_shift</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">min_duration</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">preemphasis_coefficient</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span> <span class="n">raw_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_dc_offset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -631,7 +631,7 @@
     <span class="k">return</span> <span class="n">bins</span><span class="p">,</span> <span class="n">center_freqs</span>
 
 
-<div class="viewcode-block" id="fbank"><a class="viewcode-back" href="../../../kaldi.html#torchaudio.compliance.kaldi.fbank">[docs]</a><span class="k">def</span> <span class="nf">fbank</span><span class="p">(</span>
+<div class="viewcode-block" id="fbank"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.fbank">[docs]</a><span class="k">def</span> <span class="nf">fbank</span><span class="p">(</span>
         <span class="n">sig</span><span class="p">,</span> <span class="n">blackman_coeff</span><span class="o">=</span><span class="mf">0.42</span><span class="p">,</span> <span class="n">channel</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dither</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">energy_floor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">frame_length</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span> <span class="n">frame_shift</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">high_freq</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">htk_compat</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">low_freq</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
         <span class="n">min_duration</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">num_mel_bins</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">preemphasis_coefficient</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span> <span class="n">raw_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>

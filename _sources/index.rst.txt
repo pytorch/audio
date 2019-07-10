@@ -9,7 +9,7 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
 
    sox_effects
    datasets
-   kaldi
+   compliance.kaldi
    kaldi_io
    transforms
    legacy
