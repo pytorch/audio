@@ -149,6 +149,10 @@ class TestFunctional(unittest.TestCase):
         torchaudio.functional.istft(stft, **kwargs_ok)
         self.assertRaises(AssertionError, torchaudio.functional.istft, stft, **kwargs_not_ok)
 
+    def test_istft_requires_non_empty(self):
+        self.assertRaises(AssertionError, torchaudio.functional.istft, torch.zeros((3, 0, 2)), 2)
+        self.assertRaises(AssertionError, torchaudio.functional.istft, torch.zeros((0, 3, 2)), 2)
+
     def _test_istft_of_sine(self, amplitude, L, n):
         # stft of amplitude*sin(2*pi/L*n*x) with the hop length and window size equaling L
         x = torch.arange(2 * L + 1, dtype=torch.get_default_dtype())
