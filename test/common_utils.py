@@ -37,7 +37,7 @@ def random_float_tensor(seed, size, a=22695477, c=1, m=2 ** 32):
     for s in size:
         num_elements *= s
 
-    arr = [seed % m]
+    arr = [(a * seed + c) % m]
     for i in range(num_elements - 1):
         arr.append((a * arr[i] + c) % m)
 
