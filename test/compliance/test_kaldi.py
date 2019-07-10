@@ -48,7 +48,7 @@ class Test_Kaldi(unittest.TestCase):
     test_dirpath, test_dir = test.common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file.wav')
     kaldi_output_dir = os.path.join(test_dirpath, 'assets', 'kaldi')
-    test_filepaths = {'spec': [], 'fbank': []}
+    test_filepaths = {prefix: [] for prefix in test.compliance.utils.TEST_PREFIX}
 
     # separating test files by their types (e.g 'spec', 'fbank', etc.)
     for f in os.listdir(kaldi_output_dir):
@@ -118,16 +118,18 @@ class Test_Kaldi(unittest.TestCase):
         print('abs_mse:', abs_mse.item(), 'abs_max_error:', abs_max_error.item())
         print('relative_mse:', relative_mse.item(), 'relative_max_error:', relative_max_error.item())
 
-    def _compliance_test_helper(self, filepath_key, expected_num_files, expected_num_args, get_output_fn):
+    def _compliance_test_helper(self, sound_filepath, filepath_key, expected_num_files,
+                                expected_num_args, get_output_fn):
         """
         Inputs:
+            sound_filepath (str): The location of the sound file
             filepath_key (str): A key to `test_filepaths` which matches which files to use
             expected_num_files (int): The expected number of kaldi files to read
             expected_num_args (int): The expected number of arguments used in a kaldi configuration
             get_output_fn (Callable[[Tensor, List], Tensor]): A function that takes in a sound signal
                 and a configuration and returns an output
         """
-        sound, sample_rate = torchaudio.load_wav(self.test_filepath)
+        sound, sample_rate = torchaudio.load_wav(sound_filepath)
         files = self.test_filepaths[filepath_key]
 
         assert len(files) == expected_num_files, ('number of kaldi %s file changed to %d' % (filepath_key, len(files)))
@@ -172,7 +174,7 @@ class Test_Kaldi(unittest.TestCase):
                 window_type=args[12])
             return output
 
-        self._compliance_test_helper('spec', 131, 13, get_output_fn)
+        self._compliance_test_helper(self.test_filepath, 'spec', 131, 13, get_output_fn)
 
     def test_fbank(self):
         def get_output_fn(sound, args):
@@ -202,7 +204,11 @@ class Test_Kaldi(unittest.TestCase):
                 window_type=args[21])
             return output
 
-        self._compliance_test_helper('fbank', 97, 22, get_output_fn)
+        self._compliance_test_helper(self.test_filepath, 'fbank', 97, 22, get_output_fn)
+
+    def test_resample(self):
+        def get_output_fn(sound, args):
+            pass
 
 
 if __name__ == '__main__':

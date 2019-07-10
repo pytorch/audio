@@ -684,6 +684,9 @@ def resample_waveform(wave, orig_freq, new_freq):
     return output
 
 
-a = resample_waveform(torch.arange(10).unsqueeze(0).float(), 1600, 1200)
-# torch.set_printoptions(precision=16, sci_mode=False)
-print(a)
+# a = resample_waveform(torch.arange(10).unsqueeze(0).float(), 1600, 1200)
+# # torch.set_printoptions(precision=16, sci_mode=False)
+# print(a)
+
+for k in range(32):
+    print(_get_num_LR_output_samples(20, 16000, k*1000))
