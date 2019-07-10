@@ -21,9 +21,8 @@ class TestFunctional(unittest.TestCase):
         # generates a random sound signal for each tril and then does the stft/istft
         # operation to check whether we can reconstruct signal
         for data_size in self.data_sizes:
-            rtg = test.common_utils.RandomTensorGenerator(seed=0, size=data_size)
-            for _ in range(self.number_of_trials):
-                sound = rtg.rand_float_tensor()
+            for i in range(self.number_of_trials):
+                sound = test.common_utils.random_float_tensor(i, data_size)
 
                 stft = torch.stft(sound, **kwargs)
                 estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
