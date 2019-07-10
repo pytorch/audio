@@ -565,6 +565,47 @@ def get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, wind
     return min_input_index, weights
 
 
+def _lcm(a, b):
+    return abs(a * b) // math.gcd(a, b)
+
+
+def _get_num_LR_output_samples(input_num_samp, samp_rate_in, samp_rate_out):
+    """ Based on LinearResample::GetNumOutputSamples
+    Inputs:
+        input_num_samp (int): the number of samples in the input
+        samp_rate_in (float): the original frequency of the signal
+        samp_rate_out (float): the desired frequency
+
+    Outputs:
+        int: the number of output samples
+    """
+    # For exact computation, we measure time in "ticks" of 1.0 / tick_freq,
+    # where tick_freq is the least common multiple of samp_rate_in and
+    # samp_rate_out.
+    tick_freq = _lcm(samp_rate_in, samp_rate_out)
+    ticks_per_input_period = tick_freq // samp_rate_in
+
+    # work out the number of ticks in the time interval
+    # [ 0, input_num_samp/samp_rate_in ).
+    interval_length_in_ticks = input_num_samp * ticks_per_input_period
+    if interval_length_in_ticks <= 0:
+        return 0
+    ticks_per_output_period = tick_freq // samp_rate_out
+    # Get the last output-sample in the closed interval, i.e. replacing [ ) with
+    # [ ].  Note: integer division rounds down.  See
+    # http://en.wikipedia.org/wiki/Interval_(mathematics) for an explanation of
+    # the notation.
+    last_output_samp = interval_length_in_ticks // ticks_per_output_period
+    # We need the last output-sample in the open interval, so if it takes us to
+    # the end of the interval exactly, subtract one.
+    if last_output_samp * ticks_per_output_period == interval_length_in_ticks:
+        last_output_samp -= 1
+    # First output-sample index is zero, so the number of output samples
+    # is the last output-sample plus one.
+    num_output_samp = last_output_samp + 1
+    return num_output_samp
+
+
 def resample_waveform(wave, orig_freq, new_freq):
     """Resamples the wave at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
@@ -592,35 +633,57 @@ def resample_waveform(wave, orig_freq, new_freq):
 
     window_width = lowpass_filter_width / (2.0 * lowpass_cutoff)
     first_indices, weights = get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit,
-                                                      window_width, lowpass_cutoff, lowpass_filter_width)
+                                                        window_width, lowpass_cutoff, lowpass_filter_width)
 
     assert first_indices.dim() == 1
     # TODO figure a better way to do this. conv1d reaches every element i*stride + padding
     # all the weights have the same stride but have different padding.
-    stride = input_samples_in_unit
+    # Current implementation takes the input and applies the various padding before
+    # doing a conv1d for that specific weight.
+    conv_stride = input_samples_in_unit
+    conv_transpose_stride = output_samples_in_unit
     num_channels, wave_len = wave.size()
     window_size = weights.size(1)
+    tot_output_samp = _get_num_LR_output_samples(wave_len, orig_freq, new_freq)
+    output = torch.zeros((num_channels, tot_output_samp))
     eye = torch.eye(num_channels).unsqueeze(2)  # size (num_channels, num_channels, 1)
     for i in range(first_indices.size(0)):
         wave_to_conv = wave
-        # pad the right of the signal to allow partial convolutions
-        right_padding = window_size - (wave_len - ((wave_len - 1) // stride) * stride)
-
         first_index = int(first_indices[i].item())
         if first_index >= 0:
-            # trim the signal as the filter will be applied before the first_index
+            # trim the signal as the filter will not be applied before the first_index
             wave_to_conv = wave_to_conv[..., first_index:]
 
-        if right_padding > 0:
-            left_padding = -first_index if first_index < 0 else 0
+        # pad the right of the signal to allow partial convolutions meaning compute
+        # values for partial windows (e.g. end of the window is outside the signal length)
+        max_unit_index = (tot_output_samp - 1) // output_samples_in_unit
+        end_index_of_last_window = max_unit_index * conv_stride + window_size
+        current_wave_len = wave_len - first_index
+        right_padding = max(0, end_index_of_last_window + 1 - current_wave_len)
+
+        left_padding = max(0, -first_index)
+        if left_padding != 0 or right_padding != 0:
             wave_to_conv = torch.nn.functional.pad(wave_to_conv, (left_padding, right_padding))
 
         conv_wave = torch.nn.functional.conv1d(
-            wave_to_conv.unsqueeze(0), weights[i].view(1, 1, window_size), stride=stride)
-        # we want conv_wave[i, :] to be at output[i + n*input_samples_in_unit]
-        conv_wave = torch.nn.functional.conv_tranpose1d(conv_wave.unsqueeze(0), eye, stride=stride)
+            wave_to_conv.unsqueeze(0), weights[i].view(1, 1, window_size), stride=conv_stride)
+
+        # we want conv_wave[:, i] to be at output[:, i + n*conv_transpose_stride]
+        dilated_conv_wave = torch.nn.functional.conv_transpose1d(
+            conv_wave, eye, stride=conv_transpose_stride).squeeze(0)
+
+        # pad dilated_conv_wave so it reaches the output length if needed.
+        dialated_conv_wave_len = dilated_conv_wave.size(-1)
+        left_padding = i
+        right_padding = max(0, tot_output_samp - (left_padding + dialated_conv_wave_len))
+        dilated_conv_wave = torch.nn.functional.pad(
+            dilated_conv_wave, (left_padding, right_padding))[..., :tot_output_samp]
+
+        output += dilated_conv_wave
+
+    return output
 
 
-a = resample_waveform(torch.rand((1,100)), 1600, 1200)
-torch.set_printoptions(precision=16, sci_mode=False)
+a = resample_waveform(torch.arange(10).unsqueeze(0).float(), 1600, 1200)
+# torch.set_printoptions(precision=16, sci_mode=False)
 print(a)
