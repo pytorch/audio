@@ -138,6 +138,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kaldi.html">torchaudio.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../legacy.html">torchaudio.legacy</a></li>
@@ -218,7 +219,7 @@
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">_torch_sox</span>
 
-<span class="kn">from</span> <span class="nn">torchaudio</span> <span class="k">import</span> <span class="n">transforms</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">sox_effects</span><span class="p">,</span> <span class="n">legacy</span>
+<span class="kn">from</span> <span class="nn">torchaudio</span> <span class="k">import</span> <span class="n">transforms</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">kaldi_io</span><span class="p">,</span> <span class="n">sox_effects</span><span class="p">,</span> <span class="n">legacy</span><span class="p">,</span> <span class="n">compliance</span>
 
 
 <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="n">src</span><span class="p">):</span>
@@ -304,6 +305,14 @@
     <span class="n">_audio_normalization</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">normalization</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">sample_rate</span></div>
+
+
+<div class="viewcode-block" id="load_wav"><a class="viewcode-back" href="../index.html#torchaudio.load_wav">[docs]</a><span class="k">def</span> <span class="nf">load_wav</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Loads a wave file. It assumes that the wav file uses 16 bit per sample that needs normalization by shifting</span>
+<span class="sd">    the input right by 16 bits.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;normalization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span>
+    <span class="k">return</span> <span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="save"><a class="viewcode-back" href="../index.html#torchaudio.save">[docs]</a><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
