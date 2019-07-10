@@ -1,7 +1,7 @@
 .. role:: hidden
     :class: hidden-section
 
-torchaudio.kaldi
+torchaudio.compliance.kaldi
 ======================
 
 .. currentmodule:: torchaudio.compliance.kaldi
