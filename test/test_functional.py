@@ -9,17 +9,6 @@ import test.common_utils
 class TestFunctional(unittest.TestCase):
     data_sizes = [(2, 20), (3, 15)]
     number_of_trials = 100
-    random_tensor_generators = []
-
-    def setUp(self):
-        self.random_tensor_generators.clear()
-        for data_size in self.data_sizes:
-            rtg = test.common_utils.RandomTensorGenerator(seed=0, size=data_size)
-            self.random_tensor_generators.append(rtg)
-
-    def _get_random_tensor(self, i):
-        # gets a random tensor of size data_sizes[i]
-        return self.random_tensor_generators[i].rand_float_tensor()
 
     def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
         # trim sound for case when constructed signal is shorter than original
@@ -31,9 +20,10 @@ class TestFunctional(unittest.TestCase):
     def _test_istft_is_inverse_of_stft(self, kwargs):
         # generates a random sound signal for each tril and then does the stft/istft
         # operation to check whether we can reconstruct signal
-        for i in range(len(self.data_sizes)):
+        for data_size in self.data_sizes:
+            rtg = test.common_utils.RandomTensorGenerator(seed=0, size=data_size)
             for _ in range(self.number_of_trials):
-                sound = self._get_random_tensor(i)
+                sound = rtg.rand_float_tensor()
 
                 stft = torch.stft(sound, **kwargs)
                 estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
@@ -137,7 +127,7 @@ class TestFunctional(unittest.TestCase):
 
     def test_istft_requires_overlap_windows(self):
         # the window is size 1 but it hops 20 so there is a gap which throw an error
-        stft = self._get_random_tensor(0)
+        stft = test.common_utils.RandomTensorGenerator(seed=0, size=(3, 5, 2)).rand_float_tensor()
         self.assertRaises(AssertionError, torchaudio.functional.istft, stft, n_fft=4,
                           hop_length=20, win_length=1, window=torch.ones(1))
 
