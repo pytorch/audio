@@ -31,8 +31,14 @@ class RandomTensorGenerator:
 
     def __init__(self, seed, size):
         # seed is an int and size is a tuple of ints
-        torch.manual_seed(seed)
-        self.x_n = torch.randint(low=0, high=self.m, size=size)
+        num_elements = 1
+        for s in size:
+            num_elements *= s
+
+        arr = [seed]
+        for i in range(num_elements - 1):
+            arr.append((self.a * arr[i] + self.c) % self.m)
+        self.x_n = torch.tensor(arr, dtype=torch.int64).view(size)
 
     def rand_int_tensor(self, rand_min=0, rand_max=2 ** 32):
         # returns an integer tensor between [rand_min, rand_max)
