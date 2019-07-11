@@ -307,8 +307,8 @@ def mu_law_expanding(x_mu, qc):
     return x
 
 
-def stft(waveforms, fft_length, hop_length=None, win_length=None, window=None,
-         center=True, pad_mode='reflect', normalized=False, onesided=True):
+def batched_stft(waveforms, fft_length, hop_length=None, win_length=None, window=None,
+                 center=True, pad_mode='reflect', normalized=False, onesided=True):
     """Compute a short-time Fourier transform of the input waveform(s).
     It wraps `torch.stft` but after reshaping the input audio
     to allow for `waveforms` that `.dim()` >= 3.

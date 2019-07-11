@@ -15,6 +15,11 @@ if IMPORT_LIBROSA:
 if IMPORT_SCIPY:
     import scipy
 
+import pytest
+import numpy as np
+import torchaudio.functional as F
+xfail = pytest.mark.xfail
+
 
 class Tester(unittest.TestCase):
 
@@ -305,12 +310,6 @@ class Tester(unittest.TestCase):
         _test_librosa_consistency_helper(**kwargs3)
 
 
-import pytest
-import numpy as np
-import torchaudio.functional as F
-xfail = pytest.mark.xfail
-
-
 @pytest.mark.parametrize('fft_length', [512])
 @pytest.mark.parametrize('hop_length', [256])
 @pytest.mark.parametrize('waveform', [
@@ -322,7 +321,8 @@ xfail = pytest.mark.xfail
     # 'constant',
     'reflect',
 ])
-def test_stft(waveform, fft_length, hop_length, pad_mode):
+@unittest.skipIf(not IMPORT_LIBROSA, 'Librosa is not available')
+def test_batched_stft(waveform, fft_length, hop_length, pad_mode):
     """
     Test STFT for multi-channel signals.
 
@@ -330,11 +330,11 @@ def test_stft(waveform, fft_length, hop_length, pad_mode):
     """
     pad = fft_length // 2
     window = torch.hann_window(fft_length)
-    complex_spec = F.stft(waveform,
-                          fft_length=fft_length,
-                          hop_length=hop_length,
-                          window=window,
-                          pad_mode=pad_mode)
+    complex_spec = F.batched_stft(waveform,
+                                  fft_length=fft_length,
+                                  hop_length=hop_length,
+                                  window=window,
+                                  pad_mode=pad_mode)
     mag_spec, phase_spec = F.magphase(complex_spec)
 
     # == Test shape
@@ -364,22 +364,22 @@ def test_stft(waveform, fft_length, hop_length, pad_mode):
     torch.randn(1, 1025, 400, 2)
 ])
 @pytest.mark.parametrize('hop_length', [256])
+@unittest.skipIf(not IMPORT_LIBROSA, 'Librosa is not available')
 def test_phase_vocoder(complex_specgrams, rate, hop_length):
 
     class use_double_precision:
         def __enter__(self):
-            self.default_dtype = torch.get_default_dtype()
             torch.set_default_dtype(torch.float64)
 
         def __exit__(self, type, value, traceback):
-            torch.set_default_dtype(self.default_dtype)
+            torch.set_default_dtype(torch.float32)
 
     # Due to cummulative sum, numerical error in using torch.float32 will
     # result in bottom right values of the stretched sectrogram to not
-    # match with librosa
+    # match with librosa.
     with use_double_precision():
 
-        complex_specgrams = complex_specgrams.type(torch.get_default_dtype())
+        complex_specgrams = complex_specgrams.type(torch.float64)
 
         phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-3])[..., None]
         complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
@@ -417,7 +417,7 @@ def test_complex_norm(complex_tensor, power):
     expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
     norm_tensor = F.complex_norm(complex_tensor, power)
 
-    assert test.common_utils._approx_all_equal(expected_norm_tensor, norm_tensor, atol=1e-5)
+    assert torch.allclose(expected_norm_tensor, norm_tensor, atol=1e-5)
 
 
 if __name__ == '__main__':

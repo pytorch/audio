@@ -20,7 +20,3 @@ def create_temp_assets_dir():
 
 def _num_stft_bins(signal_len, fft_len, hop_length, pad):
     return (signal_len + 2 * pad - fft_len + hop_length) // hop_length
-
-
-def _approx_all_equal(x, y, atol=1e-7):
-    return torch.all(torch.lt(torch.abs(torch.add(x, -y)), atol))
