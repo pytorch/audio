@@ -547,7 +547,8 @@ def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, win
         output_samples_in_unit (int): the number of output samples in the smallest repeating unit:
             num_samp_out = new_freq / Gcd(orig_freq, new_freq)
         window_width (float): the width of the window which is nonzero
-        lowpass_cutoff (float): the filter cutoff in Hz
+        lowpass_cutoff (float): the filter cutoff in Hz. The filter cutoff needs to be less
+            than samp_rate_in_hz/2 and less than samp_rate_out_hz/2.
         lowpass_filter_width (int): controls the sharpness of the filter, more == sharper but less
             efficient. We suggest around 4 to 10 for normal use
 
@@ -556,6 +557,7 @@ def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, win
         weights (Tensor): the weights which correspond with min_input_index. size (
             output_samples_in_unit, max_weight_width)
     """
+    assert lowpass_cutoff < min(orig_freq, new_freq) / 2
     output_t = torch.arange(0, output_samples_in_unit, dtype=torch.get_default_dtype()) / new_freq
     min_t = output_t - window_width
     max_t = output_t + window_width
