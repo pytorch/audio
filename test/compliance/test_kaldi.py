@@ -120,7 +120,7 @@ class Test_Kaldi(unittest.TestCase):
         print('relative_mse:', relative_mse.item(), 'relative_max_error:', relative_max_error.item())
 
     def _compliance_test_helper(self, sound_filepath, filepath_key, expected_num_files,
-                                expected_num_args, get_output_fn):
+                                expected_num_args, get_output_fn, atol=1e-5, rtol=1e-8):
         """
         Inputs:
             sound_filepath (str): The location of the sound file
@@ -129,6 +129,8 @@ class Test_Kaldi(unittest.TestCase):
             expected_num_args (int): The expected number of arguments used in a kaldi configuration
             get_output_fn (Callable[[Tensor, List], Tensor]): A function that takes in a sound signal
                 and a configuration and returns an output
+            atol (float): absolute tolerance
+            rtol (float): relative tolerance
         """
         sound, sample_rate = torchaudio.load_wav(sound_filepath)
         files = self.test_filepaths[filepath_key]
@@ -155,7 +157,7 @@ class Test_Kaldi(unittest.TestCase):
 
             self._print_diagnostic(output, kaldi_output)
             self.assertTrue(output.shape, kaldi_output.shape)
-            # self.assertTrue(torch.allclose(output, kaldi_output, atol=1e-3, rtol=1e-1))
+            self.assertTrue(torch.allclose(output, kaldi_output, atol=atol, rtol=rtol))
 
     def test_spectrogram(self):
         def get_output_fn(sound, args):
@@ -175,7 +177,7 @@ class Test_Kaldi(unittest.TestCase):
                 window_type=args[12])
             return output
 
-        self._compliance_test_helper(self.test_filepath, 'spec', 131, 13, get_output_fn)
+        self._compliance_test_helper(self.test_filepath, 'spec', 131, 13, get_output_fn, atol=1e-3)
 
     def test_fbank(self):
         def get_output_fn(sound, args):
@@ -205,14 +207,14 @@ class Test_Kaldi(unittest.TestCase):
                 window_type=args[21])
             return output
 
-        self._compliance_test_helper(self.test_filepath, 'fbank', 97, 22, get_output_fn)
+        self._compliance_test_helper(self.test_filepath, 'fbank', 97, 22, get_output_fn, atol=1e-3, rtol=1e-1)
 
     def test_resample_waveform(self):
         def get_output_fn(sound, args):
             output = kaldi.resample_waveform(sound, args[1], args[2])
             return output
 
-        self._compliance_test_helper(self.test_8000_filepath, 'resample', 31, 3, get_output_fn)
+        self._compliance_test_helper(self.test_8000_filepath, 'resample', 31, 3, get_output_fn, atol=1e-2, rtol=1e-5)
 
 
 if __name__ == '__main__':
