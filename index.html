@@ -139,6 +139,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="legacy.html">torchaudio.legacy</a></li>
@@ -224,6 +225,10 @@
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="datasets.html#vctk">VCTK</a></li>
 <li class="toctree-l2"><a class="reference internal" href="datasets.html#yesno">YESNO</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="compliance.kaldi.html#functions">Functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a><ul>
@@ -383,6 +388,13 @@ audio type cannot be automatically determined</li>
 <span class="go">1.</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="function">
+<dt id="torchaudio.load_wav">
+<code class="descclassname">torchaudio.</code><code class="descname">load_wav</code><span class="sig-paren">(</span><em>filepath</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio.html#load_wav"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.load_wav" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a wave file. It assumes that the wav file uses 16 bit per sample that needs normalization by shifting
+the input right by 16 bits.</p>
 </dd></dl>
 
 <dl class="function">
