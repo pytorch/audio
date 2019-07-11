@@ -1,7 +1,7 @@
 import random
 import torchaudio
 
-TEST_PREFIX = ['fbank', 'spec']
+TEST_PREFIX = ['fbank', 'spec', 'resample']
 
 
 def generate_rand_boolean():
