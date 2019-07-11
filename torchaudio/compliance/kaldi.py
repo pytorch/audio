@@ -633,7 +633,7 @@ def _get_num_LR_output_samples(input_num_samp, samp_rate_in, samp_rate_out):
     return num_output_samp
 
 
-def resample_waveform(wave, orig_freq, new_freq):
+def resample_waveform(wave, orig_freq, new_freq, lowpass_filter_width=6):
     """Resamples the wave at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
     a signal). LinearResample (LR) means that the output signal is at linearly spaced intervals (i.e
@@ -647,6 +647,8 @@ def resample_waveform(wave, orig_freq, new_freq):
         wave (Tensor): the input signal of size (c, n)
         orig_freq (float): the original frequency of the signal
         new_freq (float): the desired frequency
+        lowpass_filter_width (int): controls the sharpness of the filter, more == sharper
+            but less efficient. We suggest around 4 to 10 for normal use
 
     Outputs:
         Tensor: the signal at the new frequency
@@ -655,7 +657,6 @@ def resample_waveform(wave, orig_freq, new_freq):
 
     min_freq = min(orig_freq, new_freq)
     lowpass_cutoff = 0.99 * 0.5 * min_freq
-    lowpass_filter_width = 6
 
     assert lowpass_cutoff * 2 <= min_freq
 
