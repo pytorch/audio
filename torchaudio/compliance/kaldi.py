@@ -5,7 +5,6 @@ import torch
 
 __all__ = [
     'fbank',
-    'get_LR_indices_and_weights',
     'get_mel_banks',
     'inverse_mel_scale',
     'inverse_mel_scale_scalar',
@@ -516,10 +515,31 @@ def fbank(
     return mel_energies
 
 
-def get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, window_width,
+def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, window_width,
                                lowpass_cutoff, lowpass_filter_width):
     """Based on LinearResample::SetIndexesAndWeights where it retrieves the weights for
-    resampling as well as the indices in which they are valid.
+    resampling as well as the indices in which they are valid. LinearResample (LR) means
+    that the output signal is at linearly spaced intervals (i.e the output signal has a
+    frequency of `new_freq`). It uses sinc/bandlimited interpolation to upsample/downsample
+    the signal.
+
+    The reason why the same filter is not used for multiple convolutions is because the
+    sinc function could sampled at different points in time. For example, suppose
+    a signal is sampled at the timestamps (seconds)
+    0         16        32
+    and we want it to be sampled at the timestamps (seconds)
+    0 5 10 15   20 25 30  35
+    at the timestamp of 16, the delta timestamps are
+    16 11 6 1   4  9  14  19
+    at the timestamp of 32, the delta timestamps are
+    32 27 22 17 12 8 2    3
+
+    As we can see from deltas, the sinc function is sampled at different points of time
+    assuming the center of the sinc function is at 0, 16, and 32 (the deltas [..., 6, 1, 4, ....]
+    for 16 vs [...., 2, 3, ....] for 32)
+
+    Example, one case is when the orig_freq and new_freq are multiples of each other then
+    there needs to be one filter.
 
     Inputs:
         orig_freq (float): the original frequency of the signal
@@ -571,7 +591,11 @@ def _lcm(a, b):
 
 
 def _get_num_LR_output_samples(input_num_samp, samp_rate_in, samp_rate_out):
-    """ Based on LinearResample::GetNumOutputSamples
+    """ Based on LinearResample::GetNumOutputSamples. LinearResample (LR) means that
+    the output signal is at linearly spaced intervals (i.e the output signal has a
+    frequency of `new_freq`). It uses sinc/bandlimited interpolation to upsample/downsample
+    the signal.
+
     Inputs:
         input_num_samp (int): the number of samples in the input
         samp_rate_in (float): the original frequency of the signal
@@ -610,7 +634,12 @@ def _get_num_LR_output_samples(input_num_samp, samp_rate_in, samp_rate_out):
 def resample_waveform(wave, orig_freq, new_freq):
     """Resamples the wave at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
-    a signal).
+    a signal). LinearResample (LR) means that the output signal is at linearly spaced intervals (i.e
+    the output signal has a frequency of `new_freq`). It uses sinc/bandlimited interpolation to
+    upsample/downsample the signal.
+
+    https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html
+    https://github.com/kaldi-asr/kaldi/blob/master/src/feat/resample.h#L56
 
     Inputs:
         wave (Tensor): the input signal of size (c, n)
@@ -633,8 +662,8 @@ def resample_waveform(wave, orig_freq, new_freq):
     output_samples_in_unit = int(new_freq) // base_freq
 
     window_width = lowpass_filter_width / (2.0 * lowpass_cutoff)
-    first_indices, weights = get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit,
-                                                        window_width, lowpass_cutoff, lowpass_filter_width)
+    first_indices, weights = _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit,
+                                                         window_width, lowpass_cutoff, lowpass_filter_width)
 
     assert first_indices.dim() == 1
     # TODO figure a better way to do this. conv1d reaches every element i*stride + padding

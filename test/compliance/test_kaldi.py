@@ -177,7 +177,7 @@ class Test_Kaldi(unittest.TestCase):
                 window_type=args[12])
             return output
 
-        self._compliance_test_helper(self.test_filepath, 'spec', 131, 13, get_output_fn, atol=1e-3)
+        self._compliance_test_helper(self.test_filepath, 'spec', 131, 13, get_output_fn, atol=1e-3, rtol=0)
 
     def test_fbank(self):
         def get_output_fn(sound, args):
