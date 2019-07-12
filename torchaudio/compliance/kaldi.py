@@ -185,10 +185,10 @@ def spectrogram(
         preemphasis_coefficient=0.97, raw_energy=True, remove_dc_offset=True,
         round_to_power_of_two=True, sample_frequency=16000.0, snip_edges=True,
         subtract_mean=False, window_type=POVEY):
-    """Create a spectrogram from a raw audio signal. This matches the input/output of Kaldi's
+    r"""Create a spectrogram from a raw audio signal. This matches the input/output of Kaldi's
     compute-spectrogram-feats.
 
-    Inputs:
+    Args:
         sig (Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
         blackman_coeff (float): Constant coefficient for generalized Blackman window. (default = 0.42)
         channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (default = -1)
@@ -214,9 +214,9 @@ def spectrogram(
             it this way.  (default = False)
         window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (default = 'povey')
 
-    Outputs:
-        Tensor: a spectrogram identical to what Kaldi would output. The shape is (m, `padded_window_size` // 2 + 1)
-            where m is calculated in _get_strided
+    Returns:
+        Tensor: a spectrogram identical to what Kaldi would output. The shape is
+        (m, `padded_window_size` // 2 + 1) where m is calculated in _get_strided
     """
     waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
         sig, channel, sample_frequency, frame_shift, frame_length, round_to_power_of_two, preemphasis_coefficient)
@@ -422,10 +422,10 @@ def fbank(
         remove_dc_offset=True, round_to_power_of_two=True, sample_frequency=16000.0,
         snip_edges=True, subtract_mean=False, use_energy=False, use_log_fbank=True, use_power=True,
         vtln_high=-500.0, vtln_low=100.0, vtln_warp=1.0, window_type='povey'):
-    """Create a fbank from a raw audio signal. This matches the input/output of Kaldi's
+    r"""Create a fbank from a raw audio signal. This matches the input/output of Kaldi's
     compute-fbank-feats.
 
-    Inputs:
+    Args:
         sig (Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
         blackman_coeff (float): Constant coefficient for generalized Blackman window. (default = 0.42)
         channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (default = -1)
@@ -463,9 +463,9 @@ def fbank(
         vtln_warp (float): Vtln warp factor (only applicable if vtln_map not specified) (float, default = 1.0)
         window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (default = 'povey')
 
-    Outputs:
+    Returns:
         Tensor: a fbank identical to what Kaldi would output. The shape is (m, `num_mel_bins` + `use_energy`)
-            where m is calculated in _get_strided
+        where m is calculated in _get_strided
     """
     waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
         sig, channel, sample_frequency, frame_shift, frame_length, round_to_power_of_two, preemphasis_coefficient)
