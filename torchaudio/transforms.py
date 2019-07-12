@@ -4,6 +4,7 @@ import math
 import torch
 from typing import Optional
 from . import functional as F
+from .compliance import kaldi
 
 
 # TODO remove this class
@@ -497,3 +498,32 @@ class MuLawExpanding(torch.jit.ScriptModule):
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
+
+
+class Resample(object):
+    """Resamples a signal from one frequency to another. A resampling method can
+    be given.
+
+    Args:
+        orig_freq (float): the original frequency of the signal
+        new_freq (float): the desired frequency
+        resampling_method (str): the resampling method (Default: 'kaldi' which uses
+            sinc interpolation)
+    """
+    def __init__(self, orig_freq, new_freq, resampling_method='kaldi'):
+        self.orig_freq = orig_freq
+        self.new_freq = new_freq
+        self.resampling_method = resampling_method
+
+    def __call__(self, sig):
+        """
+        Args:
+            sig (Tensor): the input signal of size (c, n)
+
+        Returns:
+            Tensor: output signal of size (c, m)
+        """
+        if self.resampling_method == 'kaldi':
+            return kaldi.resample_waveform(sig, self.orig_freq, self.new_freq)
+
+        raise ValueError('Invalid resampling method: %s' % (self.resampling_method))

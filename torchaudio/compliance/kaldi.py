@@ -516,7 +516,7 @@ def fbank(
 
 
 def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, window_width,
-                               lowpass_cutoff, lowpass_filter_width):
+                                lowpass_cutoff, lowpass_filter_width):
     """Based on LinearResample::SetIndexesAndWeights where it retrieves the weights for
     resampling as well as the indices in which they are valid. LinearResample (LR) means
     that the output signal is at linearly spaced intervals (i.e the output signal has a
@@ -541,7 +541,7 @@ def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, win
     Example, one case is when the orig_freq and new_freq are multiples of each other then
     there needs to be one filter.
 
-    Inputs:
+    Args:
         orig_freq (float): the original frequency of the signal
         new_freq (float): the desired frequency
         output_samples_in_unit (int): the number of output samples in the smallest repeating unit:
@@ -552,7 +552,7 @@ def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, win
         lowpass_filter_width (int): controls the sharpness of the filter, more == sharper but less
             efficient. We suggest around 4 to 10 for normal use
 
-    Outputs:
+    Returns:
         min_input_index (Tensor): the minimum indices where the window is valid. size (output_samples_in_unit)
         weights (Tensor): the weights which correspond with min_input_index. size (
             output_samples_in_unit, max_weight_width)
@@ -598,12 +598,12 @@ def _get_num_LR_output_samples(input_num_samp, samp_rate_in, samp_rate_out):
     frequency of `new_freq`). It uses sinc/bandlimited interpolation to upsample/downsample
     the signal.
 
-    Inputs:
+    Args:
         input_num_samp (int): the number of samples in the input
         samp_rate_in (float): the original frequency of the signal
         samp_rate_out (float): the desired frequency
 
-    Outputs:
+    Returns:
         int: the number of output samples
     """
     # For exact computation, we measure time in "ticks" of 1.0 / tick_freq,
@@ -634,7 +634,7 @@ def _get_num_LR_output_samples(input_num_samp, samp_rate_in, samp_rate_out):
 
 
 def resample_waveform(wave, orig_freq, new_freq, lowpass_filter_width=6):
-    """Resamples the wave at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
+    r"""Resamples the wave at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
     a signal). LinearResample (LR) means that the output signal is at linearly spaced intervals (i.e
     the output signal has a frequency of `new_freq`). It uses sinc/bandlimited interpolation to
@@ -643,14 +643,14 @@ def resample_waveform(wave, orig_freq, new_freq, lowpass_filter_width=6):
     https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html
     https://github.com/kaldi-asr/kaldi/blob/master/src/feat/resample.h#L56
 
-    Inputs:
+    Args:
         wave (Tensor): the input signal of size (c, n)
         orig_freq (float): the original frequency of the signal
         new_freq (float): the desired frequency
         lowpass_filter_width (int): controls the sharpness of the filter, more == sharper
             but less efficient. We suggest around 4 to 10 for normal use
 
-    Outputs:
+    Returns:
         Tensor: the signal at the new frequency
     """
     assert orig_freq > 0.0 and new_freq > 0.0
