@@ -617,6 +617,9 @@ def _get_num_LR_output_samples(input_num_samp, samp_rate_in, samp_rate_out):
     # For exact computation, we measure time in "ticks" of 1.0 / tick_freq,
     # where tick_freq is the least common multiple of samp_rate_in and
     # samp_rate_out.
+    samp_rate_in = int(samp_rate_in)
+    samp_rate_out = int(samp_rate_out)
+
     tick_freq = _lcm(samp_rate_in, samp_rate_out)
     ticks_per_input_period = tick_freq // samp_rate_in
 
@@ -661,6 +664,7 @@ def resample_waveform(wave, orig_freq, new_freq, lowpass_filter_width=6):
     Returns:
         Tensor: the signal at the new frequency
     """
+    assert wave.dim() == 2
     assert orig_freq > 0.0 and new_freq > 0.0
 
     min_freq = min(orig_freq, new_freq)
