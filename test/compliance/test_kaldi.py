@@ -216,17 +216,17 @@ class Test_Kaldi(unittest.TestCase):
 
         self._compliance_test_helper(self.test_8000_filepath, 'resample', 32, 3, get_output_fn, atol=1e-2, rtol=1e-5)
 
-    def test_resample_waveform_upsample(self):
+    def test_resample_waveform_upsample_size(self):
         sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)
         upsample_sound = kaldi.resample_waveform(sound, sample_rate, sample_rate * 2)
         self.assertTrue(upsample_sound.size(-1) == sound.size(-1) * 2)
 
-    def test_resample_waveform_downsample(self):
+    def test_resample_waveform_downsample_size(self):
         sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)
         downsample_sound = kaldi.resample_waveform(sound, sample_rate, sample_rate // 2)
         self.assertTrue(downsample_sound.size(-1) == sound.size(-1) // 2)
 
-    def test_resample_waveform_identity(self):
+    def test_resample_waveform_identity_size(self):
         sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)
         downsample_sound = kaldi.resample_waveform(sound, sample_rate, sample_rate)
         self.assertTrue(downsample_sound.size(-1) == sound.size(-1))

@@ -306,7 +306,7 @@ class Tester(unittest.TestCase):
         _test_librosa_consistency_helper(**kwargs2)
         _test_librosa_consistency_helper(**kwargs3)
 
-    def test_resample(self):
+    def test_resample_size(self):
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
         sound, sample_rate = torchaudio.load(input_path)
 
