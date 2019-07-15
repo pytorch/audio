@@ -541,6 +541,12 @@ def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, win
     Example, one case is when the orig_freq and new_freq are multiples of each other then
     there needs to be one filter.
 
+    A windowed filter function (i.e. Hanning * sinc) because the ideal case of sinc function
+    has infinite support (non-zero for all values) so instead it is truncated and multiplied by
+    a window function which gives it less-than-perfect rolloff [1].
+
+    [1] Chapter 16: Windowed-Sinc Filters, https://www.dspguide.com/ch16/1.htm
+
     Args:
         orig_freq (float): the original frequency of the signal
         new_freq (float): the desired frequency
@@ -574,11 +580,13 @@ def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, win
 
     weights = torch.zeros_like(delta_t)
     inside_window_indices = delta_t.abs().lt(window_width)
+    # raised-cosine (Hanning) window with width `window_width`
     weights[inside_window_indices] = 0.5 * (1 + torch.cos(2 * math.pi * lowpass_cutoff /
                                             lowpass_filter_width * delta_t[inside_window_indices]))
 
     t_eq_zero_indices = delta_t.eq(0.0)
     t_not_eq_zero_indices = ~t_eq_zero_indices
+    # sinc filter function
     weights[t_not_eq_zero_indices] *= torch.sin(
         2 * math.pi * lowpass_cutoff * delta_t[t_not_eq_zero_indices]) / (math.pi * delta_t[t_not_eq_zero_indices])
     # limit of the function at t = 0
