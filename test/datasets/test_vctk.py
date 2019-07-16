@@ -22,9 +22,10 @@ class TestVCTK(unittest.TestCase):
     def test_make_manifest(self):
         audios = vctk.make_manifest(self.test_dirpath)
         files = ['kaldi_file.wav', 'kaldi_file_8000.wav',
-                 'steam-train-whistle-daniel_simon.mp3', 'sinewave.wav']
+                 'sinewave.wav', 'steam-train-whistle-daniel_simon.mp3']
         files = [self.get_full_path(file) for file in files]
 
+        audios.sort()
         self.assertEqual(files, audios, msg='files %s did not match audios %s' % (files, audios))
 
     def test_read_audio(self):
