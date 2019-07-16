@@ -28,9 +28,15 @@ class TestVCTK(unittest.TestCase):
         audios.sort()
         self.assertEqual(files, audios, msg='files %s did not match audios %s' % (files, audios))
 
-    def test_read_audio(self):
+    def test_read_audio_downsample_false(self):
         file = self.get_full_path('kaldi_file.wav')
         s, sr = vctk.read_audio(file, downsample=False)
+        self.assertEqual(sr, 16000, msg='incorrect sample rate %d' % (sr))
+        self.assertEqual(s.shape, (1, 20), msg='incorrect shape %s' % (str(s.shape)))
+
+    def test_read_audio_downsample_true(self):
+        file = self.get_full_path('kaldi_file.wav')
+        s, sr = vctk.read_audio(file, downsample=True)
         self.assertEqual(sr, 16000, msg='incorrect sample rate %d' % (sr))
         self.assertEqual(s.shape, (1, 20), msg='incorrect shape %s' % (str(s.shape)))
 
