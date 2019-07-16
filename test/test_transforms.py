@@ -311,6 +311,29 @@ class Tester(unittest.TestCase):
         _test_librosa_consistency_helper(**kwargs2)
         _test_librosa_consistency_helper(**kwargs3)
 
+    def test_resample_size(self):
+        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        sound, sample_rate = torchaudio.load(input_path)
+
+        upsample_rate = sample_rate * 2
+        downsample_rate = sample_rate // 2
+        invalid_resample = torchaudio.transforms.Resample(sample_rate, upsample_rate, resampling_method='foo')
+
+        self.assertRaises(ValueError, invalid_resample, sound)
+
+        upsample_resample = torchaudio.transforms.Resample(
+            sample_rate, upsample_rate, resampling_method='sinc_interpolation')
+        up_sampled = upsample_resample(sound)
+
+        # we expect the upsampled signal to have twice as many samples
+        self.assertTrue(up_sampled.size(-1) == sound.size(-1) * 2)
+
+        downsample_resample = torchaudio.transforms.Resample(
+            sample_rate, downsample_rate, resampling_method='sinc_interpolation')
+        down_sampled = downsample_resample(sound)
+
+        # we expect the downsampled signal to have half as many samples
+        self.assertTrue(down_sampled.size(-1) == sound.size(-1) // 2)
 
 @pytest.mark.parametrize('fft_length', [512])
 @pytest.mark.parametrize('hop_length', [256])
