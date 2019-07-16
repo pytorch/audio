@@ -230,10 +230,10 @@ class Tester(unittest.TestCase):
             librosa_mel = librosa.feature.melspectrogram(y=sound_librosa, sr=sample_rate,
                                                          n_fft=n_fft, hop_length=hop_length, n_mels=n_mels,
                                                          htk=True, norm=None)
+            librosa_mel_tensor = torch.from_numpy(librosa_mel)
             torch_mel = melspect_transform(sound).squeeze().cpu().t()
 
-            # lower tolerance, think it's double vs. float
-            self.assertTrue(torch.allclose(torch_mel.type(torch.double), torch.from_numpy(librosa_mel), atol=5e-3))
+            self.assertTrue(torch.allclose(torch_mel.type(librosa_mel_tensor.dtype), librosa_mel_tensor, atol=5e-3))
 
             # test s2db
 
@@ -244,8 +244,9 @@ class Tester(unittest.TestCase):
 
             db_torch = db_transform(melspect_transform(sound)).squeeze().cpu().t()
             db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
+            db_librosa_tensor = torch.from_numpy(db_librosa)
 
-            self.assertTrue(torch.allclose(db_torch.type(torch.double), torch.from_numpy(db_librosa), atol=5e-3))
+            self.assertTrue(torch.allclose(db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3))
 
             # test MFCC
             melkwargs = {'hop': hop_length, 'n_fft': n_fft}
@@ -269,9 +270,10 @@ class Tester(unittest.TestCase):
     #                                             n_mels=n_mels)
 
             librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm='ortho')[:n_mfcc]
+            librosa_mfcc_tensor = torch.from_numpy(librosa_mfcc)
             torch_mfcc = mfcc_transform(sound).squeeze().cpu().t()
 
-            self.assertTrue(torch.allclose(torch_mfcc.type(torch.double), torch.from_numpy(librosa_mfcc), atol=5e-3))
+            self.assertTrue(torch.allclose(torch_mfcc.type(librosa_mfcc_tensor.dtype), librosa_mfcc_tensor, atol=5e-3))
 
         kwargs1 = {
             'n_fft': 400,
@@ -304,6 +306,29 @@ class Tester(unittest.TestCase):
         _test_librosa_consistency_helper(**kwargs2)
         _test_librosa_consistency_helper(**kwargs3)
 
+    def test_resample_size(self):
+        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        sound, sample_rate = torchaudio.load(input_path)
+
+        upsample_rate = sample_rate * 2
+        downsample_rate = sample_rate // 2
+        invalid_resample = torchaudio.transforms.Resample(sample_rate, upsample_rate, resampling_method='foo')
+
+        self.assertRaises(ValueError, invalid_resample, sound)
+
+        upsample_resample = torchaudio.transforms.Resample(
+            sample_rate, upsample_rate, resampling_method='sinc_interpolation')
+        up_sampled = upsample_resample(sound)
+
+        # we expect the upsampled signal to have twice as many samples
+        self.assertTrue(up_sampled.size(-1) == sound.size(-1) * 2)
+
+        downsample_resample = torchaudio.transforms.Resample(
+            sample_rate, downsample_rate, resampling_method='sinc_interpolation')
+        down_sampled = downsample_resample(sound)
+
+        # we expect the downsampled signal to have half as many samples
+        self.assertTrue(down_sampled.size(-1) == sound.size(-1) // 2)
 
 if __name__ == '__main__':
     unittest.main()
