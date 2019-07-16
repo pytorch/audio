@@ -1,0 +1,920 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torchaudio.functional &mdash; Torchaudio master documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/features">Features</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+
+  </div>
+</div>
+
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+                <div class="version">
+                  master 
+                </div>
+              
+            
+
+            
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../legacy.html">torchaudio.legacy</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+          <li><a href="../index.html">Module code</a> &gt;</li>
+        
+          <li><a href="../torchaudio.html">torchaudio</a> &gt;</li>
+        
+      <li>torchaudio.functional</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <h1>Source code for torchaudio.functional</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;scale&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pad_trim&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;downmix_mono&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;LC2CL&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;istft&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;spectrogram&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;create_fb_matrix&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;spectrogram_to_DB&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;create_dct&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;BLC2CBL&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mu_law_encoding&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mu_law_expanding&#39;</span>
+<span class="p">]</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor, int) -&gt; Tensor</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Scale audio tensor from a 16-bit integer (represented as a</span>
+<span class="sd">    :class:`torch.FloatTensor`) to a floating point number between -1.0 and 1.0.</span>
+<span class="sd">    Note the 16-bit number is called the &quot;bit depth&quot; or &quot;precision&quot;, not to be</span>
+<span class="sd">    confused with &quot;bit rate&quot;.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tensor (torch.Tensor): Tensor of audio of size (n, c) or (c, n)</span>
+<span class="sd">        factor (int): Maximum value of input tensor</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Scaled by the scale factor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">tensor</span><span class="o">.</span><span class="n">is_floating_point</span><span class="p">():</span>
+        <span class="n">tensor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tensor</span> <span class="o">/</span> <span class="n">factor</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">pad_trim</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">ch_dim</span><span class="p">,</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">len_dim</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor, int, int, int, float) -&gt; Tensor</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pad/trim a 2D tensor (signal or labels).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tensor (torch.Tensor): Tensor of audio of size (n, c) or (c, n)</span>
+<span class="sd">        ch_dim (int): Dimension of channel (not size)</span>
+<span class="sd">        max_len (int): Length to which the tensor will be padded</span>
+<span class="sd">        len_dim (int): Dimension of length (not size)</span>
+<span class="sd">        fill_value (float): Value to fill in</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Padded/trimmed tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">max_len</span> <span class="o">&gt;</span> <span class="n">tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">len_dim</span><span class="p">):</span>
+        <span class="c1"># array of [padding_left, padding_right, padding_top, padding_bottom]</span>
+        <span class="c1"># so pad similar to append (aka only right/bottom) and do not pad</span>
+        <span class="c1"># the length dimension. assumes equal sizes of padding.</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="p">[</span><span class="n">max_len</span> <span class="o">-</span> <span class="n">tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">len_dim</span><span class="p">)</span>
+                   <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">!=</span> <span class="n">len_dim</span><span class="p">)</span>
+                   <span class="k">else</span> <span class="mi">0</span>
+                   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span>
+        <span class="c1"># TODO add &quot;with torch.no_grad():&quot; back when JIT supports it</span>
+        <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">max_len</span> <span class="o">&lt;</span> <span class="n">tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">len_dim</span><span class="p">):</span>
+        <span class="n">tensor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="n">len_dim</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">max_len</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tensor</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">downmix_mono</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">ch_dim</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor, int) -&gt; Tensor</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Downmix any stereo signals to mono.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tensor (torch.Tensor): Tensor of audio of size (c, n) or (n, c)</span>
+<span class="sd">        ch_dim (int): Dimension of channel (not size)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Mono signal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">tensor</span><span class="o">.</span><span class="n">is_floating_point</span><span class="p">():</span>
+        <span class="n">tensor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">ch_dim</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tensor</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">LC2CL</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor) -&gt; Tensor</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Permute a 2D tensor from samples (n, c) to (c, n).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tensor (torch.Tensor): Tensor of audio signal with shape (n, c)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Tensor of audio signal with shape (c, n)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">tensor</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_stft</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="p">,</span> <span class="n">win_length</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">pad_mode</span><span class="p">,</span> <span class="n">normalized</span><span class="p">,</span> <span class="n">onesided</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor, int, Optional[int], Optional[int], Optional[Tensor], bool, str, bool, bool) -&gt; Tensor</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="p">,</span> <span class="n">win_length</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">pad_mode</span><span class="p">,</span> <span class="n">normalized</span><span class="p">,</span> <span class="n">onesided</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="istft"><a class="viewcode-back" href="../../functional.html#torchaudio.functional.istft">[docs]</a><span class="k">def</span> <span class="nf">istft</span><span class="p">(</span><span class="n">stft_matrix</span><span class="p">,</span>          <span class="c1"># type: Tensor</span>
+          <span class="n">n_fft</span><span class="p">,</span>                <span class="c1"># type: int</span>
+          <span class="n">hop_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>      <span class="c1"># type: Optional[int]</span>
+          <span class="n">win_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>      <span class="c1"># type: Optional[int]</span>
+          <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>          <span class="c1"># type: Optional[Tensor]</span>
+          <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>          <span class="c1"># type: bool</span>
+          <span class="n">pad_mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">,</span>   <span class="c1"># type: str</span>
+          <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>     <span class="c1"># type: bool</span>
+          <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>        <span class="c1"># type: bool</span>
+          <span class="n">length</span><span class="o">=</span><span class="kc">None</span>           <span class="c1"># type: Optional[int]</span>
+          <span class="p">):</span>
+    <span class="c1"># type: (...) -&gt; Tensor</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.</span>
+<span class="sd">    It has the same parameters (+ additional optional parameter of ``length``) and it should return the</span>
+<span class="sd">    least squares estimation of the original signal. The algorithm will check using the NOLA condition (</span>
+<span class="sd">    nonzero overlap).</span>
+
+<span class="sd">    Important consideration in the parameters ``window`` and ``center`` so that the envelop</span>
+<span class="sd">    created by the summation of all the windows is never zero at certain point in time. Specifically,</span>
+<span class="sd">    :math:`\sum_{t=-\infty}^{\infty} w^2[n-t\times hop\_length] \cancel{=} 0`.</span>
+
+<span class="sd">    Since stft discards elements at the end of the signal if they do not fit in a frame, the</span>
+<span class="sd">    istft may return a shorter signal than the original signal (can occur if `center` is False</span>
+<span class="sd">    since the signal isn&#39;t padded).</span>
+
+<span class="sd">    If ``center`` is True, then there will be padding e.g. &#39;constant&#39;, &#39;reflect&#39;, etc. Left padding</span>
+<span class="sd">    can be trimmed off exactly because they can be calculated but right padding cannot be calculated</span>
+<span class="sd">    without additional information.</span>
+
+<span class="sd">    Example: Suppose the last window is:</span>
+<span class="sd">    [17, 18, 0, 0, 0] vs [18, 0, 0, 0, 0]</span>
+
+<span class="sd">    The n_frames, hop_length, win_length are all the same which prevents the calculation of right padding.</span>
+<span class="sd">    These additional values could be zeros or a reflection of the signal so providing ``length``</span>
+<span class="sd">    could be useful. If ``length`` is ``None`` then padding will be aggressively removed</span>
+<span class="sd">    (some loss of signal).</span>
+
+<span class="sd">    [1] D. W. Griffin and J. S. Lim, “Signal estimation from modified short-time Fourier transform,”</span>
+<span class="sd">    IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stft_matrix (torch.Tensor): Output of stft where each row of a batch is a frequency and each</span>
+<span class="sd">            column is a window. it has a shape of either (batch, fft_size, n_frames, 2) or (</span>
+<span class="sd">            fft_size, n_frames, 2)</span>
+<span class="sd">        n_fft (int): Size of Fourier transform</span>
+<span class="sd">        hop_length (Optional[int]): The distance between neighboring sliding window frames.</span>
+<span class="sd">            (Default: ``win_length // 4``)</span>
+<span class="sd">        win_length (Optional[int]): The size of window frame and STFT filter. (Default: ``n_fft``)</span>
+<span class="sd">        window (Optional[torch.Tensor]): The optional window function.</span>
+<span class="sd">            (Default: ``torch.ones(win_length)``)</span>
+<span class="sd">        center (bool): Whether ``input`` was padded on both sides so</span>
+<span class="sd">            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`</span>
+<span class="sd">        pad_mode (str): Controls the padding method used when ``center`` is ``True``</span>
+<span class="sd">        normalized (bool): Whether the STFT was normalized</span>
+<span class="sd">        onesided (bool): Whether the STFT is onesided</span>
+<span class="sd">        length (Optional[int]): The amount to trim the signal by (i.e. the</span>
+<span class="sd">            original signal length). (Default: whole signal)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Least squares estimation of the original signal of size</span>
+<span class="sd">        (batch, signal_length) or (signal_length)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">stft_matrix_dim</span> <span class="o">=</span> <span class="n">stft_matrix</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="mi">3</span> <span class="o">&lt;=</span> <span class="n">stft_matrix_dim</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;Incorrect stft dimension: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">stft_matrix_dim</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">stft_matrix_dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="c1"># add a batch dimension</span>
+        <span class="n">stft_matrix</span> <span class="o">=</span> <span class="n">stft_matrix</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">device</span> <span class="o">=</span> <span class="n">stft_matrix</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">fft_size</span> <span class="o">=</span> <span class="n">stft_matrix</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">onesided</span> <span class="ow">and</span> <span class="n">n_fft</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">fft_size</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">onesided</span> <span class="ow">and</span> <span class="n">n_fft</span> <span class="o">==</span> <span class="n">fft_size</span><span class="p">),</span> <span class="p">(</span>
+        <span class="s1">&#39;one_sided implies that n_fft // 2 + 1 == fft_size and not one_sided implies n_fft == fft_size. &#39;</span>
+        <span class="o">+</span> <span class="s1">&#39;Given values were onesided: </span><span class="si">%s</span><span class="s1">, n_fft: </span><span class="si">%d</span><span class="s1">, fft_size: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;True&#39;</span> <span class="k">if</span> <span class="n">onesided</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span> <span class="n">n_fft</span><span class="p">,</span> <span class="n">fft_size</span><span class="p">))</span>
+
+    <span class="c1"># use stft defaults for Optionals</span>
+    <span class="k">if</span> <span class="n">win_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">win_length</span> <span class="o">=</span> <span class="n">n_fft</span>
+
+    <span class="k">if</span> <span class="n">hop_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">hop_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">win_length</span> <span class="o">//</span> <span class="mi">4</span><span class="p">)</span>
+
+    <span class="c1"># There must be overlap</span>
+    <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">hop_length</span> <span class="o">&lt;=</span> <span class="n">win_length</span>
+    <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">win_length</span> <span class="o">&lt;=</span> <span class="n">n_fft</span>
+
+    <span class="k">if</span> <span class="n">window</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">win_length</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">window</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">window</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">win_length</span>
+
+    <span class="k">if</span> <span class="n">win_length</span> <span class="o">!=</span> <span class="n">n_fft</span><span class="p">:</span>
+        <span class="c1"># center window with pad left and right zeros</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_fft</span> <span class="o">-</span> <span class="n">win_length</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">n_fft</span> <span class="o">-</span> <span class="n">win_length</span> <span class="o">-</span> <span class="n">left</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">window</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">n_fft</span>
+    <span class="c1"># win_length and n_fft are synonymous from here on</span>
+
+    <span class="n">stft_matrix</span> <span class="o">=</span> <span class="n">stft_matrix</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># size (batch, n_frames, fft_size, 2)</span>
+    <span class="n">stft_matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="n">stft_matrix</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">normalized</span><span class="p">,</span>
+                              <span class="n">onesided</span><span class="p">,</span> <span class="n">signal_sizes</span><span class="o">=</span><span class="p">(</span><span class="n">n_fft</span><span class="p">,))</span>  <span class="c1"># size (batch, n_frames, n_fft)</span>
+
+    <span class="k">assert</span> <span class="n">stft_matrix</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="n">n_fft</span>
+    <span class="n">n_frames</span> <span class="o">=</span> <span class="n">stft_matrix</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">ytmp</span> <span class="o">=</span> <span class="n">stft_matrix</span> <span class="o">*</span> <span class="n">window</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_fft</span><span class="p">)</span>  <span class="c1"># size (batch, n_frames, n_fft)</span>
+    <span class="c1"># each column of a batch is a frame which needs to be overlap added at the right place</span>
+    <span class="n">ytmp</span> <span class="o">=</span> <span class="n">ytmp</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># size (batch, n_fft, n_frames)</span>
+
+    <span class="n">eye</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># size (n_fft, 1, n_fft)</span>
+
+    <span class="c1"># this does overlap add where the frames of ytmp are added such that the i&#39;th frame of</span>
+    <span class="c1"># ytmp is added starting at i*hop_length in the output</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv_transpose1d</span><span class="p">(</span>
+        <span class="n">ytmp</span><span class="p">,</span> <span class="n">eye</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># size (batch, 1, expected_signal_len)</span>
+
+    <span class="c1"># do the same for the window function</span>
+    <span class="n">window_sq</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">n_fft</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_frames</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># size (1, n_fft, n_frames)</span>
+    <span class="n">window_envelop</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv_transpose1d</span><span class="p">(</span>
+        <span class="n">window_sq</span><span class="p">,</span> <span class="n">eye</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># size (1, 1, expected_signal_len)</span>
+
+    <span class="n">expected_signal_len</span> <span class="o">=</span> <span class="n">n_fft</span> <span class="o">+</span> <span class="n">hop_length</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_frames</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected_signal_len</span>
+    <span class="k">assert</span> <span class="n">window_envelop</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected_signal_len</span>
+
+    <span class="n">half_n_fft</span> <span class="o">=</span> <span class="n">n_fft</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="c1"># we need to trim the front padding away if center</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">half_n_fft</span> <span class="k">if</span> <span class="n">center</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="o">-</span><span class="n">half_n_fft</span> <span class="k">if</span> <span class="n">length</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">start</span> <span class="o">+</span> <span class="n">length</span>
+
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+    <span class="n">window_envelop</span> <span class="o">=</span> <span class="n">window_envelop</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+
+    <span class="c1"># check NOLA non-zero overlap condition</span>
+    <span class="n">window_envelop_lowest</span> <span class="o">=</span> <span class="n">window_envelop</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">window_envelop_lowest</span> <span class="o">&gt;</span> <span class="mf">1e-11</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;window overlap add min: </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">window_envelop_lowest</span><span class="p">))</span>
+
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">/</span> <span class="n">window_envelop</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># size (batch, expected_signal_len)</span>
+
+    <span class="k">if</span> <span class="n">stft_matrix_dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># remove the batch dimension</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">y</span></div>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">spectrogram</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">n_fft</span><span class="p">,</span> <span class="n">hop</span><span class="p">,</span> <span class="n">ws</span><span class="p">,</span> <span class="n">power</span><span class="p">,</span> <span class="n">normalize</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor, int, Tensor, int, int, int, int, bool) -&gt; Tensor</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a spectrogram from a raw audio signal.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sig (torch.Tensor): Tensor of audio of size (c, n)</span>
+<span class="sd">        pad (int): Two sided padding of signal</span>
+<span class="sd">        window (torch.Tensor): Window_tensor</span>
+<span class="sd">        n_fft (int): Size of fft</span>
+<span class="sd">        hop (int): Length of hop between STFT windows</span>
+<span class="sd">        ws (int): Window size</span>
+<span class="sd">        power (int) : Exponent for the magnitude spectrogram,</span>
+<span class="sd">            (must be &gt; 0) e.g., 1 for energy, 2 for power, etc.</span>
+<span class="sd">        normalize (bool) : Whether to normalize by magnitude after stft</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Channels x hops x n_fft (c, l, f), where channels</span>
+<span class="sd">        is unchanged, hops is the number of hops, and n_fft is the</span>
+<span class="sd">        number of fourier bins, which should be the window size divided</span>
+<span class="sd">        by 2 plus 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">sig</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="n">pad</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># TODO add &quot;with torch.no_grad():&quot; back when JIT supports it</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="p">(</span><span class="n">pad</span><span class="p">,</span> <span class="n">pad</span><span class="p">),</span> <span class="s2">&quot;constant&quot;</span><span class="p">)</span>
+
+    <span class="c1"># default values are consistent with librosa.core.spectrum._spectrogram</span>
+    <span class="n">spec_f</span> <span class="o">=</span> <span class="n">_stft</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="n">n_fft</span><span class="p">,</span> <span class="n">hop</span><span class="p">,</span> <span class="n">ws</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span>
+                   <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;reflect&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="n">spec_f</span> <span class="o">/=</span> <span class="n">window</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+    <span class="n">spec_f</span> <span class="o">=</span> <span class="n">spec_f</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">power</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># get power of &quot;complex&quot; tensor (c, l, n_fft)</span>
+    <span class="k">return</span> <span class="n">spec_f</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">create_fb_matrix</span><span class="p">(</span><span class="n">n_stft</span><span class="p">,</span> <span class="n">f_min</span><span class="p">,</span> <span class="n">f_max</span><span class="p">,</span> <span class="n">n_mels</span><span class="p">):</span>
+    <span class="c1"># type: (int, float, float, int) -&gt; Tensor</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Create a frequency bin conversion matrix.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n_stft (int): Number of filter banks from spectrogram</span>
+<span class="sd">        f_min (float): Minimum frequency</span>
+<span class="sd">        f_max (float): Maximum frequency</span>
+<span class="sd">        n_mels (int): Number of mel bins</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Triangular filter banks (fb matrix)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># get stft freq bins</span>
+    <span class="n">stft_freqs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">f_min</span><span class="p">,</span> <span class="n">f_max</span><span class="p">,</span> <span class="n">n_stft</span><span class="p">)</span>
+    <span class="c1"># calculate mel freq bins</span>
+    <span class="c1"># hertz to mel(f) is 2595. * math.log10(1. + (f / 700.))</span>
+    <span class="n">m_min</span> <span class="o">=</span> <span class="mf">0.</span> <span class="k">if</span> <span class="n">f_min</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">2595.</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">f_min</span> <span class="o">/</span> <span class="mf">700.</span><span class="p">))</span>
+    <span class="n">m_max</span> <span class="o">=</span> <span class="mf">2595.</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="p">(</span><span class="n">f_max</span> <span class="o">/</span> <span class="mf">700.</span><span class="p">))</span>
+    <span class="n">m_pts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">m_min</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">n_mels</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># mel to hertz(mel) is 700. * (10**(mel / 2595.) - 1.)</span>
+    <span class="n">f_pts</span> <span class="o">=</span> <span class="mf">700.</span> <span class="o">*</span> <span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="n">m_pts</span> <span class="o">/</span> <span class="mf">2595.</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="c1"># calculate the difference between each mel point and each stft freq point in hertz</span>
+    <span class="n">f_diff</span> <span class="o">=</span> <span class="n">f_pts</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">f_pts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># (n_mels + 1)</span>
+    <span class="n">slopes</span> <span class="o">=</span> <span class="n">f_pts</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">stft_freqs</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (n_stft, n_mels + 2)</span>
+    <span class="c1"># create overlapping triangles</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">down_slopes</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">slopes</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">f_diff</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># (n_stft, n_mels)</span>
+    <span class="n">up_slopes</span> <span class="o">=</span> <span class="n">slopes</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:]</span> <span class="o">/</span> <span class="n">f_diff</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># (n_stft, n_mels)</span>
+    <span class="n">fb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">down_slopes</span><span class="p">,</span> <span class="n">up_slopes</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">fb</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">spectrogram_to_DB</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">multiplier</span><span class="p">,</span> <span class="n">amin</span><span class="p">,</span> <span class="n">db_multiplier</span><span class="p">,</span> <span class="n">top_db</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor, float, float, float, Optional[float]) -&gt; Tensor</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turns a spectrogram from the power/amplitude scale to the decibel scale.</span>
+
+<span class="sd">    This output depends on the maximum value in the input spectrogram, and so</span>
+<span class="sd">    may return different values for an audio clip split into snippets vs. a</span>
+<span class="sd">    a full clip.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        spec (torch.Tensor): Normal STFT</span>
+<span class="sd">        multiplier (float): Use 10. for power and 20. for amplitude</span>
+<span class="sd">        amin (float): Number to clamp spec</span>
+<span class="sd">        db_multiplier (float): Log10(max(reference value and amin))</span>
+<span class="sd">        top_db (Optional[float]): Minimum negative cut-off in decibels.  A reasonable number</span>
+<span class="sd">            is 80.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Spectrogram in DB</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">spec_db</span> <span class="o">=</span> <span class="n">multiplier</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="n">amin</span><span class="p">))</span>
+    <span class="n">spec_db</span> <span class="o">-=</span> <span class="n">multiplier</span> <span class="o">*</span> <span class="n">db_multiplier</span>
+
+    <span class="k">if</span> <span class="n">top_db</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">new_spec_db_max</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">spec_db</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">-</span> <span class="n">top_db</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">spec_db</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">spec_db</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">spec_db</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">spec_db</span><span class="p">,</span> <span class="n">new_spec_db_max</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">spec_db</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">create_dct</span><span class="p">(</span><span class="n">n_mfcc</span><span class="p">,</span> <span class="n">n_mels</span><span class="p">,</span> <span class="n">norm</span><span class="p">):</span>
+    <span class="c1"># type: (int, int, Optional[str]) -&gt; Tensor</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Creates a DCT transformation matrix with shape (num_mels, num_mfcc),</span>
+<span class="sd">    normalized depending on norm.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n_mfcc (int) : Number of mfc coefficients to retain</span>
+<span class="sd">        n_mels (int): Number of MEL bins</span>
+<span class="sd">        norm (Optional[str]) : Norm to use (either &#39;ortho&#39; or None)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: The transformation matrix, to be right-multiplied to row-wise data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">outdim</span> <span class="o">=</span> <span class="n">n_mfcc</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">n_mels</span>
+    <span class="c1"># http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">outdim</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">dct</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">k</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">norm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dct</span> <span class="o">*=</span> <span class="mf">2.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">norm</span> <span class="o">==</span> <span class="s1">&#39;ortho&#39;</span>
+        <span class="n">dct</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">dct</span> <span class="o">*=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">dct</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">BLC2CBL</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor) -&gt; Tensor</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Permute a 3D tensor from Bands x Sample length x Channels to Channels x</span>
+<span class="sd">    Bands x Samples length.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tensor (torch.Tensor): Tensor of spectrogram with shape (b, l, c)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Tensor of spectrogram with shape (c, b, l)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">tensor</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">mu_law_encoding</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">qc</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor, int) -&gt; Tensor</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode signal based on mu-law companding.  For more info see the</span>
+<span class="sd">    `Wikipedia Entry &lt;https://en.wikipedia.org/wiki/%CE%9C-law_algorithm&gt;`_</span>
+
+<span class="sd">    This algorithm assumes the signal has been scaled to between -1 and 1 and</span>
+<span class="sd">    returns a signal encoded with values from 0 to quantization_channels - 1.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (torch.Tensor): Input tensor</span>
+<span class="sd">        qc (int): Number of channels (i.e. quantization channels)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Input after mu-law companding</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">),</span> <span class="s1">&#39;mu_law_encoding expects a Tensor&#39;</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">qc</span> <span class="o">-</span> <span class="mf">1.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">is_floating_point</span><span class="p">():</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">x_mu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">mu</span> <span class="o">*</span>
+                                       <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+    <span class="n">x_mu</span> <span class="o">=</span> <span class="p">((</span><span class="n">x_mu</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x_mu</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">mu_law_expanding</span><span class="p">(</span><span class="n">x_mu</span><span class="p">,</span> <span class="n">qc</span><span class="p">):</span>
+    <span class="c1"># type: (Tensor, int) -&gt; Tensor</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode mu-law encoded signal.  For more info see the</span>
+<span class="sd">    `Wikipedia Entry &lt;https://en.wikipedia.org/wiki/%CE%9C-law_algorithm&gt;`_</span>
+
+<span class="sd">    This expects an input with values between 0 and quantization_channels - 1</span>
+<span class="sd">    and returns a signal scaled between -1 and 1.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x_mu (torch.Tensor): Input tensor</span>
+<span class="sd">        qc (int): Number of channels (i.e. quantization channels)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Input after decoding</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x_mu</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">),</span> <span class="s1">&#39;mu_law_expanding expects a Tensor&#39;</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">qc</span> <span class="o">-</span> <span class="mf">1.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">x_mu</span><span class="o">.</span><span class="n">is_floating_point</span><span class="p">():</span>
+        <span class="n">x_mu</span> <span class="o">=</span> <span class="n">x_mu</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">x_mu</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">((</span><span class="n">x_mu</span><span class="p">)</span> <span class="o">/</span> <span class="n">mu</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">1.</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">mu</span><span class="p">))</span> <span class="o">-</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">/</span> <span class="n">mu</span>
+    <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+
+             </article>
+             
+            </div>
+            <footer>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+         <script type="text/javascript" src="../../_static/jquery.js"></script>
+         <script type="text/javascript" src="../../_static/underscore.js"></script>
+         <script type="text/javascript" src="../../_static/doctools.js"></script>
+         <script type="text/javascript" src="../../_static/language_data.js"></script>
+         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js"></script>
+         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js"></script>
+         <script type="text/javascript" src="../../_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/vendor/bootstrap.min.js"></script>
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://pytorch.org/resources">Resources</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/support">Support</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Follow Us</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="#">Get Started</a>
+          </li>
+
+          <li>
+            <a href="#">Features</a>
+          </li>
+
+          <li>
+            <a href="#">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

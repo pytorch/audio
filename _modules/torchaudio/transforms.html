@@ -138,8 +138,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../legacy.html">torchaudio.legacy</a></li>
 </ul>
 
@@ -218,9 +220,11 @@
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
 
+<span class="c1"># TODO remove this class</span>
 <div class="viewcode-block" id="Compose"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Compose">[docs]</a><span class="k">class</span> <span class="nc">Compose</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Composes several transforms together.</span>
 
@@ -233,7 +237,6 @@
 <span class="sd">        &gt;&gt;&gt;     transforms.PadTrim(max_len=16000),</span>
 <span class="sd">        &gt;&gt;&gt; ])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transforms</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span> <span class="o">=</span> <span class="n">transforms</span>
 
@@ -251,7 +254,7 @@
         <span class="k">return</span> <span class="n">format_string</span></div>
 
 
-<div class="viewcode-block" id="Scale"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Scale">[docs]</a><span class="k">class</span> <span class="nc">Scale</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Scale"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Scale">[docs]</a><span class="k">class</span> <span class="nc">Scale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Scale audio tensor from a 16-bit integer (represented as a FloatTensor)</span>
 <span class="sd">    to a floating point number between -1.0 and 1.0.  Note the 16-bit number is</span>
 <span class="sd">    called the &quot;bit depth&quot; or &quot;precision&quot;, not to be confused with &quot;bit rate&quot;.</span>
@@ -260,11 +263,14 @@
 <span class="sd">        factor (int): maximum value of input tensor. default: 16-bit depth</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;factor&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">31</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Scale</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Args:</span>
@@ -280,7 +286,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;()&#39;</span></div>
 
 
-<div class="viewcode-block" id="PadTrim"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.PadTrim">[docs]</a><span class="k">class</span> <span class="nc">PadTrim</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PadTrim"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.PadTrim">[docs]</a><span class="k">class</span> <span class="nc">PadTrim</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Pad/Trim a 2d-Tensor (Signal or Labels)</span>
 
 <span class="sd">    Args:</span>
@@ -289,13 +295,16 @@
 <span class="sd">        channels_first (bool): Pad for channels first tensors.  Default: `True`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;max_len&#39;</span><span class="p">,</span> <span class="s1">&#39;fill_value&#39;</span><span class="p">,</span> <span class="s1">&#39;len_dim&#39;</span><span class="p">,</span> <span class="s1">&#39;ch_dim&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PadTrim</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_len</span> <span class="o">=</span> <span class="n">max_len</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span> <span class="o">=</span> <span class="n">fill_value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">len_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">channels_first</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">channels_first</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Returns:</span>
@@ -308,7 +317,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;(max_len=</span><span class="si">{0}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_len</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="DownmixMono"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.DownmixMono">[docs]</a><span class="k">class</span> <span class="nc">DownmixMono</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="DownmixMono"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.DownmixMono">[docs]</a><span class="k">class</span> <span class="nc">DownmixMono</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Downmix any stereo signals to mono.  Consider using a `SoxEffectsChain` with</span>
 <span class="sd">       the `channels` effect instead of this transformation.</span>
 
@@ -320,22 +329,29 @@
 <span class="sd">        tensor (Tensor) (Samples x 1):</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ch_dim&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DownmixMono</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ch_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="n">channels_first</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">downmix_mono</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_dim</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;()&#39;</span></div>
 
 
-<div class="viewcode-block" id="LC2CL"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.LC2CL">[docs]</a><span class="k">class</span> <span class="nc">LC2CL</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="LC2CL"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.LC2CL">[docs]</a><span class="k">class</span> <span class="nc">LC2CL</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Permute a 2d tensor from samples (n x c) to (c x n)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LC2CL</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Args:</span>
@@ -355,7 +371,7 @@
     <span class="k">return</span> <span class="n">Spectrogram</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">Spectrogram</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Spectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a spectrogram from a raw audio signal</span>
 
 <span class="sd">    Args:</span>
@@ -369,21 +385,25 @@
 <span class="sd">        normalize (bool) : whether to normalize by magnitude after stft</span>
 <span class="sd">        wkwargs (dict, optional): arguments for window function</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;ws&#39;</span><span class="p">,</span> <span class="s1">&#39;hop&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">,</span> <span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="s1">&#39;normalize&#39;</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">ws</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">pad</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">,</span>
                  <span class="n">power</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">wkwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Spectrogram</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span> <span class="o">=</span> <span class="n">n_fft</span>
         <span class="c1"># number of fft bins. the returned STFT result will have n_fft // 2 + 1</span>
         <span class="c1"># number of frequecies due to onesided=True in torch.stft</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ws</span> <span class="o">=</span> <span class="n">ws</span> <span class="k">if</span> <span class="n">ws</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">n_fft</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hop</span> <span class="o">=</span> <span class="n">hop</span> <span class="k">if</span> <span class="n">hop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">ws</span> <span class="o">//</span> <span class="mi">2</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">window</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ws</span><span class="p">)</span> <span class="k">if</span> <span class="n">wkwargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ws</span><span class="p">,</span> <span class="o">**</span><span class="n">wkwargs</span><span class="p">)</span>
+        <span class="n">window</span> <span class="o">=</span> <span class="n">window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ws</span><span class="p">)</span> <span class="k">if</span> <span class="n">wkwargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ws</span><span class="p">,</span> <span class="o">**</span><span class="n">wkwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">Attribute</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">=</span> <span class="n">pad</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">power</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span> <span class="o">=</span> <span class="n">normalize</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">wkwargs</span> <span class="o">=</span> <span class="n">wkwargs</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            sig (Tensor): Tensor of audio of size (c, n)</span>
@@ -404,9 +424,11 @@
     <span class="k">return</span> <span class="n">MelScale</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">MelScale</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">MelScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This turns a normal STFT into a mel frequency STFT, using a conversion</span>
 <span class="sd">       matrix.  This uses triangular filter banks.</span>
+
+<span class="sd">       User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n_mels (int): number of mel bins</span>
@@ -416,20 +438,30 @@
 <span class="sd">        n_stft (int, optional): number of filter banks from stft. Calculated from first input</span>
 <span class="sd">            if `None` is given.  See `n_fft` in `Spectrogram`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_mels&#39;</span><span class="p">,</span> <span class="s1">&#39;sr&#39;</span><span class="p">,</span> <span class="s1">&#39;f_min&#39;</span><span class="p">,</span> <span class="s1">&#39;f_max&#39;</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_mels</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span> <span class="n">f_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">f_min</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">n_stft</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MelScale</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span> <span class="o">=</span> <span class="n">n_mels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sr</span> <span class="o">=</span> <span class="n">sr</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span> <span class="o">=</span> <span class="n">f_max</span> <span class="k">if</span> <span class="n">f_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">sr</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span> <span class="o">=</span> <span class="n">f_max</span> <span class="k">if</span> <span class="n">f_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">sr</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span> <span class="o">=</span> <span class="n">f_min</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fb</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span>
-            <span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">)</span> <span class="k">if</span> <span class="n">n_stft</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">n_stft</span>
+        <span class="n">fb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">n_stft</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span>
+            <span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">Attribute</span><span class="p">(</span><span class="n">fb</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_f</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="p">,</span> <span class="n">spec_m</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mel_scale</span><span class="p">(</span><span class="n">spec_f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="p">)</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_f</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">tmp_fb</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span><span class="n">spec_f</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">)</span>
+            <span class="c1"># Attributes cannot be reassigned outside __init__ so workaround</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="o">.</span><span class="n">resize_</span><span class="p">(</span><span class="n">tmp_fb</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">tmp_fb</span><span class="p">)</span>
+        <span class="n">spec_m</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">spec_f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="p">)</span>  <span class="c1"># (c, l, n_fft) dot (n_fft, n_mels) -&gt; (c, l, n_mels)</span>
         <span class="k">return</span> <span class="n">spec_m</span>
 
 
-<span class="k">class</span> <span class="nc">SpectrogramToDB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SpectrogramToDB</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Turns a spectrogram from the power/amplitude scale to the decibel scale.</span>
 
 <span class="sd">    This output depends on the maximum value in the input spectrogram, and so</span>
@@ -442,23 +474,27 @@
 <span class="sd">        top_db (float, optional): minimum negative cut-off in decibels.  A reasonable number</span>
 <span class="sd">            is 80.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;multiplier&#39;</span><span class="p">,</span> <span class="s1">&#39;amin&#39;</span><span class="p">,</span> <span class="s1">&#39;ref_value&#39;</span><span class="p">,</span> <span class="s1">&#39;db_multiplier&#39;</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stype</span><span class="o">=</span><span class="s2">&quot;power&quot;</span><span class="p">,</span> <span class="n">top_db</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stype</span> <span class="o">=</span> <span class="n">stype</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SpectrogramToDB</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">Attribute</span><span class="p">(</span><span class="n">stype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">top_db</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">top_db</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;top_db must be positive value&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">top_db</span> <span class="o">=</span> <span class="n">top_db</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_db</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">Attribute</span><span class="p">(</span><span class="n">top_db</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">multiplier</span> <span class="o">=</span> <span class="mf">10.</span> <span class="k">if</span> <span class="n">stype</span> <span class="o">==</span> <span class="s2">&quot;power&quot;</span> <span class="k">else</span> <span class="mf">20.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">amin</span> <span class="o">=</span> <span class="mf">1e-10</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ref_value</span> <span class="o">=</span> <span class="mf">1.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db_multiplier</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">amin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_value</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
         <span class="c1"># numerically stable implementation from librosa</span>
         <span class="c1"># https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html</span>
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">spectrogram_to_DB</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">amin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_multiplier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_db</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">MFCC</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">MFCC</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create the Mel-frequency cepstrum coefficients from an audio signal</span>
 
 <span class="sd">        By default, this calculates the MFCC on the DB-scaled Mel spectrogram.</span>
@@ -473,21 +509,22 @@
 <span class="sd">        sr (int) : sample rate of audio signal</span>
 <span class="sd">        n_mfcc (int) : number of mfc coefficients to retain</span>
 <span class="sd">        dct_type (int) : type of DCT (discrete cosine transform) to use</span>
-<span class="sd">        norm (string) : norm to use</span>
+<span class="sd">        norm (string, optional) : norm to use</span>
 <span class="sd">        log_mels (bool) : whether to use log-mel spectrograms instead of db-scaled</span>
 <span class="sd">        melkwargs (dict, optional): arguments for MelSpectrogram</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sr&#39;</span><span class="p">,</span> <span class="s1">&#39;n_mfcc&#39;</span><span class="p">,</span> <span class="s1">&#39;dct_type&#39;</span><span class="p">,</span> <span class="s1">&#39;top_db&#39;</span><span class="p">,</span> <span class="s1">&#39;log_mels&#39;</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span> <span class="n">n_mfcc</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">dct_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s1">&#39;ortho&#39;</span><span class="p">,</span> <span class="n">log_mels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">melkwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
+        <span class="nb">super</span><span class="p">(</span><span class="n">MFCC</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">supported_dct_types</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">dct_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_dct_types</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;DCT type not supported&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dct_type</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sr</span> <span class="o">=</span> <span class="n">sr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_mfcc</span> <span class="o">=</span> <span class="n">n_mfcc</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dct_type</span> <span class="o">=</span> <span class="n">dct_type</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">melkwargs</span> <span class="o">=</span> <span class="n">melkwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">Attribute</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">top_db</span> <span class="o">=</span> <span class="mf">80.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">s2db</span> <span class="o">=</span> <span class="n">SpectrogramToDB</span><span class="p">(</span><span class="s2">&quot;power&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_db</span><span class="p">)</span>
 
@@ -498,10 +535,12 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mfcc</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MelSpectrogram</span><span class="o">.</span><span class="n">n_mels</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot select more MFCC coefficients than # mel bins&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dct_mat</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">create_dct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_mfcc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MelSpectrogram</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">)</span>
+        <span class="n">dct_mat</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">create_dct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_mfcc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MelSpectrogram</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dct_mat</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">Attribute</span><span class="p">(</span><span class="n">dct_mat</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_mels</span> <span class="o">=</span> <span class="n">log_mels</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            sig (Tensor): Tensor of audio of size (channels [c], samples [n])</span>
@@ -511,10 +550,17 @@
 <span class="sd">                is unchanged, hops is the number of hops, and n_mels is the</span>
 <span class="sd">                number of mel bins.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">MFCC</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sig</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s2db</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dct_mat</span><span class="p">)</span>
+        <span class="n">mel_spect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_mels</span><span class="p">:</span>
+            <span class="n">log_offset</span> <span class="o">=</span> <span class="mf">1e-6</span>
+            <span class="n">mel_spect</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">mel_spect</span> <span class="o">+</span> <span class="n">log_offset</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mel_spect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s2db</span><span class="p">(</span><span class="n">mel_spect</span><span class="p">)</span>
+        <span class="n">mfcc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">mel_spect</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dct_mat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mfcc</span>
 
 
-<span class="k">class</span> <span class="nc">MelSpectrogram</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">MelSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create MEL Spectrograms from a raw audio signal using the stft</span>
 <span class="sd">       function in PyTorch.</span>
 
@@ -539,27 +585,26 @@
 <span class="sd">        &gt;&gt;&gt; sig, sr = torchaudio.load(&quot;test.wav&quot;, normalization=True)</span>
 <span class="sd">        &gt;&gt;&gt; spec_mel = transforms.MelSpectrogram(sr)(sig)  # (c, l, m)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sr&#39;</span><span class="p">,</span> <span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;ws&#39;</span><span class="p">,</span> <span class="s1">&#39;hop&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">,</span> <span class="s1">&#39;n_mels&#39;</span><span class="p">,</span> <span class="s1">&#39;f_min&#39;</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">ws</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">f_min</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">f_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">pad</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_mels</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">,</span> <span class="n">wkwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">window</span> <span class="o">=</span> <span class="n">window</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MelSpectrogram</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sr</span> <span class="o">=</span> <span class="n">sr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span> <span class="o">=</span> <span class="n">n_fft</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ws</span> <span class="o">=</span> <span class="n">ws</span> <span class="k">if</span> <span class="n">ws</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">n_fft</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hop</span> <span class="o">=</span> <span class="n">hop</span> <span class="k">if</span> <span class="n">hop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">ws</span> <span class="o">//</span> <span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">=</span> <span class="n">pad</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span> <span class="o">=</span> <span class="n">n_mels</span>  <span class="c1"># number of mel frequency bins</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">wkwargs</span> <span class="o">=</span> <span class="n">wkwargs</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span> <span class="o">=</span> <span class="n">f_max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">Attribute</span><span class="p">(</span><span class="n">f_max</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span> <span class="o">=</span> <span class="n">f_min</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spec</span> <span class="o">=</span> <span class="n">Spectrogram</span><span class="p">(</span><span class="n">n_fft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">ws</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws</span><span class="p">,</span> <span class="n">hop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hop</span><span class="p">,</span>
-                                <span class="n">pad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                                <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">wkwargs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wkwargs</span><span class="p">)</span>
+                                <span class="n">pad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">wkwargs</span><span class="o">=</span><span class="n">wkwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fm</span> <span class="o">=</span> <span class="n">MelScale</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span> <span class="o">=</span> <span class="n">Compose</span><span class="p">([</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fm</span>
-        <span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            sig (Tensor): Tensor of audio of size (channels [c], samples [n])</span>
@@ -570,8 +615,8 @@
 <span class="sd">                number of mel bins.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">spec_mel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
-
+        <span class="n">spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+        <span class="n">spec_mel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fm</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">spec_mel</span>
 
 
@@ -579,12 +624,16 @@
     <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s2">&quot;MEL has been removed from the library please use MelSpectrogram or librosa&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="BLC2CBL"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.BLC2CBL">[docs]</a><span class="k">class</span> <span class="nc">BLC2CBL</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="BLC2CBL"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.BLC2CBL">[docs]</a><span class="k">class</span> <span class="nc">BLC2CBL</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Permute a 3d tensor from Bands x Sample length x Channels to Channels x</span>
 <span class="sd">       Bands x Samples length</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BLC2CBL</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Args:</span>
@@ -600,7 +649,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;()&#39;</span></div>
 
 
-<div class="viewcode-block" id="MuLawEncoding"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.MuLawEncoding">[docs]</a><span class="k">class</span> <span class="nc">MuLawEncoding</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="MuLawEncoding"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.MuLawEncoding">[docs]</a><span class="k">class</span> <span class="nc">MuLawEncoding</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Encode signal based on mu-law companding.  For more info see the</span>
 <span class="sd">    `Wikipedia Entry &lt;https://en.wikipedia.org/wiki/%CE%9C-law_algorithm&gt;`_</span>
 
@@ -611,11 +660,14 @@
 <span class="sd">        quantization_channels (int): Number of channels. default: 256</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;qc&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantization_channels</span><span class="o">=</span><span class="mi">256</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MuLawEncoding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">qc</span> <span class="o">=</span> <span class="n">quantization_channels</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Args:</span>
@@ -631,7 +683,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;()&#39;</span></div>
 
 
-<div class="viewcode-block" id="MuLawExpanding"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.MuLawExpanding">[docs]</a><span class="k">class</span> <span class="nc">MuLawExpanding</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="MuLawExpanding"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.MuLawExpanding">[docs]</a><span class="k">class</span> <span class="nc">MuLawExpanding</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">ScriptModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Decode mu-law encoded signal.  For more info see the</span>
 <span class="sd">    `Wikipedia Entry &lt;https://en.wikipedia.org/wiki/%CE%9C-law_algorithm&gt;`_</span>
 
@@ -642,11 +694,14 @@
 <span class="sd">        quantization_channels (int): Number of channels. default: 256</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;qc&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantization_channels</span><span class="o">=</span><span class="mi">256</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MuLawExpanding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">qc</span> <span class="o">=</span> <span class="n">quantization_channels</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_mu</span><span class="p">):</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script_method</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_mu</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Args:</span>

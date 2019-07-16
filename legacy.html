@@ -32,7 +32,7 @@
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="torchaudio.transforms" href="transforms.html" /> 
+    <link rel="prev" title="torchaudio.functional" href="functional.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -139,8 +139,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.legacy</a></li>
 </ul>
 
@@ -219,32 +221,27 @@
 <p>Legacy loading and save functions.</p>
 <span class="target" id="module-torchaudio.legacy"></span><dl class="function">
 <dt id="torchaudio.legacy.load">
-<code class="descclassname">torchaudio.legacy.</code><code class="descname">load</code><span class="sig-paren">(</span><em>filepath</em>, <em>out=None</em>, <em>normalization=None</em>, <em>num_frames=0</em>, <em>offset=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/legacy.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.legacy.load" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.legacy.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">out=None</em>, <em class="sig-param">normalization=None</em>, <em class="sig-param">num_frames=0</em>, <em class="sig-param">offset=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/legacy.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.legacy.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads an audio file from disk into a Tensor.  The default options have
 changed as of torchaudio 0.2 and this function maintains option defaults
 from version 0.1.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filepath</strong> (<em>string</em>) – path to audio file</li>
-<li><strong>out</strong> (<em>Tensor</em><em>, </em><em>optional</em>) – an output Tensor to use instead of creating one</li>
-<li><strong>normalization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em> or </em><em>number</em><em>, </em><em>optional</em>) – If boolean <cite>True</cite>, then output is divided by <cite>1 &lt;&lt; 31</cite>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>string</em>) – path to audio file</p></li>
+<li><p><strong>out</strong> (<em>Tensor</em><em>, </em><em>optional</em>) – an output Tensor to use instead of creating one</p></li>
+<li><p><strong>normalization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em> or </em><em>number</em><em>, </em><em>optional</em>) – If boolean <cite>True</cite>, then output is divided by <cite>1 &lt;&lt; 31</cite>
 (assumes 16-bit depth audio, and normalizes to <cite>[0, 1]</cite>.
-If <cite>number</cite>, then output is divided by that number</li>
-<li><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – number of frames to load.  -1 to load everything after the offset.</li>
-<li><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – number of frames from the start of the file to begin data loading.</li>
+If <cite>number</cite>, then output is divided by that number</p></li>
+<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – number of frames to load.  -1 to load everything after the offset.</p></li>
+<li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – number of frames from the start of the file to begin data loading.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Returns: tuple(Tensor, int)</dt>
-<dd><ul class="first last simple">
-<li>Tensor: output Tensor of size <cite>[L x C]</cite> where L is the number of audio frames, C is the number of channels</li>
-<li>int: the sample-rate of the audio (as listed in the metadata of the file)</li>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns: tuple(Tensor, int)</dt><dd><ul class="simple">
+<li><p>Tensor: output Tensor of size <cite>[L x C]</cite> where L is the number of audio frames, C is the number of channels</p></li>
+<li><p>int: the sample-rate of the audio (as listed in the metadata of the file)</p></li>
 </ul>
 </dd>
 </dl>
@@ -260,25 +257,21 @@ If <cite>number</cite>, then output is divided by that number</li>
 
 <dl class="function">
 <dt id="torchaudio.legacy.save">
-<code class="descclassname">torchaudio.legacy.</code><code class="descname">save</code><span class="sig-paren">(</span><em>filepath</em>, <em>src</em>, <em>sample_rate</em>, <em>precision=32</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/legacy.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.legacy.save" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.legacy.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">src</em>, <em class="sig-param">sample_rate</em>, <em class="sig-param">precision=32</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/legacy.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.legacy.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Saves a Tensor with audio signal to disk as a standard format like mp3, wav, etc.
 The default options have changed as of torchaudio 0.2 and this function maintains
 option defaults from version 0.1.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filepath</strong> (<em>string</em>) – path to audio file</li>
-<li><strong>src</strong> (<em>Tensor</em>) – an input 2D Tensor of shape <cite>[L x C]</cite> where L is
-the number of audio frames, C is the number of channels</li>
-<li><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the sample-rate of the audio to be saved</li>
-<li><strong>precision</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – the bit-precision of the audio to be saved</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>string</em>) – path to audio file</p></li>
+<li><p><strong>src</strong> (<em>Tensor</em>) – an input 2D Tensor of shape <cite>[L x C]</cite> where L is
+the number of audio frames, C is the number of channels</p></li>
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the sample-rate of the audio to be saved</p></li>
+<li><p><strong>precision</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – the bit-precision of the audio to be saved</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;foo.wav&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
@@ -297,7 +290,7 @@ the number of audio frames, C is the number of channels</li>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="transforms.html" class="btn btn-neutral" title="torchaudio.transforms" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="functional.html" class="btn btn-neutral" title="torchaudio.functional" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   

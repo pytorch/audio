@@ -140,8 +140,10 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="legacy.html">torchaudio.legacy</a></li>
 </ul>
 
@@ -220,13 +222,12 @@
 <p>Create SoX effects chain for preprocessing audio.</p>
 <dl class="class">
 <dt id="torchaudio.sox_effects.SoxEffect">
-<em class="property">class </em><code class="descclassname">torchaudio.sox_effects.</code><code class="descname">SoxEffect</code><a class="reference internal" href="_modules/torchaudio/sox_effects.html#SoxEffect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffect" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.sox_effects.</code><code class="sig-name descname">SoxEffect</code><a class="reference internal" href="_modules/torchaudio/sox_effects.html#SoxEffect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an object for passing sox effect information between python and c++</p>
-<dl class="docutils">
-<dt>Returns: SoxEffect(object)</dt>
-<dd><ul class="first last simple">
-<li>ename (str), name of effect</li>
-<li>eopts (list[str]), list of effect options</li>
+<dl class="simple">
+<dt>Returns: SoxEffect(object)</dt><dd><ul class="simple">
+<li><p>ename (str), name of effect</p></li>
+<li><p>eopts (list[str]), list of effect options</p></li>
 </ul>
 </dd>
 </dl>
@@ -234,39 +235,34 @@
 
 <dl class="class">
 <dt id="torchaudio.sox_effects.SoxEffectsChain">
-<em class="property">class </em><code class="descclassname">torchaudio.sox_effects.</code><code class="descname">SoxEffectsChain</code><span class="sig-paren">(</span><em>normalization=True</em>, <em>channels_first=True</em>, <em>out_siginfo=None</em>, <em>out_encinfo=None</em>, <em>filetype='raw'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects.html#SoxEffectsChain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.sox_effects.</code><code class="sig-name descname">SoxEffectsChain</code><span class="sig-paren">(</span><em class="sig-param">normalization=True</em>, <em class="sig-param">channels_first=True</em>, <em class="sig-param">out_siginfo=None</em>, <em class="sig-param">out_encinfo=None</em>, <em class="sig-param">filetype='raw'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects.html#SoxEffectsChain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain" title="Permalink to this definition">¶</a></dt>
 <dd><p>SoX effects chain class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>normalization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>number</em><em>, or </em><em>callable</em><em>, </em><em>optional</em>) – If boolean <cite>True</cite>, then output is divided by <cite>1 &lt;&lt; 31</cite>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>normalization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>number</em><em>, or </em><em>callable</em><em>, </em><em>optional</em>) – If boolean <cite>True</cite>, then output is divided by <cite>1 &lt;&lt; 31</cite>
 (assumes signed 32-bit audio), and normalizes to <cite>[0, 1]</cite>.
 If <cite>number</cite>, then output is divided by that number
 If <cite>callable</cite>, then the output is passed as a parameter
 to the given function, then the output is divided by
-the result.</li>
-<li><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Set channels first or length first in result.  Default: <code class="docutils literal notranslate"><span class="pre">True</span></code></li>
-<li><strong>out_siginfo</strong> (<em>sox_signalinfo_t</em><em>, </em><em>optional</em>) – a sox_signalinfo_t type, which could be helpful if the
-audio type cannot be automatically determined</li>
-<li><strong>out_encinfo</strong> (<em>sox_encodinginfo_t</em><em>, </em><em>optional</em>) – a sox_encodinginfo_t type, which could be set if the
-audio type cannot be automatically determined</li>
-<li><strong>filetype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – a filetype or extension to be set if sox cannot determine it automatically</li>
+the result.</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Set channels first or length first in result.  Default: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>out_siginfo</strong> (<em>sox_signalinfo_t</em><em>, </em><em>optional</em>) – a sox_signalinfo_t type, which could be helpful if the
+audio type cannot be automatically determined</p></li>
+<li><p><strong>out_encinfo</strong> (<em>sox_encodinginfo_t</em><em>, </em><em>optional</em>) – a sox_encodinginfo_t type, which could be set if the
+audio type cannot be automatically determined</p></li>
+<li><p><strong>filetype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – a filetype or extension to be set if sox cannot determine it automatically</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Returns: tuple(Tensor, int)</dt>
-<dd><ul class="first last simple">
-<li><dl class="first docutils">
-<dt>Tensor: output Tensor of size <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is the number of audio frames and</dt>
-<dd>C is the number of channels</dd>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns: tuple(Tensor, int)</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>Tensor: output Tensor of size <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is the number of audio frames and</dt><dd><p>C is the number of channels</p>
+</dd>
 </dl>
 </li>
-<li>int: the sample rate of the audio (as listed in the metadata of the file)</li>
+<li><p>int: the sample rate of the audio (as listed in the metadata of the file)</p></li>
 </ul>
 </dd>
 </dl>
@@ -295,25 +291,25 @@ audio type cannot be automatically determined</li>
 </div>
 <dl class="method">
 <dt id="torchaudio.sox_effects.SoxEffectsChain.append_effect_to_chain">
-<code class="descname">append_effect_to_chain</code><span class="sig-paren">(</span><em>ename</em>, <em>eargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects.html#SoxEffectsChain.append_effect_to_chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain.append_effect_to_chain" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">append_effect_to_chain</code><span class="sig-paren">(</span><em class="sig-param">ename</em>, <em class="sig-param">eargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects.html#SoxEffectsChain.append_effect_to_chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain.append_effect_to_chain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Append effect to a sox effects chain.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="torchaudio.sox_effects.SoxEffectsChain.clear_chain">
-<code class="descname">clear_chain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects.html#SoxEffectsChain.clear_chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain.clear_chain" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">clear_chain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects.html#SoxEffectsChain.clear_chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain.clear_chain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear effects chain in python</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="torchaudio.sox_effects.SoxEffectsChain.set_input_file">
-<code class="descname">set_input_file</code><span class="sig-paren">(</span><em>input_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects.html#SoxEffectsChain.set_input_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain.set_input_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_input_file</code><span class="sig-paren">(</span><em class="sig-param">input_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects.html#SoxEffectsChain.set_input_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain.set_input_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set input file for input of chain</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="torchaudio.sox_effects.SoxEffectsChain.sox_build_flow_effects">
-<code class="descname">sox_build_flow_effects</code><span class="sig-paren">(</span><em>out=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects.html#SoxEffectsChain.sox_build_flow_effects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain.sox_build_flow_effects" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sox_build_flow_effects</code><span class="sig-paren">(</span><em class="sig-param">out=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects.html#SoxEffectsChain.sox_build_flow_effects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain.sox_build_flow_effects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build effects chain and flow effects from input file to output tensor</p>
 </dd></dl>
 

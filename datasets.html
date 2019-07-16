@@ -32,7 +32,7 @@
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="torchaudio.kaldi_io" href="kaldi_io.html" />
+    <link rel="next" title="torchaudio.compliance.kaldi" href="compliance.kaldi.html" />
     <link rel="prev" title="torchaudio.sox_effects" href="sox_effects.html" /> 
 
   
@@ -140,8 +140,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="legacy.html">torchaudio.legacy</a></li>
 </ul>
 
@@ -217,9 +219,9 @@
               
   <div class="section" id="torchaudio-datasets">
 <h1>torchaudio.datasets<a class="headerlink" href="#torchaudio-datasets" title="Permalink to this headline">¶</a></h1>
-<p>All datasets are subclasses of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code>
+<p>All datasets are subclasses of <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="(in PyTorch vmaster (1.1.0 ))"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></a>
 i.e, they have <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> and <code class="docutils literal notranslate"><span class="pre">__len__</span></code> methods implemented.
-Hence, they can all be passed to a <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code>
+Hence, they can all be passed to a <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="(in PyTorch vmaster (1.1.0 ))"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code></a>
 which can load multiple samples parallelly using <code class="docutils literal notranslate"><span class="pre">torch.multiprocessing</span></code> workers.
 For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yesno_data</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">YESNO</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -233,8 +235,8 @@ For example:</p>
 <div class="contents local topic" id="datasets">
 <p class="topic-title first">Datasets</p>
 <ul class="simple">
-<li><a class="reference internal" href="#vctk" id="id2">VCTK</a></li>
-<li><a class="reference internal" href="#yesno" id="id3">YESNO</a></li>
+<li><p><a class="reference internal" href="#vctk" id="id2">VCTK</a></p></li>
+<li><p><a class="reference internal" href="#yesno" id="id3">YESNO</a></p></li>
 </ul>
 </div>
 <p>All the datasets have almost similar API. They all have two common arguments:
@@ -243,45 +245,40 @@ For example:</p>
 <h2><a class="toc-backref" href="#id2">VCTK</a><a class="headerlink" href="#vctk" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.VCTK">
-<em class="property">class </em><code class="descclassname">torchaudio.datasets.</code><code class="descname">VCTK</code><span class="sig-paren">(</span><em>root</em>, <em>downsample=True</em>, <em>transform=None</em>, <em>target_transform=None</em>, <em>download=False</em>, <em>dev_mode=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">VCTK</code><span class="sig-paren">(</span><em class="sig-param">root</em>, <em class="sig-param">downsample=True</em>, <em class="sig-param">transform=None</em>, <em class="sig-param">target_transform=None</em>, <em class="sig-param">download=False</em>, <em class="sig-param">dev_mode=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK" title="Permalink to this definition">¶</a></dt>
 <dd><p><a class="reference external" href="http://homepages.inf.ed.ac.uk/jyamagis/page3/page58/page58.html">VCTK</a> Dataset.
 <cite>alternate url &lt;http://datashare.is.ed.ac.uk/handle/10283/2651&gt;</cite></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>root</strong> (<em>string</em>) – Root directory of dataset where <code class="docutils literal notranslate"><span class="pre">processed/training.pt</span></code>
-and  <code class="docutils literal notranslate"><span class="pre">processed/test.pt</span></code> exist.</li>
-<li><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If true, downloads the dataset from the internet and
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<em>string</em>) – Root directory of dataset where <code class="docutils literal notranslate"><span class="pre">processed/training.pt</span></code>
+and  <code class="docutils literal notranslate"><span class="pre">processed/test.pt</span></code> exist.</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If true, downloads the dataset from the internet and
 puts it in root directory. If dataset is already downloaded, it is not
-downloaded again.</li>
-<li><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that  takes in an raw audio
-and returns a transformed version. E.g, <code class="docutils literal notranslate"><span class="pre">transforms.Scale</span></code></li>
-<li><strong>target_transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that takes in the
-target and transforms it.</li>
-<li><strong>dev_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – if true, clean up is not performed on downloaded
-files.  Useful to keep raw audio and transcriptions.</li>
+downloaded again.</p></li>
+<li><p><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that  takes in an raw audio
+and returns a transformed version. E.g, <code class="docutils literal notranslate"><span class="pre">transforms.Scale</span></code></p></li>
+<li><p><strong>target_transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that takes in the
+target and transforms it.</p></li>
+<li><p><strong>dev_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – if true, clean up is not performed on downloaded
+files.  Useful to keep raw audio and transcriptions.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="method">
 <dt id="torchaudio.datasets.VCTK.__getitem__">
-<code class="descname">__getitem__</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK.__getitem__" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(image, target) where target is index of the target class.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></td>
-</tr>
-</tbody>
-</table>
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(image, target) where target is index of the target class.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -291,44 +288,39 @@ files.  Useful to keep raw audio and transcriptions.</li>
 <h2><a class="toc-backref" href="#id3">YESNO</a><a class="headerlink" href="#yesno" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.YESNO">
-<em class="property">class </em><code class="descclassname">torchaudio.datasets.</code><code class="descname">YESNO</code><span class="sig-paren">(</span><em>root</em>, <em>transform=None</em>, <em>target_transform=None</em>, <em>download=False</em>, <em>dev_mode=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/yesno.html#YESNO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.YESNO" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">YESNO</code><span class="sig-paren">(</span><em class="sig-param">root</em>, <em class="sig-param">transform=None</em>, <em class="sig-param">target_transform=None</em>, <em class="sig-param">download=False</em>, <em class="sig-param">dev_mode=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/yesno.html#YESNO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.YESNO" title="Permalink to this definition">¶</a></dt>
 <dd><p><a class="reference external" href="http://www.openslr.org/1/">YesNo Hebrew</a> Dataset.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>root</strong> (<em>string</em>) – Root directory of dataset where <code class="docutils literal notranslate"><span class="pre">processed/training.pt</span></code>
-and  <code class="docutils literal notranslate"><span class="pre">processed/test.pt</span></code> exist.</li>
-<li><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If true, downloads the dataset from the internet and
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<em>string</em>) – Root directory of dataset where <code class="docutils literal notranslate"><span class="pre">processed/training.pt</span></code>
+and  <code class="docutils literal notranslate"><span class="pre">processed/test.pt</span></code> exist.</p></li>
+<li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If true, downloads the dataset from the internet and
 puts it in root directory. If dataset is already downloaded, it is not
-downloaded again.</li>
-<li><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that  takes in an PIL image
-and returns a transformed version. E.g, <code class="docutils literal notranslate"><span class="pre">transforms.Scale</span></code></li>
-<li><strong>target_transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that takes in the
-target and transforms it.</li>
-<li><strong>dev_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – if true, clean up is not performed on downloaded
-files.  Useful to keep raw audio and transcriptions.</li>
+downloaded again.</p></li>
+<li><p><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that  takes in an PIL image
+and returns a transformed version. E.g, <code class="docutils literal notranslate"><span class="pre">transforms.Scale</span></code></p></li>
+<li><p><strong>target_transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that takes in the
+target and transforms it.</p></li>
+<li><p><strong>dev_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – if true, clean up is not performed on downloaded
+files.  Useful to keep raw audio and transcriptions.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="method">
 <dt id="torchaudio.datasets.YESNO.__getitem__">
-<code class="descname">__getitem__</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/yesno.html#YESNO.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.YESNO.__getitem__" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(image, target) where target is index of the target class.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></td>
-</tr>
-</tbody>
-</table>
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/yesno.html#YESNO.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.YESNO.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(image, target) where target is index of the target class.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -344,7 +336,7 @@ files.  Useful to keep raw audio and transcriptions.</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="kaldi_io.html" class="btn btn-neutral float-right" title="torchaudio.kaldi_io" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="compliance.kaldi.html" class="btn btn-neutral float-right" title="torchaudio.compliance.kaldi" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="sox_effects.html" class="btn btn-neutral" title="torchaudio.sox_effects" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
