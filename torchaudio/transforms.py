@@ -500,7 +500,7 @@ class MuLawExpanding(torch.jit.ScriptModule):
         return self.__class__.__name__ + '()'
 
 
-class Resample(object):
+class Resample(torch.nn.Module):
     """Resamples a signal from one frequency to another. A resampling method can
     be given.
 
@@ -510,12 +510,13 @@ class Resample(object):
         resampling_method (str): the resampling method (Default: 'kaldi' which uses
             sinc interpolation)
     """
-    def __init__(self, orig_freq, new_freq, resampling_method='kaldi'):
+    def __init__(self, orig_freq, new_freq, resampling_method='sinc_interpolation'):
+        super(Resample, self).__init__()
         self.orig_freq = orig_freq
         self.new_freq = new_freq
         self.resampling_method = resampling_method
 
-    def __call__(self, sig):
+    def forward(self, sig):
         """
         Args:
             sig (Tensor): the input signal of size (c, n)
@@ -523,7 +524,7 @@ class Resample(object):
         Returns:
             Tensor: output signal of size (c, m)
         """
-        if self.resampling_method == 'kaldi':
+        if self.resampling_method == 'sinc_interpolation':
             return kaldi.resample_waveform(sig, self.orig_freq, self.new_freq)
 
         raise ValueError('Invalid resampling method: %s' % (self.resampling_method))
