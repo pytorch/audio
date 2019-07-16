@@ -21,16 +21,17 @@ __all__ = [
 @torch.jit.script
 def scale(tensor, factor):
     # type: (Tensor, int) -> Tensor
-    r"""Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
-    to a floating point number between -1.0 and 1.0.  Note the 16-bit number is
-    called the "bit depth" or "precision", not to be confused with "bit rate".
+    r"""Scale audio tensor from a 16-bit integer (represented as a
+    :class:`torch.FloatTensor`) to a floating point number between -1.0 and 1.0.
+    Note the 16-bit number is called the "bit depth" or "precision", not to be
+    confused with "bit rate".
 
     Args:
-        tensor (Tensor): Tensor of audio of size (n, c) or (c, n)
+        tensor (torch.Tensor): Tensor of audio of size (n, c) or (c, n)
         factor (int): Maximum value of input tensor
 
     Returns:
-        Tensor: Scaled by the scale factor
+        torch.Tensor: Scaled by the scale factor
     """
     if not tensor.is_floating_point():
         tensor = tensor.to(torch.float32)
@@ -44,14 +45,14 @@ def pad_trim(tensor, ch_dim, max_len, len_dim, fill_value):
     r"""Pad/trim a 2D tensor (signal or labels).
 
     Args:
-        tensor (Tensor): Tensor of audio of size (n, c) or (c, n)
+        tensor (torch.Tensor): Tensor of audio of size (n, c) or (c, n)
         ch_dim (int): Dimension of channel (not size)
         max_len (int): Length to which the tensor will be padded
         len_dim (int): Dimension of length (not size)
         fill_value (float): Value to fill in
 
     Returns:
-        Tensor: Padded/trimmed tensor
+        torch.Tensor: Padded/trimmed tensor
     """
     if max_len > tensor.size(len_dim):
         # array of [padding_left, padding_right, padding_top, padding_bottom]
@@ -74,11 +75,11 @@ def downmix_mono(tensor, ch_dim):
     r"""Downmix any stereo signals to mono.
 
     Args:
-        tensor (Tensor): Tensor of audio of size (c, n) or (n, c)
+        tensor (torch.Tensor): Tensor of audio of size (c, n) or (n, c)
         ch_dim (int): Dimension of channel (not size)
 
     Returns:
-        Tensor: Mono signal
+        torch.Tensor: Mono signal
     """
     if not tensor.is_floating_point():
         tensor = tensor.to(torch.float32)
@@ -93,10 +94,10 @@ def LC2CL(tensor):
     r"""Permute a 2D tensor from samples (n, c) to (c, n).
 
     Args:
-        tensor (Tensor): Tensor of audio signal with shape (n, c)
+        tensor (torch.Tensor): Tensor of audio signal with shape (n, c)
 
     Returns:
-        Tensor: Tensor of audio signal with shape (c, n)
+        torch.Tensor: Tensor of audio signal with shape (c, n)
     """
     return tensor.transpose(0, 1).contiguous()
 
@@ -119,19 +120,19 @@ def istft(stft_matrix,          # type: Tensor
           ):
     # type: (...) -> Tensor
     r""" Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.
-    It has the same parameters (+ additional optional parameter of :attr:`length`) and it should return the
+    It has the same parameters (+ additional optional parameter of `length`) and it should return the
     least squares estimation of the original signal. The algorithm will check using the NOLA condition (
     nonzero overlap).
 
-    Important consideration in the parameters :attr:`window` and :attr:`center` so that the envelop
+    Important consideration in the parameters `window` and `center` so that the envelop
     created by the summation of all the windows is never zero at certain point in time. Specifically,
-    :math:`\sum_{t=-\ infty}^{\ infty} w^2[n-t\times hop\_length] \neq 0`.
+    :math:`\sum_{t=-\infty}^{\infty} w^2[n-t\times hop\_length] \neq 0`.
 
     Since stft discards elements at the end of the signal if they do not fit in a frame, the
-    istft may return a shorter signal than the original signal (can occur if :attr:`center` is False
+    istft may return a shorter signal than the original signal (can occur if `center` is False
     since the signal isn't padded).
 
-    If :attr:`center` is True, then there will be padding e.g. 'constant', 'reflect', etc. Left padding
+    If `center` is True, then there will be padding e.g. 'constant', 'reflect', etc. Left padding
     can be trimmed off exactly because they can be calculated but right padding cannot be calculated
     without additional information.
 
@@ -139,28 +140,30 @@ def istft(stft_matrix,          # type: Tensor
     [17, 18, 0, 0, 0] vs [18, 0, 0, 0, 0]
 
     The n_frames, hop_length, win_length are all the same which prevents the calculation of right padding.
-    These additional values could be zeros or a reflection of the signal so providing :attr:`length`
-    could be useful. If :attr:`length` is None then padding will be aggressively removed (some loss of signal).
+    These additional values could be zeros or a reflection of the signal so providing `length`
+    could be useful. If `length` is None then padding will be aggressively removed (some loss of signal).
     [1] D. W. Griffin and J. S. Lim, “Signal estimation from modified short-time Fourier transform,”
     IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
 
     Args:
-        stft_matrix (Tensor): Output of stft where each row of a batch is a frequency and each column is
-            a window. it has a shape of either (batch, fft_size, n_frames, 2) or (fft_size, n_frames, 2)
+        stft_matrix (torch.Tensor): Output of stft where each row of a batch is a frequency and each
+            column is a window. it has a shape of either (batch, fft_size, n_frames, 2) or (
+            fft_size, n_frames, 2)
         n_fft (int): Size of Fourier transform
         hop_length (Optional[int]): The distance between neighboring sliding window frames. (Default: win_length // 4)
         win_length (Optional[int]): The size of window frame and STFT filter. (Default: n_fft)
         window (Optional[Tensor]): The optional window function. (Default: torch.ones(win_length))
-        center (bool): Whether :attr:`input` was padded on both sides so
+        center (bool): Whether `input` was padded on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`
-        pad_mode (str): Controls the padding method used when :attr:`center` is ``True``
+        pad_mode (str): Controls the padding method used when `center` is ``True``
         normalized (bool): Whether the STFT was normalized
         onesided (bool): Whether the STFT is onesided
         length (Optional[int]): The amount to trim the signal by (i.e. the
             original signal length). (Default: whole signal)
 
     Returns:
-        Tensor: Least squares estimation of the original signal of size (batch, signal_length) or (signal_length)
+        torch.Tensor: Least squares estimation of the original signal of size
+            (batch, signal_length) or (signal_length)
     """
     stft_matrix_dim = stft_matrix.dim()
     assert 3 <= stft_matrix_dim <= 4, ('Incorrect stft dimension: %d' % (stft_matrix_dim))
@@ -251,9 +254,9 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
     r"""Create a spectrogram from a raw audio signal.
 
     Args:
-        sig (Tensor): Tensor of audio of size (c, n)
+        sig (torch.Tensor): Tensor of audio of size (c, n)
         pad (int): Two sided padding of signal
-        window (Tensor): Window_tensor
+        window (torch.Tensor): Window_tensor
         n_fft (int): Size of fft
         hop (int): Length of hop between STFT windows
         ws (int): Window size
@@ -262,7 +265,7 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
         normalize (bool) : Whether to normalize by magnitude after stft
 
     Returns:
-        Tensor: channels x hops x n_fft (c, l, f), where channels
+        torch.Tensor: channels x hops x n_fft (c, l, f), where channels
             is unchanged, hops is the number of hops, and n_fft is the
             number of fourier bins, which should be the window size divided
             by 2 plus 1.
@@ -295,7 +298,7 @@ def create_fb_matrix(n_stft, f_min, f_max, n_mels):
         n_mels (int): number of mel bins
 
     Returns:
-        Tensor: triangular filter banks (fb matrix)
+        torch.Tensor: triangular filter banks (fb matrix)
     """
     # get stft freq bins
     stft_freqs = torch.linspace(f_min, f_max, n_stft)
@@ -327,7 +330,7 @@ def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
     a full clip.
 
     Args:
-        spec (Tensor): normal STFT
+        spec (torch.Tensor): normal STFT
         multiplier (float): use 10. for power and 20. for amplitude
         amin (float): number to clamp spec
         db_multiplier (float): log10(max(reference value and amin))
@@ -335,7 +338,7 @@ def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
             is 80.
 
     Returns:
-        Tensor: spectrogram in DB
+        torch.Tensor: spectrogram in DB
     """
     spec_db = multiplier * torch.log10(torch.clamp(spec, min=amin))
     spec_db -= multiplier * db_multiplier
@@ -359,7 +362,7 @@ def create_dct(n_mfcc, n_mels, norm):
         norm (Optional[str]) : norm to use (either 'ortho' or None)
 
     Returns:
-        Tensor: The transformation matrix, to be right-multiplied to row-wise data.
+        torch.Tensor: The transformation matrix, to be right-multiplied to row-wise data.
     """
     outdim = n_mfcc
     dim = n_mels
@@ -383,10 +386,10 @@ def BLC2CBL(tensor):
        Bands x Samples length.
 
     Args:
-        tensor (Tensor): Tensor of spectrogram with shape (b, l, c)
+        tensor (torch.Tensor): Tensor of spectrogram with shape (b, l, c)
 
     Returns:
-        Tensor: Tensor of spectrogram with shape (c, b, l)
+        torch.Tensor: Tensor of spectrogram with shape (c, b, l)
     """
     return tensor.permute(2, 0, 1).contiguous()
 
@@ -401,11 +404,11 @@ def mu_law_encoding(x, qc):
     returns a signal encoded with values from 0 to quantization_channels - 1.
 
     Args:
-        x (Tensor): Input tensor
+        x (torch.Tensor): Input tensor
         qc (int): Number of channels (i.e. quantization channels)
 
     Returns:
-        Tensor: Input after mu-law companding
+        torch.Tensor: Input after mu-law companding
     """
     assert isinstance(x, torch.Tensor), 'mu_law_encoding expects a Tensor'
     mu = qc - 1.
@@ -428,11 +431,11 @@ def mu_law_expanding(x_mu, qc):
     and returns a signal scaled between -1 and 1.
 
     Args:
-        x_mu (Tensor): Input tensor
+        x_mu (torch.Tensor): Input tensor
         qc (int): Number of channels (i.e. quantization channels)
 
     Returns:
-        Tensor: Input after decoding
+        torch.Tensor: Input after decoding
     """
     assert isinstance(x_mu, torch.Tensor), 'mu_law_expanding expects a Tensor'
     mu = qc - 1.
