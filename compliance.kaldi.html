@@ -143,6 +143,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="legacy.html">torchaudio.legacy</a></li>
 </ul>
 
@@ -227,62 +228,58 @@ produce similar outputs.</p>
 <h3><span class="hidden-section">fbank</span><a class="headerlink" href="#fbank" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.compliance.kaldi.fbank">
-<code class="descclassname">torchaudio.compliance.kaldi.</code><code class="descname">fbank</code><span class="sig-paren">(</span><em>sig</em>, <em>blackman_coeff=0.42</em>, <em>channel=-1</em>, <em>dither=1.0</em>, <em>energy_floor=0.0</em>, <em>frame_length=25.0</em>, <em>frame_shift=10.0</em>, <em>high_freq=0.0</em>, <em>htk_compat=False</em>, <em>low_freq=20.0</em>, <em>min_duration=0.0</em>, <em>num_mel_bins=23</em>, <em>preemphasis_coefficient=0.97</em>, <em>raw_energy=True</em>, <em>remove_dc_offset=True</em>, <em>round_to_power_of_two=True</em>, <em>sample_frequency=16000.0</em>, <em>snip_edges=True</em>, <em>subtract_mean=False</em>, <em>use_energy=False</em>, <em>use_log_fbank=True</em>, <em>use_power=True</em>, <em>vtln_high=-500.0</em>, <em>vtln_low=100.0</em>, <em>vtln_warp=1.0</em>, <em>window_type='povey'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/compliance/kaldi.html#fbank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.compliance.kaldi.fbank" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.compliance.kaldi.</code><code class="sig-name descname">fbank</code><span class="sig-paren">(</span><em class="sig-param">sig</em>, <em class="sig-param">blackman_coeff=0.42</em>, <em class="sig-param">channel=-1</em>, <em class="sig-param">dither=1.0</em>, <em class="sig-param">energy_floor=0.0</em>, <em class="sig-param">frame_length=25.0</em>, <em class="sig-param">frame_shift=10.0</em>, <em class="sig-param">high_freq=0.0</em>, <em class="sig-param">htk_compat=False</em>, <em class="sig-param">low_freq=20.0</em>, <em class="sig-param">min_duration=0.0</em>, <em class="sig-param">num_mel_bins=23</em>, <em class="sig-param">preemphasis_coefficient=0.97</em>, <em class="sig-param">raw_energy=True</em>, <em class="sig-param">remove_dc_offset=True</em>, <em class="sig-param">round_to_power_of_two=True</em>, <em class="sig-param">sample_frequency=16000.0</em>, <em class="sig-param">snip_edges=True</em>, <em class="sig-param">subtract_mean=False</em>, <em class="sig-param">use_energy=False</em>, <em class="sig-param">use_log_fbank=True</em>, <em class="sig-param">use_power=True</em>, <em class="sig-param">vtln_high=-500.0</em>, <em class="sig-param">vtln_low=100.0</em>, <em class="sig-param">vtln_warp=1.0</em>, <em class="sig-param">window_type='povey'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/compliance/kaldi.html#fbank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.compliance.kaldi.fbank" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a fbank from a raw audio signal. This matches the input/output of Kaldi’s
 compute-fbank-feats.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>sig</strong> (<em>Tensor</em>) – Tensor of audio of size (c, n) where c is in the range [0,2)</li>
-<li><strong>blackman_coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Constant coefficient for generalized Blackman window. (default = 0.42)</li>
-<li><strong>channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (default = -1)</li>
-<li><strong>dither</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Dithering constant (0.0 means no dither). If you turn this off, you should set
-the energy_floor option, e.g. to 1.0 or 0.1 (default = 1.0)</li>
-<li><strong>energy_floor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sig</strong> (<em>Tensor</em>) – Tensor of audio of size (c, n) where c is in the range [0,2)</p></li>
+<li><p><strong>blackman_coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Constant coefficient for generalized Blackman window. (default = 0.42)</p></li>
+<li><p><strong>channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (default = -1)</p></li>
+<li><p><strong>dither</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Dithering constant (0.0 means no dither). If you turn this off, you should set
+the energy_floor option, e.g. to 1.0 or 0.1 (default = 1.0)</p></li>
+<li><p><strong>energy_floor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
 this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
-individual spectrogram elements is fixed at std::numeric_limits&lt;float&gt;::epsilon(). (default = 0.0)</li>
-<li><strong>frame_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Frame length in milliseconds (default = 25.0)</li>
-<li><strong>frame_shift</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Frame shift in milliseconds (default = 10.0)</li>
-<li><strong>high_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – High cutoff frequency for mel bins (if &lt;= 0, offset from Nyquist) (default = 0.0)</li>
-<li><strong>htk_compat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, put energy last.  Warning: not sufficient to get HTK compatible features (need
-to change other parameters). (default = False)</li>
-<li><strong>low_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Low cutoff frequency for mel bins (default = 20.0)</li>
-<li><strong>min_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Minimum duration of segments to process (in seconds). (default = 0.0)</li>
-<li><strong>num_mel_bins</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of triangular mel-frequency bins (default = 23)</li>
-<li><strong>preemphasis_coefficient</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Coefficient for use in signal preemphasis (default = 0.97)</li>
-<li><strong>raw_energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, compute energy before preemphasis and windowing (default = True)</li>
-<li><strong>remove_dc_offset</strong> – Subtract mean from waveform on each frame (default = True)</li>
-<li><strong>round_to_power_of_two</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, round window size to power of two by zero-padding input
-to FFT. (default = True)</li>
-<li><strong>sample_frequency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Waveform data sample frequency (must match the waveform file, if
-specified there) (default = 16000.0)</li>
-<li><strong>snip_edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, end effects will be handled by outputting only frames that completely fit
+individual spectrogram elements is fixed at std::numeric_limits&lt;float&gt;::epsilon(). (default = 0.0)</p></li>
+<li><p><strong>frame_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Frame length in milliseconds (default = 25.0)</p></li>
+<li><p><strong>frame_shift</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Frame shift in milliseconds (default = 10.0)</p></li>
+<li><p><strong>high_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – High cutoff frequency for mel bins (if &lt;= 0, offset from Nyquist) (default = 0.0)</p></li>
+<li><p><strong>htk_compat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, put energy last.  Warning: not sufficient to get HTK compatible features (need
+to change other parameters). (default = False)</p></li>
+<li><p><strong>low_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Low cutoff frequency for mel bins (default = 20.0)</p></li>
+<li><p><strong>min_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Minimum duration of segments to process (in seconds). (default = 0.0)</p></li>
+<li><p><strong>num_mel_bins</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of triangular mel-frequency bins (default = 23)</p></li>
+<li><p><strong>preemphasis_coefficient</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Coefficient for use in signal preemphasis (default = 0.97)</p></li>
+<li><p><strong>raw_energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, compute energy before preemphasis and windowing (default = True)</p></li>
+<li><p><strong>remove_dc_offset</strong> – Subtract mean from waveform on each frame (default = True)</p></li>
+<li><p><strong>round_to_power_of_two</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, round window size to power of two by zero-padding input
+to FFT. (default = True)</p></li>
+<li><p><strong>sample_frequency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Waveform data sample frequency (must match the waveform file, if
+specified there) (default = 16000.0)</p></li>
+<li><p><strong>snip_edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, end effects will be handled by outputting only frames that completely fit
 in the file, and the number of frames depends on the frame_length.  If False, the number of frames
-depends only on the frame_shift, and we reflect the data at the ends. (default = True)</li>
-<li><strong>subtract_mean</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Subtract mean of each feature file [CMS]; not recommended to do
-it this way.  (default = False)</li>
-<li><strong>use_energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Add an extra dimension with energy to the FBANK output. (default = False)</li>
-<li><strong>use_log_fbank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, produce log-filterbank, else produce linear. (default = True)</li>
-<li><strong>use_power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, use power, else use magnitude. (default = True)</li>
-<li><strong>vtln_high</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – High inflection point in piecewise linear VTLN warping function (if
-negative, offset from high-mel-freq (default = -500.0)</li>
-<li><strong>vtln_low</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Low inflection point in piecewise linear VTLN warping function (float, default = 100.0)</li>
-<li><strong>vtln_warp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Vtln warp factor (only applicable if vtln_map not specified) (float, default = 1.0)</li>
-<li><strong>window_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Type of window (‘hamming’|’hanning’|’povey’|’rectangular’|’blackman’) (default = ‘povey’)</li>
+depends only on the frame_shift, and we reflect the data at the ends. (default = True)</p></li>
+<li><p><strong>subtract_mean</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Subtract mean of each feature file [CMS]; not recommended to do
+it this way.  (default = False)</p></li>
+<li><p><strong>use_energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Add an extra dimension with energy to the FBANK output. (default = False)</p></li>
+<li><p><strong>use_log_fbank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, produce log-filterbank, else produce linear. (default = True)</p></li>
+<li><p><strong>use_power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, use power, else use magnitude. (default = True)</p></li>
+<li><p><strong>vtln_high</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – High inflection point in piecewise linear VTLN warping function (if
+negative, offset from high-mel-freq (default = -500.0)</p></li>
+<li><p><strong>vtln_low</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Low inflection point in piecewise linear VTLN warping function (float, default = 100.0)</p></li>
+<li><p><strong>vtln_warp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Vtln warp factor (only applicable if vtln_map not specified) (float, default = 1.0)</p></li>
+<li><p><strong>window_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Type of window (‘hamming’|’hanning’|’povey’|’rectangular’|’blackman’) (default = ‘povey’)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a fbank identical to what Kaldi would output. The shape is (m, <cite>num_mel_bins</cite> + <cite>use_energy</cite>)
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a fbank identical to what Kaldi would output. The shape is (m, <cite>num_mel_bins</cite> + <cite>use_energy</cite>)
 where m is calculated in _get_strided</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Tensor</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -290,50 +287,46 @@ where m is calculated in _get_strided</p>
 <h3><span class="hidden-section">spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.compliance.kaldi.spectrogram">
-<code class="descclassname">torchaudio.compliance.kaldi.</code><code class="descname">spectrogram</code><span class="sig-paren">(</span><em>sig</em>, <em>blackman_coeff=0.42</em>, <em>channel=-1</em>, <em>dither=1.0</em>, <em>energy_floor=0.0</em>, <em>frame_length=25.0</em>, <em>frame_shift=10.0</em>, <em>min_duration=0.0</em>, <em>preemphasis_coefficient=0.97</em>, <em>raw_energy=True</em>, <em>remove_dc_offset=True</em>, <em>round_to_power_of_two=True</em>, <em>sample_frequency=16000.0</em>, <em>snip_edges=True</em>, <em>subtract_mean=False</em>, <em>window_type='povey'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/compliance/kaldi.html#spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.compliance.kaldi.spectrogram" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.compliance.kaldi.</code><code class="sig-name descname">spectrogram</code><span class="sig-paren">(</span><em class="sig-param">sig</em>, <em class="sig-param">blackman_coeff=0.42</em>, <em class="sig-param">channel=-1</em>, <em class="sig-param">dither=1.0</em>, <em class="sig-param">energy_floor=0.0</em>, <em class="sig-param">frame_length=25.0</em>, <em class="sig-param">frame_shift=10.0</em>, <em class="sig-param">min_duration=0.0</em>, <em class="sig-param">preemphasis_coefficient=0.97</em>, <em class="sig-param">raw_energy=True</em>, <em class="sig-param">remove_dc_offset=True</em>, <em class="sig-param">round_to_power_of_two=True</em>, <em class="sig-param">sample_frequency=16000.0</em>, <em class="sig-param">snip_edges=True</em>, <em class="sig-param">subtract_mean=False</em>, <em class="sig-param">window_type='povey'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/compliance/kaldi.html#spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.compliance.kaldi.spectrogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a spectrogram from a raw audio signal. This matches the input/output of Kaldi’s
 compute-spectrogram-feats.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>sig</strong> (<em>Tensor</em>) – Tensor of audio of size (c, n) where c is in the range [0,2)</li>
-<li><strong>blackman_coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Constant coefficient for generalized Blackman window. (default = 0.42)</li>
-<li><strong>channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (default = -1)</li>
-<li><strong>dither</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Dithering constant (0.0 means no dither). If you turn this off, you should set
-the energy_floor option, e.g. to 1.0 or 0.1 (default = 1.0)</li>
-<li><strong>energy_floor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sig</strong> (<em>Tensor</em>) – Tensor of audio of size (c, n) where c is in the range [0,2)</p></li>
+<li><p><strong>blackman_coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Constant coefficient for generalized Blackman window. (default = 0.42)</p></li>
+<li><p><strong>channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (default = -1)</p></li>
+<li><p><strong>dither</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Dithering constant (0.0 means no dither). If you turn this off, you should set
+the energy_floor option, e.g. to 1.0 or 0.1 (default = 1.0)</p></li>
+<li><p><strong>energy_floor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
 this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
-individual spectrogram elements is fixed at std::numeric_limits&lt;float&gt;::epsilon(). (default = 0.0)</li>
-<li><strong>frame_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Frame length in milliseconds (default = 25.0)</li>
-<li><strong>frame_shift</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Frame shift in milliseconds (default = 10.0)</li>
-<li><strong>min_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Minimum duration of segments to process (in seconds). (default = 0.0)</li>
-<li><strong>preemphasis_coefficient</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Coefficient for use in signal preemphasis (default = 0.97)</li>
-<li><strong>raw_energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, compute energy before preemphasis and windowing (default = True)</li>
-<li><strong>remove_dc_offset</strong> – Subtract mean from waveform on each frame (default = True)</li>
-<li><strong>round_to_power_of_two</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, round window size to power of two by zero-padding input
-to FFT. (default = True)</li>
-<li><strong>sample_frequency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Waveform data sample frequency (must match the waveform file, if
-specified there) (default = 16000.0)</li>
-<li><strong>snip_edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, end effects will be handled by outputting only frames that completely fit
+individual spectrogram elements is fixed at std::numeric_limits&lt;float&gt;::epsilon(). (default = 0.0)</p></li>
+<li><p><strong>frame_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Frame length in milliseconds (default = 25.0)</p></li>
+<li><p><strong>frame_shift</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Frame shift in milliseconds (default = 10.0)</p></li>
+<li><p><strong>min_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Minimum duration of segments to process (in seconds). (default = 0.0)</p></li>
+<li><p><strong>preemphasis_coefficient</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Coefficient for use in signal preemphasis (default = 0.97)</p></li>
+<li><p><strong>raw_energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, compute energy before preemphasis and windowing (default = True)</p></li>
+<li><p><strong>remove_dc_offset</strong> – Subtract mean from waveform on each frame (default = True)</p></li>
+<li><p><strong>round_to_power_of_two</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, round window size to power of two by zero-padding input
+to FFT. (default = True)</p></li>
+<li><p><strong>sample_frequency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Waveform data sample frequency (must match the waveform file, if
+specified there) (default = 16000.0)</p></li>
+<li><p><strong>snip_edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, end effects will be handled by outputting only frames that completely fit
 in the file, and the number of frames depends on the frame_length.  If False, the number of frames
-depends only on the frame_shift, and we reflect the data at the ends. (default = True)</li>
-<li><strong>subtract_mean</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Subtract mean of each feature file [CMS]; not recommended to do
-it this way.  (default = False)</li>
-<li><strong>window_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Type of window (‘hamming’|’hanning’|’povey’|’rectangular’|’blackman’) (default = ‘povey’)</li>
+depends only on the frame_shift, and we reflect the data at the ends. (default = True)</p></li>
+<li><p><strong>subtract_mean</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Subtract mean of each feature file [CMS]; not recommended to do
+it this way.  (default = False)</p></li>
+<li><p><strong>window_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Type of window (‘hamming’|’hanning’|’povey’|’rectangular’|’blackman’) (default = ‘povey’)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a spectrogram identical to what Kaldi would output. The shape is
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a spectrogram identical to what Kaldi would output. The shape is
 (m, <cite>padded_window_size</cite> // 2 + 1) where m is calculated in _get_strided</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Tensor</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

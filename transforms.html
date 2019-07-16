@@ -32,7 +32,7 @@
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="torchaudio.legacy" href="legacy.html" />
+    <link rel="next" title="torchaudio.functional" href="functional.html" />
     <link rel="prev" title="torchaudio.kaldi_io" href="kaldi_io.html" /> 
 
   
@@ -143,6 +143,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="legacy.html">torchaudio.legacy</a></li>
 </ul>
 
@@ -221,16 +222,13 @@
 <p>Transforms are common audio transforms. They can be chained together using <a class="reference internal" href="#torchaudio.transforms.Compose" title="torchaudio.transforms.Compose"><code class="xref py py-class docutils literal notranslate"><span class="pre">Compose</span></code></a></p>
 <dl class="class">
 <dt id="torchaudio.transforms.Compose">
-<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">Compose</code><span class="sig-paren">(</span><em>transforms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Compose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Compose" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Compose</code><span class="sig-paren">(</span><em class="sig-param">transforms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Compose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Compose" title="Permalink to this definition">¶</a></dt>
 <dd><p>Composes several transforms together.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transforms</strong> (list of <code class="docutils literal notranslate"><span class="pre">Transform</span></code> objects) – list of transforms to compose.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>transforms</strong> (list of <code class="docutils literal notranslate"><span class="pre">Transform</span></code> objects) – list of transforms to compose.</p>
+</dd>
+</dl>
 <p class="rubric">Example</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">transforms</span><span class="o">.</span><span class="n">Scale</span><span class="p">(),</span>
@@ -242,111 +240,96 @@
 
 <dl class="class">
 <dt id="torchaudio.transforms.Scale">
-<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">Scale</code><span class="sig-paren">(</span><em>factor=2147483648</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Scale" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Scale</code><span class="sig-paren">(</span><em class="sig-param">factor=2147483648</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Scale" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
 to a floating point number between -1.0 and 1.0.  Note the 16-bit number is
 called the “bit depth” or “precision”, not to be confused with “bit rate”.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>factor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – maximum value of input tensor. default: 16-bit depth</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>factor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – maximum value of input tensor. default: 16-bit depth</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="class">
 <dt id="torchaudio.transforms.PadTrim">
-<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">PadTrim</code><span class="sig-paren">(</span><em>max_len</em>, <em>fill_value=0.0</em>, <em>channels_first=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#PadTrim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.PadTrim" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">PadTrim</code><span class="sig-paren">(</span><em class="sig-param">max_len</em>, <em class="sig-param">fill_value=0.0</em>, <em class="sig-param">channels_first=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#PadTrim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.PadTrim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pad/Trim a 2d-Tensor (Signal or Labels)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tensor</strong> (<em>Tensor</em>) – Tensor of audio of size (n x c) or (c x n)</li>
-<li><strong>max_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Length to which the tensor will be padded</li>
-<li><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Pad for channels first tensors.  Default: <cite>True</cite></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tensor</strong> (<em>Tensor</em>) – Tensor of audio of size (n x c) or (c x n)</p></li>
+<li><p><strong>max_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Length to which the tensor will be padded</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Pad for channels first tensors.  Default: <cite>True</cite></p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="class">
 <dt id="torchaudio.transforms.DownmixMono">
-<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">DownmixMono</code><span class="sig-paren">(</span><em>channels_first=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#DownmixMono"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.DownmixMono" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Downmix any stereo signals to mono.  Consider using a <cite>SoxEffectsChain</cite> with</dt>
-<dd>the <cite>channels</cite> effect instead of this transformation.</dd>
-<dt>Inputs:</dt>
-<dd>tensor (Tensor): Tensor of audio of size (c x n) or (n x c)
-channels_first (bool): Downmix across channels dimension.  Default: <cite>True</cite></dd>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">DownmixMono</code><span class="sig-paren">(</span><em class="sig-param">channels_first=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#DownmixMono"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.DownmixMono" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Downmix any stereo signals to mono.  Consider using a <cite>SoxEffectsChain</cite> with</dt><dd><p>the <cite>channels</cite> effect instead of this transformation.</p>
+</dd>
+<dt>Inputs:</dt><dd><p>tensor (Tensor): Tensor of audio of size (c x n) or (n x c)
+channels_first (bool): Downmix across channels dimension.  Default: <cite>True</cite></p>
+</dd>
 </dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tensor (Tensor) (Samples x 1)</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tensor (Tensor) (Samples x 1)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="class">
 <dt id="torchaudio.transforms.LC2CL">
-<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">LC2CL</code><a class="reference internal" href="_modules/torchaudio/transforms.html#LC2CL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.LC2CL" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">LC2CL</code><a class="reference internal" href="_modules/torchaudio/transforms.html#LC2CL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.LC2CL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Permute a 2d tensor from samples (n x c) to (c x n)</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="torchaudio.transforms.MEL">
-<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">MEL</code><a class="reference internal" href="_modules/torchaudio/transforms.html#MEL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MEL" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">MEL</code><a class="reference internal" href="_modules/torchaudio/transforms.html#MEL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MEL" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="class">
 <dt id="torchaudio.transforms.BLC2CBL">
-<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">BLC2CBL</code><a class="reference internal" href="_modules/torchaudio/transforms.html#BLC2CBL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.BLC2CBL" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">BLC2CBL</code><a class="reference internal" href="_modules/torchaudio/transforms.html#BLC2CBL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.BLC2CBL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Permute a 3d tensor from Bands x Sample length x Channels to Channels x
 Bands x Samples length</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="torchaudio.transforms.MuLawEncoding">
-<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">MuLawEncoding</code><span class="sig-paren">(</span><em>quantization_channels=256</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MuLawEncoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MuLawEncoding" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">MuLawEncoding</code><span class="sig-paren">(</span><em class="sig-param">quantization_channels=256</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MuLawEncoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MuLawEncoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encode signal based on mu-law companding.  For more info see the
 <a class="reference external" href="https://en.wikipedia.org/wiki/%CE%9C-law_algorithm">Wikipedia Entry</a></p>
 <p>This algorithm assumes the signal has been scaled to between -1 and 1 and
 returns a signal encoded with values from 0 to quantization_channels - 1</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of channels. default: 256</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of channels. default: 256</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="class">
 <dt id="torchaudio.transforms.MuLawExpanding">
-<em class="property">class </em><code class="descclassname">torchaudio.transforms.</code><code class="descname">MuLawExpanding</code><span class="sig-paren">(</span><em>quantization_channels=256</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MuLawExpanding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MuLawExpanding" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">MuLawExpanding</code><span class="sig-paren">(</span><em class="sig-param">quantization_channels=256</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MuLawExpanding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MuLawExpanding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decode mu-law encoded signal.  For more info see the
 <a class="reference external" href="https://en.wikipedia.org/wiki/%CE%9C-law_algorithm">Wikipedia Entry</a></p>
 <p>This expects an input with values between 0 and quantization_channels - 1
 and returns a signal scaled between -1 and 1.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of channels. default: 256</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of channels. default: 256</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -359,7 +342,7 @@ and returns a signal scaled between -1 and 1.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="legacy.html" class="btn btn-neutral float-right" title="torchaudio.legacy" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="functional.html" class="btn btn-neutral float-right" title="torchaudio.functional" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="kaldi_io.html" class="btn btn-neutral" title="torchaudio.kaldi_io" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
