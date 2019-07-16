@@ -47,8 +47,9 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
 class Test_Kaldi(unittest.TestCase):
     test_dirpath, test_dir = test.common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file.wav')
+    test_8000_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file_8000.wav')
     kaldi_output_dir = os.path.join(test_dirpath, 'assets', 'kaldi')
-    test_filepaths = {'spec': [], 'fbank': []}
+    test_filepaths = {prefix: [] for prefix in test.compliance.utils.TEST_PREFIX}
 
     # separating test files by their types (e.g 'spec', 'fbank', etc.)
     for f in os.listdir(kaldi_output_dir):
@@ -118,16 +119,20 @@ class Test_Kaldi(unittest.TestCase):
         print('abs_mse:', abs_mse.item(), 'abs_max_error:', abs_max_error.item())
         print('relative_mse:', relative_mse.item(), 'relative_max_error:', relative_max_error.item())
 
-    def _compliance_test_helper(self, filepath_key, expected_num_files, expected_num_args, get_output_fn):
+    def _compliance_test_helper(self, sound_filepath, filepath_key, expected_num_files,
+                                expected_num_args, get_output_fn, atol=1e-5, rtol=1e-8):
         """
         Inputs:
+            sound_filepath (str): The location of the sound file
             filepath_key (str): A key to `test_filepaths` which matches which files to use
             expected_num_files (int): The expected number of kaldi files to read
             expected_num_args (int): The expected number of arguments used in a kaldi configuration
             get_output_fn (Callable[[Tensor, List], Tensor]): A function that takes in a sound signal
                 and a configuration and returns an output
+            atol (float): absolute tolerance
+            rtol (float): relative tolerance
         """
-        sound, sample_rate = torchaudio.load_wav(self.test_filepath)
+        sound, sample_rate = torchaudio.load_wav(sound_filepath)
         files = self.test_filepaths[filepath_key]
 
         assert len(files) == expected_num_files, ('number of kaldi %s file changed to %d' % (filepath_key, len(files)))
@@ -152,7 +157,7 @@ class Test_Kaldi(unittest.TestCase):
 
             self._print_diagnostic(output, kaldi_output)
             self.assertTrue(output.shape, kaldi_output.shape)
-            self.assertTrue(torch.allclose(output, kaldi_output, atol=1e-3, rtol=1e-1))
+            self.assertTrue(torch.allclose(output, kaldi_output, atol=atol, rtol=rtol))
 
     def test_spectrogram(self):
         def get_output_fn(sound, args):
@@ -172,7 +177,7 @@ class Test_Kaldi(unittest.TestCase):
                 window_type=args[12])
             return output
 
-        self._compliance_test_helper('spec', 131, 13, get_output_fn)
+        self._compliance_test_helper(self.test_filepath, 'spec', 131, 13, get_output_fn, atol=1e-3, rtol=0)
 
     def test_fbank(self):
         def get_output_fn(sound, args):
@@ -202,7 +207,65 @@ class Test_Kaldi(unittest.TestCase):
                 window_type=args[21])
             return output
 
-        self._compliance_test_helper('fbank', 97, 22, get_output_fn)
+        self._compliance_test_helper(self.test_filepath, 'fbank', 97, 22, get_output_fn, atol=1e-3, rtol=1e-1)
+
+    def test_resample_waveform(self):
+        def get_output_fn(sound, args):
+            output = kaldi.resample_waveform(sound, args[1], args[2])
+            return output
+
+        self._compliance_test_helper(self.test_8000_filepath, 'resample', 32, 3, get_output_fn, atol=1e-2, rtol=1e-5)
+
+    def test_resample_waveform_upsample_size(self):
+        sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)
+        upsample_sound = kaldi.resample_waveform(sound, sample_rate, sample_rate * 2)
+        self.assertTrue(upsample_sound.size(-1) == sound.size(-1) * 2)
+
+    def test_resample_waveform_downsample_size(self):
+        sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)
+        downsample_sound = kaldi.resample_waveform(sound, sample_rate, sample_rate // 2)
+        self.assertTrue(downsample_sound.size(-1) == sound.size(-1) // 2)
+
+    def test_resample_waveform_identity_size(self):
+        sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)
+        downsample_sound = kaldi.resample_waveform(sound, sample_rate, sample_rate)
+        self.assertTrue(downsample_sound.size(-1) == sound.size(-1))
+
+    def _test_resample_waveform_accuracy(self, up_scale_factor=None, down_scale_factor=None,
+                                         atol=1e-1, rtol=1e-4):
+        # resample the signal and compare it to the ground truth
+        n_to_trim = 20
+        sample_rate = 1000
+        new_sample_rate = sample_rate
+
+        if up_scale_factor is not None:
+            new_sample_rate *= up_scale_factor
+
+        if down_scale_factor is not None:
+            new_sample_rate //= down_scale_factor
+
+        duration = 5  # seconds
+        original_timestamps = torch.arange(0, duration, 1.0 / sample_rate)
+
+        sound = 123 * torch.cos(2 * math.pi * 3 * original_timestamps).unsqueeze(0)
+        estimate = kaldi.resample_waveform(sound, sample_rate, new_sample_rate).squeeze()
+
+        new_timestamps = torch.arange(0, duration, 1.0 / new_sample_rate)[:estimate.size(0)]
+        ground_truth = 123 * torch.cos(2 * math.pi * 3 * new_timestamps)
+
+        # trim the first/last n samples as these points have boundary effects
+        ground_truth = ground_truth[..., n_to_trim:-n_to_trim]
+        estimate = estimate[..., n_to_trim:-n_to_trim]
+
+        self.assertTrue(torch.allclose(ground_truth, estimate, atol=atol, rtol=rtol))
+
+    def test_resample_waveform_downsample_accuracy(self):
+        for i in range(1, 20):
+            self._test_resample_waveform_accuracy(down_scale_factor=i * 2)
+
+    def test_resample_waveform_upsample_accuracy(self):
+        for i in range(1, 20):
+            self._test_resample_waveform_accuracy(up_scale_factor=1.0 + i / 20.0)
 
 
 if __name__ == '__main__':
