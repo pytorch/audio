@@ -36,13 +36,13 @@ def make_manifest(dir):
 
 def read_audio(fp, downsample=True):
     if downsample:
-        E = torchaudio.sox_effects.SoxEffects()
+        E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(fp)
-        E.sox_append_effect_to_chain("gain", ["-h"])
-        E.sox_append_effect_to_chain("channels", [1])
-        E.sox_append_effect_to_chain("rate", [16000])
-        E.sox_append_effect_to_chain("gain", ["-rh"])
-        E.sox_append_effect_to_chain("dither", ["-s"])
+        E.append_effect_to_chain("gain", ["-h"])
+        E.append_effect_to_chain("channels", [1])
+        E.append_effect_to_chain("rate", [16000])
+        E.append_effect_to_chain("gain", ["-rh"])
+        E.append_effect_to_chain("dither", ["-s"])
         sig, sr = E.sox_build_flow_effects()
     else:
         sig, sr = torchaudio.load(fp)
