@@ -120,19 +120,19 @@ def istft(stft_matrix,          # type: Tensor
           ):
     # type: (...) -> Tensor
     r""" Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.
-    It has the same parameters (+ additional optional parameter of `length`) and it should return the
+    It has the same parameters (+ additional optional parameter of ``length``) and it should return the
     least squares estimation of the original signal. The algorithm will check using the NOLA condition (
     nonzero overlap).
 
-    Important consideration in the parameters `window` and `center` so that the envelop
+    Important consideration in the parameters ``window`` and ``center`` so that the envelop
     created by the summation of all the windows is never zero at certain point in time. Specifically,
-    :math:`\sum_{t=-\infty}^{\infty} w^2[n-t\times hop\_length] \neq 0`.
+    :math:`\sum_{t=-\infty}^{\infty} w^2[n-t\times hop\_length] \cancel{=} 0`.
 
     Since stft discards elements at the end of the signal if they do not fit in a frame, the
     istft may return a shorter signal than the original signal (can occur if `center` is False
     since the signal isn't padded).
 
-    If `center` is True, then there will be padding e.g. 'constant', 'reflect', etc. Left padding
+    If ``center`` is True, then there will be padding e.g. 'constant', 'reflect', etc. Left padding
     can be trimmed off exactly because they can be calculated but right padding cannot be calculated
     without additional information.
 
@@ -140,8 +140,9 @@ def istft(stft_matrix,          # type: Tensor
     [17, 18, 0, 0, 0] vs [18, 0, 0, 0, 0]
 
     The n_frames, hop_length, win_length are all the same which prevents the calculation of right padding.
-    These additional values could be zeros or a reflection of the signal so providing `length`
-    could be useful. If `length` is None then padding will be aggressively removed (some loss of signal).
+    These additional values could be zeros or a reflection of the signal so providing ``length``
+    could be useful. If ``length`` is None then padding will be aggressively removed (some loss of signal).
+
     [1] D. W. Griffin and J. S. Lim, “Signal estimation from modified short-time Fourier transform,”
     IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
 
@@ -150,12 +151,14 @@ def istft(stft_matrix,          # type: Tensor
             column is a window. it has a shape of either (batch, fft_size, n_frames, 2) or (
             fft_size, n_frames, 2)
         n_fft (int): Size of Fourier transform
-        hop_length (Optional[int]): The distance between neighboring sliding window frames. (Default: win_length // 4)
-        win_length (Optional[int]): The size of window frame and STFT filter. (Default: n_fft)
-        window (Optional[Tensor]): The optional window function. (Default: torch.ones(win_length))
-        center (bool): Whether `input` was padded on both sides so
+        hop_length (Optional[int]): The distance between neighboring sliding window frames.
+            (Default: ``win_length // 4``)
+        win_length (Optional[int]): The size of window frame and STFT filter. (Default: ``n_fft``)
+        window (Optional[torch.Tensor]): The optional window function.
+            (Default: ``torch.ones(win_length)``)
+        center (bool): Whether ``input`` was padded on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`
-        pad_mode (str): Controls the padding method used when `center` is ``True``
+        pad_mode (str): Controls the padding method used when ``center`` is ``True``
         normalized (bool): Whether the STFT was normalized
         onesided (bool): Whether the STFT is onesided
         length (Optional[int]): The amount to trim the signal by (i.e. the
@@ -163,7 +166,7 @@ def istft(stft_matrix,          # type: Tensor
 
     Returns:
         torch.Tensor: Least squares estimation of the original signal of size
-            (batch, signal_length) or (signal_length)
+        (batch, signal_length) or (signal_length)
     """
     stft_matrix_dim = stft_matrix.dim()
     assert 3 <= stft_matrix_dim <= 4, ('Incorrect stft dimension: %d' % (stft_matrix_dim))
@@ -260,15 +263,15 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
         n_fft (int): Size of fft
         hop (int): Length of hop between STFT windows
         ws (int): Window size
-        power (int > 0 ) : Exponent for the magnitude spectrogram,
-                        e.g., 1 for energy, 2 for power, etc.
+        power (int) : Exponent for the magnitude spectrogram,
+            (must be > 0) e.g., 1 for energy, 2 for power, etc.
         normalize (bool) : Whether to normalize by magnitude after stft
 
     Returns:
-        torch.Tensor: channels x hops x n_fft (c, l, f), where channels
-            is unchanged, hops is the number of hops, and n_fft is the
-            number of fourier bins, which should be the window size divided
-            by 2 plus 1.
+        torch.Tensor: Channels x hops x n_fft (c, l, f), where channels
+        is unchanged, hops is the number of hops, and n_fft is the
+        number of fourier bins, which should be the window size divided
+        by 2 plus 1.
     """
     assert sig.dim() == 2
 
@@ -292,13 +295,13 @@ def create_fb_matrix(n_stft, f_min, f_max, n_mels):
     r""" Create a frequency bin conversion matrix.
 
     Args:
-        n_stft (int): number of filter banks from spectrogram
-        f_min (float): minimum frequency
-        f_max (float): maximum frequency
-        n_mels (int): number of mel bins
+        n_stft (int): Number of filter banks from spectrogram
+        f_min (float): Minimum frequency
+        f_max (float): Maximum frequency
+        n_mels (int): Number of mel bins
 
     Returns:
-        torch.Tensor: triangular filter banks (fb matrix)
+        torch.Tensor: Triangular filter banks (fb matrix)
     """
     # get stft freq bins
     stft_freqs = torch.linspace(f_min, f_max, n_stft)
@@ -330,15 +333,15 @@ def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
     a full clip.
 
     Args:
-        spec (torch.Tensor): normal STFT
-        multiplier (float): use 10. for power and 20. for amplitude
-        amin (float): number to clamp spec
-        db_multiplier (float): log10(max(reference value and amin))
-        top_db (Optional[float]): minimum negative cut-off in decibels.  A reasonable number
+        spec (torch.Tensor): Normal STFT
+        multiplier (float): Use 10. for power and 20. for amplitude
+        amin (float): Number to clamp spec
+        db_multiplier (float): Log10(max(reference value and amin))
+        top_db (Optional[float]): Minimum negative cut-off in decibels.  A reasonable number
             is 80.
 
     Returns:
-        torch.Tensor: spectrogram in DB
+        torch.Tensor: Spectrogram in DB
     """
     spec_db = multiplier * torch.log10(torch.clamp(spec, min=amin))
     spec_db -= multiplier * db_multiplier
@@ -357,9 +360,9 @@ def create_dct(n_mfcc, n_mels, norm):
     normalized depending on norm.
 
     Args:
-        n_mfcc (int) : number of mfc coefficients to retain
-        n_mels (int): number of MEL bins
-        norm (Optional[str]) : norm to use (either 'ortho' or None)
+        n_mfcc (int) : Number of mfc coefficients to retain
+        n_mels (int): Number of MEL bins
+        norm (Optional[str]) : Norm to use (either 'ortho' or None)
 
     Returns:
         torch.Tensor: The transformation matrix, to be right-multiplied to row-wise data.
@@ -383,7 +386,7 @@ def create_dct(n_mfcc, n_mels, norm):
 def BLC2CBL(tensor):
     # type: (Tensor) -> Tensor
     r"""Permute a 3D tensor from Bands x Sample length x Channels to Channels x
-       Bands x Samples length.
+    Bands x Samples length.
 
     Args:
         tensor (torch.Tensor): Tensor of spectrogram with shape (b, l, c)
