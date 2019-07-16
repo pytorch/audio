@@ -208,6 +208,7 @@ texinfo_documents = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/', None),
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+    'torch': ('https://pytorch.org/docs/stable/', None),
 }
 
 # -- A patch that prevents Sphinx from cross-referencing ivar tags -------
