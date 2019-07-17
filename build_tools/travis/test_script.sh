@@ -23,6 +23,10 @@ run_tests() {
     EXIT_STATUS="$(($EXIT_STATUS+STATUS))"
   done
 
+  python -m pytest -v -k "test_transforms"
+  STATUS=$?
+  EXIT_STATUS="$(($EXIT_STATUS+STATUS))"
+
   echo "Done, exit status: $EXIT_STATUS"
   exit $EXIT_STATUS
 }

@@ -10,13 +10,13 @@ import unittest
 import test.common_utils
 
 if IMPORT_LIBROSA:
+    import numpy as np
     import librosa
 
 if IMPORT_SCIPY:
     import scipy
 
 import pytest
-import numpy as np
 import torchaudio.functional as F
 xfail = pytest.mark.xfail
 
@@ -334,6 +334,7 @@ class Tester(unittest.TestCase):
 
         # we expect the downsampled signal to have half as many samples
         self.assertTrue(down_sampled.size(-1) == sound.size(-1) // 2)
+
 
 @pytest.mark.parametrize('fft_length', [512])
 @pytest.mark.parametrize('hop_length', [256])
