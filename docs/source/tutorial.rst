@@ -151,8 +151,8 @@ Or we can look at the Mel Spectrogram on a log scale.
 
 
 We can also compose transformations. For instance, we can reduce the
-signal from stereo to mono and revisit the spectrogram. However, the
-signal was already mono since the size of the tensor was 1 x n. :-)
+signal from stereo to mono (if the signal is not already in mono) and revisit the spectrogram. In our case, the
+signal was already mono since the size of the tensor was 1 x n.
 
 .. code:: ipython3
 
