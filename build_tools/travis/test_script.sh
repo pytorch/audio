@@ -9,7 +9,7 @@ python --version
 
 run_tests() {
   # find all the test files that match "test*.py"
-  TEST_FILES="$(find test/ -type f -name "test*.py" | sort)"
+  TEST_FILES="$(find test -type f -name "test*.py" | sort)"
   echo "Test files are:"
   echo $TEST_FILES
 
