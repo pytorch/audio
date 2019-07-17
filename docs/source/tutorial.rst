@@ -277,7 +277,7 @@ standard operators on it.
     Median relative difference is 1.49% between the original and MuLaw reconstucted signals
 
 
-Just as in Kaldi, we can apply have a resample transformation.
+Just as in Kaldi, we can resample the signal.
 
 .. code:: ipython3
 
