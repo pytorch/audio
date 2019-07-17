@@ -28,6 +28,10 @@ Linux (Ubuntu):
 ```bash
 sudo apt-get install sox libsox-dev libsox-fmt-all
 ```
+Anaconda
+```bash
+conda install -c conda-forge sox
+```
 
 Installation
 ------------
