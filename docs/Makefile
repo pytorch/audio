@@ -19,6 +19,9 @@ docset: html
 	cp $(SPHINXPROJ).docset/icon.png $(SPHINXPROJ).docset/icon@2x.png
 	convert $(SPHINXPROJ).docset/icon@2x.png -resize 16x16 $(SPHINXPROJ).docset/icon.png
 
+fiximgpath:
+	sed -in-place 's/_images/_static\/img/g;' build/html/tutorial.html
+
 .PHONY: help Makefile docset
 
 # Catch-all target: route all unknown targets to Sphinx using the new
