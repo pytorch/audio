@@ -66,8 +66,23 @@ the first audio signal.
 
 
 
-.. image:: _static/img/tutorial_8_0.png
+.. image:: Tutorial_files/Tutorial_8_0.png
 
+
+Migrating to Torch Audio from Kaldi
+===================================
+
+Users may be familiar with
+`Kaldi <http://github.com/kaldi-asr/kaldi>`__, a toolkit for speech
+recognition. Torch Audio offers compatibility with it in
+``torchaudio.kaldi_io``. It can indeed read from kaldi scp, or ark file
+or streams with:
+
+-  read_vec_int_ark
+-  read_vec_flt_scp
+-  read_vec_flt_arkfile/stream
+-  read_mat_scp
+-  read_mat_ark
 
 Transformations
 ===============
@@ -114,7 +129,7 @@ To start, we can look at the log of the spectrogram on a log scale.
 
 
 
-.. image:: _static/img/tutorial_11_1.png
+.. image:: Tutorial_files/Tutorial_12_1.png
 
 
 Or we can look at the Mel Spectrogram on a log scale.
@@ -132,7 +147,7 @@ Or we can look at the Mel Spectrogram on a log scale.
 
 
 
-.. image:: _static/img/tutorial_13_1.png
+.. image:: Tutorial_files/Tutorial_14_1.png
 
 
 We can also compose transformations. For instance, we can reduce the
@@ -161,7 +176,7 @@ signal was already mono since the size of the tensor was 1 x n. :-)
 
 
 
-.. image:: _static/img/tutorial_16_0.png
+.. image:: Tutorial_files/Tutorial_17_0.png
 
 
 As another example of transformations, we can encode the signal based on
@@ -196,7 +211,7 @@ standard operators on it.
 
 
 
-.. image:: _static/img/tutorial_19_0.png
+.. image:: Tutorial_files/Tutorial_20_0.png
 
 
 .. code:: ipython3
@@ -219,7 +234,7 @@ standard operators on it.
 
 
 
-.. image:: _static/img/tutorial_21_0.png
+.. image:: Tutorial_files/Tutorial_22_0.png
 
 
 .. code:: ipython3
@@ -242,7 +257,7 @@ standard operators on it.
 
 
 
-.. image:: _static/img/tutorial_23_0.png
+.. image:: Tutorial_files/Tutorial_24_0.png
 
 
 .. code:: ipython3
@@ -260,3 +275,33 @@ standard operators on it.
 .. parsed-literal::
 
     Median relative difference is 1.49% between the original and MuLaw reconstucted signals
+
+
+Just as in Kaldi, we can apply have a resample transformation.
+
+.. code:: ipython3
+
+    # Original frequency of the signal
+    # NOTE It can be obtained when loading data: tensor, frequency = torchaudio.load(filename)
+    original_frequency = 48000
+    new_frequency = original_frequency/48
+    resampled = torchaudio.compliance.kaldi.resample_waveform(tensor, original_frequency, new_frequency)
+    resampled.size()
+
+
+
+
+.. parsed-literal::
+
+    torch.Size([1, 4907])
+
+
+
+.. code:: ipython3
+
+    p = plt.plot(resampled[0,:].numpy())
+
+
+
+.. image:: Tutorial_files/Tutorial_28_0.png
+
