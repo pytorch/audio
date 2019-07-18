@@ -9,10 +9,9 @@ __all__ = [
     'LC2CL',
     'istft',
     'spectrogram',
-    'create_fb_matrix',
     'spectrogram_to_DB',
+    'create_fb_matrix',
     'create_dct',
-    'BLC2CBL',
     'mu_law_encoding',
     'mu_law_expanding'
 ]
@@ -20,15 +19,15 @@ __all__ = [
 
 @torch.jit.script
 def scale(tensor, factor):
-    # type: (Tensor, int) -> Tensor
+    # type: (Tensor, float) -> Tensor
     r"""Scale audio tensor from a 16-bit integer (represented as a
     :class:`torch.FloatTensor`) to a floating point number between -1.0 and 1.0.
     Note the 16-bit number is called the "bit depth" or "precision", not to be
     confused with "bit rate".
 
     Args:
-        tensor (torch.Tensor): Tensor of audio of size (n, c) or (c, n)
-        factor (int): Maximum value of input tensor
+        tensor (torch.Tensor): Tensor of audio of size (c, n)
+        factor (float): Maximum value of input tensor
 
     Returns:
         torch.Tensor: Scaled by the scale factor
@@ -40,43 +39,34 @@ def scale(tensor, factor):
 
 
 @torch.jit.script
-def pad_trim(tensor, ch_dim, max_len, len_dim, fill_value):
-    # type: (Tensor, int, int, int, float) -> Tensor
+def pad_trim(tensor, max_len, fill_value):
+    # type: (Tensor, int, float) -> Tensor
     r"""Pad/trim a 2D tensor (signal or labels).
 
     Args:
-        tensor (torch.Tensor): Tensor of audio of size (n, c) or (c, n)
-        ch_dim (int): Dimension of channel (not size)
+        tensor (torch.Tensor): Tensor of audio of size (c, n)
         max_len (int): Length to which the tensor will be padded
-        len_dim (int): Dimension of length (not size)
         fill_value (float): Value to fill in
 
     Returns:
         torch.Tensor: Padded/trimmed tensor
     """
-    if max_len > tensor.size(len_dim):
-        # array of [padding_left, padding_right, padding_top, padding_bottom]
-        # so pad similar to append (aka only right/bottom) and do not pad
-        # the length dimension. assumes equal sizes of padding.
-        padding = [max_len - tensor.size(len_dim)
-                   if (i % 2 == 1) and (i // 2 != len_dim)
-                   else 0
-                   for i in [0, 1, 2, 3]]
+    n = tensor.size(1)
+    if max_len > n:
         # TODO add "with torch.no_grad():" back when JIT supports it
-        tensor = torch.nn.functional.pad(tensor, padding, "constant", fill_value)
-    elif max_len < tensor.size(len_dim):
-        tensor = tensor.narrow(len_dim, 0, max_len)
+        tensor = torch.nn.functional.pad(tensor, (0, max_len - n), 'constant', fill_value)
+    else:
+        tensor = tensor[:, :max_len]
     return tensor
 
 
 @torch.jit.script
-def downmix_mono(tensor, ch_dim):
-    # type: (Tensor, int) -> Tensor
+def downmix_mono(tensor):
+    # type: (Tensor) -> Tensor
     r"""Downmix any stereo signals to mono.
 
     Args:
-        tensor (torch.Tensor): Tensor of audio of size (c, n) or (n, c)
-        ch_dim (int): Dimension of channel (not size)
+        tensor (torch.Tensor): Tensor of audio of size (c, n)
 
     Returns:
         torch.Tensor: Mono signal
@@ -84,7 +74,7 @@ def downmix_mono(tensor, ch_dim):
     if not tensor.is_floating_point():
         tensor = tensor.to(torch.float32)
 
-    tensor = torch.mean(tensor, ch_dim, True)
+    tensor = torch.mean(tensor, 0, True)
     return tensor
 
 
@@ -269,10 +259,9 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
         normalize (bool) : Whether to normalize by magnitude after stft
 
     Returns:
-        torch.Tensor: Channels x hops x n_fft (c, l, f), where channels
-        is unchanged, hops is the number of hops, and n_fft is the
-        number of fourier bins, which should be the window size divided
-        by 2 plus 1.
+        torch.Tensor: Channels x frequency x time (c, f, t), where channels
+        is unchanged, frequency is `n_fft // 2 + 1` where `n_fft` is the number of
+        fourier bins, time is the number of window hops
     """
     assert sig.dim() == 2
 
@@ -282,46 +271,12 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
 
     # default values are consistent with librosa.core.spectrum._spectrogram
     spec_f = _stft(sig, n_fft, hop, ws, window,
-                   True, 'reflect', False, True).transpose(1, 2)
+                   True, 'reflect', False, True)
 
     if normalize:
         spec_f /= window.pow(2).sum().sqrt()
-    spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor (c, l, n_fft)
+    spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor
     return spec_f
-
-
-@torch.jit.script
-def create_fb_matrix(n_stft, f_min, f_max, n_mels):
-    # type: (int, float, float, int) -> Tensor
-    r""" Create a frequency bin conversion matrix.
-
-    Args:
-        n_stft (int): Number of filter banks from spectrogram
-        f_min (float): Minimum frequency
-        f_max (float): Maximum frequency
-        n_mels (int): Number of mel bins
-
-    Returns:
-        torch.Tensor: Triangular filter banks (fb matrix)
-    """
-    # get stft freq bins
-    stft_freqs = torch.linspace(f_min, f_max, n_stft)
-    # calculate mel freq bins
-    # hertz to mel(f) is 2595. * math.log10(1. + (f / 700.))
-    m_min = 0. if f_min == 0 else 2595. * math.log10(1. + (f_min / 700.))
-    m_max = 2595. * math.log10(1. + (f_max / 700.))
-    m_pts = torch.linspace(m_min, m_max, n_mels + 2)
-    # mel to hertz(mel) is 700. * (10**(mel / 2595.) - 1.)
-    f_pts = 700. * (10**(m_pts / 2595.) - 1.)
-    # calculate the difference between each mel point and each stft freq point in hertz
-    f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
-    slopes = f_pts.unsqueeze(0) - stft_freqs.unsqueeze(1)  # (n_stft, n_mels + 2)
-    # create overlapping triangles
-    z = torch.zeros(1)
-    down_slopes = (-1. * slopes[:, :-2]) / f_diff[:-1]  # (n_stft, n_mels)
-    up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_stft, n_mels)
-    fb = torch.max(z, torch.min(down_slopes, up_slopes))
-    return fb
 
 
 @torch.jit.script
@@ -334,7 +289,7 @@ def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
     a full clip.
 
     Args:
-        spec (torch.Tensor): Normal STFT
+        spec (torch.Tensor): Normal STFT of size (c, f, t)
         multiplier (float): Use 10. for power and 20. for amplitude
         amin (float): Number to clamp spec
         db_multiplier (float): Log10(max(reference value and amin))
@@ -342,7 +297,7 @@ def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
             is 80.
 
     Returns:
-        torch.Tensor: Spectrogram in DB
+        torch.Tensor: Spectrogram in DB of size (c, f, t)
     """
     spec_db = multiplier * torch.log10(torch.clamp(spec, min=amin))
     spec_db -= multiplier * db_multiplier
@@ -355,47 +310,69 @@ def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
 
 
 @torch.jit.script
+def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
+    # type: (int, float, float, int) -> Tensor
+    r""" Create a frequency bin conversion matrix.
+
+    Args:
+        n_freqs (int): Number of frequencies to highlight/apply
+        f_min (float): Minimum frequency
+        f_max (float): Maximum frequency
+        n_mels (int): Number of mel filterbanks
+
+    Returns:
+        torch.Tensor: Triangular filter banks (fb matrix) of size (`n_freqs`, `n_mels`)
+        meaning number of frequencies to highlight/apply to x the number of filterbanks.
+        Each column is a filterbank so that assuming there is a matrix A of
+        size (..., `n_freqs`), the applied result would be
+        `A * create_fb_matrix(A.size(-1), ...)`.
+    """
+    # get stft freq bins
+    stft_freqs = torch.linspace(f_min, f_max, n_freqs)
+    # calculate mel freq bins
+    # hertz to mel(f) is 2595. * math.log10(1. + (f / 700.))
+    m_min = 0. if f_min == 0 else 2595. * math.log10(1. + (f_min / 700.))
+    m_max = 2595. * math.log10(1. + (f_max / 700.))
+    m_pts = torch.linspace(m_min, m_max, n_mels + 2)
+    # mel to hertz(mel) is 700. * (10**(mel / 2595.) - 1.)
+    f_pts = 700. * (10**(m_pts / 2595.) - 1.)
+    # calculate the difference between each mel point and each stft freq point in hertz
+    f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
+    slopes = f_pts.unsqueeze(0) - stft_freqs.unsqueeze(1)  # (n_freqs, n_mels + 2)
+    # create overlapping triangles
+    z = torch.zeros(1)
+    down_slopes = (-1. * slopes[:, :-2]) / f_diff[:-1]  # (n_freqs, n_mels)
+    up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_freqs, n_mels)
+    fb = torch.max(z, torch.min(down_slopes, up_slopes))
+    return fb
+
+
+@torch.jit.script
 def create_dct(n_mfcc, n_mels, norm):
     # type: (int, int, Optional[str]) -> Tensor
-    r"""Creates a DCT transformation matrix with shape (num_mels, num_mfcc),
+    r"""Creates a DCT transformation matrix with shape (`n_mels`, `n_mfcc`),
     normalized depending on norm.
 
     Args:
         n_mfcc (int) : Number of mfc coefficients to retain
-        n_mels (int): Number of MEL bins
+        n_mels (int): Number of mel filterbanks
         norm (Optional[str]) : Norm to use (either 'ortho' or None)
 
     Returns:
-        torch.Tensor: The transformation matrix, to be right-multiplied to row-wise data.
+        torch.Tensor: The transformation matrix, to be right-multiplied to
+        row-wise data of size (`n_mels`, `n_mfcc`).
     """
-    outdim = n_mfcc
-    dim = n_mels
     # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
-    n = torch.arange(dim)
-    k = torch.arange(outdim)[:, None]
-    dct = torch.cos(math.pi / float(dim) * (n + 0.5) * k)
+    n = torch.arange(n_mels, dtype=torch.get_default_dtype())
+    k = torch.arange(n_mfcc, dtype=torch.get_default_dtype()).unsqueeze(1)
+    dct = torch.cos(math.pi / float(n_mels) * (n + 0.5) * k)  # size (n_mfcc, n_mels)
     if norm is None:
         dct *= 2.0
     else:
         assert norm == 'ortho'
         dct[0] *= 1.0 / math.sqrt(2.0)
-        dct *= math.sqrt(2.0 / float(dim))
+        dct *= math.sqrt(2.0 / float(n_mels))
     return dct.t()
-
-
-@torch.jit.script
-def BLC2CBL(tensor):
-    # type: (Tensor) -> Tensor
-    r"""Permute a 3D tensor from Bands x Sample length x Channels to Channels x
-    Bands x Samples length.
-
-    Args:
-        tensor (torch.Tensor): Tensor of spectrogram with shape (b, l, c)
-
-    Returns:
-        torch.Tensor: Tensor of spectrogram with shape (c, b, l)
-    """
-    return tensor.permute(2, 0, 1).contiguous()
 
 
 @torch.jit.script

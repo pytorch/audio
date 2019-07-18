@@ -7,97 +7,56 @@ from . import functional as F
 from .compliance import kaldi
 
 
-# TODO remove this class
-class Compose(object):
-    """Composes several transforms together.
-
-    Args:
-        transforms (list of ``Transform`` objects): list of transforms to compose.
-
-    Example:
-        >>> transforms.Compose([
-        >>>     transforms.Scale(),
-        >>>     transforms.PadTrim(max_len=16000),
-        >>> ])
-    """
-    def __init__(self, transforms):
-        self.transforms = transforms
-
-    def __call__(self, audio):
-        for t in self.transforms:
-            audio = t(audio)
-        return audio
-
-    def __repr__(self):
-        format_string = self.__class__.__name__ + '('
-        for t in self.transforms:
-            format_string += '\n'
-            format_string += '    {0}'.format(t)
-        format_string += '\n)'
-        return format_string
-
-
 class Scale(torch.jit.ScriptModule):
     """Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
     to a floating point number between -1.0 and 1.0.  Note the 16-bit number is
     called the "bit depth" or "precision", not to be confused with "bit rate".
 
     Args:
-        factor (int): maximum value of input tensor. default: 16-bit depth
-
+        factor (float): maximum value of input tensor. default: 16-bit depth
     """
     __constants__ = ['factor']
 
-    def __init__(self, factor=2**31):
+    def __init__(self, factor=float(2**31)):
         super(Scale, self).__init__()
         self.factor = factor
 
     @torch.jit.script_method
     def forward(self, tensor):
         """
-
         Args:
-            tensor (Tensor): Tensor of audio of size (Samples x Channels)
+            tensor (Tensor): Tensor of audio of size (c, n)
 
         Returns:
             Tensor: Scaled by the scale factor. (default between -1.0 and 1.0)
-
         """
         return F.scale(tensor, self.factor)
 
-    def __repr__(self):
-        return self.__class__.__name__ + '()'
-
 
 class PadTrim(torch.jit.ScriptModule):
-    """Pad/Trim a 2d-Tensor (Signal or Labels)
+    """Pad/Trim a 2D-Tensor (Signal or Labels)
 
     Args:
-        tensor (Tensor): Tensor of audio of size (n x c) or (c x n)
+        tensor (Tensor): Tensor of audio of size (c, n)
         max_len (int): Length to which the tensor will be padded
-        channels_first (bool): Pad for channels first tensors.  Default: `True`
-
     """
-    __constants__ = ['max_len', 'fill_value', 'len_dim', 'ch_dim']
+    __constants__ = ['max_len', 'fill_value']
 
-    def __init__(self, max_len, fill_value=0., channels_first=True):
+    def __init__(self, max_len, fill_value=0.):
         super(PadTrim, self).__init__()
         self.max_len = max_len
         self.fill_value = fill_value
-        self.len_dim, self.ch_dim = int(channels_first), int(not channels_first)
 
     @torch.jit.script_method
     def forward(self, tensor):
         """
+        Args:
+            tensor (Tensor): Tensor of audio of size (c, n)
 
         Returns:
-            Tensor: (c x n) or (n x c)
-
+            Tensor: (c, `max_len`)
         """
-        return F.pad_trim(tensor, self.ch_dim, self.max_len, self.len_dim, self.fill_value)
-
-    def __repr__(self):
-        return self.__class__.__name__ + '(max_len={0})'.format(self.max_len)
+        return F.pad_trim(tensor, self.max_len, self.fill_value)
 
 
 class DownmixMono(torch.jit.ScriptModule):
@@ -105,53 +64,35 @@ class DownmixMono(torch.jit.ScriptModule):
        the `channels` effect instead of this transformation.
 
     Inputs:
-        tensor (Tensor): Tensor of audio of size (c x n) or (n x c)
-        channels_first (bool): Downmix across channels dimension.  Default: `True`
+        tensor (Tensor): Tensor of audio of size (c, n)
 
     Returns:
-        tensor (Tensor) (Samples x 1):
-
+        tensor (Tensor) (1, n):
     """
-    __constants__ = ['ch_dim']
 
-    def __init__(self, channels_first=None):
+    def __init__(self):
         super(DownmixMono, self).__init__()
-        self.ch_dim = int(not channels_first)
 
     @torch.jit.script_method
     def forward(self, tensor):
         return F.downmix_mono(tensor, self.ch_dim)
 
-    def __repr__(self):
-        return self.__class__.__name__ + '()'
-
 
 class LC2CL(torch.jit.ScriptModule):
-    """Permute a 2d tensor from samples (n x c) to (c x n)
+    """Converts a 2D tensor from (n, c) to (c, n)
     """
-
     def __init__(self):
         super(LC2CL, self).__init__()
 
     @torch.jit.script_method
     def forward(self, tensor):
         """
-
         Args:
-            tensor (Tensor): Tensor of audio signal with shape (LxC)
-
+            tensor (Tensor): Tensor of audio signal with shape (n, c)
         Returns:
-            tensor (Tensor): Tensor of audio signal with shape (CxL)
+            tensor (Tensor): Tensor of audio signal with shape (c, n)
         """
         return F.LC2CL(tensor)
-
-    def __repr__(self):
-        return self.__class__.__name__ + '()'
-
-
-def SPECTROGRAM(*args, **kwargs):
-    warn("SPECTROGRAM has been renamed to Spectrogram")
-    return Spectrogram(*args, **kwargs)
 
 
 class Spectrogram(torch.jit.ScriptModule):
@@ -192,56 +133,13 @@ class Spectrogram(torch.jit.ScriptModule):
             sig (Tensor): Tensor of audio of size (c, n)
 
         Returns:
-            spec_f (Tensor): channels x hops x n_fft (c, l, f), where channels
-                is unchanged, hops is the number of hops, and n_fft is the
-                number of fourier bins, which should be the window size divided
-                by 2 plus 1.
+            spec_f (Tensor): Channels x frequency x time (c, f, t), where channels
+            is unchanged, frequency is `n_fft // 2 + 1` where `n_fft` is the number of
+            fourier bins, time is the number of window hops
 
         """
         return F.spectrogram(sig, self.pad, self.window, self.n_fft, self.hop,
                              self.ws, self.power, self.normalize)
-
-
-def F2M(*args, **kwargs):
-    warn("F2M has been renamed to MelScale")
-    return MelScale(*args, **kwargs)
-
-
-class MelScale(torch.jit.ScriptModule):
-    """This turns a normal STFT into a mel frequency STFT, using a conversion
-       matrix.  This uses triangular filter banks.
-
-       User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).
-
-    Args:
-        n_mels (int): number of mel bins
-        sr (int): sample rate of audio signal
-        f_max (float, optional): maximum frequency. default: `sr` // 2
-        f_min (float): minimum frequency. default: 0
-        n_stft (int, optional): number of filter banks from stft. Calculated from first input
-            if `None` is given.  See `n_fft` in `Spectrogram`.
-    """
-    __constants__ = ['n_mels', 'sr', 'f_min', 'f_max']
-
-    def __init__(self, n_mels=128, sr=16000, f_max=None, f_min=0., n_stft=None):
-        super(MelScale, self).__init__()
-        self.n_mels = n_mels
-        self.sr = sr
-        self.f_max = f_max if f_max is not None else float(sr // 2)
-        self.f_min = f_min
-        fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
-            n_stft, self.f_min, self.f_max, self.n_mels)
-        self.fb = torch.jit.Attribute(fb, torch.Tensor)
-
-    @torch.jit.script_method
-    def forward(self, spec_f):
-        if self.fb.numel() == 0:
-            tmp_fb = F.create_fb_matrix(spec_f.size(2), self.f_min, self.f_max, self.n_mels)
-            # Attributes cannot be reassigned outside __init__ so workaround
-            self.fb.resize_(tmp_fb.size())
-            self.fb.copy_(tmp_fb)
-        spec_m = torch.matmul(spec_f, self.fb)  # (c, l, n_fft) dot (n_fft, n_mels) -> (c, l, n_mels)
-        return spec_m
 
 
 class SpectrogramToDB(torch.jit.ScriptModule):
@@ -272,9 +170,119 @@ class SpectrogramToDB(torch.jit.ScriptModule):
 
     @torch.jit.script_method
     def forward(self, spec):
-        # numerically stable implementation from librosa
-        # https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
+        r"""Numerically stable implementation from Librosa
+        https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
+
+        Args:
+            spec (torch.Tensor): STFT of size (c, f, t)
+
+        Returns:
+            torch.Tensor: STFT after changing scale of size (c, f, t)
+        """
         return F.spectrogram_to_DB(spec, self.multiplier, self.amin, self.db_multiplier, self.top_db)
+
+
+class MelScale(torch.jit.ScriptModule):
+    """This turns a normal STFT into a mel frequency STFT, using a conversion
+       matrix.  This uses triangular filter banks.
+
+       User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).
+
+    Args:
+        n_mels (int): Number of mel filterbanks
+        sr (int): sample rate of audio signal
+        f_max (float, optional): maximum frequency. default: `sr` // 2
+        f_min (float): minimum frequency. default: 0
+        n_stft (int, optional): number of filter banks from stft. Calculated from first input
+            if `None` is given.  See `n_fft` in `Spectrogram`.
+    """
+    __constants__ = ['n_mels', 'sr', 'f_min', 'f_max']
+
+    def __init__(self, n_mels=128, sr=16000, f_max=None, f_min=0., n_stft=None):
+        super(MelScale, self).__init__()
+        self.n_mels = n_mels
+        self.sr = sr
+        self.f_max = f_max if f_max is not None else float(sr // 2)
+        self.f_min = f_min
+        fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
+            n_stft, self.f_min, self.f_max, self.n_mels)
+        self.fb = torch.jit.Attribute(fb, torch.Tensor)
+
+    @torch.jit.script_method
+    def forward(self, spec_f):
+        r"""
+        Args:
+            spec_f (torch.Tensor): a spectrogram STFT of size (c, f, t)
+
+        Returns:
+            torch.Tensor: mel frequency spectrogram of size (c, `n_mels`, t)
+        """
+        if self.fb.numel() == 0:
+            tmp_fb = F.create_fb_matrix(spec_f.size(1), self.f_min, self.f_max, self.n_mels)
+            # Attributes cannot be reassigned outside __init__ so workaround
+            self.fb.resize_(tmp_fb.size())
+            self.fb.copy_(tmp_fb)
+
+        # (c, f, t).transpose(...) dot (f, n_mels) -> (c, t, n_mels).transpose(...)
+        spec_m = torch.matmul(spec_f.transpose(1, 2), self.fb).transpose(1, 2)
+        return spec_m
+
+
+class MelSpectrogram(torch.jit.ScriptModule):
+    """Create MelSpectrogram for a raw audio signal. This is a composition of Spectrogram
+    and MelScale.
+
+    Sources:
+        * https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe
+        * https://timsainb.github.io/spectrograms-mfccs-and-inversion-in-python.html
+        * http://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html
+
+    Args:
+        sr (int): sample rate of audio signal
+        ws (int): window size
+        hop (int, optional): length of hop between STFT windows. default: `ws` // 2
+        n_fft (int, optional): number of fft bins. default: `ws` // 2 + 1
+        f_max (float, optional): maximum frequency. default: `sr` // 2
+        f_min (float): minimum frequency. default: 0
+        pad (int): two sided padding of signal
+        n_mels (int): Number of mel filterbanks
+        window (torch windowing function): default: `torch.hann_window`
+        wkwargs (dict, optional): arguments for window function
+
+    Example:
+        >>> sig, sr = torchaudio.load("test.wav", normalization=True)
+        >>> spec_mel = transforms.MelSpectrogram(sr)(sig)  # (c, n_mels, t)
+    """
+    __constants__ = ['sr', 'n_fft', 'ws', 'hop', 'pad', 'n_mels', 'f_min']
+
+    def __init__(self, sr=16000, n_fft=400, ws=None, hop=None, f_min=0., f_max=None,
+                 pad=0, n_mels=128, window=torch.hann_window, wkwargs=None):
+        super(MelSpectrogram, self).__init__()
+        self.sr = sr
+        self.n_fft = n_fft
+        self.ws = ws if ws is not None else n_fft
+        self.hop = hop if hop is not None else self.ws // 2
+        self.pad = pad
+        self.n_mels = n_mels  # number of mel frequency bins
+        self.f_max = torch.jit.Attribute(f_max, Optional[float])
+        self.f_min = f_min
+        self.spec = Spectrogram(n_fft=self.n_fft, ws=self.ws, hop=self.hop,
+                                pad=self.pad, window=window, power=2,
+                                normalize=False, wkwargs=wkwargs)
+        self.fm = MelScale(self.n_mels, self.sr, self.f_max, self.f_min)
+
+    @torch.jit.script_method
+    def forward(self, sig):
+        """
+        Args:
+            sig (torch.Tensor): Tensor of audio of size (c, n)
+
+        Returns:
+            torch.Tensor: mel frequency spectrogram of size (c, `n_mels`, t)
+        """
+        spec = self.spec(sig)
+        spec_mel = self.fm(spec)
+        return spec_mel
 
 
 class MFCC(torch.jit.ScriptModule):
@@ -326,12 +334,10 @@ class MFCC(torch.jit.ScriptModule):
     def forward(self, sig):
         """
         Args:
-            sig (Tensor): Tensor of audio of size (channels [c], samples [n])
+            sig (torch.Tensor): Tensor of audio of size (c, n)
 
         Returns:
-            spec_mel_db (Tensor): channels x hops x n_mels (c, l, m), where channels
-                is unchanged, hops is the number of hops, and n_mels is the
-                number of mel bins.
+            torch.Tensor: spec_mel_db of size (c, `n_mfcc`, t)
         """
         mel_spect = self.MelSpectrogram(sig)
         if self.log_mels:
@@ -339,97 +345,9 @@ class MFCC(torch.jit.ScriptModule):
             mel_spect = torch.log(mel_spect + log_offset)
         else:
             mel_spect = self.s2db(mel_spect)
-        mfcc = torch.matmul(mel_spect, self.dct_mat)
+        # (c, `n_mels`, t).tranpose(...) dot (`n_mels`, `n_mfcc`) -> (c, t, `n_mfcc`).tranpose(...)
+        mfcc = torch.matmul(mel_spect.transpose(1, 2), self.dct_mat).transpose(1, 2)
         return mfcc
-
-
-class MelSpectrogram(torch.jit.ScriptModule):
-    """Create MEL Spectrograms from a raw audio signal using the stft
-       function in PyTorch.
-
-    Sources:
-        * https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe
-        * https://timsainb.github.io/spectrograms-mfccs-and-inversion-in-python.html
-        * http://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html
-
-    Args:
-        sr (int): sample rate of audio signal
-        ws (int): window size
-        hop (int, optional): length of hop between STFT windows. default: `ws` // 2
-        n_fft (int, optional): number of fft bins. default: `ws` // 2 + 1
-        f_max (float, optional): maximum frequency. default: `sr` // 2
-        f_min (float): minimum frequency. default: 0
-        pad (int): two sided padding of signal
-        n_mels (int): number of MEL bins
-        window (torch windowing function): default: `torch.hann_window`
-        wkwargs (dict, optional): arguments for window function
-
-    Example:
-        >>> sig, sr = torchaudio.load("test.wav", normalization=True)
-        >>> spec_mel = transforms.MelSpectrogram(sr)(sig)  # (c, l, m)
-    """
-    __constants__ = ['sr', 'n_fft', 'ws', 'hop', 'pad', 'n_mels', 'f_min']
-
-    def __init__(self, sr=16000, n_fft=400, ws=None, hop=None, f_min=0., f_max=None,
-                 pad=0, n_mels=128, window=torch.hann_window, wkwargs=None):
-        super(MelSpectrogram, self).__init__()
-        self.sr = sr
-        self.n_fft = n_fft
-        self.ws = ws if ws is not None else n_fft
-        self.hop = hop if hop is not None else self.ws // 2
-        self.pad = pad
-        self.n_mels = n_mels  # number of mel frequency bins
-        self.f_max = torch.jit.Attribute(f_max, Optional[float])
-        self.f_min = f_min
-        self.spec = Spectrogram(n_fft=self.n_fft, ws=self.ws, hop=self.hop,
-                                pad=self.pad, window=window, power=2,
-                                normalize=False, wkwargs=wkwargs)
-        self.fm = MelScale(self.n_mels, self.sr, self.f_max, self.f_min)
-
-    @torch.jit.script_method
-    def forward(self, sig):
-        """
-        Args:
-            sig (Tensor): Tensor of audio of size (channels [c], samples [n])
-
-        Returns:
-            spec_mel (Tensor): channels x hops x n_mels (c, l, m), where channels
-                is unchanged, hops is the number of hops, and n_mels is the
-                number of mel bins.
-
-        """
-        spec = self.spec(sig)
-        spec_mel = self.fm(spec)
-        return spec_mel
-
-
-def MEL(*args, **kwargs):
-    raise DeprecationWarning("MEL has been removed from the library please use MelSpectrogram or librosa")
-
-
-class BLC2CBL(torch.jit.ScriptModule):
-    """Permute a 3d tensor from Bands x Sample length x Channels to Channels x
-       Bands x Samples length
-    """
-
-    def __init__(self):
-        super(BLC2CBL, self).__init__()
-
-    @torch.jit.script_method
-    def forward(self, tensor):
-        """
-
-        Args:
-            tensor (Tensor): Tensor of spectrogram with shape (BxLxC)
-
-        Returns:
-            tensor (Tensor): Tensor of spectrogram with shape (CxBxL)
-
-        """
-        return F.BLC2CBL(tensor)
-
-    def __repr__(self):
-        return self.__class__.__name__ + '()'
 
 
 class MuLawEncoding(torch.jit.ScriptModule):
@@ -452,13 +370,11 @@ class MuLawEncoding(torch.jit.ScriptModule):
     @torch.jit.script_method
     def forward(self, x):
         """
-
         Args:
             x (FloatTensor/LongTensor)
 
         Returns:
             x_mu (LongTensor)
-
         """
         return F.mu_law_encoding(x, self.qc)
 
@@ -486,13 +402,11 @@ class MuLawExpanding(torch.jit.ScriptModule):
     @torch.jit.script_method
     def forward(self, x_mu):
         """
-
         Args:
             x_mu (Tensor)
 
         Returns:
             x (Tensor)
-
         """
         return F.mu_law_expanding(x_mu, self.qc)
 

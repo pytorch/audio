@@ -47,25 +47,21 @@ class Tester(unittest.TestCase):
 
     def test_pad_trim(self):
 
-        audio_orig = self.sig.clone()
-        length_orig = audio_orig.size(0)
+        audio_orig = self.sig.clone().t()
+        length_orig = audio_orig.size(1)
         length_new = int(length_orig * 1.2)
 
-        result = transforms.PadTrim(max_len=length_new, channels_first=False)(audio_orig)
-        self.assertEqual(result.size(0), length_new)
-
-        result = transforms.PadTrim(max_len=length_new, channels_first=True)(audio_orig.transpose(0, 1))
+        result = transforms.PadTrim(max_len=length_new)(audio_orig)
         self.assertEqual(result.size(1), length_new)
 
         audio_orig = self.sig.clone()
-        length_orig = audio_orig.size(0)
         length_new = int(length_orig * 0.8)
 
-        result = transforms.PadTrim(max_len=length_new, channels_first=False)(audio_orig)
+        result = transforms.PadTrim(max_len=length_new)(audio_orig)
 
-        self.assertEqual(result.size(0), length_new)
+        self.assertEqual(result.size(1), length_new)
 
-        repr_test = transforms.PadTrim(max_len=length_new, channels_first=False)
+        repr_test = transforms.PadTrim(max_len=length_new)
         self.assertTrue(repr_test.__repr__())
 
     def test_downmix_mono(self):
