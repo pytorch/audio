@@ -33,11 +33,11 @@ class Test_JIT(unittest.TestCase):
     def test_torchscript_scale(self):
         @torch.jit.script
         def jit_method(tensor, factor):
-            # type: (Tensor, int) -> Tensor
+            # type: (Tensor, float) -> Tensor
             return F.scale(tensor, factor)
 
-        tensor = torch.rand((10, 1))
-        factor = 2
+        tensor = torch.rand((1, 10))
+        factor = 2.0
 
         jit_out = jit_method(tensor, factor)
         py_out = F.scale(tensor, factor)
@@ -46,24 +46,22 @@ class Test_JIT(unittest.TestCase):
 
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
     def test_scriptmodule_scale(self):
-        tensor = torch.rand((10, 1), device="cuda")
+        tensor = torch.rand((1, 10), device="cuda")
 
         self._test_script_module(tensor, transforms.Scale)
 
     def test_torchscript_pad_trim(self):
         @torch.jit.script
-        def jit_method(tensor, ch_dim, max_len, len_dim, fill_value):
-            # type: (Tensor, int, int, int, float) -> Tensor
-            return F.pad_trim(tensor, ch_dim, max_len, len_dim, fill_value)
+        def jit_method(tensor, max_len, fill_value):
+            # type: (Tensor, int, float) -> Tensor
+            return F.pad_trim(tensor, max_len, fill_value)
 
-        tensor = torch.rand((10, 1))
-        ch_dim = 1
+        tensor = torch.rand((1, 10))
         max_len = 5
-        len_dim = 0
         fill_value = 3.
 
-        jit_out = jit_method(tensor, ch_dim, max_len, len_dim, fill_value)
-        py_out = F.pad_trim(tensor, ch_dim, max_len, len_dim, fill_value)
+        jit_out = jit_method(tensor, max_len, fill_value)
+        py_out = F.pad_trim(tensor, max_len, fill_value)
 
         self.assertTrue(torch.allclose(jit_out, py_out))
 
@@ -76,21 +74,20 @@ class Test_JIT(unittest.TestCase):
 
     def test_torchscript_downmix_mono(self):
         @torch.jit.script
-        def jit_method(tensor, ch_dim):
-            # type: (Tensor, int) -> Tensor
-            return F.downmix_mono(tensor, ch_dim)
+        def jit_method(tensor):
+            # type: (Tensor) -> Tensor
+            return F.downmix_mono(tensor)
 
-        tensor = torch.rand((10, 1))
-        ch_dim = 1
+        tensor = torch.rand((2, 10))
 
-        jit_out = jit_method(tensor, ch_dim)
-        py_out = F.downmix_mono(tensor, ch_dim)
+        jit_out = jit_method(tensor)
+        py_out = F.downmix_mono(tensor)
 
         self.assertTrue(torch.allclose(jit_out, py_out))
 
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
     def test_scriptmodule_downmix_mono(self):
-        tensor = torch.rand((1, 10), device="cuda")
+        tensor = torch.rand((2, 10), device="cuda")
 
         self._test_script_module(tensor, transforms.DownmixMono)
 
@@ -211,32 +208,13 @@ class Test_JIT(unittest.TestCase):
 
         self._test_script_module(tensor, transforms.MelSpectrogram)
 
-    def test_torchscript_BLC2CBL(self):
-        @torch.jit.script
-        def jit_method(tensor):
-            # type: (Tensor) -> Tensor
-            return F.BLC2CBL(tensor)
-
-        tensor = torch.rand((10, 1000, 1))
-
-        jit_out = jit_method(tensor)
-        py_out = F.BLC2CBL(tensor)
-
-        self.assertTrue(torch.allclose(jit_out, py_out))
-
-    @unittest.skipIf(not RUN_CUDA, "no CUDA")
-    def test_scriptmodule_BLC2CBL(self):
-        tensor = torch.rand((10, 1000, 1), device="cuda")
-
-        self._test_script_module(tensor, transforms.BLC2CBL)
-
     def test_torchscript_mu_law_encoding(self):
         @torch.jit.script
         def jit_method(tensor, qc):
             # type: (Tensor, int) -> Tensor
             return F.mu_law_encoding(tensor, qc)
 
-        tensor = torch.rand((10, 1))
+        tensor = torch.rand((1, 10))
         qc = 256
 
         jit_out = jit_method(tensor, qc)
@@ -246,7 +224,7 @@ class Test_JIT(unittest.TestCase):
 
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
     def test_scriptmodule_MuLawEncoding(self):
-        tensor = torch.rand((10, 1), device="cuda")
+        tensor = torch.rand((1, 10), device="cuda")
 
         self._test_script_module(tensor, transforms.MuLawEncoding)
 
@@ -256,7 +234,7 @@ class Test_JIT(unittest.TestCase):
             # type: (Tensor, int) -> Tensor
             return F.mu_law_expanding(tensor, qc)
 
-        tensor = torch.rand((10, 1))
+        tensor = torch.rand((1, 10))
         qc = 256
 
         jit_out = jit_method(tensor, qc)
@@ -266,7 +244,7 @@ class Test_JIT(unittest.TestCase):
 
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
     def test_scriptmodule_MuLawExpanding(self):
-        tensor = torch.rand((10, 1), device="cuda")
+        tensor = torch.rand((1, 10), device="cuda")
 
         self._test_script_module(tensor, transforms.MuLawExpanding)
 
