@@ -452,40 +452,28 @@ def mu_law_expanding(x_mu, qc):
     return x
 
 
-def batched_stft(waveforms, fft_length, hop_length=None, win_length=None, window=None,
-                 center=True, pad_mode='reflect', normalized=False, onesided=True):
-    """Compute a short-time Fourier transform of the input waveform(s).
-    It wraps `torch.stft` but after reshaping the input audio
-    to allow for `waveforms` that `.dim()` >= 3.
-    It follows most of the `torch.stft` default value, but for `window`,
-    if it's not specified (`None`), it uses hann window.
+def stft(waveforms, fft_length, hop_length=None, win_length=None, window=None,
+         center=True, pad_mode='reflect', normalized=False, onesided=True):
+    """Compute a short time Fourier transform of the input waveform(s).
+    It wraps `torch.stft` after reshaping the input audio to allow for `waveforms` that `.dim()` >= 3.
+    It follows most of the `torch.stft` default values, but for `window`, which defaults to hann window.
 
     Args:
-        waveforms (Tensor): Tensor of audio signal
-            of size `(*, channel, time)`
-        fft_length (int): FFT size [sample]
+        waveforms (torch.Tensor): Audio signal of size `(*, channel, time)`
+        fft_length (int): FFT size [sample].
         hop_length (int): Hop size [sample] between STFT frames.
-            Defaults to `fft_length // 4` (75%-overlapping windows)
-            by `torch.stft`.
-        win_length (int): Size of STFT window.
-            Defaults to `fft_length` by `torch.stft`.
-        window (Tensor): 1-D Tensor.
-            Defaults to Hann Window of size `win_length`
-            *unlike* `torch.stft`.
-        center (bool): Whether to pad `waveforms` on both sides so that the
-            `t`-th frame is centered at time `t * hop_length`.
-            Defaults to `True` by `torch.stft`.
-        pad_mode (str): padding method (see `torch.nn.functional.pad`).
-            Defaults to `'reflect'` by `torch.stft`.
-        normalized (bool): Whether the results are normalized.
-            Defaults to `False` by `torch.stft`.
-        onesided (bool): Whether the half + 1 frequency bins
-            are returned to removethe symmetric part of STFT
-            of real-valued signal. Defaults to `True`
-            by `torch.stft`.
+            (Defaults to `fft_length // 4`, 75%-overlapping windows by `torch.stft`).
+        win_length (int): Size of STFT window. (Defaults to `fft_length` by `torch.stft`).
+        window (torch.Tensor): window function. (Defaults to Hann Window of size `win_length` *unlike* `torch.stft`).
+        center (bool): Whether to pad `waveforms` on both sides so that the `t`-th frame is centered
+            at time `t * hop_length`. (Defaults to `True` by `torch.stft`)
+        pad_mode (str): padding method (see `torch.nn.functional.pad`). (Defaults to `'reflect'` by `torch.stft`).
+        normalized (bool): Whether the results are normalized. (Defaults to `False` by `torch.stft`).
+        onesided (bool): Whether the half + 1 frequency bins are returned to removethe symmetric part of STFT
+            of real-valued signal. (Defaults to `True` by `torch.stft`).
 
     Returns:
-        complex_specgrams (Tensor): `(*, channel, num_freqs, time, complex=2)`
+        torch.Tensor: `(*, channel, num_freqs, time, complex=2)`
 
     Example:
         >>> waveforms = torch.randn(16, 2, 10000)  # (batch, channel, time)

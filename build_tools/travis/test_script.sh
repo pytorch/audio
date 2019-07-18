@@ -18,14 +18,10 @@ run_tests() {
   for FILE in $TEST_FILES; do
     # run each file on a separate process. if one fails, just keep going and
     # return the final exit status.
-    python -m unittest -v $FILE
+    python -m pytest -v $FILE
     STATUS=$?
     EXIT_STATUS="$(($EXIT_STATUS+STATUS))"
   done
-
-  python -m pytest -v -k "test_transforms"
-  STATUS=$?
-  EXIT_STATUS="$(($EXIT_STATUS+STATUS))"
 
   echo "Done, exit status: $EXIT_STATUS"
   exit $EXIT_STATUS

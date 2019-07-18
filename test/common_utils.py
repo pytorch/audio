@@ -47,7 +47,3 @@ def random_int_tensor(seed, size, low=0, high=2 ** 32, a=22695477, c=1, m=2 ** 3
     """ Same as random_float_tensor but integers between [low, high)
     """
     return torch.floor(random_float_tensor(seed, size, a, c, m) * (high - low)) + low
-
-
-def _num_stft_bins(signal_len, fft_len, hop_length, pad):
-    return (signal_len + 2 * pad - fft_len + hop_length) // hop_length
