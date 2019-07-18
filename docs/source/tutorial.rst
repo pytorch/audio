@@ -21,24 +21,17 @@ installed for easier visualization.
 Opening a dataset
 -----------------
 
-Torch audio supports loading sound files in the wav and mp3 format with
-``tensor, frequency = torchaudio.load(filename)``. It also supports
-importing the VCTK and YESNO dataset `out of the
-box <https://pytorch.org/audio/datasets.html>`__. For instance the VCTK
-dataset can be loaded like so.
+Torch audio supports loading sound files in the wav and mp3 format.
 
 .. code:: ipython3
 
-    dataset = torchaudio.datasets.VCTK("~/VCTK", download=True)
+    filename = "_static/sound/steam-train-whistle-daniel_simon-converted-from-mp3.wav"
+    tensor, frequency = torchaudio.load(filename)
 
-Let’s quickly see how many samples there are in this dataset.
-
-.. code:: ipython3
-
-    dataset.num_samples
-    # 44257
-
-But let’s focus on the first audio signal.
+    tensor.size()
+    # torch.Size([2, 276858])
+    frequency
+    # 44100
 
 .. code:: ipython3
 
@@ -50,9 +43,8 @@ But let’s focus on the first audio signal.
 
     plt.plot(tensor.transpose(0,1).numpy())
 
-.. image:: _static/img/tutorial_8_0.png
+.. image:: _static/img/tutorial_original.png
     :width: 350 px
-    :align: center
 
 
 Transformations
@@ -91,15 +83,13 @@ To start, we can look at the log of the spectrogram on a log scale.
 .. code:: ipython3
 
     spec = torchaudio.transforms.Spectrogram()(tensor)
-
     spec.size()
     # torch.Size([1, 1178, 201])
 
     plt.imshow(spec.log2().transpose(1,2)[0,:,:].numpy(), cmap='gray')
 
-.. image:: _static/img/tutorial_12_1.png
+.. image:: _static/img/tutorial_spectrogram.png
     :width: 350 px
-    :align: center
 
 
 Or we can look at the Mel Spectrogram on a log scale.
@@ -113,54 +103,45 @@ Or we can look at the Mel Spectrogram on a log scale.
 
     plt.imshow(mel.log2().transpose(1,2)[0,:,:].detach().numpy(), cmap='gray')
 
-.. image:: _static/img/tutorial_14_1.png
+.. image:: _static/img/tutorial_melspectrogram.png
     :width: 350 px
-    :align: center
 
 
-We can resample the signal.
+We can resample the signal, one channel at a time.
 
 .. code:: ipython3
 
-    # Original frequency of the signal
-    # NOTE It can be obtained when loading data: tensor, frequency = torchaudio.load(filename)
-    original_frequency = 48000
-    new_frequency = original_frequency/48
+    new_frequency = frequency/10
 
-    resampled = torchaudio.transforms.Resample(original_frequency, new_frequency)(tensor)
-
+    # Since Resample applies to a single channel, we resample first channel here
+    resampled = torchaudio.transforms.Resample(frequency, new_frequency)(tensor[0,:].view(1,-1))
     resampled.size()
-    # torch.Size([1, 4907])
+    # torch.Size([1, 27686])
 
     plt.plot(resampled[0,:].numpy())
 
-.. image:: _static/img/tutorial_28_0.png
+.. image:: _static/img/tutorial_resample.png
     :width: 350 px
-    :align: center
 
-
-We can also compose transformations. For instance, we can reduce the signal
-from stereo to mono (if the signal is not already in mono) and revisit the
-spectrogram. In our case, the signal was already mono since the size of the
-tensor was 1 x n.
+Or we can first convert the stereo to mono, and resample, using
+composition.
 
 .. code:: ipython3
 
-    spec = composed = torchaudio.transforms.Compose([
+    resampled = torchaudio.transforms.Compose([
         torchaudio.transforms.LC2CL(),
         torchaudio.transforms.DownmixMono(),
         torchaudio.transforms.LC2CL(),
-        torchaudio.transforms.Spectrogram(),
+        torchaudio.transforms.Resample(frequency, new_frequency)
     ])(tensor)
 
-    spec.size()
-    # torch.Size([1, 1178, 201])
+    resampled.size()
+    # torch.Size([1, 27686])
 
-    plt.imshow(spec.log2().transpose(1,2)[0,:,:].numpy(), cmap='gray')
+    plt.plot(resampled[0,:].numpy())
 
-.. image:: _static/img/tutorial_17_0.png
+.. image:: _static/img/tutorial_resample_mono.png
     :width: 350 px
-    :align: center
 
 
 As another example of transformations, we can encode the signal based on
@@ -172,7 +153,7 @@ standard operators on it.
 
     # Let's check if the tensor is in the interval [-1,1]
     tensor.min(), tensor.max(), tensor.mean()
-    # (tensor(-0.6873), tensor(0.7480), tensor(-4.2871e-06))
+    # (tensor(-0.5728), tensor(0.5760), tensor(9.2938e-05))
 
     def normalize(tensor):
         # Subtract the mean, and scale to the interval [-1,1]
@@ -183,9 +164,8 @@ standard operators on it.
     
     plt.plot(normalized[0,:].numpy())
 
-.. image:: _static/img/tutorial_20_0.png
+.. image:: _static/img/tutorial_normalize.png
     :width: 350 px
-    :align: center
 
 
 .. code:: ipython3
@@ -193,13 +173,12 @@ standard operators on it.
     transformed = torchaudio.transforms.MuLawEncoding()(normalized)
 
     transformed.size()
-    # torch.Size([1, 235536])
+    # torch.Size([2, 276858])
 
     plt.plot(transformed[0,:].numpy())
 
-.. image:: _static/img/tutorial_22_0.png
+.. image:: _static/img/tutorial_mulawenc.png
     :width: 350 px
-    :align: center
 
 
 .. code:: ipython3
@@ -207,13 +186,12 @@ standard operators on it.
     recovered = torchaudio.transforms.MuLawExpanding()(transformed)
 
     recovered.size()
-    # torch.Size([1, 235536])
+    # torch.Size([2, 276858])
 
     plt.plot(recovered[0,:].numpy())
 
-.. image:: _static/img/tutorial_24_0.png
+.. image:: _static/img/tutorial_mulawdec.png
     :width: 350 px
-    :align: center
 
 
 .. code:: ipython3
@@ -224,9 +202,9 @@ standard operators on it.
         diff = (normalized-recovered)
         return (diff.abs()/normalized.abs()).median()
     
-    err = compute_median_relative_difference(normalized, recovered)
-    print("Median relative difference is {:.2%} between the original and MuLaw reconstucted signals".format(err))
-    # Median relative difference is 1.49% between the original and MuLaw reconstucted signals
+    # Median relative difference between original and MuLaw reconstucted signals
+    compute_median_relative_difference(normalized, recovered)
+    # tensor(0.0122)
 
 
 Migrating to Torch Audio from Kaldi
