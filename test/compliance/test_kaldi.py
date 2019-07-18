@@ -282,7 +282,7 @@ class Test_Kaldi(unittest.TestCase):
         for i in range(num_channels):
             single_channel = sound * (i + 1) * 1.5
             single_channel_sampled = kaldi.resample_waveform(single_channel, sample_rate, sample_rate // 2)
-            print((multi_sound_sampled[i, :] - single_channel_sampled).abs().max())
+            print(((multi_sound_sampled[i, :] - single_channel_sampled)/single_channel_sampled).abs().max())
             self.assertTrue(torch.allclose(multi_sound_sampled[i, :], single_channel_sampled, atol=1e-6))
 
 if __name__ == '__main__':
