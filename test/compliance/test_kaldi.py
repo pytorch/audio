@@ -267,6 +267,22 @@ class Test_Kaldi(unittest.TestCase):
         for i in range(1, 20):
             self._test_resample_waveform_accuracy(up_scale_factor=1.0 + i / 20.0)
 
+    def test_resample_waveform_multi_channel(self):
+        num_channels = 3
+
+        sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)  # (1, 8000)
+        multi_sound = sound.repeat(num_channels, 1)  # (num_channels, 8000)
+
+        for i in range(num_channels):
+            multi_sound[i, ...] *= (i + 1) * 1.5
+
+        multi_sound_sampled = kaldi.resample_waveform(multi_sound, sample_rate, sample_rate // 2)
+
+        # check that sampling is same whether using separately or in a tensor of size (c, n)
+        for i in range(num_channels):
+            single_channel = sound * (i + 1) * 1.5
+            single_channel_sampled = kaldi.resample_waveform(single_channel, sample_rate, sample_rate // 2)
+            self.assertTrue(torch.allclose(multi_sound_sampled[i, :], single_channel_sampled))
 
 if __name__ == '__main__':
     unittest.main()
