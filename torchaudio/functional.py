@@ -101,7 +101,8 @@ def LC2CL(tensor):
     """
     return tensor.transpose(0, 1).contiguous()
 
-
+# TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
+@torch.jit.ignore
 def _stft(input, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided):
     # type: (Tensor, int, Optional[int], Optional[int], Optional[Tensor], bool, str, bool, bool) -> Tensor
     return torch.stft(input, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided)
