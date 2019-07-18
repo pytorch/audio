@@ -7,6 +7,7 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    :maxdepth: 2
    :caption: Package Reference
 
+   tutorial
    sox_effects
    datasets
    compliance.kaldi
@@ -14,7 +15,6 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    transforms
    functional
    legacy
-   tutorial
 
 .. automodule:: torchaudio
    :members:

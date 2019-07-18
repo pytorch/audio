@@ -1,7 +1,5 @@
-torchaudio.tutorial
+Torch Audio Tutorial
 ===================
-
-.. currentmodule:: torchaudio.tutorial
 
 Significant effort in solving machine learning problems goes into data
 preparation. PyTorch provides many tools to make data loading easy and
@@ -54,22 +52,7 @@ But let’s focus on the first audio signal.
 
 .. image:: _static/img/tutorial_8_0.png
     :width: 350 px
-
-
-Migrating to Torch Audio from Kaldi
------------------------------------
-
-Users may be familiar with
-`Kaldi <http://github.com/kaldi-asr/kaldi>`__, a toolkit for speech
-recognition. Torch Audio offers compatibility with it in
-``torchaudio.kaldi_io``. It can indeed read from kaldi scp, or ark file
-or streams with:
-
--  read_vec_int_ark
--  read_vec_flt_scp
--  read_vec_flt_arkfile/stream
--  read_mat_scp
--  read_mat_ark
+    :align: center
 
 
 Transformations
@@ -116,6 +99,7 @@ To start, we can look at the log of the spectrogram on a log scale.
 
 .. image:: _static/img/tutorial_12_1.png
     :width: 350 px
+    :align: center
 
 
 Or we can look at the Mel Spectrogram on a log scale.
@@ -131,6 +115,7 @@ Or we can look at the Mel Spectrogram on a log scale.
 
 .. image:: _static/img/tutorial_14_1.png
     :width: 350 px
+    :align: center
 
 
 We can resample the signal.
@@ -151,6 +136,7 @@ We can resample the signal.
 
 .. image:: _static/img/tutorial_28_0.png
     :width: 350 px
+    :align: center
 
 
 We can also compose transformations. For instance, we can reduce the signal
@@ -174,6 +160,7 @@ tensor was 1 x n.
 
 .. image:: _static/img/tutorial_17_0.png
     :width: 350 px
+    :align: center
 
 
 As another example of transformations, we can encode the signal based on
@@ -198,6 +185,7 @@ standard operators on it.
 
 .. image:: _static/img/tutorial_20_0.png
     :width: 350 px
+    :align: center
 
 
 .. code:: ipython3
@@ -211,6 +199,7 @@ standard operators on it.
 
 .. image:: _static/img/tutorial_22_0.png
     :width: 350 px
+    :align: center
 
 
 .. code:: ipython3
@@ -224,6 +213,7 @@ standard operators on it.
 
 .. image:: _static/img/tutorial_24_0.png
     :width: 350 px
+    :align: center
 
 
 .. code:: ipython3
@@ -237,6 +227,22 @@ standard operators on it.
     err = compute_median_relative_difference(normalized, recovered)
     print("Median relative difference is {:.2%} between the original and MuLaw reconstucted signals".format(err))
     # Median relative difference is 1.49% between the original and MuLaw reconstucted signals
+
+
+Migrating to Torch Audio from Kaldi
+-----------------------------------
+
+Users may be familiar with
+`Kaldi <http://github.com/kaldi-asr/kaldi>`__, a toolkit for speech
+recognition. Torch Audio offers compatibility with it in
+``torchaudio.kaldi_io``. It can indeed read from kaldi scp, or ark file
+or streams with:
+
+-  read_vec_int_ark
+-  read_vec_flt_scp
+-  read_vec_flt_arkfile/stream
+-  read_mat_scp
+-  read_mat_ark
 
 
 Conclusion
