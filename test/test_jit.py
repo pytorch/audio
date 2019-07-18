@@ -164,7 +164,7 @@ class Test_JIT(unittest.TestCase):
             # type: (Tensor, float, float, float, Optional[float]) -> Tensor
             return F.spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db)
 
-        spec = torch.rand((10, 1))
+        spec = torch.rand((6, 201))
         multiplier = 10.
         amin = 1e-10
         db_multiplier = 0.
@@ -177,7 +177,7 @@ class Test_JIT(unittest.TestCase):
 
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
     def test_scriptmodule_SpectrogramToDB(self):
-        spec = torch.rand((10, 1), device="cuda")
+        spec = torch.rand((6, 201), device="cuda")
 
         self._test_script_module(spec, transforms.SpectrogramToDB)
 
