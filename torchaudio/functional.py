@@ -364,8 +364,8 @@ def create_dct(n_mfcc, n_mels, norm):
         row-wise data of size (`n_mels`, `n_mfcc`).
     """
     # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
-    n = torch.arange(n_mels, dtype=torch.get_default_dtype())
-    k = torch.arange(n_mfcc, dtype=torch.get_default_dtype()).unsqueeze(1)
+    n = torch.arange(float(n_mels))
+    k = torch.arange(float(n_mfcc)).unsqueeze(1)
     dct = torch.cos(math.pi / float(n_mels) * (n + 0.5) * k)  # size (n_mfcc, n_mels)
     if norm is None:
         dct *= 2.0

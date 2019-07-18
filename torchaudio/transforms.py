@@ -69,13 +69,12 @@ class DownmixMono(torch.jit.ScriptModule):
     Returns:
         tensor (Tensor) (1, n):
     """
-
     def __init__(self):
         super(DownmixMono, self).__init__()
 
     @torch.jit.script_method
     def forward(self, tensor):
-        return F.downmix_mono(tensor, self.ch_dim)
+        return F.downmix_mono(tensor)
 
 
 class LC2CL(torch.jit.ScriptModule):
