@@ -274,7 +274,7 @@ class Test_Kaldi(unittest.TestCase):
         multi_sound = sound.repeat(num_channels, 1)  # (num_channels, 8000)
 
         for i in range(num_channels):
-            multi_sound[i, ...] *= (i + 1) * 1.5
+            multi_sound[i, :] *= (i + 1) * 1.5
 
         multi_sound_sampled = kaldi.resample_waveform(multi_sound, sample_rate, sample_rate // 2)
 
