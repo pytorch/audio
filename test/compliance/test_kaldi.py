@@ -277,7 +277,7 @@ class Test_Kaldi(unittest.TestCase):
             multi_sound[i, :] *= (i + 1) * 1.5
 
         multi_sound_sampled = kaldi.resample_waveform(multi_sound, sample_rate, sample_rate // 2)
-        
+
         # check that sampling is same whether using separately or in a tensor of size (c, n)
         for i in range(num_channels):
             single_channel = sound * (i + 1) * 1.5
