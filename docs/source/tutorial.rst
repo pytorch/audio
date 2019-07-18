@@ -33,14 +33,6 @@ Torch audio supports loading sound files in the wav and mp3 format.
     frequency
     # 44100
 
-.. code:: ipython3
-
-    ith_sample = 0
-    tensor = dataset[ith_sample][0]
-    
-    tensor.size()
-    # torch.Size([1, 235536])
-
     plt.plot(tensor.transpose(0,1).numpy())
 
 .. image:: _static/img/tutorial_original.png
