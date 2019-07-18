@@ -19,6 +19,7 @@ installed for easier visualization.
     %matplotlib inline
     import matplotlib.pyplot as plt
 
+
 Opening a dataset
 -----------------
 
@@ -54,6 +55,7 @@ But let’s focus on the first audio signal.
 .. image:: _static/img/tutorial_8_0.png
     :width: 350 px
 
+
 Migrating to Torch Audio from Kaldi
 -----------------------------------
 
@@ -69,6 +71,7 @@ or streams with:
 -  read_mat_scp
 -  read_mat_ark
 
+
 Transformations
 ---------------
 
@@ -81,7 +84,8 @@ Torch audio supports a growing list of
    confused with “bit rate”.
 -  **PadTrim**: PadTrim a 2d-Tensor
 -  **Downmix**: Downmix any stereo signals to mono.
--  **LC2CL**: Permute a 2d tensor from samples (n x c) to (c x n)
+-  **LC2CL**: Permute a 2d tensor from samples (n x c) to (c x n).
+-  **Resample**: Resample the signal to a different frequency.
 -  **Spectrogram**: Create a spectrogram from a raw audio signal
 -  **MelScale**: This turns a normal STFT into a mel frequency STFT,
    using a conversion matrix. This uses triangular filter banks.
@@ -113,6 +117,7 @@ To start, we can look at the log of the spectrogram on a log scale.
 .. image:: _static/img/tutorial_12_1.png
     :width: 350 px
 
+
 Or we can look at the Mel Spectrogram on a log scale.
 
 .. code:: ipython3
@@ -125,6 +130,26 @@ Or we can look at the Mel Spectrogram on a log scale.
     plt.imshow(mel.log2().transpose(1,2)[0,:,:].detach().numpy(), cmap='gray')
 
 .. image:: _static/img/tutorial_14_1.png
+    :width: 350 px
+
+
+We can resample the signal.
+
+.. code:: ipython3
+
+    # Original frequency of the signal
+    # NOTE It can be obtained when loading data: tensor, frequency = torchaudio.load(filename)
+    original_frequency = 48000
+    new_frequency = original_frequency/48
+
+    resampled = torchaudio.transforms.Resample(original_frequency, new_frequency)(tensor)
+
+    resampled.size()
+    # torch.Size([1, 4907])
+
+    plt.plot(resampled[0,:].numpy())
+
+.. image:: _static/img/tutorial_28_0.png
     :width: 350 px
 
 
@@ -150,6 +175,7 @@ tensor was 1 x n.
 .. image:: _static/img/tutorial_17_0.png
     :width: 350 px
 
+
 As another example of transformations, we can encode the signal based on
 the Mu-Law companding. But to do so, we need the signal to be between -1
 and 1. Since the tensor is just a regular PyTorch tensor, we can apply
@@ -173,6 +199,7 @@ standard operators on it.
 .. image:: _static/img/tutorial_20_0.png
     :width: 350 px
 
+
 .. code:: ipython3
 
     transformed = torchaudio.transforms.MuLawEncoding()(normalized)
@@ -184,6 +211,7 @@ standard operators on it.
 
 .. image:: _static/img/tutorial_22_0.png
     :width: 350 px
+
 
 .. code:: ipython3
 
@@ -197,6 +225,7 @@ standard operators on it.
 .. image:: _static/img/tutorial_24_0.png
     :width: 350 px
 
+
 .. code:: ipython3
 
     recovered = torchaudio.transforms.MuLawExpanding()(transformed)
@@ -209,21 +238,12 @@ standard operators on it.
     print("Median relative difference is {:.2%} between the original and MuLaw reconstucted signals".format(err))
     # Median relative difference is 1.49% between the original and MuLaw reconstucted signals
 
-Just as in Kaldi, we can resample the signal.
 
-.. code:: ipython3
+Conclusion
+----------
 
-    # Original frequency of the signal
-    # NOTE It can be obtained when loading data: tensor, frequency = torchaudio.load(filename)
-    original_frequency = 48000
-    new_frequency = original_frequency/48
-
-    resampled = torchaudio.compliance.kaldi.resample_waveform(tensor, original_frequency, new_frequency)
-
-    resampled.size()
-    # torch.Size([1, 4907])
-
-    plt.plot(resampled[0,:].numpy())
-
-.. image:: _static/img/tutorial_28_0.png
-    :width: 350 px
+We used the VCTK dataset to illustrate how to open a dataset or
+another data using Torch Audio, and how to pre-process and transform an
+audio signal. Given that Torch Audio is built on PyTorch, these
+techniques can be used as building blocks for more advanced audio
+applications, such as speech recognition.
