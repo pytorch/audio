@@ -2,6 +2,7 @@
 import os
 import platform
 import sys
+import subprocess
 
 from setuptools import setup, find_packages
 from torch.utils.cpp_extension import BuildExtension, CppExtension
@@ -48,6 +49,32 @@ if IS_CONDA:
     # We want $PREFIX/include for conda (for sox.h)
     lib_path = os.path.dirname(sys.executable)
     include_dirs += [os.path.join(os.path.dirname(lib_path), 'include')]
+
+
+# Creating the version file
+cwd = os.path.dirname(os.path.abspath(__file__))
+version = '0.2.0a0'
+sha = 'Unknown'
+
+try:
+    sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=cwd).decode('ascii').strip()
+except Exception:
+    pass
+
+if os.getenv('TORCHAUDIO_BUILD_VERSION'):
+    assert os.getenv('TORCHAUDIO_BUILD_NUMBER') is not None
+    build_number = int(os.getenv('TORCHAUDIO_BUILD_NUMBER'))
+    version = os.getenv('TORCHAUDIO_BUILD_VERSION')
+    if build_number > 1:
+        version += '.post' + str(build_number)
+elif sha != 'Unknown':
+    version += '+' + sha[:7]
+print('-- Building version ' + version)
+
+version_path = os.path.join(cwd, 'torchaudio', 'version.py')
+with open(version_path, 'w') as f:
+    f.write("__version__ = '{}'\n".format(version))
+    f.write("git_version = {}\n".format(repr(sha)))
 
 setup(
     name="torchaudio",
