@@ -72,6 +72,7 @@ elif sha != 'Unknown':
 print('-- Building version ' + version)
 
 version_path = os.path.join(cwd, 'torchaudio', 'version.py')
+raise Exception(version_path)
 with open(version_path, 'w') as f:
     f.write("__version__ = '{}'\n".format(version))
     f.write("git_version = {}\n".format(repr(sha)))
