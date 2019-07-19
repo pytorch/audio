@@ -219,12 +219,26 @@ or streams with:
 -  read_mat_scp
 -  read_mat_ark
 
-Torchaudio provides Kaldi-compatible transforms for ``fbank`` and
-``spectrogram`` with the benefit of GPU support.
+Torchaudio provides Kaldi-compatible transforms for ``spectrogram`` and ``fbank`` with the benefit of GPU support, see [here](compliance.kaldi.html) for more information.
 
 .. code:: ipython3
 
-    spec = torchaudio.compliance.kaldi.spectrogram(tensor, channel=0)
+    n_fft = 400.0
+    frame_length = n_fft / frequency * 1000.0
+    frame_shift = frame_length / 2.0
+
+    params = {
+        "channel": 0,
+        "dither": 0.0,
+        "window_type": "hanning",
+        "frame_length": frame_length,
+        "frame_shift": frame_shift,
+        "remove_dc_offset": False,
+        "round_to_power_of_two": False,
+        "sample_frequency": frequency,
+    }
+
+    spec = torchaudio.compliance.kaldi.spectrogram(tensor, **params)
 
     spec.size()
     # torch.Size([1728, 257])
@@ -235,7 +249,7 @@ matching Kaldi’s implementation.
 
 .. code:: ipython3
 
-    fbank = torchaudio.compliance.kaldi.fbank(tensor)
+    fbank = torchaudio.compliance.kaldi.fbank(tensor, **params)
 
     fbank.size()
     # torch.Size([1728, 23])
