@@ -235,7 +235,9 @@ matching Kaldi’s implementation.
 
 .. code:: ipython3
 
-    torchaudio.compliance.kaldi.fbank(tensor).size()
+    fbank = torchaudio.compliance.kaldi.fbank(tensor)
+
+    fbank.size()
     # torch.Size([1728, 23])
 
 
