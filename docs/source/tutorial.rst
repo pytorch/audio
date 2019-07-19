@@ -1,10 +1,15 @@
-Torch Audio Tutorial
+Torchaudio Tutorial
 ===================
 
+PyTorch is an open source deep learning platform that provides a
+seamless path from research prototyping to production deployment with
+GPU support.
+
 Significant effort in solving machine learning problems goes into data
-preparation. PyTorch provides many tools to make data loading easy and
-more readable. In this tutorial, we will see how to load and preprocess
-data from a simple dataset.
+preparation. Torchaudio leverages PyTorch’s GPU support, and provides
+many tools to make data loading easy and more readable. In this
+tutorial, we will see how to load and preprocess data from a simple
+dataset.
 
 For this tutorial, please make sure the ``matplotlib`` package is
 installed for easier visualization.
@@ -21,7 +26,7 @@ installed for easier visualization.
 Opening a dataset
 -----------------
 
-Torch audio supports loading sound files in the wav and mp3 format.
+Torchaudio supports loading sound files in the wav and mp3 format.
 
 .. code:: ipython3
 
@@ -42,7 +47,7 @@ Torch audio supports loading sound files in the wav and mp3 format.
 Transformations
 ---------------
 
-Torch audio supports a growing list of
+Torchaudio supports a growing list of
 `transformations <https://pytorch.org/audio/transforms.html>`__.
 
 -  **Scale**: Scale audio tensor from a 16-bit integer (represented as a
@@ -199,12 +204,12 @@ standard operators on it.
     # tensor(0.0122)
 
 
-Migrating to Torch Audio from Kaldi
+Migrating to Torchaudio from Kaldi
 -----------------------------------
 
 Users may be familiar with
 `Kaldi <http://github.com/kaldi-asr/kaldi>`__, a toolkit for speech
-recognition. Torch Audio offers compatibility with it in
+recognition. Torchaudio offers compatibility with it in
 ``torchaudio.kaldi_io``. It can indeed read from kaldi scp, or ark file
 or streams with:
 
@@ -214,12 +219,31 @@ or streams with:
 -  read_mat_scp
 -  read_mat_ark
 
+Torchaudio provides Kaldi-compatible transforms for ``fbank`` and
+``spectrogram`` with the benefit of GPU support.
+
+.. code:: ipython3
+
+    spec = torchaudio.compliance.kaldi.spectrogram(tensor, channel=0)
+
+    spec.size()
+    # torch.Size([1728, 257])
+
+
+We also support computing the filterbank features from raw audio signal,
+matching Kaldi’s implementation.
+
+.. code:: ipython3
+
+    torchaudio.compliance.kaldi.fbank(tensor).size()
+    # torch.Size([1728, 23])
+
 
 Conclusion
 ----------
 
-We used the VCTK dataset to illustrate how to open a dataset or
-another data using Torch Audio, and how to pre-process and transform an
-audio signal. Given that Torch Audio is built on PyTorch, these
+We used an example sound signal to illustrate how to open an audio file or
+using Torchaudio, and how to pre-process and transform an
+audio signal. Given that Torchaudio is built on PyTorch, these
 techniques can be used as building blocks for more advanced audio
-applications, such as speech recognition.
+applications, such as speech recognition, while leveraging GPUs.
