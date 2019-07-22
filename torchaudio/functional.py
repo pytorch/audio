@@ -20,14 +20,12 @@ __all__ = [
 @torch.jit.script
 def scale(tensor, factor):
     # type: (Tensor, float) -> Tensor
-    r"""Scale audio tensor from a 16-bit integer (represented as a
-    :class:`torch.FloatTensor`) to a floating point number between -1.0 and 1.0.
-    Note the 16-bit number is called the "bit depth" or "precision", not to be
-    confused with "bit rate".
+    r"""Scales tensor by a factor. By default, assuming the input is int32, it
+    will scale the tensor to have values between -1.0 and 1.0.
 
     Args:
-        tensor (torch.Tensor): Tensor of audio of size (c, n)
-        factor (float): Maximum value of input tensor
+        tensor (torch.Tensor): Tensor input to scale
+        factor (float): Factor to scale by
 
     Returns:
         torch.Tensor: Scaled by the scale factor
@@ -39,43 +37,44 @@ def scale(tensor, factor):
 
 
 @torch.jit.script
-def pad_trim(tensor, max_len, fill_value):
+def pad_trim(waveform, max_len, fill_value):
     # type: (Tensor, int, float) -> Tensor
-    r"""Pad/trim a 2D tensor (signal or labels).
+    r"""Pad/trim a 2D tensor
 
     Args:
-        tensor (torch.Tensor): Tensor of audio of size (c, n)
-        max_len (int): Length to which the tensor will be padded
+        waveform (torch.Tensor): Tensor of audio of size (c, n)
+        max_len (int): Length to which the waveform will be padded
         fill_value (float): Value to fill in
 
     Returns:
         torch.Tensor: Padded/trimmed tensor
     """
-    n = tensor.size(1)
+    n = waveform.size(1)
     if max_len > n:
         # TODO add "with torch.no_grad():" back when JIT supports it
-        tensor = torch.nn.functional.pad(tensor, (0, max_len - n), 'constant', fill_value)
+        waveform = torch.nn.functional.pad(waveform, (0, max_len - n), 'constant', fill_value)
     else:
-        tensor = tensor[:, :max_len]
-    return tensor
+        waveform = waveform[:, :max_len]
+    return waveform
 
 
 @torch.jit.script
-def downmix_mono(tensor):
+def downmix_mono(waveform):
     # type: (Tensor) -> Tensor
-    r"""Downmix any stereo signals to mono.
+    r"""Downmix stereo waveform to mono.  Consider using a `SoxEffectsChain` with
+    the `channels` effect instead of this transformation.
 
     Args:
-        tensor (torch.Tensor): Tensor of audio of size (c, n)
+        waveform (torch.Tensor): Tensor of audio of size (c, n)
 
     Returns:
-        torch.Tensor: Mono signal
+        torch.Tensor: Tensor that has been downmixed of size (1, n)
     """
-    if not tensor.is_floating_point():
-        tensor = tensor.to(torch.float32)
+    if not waveform.is_floating_point():
+        waveform = waveform.to(torch.float32)
 
-    tensor = torch.mean(tensor, 0, True)
-    return tensor
+    waveform = torch.mean(waveform, 0, True)
+    return waveform
 
 
 @torch.jit.script
@@ -245,25 +244,25 @@ def istft(stft_matrix,          # type: Tensor
 
 
 @torch.jit.script
-def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
+def spectrogram(sig, pad, window, n_fft, hop_length, win_length, power, normalized):
     # type: (Tensor, int, Tensor, int, int, int, int, bool) -> Tensor
     r"""Create a spectrogram from a raw audio signal.
 
     Args:
         sig (torch.Tensor): Tensor of audio of size (c, n)
         pad (int): Two sided padding of signal
-        window (torch.Tensor): Window_tensor
+        window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of fft
-        hop (int): Length of hop between STFT windows
-        ws (int): Window size
+        hop_length (int): Length of hop between STFT windows
+        win_length (int): Window size
         power (int) : Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
-        normalize (bool) : Whether to normalize by magnitude after stft
+        normalized (bool) : Whether to normalize by magnitude after stft
 
     Returns:
         torch.Tensor: Channels x frequency x time (c, f, t), where channels
         is unchanged, frequency is `n_fft // 2 + 1` where `n_fft` is the number of
-        fourier bins, time is the number of window hops
+        fourier bins, and time is the number of window hops (n_frames).
     """
     assert sig.dim() == 2
 
@@ -272,17 +271,17 @@ def spectrogram(sig, pad, window, n_fft, hop, ws, power, normalize):
         sig = torch.nn.functional.pad(sig, (pad, pad), "constant")
 
     # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = _stft(sig, n_fft, hop, ws, window,
+    spec_f = _stft(sig, n_fft, hop_length, win_length, window,
                    True, 'reflect', False, True)
 
-    if normalize:
+    if normalized:
         spec_f /= window.pow(2).sum().sqrt()
     spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor
     return spec_f
 
 
 @torch.jit.script
-def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
+def spectrogram_to_DB(specgram, multiplier, amin, db_multiplier, top_db=None):
     # type: (Tensor, float, float, float, Optional[float]) -> Tensor
     r"""Turns a spectrogram from the power/amplitude scale to the decibel scale.
 
@@ -291,9 +290,9 @@ def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
     a full clip.
 
     Args:
-        spec (torch.Tensor): Normal STFT of size (c, f, t)
+        specgram (torch.Tensor): Normal STFT of size (c, f, t)
         multiplier (float): Use 10. for power and 20. for amplitude
-        amin (float): Number to clamp spec
+        amin (float): Number to clamp specgram
         db_multiplier (float): Log10(max(reference value and amin))
         top_db (Optional[float]): Minimum negative cut-off in decibels.  A reasonable number
             is 80.
@@ -301,7 +300,7 @@ def spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db=None):
     Returns:
         torch.Tensor: Spectrogram in DB of size (c, f, t)
     """
-    spec_db = multiplier * torch.log10(torch.clamp(spec, min=amin))
+    spec_db = multiplier * torch.log10(torch.clamp(specgram, min=amin))
     spec_db -= multiplier * db_multiplier
 
     if top_db is not None:
