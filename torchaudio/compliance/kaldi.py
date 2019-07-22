@@ -711,7 +711,8 @@ def resample_waveform(wave, orig_freq, new_freq, lowpass_filter_width=6):
             wave_to_conv = torch.nn.functional.pad(wave_to_conv, (left_padding, right_padding))
 
         conv_wave = torch.nn.functional.conv1d(
-            wave_to_conv.unsqueeze(0), weights[i].view(1, 1, window_size), stride=conv_stride)
+            wave_to_conv.unsqueeze(0), weights[i].repeat(num_channels, 1, 1),
+            stride=conv_stride, groups=num_channels)
 
         # we want conv_wave[:, i] to be at output[:, i + n*conv_transpose_stride]
         dilated_conv_wave = torch.nn.functional.conv_transpose1d(
