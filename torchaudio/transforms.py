@@ -164,9 +164,9 @@ class SpectrogramToDB(torch.jit.ScriptModule):
         if top_db is not None and top_db < 0:
             raise ValueError('top_db must be positive value')
         self.top_db = torch.jit.Attribute(top_db, Optional[float])
-        self.multiplier = 10. if stype == "power" else 20.
+        self.multiplier = 10.0 if stype == "power" else 20.0
         self.amin = 1e-10
-        self.ref_value = 1.
+        self.ref_value = 1.0
         self.db_multiplier = math.log10(max(self.amin, self.ref_value))
 
     @torch.jit.script_method
@@ -204,7 +204,7 @@ class MelScale(torch.jit.ScriptModule):
         self.n_mels = n_mels
         self.sample_rate = sample_rate
         self.f_max = f_max if f_max is not None else float(sample_rate // 2)
-        assert f_min <= f_max, 'Require f_min: %f < f_max: %f' % (f_min, f_max)
+        assert f_min <= self.f_max, 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
         self.f_min = f_min
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels)
@@ -246,7 +246,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
             Default: `win_length // 2`)
         n_fft (int, optional): Size of fft, creates `n_fft // 2 + 1` bins
         f_min (float): Minimum frequency. (Default: 0.)
-        f_max (float, optional): Maximum frequency. (Default: `sample_rate // 2`)
+        f_max (float, optional): Maximum frequency. (Default: `None`)
         pad (int): Two sided padding of signal. (Default: 0)
         n_mels (int): Number of mel filterbanks. (Default: 128)
         window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
@@ -274,7 +274,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
                                        hop_length=self.hop_length,
                                        pad=self.pad, window_fn=window_fn, power=2,
                                        normalized=False, wkwargs=wkwargs)
-        self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_max, self.f_min)
+        self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max)
 
     @torch.jit.script_method
     def forward(self, waveform):
