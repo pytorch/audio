@@ -570,22 +570,21 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     ndim = complex_specgrams.dim()
     time_slice = [slice(None)] * (ndim - 2)
 
-    time_steps = torch.arange(0, complex_specgrams.size(
-        -2), rate, device=complex_specgrams.device)
+    time_steps = torch.arange(0,
+                              complex_specgrams.size(-2),
+                              rate,
+                              device=complex_specgrams.device,
+                              dtype=complex_specgrams.dtype)
 
-    alphas = torch.remainder(time_steps,
-                             torch.tensor(1., device=complex_specgrams.device))
+    alphas = time_steps % 1.
     phase_0 = angle(complex_specgrams[time_slice + [slice(1)]])
 
     # Time Padding
-    complex_specgrams = torch.nn.functional.pad(
-        complex_specgrams, [0, 0, 0, 2])
+    complex_specgrams = torch.nn.functional.pad(complex_specgrams, [0, 0, 0, 2])
 
-    complex_specgrams_0 = complex_specgrams[time_slice +
-                                            [time_steps.long()]]
     # (new_bins, num_freqs, 2)
-    complex_specgrams_1 = complex_specgrams[time_slice +
-                                            [(time_steps + 1).long()]]
+    complex_specgrams_0 = complex_specgrams[time_slice + [time_steps.long()]]
+    complex_specgrams_1 = complex_specgrams[time_slice + [(time_steps + 1).long()]]
 
     angle_0 = angle(complex_specgrams_0)
     angle_1 = angle(complex_specgrams_1)
@@ -606,8 +605,6 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     real_stretch = mag * torch.cos(phase_acc)
     imag_stretch = mag * torch.sin(phase_acc)
 
-    complex_specgrams_stretch = torch.stack(
-        [real_stretch, imag_stretch],
-        dim=-1)
+    complex_specgrams_stretch = torch.stack([real_stretch, imag_stretch], dim=-1)
 
     return complex_specgrams_stretch

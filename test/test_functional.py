@@ -254,45 +254,35 @@ def test_stft(waveform, fft_length, hop_length, pad_mode):
 @unittest.skipIf(not IMPORT_LIBROSA, 'Librosa is not available')
 def test_phase_vocoder(complex_specgrams, rate, hop_length):
 
-    class use_double_precision:
-        def __enter__(self):
-            torch.set_default_dtype(torch.float64)
-
-        def __exit__(self, type, value, traceback):
-            torch.set_default_dtype(torch.float32)
-
     # Due to cummulative sum, numerical error in using torch.float32 will
     # result in bottom right values of the stretched sectrogram to not
     # match with librosa.
-    with use_double_precision():
 
-        complex_specgrams = complex_specgrams.type(torch.float64)
+    complex_specgrams = complex_specgrams.type(torch.float64)
+    phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-3], dtype=torch.float64)[..., None]
 
-        phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-3])[..., None]
-        complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
+    complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
 
-        # == Test shape
-        expected_size = list(complex_specgrams.size())
-        expected_size[-2] = int(np.ceil(expected_size[-2] / rate))
+    # == Test shape
+    expected_size = list(complex_specgrams.size())
+    expected_size[-2] = int(np.ceil(expected_size[-2] / rate))
 
-        assert complex_specgrams.dim() == complex_specgrams_stretch.dim()
-        assert complex_specgrams_stretch.size() == torch.Size(expected_size)
+    assert complex_specgrams.dim() == complex_specgrams_stretch.dim()
+    assert complex_specgrams_stretch.size() == torch.Size(expected_size)
 
-        # == Test values
-        index = [0] * (complex_specgrams.dim() - 3) + [slice(None)] * 3
-        mono_complex_specgram = complex_specgrams[index].numpy()
-        mono_complex_specgram = mono_complex_specgram[..., 0] + \
-            mono_complex_specgram[..., 1] * 1j
-        expected_complex_stretch = librosa.phase_vocoder(
-            mono_complex_specgram,
-            rate=rate,
-            hop_length=hop_length)
+    # == Test values
+    index = [0] * (complex_specgrams.dim() - 3) + [slice(None)] * 3
+    mono_complex_specgram = complex_specgrams[index].numpy()
+    mono_complex_specgram = mono_complex_specgram[..., 0] + \
+        mono_complex_specgram[..., 1] * 1j
+    expected_complex_stretch = librosa.phase_vocoder(mono_complex_specgram,
+                                                     rate=rate,
+                                                     hop_length=hop_length)
 
-        complex_stretch = complex_specgrams_stretch[index].numpy()
-        complex_stretch = complex_stretch[..., 0] + \
-            1j * complex_stretch[..., 1]
-        assert np.allclose(complex_stretch,
-                           expected_complex_stretch, atol=1e-5)
+    complex_stretch = complex_specgrams_stretch[index].numpy()
+    complex_stretch = complex_stretch[..., 0] + 1j * complex_stretch[..., 1]
+
+    assert np.allclose(complex_stretch, expected_complex_stretch, atol=1e-5)
 
 
 @pytest.mark.parametrize('complex_tensor', [
