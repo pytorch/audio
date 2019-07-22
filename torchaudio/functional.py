@@ -61,7 +61,7 @@ def pad_trim(waveform, max_len, fill_value):
 @torch.jit.script
 def downmix_mono(waveform):
     # type: (Tensor) -> Tensor
-    r"""Downmix stereo waveform to mono.  Consider using a `SoxEffectsChain` with
+    r"""Downmix stereo waveform to mono. Consider using a `SoxEffectsChain` with
     the `channels` effect instead of this transformation.
 
     Args:
@@ -244,12 +244,12 @@ def istft(stft_matrix,          # type: Tensor
 
 
 @torch.jit.script
-def spectrogram(sig, pad, window, n_fft, hop_length, win_length, power, normalized):
+def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, normalized):
     # type: (Tensor, int, Tensor, int, int, int, int, bool) -> Tensor
     r"""Create a spectrogram from a raw audio signal.
 
     Args:
-        sig (torch.Tensor): Tensor of audio of size (c, n)
+        waveform (torch.Tensor): Tensor of audio of size (c, n)
         pad (int): Two sided padding of signal
         window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of fft
@@ -264,14 +264,14 @@ def spectrogram(sig, pad, window, n_fft, hop_length, win_length, power, normaliz
         is unchanged, frequency is `n_fft // 2 + 1` where `n_fft` is the number of
         fourier bins, and time is the number of window hops (n_frames).
     """
-    assert sig.dim() == 2
+    assert waveform.dim() == 2
 
     if pad > 0:
         # TODO add "with torch.no_grad():" back when JIT supports it
-        sig = torch.nn.functional.pad(sig, (pad, pad), "constant")
+        waveform = torch.nn.functional.pad(waveform, (pad, pad), "constant")
 
     # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = _stft(sig, n_fft, hop_length, win_length, window,
+    spec_f = _stft(waveform, n_fft, hop_length, win_length, window,
                    True, 'reflect', False, True)
 
     if normalized:
@@ -294,20 +294,21 @@ def spectrogram_to_DB(specgram, multiplier, amin, db_multiplier, top_db=None):
         multiplier (float): Use 10. for power and 20. for amplitude
         amin (float): Number to clamp specgram
         db_multiplier (float): Log10(max(reference value and amin))
-        top_db (Optional[float]): Minimum negative cut-off in decibels.  A reasonable number
+        top_db (Optional[float]): Minimum negative cut-off in decibels. A reasonable number
             is 80.
 
     Returns:
         torch.Tensor: Spectrogram in DB of size (c, f, t)
     """
-    spec_db = multiplier * torch.log10(torch.clamp(specgram, min=amin))
-    spec_db -= multiplier * db_multiplier
+    specgram_db = multiplier * torch.log10(torch.clamp(specgram, min=amin))
+    specgram_db -= multiplier * db_multiplier
 
     if top_db is not None:
-        new_spec_db_max = torch.tensor(float(spec_db.max()) - top_db, dtype=spec_db.dtype, device=spec_db.device)
-        spec_db = torch.max(spec_db, new_spec_db_max)
+        new_spec_db_max = torch.tensor(float(specgram_db.max()) - top_db,
+                                       dtype=specgram_db.dtype, device=specgram_db.device)
+        specgram_db = torch.max(specgram_db, new_spec_db_max)
 
-    return spec_db
+    return specgram_db
 
 
 @torch.jit.script
@@ -328,8 +329,8 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
         size (..., `n_freqs`), the applied result would be
         `A * create_fb_matrix(A.size(-1), ...)`.
     """
-    # get stft freq bins
-    stft_freqs = torch.linspace(f_min, f_max, n_freqs)
+    # freq bins
+    freqs = torch.linspace(f_min, f_max, n_freqs)
     # calculate mel freq bins
     # hertz to mel(f) is 2595. * math.log10(1. + (f / 700.))
     m_min = 0. if f_min == 0 else 2595. * math.log10(1. + (f_min / 700.))
@@ -339,12 +340,12 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
     f_pts = 700. * (10**(m_pts / 2595.) - 1.)
     # calculate the difference between each mel point and each stft freq point in hertz
     f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
-    slopes = f_pts.unsqueeze(0) - stft_freqs.unsqueeze(1)  # (n_freqs, n_mels + 2)
+    slopes = f_pts.unsqueeze(0) - freqs.unsqueeze(1)  # (n_freqs, n_mels + 2)
     # create overlapping triangles
-    z = torch.zeros(1)
+    zero = torch.zeros(1)
     down_slopes = (-1. * slopes[:, :-2]) / f_diff[:-1]  # (n_freqs, n_mels)
     up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_freqs, n_mels)
-    fb = torch.max(z, torch.min(down_slopes, up_slopes))
+    fb = torch.max(zero, torch.min(down_slopes, up_slopes))
     return fb
 
 
@@ -392,7 +393,6 @@ def mu_law_encoding(x, qc):
     Returns:
         torch.Tensor: Input after mu-law companding
     """
-    assert isinstance(x, torch.Tensor), 'mu_law_encoding expects a Tensor'
     mu = qc - 1.
     if not x.is_floating_point():
         x = x.to(torch.float)
@@ -419,7 +419,6 @@ def mu_law_expanding(x_mu, qc):
     Returns:
         torch.Tensor: Input after decoding
     """
-    assert isinstance(x_mu, torch.Tensor), 'mu_law_expanding expects a Tensor'
     mu = qc - 1.
     if not x_mu.is_floating_point():
         x_mu = x_mu.to(torch.float)

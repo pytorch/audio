@@ -191,7 +191,7 @@ class MelScale(torch.jit.ScriptModule):
 
     Args:
         n_mels (int): Number of mel filterbanks. (Default: 128)
-        sample_rate (int): Sample rate of audio signal. (Default: 16000).
+        sample_rate (int): Sample rate of audio signal. (Default: 16000)
         f_min (float): Minimum frequency. (Default: 0.)
         f_max (float, optional): Maximum frequency. (Default: `sample_rate // 2`)
         n_stft (int, optional): Number of bins in STFT. Calculated from first input
@@ -226,8 +226,8 @@ class MelScale(torch.jit.ScriptModule):
             self.fb.copy_(tmp_fb)
 
         # (c, f, t).transpose(...) dot (f, n_mels) -> (c, t, n_mels).transpose(...)
-        spec_m = torch.matmul(specgram.transpose(1, 2), self.fb).transpose(1, 2)
-        return spec_m
+        mel_specgram = torch.matmul(specgram.transpose(1, 2), self.fb).transpose(1, 2)
+        return mel_specgram
 
 
 class MelSpectrogram(torch.jit.ScriptModule):
@@ -240,7 +240,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
         * http://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html
 
     Args:
-        sample_rate (int): Sample rate of audio signal. (Default: 16000).
+        sample_rate (int): Sample rate of audio signal. (Default: 16000)
         win_length (int): Window size. (Default: `n_fft`)
         hop_length (int, optional): Length of hop between STFT windows. (
             Default: `win_length // 2`)
@@ -255,7 +255,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
 
     Example:
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalization=True)
-        >>> specgram_mel = transforms.MelSpectrogram(sample_rate)(waveform)  # (c, n_mels, t)
+        >>> mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (c, n_mels, t)
     """
     __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min']
 
@@ -270,63 +270,64 @@ class MelSpectrogram(torch.jit.ScriptModule):
         self.n_mels = n_mels  # number of mel frequency bins
         self.f_max = torch.jit.Attribute(f_max, Optional[float])
         self.f_min = f_min
-        self.spec = Spectrogram(n_fft=self.n_fft, win_length=self.win_length, hop_length=self.hop_length,
-                                pad=self.pad, window_fn=window_fn, power=2,
-                                normalized=False, wkwargs=wkwargs)
-        self.fm = MelScale(self.n_mels, self.sample_rate, self.f_max, self.f_min)
+        self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
+                                       hop_length=self.hop_length,
+                                       pad=self.pad, window_fn=window_fn, power=2,
+                                       normalized=False, wkwargs=wkwargs)
+        self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_max, self.f_min)
 
     @torch.jit.script_method
     def forward(self, waveform):
-        """
+        r"""
         Args:
             waveform (torch.Tensor): Tensor of audio of size (c, n)
 
         Returns:
             torch.Tensor: mel frequency spectrogram of size (c, `n_mels`, t)
         """
-        specgram = self.spec(waveform)
-        specgram_mel = self.fm(specgram)
-        return specgram_mel
+        specgram = self.spectrogram(waveform)
+        mel_specgram = self.mel_scale(specgram)
+        return mel_specgram
 
 
 class MFCC(torch.jit.ScriptModule):
-    """Create the Mel-frequency cepstrum coefficients from an audio signal
+    r"""Create the Mel-frequency cepstrum coefficients from an audio signal
 
-        By default, this calculates the MFCC on the DB-scaled Mel spectrogram.
-        This is not the textbook implementation, but is implemented here to
-        give consistency with librosa.
+    By default, this calculates the MFCC on the DB-scaled Mel spectrogram.
+    This is not the textbook implementation, but is implemented here to
+    give consistency with librosa.
 
-        This output depends on the maximum value in the input spectrogram, and so
-        may return different values for an audio clip split into snippets vs. a
-        a full clip.
+    This output depends on the maximum value in the input spectrogram, and so
+    may return different values for an audio clip split into snippets vs. a
+    a full clip.
 
-        Args:
-        sr (int) : sample rate of audio signal
-        n_mfcc (int) : number of mfc coefficients to retain
+    Args:
+        sample_rate (int) : Sample rate of audio signal. (Default: 16000)
+        n_mfcc (int) : Number of mfc coefficients to retain
         dct_type (int) : type of DCT (discrete cosine transform) to use
         norm (string, optional) : norm to use
         log_mels (bool) : whether to use log-mel spectrograms instead of db-scaled
         melkwargs (dict, optional): arguments for MelSpectrogram
     """
-    __constants__ = ['sr', 'n_mfcc', 'dct_type', 'top_db', 'log_mels']
+    __constants__ = ['sample_rate', 'n_mfcc', 'dct_type', 'top_db', 'log_mels']
 
-    def __init__(self, sr=16000, n_mfcc=40, dct_type=2, norm='ortho', log_mels=False,
+    def __init__(self, sample_rate=16000, n_mfcc=40, dct_type=2, norm='ortho', log_mels=False,
                  melkwargs=None):
         super(MFCC, self).__init__()
         supported_dct_types = [2]
         if dct_type not in supported_dct_types:
             raise ValueError('DCT type not supported'.format(dct_type))
-        self.sr = sr
+        self.sample_rate = sample_rate
         self.n_mfcc = n_mfcc
         self.dct_type = dct_type
         self.norm = torch.jit.Attribute(norm, Optional[str])
-        self.top_db = 80.
-        self.s2db = SpectrogramToDB("power", self.top_db)
+        self.top_db = 80.0
+        self.spectrogram_to_DB = SpectrogramToDB('power', self.top_db)
 
         if melkwargs is not None:
-            self.MelSpectrogram = MelSpectrogram(sr=self.sr, **melkwargs)
+            self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate, **melkwargs)
         else:
-            self.MelSpectrogram = MelSpectrogram(sr=self.sr)
+            self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate)
 
         if self.n_mfcc > self.MelSpectrogram.n_mels:
             raise ValueError('Cannot select more MFCC coefficients than # mel bins')
@@ -335,27 +336,27 @@ class MFCC(torch.jit.ScriptModule):
         self.log_mels = log_mels
 
     @torch.jit.script_method
-    def forward(self, sig):
-        """
+    def forward(self, waveform):
+        r"""
         Args:
-            sig (torch.Tensor): Tensor of audio of size (c, n)
+            waveform (torch.Tensor): Tensor of audio of size (c, n)
 
         Returns:
-            torch.Tensor: spec_mel_db of size (c, `n_mfcc`, t)
+            torch.Tensor: specgram_mel_db of size (c, `n_mfcc`, t)
         """
-        mel_spect = self.MelSpectrogram(sig)
+        mel_specgram = self.MelSpectrogram(waveform)
         if self.log_mels:
             log_offset = 1e-6
-            mel_spect = torch.log(mel_spect + log_offset)
+            mel_specgram = torch.log(mel_specgram + log_offset)
         else:
-            mel_spect = self.s2db(mel_spect)
+            mel_specgram = self.spectrogram_to_DB(mel_specgram)
         # (c, `n_mels`, t).tranpose(...) dot (`n_mels`, `n_mfcc`) -> (c, t, `n_mfcc`).tranpose(...)
-        mfcc = torch.matmul(mel_spect.transpose(1, 2), self.dct_mat).transpose(1, 2)
+        mfcc = torch.matmul(mel_specgram.transpose(1, 2), self.dct_mat).transpose(1, 2)
         return mfcc
 
 
 class MuLawEncoding(torch.jit.ScriptModule):
-    """Encode signal based on mu-law companding.  For more info see the
+    r"""Encode signal based on mu-law companding.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
     This algorithm assumes the signal has been scaled to between -1 and 1 and
@@ -363,7 +364,6 @@ class MuLawEncoding(torch.jit.ScriptModule):
 
     Args:
         quantization_channels (int): Number of channels. default: 256
-
     """
     __constants__ = ['qc']
 
@@ -373,12 +373,12 @@ class MuLawEncoding(torch.jit.ScriptModule):
 
     @torch.jit.script_method
     def forward(self, x):
-        """
+        r"""
         Args:
-            x (FloatTensor/LongTensor)
+            x (torch.Tensor): A signal to be encoded
 
         Returns:
-            x_mu (LongTensor)
+            x_mu (torch.Tensor): An encoded signal
         """
         return F.mu_law_encoding(x, self.qc)
 
@@ -387,7 +387,7 @@ class MuLawEncoding(torch.jit.ScriptModule):
 
 
 class MuLawExpanding(torch.jit.ScriptModule):
-    """Decode mu-law encoded signal.  For more info see the
+    r"""Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
     This expects an input with values between 0 and quantization_channels - 1
@@ -395,7 +395,6 @@ class MuLawExpanding(torch.jit.ScriptModule):
 
     Args:
         quantization_channels (int): Number of channels. default: 256
-
     """
     __constants__ = ['qc']
 
@@ -405,12 +404,12 @@ class MuLawExpanding(torch.jit.ScriptModule):
 
     @torch.jit.script_method
     def forward(self, x_mu):
-        """
+        r"""
         Args:
-            x_mu (Tensor)
+            x_mu (torch.Tensor): A mu-law encoded signal which needs to be decoded
 
         Returns:
-            x (Tensor)
+            torch.Tensor: The signal decoded
         """
         return F.mu_law_expanding(x_mu, self.qc)
 
@@ -419,7 +418,7 @@ class MuLawExpanding(torch.jit.ScriptModule):
 
 
 class Resample(torch.nn.Module):
-    """Resamples a signal from one frequency to another. A resampling method can
+    r"""Resamples a signal from one frequency to another. A resampling method can
     be given.
 
     Args:
@@ -434,15 +433,15 @@ class Resample(torch.nn.Module):
         self.new_freq = new_freq
         self.resampling_method = resampling_method
 
-    def forward(self, sig):
-        """
+    def forward(self, waveform):
+        r"""
         Args:
-            sig (Tensor): the input signal of size (c, n)
+            waveform (torch.Tensor): The input signal of size (c, n)
 
         Returns:
-            Tensor: output signal of size (c, m)
+            torch.Tensor: Output signal of size (c, m)
         """
         if self.resampling_method == 'sinc_interpolation':
-            return kaldi.resample_waveform(sig, self.orig_freq, self.new_freq)
+            return kaldi.resample_waveform(waveform, self.orig_freq, self.new_freq)
 
         raise ValueError('Invalid resampling method: %s' % (self.resampling_method))
