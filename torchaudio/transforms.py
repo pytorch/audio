@@ -60,7 +60,7 @@ class PadTrim(torch.jit.ScriptModule):
 
 class DownmixMono(torch.jit.ScriptModule):
     r"""Downmix stereo waveform to mono.  Consider using a `SoxEffectsChain` with
-       the `channels` effect instead of this transformation.
+    the `channels` effect instead of this transformation.
     """
     def __init__(self):
         super(DownmixMono, self).__init__()
@@ -107,7 +107,7 @@ class Spectrogram(torch.jit.ScriptModule):
             that is applied/multiplied to each frame/window. (Default: `torch.hann_window`)
         power (int) : Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
-        normalized (bool) : Whether to normalized by magnitude after stft. (Default: `False`)
+        normalized (bool) : Whether to normalize by magnitude after stft. (Default: `False`)
         wkwargs (Dict[..., ...]): Arguments for window function. (Default: `None`)
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
@@ -137,7 +137,6 @@ class Spectrogram(torch.jit.ScriptModule):
             torch.Tensor: Channels x frequency x time (c, f, t), where channels
             is unchanged, frequency is `n_fft // 2 + 1` where `n_fft` is the number of
             fourier bins, and time is the number of window hops (n_frames).
-
         """
         return F.spectrogram(waveform, self.pad, self.window, self.n_fft, self.hop_length,
                              self.win_length, self.power, self.normalized)
@@ -151,20 +150,20 @@ class SpectrogramToDB(torch.jit.ScriptModule):
     a full clip.
 
     Args:
-        stype (str): scale of input spectrogram ("power" or "magnitude"). The
+        stype (str): scale of input spectrogram ('power' or 'magnitude'). The
             power being the elementwise square of the magnitude. (Default: 'power')
         top_db (float, optional): minimum negative cut-off in decibels.  A reasonable number
             is 80.
     """
     __constants__ = ['multiplier', 'amin', 'ref_value', 'db_multiplier']
 
-    def __init__(self, stype="power", top_db=None):
+    def __init__(self, stype='power', top_db=None):
         super(SpectrogramToDB, self).__init__()
         self.stype = torch.jit.Attribute(stype, str)
         if top_db is not None and top_db < 0:
             raise ValueError('top_db must be positive value')
         self.top_db = torch.jit.Attribute(top_db, Optional[float])
-        self.multiplier = 10.0 if stype == "power" else 20.0
+        self.multiplier = 10.0 if stype == 'power' else 20.0
         self.amin = 1e-10
         self.ref_value = 1.0
         self.db_multiplier = math.log10(max(self.amin, self.ref_value))
@@ -254,7 +253,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
         wkwargs (Dict[..., ...]): Arguments for window function. (Default: `None`)
 
     Example:
-        >>> waveform, sample_rate = torchaudio.load("test.wav", normalization=True)
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
         >>> mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (c, n_mels, t)
     """
     __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min']
