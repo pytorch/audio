@@ -105,9 +105,9 @@ class Spectrogram(torch.jit.ScriptModule):
         pad (int): Two sided padding of signal. (Default: 0)
         window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: `torch.hann_window`)
-        power (int) : Exponent for the magnitude spectrogram,
+        power (int): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
-        normalized (bool) : Whether to normalize by magnitude after stft. (Default: `False`)
+        normalized (bool): Whether to normalize by magnitude after stft. (Default: `False`)
         wkwargs (Dict[..., ...]): Arguments for window function. (Default: `None`)
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
@@ -301,11 +301,11 @@ class MFCC(torch.jit.ScriptModule):
     a full clip.
 
     Args:
-        sample_rate (int) : Sample rate of audio signal. (Default: 16000)
-        n_mfcc (int) : Number of mfc coefficients to retain
-        dct_type (int) : type of DCT (discrete cosine transform) to use
-        norm (string, optional) : norm to use
-        log_mels (bool) : whether to use log-mel spectrograms instead of db-scaled
+        sample_rate (int): Sample rate of audio signal. (Default: 16000)
+        n_mfcc (int): Number of mfc coefficients to retain
+        dct_type (int): type of DCT (discrete cosine transform) to use
+        norm (string, optional): norm to use
+        log_mels (bool): whether to use log-mel spectrograms instead of db-scaled
         melkwargs (dict, optional): arguments for MelSpectrogram
     """
     __constants__ = ['sample_rate', 'n_mfcc', 'dct_type', 'top_db', 'log_mels']

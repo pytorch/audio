@@ -255,9 +255,9 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
         n_fft (int): Size of fft
         hop_length (int): Length of hop between STFT windows
         win_length (int): Window size
-        power (int) : Exponent for the magnitude spectrogram,
+        power (int): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
-        normalized (bool) : Whether to normalize by magnitude after stft
+        normalized (bool): Whether to normalize by magnitude after stft
 
     Returns:
         torch.Tensor: Channels x frequency x time (c, f, t), where channels
@@ -356,9 +356,9 @@ def create_dct(n_mfcc, n_mels, norm):
     normalized depending on norm.
 
     Args:
-        n_mfcc (int) : Number of mfc coefficients to retain
+        n_mfcc (int): Number of mfc coefficients to retain
         n_mels (int): Number of mel filterbanks
-        norm (Optional[str]) : Norm to use (either 'ortho' or None)
+        norm (Optional[str]): Norm to use (either 'ortho' or None)
 
     Returns:
         torch.Tensor: The transformation matrix, to be right-multiplied to
