@@ -395,7 +395,8 @@ def complex_norm(complex_tensor, power=1.0):
 
 
 def angle(complex_tensor):
-    r"""
+    r"""Compute the angle of complex tensor input.
+
     Args:
         complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
 
