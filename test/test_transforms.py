@@ -36,20 +36,6 @@ class Tester(unittest.TestCase):
             waveform = waveform.to(torch.get_default_dtype())
         return waveform / factor
 
-    def test_pad_trim(self):
-
-        waveform = self.waveform.clone()
-        length_orig = waveform.size(1)
-        length_new = int(length_orig * 1.2)
-
-        result = transforms.PadTrim(max_len=length_new)(waveform)
-        self.assertEqual(result.size(1), length_new)
-
-        length_new = int(length_orig * 0.8)
-
-        result = transforms.PadTrim(max_len=length_new)(waveform)
-        self.assertEqual(result.size(1), length_new)
-
     def test_mu_law_companding(self):
 
         quantization_channels = 256

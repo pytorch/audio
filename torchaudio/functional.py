@@ -3,7 +3,6 @@ import torch
 
 
 __all__ = [
-    'pad_trim',
     'istft',
     'spectrogram',
     'create_fb_matrix',
@@ -16,28 +15,6 @@ __all__ = [
     'magphase',
     'phase_vocoder',
 ]
-
-
-@torch.jit.script
-def pad_trim(waveform, max_len, fill_value):
-    # type: (Tensor, int, float) -> Tensor
-    r"""Pad/trim a 2D tensor
-
-    Args:
-        waveform (torch.Tensor): Tensor of audio of size (c, n)
-        max_len (int): Length to which the waveform will be padded
-        fill_value (float): Value to fill in
-
-    Returns:
-        torch.Tensor: Padded/trimmed tensor
-    """
-    n = waveform.size(1)
-    if max_len > n:
-        # TODO add "with torch.no_grad():" back when JIT supports it
-        waveform = torch.nn.functional.pad(waveform, (0, max_len - n), 'constant', fill_value)
-    else:
-        waveform = waveform[:, :max_len]
-    return waveform
 
 
 # TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
