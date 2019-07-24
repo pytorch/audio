@@ -30,28 +30,6 @@ class Test_JIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out))
 
-    def test_torchscript_pad_trim(self):
-        @torch.jit.script
-        def jit_method(tensor, max_len, fill_value):
-            # type: (Tensor, int, float) -> Tensor
-            return F.pad_trim(tensor, max_len, fill_value)
-
-        tensor = torch.rand((1, 10))
-        max_len = 5
-        fill_value = 3.
-
-        jit_out = jit_method(tensor, max_len, fill_value)
-        py_out = F.pad_trim(tensor, max_len, fill_value)
-
-        self.assertTrue(torch.allclose(jit_out, py_out))
-
-    @unittest.skipIf(not RUN_CUDA, "no CUDA")
-    def test_scriptmodule_pad_trim(self):
-        tensor = torch.rand((1, 10), device="cuda")
-        max_len = 5
-
-        self._test_script_module(tensor, transforms.PadTrim, max_len)
-
     def test_torchscript_spectrogram(self):
         @torch.jit.script
         def jit_method(sig, pad, window, n_fft, hop, ws, power, normalize):
