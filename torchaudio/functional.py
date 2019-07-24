@@ -88,8 +88,8 @@ def istft(stft_matrix,          # type: Tensor
     IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
 
     Args:
-        stft_matrix (torch.Tensor): Output of stft where each row of a batch is a frequency and each
-            column is a window. it has a shape of either (batch, fft_size, n_frames, 2) or (
+        stft_matrix (torch.Tensor): Output of stft where each row of a channel is a frequency and each
+            column is a window. it has a shape of either (channel, fft_size, n_frames, 2) or (
             fft_size, n_frames, 2)
         n_fft (int): Size of Fourier transform
         hop_length (Optional[int]): The distance between neighboring sliding window frames.
@@ -107,13 +107,13 @@ def istft(stft_matrix,          # type: Tensor
 
     Returns:
         torch.Tensor: Least squares estimation of the original signal of size
-        (batch, signal_length) or (signal_length)
+        (channel, signal_length) or (signal_length)
     """
     stft_matrix_dim = stft_matrix.dim()
     assert 3 <= stft_matrix_dim <= 4, ('Incorrect stft dimension: %d' % (stft_matrix_dim))
 
     if stft_matrix_dim == 3:
-        # add a batch dimension
+        # add a channel dimension
         stft_matrix = stft_matrix.unsqueeze(0)
 
     device = stft_matrix.device
@@ -145,16 +145,16 @@ def istft(stft_matrix,          # type: Tensor
         assert window.size(0) == n_fft
     # win_length and n_fft are synonymous from here on
 
-    stft_matrix = stft_matrix.transpose(1, 2)  # size (batch, n_frames, fft_size, 2)
+    stft_matrix = stft_matrix.transpose(1, 2)  # size (channel, n_frames, fft_size, 2)
     stft_matrix = torch.irfft(stft_matrix, 1, normalized,
-                              onesided, signal_sizes=(n_fft,))  # size (batch, n_frames, n_fft)
+                              onesided, signal_sizes=(n_fft,))  # size (channel, n_frames, n_fft)
 
     assert stft_matrix.size(2) == n_fft
     n_frames = stft_matrix.size(1)
 
-    ytmp = stft_matrix * window.view(1, 1, n_fft)  # size (batch, n_frames, n_fft)
-    # each column of a batch is a frame which needs to be overlap added at the right place
-    ytmp = ytmp.transpose(1, 2)  # size (batch, n_fft, n_frames)
+    ytmp = stft_matrix * window.view(1, 1, n_fft)  # size (channel, n_frames, n_fft)
+    # each column of a channel is a frame which needs to be overlap added at the right place
+    ytmp = ytmp.transpose(1, 2)  # size (channel, n_fft, n_frames)
 
     eye = torch.eye(n_fft, requires_grad=False,
                     device=device).unsqueeze(1)  # size (n_fft, 1, n_fft)
@@ -162,7 +162,7 @@ def istft(stft_matrix,          # type: Tensor
     # this does overlap add where the frames of ytmp are added such that the i'th frame of
     # ytmp is added starting at i*hop_length in the output
     y = torch.nn.functional.conv_transpose1d(
-        ytmp, eye, stride=hop_length, padding=0)  # size (batch, 1, expected_signal_len)
+        ytmp, eye, stride=hop_length, padding=0)  # size (channel, 1, expected_signal_len)
 
     # do the same for the window function
     window_sq = window.pow(2).view(n_fft, 1).repeat((1, n_frames)).unsqueeze(0)  # size (1, n_fft, n_frames)
@@ -185,9 +185,9 @@ def istft(stft_matrix,          # type: Tensor
     window_envelop_lowest = window_envelop.abs().min()
     assert window_envelop_lowest > 1e-11, ('window overlap add min: %f' % (window_envelop_lowest))
 
-    y = (y / window_envelop).squeeze(1)  # size (batch, expected_signal_len)
+    y = (y / window_envelop).squeeze(1)  # size (channel, expected_signal_len)
 
-    if stft_matrix_dim == 3:  # remove the batch dimension
+    if stft_matrix_dim == 3:  # remove the channel dimension
         y = y.squeeze(0)
     return y
 
