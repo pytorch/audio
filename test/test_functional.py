@@ -2,6 +2,7 @@ import math
 
 import torch
 import torchaudio
+import torchaudio.functional as F
 import pytest
 import unittest
 import test.common_utils
@@ -212,8 +213,7 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
     complex_specgrams = complex_specgrams.type(torch.float64)
     phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-3], dtype=torch.float64)[..., None]
 
-    complex_specgrams_stretch = torchaudio.functional.phase_vocoder(
-        complex_specgrams, rate=rate, phase_advance=phase_advance)
+    complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
 
     # == Test shape
     expected_size = list(complex_specgrams.size())
@@ -244,7 +244,7 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
 @pytest.mark.parametrize('power', [1, 2, 0.7])
 def test_complex_norm(complex_tensor, power):
     expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
-    norm_tensor = torchaudio.functional.complex_norm(complex_tensor, power)
+    norm_tensor = F.complex_norm(complex_tensor, power)
 
     assert torch.allclose(expected_norm_tensor, norm_tensor, atol=1e-5)
 
