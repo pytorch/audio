@@ -170,25 +170,25 @@ class Test_JIT(unittest.TestCase):
 
         self._test_script_module(tensor, transforms.MuLawEncoding)
 
-    def test_torchscript_mu_law_expanding(self):
+    def test_torchscript_mu_law_decoding(self):
         @torch.jit.script
         def jit_method(tensor, qc):
             # type: (Tensor, int) -> Tensor
-            return F.mu_law_expanding(tensor, qc)
+            return F.mu_law_decoding(tensor, qc)
 
         tensor = torch.rand((1, 10))
         qc = 256
 
         jit_out = jit_method(tensor, qc)
-        py_out = F.mu_law_expanding(tensor, qc)
+        py_out = F.mu_law_decoding(tensor, qc)
 
         self.assertTrue(torch.allclose(jit_out, py_out))
 
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
-    def test_scriptmodule_MuLawExpanding(self):
+    def test_scriptmodule_MuLawDecoding(self):
         tensor = torch.rand((1, 10), device="cuda")
 
-        self._test_script_module(tensor, transforms.MuLawExpanding)
+        self._test_script_module(tensor, transforms.MuLawDecoding)
 
 
 if __name__ == '__main__':
