@@ -81,44 +81,7 @@ class Spectrogram(torch.jit.ScriptModule):
                              self.win_length, self.power, self.normalized)
 
 
-class SpectrogramToDB(torch.jit.ScriptModule):
-    r"""Turns a spectrogram from the power/amplitude scale to the decibel scale.
 
-    This output depends on the maximum value in the input spectrogram, and so
-    may return different values for an audio clip split into snippets vs. a
-    a full clip.
-
-    Args:
-        stype (str): scale of input spectrogram ('power' or 'magnitude'). The
-            power being the elementwise square of the magnitude. (Default: 'power')
-        top_db (float, optional): minimum negative cut-off in decibels.  A reasonable number
-            is 80.
-    """
-    __constants__ = ['multiplier', 'amin', 'ref_value', 'db_multiplier']
-
-    def __init__(self, stype='power', top_db=None):
-        super(SpectrogramToDB, self).__init__()
-        self.stype = torch.jit.Attribute(stype, str)
-        if top_db is not None and top_db < 0:
-            raise ValueError('top_db must be positive value')
-        self.top_db = torch.jit.Attribute(top_db, Optional[float])
-        self.multiplier = 10.0 if stype == 'power' else 20.0
-        self.amin = 1e-10
-        self.ref_value = 1.0
-        self.db_multiplier = math.log10(max(self.amin, self.ref_value))
-
-    @torch.jit.script_method
-    def forward(self, specgram):
-        r"""Numerically stable implementation from Librosa
-        https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
-
-        Args:
-            specgram (torch.Tensor): STFT of size (c, f, t)
-
-        Returns:
-            torch.Tensor: STFT after changing scale of size (c, f, t)
-        """
-        return F.spectrogram_to_DB(specgram, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
 
 class MelScale(torch.jit.ScriptModule):
@@ -166,6 +129,46 @@ class MelScale(torch.jit.ScriptModule):
         # (c, f, t).transpose(...) dot (f, n_mels) -> (c, t, n_mels).transpose(...)
         mel_specgram = torch.matmul(specgram.transpose(1, 2), self.fb).transpose(1, 2)
         return mel_specgram
+
+
+class SpectrogramToDB(torch.jit.ScriptModule):
+    r"""Turns a spectrogram from the power/amplitude scale to the decibel scale.
+
+    This output depends on the maximum value in the input spectrogram, and so
+    may return different values for an audio clip split into snippets vs. a
+    a full clip.
+
+    Args:
+        stype (str): scale of input spectrogram ('power' or 'magnitude'). The
+            power being the elementwise square of the magnitude. (Default: 'power')
+        top_db (float, optional): minimum negative cut-off in decibels.  A reasonable number
+            is 80.
+    """
+    __constants__ = ['multiplier', 'amin', 'ref_value', 'db_multiplier']
+
+    def __init__(self, stype='power', top_db=None):
+        super(SpectrogramToDB, self).__init__()
+        self.stype = torch.jit.Attribute(stype, str)
+        if top_db is not None and top_db < 0:
+            raise ValueError('top_db must be positive value')
+        self.top_db = torch.jit.Attribute(top_db, Optional[float])
+        self.multiplier = 10.0 if stype == 'power' else 20.0
+        self.amin = 1e-10
+        self.ref_value = 1.0
+        self.db_multiplier = math.log10(max(self.amin, self.ref_value))
+
+    @torch.jit.script_method
+    def forward(self, specgram):
+        r"""Numerically stable implementation from Librosa
+        https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
+
+        Args:
+            specgram (torch.Tensor): STFT of size (c, f, t)
+
+        Returns:
+            torch.Tensor: STFT after changing scale of size (c, f, t)
+        """
+        return F.spectrogram_to_DB(specgram, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
 
 class MelSpectrogram(torch.jit.ScriptModule):

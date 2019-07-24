@@ -6,8 +6,8 @@ __all__ = [
     'pad_trim',
     'istft',
     'spectrogram',
-    'spectrogram_to_DB',
     'create_fb_matrix',
+    'spectrogram_to_DB',
     'create_dct',
     'mu_law_encoding',
     'mu_law_expanding'
@@ -226,37 +226,6 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
 
 
 @torch.jit.script
-def spectrogram_to_DB(specgram, multiplier, amin, db_multiplier, top_db=None):
-    # type: (Tensor, float, float, float, Optional[float]) -> Tensor
-    r"""Turns a spectrogram from the power/amplitude scale to the decibel scale.
-
-    This output depends on the maximum value in the input spectrogram, and so
-    may return different values for an audio clip split into snippets vs. a
-    a full clip.
-
-    Args:
-        specgram (torch.Tensor): Normal STFT of size (c, f, t)
-        multiplier (float): Use 10. for power and 20. for amplitude
-        amin (float): Number to clamp specgram
-        db_multiplier (float): Log10(max(reference value and amin))
-        top_db (Optional[float]): Minimum negative cut-off in decibels. A reasonable number
-            is 80.
-
-    Returns:
-        torch.Tensor: Spectrogram in DB of size (c, f, t)
-    """
-    specgram_db = multiplier * torch.log10(torch.clamp(specgram, min=amin))
-    specgram_db -= multiplier * db_multiplier
-
-    if top_db is not None:
-        new_spec_db_max = torch.tensor(float(specgram_db.max()) - top_db,
-                                       dtype=specgram_db.dtype, device=specgram_db.device)
-        specgram_db = torch.max(specgram_db, new_spec_db_max)
-
-    return specgram_db
-
-
-@torch.jit.script
 def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
     # type: (int, float, float, int) -> Tensor
     r""" Create a frequency bin conversion matrix.
@@ -292,6 +261,37 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
     up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_freqs, n_mels)
     fb = torch.max(zero, torch.min(down_slopes, up_slopes))
     return fb
+
+
+@torch.jit.script
+def spectrogram_to_DB(specgram, multiplier, amin, db_multiplier, top_db=None):
+    # type: (Tensor, float, float, float, Optional[float]) -> Tensor
+    r"""Turns a spectrogram from the power/amplitude scale to the decibel scale.
+
+    This output depends on the maximum value in the input spectrogram, and so
+    may return different values for an audio clip split into snippets vs. a
+    a full clip.
+
+    Args:
+        specgram (torch.Tensor): Normal STFT of size (c, f, t)
+        multiplier (float): Use 10. for power and 20. for amplitude
+        amin (float): Number to clamp specgram
+        db_multiplier (float): Log10(max(reference value and amin))
+        top_db (Optional[float]): Minimum negative cut-off in decibels. A reasonable number
+            is 80.
+
+    Returns:
+        torch.Tensor: Spectrogram in DB of size (c, f, t)
+    """
+    specgram_db = multiplier * torch.log10(torch.clamp(specgram, min=amin))
+    specgram_db -= multiplier * db_multiplier
+
+    if top_db is not None:
+        new_spec_db_max = torch.tensor(float(specgram_db.max()) - top_db,
+                                       dtype=specgram_db.dtype, device=specgram_db.device)
+        specgram_db = torch.max(specgram_db, new_spec_db_max)
+
+    return specgram_db
 
 
 @torch.jit.script
