@@ -171,66 +171,6 @@ class SpectrogramToDB(torch.jit.ScriptModule):
         return F.spectrogram_to_DB(specgram, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
 
-class MelSpectrogram(torch.jit.ScriptModule):
-    r"""Create MelSpectrogram for a raw audio signal. This is a composition of Spectrogram
-    and MelScale.
-
-    Sources:
-        * https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe
-        * https://timsainb.github.io/spectrograms-mfccs-and-inversion-in-python.html
-        * http://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html
-
-    Args:
-        sample_rate (int): Sample rate of audio signal. (Default: 16000)
-        win_length (int): Window size. (Default: `n_fft`)
-        hop_length (int, optional): Length of hop between STFT windows. (
-            Default: `win_length // 2`)
-        n_fft (int, optional): Size of fft, creates `n_fft // 2 + 1` bins
-        f_min (float): Minimum frequency. (Default: 0.)
-        f_max (float, optional): Maximum frequency. (Default: `None`)
-        pad (int): Two sided padding of signal. (Default: 0)
-        n_mels (int): Number of mel filterbanks. (Default: 128)
-        window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
-            that is applied/multiplied to each frame/window. (Default: `torch.hann_window`)
-        wkwargs (Dict[..., ...]): Arguments for window function. (Default: `None`)
-
-    Example:
-        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (c, n_mels, t)
-    """
-    __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min']
-
-    def __init__(self, sample_rate=16000, n_fft=400, win_length=None, hop_length=None, f_min=0., f_max=None,
-                 pad=0, n_mels=128, window_fn=torch.hann_window, wkwargs=None):
-        super(MelSpectrogram, self).__init__()
-        self.sample_rate = sample_rate
-        self.n_fft = n_fft
-        self.win_length = win_length if win_length is not None else n_fft
-        self.hop_length = hop_length if hop_length is not None else self.win_length // 2
-        self.pad = pad
-        self.n_mels = n_mels  # number of mel frequency bins
-        self.f_max = torch.jit.Attribute(f_max, Optional[float])
-        self.f_min = f_min
-        self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
-                                       hop_length=self.hop_length,
-                                       pad=self.pad, window_fn=window_fn, power=2,
-                                       normalized=False, wkwargs=wkwargs)
-        self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max)
-
-    @torch.jit.script_method
-    def forward(self, waveform):
-        r"""
-        Args:
-            waveform (torch.Tensor): Tensor of audio of size (c, n)
-
-        Returns:
-            torch.Tensor: mel frequency spectrogram of size (c, `n_mels`, t)
-        """
-        specgram = self.spectrogram(waveform)
-        mel_specgram = self.mel_scale(specgram)
-        return mel_specgram
-
-
 class MFCC(torch.jit.ScriptModule):
     r"""Create the Mel-frequency cepstrum coefficients from an audio signal
 
@@ -294,6 +234,66 @@ class MFCC(torch.jit.ScriptModule):
         # (c, `n_mels`, t).tranpose(...) dot (`n_mels`, `n_mfcc`) -> (c, t, `n_mfcc`).tranpose(...)
         mfcc = torch.matmul(mel_specgram.transpose(1, 2), self.dct_mat).transpose(1, 2)
         return mfcc
+
+
+class MelSpectrogram(torch.jit.ScriptModule):
+    r"""Create MelSpectrogram for a raw audio signal. This is a composition of Spectrogram
+    and MelScale.
+
+    Sources:
+        * https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe
+        * https://timsainb.github.io/spectrograms-mfccs-and-inversion-in-python.html
+        * http://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html
+
+    Args:
+        sample_rate (int): Sample rate of audio signal. (Default: 16000)
+        win_length (int): Window size. (Default: `n_fft`)
+        hop_length (int, optional): Length of hop between STFT windows. (
+            Default: `win_length // 2`)
+        n_fft (int, optional): Size of fft, creates `n_fft // 2 + 1` bins
+        f_min (float): Minimum frequency. (Default: 0.)
+        f_max (float, optional): Maximum frequency. (Default: `None`)
+        pad (int): Two sided padding of signal. (Default: 0)
+        n_mels (int): Number of mel filterbanks. (Default: 128)
+        window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
+            that is applied/multiplied to each frame/window. (Default: `torch.hann_window`)
+        wkwargs (Dict[..., ...]): Arguments for window function. (Default: `None`)
+
+    Example:
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
+        >>> mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (c, n_mels, t)
+    """
+    __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min']
+
+    def __init__(self, sample_rate=16000, n_fft=400, win_length=None, hop_length=None, f_min=0., f_max=None,
+                 pad=0, n_mels=128, window_fn=torch.hann_window, wkwargs=None):
+        super(MelSpectrogram, self).__init__()
+        self.sample_rate = sample_rate
+        self.n_fft = n_fft
+        self.win_length = win_length if win_length is not None else n_fft
+        self.hop_length = hop_length if hop_length is not None else self.win_length // 2
+        self.pad = pad
+        self.n_mels = n_mels  # number of mel frequency bins
+        self.f_max = torch.jit.Attribute(f_max, Optional[float])
+        self.f_min = f_min
+        self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
+                                       hop_length=self.hop_length,
+                                       pad=self.pad, window_fn=window_fn, power=2,
+                                       normalized=False, wkwargs=wkwargs)
+        self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max)
+
+    @torch.jit.script_method
+    def forward(self, waveform):
+        r"""
+        Args:
+            waveform (torch.Tensor): Tensor of audio of size (c, n)
+
+        Returns:
+            torch.Tensor: mel frequency spectrogram of size (c, `n_mels`, t)
+        """
+        specgram = self.spectrogram(waveform)
+        mel_specgram = self.mel_scale(specgram)
+        return mel_specgram
 
 
 class MuLawEncoding(torch.jit.ScriptModule):
