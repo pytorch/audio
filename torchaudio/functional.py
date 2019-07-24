@@ -3,10 +3,8 @@ import torch
 
 
 __all__ = [
-    'scale',
     'pad_trim',
     'downmix_mono',
-    'LC2CL',
     'istft',
     'spectrogram',
     'spectrogram_to_DB',
@@ -15,25 +13,6 @@ __all__ = [
     'mu_law_encoding',
     'mu_law_expanding'
 ]
-
-
-@torch.jit.script
-def scale(tensor, factor):
-    # type: (Tensor, float) -> Tensor
-    r"""Scales tensor by a factor. By default, assuming the input is int32, it
-    will scale the tensor to have values between -1.0 and 1.0.
-
-    Args:
-        tensor (torch.Tensor): Tensor input to scale
-        factor (float): Factor to scale by
-
-    Returns:
-        torch.Tensor: Scaled by the scale factor
-    """
-    if not tensor.is_floating_point():
-        tensor = tensor.to(torch.float32)
-
-    return tensor / factor
 
 
 @torch.jit.script
@@ -75,20 +54,6 @@ def downmix_mono(waveform):
 
     waveform = torch.mean(waveform, 0, True)
     return waveform
-
-
-@torch.jit.script
-def LC2CL(tensor):
-    # type: (Tensor) -> Tensor
-    r"""Permute a 2D tensor from samples (n, c) to (c, n).
-
-    Args:
-        tensor (torch.Tensor): Tensor of audio signal with shape (n, c)
-
-    Returns:
-        torch.Tensor: Tensor of audio signal with shape (c, n)
-    """
-    return tensor.transpose(0, 1).contiguous()
 
 
 # TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved

@@ -30,16 +30,11 @@ class Tester(unittest.TestCase):
     test_filepath = os.path.join(test_dirpath, 'assets',
                                  'steam-train-whistle-daniel_simon.mp3')
 
-    def test_scale(self):
-
-        waveform = self.waveform.clone()
-        result = transforms.Scale()(waveform)
-        self.assertTrue(result.min() >= -1. and result.max() <= 1.)
-
-        maxminmax = max(abs(waveform.min()), abs(waveform.max())).item()
-        result = transforms.Scale(factor=float(maxminmax))(waveform)
-        self.assertTrue((result.min() == -1. or result.max() == 1.) and
-                        result.min() >= -1. and result.max() <= 1.)
+    def scale(self, waveform, factor=float(2**31)):
+        # scales a waveform by a factor
+        if not waveform.is_floating_point():
+            waveform = waveform.to(torch.get_default_dtype())
+        return waveform / factor
 
     def test_pad_trim(self):
 
@@ -70,12 +65,6 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(result.size(0) == 1)
 
-    def test_lc2cl(self):
-
-        waveform = self.waveform.clone().t()
-        result = transforms.LC2CL()(waveform)
-        self.assertTrue(result.size()[::-1] == waveform.size())
-
     def test_mu_law_companding(self):
 
         quantization_channels = 256
@@ -95,7 +84,7 @@ class Tester(unittest.TestCase):
         s2db = transforms.SpectrogramToDB('power', top_db)
 
         waveform = self.waveform.clone()  # (1, 16000)
-        waveform_scaled = transforms.Scale()(waveform)  # (1, 16000)
+        waveform_scaled = self.scale(waveform)  # (1, 16000)
         mel_transform = transforms.MelSpectrogram()
         # check defaults
         spectrogram_torch = s2db(mel_transform(waveform_scaled))  # (1, 128, 321)
@@ -131,7 +120,7 @@ class Tester(unittest.TestCase):
 
     def test_mfcc(self):
         audio_orig = self.waveform.clone()
-        audio_scaled = transforms.Scale()(audio_orig)  # (1, 16000)
+        audio_scaled = self.scale(audio_orig)  # (1, 16000)
 
         sample_rate = 16000
         n_mfcc = 40

@@ -7,31 +7,6 @@ from . import functional as F
 from .compliance import kaldi
 
 
-class Scale(torch.jit.ScriptModule):
-    r"""Scales tensor by a factor. By default, assuming the input is int32, it
-    will scale the tensor to have values between -1.0 and 1.0.
-
-    Args:
-        factor (float): Factor to scale by. (Default: `float(2**31)`)
-    """
-    __constants__ = ['factor']
-
-    def __init__(self, factor=float(2**31)):
-        super(Scale, self).__init__()
-        self.factor = factor
-
-    @torch.jit.script_method
-    def forward(self, tensor):
-        r"""
-        Args:
-            tensor (torch.Tensor): Tensor input to scale
-
-        Returns:
-            torch.Tensor: Scaled by the scale factor
-        """
-        return F.scale(tensor, self.factor)
-
-
 class PadTrim(torch.jit.ScriptModule):
     r"""Pad/Trim a 2D tensor
 
@@ -75,23 +50,6 @@ class DownmixMono(torch.jit.ScriptModule):
             torch.Tensor: Tensor that has been downmixed of size (1, n)
         """
         return F.downmix_mono(waveform)
-
-
-class LC2CL(torch.jit.ScriptModule):
-    r"""Converts a 2D tensor from (n, c) to (c, n)
-    """
-    def __init__(self):
-        super(LC2CL, self).__init__()
-
-    @torch.jit.script_method
-    def forward(self, tensor):
-        r"""
-        Args:
-            tensor (torch.Tensor): Tensor of audio signal with shape (n, c)
-        Returns:
-            torch.Tensor: Tensor of audio signal with shape (c, n)
-        """
-        return F.LC2CL(tensor)
 
 
 class Spectrogram(torch.jit.ScriptModule):

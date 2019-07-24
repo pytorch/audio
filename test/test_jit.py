@@ -30,26 +30,6 @@ class Test_JIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out))
 
-    def test_torchscript_scale(self):
-        @torch.jit.script
-        def jit_method(tensor, factor):
-            # type: (Tensor, float) -> Tensor
-            return F.scale(tensor, factor)
-
-        tensor = torch.rand((1, 10))
-        factor = 2.0
-
-        jit_out = jit_method(tensor, factor)
-        py_out = F.scale(tensor, factor)
-
-        self.assertTrue(torch.allclose(jit_out, py_out))
-
-    @unittest.skipIf(not RUN_CUDA, "no CUDA")
-    def test_scriptmodule_scale(self):
-        tensor = torch.rand((1, 10), device="cuda")
-
-        self._test_script_module(tensor, transforms.Scale)
-
     def test_torchscript_pad_trim(self):
         @torch.jit.script
         def jit_method(tensor, max_len, fill_value):
@@ -90,25 +70,6 @@ class Test_JIT(unittest.TestCase):
         tensor = torch.rand((2, 10), device="cuda")
 
         self._test_script_module(tensor, transforms.DownmixMono)
-
-    def test_torchscript_LC2CL(self):
-        @torch.jit.script
-        def jit_method(tensor):
-            # type: (Tensor) -> Tensor
-            return F.LC2CL(tensor)
-
-        tensor = torch.rand((10, 1))
-
-        jit_out = jit_method(tensor)
-        py_out = F.LC2CL(tensor)
-
-        self.assertTrue(torch.allclose(jit_out, py_out))
-
-    @unittest.skipIf(not RUN_CUDA, "no CUDA")
-    def test_scriptmodule_LC2CL(self):
-        tensor = torch.rand((10, 1), device="cuda")
-
-        self._test_script_module(tensor, transforms.LC2CL)
 
     def test_torchscript_spectrogram(self):
         @torch.jit.script
