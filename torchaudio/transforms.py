@@ -303,11 +303,11 @@ class MuLawEncoding(torch.jit.ScriptModule):
     Args:
         quantization_channels (int): Number of channels. default: 256
     """
-    __constants__ = ['qc']
+    __constants__ = ['quantization_channels']
 
     def __init__(self, quantization_channels=256):
         super(MuLawEncoding, self).__init__()
-        self.qc = quantization_channels
+        self.quantization_channels = quantization_channels
 
     @torch.jit.script_method
     def forward(self, x):
@@ -318,10 +318,7 @@ class MuLawEncoding(torch.jit.ScriptModule):
         Returns:
             x_mu (torch.Tensor): An encoded signal
         """
-        return F.mu_law_encoding(x, self.qc)
-
-    def __repr__(self):
-        return self.__class__.__name__ + '()'
+        return F.mu_law_encoding(x, self.quantization_channels)
 
 
 class MuLawExpanding(torch.jit.ScriptModule):
@@ -334,11 +331,11 @@ class MuLawExpanding(torch.jit.ScriptModule):
     Args:
         quantization_channels (int): Number of channels. default: 256
     """
-    __constants__ = ['qc']
+    __constants__ = ['quantization_channels']
 
     def __init__(self, quantization_channels=256):
         super(MuLawExpanding, self).__init__()
-        self.qc = quantization_channels
+        self.quantization_channels = quantization_channels
 
     @torch.jit.script_method
     def forward(self, x_mu):
@@ -349,10 +346,7 @@ class MuLawExpanding(torch.jit.ScriptModule):
         Returns:
             torch.Tensor: The signal decoded
         """
-        return F.mu_law_expanding(x_mu, self.qc)
-
-    def __repr__(self):
-        return self.__class__.__name__ + '()'
+        return F.mu_law_expanding(x_mu, self.quantization_channels)
 
 
 class Resample(torch.nn.Module):

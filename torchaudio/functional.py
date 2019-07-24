@@ -329,7 +329,7 @@ def create_dct(n_mfcc, n_mels, norm):
 
 
 @torch.jit.script
-def mu_law_encoding(x, qc):
+def mu_law_encoding(x, quantization_channels):
     # type: (Tensor, int) -> Tensor
     r"""Encode signal based on mu-law companding.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
@@ -339,12 +339,12 @@ def mu_law_encoding(x, qc):
 
     Args:
         x (torch.Tensor): Input tensor
-        qc (int): Number of channels (i.e. quantization channels)
+        quantization_channels (int): Number of channels
 
     Returns:
         torch.Tensor: Input after mu-law companding
     """
-    mu = qc - 1.
+    mu = quantization_channels - 1.
     if not x.is_floating_point():
         x = x.to(torch.float)
     mu = torch.tensor(mu, dtype=x.dtype)
@@ -355,7 +355,7 @@ def mu_law_encoding(x, qc):
 
 
 @torch.jit.script
-def mu_law_expanding(x_mu, qc):
+def mu_law_expanding(x_mu, quantization_channels):
     # type: (Tensor, int) -> Tensor
     r"""Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
@@ -365,12 +365,12 @@ def mu_law_expanding(x_mu, qc):
 
     Args:
         x_mu (torch.Tensor): Input tensor
-        qc (int): Number of channels (i.e. quantization channels)
+        quantization_channels (int): Number of channels
 
     Returns:
         torch.Tensor: Input after decoding
     """
-    mu = qc - 1.
+    mu = quantization_channels - 1.
     if not x_mu.is_floating_point():
         x_mu = x_mu.to(torch.float)
     mu = torch.tensor(mu, dtype=x_mu.dtype)
