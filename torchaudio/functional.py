@@ -121,8 +121,8 @@ def istft(stft_matrix,          # type: Tensor
     device = stft_matrix.device
     fft_size = stft_matrix.size(1)
     assert (onesided and n_fft // 2 + 1 == fft_size) or (not onesided and n_fft == fft_size), (
-        'one_sided implies that n_fft // 2 + 1 == fft_size and not one_sided implies n_fft == fft_size. '
-        + 'Given values were onesided: %s, n_fft: %d, fft_size: %d' % ('True' if onesided else False, n_fft, fft_size))
+        'one_sided implies that n_fft // 2 + 1 == fft_size and not one_sided implies n_fft == fft_size. ' +
+        'Given values were onesided: %s, n_fft: %d, fft_size: %d' % ('True' if onesided else False, n_fft, fft_size))
 
     # use stft defaults for Optionals
     if win_length is None:
@@ -383,11 +383,11 @@ def complex_norm(complex_tensor, power=1.0):
     """Compute the norm of complex tensor input
 
     Args:
-        complex_tensor (Tensor): Tensor shape of `(*, complex=2)`
+        complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
         power (float): Power of the norm. Defaults to `1.0`.
 
     Returns:
-        Tensor: power of the normed input tensor, shape of `(*, )`
+        torch.Tensor: power of the normed input tensor, shape of `(*, )`
     """
     if power == 1.0:
         return torch.norm(complex_tensor, 2, -1)
@@ -417,15 +417,14 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     without modifying pitch by a factor of `rate`.
 
     Args:
-        complex_specgrams (Tensor):
-            (*, channel, num_freqs, time, complex=2)
+        complex_specgrams (torch.Tensor): Size of (*, c, f, t, complex=2)
         rate (float): Speed-up factor.
-        phase_advance (Tensor): Expected phase advance in
-            each bin. (num_freqs, 1).
+        phase_advance (torch.Tensor): Expected phase advance in
+            each bin. Size of (f, 1).
 
     Returns:
-        complex_specgrams_stretch (Tensor):
-            (*, channel, num_freqs, ceil(time/rate), complex=2).
+        complex_specgrams_stretch (torch.Tensor):
+            (*, c, f, ceil(t/rate), complex=2).
 
     Example:
         >>> num_freqs, hop_length = 1025, 512
