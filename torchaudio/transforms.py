@@ -33,25 +33,6 @@ class PadTrim(torch.jit.ScriptModule):
         return F.pad_trim(waveform, self.max_len, self.fill_value)
 
 
-class DownmixMono(torch.jit.ScriptModule):
-    r"""Downmix stereo waveform to mono.  Consider using a `SoxEffectsChain` with
-    the `channels` effect instead of this transformation.
-    """
-    def __init__(self):
-        super(DownmixMono, self).__init__()
-
-    @torch.jit.script_method
-    def forward(self, waveform):
-        r"""
-        Args:
-            waveform (torch.Tensor): Tensor of audio of size (c, n)
-
-        Returns:
-            torch.Tensor: Tensor that has been downmixed of size (1, n)
-        """
-        return F.downmix_mono(waveform)
-
-
 class Spectrogram(torch.jit.ScriptModule):
     r"""Create a spectrogram from a audio signal
 

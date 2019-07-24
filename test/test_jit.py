@@ -52,25 +52,6 @@ class Test_JIT(unittest.TestCase):
 
         self._test_script_module(tensor, transforms.PadTrim, max_len)
 
-    def test_torchscript_downmix_mono(self):
-        @torch.jit.script
-        def jit_method(tensor):
-            # type: (Tensor) -> Tensor
-            return F.downmix_mono(tensor)
-
-        tensor = torch.rand((2, 10))
-
-        jit_out = jit_method(tensor)
-        py_out = F.downmix_mono(tensor)
-
-        self.assertTrue(torch.allclose(jit_out, py_out))
-
-    @unittest.skipIf(not RUN_CUDA, "no CUDA")
-    def test_scriptmodule_downmix_mono(self):
-        tensor = torch.rand((2, 10), device="cuda")
-
-        self._test_script_module(tensor, transforms.DownmixMono)
-
     def test_torchscript_spectrogram(self):
         @torch.jit.script
         def jit_method(sig, pad, window, n_fft, hop, ws, power, normalize):

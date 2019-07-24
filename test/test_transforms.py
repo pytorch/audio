@@ -50,20 +50,6 @@ class Tester(unittest.TestCase):
         result = transforms.PadTrim(max_len=length_new)(waveform)
         self.assertEqual(result.size(1), length_new)
 
-    def test_downmix_mono(self):
-
-        waveform_L = self.waveform.clone()
-        waveform_R = self.waveform.clone()
-        R_idx = int(waveform_R.size(0) * 0.1)
-        waveform_R = torch.cat((waveform_R[R_idx:], waveform_R[:R_idx]))
-
-        audio_Stereo = torch.cat((waveform_L, waveform_R), dim=0)
-
-        self.assertTrue(audio_Stereo.size(0) == 2)
-
-        result = transforms.DownmixMono()(audio_Stereo)
-
-        self.assertTrue(result.size(0) == 1)
 
     def test_mu_law_companding(self):
 
