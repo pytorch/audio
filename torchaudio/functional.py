@@ -371,3 +371,161 @@ def mu_law_expanding(x_mu, qc):
     x = ((x_mu) / mu) * 2 - 1.
     x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.) / mu
     return x
+
+
+def stft(waveforms, fft_length, hop_length=None, win_length=None, window=None,
+         center=True, pad_mode='reflect', normalized=False, onesided=True):
+    """Compute a short time Fourier transform of the input waveform(s).
+    It wraps `torch.stft` after reshaping the input audio to allow for `waveforms` that `.dim()` >= 3.
+    It follows most of the `torch.stft` default values, but for `window`, which defaults to hann window.
+
+    Args:
+        waveforms (torch.Tensor): Audio signal of size `(*, channel, time)`
+        fft_length (int): FFT size [sample].
+        hop_length (int): Hop size [sample] between STFT frames.
+            (Defaults to `fft_length // 4`, 75%-overlapping windows by `torch.stft`).
+        win_length (int): Size of STFT window. (Defaults to `fft_length` by `torch.stft`).
+        window (torch.Tensor): window function. (Defaults to Hann Window of size `win_length` *unlike* `torch.stft`).
+        center (bool): Whether to pad `waveforms` on both sides so that the `t`-th frame is centered
+            at time `t * hop_length`. (Defaults to `True` by `torch.stft`)
+        pad_mode (str): padding method (see `torch.nn.functional.pad`). (Defaults to `'reflect'` by `torch.stft`).
+        normalized (bool): Whether the results are normalized. (Defaults to `False` by `torch.stft`).
+        onesided (bool): Whether the half + 1 frequency bins are returned to removethe symmetric part of STFT
+            of real-valued signal. (Defaults to `True` by `torch.stft`).
+
+    Returns:
+        torch.Tensor: `(*, channel, num_freqs, time, complex=2)`
+
+    Example:
+        >>> waveforms = torch.randn(16, 2, 10000)  # (batch, channel, time)
+        >>> x = stft(waveforms, 2048, 512)
+        >>> x.shape
+        torch.Size([16, 2, 1025, 20])
+    """
+    leading_dims = waveforms.shape[:-1]
+
+    waveforms = waveforms.reshape(-1, waveforms.size(-1))
+
+    if window is None:
+        if win_length is None:
+            window = torch.hann_window(fft_length)
+        else:
+            window = torch.hann_window(win_length)
+
+    complex_specgrams = torch.stft(waveforms,
+                                   n_fft=fft_length,
+                                   hop_length=hop_length,
+                                   win_length=win_length,
+                                   window=window,
+                                   center=center,
+                                   pad_mode=pad_mode,
+                                   normalized=normalized,
+                                   onesided=onesided)
+
+    complex_specgrams = complex_specgrams.reshape(
+        leading_dims +
+        complex_specgrams.shape[1:])
+
+    return complex_specgrams
+
+
+def complex_norm(complex_tensor, power=1.0):
+    """Compute the norm of complex tensor input
+
+    Args:
+        complex_tensor (Tensor): Tensor shape of `(*, complex=2)`
+        power (float): Power of the norm. Defaults to `1.0`.
+
+    Returns:
+        Tensor: power of the normed input tensor, shape of `(*, )`
+    """
+    if power == 1.0:
+        return torch.norm(complex_tensor, 2, -1)
+    return torch.norm(complex_tensor, 2, -1).pow(power)
+
+
+def angle(complex_tensor):
+    """
+    Return angle of a complex tensor with shape (*, 2).
+    """
+    return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
+
+
+def magphase(complex_tensor, power=1.):
+    """
+    Separate a complex-valued spectrogram with shape (*,2)
+    into its magnitude and phase.
+    """
+    mag = complex_norm(complex_tensor, power)
+    phase = angle(complex_tensor)
+    return mag, phase
+
+
+def phase_vocoder(complex_specgrams, rate, phase_advance):
+    """
+    Phase vocoder. Given a STFT tensor, speed up in time
+    without modifying pitch by a factor of `rate`.
+
+    Args:
+        complex_specgrams (Tensor):
+            (*, channel, num_freqs, time, complex=2)
+        rate (float): Speed-up factor.
+        phase_advance (Tensor): Expected phase advance in
+            each bin. (num_freqs, 1).
+
+    Returns:
+        complex_specgrams_stretch (Tensor):
+            (*, channel, num_freqs, ceil(time/rate), complex=2).
+
+    Example:
+        >>> num_freqs, hop_length = 1025, 512
+        >>> # (batch, channel, num_freqs, time, complex=2)
+        >>> complex_specgrams = torch.randn(16, 1, num_freqs, 300, 2)
+        >>> rate = 1.3 # Slow down by 30%
+        >>> phase_advance = torch.linspace(
+        >>>    0, math.pi * hop_length, num_freqs)[..., None]
+        >>> x = phase_vocoder(complex_specgrams, rate, phase_advance)
+        >>> x.shape # with 231 == ceil(300 / 1.3)
+        torch.Size([16, 1, 1025, 231, 2])
+    """
+    ndim = complex_specgrams.dim()
+    time_slice = [slice(None)] * (ndim - 2)
+
+    time_steps = torch.arange(0,
+                              complex_specgrams.size(-2),
+                              rate,
+                              device=complex_specgrams.device,
+                              dtype=complex_specgrams.dtype)
+
+    alphas = time_steps % 1.
+    phase_0 = angle(complex_specgrams[time_slice + [slice(1)]])
+
+    # Time Padding
+    complex_specgrams = torch.nn.functional.pad(complex_specgrams, [0, 0, 0, 2])
+
+    # (new_bins, num_freqs, 2)
+    complex_specgrams_0 = complex_specgrams[time_slice + [time_steps.long()]]
+    complex_specgrams_1 = complex_specgrams[time_slice + [(time_steps + 1).long()]]
+
+    angle_0 = angle(complex_specgrams_0)
+    angle_1 = angle(complex_specgrams_1)
+
+    norm_0 = torch.norm(complex_specgrams_0, dim=-1)
+    norm_1 = torch.norm(complex_specgrams_1, dim=-1)
+
+    phase = angle_1 - angle_0 - phase_advance
+    phase = phase - 2 * math.pi * torch.round(phase / (2 * math.pi))
+
+    # Compute Phase Accum
+    phase = phase + phase_advance
+    phase = torch.cat([phase_0, phase[time_slice + [slice(-1)]]], dim=-1)
+    phase_acc = torch.cumsum(phase, -1)
+
+    mag = alphas * norm_1 + (1 - alphas) * norm_0
+
+    real_stretch = mag * torch.cos(phase_acc)
+    imag_stretch = mag * torch.sin(phase_acc)
+
+    complex_specgrams_stretch = torch.stack([real_stretch, imag_stretch], dim=-1)
+
+    return complex_specgrams_stretch
