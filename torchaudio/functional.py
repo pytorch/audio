@@ -380,14 +380,14 @@ def mu_law_expanding(x_mu, qc):
 
 
 def complex_norm(complex_tensor, power=1.0):
-    """Compute the norm of complex tensor input
+    r"""Compute the norm of complex tensor input.
 
     Args:
         complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
         power (float): Power of the norm. (Default: `1.0`).
 
     Returns:
-        torch.Tensor: power of the normed input tensor, shape of `(*, )`
+        torch.Tensor: Power of the normed input tensor. Shape of `(*, )`
     """
     if power == 1.0:
         return torch.norm(complex_tensor, 2, -1)
@@ -395,24 +395,22 @@ def complex_norm(complex_tensor, power=1.0):
 
 
 def angle(complex_tensor):
-    """
+    r"""
     Args:
         complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
 
     Return:
-        torch.Tensor: Angle of a complex tensor
+        torch.Tensor: Angle of a complex tensor. Shape of `(*, )`
     """
     return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
 
 
 def magphase(complex_tensor, power=1.):
-    """
-    Separate a complex-valued spectrogram with shape (*,2)
-    into its magnitude and phase.
+    r"""Separate a complex-valued spectrogram with shape (*,2) into its magnitude and phase.
 
     Args:
         complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
-        power (float): Power of the norm. (Default: `1.0`).
+        power (float): Power of the norm. (Default: `1.0`)
 
     Returns:
         Tuple[torch.Tensor, torch.Tensor]: The magnitude and phase of the complex_tensor
@@ -423,19 +421,16 @@ def magphase(complex_tensor, power=1.):
 
 
 def phase_vocoder(complex_specgrams, rate, phase_advance):
-    """
-    Phase vocoder. Given a STFT tensor, speed up in time
-    without modifying pitch by a factor of `rate`.
+    r"""Given a STFT tensor, speed up in time without modifying pitch by a
+    factor of `rate`.
 
     Args:
         complex_specgrams (torch.Tensor): Size of (*, c, f, t, complex=2)
-        rate (float): Speed-up factor.
-        phase_advance (torch.Tensor): Expected phase advance in
-            each bin. Size of (f, 1).
+        rate (float): Speed-up factor
+        phase_advance (torch.Tensor): Expected phase advance in each bin. Size of (f, 1)
 
     Returns:
-        complex_specgrams_stretch (torch.Tensor):
-            (*, c, f, ceil(t/rate), complex=2).
+        complex_specgrams_stretch (torch.Tensor): Size of (*, c, f, ceil(t/rate), complex=2)
 
     Example:
         >>> num_freqs, hop_length = 1025, 512
