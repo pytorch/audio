@@ -89,7 +89,8 @@ def istft(stft_matrix,          # type: Tensor
 
     Args:
         stft_matrix (torch.Tensor): Output of stft where each row of a batch is a frequency and each
-            column is a window. it has a shape of (fft_size, n_frames, 2)
+            column is a window. it has a shape of either (batch, fft_size, n_frames, 2) or (
+            fft_size, n_frames, 2)
         n_fft (int): Size of Fourier transform
         hop_length (Optional[int]): The distance between neighboring sliding window frames.
             (Default: ``win_length // 4``)
@@ -106,13 +107,10 @@ def istft(stft_matrix,          # type: Tensor
 
     Returns:
         torch.Tensor: Least squares estimation of the original signal of size
-        (signal_length)
+        (batch, signal_length) or (signal_length)
     """
     stft_matrix_dim = stft_matrix.dim()
-    # Technically this function can accept either (batch, fft_size, n_frames, 2) or
-    # (fft_size, n_frames, 2). But going to temporarily remove batch support (
-    # through adding an assert) to make torchaudio functions consistent.
-    assert stft_matrix_dim == 3, ('Incorrect stft dimension: %d' % (stft_matrix_dim))
+    assert 3 <= stft_matrix_dim <= 4, ('Incorrect stft dimension: %d' % (stft_matrix_dim))
 
     if stft_matrix_dim == 3:
         # add a batch dimension
