@@ -10,7 +10,7 @@ __all__ = [
     'spectrogram_to_DB',
     'create_dct',
     'mu_law_encoding',
-    'mu_law_expanding',
+    'mu_law_decoding',
     'complex_norm',
     'angle',
     'magphase',
@@ -353,7 +353,7 @@ def mu_law_encoding(x, quantization_channels):
 
 
 @torch.jit.script
-def mu_law_expanding(x_mu, quantization_channels):
+def mu_law_decoding(x_mu, quantization_channels):
     # type: (Tensor, int) -> Tensor
     r"""Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_

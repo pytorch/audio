@@ -321,7 +321,7 @@ class MuLawEncoding(torch.jit.ScriptModule):
         return F.mu_law_encoding(x, self.quantization_channels)
 
 
-class MuLawExpanding(torch.jit.ScriptModule):
+class MuLawDecoding(torch.jit.ScriptModule):
     r"""Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
@@ -334,7 +334,7 @@ class MuLawExpanding(torch.jit.ScriptModule):
     __constants__ = ['quantization_channels']
 
     def __init__(self, quantization_channels=256):
-        super(MuLawExpanding, self).__init__()
+        super(MuLawDecoding, self).__init__()
         self.quantization_channels = quantization_channels
 
     @torch.jit.script_method
@@ -346,7 +346,7 @@ class MuLawExpanding(torch.jit.ScriptModule):
         Returns:
             torch.Tensor: The signal decoded
         """
-        return F.mu_law_expanding(x_mu, self.quantization_channels)
+        return F.mu_law_decoding(x_mu, self.quantization_channels)
 
 
 class Resample(torch.nn.Module):

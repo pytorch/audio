@@ -61,7 +61,7 @@ class Tester(unittest.TestCase):
         waveform_mu = transforms.MuLawEncoding(quantization_channels)(waveform)
         self.assertTrue(waveform_mu.min() >= 0. and waveform_mu.max() <= quantization_channels)
 
-        waveform_exp = transforms.MuLawExpanding(quantization_channels)(waveform_mu)
+        waveform_exp = transforms.MuLawDecoding(quantization_channels)(waveform_mu)
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
 
     def test_mel2(self):
