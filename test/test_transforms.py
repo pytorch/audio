@@ -50,7 +50,6 @@ class Tester(unittest.TestCase):
         result = transforms.PadTrim(max_len=length_new)(waveform)
         self.assertEqual(result.size(1), length_new)
 
-
     def test_mu_law_companding(self):
 
         quantization_channels = 256

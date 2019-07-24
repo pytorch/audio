@@ -81,9 +81,6 @@ class Spectrogram(torch.jit.ScriptModule):
                              self.win_length, self.power, self.normalized)
 
 
-
-
-
 class MelScale(torch.jit.ScriptModule):
     r"""This turns a normal STFT into a mel frequency STFT, using a conversion
        matrix.  This uses triangular filter banks.

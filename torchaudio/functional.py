@@ -10,7 +10,11 @@ __all__ = [
     'spectrogram_to_DB',
     'create_dct',
     'mu_law_encoding',
-    'mu_law_expanding'
+    'mu_law_expanding',
+    'complex_norm',
+    'angle',
+    'magphase',
+    'phase_vocoder',
 ]
 
 
@@ -371,62 +375,6 @@ def mu_law_expanding(x_mu, qc):
     x = ((x_mu) / mu) * 2 - 1.
     x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.) / mu
     return x
-
-
-def stft(waveforms, fft_length, hop_length=None, win_length=None, window=None,
-         center=True, pad_mode='reflect', normalized=False, onesided=True):
-    """Compute a short time Fourier transform of the input waveform(s).
-    It wraps `torch.stft` after reshaping the input audio to allow for `waveforms` that `.dim()` >= 3.
-    It follows most of the `torch.stft` default values, but for `window`, which defaults to hann window.
-
-    Args:
-        waveforms (torch.Tensor): Audio signal of size `(*, channel, time)`
-        fft_length (int): FFT size [sample].
-        hop_length (int): Hop size [sample] between STFT frames.
-            (Defaults to `fft_length // 4`, 75%-overlapping windows by `torch.stft`).
-        win_length (int): Size of STFT window. (Defaults to `fft_length` by `torch.stft`).
-        window (torch.Tensor): window function. (Defaults to Hann Window of size `win_length` *unlike* `torch.stft`).
-        center (bool): Whether to pad `waveforms` on both sides so that the `t`-th frame is centered
-            at time `t * hop_length`. (Defaults to `True` by `torch.stft`)
-        pad_mode (str): padding method (see `torch.nn.functional.pad`). (Defaults to `'reflect'` by `torch.stft`).
-        normalized (bool): Whether the results are normalized. (Defaults to `False` by `torch.stft`).
-        onesided (bool): Whether the half + 1 frequency bins are returned to removethe symmetric part of STFT
-            of real-valued signal. (Defaults to `True` by `torch.stft`).
-
-    Returns:
-        torch.Tensor: `(*, channel, num_freqs, time, complex=2)`
-
-    Example:
-        >>> waveforms = torch.randn(16, 2, 10000)  # (batch, channel, time)
-        >>> x = stft(waveforms, 2048, 512)
-        >>> x.shape
-        torch.Size([16, 2, 1025, 20])
-    """
-    leading_dims = waveforms.shape[:-1]
-
-    waveforms = waveforms.reshape(-1, waveforms.size(-1))
-
-    if window is None:
-        if win_length is None:
-            window = torch.hann_window(fft_length)
-        else:
-            window = torch.hann_window(win_length)
-
-    complex_specgrams = torch.stft(waveforms,
-                                   n_fft=fft_length,
-                                   hop_length=hop_length,
-                                   win_length=win_length,
-                                   window=window,
-                                   center=center,
-                                   pad_mode=pad_mode,
-                                   normalized=normalized,
-                                   onesided=onesided)
-
-    complex_specgrams = complex_specgrams.reshape(
-        leading_dims +
-        complex_specgrams.shape[1:])
-
-    return complex_specgrams
 
 
 def complex_norm(complex_tensor, power=1.0):
