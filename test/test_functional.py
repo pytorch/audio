@@ -13,8 +13,6 @@ if IMPORT_LIBROSA:
     import numpy as np
     import librosa
 
-xfail = pytest.mark.xfail
-
 
 class TestFunctional(unittest.TestCase):
     data_sizes = [(2, 20), (3, 15), (4, 10)]
