@@ -1,3 +1,5 @@
+torch>=1.1.0
+
 # Optional for torchaudio.kaldi_io
 numpy
 kaldi_io
@@ -8,7 +10,7 @@ kaldi_io
 flake8
 
 # Used for comparison of outputs in tests
-librosa
+librosa>=0.4.3
 scipy
 
 # Unit tests with pytest

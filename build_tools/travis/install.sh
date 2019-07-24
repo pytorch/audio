@@ -56,5 +56,5 @@ if [[ "$SKIP_TESTS" != "true" ]]; then
     conda install --yes pytorch-nightly-cpu -c pytorch
 
      # TorchAudio CPP Extensions
-    pip install .
+    python setup.py install
 fi
