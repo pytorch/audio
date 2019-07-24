@@ -4,7 +4,6 @@ import torch
 
 __all__ = [
     'pad_trim',
-    'downmix_mono',
     'istft',
     'spectrogram',
     'spectrogram_to_DB',
@@ -34,25 +33,6 @@ def pad_trim(waveform, max_len, fill_value):
         waveform = torch.nn.functional.pad(waveform, (0, max_len - n), 'constant', fill_value)
     else:
         waveform = waveform[:, :max_len]
-    return waveform
-
-
-@torch.jit.script
-def downmix_mono(waveform):
-    # type: (Tensor) -> Tensor
-    r"""Downmix stereo waveform to mono. Consider using a `SoxEffectsChain` with
-    the `channels` effect instead of this transformation.
-
-    Args:
-        waveform (torch.Tensor): Tensor of audio of size (c, n)
-
-    Returns:
-        torch.Tensor: Tensor that has been downmixed of size (1, n)
-    """
-    if not waveform.is_floating_point():
-        waveform = waveform.to(torch.float32)
-
-    waveform = torch.mean(waveform, 0, True)
     return waveform
 
 
