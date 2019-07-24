@@ -384,7 +384,7 @@ def complex_norm(complex_tensor, power=1.0):
 
     Args:
         complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
-        power (float): Power of the norm. Defaults to `1.0`.
+        power (float): Power of the norm. (Default: `1.0`).
 
     Returns:
         torch.Tensor: power of the normed input tensor, shape of `(*, )`
@@ -396,7 +396,11 @@ def complex_norm(complex_tensor, power=1.0):
 
 def angle(complex_tensor):
     """
-    Return angle of a complex tensor with shape (*, 2).
+    Args:
+        complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
+
+    Return:
+        torch.Tensor: Angle of a complex tensor
     """
     return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
 
@@ -405,6 +409,13 @@ def magphase(complex_tensor, power=1.):
     """
     Separate a complex-valued spectrogram with shape (*,2)
     into its magnitude and phase.
+
+    Args:
+        complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
+        power (float): Power of the norm. (Default: `1.0`).
+
+    Returns:
+        Tuple[torch.Tensor, torch.Tensor]: The magnitude and phase of the complex_tensor
     """
     mag = complex_norm(complex_tensor, power)
     phase = angle(complex_tensor)
