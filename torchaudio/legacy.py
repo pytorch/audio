@@ -13,17 +13,20 @@ def load(filepath, out=None, normalization=None, num_frames=0, offset=0):
     from version 0.1.
 
     Args:
-        filepath (string): path to audio file
-        out (Tensor, optional): an output Tensor to use instead of creating one
+        filepath (str): Path to audio file
+        out (torch.Tensor, optional): An output Tensor to use instead of creating one. (Default: ``None``)
         normalization (bool or number, optional): If boolean `True`, then output is divided by `1 << 31`
-                                                  (assumes 16-bit depth audio, and normalizes to `[0, 1]`.
-                                                  If `number`, then output is divided by that number
-        num_frames (int, optional): number of frames to load.  -1 to load everything after the offset.
-        offset (int, optional): number of frames from the start of the file to begin data loading.
+            (assumes 16-bit depth audio, and normalizes to `[0, 1]`. If `number`, then output is divided by that
+            number. (Default: ``None``)
+        num_frames (int, optional): Number of frames to load.  -1 to load everything after the
+            offset. (Default: ``0``)
+        offset (int, optional): Number of frames from the start of the file to begin data
+            loading. (Default: ``0``)
 
-    Returns: tuple(Tensor, int)
-       - Tensor: output Tensor of size `[L x C]` where L is the number of audio frames, C is the number of channels
-       - int: the sample-rate of the audio (as listed in the metadata of the file)
+    Returns: Tuple[torch.Tensor, int]
+       - torch.Tensor: Output Tensor of size `[L x C]` where L is the number of audio frames, C is the number of
+       channels
+       - int: The sample-rate of the audio (as listed in the metadata of the file)
 
     Example::
 
@@ -43,11 +46,11 @@ def save(filepath, src, sample_rate, precision=32):
     option defaults from version 0.1.
 
     Args:
-        filepath (string): path to audio file
-        src (Tensor): an input 2D Tensor of shape `[L x C]` where L is
-                      the number of audio frames, C is the number of channels
-        sample_rate (int): the sample-rate of the audio to be saved
-        precision (int, optional): the bit-precision of the audio to be saved
+        filepath (str): Path to audio file
+        src (torch.Tensor): An input 2D Tensor of shape `[L x C]` where L is
+            the number of audio frames, C is the number of channels
+        sample_rate (int): The sample-rate of the audio to be saved
+        precision (int, optional): The bit-precision of the audio to be saved. (Default: ``32``)
 
     Example::
 
