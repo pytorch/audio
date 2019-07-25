@@ -77,8 +77,8 @@ def istft(stft_matrix,          # type: Tensor
         center (bool): Whether ``input`` was padded on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
             (Default: ``True``)
-        pad_mode (str): Controls the padding method used when ``center`` is ``True``. (Default:
-            'reflect')
+        pad_mode (str): Controls the padding method used when ``center`` is True. (Default:
+            ``'reflect'``)
         normalized (bool): Whether the STFT was normalized. (Default: ``False``)
         onesided (bool): Whether the STFT is onesided. (Default: ``True``)
         length (Optional[int]): The amount to trim the signal by (i.e. the
@@ -223,7 +223,7 @@ def spectrogram_to_DB(specgram, multiplier, amin, db_multiplier, top_db=None):
         amin (float): Number to clamp specgram
         db_multiplier (float): Log10(max(reference value and amin))
         top_db (Optional[float]): Minimum negative cut-off in decibels. A reasonable number
-            is 80.
+            is 80. (Default: ``None``)
 
     Returns:
         torch.Tensor: Spectrogram in DB of size (c, f, t)
