@@ -75,10 +75,12 @@ def istft(stft_matrix,          # type: Tensor
         window (Optional[torch.Tensor]): The optional window function.
             (Default: ``torch.ones(win_length)``)
         center (bool): Whether ``input`` was padded on both sides so
-            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`
-        pad_mode (str): Controls the padding method used when ``center`` is ``True``
-        normalized (bool): Whether the STFT was normalized
-        onesided (bool): Whether the STFT is onesided
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            (Default: ``True``)
+        pad_mode (str): Controls the padding method used when ``center`` is ``True``. (Default:
+            'reflect')
+        normalized (bool): Whether the STFT was normalized. (Default: ``False``)
+        onesided (bool): Whether the STFT is onesided. (Default: ``True``)
         length (Optional[int]): The amount to trim the signal by (i.e. the
             original signal length). (Default: whole signal)
 
