@@ -24,16 +24,16 @@ class Spectrogram(torch.jit.ScriptModule):
 
     Args:
         n_fft (int, optional): Size of fft, creates ``n_fft // 2 + 1`` bins
-        win_length (int): Window size. (Default: ```n_fft``)
+        win_length (int): Window size. (Default: ``n_fft``)
         hop_length (int, optional): Length of hop between STFT windows. (
             Default: ``win_length // 2``)
         pad (int): Two sided padding of signal. (Default: ``0``)
         window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         power (int): Exponent for the magnitude spectrogram,
-            (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ```2``)
+            (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
         normalized (bool): Whether to normalize by magnitude after stft. (Default: ``False``)
-        wkwargs (Dict[..., ...]): Arguments for window function. (Default: ```None``)
+        wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -60,7 +60,7 @@ class Spectrogram(torch.jit.ScriptModule):
 
         Returns:
             torch.Tensor: Channels x frequency x time (c, f, t), where channels
-            is unchanged, frequency is ```n_fft // 2 + 1`` where ``n_fft`` is the number of
+            is unchanged, frequency is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
             Fourier bins, and time is the number of window hops (n_frames).
         """
         return F.spectrogram(waveform, self.pad, self.window, self.n_fft, self.hop_length,
