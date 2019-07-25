@@ -46,7 +46,7 @@ def istft(stft_matrix,          # type: Tensor
     :math:`\sum_{t=-\infty}^{\infty} w^2[n-t\times hop\_length] \cancel{=} 0`.
 
     Since stft discards elements at the end of the signal if they do not fit in a frame, the
-    istft may return a shorter signal than the original signal (can occur if `center` is False
+    istft may return a shorter signal than the original signal (can occur if ``center`` is False
     since the signal isn't padded).
 
     If ``center`` is True, then there will be padding e.g. 'constant', 'reflect', etc. Left padding
@@ -58,7 +58,7 @@ def istft(stft_matrix,          # type: Tensor
 
     The n_frames, hop_length, win_length are all the same which prevents the calculation of right padding.
     These additional values could be zeros or a reflection of the signal so providing ``length``
-    could be useful. If ``length`` is ``None`` then padding will be aggressively removed
+    could be useful. If ``length`` is None then padding will be aggressively removed
     (some loss of signal).
 
     [1] D. W. Griffin and J. S. Lim, “Signal estimation from modified short-time Fourier transform,”
@@ -187,8 +187,8 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
 
     Returns:
         torch.Tensor: Channels x frequency x time (c, f, t), where channels
-        is unchanged, frequency is `n_fft // 2 + 1` where `n_fft` is the number of
-        fourier bins, and time is the number of window hops (n_frames).
+        is unchanged, frequency is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
+        Fourier bins, and time is the number of window hops (n_frames).
     """
     assert waveform.dim() == 2
 
@@ -249,11 +249,11 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
         n_mels (int): Number of mel filterbanks
 
     Returns:
-        torch.Tensor: Triangular filter banks (fb matrix) of size (`n_freqs`, `n_mels`)
+        torch.Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)
         meaning number of frequencies to highlight/apply to x the number of filterbanks.
         Each column is a filterbank so that assuming there is a matrix A of
-        size (..., `n_freqs`), the applied result would be
-        `A * create_fb_matrix(A.size(-1), ...)`.
+        size (..., ``n_freqs``), the applied result would be
+        ``A * create_fb_matrix(A.size(-1), ...)``.
     """
     # freq bins
     freqs = torch.linspace(f_min, f_max, n_freqs)
@@ -278,7 +278,7 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
 @torch.jit.script
 def create_dct(n_mfcc, n_mels, norm):
     # type: (int, int, Optional[str]) -> Tensor
-    r"""Creates a DCT transformation matrix with shape (`n_mels`, `n_mfcc`),
+    r"""Creates a DCT transformation matrix with shape (``n_mels``, ``n_mfcc``),
     normalized depending on norm.
 
     Args:
@@ -288,7 +288,7 @@ def create_dct(n_mfcc, n_mels, norm):
 
     Returns:
         torch.Tensor: The transformation matrix, to be right-multiplied to
-        row-wise data of size (`n_mels`, `n_mfcc`).
+        row-wise data of size (``n_mels``, ``n_mfcc``).
     """
     # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
     n = torch.arange(float(n_mels))
@@ -317,7 +317,7 @@ def mu_law_encoding(x, quantization_channels):
         quantization_channels (int): Number of channels
 
     Returns:
-        torch.Tensor: Input after mu-law companding
+        torch.Tensor: Input after mu-law encoding
     """
     mu = quantization_channels - 1.
     if not x.is_floating_point():
@@ -343,7 +343,7 @@ def mu_law_decoding(x_mu, quantization_channels):
         quantization_channels (int): Number of channels
 
     Returns:
-        torch.Tensor: Input after decoding
+        torch.Tensor: Input after mu-law decoding
     """
     mu = quantization_channels - 1.
     if not x_mu.is_floating_point():
@@ -389,7 +389,7 @@ def magphase(complex_tensor, power=1.):
         power (float): Power of the norm. (Default: `1.0`)
 
     Returns:
-        Tuple[torch.Tensor, torch.Tensor]: The magnitude and phase of the complex_tensor
+        Tuple[torch.Tensor, torch.Tensor]: The magnitude and phase of the complex tensor
     """
     mag = complex_norm(complex_tensor, power)
     phase = angle(complex_tensor)
@@ -398,7 +398,7 @@ def magphase(complex_tensor, power=1.):
 
 def phase_vocoder(complex_specgrams, rate, phase_advance):
     r"""Given a STFT tensor, speed up in time without modifying pitch by a
-    factor of `rate`.
+    factor of ``rate``.
 
     Args:
         complex_specgrams (torch.Tensor): Size of `(*, c, f, t, complex=2)`
@@ -406,7 +406,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
         phase_advance (torch.Tensor): Expected phase advance in each bin. Size of (f, 1)
 
     Returns:
-        complex_specgrams_stretch (torch.Tensor): Size of `(*, c, f, ceil(t/rate), complex=2)`
+        torch.Tensor: complex_specgrams_stretch, size of `(*, c, f, ceil(t/rate), complex=2)`
 
     Example:
         >>> num_freqs, hop_length = 1025, 512
