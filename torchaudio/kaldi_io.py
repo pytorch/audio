@@ -53,7 +53,6 @@ def read_vec_int_ark(file_or_fd):
         Generator[str, torch.Tensor]: The string is the key and the tensor is the vector read from file
 
     Example::
-
         >>> # read ark to a 'dictionary'
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_vec_int_ark(file) }
     """
@@ -73,7 +72,6 @@ def read_vec_flt_scp(file_or_fd):
         Generator[str, torch.Tensor]: The string is the key and the tensor is the vector read from file
 
     Example::
-
         >>> # read scp to a 'dictionary'
         >>> # d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_scp(file) }
     """
@@ -90,7 +88,6 @@ def read_vec_flt_ark(file_or_fd):
         Generator[str, torch.Tensor]: The string is the key and the tensor is the vector read from file
 
     Example::
-
         >>> # read ark to a 'dictionary'
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_ark(file) }
     """
@@ -107,7 +104,6 @@ def read_mat_scp(file_or_fd):
         Generator[str, torch.Tensor]: The string is the key and the tensor is the matrix read from file
 
     Example::
-
         >>> # read scp to a 'dictionary'
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_mat_scp(file) }
     """
@@ -124,7 +120,6 @@ def read_mat_ark(file_or_fd):
         Generator[str, torch.Tensor]: The string is the key and the tensor is the matrix read from file
 
     Example::
-
         >>> # read ark to a 'dictionary'
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_mat_ark(file) }
     """

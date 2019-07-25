@@ -48,22 +48,21 @@ class SoxEffectsChain(object):
         audio (as listed in the metadata of the file)
 
     Example::
-
-        class MyDataset(Dataset):
-            def __init__(self, audiodir_path):
-                self.data = [os.path.join(audiodir_path, fn) for fn in os.listdir(audiodir_path)]
-                self.E = torchaudio.sox_effects.SoxEffectsChain()
-                self.E.append_effect_to_chain("rate", [16000])  # resample to 16000hz
-                self.E.append_effect_to_chain("channels", ["1"])  # mono signal
-            def __getitem__(self, index):
-                fn = self.data[index]
-                self.E.set_input_file(fn)
-                x, sr = self.E.sox_build_flow_effects()
-                return x, sr
-
-            def __len__(self):
-                return len(self.data)
-
+        >>> class MyDataset(Dataset):
+        >>>     def __init__(self, audiodir_path):
+        >>>         self.data = [os.path.join(audiodir_path, fn) for fn in os.listdir(audiodir_path)]
+        >>>         self.E = torchaudio.sox_effects.SoxEffectsChain()
+        >>>         self.E.append_effect_to_chain("rate", [16000])  # resample to 16000hz
+        >>>         self.E.append_effect_to_chain("channels", ["1"])  # mono signal
+        >>>     def __getitem__(self, index):
+        >>>         fn = self.data[index]
+        >>>         self.E.set_input_file(fn)
+        >>>         x, sr = self.E.sox_build_flow_effects()
+        >>>         return x, sr
+        >>>
+        >>>     def __len__(self):
+        >>>         return len(self.data)
+        >>>
         >>> torchaudio.initialize_sox()
         >>> ds = MyDataset(path_to_audio_files)
         >>> for sig, sr in ds:

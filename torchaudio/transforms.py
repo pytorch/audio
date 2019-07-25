@@ -177,7 +177,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
 
-    Example:
+    Example::
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
         >>> mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (c, n_mels, t)
     """

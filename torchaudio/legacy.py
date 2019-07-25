@@ -29,7 +29,6 @@ def load(filepath, out=None, normalization=None, num_frames=0, offset=0):
         the file)
 
     Example::
-
         >>> data, sample_rate = torchaudio.legacy.load('foo.mp3')
         >>> print(data.size())
         torch.Size([278756, 2])
@@ -52,7 +51,6 @@ def save(filepath, src, sample_rate, precision=32):
         precision (int, optional): The bit-precision of the audio to be saved. (Default: ``32``)
 
     Example::
-
         >>> data, sample_rate = torchaudio.legacy.load('foo.mp3')
         >>> torchaudio.legacy.save('foo.wav', data, sample_rate)
     """
