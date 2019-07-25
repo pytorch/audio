@@ -275,7 +275,7 @@ class MuLawEncoding(torch.jit.ScriptModule):
     returns a signal encoded with values from 0 to quantization_channels - 1
 
     Args:
-        quantization_channels (int): Number of channels. default: 256
+        quantization_channels (int): Number of channels (Default: 256)
     """
     __constants__ = ['quantization_channels']
 
@@ -303,7 +303,7 @@ class MuLawDecoding(torch.jit.ScriptModule):
     and returns a signal scaled between -1 and 1.
 
     Args:
-        quantization_channels (int): Number of channels. default: 256
+        quantization_channels (int): Number of channels (Default: 256)
     """
     __constants__ = ['quantization_channels']
 
@@ -328,10 +328,9 @@ class Resample(torch.nn.Module):
     be given.
 
     Args:
-        orig_freq (float): the original frequency of the signal
-        new_freq (float): the desired frequency
-        resampling_method (str): the resampling method (Default: 'kaldi' which uses
-            sinc interpolation)
+        orig_freq (float): The original frequency of the signal
+        new_freq (float): The desired frequency
+        resampling_method (str): The resampling method (Default: 'sinc_interpolation')
     """
     def __init__(self, orig_freq, new_freq, resampling_method='sinc_interpolation'):
         super(Resample, self).__init__()
