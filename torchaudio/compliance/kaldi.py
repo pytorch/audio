@@ -217,7 +217,7 @@ def spectrogram(
 
     Returns:
         torch.Tensor: A spectrogram identical to what Kaldi would output. The shape is
-        (m, ``padded_window_size`` // 2 + 1) where m is calculated in _get_strided
+        (m, ``padded_window_size // 2 + 1``) where m is calculated in _get_strided
     """
     waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
         waveform, channel, sample_frequency, frame_shift, frame_length, round_to_power_of_two, preemphasis_coefficient)

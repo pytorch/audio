@@ -9,20 +9,21 @@ import torchaudio
 
 
 class YESNO(data.Dataset):
-    """`YesNo Hebrew <http://www.openslr.org/1/>`_ Dataset.
+    r"""`YesNo Hebrew <http://www.openslr.org/1/>`_ Dataset.
 
     Args:
-        root (string): Root directory of dataset where ``processed/training.pt``
+        root (str): Root directory of dataset where ``processed/training.pt``
             and  ``processed/test.pt`` exist.
+        transform (Callable, optional): A function/transform that takes in an PIL image
+            and returns a transformed version. E.g, ``transforms.Spectrogram``. (
+            Default: ``None``)
+        target_transform (Callable, optional): A function/transform that takes in the
+            target and transforms it. (Default: ``None``)
         download (bool, optional): If true, downloads the dataset from the internet and
             puts it in root directory. If dataset is already downloaded, it is not
-            downloaded again.
-        transform (callable, optional): A function/transform that  takes in an PIL image
-            and returns a transformed version. E.g, ``transforms.Scale``
-        target_transform (callable, optional): A function/transform that takes in the
-            target and transforms it.
-        dev_mode(bool, optional): if true, clean up is not performed on downloaded
-            files.  Useful to keep raw audio and transcriptions.
+            downloaded again. (Default: ``False``)
+        dev_mode(bool, optional): If true, clean up is not performed on downloaded
+            files.  Useful to keep raw audio and transcriptions. (Default: ``False``)
     """
     raw_folder = 'yesno/raw'
     processed_folder = 'yesno/processed'
@@ -55,7 +56,8 @@ class YESNO(data.Dataset):
             index (int): Index
 
         Returns:
-            tuple: (image, target) where target is index of the target class.
+            Tuple[torch.Tensor, int]: The output tuple (image, target) where target
+            is index of the target class.
         """
         audio, target = self.data[index], self.labels[index]
 

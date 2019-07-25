@@ -71,21 +71,22 @@ def load_txts(dir):
 
 
 class VCTK(data.Dataset):
-    """`VCTK <http://homepages.inf.ed.ac.uk/jyamagis/page3/page58/page58.html>`_ Dataset.
-    `alternate url <http://datashare.is.ed.ac.uk/handle/10283/2651>`
+    r"""`VCTK <http://homepages.inf.ed.ac.uk/jyamagis/page3/page58/page58.html>`_ Dataset.
+    `alternate url <http://datashare.is.ed.ac.uk/handle/10283/2651>`_
 
     Args:
-        root (string): Root directory of dataset where ``processed/training.pt``
+        root (str): Root directory of dataset where ``processed/training.pt``
             and  ``processed/test.pt`` exist.
+        downsample (bool, optional): Whether to downsample the signal (Default: ``True``)
+        transform (Callable, optional): A function/transform that takes in an raw audio
+            and returns a transformed version. E.g, ``transforms.Spectrogram``. (Default: ``None``)
+        target_transform (callable, optional): A function/transform that takes in the
+            target and transforms it. (Default: ``None``)
         download (bool, optional): If true, downloads the dataset from the internet and
             puts it in root directory. If dataset is already downloaded, it is not
-            downloaded again.
-        transform (callable, optional): A function/transform that  takes in an raw audio
-            and returns a transformed version. E.g, ``transforms.Scale``
-        target_transform (callable, optional): A function/transform that takes in the
-            target and transforms it.
-        dev_mode(bool, optional): if true, clean up is not performed on downloaded
-            files.  Useful to keep raw audio and transcriptions.
+            downloaded again. (Default: ``True``)
+        dev_mode(bool, optional): If true, clean up is not performed on downloaded
+            files.  Useful to keep raw audio and transcriptions. (Default: ``False``)
     """
     raw_folder = 'vctk/raw'
     processed_folder = 'vctk/processed'
@@ -121,7 +122,8 @@ class VCTK(data.Dataset):
             index (int): Index
 
         Returns:
-            tuple: (image, target) where target is index of the target class.
+            Tuple[torch.Tensor, int]: The output tuple (image, target) where target
+            is index of the target class.
         """
         if self.cached_pt != index // self.chunk_size:
             self.cached_pt = int(index // self.chunk_size)
