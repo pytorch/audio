@@ -66,6 +66,8 @@ class Spectrogram(torch.jit.ScriptModule):
         return F.spectrogram(waveform, self.pad, self.window, self.n_fft, self.hop_length,
                              self.win_length, self.power, self.normalized)
 
+class SpectrogramDocs:
+    forward = Spectrogram().forward
 
 class SpectrogramToDB(torch.jit.ScriptModule):
     r"""Turns a spectrogram from the power/amplitude scale to the decibel scale.
