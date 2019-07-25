@@ -89,8 +89,8 @@ class SoxEffectsChain(object):
         r"""Append effect to a sox effects chain.
 
         Args:
-            ename (str) which is the name of effect
-            eopts (List[str]) which is a list of effect options. (Default: ``None``)
+            ename (str): which is the name of effect
+            eargs (List[str]): which is a list of effect options. (Default: ``None``)
         """
         e = SoxEffect()
         # check if we have a valid effect
