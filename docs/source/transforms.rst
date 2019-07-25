@@ -1,24 +1,50 @@
+.. role:: hidden
+    :class: hidden-section
+
 torchaudio.transforms
 ======================
 
 .. currentmodule:: torchaudio.transforms
 
-Transforms are common audio transforms. They can be chained together using :class:`Compose`
+Transforms are common audio transforms. They can be chained together using :class:`torch.nn.Sequential`
 
-.. autoclass:: Compose
 
-.. autoclass:: Scale
+:hidden:`Spectrogram`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: PadTrim
+.. autoclass:: Spectrogram
 
-.. autoclass:: DownmixMono
+:hidden:`SpectrogramToDB`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: LC2CL
+.. autoclass:: SpectrogramToDB
 
-.. autoclass:: MEL
+:hidden:`MelScale`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: BLC2CBL
+.. autoclass:: MelScale
+
+:hidden:`MelSpectrogram`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: MelSpectrogram
+
+:hidden:`MFCC`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: MFCC
+
+:hidden:`MuLawEncoding`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: MuLawEncoding
 
-.. autoclass:: MuLawExpanding
+:hidden:`MuLawDecoding`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: MuLawDecoding
+
+:hidden:`Resample`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Resample

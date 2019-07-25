@@ -36,7 +36,7 @@ def istft(stft_matrix,          # type: Tensor
           length=None           # type: Optional[int]
           ):
     # type: (...) -> Tensor
-    r""" Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.
+    r"""Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.
     It has the same parameters (+ additional optional parameter of ``length``) and it should return the
     least squares estimation of the original signal. The algorithm will check using the NOLA condition (
     nonzero overlap).
@@ -382,7 +382,7 @@ def angle(complex_tensor):
 
 
 def magphase(complex_tensor, power=1.):
-    r"""Separate a complex-valued spectrogram with shape (*,2) into its magnitude and phase.
+    r"""Separate a complex-valued spectrogram with shape `(*, 2)` into its magnitude and phase.
 
     Args:
         complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
@@ -401,12 +401,12 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     factor of `rate`.
 
     Args:
-        complex_specgrams (torch.Tensor): Size of (*, c, f, t, complex=2)
+        complex_specgrams (torch.Tensor): Size of `(*, c, f, t, complex=2)`
         rate (float): Speed-up factor
         phase_advance (torch.Tensor): Expected phase advance in each bin. Size of (f, 1)
 
     Returns:
-        complex_specgrams_stretch (torch.Tensor): Size of (*, c, f, ceil(t/rate), complex=2)
+        complex_specgrams_stretch (torch.Tensor): Size of `(*, c, f, ceil(t/rate), complex=2)`
 
     Example:
         >>> num_freqs, hop_length = 1025, 512
