@@ -14,7 +14,7 @@ Transforms are common audio transforms. They can be chained together using :clas
 
 .. autoclass:: Spectrogram
 
-  .. automethod:: SpectrogramDocs.forward
+  .. automethod:: torchaudio.hello.Spectrogram.forward
 
 :hidden:`SpectrogramToDB`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
