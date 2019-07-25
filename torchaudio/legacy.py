@@ -23,10 +23,10 @@ def load(filepath, out=None, normalization=None, num_frames=0, offset=0):
         offset (int, optional): Number of frames from the start of the file to begin data
             loading. (Default: ``0``)
 
-    Returns: Tuple[torch.Tensor, int]
-       - torch.Tensor: Output Tensor of size `[L x C]` where L is the number of audio frames, C is the number of
-       channels
-       - int: The sample-rate of the audio (as listed in the metadata of the file)
+    Returns:
+        Tuple[torch.Tensor, int]: The output tensor is of size `[L x C]` where L is the number of audio frames,
+        C is the number of channels. The integer is sample-rate of the audio (as listed in the metadata of
+        the file)
 
     Example::
 
