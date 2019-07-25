@@ -229,7 +229,7 @@ class MFCC(torch.jit.ScriptModule):
         sample_rate (int): Sample rate of audio signal. (Default: ``16000``)
         n_mfcc (int): Number of mfc coefficients to retain. (Default: ``40``)
         dct_type (int): type of DCT (discrete cosine transform) to use. (Default: ``2``)
-        norm (string, optional): norm to use. (Default: ``'ortho'``)
+        norm (str, optional): norm to use. (Default: ``'ortho'``)
         log_mels (bool): whether to use log-mel spectrograms instead of db-scaled. (Default:
             ``False``)
         melkwargs (dict, optional): arguments for MelSpectrogram. (Default: ``None``)
