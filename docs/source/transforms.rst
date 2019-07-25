@@ -14,39 +14,53 @@ Transforms are common audio transforms. They can be chained together using :clas
 
 .. autoclass:: Spectrogram
 
-  .. automethod:: torchaudio.hello.Spectrogram.forward
+  .. automethod:: torchaudio._docs.Spectrogram.forward
 
 :hidden:`SpectrogramToDB`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: SpectrogramToDB
 
+  .. automethod:: torchaudio._docs.SpectrogramToDB.forward
+
 :hidden:`MelScale`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: MelScale
+
+  .. automethod:: torchaudio._docs.MelScale.forward
 
 :hidden:`MelSpectrogram`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: MelSpectrogram
 
+  .. automethod:: torchaudio._docs.MelSpectrogram.forward
+
 :hidden:`MFCC`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: MFCC
+
+  .. automethod:: torchaudio._docs.MFCC.forward
 
 :hidden:`MuLawEncoding`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: MuLawEncoding
 
+  .. automethod:: torchaudio._docs.MuLawEncoding.forward
+
 :hidden:`MuLawDecoding`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: MuLawDecoding
 
+  .. automethod:: torchaudio._docs.MuLawDecoding.forward
+
 :hidden:`Resample`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Resample
+
+  .. automethod:: torchaudio._docs.Resample.forward

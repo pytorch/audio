@@ -8,7 +8,7 @@ import torchaudio
 
 
 def load(filepath, out=None, normalization=None, num_frames=0, offset=0):
-    """Loads an audio file from disk into a Tensor.  The default options have
+    r"""Loads an audio file from disk into a Tensor.  The default options have
     changed as of torchaudio 0.2 and this function maintains option defaults
     from version 0.1.
 
@@ -35,13 +35,12 @@ def load(filepath, out=None, normalization=None, num_frames=0, offset=0):
         torch.Size([278756, 2])
         >>> print(sample_rate)
         44100
-
     """
     return torchaudio.load(filepath, out, normalization, False, num_frames, offset)
 
 
 def save(filepath, src, sample_rate, precision=32):
-    """Saves a Tensor with audio signal to disk as a standard format like mp3, wav, etc.
+    r"""Saves a Tensor with audio signal to disk as a standard format like mp3, wav, etc.
     The default options have changed as of torchaudio 0.2 and this function maintains
     option defaults from version 0.1.
 
@@ -56,6 +55,5 @@ def save(filepath, src, sample_rate, precision=32):
 
         >>> data, sample_rate = torchaudio.legacy.load('foo.mp3')
         >>> torchaudio.legacy.save('foo.wav', data, sample_rate)
-
     """
     torchaudio.save(filepath, src, sample_rate, precision, False)

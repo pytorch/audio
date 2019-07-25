@@ -37,11 +37,11 @@ def _next_power_of_2(x):
 
 
 def _get_strided(waveform, window_size, window_shift, snip_edges):
-    r"""Given a waveform (1D tensor of size `num_samples`), it returns a 2D tensor (m, `window_size`)
+    r"""Given a waveform (1D tensor of size ``num_samples``), it returns a 2D tensor (m, ``window_size``)
     representing how the window is shifted along the waveform. Each row is a frame.
 
     Args:
-        waveform (torch.Tensor): Tensor of size `num_samples`
+        waveform (torch.Tensor): Tensor of size ``num_samples``
         window_size (int): Frame length
         window_shift (int): Frame shift
         snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit
@@ -49,7 +49,7 @@ def _get_strided(waveform, window_size, window_shift, snip_edges):
             depends only on the frame_shift, and we reflect the data at the ends.
 
     Returns:
-        torch.Tensor: 2D tensor of size (m, `window_size`) where each row is a frame
+        torch.Tensor: 2D tensor of size (m, ``window_size``) where each row is a frame
     """
     assert waveform.dim() == 1
     num_samples = waveform.size(0)
@@ -134,7 +134,7 @@ def _get_window(waveform, padded_window_size, window_size, window_shift, window_
     r"""Gets a window and its log energy
 
     Returns:
-        strided_input (torch.Tensor): size (m, `padded_window_size`)
+        strided_input (torch.Tensor): size (m, ``padded_window_size``)
         signal_log_energy (torch.Tensor): size (m)
     """
     # size (m, window_size)
@@ -191,33 +191,33 @@ def spectrogram(
 
     Args:
         waveform (torch.Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
-        blackman_coeff (float): Constant coefficient for generalized Blackman window. (Default: 0.42)
-        channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (Default: -1)
+        blackman_coeff (float): Constant coefficient for generalized Blackman window. (Default: ``0.42``)
+        channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (Default: ``-1``)
         dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
-            the energy_floor option, e.g. to 1.0 or 0.1 (Default: 1.0)
+            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``1.0``)
         energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
             this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
-            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (Default: 0.0)
-        frame_length (float): Frame length in milliseconds (Default: 25.0)
-        frame_shift (float): Frame shift in milliseconds (Default: 10.0)
-        min_duration (float): Minimum duration of segments to process (in seconds). (Default: 0.0)
-        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (Default: 0.97)
-        raw_energy (bool): If True, compute energy before preemphasis and windowing (Default: True)
-        remove_dc_offset: Subtract mean from waveform on each frame (Default: True)
+            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (Default: ``0.0``)
+        frame_length (float): Frame length in milliseconds (Default: ``25.0``)
+        frame_shift (float): Frame shift in milliseconds (Default: ``10.0``)
+        min_duration (float): Minimum duration of segments to process (in seconds). (Default: ``0.0``)
+        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (Default: ``0.97``)
+        raw_energy (bool): If True, compute energy before preemphasis and windowing (Default: ``True``)
+        remove_dc_offset: Subtract mean from waveform on each frame (Default: ``True``)
         round_to_power_of_two (bool): If True, round window size to power of two by zero-padding input
-            to FFT. (Default: True)
+            to FFT. (Default: ``True``)
         sample_frequency (float): Waveform data sample frequency (must match the waveform file, if
-            specified there) (Default: 16000.0)
+            specified there) (Default: ``16000.0``)
         snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit
             in the file, and the number of frames depends on the frame_length.  If False, the number of frames
-            depends only on the frame_shift, and we reflect the data at the ends. (Default: True)
+            depends only on the frame_shift, and we reflect the data at the ends. (Default: ``True``)
         subtract_mean (bool): Subtract mean of each feature file [CMS]; not recommended to do
-            it this way.  (Default: False)
-        window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (Default: 'povey')
+            it this way.  (Default: ``False``)
+        window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (Default: ``'povey'``)
 
     Returns:
         torch.Tensor: A spectrogram identical to what Kaldi would output. The shape is
-        (m, `padded_window_size` // 2 + 1) where m is calculated in _get_strided
+        (m, ``padded_window_size`` // 2 + 1) where m is calculated in _get_strided
     """
     waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
         waveform, channel, sample_frequency, frame_shift, frame_length, round_to_power_of_two, preemphasis_coefficient)
@@ -343,7 +343,7 @@ def vtln_warp_mel_freq(vtln_low_cutoff, vtln_high_cutoff, low_freq, high_freq,
         mel_freq (torch.Tensor): Given frequency in Mel
 
     Returns:
-        torch.Tensor: `mel_freq` after vtln warp
+        torch.Tensor: ``mel_freq`` after vtln warp
     """
     return mel_scale(vtln_warp_freq(vtln_low_cutoff, vtln_high_cutoff, low_freq, high_freq,
                                     vtln_warp_factor, inverse_mel_scale(mel_freq)))
@@ -354,9 +354,9 @@ def get_mel_banks(num_bins, window_length_padded, sample_freq,
     # type: (int, int, float, float, float, float, float)
     """
     Returns:
-        Tuple[torch.Tensor, torch.Tensor]: The tuple consists of `bins` (which is
-        Melbank of size (`num_bins`, `num_fft_bins`)) and `center_freqs` (which is
-        Center frequencies of bins of size (`num_bins`)).
+        Tuple[torch.Tensor, torch.Tensor]: The tuple consists of ``bins`` (which is
+        melbank of size (``num_bins``, ``num_fft_bins``)) and ``center_freqs`` (which is
+        center frequencies of bins of size (``num_bins``)).
     """
     assert num_bins > 3, 'Must have at least 3 mel bins'
     assert window_length_padded % 2 == 0
@@ -430,44 +430,44 @@ def fbank(
 
     Args:
         waveform (torch.Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
-        blackman_coeff (float): Constant coefficient for generalized Blackman window. (Default: 0.42)
-        channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (Default: -1)
+        blackman_coeff (float): Constant coefficient for generalized Blackman window. (Default: ``0.42``)
+        channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (Default: ``-1``)
         dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
-            the energy_floor option, e.g. to 1.0 or 0.1 (Default: 1.0)
+            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``1.0``)
         energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
             this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
-            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (Default: 0.0)
-        frame_length (float): Frame length in milliseconds (Default: 25.0)
-        frame_shift (float): Frame shift in milliseconds (Default: 10.0)
-        high_freq (float): High cutoff frequency for mel bins (if <= 0, offset from Nyquist) (Default: 0.0)
+            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (Default: ``0.0``)
+        frame_length (float): Frame length in milliseconds (Default: ``25.0``)
+        frame_shift (float): Frame shift in milliseconds (Default: ``10.0``)
+        high_freq (float): High cutoff frequency for mel bins (if <= 0, offset from Nyquist) (Default: ``0.0``)
         htk_compat (bool): If true, put energy last.  Warning: not sufficient to get HTK compatible features (need
-            to change other parameters). (Default: False)
-        low_freq (float): Low cutoff frequency for mel bins (Default: 20.0)
-        min_duration (float): Minimum duration of segments to process (in seconds). (Default: 0.0)
-        num_mel_bins (int): Number of triangular mel-frequency bins (Default: 23)
-        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (Default: 0.97)
-        raw_energy (bool): If True, compute energy before preemphasis and windowing (Default: True)
-        remove_dc_offset: Subtract mean from waveform on each frame (Default: True)
+            to change other parameters). (Default: ``False``)
+        low_freq (float): Low cutoff frequency for mel bins (Default: ``20.0``)
+        min_duration (float): Minimum duration of segments to process (in seconds). (Default: ``0.0``)
+        num_mel_bins (int): Number of triangular mel-frequency bins (Default: ``23``)
+        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (Default: ``0.97``)
+        raw_energy (bool): If True, compute energy before preemphasis and windowing (Default: ``True``)
+        remove_dc_offset: Subtract mean from waveform on each frame (Default: ``True``)
         round_to_power_of_two (bool): If True, round window size to power of two by zero-padding input
-            to FFT. (Default: True)
+            to FFT. (Default: ``True``)
         sample_frequency (float): Waveform data sample frequency (must match the waveform file, if
-            specified there) (Default: 16000.0)
+            specified there) (Default: ``16000.0``)
         snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit
             in the file, and the number of frames depends on the frame_length.  If False, the number of frames
-            depends only on the frame_shift, and we reflect the data at the ends. (Default: True)
+            depends only on the frame_shift, and we reflect the data at the ends. (Default: ``True``)
         subtract_mean (bool): Subtract mean of each feature file [CMS]; not recommended to do
-            it this way.  (Default: False)
-        use_energy (bool): Add an extra dimension with energy to the FBANK output. (Default: False)
-        use_log_fbank (bool):If true, produce log-filterbank, else produce linear. (Default: True)
-        use_power (bool): If true, use power, else use magnitude. (Default: True)
+            it this way.  (Default: ``False``)
+        use_energy (bool): Add an extra dimension with energy to the FBANK output. (Default: ``False``)
+        use_log_fbank (bool):If true, produce log-filterbank, else produce linear. (Default: ``True``)
+        use_power (bool): If true, use power, else use magnitude. (Default: ``True``)
         vtln_high (float): High inflection point in piecewise linear VTLN warping function (if
-            negative, offset from high-mel-freq (Default: -500.0)
-        vtln_low (float): Low inflection point in piecewise linear VTLN warping function (Default: 100.0)
-        vtln_warp (float): Vtln warp factor (only applicable if vtln_map not specified) (Default: 1.0)
-        window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (Default: 'povey')
+            negative, offset from high-mel-freq (Default: ``-500.0``)
+        vtln_low (float): Low inflection point in piecewise linear VTLN warping function (Default: ``100.0``)
+        vtln_warp (float): Vtln warp factor (only applicable if vtln_map not specified) (Default: ``1.0``)
+        window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (Default: ``'povey'``)
 
     Returns:
-        torch.Tensor: A fbank identical to what Kaldi would output. The shape is (m, `num_mel_bins` + `use_energy`)
+        torch.Tensor: A fbank identical to what Kaldi would output. The shape is (m, ``num_mel_bins + use_energy``)
         where m is calculated in _get_strided
     """
     waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
@@ -523,7 +523,7 @@ def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, win
     r"""Based on LinearResample::SetIndexesAndWeights where it retrieves the weights for
     resampling as well as the indices in which they are valid. LinearResample (LR) means
     that the output signal is at linearly spaced intervals (i.e the output signal has a
-    frequency of `new_freq`). It uses sinc/bandlimited interpolation to upsample/downsample
+    frequency of ``new_freq``). It uses sinc/bandlimited interpolation to upsample/downsample
     the signal.
 
     The reason why the same filter is not used for multiple convolutions is because the
@@ -541,7 +541,7 @@ def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, win
     assuming the center of the sinc function is at 0, 16, and 32 (the deltas [..., 6, 1, 4, ....]
     for 16 vs [...., 2, 3, ....] for 32)
 
-    Example, one case is when the orig_freq and new_freq are multiples of each other then
+    Example, one case is when the ``orig_freq`` and ``new_freq`` are multiples of each other then
     there needs to be one filter.
 
     A windowed filter function (i.e. Hanning * sinc) because the ideal case of sinc function
@@ -562,9 +562,9 @@ def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, win
             efficient. We suggest around 4 to 10 for normal use
 
     Returns:
-        Tuple[torch.Tensor, torch.Tensor]: A tuple of `min_input_index` (which is the minimum indices
-        where the window is valid, size (`output_samples_in_unit`)) and `weights` (which is the weights
-        which correspond with min_input_index, size (`output_samples_in_unit`, `max_weight_width`)).
+        Tuple[torch.Tensor, torch.Tensor]: A tuple of ``min_input_index`` (which is the minimum indices
+        where the window is valid, size (``output_samples_in_unit``)) and ``weights`` (which is the weights
+        which correspond with min_input_index, size (``output_samples_in_unit``, ``max_weight_width``)).
     """
     assert lowpass_cutoff < min(orig_freq, new_freq) / 2
     output_t = torch.arange(0, output_samples_in_unit, dtype=torch.get_default_dtype()) / new_freq
@@ -606,7 +606,7 @@ def _lcm(a, b):
 def _get_num_LR_output_samples(input_num_samp, samp_rate_in, samp_rate_out):
     r"""Based on LinearResample::GetNumOutputSamples. LinearResample (LR) means that
     the output signal is at linearly spaced intervals (i.e the output signal has a
-    frequency of `new_freq`). It uses sinc/bandlimited interpolation to upsample/downsample
+    frequency of ``new_freq``). It uses sinc/bandlimited interpolation to upsample/downsample
     the signal.
 
     Args:
@@ -651,7 +651,7 @@ def resample_waveform(waveform, orig_freq, new_freq, lowpass_filter_width=6):
     r"""Resamples the waveform at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
     a signal). LinearResample (LR) means that the output signal is at linearly spaced intervals (i.e
-    the output signal has a frequency of `new_freq`). It uses sinc/bandlimited interpolation to
+    the output signal has a frequency of ``new_freq``). It uses sinc/bandlimited interpolation to
     upsample/downsample the signal.
 
     https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html
@@ -662,10 +662,10 @@ def resample_waveform(waveform, orig_freq, new_freq, lowpass_filter_width=6):
         orig_freq (float): The original frequency of the signal
         new_freq (float): The desired frequency
         lowpass_filter_width (int): Controls the sharpness of the filter, more == sharper
-            but less efficient. We suggest around 4 to 10 for normal use. (Default: 6)
+            but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
 
     Returns:
-        torch.Tensor: The signal at the new frequency
+        torch.Tensor: The waveform at the new frequency
     """
     assert waveform.dim() == 2
     assert orig_freq > 0.0 and new_freq > 0.0

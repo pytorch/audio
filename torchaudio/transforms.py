@@ -341,11 +341,11 @@ class Resample(torch.nn.Module):
     be given.
 
     Args:
-        orig_freq (float): The original frequency of the signal
-        new_freq (float): The desired frequency
+        orig_freq (float): The original frequency of the signal. (Default: ``16000``)
+        new_freq (float): The desired frequency. (Default: ``16000``)
         resampling_method (str): The resampling method (Default: ``'sinc_interpolation'``)
     """
-    def __init__(self, orig_freq, new_freq, resampling_method='sinc_interpolation'):
+    def __init__(self, orig_freq=16000, new_freq=16000, resampling_method='sinc_interpolation'):
         super(Resample, self).__init__()
         self.orig_freq = orig_freq
         self.new_freq = new_freq
