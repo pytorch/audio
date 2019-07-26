@@ -69,7 +69,7 @@ Torchaudio is standardized around the following naming conventions.
 * mel_specgram: a mel spectrogram with dimensions (channel, freq, time)
 * hop_length: the number of samples between the starts of consecutive frames
 * n_fft: the number of Fourier bins
-* n_mfcc, n_mel: the number of mel and MFCC bins,
+* n_mfcc, n_mel: the number of mel and MFCC bins
 * n_freq: the number of bins in a linear spectrogram
 * min_freq: the lowest frequency of the lowest band in a spectrogram
 * max_freq: the highest frequency of the highest band in a spectrogram
