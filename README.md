@@ -13,7 +13,7 @@ torchaudio: an audio library for PyTorch
 - Common audio transforms
     - [Spectrogram, SpectrogramToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/transforms.html)
 - Compliance interfaces: Run code using PyTorch that align with other libraries
-    - [Kaldi: 'fbank', 'spectrogram', 'resample_waveform'](https://pytorch.org/audio/compliance.kaldi.html)
+    - [Kaldi: fbank, spectrogram, resample_waveform](https://pytorch.org/audio/compliance.kaldi.html)
 
 Dependencies
 ------------
