@@ -109,9 +109,9 @@ class SpectrogramToDB(torch.jit.ScriptModule):
 
 class MelScale(torch.jit.ScriptModule):
     r"""This turns a normal STFT into a mel frequency STFT, using a conversion
-       matrix.  This uses triangular filter banks.
+    matrix.  This uses triangular filter banks.
 
-       User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).
+    User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).
 
     Args:
         n_mels (int): Number of mel filterbanks. (Default: ``128``)
