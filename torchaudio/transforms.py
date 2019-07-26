@@ -56,10 +56,10 @@ class Spectrogram(torch.jit.ScriptModule):
     def forward(self, waveform):
         r"""
         Args:
-            waveform (torch.Tensor): Tensor of audio of size (channels, time)
+            waveform (torch.Tensor): Tensor of audio of size (channel, time)
 
         Returns:
-            torch.Tensor: Size (channels, frequency, time), where channels
+            torch.Tensor: Size (channel, frequency, time), where channel
             is unchanged, frequency is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
             Fourier bins, and time is the number of window hops (n_frames).
         """
@@ -138,10 +138,10 @@ class MelScale(torch.jit.ScriptModule):
     def forward(self, specgram):
         r"""
         Args:
-            specgram (torch.Tensor): A spectrogram STFT of size (channels, frequency, time)
+            specgram (torch.Tensor): A spectrogram STFT of size (channel, frequency, time)
 
         Returns:
-            torch.Tensor: Mel frequency spectrogram of size (channels, ``n_mels``, time)
+            torch.Tensor: Mel frequency spectrogram of size (channel, ``n_mels``, time)
         """
         if self.fb.numel() == 0:
             tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max, self.n_mels)
@@ -149,8 +149,8 @@ class MelScale(torch.jit.ScriptModule):
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)
 
-        # (channels, frequency, time).transpose(...) dot (frequency, n_mels)
-        # -> (channels, time, n_mels).transpose(...)
+        # (channel, frequency, time).transpose(...) dot (frequency, n_mels)
+        # -> (channel, time, n_mels).transpose(...)
         mel_specgram = torch.matmul(specgram.transpose(1, 2), self.fb).transpose(1, 2)
         return mel_specgram
 
@@ -180,7 +180,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-        >>> mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (channels, n_mels, time)
+        >>> mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (channel, n_mels, time)
     """
     __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min']
 
@@ -205,10 +205,10 @@ class MelSpectrogram(torch.jit.ScriptModule):
     def forward(self, waveform):
         r"""
         Args:
-            waveform (torch.Tensor): Tensor of audio of size (channels, time)
+            waveform (torch.Tensor): Tensor of audio of size (channel, time)
 
         Returns:
-            torch.Tensor: Mel frequency spectrogram of size (channels, ``n_mels``, time)
+            torch.Tensor: Mel frequency spectrogram of size (channel, ``n_mels``, time)
         """
         specgram = self.spectrogram(waveform)
         mel_specgram = self.mel_scale(specgram)
@@ -265,10 +265,10 @@ class MFCC(torch.jit.ScriptModule):
     def forward(self, waveform):
         r"""
         Args:
-            waveform (torch.Tensor): Tensor of audio of size (channels, time)
+            waveform (torch.Tensor): Tensor of audio of size (channel, time)
 
         Returns:
-            torch.Tensor: specgram_mel_db of size (channels, ``n_mfcc``, time)
+            torch.Tensor: specgram_mel_db of size (channel, ``n_mfcc``, time)
         """
         mel_specgram = self.MelSpectrogram(waveform)
         if self.log_mels:
@@ -276,8 +276,8 @@ class MFCC(torch.jit.ScriptModule):
             mel_specgram = torch.log(mel_specgram + log_offset)
         else:
             mel_specgram = self.amplitude_to_DB(mel_specgram)
-        # (channels, n_mels, time).tranpose(...) dot (n_mels, n_mfcc)
-        # -> (channels, time, n_mfcc).tranpose(...)
+        # (channel, n_mels, time).tranpose(...) dot (n_mels, n_mfcc)
+        # -> (channel, time, n_mfcc).tranpose(...)
         mfcc = torch.matmul(mel_specgram.transpose(1, 2), self.dct_mat).transpose(1, 2)
         return mfcc
 
@@ -356,10 +356,10 @@ class Resample(torch.nn.Module):
     def forward(self, waveform):
         r"""
         Args:
-            waveform (torch.Tensor): The input signal of size (channels, time)
+            waveform (torch.Tensor): The input signal of size (channel, time)
 
         Returns:
-            torch.Tensor: Output signal of size (channels, time)
+            torch.Tensor: Output signal of size (channel, time)
         """
         if self.resampling_method == 'sinc_interpolation':
             return kaldi.resample_waveform(waveform, self.orig_freq, self.new_freq)

@@ -177,7 +177,7 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
     r"""Create a spectrogram from a raw audio signal.
 
     Args:
-        waveform (torch.Tensor): Tensor of audio of size (channels, time)
+        waveform (torch.Tensor): Tensor of audio of size (channel, time)
         pad (int): Two sided padding of signal
         window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of fft
@@ -188,7 +188,7 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
         normalized (bool): Whether to normalize by magnitude after stft
 
     Returns:
-        torch.Tensor: Size (channels, frequency, time), where channels
+        torch.Tensor: Size (channel, frequency, time), where channel
         is unchanged, frequency is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frames).
     """
@@ -403,13 +403,13 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     factor of ``rate``.
 
     Args:
-        complex_specgrams (torch.Tensor): Size of `(*, channels, frequency, time, complex=2)`
+        complex_specgrams (torch.Tensor): Size of `(*, channel, frequency, time, complex=2)`
         rate (float): Speed-up factor
         phase_advance (torch.Tensor): Expected phase advance in each bin. Size
             of (frequency, 1)
 
     Returns:
-        complex_specgrams_stretch (torch.Tensor): Size of `(*, channels,
+        complex_specgrams_stretch (torch.Tensor): Size of `(*, channel,
         frequency, ceil(time/rate), complex=2)`
 
     Example
