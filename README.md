@@ -78,15 +78,11 @@ Torchaudio is standardized around the following naming conventions.
 
 Transforms expect the following dimensions. In particular, the input of all transforms and functions assumes channel first.
 
-* Spectrogram: (channel, time) -> (channel, freq, time, complex)
-* AmplitudeToDB: (channel, freq, time, complex) -> (channel, freq, time, complex)
+* Spectrogram: (channel, time) -> (channel, freq, time)
+* AmplitudeToDB: (channel, freq, time) -> (channel, freq, time)
 * MelScale: (channel, time) -> (channel, mel, time)
-* MelSpectrogram: (channel, time) -> (channel, mel, time, complex)
+* MelSpectrogram: (channel, time) -> (channel, mel, time)
 * MFCC: (channel, time) -> (channel, mfcc, time)
 * MuLawEncode: (channel, time) -> (channel, time)
 * MuLawDecode: (channel, time) -> (channel, time)
 * Resample: (channel, time) -> (channel, time)
-* STFT: (channel, time, complex) -> (channel, freq, time, complex)
-* ISTFT: (channel, freq, time, complex) -> (channel, time, complex)
-
-where complex refers to the 2 dimensions required to represent a complex number using real numbers.
