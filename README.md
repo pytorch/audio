@@ -89,4 +89,4 @@ Transforms expect the following shapes. In particular, the input of all transfor
 
 A spectrogram can be converted to DB scale or Mel scale, using AmplitudeToDB and AmplitudeToMel.
 
-The Kaldi compliance interface follow Kaldi's interface.
+The Kaldi compliance interface follows Kaldi's interface.
