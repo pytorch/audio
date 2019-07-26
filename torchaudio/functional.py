@@ -36,7 +36,7 @@ def istft(stft_matrix,          # type: Tensor
           length=None           # type: Optional[int]
           ):
     # type: (...) -> Tensor
-    r""" Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.
+    r"""Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.
     It has the same parameters (+ additional optional parameter of ``length``) and it should return the
     least squares estimation of the original signal. The algorithm will check using the NOLA condition (
     nonzero overlap).
@@ -46,7 +46,7 @@ def istft(stft_matrix,          # type: Tensor
     :math:`\sum_{t=-\infty}^{\infty} w^2[n-t\times hop\_length] \cancel{=} 0`.
 
     Since stft discards elements at the end of the signal if they do not fit in a frame, the
-    istft may return a shorter signal than the original signal (can occur if `center` is False
+    istft may return a shorter signal than the original signal (can occur if ``center`` is False
     since the signal isn't padded).
 
     If ``center`` is True, then there will be padding e.g. 'constant', 'reflect', etc. Left padding
@@ -75,10 +75,12 @@ def istft(stft_matrix,          # type: Tensor
         window (Optional[torch.Tensor]): The optional window function.
             (Default: ``torch.ones(win_length)``)
         center (bool): Whether ``input`` was padded on both sides so
-            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`
-        pad_mode (str): Controls the padding method used when ``center`` is ``True``
-        normalized (bool): Whether the STFT was normalized
-        onesided (bool): Whether the STFT is onesided
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            (Default: ``True``)
+        pad_mode (str): Controls the padding method used when ``center`` is True. (Default:
+            ``'reflect'``)
+        normalized (bool): Whether the STFT was normalized. (Default: ``False``)
+        onesided (bool): Whether the STFT is onesided. (Default: ``True``)
         length (Optional[int]): The amount to trim the signal by (i.e. the
             original signal length). (Default: whole signal)
 
@@ -187,8 +189,8 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
 
     Returns:
         torch.Tensor: Size (channels, frequency, time), where channels
-        is unchanged, frequency is `n_fft // 2 + 1` where `n_fft` is the number of
-        fourier bins, and time is the number of window hops (n_frames).
+        is unchanged, frequency is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
+        Fourier bins, and time is the number of window hops (n_frames).
     """
     assert waveform.dim() == 2
 
@@ -221,7 +223,7 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
         amin (float): Number to clamp ``x``
         db_multiplier (float): Log10(max(reference value and amin))
         top_db (Optional[float]): Minimum negative cut-off in decibels. A reasonable number
-            is 80.
+            is 80. (Default: ``None``)
 
     Returns:
         torch.Tensor: Output tensor in decibel scale
@@ -249,11 +251,11 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
         n_mels (int): Number of mel filterbanks
 
     Returns:
-        torch.Tensor: Triangular filter banks (fb matrix) of size (`n_freqs`, `n_mels`)
+        torch.Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)
         meaning number of frequencies to highlight/apply to x the number of filterbanks.
         Each column is a filterbank so that assuming there is a matrix A of
-        size (..., `n_freqs`), the applied result would be
-        `A * create_fb_matrix(A.size(-1), ...)`.
+        size (..., ``n_freqs``), the applied result would be
+        ``A * create_fb_matrix(A.size(-1), ...)``.
     """
     # freq bins
     freqs = torch.linspace(f_min, f_max, n_freqs)
@@ -278,7 +280,7 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
 @torch.jit.script
 def create_dct(n_mfcc, n_mels, norm):
     # type: (int, int, Optional[str]) -> Tensor
-    r"""Creates a DCT transformation matrix with shape (`n_mels`, `n_mfcc`),
+    r"""Creates a DCT transformation matrix with shape (``n_mels``, ``n_mfcc``),
     normalized depending on norm.
 
     Args:
@@ -288,7 +290,7 @@ def create_dct(n_mfcc, n_mels, norm):
 
     Returns:
         torch.Tensor: The transformation matrix, to be right-multiplied to
-        row-wise data of size (`n_mels`, `n_mfcc`).
+        row-wise data of size (``n_mels``, ``n_mfcc``).
     """
     # http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-II
     n = torch.arange(float(n_mels))
@@ -317,7 +319,7 @@ def mu_law_encoding(x, quantization_channels):
         quantization_channels (int): Number of channels
 
     Returns:
-        torch.Tensor: Input after mu-law companding
+        torch.Tensor: Input after mu-law encoding
     """
     mu = quantization_channels - 1.
     if not x.is_floating_point():
@@ -343,7 +345,7 @@ def mu_law_decoding(x_mu, quantization_channels):
         quantization_channels (int): Number of channels
 
     Returns:
-        torch.Tensor: Input after decoding
+        torch.Tensor: Input after mu-law decoding
     """
     mu = quantization_channels - 1.
     if not x_mu.is_floating_point():
@@ -382,14 +384,14 @@ def angle(complex_tensor):
 
 
 def magphase(complex_tensor, power=1.):
-    r"""Separate a complex-valued spectrogram with shape (*,2) into its magnitude and phase.
+    r"""Separate a complex-valued spectrogram with shape `(*, 2)` into its magnitude and phase.
 
     Args:
         complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
         power (float): Power of the norm. (Default: `1.0`)
 
     Returns:
-        Tuple[torch.Tensor, torch.Tensor]: The magnitude and phase of the complex_tensor
+        Tuple[torch.Tensor, torch.Tensor]: The magnitude and phase of the complex tensor
     """
     mag = complex_norm(complex_tensor, power)
     phase = angle(complex_tensor)
@@ -398,19 +400,19 @@ def magphase(complex_tensor, power=1.):
 
 def phase_vocoder(complex_specgrams, rate, phase_advance):
     r"""Given a STFT tensor, speed up in time without modifying pitch by a
-    factor of `rate`.
+    factor of ``rate``.
 
     Args:
-        complex_specgrams (torch.Tensor): Size of (*, channels, frequency, time, complex=2)
+        complex_specgrams (torch.Tensor): Size of `(*, channels, frequency, time, complex=2)`
         rate (float): Speed-up factor
         phase_advance (torch.Tensor): Expected phase advance in each bin. Size
             of (frequency, 1)
 
     Returns:
-        complex_specgrams_stretch (torch.Tensor): Size of (*, channels,
-        frequency, ceil(time/rate), complex=2)
+        complex_specgrams_stretch (torch.Tensor): Size of `(*, channels,
+        frequency, ceil(time/rate), complex=2)`
 
-    Example:
+    Example
         >>> num_freqs, hop_length = 1025, 512
         >>> # (batch, channel, num_freqs, time, complex=2)
         >>> complex_specgrams = torch.randn(16, 1, num_freqs, 300, 2)
