@@ -61,12 +61,12 @@ API Reference is located here: http://pytorch.org/audio/
 Conventions
 -----------
 
-Torchaudio is standardized around the following conventions. The following variables are used with their corresponding definitions.
+Torchaudio is standardized around the following naming conventions.
 
 * waveform: a tensor of audio samples with shape (channels, time)
 * sample_rate: the rate of audio samples (samples per second)
-* specgram: a tensor of spectrogram with shape (channels, frequency, time)
-* mel_specgram: a mel spectrogram with shape (channels, frequency, time)
+* specgram: a tensor of spectrogram with shape (channels, time)
+* mel_specgram: a mel spectrogram with shape (channels, time)
 * hop_length: the number of samples between the starts of consecutive frames
 * n_freqs: the number of bins in a linear spectrogram
 * min_freq: the lowest frequency of the lowest band in a spectrogram
@@ -76,8 +76,17 @@ Torchaudio is standardized around the following conventions. The following varia
 * win_length: the length of the STFT window
 * window_fn: for functions that creates windows e.g. torch.hann_window
 
-A spectrogram can be converted to DB scale or Mel scale, using AmplitudeToDB and AmplitudetoMel.
+Transforms expect the following shapes. In particular, the input of all transforms and functions assumes channel first.
 
-The input (Spectrogram, MFCC, MelSpectrogram, Resample, etc.) of all transforms and functions assumes channel first. The output of STFT is (channel, frequency, time, 2).
+* Spectrogram: (channel, time) -> (channel, frequency, time, 2)
+* MelScale: (channel, time) -> (channel, n_mels, time)
+* MFCC: (channel, time) -> (channel, n_mfcc, time)
+* MuLawEncode: (channel, time) -> (channel, n_mulaw, time)
+* MuLawDecode: (channel, n_mulaw, time) -> (channel, time)
+* Resample: (channel, time) -> (channel, time)
+* STFT: (channel, time) -> (channel, frequency, time, 2).
+* ISTFT: (channel, frequency, time) -> (channel, time, 2).
+
+A spectrogram can be converted to DB scale or Mel scale, using AmplitudeToDB and AmplitudeToMel.
 
 The Kaldi compliance interface follow Kaldi's interface.
