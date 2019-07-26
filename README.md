@@ -79,6 +79,7 @@ Torchaudio is standardized around the following naming conventions.
 Transforms expect the following shapes. In particular, the input of all transforms and functions assumes channel first.
 
 * Spectrogram: (channel, time) -> (channel, frequency, time, 2)
+* AmplitudeToDB: (channel, frequency, time, 2) -> (channel, frequency, time, 2)
 * MelScale: (channel, time) -> (channel, n_mels, time)
 * MFCC: (channel, time) -> (channel, n_mfcc, time)
 * MuLawEncode: (channel, time) -> (channel, time)
@@ -86,7 +87,3 @@ Transforms expect the following shapes. In particular, the input of all transfor
 * Resample: (channel, time) -> (channel, time)
 * STFT: (channel, time, 2) -> (channel, frequency, time, 2).
 * ISTFT: (channel, frequency, time, 2) -> (channel, time, 2).
-
-A spectrogram can be converted to DB scale or Mel scale, using AmplitudeToDB and AmplitudeToMel.
-
-The Kaldi compliance interface follows Kaldi's interface, and provides access to: Kaldi's `fbank`, `spectrogram`, and `resample_waveform`.
