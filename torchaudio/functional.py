@@ -58,7 +58,7 @@ def istft(stft_matrix,          # type: Tensor
 
     The n_frames, hop_length, win_length are all the same which prevents the calculation of right padding.
     These additional values could be zeros or a reflection of the signal so providing ``length``
-    could be useful. If ``length`` is None then padding will be aggressively removed
+    could be useful. If ``length`` is ``None`` then padding will be aggressively removed
     (some loss of signal).
 
     [1] D. W. Griffin and J. S. Lim, “Signal estimation from modified short-time Fourier transform,”
