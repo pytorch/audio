@@ -5,7 +5,7 @@ import torch
 __all__ = [
     'istft',
     'spectrogram',
-    'spectrogram_to_DB',
+    'amplitude_to_DB',
     'create_fb_matrix',
     'create_dct',
     'mu_law_encoding',
@@ -209,34 +209,34 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
 
 
 @torch.jit.script
-def spectrogram_to_DB(specgram, multiplier, amin, db_multiplier, top_db=None):
+def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
     # type: (Tensor, float, float, float, Optional[float]) -> Tensor
-    r"""Turns a spectrogram from the power/amplitude scale to the decibel scale.
+    r"""Turns a tensor from the power/amplitude scale to the decibel scale.
 
-    This output depends on the maximum value in the input spectrogram, and so
+    This output depends on the maximum value in the input tensor, and so
     may return different values for an audio clip split into snippets vs. a
     a full clip.
 
     Args:
-        specgram (torch.Tensor): Normal STFT of size (c, f, t)
+        x (torch.Tensor): Input tensor before being converted to decibel scale
         multiplier (float): Use 10. for power and 20. for amplitude
-        amin (float): Number to clamp specgram
+        amin (float): Number to clamp ``x``
         db_multiplier (float): Log10(max(reference value and amin))
         top_db (Optional[float]): Minimum negative cut-off in decibels. A reasonable number
             is 80. (Default: ``None``)
 
     Returns:
-        torch.Tensor: Spectrogram in DB of size (c, f, t)
+        torch.Tensor: Output tensor in decibel scale
     """
-    specgram_db = multiplier * torch.log10(torch.clamp(specgram, min=amin))
-    specgram_db -= multiplier * db_multiplier
+    x_db = multiplier * torch.log10(torch.clamp(x, min=amin))
+    x_db -= multiplier * db_multiplier
 
     if top_db is not None:
-        new_spec_db_max = torch.tensor(float(specgram_db.max()) - top_db,
-                                       dtype=specgram_db.dtype, device=specgram_db.device)
-        specgram_db = torch.max(specgram_db, new_spec_db_max)
+        new_x_db_max = torch.tensor(float(x_db.max()) - top_db,
+                                    dtype=x_db.dtype, device=x_db.device)
+        x_db = torch.max(x_db, new_x_db_max)
 
-    return specgram_db
+    return x_db
 
 
 @torch.jit.script
