@@ -66,7 +66,7 @@ Torchaudio is standardized around the following naming conventions.
 * waveform: a tensor of audio samples with dimensions (channel, time)
 * sample_rate: the rate of audio dimensions (samples per second)
 * specgram: a tensor of spectrogram with dimensions (channel, freq, time)
-* mel_specgram: a mel spectrogram with dimensions (channel, freq, time)
+* mel_specgram: a mel spectrogram with dimensions (channel, mel, time)
 * hop_length: the number of samples between the starts of consecutive frames
 * n_fft: the number of Fourier bins
 * n_mfcc, n_mel: the number of mel and MFCC bins
