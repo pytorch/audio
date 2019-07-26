@@ -63,28 +63,28 @@ Conventions
 
 Torchaudio is standardized around the following naming conventions.
 
-* waveform: a tensor of audio samples with shape (channel, time)
-* sample_rate: the rate of audio samples (samples per second)
-* specgram: a tensor of spectrogram with shape (channel, n_freqs, time)
-* mel_specgram: a mel spectrogram with shape (channel, n_mels, time)
+* waveform: a tensor of audio samples with dimensions (channel, time)
+* sample_rate: the rate of audio dimensions (samples per second)
+* specgram: a tensor of spectrogram with dimensions (channel, freq, time)
+* mel_specgram: a mel spectrogram with dimensions (channel, freq, time)
 * hop_length: the number of samples between the starts of consecutive frames
-* n_freqs: the number of bins in a linear spectrogram
+* n_fft: the number of Fourier bins
+* n_mfcc, n_mel: the number of mel and MFCC bins,
+* n_freq: the number of bins in a linear spectrogram
 * min_freq: the lowest frequency of the lowest band in a spectrogram
 * max_freq: the highest frequency of the highest band in a spectrogram
-* n_fft: the number of Fourier bins
-* n_mfcc, n_mels: to be consistent with other similarly named variables, with shape (channel, n_mfcc, time) and (channel, n_mels, time)
 * win_length: the length of the STFT window
 * window_fn: for functions that creates windows e.g. torch.hann_window
 
-Transforms expect the following shapes. In particular, the input of all transforms and functions assumes channel first.
+Transforms expect the following dimensions. In particular, the input of all transforms and functions assumes channel first.
 
-* Spectrogram: (channel, time) -> (channel, n_freqs, time, 2)
-* AmplitudeToDB: (channel, n_freqs, time, 2) -> (channel, n_freqs, time, 2)
-* MelScale: (channel, time) -> (channel, n_mels, time)
-* MelSpectrogram: (channel, time) -> (channel, n_mels, time, 2)
-* MFCC: (channel, time) -> (channel, n_mfcc, time)
+* Spectrogram: (channel, time) -> (channel, freq, time, 2)
+* AmplitudeToDB: (channel, freq, time, 2) -> (channel, freq, time, 2)
+* MelScale: (channel, time) -> (channel, mel, time)
+* MelSpectrogram: (channel, time) -> (channel, mel, time, 2)
+* MFCC: (channel, time) -> (channel, mfcc, time)
 * MuLawEncode: (channel, time) -> (channel, time)
 * MuLawDecode: (channel, time) -> (channel, time)
 * Resample: (channel, time) -> (channel, time)
-* STFT: (channel, time, 2) -> (channel, n_freqs, time, 2).
-* ISTFT: (channel, n_freqs, time, 2) -> (channel, time, 2).
+* STFT: (channel, time, 2) -> (channel, freq, time, 2)
+* ISTFT: (channel, freq, time, 2) -> (channel, time, 2)
