@@ -28,7 +28,7 @@ def load(filepath, out=None, normalization=None, num_frames=0, offset=0):
         C is the number of channels. The integer is sample-rate of the audio (as listed in the metadata of
         the file)
 
-    Example::
+    Example
         >>> data, sample_rate = torchaudio.legacy.load('foo.mp3')
         >>> print(data.size())
         torch.Size([278756, 2])
@@ -50,7 +50,7 @@ def save(filepath, src, sample_rate, precision=32):
         sample_rate (int): The sample-rate of the audio to be saved
         precision (int, optional): The bit-precision of the audio to be saved. (Default: ``32``)
 
-    Example::
+    Example
         >>> data, sample_rate = torchaudio.legacy.load('foo.mp3')
         >>> torchaudio.legacy.save('foo.wav', data, sample_rate)
     """

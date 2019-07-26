@@ -410,7 +410,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     Returns:
         torch.Tensor: complex_specgrams_stretch, size of `(*, c, f, ceil(t/rate), complex=2)`
 
-    Example::
+    Example
         >>> num_freqs, hop_length = 1025, 512
         >>> # (batch, channel, num_freqs, time, complex=2)
         >>> complex_specgrams = torch.randn(16, 1, num_freqs, 300, 2)

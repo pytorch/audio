@@ -158,7 +158,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
     r"""Create MelSpectrogram for a raw audio signal. This is a composition of Spectrogram
     and MelScale.
 
-    Sources:
+    Sources
         * https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe
         * https://timsainb.github.io/spectrograms-mfccs-and-inversion-in-python.html
         * http://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html
@@ -177,7 +177,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
 
-    Example::
+    Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
         >>> mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (c, n_mels, t)
     """

@@ -51,7 +51,7 @@ def load(filepath,
         of audio frames and C is the number of channels. An integer which is the sample rate of the
         audio (as listed in the metadata of the file)
 
-    Example::
+    Example
         >>> data, sample_rate = torchaudio.load('foo.mp3')
         >>> print(data.size())
         torch.Size([2, 278756])
@@ -152,7 +152,7 @@ def save_encinfo(filepath,
         filetype (str, optional): A filetype or extension to be set if sox cannot determine it
             automatically. (Default: ``None``)
 
-    Example::
+    Example
         >>> data, sample_rate = torchaudio.load('foo.mp3')
         >>> torchaudio.save('foo.wav', data, sample_rate)
 
@@ -211,7 +211,7 @@ def info(filepath):
         Tuple[sox_signalinfo_t, sox_encodinginfo_t]: A si (sox_signalinfo_t) signal
         info as a python object. An ei (sox_encodinginfo_t) encoding info
 
-     Example::
+     Example
          >>> si, ei = torchaudio.info('foo.wav')
          >>> rate, channels, encoding = si.rate, si.channels, ei.encoding
      """
@@ -230,7 +230,7 @@ def sox_signalinfo_t():
         - length (int), length of audio in samples * channels, 0 for unspecified and -1 for unknown
         - mult (float, optional), headroom multiplier for effects and ``None`` for no multiplier
 
-    Example::
+    Example
         >>> si = torchaudio.sox_signalinfo_t()
         >>> si.channels = 1
         >>> si.rate = 16000.
@@ -258,7 +258,7 @@ def sox_encodinginfo_t():
         - reverse_bits (sox_option_t), reverse bytes, use sox_option_default
         - opposite_endian (sox_bool), change endianness, use sox_false
 
-    Example::
+    Example
         >>> ei = torchaudio.sox_encodinginfo_t()
         >>> ei.encoding = torchaudio.get_sox_encoding_t(1)
         >>> ei.bits_per_sample = 16

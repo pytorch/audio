@@ -10,7 +10,7 @@ def effect_names():
 
     Returns: list[str]
 
-    Example::
+    Example
         >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
     """
     return _torch_sox.get_effect_names()
@@ -47,7 +47,7 @@ class SoxEffectsChain(object):
         of audio frames and C is the number of channels. An integer which is the sample rate of the
         audio (as listed in the metadata of the file)
 
-    Example::
+    Example
         >>> class MyDataset(Dataset):
         >>>     def __init__(self, audiodir_path):
         >>>         self.data = [os.path.join(audiodir_path, fn) for fn in os.listdir(audiodir_path)]
