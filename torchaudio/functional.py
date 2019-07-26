@@ -224,7 +224,7 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
             is 80.
 
     Returns:
-        torch.Tensor: Spectrogram in DB of size (c, f, t)
+        torch.Tensor: Output tensor in decibel scale
     """
     x_db = multiplier * torch.log10(torch.clamp(x, min=amin))
     x_db -= multiplier * db_multiplier
