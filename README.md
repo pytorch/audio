@@ -1,5 +1,5 @@
 torchaudio: an audio library for PyTorch
-================================================
+========================================
 
 [![Build Status](https://travis-ci.org/pytorch/audio.svg?branch=master)](https://travis-ci.org/pytorch/audio)
 
@@ -50,6 +50,30 @@ torchaudio.save('foo_save.mp3', sound, sample_rate) # saves tensor to file
 ```
 
 API Reference
------------
+-------------
 
 API Reference is located here: http://pytorch.org/audio/
+
+Conventions
+-----------
+
+Torchaudio is standardized around the following conventions. The following variables are used with their corresponding definitions.
+
+* waveform: a tensor of audio samples with shape (channels, time)
+* sample_rate: the rate of audio samples (samples per second)
+* specgram: a tensor of spectrogram with shape (channels, frequency, time)
+* mel_specgram: a mel spectrogram with shape (channels, frequency, time)
+* hop_length: the number of samples between the starts of consecutive frames
+* n_freqs: the number of bins in a linear spectrogram
+* min_freq: the lowest frequency of the lowest band in a spectrogram
+* max_freq: the highest frequency of the highest band in a spectrogram
+* n_fft: the number of fourier bins
+* n_mfcc, n_mels: to be consistent with other similarly named variables, with shape (channel, n_mfcc, time) and (channel, n_mels, times)
+* win_length: the length of the STFT window
+* window_fn: for functions that creates windows e.g. torch.hann_window
+
+A spectrogram can be converted to DB scale or Mel scale, using AmplitudeToDB and AmplitudetoMel.
+
+The input (Spectrogram, MFCC, MelSpectrogram, Resample, etc.) of all transforms and functions assumes channel first. The output of STFT is (channel, frequency, time, 2).
+
+The Kaldi compliance interface follow Kaldi's interface.
