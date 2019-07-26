@@ -11,7 +11,9 @@ torchaudio: an audio library for PyTorch
     - [Kaldi (ark/scp)](http://pytorch.org/audio/kaldi_io.html)
 - [Dataloaders for common audio datasets (VCTK, YesNo)](http://pytorch.org/audio/datasets.html)
 - Common audio transforms
-  - [Scale, PadTrim, DownmixMono, LC2CL, BLC2CBL, MuLawEncoding, MuLawExpanding](http://pytorch.org/audio/transforms.html)
+    - [Spectrogram, SpectrogramToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/transforms.html)
+- Compliance interfaces: Run code using PyTorch that align with other libraries
+    - [Kaldi: 'fbank', 'spectrogram', 'resample_waveform'](https://pytorch.org/audio/compliance.kaldi.html)
 
 Dependencies
 ------------
