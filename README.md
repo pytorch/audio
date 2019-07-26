@@ -72,7 +72,7 @@ Torchaudio is standardized around the following naming conventions.
 * min_freq: the lowest frequency of the lowest band in a spectrogram
 * max_freq: the highest frequency of the highest band in a spectrogram
 * n_fft: the number of Fourier bins
-* n_mfcc, n_mels: to be consistent with other similarly named variables, with shape (channel, n_mfcc, time) and (channel, n_mels, times)
+* n_mfcc, n_mels: to be consistent with other similarly named variables, with shape (channel, n_mfcc, time) and (channel, n_mels, time)
 * win_length: the length of the STFT window
 * window_fn: for functions that creates windows e.g. torch.hann_window
 
