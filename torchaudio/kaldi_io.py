@@ -26,7 +26,7 @@ def _convert_method_output_to_tensor(file_or_fd, fn, convert_contiguous=False):
     Args:
         file_or_fd (str/FileDescriptor): File name or file descriptor
         fn (Callable[[...], Generator[str, numpy.ndarray]]): Function that has the signature (
-            file name/descriptor) -> Generator(str, ndarray) and converts it to (
+            file name/descriptor) -> Generator(str, numpy.ndarray) and converts it to (
             file name/descriptor) -> Generator(str, torch.Tensor).
         convert_contiguous (bool): Determines whether the array should be converted into a
             contiguous layout. (Default: None)
