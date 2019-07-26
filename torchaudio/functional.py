@@ -231,7 +231,7 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
 
     if top_db is not None:
         new_x_db_max = torch.tensor(float(x_db.max()) - top_db,
-                                       dtype=x_db.dtype, device=x_db.device)
+                                    dtype=x_db.dtype, device=x_db.device)
         x_db = torch.max(x_db, new_x_db_max)
 
     return x_db
