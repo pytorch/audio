@@ -47,7 +47,7 @@ def read_vec_int_ark(file_or_fd):
     r"""Create generator of (key,vector<int>) tuples, which reads from the ark file/stream.
 
     Args:
-        file_or_fd (str/FileDescriptor): Ark, gzipped ark, pipe or opened file descriptor
+        file_or_fd (str/FileDescriptor): ark, gzipped ark, pipe or opened file descriptor
 
     Returns:
         Generator[str, torch.Tensor]: The string is the key and the tensor is the vector read from file
@@ -66,7 +66,7 @@ def read_vec_flt_scp(file_or_fd):
     r"""Create generator of (key,vector<float32/float64>) tuples, read according to Kaldi scp.
 
     Args:
-        file_or_fd (str/FileDescriptor): Scp, gzipped scp, pipe or opened file descriptor
+        file_or_fd (str/FileDescriptor): scp, gzipped scp, pipe or opened file descriptor
 
     Returns:
         Generator[str, torch.Tensor]: The string is the key and the tensor is the vector read from file
@@ -82,7 +82,7 @@ def read_vec_flt_ark(file_or_fd):
     r"""Create generator of (key,vector<float32/float64>) tuples, which reads from the ark file/stream.
 
     Args:
-        file_or_fd (str/FileDescriptor): Ark, gzipped ark, pipe or opened file descriptor
+        file_or_fd (str/FileDescriptor): ark, gzipped ark, pipe or opened file descriptor
 
     Returns:
         Generator[str, torch.Tensor]: The string is the key and the tensor is the vector read from file
@@ -98,7 +98,7 @@ def read_mat_scp(file_or_fd):
     r"""Create generator of (key,matrix<float32/float64>) tuples, read according to Kaldi scp.
 
     Args:
-        file_or_fd (str/FileDescriptor): Scp, gzipped scp, pipe or opened file descriptor
+        file_or_fd (str/FileDescriptor): scp, gzipped scp, pipe or opened file descriptor
 
     Returns:
         Generator[str, torch.Tensor]: The string is the key and the tensor is the matrix read from file
@@ -114,7 +114,7 @@ def read_mat_ark(file_or_fd):
     r"""Create generator of (key,matrix<float32/float64>) tuples, which reads from the ark file/stream.
 
     Args:
-        file_or_fd (str/FileDescriptor): Ark, gzipped ark, pipe or opened file descriptor
+        file_or_fd (str/FileDescriptor): ark, gzipped ark, pipe or opened file descriptor
 
     Returns:
         Generator[str, torch.Tensor]: The string is the key and the tensor is the matrix read from file
