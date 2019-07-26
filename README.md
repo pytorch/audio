@@ -69,7 +69,7 @@ Torchaudio is standardized around the following naming conventions.
 * mel_specgram: a mel spectrogram with dimensions (channel, mel, time)
 * hop_length: the number of samples between the starts of consecutive frames
 * n_fft: the number of Fourier bins
-* n_mfcc, n_mel: the number of mel and MFCC bins
+* n_mel, n_mfcc: the number of mel and MFCC bins
 * n_freq: the number of bins in a linear spectrogram
 * min_freq: the lowest frequency of the lowest band in a spectrogram
 * max_freq: the highest frequency of the highest band in a spectrogram
@@ -78,13 +78,15 @@ Torchaudio is standardized around the following naming conventions.
 
 Transforms expect the following dimensions. In particular, the input of all transforms and functions assumes channel first.
 
-* Spectrogram: (channel, time) -> (channel, freq, time, 2)
-* AmplitudeToDB: (channel, freq, time, 2) -> (channel, freq, time, 2)
+* Spectrogram: (channel, time) -> (channel, freq, time, complex)
+* AmplitudeToDB: (channel, freq, time, complex) -> (channel, freq, time, complex)
 * MelScale: (channel, time) -> (channel, mel, time)
-* MelSpectrogram: (channel, time) -> (channel, mel, time, 2)
+* MelSpectrogram: (channel, time) -> (channel, mel, time, complex)
 * MFCC: (channel, time) -> (channel, mfcc, time)
 * MuLawEncode: (channel, time) -> (channel, time)
 * MuLawDecode: (channel, time) -> (channel, time)
 * Resample: (channel, time) -> (channel, time)
-* STFT: (channel, time, 2) -> (channel, freq, time, 2)
-* ISTFT: (channel, freq, time, 2) -> (channel, time, 2)
+* STFT: (channel, time, complex) -> (channel, freq, time, complex)
+* ISTFT: (channel, freq, time, complex) -> (channel, time, complex)
+
+where complex refers to the 2 dimensions required to represent a complex number using real numbers.
