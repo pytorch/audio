@@ -84,8 +84,8 @@ Transforms expect the following shapes. In particular, the input of all transfor
 * MuLawEncode: (channel, time) -> (channel, n_mulaw, time)
 * MuLawDecode: (channel, n_mulaw, time) -> (channel, time)
 * Resample: (channel, time) -> (channel, time)
-* STFT: (channel, time) -> (channel, frequency, time, 2).
-* ISTFT: (channel, frequency, time) -> (channel, time, 2).
+* STFT: (channel, time, 2) -> (channel, frequency, time, 2).
+* ISTFT: (channel, frequency, time, 2) -> (channel, time, 2).
 
 A spectrogram can be converted to DB scale or Mel scale, using AmplitudeToDB and AmplitudeToMel.
 
