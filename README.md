@@ -81,8 +81,8 @@ Transforms expect the following shapes. In particular, the input of all transfor
 * Spectrogram: (channel, time) -> (channel, frequency, time, 2)
 * MelScale: (channel, time) -> (channel, n_mels, time)
 * MFCC: (channel, time) -> (channel, n_mfcc, time)
-* MuLawEncode: (channel, time) -> (channel, n_mulaw, time)
-* MuLawDecode: (channel, n_mulaw, time) -> (channel, time)
+* MuLawEncode: (channel, time) -> (channel, time)
+* MuLawDecode: (channel, time) -> (channel, time)
 * Resample: (channel, time) -> (channel, time)
 * STFT: (channel, time, 2) -> (channel, frequency, time, 2).
 * ISTFT: (channel, frequency, time, 2) -> (channel, time, 2).
