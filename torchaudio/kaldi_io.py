@@ -29,7 +29,7 @@ def _convert_method_output_to_tensor(file_or_fd, fn, convert_contiguous=False):
             file name/descriptor) -> Generator(str, numpy.ndarray) and converts it to (
             file name/descriptor) -> Generator(str, torch.Tensor).
         convert_contiguous (bool): Determines whether the array should be converted into a
-            contiguous layout. (Default: None)
+            contiguous layout. (Default: ``None``)
 
     Returns:
         Generator[str, torch.Tensor]: The string is the key and the tensor is vec/mat
