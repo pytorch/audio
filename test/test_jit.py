@@ -78,11 +78,11 @@ class Test_JIT(unittest.TestCase):
 
         self._test_script_module(spec_f, transforms.MelScale)
 
-    def test_torchscript_spectrogram_to_DB(self):
+    def test_torchscript_amplitude_to_DB(self):
         @torch.jit.script
         def jit_method(spec, multiplier, amin, db_multiplier, top_db):
             # type: (Tensor, float, float, float, Optional[float]) -> Tensor
-            return F.spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db)
+            return F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db)
 
         spec = torch.rand((6, 201))
         multiplier = 10.
@@ -91,15 +91,15 @@ class Test_JIT(unittest.TestCase):
         top_db = 80.
 
         jit_out = jit_method(spec, multiplier, amin, db_multiplier, top_db)
-        py_out = F.spectrogram_to_DB(spec, multiplier, amin, db_multiplier, top_db)
+        py_out = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db)
 
         self.assertTrue(torch.allclose(jit_out, py_out))
 
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
-    def test_scriptmodule_SpectrogramToDB(self):
+    def test_scriptmodule_AmplitudeToDB(self):
         spec = torch.rand((6, 201), device="cuda")
 
-        self._test_script_module(spec, transforms.SpectrogramToDB)
+        self._test_script_module(spec, transforms.AmplitudeToDB)
 
     def test_torchscript_create_dct(self):
         @torch.jit.script
