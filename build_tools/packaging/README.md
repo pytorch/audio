@@ -5,6 +5,7 @@
  ### Linux
 
  ```bash
+# NB: We don't actually need CUDA; you don't have to run this on nvidia-docker
 nvidia-docker run -it --ipc=host --rm -v $(pwd):/remote soumith/conda-cuda bash
 pushd remote/conda
 conda config --add channels pytorch
