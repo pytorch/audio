@@ -63,10 +63,10 @@ Conventions
 
 Torchaudio is standardized around the following naming conventions.
 
-* waveform: a tensor of audio samples with shape (channels, time)
+* waveform: a tensor of audio samples with shape (channel, time)
 * sample_rate: the rate of audio samples (samples per second)
-* specgram: a tensor of spectrogram with shape (channels, time)
-* mel_specgram: a mel spectrogram with shape (channels, time)
+* specgram: a tensor of spectrogram with shape (channel, frequency, time)
+* mel_specgram: a mel spectrogram with shape (channel, frequency, time)
 * hop_length: the number of samples between the starts of consecutive frames
 * n_freqs: the number of bins in a linear spectrogram
 * min_freq: the lowest frequency of the lowest band in a spectrogram
