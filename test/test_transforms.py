@@ -52,7 +52,7 @@ class Tester(unittest.TestCase):
 
     def test_mel2(self):
         top_db = 80.
-        s2db = transforms.SpectrogramToDB('power', top_db)
+        s2db = transforms.AmplitudeToDB('power', top_db)
 
         waveform = self.waveform.clone()  # (1, 16000)
         waveform_scaled = self.scale(waveform)  # (1, 16000)
@@ -155,7 +155,7 @@ class Tester(unittest.TestCase):
             self.assertTrue(torch.allclose(torch_mel.type(librosa_mel_tensor.dtype), librosa_mel_tensor, atol=5e-3))
 
             # test s2db
-            db_transform = torchaudio.transforms.SpectrogramToDB('power', 80.)
+            db_transform = torchaudio.transforms.AmplitudeToDB('power', 80.)
             db_torch = db_transform(spect_transform(sound)).squeeze().cpu()
             db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
             self.assertTrue(torch.allclose(db_torch, torch.from_numpy(db_librosa), atol=5e-3))

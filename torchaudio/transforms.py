@@ -9,7 +9,7 @@ from .compliance import kaldi
 
 __all__ = [
     'Spectrogram',
-    'SpectrogramToDB',
+    'AmplitudeToDB',
     'MelScale',
     'MelSpectrogram',
     'MFCC',
@@ -67,15 +67,15 @@ class Spectrogram(torch.jit.ScriptModule):
                              self.win_length, self.power, self.normalized)
 
 
-class SpectrogramToDB(torch.jit.ScriptModule):
-    r"""Turns a spectrogram from the power/amplitude scale to the decibel scale.
+class AmplitudeToDB(torch.jit.ScriptModule):
+    r"""Turns a tensor from the power/amplitude scale to the decibel scale.
 
-    This output depends on the maximum value in the input spectrogram, and so
+    This output depends on the maximum value in the input tensor, and so
     may return different values for an audio clip split into snippets vs. a
     a full clip.
 
     Args:
-        stype (str): scale of input spectrogram ('power' or 'magnitude'). The
+        stype (str): scale of input tensor ('power' or 'magnitude'). The
             power being the elementwise square of the magnitude. (Default: 'power')
         top_db (float, optional): minimum negative cut-off in decibels.  A reasonable number
             is 80.
@@ -83,7 +83,7 @@ class SpectrogramToDB(torch.jit.ScriptModule):
     __constants__ = ['multiplier', 'amin', 'ref_value', 'db_multiplier']
 
     def __init__(self, stype='power', top_db=None):
-        super(SpectrogramToDB, self).__init__()
+        super(AmplitudeToDB, self).__init__()
         self.stype = torch.jit.Attribute(stype, str)
         if top_db is not None and top_db < 0:
             raise ValueError('top_db must be positive value')
@@ -94,17 +94,17 @@ class SpectrogramToDB(torch.jit.ScriptModule):
         self.db_multiplier = math.log10(max(self.amin, self.ref_value))
 
     @torch.jit.script_method
-    def forward(self, specgram):
+    def forward(self, x):
         r"""Numerically stable implementation from Librosa
         https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
 
         Args:
-            specgram (torch.Tensor): STFT of size (c, f, t)
+            x (torch.Tensor): Input tensor before being converted to decibel scale
 
         Returns:
-            torch.Tensor: STFT after changing scale of size (c, f, t)
+            torch.Tensor: Output tensor in decibel scale
         """
-        return F.spectrogram_to_DB(specgram, self.multiplier, self.amin, self.db_multiplier, self.top_db)
+        return F.amplitude_to_DB(x, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
 
 class MelScale(torch.jit.ScriptModule):
@@ -246,7 +246,7 @@ class MFCC(torch.jit.ScriptModule):
         self.dct_type = dct_type
         self.norm = torch.jit.Attribute(norm, Optional[str])
         self.top_db = 80.0
-        self.spectrogram_to_DB = SpectrogramToDB('power', self.top_db)
+        self.amplitude_to_DB = AmplitudeToDB('power', self.top_db)
 
         if melkwargs is not None:
             self.MelSpectrogram = MelSpectrogram(sample_rate=self.sample_rate, **melkwargs)
@@ -273,7 +273,7 @@ class MFCC(torch.jit.ScriptModule):
             log_offset = 1e-6
             mel_specgram = torch.log(mel_specgram + log_offset)
         else:
-            mel_specgram = self.spectrogram_to_DB(mel_specgram)
+            mel_specgram = self.amplitude_to_DB(mel_specgram)
         # (c, `n_mels`, t).tranpose(...) dot (`n_mels`, `n_mfcc`) -> (c, t, `n_mfcc`).tranpose(...)
         mfcc = torch.matmul(mel_specgram.transpose(1, 2), self.dct_mat).transpose(1, 2)
         return mfcc
