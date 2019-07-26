@@ -169,7 +169,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
         win_length (int): Window size. (Default: ``n_fft``)
         hop_length (int, optional): Length of hop between STFT windows. (
             Default: ``win_length // 2``)
-        n_fft (int, optional): Size of fft, creates ``n_fft // 2 + 1`` bins
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins
         f_min (float): Minimum frequency. (Default: ``0.``)
         f_max (float, optional): Maximum frequency. (Default: ``None``)
         pad (int): Two sided padding of signal. (Default: ``0``)
