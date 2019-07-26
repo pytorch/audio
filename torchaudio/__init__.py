@@ -4,6 +4,7 @@ import os.path
 import torch
 import _torch_sox
 
+from .version import __version__, git_version
 from torchaudio import transforms, datasets, kaldi_io, sox_effects, legacy, compliance, _docs
 
 
