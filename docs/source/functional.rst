@@ -18,10 +18,10 @@ Functions to perform common audio operations.
 
 .. autofunction:: spectrogram
 
-:hidden:`spectrogram_to_DB`
+:hidden:`amplitude_to_DB`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: spectrogram_to_DB
+.. autofunction:: amplitude_to_DB
 
 :hidden:`create_fb_matrix`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

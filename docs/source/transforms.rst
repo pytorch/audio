@@ -16,12 +16,12 @@ Transforms are common audio transforms. They can be chained together using :clas
 
   .. automethod:: torchaudio._docs.Spectrogram.forward
 
-:hidden:`SpectrogramToDB`
+:hidden:`AmplitudeToDB`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: SpectrogramToDB
+.. autoclass:: AmplitudeToDB
 
-  .. automethod:: torchaudio._docs.SpectrogramToDB.forward
+  .. automethod:: torchaudio._docs.AmplitudeToDB.forward
 
 :hidden:`MelScale`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
