@@ -6,8 +6,8 @@ class Spectrogram:
     forward = torchaudio.transforms.Spectrogram().forward
 
 
-class SpectrogramToDB:
-    forward = torchaudio.transforms.SpectrogramToDB().forward
+class AmplitudeToDB:
+    forward = torchaudio.transforms.AmplitudeToDB().forward
 
 
 class MelScale:
