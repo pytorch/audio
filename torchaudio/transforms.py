@@ -23,7 +23,7 @@ class Spectrogram(torch.jit.ScriptModule):
     r"""Create a spectrogram from a audio signal
 
     Args:
-        n_fft (int, optional): Size of fft, creates ``n_fft // 2 + 1`` bins
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins
         win_length (int): Window size. (Default: ``n_fft``)
         hop_length (int, optional): Length of hop between STFT windows. (
             Default: ``win_length // 2``)
@@ -42,7 +42,7 @@ class Spectrogram(torch.jit.ScriptModule):
                  power=2, normalized=False, wkwargs=None):
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
-        # number of fft bins. the returned STFT result will have n_fft // 2 + 1
+        # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
         # number of frequecies due to onesided=True in torch.stft
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2

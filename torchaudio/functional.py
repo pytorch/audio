@@ -180,7 +180,7 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
         waveform (torch.Tensor): Tensor of audio of size (channel, time)
         pad (int): Two sided padding of signal
         window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
-        n_fft (int): Size of fft
+        n_fft (int): Size of FFT
         hop_length (int): Length of hop between STFT windows
         win_length (int): Window size
         power (int): Exponent for the magnitude spectrogram,
