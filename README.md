@@ -92,11 +92,11 @@ dimension (when applicable). This makes it consistent with PyTorch's dimensions.
 
 Transforms expect the following dimensions.
 
-* Spectrogram: (channel, time) -> (channel, freq, time)
-* AmplitudeToDB: (channel, freq, time) -> (channel, freq, time)
-* MelScale: (channel, time) -> (channel, mel, time)
-* MelSpectrogram: (channel, time) -> (channel, mel, time)
-* MFCC: (channel, time) -> (channel, mfcc, time)
-* MuLawEncode: (channel, time) -> (channel, time)
-* MuLawDecode: (channel, time) -> (channel, time)
-* Resample: (channel, time) -> (channel, time)
+* `Spectrogram`: (channel, time) -> (channel, freq, time)
+* `AmplitudeToDB`: (channel, freq, time) -> (channel, freq, time)
+* `MelScale`: (channel, time) -> (channel, mel, time)
+* `MelSpectrogram`: (channel, time) -> (channel, mel, time)
+* `MFCC`: (channel, time) -> (channel, mfcc, time)
+* `MuLawEncode`: (channel, time) -> (channel, time)
+* `MuLawDecode`: (channel, time) -> (channel, time)
+* `Resample`: (channel, time) -> (channel, time)
