@@ -24,9 +24,9 @@ Steps to reproduce the behavior:
 
 ## Environment
 
--What commands did you used to install torchaudio (conda/pip/build from source)?
--If you are building from source, which commit is it?
--What does `torchaudio.__version__` print? (If applicable)
+ - What commands did you used to install torchaudio (conda/pip/build from source)?
+ - If you are building from source, which commit is it?
+ - What does `torchaudio.__version__` print? (If applicable)
 
 Please copy and paste the output from our
 [environment collection script](https://raw.githubusercontent.com/pytorch/pytorch/master/torch/utils/collect_env.py)
