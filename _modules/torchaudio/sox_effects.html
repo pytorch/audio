@@ -228,61 +228,59 @@
 
 <span class="sd">    Returns: list[str]</span>
 
-<span class="sd">    Example::</span>
+<span class="sd">    Example</span>
 <span class="sd">        &gt;&gt;&gt; EFFECT_NAMES = torchaudio.sox_effects.effect_names()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_torch_sox</span><span class="o">.</span><span class="n">get_effect_names</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="SoxEffect"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffect">[docs]</a><span class="k">def</span> <span class="nf">SoxEffect</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Create an object for passing sox effect information between python and c++</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an object for passing sox effect information between python and c++</span>
 
-<span class="sd">    Returns: SoxEffect(object)</span>
-<span class="sd">      - ename (str), name of effect</span>
-<span class="sd">      - eopts (list[str]), list of effect options</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        SoxEffect: An object with the following attributes: ename (str) which is the</span>
+<span class="sd">        name of effect, and eopts (List[str]) which is a list of effect options.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_torch_sox</span><span class="o">.</span><span class="n">SoxEffect</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="SoxEffectsChain"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain">[docs]</a><span class="k">class</span> <span class="nc">SoxEffectsChain</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;SoX effects chain class.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;SoX effects chain class.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        normalization (bool, number, or callable, optional): If boolean `True`, then output is divided by `1 &lt;&lt; 31`</span>
-<span class="sd">                                                             (assumes signed 32-bit audio), and normalizes to `[0, 1]`.</span>
-<span class="sd">                                                             If `number`, then output is divided by that number</span>
-<span class="sd">                                                             If `callable`, then the output is passed as a parameter</span>
-<span class="sd">                                                             to the given function, then the output is divided by</span>
-<span class="sd">                                                             the result.</span>
-<span class="sd">        channels_first (bool, optional): Set channels first or length first in result.  Default: ``True``</span>
+<span class="sd">            (assumes signed 32-bit audio), and normalizes to `[0, 1]`. If `number`, then output is divided by that</span>
+<span class="sd">            number. If `callable`, then the output is passed as a parameter to the given function, then the</span>
+<span class="sd">            output is divided by the result. (Default: ``True``)</span>
+<span class="sd">        channels_first (bool, optional): Set channels first or length first in result.  (Default: ``True``)</span>
 <span class="sd">        out_siginfo (sox_signalinfo_t, optional): a sox_signalinfo_t type, which could be helpful if the</span>
-<span class="sd">                                                  audio type cannot be automatically determined</span>
+<span class="sd">            audio type cannot be automatically determined. (Default: ``None``)</span>
 <span class="sd">        out_encinfo (sox_encodinginfo_t, optional): a sox_encodinginfo_t type, which could be set if the</span>
-<span class="sd">                                                    audio type cannot be automatically determined</span>
-<span class="sd">        filetype (str, optional): a filetype or extension to be set if sox cannot determine it automatically</span>
+<span class="sd">            audio type cannot be automatically determined. (Default: ``None``)</span>
+<span class="sd">        filetype (str, optional): a filetype or extension to be set if sox cannot determine it</span>
+<span class="sd">            automatically. . (Default: ``&#39;raw&#39;``)</span>
 
-<span class="sd">    Returns: tuple(Tensor, int)</span>
-<span class="sd">       - Tensor: output Tensor of size `[C x L]` or `[L x C]` where L is the number of audio frames and</span>
-<span class="sd">                 C is the number of channels</span>
-<span class="sd">       - int: the sample rate of the audio (as listed in the metadata of the file)</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[torch.Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number</span>
+<span class="sd">        of audio frames and C is the number of channels. An integer which is the sample rate of the</span>
+<span class="sd">        audio (as listed in the metadata of the file)</span>
 
-<span class="sd">    Example::</span>
-
-<span class="sd">        class MyDataset(Dataset):</span>
-<span class="sd">            def __init__(self, audiodir_path):</span>
-<span class="sd">                self.data = [os.path.join(audiodir_path, fn) for fn in os.listdir(audiodir_path)]</span>
-<span class="sd">                self.E = torchaudio.sox_effects.SoxEffectsChain()</span>
-<span class="sd">                self.E.append_effect_to_chain(&quot;rate&quot;, [16000])  # resample to 16000hz</span>
-<span class="sd">                self.E.append_effect_to_chain(&quot;channels&quot;, [&quot;1&quot;])  # mono signal</span>
-<span class="sd">            def __getitem__(self, index):</span>
-<span class="sd">                fn = self.data[index]</span>
-<span class="sd">                self.E.set_input_file(fn)</span>
-<span class="sd">                x, sr = self.E.sox_build_flow_effects()</span>
-<span class="sd">                return x, sr</span>
-
-<span class="sd">            def __len__(self):</span>
-<span class="sd">                return len(self.data)</span>
-
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; class MyDataset(Dataset):</span>
+<span class="sd">        &gt;&gt;&gt;     def __init__(self, audiodir_path):</span>
+<span class="sd">        &gt;&gt;&gt;         self.data = [os.path.join(audiodir_path, fn) for fn in os.listdir(audiodir_path)]</span>
+<span class="sd">        &gt;&gt;&gt;         self.E = torchaudio.sox_effects.SoxEffectsChain()</span>
+<span class="sd">        &gt;&gt;&gt;         self.E.append_effect_to_chain(&quot;rate&quot;, [16000])  # resample to 16000hz</span>
+<span class="sd">        &gt;&gt;&gt;         self.E.append_effect_to_chain(&quot;channels&quot;, [&quot;1&quot;])  # mono signal</span>
+<span class="sd">        &gt;&gt;&gt;     def __getitem__(self, index):</span>
+<span class="sd">        &gt;&gt;&gt;         fn = self.data[index]</span>
+<span class="sd">        &gt;&gt;&gt;         self.E.set_input_file(fn)</span>
+<span class="sd">        &gt;&gt;&gt;         x, sr = self.E.sox_build_flow_effects()</span>
+<span class="sd">        &gt;&gt;&gt;         return x, sr</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt;     def __len__(self):</span>
+<span class="sd">        &gt;&gt;&gt;         return len(self.data)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
 <span class="sd">        &gt;&gt;&gt; torchaudio.initialize_sox()</span>
 <span class="sd">        &gt;&gt;&gt; ds = MyDataset(path_to_audio_files)</span>
 <span class="sd">        &gt;&gt;&gt; for sig, sr in ds:</span>
@@ -305,7 +303,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">channels_first</span> <span class="o">=</span> <span class="n">channels_first</span>
 
 <div class="viewcode-block" id="SoxEffectsChain.append_effect_to_chain"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.append_effect_to_chain">[docs]</a>    <span class="k">def</span> <span class="nf">append_effect_to_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ename</span><span class="p">,</span> <span class="n">eargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Append effect to a sox effects chain.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append effect to a sox effects chain.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ename (str): which is the name of effect</span>
+<span class="sd">            eargs (List[str]): which is a list of effect options. (Default: ``None``)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">SoxEffect</span><span class="p">()</span>
         <span class="c1"># check if we have a valid effect</span>
@@ -324,7 +326,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SoxEffectsChain.sox_build_flow_effects"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.sox_build_flow_effects">[docs]</a>    <span class="k">def</span> <span class="nf">sox_build_flow_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Build effects chain and flow effects from input file to output tensor</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Build effects chain and flow effects from input file to output tensor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            out (torch.Tensor): Where the output will be written to. (Default: ``None``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[torch.Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number</span>
+<span class="sd">            of audio frames and C is the number of channels. An integer which is the sample rate of the</span>
+<span class="sd">            audio (as listed in the metadata of the file)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># initialize output tensor</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -352,12 +362,15 @@
         <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">sr</span></div>
 
 <div class="viewcode-block" id="SoxEffectsChain.clear_chain"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.clear_chain">[docs]</a>    <span class="k">def</span> <span class="nf">clear_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Clear effects chain in python</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clear effects chain in python</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="SoxEffectsChain.set_input_file"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.set_input_file">[docs]</a>    <span class="k">def</span> <span class="nf">set_input_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Set input file for input of chain</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set input file for input of chain</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_file (str): The path to the input file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="n">input_file</span></div>
 

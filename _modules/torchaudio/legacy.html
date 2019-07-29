@@ -226,52 +226,51 @@
 
 
 <div class="viewcode-block" id="load"><a class="viewcode-back" href="../../legacy.html#torchaudio.legacy.load">[docs]</a><span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_frames</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Loads an audio file from disk into a Tensor.  The default options have</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loads an audio file from disk into a Tensor.  The default options have</span>
 <span class="sd">    changed as of torchaudio 0.2 and this function maintains option defaults</span>
 <span class="sd">    from version 0.1.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filepath (string): path to audio file</span>
-<span class="sd">        out (Tensor, optional): an output Tensor to use instead of creating one</span>
+<span class="sd">        filepath (str): Path to audio file</span>
+<span class="sd">        out (torch.Tensor, optional): An output Tensor to use instead of creating one. (Default: ``None``)</span>
 <span class="sd">        normalization (bool or number, optional): If boolean `True`, then output is divided by `1 &lt;&lt; 31`</span>
-<span class="sd">                                                  (assumes 16-bit depth audio, and normalizes to `[0, 1]`.</span>
-<span class="sd">                                                  If `number`, then output is divided by that number</span>
-<span class="sd">        num_frames (int, optional): number of frames to load.  -1 to load everything after the offset.</span>
-<span class="sd">        offset (int, optional): number of frames from the start of the file to begin data loading.</span>
+<span class="sd">            (assumes 16-bit depth audio, and normalizes to `[0, 1]`. If `number`, then output is divided by that</span>
+<span class="sd">            number. (Default: ``None``)</span>
+<span class="sd">        num_frames (int, optional): Number of frames to load.  -1 to load everything after the</span>
+<span class="sd">            offset. (Default: ``0``)</span>
+<span class="sd">        offset (int, optional): Number of frames from the start of the file to begin data</span>
+<span class="sd">            loading. (Default: ``0``)</span>
 
-<span class="sd">    Returns: tuple(Tensor, int)</span>
-<span class="sd">       - Tensor: output Tensor of size `[L x C]` where L is the number of audio frames, C is the number of channels</span>
-<span class="sd">       - int: the sample-rate of the audio (as listed in the metadata of the file)</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[torch.Tensor, int]: The output tensor is of size `[L x C]` where L is the number of audio frames,</span>
+<span class="sd">        C is the number of channels. The integer is sample-rate of the audio (as listed in the metadata of</span>
+<span class="sd">        the file)</span>
 
-<span class="sd">    Example::</span>
-
+<span class="sd">    Example</span>
 <span class="sd">        &gt;&gt;&gt; data, sample_rate = torchaudio.legacy.load(&#39;foo.mp3&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; print(data.size())</span>
 <span class="sd">        torch.Size([278756, 2])</span>
 <span class="sd">        &gt;&gt;&gt; print(sample_rate)</span>
 <span class="sd">        44100</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">normalization</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="save"><a class="viewcode-back" href="../../legacy.html#torchaudio.legacy.save">[docs]</a><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Saves a Tensor with audio signal to disk as a standard format like mp3, wav, etc.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Saves a Tensor with audio signal to disk as a standard format like mp3, wav, etc.</span>
 <span class="sd">    The default options have changed as of torchaudio 0.2 and this function maintains</span>
 <span class="sd">    option defaults from version 0.1.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filepath (string): path to audio file</span>
-<span class="sd">        src (Tensor): an input 2D Tensor of shape `[L x C]` where L is</span>
-<span class="sd">                      the number of audio frames, C is the number of channels</span>
-<span class="sd">        sample_rate (int): the sample-rate of the audio to be saved</span>
-<span class="sd">        precision (int, optional): the bit-precision of the audio to be saved</span>
+<span class="sd">        filepath (str): Path to audio file</span>
+<span class="sd">        src (torch.Tensor): An input 2D Tensor of shape `[L x C]` where L is</span>
+<span class="sd">            the number of audio frames, C is the number of channels</span>
+<span class="sd">        sample_rate (int): The sample-rate of the audio to be saved</span>
+<span class="sd">        precision (int, optional): The bit-precision of the audio to be saved. (Default: ``32``)</span>
 
-<span class="sd">    Example::</span>
-
+<span class="sd">    Example</span>
 <span class="sd">        &gt;&gt;&gt; data, sample_rate = torchaudio.legacy.load(&#39;foo.mp3&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; torchaudio.legacy.save(&#39;foo.wav&#39;, data, sample_rate)</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 </pre></div>

@@ -254,13 +254,13 @@
 
 <span class="k">def</span> <span class="nf">read_audio</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">downsample</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">downsample</span><span class="p">:</span>
-        <span class="n">E</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">SoxEffects</span><span class="p">()</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">SoxEffectsChain</span><span class="p">()</span>
         <span class="n">E</span><span class="o">.</span><span class="n">set_input_file</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
-        <span class="n">E</span><span class="o">.</span><span class="n">sox_append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;gain&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;-h&quot;</span><span class="p">])</span>
-        <span class="n">E</span><span class="o">.</span><span class="n">sox_append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;channels&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">E</span><span class="o">.</span><span class="n">sox_append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">16000</span><span class="p">])</span>
-        <span class="n">E</span><span class="o">.</span><span class="n">sox_append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;gain&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;-rh&quot;</span><span class="p">])</span>
-        <span class="n">E</span><span class="o">.</span><span class="n">sox_append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;dither&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;-s&quot;</span><span class="p">])</span>
+        <span class="n">E</span><span class="o">.</span><span class="n">append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;gain&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;-h&quot;</span><span class="p">])</span>
+        <span class="n">E</span><span class="o">.</span><span class="n">append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;channels&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">E</span><span class="o">.</span><span class="n">append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">16000</span><span class="p">])</span>
+        <span class="n">E</span><span class="o">.</span><span class="n">append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;gain&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;-rh&quot;</span><span class="p">])</span>
+        <span class="n">E</span><span class="o">.</span><span class="n">append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;dither&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;-s&quot;</span><span class="p">])</span>
         <span class="n">sig</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">E</span><span class="o">.</span><span class="n">sox_build_flow_effects</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">sig</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
@@ -289,21 +289,22 @@
 
 
 <div class="viewcode-block" id="VCTK"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VCTK">[docs]</a><span class="k">class</span> <span class="nc">VCTK</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;`VCTK &lt;http://homepages.inf.ed.ac.uk/jyamagis/page3/page58/page58.html&gt;`_ Dataset.</span>
-<span class="sd">    `alternate url &lt;http://datashare.is.ed.ac.uk/handle/10283/2651&gt;`</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;`VCTK &lt;http://homepages.inf.ed.ac.uk/jyamagis/page3/page58/page58.html&gt;`_ Dataset.</span>
+<span class="sd">    `alternate url &lt;http://datashare.is.ed.ac.uk/handle/10283/2651&gt;`_</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        root (string): Root directory of dataset where ``processed/training.pt``</span>
+<span class="sd">        root (str): Root directory of dataset where ``processed/training.pt``</span>
 <span class="sd">            and  ``processed/test.pt`` exist.</span>
+<span class="sd">        downsample (bool, optional): Whether to downsample the signal (Default: ``True``)</span>
+<span class="sd">        transform (Callable, optional): A function/transform that takes in an raw audio</span>
+<span class="sd">            and returns a transformed version. E.g, ``transforms.Spectrogram``. (Default: ``None``)</span>
+<span class="sd">        target_transform (callable, optional): A function/transform that takes in the</span>
+<span class="sd">            target and transforms it. (Default: ``None``)</span>
 <span class="sd">        download (bool, optional): If true, downloads the dataset from the internet and</span>
 <span class="sd">            puts it in root directory. If dataset is already downloaded, it is not</span>
-<span class="sd">            downloaded again.</span>
-<span class="sd">        transform (callable, optional): A function/transform that  takes in an raw audio</span>
-<span class="sd">            and returns a transformed version. E.g, ``transforms.Scale``</span>
-<span class="sd">        target_transform (callable, optional): A function/transform that takes in the</span>
-<span class="sd">            target and transforms it.</span>
-<span class="sd">        dev_mode(bool, optional): if true, clean up is not performed on downloaded</span>
-<span class="sd">            files.  Useful to keep raw audio and transcriptions.</span>
+<span class="sd">            downloaded again. (Default: ``True``)</span>
+<span class="sd">        dev_mode(bool, optional): If true, clean up is not performed on downloaded</span>
+<span class="sd">            files.  Useful to keep raw audio and transcriptions. (Default: ``False``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">raw_folder</span> <span class="o">=</span> <span class="s1">&#39;vctk/raw&#39;</span>
     <span class="n">processed_folder</span> <span class="o">=</span> <span class="s1">&#39;vctk/processed&#39;</span>
@@ -339,7 +340,8 @@
 <span class="sd">            index (int): Index</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple: (image, target) where target is index of the target class.</span>
+<span class="sd">            Tuple[torch.Tensor, int]: The output tuple (image, target) where target</span>
+<span class="sd">            is index of the target class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cached_pt</span> <span class="o">!=</span> <span class="n">index</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cached_pt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">)</span>
