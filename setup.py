@@ -76,6 +76,8 @@ with open(version_path, 'w') as f:
     f.write("__version__ = '{}'\n".format(version))
     f.write("git_version = {}\n".format(repr(sha)))
 
+pytorch_package_name = os.getenv('TORCHAUDIO_PYTORCH_DEPENDENCY_NAME', 'torch')
+
 setup(
     name="torchaudio",
     version="0.2",
@@ -111,5 +113,5 @@ setup(
             extra_link_args=ela),
     ],
     cmdclass={'build_ext': BuildExtension},
-    install_requires=['torch']
+    install_requires=[pytorch_package_name]
 )
