@@ -66,7 +66,7 @@ def istft(stft_matrix,          # type: Tensor
 
     Args:
         stft_matrix (torch.Tensor): Output of stft where each row of a channel is a frequency and each
-            column is a window. it has a shape of either (channel, fft_size, n_frames, 2) or (
+            column is a window. it has a size of either (channel, fft_size, n_frames, 2) or (
             fft_size, n_frames, 2)
         n_fft (int): Size of Fourier transform
         hop_length (Optional[int]): The distance between neighboring sliding window frames.
@@ -177,7 +177,7 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
     r"""Create a spectrogram from a raw audio signal.
 
     Args:
-        waveform (torch.Tensor): Tensor of audio of size (channel, time)
+        waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
         pad (int): Two sided padding of signal
         window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT
@@ -188,8 +188,8 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
         normalized (bool): Whether to normalize by magnitude after stft
 
     Returns:
-        torch.Tensor: Size (channel, frequency, time), where channel
-        is unchanged, frequency is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
+        torch.Tensor: Dimension (channel, freq, time), where channel
+        is unchanged, freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frames).
     """
     assert waveform.dim() == 2
@@ -403,14 +403,14 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     factor of ``rate``.
 
     Args:
-        complex_specgrams (torch.Tensor): Size of `(*, channel, frequency, time, complex=2)`
+        complex_specgrams (torch.Tensor): Dimension of `(*, channel, freq, time, complex=2)`
         rate (float): Speed-up factor
-        phase_advance (torch.Tensor): Expected phase advance in each bin. Size
-            of (frequency, 1)
+        phase_advance (torch.Tensor): Expected phase advance in each bin. Dimension
+            of (freq, 1)
 
     Returns:
-        complex_specgrams_stretch (torch.Tensor): Size of `(*, channel,
-        frequency, ceil(time/rate), complex=2)`
+        complex_specgrams_stretch (torch.Tensor): Dimension of `(*, channel,
+        freq, ceil(time/rate), complex=2)`
 
     Example
         >>> num_freqs, hop_length = 1025, 512
