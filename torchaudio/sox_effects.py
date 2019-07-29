@@ -10,61 +10,59 @@ def effect_names():
 
     Returns: list[str]
 
-    Example::
+    Example
         >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
     """
     return _torch_sox.get_effect_names()
 
 
 def SoxEffect():
-    """Create an object for passing sox effect information between python and c++
+    r"""Create an object for passing sox effect information between python and c++
 
-    Returns: SoxEffect(object)
-      - ename (str), name of effect
-      - eopts (list[str]), list of effect options
+    Returns:
+        SoxEffect: An object with the following attributes: ename (str) which is the
+        name of effect, and eopts (List[str]) which is a list of effect options.
     """
     return _torch_sox.SoxEffect()
 
 
 class SoxEffectsChain(object):
-    """SoX effects chain class.
+    r"""SoX effects chain class.
 
     Args:
         normalization (bool, number, or callable, optional): If boolean `True`, then output is divided by `1 << 31`
-                                                             (assumes signed 32-bit audio), and normalizes to `[0, 1]`.
-                                                             If `number`, then output is divided by that number
-                                                             If `callable`, then the output is passed as a parameter
-                                                             to the given function, then the output is divided by
-                                                             the result.
-        channels_first (bool, optional): Set channels first or length first in result.  Default: ``True``
+            (assumes signed 32-bit audio), and normalizes to `[0, 1]`. If `number`, then output is divided by that
+            number. If `callable`, then the output is passed as a parameter to the given function, then the
+            output is divided by the result. (Default: ``True``)
+        channels_first (bool, optional): Set channels first or length first in result.  (Default: ``True``)
         out_siginfo (sox_signalinfo_t, optional): a sox_signalinfo_t type, which could be helpful if the
-                                                  audio type cannot be automatically determined
+            audio type cannot be automatically determined. (Default: ``None``)
         out_encinfo (sox_encodinginfo_t, optional): a sox_encodinginfo_t type, which could be set if the
-                                                    audio type cannot be automatically determined
-        filetype (str, optional): a filetype or extension to be set if sox cannot determine it automatically
+            audio type cannot be automatically determined. (Default: ``None``)
+        filetype (str, optional): a filetype or extension to be set if sox cannot determine it
+            automatically. . (Default: ``'raw'``)
 
-    Returns: tuple(Tensor, int)
-       - Tensor: output Tensor of size `[C x L]` or `[L x C]` where L is the number of audio frames and
-                 C is the number of channels
-       - int: the sample rate of the audio (as listed in the metadata of the file)
+    Returns:
+        Tuple[torch.Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number
+        of audio frames and C is the number of channels. An integer which is the sample rate of the
+        audio (as listed in the metadata of the file)
 
-    Example::
-
-        class MyDataset(Dataset):
-            def __init__(self, audiodir_path):
-                self.data = [os.path.join(audiodir_path, fn) for fn in os.listdir(audiodir_path)]
-                self.E = torchaudio.sox_effects.SoxEffectsChain()
-                self.E.append_effect_to_chain("rate", [16000])  # resample to 16000hz
-                self.E.append_effect_to_chain("channels", ["1"])  # mono signal
-            def __getitem__(self, index):
-                fn = self.data[index]
-                self.E.set_input_file(fn)
-                x, sr = self.E.sox_build_flow_effects()
-                return x, sr
-
-            def __len__(self):
-                return len(self.data)
-
+    Example
+        >>> class MyDataset(Dataset):
+        >>>     def __init__(self, audiodir_path):
+        >>>         self.data = [os.path.join(audiodir_path, fn) for fn in os.listdir(audiodir_path)]
+        >>>         self.E = torchaudio.sox_effects.SoxEffectsChain()
+        >>>         self.E.append_effect_to_chain("rate", [16000])  # resample to 16000hz
+        >>>         self.E.append_effect_to_chain("channels", ["1"])  # mono signal
+        >>>     def __getitem__(self, index):
+        >>>         fn = self.data[index]
+        >>>         self.E.set_input_file(fn)
+        >>>         x, sr = self.E.sox_build_flow_effects()
+        >>>         return x, sr
+        >>>
+        >>>     def __len__(self):
+        >>>         return len(self.data)
+        >>>
         >>> torchaudio.initialize_sox()
         >>> ds = MyDataset(path_to_audio_files)
         >>> for sig, sr in ds:
@@ -87,7 +85,11 @@ class SoxEffectsChain(object):
         self.channels_first = channels_first
 
     def append_effect_to_chain(self, ename, eargs=None):
-        """Append effect to a sox effects chain.
+        r"""Append effect to a sox effects chain.
+
+        Args:
+            ename (str): which is the name of effect
+            eargs (List[str]): which is a list of effect options. (Default: ``None``)
         """
         e = SoxEffect()
         # check if we have a valid effect
@@ -106,7 +108,15 @@ class SoxEffectsChain(object):
         self.chain.append(e)
 
     def sox_build_flow_effects(self, out=None):
-        """Build effects chain and flow effects from input file to output tensor
+        r"""Build effects chain and flow effects from input file to output tensor
+
+        Args:
+            out (torch.Tensor): Where the output will be written to. (Default: ``None``)
+
+        Returns:
+            Tuple[torch.Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number
+            of audio frames and C is the number of channels. An integer which is the sample rate of the
+            audio (as listed in the metadata of the file)
         """
         # initialize output tensor
         if out is not None:
@@ -134,12 +144,15 @@ class SoxEffectsChain(object):
         return out, sr
 
     def clear_chain(self):
-        """Clear effects chain in python
+        r"""Clear effects chain in python
         """
         self.chain = []
 
     def set_input_file(self, input_file):
-        """Set input file for input of chain
+        r"""Set input file for input of chain
+
+        Args:
+            input_file (str): The path to the input file.
         """
         self.input_file = input_file
 

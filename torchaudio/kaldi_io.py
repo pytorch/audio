@@ -21,17 +21,18 @@ __all__ = [
 
 
 def _convert_method_output_to_tensor(file_or_fd, fn, convert_contiguous=False):
-    r""" Takes a method invokes it. The output is converted to a tensor.
+    r"""Takes a method invokes it. The output is converted to a tensor.
 
-    Arguments:
-        file_or_fd (string/File Descriptor): file name or file descriptor.
-        fn (Function): function that has the signature (file name/descriptor) -> generator(string, ndarray)
-            and converts it to (file name/descriptor) -> generator(string, Tensor).
-        convert_contiguous (bool): determines whether the array should be converted into a
-            contiguous layout.
+    Args:
+        file_or_fd (str/FileDescriptor): File name or file descriptor
+        fn (Callable[[...], Generator[str, numpy.ndarray]]): Function that has the signature (
+            file name/descriptor) -> Generator(str, numpy.ndarray) and converts it to (
+            file name/descriptor) -> Generator(str, torch.Tensor).
+        convert_contiguous (bool): Determines whether the array should be converted into a
+            contiguous layout. (Default: ``None``)
 
     Returns:
-        generator[key (string), vec/mat (Tensor)]
+        Generator[str, torch.Tensor]: The string is the key and the tensor is vec/mat
     """
     if not IMPORT_KALDI_IO:
         raise ImportError('Could not import kaldi_io. Did you install it?')
@@ -45,14 +46,13 @@ def _convert_method_output_to_tensor(file_or_fd, fn, convert_contiguous=False):
 def read_vec_int_ark(file_or_fd):
     r"""Create generator of (key,vector<int>) tuples, which reads from the ark file/stream.
 
-    Arguments:
-        file_or_fd (string/File Descriptor): ark, gzipped ark, pipe or opened file descriptor.
+    Args:
+        file_or_fd (str/FileDescriptor): ark, gzipped ark, pipe or opened file descriptor
 
     Returns:
-        generator[key (string), vec (Tensor)]
+        Generator[str, torch.Tensor]: The string is the key and the tensor is the vector read from file
 
-    Example::
-
+    Example
         >>> # read ark to a 'dictionary'
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_vec_int_ark(file) }
     """
@@ -63,16 +63,15 @@ def read_vec_int_ark(file_or_fd):
 
 
 def read_vec_flt_scp(file_or_fd):
-    r"""Create generator of (key,vector<float32/float64>) tuples, read according to kaldi scp.
+    r"""Create generator of (key,vector<float32/float64>) tuples, read according to Kaldi scp.
 
-    Arguments:
-        file_or_fd (string/File Descriptor): scp, gzipped scp, pipe or opened file descriptor.
+    Args:
+        file_or_fd (str/FileDescriptor): scp, gzipped scp, pipe or opened file descriptor
 
     Returns:
-        generator[key (string), vec (Tensor)]
+        Generator[str, torch.Tensor]: The string is the key and the tensor is the vector read from file
 
-    Example::
-
+    Example
         >>> # read scp to a 'dictionary'
         >>> # d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_scp(file) }
     """
@@ -82,14 +81,13 @@ def read_vec_flt_scp(file_or_fd):
 def read_vec_flt_ark(file_or_fd):
     r"""Create generator of (key,vector<float32/float64>) tuples, which reads from the ark file/stream.
 
-    Arguments:
-        file_or_fd (string/File Descriptor): ark, gzipped ark, pipe or opened file descriptor.
+    Args:
+        file_or_fd (str/FileDescriptor): ark, gzipped ark, pipe or opened file descriptor
 
     Returns:
-        generator[key (string), vec (Tensor)]
+        Generator[str, torch.Tensor]: The string is the key and the tensor is the vector read from file
 
-    Example::
-
+    Example
         >>> # read ark to a 'dictionary'
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_ark(file) }
     """
@@ -97,16 +95,15 @@ def read_vec_flt_ark(file_or_fd):
 
 
 def read_mat_scp(file_or_fd):
-    r"""Create generator of (key,matrix<float32/float64>) tuples, read according to kaldi scp.
+    r"""Create generator of (key,matrix<float32/float64>) tuples, read according to Kaldi scp.
 
-    Arguments:
-        file_or_fd (string/File Descriptor): scp, gzipped scp, pipe or opened file descriptor.
+    Args:
+        file_or_fd (str/FileDescriptor): scp, gzipped scp, pipe or opened file descriptor
 
     Returns:
-        generator[key (string), mat (Tensor)]
+        Generator[str, torch.Tensor]: The string is the key and the tensor is the matrix read from file
 
-    Example::
-
+    Example
         >>> # read scp to a 'dictionary'
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_mat_scp(file) }
     """
@@ -116,14 +113,13 @@ def read_mat_scp(file_or_fd):
 def read_mat_ark(file_or_fd):
     r"""Create generator of (key,matrix<float32/float64>) tuples, which reads from the ark file/stream.
 
-    Arguments:
-        file_or_fd (string/File Descriptor): ark, gzipped ark, pipe or opened file descriptor.
+    Args:
+        file_or_fd (str/FileDescriptor): ark, gzipped ark, pipe or opened file descriptor
 
     Returns:
-        generator[key (string), mat (Tensor)]
+        Generator[str, torch.Tensor]: The string is the key and the tensor is the matrix read from file
 
-    Example::
-
+    Example
         >>> # read ark to a 'dictionary'
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_mat_ark(file) }
     """

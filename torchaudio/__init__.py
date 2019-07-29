@@ -5,7 +5,7 @@ import torch
 import _torch_sox
 
 from .version import __version__, git_version
-from torchaudio import transforms, datasets, kaldi_io, sox_effects, legacy, compliance
+from torchaudio import transforms, datasets, kaldi_io, sox_effects, legacy, compliance, _docs
 
 
 def check_input(src):
@@ -24,33 +24,35 @@ def load(filepath,
          signalinfo=None,
          encodinginfo=None,
          filetype=None):
-    """Loads an audio file from disk into a Tensor
+    r"""Loads an audio file from disk into a tensor
 
     Args:
-        filepath (string or pathlib.Path): path to audio file
-        out (Tensor, optional): an output Tensor to use instead of creating one
+        filepath (str or pathlib.Path): Path to audio file
+        out (torch.Tensor, optional): An output tensor to use instead of creating one. (Default: ``None``)
         normalization (bool, number, or callable, optional): If boolean `True`, then output is divided by `1 << 31`
-                                                             (assumes signed 32-bit audio), and normalizes to `[0, 1]`.
-                                                             If `number`, then output is divided by that number
-                                                             If `callable`, then the output is passed as a parameter
-                                                             to the given function, then the output is divided by
-                                                             the result.
-        channels_first (bool): Set channels first or length first in result.  Default: ``True``
-        num_frames (int, optional): number of frames to load.  0 to load everything after the offset.
-        offset (int, optional): number of frames from the start of the file to begin data loading.
-        signalinfo (sox_signalinfo_t, optional): a sox_signalinfo_t type, which could be helpful if the
-                                                 audio type cannot be automatically determined
-        encodinginfo (sox_encodinginfo_t, optional): a sox_encodinginfo_t type, which could be set if the
-                                                     audio type cannot be automatically determined
-        filetype (str, optional): a filetype or extension to be set if sox cannot determine it automatically
+            (assumes signed 32-bit audio), and normalizes to `[0, 1]`.
+            If `number`, then output is divided by that number
+            If `callable`, then the output is passed as a parameter
+            to the given function, then the output is divided by
+            the result. (Default: ``True``)
+        channels_first (bool): Set channels first or length first in result. (Default: ``True``)
+        num_frames (int, optional): Number of frames to load.  0 to load everything after the offset.
+            (Default: ``0``)
+        offset (int, optional): Number of frames from the start of the file to begin data loading.
+            (Default: ``0``)
+        signalinfo (sox_signalinfo_t, optional): A sox_signalinfo_t type, which could be helpful if the
+            audio type cannot be automatically determined. (Default: ``None``)
+        encodinginfo (sox_encodinginfo_t, optional): A sox_encodinginfo_t type, which could be set if the
+            audio type cannot be automatically determined. (Default: ``None``)
+        filetype (str, optional): A filetype or extension to be set if sox cannot determine it
+            automatically. (Default: ``None``)
 
-    Returns: tuple(Tensor, int)
-       - Tensor: output Tensor of size `[C x L]` or `[L x C]` where L is the number of audio frames and
-                 C is the number of channels
-       - int: the sample rate of the audio (as listed in the metadata of the file)
+    Returns:
+        Tuple[torch.Tensor, int]: An output tensor of size `[C x L]` or `[L x C]` where L is the number
+        of audio frames and C is the number of channels. An integer which is the sample rate of the
+        audio (as listed in the metadata of the file)
 
-    Example::
-
+    Example
         >>> data, sample_rate = torchaudio.load('foo.mp3')
         >>> print(data.size())
         torch.Size([2, 278756])
@@ -94,16 +96,33 @@ def load(filepath,
 
 
 def load_wav(filepath, **kwargs):
-    """ Loads a wave file. It assumes that the wav file uses 16 bit per sample that needs normalization by shifting
+    r""" Loads a wave file. It assumes that the wav file uses 16 bit per sample that needs normalization by shifting
     the input right by 16 bits.
+
+    Args:
+        filepath (str or pathlib.Path): Path to audio file
+
+    Returns:
+        Tuple[torch.Tensor, int]: An output tensor of size `[C x L]` or `[L x C]` where L is the number
+        of audio frames and C is the number of channels. An integer which is the sample rate of the
+        audio (as listed in the metadata of the file)
     """
     kwargs['normalization'] = 1 << 16
     return load(filepath, **kwargs)
 
 
 def save(filepath, src, sample_rate, precision=16, channels_first=True):
-    """Convenience function for `save_encinfo`.
+    r"""Convenience function for `save_encinfo`.
 
+    Args:
+        filepath (str): Path to audio file
+        src (torch.Tensor): An input 2D tensor of shape `[C x L]` or `[L x C]` where L is
+            the number of audio frames, C is the number of channels
+        sample_rate (int): An integer which is the sample rate of the
+            audio (as listed in the metadata of the file)
+        precision (int): Bit precision (Default: ``16``)
+        channels_first (bool): Set channels first or length first in result. (
+            Default: ``True``)
     """
     si = sox_signalinfo_t()
     ch_idx = 0 if channels_first else 1
@@ -120,21 +139,21 @@ def save_encinfo(filepath,
                  signalinfo=None,
                  encodinginfo=None,
                  filetype=None):
-    """Saves a Tensor of an audio signal to disk as a standard format like mp3, wav, etc.
+    r"""Saves a tensor of an audio signal to disk as a standard format like mp3, wav, etc.
 
     Args:
-        filepath (string): path to audio file
-        src (Tensor): an input 2D Tensor of shape `[C x L]` or `[L x C]` where L is
-                      the number of audio frames, C is the number of channels
-        channels_first (bool): Set channels first or length first in result.  Default: ``True``
-        signalinfo (sox_signalinfo_t): a sox_signalinfo_t type, which could be helpful if the
-                                       audio type cannot be automatically determined
-        encodinginfo (sox_encodinginfo_t, optional): a sox_encodinginfo_t type, which could be set if the
-                                                     audio type cannot be automatically determined
-        filetype (str, optional): a filetype or extension to be set if sox cannot determine it automatically
+        filepath (str): Path to audio file
+        src (torch.Tensor): An input 2D tensor of shape `[C x L]` or `[L x C]` where L is
+            the number of audio frames, C is the number of channels
+        channels_first (bool): Set channels first or length first in result. (Default: ``True``)
+        signalinfo (sox_signalinfo_t): A sox_signalinfo_t type, which could be helpful if the
+            audio type cannot be automatically determined. (Default: ``None``)
+        encodinginfo (sox_encodinginfo_t, optional): A sox_encodinginfo_t type, which could be set if the
+            audio type cannot be automatically determined. (Default: ``None``)
+        filetype (str, optional): A filetype or extension to be set if sox cannot determine it
+            automatically. (Default: ``None``)
 
-    Example::
-
+    Example
         >>> data, sample_rate = torchaudio.load('foo.mp3')
         >>> torchaudio.save('foo.wav', data, sample_rate)
 
@@ -184,16 +203,16 @@ def save_encinfo(filepath,
 
 
 def info(filepath):
-    """Gets metadata from an audio file without loading the signal.
+    r"""Gets metadata from an audio file without loading the signal.
 
      Args:
-        filepath (string): path to audio file
+        filepath (str): Path to audio file
 
-     Returns: tuple(si, ei)
-       - si (sox_signalinfo_t): signal info as a python object
-       - ei (sox_encodinginfo_t): encoding info as a python object
+     Returns:
+        Tuple[sox_signalinfo_t, sox_encodinginfo_t]: A si (sox_signalinfo_t) signal
+        info as a python object. An ei (sox_encodinginfo_t) encoding info
 
-     Example::
+     Example
          >>> si, ei = torchaudio.info('foo.wav')
          >>> rate, channels, encoding = si.rate, si.channels, ei.encoding
      """
@@ -206,13 +225,13 @@ def sox_signalinfo_t():
     primarily for effects
 
     Returns: sox_signalinfo_t(object)
-      - rate (float), sample rate as a float, practically will likely be an integer float
-      - channel (int), number of audio channels
-      - precision (int), bit precision
-      - length (int), length of audio in samples * channels, 0 for unspecified and -1 for unknown
-      - mult (float, optional), headroom multiplier for effects and None for no multiplier
+        - rate (float), sample rate as a float, practically will likely be an integer float
+        - channel (int), number of audio channels
+        - precision (int), bit precision
+        - length (int), length of audio in samples * channels, 0 for unspecified and -1 for unknown
+        - mult (float, optional), headroom multiplier for effects and ``None`` for no multiplier
 
-    Example::
+    Example
         >>> si = torchaudio.sox_signalinfo_t()
         >>> si.channels = 1
         >>> si.rate = 16000.
@@ -223,7 +242,7 @@ def sox_signalinfo_t():
 
 
 def sox_encodinginfo_t():
-    """Create a sox_encodinginfo_t object.  This object can be used to set the encoding
+    r"""Create a sox_encodinginfo_t object.  This object can be used to set the encoding
     type, bit precision, compression factor, reverse bytes, reverse nibbles,
     reverse bits and endianness.  This can be used in an effects chain to encode the
     final output or to save a file with a specific encoding.  For example, one could
@@ -232,15 +251,15 @@ def sox_encodinginfo_t():
     the bit precision.
 
     Returns: sox_encodinginfo_t(object)
-      - encoding (sox_encoding_t), output encoding
-      - bits_per_sample (int), bit precision, same as `precision` in sox_signalinfo_t
-      - compression (float), compression for lossy formats, 0.0 for default compression
-      - reverse_bytes (sox_option_t), reverse bytes, use sox_option_default
-      - reverse_nibbles (sox_option_t), reverse nibbles, use sox_option_default
-      - reverse_bits (sox_option_t), reverse bytes, use sox_option_default
-      - opposite_endian (sox_bool), change endianness, use sox_false
+        - encoding (sox_encoding_t), output encoding
+        - bits_per_sample (int), bit precision, same as `precision` in sox_signalinfo_t
+        - compression (float), compression for lossy formats, 0.0 for default compression
+        - reverse_bytes (sox_option_t), reverse bytes, use sox_option_default
+        - reverse_nibbles (sox_option_t), reverse nibbles, use sox_option_default
+        - reverse_bits (sox_option_t), reverse bytes, use sox_option_default
+        - opposite_endian (sox_bool), change endianness, use sox_false
 
-    Example::
+    Example
         >>> ei = torchaudio.sox_encodinginfo_t()
         >>> ei.encoding = torchaudio.get_sox_encoding_t(1)
         >>> ei.bits_per_sample = 16
@@ -260,13 +279,14 @@ def sox_encodinginfo_t():
 
 
 def get_sox_encoding_t(i=None):
-    """Get enum of sox_encoding_t for sox encodings.
+    r"""Get enum of sox_encoding_t for sox encodings.
 
     Args:
-        i (int, optional): choose type or get a dict with all possible options
-                           use `__members__` to see all options when not specified
+        i (int, optional): Choose type or get a dict with all possible options
+            use ``__members__`` to see all options when not specified. (Default: ``None``)
+
     Returns:
-        sox_encoding_t: a sox_encoding_t type for output encoding
+        sox_encoding_t: A sox_encoding_t type for output encoding
     """
     if i is None:
         # one can see all possible values using the .__members__ attribute
@@ -276,14 +296,14 @@ def get_sox_encoding_t(i=None):
 
 
 def get_sox_option_t(i=2):
-    """Get enum of sox_option_t for sox encodinginfo options.
+    r"""Get enum of sox_option_t for sox encodinginfo options.
 
     Args:
-        i (int, optional): choose type or get a dict with all possible options
-                           use `__members__` to see all options when not specified.
-                           Defaults to sox_option_default.
+        i (int, optional): Choose type or get a dict with all possible options
+            use ``__members__`` to see all options when not specified.
+            (Default: ``sox_option_default`` or ``2``)
     Returns:
-        sox_option_t: a sox_option_t type
+        sox_option_t: A sox_option_t type
     """
     if i is None:
         return _torch_sox.sox_option_t
@@ -292,14 +312,15 @@ def get_sox_option_t(i=2):
 
 
 def get_sox_bool(i=0):
-    """Get enum of sox_bool for sox encodinginfo options.
+    r"""Get enum of sox_bool for sox encodinginfo options.
 
     Args:
-        i (int, optional): choose type or get a dict with all possible options
-                           use `__members__` to see all options when not specified.
-                           Defaults to sox_false.
+        i (int, optional): Choose type or get a dict with all possible options
+            use ``__members__`` to see all options when not specified. (Default:
+            ``sox_false`` or ``0``)
+
     Returns:
-        sox_bool: a sox_bool type
+        sox_bool: A sox_bool type
     """
     if i is None:
         return _torch_sox.sox_bool
