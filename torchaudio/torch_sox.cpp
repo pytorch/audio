@@ -18,7 +18,9 @@ struct SoxDescriptor {
   SoxDescriptor& operator=(const SoxDescriptor& other) = delete;
   SoxDescriptor& operator=(SoxDescriptor&& other) = delete;
   ~SoxDescriptor() {
-    sox_close(fd_);
+    if (fd_ != nullptr) {
+      sox_close(fd_);
+    }
   }
   sox_format_t* operator->() noexcept {
     return fd_;

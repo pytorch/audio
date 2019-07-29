@@ -1,5 +1,5 @@
 torchaudio: an audio library for PyTorch
-================================================
+========================================
 
 [![Build Status](https://travis-ci.org/pytorch/audio.svg?branch=master)](https://travis-ci.org/pytorch/audio)
 
@@ -56,6 +56,35 @@ torchaudio.save('foo_save.mp3', sound, sample_rate) # saves tensor to file
 ```
 
 API Reference
------------
+-------------
 
 API Reference is located here: http://pytorch.org/audio/
+
+Conventions
+-----------
+
+Torchaudio is standardized around the following naming conventions.
+
+* waveform: a tensor of audio samples with dimensions (channel, time)
+* sample_rate: the rate of audio dimensions (samples per second)
+* specgram: a tensor of spectrogram with dimensions (channel, freq, time)
+* mel_specgram: a mel spectrogram with dimensions (channel, mel, time)
+* hop_length: the number of samples between the starts of consecutive frames
+* n_fft: the number of Fourier bins
+* n_mel, n_mfcc: the number of mel and MFCC bins
+* n_freq: the number of bins in a linear spectrogram
+* min_freq: the lowest frequency of the lowest band in a spectrogram
+* max_freq: the highest frequency of the highest band in a spectrogram
+* win_length: the length of the STFT window
+* window_fn: for functions that creates windows e.g. torch.hann_window
+
+Transforms expect the following dimensions. In particular, the input of all transforms and functions assumes channel first.
+
+* Spectrogram: (channel, time) -> (channel, freq, time)
+* AmplitudeToDB: (channel, freq, time) -> (channel, freq, time)
+* MelScale: (channel, time) -> (channel, mel, time)
+* MelSpectrogram: (channel, time) -> (channel, mel, time)
+* MFCC: (channel, time) -> (channel, mfcc, time)
+* MuLawEncode: (channel, time) -> (channel, time)
+* MuLawDecode: (channel, time) -> (channel, time)
+* Resample: (channel, time) -> (channel, time)
