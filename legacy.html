@@ -219,7 +219,9 @@
   <div class="section" id="torchaudio-legacy">
 <h1>torchaudio.legacy<a class="headerlink" href="#torchaudio-legacy" title="Permalink to this headline">¶</a></h1>
 <p>Legacy loading and save functions.</p>
-<span class="target" id="module-torchaudio.legacy"></span><dl class="function">
+<div class="section" id="load">
+<h2><span class="hidden-section">load</span><a class="headerlink" href="#load" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
 <dt id="torchaudio.legacy.load">
 <code class="sig-prename descclassname">torchaudio.legacy.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">out=None</em>, <em class="sig-param">normalization=None</em>, <em class="sig-param">num_frames=0</em>, <em class="sig-param">offset=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/legacy.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.legacy.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads an audio file from disk into a Tensor.  The default options have
@@ -228,33 +230,41 @@ from version 0.1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<em>string</em>) – path to audio file</p></li>
-<li><p><strong>out</strong> (<em>Tensor</em><em>, </em><em>optional</em>) – an output Tensor to use instead of creating one</p></li>
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to audio file</p></li>
+<li><p><strong>out</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a><em>, </em><em>optional</em>) – An output Tensor to use instead of creating one. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>normalization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em> or </em><em>number</em><em>, </em><em>optional</em>) – If boolean <cite>True</cite>, then output is divided by <cite>1 &lt;&lt; 31</cite>
-(assumes 16-bit depth audio, and normalizes to <cite>[0, 1]</cite>.
-If <cite>number</cite>, then output is divided by that number</p></li>
-<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – number of frames to load.  -1 to load everything after the offset.</p></li>
-<li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – number of frames from the start of the file to begin data loading.</p></li>
+(assumes 16-bit depth audio, and normalizes to <cite>[0, 1]</cite>. If <cite>number</cite>, then output is divided by that
+number. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of frames to load.  -1 to load everything after the
+offset. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
+<li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of frames from the start of the file to begin data
+loading. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
 </ul>
 </dd>
-</dl>
-<dl class="simple">
-<dt>Returns: tuple(Tensor, int)</dt><dd><ul class="simple">
-<li><p>Tensor: output Tensor of size <cite>[L x C]</cite> where L is the number of audio frames, C is the number of channels</p></li>
-<li><p>int: the sample-rate of the audio (as listed in the metadata of the file)</p></li>
-</ul>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The output tensor is of size <cite>[L x C]</cite> where L is the number of audio frames,
+C is the number of channels. The integer is sample-rate of the audio (as listed in the metadata of
+the file)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>]</p>
 </dd>
 </dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">)</span>
+<dl>
+<dt>Example</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
 <span class="go">torch.Size([278756, 2])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)</span>
 <span class="go">44100</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
+</div>
+<div class="section" id="save">
+<h2><span class="hidden-section">save</span><a class="headerlink" href="#save" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="torchaudio.legacy.save">
 <code class="sig-prename descclassname">torchaudio.legacy.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">src</em>, <em class="sig-param">sample_rate</em>, <em class="sig-param">precision=32</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/legacy.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.legacy.save" title="Permalink to this definition">¶</a></dt>
@@ -264,21 +274,24 @@ option defaults from version 0.1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<em>string</em>) – path to audio file</p></li>
-<li><p><strong>src</strong> (<em>Tensor</em>) – an input 2D Tensor of shape <cite>[L x C]</cite> where L is
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to audio file</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – An input 2D Tensor of shape <cite>[L x C]</cite> where L is
 the number of audio frames, C is the number of channels</p></li>
-<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the sample-rate of the audio to be saved</p></li>
-<li><p><strong>precision</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – the bit-precision of the audio to be saved</p></li>
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The sample-rate of the audio to be saved</p></li>
+<li><p><strong>precision</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – The bit-precision of the audio to be saved. (Default: <code class="docutils literal notranslate"><span class="pre">32</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">)</span>
+<dl>
+<dt>Example</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;foo.wav&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
+</div>
 </div>
 
 
@@ -322,7 +335,11 @@ the number of audio frames, C is the number of channels</p></li>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">torchaudio.legacy</a></li>
+<li><a class="reference internal" href="#">torchaudio.legacy</a><ul>
+<li><a class="reference internal" href="#load"><span class="hidden-section">load</span></a></li>
+<li><a class="reference internal" href="#save"><span class="hidden-section">save</span></a></li>
+</ul>
+</li>
 </ul>
 
             </div>

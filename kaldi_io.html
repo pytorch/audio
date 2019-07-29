@@ -220,7 +220,7 @@
   <div class="section" id="torchaudio-kaldi-io">
 <h1>torchaudio.kaldi_io<a class="headerlink" href="#torchaudio-kaldi-io" title="Permalink to this headline">¶</a></h1>
 <p>To use this module, the dependency <a class="reference external" href="https://github.com/vesis84/kaldi-io-for-python">kaldi_io</a> needs to be installed.
-This is a light wrapper around <code class="docutils literal notranslate"><span class="pre">kaldi_io</span></code> that returns <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensors</span></code>.</p>
+This is a light wrapper around <code class="docutils literal notranslate"><span class="pre">kaldi_io</span></code> that returns <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code></a>.</p>
 <div class="section" id="vectors">
 <h2>Vectors<a class="headerlink" href="#vectors" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="read-vec-int-ark">
@@ -231,17 +231,22 @@ This is a light wrapper around <code class="docutils literal notranslate"><span 
 <dd><p>Create generator of (key,vector&lt;int&gt;) tuples, which reads from the ark file/stream.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>string/File Descriptor</em>) – ark, gzipped ark, pipe or opened file descriptor.</p>
+<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>str/FileDescriptor</em>) – ark, gzipped ark, pipe or opened file descriptor</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>generator[key (string), vec (Tensor)]</p>
+<dd class="field-even"><p>The string is the key and the tensor is the vector read from file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Generator[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>]</p>
 </dd>
 </dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read ark to a &#39;dictionary&#39;</span>
+<dl>
+<dt>Example</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read ark to a &#39;dictionary&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_int_ark</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -250,20 +255,25 @@ This is a light wrapper around <code class="docutils literal notranslate"><span 
 <dl class="function">
 <dt id="torchaudio.kaldi_io.read_vec_flt_scp">
 <code class="sig-prename descclassname">torchaudio.kaldi_io.</code><code class="sig-name descname">read_vec_flt_scp</code><span class="sig-paren">(</span><em class="sig-param">file_or_fd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/kaldi_io.html#read_vec_flt_scp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_flt_scp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create generator of (key,vector&lt;float32/float64&gt;) tuples, read according to kaldi scp.</p>
+<dd><p>Create generator of (key,vector&lt;float32/float64&gt;) tuples, read according to Kaldi scp.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>string/File Descriptor</em>) – scp, gzipped scp, pipe or opened file descriptor.</p>
+<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>str/FileDescriptor</em>) – scp, gzipped scp, pipe or opened file descriptor</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>generator[key (string), vec (Tensor)]</p>
+<dd class="field-even"><p>The string is the key and the tensor is the vector read from file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Generator[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>]</p>
 </dd>
 </dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read scp to a &#39;dictionary&#39;</span>
+<dl>
+<dt>Example</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read scp to a &#39;dictionary&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_scp(file) }</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -275,17 +285,22 @@ This is a light wrapper around <code class="docutils literal notranslate"><span 
 <dd><p>Create generator of (key,vector&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>string/File Descriptor</em>) – ark, gzipped ark, pipe or opened file descriptor.</p>
+<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>str/FileDescriptor</em>) – ark, gzipped ark, pipe or opened file descriptor</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>generator[key (string), vec (Tensor)]</p>
+<dd class="field-even"><p>The string is the key and the tensor is the vector read from file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Generator[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>]</p>
 </dd>
 </dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read ark to a &#39;dictionary&#39;</span>
+<dl>
+<dt>Example</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read ark to a &#39;dictionary&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_flt_ark</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -297,20 +312,25 @@ This is a light wrapper around <code class="docutils literal notranslate"><span 
 <dl class="function">
 <dt id="torchaudio.kaldi_io.read_mat_scp">
 <code class="sig-prename descclassname">torchaudio.kaldi_io.</code><code class="sig-name descname">read_mat_scp</code><span class="sig-paren">(</span><em class="sig-param">file_or_fd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/kaldi_io.html#read_mat_scp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.kaldi_io.read_mat_scp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create generator of (key,matrix&lt;float32/float64&gt;) tuples, read according to kaldi scp.</p>
+<dd><p>Create generator of (key,matrix&lt;float32/float64&gt;) tuples, read according to Kaldi scp.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>string/File Descriptor</em>) – scp, gzipped scp, pipe or opened file descriptor.</p>
+<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>str/FileDescriptor</em>) – scp, gzipped scp, pipe or opened file descriptor</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>generator[key (string), mat (Tensor)]</p>
+<dd class="field-even"><p>The string is the key and the tensor is the matrix read from file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Generator[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>]</p>
 </dd>
 </dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read scp to a &#39;dictionary&#39;</span>
+<dl>
+<dt>Example</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read scp to a &#39;dictionary&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_scp</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -322,17 +342,22 @@ This is a light wrapper around <code class="docutils literal notranslate"><span 
 <dd><p>Create generator of (key,matrix&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>string/File Descriptor</em>) – ark, gzipped ark, pipe or opened file descriptor.</p>
+<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>str/FileDescriptor</em>) – ark, gzipped ark, pipe or opened file descriptor</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>generator[key (string), mat (Tensor)]</p>
+<dd class="field-even"><p>The string is the key and the tensor is the matrix read from file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Generator[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>]</p>
 </dd>
 </dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read ark to a &#39;dictionary&#39;</span>
+<dl>
+<dt>Example</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read ark to a &#39;dictionary&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_ark</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
 </pre></div>
 </div>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

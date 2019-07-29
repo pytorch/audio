@@ -219,91 +219,235 @@
               
   <div class="section" id="torchaudio-transforms">
 <h1>torchaudio.transforms<a class="headerlink" href="#torchaudio-transforms" title="Permalink to this headline">¶</a></h1>
-<p>Transforms are common audio transforms. They can be chained together using <a class="reference internal" href="#torchaudio.transforms.Compose" title="torchaudio.transforms.Compose"><code class="xref py py-class docutils literal notranslate"><span class="pre">Compose</span></code></a></p>
+<p>Transforms are common audio transforms. They can be chained together using <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.Sequential" title="(in PyTorch vmaster (1.1.0 ))"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Sequential</span></code></a></p>
+<div class="section" id="spectrogram">
+<h2><span class="hidden-section">Spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="torchaudio.transforms.Compose">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Compose</code><span class="sig-paren">(</span><em class="sig-param">transforms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Compose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Compose" title="Permalink to this definition">¶</a></dt>
-<dd><p>Composes several transforms together.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>transforms</strong> (list of <code class="docutils literal notranslate"><span class="pre">Transform</span></code> objects) – list of transforms to compose.</p>
-</dd>
-</dl>
-<p class="rubric">Example</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">transforms</span><span class="o">.</span><span class="n">Scale</span><span class="p">(),</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">transforms</span><span class="o">.</span><span class="n">PadTrim</span><span class="p">(</span><span class="n">max_len</span><span class="o">=</span><span class="mi">16000</span><span class="p">),</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">])</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="class">
-<dt id="torchaudio.transforms.Scale">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Scale</code><span class="sig-paren">(</span><em class="sig-param">factor=2147483648</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Scale" title="Permalink to this definition">¶</a></dt>
-<dd><p>Scale audio tensor from a 16-bit integer (represented as a FloatTensor)
-to a floating point number between -1.0 and 1.0.  Note the 16-bit number is
-called the “bit depth” or “precision”, not to be confused with “bit rate”.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>factor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – maximum value of input tensor. default: 16-bit depth</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="class">
-<dt id="torchaudio.transforms.PadTrim">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">PadTrim</code><span class="sig-paren">(</span><em class="sig-param">max_len</em>, <em class="sig-param">fill_value=0.0</em>, <em class="sig-param">channels_first=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#PadTrim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.PadTrim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pad/Trim a 2d-Tensor (Signal or Labels)</p>
+<dt id="torchaudio.transforms.Spectrogram">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Spectrogram</code><span class="sig-paren">(</span><em class="sig-param">n_fft=400</em>, <em class="sig-param">win_length=None</em>, <em class="sig-param">hop_length=None</em>, <em class="sig-param">pad=0</em>, <em class="sig-param">window_fn=&lt;built-in method hann_window of type object&gt;</em>, <em class="sig-param">power=2</em>, <em class="sig-param">normalized=False</em>, <em class="sig-param">wkwargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Spectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a spectrogram from a audio signal</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tensor</strong> (<em>Tensor</em>) – Tensor of audio of size (n x c) or (c x n)</p></li>
-<li><p><strong>max_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Length to which the tensor will be padded</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Pad for channels first tensors.  Default: <cite>True</cite></p></li>
+<li><p><strong>n_fft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Size of FFT, creates <code class="docutils literal notranslate"><span class="pre">n_fft</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code> bins</p></li>
+<li><p><strong>win_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Window size. (Default: <code class="docutils literal notranslate"><span class="pre">n_fft</span></code>)</p></li>
+<li><p><strong>hop_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Length of hop between STFT windows. (
+Default: <code class="docutils literal notranslate"><span class="pre">win_length</span> <span class="pre">//</span> <span class="pre">2</span></code>)</p></li>
+<li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Two sided padding of signal. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
+<li><p><strong>window_fn</strong> (<em>Callable</em><em>[</em><em>[</em><em>..</em><em>]</em><em>, </em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a><em>]</em>) – A function to create a window tensor
+that is applied/multiplied to each frame/window. (Default: <code class="docutils literal notranslate"><span class="pre">torch.hann_window</span></code>)</p></li>
+<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Exponent for the magnitude spectrogram,
+(must be &gt; 0) e.g., 1 for energy, 2 for power, etc. (Default: <code class="docutils literal notranslate"><span class="pre">2</span></code>)</p></li>
+<li><p><strong>normalized</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether to normalize by magnitude after stft. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>wkwargs</strong> (<em>Dict</em><em>[</em><em>..</em><em>, </em><em>..</em><em>]</em>) – Arguments for window function. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="method">
+<dt id="torchaudio._docs.Spectrogram.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Spectrogram.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.Spectrogram.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – Tensor of audio of dimension (channel, time)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dimension (channel, freq, time), where channel
+is unchanged, freq is <code class="docutils literal notranslate"><span class="pre">n_fft</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code> where <code class="docutils literal notranslate"><span class="pre">n_fft</span></code> is the number of
+Fourier bins, and time is the number of window hops (n_frames).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+</dd>
+</dl>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="amplitudetodb">
+<h2><span class="hidden-section">AmplitudeToDB</span><a class="headerlink" href="#amplitudetodb" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="torchaudio.transforms.DownmixMono">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">DownmixMono</code><span class="sig-paren">(</span><em class="sig-param">channels_first=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#DownmixMono"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.DownmixMono" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Downmix any stereo signals to mono.  Consider using a <cite>SoxEffectsChain</cite> with</dt><dd><p>the <cite>channels</cite> effect instead of this transformation.</p>
+<dt id="torchaudio.transforms.AmplitudeToDB">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">AmplitudeToDB</code><span class="sig-paren">(</span><em class="sig-param">stype='power'</em>, <em class="sig-param">top_db=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#AmplitudeToDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.AmplitudeToDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turns a tensor from the power/amplitude scale to the decibel scale.</p>
+<p>This output depends on the maximum value in the input tensor, and so
+may return different values for an audio clip split into snippets vs. a
+a full clip.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – scale of input tensor (‘power’ or ‘magnitude’). The
+power being the elementwise square of the magnitude. (Default: <code class="docutils literal notranslate"><span class="pre">'power'</span></code>)</p></li>
+<li><p><strong>top_db</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – minimum negative cut-off in decibels.  A reasonable number
+is 80. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
 </dd>
-<dt>Inputs:</dt><dd><p>tensor (Tensor): Tensor of audio of size (c x n) or (n x c)
-channels_first (bool): Downmix across channels dimension.  Default: <cite>True</cite></p>
+</dl>
+<dl class="method">
+<dt id="torchaudio._docs.AmplitudeToDB.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#AmplitudeToDB.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.AmplitudeToDB.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Numerically stable implementation from Librosa
+<a class="reference external" href="https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html">https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – Input tensor before being converted to decibel scale</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output tensor in decibel scale</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="melscale">
+<h2><span class="hidden-section">MelScale</span><a class="headerlink" href="#melscale" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.transforms.MelScale">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">MelScale</code><span class="sig-paren">(</span><em class="sig-param">n_mels=128</em>, <em class="sig-param">sample_rate=16000</em>, <em class="sig-param">f_min=0.0</em>, <em class="sig-param">f_max=None</em>, <em class="sig-param">n_stft=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MelScale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MelScale" title="Permalink to this definition">¶</a></dt>
+<dd><p>This turns a normal STFT into a mel frequency STFT, using a conversion
+matrix.  This uses triangular filter banks.</p>
+<p>User can control which device the filter bank (<cite>fb</cite>) is (e.g. fb.to(spec_f.device)).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of mel filterbanks. (Default: <code class="docutils literal notranslate"><span class="pre">128</span></code>)</p></li>
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Sample rate of audio signal. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
+<li><p><strong>f_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Minimum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">0.</span></code>)</p></li>
+<li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">sample_rate</span> <span class="pre">//</span> <span class="pre">2</span></code>)</p></li>
+<li><p><strong>n_stft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of bins in STFT. Calculated from first input
+if None is given.  See <code class="docutils literal notranslate"><span class="pre">n_fft</span></code> in <a class="reference internal" href="#torchaudio.transforms.Spectrogram" title="torchaudio.transforms.Spectrogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrogram</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio._docs.MelScale.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">specgram</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MelScale.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.MelScale.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>specgram</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – A spectrogram STFT of dimension (channel, freq, time)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mel frequency spectrogram of size (channel, <code class="docutils literal notranslate"><span class="pre">n_mels</span></code>, time)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="melspectrogram">
+<h2><span class="hidden-section">MelSpectrogram</span><a class="headerlink" href="#melspectrogram" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.transforms.MelSpectrogram">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">MelSpectrogram</code><span class="sig-paren">(</span><em class="sig-param">sample_rate=16000</em>, <em class="sig-param">n_fft=400</em>, <em class="sig-param">win_length=None</em>, <em class="sig-param">hop_length=None</em>, <em class="sig-param">f_min=0.0</em>, <em class="sig-param">f_max=None</em>, <em class="sig-param">pad=0</em>, <em class="sig-param">n_mels=128</em>, <em class="sig-param">window_fn=&lt;built-in method hann_window of type object&gt;</em>, <em class="sig-param">wkwargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MelSpectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MelSpectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create MelSpectrogram for a raw audio signal. This is a composition of Spectrogram
+and MelScale.</p>
+<dl class="simple">
+<dt>Sources</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe">https://gist.github.com/kastnerkyle/179d6e9a88202ab0a2fe</a></p></li>
+<li><p><a class="reference external" href="https://timsainb.github.io/spectrograms-mfccs-and-inversion-in-python.html">https://timsainb.github.io/spectrograms-mfccs-and-inversion-in-python.html</a></p></li>
+<li><p><a class="reference external" href="http://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html">http://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html</a></p></li>
+</ul>
 </dd>
 </dl>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Sample rate of audio signal. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
+<li><p><strong>win_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Window size. (Default: <code class="docutils literal notranslate"><span class="pre">n_fft</span></code>)</p></li>
+<li><p><strong>hop_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Length of hop between STFT windows. (
+Default: <code class="docutils literal notranslate"><span class="pre">win_length</span> <span class="pre">//</span> <span class="pre">2</span></code>)</p></li>
+<li><p><strong>n_fft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Size of FFT, creates <code class="docutils literal notranslate"><span class="pre">n_fft</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code> bins</p></li>
+<li><p><strong>f_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Minimum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">0.</span></code>)</p></li>
+<li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Two sided padding of signal. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
+<li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of mel filterbanks. (Default: <code class="docutils literal notranslate"><span class="pre">128</span></code>)</p></li>
+<li><p><strong>window_fn</strong> (<em>Callable</em><em>[</em><em>[</em><em>..</em><em>]</em><em>, </em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a><em>]</em>) – A function to create a window tensor
+that is applied/multiplied to each frame/window. (Default: <code class="docutils literal notranslate"><span class="pre">torch.hann_window</span></code>)</p></li>
+<li><p><strong>wkwargs</strong> (<em>Dict</em><em>[</em><em>..</em><em>, </em><em>..</em><em>]</em>) – Arguments for window function. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>tensor (Tensor) (Samples x 1)</p>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mel_specgram</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)(</span><span class="n">waveform</span><span class="p">)</span>  <span class="c1"># (channel, n_mels, time)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio._docs.MelSpectrogram.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MelSpectrogram.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.MelSpectrogram.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – Tensor of audio of dimension (channel, time)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Mel frequency spectrogram of size (channel, <code class="docutils literal notranslate"><span class="pre">n_mels</span></code>, time)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="class">
-<dt id="torchaudio.transforms.LC2CL">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">LC2CL</code><a class="reference internal" href="_modules/torchaudio/transforms.html#LC2CL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.LC2CL" title="Permalink to this definition">¶</a></dt>
-<dd><p>Permute a 2d tensor from samples (n x c) to (c x n)</p>
 </dd></dl>
 
+</div>
+<div class="section" id="mfcc">
+<h2><span class="hidden-section">MFCC</span><a class="headerlink" href="#mfcc" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="torchaudio.transforms.MEL">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">MEL</code><a class="reference internal" href="_modules/torchaudio/transforms.html#MEL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MEL" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="torchaudio.transforms.BLC2CBL">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">BLC2CBL</code><a class="reference internal" href="_modules/torchaudio/transforms.html#BLC2CBL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.BLC2CBL" title="Permalink to this definition">¶</a></dt>
-<dd><p>Permute a 3d tensor from Bands x Sample length x Channels to Channels x
-Bands x Samples length</p>
+<dt id="torchaudio.transforms.MFCC">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">MFCC</code><span class="sig-paren">(</span><em class="sig-param">sample_rate=16000</em>, <em class="sig-param">n_mfcc=40</em>, <em class="sig-param">dct_type=2</em>, <em class="sig-param">norm='ortho'</em>, <em class="sig-param">log_mels=False</em>, <em class="sig-param">melkwargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MFCC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MFCC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the Mel-frequency cepstrum coefficients from an audio signal</p>
+<p>By default, this calculates the MFCC on the DB-scaled Mel spectrogram.
+This is not the textbook implementation, but is implemented here to
+give consistency with librosa.</p>
+<p>This output depends on the maximum value in the input spectrogram, and so
+may return different values for an audio clip split into snippets vs. a
+a full clip.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Sample rate of audio signal. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
+<li><p><strong>n_mfcc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of mfc coefficients to retain. (Default: <code class="docutils literal notranslate"><span class="pre">40</span></code>)</p></li>
+<li><p><strong>dct_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – type of DCT (discrete cosine transform) to use. (Default: <code class="docutils literal notranslate"><span class="pre">2</span></code>)</p></li>
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – norm to use. (Default: <code class="docutils literal notranslate"><span class="pre">'ortho'</span></code>)</p></li>
+<li><p><strong>log_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – whether to use log-mel spectrograms instead of db-scaled. (Default:
+<code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>melkwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – arguments for MelSpectrogram. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio._docs.MFCC.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MFCC.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.MFCC.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – Tensor of audio of dimension (channel, time)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>specgram_mel_db of size (channel, <code class="docutils literal notranslate"><span class="pre">n_mfcc</span></code>, time)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+</dd>
+</dl>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="mulawencoding">
+<h2><span class="hidden-section">MuLawEncoding</span><a class="headerlink" href="#mulawencoding" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.MuLawEncoding">
 <em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">MuLawEncoding</code><span class="sig-paren">(</span><em class="sig-param">quantization_channels=256</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MuLawEncoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MuLawEncoding" title="Permalink to this definition">¶</a></dt>
@@ -313,25 +457,96 @@ Bands x Samples length</p>
 returns a signal encoded with values from 0 to quantization_channels - 1</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of channels. default: 256</p>
+<dd class="field-odd"><p><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of channels (Default: <code class="docutils literal notranslate"><span class="pre">256</span></code>)</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio._docs.MuLawEncoding.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MuLawEncoding.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.MuLawEncoding.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – A signal to be encoded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An encoded signal</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>x_mu (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>)</p>
 </dd>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="mulawdecoding">
+<h2><span class="hidden-section">MuLawDecoding</span><a class="headerlink" href="#mulawdecoding" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="torchaudio.transforms.MuLawExpanding">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">MuLawExpanding</code><span class="sig-paren">(</span><em class="sig-param">quantization_channels=256</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MuLawExpanding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MuLawExpanding" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.transforms.MuLawDecoding">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">MuLawDecoding</code><span class="sig-paren">(</span><em class="sig-param">quantization_channels=256</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MuLawDecoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MuLawDecoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decode mu-law encoded signal.  For more info see the
 <a class="reference external" href="https://en.wikipedia.org/wiki/%CE%9C-law_algorithm">Wikipedia Entry</a></p>
 <p>This expects an input with values between 0 and quantization_channels - 1
 and returns a signal scaled between -1 and 1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of channels. default: 256</p>
+<dd class="field-odd"><p><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of channels (Default: <code class="docutils literal notranslate"><span class="pre">256</span></code>)</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio._docs.MuLawDecoding.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x_mu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MuLawDecoding.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.MuLawDecoding.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x_mu</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – A mu-law encoded signal which needs to be decoded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The signal decoded</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="resample">
+<h2><span class="hidden-section">Resample</span><a class="headerlink" href="#resample" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.transforms.Resample">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Resample</code><span class="sig-paren">(</span><em class="sig-param">orig_freq=16000</em>, <em class="sig-param">new_freq=16000</em>, <em class="sig-param">resampling_method='sinc_interpolation'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Resample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resamples a signal from one frequency to another. A resampling method can
+be given.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>orig_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The original frequency of the signal. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
+<li><p><strong>new_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The desired frequency. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
+<li><p><strong>resampling_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The resampling method (Default: <code class="docutils literal notranslate"><span class="pre">'sinc_interpolation'</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio._docs.Resample.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Resample.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.Resample.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – The input signal of dimension (channel, time)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output signal of dimension (channel, time)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -377,7 +592,17 @@ and returns a signal scaled between -1 and 1.</p>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">torchaudio.transforms</a></li>
+<li><a class="reference internal" href="#">torchaudio.transforms</a><ul>
+<li><a class="reference internal" href="#spectrogram"><span class="hidden-section">Spectrogram</span></a></li>
+<li><a class="reference internal" href="#amplitudetodb"><span class="hidden-section">AmplitudeToDB</span></a></li>
+<li><a class="reference internal" href="#melscale"><span class="hidden-section">MelScale</span></a></li>
+<li><a class="reference internal" href="#melspectrogram"><span class="hidden-section">MelSpectrogram</span></a></li>
+<li><a class="reference internal" href="#mfcc"><span class="hidden-section">MFCC</span></a></li>
+<li><a class="reference internal" href="#mulawencoding"><span class="hidden-section">MuLawEncoding</span></a></li>
+<li><a class="reference internal" href="#mulawdecoding"><span class="hidden-section">MuLawDecoding</span></a></li>
+<li><a class="reference internal" href="#resample"><span class="hidden-section">Resample</span></a></li>
+</ul>
+</li>
 </ul>
 
             </div>

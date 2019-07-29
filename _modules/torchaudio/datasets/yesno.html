@@ -227,20 +227,21 @@
 
 
 <div class="viewcode-block" id="YESNO"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.YESNO">[docs]</a><span class="k">class</span> <span class="nc">YESNO</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;`YesNo Hebrew &lt;http://www.openslr.org/1/&gt;`_ Dataset.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;`YesNo Hebrew &lt;http://www.openslr.org/1/&gt;`_ Dataset.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        root (string): Root directory of dataset where ``processed/training.pt``</span>
+<span class="sd">        root (str): Root directory of dataset where ``processed/training.pt``</span>
 <span class="sd">            and  ``processed/test.pt`` exist.</span>
+<span class="sd">        transform (Callable, optional): A function/transform that takes in an PIL image</span>
+<span class="sd">            and returns a transformed version. E.g, ``transforms.Spectrogram``. (</span>
+<span class="sd">            Default: ``None``)</span>
+<span class="sd">        target_transform (Callable, optional): A function/transform that takes in the</span>
+<span class="sd">            target and transforms it. (Default: ``None``)</span>
 <span class="sd">        download (bool, optional): If true, downloads the dataset from the internet and</span>
 <span class="sd">            puts it in root directory. If dataset is already downloaded, it is not</span>
-<span class="sd">            downloaded again.</span>
-<span class="sd">        transform (callable, optional): A function/transform that  takes in an PIL image</span>
-<span class="sd">            and returns a transformed version. E.g, ``transforms.Scale``</span>
-<span class="sd">        target_transform (callable, optional): A function/transform that takes in the</span>
-<span class="sd">            target and transforms it.</span>
-<span class="sd">        dev_mode(bool, optional): if true, clean up is not performed on downloaded</span>
-<span class="sd">            files.  Useful to keep raw audio and transcriptions.</span>
+<span class="sd">            downloaded again. (Default: ``False``)</span>
+<span class="sd">        dev_mode(bool, optional): If true, clean up is not performed on downloaded</span>
+<span class="sd">            files.  Useful to keep raw audio and transcriptions. (Default: ``False``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">raw_folder</span> <span class="o">=</span> <span class="s1">&#39;yesno/raw&#39;</span>
     <span class="n">processed_folder</span> <span class="o">=</span> <span class="s1">&#39;yesno/processed&#39;</span>
@@ -273,7 +274,8 @@
 <span class="sd">            index (int): Index</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple: (image, target) where target is index of the target class.</span>
+<span class="sd">            Tuple[torch.Tensor, int]: The output tuple (image, target) where target</span>
+<span class="sd">            is index of the target class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">audio</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 

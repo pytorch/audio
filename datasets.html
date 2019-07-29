@@ -247,21 +247,22 @@ For example:</p>
 <dt id="torchaudio.datasets.VCTK">
 <em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">VCTK</code><span class="sig-paren">(</span><em class="sig-param">root</em>, <em class="sig-param">downsample=True</em>, <em class="sig-param">transform=None</em>, <em class="sig-param">target_transform=None</em>, <em class="sig-param">download=False</em>, <em class="sig-param">dev_mode=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK" title="Permalink to this definition">¶</a></dt>
 <dd><p><a class="reference external" href="http://homepages.inf.ed.ac.uk/jyamagis/page3/page58/page58.html">VCTK</a> Dataset.
-<cite>alternate url &lt;http://datashare.is.ed.ac.uk/handle/10283/2651&gt;</cite></p>
+<a class="reference external" href="http://datashare.is.ed.ac.uk/handle/10283/2651">alternate url</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>root</strong> (<em>string</em>) – Root directory of dataset where <code class="docutils literal notranslate"><span class="pre">processed/training.pt</span></code>
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Root directory of dataset where <code class="docutils literal notranslate"><span class="pre">processed/training.pt</span></code>
 and  <code class="docutils literal notranslate"><span class="pre">processed/test.pt</span></code> exist.</p></li>
+<li><p><strong>downsample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to downsample the signal (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>transform</strong> (<em>Callable</em><em>, </em><em>optional</em>) – A function/transform that takes in an raw audio
+and returns a transformed version. E.g, <code class="docutils literal notranslate"><span class="pre">transforms.Spectrogram</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>target_transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that takes in the
+target and transforms it. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If true, downloads the dataset from the internet and
 puts it in root directory. If dataset is already downloaded, it is not
-downloaded again.</p></li>
-<li><p><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that  takes in an raw audio
-and returns a transformed version. E.g, <code class="docutils literal notranslate"><span class="pre">transforms.Scale</span></code></p></li>
-<li><p><strong>target_transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that takes in the
-target and transforms it.</p></li>
-<li><p><strong>dev_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – if true, clean up is not performed on downloaded
-files.  Useful to keep raw audio and transcriptions.</p></li>
+downloaded again. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>dev_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If true, clean up is not performed on downloaded
+files.  Useful to keep raw audio and transcriptions. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -273,10 +274,11 @@ files.  Useful to keep raw audio and transcriptions.</p></li>
 <dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>(image, target) where target is index of the target class.</p>
+<dd class="field-even"><p>The output tuple (image, target) where target
+is index of the target class.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
+<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -293,17 +295,18 @@ files.  Useful to keep raw audio and transcriptions.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>root</strong> (<em>string</em>) – Root directory of dataset where <code class="docutils literal notranslate"><span class="pre">processed/training.pt</span></code>
+<li><p><strong>root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Root directory of dataset where <code class="docutils literal notranslate"><span class="pre">processed/training.pt</span></code>
 and  <code class="docutils literal notranslate"><span class="pre">processed/test.pt</span></code> exist.</p></li>
+<li><p><strong>transform</strong> (<em>Callable</em><em>, </em><em>optional</em>) – A function/transform that takes in an PIL image
+and returns a transformed version. E.g, <code class="docutils literal notranslate"><span class="pre">transforms.Spectrogram</span></code>. (
+Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>target_transform</strong> (<em>Callable</em><em>, </em><em>optional</em>) – A function/transform that takes in the
+target and transforms it. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If true, downloads the dataset from the internet and
 puts it in root directory. If dataset is already downloaded, it is not
-downloaded again.</p></li>
-<li><p><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that  takes in an PIL image
-and returns a transformed version. E.g, <code class="docutils literal notranslate"><span class="pre">transforms.Scale</span></code></p></li>
-<li><p><strong>target_transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function/transform that takes in the
-target and transforms it.</p></li>
-<li><p><strong>dev_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – if true, clean up is not performed on downloaded
-files.  Useful to keep raw audio and transcriptions.</p></li>
+downloaded again. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>dev_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If true, clean up is not performed on downloaded
+files.  Useful to keep raw audio and transcriptions. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -315,10 +318,11 @@ files.  Useful to keep raw audio and transcriptions.</p></li>
 <dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>(image, target) where target is index of the target class.</p>
+<dd class="field-even"><p>The output tuple (image, target) where target
+is index of the target class.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></p>
+<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>]</p>
 </dd>
 </dl>
 </dd></dl>
