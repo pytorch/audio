@@ -37,9 +37,13 @@ if IS_WHEEL:
     include_dirs += [os.path.join(audio_path, 'third_party/flac/include')]
     include_dirs += [os.path.join(audio_path, 'third_party/lame/include')]
     include_dirs += [os.path.join(audio_path, 'third_party/sox/include')]
+    include_dirs += [os.path.join(audio_path, 'third_party/mad/include')]
 
-    # proper link order (sox, flac, lame)
+    # proper link order (sox, mad, flac, lame)
+    # (the most important thing is that dependencies come after a libraryl
+    # e.g., sox comes first)
     extra_objects += [os.path.join(audio_path, 'third_party/sox/lib/libsox.a')]
+    extra_objects += [os.path.join(audio_path, 'third_party/mad/lib/libmad.a')]
     extra_objects += [os.path.join(audio_path, 'third_party/flac/lib/libFLAC.a')]
     extra_objects += [os.path.join(audio_path, 'third_party/lame/lib/libmp3lame.a')]
 else:
