@@ -77,7 +77,7 @@ torchaudio is standardized around the following naming conventions. In particula
 tensors are assumed to have channel as the first dimension and time as the last
 dimension (when applicable). This makes it consistent with PyTorch's dimensions.
 For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`, `n_mel`)")
-whereas, dimension names do not have this prefix (e.g. "a tensor of
+whereas dimension names do not have this prefix (e.g. "a tensor of
 dimension (channel, time)")
 
 * `waveform`: a tensor of audio samples with dimensions (channel, time)
