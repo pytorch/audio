@@ -2,13 +2,13 @@ import os
 import torch
 import torchaudio.kaldi_io as kio
 import unittest
-import test.common_utils
+import common_utils
 
 
 class Test_KaldiIO(unittest.TestCase):
     data1 = [[1, 2, 3], [11, 12, 13], [21, 22, 23]]
     data2 = [[31, 32, 33], [41, 42, 43], [51, 52, 53]]
-    test_dirpath, test_dir = test.common_utils.create_temp_assets_dir()
+    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
 
     def _test_helper(self, file_name, expected_data, fn, expected_dtype):
         """ Takes a file_name to the input data and a function fn to extract the
