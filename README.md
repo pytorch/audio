@@ -4,16 +4,16 @@ torchaudio: an audio library for PyTorch
 [![Build Status](https://travis-ci.org/pytorch/audio.svg?branch=master)](https://travis-ci.org/pytorch/audio)
 
 The aim of torchaudio is to apply [PyTorch](https://github.com/pytorch/pytorch) to
-the audio domain. By supporting PyTorch, torchaudio will follow the same philosophy
+the audio domain. By supporting PyTorch, torchaudio follows the same philosophy
 of providing strong GPU acceleration, having a focus on trainable features through
 the autograd system, and having consistent style (tensor names and dimension names).
-Therefore, it will be primarily a machine learning library and not a general signal
-processing library. The benefits of Pytorch will be seen in torchaudio through
+Therefore, it is primarily a machine learning library and not a general signal
+processing library. The benefits of Pytorch is be seen in torchaudio through
 having all the computations be through Pytorch operations which makes it easy
 to use and feel like a natural extension.
 
 - [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/)
-  - Load the following formats into a torch Tensor
+  - Load the following formats into a torch Tensor using sox
     - mp3, wav, aac, ogg, flac, avr, cdda, cvs/vms,
     - aiff, au, amr, mp2, mp4, ac3, avi, wmv,
     - mpeg, ircam and any other format supported by libsox.
@@ -73,8 +73,8 @@ Conventions
 -----------
 
 With torchaudio being a machine learning library and built on top of PyTorch,
-torchaudio is standardized around the following naming conventions. In particular,
-tensors are assumed to have channel as the first dimension and time as the last
+torchaudio is standardized around the following naming conventions. Tensors are
+assumed to have channel as the first dimension and time as the last
 dimension (when applicable). This makes it consistent with PyTorch's dimensions.
 For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`, `n_mel`)")
 whereas dimension names do not have this prefix (e.g. "a tensor of
