@@ -7,7 +7,7 @@ import torchaudio
 from torchaudio.common_utils import IMPORT_LIBROSA, IMPORT_SCIPY
 import torchaudio.transforms as transforms
 import unittest
-import test.common_utils
+import common_utils
 
 if IMPORT_LIBROSA:
     import librosa
@@ -26,9 +26,9 @@ class Tester(unittest.TestCase):
     sig.unsqueeze_(1)  # (64000, 1)
     sig = (sig * volume * 2**31).long()
     # file for stereo stft test
-    test_dirpath, test_dir = test.common_utils.create_temp_assets_dir()
-    test_filepath = os.path.join(test_dirpath, "assets",
-                                 "steam-train-whistle-daniel_simon.mp3")
+    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    test_filepath = os.path.join(test_dirpath, 'assets',
+                                 'steam-train-whistle-daniel_simon.mp3')
 
     def test_scale(self):
 
