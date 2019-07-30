@@ -3,13 +3,13 @@ import os
 import torch
 import torchaudio
 import unittest
-import test.common_utils
+import common_utils
 import torchaudio.datasets.vctk as vctk
 
 
 class TestVCTK(unittest.TestCase):
     def setUp(self):
-        self.test_dirpath, self.test_dir = test.common_utils.create_temp_assets_dir()
+        self.test_dirpath, self.test_dir = common_utils.create_temp_assets_dir()
 
     def get_full_path(self, file):
         return os.path.join(self.test_dirpath, 'assets', file)

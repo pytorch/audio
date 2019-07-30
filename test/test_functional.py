@@ -5,7 +5,7 @@ import torchaudio
 import torchaudio.functional as F
 import pytest
 import unittest
-import test.common_utils
+import common_utils
 
 from torchaudio.common_utils import IMPORT_LIBROSA
 
@@ -30,7 +30,7 @@ class TestFunctional(unittest.TestCase):
         # operation to check whether we can reconstruct signal
         for data_size in self.data_sizes:
             for i in range(self.number_of_trials):
-                sound = test.common_utils.random_float_tensor(i, data_size)
+                sound = common_utils.random_float_tensor(i, data_size)
 
                 stft = torch.stft(sound, **kwargs)
                 estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
