@@ -31,6 +31,29 @@ sudo apt-get install sox libsox-dev libsox-fmt-all
 Installation
 ------------
 
+### Binaries
+
+To install pip wheels of 0.2.0, select the appropriate pip wheel for
+your version of Python:
+
+```
+# Wheels for Python 2 are NOT supported
+
+# Python 3.5
+pip3 install http://download.pytorch.org/whl/torchaudio-0.2-cp35-cp35m-linux_x86_64.whl
+
+# Python 3.6
+pip3 install http://download.pytorch.org/whl/torchaudio-0.2-cp36-cp36m-linux_x86_64.whl
+
+# Python 3.7
+pip3 install http://download.pytorch.org/whl/torchaudio-0.2-cp37-cp37m-linux_x86_64.whl
+```
+
+### From Source
+
+If your system configuration is not among the supported configurations
+above, you can build from source.
+
 ```bash
 # Linux
 python setup.py install
