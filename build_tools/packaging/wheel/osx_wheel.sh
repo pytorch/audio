@@ -1,3 +1,7 @@
+#!/bin/bash
+
+set -ex
+
 if [[ ":$PATH:" == *"conda"* ]]; then
     echo "existing anaconda install in PATH, remove it and run script"
     exit 1
@@ -11,19 +15,18 @@ wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh &
 
 . ~/minconda_wheel_env_tmp/bin/activate
 
-export TORCHAUDIO_BUILD_VERSION="0.2.0"
+export TORCHAUDIO_PACKAGE_NAME="torchaudio_nightly"
+export TORCHAUDIO_BUILD_VERSION="0.4.0.dev$(date "+%Y%m%d")"
 export TORCHAUDIO_BUILD_NUMBER="1"
 export OUT_DIR=~/torchaudio_wheels
 
 export MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++
 
-# TODO remove when pytorch is good https://github.com/pytorch/pytorch/issues/20030
-brew install libomp
 CURR_PATH=$(pwd)
 
 cd /tmp
 rm -rf audio
-git clone https://github.com/pytorch/audio -b v${TORCHAUDIO_BUILD_VERSION}
+git clone https://github.com/pytorch/audio
 mkdir audio/third_party
 
 export PREFIX="/tmp"
@@ -39,6 +42,12 @@ do
     env_name="env$desired_python"
     conda create -yn $env_name python="$desired_python"
     conda activate $env_name
+
+    export TORCHAUDIO_PYTORCH_DEPENDENCY_NAME=torch_nightly
+    pip install torch_nightly -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+    # NB: OS X builds don't have local package qualifiers
+    export TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION="$(pip show torch_nightly | grep ^Version: | sed 's/Version: \+//')"
+    echo "Building against ${TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION}"
 
      # install torchaudio dependencies
     pip install -r requirements.txt
