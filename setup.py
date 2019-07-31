@@ -57,7 +57,7 @@ if IS_CONDA:
 
 # Creating the version file
 cwd = os.path.dirname(os.path.abspath(__file__))
-version = '0.2.0a0'
+version = '0.3.0a0'
 sha = 'Unknown'
 
 try:
