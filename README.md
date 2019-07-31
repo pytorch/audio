@@ -49,20 +49,22 @@ Installation
 
 ### Binaries
 
-To install pip wheels of 0.2.0, select the appropriate pip wheel for
-your version of Python:
+To install the latest pip wheels, run:
 
 ```
-# Wheels for Python 2 are NOT supported
+pip install torchaudio -f https://download.pytorch.org/whl/torch_stable.html
+```
 
-# Python 3.5
-pip3 install http://download.pytorch.org/whl/torchaudio-0.2-cp35-cp35m-linux_x86_64.whl
+(If you do not have torch already installed, this will default to installing
+torch from PyPI. If you need a different torch configuration, preinstall torch
+before running this command.)
 
-# Python 3.6
-pip3 install http://download.pytorch.org/whl/torchaudio-0.2-cp36-cp36m-linux_x86_64.whl
+At the moment, there is no automated nightly build process, but we occasionally
+build nightlies based on PyTorch nightlies by hand following the instructions in
+[build_tools/packaging](build_tools/packaging).  To install the latest nightly, run:
 
-# Python 3.7
-pip3 install http://download.pytorch.org/whl/torchaudio-0.2-cp37-cp37m-linux_x86_64.whl
+```
+pip install torchaudio_nightly -f https://download.pytorch.org/whl/nightly/torch_nightly.html
 ```
 
 ### From Source

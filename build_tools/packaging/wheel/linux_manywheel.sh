@@ -25,21 +25,26 @@ export PREFIX="/tmp"
 cd /tmp/audio
 
 for PYDIR in "${python_installations[@]}"; do
-    # wheels for numba does not work with python 2.7
-    if [[ "$PYDIR" == "/opt/python/cp27-cp27m/" || "$PYDIR" == "/opt/python/cp27-cp27mu/" ]]; then
-      continue;
-    fi
     export PATH=$PYDIR/bin:$OLD_PATH
     pip install --upgrade pip
 
+    # For true hermetic builds, you ought to be constructing the docker
+    # from scratch each time.  But this makes things marginally safer if
+    # you aren't doing this.
+    pip uninstall -y torch || true
+    pip uninstall -y torch_nightly || true
+
     export TORCHAUDIO_PYTORCH_DEPENDENCY_NAME=torch_nightly
-    pip install torch_nightly -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+    pip install torch_nightly -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
     # CPU/CUDA variants of PyTorch have ABI compatible PyTorch.  Therefore, we
-    # strip off the local package qualifier
+    # strip off the local package qualifier.  Also, we choose to build against
+    # the CPU build, because it takes less time to download.
     export TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION="$(pip show torch_nightly | grep ^Version: | sed 's/Version: \+//' | sed 's/+.\+//')"
     echo "Building against ${TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION}"
 
-    pip install -r requirements.txt
+    # NB: do not actually install requirements.txt; that is only needed for
+    # testing
+    pip install numpy future
     IS_WHEEL=1 python setup.py clean
     IS_WHEEL=1 python setup.py bdist_wheel
     mkdir -p $OUT_DIR
