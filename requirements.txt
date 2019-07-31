@@ -12,3 +12,6 @@ flake8
 # Used for comparison of outputs in tests
 librosa>=0.4.3
 scipy
+
+# Unit tests with pytest
+pytest
