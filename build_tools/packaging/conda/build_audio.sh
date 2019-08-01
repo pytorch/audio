@@ -30,13 +30,11 @@ cd "$SOURCE_DIR"
 ANACONDA_USER=pytorch
 conda config --set anaconda_upload no
 
-# "$desired_cuda" == 'cpu'
-export TORCHAUDIO_PACKAGE_SUFFIX=""
+# TODO: unhardcode
+export CONDA_PYTORCH_CONSTRAINT="    - pytorch-nightly ==1.2.0.dev20190801+cpu"
 export CONDA_CUDATOOLKIT_CONSTRAINT=""
 export CUDA_VERSION="None"
-if [[ "$OSTYPE" != "darwin"* ]]; then
-    export TORCHAUDIO_PACKAGE_SUFFIX="-cpu"
-else
+if [[ "$OSTYPE" == "darwin"* ]]; then
   export MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++
 fi
 
