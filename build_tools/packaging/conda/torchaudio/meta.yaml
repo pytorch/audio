@@ -37,7 +37,8 @@ test:
 
   requires:
     - pytest
-    - librosa >=0.4.3
+    # Ideally we would test this, but conda doesn't provide librosa
+    # - librosa >=0.4.3
     - scipy
 
 about:
