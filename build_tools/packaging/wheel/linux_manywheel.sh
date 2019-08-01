@@ -27,13 +27,15 @@ export PREFIX="/tmp"
 cd /tmp/audio
 
 for PYDIR in "${python_installations[@]}"; do
-    # wheels for numba does not work with python 2.7
-    if [[ "$PYDIR" == "/opt/python/cp27-cp27m/" || "$PYDIR" == "/opt/python/cp27-cp27mu/" ]]; then
-      continue;
-    fi
     export PATH=$PYDIR/bin:$OLD_PATH
+    # For true hermetic builds, you ought to be constructing the docker
+    # from scratch each time.  But this makes things marginally safer if
+    # you aren't doing this.
+    pip uninstall -y torch || true
     pip install --upgrade pip
-    pip install -r requirements.txt
+    pip install numpy future torch
+    # NB: do not actually install requirements.txt; that is only needed for
+    # testing
     IS_WHEEL=1 python setup.py clean
     IS_WHEEL=1 python setup.py bdist_wheel
     mkdir -p $OUT_DIR
