@@ -44,14 +44,13 @@ do
     conda activate $env_name
 
     export TORCHAUDIO_PYTORCH_DEPENDENCY_NAME=torch_nightly
-    pip install torch_nightly -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+    pip install torch_nightly -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
     # NB: OS X builds don't have local package qualifiers
-    export TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION="$(pip show torch_nightly | grep ^Version: | sed 's/Version: \+//')"
+    # NB: Don't use \+ here, it's not portable
+    export TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION="$(pip show torch_nightly | grep ^Version: | sed 's/Version:  *//')"
     echo "Building against ${TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION}"
 
-     # install torchaudio dependencies
-    pip install -r requirements.txt
-
+    pip install numpy future
     IS_WHEEL=1 python setup.py clean
     IS_WHEEL=1 python setup.py bdist_wheel
     mkdir -p $OUT_DIR
