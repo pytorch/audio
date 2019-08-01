@@ -114,7 +114,7 @@ dimension (channel, time)")
 * `min_freq`: the lowest frequency of the lowest band in a spectrogram
 * `max_freq`: the highest frequency of the highest band in a spectrogram
 * `win_length`: the length of the STFT window
-* `window_fn`: for functions that creates windows e.g. torch.hann_window
+* `window_fn`: for functions that creates windows e.g. `torch.hann_window`
 
 Transforms expect the following dimensions.
 
@@ -126,6 +126,8 @@ Transforms expect the following dimensions.
 * `MuLawEncode`: (channel, time) -> (channel, time)
 * `MuLawDecode`: (channel, time) -> (channel, time)
 * `Resample`: (channel, time) -> (channel, time)
+
+Complex numbers are supported via tensors of dimension (..., 2), and provide `magphase` to convert such a tensor into its magnitude and phase, and also `complex_norm` and `angle`.
 
 Contributing Guidelines
 -----------------------
