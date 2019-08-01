@@ -36,10 +36,13 @@ make -s -j && make install
 popd
 
 # build sox, statically
+# --without-png makes OS X build less hazardous; somehow the build
+# finds png and enables it.  We don't want it; we'd need to package
+# it statically if we do.
 pushd sox-14.4.2
 ./configure --disable-shared --enable-static --prefix="$PREFIX/audio/third_party/sox" \
     LDFLAGS="-L$PREFIX/audio/third_party/lame/lib -L$PREFIX/audio/third_party/flac/lib -L$PREFIX/audio/third_party/mad/lib" \
     CPPFLAGS="-I$PREFIX/audio/third_party/lame/include -I$PREFIX/audio/third_party/flac/include -I$PREFIX/audio/third_party/mad/include" \
-    --with-lame --with-flac --with-mad --without-oggvorbis --without-oss --without-sndfile CFLAGS=-fPIC CXXFLAGS=-fPIC --with-pic --disable-debug --disable-dependency-tracking
+    --with-lame --with-flac --with-mad --without-png --without-oggvorbis --without-oss --without-sndfile CFLAGS=-fPIC CXXFLAGS=-fPIC --with-pic --disable-debug --disable-dependency-tracking
 make -s -j && make install
 popd
