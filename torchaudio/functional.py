@@ -1,5 +1,6 @@
 import math
 import torch
+from __future__ import division
 
 
 __all__ = [

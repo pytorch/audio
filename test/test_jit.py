@@ -2,6 +2,7 @@ import torch
 import torchaudio.functional as F
 import torchaudio.transforms as transforms
 import unittest
+from __future__ import division
 
 RUN_CUDA = torch.cuda.is_available()
 print('Run test with cuda:', RUN_CUDA)
