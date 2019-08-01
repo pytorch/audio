@@ -31,7 +31,8 @@ ANACONDA_USER=pytorch
 conda config --set anaconda_upload no
 
 # TODO: unhardcode
-export CONDA_PYTORCH_CONSTRAINT="    - pytorch-nightly ==1.2.0.dev20190801+cpu"
+# TODO: use CPU
+export CONDA_PYTORCH_CONSTRAINT="    - pytorch-nightly ==1.2.0.dev20190801+cu100"
 export CONDA_CUDATOOLKIT_CONSTRAINT=""
 export CUDA_VERSION="None"
 if [[ "$OSTYPE" == "darwin"* ]]; then
