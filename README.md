@@ -127,7 +127,7 @@ Transforms expect the following dimensions.
 * `MuLawDecode`: (channel, time) -> (channel, time)
 * `Resample`: (channel, time) -> (channel, time)
 
-Complex numbers are supported via tensors of dimension (..., 2), and provide `magphase` to convert such a tensor into its magnitude and phase, and also `complex_norm` and `angle`.
+Complex numbers are supported via tensors of dimension (..., 2), and torchaudio provides `complex_norm` and `angle` to convert such a tensor into its magnitude and phase.
 
 Contributing Guidelines
 -----------------------
