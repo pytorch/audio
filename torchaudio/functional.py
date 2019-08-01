@@ -1,6 +1,6 @@
+from __future__ import division
 import math
 import torch
-from __future__ import division
 
 
 __all__ = [
@@ -62,8 +62,8 @@ def istft(stft_matrix,          # type: Tensor
     could be useful. If ``length`` is ``None`` then padding will be aggressively removed
     (some loss of signal).
 
-    [1] D. W. Griffin and J. S. Lim, “Signal estimation from modified short-time Fourier transform,”
-    IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
+    [1] D. W. Griffin and J. S. Lim, "Signal estimation from modified short-time Fourier transform,"
+    IEEE Trans. ASSP, vol.32, no.2, pp.236-243, Apr. 1984.
 
     Args:
         stft_matrix (torch.Tensor): Output of stft where each row of a channel is a frequency and each
