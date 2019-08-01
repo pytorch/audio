@@ -28,6 +28,8 @@ popd
 
 # build mad, statically
 pushd libmad-0.15.1b
+# See https://stackoverflow.com/a/12864879/23845
+sed -i 's#-march=i486##' configure
 ./configure --disable-shared --enable-static --prefix="$PREFIX/audio/third_party/mad" CFLAGS=-fPIC CXXFLAGS=-fPIC \
     --with-pic --disable-debug --disable-dependency-tracking
 make -s -j && make install
