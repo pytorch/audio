@@ -5,7 +5,7 @@ import torch
 import _torch_sox
 
 from .version import __version__, git_version
-from torchaudio import transforms, datasets, kaldi_io, sox_effects, legacy, compliance, _docs
+from torchaudio import transforms, datasets, kaldi_io, sox_effects, compliance, _docs
 
 
 def check_input(src):
