@@ -1,4 +1,6 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import math
+import fractions
 import random
 import torch
 
@@ -600,7 +602,7 @@ def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, win
 
 
 def _lcm(a, b):
-    return abs(a * b) // math.gcd(a, b)
+    return abs(a * b) // fractions.gcd(a, b)
 
 
 def _get_num_LR_output_samples(input_num_samp, samp_rate_in, samp_rate_out):
@@ -675,7 +677,7 @@ def resample_waveform(waveform, orig_freq, new_freq, lowpass_filter_width=6):
 
     assert lowpass_cutoff * 2 <= min_freq
 
-    base_freq = math.gcd(int(orig_freq), int(new_freq))
+    base_freq = fractions.gcd(int(orig_freq), int(new_freq))
     input_samples_in_unit = int(orig_freq) // base_freq
     output_samples_in_unit = int(new_freq) // base_freq
 
