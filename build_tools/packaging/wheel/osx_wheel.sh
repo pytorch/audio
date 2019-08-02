@@ -11,7 +11,7 @@ wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh &
 
 . ~/minconda_wheel_env_tmp/bin/activate
 
-export TORCHAUDIO_BUILD_VERSION="0.2.0"
+export TORCHAUDIO_BUILD_VERSION="0.3.0"
 export TORCHAUDIO_BUILD_NUMBER="1"
 export OUT_DIR=~/torchaudio_wheels
 
@@ -40,9 +40,7 @@ do
     conda create -yn $env_name python="$desired_python"
     conda activate $env_name
 
-     # install torchaudio dependencies
-    pip install -r requirements.txt
-
+    pip install torch numpy future
     IS_WHEEL=1 python setup.py clean
     IS_WHEEL=1 python setup.py bdist_wheel
     mkdir -p $OUT_DIR
