@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 
 import torch
@@ -195,14 +196,17 @@ def _num_stft_bins(signal_len, fft_len, hop_length, pad):
     return (signal_len + 2 * pad - fft_len + hop_length) // hop_length
 
 
-@pytest.mark.parametrize('rate', [0.5, 1.01, 1.3])
 @pytest.mark.parametrize('complex_specgrams', [
     torch.randn(1, 2, 1025, 400, 2),
     torch.randn(1, 1025, 400, 2)
 ])
+@pytest.mark.parametrize('rate', [0.5, 1.01, 1.3])
 @pytest.mark.parametrize('hop_length', [256])
-@unittest.skipIf(not IMPORT_LIBROSA, 'Librosa is not available')
 def test_phase_vocoder(complex_specgrams, rate, hop_length):
+
+    # Using a decorator here causes parametrize to fail on Python 2
+    if not IMPORT_LIBROSA:
+        raise unittest.SkipTest('Librosa is not available')
 
     # Due to cummulative sum, numerical error in using torch.float32 will
     # result in bottom right values of the stretched sectrogram to not

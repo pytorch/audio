@@ -12,10 +12,11 @@ cache:
 matrix:
   fast_finish: true
   include:
-    # TODO add this back in when there is a pytorch 1.2 for python 3.5
-    # - env: PYTHON_VERSION="3.5"
+    - env: PYTHON_VERSION="3.7"
     - env: PYTHON_VERSION="3.6"
+    # TODO add this back in when there is a pytorch 1.2 for python 3.5
     - env: PYTHON_VERSION="3.5" RUN_FLAKE8="true" SKIP_TESTS="true"
+    - env: PYTHON_VERSION="2.7"
 
 addons:
   apt:
