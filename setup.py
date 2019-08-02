@@ -81,9 +81,14 @@ with open(version_path, 'w') as f:
     f.write("git_version = {}\n".format(repr(sha)))
 
 pytorch_package_name = os.getenv('TORCHAUDIO_PYTORCH_DEPENDENCY_NAME', 'torch')
+pytorch_package_version = os.getenv('TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION')
+
+pytorch_package_dep = pytorch_package_name
+if pytorch_package_version is not None:
+    pytorch_package_dep += "==" + pytorch_package_version
 
 setup(
-    name="torchaudio",
+    name=os.getenv("TORCHAUDIO_PACKAGE_NAME", "torchaudio"),
     version="0.2",
     description="An audio package for PyTorch",
     url="https://github.com/pytorch/audio",
@@ -117,5 +122,5 @@ setup(
             extra_link_args=ela),
     ],
     cmdclass={'build_ext': BuildExtension},
-    install_requires=[pytorch_package_name]
+    install_requires=[pytorch_package_dep]
 )

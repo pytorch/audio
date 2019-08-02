@@ -1,10 +1,11 @@
 if [ "$#" -ne 1 ]; then
-    echo "Illegal number of parameters. Pass cuda version"
-    echo "CUDA version should be cu90, cu100 or cpu"
+    echo "Illegal number of parameters. Pass package suffix."
+    echo "Package suffix should be '' or '-cpu'"
     exit 1
 fi
-export CUVER="$1" # cu90 cu100 cpu
+export PACKAGE_SUFFIX="$1" # '' or '-cpu'
 
+export TORCHAUDIO_PACKAGE_NAME="torchaudio${PACKAGE_SUFFIX}"
 export TORCHAUDIO_BUILD_VERSION="0.2.0"
 export TORCHAUDIO_BUILD_NUMBER="1"
 export OUT_DIR="/remote/$CUVER"
@@ -18,7 +19,7 @@ done
 OLD_PATH=$PATH
 cd /tmp
 rm -rf audio
-git clone https://github.com/pytorch/audio -b v${TORCHAUDIO_BUILD_VERSION}
+git clone https://github.com/pytorch/audio -b pr/0.2-wheel-updates
 mkdir audio/third_party
 
 export PREFIX="/tmp"
