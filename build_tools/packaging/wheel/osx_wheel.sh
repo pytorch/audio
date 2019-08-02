@@ -3,8 +3,8 @@
 set -ex
 
 if [[ ":$PATH:" == *"conda"* ]]; then
-  echo "existing anaconda install in PATH, remove it and run script"
-  exit 1
+    echo "existing anaconda install in PATH, remove it and run script"
+    exit 1
 fi
 
 # download and activate anaconda
