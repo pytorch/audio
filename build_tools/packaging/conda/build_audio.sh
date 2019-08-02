@@ -19,11 +19,10 @@ audio_rootdir="$(pwd)/torchaudio-src"
 
 if [[ ! -d "$audio_rootdir" ]]; then
     rm -rf "$audio_rootdir"
-    git clone "https://github.com/pytorch/audio" "$audio_rootdir"
-    pushd "$audio_rootdir"
-    git checkout v$TORCHAUDIO_BUILD_VERSION
-    popd
+    git clone "https://github.com/pytorch/audio" "$audio_rootdir" -b pr/conda-nightly
 fi
+
+export TORCHAUDIO_GITHUB_ROOT_DIR="$audio_rootdir"
 
 cd "$SOURCE_DIR"
 
