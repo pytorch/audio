@@ -34,7 +34,7 @@ ANACONDA_USER=pytorch
 conda config --set anaconda_upload no
 
 LATEST_PYTORCH_NIGHTLY_VERSION=$(conda search --json 'pytorch-nightly[channel=pytorch]' | python "$SOURCE_DIR/get-latest.py")
-export CONDA_PYTORCH_CONSTRAINT="    - pytorch-nightly ==${LATEST_PYTORCH_NIGHTLY_VERSION}+cpu"
+export CONDA_PYTORCH_CONSTRAINT="    - pytorch-nightly ==${LATEST_PYTORCH_NIGHTLY_VERSION}"
 export CONDA_CUDATOOLKIT_CONSTRAINT=""
 export CUDA_VERSION="None"
 if [[ "$OSTYPE" == "darwin"* ]]; then
