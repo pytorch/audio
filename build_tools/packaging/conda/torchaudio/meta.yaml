@@ -1,10 +1,9 @@
 package:
-  name: torchaudio{{ environ.get('TORCHAUDIO_PACKAGE_SUFFIX') }}
+  name: torchaudio
   version: "{{ environ.get('TORCHAUDIO_BUILD_VERSION') }}"
 
 source:
-  git_rev: v{{ environ.get('TORCHAUDIO_BUILD_VERSION') }}
-  git_url: https://github.com/pytorch/audio.git
+  path: "{{ environ.get('TORCHAUDIO_GITHUB_ROOT_DIR') }}"
 
 requirements:
   build:
@@ -14,20 +13,16 @@ requirements:
   host:
     - python
     - setuptools
-    - pytorch{{ environ.get('TORCHAUDIO_PACKAGE_SUFFIX') }} >=1.1.0
-    - sox
+{{ environ.get('CONDA_PYTORCH_CONSTRAINT') }}
 
   run:
     - python
-    - pytorch{{ environ.get('TORCHAUDIO_PACKAGE_SUFFIX') }} >=1.1.0
-    - librosa >=0.4.3
-    - scipy
-    - sox
+    - typing
+{{ environ.get('CONDA_PYTORCH_CONSTRAINT') }}
 
 build:
   number: {{ environ.get('TORCHAUDIO_BUILD_NUMBER') }}
   string: py{{py}}_{{environ.get('TORCHAUDIO_BUILD_NUMBER')}}
-  script: IS_CONDA=1 python setup.py install --single-version-externally-managed --record=record.txt # [not win]
 
 test:
   imports:
@@ -42,7 +37,8 @@ test:
 
   requires:
     - pytest
-    - librosa >=0.4.3
+    # Ideally we would test this, but conda doesn't provide librosa
+    # - librosa >=0.4.3
     - scipy
 
 about:

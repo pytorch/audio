@@ -19,7 +19,7 @@ rm -rf audio
 git clone https://github.com/pytorch/audio
 mkdir audio/third_party
 
-export PREFIX="/tmp"
+export PREFIX="/tmp/audio"
 . /remote/wheel/build_from_source.sh
 
 cd /tmp/audio
