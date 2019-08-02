@@ -17,9 +17,13 @@ SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 audio_rootdir="$(pwd)/torchaudio-src"
 
+if [[ "$BRANCH" == "" ]]; then
+  BRANCH=master
+fi
+
 if [[ ! -d "$audio_rootdir" ]]; then
     rm -rf "$audio_rootdir"
-    git clone "https://github.com/pytorch/audio" "$audio_rootdir" -b pr/conda-nightly
+    git clone "https://github.com/pytorch/audio" "$audio_rootdir" -b "$BRANCH"
 fi
 
 export TORCHAUDIO_GITHUB_ROOT_DIR="$audio_rootdir"
@@ -29,8 +33,8 @@ cd "$SOURCE_DIR"
 ANACONDA_USER=pytorch
 conda config --set anaconda_upload no
 
-# TODO: unhardcode
-export CONDA_PYTORCH_CONSTRAINT="    - pytorch-nightly ==1.2.0.dev20190802+cpu"
+LATEST_PYTORCH_NIGHTLY_VERSION=$(conda search --json 'pytorch-nightly[channel=pytorch]' | python "$SOURCE_DIR/get-latest.py")
+export CONDA_PYTORCH_CONSTRAINT="    - pytorch-nightly ==${LATEST_PYTORCH_NIGHTLY_VERSION}+cpu"
 export CONDA_CUDATOOLKIT_CONSTRAINT=""
 export CUDA_VERSION="None"
 if [[ "$OSTYPE" == "darwin"* ]]; then
