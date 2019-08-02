@@ -3,8 +3,7 @@ package:
   version: "{{ environ.get('TORCHAUDIO_BUILD_VERSION') }}"
 
 source:
-  git_rev: v{{ environ.get('TORCHAUDIO_BUILD_VERSION') }}
-  git_url: https://github.com/pytorch/audio.git
+  path: "{{ environ.get('TORCHAUDIO_GITHUB_ROOT_DIR') }}"
 
 requirements:
   build:
