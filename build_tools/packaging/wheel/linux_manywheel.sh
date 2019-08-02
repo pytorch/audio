@@ -12,7 +12,7 @@ done
 OLD_PATH=$PATH
 cd /tmp
 rm -rf audio
-git clone https://github.com/pytorch/audio -b pr/0.2-wheel-updates
+git clone https://github.com/pytorch/audio -b v${TORCHAUDIO_BUILD_VERSION}
 mkdir audio/third_party
 
 export PREFIX="/tmp"
