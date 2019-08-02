@@ -1,11 +1,4 @@
-if [ "$#" -ne 1 ]; then
-    echo "Illegal number of parameters. Pass package suffix."
-    echo "Package suffix should be '' or '-cpu'"
-    exit 1
-fi
-export PACKAGE_SUFFIX="$1" # '' or '-cpu'
-
-export TORCHAUDIO_PACKAGE_NAME="torchaudio${PACKAGE_SUFFIX}"
+export TORCHAUDIO_PACKAGE_NAME="torchaudio"
 export TORCHAUDIO_BUILD_VERSION="0.2.0"
 export TORCHAUDIO_BUILD_NUMBER="1"
 export OUT_DIR="/remote/$CUVER"
