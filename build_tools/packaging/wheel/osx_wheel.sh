@@ -2,6 +2,11 @@
 
 set -ex
 
+if [[ ":$PATH:" == *"conda"* ]]; then
+  echo "existing anaconda install in PATH, remove it and run script"
+  exit 1
+fi
+
 # download and activate anaconda
 rm -rf ~/minconda_wheel_env_tmp
 wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh && \
