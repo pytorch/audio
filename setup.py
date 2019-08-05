@@ -31,7 +31,10 @@ libraries = []
 include_dirs = []
 extra_objects = []
 
-if IS_WHEEL:
+# Hypothetically, the conda distribution could rely on an external sox,
+# but the library is pretty small and it is not available on the default
+# anaconda channel.  So we statically link it in, just as we do with wheels.
+if IS_WHEEL or IS_CONDA:
     audio_path = os.path.dirname(os.path.abspath(__file__))
 
     include_dirs += [os.path.join(audio_path, 'third_party/flac/include')]
@@ -48,11 +51,6 @@ if IS_WHEEL:
     extra_objects += [os.path.join(audio_path, 'third_party/lame/lib/libmp3lame.a')]
 else:
     libraries += ['sox']
-
-if IS_CONDA:
-    # We want $PREFIX/include for conda (for sox.h)
-    lib_path = os.path.dirname(sys.executable)
-    include_dirs += [os.path.join(os.path.dirname(lib_path), 'include')]
 
 
 # Creating the version file

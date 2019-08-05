@@ -17,26 +17,25 @@ SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 audio_rootdir="$(pwd)/torchaudio-src"
 
+if [[ "$BRANCH" == "" ]]; then
+  BRANCH=master
+fi
+
 if [[ ! -d "$audio_rootdir" ]]; then
     rm -rf "$audio_rootdir"
-    git clone "https://github.com/pytorch/audio" "$audio_rootdir"
-    pushd "$audio_rootdir"
-    git checkout v$TORCHAUDIO_BUILD_VERSION
-    popd
+    git clone "https://github.com/pytorch/audio" "$audio_rootdir" -b "$BRANCH"
 fi
+
+export TORCHAUDIO_GITHUB_ROOT_DIR="$audio_rootdir"
 
 cd "$SOURCE_DIR"
 
 ANACONDA_USER=pytorch
 conda config --set anaconda_upload no
 
-# "$desired_cuda" == 'cpu'
-export TORCHAUDIO_PACKAGE_SUFFIX=""
 export CONDA_CUDATOOLKIT_CONSTRAINT=""
 export CUDA_VERSION="None"
-if [[ "$OSTYPE" != "darwin"* ]]; then
-    export TORCHAUDIO_PACKAGE_SUFFIX="-cpu"
-else
+if [[ "$OSTYPE" == "darwin"* ]]; then
   export MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++
 fi
 
