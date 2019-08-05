@@ -26,7 +26,7 @@ rm -rf audio
 git clone https://github.com/pytorch/audio -b v${TORCHAUDIO_BUILD_VERSION}
 mkdir audio/third_party
 
-export PREFIX="/tmp"
+export PREFIX="/tmp/audio"
 . $CURR_PATH/build_from_source.sh
 
 cd /tmp/audio
