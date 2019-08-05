@@ -13,12 +13,12 @@ requirements:
   host:
     - python
     - setuptools
-    - pytorch >=1.1.0
+    - pytorch >=1.2.0
 
   run:
     - python
     - typing
-    - pytorch >=1.1.0
+    - pytorch >=1.2.0
 
 build:
   number: {{ environ.get('TORCHAUDIO_BUILD_NUMBER') }}
