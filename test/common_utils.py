@@ -1,6 +1,7 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 from shutil import copytree
-import tempfile
+import backports.tempfile as tempfile
 import torch
 
 TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
