@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 # To use this file, the dependency (https://github.com/vesis84/kaldi-io-for-python)
 # needs to be installed. This is a light wrapper around kaldi_io that returns
 # torch.Tensors.
