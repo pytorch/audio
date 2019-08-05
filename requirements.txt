@@ -15,3 +15,6 @@ scipy
 
 # Unit tests with pytest
 pytest
+
+# Testing only Py3 compat
+backports.tempfile
