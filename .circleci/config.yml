@@ -87,18 +87,26 @@ release_parameters: &release_parameters
 workflows:
   build:
     jobs:
-      - binary_linux_wheel
-      - binary_linux_conda
-      - binary_macos_wheel
-      - binary_macos_conda
+      - binary_linux_wheel:
+          name: nightly_binary_linux_wheel
+      - binary_linux_conda:
+          name: nightly_binary_linux_conda
+      - binary_macos_wheel:
+          name: nightly_binary_macos_wheel
+      - binary_macos_conda:
+          name: nightly_binary_macos_conda
 
 # release:
 #   jobs:
 #     - binary_linux_wheel:
 #         <<: *release_parameters
+#         name: release_binary_linux_wheel
 #     - binary_linux_conda:
 #         <<: *release_parameters
+#         name: release_binary_linux_conda
 #     - binary_macos_wheel:
 #         <<: *release_parameters
+#         name: release_binary_macos_wheel
 #     - binary_macos_conda:
 #         <<: *release_parameters
+#         name: release_binary_macos_conda

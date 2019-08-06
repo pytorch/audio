@@ -26,6 +26,7 @@ cd "$script_dir"
 
 ANACONDA_USER=pytorch-nightly
 conda config --set anaconda_upload no
+conda config --set channel_priority strict
 
 LATEST_PYTORCH_NIGHTLY_VERSION=$(conda search --json 'pytorch[channel=pytorch-nightly]' | python "$script_dir/get-latest.py")
 export CONDA_PYTORCH_CONSTRAINT="    - pytorch ==${LATEST_PYTORCH_NIGHTLY_VERSION}"
