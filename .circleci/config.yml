@@ -66,3 +66,5 @@ workflows:
     jobs:
       - binary_linux_wheel
       - binary_linux_conda
+      - binary_macos_wheel
+      - binary_macos_conda
