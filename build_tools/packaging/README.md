@@ -9,7 +9,6 @@
 nvidia-docker run -it --ipc=host --rm -v $(pwd):/remote soumith/conda-cuda bash
 pushd remote/conda
 conda config --add channels pytorch
-conda config --add channels conda-forge
 ./build_audio.sh
 ```
 
