@@ -92,13 +92,13 @@ workflows:
       - binary_macos_wheel
       - binary_macos_conda
 
-  release:
-    jobs:
-      - binary_linux_wheel:
-          <<: *release_parameters
-      - binary_linux_conda:
-          <<: *release_parameters
-      - binary_macos_wheel:
-          <<: *release_parameters
-      - binary_macos_conda:
-          <<: *release_parameters
+# release:
+#   jobs:
+#     - binary_linux_wheel:
+#         <<: *release_parameters
+#     - binary_linux_conda:
+#         <<: *release_parameters
+#     - binary_macos_wheel:
+#         <<: *release_parameters
+#     - binary_macos_conda:
+#         <<: *release_parameters
