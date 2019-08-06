@@ -36,31 +36,6 @@ jobs:
       - store_artifacts:
           path: /opt/conda/conda-bld/linux-64
 
-  binary_macos_wheel:
-    parameters:
-      <<: *param_target_commit
-    macos:
-      xcode: "9.0"
-    resource_class: 2xlarge+
-    steps:
-      - checkout
-      - run: TARGET_COMMIT=<< parameters.target_commit >> build_tools/packaging/wheel/osx_wheel.sh
-      - store_artifacts:
-          path: $HOME/torchaudio_wheels
-
-  binary_macos_conda:
-    parameters:
-      <<: *param_target_commit
-    macos:
-      xcode: "9.0"
-    resource_class: 2xlarge+
-    steps:
-      - checkout
-      # TODO: This needs a conda install...
-      - run: TARGET_COMMIT=<< parameters.target_commit >> build_tools/packaging/conda/build_audio.sh
-      - store_artifacts:
-          path: $HOME/miniconda3/conda-bld/osx-64
-
 workflows:
   build:
     jobs:
