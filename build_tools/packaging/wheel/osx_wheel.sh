@@ -23,15 +23,25 @@ export MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-cd /tmp
-rm -rf audio
-git clone https://github.com/pytorch/audio
-mkdir audio/third_party
+if [[ "$TARGET_COMMIT" == HEAD ]]; then
+  # Assume that this script was called from a valid checkout
+  WORKDIR="$(realpath "$script_dir/../../..")"
+else
+  WORKDIR="/tmp/audio"
+  cd /tmp
+  rm -rf audio
+  git clone https://github.com/pytorch/audio
+  cd audio
+  git checkout "$TARGET_COMMIT"
+  git submodule update --init --recursive
+fi
 
-export PREFIX="/tmp/audio"
+mkdir "$WORKDIR/third_party"
+
+export PREFIX="$WORKDIR"
 . "$script_dir/build_from_source.sh"
 
-cd /tmp/audio
+cd "$WORKDIR"
 
 desired_pythons=( "2.7" "3.5" "3.6" "3.7" )
 # for each python
