@@ -10,31 +10,38 @@ retry () {
     $*  || (sleep 1 && $*) || (sleep 2 && $*) || (sleep 4 && $*) || (sleep 8 && $*)
 }
 
-export TORCHAUDIO_BUILD_VERSION="0.4.0.dev$(date "+%Y%m%d")"
-export TORCHAUDIO_BUILD_NUMBER=1
-
-SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-
-audio_rootdir="$(pwd)/torchaudio-src"
-
-if [[ "$BRANCH" == "" ]]; then
-  BRANCH=master
+if [[ -z "$TORCHAUDIO_BUILD_VERSION" ]]; then
+  export TORCHAUDIO_BUILD_VERSION="0.4.0.dev$(date "+%Y%m%d")"
+fi
+if [[ -z "$TORCHAUDIO_BUILD_NUMBER" ]]; then
+  export TORCHAUDIO_BUILD_NUMBER=1
 fi
 
-if [[ ! -d "$audio_rootdir" ]]; then
-    rm -rf "$audio_rootdir"
-    git clone "https://github.com/pytorch/audio" "$audio_rootdir" -b "$BRANCH"
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+if [[ "$TARGET_COMMIT" == HEAD ]]; then
+  # Assume that this script was called from a valid checkout
+  WORKDIR="$(realpath "$script_dir/../../..")"
+else
+  WORKDIR="/tmp/audio"
+  cd /tmp
+  rm -rf audio
+  git clone https://github.com/pytorch/audio
+  cd audio
+  git checkout "$TARGET_COMMIT"
+  git submodule update --init --recursive
+  mkdir audio/third_party
 fi
 
-export TORCHAUDIO_GITHUB_ROOT_DIR="$audio_rootdir"
+export TORCHAUDIO_GITHUB_ROOT_DIR="$WORKDIR"
 
-cd "$SOURCE_DIR"
+cd "$script_dir"
 
-ANACONDA_USER=pytorch
+ANACONDA_USER=pytorch-nightly
 conda config --set anaconda_upload no
 
-LATEST_PYTORCH_NIGHTLY_VERSION=$(conda search --json 'pytorch-nightly[channel=pytorch]' | python "$SOURCE_DIR/get-latest.py")
-export CONDA_PYTORCH_CONSTRAINT="    - pytorch-nightly ==${LATEST_PYTORCH_NIGHTLY_VERSION}"
+LATEST_PYTORCH_NIGHTLY_VERSION=$(conda search --json 'pytorch[channel=pytorch-nightly]' | python "$script_dir/get-latest.py")
+export CONDA_PYTORCH_CONSTRAINT="    - pytorch ==${LATEST_PYTORCH_NIGHTLY_VERSION}"
 export CONDA_CUDATOOLKIT_CONSTRAINT=""
 export CUDA_VERSION="None"
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -42,9 +49,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 time conda build -c $ANACONDA_USER --no-anaconda-upload --python 2.7 torchaudio
-# Currently disabled, see https://github.com/pytorch/pytorch/issues/23738
-# time conda build -c $ANACONDA_USER --no-anaconda-upload --python 3.5 torchaudio
+time conda build -c $ANACONDA_USER --no-anaconda-upload --python 3.5 torchaudio
 time conda build -c $ANACONDA_USER --no-anaconda-upload --python 3.6 torchaudio
 time conda build -c $ANACONDA_USER --no-anaconda-upload --python 3.7 torchaudio
-
- set +e

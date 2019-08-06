@@ -1,0 +1,43 @@
+version: 2.1
+
+# How to test:
+#   - Install CircleCI local CLI: https://circleci.com/docs/2.0/local-cli/
+#   - circleci config process .circleci/config.yml > gen.yml && circleci local execute -c gen.yml --job binary_linux_wheel
+#     - Replace binary_linux_wheel with the name of the job you want to test
+
+param_target_commit: &param_target_commit
+  target_commit:
+    description: "what hash or branch to build binaries for; by default, same as trigger"
+    type: string
+    default: HEAD
+
+jobs:
+  binary_linux_wheel:
+    parameters:
+      <<: *param_target_commit
+    docker:
+      - image: "soumith/manylinux-cuda100"
+    resource_class: 2xlarge+
+    steps:
+      - checkout
+      - run: TARGET_COMMIT=<< parameters.target_commit >> build_tools/packaging/wheel/linux_manywheel.sh
+      - store_artifacts:
+          path: /remote/cpu
+
+  binary_linux_conda:
+    parameters:
+      <<: *param_target_commit
+    docker:
+      - image: "soumith/conda-cuda"
+    resource_class: 2xlarge+
+    steps:
+      - checkout
+      - run: TARGET_COMMIT=<< parameters.target_commit >> build_tools/packaging/conda/build_audio.sh
+      - store_artifacts:
+          path: /opt/conda/conda-bld/linux-64
+
+workflows:
+  build:
+    jobs:
+      - binary_linux_wheel
+      - binary_linux_conda
