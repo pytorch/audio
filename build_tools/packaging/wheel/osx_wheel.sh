@@ -15,7 +15,6 @@ wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh &
 
 . ~/minconda_wheel_env_tmp/bin/activate
 
-export TORCHAUDIO_PACKAGE_NAME="torchaudio_nightly"
 export TORCHAUDIO_BUILD_VERSION="0.4.0.dev$(date "+%Y%m%d")"
 export TORCHAUDIO_BUILD_NUMBER="1"
 export OUT_DIR=~/torchaudio_wheels
