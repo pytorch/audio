@@ -25,7 +25,7 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 if [[ "$TARGET_COMMIT" == HEAD ]]; then
   # Assume that this script was called from a valid checkout
-  WORKDIR="$(realpath "$script_dir/../../..")"
+  WORKDIR="$script_dir/../../.."
 else
   WORKDIR="/tmp/audio"
   cd /tmp
