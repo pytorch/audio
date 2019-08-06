@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 # Arguments: PREFIX, specifying where to install dependencies into
 
 PREFIX="$1"

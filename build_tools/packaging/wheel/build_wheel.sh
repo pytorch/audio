@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 # Assume we are in a valid Python environment that we want to build the wheel in
 
 if [[ -z "$OUT_DIR" ]]; then
@@ -17,7 +19,7 @@ fi
 
 if [[ -z "$TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION" ]]; then
   is_nightly=1  # to unset later
-  pip install --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
+  pip install --progress-bar off --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
   # CPU/CUDA variants of PyTorch have ABI compatible PyTorch.  Therefore, we
   # strip off the local package qualifier.  Also, we choose to build against
   # the CPU build, because it takes less time to download.
@@ -27,7 +29,7 @@ else
   # NB: We include the nightly channel to, since sometimes we stage
   # prereleases in it.  Those releases should get moved to stable
   # when they're ready
-  pip install "torch==$TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION" \
+  pip install --progress-bar off "torch==$TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION" \
     -f https://download.pytorch.org/whl/torch_stable.html \
     -f https://download.pytorch.org/whl/nightly/torch_nightly.html
 fi
@@ -35,7 +37,7 @@ echo "Building against ${TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION}"
 
 # NB: do not actually install requirements.txt; that is only needed for
 # testing
-pip install numpy future
+pip install --progress-bar off numpy future
 IS_WHEEL=1 python setup.py clean
 IS_WHEEL=1 python setup.py bdist_wheel
 mkdir -p $OUT_DIR
