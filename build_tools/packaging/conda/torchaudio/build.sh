@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -ex
 
-PREFIX="$(pwd)"
-. build_tools/packaging/wheel/build_from_source.sh
+build_tools/packaging/build_from_source.sh "$(pwd)"
 
 IS_CONDA=1 python setup.py install --single-version-externally-managed --record=record.txt

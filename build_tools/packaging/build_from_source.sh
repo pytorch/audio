@@ -1,6 +1,12 @@
-rm -rf source_code
-mkdir source_code
-pushd source_code
+#!/bin/bash
+
+# Arguments: PREFIX, specifying where to install dependencies into
+
+PREFIX="$1"
+
+rm -rf /tmp/torchaudio-deps
+mkdir /tmp/torchaudio-deps
+pushd /tmp/torchaudio-deps
 
 curl -L -o sox-14.4.2.tar.bz2 "http://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fsox%2Ffiles%2Fsox%2F14.4.2%2F&ts=1416316415&use_mirror=heanet"
 curl -L -o lame-3.99.5.tar.gz "http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Flame%2Ffiles%2Flame%2F3.99%2F&ts=1416316457&use_mirror=kent"

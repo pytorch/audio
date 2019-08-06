@@ -5,10 +5,6 @@ fi
 
 set -ex
 
-command -v realpath >/dev/null 2>&1 || realpath() {
-    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
-}
-
  # Function to retry functions that sometimes timeout or have flaky failures
 retry () {
     $*  || (sleep 1 && $*) || (sleep 2 && $*) || (sleep 4 && $*) || (sleep 8 && $*)
@@ -23,20 +19,7 @@ fi
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-if [[ "$TARGET_COMMIT" == HEAD ]]; then
-  # Assume that this script was called from a valid checkout
-  WORKDIR="$(realpath "$script_dir/../../..")"
-else
-  WORKDIR="/tmp/audio"
-  cd /tmp
-  rm -rf audio
-  git clone https://github.com/pytorch/audio
-  cd audio
-  git checkout "$TARGET_COMMIT"
-  git submodule update --init --recursive
-  mkdir audio/third_party
-fi
-
+. "$script_dir/../setup_workdir"
 export TORCHAUDIO_GITHUB_ROOT_DIR="$WORKDIR"
 
 cd "$script_dir"
