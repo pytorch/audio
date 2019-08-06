@@ -21,7 +21,7 @@ export OUT_DIR=~/torchaudio_wheels
 
 export MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++
 
-CURR_PATH=$(pwd)
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 cd /tmp
 rm -rf audio
@@ -29,7 +29,7 @@ git clone https://github.com/pytorch/audio
 mkdir audio/third_party
 
 export PREFIX="/tmp/audio"
-. $CURR_PATH/build_from_source.sh
+. "$script_dir/build_from_source.sh"
 
 cd /tmp/audio
 
