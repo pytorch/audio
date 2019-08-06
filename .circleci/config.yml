@@ -1,55 +1,69 @@
 version: 2.1
 
-# How to test:
+# How to test the Linux jobs:
 #   - Install CircleCI local CLI: https://circleci.com/docs/2.0/local-cli/
 #   - circleci config process .circleci/config.yml > gen.yml && circleci local execute -c gen.yml --job binary_linux_wheel
 #     - Replace binary_linux_wheel with the name of the job you want to test
 
-param_target_commit: &param_target_commit
-  target_commit:
-    description: "what hash or branch to build binaries for; by default, same as trigger"
-    type: string
-    default: HEAD
+binary_common: &binary_common
+  parameters:
+    target_commit:
+      description: "what hash or branch to build binaries for; by default, same as trigger"
+      type: string
+      default: HEAD
+    version:
+      description: "version number of release binary; by default, build a nightly"
+      type: string
+      default: ""
+    pytorch_version:
+      description: "PyTorch version to build against; by default, use a nightly"
+      type: string
+      default: ""
+    build_number:
+      description: "build number (if you need to rebuild a version with minor changes)"
+      type: integer
+      default: 1
+  environment:
+    TARGET_COMMIT: << parameters.target_commit >>
+    TORCHAUDIO_BUILD_VERSION: << parameters.version >>
+    TORCHAUDIO_BUILD_NUMBER: << parameters.build_number >>
+    TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION: << parameters.pytorch_version >>
 
 jobs:
   binary_linux_wheel:
-    parameters:
-      <<: *param_target_commit
+    <<: *binary_common
     docker:
       - image: "soumith/manylinux-cuda100"
     resource_class: 2xlarge+
     steps:
       - checkout
-      - run: TARGET_COMMIT=<< parameters.target_commit >> build_tools/packaging/wheel/linux_manywheel.sh
+      - run: build_tools/packaging/wheel/linux_manywheel.sh
       - store_artifacts:
           path: /remote/cpu
 
   binary_linux_conda:
-    parameters:
-      <<: *param_target_commit
+    <<: *binary_common
     docker:
       - image: "soumith/conda-cuda"
     resource_class: 2xlarge+
     steps:
       - checkout
-      - run: TARGET_COMMIT=<< parameters.target_commit >> build_tools/packaging/conda/build_audio.sh
+      - run: build_tools/packaging/conda/build_audio.sh
       - store_artifacts:
           path: /opt/conda/conda-bld/linux-64
 
   binary_macos_wheel:
-    parameters:
-      <<: *param_target_commit
+    <<: *binary_common
     macos:
       xcode: "9.0"
     steps:
       - checkout
-      - run: TARGET_COMMIT=<< parameters.target_commit >> build_tools/packaging/wheel/osx_wheel.sh
+      - run: build_tools/packaging/wheel/osx_wheel.sh
       - store_artifacts:
-          path: $HOME/torchaudio_wheels
+          path: /Users/distiller/torchaudio_wheels
 
   binary_macos_conda:
-    parameters:
-      <<: *param_target_commit
+    <<: *binary_common
     macos:
       xcode: "9.0"
     steps:
@@ -60,10 +74,15 @@ jobs:
             sh conda.sh -b
             source $HOME/miniconda3/bin/activate
             conda install -yq conda-build
-            TARGET_COMMIT=<< parameters.target_commit >> \
-              build_tools/packaging/conda/build_audio.sh
+            build_tools/packaging/conda/build_audio.sh
       - store_artifacts:
-          path: $HOME/miniconda3/conda-bld/osx-64
+          path: /Users/distiller/miniconda3/conda-bld/osx-64
+
+release_parameters: &release_parameters
+  version: "0.3.0"
+  target_commit: "v0.3.0"
+  pytorch_version: "1.2.0"
+  build_number: 1
 
 workflows:
   build:
@@ -72,3 +91,14 @@ workflows:
       - binary_linux_conda
       - binary_macos_wheel
       - binary_macos_conda
+
+  release:
+    jobs:
+      - binary_linux_wheel:
+          <<: *release_parameters
+      - binary_linux_conda:
+          <<: *release_parameters
+      - binary_macos_wheel:
+          <<: *release_parameters
+      - binary_macos_conda:
+          <<: *release_parameters

@@ -15,8 +15,12 @@ curl -o Miniconda3-latest-MacOSX-x86_64.sh https://repo.anaconda.com/miniconda/M
 
 . ~/minconda_wheel_env_tmp/bin/activate
 
-export TORCHAUDIO_BUILD_VERSION="0.4.0.dev$(date "+%Y%m%d")"
-export TORCHAUDIO_BUILD_NUMBER="1"
+if [[ -z "$TORCHAUDIO_BUILD_VERSION" ]]; then
+  export TORCHAUDIO_BUILD_VERSION="0.4.0.dev$(date "+%Y%m%d")"
+fi
+if [[ -z "$TORCHAUDIO_BUILD_NUMBER" ]]; then
+  export TORCHAUDIO_BUILD_NUMBER="1"
+fi
 export OUT_DIR=~/torchaudio_wheels
 
 export MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++
@@ -43,6 +47,8 @@ export PREFIX="$WORKDIR"
 
 cd "$WORKDIR"
 
+ORIG_TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION="$TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION"
+
 desired_pythons=( "2.7" "3.5" "3.6" "3.7" )
 # for each python
 for desired_python in "${desired_pythons[@]}"
@@ -52,11 +58,19 @@ do
     conda create -yn $env_name python="$desired_python"
     conda activate $env_name
 
-    export TORCHAUDIO_PYTORCH_DEPENDENCY_NAME=torch_nightly
-    pip install torch_nightly -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
-    # NB: OS X builds don't have local package qualifiers
-    # NB: Don't use \+ here, it's not portable
-    export TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION="$(pip show torch_nightly | grep ^Version: | sed 's/Version:  *//')"
+    if [[ -z "$ORIG_TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION" ]]; then
+      pip install torch -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
+      # NB: OS X builds don't have local package qualifiers
+      # NB: Don't use \+ here, it's not portable
+      export TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION="$(pip show torch | grep ^Version: | sed 's/Version:  *//')"
+    else
+      # NB: We include the nightly channel to, since sometimes we stage
+      # prereleases in it.  Those releases should get moved to stable
+      # when they're ready
+      pip install "torch==$TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION" \
+        -f https://download.pytorch.org/whl/torch_stable.html \
+        -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+    fi
     echo "Building against ${TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION}"
 
     pip install numpy future

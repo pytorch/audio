@@ -52,7 +52,12 @@ for PYDIR in "${python_installations[@]}"; do
       # the CPU build, because it takes less time to download.
       export TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION="$(pip show torch | grep ^Version: | sed 's/Version: \+//' | sed 's/+.\+//')"
     else
-      pip install "torch==$TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION" -f https://download.pytorch.org/whl/torch_stable.html
+      # NB: We include the nightly channel to, since sometimes we stage
+      # prereleases in it.  Those releases should get moved to stable
+      # when they're ready
+      pip install "torch==$TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION" \
+        -f https://download.pytorch.org/whl/torch_stable.html \
+        -f https://download.pytorch.org/whl/nightly/torch_nightly.html
     fi
     echo "Building against ${TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION}"
 
