@@ -23,7 +23,7 @@ if [[ -z "$TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION" ]]; then
   # CPU/CUDA variants of PyTorch have ABI compatible PyTorch.  Therefore, we
   # strip off the local package qualifier.  Also, we choose to build against
   # the CPU build, because it takes less time to download.
-  export TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION="$(pip show torch | grep ^Version: | sed 's/Version: \+//' | sed 's/+.\+//')"
+  export TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION="$(pip show torch | grep ^Version: | sed 's/Version:  *//' | sed 's/+.\+//')"
 else
   is_nightly=
   # NB: We include the nightly channel to, since sometimes we stage
