@@ -41,7 +41,6 @@ jobs:
       <<: *param_target_commit
     macos:
       xcode: "9.0"
-    resource_class: 2xlarge+
     steps:
       - checkout
       - run: TARGET_COMMIT=<< parameters.target_commit >> build_tools/packaging/wheel/osx_wheel.sh
@@ -53,7 +52,6 @@ jobs:
       <<: *param_target_commit
     macos:
       xcode: "9.0"
-    resource_class: 2xlarge+
     steps:
       - checkout
       # TODO: This needs a conda install...
