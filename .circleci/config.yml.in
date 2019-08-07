@@ -32,7 +32,7 @@ binary_common: &binary_common
     CUDA_VERSION: cpu
 
 jobs:
-  ensure_consistency:
+  circleci_consistency:
     docker:
       - image: circleci/python:3.7
     steps:
@@ -41,7 +41,7 @@ jobs:
           command: |
             pip install --user --progress-bar off jinja2
             python .circleci/regenerate.py
-            git diff || (echo "Run .circleci/regenerate.py to update config"; exit 1)
+            git diff --exit-code || (echo ".circleci/config.yml not in sync with config.yml.in! Run .circleci/regenerate.py to update config"; exit 1)
 
   binary_linux_wheel:
     <<: *binary_common
@@ -99,7 +99,7 @@ jobs:
 workflows:
   build:
     jobs:
-      - ensure_consistency
+      - circleci_consistency
 {%- for btype in ["wheel", "conda"] -%}
 {%-   for os in ["linux", "macos"] -%}
 {%-     for python_version in ["2.7", "3.5", "3.6", "3.7"] %}
