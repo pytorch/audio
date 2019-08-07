@@ -7,11 +7,7 @@ version: 2.1
 
 binary_common: &binary_common
   parameters:
-    target_commit:
-      description: "what hash or branch to build binaries for; by default, same as trigger"
-      type: string
-      default: HEAD
-    version:
+    build_version:
       description: "version number of release binary; by default, build a nightly"
       type: string
       default: ""
@@ -19,15 +15,18 @@ binary_common: &binary_common
       description: "PyTorch version to build against; by default, use a nightly"
       type: string
       default: ""
-    build_number:
-      description: "build number (if you need to rebuild a version with minor changes)"
-      type: integer
-      default: 1
+    python_version:
+      description: "Python version to build against (e.g., 3.7)"
+      type: string
+    unicode_abi:
+      description: "Python 2.7 wheel only: whether or not we are cp27mu (default: no)"
+      type: string
+      default: ""
   environment:
-    TARGET_COMMIT: << parameters.target_commit >>
-    TORCHAUDIO_BUILD_VERSION: << parameters.version >>
-    TORCHAUDIO_BUILD_NUMBER: << parameters.build_number >>
-    TORCHAUDIO_PYTORCH_DEPENDENCY_VERSION: << parameters.pytorch_version >>
+    PYTHON_VERSION: << parameters.python_version >>
+    BUILD_VERSION: << parameters.build_version >>
+    PYTORCH_VERSION: << parameters.pytorch_version >>
+    UNICODE_ABI: << parameters.unicode_abi >>
 
 jobs:
   binary_linux_wheel:
@@ -37,9 +36,9 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
-      - run: build_tools/packaging/wheel/linux_manywheel.sh
+      - run: packaging/build_wheel.sh
       - store_artifacts:
-          path: /remote/cpu
+          path: dist
 
   binary_linux_conda:
     <<: *binary_common
@@ -48,7 +47,7 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
-      - run: build_tools/packaging/conda/build_audio.sh
+      - run: packaging/conda/build_audio.sh
       - store_artifacts:
           path: /opt/conda/conda-bld/linux-64
 
@@ -58,7 +57,12 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
-      - run: build_tools/packaging/wheel/osx_wheel.sh
+      - run:
+          command: |
+            curl -o conda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+            sh conda.sh -b
+            source $HOME/miniconda3/bin/activate
+            packaging/wheel/osx_wheel.sh
       - store_artifacts:
           path: /Users/distiller/torchaudio_wheels
 
@@ -80,21 +84,47 @@ jobs:
 
 release_parameters: &release_parameters
   version: "0.3.0"
-  target_commit: "v0.3.0"
   pytorch_version: "1.2.0"
-  build_number: 1
 
 workflows:
   build:
     jobs:
       - binary_linux_wheel:
-          name: nightly_binary_linux_wheel
-      - binary_linux_conda:
-          name: nightly_binary_linux_conda
+          name: nightly_binary_linux_wheel_cp27m
+          python_version: "2.7"
+      - binary_linux_wheel:
+          name: nightly_binary_linux_wheel_cp27mu
+          python_version: "2.7"
+          unicode_abi: "1"
+      - binary_linux_wheel:
+          name: nightly_binary_linux_wheel_cp35
+          python_version: "3.5"
+      - binary_linux_wheel:
+          name: nightly_binary_linux_wheel_cp36
+          python_version: "3.6"
+      - binary_linux_wheel:
+          name: nightly_binary_linux_wheel_cp37
+          python_version: "3.7"
+#     - binary_linux_conda:
+#         name: nightly_binary_linux_conda
       - binary_macos_wheel:
-          name: nightly_binary_macos_wheel
-      - binary_macos_conda:
-          name: nightly_binary_macos_conda
+          name: nightly_binary_macos_wheel_cp27m
+          python_version: "2.7"
+      - binary_macos_wheel:
+          name: nightly_binary_macos_wheel_cp27mu
+          python_version: "2.7"
+          unicode_abi: "1"
+      - binary_macos_wheel:
+          name: nightly_binary_macos_wheel_cp35
+          python_version: "3.5"
+      - binary_macos_wheel:
+          name: nightly_binary_macos_wheel_cp36
+          python_version: "3.6"
+      - binary_macos_wheel:
+          name: nightly_binary_macos_wheel_cp37
+          python_version: "3.7"
+#     - binary_macos_conda:
+#         name: nightly_binary_macos_conda
 
 # release:
 #   jobs:
