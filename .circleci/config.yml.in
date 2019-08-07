@@ -145,6 +145,7 @@ jobs:
       - run:
           command: |
             pip install --user awscli
+            export PATH="$HOME/.local/bin:$PATH"
             # Prevent credential from leaking
             set +x
             export AWS_ACCESS_KEY_ID="${PYTORCH_BINARY_AWS_ACCESS_KEY_ID}"
