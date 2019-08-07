@@ -104,30 +104,28 @@ jobs:
 
   binary_windows_wheel:
     <<: *binary_common
-    executor: win/vs2019
+    executor:
+      name: win/vs2019
+      shell: bash.exe
     steps:
       - checkout
       - run:
           command: |
-            curl -o conda.exe https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe
-            set "CONDA_HOME=%CD%\conda"
-            start /wait "" conda.exe /S /InstallationType=JustMe /RegisterPython=0 /AddToPath=0 /D=%CONDA_HOME%
-            set "PATH=%CONDA_HOME%;%CONDA_HOME%\scripts;%CONDA_HOME%\Library\bin;%PATH%"
+            choco install miniconda3
             bash packaging/build_wheel.sh
       - store_artifacts:
           path: dist
 
   binary_windows_conda:
     <<: *binary_common
-    executor: win/vs2019
+    executor:
+      name: win/vs2019
+      shell: bash.exe
     steps:
       - checkout
       - run:
           command: |
-            curl -o conda.exe https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe
-            set "CONDA_HOME=%CD%\conda"
-            start /wait "" conda.exe /S /InstallationType=JustMe /RegisterPython=0 /AddToPath=0 /D=%CONDA_HOME%
-            set "PATH=%CONDA_HOME%;%CONDA_HOME%\scripts;%CONDA_HOME%\Library\bin;%PATH%"
+            choco install miniconda3
             conda install -yq conda-build
             bash packaging/build_conda.sh
       - store_artifacts:
