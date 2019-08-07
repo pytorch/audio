@@ -1,9 +1,9 @@
 package:
   name: torchaudio
-  version: "{{ environ.get('TORCHAUDIO_BUILD_VERSION') }}"
+  version: "{{ environ.get('BUILD_VERSION') }}"
 
 source:
-  path: "{{ environ.get('TORCHAUDIO_GITHUB_ROOT_DIR') }}"
+  path: "{{ environ.get('SOURCE_ROOT_DIR') }}"
 
 requirements:
   build:
@@ -13,16 +13,16 @@ requirements:
   host:
     - python
     - setuptools
-{{ environ.get('CONDA_PYTORCH_CONSTRAINT') }}
+    - cpuonly
+    {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT') }}
 
   run:
     - python
     - typing
-{{ environ.get('CONDA_PYTORCH_CONSTRAINT') }}
+    {{ environ.get('CONDA_PYTORCH_CONSTRAINT') }}
 
 build:
-  number: {{ environ.get('TORCHAUDIO_BUILD_NUMBER') }}
-  string: py{{py}}_{{environ.get('TORCHAUDIO_BUILD_NUMBER')}}
+  string: py{{py}}
 
 test:
   imports:
