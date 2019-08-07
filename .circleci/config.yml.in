@@ -32,6 +32,17 @@ binary_common: &binary_common
     CUDA_VERSION: cpu
 
 jobs:
+  ensure_consistency:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run:
+          command: |
+            pip install --user --progress-bar off jinja2
+            python .circleci/regenerate.py
+            git diff || (echo "Run .circleci/regenerate.py to update config"; exit 1)
+
   binary_linux_wheel:
     <<: *binary_common
     docker:
@@ -88,66 +99,19 @@ jobs:
 workflows:
   build:
     jobs:
-      # Linux wheels
-      - binary_linux_wheel:
-          name: nightly_binary_linux_wheel_cp27m
-          python_version: "2.7"
-      - binary_linux_wheel:
-          name: nightly_binary_linux_wheel_cp27mu
-          python_version: "2.7"
+      - ensure_consistency
+{%- for btype in ["wheel", "conda"] -%}
+{%-   for os in ["linux", "macos"] -%}
+{%-     for python_version in ["2.7", "3.5", "3.6", "3.7"] %}
+      - binary_{{os}}_{{btype}}:
+          name: binary_{{os}}_{{btype}}_py{{python_version}}
+          python_version: "{{python_version}}"
+{%-       if btype == "wheel" and python_version == "2.7" %}
+      - binary_{{os}}_{{btype}}:
+          name: binary_{{os}}_{{btype}}_py{{python_version}}_unicode
+          python_version: "{{python_version}}"
           unicode_abi: "1"
-      - binary_linux_wheel:
-          name: nightly_binary_linux_wheel_cp35
-          python_version: "3.5"
-      - binary_linux_wheel:
-          name: nightly_binary_linux_wheel_cp36
-          python_version: "3.6"
-      - binary_linux_wheel:
-          name: nightly_binary_linux_wheel_cp37
-          python_version: "3.7"
-
-      # Linux conda
-      - binary_linux_conda:
-          name: nightly_binary_linux_conda_py27
-          python_version: "2.7"
-      - binary_linux_conda:
-          name: nightly_binary_linux_conda_py35
-          python_version: "3.5"
-      - binary_linux_conda:
-          name: nightly_binary_linux_conda_py36
-          python_version: "3.6"
-      - binary_linux_conda:
-          name: nightly_binary_linux_conda_py37
-          python_version: "3.7"
-
-      # Macos wheel
-      - binary_macos_wheel:
-          name: nightly_binary_macos_wheel_cp27m
-          python_version: "2.7"
-      - binary_macos_wheel:
-          name: nightly_binary_macos_wheel_cp27mu
-          python_version: "2.7"
-          unicode_abi: "1"
-      - binary_macos_wheel:
-          name: nightly_binary_macos_wheel_cp35
-          python_version: "3.5"
-      - binary_macos_wheel:
-          name: nightly_binary_macos_wheel_cp36
-          python_version: "3.6"
-      - binary_macos_wheel:
-          name: nightly_binary_macos_wheel_cp37
-          python_version: "3.7"
-
-      # Macos conda
-      - binary_macos_conda:
-          name: nightly_binary_macos_conda_py27
-          python_version: "2.7"
-      - binary_macos_conda:
-          name: nightly_binary_macos_conda_py35
-          python_version: "3.5"
-      - binary_macos_conda:
-          name: nightly_binary_macos_conda_py36
-          python_version: "3.6"
-      - binary_macos_conda:
-          name: nightly_binary_macos_conda_py37
-          python_version: "3.7"
+{%-       endif -%}
+{%-     endfor -%}
+{%-   endfor -%}
+{%-   endfor -%}
