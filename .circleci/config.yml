@@ -155,10 +155,10 @@ jobs:
             done
 
 workflows:
-  build:
-    jobs:
-      - circleci_consistency
-      
+# build:
+#   jobs:
+#     - circleci_consistency
+#     
       - binary_linux_wheel:
           name: binary_linux_wheel_py2.7
           python_version: "2.7"

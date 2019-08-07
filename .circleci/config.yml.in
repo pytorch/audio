@@ -185,10 +185,10 @@ jobs:
 {%- endmacro %}
 
 workflows:
-  build:
-    jobs:
-      - circleci_consistency
-      {{ workflows() }}
+# build:
+#   jobs:
+#     - circleci_consistency
+#     {{ workflows() }}
 
   nightly:
 #   triggers:
