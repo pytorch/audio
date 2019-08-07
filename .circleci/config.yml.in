@@ -110,7 +110,8 @@ jobs:
       - run:
           command: |
             choco install miniconda3
-            refreshenv
+            # For some reason, refreshenv doesn't work
+            set PATH="C:\tools\miniconda3\Scripts;%PATH%"
             bash packaging/build_wheel.sh
       - store_artifacts:
           path: dist
@@ -123,7 +124,8 @@ jobs:
       - run:
           command: |
             choco install miniconda3
-            refreshenv
+            # For some reason, refreshenv doesn't work
+            set PATH="C:\tools\miniconda3\Scripts;%PATH%"
             conda install -yq conda-build
             bash packaging/build_conda.sh
       - store_artifacts:
