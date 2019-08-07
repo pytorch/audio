@@ -5,6 +5,9 @@ version: 2.1
 #   - circleci config process .circleci/config.yml > gen.yml && circleci local execute -c gen.yml --job binary_linux_wheel
 #     - Replace binary_linux_wheel with the name of the job you want to test
 
+orbs:
+  win: circleci/windows@1.0.0
+
 binary_common: &binary_common
   parameters:
     # Edit these defaults to do a release`
