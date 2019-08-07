@@ -40,6 +40,7 @@ setup_cuda_suffix() {
     fi
     export CPU_SUFFIX=""
     export CU_VERSION="cpu"
+    export WHEEL_DIR=""
   else
     case "$CUDA_VERSION" in
       10.0)
@@ -58,6 +59,7 @@ setup_cuda_suffix() {
         echo "Unrecognized CUDA_VERSION=$CUDA_VERSION"
     esac
     export CPU_SUFFIX="+cpu"
+    export WHEEL_DIR="$CU_VERSION/"
   fi
 }
 
@@ -65,6 +67,8 @@ setup_cuda_suffix() {
 setup_cpuonly_cuda_suffix() {
   export CUDA_SUFFIX=""
   export CPU_SUFFIX=""
+  export CU_VERSION="cpu"
+  export WHEEL_DIR=""
 }
 
 # Fill BUILD_VERSION and BUILD_NUMBER if it doesn't exist already with a nightly string
@@ -98,7 +102,7 @@ setup_pip_pytorch_version() {
   if [[ -z "$PYTORCH_VERSION" ]]; then
     # Install latest prerelease version of torch, per our nightlies, consistent
     # with the requested cuda version
-    pip_install --pre torch -f "https://download.pytorch.org/whl/nightly/${CU_VERSION}/torch_nightly.html"
+    pip_install --pre torch -f "https://download.pytorch.org/whl/nightly/${WHEEL_DIR}torch_nightly.html"
     if [[ "$CUDA_VERSION" == "cpu" ]]; then
       # CUDA and CPU are ABI compatible on the CPU-only parts, so strip
       # in this case

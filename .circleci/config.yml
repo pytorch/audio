@@ -143,7 +143,7 @@ jobs:
           at: ~/workspace
       - run:
           command: |
-            pip install awscli
+            pip install --user awscli
             # Prevent credential from leaking
             set +x
             export AWS_ACCESS_KEY_ID="${PYTORCH_BINARY_AWS_ACCESS_KEY_ID}"
