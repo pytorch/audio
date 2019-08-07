@@ -150,9 +150,8 @@ jobs:
             export AWS_ACCESS_KEY_ID="${PYTORCH_BINARY_AWS_ACCESS_KEY_ID}"
             export AWS_SECRET_ACCESS_KEY="${PYTORCH_BINARY_AWS_SECRET_ACCESS_KEY}"
             set -x
-            packaging/upload_wheel.sh
             for pkg in ~/workspace/*.whl; do
-              aws s3 cp "$pkg" "s3://pytorch/libtorch/nightly/" --acl public-read
+              aws s3 cp "$pkg" "s3://pytorch/whl/nightly/" --acl public-read
             done
 
 
