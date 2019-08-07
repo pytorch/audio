@@ -110,4 +110,3 @@ ENV/
 test/assets/sinewave.wav
 torchaudio/version.py
 gen.yml
-.circleci/config.yml
