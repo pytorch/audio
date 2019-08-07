@@ -7,6 +7,7 @@ version: 2.1
 
 binary_common: &binary_common
   parameters:
+    # Edit these defaults to do a release`
     build_version:
       description: "version number of release binary; by default, build a nightly"
       type: string
@@ -15,6 +16,7 @@ binary_common: &binary_common
       description: "PyTorch version to build against; by default, use a nightly"
       type: string
       default: ""
+    # Don't edit these
     python_version:
       description: "Python version to build against (e.g., 3.7)"
       type: string
@@ -27,6 +29,7 @@ binary_common: &binary_common
     BUILD_VERSION: << parameters.build_version >>
     PYTORCH_VERSION: << parameters.pytorch_version >>
     UNICODE_ABI: << parameters.unicode_abi >>
+    CUDA_VERSION: cpu
 
 jobs:
   binary_linux_wheel:
@@ -81,10 +84,6 @@ jobs:
             packaging/build_conda.sh
       - store_artifacts:
           path: /Users/distiller/miniconda3/conda-bld/osx-64
-
-release_parameters: &release_parameters
-  version: "0.3.0"
-  pytorch_version: "1.2.0"
 
 workflows:
   build:
@@ -152,18 +151,3 @@ workflows:
       - binary_macos_conda:
           name: nightly_binary_macos_conda_py37
           python_version: "3.7"
-
-# release:
-#   jobs:
-#     - binary_linux_wheel:
-#         <<: *release_parameters
-#         name: release_binary_linux_wheel
-#     - binary_linux_conda:
-#         <<: *release_parameters
-#         name: release_binary_linux_conda
-#     - binary_macos_wheel:
-#         <<: *release_parameters
-#         name: release_binary_macos_wheel
-#     - binary_macos_conda:
-#         <<: *release_parameters
-#         name: release_binary_macos_conda

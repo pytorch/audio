@@ -20,12 +20,36 @@ setup_python() {
       3.5) python_abi=cp35-cp35m ;;
       3.6) python_abi=cp36-cp36m ;;
       3.7) python_abi=cp37-cp37m ;;
+      *)
+        echo "Unrecognized PYTHON_VERSION=$PYTHON_VERSION"
+        exit 1
+        ;;
     esac
     export PATH="/opt/python/$python_abi/bin:$PATH"
   fi
 }
 
-# Fill BUILD_VERSION if it doesn't exist already with a nightly string
+# Fill CUDA_SUFFIX with CUDA_VERSION, but don't fill it for the default
+# CUDA version (that's a blank suffix)
+setup_cuda_suffix() {
+  case "$CUDA_VERSION" in
+    10.0)
+      export CUDA_SUFFIX="" ;; # default!
+    9.2)
+      export CUDA_SUFFIX="+cu92" ;;
+    cpu)
+      export CUDA_SUFFIX="+cpu" ;;
+    *)
+      echo "Unrecognized CUDA_VERSION=$CUDA_VERSION"
+  esac
+}
+
+# If a package is cpu-only, we never provide a cuda suffix
+setup_cpuonly_cuda_suffix() {
+  export CUDA_SUFFIX=""
+}
+
+# Fill BUILD_VERSION and BUILD_NUMBER if it doesn't exist already with a nightly string
 # Usage: setup_build_version 0.2
 setup_build_version() {
   if [[ -z "$BUILD_VERSION" ]]; then
@@ -68,16 +92,32 @@ setup_pip_pytorch_version() {
 
 # Fill PYTORCH_VERSION with the latest conda nightly version, and
 # CONDA_CHANNEL_FLAGS with appropriate flags to retrieve these versions
-setup_conda_pytorch_version() {
+#
+# You MUST have populated CUDA_SUFFIX before hand.
+#
+# TODO: This is currently hard-coded for CPU-only case
+setup_conda_pytorch_constraint() {
   if [[ -z "$PYTORCH_VERSION" ]]; then
     export CONDA_CHANNEL_FLAGS="-c pytorch-nightly"
-    export PYTORCH_VERSION=$(conda search --json 'pytorch[channel=pytorch-nightly]' | python -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version'])")
+    export PYTORCH_VERSION="$(conda search --json 'pytorch[channel=pytorch-nightly]' | python -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version']))")"
   else
     export CONDA_CHANNEL_FLAGS="-c pytorch"
+  fi
+  if [[ "$CUDA_VERSION" == cpu ]]; then
+    export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==$PYTORCH_VERSION+cpu"
+    export CONDA_PYTORCH_CONSTRAINT="- pytorch==$PYTORCH_VERSION"
+  else
+    export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==${PYTORCH_VERSION}${CUDA_SUFFIX}"
+    export CONDA_PYTORCH_CONSTRAINT="- pytorch==${PYTORCH_VERSION}${CUDA_SUFFIX}"
   fi
 }
 
 # Translate CUDA_VERSION into CUDA_CUDATOOLKIT_CONSTRAINT
 setup_conda_cudatoolkit_constraint() {
-  export CONDA_CUDATOOLKIT_CONSTRAINT=""
+  if [[ "$CUDA_VERSION" == cpu ]]; then
+    export CONDA_CUDATOOLKIT_CONSTRAINT=""
+  else
+    echo
+    # TODO
+  fi
 }
