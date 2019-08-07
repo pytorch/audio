@@ -5,12 +5,9 @@
  ### Linux
 
  ```bash
-# NB: We don't actually need CUDA; you don't have to run this on nvidia-docker
-nvidia-docker run -it --ipc=host --rm -v $(pwd):/remote soumith/conda-cuda bash
-pushd remote/conda
-conda config --add channels pytorch
-conda config --add channels conda-forge
-./build_audio.sh
+docker run -it --ipc=host --rm -v $(pwd):/remote soumith/conda-cuda bash
+cd remote
+PYTHON_VERSION=3.7 packaging/build_conda.sh
 ```
 
 To install bz2,
@@ -32,11 +29,7 @@ anaconda upload -u pytorch /opt/conda/conda-bld/linux-64/torchaudio*.bz2
 
  ```bash
 # create a fresh anaconda environment / install and activate it
-cd packaging/conda
-conda install -y conda-build anaconda-client
-conda config --add channels pytorch
-conda config --add channels conda-forge
-./build_audio.sh
+PYTHON_VERSION=3.7 packaging/build_conda.sh
 ```
 
 To install bz2,
@@ -64,8 +57,8 @@ anaconda upload -u pytorch /Users/jamarshon/anaconda3/conda-bld/osx-64/torchaudi
 
  ```bash
 nvidia-docker run -it --ipc=host --rm -v $(pwd):/remote soumith/manylinux-cuda90:latest bash
-cd remote/wheel
-./linux_manywheel.sh cpu
+cd remote
+PYTHON_VERSION=3.7 packaging/build_wheel.sh
 ```
 
 To install wheels,
@@ -84,8 +77,7 @@ cd ../cpu
  ### OSX
 
  ```bash
-pushd wheel
-./osx_wheel.sh
+PYTHON_VERSION=3.7 packaging/build_wheel.sh
 ```
 
 To install wheels,
