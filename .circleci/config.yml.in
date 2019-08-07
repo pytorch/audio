@@ -104,28 +104,26 @@ jobs:
 
   binary_windows_wheel:
     <<: *binary_common
-    executor:
-      name: win/vs2019
-      shell: bash.exe
+    executor: win/vs2019
     steps:
       - checkout
       - run:
           command: |
             choco install miniconda3
+            refreshenv
             bash packaging/build_wheel.sh
       - store_artifacts:
           path: dist
 
   binary_windows_conda:
     <<: *binary_common
-    executor:
-      name: win/vs2019
-      shell: bash.exe
+    executor: win/vs2019
     steps:
       - checkout
       - run:
           command: |
             choco install miniconda3
+            refreshenv
             conda install -yq conda-build
             bash packaging/build_conda.sh
       - store_artifacts:
