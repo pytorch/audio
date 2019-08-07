@@ -47,7 +47,7 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
-      - run: packaging/conda/build_audio.sh
+      - run: packaging/build_conda.sh
       - store_artifacts:
           path: /opt/conda/conda-bld/linux-64
 
@@ -78,7 +78,7 @@ jobs:
             sh conda.sh -b
             source $HOME/miniconda3/bin/activate
             conda install -yq conda-build
-            build_tools/packaging/conda/build_audio.sh
+            packaging/build_conda.sh
       - store_artifacts:
           path: /Users/distiller/miniconda3/conda-bld/osx-64
 
@@ -89,6 +89,7 @@ release_parameters: &release_parameters
 workflows:
   build:
     jobs:
+      # Linux wheels
       - binary_linux_wheel:
           name: nightly_binary_linux_wheel_cp27m
           python_version: "2.7"
@@ -105,8 +106,22 @@ workflows:
       - binary_linux_wheel:
           name: nightly_binary_linux_wheel_cp37
           python_version: "3.7"
-#     - binary_linux_conda:
-#         name: nightly_binary_linux_conda
+
+      # Linux conda
+      - binary_linux_conda:
+          name: nightly_binary_linux_conda_py27
+          python_version: "2.7"
+      - binary_linux_conda:
+          name: nightly_binary_linux_conda_py35
+          python_version: "3.5"
+      - binary_linux_conda:
+          name: nightly_binary_linux_conda_py36
+          python_version: "3.6"
+      - binary_linux_conda:
+          name: nightly_binary_linux_conda_py37
+          python_version: "3.7"
+
+      # Macos wheel
       - binary_macos_wheel:
           name: nightly_binary_macos_wheel_cp27m
           python_version: "2.7"
@@ -123,8 +138,20 @@ workflows:
       - binary_macos_wheel:
           name: nightly_binary_macos_wheel_cp37
           python_version: "3.7"
-#     - binary_macos_conda:
-#         name: nightly_binary_macos_conda
+
+      # Macos conda
+      - binary_macos_conda:
+          name: nightly_binary_macos_conda_py27
+          python_version: "2.7"
+      - binary_macos_conda:
+          name: nightly_binary_macos_conda_py35
+          python_version: "3.5"
+      - binary_macos_conda:
+          name: nightly_binary_macos_conda_py36
+          python_version: "3.6"
+      - binary_macos_conda:
+          name: nightly_binary_macos_conda_py37
+          python_version: "3.7"
 
 # release:
 #   jobs:

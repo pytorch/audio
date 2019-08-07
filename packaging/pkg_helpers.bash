@@ -40,14 +40,19 @@ setup_macos() {
   fi
 }
 
+# Function to retry functions that sometimes timeout or have flaky failures
+retry () {
+    $*  || (sleep 1 && $*) || (sleep 2 && $*) || (sleep 4 && $*) || (sleep 8 && $*)
+}
+
 # Install with pip a bit more robustly than the default
 pip_install() {
-  pip install --progress-bar off "$@"
+  retry pip install --progress-bar off "$@"
 }
 
 # Install torch with pip, respecting PYTORCH_VERSION, and record the installed
 # version into PYTORCH_VERSION, if applicable
-pip_install_torch() {
+setup_pip_pytorch_version() {
   if [[ -z "$PYTORCH_VERSION" ]]; then
     # Install latest prerelease CPU version of torch, per our nightlies.
     pip_install --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
@@ -55,11 +60,24 @@ pip_install_torch() {
     # strip off the local package qualifier.
     export PYTORCH_VERSION="$(pip show torch | grep ^Version: | sed 's/Version:  *//' | sed 's/+.\+//')"
   else
-    # NB: We include the nightly channel to, since sometimes we stage
-    # prereleases in it.  Those releases should get moved to stable
-    # when they're ready
+    # TODO: Maybe add staging too
     pip_install "torch==$PYTORCH_VERSION" \
-      -f https://download.pytorch.org/whl/torch_stable.html \
-      -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+      -f https://download.pytorch.org/whl/torch_stable.html
   fi
+}
+
+# Fill PYTORCH_VERSION with the latest conda nightly version, and
+# CONDA_CHANNEL_FLAGS with appropriate flags to retrieve these versions
+setup_conda_pytorch_version() {
+  if [[ -z "$PYTORCH_VERSION" ]]; then
+    export CONDA_CHANNEL_FLAGS="-c pytorch-nightly"
+    export PYTORCH_VERSION=$(conda search --json 'pytorch[channel=pytorch-nightly]' | python -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version'])")
+  else
+    export CONDA_CHANNEL_FLAGS="-c pytorch"
+  fi
+}
+
+# Translate CUDA_VERSION into CUDA_CUDATOOLKIT_CONSTRAINT
+setup_conda_cudatoolkit_constraint() {
+  export CONDA_CUDATOOLKIT_CONSTRAINT=""
 }
