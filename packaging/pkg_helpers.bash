@@ -5,6 +5,7 @@
 # version of Python to perform a build.  Relevant to wheel builds.
 setup_python() {
   if [[ "$(uname)" == Darwin ]]; then
+    eval "$(conda shell.bash hook)"
     conda create -yn "env$PYTHON_VERSION" python="$PYTHON_VERSION"
     conda activate "env$PYTHON_VERSION"
   else
