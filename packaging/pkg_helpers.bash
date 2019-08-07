@@ -6,6 +6,7 @@
 setup_python() {
   if [[ "$(uname)" == Darwin ]]; then
     eval "$(conda shell.bash hook)"
+    conda env remove -n "env$PYTHON_VERSION" || true
     conda create -yn "env$PYTHON_VERSION" python="$PYTHON_VERSION"
     conda activate "env$PYTHON_VERSION"
   else
