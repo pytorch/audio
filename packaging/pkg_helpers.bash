@@ -32,21 +32,31 @@ setup_python() {
 # Fill CUDA_SUFFIX with CUDA_VERSION, but don't fill it for the default
 # CUDA version (that's a blank suffix)
 setup_cuda_suffix() {
-  case "$CUDA_VERSION" in
-    10.0)
-      export CUDA_SUFFIX="" ;; # default!
-    9.2)
-      export CUDA_SUFFIX="+cu92" ;;
-    cpu)
-      export CUDA_SUFFIX="+cpu" ;;
-    *)
-      echo "Unrecognized CUDA_VERSION=$CUDA_VERSION"
-  esac
+  if [[ "$(uname)" == Darwin ]]; then
+    if [[ "$CUDA_VERSION" != "cpu" ]]; then
+      echo "CUDA_VERSION on OS X must be cpu"
+      exit 1
+    fi
+    export CPU_SUFFIX=""
+  else
+    case "$CUDA_VERSION" in
+      10.0)
+        export CUDA_SUFFIX="" ;; # default!
+      9.2)
+        export CUDA_SUFFIX="+cu92" ;;
+      cpu)
+        export CUDA_SUFFIX="+cpu" ;;
+      *)
+        echo "Unrecognized CUDA_VERSION=$CUDA_VERSION"
+    esac
+    export CPU_SUFFIX="+cpu"
+  fi
 }
 
 # If a package is cpu-only, we never provide a cuda suffix
 setup_cpuonly_cuda_suffix() {
   export CUDA_SUFFIX=""
+  export CPU_SUFFIX=""
 }
 
 # Fill BUILD_VERSION and BUILD_NUMBER if it doesn't exist already with a nightly string
@@ -104,7 +114,7 @@ setup_conda_pytorch_constraint() {
     export CONDA_CHANNEL_FLAGS="-c pytorch"
   fi
   if [[ "$CUDA_VERSION" == cpu ]]; then
-    export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==$PYTORCH_VERSION+cpu"
+    export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==$PYTORCH_VERSION${CPU_SUFFIX}"
     export CONDA_PYTORCH_CONSTRAINT="- pytorch==$PYTORCH_VERSION"
   else
     export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==${PYTORCH_VERSION}${CUDA_SUFFIX}"
