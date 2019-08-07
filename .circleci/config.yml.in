@@ -155,27 +155,42 @@ jobs:
             done
 
 
+{%- macro workflow(btype, os, python_version, unicode, prefix='', upload=False) %}
+      - binary_{{os}}_{{btype}}:
+          name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}
+          python_version: "{{python_version}}"
+{%-   if unicode %}
+          unicode_abi: "1"
+{%-   endif %}
+
+{%-   if upload %}
+      - binary_{{btype}}_upload:
+          name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_upload
+          context: org-member
+          requires:
+            - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}
+{%-   endif %}
+{%- endmacro %}
+
+{%- macro workflows(prefix='', upload=False) %}
+{%- for btype in ["wheel", "conda"] -%}
+{%-   for os in ["linux", "macos"] -%}
+{%-     for python_version in ["2.7", "3.5", "3.6", "3.7"] -%}
+{%-       for unicode in ([False, True] if btype == "wheel" and python_version == "2.7" else [False]) -%}
+          {{ workflow(btype, os, python_version, unicode, prefix=prefix, upload=upload) }}
+{%-       endfor -%}
+{%-     endfor -%}
+{%-   endfor -%}
+{%- endfor %}
+{%- endmacro %}
+
 workflows:
   build:
     jobs:
       - circleci_consistency
-{%- for btype in ["wheel", "conda"] -%}
-{%-   for os in ["linux", "macos"] -%}
-{%-     for python_version in ["2.7", "3.5", "3.6", "3.7"] %}
-      - binary_{{os}}_{{btype}}:
-          name: binary_{{os}}_{{btype}}_py{{python_version}}
-          python_version: "{{python_version}}"
-{%-       if btype == "wheel" and python_version == "2.7" %}
-      - binary_{{os}}_{{btype}}:
-          name: binary_{{os}}_{{btype}}_py{{python_version}}_unicode
-          python_version: "{{python_version}}"
-          unicode_abi: "1"
-{%-       endif -%}
-{%-     endfor -%}
-{%-   endfor -%}
-{%-   endfor %}
+      {{ workflows() }}
 
-  master:
+  nightly:
 #   triggers:
 #     - schedule:
 #         cron: "0 9 * * *"
@@ -184,18 +199,6 @@ workflows:
 #             only:
 #               - master
     jobs:
-      - binary_linux_conda:
-          name: master_binary_linux_conda_py3.7
-          python_version: "3.7"
-      - binary_conda_upload:
-          context: org-member
-          requires:
-            - master_binary_linux_conda_py3.7
+      - circleci_consistency
+      {{ workflows(prefix="nightly_", upload=True) }}
 
-      - binary_linux_wheel:
-          name: master_binary_linux_wheel_py3.7
-          python_version: "3.7"
-      - binary_wheel_upload:
-          context: org-member
-          requires:
-            - master_binary_linux_wheel_py3.7
