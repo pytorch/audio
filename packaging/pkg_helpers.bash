@@ -30,8 +30,8 @@ setup_python() {
   fi
 }
 
-# Fill CUDA_SUFFIX with CUDA_VERSION, but don't fill it for the default
-# CUDA version (that's a blank suffix)
+# Fill CUDA_SUFFIX and CU_VERSION with CUDA_VERSION. CUDA_SUFFIX is
+# left blank for the default CUDA version (that's a blank suffix)
 setup_cuda_suffix() {
   if [[ "$(uname)" == Darwin ]]; then
     if [[ "$CUDA_VERSION" != "cpu" ]]; then
@@ -39,14 +39,21 @@ setup_cuda_suffix() {
       exit 1
     fi
     export CPU_SUFFIX=""
+    export CU_VERSION="cpu"
   else
     case "$CUDA_VERSION" in
       10.0)
-        export CUDA_SUFFIX="" ;; # default!
+        export CUDA_SUFFIX=""
+        export CU_VERSION="cu100"
+        ;;
       9.2)
-        export CUDA_SUFFIX="+cu92" ;;
+        export CUDA_SUFFIX="+cu92"
+        export CU_VERSION="cu92"
+        ;;
       cpu)
-        export CUDA_SUFFIX="+cpu" ;;
+        export CUDA_SUFFIX="+cpu"
+        export CU_VERSION="cpu"
+        ;;
       *)
         echo "Unrecognized CUDA_VERSION=$CUDA_VERSION"
     esac
@@ -89,14 +96,19 @@ pip_install() {
 # version into PYTORCH_VERSION, if applicable
 setup_pip_pytorch_version() {
   if [[ -z "$PYTORCH_VERSION" ]]; then
-    # Install latest prerelease CPU version of torch, per our nightlies.
-    pip_install --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
-    # CPU/CUDA variants of PyTorch have ABI compatible PyTorch.  Therefore, we
-    # strip off the local package qualifier.
-    export PYTORCH_VERSION="$(pip show torch | grep ^Version: | sed 's/Version:  *//' | sed 's/+.\+//')"
+    # Install latest prerelease version of torch, per our nightlies, consistent
+    # with the requested cuda version
+    pip_install --pre torch -f "https://download.pytorch.org/whl/nightly/${CU_VERSION}/torch_nightly.html"
+    if [[ "$CUDA_VERSION" == "cpu" ]]; then
+      # CUDA and CPU are ABI compatible on the CPU-only parts, so strip
+      # in this case
+      export PYTORCH_VERSION="$(pip show torch | grep ^Version: | sed 's/Version:  *//' | sed 's/+.\+//')"
+    else
+      export PYTORCH_VERSION="$(pip show torch | grep ^Version: | sed 's/Version:  *//')"
+    fi
   else
     # TODO: Maybe add staging too
-    pip_install "torch==$PYTORCH_VERSION" \
+    pip_install "torch==$PYTORCH_VERSION$CUDA_SUFFIX" \
       -f https://download.pytorch.org/whl/torch_stable.html
   fi
 }
@@ -125,10 +137,21 @@ setup_conda_pytorch_constraint() {
 
 # Translate CUDA_VERSION into CUDA_CUDATOOLKIT_CONSTRAINT
 setup_conda_cudatoolkit_constraint() {
-  if [[ "$CUDA_VERSION" == cpu ]]; then
+  export CONDA_CPUONLY_FEATURE=""
+  if [[ "$(uname)" == Darwin ]]; then
     export CONDA_CUDATOOLKIT_CONSTRAINT=""
   else
-    echo
-    # TODO
+    case "$CUDA_VERSION" in
+      10.0)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=10.0,<10.1 # [not osx]"
+        ;;
+      9.2)
+        export CONDA_CUDATOOLKIT_CONSTRAINT="- cudatoolkit >=9.2,<9.3 # [not osx]"
+        ;;
+      cpu)
+        export CONDA_CUDATOOLKIT_CONSTRAINT=""
+        export CONDA_CPUONLY_FEATURE="- cpuonly"
+        ;;
+    esac
   fi
 }
