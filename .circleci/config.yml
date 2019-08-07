@@ -31,16 +31,6 @@ binary_common: &binary_common
     UNICODE_ABI: << parameters.unicode_abi >>
     CUDA_VERSION: cpu
 
-commands:
-  setup_conda:
-    description: "Install conda in the environment"
-    steps:
-      - run:
-          command: |
-            curl -o conda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
-            sh conda.sh -b
-            source $HOME/miniconda3/bin/activate
-
 jobs:
   circleci_consistency:
     docker:
@@ -81,8 +71,15 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
-      - setup_conda
-      - run: packaging/build_wheel.sh
+      - run:
+          # Cannot easily deduplicate this as source'ing activate
+          # will set environment variables which we need to propagate
+          # to build_wheel.sh
+          command: |
+            curl -o conda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+            sh conda.sh -b
+            source $HOME/miniconda3/bin/activate
+            packaging/build_wheel.sh
       - store_artifacts:
           path: dist
 
@@ -92,9 +89,13 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
-      - setup_conda
-      - run: conda install -yq conda-build
-      - run: packaging/build_conda.sh
+      - run:
+          command: |
+            curl -o conda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+            sh conda.sh -b
+            source $HOME/miniconda3/bin/activate
+            conda install -yq conda-build
+            packaging/build_conda.sh
       - store_artifacts:
           path: /Users/distiller/miniconda3/conda-bld/osx-64
 
