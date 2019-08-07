@@ -142,13 +142,13 @@ workflows:
 {%-   endfor %}
 
   master:
-    triggers:
-      - schedule:
-          cron: "0 9 * * *"
-          filters:
-            branches:
-              only:
-                - master
+#   triggers:
+#     - schedule:
+#         cron: "0 9 * * *"
+#         filters:
+#           branches:
+#             only:
+#               - master
     jobs:
       - binary_linux_conda:
           name: master_binary_linux_conda_py3.7
