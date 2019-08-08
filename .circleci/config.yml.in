@@ -30,7 +30,7 @@ binary_common: &binary_common
     BUILD_VERSION: << parameters.build_version >>
     PYTORCH_VERSION: << parameters.pytorch_version >>
     UNICODE_ABI: << parameters.unicode_abi >>
-    CUDA_VERSION: cpu
+    CU_VERSION: cpu
 
 jobs:
   circleci_consistency:
