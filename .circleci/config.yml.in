@@ -169,7 +169,7 @@ jobs:
           name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_upload
           context: org-member
           requires:
-            - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}
+            - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}
 {%-   endif %}
 {%- endmacro %}
 

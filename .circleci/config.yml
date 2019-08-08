@@ -176,7 +176,7 @@ workflows:
           name: nightly_binary_linux_wheel_py2.7_unicode_upload
           context: org-member
           requires:
-            - nightly_binary_linux_wheel_py2.7
+            - nightly_binary_linux_wheel_py2.7_unicode
       - binary_linux_wheel:
           name: nightly_binary_linux_wheel_py3.5
           python_version: "3.5"
@@ -217,7 +217,7 @@ workflows:
           name: nightly_binary_macos_wheel_py2.7_unicode_upload
           context: org-member
           requires:
-            - nightly_binary_macos_wheel_py2.7
+            - nightly_binary_macos_wheel_py2.7_unicode
       - binary_macos_wheel:
           name: nightly_binary_macos_wheel_py3.5
           python_version: "3.5"
