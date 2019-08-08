@@ -5,7 +5,7 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 . "$script_dir/pkg_helpers.bash"
 
 setup_env 0.4.0
-setup_python
+setup_wheel_python
 "$script_dir/build_from_source.sh" "$(pwd)"  # Build static dependencies
 pip_install numpy future
 setup_pip_pytorch_version
