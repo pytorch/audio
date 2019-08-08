@@ -12,11 +12,11 @@ binary_common: &binary_common
     build_version:
       description: "version number of release binary; by default, build a nightly"
       type: string
-      default: ""
+      default: "0.3.0"
     pytorch_version:
       description: "PyTorch version to build against; by default, use a nightly"
       type: string
-      default: ""
+      default: "1.2.0.post4"
     # Don't edit these
     python_version:
       description: "Python version to build against (e.g., 3.7)"
@@ -157,74 +157,6 @@ jobs:
 
 workflows:
   build:
-    jobs:
-      - circleci_consistency
-      
-      - binary_linux_wheel:
-          name: binary_linux_wheel_py2.7
-          python_version: "2.7"
-      - binary_linux_wheel:
-          name: binary_linux_wheel_py2.7_unicode
-          python_version: "2.7"
-          unicode_abi: "1"
-      - binary_linux_wheel:
-          name: binary_linux_wheel_py3.5
-          python_version: "3.5"
-      - binary_linux_wheel:
-          name: binary_linux_wheel_py3.6
-          python_version: "3.6"
-      - binary_linux_wheel:
-          name: binary_linux_wheel_py3.7
-          python_version: "3.7"
-      - binary_macos_wheel:
-          name: binary_macos_wheel_py2.7
-          python_version: "2.7"
-      - binary_macos_wheel:
-          name: binary_macos_wheel_py2.7_unicode
-          python_version: "2.7"
-          unicode_abi: "1"
-      - binary_macos_wheel:
-          name: binary_macos_wheel_py3.5
-          python_version: "3.5"
-      - binary_macos_wheel:
-          name: binary_macos_wheel_py3.6
-          python_version: "3.6"
-      - binary_macos_wheel:
-          name: binary_macos_wheel_py3.7
-          python_version: "3.7"
-      - binary_linux_conda:
-          name: binary_linux_conda_py2.7
-          python_version: "2.7"
-      - binary_linux_conda:
-          name: binary_linux_conda_py3.5
-          python_version: "3.5"
-      - binary_linux_conda:
-          name: binary_linux_conda_py3.6
-          python_version: "3.6"
-      - binary_linux_conda:
-          name: binary_linux_conda_py3.7
-          python_version: "3.7"
-      - binary_macos_conda:
-          name: binary_macos_conda_py2.7
-          python_version: "2.7"
-      - binary_macos_conda:
-          name: binary_macos_conda_py3.5
-          python_version: "3.5"
-      - binary_macos_conda:
-          name: binary_macos_conda_py3.6
-          python_version: "3.6"
-      - binary_macos_conda:
-          name: binary_macos_conda_py3.7
-          python_version: "3.7"
-
-  nightly:
-    triggers:
-      - schedule:
-          cron: "0 9 * * *"
-          filters:
-            branches:
-              only:
-                - master
     jobs:
       - circleci_consistency
       

@@ -55,7 +55,7 @@ else:
 
 # Creating the version file
 cwd = os.path.dirname(os.path.abspath(__file__))
-version = '0.3.0a0'
+version = '0.3.0'
 sha = 'Unknown'
 
 try:
@@ -115,5 +115,5 @@ setup(
             extra_link_args=ela),
     ],
     cmdclass={'build_ext': BuildExtension},
-    install_requires=[pytorch_package_name]
+    install_requires=[pytorch_package_dep]
 )
