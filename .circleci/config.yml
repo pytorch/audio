@@ -161,6 +161,74 @@ workflows:
       - circleci_consistency
       
       - binary_linux_wheel:
+          name: binary_linux_wheel_py2.7
+          python_version: "2.7"
+      - binary_linux_wheel:
+          name: binary_linux_wheel_py2.7_unicode
+          python_version: "2.7"
+          unicode_abi: "1"
+      - binary_linux_wheel:
+          name: binary_linux_wheel_py3.5
+          python_version: "3.5"
+      - binary_linux_wheel:
+          name: binary_linux_wheel_py3.6
+          python_version: "3.6"
+      - binary_linux_wheel:
+          name: binary_linux_wheel_py3.7
+          python_version: "3.7"
+      - binary_macos_wheel:
+          name: binary_macos_wheel_py2.7
+          python_version: "2.7"
+      - binary_macos_wheel:
+          name: binary_macos_wheel_py2.7_unicode
+          python_version: "2.7"
+          unicode_abi: "1"
+      - binary_macos_wheel:
+          name: binary_macos_wheel_py3.5
+          python_version: "3.5"
+      - binary_macos_wheel:
+          name: binary_macos_wheel_py3.6
+          python_version: "3.6"
+      - binary_macos_wheel:
+          name: binary_macos_wheel_py3.7
+          python_version: "3.7"
+      - binary_linux_conda:
+          name: binary_linux_conda_py2.7
+          python_version: "2.7"
+      - binary_linux_conda:
+          name: binary_linux_conda_py3.5
+          python_version: "3.5"
+      - binary_linux_conda:
+          name: binary_linux_conda_py3.6
+          python_version: "3.6"
+      - binary_linux_conda:
+          name: binary_linux_conda_py3.7
+          python_version: "3.7"
+      - binary_macos_conda:
+          name: binary_macos_conda_py2.7
+          python_version: "2.7"
+      - binary_macos_conda:
+          name: binary_macos_conda_py3.5
+          python_version: "3.5"
+      - binary_macos_conda:
+          name: binary_macos_conda_py3.6
+          python_version: "3.6"
+      - binary_macos_conda:
+          name: binary_macos_conda_py3.7
+          python_version: "3.7"
+
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 9 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - circleci_consistency
+      
+      - binary_linux_wheel:
           name: nightly_binary_linux_wheel_py2.7
           python_version: "2.7"
       - binary_wheel_upload:
