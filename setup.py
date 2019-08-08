@@ -55,7 +55,7 @@ else:
 
 # Creating the version file
 cwd = os.path.dirname(os.path.abspath(__file__))
-version = '0.3.0a0'
+version = '0.3.0'
 sha = 'Unknown'
 
 try:
@@ -63,12 +63,8 @@ try:
 except Exception:
     pass
 
-if os.getenv('TORCHAUDIO_BUILD_VERSION'):
-    assert os.getenv('TORCHAUDIO_BUILD_NUMBER') is not None
-    build_number = int(os.getenv('TORCHAUDIO_BUILD_NUMBER'))
-    version = os.getenv('TORCHAUDIO_BUILD_VERSION')
-    if build_number > 1:
-        version += '.post' + str(build_number)
+if os.getenv('BUILD_VERSION'):
+    version = os.getenv('BUILD_VERSION')
 elif sha != 'Unknown':
     version += '+' + sha[:7]
 print('-- Building version ' + version)
@@ -78,11 +74,15 @@ with open(version_path, 'w') as f:
     f.write("__version__ = '{}'\n".format(version))
     f.write("git_version = {}\n".format(repr(sha)))
 
-pytorch_package_name = os.getenv('TORCHAUDIO_PYTORCH_DEPENDENCY_NAME', 'torch')
+pytorch_package_version = os.getenv('PYTORCH_VERSION')
+
+pytorch_package_dep = 'torch'
+if pytorch_package_version is not None:
+    pytorch_package_dep += "==" + pytorch_package_version
 
 setup(
     name="torchaudio",
-    version="0.2",
+    version=version,
     description="An audio package for PyTorch",
     url="https://github.com/pytorch/audio",
     author="Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough",
@@ -115,5 +115,5 @@ setup(
             extra_link_args=ela),
     ],
     cmdclass={'build_ext': BuildExtension},
-    install_requires=[pytorch_package_name]
+    install_requires=[pytorch_package_dep]
 )
