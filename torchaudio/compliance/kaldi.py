@@ -13,6 +13,7 @@ __all__ = [
     'mel_scale',
     'mel_scale_scalar',
     'spectrogram',
+    'mfcc',
     'vtln_warp_freq',
     'vtln_warp_mel_freq',
     'resample_waveform',
@@ -518,6 +519,60 @@ def fbank(
         mel_energies = mel_energies - col_means
 
     return mel_energies
+
+
+def mfcc(
+        waveform, blackman_coeff=0.42, cepstral_lifter=22.0, channel=-1, dither=1.0,
+        energy_floor=0.0, frame_length=25.0, frame_shift=10.0, high_freq=0.0, htk_compat=False,
+        low_freq=20.0, num_ceps=13, min_duration=0.0, num_mel_bins=23, preemphasis_coefficient=0.97,
+        raw_energy=True, remove_dc_offset=True, round_to_power_of_two=True,
+        sample_frequency=16000.0, snip_edges=True, subtract_mean=False, use_energy=False,
+        vtln_high=-500.0, vtln_low=100.0, vtln_warp=1.0, window_type=POVEY):
+    r"""Create a mfcc from a raw audio signal. This matches the input/output of Kaldi's
+    compute-mfcc-feats.
+
+    Args:
+        waveform (torch.Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
+        blackman_coeff (float): Constant coefficient for generalized Blackman window. (Default: ``0.42``)
+        cepstral_lifter (float): Constant that controls scaling of MFCCs (Default: ``22.0``)
+        channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (Default: ``-1``)
+        dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
+            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``1.0``)
+        energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
+            this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
+            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (Default: ``0.0``)
+        frame_length (float): Frame length in milliseconds (Default: ``25.0``)
+        frame_shift (float): Frame shift in milliseconds (Default: ``10.0``)
+        high_freq (float): High cutoff frequency for mel bins (if <= 0, offset from Nyquist) (Default: ``0.0``)
+        htk_compat (bool): If true, put energy last.  Warning: not sufficient to get HTK compatible features (need
+            to change other parameters). (Default: ``False``)
+        low_freq (float): Low cutoff frequency for mel bins (Default: ``20.0``)
+        num_ceps (int): Number of cepstra in MFCC computation (including C0) (Default: ``13``)
+        min_duration (float): Minimum duration of segments to process (in seconds). (Default: ``0.0``)
+        num_mel_bins (int): Number of triangular mel-frequency bins (Default: ``23``)
+        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (Default: ``0.97``)
+        raw_energy (bool): If True, compute energy before preemphasis and windowing (Default: ``True``)
+        remove_dc_offset: Subtract mean from waveform on each frame (Default: ``True``)
+        round_to_power_of_two (bool): If True, round window size to power of two by zero-padding input
+            to FFT. (Default: ``True``)
+        sample_frequency (float): Waveform data sample frequency (must match the waveform file, if
+            specified there) (Default: ``16000.0``)
+        snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit
+            in the file, and the number of frames depends on the frame_length.  If False, the number of frames
+            depends only on the frame_shift, and we reflect the data at the ends. (Default: ``True``)
+        subtract_mean (bool): Subtract mean of each feature file [CMS]; not recommended to do
+            it this way.  (Default: ``False``)
+        use_energy (bool): Add an extra dimension with energy to the FBANK output. (Default: ``False``)
+        vtln_high (float): High inflection point in piecewise linear VTLN warping function (if
+            negative, offset from high-mel-freq (Default: ``-500.0``)
+        vtln_low (float): Low inflection point in piecewise linear VTLN warping function (Default: ``100.0``)
+        vtln_warp (float): Vtln warp factor (only applicable if vtln_map not specified) (Default: ``1.0``)
+        window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (Default: ``'povey'``)
+
+    Returns:
+        torch.Tensor: A mfcc identical to what Kaldi would output. The shape is ()
+    """
+    return None
 
 
 def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, window_width,
