@@ -48,8 +48,8 @@ popd
 source activate testenv
 
  # Install requirements via pip in our conda environment
-python --version
-pip3 install -vvv -r requirements.txt
+which conda
+pip install -vvv -r requirements.txt
 
  # Install the following only if running tests
 if [[ "$SKIP_TESTS" != "true" ]]; then
