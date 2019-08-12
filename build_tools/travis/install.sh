@@ -48,11 +48,7 @@ popd
 source activate testenv
 
  # Install requirements via pip in our conda environment
-which pip
-which python
-pip --version
-python --version
-
+# conda install pytorch torchvision cpuonly -c pytorch
 python -m pip install -vvv -r requirements.txt
 
  # Install the following only if running tests
