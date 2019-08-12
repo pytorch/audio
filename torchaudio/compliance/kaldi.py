@@ -3,7 +3,7 @@ import math
 import fractions
 import random
 import torch
-
+from torchaudio import functional
 
 __all__ = [
     'fbank',
@@ -190,6 +190,7 @@ def _subtract_column_mean(tensor, subtract_mean):
         col_means = torch.mean(tensor, dim=0).unsqueeze(0)
         tensor = tensor - col_means
     return tensor
+
 
 def spectrogram(
         waveform, blackman_coeff=0.42, channel=-1, dither=1.0, energy_floor=0.0,
@@ -523,8 +524,19 @@ def fbank(
     return mel_energies
 
 
-def get_dct_matrix():
-    return torch.rand(1,100)
+def _get_dct_matrix(num_ceps, num_mel_bins):
+    # returns a dct matrix of size (num_ceps, num_mel_bins)
+    # size (num_mel_bins, num_mel_bins)
+    dct_matrix = functional.create_dct(num_mel_bins, num_mel_bins, 'ortho')
+    return dct_matrix[:num_ceps, :]
+
+
+def _get_lifter_coeffs(num_ceps, cepstral_lifter):
+    # returns size (num_ceps)
+    # Compute liftering coefficients (scaling on cepstral coeffs)
+    # coeffs are numbered slightly differently from HTK: the zeroth index is C0, which is not affected.
+    i = torch.arange(num_ceps, dtype=torch.get_default_dtype())
+    return 1.0 + 0.5 * cepstral_lifter * torch.sin(math.pi * i / cepstral_lifter)
 
 
 def mfcc(
@@ -578,6 +590,8 @@ def mfcc(
     Returns:
         torch.Tensor: A mfcc identical to what Kaldi would output. The shape is ()
     """
+    assert num_ceps <= num_mel_bins, 'num_ceps cannot be larger than num_mel_bins: %d vs %d' % (num_ceps, num_mel_bins)
+
     # The mel_energies should not be squared (use_power=True), not have mean subtracted
     # (subtract_mean=False), and use log (use_log_fbank=True).
     # size (m, num_mel_bins + use_energy)
@@ -602,10 +616,15 @@ def mfcc(
     feature.unsqueeze_(1)
 
     # size (1, num_ceps, num_mel_bins)
-    dct_matrix = get_dct_matrix().unsqueeze(0)
+    dct_matrix = _get_dct_matrix(num_ceps, num_mel_bins).unsqueeze(0)
 
     # size (m, num_ceps)
     feature = (feature * dct_matrix).sum(-1)
+
+    if cepstral_lifter != 0.0:
+        # size (1, num_ceps)
+        lifter_coeffs = _get_lifter_coeffs(num_ceps, cepstral_lifter).unsqueeze(0)
+        feature *= lifter_coeffs
 
     # if use_energy then replace the last column for htk_compat == true else first column
     if use_energy:
@@ -616,9 +635,8 @@ def mfcc(
         energy = feature[:, 0].unsqueeze(1)
         feature = feature[:, 1]
         if not use_energy:
-            # scale on C0 (actually removing a scale
-            # we previously added that's part of one common definition of
-            # the cosine transform.)
+            # scale on C0 (actually removing a scale we previously added that's
+            # part of one common definition of the cosine transform.)
             energy *= math.sqrt(2)
         feature = torch.cat((feature, energy), dim=1)
 
