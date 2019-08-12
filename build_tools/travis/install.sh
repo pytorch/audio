@@ -48,6 +48,7 @@ popd
 source activate testenv
 
  # Install requirements via pip in our conda environment
+python --version
 pip install -vvv -r requirements.txt
 
  # Install the following only if running tests
