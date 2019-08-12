@@ -1,4 +1,4 @@
-torch>=1.2.0 -c pytorch
+torch>=1.2.0
 
 # Optional for torchaudio.kaldi_io
 numpy
