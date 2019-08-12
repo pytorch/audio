@@ -183,6 +183,14 @@ def _get_window(waveform, padded_window_size, window_size, window_shift, window_
     return strided_input, signal_log_energy
 
 
+def _subtract_column_mean(tensor, subtract_mean):
+    # subtracts the column mean of the tensor size (m, n) if subtract_mean=True
+    # it returns size (m, n)
+    if subtract_mean:
+        col_means = torch.mean(tensor, dim=0).unsqueeze(0)
+        tensor = tensor - col_means
+    return tensor
+
 def spectrogram(
         waveform, blackman_coeff=0.42, channel=-1, dither=1.0, energy_floor=0.0,
         frame_length=25.0, frame_shift=10.0, min_duration=0.0,
@@ -240,10 +248,7 @@ def spectrogram(
     power_spectrum = torch.max(fft.pow(2).sum(2), EPSILON).log()  # size (m, padded_window_size // 2 + 1)
     power_spectrum[:, 0] = signal_log_energy
 
-    if subtract_mean:
-        col_means = torch.mean(power_spectrum, dim=0).unsqueeze(0)  # size (1, padded_window_size // 2 + 1)
-        power_spectrum = power_spectrum - col_means
-
+    power_spectrum = _subtract_column_mean(power_spectrum, subtract_mean)
     return power_spectrum
 
 
@@ -505,7 +510,7 @@ def fbank(
         # avoid log of zero (which should be prevented anyway by dithering)
         mel_energies = torch.max(mel_energies, EPSILON).log()
 
-    # if use_energy then add it as the first column for htk_compat == true else last column
+    # if use_energy then add it as the last column for htk_compat == true else first column
     if use_energy:
         signal_log_energy = signal_log_energy.unsqueeze(1)  # size (m, 1)
         # returns size (m, num_mel_bins + 1)
@@ -514,11 +519,12 @@ def fbank(
         else:
             mel_energies = torch.cat((signal_log_energy, mel_energies), dim=1)
 
-    if subtract_mean:
-        col_means = torch.mean(mel_energies, dim=0).unsqueeze(0)  # size (1, num_mel_bins + use_energy)
-        mel_energies = mel_energies - col_means
-
+    mel_energies = _subtract_column_mean(mel_energies, subtract_mean)
     return mel_energies
+
+
+def get_dct_matrix():
+    return torch.rand(1,100)
 
 
 def mfcc(
@@ -572,7 +578,52 @@ def mfcc(
     Returns:
         torch.Tensor: A mfcc identical to what Kaldi would output. The shape is ()
     """
-    return None
+    # The mel_energies should not be squared (use_power=True), not have mean subtracted
+    # (subtract_mean=False), and use log (use_log_fbank=True).
+    # size (m, num_mel_bins + use_energy)
+    feature = fbank(waveform=waveform, blackman_coeff=blackman_coeff, channel=channel,
+                    dither=dither, energy_floor=energy_floor, frame_length=frame_length,
+                    frame_shift=frame_shift, high_freq=high_freq, htk_compat=htk_compat,
+                    low_freq=low_freq, min_duration=min_duration, num_mel_bins=num_mel_bins,
+                    preemphasis_coefficient=preemphasis_coefficient, raw_energy=raw_energy,
+                    remove_dc_offset=remove_dc_offset, round_to_power_of_two=round_to_power_of_two,
+                    sample_frequency=sample_frequency, snip_edges=snip_edges, subtract_mean=False,
+                    use_energy=use_energy, use_log_fbank=True, use_power=True,
+                    vtln_high=vtln_high, vtln_low=vtln_low, vtln_warp=vtln_warp, window_type=window_type)
+
+    if use_energy:
+        # offset is 0 if htk_compat==True else 1
+        mel_offset = int(not htk_compat)
+        feature = feature[:, mel_offset:(num_mel_bins + mel_offset)]
+        # size (m, 1)
+        signal_log_energy = feature[:, 0 if not htk_compat else num_mel_bins].unsqueeze(1)
+
+    # size (m, 1, num_mel_bins)
+    feature.unsqueeze_(1)
+
+    # size (1, num_ceps, num_mel_bins)
+    dct_matrix = get_dct_matrix().unsqueeze(0)
+
+    # size (m, num_ceps)
+    feature = (feature * dct_matrix).sum(-1)
+
+    # if use_energy then replace the last column for htk_compat == true else first column
+    if use_energy:
+        feature[:, 0] = signal_log_energy
+
+    if htk_compat:
+        # size (m, 1)
+        energy = feature[:, 0].unsqueeze(1)
+        feature = feature[:, 1]
+        if not use_energy:
+            # scale on C0 (actually removing a scale
+            # we previously added that's part of one common definition of
+            # the cosine transform.)
+            energy *= math.sqrt(2)
+        feature = torch.cat((feature, energy), dim=1)
+
+    feature = _subtract_column_mean(feature, subtract_mean)
+    return feature
 
 
 def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, window_width,
