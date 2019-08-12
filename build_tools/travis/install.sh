@@ -48,8 +48,8 @@ popd
 source activate testenv
 
  # Install requirements via pip in our conda environment
-which conda
-pip install -vvv -r requirements.txt
+conda install pip
+/home/travis/miniconda3/condabin/conda/pip install -vvv -r requirements.txt
 
  # Install the following only if running tests
 if [[ "$SKIP_TESTS" != "true" ]]; then
