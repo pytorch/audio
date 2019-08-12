@@ -49,7 +49,7 @@ source activate testenv
 
  # Install requirements via pip in our conda environment
 conda install pip
-/home/travis/miniconda3/condabin/conda/envs/$(testenv)/bin/pip install -vvv -r requirements.txt
+/home/travis/miniconda3/condabin/conda/envs/testenv/bin/pip install -vvv -r requirements.txt
 
  # Install the following only if running tests
 if [[ "$SKIP_TESTS" != "true" ]]; then
