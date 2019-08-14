@@ -120,7 +120,7 @@ int read_audio_file(
 
   const int number_of_channels = fd->signal.channels;
   const int sample_rate = fd->signal.rate;
-  const int64_t total_length = fd->signal.length;
+  const int64_t total_length = fd->signal.length/fd->signal.channels;
 
   // multiply offset and number of frames by number of channels
   offset *= number_of_channels;
