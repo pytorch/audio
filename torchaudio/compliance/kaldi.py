@@ -616,8 +616,8 @@ def mfcc(
         # offset is 0 if htk_compat==True else 1
         mel_offset = int(not htk_compat)
         feature = feature[:, mel_offset:(num_mel_bins + mel_offset)]
-        # size (m, 1)
-        signal_log_energy = feature[:, 0 if not htk_compat else num_mel_bins].unsqueeze(1)
+        # size (m)
+        signal_log_energy = feature[:, 0 if not htk_compat else num_mel_bins - 1]
 
     # size (num_mel_bins, num_ceps)
     dct_matrix = _get_dct_matrix(num_ceps, num_mel_bins)
@@ -635,13 +635,13 @@ def mfcc(
         feature[:, 0] = signal_log_energy
 
     if htk_compat:
-        # size (m, 1)
-        energy = feature[:, 0].unsqueeze(1)
-        feature = feature[:, 1]
+        energy = feature[:, 0].unsqueeze(1)  # size (m, 1)
+        feature = feature[:, 1:]  # size (m, num_ceps-1)
         if not use_energy:
             # scale on C0 (actually removing a scale we previously added that's
             # part of one common definition of the cosine transform.)
             energy *= math.sqrt(2)
+
         feature = torch.cat((feature, energy), dim=1)
 
     feature = _subtract_column_mean(feature, subtract_mean)
