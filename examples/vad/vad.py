@@ -40,18 +40,24 @@ def compute_energy(frame):
 
 class VoiceActivityDetection(object):
 
-    def __init__(self):
+    def __init__(self,
+                 num_init_frames = 30,
+                 ignore_silent_count = 4,
+                 ignore_speech_count = 1,
+                 energy_prim_thresh = 60,
+                 frequency_prim_thresh = 10,
+                 spectral_flatness_prim_thresh = 3,
+                 verbose = False):
 
-        self.num_init_frames = 30
-        self.ignore_silent_count = 10
-        self.ignore_speech_count = 5
+        self.num_init_frames = num_init_frames
+        self.ignore_silent_count ignore_silent_count
+        self.ignore_speech_count ignore_speech_count
 
-        self.energy_prim_thresh = 60
-        self.frequency_prim_thresh = 10
-        self.spectral_flatness_prim_thresh = 3
+        self.energy_prim_thresh = energy_prim_thresh
+        self.frequency_prim_thresh = frequency_prim_thresh
+        self.spectral_flatness_prim_thresh spectral_flatness_prim_thresh
 
-        self.ignore_silent_count = 4
-        self.ignore_speech_count = 1
+        self.verbose = verbose
 
         self.speech_mark = True
         self.silence_mark = False
@@ -60,9 +66,10 @@ class VoiceActivityDetection(object):
         self.speech_count = 0
         self.n = 0
 
-        self.energy_list = []
-        self.frequency_list = []
-        self.spectral_flatness_list = []
+        if self.verbose:
+            self.energy_list = []
+            self.frequency_list = []
+            self.spectral_flatness_list = []
 
     def iter(self, frame):
 
@@ -79,9 +86,10 @@ class VoiceActivityDetection(object):
         # Spectral flatness measure
         spectral_flatness = compute_spectral_flatness(amplitudes)
 
-        self.energy_list.append(energy)
-        self.frequency_list.append(frequency)
-        self.spectral_flatness_list.append(spectral_flatness)
+        if self.verbose:
+            self.energy_list.append(energy)
+            self.frequency_list.append(frequency)
+            self.spectral_flatness_list.append(spectral_flatness)
 
         if self.n == 0:
             self.min_energy = energy
@@ -215,16 +223,14 @@ class MicrophoneStream(object):
                 yield librosa.core.resample(chunk, self._rate, 22050)
 
 
-def get_microphone_chunks():
+def get_microphone_chunks(min_to_cumulate = 5,  # 0.5 seconds
+                          max_to_cumulate = 100  # 10 seconds
+                          precumulate = 5
+                          max_to_visualize = 100):
+
     vad = VoiceActivityDetection()
     speech_frames = []
     chunks = []
-
-    min_to_cumulate = 5  # 0.5 seconds, with defaults
-    max_to_cumulate = 100  # 10 seconds with defaults
-    precumulate = 5
-
-    max_to_visualize = 100
 
     cumulated = []
     precumulated = deque(maxlen=precumulate)

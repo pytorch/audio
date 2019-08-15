@@ -103,7 +103,6 @@ def calcMN(features):
     res = (features - mean) * invstddev
     return res
 
-import matplotlib.pyplot as plt
 
 def transcribe(waveform, args, task, generator, models, sp, tgt_dict):
     num_features = 80
@@ -129,6 +128,7 @@ def transcribe(waveform, args, task, generator, models, sp, tgt_dict):
 
     print('transcription:', transcription)
     return transcription
+
 
 def main(args):
     check_args(args)
