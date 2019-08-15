@@ -3,7 +3,7 @@ import math
 import fractions
 import random
 import torch
-from torchaudio import functional
+import torchaudio
 
 __all__ = [
     'fbank',
@@ -525,10 +525,16 @@ def fbank(
 
 
 def _get_dct_matrix(num_ceps, num_mel_bins):
-    # returns a dct matrix of size (num_ceps, num_mel_bins)
+    # returns a dct matrix of size (num_mel_bins, num_ceps)
     # size (num_mel_bins, num_mel_bins)
-    dct_matrix = functional.create_dct(num_mel_bins, num_mel_bins, 'ortho')
-    return dct_matrix[:num_ceps, :]
+    dct_matrix = torchaudio.functional.create_dct(num_mel_bins, num_mel_bins, 'ortho')
+    # kaldi expects the first cepstral to be weighted sum of factor sqrt(1/num_mel_bins)
+    # this would be the first column in the dct_matrix for torchaudio as it expects a
+    # right multiply (which would be the first column of the kaldi's dct_matrix as kaldi
+    # expects a left multiply e.g. dct_matrix * vector).
+    dct_matrix[:, 0] = math.sqrt(1 / float(num_mel_bins))
+    dct_matrix = dct_matrix[:, :num_ceps]
+    return dct_matrix
 
 
 def _get_lifter_coeffs(num_ceps, cepstral_lifter):
@@ -588,7 +594,8 @@ def mfcc(
         window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (Default: ``'povey'``)
 
     Returns:
-        torch.Tensor: A mfcc identical to what Kaldi would output. The shape is ()
+        torch.Tensor: A mfcc identical to what Kaldi would output. The shape is (m, ``num_ceps``)
+        where m is calculated in _get_strided
     """
     assert num_ceps <= num_mel_bins, 'num_ceps cannot be larger than num_mel_bins: %d vs %d' % (num_ceps, num_mel_bins)
 
@@ -612,14 +619,11 @@ def mfcc(
         # size (m, 1)
         signal_log_energy = feature[:, 0 if not htk_compat else num_mel_bins].unsqueeze(1)
 
-    # size (m, 1, num_mel_bins)
-    feature.unsqueeze_(1)
-
-    # size (1, num_ceps, num_mel_bins)
-    dct_matrix = _get_dct_matrix(num_ceps, num_mel_bins).unsqueeze(0)
+    # size (num_mel_bins, num_ceps)
+    dct_matrix = _get_dct_matrix(num_ceps, num_mel_bins)
 
     # size (m, num_ceps)
-    feature = (feature * dct_matrix).sum(-1)
+    feature = feature.matmul(dct_matrix)
 
     if cepstral_lifter != 0.0:
         # size (1, num_ceps)
