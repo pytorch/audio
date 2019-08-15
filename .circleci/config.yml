@@ -173,9 +173,6 @@ workflows:
       - binary_linux_wheel:
           name: binary_linux_wheel_py3.6
           python_version: "3.6"
-      - binary_linux_wheel:
-          name: binary_linux_wheel_py3.7
-          python_version: "3.7"
       - binary_macos_wheel:
           name: binary_macos_wheel_py2.7
           python_version: "2.7"
@@ -189,9 +186,6 @@ workflows:
       - binary_macos_wheel:
           name: binary_macos_wheel_py3.6
           python_version: "3.6"
-      - binary_macos_wheel:
-          name: binary_macos_wheel_py3.7
-          python_version: "3.7"
       - binary_linux_conda:
           name: binary_linux_conda_py2.7
           python_version: "2.7"
@@ -201,9 +195,6 @@ workflows:
       - binary_linux_conda:
           name: binary_linux_conda_py3.6
           python_version: "3.6"
-      - binary_linux_conda:
-          name: binary_linux_conda_py3.7
-          python_version: "3.7"
       - binary_macos_conda:
           name: binary_macos_conda_py2.7
           python_version: "2.7"
@@ -213,9 +204,6 @@ workflows:
       - binary_macos_conda:
           name: binary_macos_conda_py3.6
           python_version: "3.6"
-      - binary_macos_conda:
-          name: binary_macos_conda_py3.7
-          python_version: "3.7"
 
   nightly:
     triggers:
@@ -261,14 +249,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py3.6
-      - binary_linux_wheel:
-          name: nightly_binary_linux_wheel_py3.7
-          python_version: "3.7"
-      - binary_wheel_upload:
-          name: nightly_binary_linux_wheel_py3.7_upload
-          context: org-member
-          requires:
-            - nightly_binary_linux_wheel_py3.7
       - binary_macos_wheel:
           name: nightly_binary_macos_wheel_py2.7
           python_version: "2.7"
@@ -302,14 +282,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_macos_wheel_py3.6
-      - binary_macos_wheel:
-          name: nightly_binary_macos_wheel_py3.7
-          python_version: "3.7"
-      - binary_wheel_upload:
-          name: nightly_binary_macos_wheel_py3.7_upload
-          context: org-member
-          requires:
-            - nightly_binary_macos_wheel_py3.7
       - binary_linux_conda:
           name: nightly_binary_linux_conda_py2.7
           python_version: "2.7"
@@ -334,14 +306,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py3.6
-      - binary_linux_conda:
-          name: nightly_binary_linux_conda_py3.7
-          python_version: "3.7"
-      - binary_conda_upload:
-          name: nightly_binary_linux_conda_py3.7_upload
-          context: org-member
-          requires:
-            - nightly_binary_linux_conda_py3.7
       - binary_macos_conda:
           name: nightly_binary_macos_conda_py2.7
           python_version: "2.7"
@@ -366,11 +330,3 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_macos_conda_py3.6
-      - binary_macos_conda:
-          name: nightly_binary_macos_conda_py3.7
-          python_version: "3.7"
-      - binary_conda_upload:
-          name: nightly_binary_macos_conda_py3.7_upload
-          context: org-member
-          requires:
-            - nightly_binary_macos_conda_py3.7
