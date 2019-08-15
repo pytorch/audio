@@ -6,13 +6,13 @@ import torch
 import torchaudio
 
 __all__ = [
-    'fbank',
     'get_mel_banks',
     'inverse_mel_scale',
     'inverse_mel_scale_scalar',
     'mel_scale',
     'mel_scale_scalar',
     'spectrogram',
+    'fbank',
     'mfcc',
     'vtln_warp_freq',
     'vtln_warp_mel_freq',

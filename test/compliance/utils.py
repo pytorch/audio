@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import random
 import torchaudio
 
-TEST_PREFIX = ['fbank', 'spec', 'resample', 'mfcc']
+TEST_PREFIX = ['spec', 'fbank', 'mfcc', 'resample']
 
 
 def generate_rand_boolean():
