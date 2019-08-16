@@ -30,7 +30,7 @@ if DEBUG:
 libraries = []
 include_dirs = []
 extra_objects = []
-hello
+
 # Hypothetically, the conda distribution could rely on an external sox,
 # but the library is pretty small and it is not available on the default
 # anaconda channel.  So we statically link it in, just as we do with wheels.
