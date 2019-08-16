@@ -9,26 +9,25 @@
 Run inference for pre-processed data with a trained model.
 """
 
+import datetime as dt
 import logging
 import os
 import random
 import string
 import sys
-from vad import get_microphone_chunks
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import datetime as dt
 from time import time
-import datetime as dt
 
-import sentencepiece as spm
-import torch
-import torchaudio
 import numpy as np
-from fairseq import options, progress_bar, utils, tasks
+import torch
+
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+import sentencepiece as spm
+import torchaudio
+from fairseq import options, progress_bar, tasks, utils
 from fairseq.meters import StopwatchMeter, TimeMeter
 from fairseq.utils import import_user_module
-
+from vad import get_microphone_chunks
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

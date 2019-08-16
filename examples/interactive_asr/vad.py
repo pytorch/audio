@@ -5,16 +5,15 @@ algorithm <https://www.eurasip.org/Proceedings/Eusipco/Eusipco2009/contents/pape
 """
 
 import math
+from collections import deque
+
+import librosa
+import numpy as np
+import torch
 
 import pyaudio
-import numpy as np
-import librosa
-
-import torch
 import torchaudio
-
 from six.moves import queue
-from collections import deque
 
 ######################################################################
 # There are three criteria to decide if a frame contains speech: energy,
