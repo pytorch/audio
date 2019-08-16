@@ -34,11 +34,9 @@ logger.setLevel(logging.INFO)
 
 
 def add_asr_eval_argument(parser):
-    parser.add_argument("--ctc", action="store_true",
-                        help="decode a ctc model")
+    parser.add_argument("--ctc", action="store_true", help="decode a ctc model")
     parser.add_argument("--rnnt", default=False, help="decode a rnnt model")
-    parser.add_argument("--kspmodel", default=None,
-                        help="sentence piece model")
+    parser.add_argument("--kspmodel", default=None, help="sentence piece model")
     parser.add_argument(
         "--wfstlm", default=None, help="wfstlm on dictonary output units"
     )
@@ -117,8 +115,7 @@ def transcribe(waveform, args, task, generator, models, sp, tgt_dict):
         /Users/jamarshon/Downloads/checkpoint_avg_60_80.pt --beam 20 
     """
     num_features = 80
-    output = torchaudio.compliance.kaldi.fbank(
-        waveform, num_mel_bins=num_features)
+    output = torchaudio.compliance.kaldi.fbank(waveform, num_mel_bins=num_features)
     output_cmvn = calcMN(output.cpu().detach().numpy())
 
     # size (m, n)
@@ -127,7 +124,7 @@ def transcribe(waveform, args, task, generator, models, sp, tgt_dict):
 
     # size (1, m, n). In general, if source is (x, m, n), then hypos is (x, ...)
     source.unsqueeze_(0)
-    sample = {'net_input': {'src_tokens': source, 'src_lengths': frames_lengths}}
+    sample = {"net_input": {"src_tokens": source, "src_lengths": frames_lengths}}
 
     hypos = task.inference_step(generator, models, sample)
 
@@ -169,14 +166,19 @@ def main(args):
     generator = task.build_generator(args)
 
     sp = spm.SentencePieceProcessor()
-    sp.Load(os.path.join(args.data, 'spm.model'))
+    sp.Load(os.path.join(args.data, "spm.model"))
 
     print("READY!")
     for (waveform, sample_rate) in get_microphone_chunks():
         waveform = torchaudio.transforms.Resample(
-            orig_freq=sample_rate, new_freq=16000)(waveform.reshape(1, -1))
-        transcription = transcribe(waveform, args, task, generator, models, sp, tgt_dict)
-        print("{}: {}".format(dt.datetime.now().strftime('%H:%M:%S'), transcription[0][0]))
+            orig_freq=sample_rate, new_freq=16000
+        )(waveform.reshape(1, -1))
+        transcription = transcribe(
+            waveform, args, task, generator, models, sp, tgt_dict
+        )
+        print(
+            "{}: {}".format(dt.datetime.now().strftime("%H:%M:%S"), transcription[0][0])
+        )
 
 
 def cli_main():

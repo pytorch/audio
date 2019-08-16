@@ -30,7 +30,7 @@ def compute_spectral_flatness(frame):
     n = frame.nonzero().size(0)
     geometric_mean = torch.exp((EPSILON + frame).log().mean(-1)) - EPSILON
     arithmetic_mean = frame.mean(-1)
-    return -10 * torch.log10(EPSILON + geometric_mean/arithmetic_mean)
+    return -10 * torch.log10(EPSILON + geometric_mean / arithmetic_mean)
 
 
 def compute_energy(frame):
@@ -38,15 +38,16 @@ def compute_energy(frame):
 
 
 class VoiceActivityDetection(object):
-
-    def __init__(self,
-                 num_init_frames=30,
-                 ignore_silent_count=4,
-                 ignore_speech_count=1,
-                 energy_prim_thresh=60,
-                 frequency_prim_thresh=10,
-                 spectral_flatness_prim_thresh=3,
-                 verbose=False):
+    def __init__(
+        self,
+        num_init_frames=30,
+        ignore_silent_count=4,
+        ignore_speech_count=1,
+        energy_prim_thresh=60,
+        frequency_prim_thresh=10,
+        spectral_flatness_prim_thresh=3,
+        verbose=False,
+    ):
 
         self.num_init_frames = num_init_frames
         self.ignore_silent_count = ignore_silent_count
@@ -72,7 +73,7 @@ class VoiceActivityDetection(object):
 
     def iter(self, frame):
 
-        EPSILON = 1.
+        EPSILON = 1.0
         frame_fft = torch.rfft(frame, 1)
         amplitudes = torchaudio.functional.complex_norm(frame_fft)
 
@@ -98,12 +99,12 @@ class VoiceActivityDetection(object):
             self.min_energy = min(energy, self.min_energy)
             self.min_frequency = min(frequency, self.min_frequency)
             self.min_spectral_flatness = min(
-                spectral_flatness, self.min_spectral_flatness)
+                spectral_flatness, self.min_spectral_flatness
+            )
 
         self.n += 1
 
-        thresh_energy = self.energy_prim_thresh * \
-            torch.log(EPSILON + self.min_energy)
+        thresh_energy = self.energy_prim_thresh * torch.log(EPSILON + self.min_energy)
         thresh_frequency = self.frequency_prim_thresh
         thresh_spectral_flatness = self.spectral_flatness_prim_thresh
 
@@ -122,7 +123,10 @@ class VoiceActivityDetection(object):
             # Speech detected
             self.speech_count += 1
             # Inertia against switching
-            if self.n >= self.num_init_frames and self.speech_count <= self.ignore_speech_count:
+            if (
+                self.n >= self.num_init_frames
+                and self.speech_count <= self.ignore_speech_count
+            ):
                 # Too soon to change
                 return self.silence_mark
             else:
@@ -130,11 +134,15 @@ class VoiceActivityDetection(object):
                 return self.speech_mark
         else:
             # Silence detected
-            self.min_energy = (
-                (self.silent_count * self.min_energy) + energy) / (self.silent_count + 1)
+            self.min_energy = ((self.silent_count * self.min_energy) + energy) / (
+                self.silent_count + 1
+            )
             self.silent_count += 1
             # Inertia against switching
-            if self.n >= self.num_init_frames and self.silent_count <= self.ignore_silent_count:
+            if (
+                self.n >= self.num_init_frames
+                and self.silent_count <= self.ignore_silent_count
+            ):
                 # Too soon to change
                 return self.speech_mark
             else:
@@ -167,8 +175,10 @@ class MicrophoneStream(object):
             format=pyaudio.paFloat32,
             # The API currently only supports 1-channel (mono) audio
             # https://goo.gl/z757pE
-            channels=1, rate=self._rate,
-            input=True, frames_per_buffer=self._chunk,
+            channels=1,
+            rate=self._rate,
+            input=True,
+            frames_per_buffer=self._chunk,
             input_device_index=self._device,
             # Run the audio stream asynchronously to fill the buffer object.
             # This is necessary so that the input device's buffer doesn't
@@ -214,7 +224,7 @@ class MicrophoneStream(object):
                 except queue.Empty:
                     break
 
-            ans = np.fromstring(b''.join(data), dtype=np.float32)
+            ans = np.fromstring(b"".join(data), dtype=np.float32)
             # yield uniform-sized chunks
             ans = np.split(ans, np.shape(ans)[0] / self._chunk)
             # Resample the audio to 22050, librosa default
@@ -222,10 +232,12 @@ class MicrophoneStream(object):
                 yield librosa.core.resample(chunk, self._rate, 22050)
 
 
-def get_microphone_chunks(min_to_cumulate=5,  # 0.5 seconds
-                          max_to_cumulate=100,  # 10 seconds
-                          precumulate=5,
-                          max_to_visualize=100):
+def get_microphone_chunks(
+    min_to_cumulate=5,  # 0.5 seconds
+    max_to_cumulate=100,  # 10 seconds
+    precumulate=5,
+    max_to_visualize=100,
+):
 
     vad = VoiceActivityDetection()
     speech_frames = []
@@ -237,8 +249,8 @@ def get_microphone_chunks(min_to_cumulate=5,  # 0.5 seconds
     with MicrophoneStream() as stream:
         audio_generator = stream.generator()
         chunk_length = stream._chunk
-        waveform = torch.zeros(max_to_visualize*chunk_length)
-        speechform = torch.zeros(max_to_visualize*chunk_length)
+        waveform = torch.zeros(max_to_visualize * chunk_length)
+        speechform = torch.zeros(max_to_visualize * chunk_length)
         for chunk in audio_generator:
             # Is speech?
 
@@ -252,8 +264,10 @@ def get_microphone_chunks(min_to_cumulate=5,  # 0.5 seconds
             else:
                 precumulated.append(chunk)
 
-            if (not is_speech and len(cumulated) >= min_to_cumulate) or (len(cumulated) > max_to_cumulate):
+            if (not is_speech and len(cumulated) >= min_to_cumulate) or (
+                len(cumulated) > max_to_cumulate
+            ):
                 waveform = torch.cat(list(precumulated) + cumulated, -1)
-                yield (waveform*stream._rate, stream._rate)
+                yield (waveform * stream._rate, stream._rate)
                 cumulated = []
                 precumulated = deque(maxlen=precumulate)
