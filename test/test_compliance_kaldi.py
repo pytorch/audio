@@ -238,7 +238,7 @@ class Test_Kaldi(unittest.TestCase):
                 window_type=args[21])
             return output
 
-        self._compliance_test_helper(self.test_filepath, 'mfcc', 70, 22, get_output_fn, atol=1e10, rtol=1e10)
+        self._compliance_test_helper(self.test_filepath, 'mfcc', 70, 22, get_output_fn, atol=1e-3)
 
     def test_resample_waveform(self):
         def get_output_fn(sound, args):
