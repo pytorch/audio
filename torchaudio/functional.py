@@ -114,7 +114,7 @@ def istft(stft_matrix,          # type: Tensor
     assert 0 < win_length <= n_fft
 
     if window is None:
-        window = torch.ones(win_length)
+        window = torch.ones(win_length, device=device)
 
     assert window.dim() == 1 and window.size(0) == win_length
 
