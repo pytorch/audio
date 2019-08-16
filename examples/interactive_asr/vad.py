@@ -30,12 +30,13 @@ from six.moves import queue
 #
 
 
-def compute_spectral_flatness(frame):
-    EPSILON = 0.01
+def compute_spectral_flatness(frame, epsilon=0.01):
     n = frame.nonzero().size(0)
-    geometric_mean = torch.exp((EPSILON + frame).log().mean(-1)) - EPSILON
+
+    # epsilon protects against log(0)
+    geometric_mean = torch.exp((frame + epsilon).log().mean(-1)) - epsilon
     arithmetic_mean = frame.mean(-1)
-    return -10 * torch.log10(EPSILON + geometric_mean / arithmetic_mean)
+    return -10 * torch.log10(epsilon + geometric_mean / arithmetic_mean)
 
 
 class VoiceActivityDetection(object):
@@ -74,7 +75,6 @@ class VoiceActivityDetection(object):
 
     def iter(self, frame):
 
-        EPSILON = 1.0
         frame_fft = torch.rfft(frame, 1)
         amplitudes = torchaudio.functional.complex_norm(frame_fft)
 
@@ -105,7 +105,8 @@ class VoiceActivityDetection(object):
 
         self.n += 1
 
-        thresh_energy = self.energy_prim_thresh * torch.log(EPSILON + self.min_energy)
+        # Add 1. to avoid log(0)
+        thresh_energy = self.energy_prim_thresh * torch.log(1. + self.min_energy)
         thresh_frequency = self.frequency_prim_thresh
         thresh_spectral_flatness = self.spectral_flatness_prim_thresh
 
