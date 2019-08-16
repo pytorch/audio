@@ -13,7 +13,6 @@ import logging
 import os
 import sys
 
-import numpy as np
 import torch
 
 import sentencepiece as spm
@@ -88,12 +87,12 @@ def optimize_models(args, use_cuda, models):
 def calc_mean_invstddev(feature):
     if len(feature.shape) != 2:
         raise ValueError("We expect the input feature to be 2-D tensor")
-    mean = np.mean(feature, axis=0)
-    var = np.var(feature, axis=0)
-    # avoid division by ~zero
-    if var.any() < sys.float_info.epsilon:
-        return mean, 1.0 / (np.sqrt(var) + sys.float_info.epsilon)
-    return mean, 1.0 / np.sqrt(var)
+    mean = torch.mean(feature, dim=0)
+    var = torch.var(feature, dim=0)
+    # avoid division by zero
+    if (var < sys.float_info.epsilon).any():
+        return mean, 1.0 / (torch.sqrt(var) + sys.float_info.epsilon)
+    return mean, 1.0 / torch.sqrt(var)
 
 
 def calcMN(features):
@@ -105,7 +104,7 @@ def calcMN(features):
 def transcribe(waveform, args, task, generator, models, sp, tgt_dict):
     num_features = 80
     output = torchaudio.compliance.kaldi.fbank(waveform, num_mel_bins=num_features)
-    output_cmvn = calcMN(output.cpu().detach().numpy())
+    output_cmvn = calcMN(output.cpu().detach())
 
     # size (m, n)
     source = torch.tensor(output_cmvn)
