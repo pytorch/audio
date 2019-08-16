@@ -210,6 +210,40 @@ class Test_Kaldi(unittest.TestCase):
 
         self._compliance_test_helper(self.test_filepath, 'fbank', 97, 22, get_output_fn, atol=1e-3, rtol=1e-1)
 
+    def test_mfcc(self):
+        def get_output_fn(sound, args):
+            output = kaldi.mfcc(
+                sound,
+                blackman_coeff=args[1],
+                dither=0.0,
+                energy_floor=args[2],
+                frame_length=args[3],
+                frame_shift=args[4],
+                high_freq=args[5],
+                htk_compat=args[6],
+                low_freq=args[7],
+                num_mel_bins=args[8],
+                preemphasis_coefficient=args[9],
+                raw_energy=args[10],
+                remove_dc_offset=args[11],
+                round_to_power_of_two=args[12],
+                snip_edges=args[13],
+                subtract_mean=args[14],
+                use_energy=args[15],
+                num_ceps=args[16],
+                cepstral_lifter=args[17],
+                vtln_high=args[18],
+                vtln_low=args[19],
+                vtln_warp=args[20],
+                window_type=args[21])
+            return output
+
+        self._compliance_test_helper(self.test_filepath, 'mfcc', 145, 22, get_output_fn, atol=1e-3)
+
+    def test_mfcc_empty(self):
+        # Passing in an empty tensor should result in an error
+        self.assertRaises(AssertionError, kaldi.mfcc, torch.empty(0))
+
     def test_resample_waveform(self):
         def get_output_fn(sound, args):
             output = kaldi.resample_waveform(sound, args[1], args[2])
