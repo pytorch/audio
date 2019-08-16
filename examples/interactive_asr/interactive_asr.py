@@ -13,6 +13,7 @@ import datetime as dt
 import logging
 import os
 import sys
+import time
 
 import numpy as np
 import torch
@@ -29,6 +30,7 @@ logger.setLevel(logging.INFO)
 
 
 def add_asr_eval_argument(parser):
+    parser.add_argument("--input_file", help="input file")
     parser.add_argument("--ctc", action="store_true", help="decode a ctc model")
     parser.add_argument("--rnnt", default=False, help="decode a rnnt model")
     parser.add_argument("--kspmodel", default=None, help="sentence piece model")
@@ -147,6 +149,13 @@ def main(args):
     # Set dictionary
     tgt_dict = task.target_dictionary
 
+    if args.ctc or args.rnnt:
+        tgt_dict.add_symbol("<ctc_blank>")
+        if args.ctc:
+            logger.info("| decoding a ctc model")
+        if args.rnnt:
+            logger.info("| decoding a rnnt model")
+
     # Load ensemble
     logger.info("| loading model(s) from {}".format(args.path))
     models, _model_args = utils.load_ensemble_for_inference(
@@ -162,17 +171,36 @@ def main(args):
     sp = spm.SentencePieceProcessor()
     sp.Load(os.path.join(args.data, "spm.model"))
 
-    print("READY!")
-    for (waveform, sample_rate) in get_microphone_chunks():
+    if args.input_file:
+
+        path = args.input_file
+        if not os.path.exists(path):
+            raise FileNotFoundError("Audio file not found: {}".format(path))
+        waveform, sample_rate = torchaudio.load_wav(path)
+        waveform = waveform.mean(0, True)
         waveform = torchaudio.transforms.Resample(
             orig_freq=sample_rate, new_freq=16000
-        )(waveform.reshape(1, -1))
-        transcription = transcribe(
-            waveform, args, task, generator, models, sp, tgt_dict
-        )
-        print(
-            "{}: {}".format(dt.datetime.now().strftime("%H:%M:%S"), transcription[0][0])
-        )
+        )(waveform)
+
+        print(sample_rate, waveform.shape)
+        start = time.time()
+        transcribe(waveform, args, task, generator, models, sp, tgt_dict)
+        end = time.time()
+        print(end - start)
+    else:
+        print("READY!")
+        for (waveform, sample_rate) in get_microphone_chunks():
+            waveform = torchaudio.transforms.Resample(
+                orig_freq=sample_rate, new_freq=16000
+            )(waveform.reshape(1, -1))
+            transcription = transcribe(
+                waveform, args, task, generator, models, sp, tgt_dict
+            )
+            print(
+                "{}: {}".format(
+                    dt.datetime.now().strftime("%H:%M:%S"), transcription[0][0]
+                )
+            )
 
 
 def cli_main():
