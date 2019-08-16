@@ -106,7 +106,7 @@ class VoiceActivityDetection(object):
         self.n += 1
 
         # Add 1. to avoid log(0)
-        thresh_energy = self.energy_prim_thresh * torch.log(1. + self.min_energy)
+        thresh_energy = self.energy_prim_thresh * torch.log(1.0 + self.min_energy)
         thresh_frequency = self.frequency_prim_thresh
         thresh_spectral_flatness = self.spectral_flatness_prim_thresh
 
