@@ -2,7 +2,7 @@
 
 To run this demo, you need the following libraries
 - [python3](https://www.python.org/download/releases/3.0/)
-- pyaudio
+- [pyaudio](https://people.csail.mit.edu/hubert/pyaudio/)
 - [torchaudio](https://github.com/pytorch/audio/tree/master/torchaudio)
 - [pytorch](https://pytorch.org/)
 - [librosa](https://librosa.github.io/librosa/)
