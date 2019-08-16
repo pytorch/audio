@@ -251,6 +251,7 @@ def get_microphone_chunks(
         chunk_length = stream._chunk
         waveform = torch.zeros(max_to_visualize * chunk_length)
         speechform = torch.zeros(max_to_visualize * chunk_length)
+
         for chunk in audio_generator:
             # Is speech?
 
