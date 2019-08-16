@@ -96,6 +96,7 @@ def istft(stft_matrix,          # type: Tensor
         # add a channel dimension
         stft_matrix = stft_matrix.unsqueeze(0)
 
+    dtype = stft_matrix.dtype
     device = stft_matrix.device
     fft_size = stft_matrix.size(1)
     assert (onesided and n_fft // 2 + 1 == fft_size) or (not onesided and n_fft == fft_size), (
@@ -114,7 +115,7 @@ def istft(stft_matrix,          # type: Tensor
     assert 0 < win_length <= n_fft
 
     if window is None:
-        window = torch.ones(win_length, device=device)
+        window = torch.ones(win_length, requires_grad=False, device=device, dtype=dtype)
 
     assert window.dim() == 1 and window.size(0) == win_length
 
@@ -137,7 +138,7 @@ def istft(stft_matrix,          # type: Tensor
     ytmp = ytmp.transpose(1, 2)  # size (channel, n_fft, n_frames)
 
     eye = torch.eye(n_fft, requires_grad=False,
-                    device=device).unsqueeze(1)  # size (n_fft, 1, n_fft)
+                    device=device, dtype=dtype).unsqueeze(1)  # size (n_fft, 1, n_fft)
 
     # this does overlap add where the frames of ytmp are added such that the i'th frame of
     # ytmp is added starting at i*hop_length in the output
