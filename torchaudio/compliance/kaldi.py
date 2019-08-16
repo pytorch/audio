@@ -118,7 +118,9 @@ def _get_waveform_and_window_properties(waveform, channel, sample_frequency, fra
                                         frame_length, round_to_power_of_two, preemphasis_coefficient):
     r"""Gets the waveform and window properties
     """
-    waveform = waveform[max(channel, 0), :]  # size (n)
+    channel = max(channel, 0)
+    assert channel < waveform.size(0), ('Invalid channel %d for size %d' % (channel, waveform.size(0)))
+    waveform = waveform[channel, :]  # size (n)
     window_shift = int(sample_frequency * frame_shift * MILLISECONDS_TO_SECONDS)
     window_size = int(sample_frequency * frame_length * MILLISECONDS_TO_SECONDS)
     padded_window_size = _next_power_of_2(window_size) if round_to_power_of_two else window_size
