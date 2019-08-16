@@ -6,8 +6,15 @@
 # the root directory of this source tree. An additional grant of patent rights
 # can be found in the PATENTS file in the same directory.
 """
-Following `a simple but efficient real-time voice activity detection
-algorithm <https://www.eurasip.org/Proceedings/Eusipco/Eusipco2009/contents/papers/1569192958.pdf>`__.
+Following `a simple but efficient real-time voice activity detection algorithm
+<https://www.eurasip.org/Proceedings/Eusipco/Eusipco2009/contents/papers/1569192958.pdf>`__.
+
+There are three criteria to decide if a frame contains speech: energy, most
+dominant frequency, and spectral flatness. If any two of those are higher than
+a minimum plus a threshold, then the frame contains speech.  In the offline
+case, the list of frames is postprocessed to remove too short silence and
+speech sequences. In the online case here, inertia is added before switching
+from speech to silence or vice versa.
 """
 
 from collections import deque
@@ -19,15 +26,6 @@ import torch
 import pyaudio
 import torchaudio
 from six.moves import queue
-
-######################################################################
-# There are three criteria to decide if a frame contains speech: energy,
-# most dominant frequency, and spectral flatness. If any two of those are
-# higher than a minimum plus a threshold, then the frame contains speech.
-# In the offline case, the list of frames is postprocessed to remove too
-# short silence and speech sequences. In the online case here, inertia is
-# added before switching from speech to silence or vice versa.
-#
 
 
 def compute_spectral_flatness(frame, epsilon=0.01):
