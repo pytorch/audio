@@ -184,8 +184,11 @@ def main(args):
 
         print(sample_rate, waveform.shape)
         start = time.time()
-        transcribe(waveform, args, task, generator, models, sp, tgt_dict)
+        transcription = transcribe(
+            waveform, args, task, generator, models, sp, tgt_dict
+        )
         end = time.time()
+        print("transcription:", transcription)
         print(end - start)
     else:
         print("READY!")
