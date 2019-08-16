@@ -20,11 +20,9 @@ from time import time
 import numpy as np
 import torch
 
-import matplotlib.animation as animation
-import matplotlib.pyplot as plt
 import sentencepiece as spm
 import torchaudio
-from fairseq import options, progress_bar, tasks, utils
+from fairseq import options, tasks, utils
 from fairseq.meters import StopwatchMeter, TimeMeter
 from fairseq.utils import import_user_module
 from vad import get_microphone_chunks
@@ -43,14 +41,12 @@ def add_asr_eval_argument(parser):
     parser.add_argument(
         "--rnnt_decoding_type",
         default="greedy",
-        help="wfstlm on dictonary\
-output units",
+        help="wfstlm on dictonary output units",
     )
     parser.add_argument(
         "--lm_weight",
         default=0.2,
-        help="weight for wfstlm while interpolating\
-with neural score",
+        help="weight for wfstlm while interpolating with neural score",
     )
     parser.add_argument(
         "--rnnt_len_penalty", default=-0.5, help="rnnt length penalty on word level"
