@@ -38,10 +38,6 @@ def compute_spectral_flatness(frame):
     return -10 * torch.log10(EPSILON + geometric_mean / arithmetic_mean)
 
 
-def compute_energy(frame):
-    return frame.pow(2).sum(-1)
-
-
 class VoiceActivityDetection(object):
     def __init__(
         self,
@@ -83,7 +79,7 @@ class VoiceActivityDetection(object):
         amplitudes = torchaudio.functional.complex_norm(frame_fft)
 
         # Compute frame energy
-        energy = compute_energy(frame)
+        energy = frame.pow(2).sum(-1)
 
         # Most dominant frequency component
         frequency = amplitudes.argmax()

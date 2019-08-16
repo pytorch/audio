@@ -171,7 +171,6 @@ def main(args):
     sp.Load(os.path.join(args.data, "spm.model"))
 
     if args.input_file:
-
         path = args.input_file
         if not os.path.exists(path):
             raise FileNotFoundError("Audio file not found: {}".format(path))
