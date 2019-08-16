@@ -106,7 +106,7 @@ def transcribe(waveform, args, task, generator, models, sp, tgt_dict):
     r"""
     CUDA_VISIBLE_DEVICES=0 python infer_asr.py /Users/jamarshon/Documents/downloads/ \
         --task speech_recognition --max-tokens 250000 --nbest 1 --path \
-        /Users/jamarshon/Downloads/checkpoint_avg_60_80.pt --beam 20 
+        /Users/jamarshon/Downloads/checkpoint_avg_60_80.pt --beam 20
     """
     num_features = 80
     output = torchaudio.compliance.kaldi.fbank(waveform, num_mel_bins=num_features)
