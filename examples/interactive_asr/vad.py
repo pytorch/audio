@@ -1,7 +1,13 @@
+#!/usr/bin/env python3
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the license found in the LICENSE file in
+# the root directory of this source tree. An additional grant of patent rights
+# can be found in the PATENTS file in the same directory.
 """
 Following `a simple but efficient real-time voice activity detection
 algorithm <https://www.eurasip.org/Proceedings/Eusipco/Eusipco2009/contents/papers/1569192958.pdf>`__.
-
 """
 
 from collections import deque
