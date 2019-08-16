@@ -12,10 +12,7 @@ Run inference for pre-processed data with a trained model.
 import datetime as dt
 import logging
 import os
-import random
-import string
 import sys
-from time import time
 
 import numpy as np
 import torch

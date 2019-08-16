@@ -11,18 +11,16 @@ Run inference for pre-processed data with a trained model.
 
 import logging
 import os
-import random
-import string
 import sys
 
-import sentencepiece as spm
-import torch
-import torchaudio
 import numpy as np
-from fairseq import options, progress_bar, utils, tasks
+import torch
+
+import sentencepiece as spm
+import torchaudio
+from fairseq import options, progress_bar, tasks, utils
 from fairseq.meters import StopwatchMeter, TimeMeter
 from fairseq.utils import import_user_module
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -97,7 +95,7 @@ def calc_mean_invstddev(feature):
         return mean, 1.0 / (np.sqrt(var) + sys.float_info.epsilon)
     return mean, 1.0 / np.sqrt(var)
 
-    
+
 def calcMN(features):
     mean, invstddev = calc_mean_invstddev(features)
     res = (features - mean) * invstddev
@@ -115,7 +113,7 @@ def transcribe(waveform, args, task, generator, models, sp, tgt_dict):
 
     # size (1, m, n). In general, if source is (x, m, n), then hypos is (x, ...)
     source.unsqueeze_(0)
-    sample = {'net_input': {'src_tokens': source, 'src_lengths': frames_lengths}}
+    sample = {"net_input": {"src_tokens": source, "src_lengths": frames_lengths}}
 
     hypos = task.inference_step(generator, models, sample)
 
@@ -126,7 +124,7 @@ def transcribe(waveform, args, task, generator, models, sp, tgt_dict):
         hyp_words = process_predictions(args, hypos[i], sp, tgt_dict)
         transcription.append(hyp_words)
 
-    print('transcription:', transcription)
+    print("transcription:", transcription)
     return transcription
 
 
@@ -166,30 +164,32 @@ def main(args):
     generator = task.build_generator(args)
 
     sp = spm.SentencePieceProcessor()
-    sp.Load(os.path.join(args.data, 'spm.model'))
+    sp.Load(os.path.join(args.data, "spm.model"))
 
     path = args.input_file
     if not os.path.exists(path):
         raise FileNotFoundError("Audio file not found: {}".format(path))
     waveform, sample_rate = torchaudio.load_wav(path)
     waveform = waveform.mean(0, True)
-    waveform = torchaudio.transforms.Resample(orig_freq=sample_rate,new_freq=16000)(waveform)
+    waveform = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=16000)(
+        waveform
+    )
     import time
+
     print(sample_rate, waveform.shape)
     start = time.time()
     transcribe(waveform, args, task, generator, models, sp, tgt_dict)
     end = time.time()
     print(end - start)
-    
+
 
 def cli_main():
     parser = options.get_generation_parser()
     parser = add_asr_eval_argument(parser)
-    #args = fairspeq_options.parse_args_and_arch(parser)
+    # args = fairspeq_options.parse_args_and_arch(parser)
     args = options.parse_args_and_arch(parser)
     main(args)
 
 
 if __name__ == "__main__":
     cli_main()
-

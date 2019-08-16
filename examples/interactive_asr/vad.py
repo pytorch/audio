@@ -4,7 +4,6 @@ algorithm <https://www.eurasip.org/Proceedings/Eusipco/Eusipco2009/contents/pape
 
 """
 
-import math
 from collections import deque
 
 import librosa
