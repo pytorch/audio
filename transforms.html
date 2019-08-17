@@ -218,7 +218,7 @@
               
   <div class="section" id="torchaudio-transforms">
 <h1>torchaudio.transforms<a class="headerlink" href="#torchaudio-transforms" title="Permalink to this headline">¶</a></h1>
-<p>Transforms are common audio transforms. They can be chained together using <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.Sequential" title="(in PyTorch vmaster (1.1.0 ))"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Sequential</span></code></a></p>
+<p>Transforms are common audio transforms. They can be chained together using <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.Sequential" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Sequential</span></code></a></p>
 <div class="section" id="spectrogram">
 <h2><span class="hidden-section">Spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -233,7 +233,7 @@
 <li><p><strong>hop_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Length of hop between STFT windows. (
 Default: <code class="docutils literal notranslate"><span class="pre">win_length</span> <span class="pre">//</span> <span class="pre">2</span></code>)</p></li>
 <li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Two sided padding of signal. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
-<li><p><strong>window_fn</strong> (<em>Callable</em><em>[</em><em>[</em><em>..</em><em>]</em><em>, </em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a><em>]</em>) – A function to create a window tensor
+<li><p><strong>window_fn</strong> (<em>Callable</em><em>[</em><em>[</em><em>..</em><em>]</em><em>, </em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a><em>]</em>) – A function to create a window tensor
 that is applied/multiplied to each frame/window. (Default: <code class="docutils literal notranslate"><span class="pre">torch.hann_window</span></code>)</p></li>
 <li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Exponent for the magnitude spectrogram,
 (must be &gt; 0) e.g., 1 for energy, 2 for power, etc. (Default: <code class="docutils literal notranslate"><span class="pre">2</span></code>)</p></li>
@@ -247,7 +247,7 @@ that is applied/multiplied to each frame/window. (Default: <code class="docutils
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Spectrogram.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.Spectrogram.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – Tensor of audio of dimension (channel, time)</p>
+<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – Tensor of audio of dimension (channel, time)</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Dimension (channel, freq, time), where channel
@@ -255,7 +255,7 @@ is unchanged, freq is <code class="docutils literal notranslate"><span class="pr
 Fourier bins, and time is the number of window hops (n_frames).</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -289,13 +289,13 @@ is 80. (Default: <code class="docutils literal notranslate"><span class="pre">No
 <a class="reference external" href="https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html">https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – Input tensor before being converted to decibel scale</p>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – Input tensor before being converted to decibel scale</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Output tensor in decibel scale</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -328,13 +328,13 @@ if None is given.  See <code class="docutils literal notranslate"><span class="p
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">specgram</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MelScale.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.MelScale.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>specgram</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – A spectrogram STFT of dimension (channel, freq, time)</p>
+<dd class="field-odd"><p><strong>specgram</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – A spectrogram STFT of dimension (channel, freq, time)</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Mel frequency spectrogram of size (channel, <code class="docutils literal notranslate"><span class="pre">n_mels</span></code>, time)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -369,7 +369,7 @@ Default: <code class="docutils literal notranslate"><span class="pre">win_length
 <li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum frequency. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Two sided padding of signal. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
 <li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of mel filterbanks. (Default: <code class="docutils literal notranslate"><span class="pre">128</span></code>)</p></li>
-<li><p><strong>window_fn</strong> (<em>Callable</em><em>[</em><em>[</em><em>..</em><em>]</em><em>, </em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a><em>]</em>) – A function to create a window tensor
+<li><p><strong>window_fn</strong> (<em>Callable</em><em>[</em><em>[</em><em>..</em><em>]</em><em>, </em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a><em>]</em>) – A function to create a window tensor
 that is applied/multiplied to each frame/window. (Default: <code class="docutils literal notranslate"><span class="pre">torch.hann_window</span></code>)</p></li>
 <li><p><strong>wkwargs</strong> (<em>Dict</em><em>[</em><em>..</em><em>, </em><em>..</em><em>]</em>) – Arguments for window function. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
@@ -387,13 +387,13 @@ that is applied/multiplied to each frame/window. (Default: <code class="docutils
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MelSpectrogram.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.MelSpectrogram.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – Tensor of audio of dimension (channel, time)</p>
+<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – Tensor of audio of dimension (channel, time)</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Mel frequency spectrogram of size (channel, <code class="docutils literal notranslate"><span class="pre">n_mels</span></code>, time)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -431,13 +431,13 @@ a full clip.</p>
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MFCC.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.MFCC.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – Tensor of audio of dimension (channel, time)</p>
+<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – Tensor of audio of dimension (channel, time)</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>specgram_mel_db of size (channel, <code class="docutils literal notranslate"><span class="pre">n_mfcc</span></code>, time)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -464,13 +464,13 @@ returns a signal encoded with values from 0 to quantization_channels - 1</p>
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MuLawEncoding.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.MuLawEncoding.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – A signal to be encoded</p>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – A signal to be encoded</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>An encoded signal</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>x_mu (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>)</p>
+<dd class="field-odd"><p>x_mu (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -497,13 +497,13 @@ and returns a signal scaled between -1 and 1.</p>
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x_mu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MuLawDecoding.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.MuLawDecoding.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x_mu</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – A mu-law encoded signal which needs to be decoded</p>
+<dd class="field-odd"><p><strong>x_mu</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – A mu-law encoded signal which needs to be decoded</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The signal decoded</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -532,13 +532,13 @@ be given.</p>
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Resample.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio._docs.Resample.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – The input signal of dimension (channel, time)</p>
+<dd class="field-odd"><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – The input signal of dimension (channel, time)</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Output signal of dimension (channel, time)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>

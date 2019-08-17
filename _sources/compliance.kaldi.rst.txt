@@ -15,15 +15,20 @@ produce similar outputs.
 Functions
 ---------
 
+:hidden:`spectrogram`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: spectrogram
+
 :hidden:`fbank`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: fbank
 
-:hidden:`spectrogram`
+:hidden:`mfcc`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: spectrogram
+.. autofunction:: mfcc
 
 :hidden:`resample_waveform`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
