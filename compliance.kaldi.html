@@ -223,6 +223,53 @@ Various functions with identical parameters are given so that torchaudio can
 produce similar outputs.</p>
 <div class="section" id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="spectrogram">
+<h3><span class="hidden-section">spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.compliance.kaldi.spectrogram">
+<code class="sig-prename descclassname">torchaudio.compliance.kaldi.</code><code class="sig-name descname">spectrogram</code><span class="sig-paren">(</span><em class="sig-param">waveform</em>, <em class="sig-param">blackman_coeff=0.42</em>, <em class="sig-param">channel=-1</em>, <em class="sig-param">dither=1.0</em>, <em class="sig-param">energy_floor=0.0</em>, <em class="sig-param">frame_length=25.0</em>, <em class="sig-param">frame_shift=10.0</em>, <em class="sig-param">min_duration=0.0</em>, <em class="sig-param">preemphasis_coefficient=0.97</em>, <em class="sig-param">raw_energy=True</em>, <em class="sig-param">remove_dc_offset=True</em>, <em class="sig-param">round_to_power_of_two=True</em>, <em class="sig-param">sample_frequency=16000.0</em>, <em class="sig-param">snip_edges=True</em>, <em class="sig-param">subtract_mean=False</em>, <em class="sig-param">window_type='povey'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/compliance/kaldi.html#spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.compliance.kaldi.spectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a spectrogram from a raw audio signal. This matches the input/output of Kaldi’s
+compute-spectrogram-feats.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – Tensor of audio of size (c, n) where c is in the range [0,2)</p></li>
+<li><p><strong>blackman_coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Constant coefficient for generalized Blackman window. (Default: <code class="docutils literal notranslate"><span class="pre">0.42</span></code>)</p></li>
+<li><p><strong>channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
+<li><p><strong>dither</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Dithering constant (0.0 means no dither). If you turn this off, you should set
+the energy_floor option, e.g. to 1.0 or 0.1 (Default: <code class="docutils literal notranslate"><span class="pre">1.0</span></code>)</p></li>
+<li><p><strong>energy_floor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
+this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
+individual spectrogram elements is fixed at std::numeric_limits&lt;float&gt;::epsilon(). (Default: <code class="docutils literal notranslate"><span class="pre">0.0</span></code>)</p></li>
+<li><p><strong>frame_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Frame length in milliseconds (Default: <code class="docutils literal notranslate"><span class="pre">25.0</span></code>)</p></li>
+<li><p><strong>frame_shift</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Frame shift in milliseconds (Default: <code class="docutils literal notranslate"><span class="pre">10.0</span></code>)</p></li>
+<li><p><strong>min_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Minimum duration of segments to process (in seconds). (Default: <code class="docutils literal notranslate"><span class="pre">0.0</span></code>)</p></li>
+<li><p><strong>preemphasis_coefficient</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Coefficient for use in signal preemphasis (Default: <code class="docutils literal notranslate"><span class="pre">0.97</span></code>)</p></li>
+<li><p><strong>raw_energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, compute energy before preemphasis and windowing (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>remove_dc_offset</strong> – Subtract mean from waveform on each frame (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>round_to_power_of_two</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, round window size to power of two by zero-padding input
+to FFT. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>sample_frequency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Waveform data sample frequency (must match the waveform file, if
+specified there) (Default: <code class="docutils literal notranslate"><span class="pre">16000.0</span></code>)</p></li>
+<li><p><strong>snip_edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, end effects will be handled by outputting only frames that completely fit
+in the file, and the number of frames depends on the frame_length.  If False, the number of frames
+depends only on the frame_shift, and we reflect the data at the ends. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>subtract_mean</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Subtract mean of each feature file [CMS]; not recommended to do
+it this way.  (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>window_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Type of window (‘hamming’|’hanning’|’povey’|’rectangular’|’blackman’) (Default: <code class="docutils literal notranslate"><span class="pre">'povey'</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A spectrogram identical to what Kaldi would output. The shape is
+(m, <code class="docutils literal notranslate"><span class="pre">padded_window_size</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code>) where m is calculated in _get_strided</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="fbank">
 <h3><span class="hidden-section">fbank</span><a class="headerlink" href="#fbank" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
@@ -233,7 +280,7 @@ compute-fbank-feats.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – Tensor of audio of size (c, n) where c is in the range [0,2)</p></li>
+<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – Tensor of audio of size (c, n) where c is in the range [0,2)</p></li>
 <li><p><strong>blackman_coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Constant coefficient for generalized Blackman window. (Default: <code class="docutils literal notranslate"><span class="pre">0.42</span></code>)</p></li>
 <li><p><strong>channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
 <li><p><strong>dither</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Dithering constant (0.0 means no dither). If you turn this off, you should set
@@ -276,24 +323,25 @@ negative, offset from high-mel-freq (Default: <code class="docutils literal notr
 where m is calculated in _get_strided</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 </div>
-<div class="section" id="spectrogram">
-<h3><span class="hidden-section">spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="mfcc">
+<h3><span class="hidden-section">mfcc</span><a class="headerlink" href="#mfcc" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt id="torchaudio.compliance.kaldi.spectrogram">
-<code class="sig-prename descclassname">torchaudio.compliance.kaldi.</code><code class="sig-name descname">spectrogram</code><span class="sig-paren">(</span><em class="sig-param">waveform</em>, <em class="sig-param">blackman_coeff=0.42</em>, <em class="sig-param">channel=-1</em>, <em class="sig-param">dither=1.0</em>, <em class="sig-param">energy_floor=0.0</em>, <em class="sig-param">frame_length=25.0</em>, <em class="sig-param">frame_shift=10.0</em>, <em class="sig-param">min_duration=0.0</em>, <em class="sig-param">preemphasis_coefficient=0.97</em>, <em class="sig-param">raw_energy=True</em>, <em class="sig-param">remove_dc_offset=True</em>, <em class="sig-param">round_to_power_of_two=True</em>, <em class="sig-param">sample_frequency=16000.0</em>, <em class="sig-param">snip_edges=True</em>, <em class="sig-param">subtract_mean=False</em>, <em class="sig-param">window_type='povey'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/compliance/kaldi.html#spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.compliance.kaldi.spectrogram" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a spectrogram from a raw audio signal. This matches the input/output of Kaldi’s
-compute-spectrogram-feats.</p>
+<dt id="torchaudio.compliance.kaldi.mfcc">
+<code class="sig-prename descclassname">torchaudio.compliance.kaldi.</code><code class="sig-name descname">mfcc</code><span class="sig-paren">(</span><em class="sig-param">waveform</em>, <em class="sig-param">blackman_coeff=0.42</em>, <em class="sig-param">cepstral_lifter=22.0</em>, <em class="sig-param">channel=-1</em>, <em class="sig-param">dither=1.0</em>, <em class="sig-param">energy_floor=0.0</em>, <em class="sig-param">frame_length=25.0</em>, <em class="sig-param">frame_shift=10.0</em>, <em class="sig-param">high_freq=0.0</em>, <em class="sig-param">htk_compat=False</em>, <em class="sig-param">low_freq=20.0</em>, <em class="sig-param">num_ceps=13</em>, <em class="sig-param">min_duration=0.0</em>, <em class="sig-param">num_mel_bins=23</em>, <em class="sig-param">preemphasis_coefficient=0.97</em>, <em class="sig-param">raw_energy=True</em>, <em class="sig-param">remove_dc_offset=True</em>, <em class="sig-param">round_to_power_of_two=True</em>, <em class="sig-param">sample_frequency=16000.0</em>, <em class="sig-param">snip_edges=True</em>, <em class="sig-param">subtract_mean=False</em>, <em class="sig-param">use_energy=False</em>, <em class="sig-param">vtln_high=-500.0</em>, <em class="sig-param">vtln_low=100.0</em>, <em class="sig-param">vtln_warp=1.0</em>, <em class="sig-param">window_type='povey'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/compliance/kaldi.html#mfcc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.compliance.kaldi.mfcc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a mfcc from a raw audio signal. This matches the input/output of Kaldi’s
+compute-mfcc-feats.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – Tensor of audio of size (c, n) where c is in the range [0,2)</p></li>
+<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – Tensor of audio of size (c, n) where c is in the range [0,2)</p></li>
 <li><p><strong>blackman_coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Constant coefficient for generalized Blackman window. (Default: <code class="docutils literal notranslate"><span class="pre">0.42</span></code>)</p></li>
+<li><p><strong>cepstral_lifter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Constant that controls scaling of MFCCs (Default: <code class="docutils literal notranslate"><span class="pre">22.0</span></code>)</p></li>
 <li><p><strong>channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
 <li><p><strong>dither</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Dithering constant (0.0 means no dither). If you turn this off, you should set
 the energy_floor option, e.g. to 1.0 or 0.1 (Default: <code class="docutils literal notranslate"><span class="pre">1.0</span></code>)</p></li>
@@ -302,7 +350,13 @@ this floor is applied to the zeroth component, representing the total signal ene
 individual spectrogram elements is fixed at std::numeric_limits&lt;float&gt;::epsilon(). (Default: <code class="docutils literal notranslate"><span class="pre">0.0</span></code>)</p></li>
 <li><p><strong>frame_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Frame length in milliseconds (Default: <code class="docutils literal notranslate"><span class="pre">25.0</span></code>)</p></li>
 <li><p><strong>frame_shift</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Frame shift in milliseconds (Default: <code class="docutils literal notranslate"><span class="pre">10.0</span></code>)</p></li>
+<li><p><strong>high_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – High cutoff frequency for mel bins (if &lt;= 0, offset from Nyquist) (Default: <code class="docutils literal notranslate"><span class="pre">0.0</span></code>)</p></li>
+<li><p><strong>htk_compat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, put energy last.  Warning: not sufficient to get HTK compatible features (need
+to change other parameters). (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>low_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Low cutoff frequency for mel bins (Default: <code class="docutils literal notranslate"><span class="pre">20.0</span></code>)</p></li>
+<li><p><strong>num_ceps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of cepstra in MFCC computation (including C0) (Default: <code class="docutils literal notranslate"><span class="pre">13</span></code>)</p></li>
 <li><p><strong>min_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Minimum duration of segments to process (in seconds). (Default: <code class="docutils literal notranslate"><span class="pre">0.0</span></code>)</p></li>
+<li><p><strong>num_mel_bins</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of triangular mel-frequency bins (Default: <code class="docutils literal notranslate"><span class="pre">23</span></code>)</p></li>
 <li><p><strong>preemphasis_coefficient</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Coefficient for use in signal preemphasis (Default: <code class="docutils literal notranslate"><span class="pre">0.97</span></code>)</p></li>
 <li><p><strong>raw_energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, compute energy before preemphasis and windowing (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
 <li><p><strong>remove_dc_offset</strong> – Subtract mean from waveform on each frame (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
@@ -315,15 +369,20 @@ in the file, and the number of frames depends on the frame_length.  If False, th
 depends only on the frame_shift, and we reflect the data at the ends. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
 <li><p><strong>subtract_mean</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Subtract mean of each feature file [CMS]; not recommended to do
 it this way.  (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>use_energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Add an extra dimension with energy to the FBANK output. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>vtln_high</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – High inflection point in piecewise linear VTLN warping function (if
+negative, offset from high-mel-freq (Default: <code class="docutils literal notranslate"><span class="pre">-500.0</span></code>)</p></li>
+<li><p><strong>vtln_low</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Low inflection point in piecewise linear VTLN warping function (Default: <code class="docutils literal notranslate"><span class="pre">100.0</span></code>)</p></li>
+<li><p><strong>vtln_warp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Vtln warp factor (only applicable if vtln_map not specified) (Default: <code class="docutils literal notranslate"><span class="pre">1.0</span></code>)</p></li>
 <li><p><strong>window_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Type of window (‘hamming’|’hanning’|’povey’|’rectangular’|’blackman’) (Default: <code class="docutils literal notranslate"><span class="pre">'povey'</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A spectrogram identical to what Kaldi would output. The shape is
-(m, <code class="docutils literal notranslate"><span class="pre">padded_window_size</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code>) where m is calculated in _get_strided</p>
+<dd class="field-even"><p>A mfcc identical to what Kaldi would output. The shape is (m, <code class="docutils literal notranslate"><span class="pre">num_ceps</span></code>)
+where m is calculated in _get_strided</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -344,7 +403,7 @@ upsample/downsample the signal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – The input signal of size (c, n)</p></li>
+<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – The input signal of size (c, n)</p></li>
 <li><p><strong>orig_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The original frequency of the signal</p></li>
 <li><p><strong>new_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The desired frequency</p></li>
 <li><p><strong>lowpass_filter_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Controls the sharpness of the filter, more == sharper
@@ -355,7 +414,7 @@ but less efficient. We suggest around 4 to 10 for normal use. (Default: <code cl
 <dd class="field-even"><p>The waveform at the new frequency</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -409,8 +468,9 @@ but less efficient. We suggest around 4 to 10 for normal use. (Default: <code cl
               <ul>
 <li><a class="reference internal" href="#">torchaudio.compliance.kaldi</a><ul>
 <li><a class="reference internal" href="#functions">Functions</a><ul>
-<li><a class="reference internal" href="#fbank"><span class="hidden-section">fbank</span></a></li>
 <li><a class="reference internal" href="#spectrogram"><span class="hidden-section">spectrogram</span></a></li>
+<li><a class="reference internal" href="#fbank"><span class="hidden-section">fbank</span></a></li>
+<li><a class="reference internal" href="#mfcc"><span class="hidden-section">mfcc</span></a></li>
 <li><a class="reference internal" href="#resample-waveform"><span class="hidden-section">resample_waveform</span></a></li>
 </ul>
 </li>

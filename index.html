@@ -364,7 +364,7 @@ after each effect chain, but rather once you are finished with all effects chain
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.7)"><em>pathlib.Path</em></a>) – Path to audio file</p></li>
-<li><p><strong>out</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a><em>, </em><em>optional</em>) – An output tensor to use instead of creating one. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>out</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a><em>, </em><em>optional</em>) – An output tensor to use instead of creating one. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>normalization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>number</em><em>, or </em><em>callable</em><em>, </em><em>optional</em>) – If boolean <cite>True</cite>, then output is divided by <cite>1 &lt;&lt; 31</cite>
 (assumes signed 32-bit audio), and normalizes to <cite>[0, 1]</cite>.
 If <cite>number</cite>, then output is divided by that number
@@ -390,7 +390,7 @@ of audio frames and C is the number of channels. An integer which is the sample 
 audio (as listed in the metadata of the file)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>]</p>
+<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>]</p>
 </dd>
 </dl>
 <dl>
@@ -423,7 +423,7 @@ of audio frames and C is the number of channels. An integer which is the sample 
 audio (as listed in the metadata of the file)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>]</p>
+<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -436,7 +436,7 @@ audio (as listed in the metadata of the file)</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to audio file</p></li>
-<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – An input 2D tensor of shape <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is
+<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – An input 2D tensor of shape <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is
 the number of audio frames, C is the number of channels</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – An integer which is the sample rate of the
 audio (as listed in the metadata of the file)</p></li>
@@ -456,7 +456,7 @@ Default: <code class="docutils literal notranslate"><span class="pre">True</span
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to audio file</p></li>
-<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – An input 2D tensor of shape <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is
+<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – An input 2D tensor of shape <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is
 the number of audio frames, C is the number of channels</p></li>
 <li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Set channels first or length first in result. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
 <li><p><strong>signalinfo</strong> (<em>sox_signalinfo_t</em>) – A sox_signalinfo_t type, which could be helpful if the
