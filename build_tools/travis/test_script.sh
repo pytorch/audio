@@ -36,7 +36,7 @@ if [[ "$SKIP_TESTS" != "true" ]]; then
 fi
 
 if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
-  INPUT_FILE=./data/sample.wav
+  INPUT_FILE=examples/interactive_asr/data/sample.wav
   python asr.py $HOME/download/data --input_file $INPUT_FILE --max-tokens 10000000 --nbest 1 \
     --path $HOME/download/data/model.pt --beam 40 --task speech_recognition --user-dir $HOME/download/fairseq/examples/speech_recognition
 fi
