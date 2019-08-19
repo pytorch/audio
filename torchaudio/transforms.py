@@ -199,7 +199,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
                                        hop_length=self.hop_length,
                                        pad=self.pad, window_fn=window_fn, power=2,
                                        normalized=False, wkwargs=wkwargs)
-        self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max)
+        self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1)
 
     @torch.jit.script_method
     def forward(self, waveform):
