@@ -58,9 +58,7 @@ fi
 
 if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
   # Install dependencies
-  conda install -c conda-forge librosa
-  conda install pyaudio
-  pip install sentencepiece
+  pip install sentencepiece PyAudio
 
   # Install fairseq from source
   git clone https://github.com/pytorch/fairseq $HOME/download/fairseq
