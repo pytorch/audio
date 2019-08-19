@@ -60,12 +60,15 @@ if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
   # Install dependencies
   pip install sentencepiece PyAudio
 
-  # Install fairseq from source
-  git clone https://github.com/pytorch/fairseq $HOME/download/fairseq
-  pushd $HOME/download/fairseq
-  pip install --editable .
-  popd
+  if [[ ! -d $HOME/download/fairseq ]]; then
+    # Install fairseq from source
+    git clone https://github.com/pytorch/fairseq $HOME/download/fairseq
+    pushd $HOME/download/fairseq
+    pip install --editable .
+    popd
+  fi
 
+  mkdir -p $HOME/download/data
   # Install dictionary, sentence piece model, and model
   wget -nc -O $HOME/download/data/dict.txt https://download.pytorch.org/models/audio/dict.txt
   wget -nc -O $HOME/download/data/spm.model https://download.pytorch.org/models/audio/spm.model
