@@ -55,3 +55,21 @@ if [[ "$SKIP_TESTS" != "true" ]]; then
      # TorchAudio CPP Extensions
     python setup.py install
 fi
+
+if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
+  # Install dependencies
+  conda install -c conda-forge librosa
+  conda install pyaudio
+  pip install sentencepiece
+
+  # Install fairseq from source
+  git clone https://github.com/pytorch/fairseq $HOME/download/fairseq
+  pushd $HOME/download/fairseq
+  pip install --editable .
+  popd
+
+  # Install dictionary, sentence piece model, and model
+  wget -nc -O $HOME/download/data/dict.txt https://download.pytorch.org/models/audio/dict.txt
+  wget -nc -O $HOME/download/data/spm.model https://download.pytorch.org/models/audio/spm.model
+  wget -nc -O $HOME/download/data/model.pt https://download.pytorch.org/models/audio/checkpoint_avg_60_80.pt
+fi
