@@ -74,3 +74,5 @@ if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
   wget -nc -O $HOME/download/data/spm.model https://download.pytorch.org/models/audio/spm.model
   wget -nc -O $HOME/download/data/model.pt https://download.pytorch.org/models/audio/checkpoint_avg_60_80.pt
 fi
+
+echo "Finished installation"

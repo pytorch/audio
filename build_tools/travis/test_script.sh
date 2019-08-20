@@ -32,10 +32,12 @@ if [[ "$RUN_FLAKE8" == "true" ]]; then
 fi
 
 if [[ "$SKIP_TESTS" != "true" ]]; then
+  echo "run_tests"
   run_tests
 fi
 
 if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
+  echo "run_example_tests"
   INPUT_FILE=examples/interactive_asr/data/sample.wav
   python examples/interactive_asr/asr.py $HOME/download/data --input_file $INPUT_FILE \
     --max-tokens 10000000 --nbest 1 \
