@@ -16,7 +16,7 @@ matrix:
     - env: PYTHON_VERSION="3.5"
     - env: PYTHON_VERSION="3.6"
     - env: PYTHON_VERSION="3.7"
-    - env: PYTHON_VERSION="3.5" RUN_FLAKE8="true" SKIP_TESTS="true"
+    - env: PYTHON_VERSION="3.5" RUN_FLAKE8="true" SKIP_INSTALL="true" SKIP_TESTS="true"
     - env: PYTHON_VERSION="3.5" RUN_EXAMPLE_TESTS="true" SKIP_TESTS="true"
   # allow_failures:
 

@@ -51,7 +51,7 @@ source activate testenv
 pip install -r requirements.txt
 
  # Install the following only if running tests
-if [[ "$SKIP_TESTS" != "true" ]]; then
+if [[ "$SKIP_INSTALL" != "true" ]]; then
      # TorchAudio CPP Extensions
     python setup.py install
 fi
