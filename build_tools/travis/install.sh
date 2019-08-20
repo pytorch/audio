@@ -63,13 +63,15 @@ if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
   if [[ ! -d $HOME/download/fairseq ]]; then
     # Install fairseq from source
     git clone https://github.com/pytorch/fairseq $HOME/download/fairseq
-    pushd $HOME/download/fairseq
-    pip install --editable .
-    popd
   fi
+
+  pushd $HOME/download/fairseq
+  pip install --editable .
+  popd
 
   mkdir -p $HOME/download/data
   # Install dictionary, sentence piece model, and model
+  # These are cached so they are not downloaded if they already exist
   wget -nc -O $HOME/download/data/dict.txt https://download.pytorch.org/models/audio/dict.txt || true
   wget -nc -O $HOME/download/data/spm.model https://download.pytorch.org/models/audio/spm.model || true
   wget -nc -O $HOME/download/data/model.pt https://download.pytorch.org/models/audio/checkpoint_avg_60_80.pt || true
