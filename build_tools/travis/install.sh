@@ -70,9 +70,9 @@ if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
 
   mkdir -p $HOME/download/data
   # Install dictionary, sentence piece model, and model
-  wget -nc -O $HOME/download/data/dict.txt https://download.pytorch.org/models/audio/dict.txt
-  wget -nc -O $HOME/download/data/spm.model https://download.pytorch.org/models/audio/spm.model
-  wget -nc -O $HOME/download/data/model.pt https://download.pytorch.org/models/audio/checkpoint_avg_60_80.pt
+  wget -nc -O $HOME/download/data/dict.txt https://download.pytorch.org/models/audio/dict.txt || true
+  wget -nc -O $HOME/download/data/spm.model https://download.pytorch.org/models/audio/spm.model || true
+  wget -nc -O $HOME/download/data/model.pt https://download.pytorch.org/models/audio/checkpoint_avg_60_80.pt || true
 fi
 
 echo "Finished installation"
