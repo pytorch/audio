@@ -50,6 +50,39 @@ class Tester(unittest.TestCase):
         waveform_exp = transforms.MuLawDecoding(quantization_channels)(waveform_mu)
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
 
+    def test_melscale_load_save(self):
+        specgram = torch.ones(1, 1000, 100)
+        melscale_transform = transforms.MelScale()
+        melscale_transform(specgram)
+
+        melscale_transform_copy = transforms.MelScale(n_stft=1000)
+        melscale_transform_copy.load_state_dict(melscale_transform.state_dict())
+
+        fb = melscale_transform.fb
+        fb_copy = melscale_transform_copy.fb
+
+        self.assertEqual(fb_copy.size(), (1000, 128))
+        self.assertTrue(torch.allclose(fb, fb_copy))
+
+    def test_melspectrogram_load_save(self):
+        waveform = self.waveform.float()
+        mel_spectrogram_transform = transforms.MelSpectrogram()
+        mel_spectrogram_transform(waveform)
+
+        mel_spectrogram_transform_copy = transforms.MelSpectrogram()
+        mel_spectrogram_transform_copy.load_state_dict(mel_spectrogram_transform.state_dict())
+
+        window = mel_spectrogram_transform.spectrogram.window
+        window_copy = mel_spectrogram_transform_copy.spectrogram.window
+
+        fb = mel_spectrogram_transform.mel_scale.fb
+        fb_copy = mel_spectrogram_transform_copy.mel_scale.fb
+
+        self.assertTrue(torch.allclose(window, window_copy))
+        # the default for n_fft = 400 and n_mels = 128
+        self.assertEqual(fb_copy.size(), (201, 128))
+        self.assertTrue(torch.allclose(fb, fb_copy))
+
     def test_mel2(self):
         top_db = 80.
         s2db = transforms.AmplitudeToDB('power', top_db)
