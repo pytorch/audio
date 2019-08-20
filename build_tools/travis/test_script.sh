@@ -38,7 +38,6 @@ fi
 
 if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
   echo "run_example_tests"
-
   pushd examples
   ASR_MODEL_PATH=$HOME/download/data/model.pt \
   ASR_INPUT_FILE=interactive_asr/data/sample.wav \
