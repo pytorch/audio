@@ -38,9 +38,12 @@ fi
 
 if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
   echo "run_example_tests"
-  INPUT_FILE=examples/interactive_asr/data/sample.wav
-  python examples/interactive_asr/asr.py $HOME/download/data --input_file $INPUT_FILE \
-    --max-tokens 10000000 --nbest 1 \
-    --path $HOME/download/data/model.pt --beam 40 --task speech_recognition \
-    --user-dir $HOME/download/fairseq/examples/speech_recognition
+
+  pushd examples
+  ASR_MODEL_PATH=$HOME/download/data/model.pt \
+  ASR_INPUT_FILE=interactive_asr/data/sample.wav \
+  ASR_DATA_PATH=$HOME/download/data \
+  ASR_USER_DIR=$HOME/download/fairseq/examples/speech_recognition \
+  python -m unittest test/test_interactive_asr.py
+  popd
 fi
