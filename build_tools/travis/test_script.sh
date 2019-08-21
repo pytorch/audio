@@ -32,5 +32,17 @@ if [[ "$RUN_FLAKE8" == "true" ]]; then
 fi
 
 if [[ "$SKIP_TESTS" != "true" ]]; then
+  echo "run_tests"
   run_tests
+fi
+
+if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
+  echo "run_example_tests"
+  pushd examples
+  ASR_MODEL_PATH=$HOME/download/data/model.pt \
+  ASR_INPUT_FILE=interactive_asr/data/sample.wav \
+  ASR_DATA_PATH=$HOME/download/data \
+  ASR_USER_DIR=$HOME/download/fairseq/examples/speech_recognition \
+  python -m unittest test/test_interactive_asr.py
+  popd
 fi
