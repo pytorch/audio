@@ -51,7 +51,7 @@ pushd sox-14.4.2
 ./configure --disable-shared --enable-static --prefix="$PREFIX/third_party/sox" \
     LDFLAGS="-L$PREFIX/third_party/lame/lib -L$PREFIX/third_party/flac/lib -L$PREFIX/third_party/mad/lib" \
     CPPFLAGS="-I$PREFIX/third_party/lame/include -I$PREFIX/third_party/flac/include -I$PREFIX/third_party/mad/include" \
-    --with-lame --with-flac --with-mad --without-coreaudio --without-png --without-oggvorbis --without-oss --without-sndfile CFLAGS=-fPIC CXXFLAGS=-fPIC --with-pic --disable-debug --disable-dependency-tracking
+    --with-lame --with-flac --with-mad --without-alsa --without-coreaudio --without-png --without-oggvorbis --without-oss --without-sndfile CFLAGS=-fPIC CXXFLAGS=-fPIC --with-pic --disable-debug --disable-dependency-tracking
 make -s -j && make install
 popd
 
