@@ -61,7 +61,7 @@ before running this command.)
 
 At the moment, there is no automated nightly build process, but we occasionally
 build nightlies based on PyTorch nightlies by hand following the instructions in
-[build_tools/packaging](build_tools/packaging).  To install the latest nightly, run:
+[packaging](packaging).  To install the latest nightly, run:
 
 ```
 pip install torchaudio_nightly -f https://download.pytorch.org/whl/nightly/torch_nightly.html
