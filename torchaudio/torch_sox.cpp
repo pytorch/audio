@@ -36,7 +36,7 @@ struct SoxDescriptor {
 int64_t write_audio(SoxDescriptor& fd, at::Tensor tensor) {
   std::vector<sox_sample_t> buffer(tensor.numel());
 
-  AT_DISPATCH_ALL_TYPES(tensor.scalar_type(), "write_audio_buffer", [&] {
+  AT_DISPATCH_ALL_TYPES(tensor.type(), "write_audio_buffer", [&] {
     auto* data = tensor.data_ptr<scalar_t>();
     std::copy(data, data + tensor.numel(), buffer.begin());
   });
@@ -63,7 +63,7 @@ void read_audio(
   output.resize_({samples_read / number_of_channels, number_of_channels});
   output = output.contiguous();
 
-  AT_DISPATCH_ALL_TYPES(output.scalar_type(), "read_audio_buffer", [&] {
+  AT_DISPATCH_ALL_TYPES(output.type(), "read_audio_buffer", [&] {
     auto* data = output.data_ptr<scalar_t>();
     std::copy(buffer.begin(), buffer.begin() + samples_read, data);
   });
@@ -369,7 +369,7 @@ int build_flow_effects(const std::string& file_name,
   std::vector<sox_sample_t> samples(buffer_size);
   const int64_t samples_read = sox_read(input, samples.data(), buffer_size);
   assert(samples_read != nc * ns && samples_read != 0);
-  AT_DISPATCH_ALL_TYPES(otensor.scalar_type(), "effects_buffer", [&] {
+  AT_DISPATCH_ALL_TYPES(otensor.type(), "effects_buffer", [&] {
     auto* data = otensor.data_ptr<scalar_t>();
     std::copy(samples.begin(), samples.begin() + samples_read, data);
   });
