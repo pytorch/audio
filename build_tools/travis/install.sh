@@ -56,7 +56,8 @@ if [[ "$SKIP_INSTALL" != "true" ]]; then
     python setup.py install
 fi
 
-if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
+# if [[ "$RUN_EXAMPLE_TESTS" == "true" ]]; then
+if [ false; ]; then
   # Install dependencies
   pip install sentencepiece PyAudio
 
