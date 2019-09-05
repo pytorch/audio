@@ -665,7 +665,7 @@ def compute_deltas(specgram, n_diff=2):
         deltas (torch.Tensor): Tensor of audio of dimension (channel, time)
 
     Example
-        >>> specgram = torch.randn(2, 100)
+        >>> specgram = torch.randn(1, 40, 1000)
         >>> deltas = compute_deltas(specgram)
     """
 
