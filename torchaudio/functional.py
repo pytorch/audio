@@ -655,7 +655,14 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
 
 
 def compute_deltas(specgram, n_diff=2):
-    r"""Compute delta coefficients of a spectogram.
+    r"""Compute delta coefficients of a spectogram:
+
+    .. math::
+        d_t = \frac{\sum_{n=1}^{N} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^N n^2}
+
+    where :math:`d_t` is the deltas at time :math:`t`,
+    :math:`N` is n_diff,
+    :math:`c_t` are the spectogram coeffcients at time :math:`t`,
 
     Args:
         specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
@@ -671,6 +678,7 @@ def compute_deltas(specgram, n_diff=2):
 
     assert specgram.dim() == 3
     assert not specgram.shape[1] % specgram.shape[0]
+    assert n_diff > 0
 
     # twice sum of integer squared
     denom = n_diff * (n_diff + 1) * (2 * n_diff + 1) / 3
