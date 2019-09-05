@@ -211,6 +211,14 @@ class TestDeltas(unittest.TestCase):
                                   [1.0, 1.0, 1.0, -1.5]]])
         self._test(specgram, expected)
 
+    def test_randn(self):
+        channel = 13
+        n_mfcc = channel * 3
+        time = 1021
+        specgram = torch.randn(channel, n_mfcc, time)
+        computed = F.compute_deltas(specgram, n_diff=7)
+        self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
+
 
 def _num_stft_bins(signal_len, fft_len, hop_length, pad):
     return (signal_len + 2 * pad - fft_len + hop_length) // hop_length
