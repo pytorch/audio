@@ -689,5 +689,5 @@ def compute_deltas(specgram, n_diff=2):
         .repeat(specgram.shape[1], specgram.shape[0], 1)
     )
     return torch.nn.functional.conv1d(
-        specgram, kernel, padding=n_diff, groups=specgram.shape[1]//specgram.shape[0]
+        specgram, kernel, padding=n_diff, groups=specgram.shape[1] // specgram.shape[0]
     ) / denom
