@@ -661,12 +661,12 @@ def compute_deltas(specgram, n_diff=2):
         d_t = \frac{\sum_{n=1}^{N} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^N n^2}
 
     where :math:`d_t` is the deltas at time :math:`t`,
-    :math:`N` is n_diff,
-    :math:`c_t` are the spectogram coeffcients at time :math:`t`,
+    :math:`c_t` is the spectogram coeffcients at time :math:`t`,
+    :math:`N` is n_diff.
 
     Args:
         specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
-        n_diff (int): Number of differences to use in computing delta
+        n_diff (int): A nonzero number of differences to use in computing delta
 
     Returns:
         deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
@@ -676,9 +676,9 @@ def compute_deltas(specgram, n_diff=2):
         >>> deltas = compute_deltas(specgram)
     """
 
+    assert n_diff > 0
     assert specgram.dim() == 3
     assert not specgram.shape[1] % specgram.shape[0]
-    assert n_diff > 0
 
     # twice sum of integer squared
     denom = n_diff * (n_diff + 1) * (2 * n_diff + 1) / 3
