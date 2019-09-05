@@ -673,7 +673,7 @@ def compute_deltas(waveform, n_diff=2):
 
     kernel = (
         torch
-        .tensor(range(-n_diff, n_diff+1, 1), device=waveform.device, dtype=waveform.dtype)
+        .tensor(range(-n_diff, n_diff + 1, 1), device=waveform.device, dtype=waveform.dtype)
         .repeat(waveform.shape[0], 1)
         .unsqueeze(1)
     )
@@ -681,7 +681,7 @@ def compute_deltas(waveform, n_diff=2):
     deltas = torch.nn.functional.conv1d(waveform, kernel, padding=n_diff, groups=waveform.shape[1])
 
     # twice sum of integer squared
-    denom = n_diff * (n_diff+1) * (2*n_diff+1) / 3
+    denom = n_diff * (n_diff + 1) * (2 * n_diff + 1) / 3
 
     deltas /= denom
     return deltas.squeeze(0)
