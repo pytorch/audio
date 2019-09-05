@@ -193,23 +193,23 @@ class TestFunctional(unittest.TestCase):
 
 
 class TestDeltas(unittest.TestCase):
-    waveform = torch.tensor([1., 2., 3., 4.]).unsqueeze(0)
+    specgram = torch.tensor([1., 2., 3., 4.])
 
-    def _test(self, waveform, expected, n_diff=1, atol=1e-6, rtol=1e-8):
-        computed = F.compute_deltas(waveform, n_diff=1)
+    def _test(self, specgram, expected, n_diff=1, atol=1e-6, rtol=1e-8):
+        computed = F.compute_deltas(specgram, n_diff=1)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected, atol=atol, rtol=rtol))
 
     def test_onechannel(self):
-        waveform = self.waveform
-        expected = torch.tensor([[1.0, 1.0, 1.0, -1.5]])
-        self._test(waveform, expected)
+        specgram = self.specgram.unsqueeze(0).unsqueeze(0)
+        expected = torch.tensor([[[1.0, 1.0, 1.0, -1.5]]])
+        self._test(specgram, expected)
 
     def test_twochannel(self):
-        waveform = torch.cat([self.waveform, self.waveform], dim=0)
-        expected = torch.tensor([[1.0, 1.0, 1.0, -1.5],
-                                 [1.0, 1.0, 1.0, -1.5]])
-        self._test(waveform, expected)
+        specgram = self.specgram.repeat(1, 2, 1)
+        expected = torch.tensor([[[1.0, 1.0, 1.0, -1.5],
+                                  [1.0, 1.0, 1.0, -1.5]]])
+        self._test(specgram, expected)
 
 
 def _num_stft_bins(signal_len, fft_len, hop_length, pad):

@@ -654,34 +654,31 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-def compute_deltas(waveform, n_diff=2):
-    r"""Compute delta coefficients.
+def compute_deltas(specgram, n_diff=2):
+    r"""Compute delta coefficients of a spectogram.
 
     Args:
-        waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
+        specgram (torch.Tensor): Tensor of audio of dimension (channel, time)
         n_diff (int): Number of differences to consider
 
     Returns:
-        waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
+        deltas (torch.Tensor): Tensor of audio of dimension (channel, time)
 
     Example
-        >>> waveform = torch.randn(2, 100)
-        >>> deltas = compute_deltas(waveform)
+        >>> specgram = torch.randn(2, 100)
+        >>> deltas = compute_deltas(specgram)
     """
 
-    assert waveform.dim() == 2
-
-    kernel = (
-        torch
-        .tensor(range(-n_diff, n_diff + 1, 1), device=waveform.device, dtype=waveform.dtype)
-        .repeat(waveform.shape[0], 1)
-        .unsqueeze(1)
-    )
-    waveform = waveform.unsqueeze(0)
-    deltas = torch.nn.functional.conv1d(waveform, kernel, padding=n_diff, groups=waveform.shape[1])
+    assert specgram.dim() == 3
 
     # twice sum of integer squared
     denom = n_diff * (n_diff + 1) * (2 * n_diff + 1) / 3
 
-    deltas /= denom
-    return deltas.squeeze(0)
+    kernel = (
+        torch
+        .tensor(range(-n_diff, n_diff + 1, 1), device=specgram.device, dtype=specgram.dtype)
+        .repeat(specgram.shape[1], specgram.shape[0], 1)
+    )
+    return torch.nn.functional.conv1d(
+        specgram, kernel, padding=n_diff, groups=specgram.shape[1]
+    ) / denom
