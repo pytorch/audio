@@ -652,3 +652,36 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     a1 = -2 * math.cos(w0)
     a2 = 1 - alpha
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def compute_deltas(waveform, n_diff=2):
+    r"""Compute delta coefficients.
+
+    Args:
+        waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
+        n_diff (int): Number of differences to consider
+
+    Returns:
+        waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
+
+    Example
+        >>> waveform = torch.randn(2, 100)
+        >>> deltas = compute_deltas(waveform)
+    """
+
+    assert waveform.dim() == 2
+
+    kernel = (
+        torch
+        .tensor(range(-n_diff, n_diff+1, 1), device=waveform.device, dtype=waveform.dtype)
+        .repeat(waveform.shape[0], 1)
+        .unsqueeze(1)
+    )
+    waveform = waveform.unsqueeze(0)
+    deltas = torch.nn.functional.conv1d(waveform, kernel, padding=n_diff, groups=waveform.shape[1])
+
+    # twice sum of integer squared
+    denom = n_diff * (n_diff+1) * (2*n_diff+1) / 3
+
+    deltas /= denom
+    return deltas.squeeze(0)
