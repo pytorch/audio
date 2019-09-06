@@ -281,5 +281,15 @@ class Tester(unittest.TestCase):
         # we expect the downsampled signal to have half as many samples
         self.assertTrue(down_sampled.size(-1) == waveform.size(-1) // 2)
 
+    def test_compute_deltas(self):
+        channel = 13
+        n_mfcc = channel * 3
+        time = 1021
+        window = 7
+        specgram = torch.randn(channel, n_mfcc, time)
+        transform = transforms.ComputeDeltas(window=window)
+        computed = transform(specgram)
+        self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
+
 if __name__ == '__main__':
     unittest.main()

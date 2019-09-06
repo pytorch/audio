@@ -215,8 +215,9 @@ class TestDeltas(unittest.TestCase):
         channel = 13
         n_mfcc = channel * 3
         time = 1021
+        window = 7
         specgram = torch.randn(channel, n_mfcc, time)
-        computed = F.compute_deltas(specgram, window=7)
+        computed = F.compute_deltas(specgram, window=window)
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
 

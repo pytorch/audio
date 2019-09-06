@@ -365,3 +365,36 @@ class Resample(torch.nn.Module):
             return kaldi.resample_waveform(waveform, self.orig_freq, self.new_freq)
 
         raise ValueError('Invalid resampling method: %s' % (self.resampling_method))
+
+
+class ComputeDeltas(torch.jit.ScriptModule):
+    r"""Compute delta coefficients of a spectogram:
+
+    .. math::
+        d_t = \frac{\sum_{n=1}^{\text{window}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{window} n^2}
+
+    where :math:`d_t` is the deltas at time :math:`t`,
+    :math:`c_t` is the spectogram coeffcients at time :math:`t`,
+    `window` is the parameter given to the function (the actual window size is 2*window+1).
+
+    The behavior at the edges is to replicate the boundaries.
+
+    Args:
+        window (int): A nonzero number of differences to use in computing delta
+    """
+    __constants__ = ['window']
+
+    def __init__(self, window=2):
+        super(ComputeDeltas, self).__init__()
+        self.window = window
+
+    @torch.jit.script_method
+    def forward(self, specgram):
+        r"""
+        Args:
+            specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
+
+        Returns:
+            deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
+        """
+        return F.compute_deltas(specgram, window=self.window)

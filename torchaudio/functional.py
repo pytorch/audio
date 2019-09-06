@@ -655,6 +655,7 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
 
 
 def compute_deltas(specgram, window=2):
+    # type: (Tensor, int) -> Tensor
     r"""Compute delta coefficients of a spectogram:
 
     .. math::
@@ -690,7 +691,7 @@ def compute_deltas(specgram, window=2):
 
     kernel = (
         torch
-        .tensor(range(-window, window + 1, 1), device=specgram.device, dtype=specgram.dtype)
+        .arange(-window, window + 1, 1, device=specgram.device, dtype=specgram.dtype)
         .repeat(specgram.shape[1], specgram.shape[0], 1)
     )
 
