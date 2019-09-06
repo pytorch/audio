@@ -291,5 +291,6 @@ class Tester(unittest.TestCase):
         computed = transform(specgram)
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
+
 if __name__ == '__main__':
     unittest.main()
