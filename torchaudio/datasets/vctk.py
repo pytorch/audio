@@ -53,7 +53,6 @@ def read_audio(fp, downsample=True):
 def load_txts(dir):
     """Create a dictionary with all the text of the audio transcriptions."""
     utterences = dict()
-    txts = []
     dir = os.path.expanduser(dir)
     for target in sorted(os.listdir(dir)):
         d = os.path.join(dir, target)

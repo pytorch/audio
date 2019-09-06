@@ -19,18 +19,16 @@ from speech to silence or vice versa.
 
 from collections import deque
 
-import librosa
 import numpy as np
 import torch
+from six.moves import queue
 
+import librosa
 import pyaudio
 import torchaudio
-from six.moves import queue
 
 
 def compute_spectral_flatness(frame, epsilon=0.01):
-    n = frame.nonzero().size(0)
-
     # epsilon protects against log(0)
     geometric_mean = torch.exp((frame + epsilon).log().mean(-1)) - epsilon
     arithmetic_mean = frame.mean(-1)
@@ -240,8 +238,6 @@ def get_microphone_chunks(
 ):
 
     vad = VoiceActivityDetection()
-    speech_frames = []
-    chunks = []
 
     cumulated = []
     precumulated = deque(maxlen=precumulate)
@@ -250,7 +246,6 @@ def get_microphone_chunks(
         audio_generator = stream.generator()
         chunk_length = stream._chunk
         waveform = torch.zeros(max_to_visualize * chunk_length)
-        speechform = torch.zeros(max_to_visualize * chunk_length)
 
         for chunk in audio_generator:
             # Is speech?
