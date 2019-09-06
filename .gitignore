@@ -110,8 +110,3 @@ ENV/
 test/assets/sinewave.wav
 torchaudio/version.py
 gen.yml
-
-# Examples
-examples/interactive_asr/data/*.txt
-examples/interactive_asr/data/*.model
-examples/interactive_asr/data/*.pt

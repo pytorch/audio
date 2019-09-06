@@ -8,19 +8,15 @@ cache:
   directories:
   - /home/travis/download
 
-# This matrix tests that the code works on Python 2.7, 3.5, 3.6, 3.7, passes
-# lint and example tests.
+# This matrix tests that the code works on Python 3.5, 3.6, and passes lint.
 matrix:
   fast_finish: true
   include:
-    - env: PYTHON_VERSION="2.7"
-    - env: PYTHON_VERSION="3.5"
-    - env: PYTHON_VERSION="3.6"
     - env: PYTHON_VERSION="3.7"
-    - env: PYTHON_VERSION="3.5" RUN_FLAKE8="true" SKIP_INSTALL="true" SKIP_TESTS="true"
-    - env: PYTHON_VERSION="3.5" RUN_EXAMPLE_TESTS="true" SKIP_TESTS="true"
-  allow_failures:
-    - env: PYTHON_VERSION="3.5" RUN_EXAMPLE_TESTS="true" SKIP_TESTS="true"
+    - env: PYTHON_VERSION="3.6"
+    # TODO add this back in when there is a pytorch 1.2 for python 3.5
+    - env: PYTHON_VERSION="3.5" RUN_FLAKE8="true" SKIP_TESTS="true"
+    - env: PYTHON_VERSION="2.7"
 
 addons:
   apt:
@@ -28,7 +24,6 @@ addons:
       sox
       libsox-dev
       libsox-fmt-all
-      portaudio19-dev
 
 notifications:
   email: false
