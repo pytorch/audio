@@ -654,40 +654,46 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-def compute_deltas(specgram, n_diff=2):
+def compute_deltas(specgram, window=2):
     r"""Compute delta coefficients of a spectogram:
 
     .. math::
-        d_t = \frac{\sum_{n=1}^{N} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^N n^2}
+        d_t = \frac{\sum_{n=1}^{\text{window}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{window} n^2}
 
     where :math:`d_t` is the deltas at time :math:`t`,
     :math:`c_t` is the spectogram coeffcients at time :math:`t`,
-    :math:`N` is n_diff.
+    `window` is the parameter given to the function (the actual window size is 2*window+1).
+
+    The behavior at the edges is to replicate the boundaries.
 
     Args:
         specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
-        n_diff (int): A nonzero number of differences to use in computing delta
+        window (int): A nonzero number of differences to use in computing delta
 
     Returns:
         deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
 
     Example
         >>> specgram = torch.randn(1, 40, 1000)
-        >>> deltas = compute_deltas(specgram)
+        >>> delta = compute_deltas(specgram)
+        >>> delta2 = compute_deltas(delta)
     """
 
-    assert n_diff > 0
+    assert window > 0
     assert specgram.dim() == 3
     assert not specgram.shape[1] % specgram.shape[0]
 
     # twice sum of integer squared
-    denom = n_diff * (n_diff + 1) * (2 * n_diff + 1) / 3
+    denom = window * (window + 1) * (2 * window + 1) / 3
+
+    specgram = torch.nn.functional.pad(specgram, (window, window), mode='replicate')
 
     kernel = (
         torch
-        .tensor(range(-n_diff, n_diff + 1, 1), device=specgram.device, dtype=specgram.dtype)
+        .tensor(range(-window, window + 1, 1), device=specgram.device, dtype=specgram.dtype)
         .repeat(specgram.shape[1], specgram.shape[0], 1)
     )
+
     return torch.nn.functional.conv1d(
-        specgram, kernel, padding=n_diff, groups=specgram.shape[1] // specgram.shape[0]
+        specgram, kernel, groups=specgram.shape[1] // specgram.shape[0]
     ) / denom

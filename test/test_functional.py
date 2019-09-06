@@ -195,20 +195,20 @@ class TestFunctional(unittest.TestCase):
 class TestDeltas(unittest.TestCase):
     specgram = torch.tensor([1., 2., 3., 4.])
 
-    def _test(self, specgram, expected, n_diff=1, atol=1e-6, rtol=1e-8):
-        computed = F.compute_deltas(specgram, n_diff=1)
+    def _test(self, specgram, expected, window=1, atol=1e-6, rtol=1e-8):
+        computed = F.compute_deltas(specgram, window=1)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected, atol=atol, rtol=rtol))
 
     def test_onechannel(self):
         specgram = self.specgram.unsqueeze(0).unsqueeze(0)
-        expected = torch.tensor([[[1.0, 1.0, 1.0, -1.5]]])
+        expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5]]])
         self._test(specgram, expected)
 
     def test_twochannel(self):
         specgram = self.specgram.repeat(1, 2, 1)
-        expected = torch.tensor([[[1.0, 1.0, 1.0, -1.5],
-                                  [1.0, 1.0, 1.0, -1.5]]])
+        expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5],
+                                  [0.5, 1.0, 1.0, 0.5]]])
         self._test(specgram, expected)
 
     def test_randn(self):
@@ -216,7 +216,7 @@ class TestDeltas(unittest.TestCase):
         n_mfcc = channel * 3
         time = 1021
         specgram = torch.randn(channel, n_mfcc, time)
-        computed = F.compute_deltas(specgram, n_diff=7)
+        computed = F.compute_deltas(specgram, window=7)
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
 
