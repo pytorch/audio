@@ -1,7 +1,7 @@
 torch>=1.2.0
 
 # Optional for torchaudio.kaldi_io
-numpy
+# numpy  # TODO add back when python 2.7 is deprecated
 kaldi_io
 
 # Required for tests only:
