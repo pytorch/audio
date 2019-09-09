@@ -368,25 +368,18 @@ class Resample(torch.nn.Module):
 
 
 class ComputeDeltas(torch.jit.ScriptModule):
-    r"""Compute delta coefficients of a spectogram:
+    r"""Compute delta coefficients of a spectogram.
 
-    .. math::
-        d_t = \frac{\sum_{n=1}^{\text{window}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{window} n^2}
-
-    where :math:`d_t` is the deltas at time :math:`t`,
-    :math:`c_t` is the spectogram coeffcients at time :math:`t`,
-    `window` is the parameter given to the function (the actual window size is 2*window+1).
-
-    The behavior at the edges is to replicate the boundaries.
+    See `torchaudio.functional.compute_deltas` for more details.
 
     Args:
-        window (int): A nonzero number of differences to use in computing delta
+        win_length (int): The window length used for computing delta
     """
-    __constants__ = ['window']
+    __constants__ = ['win_length']
 
-    def __init__(self, window=2):
+    def __init__(self, win_length=5):
         super(ComputeDeltas, self).__init__()
-        self.window = window
+        self.win_length = win_length
 
     @torch.jit.script_method
     def forward(self, specgram):
@@ -397,4 +390,4 @@ class ComputeDeltas(torch.jit.ScriptModule):
         Returns:
             deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
         """
-        return F.compute_deltas(specgram, window=self.window)
+        return F.compute_deltas(specgram, win_length=self.win_length)

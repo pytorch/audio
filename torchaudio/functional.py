@@ -654,22 +654,22 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-def compute_deltas(specgram, window=2):
+def compute_deltas(specgram, win_length=5):
     # type: (Tensor, int) -> Tensor
     r"""Compute delta coefficients of a spectogram:
 
     .. math::
-        d_t = \frac{\sum_{n=1}^{\text{window}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{window} n^2}
+        d_t = \frac{\sum_{n=1}^{\text{N}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{N} n^2}
 
     where :math:`d_t` is the deltas at time :math:`t`,
     :math:`c_t` is the spectogram coeffcients at time :math:`t`,
-    `window` is the parameter given to the function (the actual window size is 2*window+1).
+    :math:`N` is (`win_length`-1)//2.
 
     The behavior at the edges is to replicate the boundaries.
 
     Args:
         specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
-        window (int): A nonzero number of differences to use in computing delta
+        win_length (int): A nonzero number of differences to use in computing delta
 
     Returns:
         deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
@@ -680,18 +680,20 @@ def compute_deltas(specgram, window=2):
         >>> delta2 = compute_deltas(delta)
     """
 
-    assert window > 0
+    assert win_length >= 3
     assert specgram.dim() == 3
     assert not specgram.shape[1] % specgram.shape[0]
 
-    # twice sum of integer squared
-    denom = window * (window + 1) * (2 * window + 1) / 3
+    n = (win_length - 1) // 2
 
-    specgram = torch.nn.functional.pad(specgram, (window, window), mode='replicate')
+    # twice sum of integer squared
+    denom = n * (n + 1) * (2 * n + 1) / 3
+
+    specgram = torch.nn.functional.pad(specgram, (n, n), mode='replicate')
 
     kernel = (
         torch
-        .arange(-window, window + 1, 1, device=specgram.device, dtype=specgram.dtype)
+        .arange(-n, n + 1, 1, device=specgram.device, dtype=specgram.dtype)
         .repeat(specgram.shape[1], specgram.shape[0], 1)
     )
 
