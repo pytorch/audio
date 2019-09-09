@@ -27,7 +27,7 @@ jobs:
           command: |
             choco install miniconda3
             $env:Path += ";C:\tools\miniconda3\Scripts"
-            conda install -c pytorch pytorch
+            #conda install -c pytorch pytorch
             nvidia-smi
             python -c "import torch; print(torch.cuda.device_count())"
 
