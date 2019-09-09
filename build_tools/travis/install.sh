@@ -53,7 +53,7 @@ pip install -r requirements.txt
  # TODO Remove python version check once python 2.7 is deprecated
 ver=$(python -c"import sys; print(sys.version_info.major)")
 if [ $ver -eq 2 ]; then
-    pip install numpy=1.10
+    pip install 'numpy==1.10'
 else
     pip install numpy
 fi
