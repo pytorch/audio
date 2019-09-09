@@ -40,7 +40,7 @@ class TestFunctional(unittest.TestCase):
         channel = 13
         n_mfcc = channel * 3
         time = 1021
-        win_length = 2*7+1
+        win_length = 2 * 7 + 1
         specgram = torch.randn(channel, n_mfcc, time)
         computed = F.compute_deltas(specgram, win_length=win_length)
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
