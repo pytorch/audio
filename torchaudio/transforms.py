@@ -373,7 +373,7 @@ class ComputeDeltas(torch.jit.ScriptModule):
     See `torchaudio.functional.compute_deltas` for more details.
 
     Args:
-        win_length (int): The window length used for computing delta
+        win_length (int): The window length used for computing delta.
     """
     __constants__ = ['win_length']
 

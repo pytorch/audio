@@ -868,18 +868,18 @@ def resample_waveform(waveform, orig_freq, new_freq, lowpass_filter_width=6):
     return output
 
 
-def add_deltas(specgram, order=1, window=2):
+def add_deltas(specgram, order=1, win_length=2):
     r"""Compute delta coefficients of given order of a spectogram.
 
     Args:
         specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
         order (int): A nonzero order of difference
-        window (int): A nonzero number of differences to use in computing delta
+        win_length (int): The window length used for computing delta.
 
     Returns:
         deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
     """
     deltas = specgram
     for _ in range(order):
-        deltas = torchaudio.functional.compute_deltas(deltas, window=window)
+        deltas = torchaudio.functional.compute_deltas(deltas, win_length=win_length)
     return deltas

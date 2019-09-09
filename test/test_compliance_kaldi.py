@@ -323,10 +323,10 @@ class Test_Kaldi(unittest.TestCase):
         channel = 13
         n_mfcc = channel * 3
         time = 1021
-        window = 7
+        win_length = 7
         order = 1
         specgram = torch.randn(channel, n_mfcc, time)
-        computed = kaldi.add_deltas(specgram, window=window, order=order)
+        computed = kaldi.add_deltas(specgram, win_length=win_length, order=order)
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
 if __name__ == '__main__':

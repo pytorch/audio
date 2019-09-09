@@ -669,7 +669,7 @@ def compute_deltas(specgram, win_length=5):
 
     Args:
         specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
-        win_length (int): A nonzero number of differences to use in computing delta
+        win_length (int): The window length used for computing delta.
 
     Returns:
         deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
