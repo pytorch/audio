@@ -6,9 +6,45 @@ import torchaudio
 
 __all__ = [
     'lowpass1',
+    'biquad',
 ]
 
-# Should we name this low pass filter?
+
+"""
+Biquad filtering approach based on SoX
+
+Given coefficients of a biquad filter, return the output
+
+TBD Need to do performance profile, very slow
+"""
+def biquad(input, b0, b1, b2, a0, a1, a2):
+
+    n_channels, n_samples = input.size()
+    output = torch.zeros_like(input)
+
+    # Normalize the coefficients
+    b2 = b2 / a0
+    b1 = b1 / a0
+    b0 = b0 / a0
+    a2 = a2 / a0
+    a1 = a1 / a0
+
+    # Initial Conditions set to zero
+    pi1 = torch.zeros(n_channels, 1)
+    pi2 = torch.zeros(n_channels, 1)
+    po1 = torch.zeros(n_channels, 1)
+    po2 = torch.zeros(n_channels, 1)
+
+    for i in range(input.size()[1]):
+        o0 = input[:, i] * b0 + pi1 * b1 + pi2 * b2 - po1 * a1 - po2 * a2
+        pi2 = pi1
+        pi1 = input[:, i]
+        po2 = po1
+        po1 = o0
+        output[:, i] = o0
+
+    return output
+
 def lowpass1(waveform,           # type: Tensor
              sample_rate,        # type: int
              n_fft,              # type: int

@@ -40,5 +40,31 @@ class TestFunctionalFiltering(unittest.TestCase):
         print(high_to_low_pre_lowpass, high_to_low_post_lowpass)
         self.assertTrue( high_to_low_post_lowpass * 10 < high_to_low_pre_lowpass )
 
+    def test_biquad_sox_compliance(self):
+
+        """
+        Run a file through SoX biquad with randomly chosen coefficients
+        Then run a file through our biquad method. 
+        Should match
+        """
+        b0 = 0.4
+        b1 = 0.2
+        b2 = 0.9
+        a0 = 0.7
+        a1 = 0.2
+        a2 = 0.6
+
+        fn_sine = os.path.join(self.test_dirpath, "assets", "sinewave.wav")
+        
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(fn_sine)
+        E.append_effect_to_chain("biquad", [b0, b1, b2, a0, a1, a2])
+        sox_signal_out, sr = E.sox_build_flow_effects()
+        
+        audio, sample_rate = torchaudio.load(fn_sine, normalization=True)
+        signal_out = torchaudio.functional.biquad(audio, b0, b1, b2, a0, a1, a2)
+
+        assert(torch.allclose(sox_signal_out, signal_out, atol=1e-4))
+
 if __name__ == '__main__':
     unittest.main()
