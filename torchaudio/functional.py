@@ -15,6 +15,7 @@ __all__ = [
     'angle',
     'magphase',
     'phase_vocoder',
+    'lowpass',
 ]
 
 
@@ -466,3 +467,6 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     complex_specgrams_stretch = torch.stack([real_stretch, imag_stretch], dim=-1)
 
     return complex_specgrams_stretch
+
+
+from torchaudio.functional_filtering import lowpass1 as lowpass
