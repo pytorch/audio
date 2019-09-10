@@ -16,6 +16,8 @@ __all__ = [
     'magphase',
     'phase_vocoder',
     'lowpass',
+    'lowpass_biquad',
+    'highpass_biquad',
     'biquad',
 ]
 
@@ -471,4 +473,6 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 
 
 from torchaudio.functional_filtering import lowpass1 as lowpass
+from torchaudio.functional_filtering import lowpass_biquad
+from torchaudio.functional_filtering import highpass_biquad
 from torchaudio.functional_filtering import biquad

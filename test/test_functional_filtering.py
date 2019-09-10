@@ -34,7 +34,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         high_to_low_pre_lowpass = compute_ratio_high_vs_low(audio, 512)
         self.assertTrue(0.25 < high_to_low_pre_lowpass < 4)
         CUTOFF_FREQ = sample_rate // 4 # half of nyquist
-        lowpassed_audio = torchaudio.functional.lowpass(audio, sample_rate, 512, CUTOFF_FREQ)
+        lowpassed_audio = F.lowpass(audio, sample_rate, 512, CUTOFF_FREQ)
         high_to_low_post_lowpass = compute_ratio_high_vs_low(lowpassed_audio, 512)
         
         print(high_to_low_pre_lowpass, high_to_low_post_lowpass)
@@ -55,16 +55,63 @@ class TestFunctionalFiltering(unittest.TestCase):
         a2 = 0.6
 
         fn_sine = os.path.join(self.test_dirpath, "assets", "sinewave.wav")
-        
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(fn_sine)
         E.append_effect_to_chain("biquad", [b0, b1, b2, a0, a1, a2])
         sox_signal_out, sr = E.sox_build_flow_effects()
         
         audio, sample_rate = torchaudio.load(fn_sine, normalization=True)
-        signal_out = torchaudio.functional.biquad(audio, b0, b1, b2, a0, a1, a2)
+        signal_out = F.biquad(audio, b0, b1, b2, a0, a1, a2)
 
         assert(torch.allclose(sox_signal_out, signal_out, atol=1e-4))
+
+    def test_lowpass_sox_compliance(self):
+
+        """
+        Run a file through SoX lowpass filter
+        Then run through our lowpass filter
+        Should match
+        """
+
+        CUTOFF_FREQ = 3000
+
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("lowpass", [CUTOFF_FREQ])
+        sox_signal_out, sr = E.sox_build_flow_effects()
+
+        noise, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        signal_out = F.lowpass_biquad(noise, sample_rate, CUTOFF_FREQ)
+
+        print(sox_signal_out, signal_out)
+
+        assert(torch.allclose(sox_signal_out, signal_out, atol=1e-4))
+
+    def test_highpass_sox_compliance(self):
+
+        """
+        Run a file through SoX highpass filter
+        Then run through our highpass filter
+        Should match
+        """
+
+        CUTOFF_FREQ = 1000
+
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("highpass", [CUTOFF_FREQ])
+        sox_signal_out, sr = E.sox_build_flow_effects()
+
+        noise, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        signal_out = F.highpass_biquad(noise, sample_rate, CUTOFF_FREQ)
+
+        print(sox_signal_out, signal_out)
+
+        assert(torch.allclose(sox_signal_out, signal_out, atol=1e-4))
+
+
 
 if __name__ == '__main__':
     unittest.main()
