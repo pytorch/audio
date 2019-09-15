@@ -19,6 +19,7 @@ __all__ = [
     'highpass_biquad',
     'biquad',
     'lfilter',
+    'convolve',
 ]
 
 # TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
@@ -475,3 +476,4 @@ from torchaudio.functional_filtering import lowpass_biquad
 from torchaudio.functional_filtering import highpass_biquad
 from torchaudio.functional_filtering import biquad
 from torchaudio.functional_filtering import lfilter
+from torchaudio.functional_filtering import convolve

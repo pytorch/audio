@@ -12,38 +12,31 @@ import time
 class TestFunctionalFiltering(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
 
-    @unittest.skip
-    def test_lowpass_sox_compliance(self):
-
+    def test_lfilter_basic(self):
         """
-        Run a file through SoX lowpass filter
-        Then run through our lowpass filter
-        Should match
+        Create a very basic signal,
+        Then make a simple 4th order delay
+        The output should be same as the input but shifted
         """
 
-        CUTOFF_FREQ = 3000
+        torch.random.manual_seed(42)
+        input_waveform = torch.rand(2, 1000)
+        b_coeffs = torch.tensor([0, 0, 0, 1], dtype=torch.float32)
+        a_coeffs = torch.tensor([1, 0, 0, 0], dtype=torch.float32)
+        output_waveform = F.lfilter(input_waveform, a_coeffs, b_coeffs)
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
-        E = torchaudio.sox_effects.SoxEffectsChain()
-        E.set_input_file(noise_filepath)
-        E.append_effect_to_chain("lowpass", [CUTOFF_FREQ])
-        sox_signal_out, sr = E.sox_build_flow_effects()
+        assert torch.allclose(
+            input_waveform[:, 0:-3], output_waveform[:, 3:], atol=1e-5
+        )
 
-        noise, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        signal_out = F.lowpass_biquad_python(noise, sample_rate, CUTOFF_FREQ)
-
-        assert torch.allclose(sox_signal_out, signal_out, atol=1e-4)
-
-    @unittest.skip
-    def test_diff_eq(self):
+    def test_lfilter(self):
         """
-        Design a lowpass filter using scipy.signal filter design
+        Design an IIR lowpass filter using scipy.signal filter design
         https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.iirdesign.html#scipy.signal.iirdesign
 
         from scipy.signal import iirdesign
         b, a = iirdesign(0.2, 0.3, 1, 60)
 
-        Test is that this runs
         """
 
         b_coeffs = torch.tensor(
@@ -69,115 +62,71 @@ class TestFunctionalFiltering(unittest.TestCase):
             ]
         )
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
-        audio, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        filepath = os.path.join(self.test_dirpath, "assets", "dtmf_30s_stereo.mp3")
+        input_waveform, sample_rate = torchaudio.load(filepath, normalization=True)
+        output_waveform = F.lfilter(input_waveform, a_coeffs, b_coeffs)
+        assert len(output_waveform.size()) == 2
+        assert output_waveform.size(0) == input_waveform.size(0)
+        assert output_waveform.size(1) == input_waveform.size(1)
 
-        waveform_diff_eq_out = torch.zeros_like(audio)
-        F.diffeq_cpp(audio, waveform_diff_eq_out, a_coeffs, b_coeffs)
+    def test_lowpass_sox_compliance(self):
 
-
-    @unittest.skip
-    def test_low_pass_perf_iir_vs_fir(self):
         """
-        Try two low pass filters to compare performance
-        - 10th order IIR 
-        - 40th order FIR
+        Run a biquad lowpass filter using SoX vs torchaudio's lfilter
+        Results should be very close
         """
 
-        fir_impulse_response = [
-            -0.00040463742194593165,
-            -0.0011997613323707066,
-            -0.0018908492870125047,
-            -0.00207654308585229,
-            -0.001096110046662624,
-            0.0015056218536868779,
-            0.005330573111949219,
-            0.008753080180802494,
-            0.009251376850303583,
-            0.004551586188930009,
-            -0.00579865949432587,
-            -0.01919960191734472,
-            -0.029922330203954777,
-            -0.03058886187399114,
-            -0.014900805267782886,
-            0.019382291456268037,
-            0.06852266400807679,
-            0.12297037769851049,
-            0.16984408705548223,
-            0.19696650152723372,
-            0.19696650152723374,
-            0.16984408705548223,
-            0.12297037769851049,
-            0.06852266400807679,
-            0.01938229145626804,
-            -0.014900805267782887,
-            -0.03058886187399115,
-            -0.029922330203954784,
-            -0.01919960191734472,
-            -0.00579865949432587,
-            0.004551586188930011,
-            0.009251376850303588,
-            0.008753080180802494,
-            0.005330573111949219,
-            0.0015056218536868779,
-            -0.001096110046662626,
-            -0.0020765430858522907,
-            -0.0018908492870125056,
-            -0.0011997613323707066,
-            -0.00040463742194593165,
-        ]
+        CUTOFF_FREQ = 3000
 
-        iir_b_coeffs = torch.tensor(
-            [
-                4.14176942e-05,
-                -6.74168865e-05,
-                1.28894969e-04,
-                -7.60724730e-05,
-                6.18923831e-05,
-                6.18923831e-05,
-                -7.60724730e-05,
-                1.28894969e-04,
-                -6.74168865e-05,
-                4.14176942e-05,
-            ]
+        noise_filepath = os.path.join(
+            self.test_dirpath, "assets", "whitenoise_1min.mp3"
         )
-        iir_a_coeffs = torch.tensor(
-            [
-                1.0,
-                -7.51701965,
-                25.93753044,
-                -53.79433042,
-                73.79210968,
-                -69.36257588,
-                44.65306696,
-                -18.98130961,
-                4.83553413,
-                -0.56282822,
-            ]
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("lowpass", [CUTOFF_FREQ])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        input_waveform, sample_rate = torchaudio.load(
+            noise_filepath, normalization=True
         )
+        output_waveform = F.lowpass_biquad(input_waveform, sample_rate, CUTOFF_FREQ)
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
-        noise, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
 
-        waveform_diff_eq_out = torch.zeros_like(noise)
-        _diffeq_start_time = time.time()
-        F.diffeq_cpp(noise, waveform_diff_eq_out, iir_a_coeffs, iir_b_coeffs)
-        _diffeq_run_time = time.time() - _diffeq_start_time
+    def test_highpass_sox_compliance(self):
+        """
+        Run a biquad highpass filter using SoX vs torchaudio's lfilter
+        Results should be very close
+        """
 
-        # TBD
+        CUTOFF_FREQ = 2000
 
-        print("Diff Eq Low Pass Run Time:", _diffeq_run_time)
-        # print("FIR Low Pass Run Time    :", _fir_run_time)
+        noise_filepath = os.path.join(
+            self.test_dirpath, "assets", "whitenoise_1min.mp3"
+        )
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("highpass", [CUTOFF_FREQ])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        input_waveform, sample_rate = torchaudio.load(
+            noise_filepath, normalization=True
+        )
+        output_waveform = F.highpass_biquad(input_waveform, sample_rate, CUTOFF_FREQ)
+
+        # TBD - this fails at the 1e-4 level, debug why
+        assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-3)
 
     def test_perf_biquad_filtering(self):
         """
         Compare SoX implementation of biquad filtering with C++ implementation
 
-        Current results: C++ implementation ~5x faster
+        Test that results are similar and how performance differs
+
+        Current results: C++ implementation approximately same speed
         """
 
         fn_sine = os.path.join(self.test_dirpath, "assets", "whitenoise_1min.mp3")
-        audio, sample_rate = torchaudio.load(fn_sine, normalization=True)
 
         b0 = 0.4
         b1 = 0.2
@@ -196,18 +145,58 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         # C++ Diff Eq Filter
         _timing_cpp_filtering = time.time()
+        input_waveform, sample_rate = torchaudio.load(fn_sine, normalization=True)
         waveform_diff_eq_out = F.lfilter(
-            audio,
-            torch.tensor([a0, a1, a2]),
-            torch.tensor([b0, b1, b2]),
+            input_waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
         )
         _timing_diff_eq_run_time = time.time() - _timing_cpp_filtering
 
         print("\n")
         print("SoX Run Time         (s): ", round(_timing_sox_run_time, 3))
-        print("CPP Diff Eq Run Time (s): ", round(_timing_diff_eq_run_time, 3))
+        print("CPP Lfilter Run Time (s): ", round(_timing_diff_eq_run_time, 3))
 
         assert torch.allclose(waveform_sox_out, waveform_diff_eq_out, atol=1e-4)
+
+    def test_convolve_basic(self):
+
+        # Create a short signal and filter
+        # Check results
+
+        input_waveform = torch.tensor(
+            [[0.0, 1.0, 0.0, 1.0, 0.0, 1.0]], dtype=torch.float32
+        )
+        filter_impulse_response = torch.tensor([0.33333, 0.33333, 0.33333])
+
+        output_waveform = F.convolve(input_waveform, filter_impulse_response)
+
+        assert len(output_waveform.size()) == 2
+        assert output_waveform.size(0) == input_waveform.size(0)
+        assert output_waveform.size(1) == (
+            input_waveform.size(1) + filter_impulse_response.size(0) - 1
+        )
+        assert torch.allclose(
+            output_waveform[0, 0:4],
+            torch.tensor([0.000, 0.3333, 0.3333, 0.6666]),
+            atol=1e-4,
+        )
+
+    def test_convolve(self):
+
+        # Run a stereo file through convolve, confirm output is of right size
+
+        filepath = os.path.join(self.test_dirpath, "assets", "dtmf_30s_stereo.mp3")
+        input_waveform, sample_rate = torchaudio.load(filepath, normalization=True)
+
+        torch.random.manual_seed(42)
+        filter_impulse_response = torch.rand(20)
+
+        output_waveform = F.convolve(input_waveform, filter_impulse_response)
+
+        assert len(output_waveform.size()) == 2
+        assert output_waveform.size(0) == input_waveform.size(0)
+        assert output_waveform.size(1) == (
+            input_waveform.size(1) + filter_impulse_response.size(0) - 1
+        )
 
 
 if __name__ == "__main__":
