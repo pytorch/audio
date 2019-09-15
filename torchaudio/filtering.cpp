@@ -25,28 +25,33 @@ namespace audio {
     int n_order = a_coeffs.size(0); // n'th order filter
     assert(a_coeffs.size(0) == b_coeffs.size(0));
 
+    auto input_accessor = input_waveform.accessor<float,2>();
+    auto output_accessor = output_waveform.accessor<float,2>();    
+    auto a_coeffs_accessor = a_coeffs.accessor<float,1>();
+    auto b_coeffs_accessor = b_coeffs.accessor<float,1>();
+
     for (int64_t i_channel = 0; i_channel < n_channels; ++i_channel) {
 
       // allocate a temporary data structure of size 2 x n_order
-      double i_s[n_order]= { };
-      double o_s[n_order]= { };
+      float i_s[n_order]= { };
+      float o_s[n_order]= { };
     
       for (int64_t i_frame = 0; i_frame < n_frames; ++i_frame) {
 
         // populate the output
-        i_s[n_order-1] = input_waveform[i_channel][i_frame].item<double>();
-        double o0 = 0;
+        i_s[n_order-1] = input_accessor[i_channel][i_frame];
+        float o0 = 0;
         for (int i = 0; i < n_order; ++i) {
-          o0 += i_s[i] * b_coeffs[n_order - i - 1].item<double>();
+          o0 += i_s[i] * b_coeffs_accessor[n_order - i - 1];
           if (i != n_order - 1) {
-            o0 -= o_s[i] * a_coeffs[n_order - i - 1].item<double>();
+            o0 -= o_s[i] * a_coeffs_accessor[n_order - i - 1];
           }
         }
-        o0 = o0 / a_coeffs[0].item<double>();
+        o0 = o0 / a_coeffs_accessor[0];
         if (o0 > 1) o0 = 1;
         if (o0 < -1) o0 = -1;
         o_s[n_order-1] = o0;
-        output_waveform[i_channel][i_frame] = o0;
+        output_accessor[i_channel][i_frame] = o0;
         
         // shift everything over
         for (int i = 0; i < (n_order - 1); ++i) {
@@ -62,12 +67,12 @@ namespace audio {
   void biquad(
     at::Tensor& input_waveform,
     at::Tensor& output_waveform,
-    double b0,
-    double b1,
-    double b2,
-    double a0,
-    double a1,
-    double a2
+    float b0,
+    float b1,
+    float b2,
+    float a0,
+    float a1,
+    float a2
   ) {
 
     int64_t n_channels = input_waveform.size(0);
@@ -82,16 +87,19 @@ namespace audio {
     a1 = a1 / a0;
     a2 = a2 / a0;
 
+    auto input_accessor = input_waveform.accessor<float,2>();
+    auto output_accessor = output_waveform.accessor<float,2>();
+
     for (int64_t i_channel = 0; i_channel < n_channels; ++i_channel) {
 
-      double pi1 = 0;
-      double pi2 = 0;
-      double po1 = 0;
-      double po2 = 0;
-      double o0, i0;
+      float pi1 = 0;
+      float pi2 = 0;
+      float po1 = 0;
+      float po2 = 0;
+      float o0, i0;
     
       for (int64_t i_frame = 0; i_frame < n_frames; ++i_frame) {
-        i0 = input_waveform[i_channel][i_frame].item<double>();
+        i0 = input_accessor[i_channel][i_frame];
         o0 = (i0 * b0 + pi1 * b1 + pi2 * b2 - po1 * a1 - po2 * a2);
         
         // increment time forward
@@ -104,7 +112,7 @@ namespace audio {
         } else if (o0 < -1) {
           o0 = -1;
         }
-        output_waveform[i_channel][i_frame] = o0;
+        output_accessor[i_channel][i_frame] = o0;
       }
     }
   }
