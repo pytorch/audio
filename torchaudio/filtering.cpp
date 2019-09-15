@@ -8,12 +8,12 @@
 namespace torch {
 namespace audio {
 
-
+  // N.B. only handles floating point right now
   void diff_eq(
-    at::Tensor& input_waveform,
+    at::Tensor const & input_waveform,
     at::Tensor& output_waveform,
-    at::Tensor& a_coeffs,
-    at::Tensor& b_coeffs
+    at::Tensor const & a_coeffs,
+    at::Tensor const & b_coeffs
   ) {
 
     // assumes waveform is normalized between 1 and -1
@@ -35,12 +35,14 @@ namespace audio {
     for (int64_t i_channel = 0; i_channel < n_channels; ++i_channel) {
 
       // allocate a temporary data structure of size 2 x (n_order + 1)
+      // set to 0 because initial conditions are 0
       float i_s[n_order]= { };
       float o_s[n_order]= { };
     
       for (int64_t i_frame = 0; i_frame < n_frames; ++i_frame) {
 
-        // calculate the output at time i_frame
+        // calculate the output at time i_frame by iterating through
+        // inputs / outputs at previous time steps and multiplying by coeffs
         i_s[n_order-1] = input_accessor[i_channel][i_frame];
         float o0 = 0;
         for (int i = 0; i < n_order; ++i) {

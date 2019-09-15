@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import torch
-
+from _torch_filtering import diff_eq as diffeq_cpp
 
 __all__ = [
     'istft',
@@ -471,9 +471,36 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 
     return complex_specgrams_stretch
 
+def convolve(input_waveform, impulse_response):
+
+    n_channels, n_frames = input_waveform.size()
+
+    # Perform convolution for each channel
+    assert input_waveform.dtype == torch.float32
+    assert impulse_response.dtype == torch.float32
+
+    # N.B. - can we do all channels at once?
+    channel_output_waveforms = []
+    for i_channel in range(n_channels):
+        channel_output_waveforms.append(
+
+            # torch nn conv requires 3D tensor
+            torch.nn.functional.conv_transpose1d(
+                input_waveform[i_channel, :].unsqueeze(0).unsqueeze(0),
+                impulse_response.unsqueeze(0).unsqueeze(0),
+            ).squeeze(0).squeeze(0)
+        )
+
+    return torch.stack(channel_output_waveforms)
+
+
+def lfilter(input_waveform, a_coeffs, b_coeffs):
+    output_waveform = torch.zeros_like(input_waveform)
+    assert input_waveform.dtype == torch.float32
+
+    diffeq_cpp(input_waveform, output_waveform, a_coeffs, b_coeffs)
+    return output_waveform
 
 from torchaudio.functional_filtering import lowpass_biquad
 from torchaudio.functional_filtering import highpass_biquad
 from torchaudio.functional_filtering import biquad
-from torchaudio.functional_filtering import lfilter
-from torchaudio.functional_filtering import convolve
