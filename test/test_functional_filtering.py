@@ -13,7 +13,7 @@ class TestFunctionalFiltering(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
 
     def test_lfilter_basic(self):
-        """
+        """l
         Create a very basic signal,
         Then make a simple 4th order delay
         The output should be same as the input but shifted
@@ -192,9 +192,9 @@ class TestFunctionalFiltering(unittest.TestCase):
         )
         _timing_diff_eq_run_time = time.time() - _timing_cpp_filtering
 
-        print("\n")
-        print("SoX Run Time         (s): ", round(_timing_sox_run_time, 3))
-        print("CPP Lfilter Run Time (s): ", round(_timing_diff_eq_run_time, 3))
+        # print("\n")
+        # print("SoX Run Time         (s): ", round(_timing_sox_run_time, 3))
+        # print("CPP Lfilter Run Time (s): ", round(_timing_diff_eq_run_time, 3))
 
         assert torch.allclose(waveform_sox_out, waveform_diff_eq_out, atol=1e-4)
 

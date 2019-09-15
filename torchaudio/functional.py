@@ -1,6 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import torch
+from torchaudio.functional_filtering import lowpass_biquad
+from torchaudio.functional_filtering import highpass_biquad
+from torchaudio.functional_filtering import biquad
 from _torch_filtering import diff_eq as diffeq_cpp
 
 __all__ = [
@@ -471,6 +474,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 
     return complex_specgrams_stretch
 
+
 def convolve(input_waveform, impulse_response):
 
     n_channels, n_frames = input_waveform.size()
@@ -500,7 +504,3 @@ def lfilter(input_waveform, a_coeffs, b_coeffs):
 
     diffeq_cpp(input_waveform, output_waveform, a_coeffs, b_coeffs)
     return output_waveform
-
-from torchaudio.functional_filtering import lowpass_biquad
-from torchaudio.functional_filtering import highpass_biquad
-from torchaudio.functional_filtering import biquad
