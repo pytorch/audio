@@ -1,24 +1,27 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import torch
-import math
 import torchaudio
 
-"""
-Biquad filtering approach based on SoX implementation 14.4.2
+__all__ = [
+    "lowpass_depr",
+    "biquad_python",
+    "lowpass_biquad_python",
+    "highpass_biquad_python",
+    "biquad_cpp",
+    "diffeq_cpp",
+]
 
-Performance needs to be evaluated against SoX
-
-"""
-
-__all__ = ["lowpass1", "biquad", "lowpass_biquad", "highpass_biquad"]
+from _torch_filtering import biquad as biquad_cpp
+from _torch_filtering import diff_eq as diffeq_cpp
 
 
 def _dB2Linear(x):
+
     return math.exp(x * math.log(10) / 20.0)
 
 
-def highpass_biquad(input, sr, cutoff_freq, Q=0.707):
+def highpass_biquad_python(input, sr, cutoff_freq, Q=0.707):
 
     GAIN = 1
     w0 = 2 * math.pi * cutoff_freq / sr
@@ -32,10 +35,10 @@ def highpass_biquad(input, sr, cutoff_freq, Q=0.707):
     a0 = 1 + alpha
     a1 = -2 * math.cos(w0)
     a2 = 1 - alpha
-    return biquad(input, b0, b1, b2, a0, a1, a2)
+    return biquad_python(input, b0, b1, b2, a0, a1, a2)
 
 
-def lowpass_biquad(input, sr, cutoff_freq, Q=0.707):
+def lowpass_biquad_python(input, sr, cutoff_freq, Q=0.707):
 
     GAIN = 1
     w0 = 2 * math.pi * cutoff_freq / sr
@@ -49,69 +52,10 @@ def lowpass_biquad(input, sr, cutoff_freq, Q=0.707):
     a0 = 1 + alpha
     a1 = -2 * math.cos(w0)
     a2 = 1 - alpha
-    return biquad(input, b0, b1, b2, a0, a1, a2)
+    return biquad_python(input, b0, b1, b2, a0, a1, a2)
 
 
-
-
-def diff_eq_calculate(waveform, a_coeffs, b_coeffs):
-    """
-    waveform is the input audio tensor of size [n_channels, n_frames]
-
-    expresses general difference equation of the form:
-
-    a0 * o[n] + a1 * o[n-1] + a2 * o[n-2] + ... =
-    b0 * i[n] + b1 * i[n-1] + b2 * i[n-2] + ...
-
-    a_coeffs input list of length and [a0, a1, a2, ...]
-    b_coeffs input list length and [b0, b1, b2, ...]
-
-    """
-
-    def clip(v):
-        return max(-1.0, min(1.0, v))
-
-    [n_channels, n_frames] = waveform.size()    
-    n_a_coeffs = len(a_coeffs)
-    n_b_coeffs = len(b_coeffs)
-    n_order = max([n_a_coeffs, n_b_coeffs])
-    assert(n_order > 0 and n_a_coeffs > 0)
-    a0 = a_coeffs[0]
-
-    coeff_matrix = torch.zeros(2, n_order, dtype=torch.float)
-    # fill in the output coefficients
-    for i_a, a in enumerate(a_coeffs):
-        if i_a > 0:
-            coeff_matrix[0, n_order - i_a - 1] = -1.0 * a / a0
-    # fill in the input coefficients
-    for i_b, b in enumerate(b_coeffs):
-        coeff_matrix[1, n_order - i_b - 1] = float(b) / a0
-
-    print("Coefficients matrix", coeff_matrix)
-
-    # pad waveform by the order of the filter
-    pad = torch.zeros(n_channels, n_order - 1)
-    
-    padded_waveform = torch.cat([pad, waveform], dim = 1)
-    print("padded waveform", padded_waveform, padded_waveform.size())
-
-    dat = torch.stack([torch.zeros_like(padded_waveform), padded_waveform])
-    #print("padded data", dat.size(), dat)
-    coeff_flattened = coeff_matrix.view(-1)
-    for i in range(n_frames):
-        for i_channel in range(n_channels):
-            sub = dat[
-                [
-                    slice(None),
-                    i_channel,
-                    torch.arange(i, i + n_order).long(),
-                ]
-            ]
-            dat[0, i_channel, i + n_order - 1] = clip(torch.dot(sub.view(-1), coeff_flattened))
-    
-    return dat[[0, slice(None), torch.arange(n_order - 1, n_frames + n_order-1)]]
-
-def biquad(input, b0, b1, b2, a0, a1, a2):
+def biquad_python(input, b0, b1, b2, a0, a1, a2):
 
     def clip(v):
         return max(-1.0, min(1.0, v))
@@ -142,7 +86,8 @@ def biquad(input, b0, b1, b2, a0, a1, a2):
 
     return output
 
-def lowpass1(
+
+def lowpass_depr(
     waveform,  # type: Tensor
     sample_rate,  # type: int
     n_fft,  # type: int
@@ -155,10 +100,11 @@ def lowpass1(
     normalized=False,  # type: Optional[bool]
     onesided=True,  # type: Optional[bool]
 ):
+
     # type: (...) -> Tensor
     r"""Simple low pass filter.  Performs Short Time Fourier Transform, zeros out elements
         above a threshold requency, and inverts Fourier Transform.
-        
+
     Args:
         waveform (torch.Tensor): Audio waveform that has a size of (channel, n_frames)
         sample_rate (int): Audio waveform sampling rate in frames / sec (Hz)
@@ -230,27 +176,4 @@ def lowpass1(
 
 
 if __name__ == '__main__':
-
-    import _torch_filtering
-    x = torch.rand(1, 8000 * 10, dtype=torch.float)
-
-    
-    b0 = 0.3
-    b1 = 0.2
-    b2 = 0.4
-    a0 = 1.0
-    a1 = 0.2
-    a2 = 0.4
-    print(_torch_filtering.biquad(x, x, a0, a1, a2, b0,b1, b2))
-    
-
-    """startdiff = time.time()
-    v = diff_eq_calculate(x, [a0, a1, a2], [b0, b1, b2])
-    enddiff = time.time()
-    y = biquad(x, b0, b1, b2, a0, a1, a2)
-    end2 = time.time()
-    print(y.size())
-    print(v.size())
-    print(v, y)
-    print("time1", enddiff - startdiff)
-    print("time2", end2 - enddiff)"""
+    pass
