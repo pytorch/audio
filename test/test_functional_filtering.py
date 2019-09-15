@@ -171,13 +171,9 @@ class TestFunctionalFiltering(unittest.TestCase):
 
     def test_perf_biquad_filtering(self):
         """
-        Try implementations of biquad filtering and test speed
-        - 1.) Call to SoX
-        - 2.) Call to cpp biquad function
-        - 3.) Call to cpp general difference equation function
-        - 4.) Call to Python biquad function
+        Compare SoX implementation of biquad filtering with C++ implementation
 
-        Current results: 1 ~20x faster than 2, 2 ~ 2x faster than 3, 3 ~8x faster than 4
+        Current results: C++ implementation ~5x faster
         """
 
         fn_sine = os.path.join(self.test_dirpath, "assets", "whitenoise_1min.mp3")
@@ -198,40 +194,20 @@ class TestFunctionalFiltering(unittest.TestCase):
         waveform_sox_out, sr = E.sox_build_flow_effects()
         _timing_sox_run_time = time.time() - _timing_sox
 
-        # CPP Filtering with Biquad
-        waveform_cpp_out = torch.zeros_like(audio)
+        # C++ Diff Eq Filter
         _timing_cpp_filtering = time.time()
-        F.biquad_cpp(audio, waveform_cpp_out, b0, b1, b2, a0, a1, a2)
-        _timing_cpp_run_time = time.time() - _timing_cpp_filtering
-
-        # Diff Eq Filter
-        waveform_diff_eq_out = torch.zeros_like(audio)
-        _timing_cpp_filtering = time.time()
-        F.diffeq_cpp(
+        waveform_diff_eq_out = F.lfilter(
             audio,
-            waveform_diff_eq_out,
             torch.tensor([a0, a1, a2]),
             torch.tensor([b0, b1, b2]),
         )
         _timing_diff_eq_run_time = time.time() - _timing_cpp_filtering
 
-        # Native Python Implementation
-        #_timing_python = time.time()
-        #waveform_python_out = F.biquad_python(audio, b0, b1, b2, a0, a1, a2)
-        #_timing_python_run_time = time.time() - _timing_python
+        print("\n")
+        print("SoX Run Time         (s): ", round(_timing_sox_run_time, 3))
+        print("CPP Diff Eq Run Time (s): ", round(_timing_diff_eq_run_time, 3))
 
-        print("SoX Run Time          : ", round(_timing_sox_run_time, 3))
-        print("CPP Biquad Run Time   : ", round(_timing_cpp_run_time, 3))
-        print("CPP Diff Eq Run Time  : ", round(_timing_diff_eq_run_time, 3))
-
-
-        #assert torch.allclose(waveform_sox_out, waveform_python_out, atol=1e-5)
-        assert torch.allclose(waveform_sox_out, waveform_cpp_out, atol=1e-4)
-        #assert torch.allclose(waveform_sox_out, waveform_diff_eq_out, atol=1e-5)
-
-        #print("Python Run Time       : ", round(_timing_python_run_time, 3))
-
-        assert( 1 == 0 )
+        assert torch.allclose(waveform_sox_out, waveform_diff_eq_out, atol=1e-4)
 
 
 if __name__ == "__main__":

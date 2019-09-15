@@ -15,12 +15,10 @@ __all__ = [
     'angle',
     'magphase',
     'phase_vocoder',
-    'lowpass_depr',
-    'lowpass_biquad_python',
-    'highpass_biquad_python',
-    'biquad_python',
-    'biquad_cpp',
-    'diffeq_cpp',
+    'lowpass_biquad',
+    'highpass_biquad',
+    'biquad',
+    'lfilter',
 ]
 
 # TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
@@ -473,9 +471,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     return complex_specgrams_stretch
 
 
-from torchaudio.functional_filtering import lowpass_depr
-from torchaudio.functional_filtering import lowpass_biquad_python
-from torchaudio.functional_filtering import highpass_biquad_python
-from torchaudio.functional_filtering import biquad_python
-from torchaudio.functional_filtering import biquad_cpp
-from torchaudio.functional_filtering import diffeq_cpp
+from torchaudio.functional_filtering import lowpass_biquad
+from torchaudio.functional_filtering import highpass_biquad
+from torchaudio.functional_filtering import biquad
+from torchaudio.functional_filtering import lfilter
