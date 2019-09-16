@@ -176,7 +176,10 @@ def istft(stft_matrix,          # type: Tensor
 @torch.jit.script
 def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, normalized):
     # type: (Tensor, int, Tensor, int, int, int, int, bool) -> Tensor
-    r"""Create a spectrogram from a raw audio signal.
+    r"""
+    spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, normalized)
+    
+    Create a spectrogram from a raw audio signal.
 
     Args:
         waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
@@ -213,7 +216,10 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
 @torch.jit.script
 def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
     # type: (Tensor, float, float, float, Optional[float]) -> Tensor
-    r"""Turns a tensor from the power/amplitude scale to the decibel scale.
+    r"""
+    amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None)
+
+    Turns a tensor from the power/amplitude scale to the decibel scale.
 
     This output depends on the maximum value in the input tensor, and so
     may return different values for an audio clip split into snippets vs. a
@@ -244,7 +250,10 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
 @torch.jit.script
 def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
     # type: (int, float, float, int) -> Tensor
-    r""" Create a frequency bin conversion matrix.
+    r"""
+    create_fb_matrix(n_freqs, f_min, f_max, n_mels)
+
+    Create a frequency bin conversion matrix.
 
     Args:
         n_freqs (int): Number of frequencies to highlight/apply
@@ -282,7 +291,10 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
 @torch.jit.script
 def create_dct(n_mfcc, n_mels, norm):
     # type: (int, int, Optional[str]) -> Tensor
-    r"""Creates a DCT transformation matrix with shape (``n_mels``, ``n_mfcc``),
+    r"""
+    create_dct(n_mfcc, n_mels, norm)
+
+    Creates a DCT transformation matrix with shape (``n_mels``, ``n_mfcc``),
     normalized depending on norm.
 
     Args:
@@ -310,7 +322,10 @@ def create_dct(n_mfcc, n_mels, norm):
 @torch.jit.script
 def mu_law_encoding(x, quantization_channels):
     # type: (Tensor, int) -> Tensor
-    r"""Encode signal based on mu-law companding.  For more info see the
+    r"""
+    mu_law_encoding(x, quantization_channels)
+
+    Encode signal based on mu-law companding.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
     This algorithm assumes the signal has been scaled to between -1 and 1 and
@@ -336,7 +351,10 @@ def mu_law_encoding(x, quantization_channels):
 @torch.jit.script
 def mu_law_decoding(x_mu, quantization_channels):
     # type: (Tensor, int) -> Tensor
-    r"""Decode mu-law encoded signal.  For more info see the
+    r"""
+    mu_law_decoding(x_mu, quantization_channels)
+    
+    Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
     This expects an input with values between 0 and quantization_channels - 1
