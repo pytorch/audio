@@ -6,7 +6,7 @@
 namespace torch {
 namespace audio {
 
-  // N.B. only handles floating point right now
+  // N.B. TBD - Test with CUDA
   at::Tensor lfilter(
     at::Tensor const & waveform,
     at::Tensor const & a_coeffs,

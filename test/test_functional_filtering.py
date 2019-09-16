@@ -13,20 +13,20 @@ class TestFunctionalFiltering(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
 
     def test_lfilter_basic(self):
-        """l
+        """
         Create a very basic signal,
         Then make a simple 4th order delay
         The output should be same as the input but shifted
         """
 
         torch.random.manual_seed(42)
-        input_waveform = torch.rand(2, 1000)
+        waveform = torch.rand(2, 1000)
         b_coeffs = torch.tensor([0, 0, 0, 1], dtype=torch.float32)
         a_coeffs = torch.tensor([1, 0, 0, 0], dtype=torch.float32)
-        output_waveform = F.lfilter(input_waveform, a_coeffs, b_coeffs)
+        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
 
         assert torch.allclose(
-            input_waveform[:, 0:-3], output_waveform[:, 3:], atol=1e-5
+            waveform[:, 0:-3], output_waveform[:, 3:], atol=1e-5
         )
 
     def test_lfilter(self):
@@ -63,11 +63,11 @@ class TestFunctionalFiltering(unittest.TestCase):
         )
 
         filepath = os.path.join(self.test_dirpath, "assets", "dtmf_30s_stereo.mp3")
-        input_waveform, sample_rate = torchaudio.load(filepath, normalization=True)
-        output_waveform = F.lfilter(input_waveform, a_coeffs, b_coeffs)
+        waveform, sample_rate = torchaudio.load(filepath, normalization=True)
+        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
         assert len(output_waveform.size()) == 2
-        assert output_waveform.size(0) == input_waveform.size(0)
-        assert output_waveform.size(1) == input_waveform.size(1)
+        assert output_waveform.size(0) == waveform.size(0)
+        assert output_waveform.size(1) == waveform.size(1)
 
     def test_lowpass_sox_compliance(self):
 
@@ -86,10 +86,10 @@ class TestFunctionalFiltering(unittest.TestCase):
         E.append_effect_to_chain("lowpass", [CUTOFF_FREQ])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        input_waveform, sample_rate = torchaudio.load(
+        waveform, sample_rate = torchaudio.load(
             noise_filepath, normalization=True
         )
-        output_waveform = F.lowpass_biquad(input_waveform, sample_rate, CUTOFF_FREQ)
+        output_waveform = F.lowpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
 
@@ -109,10 +109,10 @@ class TestFunctionalFiltering(unittest.TestCase):
         E.append_effect_to_chain("highpass", [CUTOFF_FREQ])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        input_waveform, sample_rate = torchaudio.load(
+        waveform, sample_rate = torchaudio.load(
             noise_filepath, normalization=True
         )
-        output_waveform = F.highpass_biquad(input_waveform, sample_rate, CUTOFF_FREQ)
+        output_waveform = F.highpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
 
         # TBD - this fails at the 1e-4 level, debug why
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-3)
@@ -145,9 +145,9 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         # C++ Diff Eq Filter
         _timing_cpp_filtering = time.time()
-        input_waveform, sample_rate = torchaudio.load(fn_sine, normalization=True)
+        waveform, sample_rate = torchaudio.load(fn_sine, normalization=True)
         waveform_diff_eq_out = F.lfilter(
-            input_waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
+            waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
         )
         _timing_diff_eq_run_time = time.time() - _timing_cpp_filtering
 

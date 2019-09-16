@@ -511,7 +511,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 
 def biquad(waveform, b0, b1, b2, a0, a1, a2):
 
-    assert waveform.dtype == torch.float32
+    assert(waveform.dtype == torch.float32)
 
     output_waveform = lfilter(
         waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
