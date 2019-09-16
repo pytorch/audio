@@ -178,7 +178,7 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
     # type: (Tensor, int, Tensor, int, int, int, int, bool) -> Tensor
     r"""
     spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, normalized)
-    
+
     Create a spectrogram from a raw audio signal.
 
     Args:
@@ -353,7 +353,7 @@ def mu_law_decoding(x_mu, quantization_channels):
     # type: (Tensor, int) -> Tensor
     r"""
     mu_law_decoding(x_mu, quantization_channels)
-    
+
     Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
