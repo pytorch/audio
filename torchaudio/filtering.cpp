@@ -1,36 +1,41 @@
 #include <torch/extension.h>
-
-//#include <algorithm>
-//#include <cstdint>
-//#include <stdexcept>
-//#include <vector>
+#ifdef WITH_CUDA
+#include <cuda.h>
+#endif
 
 namespace torch {
 namespace audio {
 
   // N.B. only handles floating point right now
-  void diff_eq(
-    at::Tensor const & input_waveform,
-    at::Tensor& output_waveform,
+  at::Tensor lfilter(
+    at::Tensor const & waveform,
     at::Tensor const & a_coeffs,
     at::Tensor const & b_coeffs
   ) {
 
     // assumes waveform is normalized between 1 and -1
+    assert(waveform.dtype == torch::float32);
+    assert(a_coeffs.size(0) == b_coeffs.size(0));
+    int n_order = a_coeffs.size(0); // n'th order - 1 filter
 
-    int64_t n_channels = input_waveform.size(0);
-    int64_t n_frames = input_waveform.size(1);
+    int64_t n_channels = waveform.size(0);
+    int64_t n_frames = waveform.size(1);
 
-    assert(output_waveform.size(0) == n_channels);
-    assert(output_waveform.size(1) == n_frames);
+    // initialize the output tensor
+    torch::Tensor output_waveform = torch::zeros({n_channels, n_frames});
 
-    auto input_accessor = input_waveform.accessor<float,2>();
+#ifdef WITH_CUDA
+    auto input_accessor = waveform.packed_accessor64<float,2>();
+    auto output_accessor = output_waveform.packed_accessor64<float,2>();    
+    auto a_coeffs_accessor = a_coeffs.packed_accessor64<float,1>();
+    auto b_coeffs_accessor = b_coeffs.packed_accessor64<float,1>();
+#endif
+#ifndef WITH_CUDA
+    auto input_accessor = waveform.accessor<float,2>();
     auto output_accessor = output_waveform.accessor<float,2>();    
     auto a_coeffs_accessor = a_coeffs.accessor<float,1>();
     auto b_coeffs_accessor = b_coeffs.accessor<float,1>();
-
-    int n_order = a_coeffs.size(0); // n'th order - 1 filter
-    assert(a_coeffs.size(0) == b_coeffs.size(0));
+#endif
 
     for (int64_t i_channel = 0; i_channel < n_channels; ++i_channel) {
 
@@ -67,6 +72,7 @@ namespace audio {
         }
       }
     }
+    return output_waveform;
   }
 
 }}
@@ -74,7 +80,11 @@ namespace audio {
 
 PYBIND11_MODULE(_torch_filtering, m) {
   m.def(
-      "diff_eq",
-      &torch::audio::diff_eq,
+      "lfilter",
+      &torch::audio::lfilter,
       "Executes difference equation");
+#ifdef WITH_CUDA
+  m.attr("CUDA_VERSION") = CUDA_VERSION;
+#endif
+
 }

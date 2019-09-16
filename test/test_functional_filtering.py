@@ -69,47 +69,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert output_waveform.size(0) == input_waveform.size(0)
         assert output_waveform.size(1) == input_waveform.size(1)
 
-    def test_convolve_basic(self):
-
-        # Create a short signal and filter
-        # Check results
-
-        input_waveform = torch.tensor(
-            [[0.0, 1.0, 0.0, 1.0, 0.0, 1.0]], dtype=torch.float32
-        )
-        filter_impulse_response = torch.tensor([0.33333, 0.33333, 0.33333])
-
-        output_waveform = F.convolve(input_waveform, filter_impulse_response)
-
-        assert len(output_waveform.size()) == 2
-        assert output_waveform.size(0) == input_waveform.size(0)
-        assert output_waveform.size(1) == (
-            input_waveform.size(1) + filter_impulse_response.size(0) - 1
-        )
-        assert torch.allclose(
-            output_waveform[0, 0:4],
-            torch.tensor([0.000, 0.3333, 0.3333, 0.6666]),
-            atol=1e-4,
-        )
-
-    def test_convolve(self):
-
-        # Run a stereo file through convolve, confirm output is of right size
-
-        filepath = os.path.join(self.test_dirpath, "assets", "dtmf_30s_stereo.mp3")
-        input_waveform, sample_rate = torchaudio.load(filepath, normalization=True)
-
-        torch.random.manual_seed(42)
-        filter_impulse_response = torch.rand(20)
-
-        output_waveform = F.convolve(input_waveform, filter_impulse_response)
-
-        assert len(output_waveform.size()) == 2
-        assert output_waveform.size(0) == input_waveform.size(0)
-        assert output_waveform.size(1) == (
-            input_waveform.size(1) + filter_impulse_response.size(0) - 1
-        )
-
     def test_lowpass_sox_compliance(self):
 
         """
