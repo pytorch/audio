@@ -31,7 +31,7 @@ class SoxEffectsChain(object):
 
     Args:
         normalization (bool, number, or callable, optional): If boolean `True`, then output is divided by `1 << 31`
-            (assumes signed 32-bit audio), and normalizes to `[0, 1]`. If `number`, then output is divided by that
+            (assumes signed 32-bit audio), and normalizes to `[-1, 1]`. If `number`, then output is divided by that
             number. If `callable`, then the output is passed as a parameter to the given function, then the
             output is divided by the result. (Default: ``True``)
         channels_first (bool, optional): Set channels first or length first in result.  (Default: ``True``)
