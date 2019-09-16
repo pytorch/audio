@@ -197,8 +197,7 @@ def _num_stft_bins(signal_len, fft_len, hop_length, pad):
 
 
 @pytest.mark.parametrize('complex_specgrams', [
-    torch.randn(1, 2, 1025, 400, 2),
-    torch.randn(1, 1025, 400, 2)
+    torch.randn(2, 1025, 400, 2)
 ])
 @pytest.mark.parametrize('rate', [0.5, 1.01, 1.3])
 @pytest.mark.parametrize('hop_length', [256])
