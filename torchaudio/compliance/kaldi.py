@@ -814,7 +814,7 @@ def resample_waveform(waveform, orig_freq, new_freq, lowpass_filter_width=6):
     window_width = lowpass_filter_width / (2.0 * lowpass_cutoff)
     first_indices, weights = _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit,
                                                          window_width, lowpass_cutoff, lowpass_filter_width)
-    weights = weights.to(waveform.device)
+    weights = weights.to(waveform.device)  # TODO Create weights on device directly
 
     assert first_indices.dim() == 1
     # TODO figure a better way to do this. conv1d reaches every element i*stride + padding
