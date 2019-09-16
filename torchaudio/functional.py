@@ -1,9 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import torch
-from torchaudio.functional_filtering import lowpass_biquad
-from torchaudio.functional_filtering import highpass_biquad
-from torchaudio.functional_filtering import biquad
+from torchaudio.functional_sox_convenience import lowpass_biquad, highpass_biquad, biquad
 from _torch_filtering import diff_eq as diffeq_cpp
 
 __all__ = [
@@ -476,6 +474,16 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 
 
 def convolve(input_waveform, impulse_response):
+    r"""Evaluate 1D convolution of impulse response on input waveform by channel
+    Thin wrapper around torch.nn.functional.conv_transpose1d
+
+    Args:
+        input_waveform (torch.Tensor): Tensor shape of `(n_channels, n_frames)`
+        impulse_response (torch.Tensor): Tensor shape of `(n_response_length)`
+
+    Returns:
+        torch.Tensor: output waveform filtered, shape `(n_channels, n_frames + n_response_length - 1)`
+    """
 
     n_channels, n_frames = input_waveform.size()
 
@@ -499,6 +507,25 @@ def convolve(input_waveform, impulse_response):
 
 
 def lfilter(input_waveform, a_coeffs, b_coeffs):
+    r"""Evaluate a difference equation on an input waveform
+    of form a0 * y[n] = b0 * x[n] + b1 * x[n-1] + ... - a1 * y[n-1] - a2 * y[n-2] ....
+    All initial inputs / outputs are zero
+
+    Args:
+        input_waveform (torch.Tensor): Tensor shape of `(n_channels, n_frames)`
+        a_coeffs (torch.Tensor): difference equation denominator coefficients ordered
+                   by time delay, e.g. [a0, a1, a2, ...], shape `(n_coeffs)`
+        b_coeffs (torch.Tensor): difference equation numerator coefficients ordered
+                   by time delay, e.g. [b0, b1, b2, ...], shape `(n_coeffs)`
+
+        N.B. a_coeffs and b_coeffs should be the exact same length, padding with 0's
+        may be required
+        N.B. all tensors must be of float32 type
+
+    Returns:
+        torch.Tensor: output waveform filtered, shape `(n_channels, n_frames)`
+    """
+
     output_waveform = torch.zeros_like(input_waveform)
     assert input_waveform.dtype == torch.float32
 
