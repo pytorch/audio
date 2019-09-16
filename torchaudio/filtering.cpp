@@ -41,8 +41,9 @@ namespace audio {
 
       // allocate a temporary data structure of size 2 x (n_order + 1)
       // set to 0 because initial conditions are 0
-      float i_s[n_order]= { };
-      float o_s[n_order]= { };
+      float i_s[n_order], o_s[n_order];
+      memset( i_s, 0, n_order*sizeof(float) );
+      memset( o_s, 0, n_order*sizeof(float) );
     
       for (int64_t i_frame = 0; i_frame < n_frames; ++i_frame) {
 
