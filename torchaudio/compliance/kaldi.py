@@ -814,6 +814,7 @@ def resample_waveform(waveform, orig_freq, new_freq, lowpass_filter_width=6):
     window_width = lowpass_filter_width / (2.0 * lowpass_cutoff)
     first_indices, weights = _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit,
                                                          window_width, lowpass_cutoff, lowpass_filter_width)
+    weights = weights.to(waveform.device)  # TODO Create weights on device directly
 
     assert first_indices.dim() == 1
     # TODO figure a better way to do this. conv1d reaches every element i*stride + padding
@@ -825,8 +826,10 @@ def resample_waveform(waveform, orig_freq, new_freq, lowpass_filter_width=6):
     num_channels, wave_len = waveform.size()
     window_size = weights.size(1)
     tot_output_samp = _get_num_LR_output_samples(wave_len, orig_freq, new_freq)
-    output = torch.zeros((num_channels, tot_output_samp))
-    eye = torch.eye(num_channels).unsqueeze(2)  # size (num_channels, num_channels, 1)
+    output = torch.zeros((num_channels, tot_output_samp),
+                         device=waveform.device)
+    # eye size: (num_channels, num_channels, 1)
+    eye = torch.eye(num_channels, device=waveform.device).unsqueeze(2)
     for i in range(first_indices.size(0)):
         wave_to_conv = waveform
         first_index = int(first_indices[i].item())
