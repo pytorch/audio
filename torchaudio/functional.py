@@ -524,10 +524,10 @@ def _dB2Linear(x):
     return math.exp(x * math.log(10) / 20.0)
 
 
-def highpass_biquad(waveform, sr, cutoff_freq, Q=0.707):
+def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
 
     GAIN = 1
-    w0 = 2 * math.pi * cutoff_freq / sr
+    w0 = 2 * math.pi * cutoff_freq / sample_rate
     A = math.exp(GAIN / 40.0 * math.log(10))
     alpha = math.sin(w0) / 2 / Q
     mult = _dB2Linear(max(GAIN, 0))
@@ -541,10 +541,10 @@ def highpass_biquad(waveform, sr, cutoff_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-def lowpass_biquad(waveform, sr, cutoff_freq, Q=0.707):
+def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
 
     GAIN = 1
-    w0 = 2 * math.pi * cutoff_freq / sr
+    w0 = 2 * math.pi * cutoff_freq / sample_rate
     A = math.exp(GAIN / 40.0 * math.log(10))
     alpha = math.sin(w0) / 2 / Q
     mult = _dB2Linear(max(GAIN, 0))
