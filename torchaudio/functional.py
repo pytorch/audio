@@ -419,12 +419,12 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
         freq, ceil(time/rate), complex=2)`
 
     Example
-        >>> num_freqs, hop_length = 1025, 512
-        >>> # (channel, num_freqs, time, complex=2)
-        >>> complex_specgrams = torch.randn(1, num_freqs, 300, 2)
+        >>> freq, hop_length = 1025, 512
+        >>> # (channel, freq, time, complex=2)
+        >>> complex_specgrams = torch.randn(1, freq, 300, 2)
         >>> rate = 1.3 # Slow down by 30%
         >>> phase_advance = torch.linspace(
-        >>>    0, math.pi * hop_length, num_freqs)[..., None]
+        >>>    0, math.pi * hop_length, freq)[..., None]
         >>> x = phase_vocoder(complex_specgrams, rate, phase_advance)
         >>> x.shape # with 231 == ceil(300 / 1.3)
         torch.Size([16, 1, 1025, 231, 2])
@@ -442,7 +442,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     # Time Padding
     complex_specgrams = torch.nn.functional.pad(complex_specgrams, [0, 0, 0, 2])
 
-    # (new_bins, num_freqs, 2)
+    # (new_bins, freq, 2)
     complex_specgrams_0 = complex_specgrams[:, :, time_steps.long()]
     complex_specgrams_1 = complex_specgrams[:, :, (time_steps + 1).long()]
 
@@ -501,58 +501,58 @@ def stft(waveform, pad, window, n_fft, hop_length, win_length):
 
 
 @torch.jit.script
-def mask_along_axis_iid(specgram, mask_param, mask_value, axis):
+def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
     # type: (Tensor, int, float, int) -> Tensor
     r"""
-    Apply a mask along ``axis``. Mask will be applied from ``[v_0, v_0 + v)``, where
+    Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
     ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.
     All examples will have the same mask interval.
 
     Args:
-        specgram (Tensor): Real spectogram (batch, channel, num_freqs, time)
+        specgrams (Tensor): Real spectograms (batch, channel, freq, time)
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (2 -> frequency, 3 -> time)
 
     Returns:
-        torch.Tensor: Masked scpectograms of dimensions (batch, channel, num_freqs, time)
+        torch.Tensor: Masked scpectograms of dimensions (batch, channel, freq, time)
     """
 
     if axis != 2 and axis != 3:
         raise ValueError('Only Frequency and Time masking are supported')
 
-    value = torch.rand(specgram.shape[:2]) * mask_param
-    min_value = torch.rand(specgram.shape[:2]) * (specgram.size(axis) - value)
+    value = torch.rand(specgrams.shape[:2]) * mask_param
+    min_value = torch.rand(specgrams.shape[:2]) * (specgrams.size(axis) - value)
 
     # Create broadcastable mask
     mask_start = (min_value.long())[..., None, None].float()
     mask_end = (min_value.long() + value.long())[..., None, None].float()
-    mask = torch.arange(0, specgram.size(axis)).float()
+    mask = torch.arange(0, specgrams.size(axis)).float()
 
     # Per batch example masking
-    specgram = specgram.transpose(axis, -1)
-    specgram.masked_fill_((mask >= mask_start) & (mask < mask_end), mask_value)
-    specgram = specgram.transpose(axis, -1)
+    specgrams = specgrams.transpose(axis, -1)
+    specgrams.masked_fill_((mask >= mask_start) & (mask < mask_end), mask_value)
+    specgrams = specgrams.transpose(axis, -1)
 
-    return specgram
+    return specgrams
 
 
 @torch.jit.script
 def mask_along_axis(specgram, mask_param, mask_value, axis):
     # type: (Tensor, int, float, int) -> Tensor
     r"""
-    Apply a mask along ``axis``. Mask will be applied from ``[v_0, v_0 + v)``, where
+    Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
     ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.
     All examples will have the same mask interval.
 
     Args:
-        specgram (Tensor): Real spectogram (batch, channel, num_freqs, time)
+        specgram (Tensor): Real spectogram (channel, freq, time)
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
 
     Returns:
-        torch.Tensor: Masked scpectogram of dimensions (channel, num_freqs, time)
+        torch.Tensor: Masked scpectogram of dimensions (channel, freq, time)
     """
 
     value = torch.rand(1) * mask_param
@@ -566,6 +566,6 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
     elif axis == 2:
         specgram[:, :, mask_start:mask_end] = mask_value
     else:
-        raise ValueError('Only Frequency and Time masking is supported')
+        raise ValueError('Only Frequency and Time masking are supported')
 
     return specgram

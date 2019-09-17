@@ -14,17 +14,18 @@ class TimeStretch(torch.jit.ScriptModule):
     r"""Stretch stft in time without modifying pitch for a given rate.
 
     Args:
-        hop_length (int): Number audio of frames between STFT columns.
-        num_freqs (int, optional): number of filter banks from stft.
+        hop_length (int): Number audio of frames between STFT columns. (Default: ``n_fft // 2``)
+        num_freqs (int, optional): number of filter banks from stft. (Default: ``201``)
         fixed_rate (float): rate to speed up or slow down by.
-            Defaults to None (in which case a rate must be
-            passed to the forward method per batch).
+            If None is provided, rate must be passed to the forward method. (Default: ``None``)
     """
     __constants__ = ['fixed_rate']
 
-    def __init__(self, hop_length=200, num_freqs=201, fixed_rate=None):
+    def __init__(self, hop_length=None, num_freqs=201, fixed_rate=None):
         super(TimeStretch, self).__init__()
 
+        n_fft = (num_freqs - 1) * 2
+        hop_length = hop_length if hop_length is not None else n_fft // 2
         self.fixed_rate = fixed_rate
         phase_advance = torch.linspace(0, math.pi * hop_length, num_freqs)[..., None]
 
@@ -35,12 +36,12 @@ class TimeStretch(torch.jit.ScriptModule):
         # type: (Tensor, Optional[float]) -> Tensor
         r"""
         Args:
-            complex_specgrams (Tensor): complex spectrogram
-                (*, channel, freq, time, complex=2)
+            complex_specgrams (Tensor): complex spectrogram (*, channel, freq, time, complex=2)
             overriding_rate (float or None): speed up to apply to this batch.
-                If no rate is passed, use self.fixed_rate
+                If no rate is passed, use ``self.fixed_rate``
+
         Returns:
-            (Tensor): (*, channel, num_freqs, ceil(time/rate), complex=2)
+            (Tensor): Stretched complex spectrogram of dimension (*, channel, num_freqs, ceil(time/rate), complex=2)
         """
         if overriding_rate is None:
             rate = self.fixed_rate
@@ -85,9 +86,7 @@ class _AxisMasking(torch.jit.ScriptModule):
             specgram (torch.Tensor): Tensor of dimension (*, channel, freq, time)
 
         Returns:
-            torch.Tensor: Dimension (channel, freq, time), where channel
-            is unchanged, freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
-            Fourier bins, and time is the number of window hops (n_frames).
+            torch.Tensor: Masked scpectogram of dimensions (*, channel, freq, time)
         """
 
         # if iid_masks flag marked and specgram has a batch dimension
@@ -106,9 +105,9 @@ class FrequencyMasking(_AxisMasking):
     Apply masking to a spectrogram in the frequency domain.
     Args:
         freq_mask_param (int): maximum possible length of the mask.
-            Uniformly sampled from [0, freq_mask_param).
+            Indices uniformly sampled from [0, freq_mask_param).
         iid_masks (bool): weather to apply the same mask to all
-            the examples/channels in the batch. Defaults to False.
+            the examples/channels in the batch. (Default: False)
     """
 
     def __init__(self, freq_mask_param, iid_masks=False):
@@ -120,7 +119,7 @@ class TimeMasking(_AxisMasking):
     Apply masking to a spectrogram in the time domain.
     Args:
         time_mask_param (int): maximum possible length of the mask.
-            Uniformly sampled from [0, time_mask_param).
+            Indices uniformly sampled from [0, time_mask_param).
         iid_masks (bool): weather to apply the same mask to all
             the examples/channels in the batch. Defaults to False.
     """
