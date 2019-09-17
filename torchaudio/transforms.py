@@ -16,6 +16,8 @@ __all__ = [
     'MuLawEncoding',
     'MuLawDecoding',
     'Resample',
+    'STFT',
+    'ComplexNorm'
 ]
 
 

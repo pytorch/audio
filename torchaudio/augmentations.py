@@ -80,6 +80,16 @@ class _AxisMasking(torch.jit.ScriptModule):
     @torch.jit.script_method
     def forward(self, specgram, mask_value=0.):
         # type: (Tensor, float) -> Tensor
+        r"""
+        Args:
+            specgram (torch.Tensor): Tensor of dimension (*, channel, freq, time)
+
+        Returns:
+            torch.Tensor: Dimension (channel, freq, time), where channel
+            is unchanged, freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
+            Fourier bins, and time is the number of window hops (n_frames).
+        """
+
         # if iid_masks flag marked and specgram has a batch dimension
         if self.iid_masks and specgram.dim() == 4:
             return F.mask_along_axis_iid(specgram, self.mask_param, mask_value, self.axis + 1)

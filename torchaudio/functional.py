@@ -513,6 +513,9 @@ def mask_along_axis_iid(specgram, mask_param, mask_value, axis):
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (2 -> frequency, 3 -> time)
+
+    Returns:
+        torch.Tensor: Masked scpectograms of dimensions (batch, channel, num_freqs, time)
     """
 
     if axis != 2 and axis != 3:
@@ -521,14 +524,15 @@ def mask_along_axis_iid(specgram, mask_param, mask_value, axis):
     value = torch.rand(specgram.shape[:2]) * mask_param
     min_value = torch.rand(specgram.shape[:2]) * (specgram.size(axis) - value)
 
-    mask_start = (min_value.long()).unsqueeze(-1).float()
-    mask_end = (min_value.long() + value.long()).unsqueeze(-1).float()
+    # Create broadcastable mask
+    mask_start = (min_value.long())[..., None, None].float()
+    mask_end = (min_value.long() + value.long())[..., None, None].float()
+    mask = torch.arange(0, specgram.size(axis)).float()
 
-    mask = torch.arange(0, specgram.size(axis)).repeat(specgram.size(0), specgram.size(1), 1).float()
-
-    specgram = specgram.transpose(2, axis)
-    specgram[(mask >= mask_start) & (mask < mask_end)] = torch.tensor(mask_value)
-    specgram = specgram.transpose(2, axis)
+    # Per batch example masking
+    specgram = specgram.transpose(axis, -1)
+    specgram.masked_fill_((mask >= mask_start) & (mask < mask_end), mask_value)
+    specgram = specgram.transpose(axis, -1)
 
     return specgram
 
@@ -546,6 +550,9 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
+
+    Returns:
+        torch.Tensor: Masked scpectogram of dimensions (channel, num_freqs, time)
     """
 
     value = torch.rand(1) * mask_param
