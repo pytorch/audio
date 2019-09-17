@@ -137,7 +137,7 @@ def istft(stft_matrix,          # type: Tensor
     # each column of a channel is a frame which needs to be overlap added at the right place
     ytmp = ytmp.transpose(1, 2)  # size (channel, n_fft, n_frames)
 
-    eye = torch.eye(n_fft, requires_grad=False,
+    eye = torch.eye(n_fft, requires_grad=False, dtype=ytmp.dtype,
                     device=device, dtype=dtype).unsqueeze(1)  # size (n_fft, 1, n_fft)
 
     # this does overlap add where the frames of ytmp are added such that the i'th frame of
