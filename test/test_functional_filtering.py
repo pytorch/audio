@@ -28,28 +28,38 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(
             waveform[:, 0:-3], output_waveform[:, 3:], atol=1e-5
         )
-    
+
     def test_lfilter_loop_vs_tensor(self):
-    
+
         torch.random.manual_seed(42)
         waveform = torch.rand(2, 100000)
-        b_coeffs = torch.tensor([0.3, 0.4, 0, 1], dtype=torch.float32)
-        a_coeffs = torch.tensor([1, 0.2, 0.2, 0], dtype=torch.float32)
+        b_coeffs = torch.tensor([0, 0.1, 0.1, 1], dtype=torch.float32)
+        a_coeffs = torch.tensor([1, 0.2, 0, 0], dtype=torch.float32)
         import time
+
         tensor_time_start = time.time()
         output_waveform1 = F.lfilter_tensor(waveform, a_coeffs, b_coeffs)
         tensor_time_taken = time.time() - tensor_time_start
+
         loop_time_start = time.time()
         output_waveform2 = F.lfilter(waveform, a_coeffs, b_coeffs)
         loop_time_taken = time.time() - loop_time_start
 
+        tensor_matrix_time_start = time.time()
+        output_waveform3 = F.lfilter_tensor_matrix(waveform, a_coeffs, b_coeffs)
+        tensor_matrix_time_taken = time.time() - tensor_matrix_time_start
+
         print("\n")
-        print("Looped Implementation took: ", loop_time_taken)
-        print("Tensor Implementation took: ", tensor_time_taken)
+        print("Looped Implementation took       : ", loop_time_taken)
+        print("Tensor Implementation took       : ", tensor_time_taken)
+        print("Tensor Matrix Implementation took: ", tensor_matrix_time_taken)
 
         assert torch.allclose(
             output_waveform1, output_waveform2, atol=1e-5
-        )        
+        )
+        assert torch.allclose(
+            output_waveform1, output_waveform3, atol=1e-5
+        )
 
     def test_lfilter(self):
         """
@@ -135,7 +145,6 @@ class TestFunctionalFiltering(unittest.TestCase):
             noise_filepath, normalization=True
         )
         output_waveform = F.highpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
-        
 
         # TBD - this fails at the 1e-4 level, debug why
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-3)

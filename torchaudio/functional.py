@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import torch
-from _torch_filtering import lfilter, lfilter_tensor
+from _torch_filtering import lfilter, lfilter_tensor, lfilter_tensor_matrix
 
 __all__ = [
     "istft",
@@ -553,7 +553,7 @@ def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
         output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`
     """
 
-    GAIN = 1 # TBD - add as a parameter
+    GAIN = 1  # TBD - add as a parameter
     w0 = 2 * math.pi * cutoff_freq / sample_rate
     A = math.exp(GAIN / 40.0 * math.log(10))
     alpha = math.sin(w0) / 2 / Q
