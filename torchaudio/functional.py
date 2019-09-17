@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import torch
-from _torch_filtering import lfilter
+from _torch_filtering import lfilter, lfilter_tensor
 
 __all__ = [
     "istft",
