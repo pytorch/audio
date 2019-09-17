@@ -141,6 +141,8 @@ at::Tensor lfilter_tensor(
 
 
 PYBIND11_MODULE(_torch_filtering, m) {
+  py::options options;
+  options.disable_function_signatures();
   m.def(
       "lfilter_tensor",
       &torch::audio::lfilter_tensor,
@@ -148,7 +150,19 @@ PYBIND11_MODULE(_torch_filtering, m) {
   m.def(
       "lfilter",
       &torch::audio::lfilter,
-      "Executes difference equation");      
+      R"mydelimiter(lfilter(waveform, a_coeffs, b_coeffs)
+
+    Performs an IIR filter by evaluating difference equation.
+
+    Args:
+        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`
+        a_coeffs (torch.Tensor): denominator coefficients of difference equation of dimension of `(n_order + 1)`.  Lower delays coefficients are first, e.g. `[a0, a1, a2, ...]`.  Must be same size as b_coeffs (pad with 0's as necessary).
+        b_coeffs (torch.Tensor): numerator coefficients of difference equation of dimension of `(n_order + 1)`.  Lower delays coefficients are first, e.g. `[b0, b1, b2, ...]`. Must be same size as a_coeffs (pad with 0's as necessary).
+        
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`
+
+      )mydelimiter");      
 #ifdef WITH_CUDA
   m.attr("CUDA_VERSION") = CUDA_VERSION;
 #endif

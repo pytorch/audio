@@ -62,3 +62,23 @@ Functions to perform common audio operations.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: phase_vocoder
+
+:hidden:`lfilter`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: lfilter
+
+:hidden:`biquad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: biquad
+
+:hidden:`highpass_biquad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: highpass_biquad
+
+:hidden:`lowpass_biquad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: lowpass_biquad
