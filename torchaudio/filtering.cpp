@@ -218,12 +218,12 @@ PYBIND11_MODULE(_torch_filtering, m) {
     Performs an IIR filter by evaluating difference equation.
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`
+        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`. Must be normalized to -1 to 1.
         a_coeffs (torch.Tensor): denominator coefficients of difference equation of dimension of `(n_order + 1)`.  Lower delays coefficients are first, e.g. `[a0, a1, a2, ...]`.  Must be same size as b_coeffs (pad with 0's as necessary).
         b_coeffs (torch.Tensor): numerator coefficients of difference equation of dimension of `(n_order + 1)`.  Lower delays coefficients are first, e.g. `[b0, b1, b2, ...]`. Must be same size as a_coeffs (pad with 0's as necessary).
         
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`
+        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)` Output will be clipped to -1 to 1.
 
       )mydelimiter");      
 #ifdef WITH_CUDA

@@ -29,10 +29,13 @@ class TestFunctionalFiltering(unittest.TestCase):
             waveform[:, 0:-3], output_waveform[:, 3:], atol=1e-5
         )
 
-    def test_lfilter_loop_vs_tensor(self):
+    def test_lfilter_multiple_implementations(self):
+
+        # Run all implementations of lfilter
+        # Test that they are the same as each other
 
         torch.random.manual_seed(42)
-        waveform = torch.rand(2, 100000)
+        waveform = torch.rand(2, 44100 * 5)
         b_coeffs = torch.tensor([0, 0.1, 0.1, 1], dtype=torch.float32)
         a_coeffs = torch.tensor([1, 0.2, 0, 0], dtype=torch.float32)
         import time
@@ -49,16 +52,24 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform3 = F.lfilter_tensor_matrix(waveform, a_coeffs, b_coeffs)
         tensor_matrix_time_taken = time.time() - tensor_matrix_time_start
 
+        python_time_start = time.time()
+        output_waveform4 = F.lfilter_python(waveform, a_coeffs, b_coeffs)
+        python_time_taken = time.time() - python_time_start
+
         print("\n")
-        print("Looped Implementation took       : ", loop_time_taken)
-        print("Tensor Implementation took       : ", tensor_time_taken)
-        print("Tensor Matrix Implementation took: ", tensor_matrix_time_taken)
+        print("Element Wise Implementation took  : ", loop_time_taken)
+        print("Tensor Implementation took        : ", tensor_time_taken)
+        print("Tensor Matrix Implementation took : ", tensor_matrix_time_taken)
+        print("Python Implementation took        : ", python_time_taken)
 
         assert torch.allclose(
             output_waveform1, output_waveform2, atol=1e-5
         )
         assert torch.allclose(
             output_waveform1, output_waveform3, atol=1e-5
+        )
+        assert torch.allclose(
+            output_waveform1, output_waveform4, atol=1e-5
         )
 
     def test_lfilter(self):

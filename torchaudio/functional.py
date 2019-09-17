@@ -19,6 +19,9 @@ __all__ = [
     "highpass_biquad",
     "biquad",
     "lfilter",
+    "lfilter_tensor",
+    "lfilter_tensor_matrix",
+    "lfilter_python",
 ]
 
 # TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
@@ -595,3 +598,61 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     a1 = -2 * math.cos(w0)
     a2 = 1 - alpha
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def lfilter_python(waveform, a_coeffs, b_coeffs):
+    # type: (Tensor, Tensor, Tensor) -> Tensor
+    r"""
+    Performs an IIR filter by evaluating difference equation.
+
+    Args:
+        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`.  Must be normalized to -1 to 1.
+        a_coeffs (torch.Tensor): denominator coefficients of difference equation of dimension of `(n_order + 1)`.
+                                Lower delays coefficients are first, e.g. `[a0, a1, a2, ...]`.
+                                Must be same size as b_coeffs (pad with 0's as necessary).
+        b_coeffs (torch.Tensor): numerator coefficients of difference equation of dimension of `(n_order + 1)`.
+                                 Lower delays coefficients are first, e.g. `[b0, b1, b2, ...]`.
+                                 Must be same size as a_coeffs (pad with 0's as necessary).
+
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`.  Output will be clipped to -1 to 1.
+
+    """
+
+    assert(waveform.dtype == torch.float32)
+    assert(a_coeffs.size(0) == b_coeffs.size(0))
+    assert(len(waveform.size()) == 2)
+
+    n_channels, n_frames = waveform.size()
+    n_order = a_coeffs.size(0)
+    assert(n_order > 0)
+
+    # Pad the input and create output
+    padded_waveform = torch.zeros(n_channels, n_frames + n_order - 1)
+    padded_waveform[:, 3:] = waveform
+    padded_output_waveform = torch.zeros(n_channels, n_frames + n_order - 1)
+
+    # Set up the coefficients matrix
+    # Flip order, repeat, and transpose
+    a_coeffs_filled = a_coeffs.flip(0).repeat(n_channels, 1).t()
+    b_coeffs_filled = b_coeffs.flip(0).repeat(n_channels, 1).t()
+
+    # Set up a few other utilities
+    a0_repeated = torch.ones(n_channels) * a_coeffs[0]
+    ones = torch.ones(n_channels, n_frames)
+
+    for i_frame in range(n_frames):
+
+        o0 = torch.zeros(n_channels)
+
+        windowed_input_signal = padded_waveform[:, i_frame:(i_frame + n_order)]
+        windowed_output_signal = padded_output_waveform[:, i_frame:(i_frame + n_order)]
+
+        o0.add_(torch.diag(torch.mm(windowed_input_signal, b_coeffs_filled)))
+        o0.sub_(torch.diag(torch.mm(windowed_output_signal, a_coeffs_filled)))
+
+        o0.div_(a0_repeated)
+
+        padded_output_waveform[:, i_frame + n_order - 1] = o0
+
+    return torch.min(ones, torch.max(ones * -1, padded_output_waveform[:, 3:]))
