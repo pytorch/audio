@@ -10,10 +10,14 @@ rm -rf /tmp/torchaudio-deps
 mkdir /tmp/torchaudio-deps
 pushd /tmp/torchaudio-deps
 
-CURL_OPTS=" --retry 8 --connect-timeout 8 "
 
-curl -L $CURL_OPTS -o sox-14.4.2.tar.bz2 "http://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fsox%2Ffiles%2Fsox%2F14.4.2%2F&ts=1416316415&use_mirror=heanet"
-curl -L $CURL_OPTS -o lame-3.99.5.tar.gz "http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Flame%2Ffiles%2Flame%2F3.99%2F&ts=1416316457&use_mirror=kent"
+# Curl Settings
+# 3 minutes is the absolute max for the curl command
+# Retry up to 10 times, wait to connect at most 5s per time
+CURL_OPTS=" --retry 10 --connect-timeout 5 --max-time 180 "
+
+curl -L $CURL_OPTS -o sox-14.4.2.tar.bz2 "http://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2"
+curl -L $CURL_OPTS -o lame-3.99.5.tar.gz "http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz"
 curl -L $CURL_OPTS -o flac-1.3.2.tar.xz "https://superb-dca2.dl.sourceforge.net/project/flac/flac-src/flac-1.3.2.tar.xz"
 curl -L $CURL_OPTS -o libmad-0.15.1b.tar.gz "https://downloads.sourceforge.net/project/mad/libmad/0.15.1b/libmad-0.15.1b.tar.gz"
 
