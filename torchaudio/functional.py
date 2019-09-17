@@ -421,13 +421,13 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     Example
         >>> freq, hop_length = 1025, 512
         >>> # (channel, freq, time, complex=2)
-        >>> complex_specgrams = torch.randn(1, freq, 300, 2)
-        >>> rate = 1.3 # Slow down by 30%
+        >>> complex_specgrams = torch.randn(2, freq, 300, 2)
+        >>> rate = 1.3 # Speed up by 30%
         >>> phase_advance = torch.linspace(
         >>>    0, math.pi * hop_length, freq)[..., None]
         >>> x = phase_vocoder(complex_specgrams, rate, phase_advance)
         >>> x.shape # with 231 == ceil(300 / 1.3)
-        torch.Size([16, 1, 1025, 231, 2])
+        torch.Size([2, 1025, 231, 2])
     """
 
     time_steps = torch.arange(0,

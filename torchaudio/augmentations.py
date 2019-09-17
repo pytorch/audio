@@ -115,7 +115,7 @@ class FrequencyMasking(_AxisMasking):
 
 
 class TimeMasking(_AxisMasking):
-    """
+    r"""
     Apply masking to a spectrogram in the time domain.
     Args:
         time_mask_param (int): maximum possible length of the mask.

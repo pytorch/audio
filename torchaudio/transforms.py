@@ -415,7 +415,7 @@ class STFT(torch.jit.ScriptModule):
 
 
 class ComplexNorm(torch.jit.ScriptModule):
-    """Compute the norm of complex tensor input
+    r"""Compute the norm of complex tensor input
     Args:
         power (float): Power of the norm. Defaults to `1.0`.
     """
@@ -427,7 +427,7 @@ class ComplexNorm(torch.jit.ScriptModule):
 
     @torch.jit.script_method
     def forward(self, complex_tensor):
-        """
+        r"""
         Args:
             complex_tensor (Tensor): Tensor shape of `(*, complex=2)`
         Returns:
