@@ -4,6 +4,7 @@ import os
 import torch
 import torchaudio
 import torchaudio.functional as F
+import torchaudio.functional_sox_compatibility as FSOX
 import unittest
 import common_utils
 import time
@@ -89,7 +90,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         waveform, sample_rate = torchaudio.load(
             noise_filepath, normalization=True
         )
-        output_waveform = F.lowpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
+        output_waveform = FSOX.lowpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
 
@@ -112,7 +113,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         waveform, sample_rate = torchaudio.load(
             noise_filepath, normalization=True
         )
-        output_waveform = F.highpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
+        output_waveform = FSOX.highpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
 
         # TBD - this fails at the 1e-4 level, debug why
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-3)
@@ -143,19 +144,18 @@ class TestFunctionalFiltering(unittest.TestCase):
         waveform_sox_out, sr = E.sox_build_flow_effects()
         _timing_sox_run_time = time.time() - _timing_sox
 
-        # C++ Diff Eq Filter
-        _timing_cpp_filtering = time.time()
+        _timing_lfilter_filtering = time.time()
         waveform, sample_rate = torchaudio.load(fn_sine, normalization=True)
-        waveform_diff_eq_out = F.lfilter(
+        waveform_lfilter_out = F.lfilter(
             waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
         )
-        _timing_diff_eq_run_time = time.time() - _timing_cpp_filtering
+        _timing_lfilter_run_time = time.time() - _timing_lfilter_filtering
 
         # print("\n")
         # print("SoX Run Time         (s): ", round(_timing_sox_run_time, 3))
-        # print("CPP Lfilter Run Time (s): ", round(_timing_diff_eq_run_time, 3))
+        # print("Lfilter Run Time (s): ", round(_timing_lfilter_run_time, 3))
 
-        assert torch.allclose(waveform_sox_out, waveform_diff_eq_out, atol=1e-4)
+        assert torch.allclose(waveform_sox_out, waveform_lfilter_out, atol=1e-4)
 
 
 if __name__ == "__main__":

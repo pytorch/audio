@@ -1,7 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import torch
-from torchaudio.functional_sox_compatibility import biquad, lowpass_biquad, highpass_biquad
 
 __all__ = [
     "istft",
@@ -15,9 +14,6 @@ __all__ = [
     "angle",
     "magphase",
     "phase_vocoder",
-    "lowpass_biquad",
-    "highpass_biquad",
-    "biquad",
     "lfilter",
 ]
 
