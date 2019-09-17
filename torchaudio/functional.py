@@ -1,7 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import torch
-from _torch_filtering import lfilter, lfilter_tensor, lfilter_tensor_matrix
 
 __all__ = [
     "istft",
@@ -19,9 +18,6 @@ __all__ = [
     "highpass_biquad",
     "biquad",
     "lfilter",
-    "lfilter_tensor",
-    "lfilter_tensor_matrix",
-    "lfilter_python",
 ]
 
 # TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
@@ -600,7 +596,7 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-def lfilter_python(waveform, a_coeffs, b_coeffs):
+def lfilter(waveform, a_coeffs, b_coeffs):
     # type: (Tensor, Tensor, Tensor) -> Tensor
     r"""
     Performs an IIR filter by evaluating difference equation.
@@ -629,7 +625,7 @@ def lfilter_python(waveform, a_coeffs, b_coeffs):
 
     # Pad the input and create output
     padded_waveform = torch.zeros(n_channels, n_frames + n_order - 1)
-    padded_waveform[:, 3:] = waveform
+    padded_waveform[:, (n_order - 1):] = waveform
     padded_output_waveform = torch.zeros(n_channels, n_frames + n_order - 1)
 
     # Set up the coefficients matrix
@@ -655,4 +651,4 @@ def lfilter_python(waveform, a_coeffs, b_coeffs):
 
         padded_output_waveform[:, i_frame + n_order - 1] = o0
 
-    return torch.min(ones, torch.max(ones * -1, padded_output_waveform[:, 3:]))
+    return torch.min(ones, torch.max(ones * -1, padded_output_waveform[:, (n_order - 1):]))

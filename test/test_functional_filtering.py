@@ -20,56 +20,13 @@ class TestFunctionalFiltering(unittest.TestCase):
         """
 
         torch.random.manual_seed(42)
-        waveform = torch.rand(2, 10000)
+        waveform = torch.rand(2, 44100 * 10)
         b_coeffs = torch.tensor([0, 0, 0, 1], dtype=torch.float32)
         a_coeffs = torch.tensor([1, 0, 0, 0], dtype=torch.float32)
         output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
 
         assert torch.allclose(
             waveform[:, 0:-3], output_waveform[:, 3:], atol=1e-5
-        )
-
-    def test_lfilter_multiple_implementations(self):
-
-        # Run all implementations of lfilter
-        # Test that they are the same as each other
-
-        torch.random.manual_seed(42)
-        waveform = torch.rand(2, 44100 * 5)
-        b_coeffs = torch.tensor([0, 0.1, 0.1, 1], dtype=torch.float32)
-        a_coeffs = torch.tensor([1, 0.2, 0, 0], dtype=torch.float32)
-        import time
-
-        tensor_time_start = time.time()
-        output_waveform1 = F.lfilter_tensor(waveform, a_coeffs, b_coeffs)
-        tensor_time_taken = time.time() - tensor_time_start
-
-        loop_time_start = time.time()
-        output_waveform2 = F.lfilter(waveform, a_coeffs, b_coeffs)
-        loop_time_taken = time.time() - loop_time_start
-
-        tensor_matrix_time_start = time.time()
-        output_waveform3 = F.lfilter_tensor_matrix(waveform, a_coeffs, b_coeffs)
-        tensor_matrix_time_taken = time.time() - tensor_matrix_time_start
-
-        python_time_start = time.time()
-        output_waveform4 = F.lfilter_python(waveform, a_coeffs, b_coeffs)
-        python_time_taken = time.time() - python_time_start
-
-        print("\n")
-        print("Element Wise Implementation took  : ", loop_time_taken)
-        print("Tensor Implementation took        : ", tensor_time_taken)
-        print("Tensor Matrix Implementation took : ", tensor_matrix_time_taken)
-        print("Python Implementation took        : ", python_time_taken)
-
-        assert torch.allclose(
-            output_waveform1, output_waveform2, atol=1e-5
-        )
-        assert torch.allclose(
-            output_waveform1, output_waveform3, atol=1e-5
-        )
-        assert torch.allclose(
-            output_waveform1, output_waveform4, atol=1e-5
         )
 
     def test_lfilter(self):
@@ -105,7 +62,7 @@ class TestFunctionalFiltering(unittest.TestCase):
             ]
         )
 
-        filepath = os.path.join(self.test_dirpath, "assets", "dtmf_30s_stereo.mp3")
+        filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
         waveform, sample_rate = torchaudio.load(filepath, normalization=True)
         output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
         assert len(output_waveform.size()) == 2
@@ -122,7 +79,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         CUTOFF_FREQ = 3000
 
         noise_filepath = os.path.join(
-            self.test_dirpath, "assets", "whitenoise_1min.mp3"
+            self.test_dirpath, "assets", "whitenoise.mp3"
         )
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
@@ -145,7 +102,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         CUTOFF_FREQ = 2000
 
         noise_filepath = os.path.join(
-            self.test_dirpath, "assets", "whitenoise_1min.mp3"
+            self.test_dirpath, "assets", "whitenoise.mp3"
         )
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
@@ -169,7 +126,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         Current results: C++ implementation approximately same speed
         """
 
-        fn_sine = os.path.join(self.test_dirpath, "assets", "whitenoise_1min.mp3")
+        fn_sine = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
 
         b0 = 0.4
         b1 = 0.2
