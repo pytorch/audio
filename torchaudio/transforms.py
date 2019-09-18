@@ -368,7 +368,7 @@ class Resample(torch.nn.Module):
 
 
 class ComputeDeltas(torch.jit.ScriptModule):
-    r"""Compute delta coefficients of a spectogram.
+    r"""Compute delta coefficients of a spectrogram.
 
     See `torchaudio.functional.compute_deltas` for more details.
 

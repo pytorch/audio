@@ -20,6 +20,7 @@ __all__ = [
     "biquad",
 ]
 
+
 # TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
 @torch.jit.ignore
 def _stft(
@@ -656,13 +657,13 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
 
 def compute_deltas(specgram, win_length=5):
     # type: (Tensor, int) -> Tensor
-    r"""Compute delta coefficients of a spectogram:
+    r"""Compute delta coefficients of a spectrogram:
 
     .. math::
         d_t = \frac{\sum_{n=1}^{\text{N}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{N} n^2}
 
     where :math:`d_t` is the deltas at time :math:`t`,
-    :math:`c_t` is the spectogram coeffcients at time :math:`t`,
+    :math:`c_t` is the spectrogram coeffcients at time :math:`t`,
     :math:`N` is (`win_length`-1)//2.
 
     The behavior at the edges is to replicate the boundaries.
