@@ -7,18 +7,14 @@ import unittest
 import common_utils
 
 from torchaudio.functional import lfilter
-from _torch_filtering import (
-    _lfilter_tensor_matrix,
-    _lfilter_tensor,
-    _lfilter_element_wise,
-)
+from _torch_filtering import _lfilter_tensor_matrix, _lfilter_element_wise
 
 
 class TestFunctionalLFilterPerformance(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
 
     @staticmethod
-    def run_test(n_channels, n_frames, n_order_filter):
+    def run_test(n_channels, n_frames, n_order_filter, assertClose=True):
         waveform = torch.rand(n_channels, n_frames, device="cpu")
         b_coeffs = torch.rand(n_order_filter, dtype=torch.float32, device="cpu")
         a_coeffs = torch.rand(n_order_filter, dtype=torch.float32, device="cpu")
@@ -70,6 +66,50 @@ class TestFunctionalLFilterPerformance(unittest.TestCase):
                 -1.5774235418173692,
                 0.4158137396065854,
             ]
+        elif n_order_filter == 18:
+            # >>> import scipy.signal
+            # >>> wp = 0.48, ws = 0.5, gpass = 0.2, gstop = 120
+            # >>> b, a = scipy.signal.iirdesign(wp, ws, gpass, gstop)
+            b_coeffs = [
+                0.0006050813536446144,
+                0.002920916369302935,
+                0.010247568347759453,
+                0.02591236698507957,
+                0.05390501051935878,
+                0.09344581172781004,
+                0.13951533321139883,
+                0.1808658576803922,
+                0.2056643061895918,
+                0.2056643061895911,
+                0.1808658576803912,
+                0.13951533321139847,
+                0.09344581172781012,
+                0.053905010519358885,
+                0.02591236698507962,
+                0.010247568347759466,
+                0.0029209163693029367,
+                0.0006050813536446148,
+            ]
+            a_coeffs = [
+                1.0,
+                -4.3964136877356745,
+                14.650181359641305,
+                -34.45816395187684,
+                67.18247518997862,
+                -108.01956225077998,
+                149.4332056661277,
+                -178.07791467502364,
+                185.28267044557634,
+                -168.13382659655514,
+                133.22364764531704,
+                -91.59439958870928,
+                54.15835239046956,
+                -27.090521914173934,
+                11.163677645454127,
+                -3.627296054625132,
+                0.8471764313073272,
+                -0.11712354962357388,
+            ]
 
         # Cast into Tensors
         a_coeffs = torch.tensor(a_coeffs, device="cpu", dtype=torch.float32)
@@ -94,24 +134,23 @@ class TestFunctionalLFilterPerformance(unittest.TestCase):
         )
 
         print("-" * 80)
-        print("Evaluating Runtime between lfilter implementations")
-        print("-" * 80)
         print(
-            "Data Size: [%d x %d], Filter Order: %d"
+            "lfilter perf - Data Size: [%d x %d], Filter Order: %d"
             % (waveform.size(0), waveform.size(1), a_coeffs.size(0))
         )
         print("-" * 80)
         print("Python Matrix Runtime [current]: %10.6f s" % run_time_1)
         print("CPP Element Wise Runtime       : %10.6f s" % run_time_2)
         print("CPP Matrix Runtime             : %10.6f s" % run_time_3)
-
-        # maxDeviation = torch.kthvalue(torch.abs(output_waveform_1- output_waveform_2), output_waveform_1.size(1))
-
-        assert torch.allclose(output_waveform_1, output_waveform_2, atol=3e-4)
-        assert torch.allclose(output_waveform_1, output_waveform_3, atol=3e-4)
         print("-" * 80)
-        print("✓ - all outputs are identical")
-        print("-" * 80)
+        print("Ratio Python / CPP ElementWise : %10.2f x" % (run_time_1/run_time_2))
+
+        if assertClose:
+            # maxDeviation = torch.kthvalue(torch.abs(output_waveform_3- output_waveform_2), output_waveform_1.size(1))
+            assert torch.allclose(output_waveform_1, output_waveform_2, atol=3e-4)
+            assert torch.allclose(output_waveform_2, output_waveform_3, atol=3e-4)
+            print("✓ - all outputs are identical")
+            print("-" * 80)
 
     def test_lfilter_cmp(self):
         """
@@ -125,6 +164,14 @@ class TestFunctionalLFilterPerformance(unittest.TestCase):
         self.run_test(2, 8000, 8)
         self.run_test(2, 80000, 8)
         self.run_test(2, 800000, 8)
+
+        # For higher order filters, due to floating point precision
+        #  matrix method and element method can get different results depending on order of operations
+        # Also, for longer signals and higher filters, easier to create unstable filter
+        # https://dsp.stackexchange.com/questions/54386/relation-between-order-and-stability-in-iir-filter
+        self.run_test(2, 8000, 18, False)
+        self.run_test(2, 80000, 18, False)
+        self.run_test(2, 800000, 18, False)
 
 
 if __name__ == "__main__":

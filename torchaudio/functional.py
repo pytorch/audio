@@ -529,7 +529,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 def lfilter(waveform, a_coeffs, b_coeffs):
     # type: (Tensor, Tensor, Tensor) -> Tensor
     r"""
-    Performs an IIR filter by evaluating difference equation.
+    Performs an IIR filter by evaluating difference equation.  Assumes difference equation is stable.
 
     Args:
         waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`.  Must be normalized to -1 to 1.
@@ -594,7 +594,7 @@ def biquad(waveform, b0, b1, b2, a0, a1, a2):
     https://en.wikipedia.org/wiki/Digital_biquad_filter
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`
+        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`.  Currently only supports float32.
         b0 (float): numerator coefficient of current input, x[n]
         b1 (float): numerator coefficient of input one time step ago x[n-1]
         b2 (float): numerator coefficient of input two time steps ago x[n-2]
