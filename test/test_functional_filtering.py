@@ -151,10 +151,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         )
         _timing_lfilter_run_time = time.time() - _timing_lfilter_filtering
 
-        # print("\n")
-        # print("SoX Run Time         (s): ", round(_timing_sox_run_time, 3))
-        # print("Lfilter Run Time (s): ", round(_timing_lfilter_run_time, 3))
-
         assert torch.allclose(waveform_sox_out, waveform_lfilter_out, atol=1e-4)
 
 
