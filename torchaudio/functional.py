@@ -565,6 +565,7 @@ def lfilter(waveform, a_coeffs, b_coeffs):
 
     return torch.min(ones, torch.max(ones * -1, padded_output_waveform[:, (n_order - 1):]))
 
+
 def biquad(waveform, b0, b1, b2, a0, a1, a2):
     # type: (Tensor, float, float, float, float, float, float) -> Tensor
     r"""Performs a biquad filter of input tensor.  Initial conditions set to 0.
@@ -585,7 +586,7 @@ def biquad(waveform, b0, b1, b2, a0, a1, a2):
 
     assert(waveform.dtype == torch.float32)
 
-    output_waveform = torchaudio.functional.lfilter(
+    output_waveform = lfilter(
         waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
     )
     return output_waveform
