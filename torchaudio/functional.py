@@ -594,7 +594,8 @@ def biquad(waveform, b0, b1, b2, a0, a1, a2):
     https://en.wikipedia.org/wiki/Digital_biquad_filter
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`.  Currently only supports float32.
+        waveform (torch.Tensor): Audio waveform of dimension of `(n_channel, n_frames)`.
+                                 Currently only supports float32. Normalized [-1, 1]
         b0 (float): numerator coefficient of current input, x[n]
         b1 (float): numerator coefficient of input one time step ago x[n-1]
         b2 (float): numerator coefficient of input two time steps ago x[n-2]
@@ -603,7 +604,7 @@ def biquad(waveform, b0, b1, b2, a0, a1, a2):
         a2 (float): denominator coefficient of current output y[n-2]
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`
+        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)` in range [-1, 1]
     """
 
     device = waveform.device
@@ -626,13 +627,13 @@ def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     r"""Designs biquad highpass filter and performs filtering.  Similar to SoX implementation.
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`
+        waveform (torch.Tensor): Reference `biquad` documentation.
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
         cutoff_freq (float): filter cutoff frequency
         Q (float): https://en.wikipedia.org/wiki/Q_factor
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`
+        output_waveform (torch.Tensor): Reference `biquad` documentation.
     """
 
     GAIN = 1  # TBD - add as a parameter
@@ -653,15 +654,15 @@ def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
 def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     # type: (Tensor, int, float, Optional[float]) -> Tensor
     r"""Designs biquad lowpass filter and performs filtering.  Similar to SoX implementation.
-
+    
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`
+        waveform (torch.Tensor): Reference `biquad` documentation
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
         cutoff_freq (float): filter cutoff frequency
         Q (float): https://en.wikipedia.org/wiki/Q_factor
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`
+        output_waveform (torch.Tensor): Reference `biquad` documentation.
     """
 
     GAIN = 1

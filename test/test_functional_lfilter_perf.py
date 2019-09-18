@@ -143,7 +143,7 @@ class TestFunctionalLFilterPerformance(unittest.TestCase):
         print("CPP Element Wise Runtime       : %10.6f s" % run_time_2)
         print("CPP Matrix Runtime             : %10.6f s" % run_time_3)
         print("-" * 80)
-        print("Ratio Python / CPP ElementWise : %10.2f x" % (run_time_1/run_time_2))
+        print("Ratio Python / CPP ElementWise : %10.2f x" % (run_time_1 / run_time_2))
 
         if assertClose:
             # maxDeviation = torch.kthvalue(torch.abs(output_waveform_3- output_waveform_2), output_waveform_1.size(1))
