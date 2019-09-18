@@ -656,7 +656,7 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
 
 
 def compute_deltas(specgram, win_length=5, mode="replicate"):
-    # type: (Tensor, int, string) -> Tensor
+    # type: (Tensor, int, str) -> Tensor
     r"""Compute delta coefficients of a spectrogram:
 
     .. math::
@@ -669,7 +669,7 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
     Args:
         specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
         win_length (int): The window length used for computing delta
-        mode (string): Mode parameter passed to padding
+        mode (str): Mode parameter passed to padding
 
     Returns:
         deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
