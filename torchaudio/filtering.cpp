@@ -45,7 +45,6 @@ at::Tensor lfilter_tensor_matrix(
     at::Tensor negones = torch::ones({n_channels, n_frames + n_order -1 }, options) * -1;
     at::Tensor normalization_a0 = torch::unsqueeze(a_coeffs[0], {0,}).repeat({n_channels, 1});
 
-
     for (int64_t i_frame = 0; i_frame < n_frames; ++i_frame) {
 
       // calculate the output at time i_frame for all channels
@@ -79,7 +78,6 @@ at::Tensor lfilter_tensor_matrix(
     at::Tensor const & b_coeffs
   ) {
 
-
     // Assumptions - float32, waveform between -1 and 1
     assert(waveform.dtype() == torch::kFloat32);
 
@@ -108,25 +106,24 @@ at::Tensor lfilter_tensor_matrix(
     at::Tensor negones = torch::ones({n_channels, n_frames + n_order -1 }, options) * -1;
     at::Tensor normalization_a0 = torch::unsqueeze(a_coeffs[0], {0,}).repeat({n_channels, 1});    // Device options should mirror input waveform
 
-    // TBD - Implement for CUDA
-    //auto input_accessor = waveform.packed_accessor64<float,2>();
-    //auto output_accessor = output_waveform.packed_accessor64<float,2>();    
-    //auto a_coeffs_accessor = a_coeffs.packed_accessor64<float,1>();
-    //auto b_coeffs_accessor = b_coeffs.packed_accessor64<float,1>();
-    
-    // initialize the output tensor
-  
+    // Create accessors for fast access - https://pytorch.org/cppdocs/notes/tensor_basics.html#efficient-access-to-tensor-elements
+    // CPU
     auto input_accessor = padded_waveform.accessor<float,2>();
     auto output_accessor = padded_output_waveform.accessor<float,2>();    
     auto a_coeffs_accessor = a_coeffs.accessor<float,1>();
     auto b_coeffs_accessor = b_coeffs.accessor<float,1>();
 
+    // CUDA - TBD
+    //auto input_accessor = waveform.packed_accessor64<float,2>();
+    //auto output_accessor = output_waveform.packed_accessor64<float,2>();    
+    //auto a_coeffs_accessor = a_coeffs.packed_accessor64<float,1>();
+    //auto b_coeffs_accessor = b_coeffs.packed_accessor64<float,1>();
+    
     for (int64_t i_channel = 0; i_channel < n_channels; ++i_channel) {
 
       for (int64_t i_frame = 0; i_frame < n_frames; ++i_frame) {
 
-        // calculate the output at time i_frame by iterating through
-        // inputs / outputs at previous time steps and multiplying by coeffs
+        // execute the difference equation
         float o0 = 0;
         for (int i_offset = 0; i_offset < n_order; ++i_offset) {
           o0 += input_accessor[i_channel][i_frame + i_offset] * b_coeffs_accessor[n_order - i_offset - 1];
@@ -134,10 +131,12 @@ at::Tensor lfilter_tensor_matrix(
         }
         o0 = o0 / a_coeffs_accessor[0];
 
+        // put back into the main data structure
         output_accessor[i_channel][i_frame + n_order - 1] = o0;
 
       }
     }
+
     // return clipped, and without initial conditions
     return torch::min(ones, torch::max(negones, padded_output_waveform)).slice(0, 0, n_channels).slice(1, n_order - 1, n_order + n_frames - 1);
   }

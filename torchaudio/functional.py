@@ -511,7 +511,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 def lfilter(waveform, a_coeffs, b_coeffs):
     # type: (Tensor, Tensor, Tensor) -> Tensor
     r"""
-    Performs an IIR filter by evaluating difference equation.  Assumes difference equation is stable.
+    Performs an IIR filter by evaluating difference equation.  Coefficients should be designed to be stable.
 
     Args:
         waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`.  Must be normalized to -1 to 1.
