@@ -866,20 +866,3 @@ def resample_waveform(waveform, orig_freq, new_freq, lowpass_filter_width=6):
         output += dilated_conv_wave
 
     return output
-
-
-def add_deltas(specgram, order=1, win_length=2):
-    r"""Compute delta coefficients of given order of a spectogram.
-
-    Args:
-        specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
-        order (int): A nonzero order of difference
-        win_length (int): The window length used for computing delta.
-
-    Returns:
-        deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
-    """
-    deltas = specgram
-    for _ in range(order):
-        deltas = torchaudio.functional.compute_deltas(deltas, win_length=win_length)
-    return deltas
