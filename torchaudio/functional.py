@@ -15,6 +15,8 @@ __all__ = [
     'angle',
     'magphase',
     'phase_vocoder',
+    'mask_along_axis',
+    'mask_along_axis_iid'
 ]
 
 
@@ -190,8 +192,8 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
         normalized (bool): Whether to normalize by magnitude after stft
 
     Returns:
-        torch.Tensor: Dimension (channel, freq, time), where channel
-        is unchanged, freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
+        torch.Tensor: Dimension (channel, n_freq, time), where channel
+        is unchanged, n_freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frames).
     """
     assert waveform.dim() == 2
@@ -409,22 +411,22 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     factor of ``rate``.
 
     Args:
-        complex_specgrams (torch.Tensor): Dimension of `(channel, freq, time, complex=2)`
+        complex_specgrams (torch.Tensor): Dimension of `(channel, n_freq, time, complex=2)`
         rate (float): Speed-up factor
         phase_advance (torch.Tensor): Expected phase advance in each bin. Dimension
-            of (freq, 1)
+            of (n_freq, 1)
 
     Returns:
         complex_specgrams_stretch (torch.Tensor): Dimension of `(channel,
-        freq, ceil(time/rate), complex=2)`
+        n_freq, ceil(time/rate), complex=2)`
 
-    Example
-        >>> freq, hop_length = 1025, 512
-        >>> # (channel, freq, time, complex=2)
-        >>> complex_specgrams = torch.randn(2, freq, 300, 2)
+    Example:
+        >>> n_freq, hop_length = 1025, 512
+        >>> # (channel, n_freq, time, complex=2)
+        >>> complex_specgrams = torch.randn(2, n_freq, 300, 2)
         >>> rate = 1.3 # Speed up by 30%
         >>> phase_advance = torch.linspace(
-        >>>    0, math.pi * hop_length, freq)[..., None]
+        >>>    0, math.pi * hop_length, n_freq)[..., None]
         >>> x = phase_vocoder(complex_specgrams, rate, phase_advance)
         >>> x.shape # with 231 == ceil(300 / 1.3)
         torch.Size([2, 1025, 231, 2])
@@ -442,7 +444,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     # Time Padding
     complex_specgrams = torch.nn.functional.pad(complex_specgrams, [0, 0, 0, 2])
 
-    # (new_bins, freq, 2)
+    # (new_bins, n_freq, 2)
     complex_specgrams_0 = complex_specgrams[:, :, time_steps.long()]
     complex_specgrams_1 = complex_specgrams[:, :, (time_steps + 1).long()]
 
@@ -471,36 +473,6 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 
 
 @torch.jit.script
-def stft(waveform, pad, window, n_fft, hop_length, win_length):
-    # type: (Tensor, int, Tensor, int, int, int) -> Tensor
-    r"""Create a spectrogram from a raw audio signal.
-
-    Args:
-        waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
-        pad (int): Two sided padding of signal
-        window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
-        n_fft (int): Size of FFT
-        hop_length (int): Length of hop between STFT windows
-        win_length (int): Window size
-
-    Returns:
-        torch.Tensor: Dimension (channel, freq, time), where channel
-        is unchanged, freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
-        Fourier bins, and time is the number of window hops (n_frames).
-    """
-    assert waveform.dim() == 2
-
-    if pad > 0:
-        # TODO add "with torch.no_grad():" back when JIT supports it
-        waveform = torch.nn.functional.pad(waveform, (pad, pad), "constant")
-
-    # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = _stft(waveform, n_fft, hop_length, win_length, window,
-                   True, 'reflect', False, True)
-    return spec_f
-
-
-@torch.jit.script
 def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
     # type: (Tensor, int, float, int) -> Tensor
     r"""
@@ -509,13 +481,13 @@ def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
     All examples will have the same mask interval.
 
     Args:
-        specgrams (Tensor): Real spectograms (batch, channel, freq, time)
+        specgrams (Tensor): Real spectograms (batch, channel, n_freq, time)
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (2 -> frequency, 3 -> time)
 
     Returns:
-        torch.Tensor: Masked scpectograms of dimensions (batch, channel, freq, time)
+        torch.Tensor: Masked scpectograms of dimensions (batch, channel, n_freq, time)
     """
 
     if axis != 2 and axis != 3:
@@ -546,13 +518,13 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
     All examples will have the same mask interval.
 
     Args:
-        specgram (Tensor): Real spectogram (channel, freq, time)
+        specgram (Tensor): Real spectogram (channel, n_freq, time)
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
 
     Returns:
-        torch.Tensor: Masked scpectogram of dimensions (channel, freq, time)
+        torch.Tensor: Masked scpectogram of dimensions (channel, n_freq, time)
     """
 
     value = torch.rand(1) * mask_param
@@ -561,6 +533,7 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
     mask_start = (min_value.long()).squeeze()
     mask_end = (min_value.long() + value.long()).squeeze()
 
+    assert mask_end - mask_start < mask_param
     if axis == 1:
         specgram[:, mask_start:mask_end] = mask_value
     elif axis == 2:

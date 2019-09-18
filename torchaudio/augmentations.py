@@ -15,19 +15,19 @@ class TimeStretch(torch.jit.ScriptModule):
 
     Args:
         hop_length (int): Number audio of frames between STFT columns. (Default: ``n_fft // 2``)
-        num_freqs (int, optional): number of filter banks from stft. (Default: ``201``)
+        n_freq (int, optional): number of filter banks from stft. (Default: ``201``)
         fixed_rate (float): rate to speed up or slow down by.
             If None is provided, rate must be passed to the forward method. (Default: ``None``)
     """
     __constants__ = ['fixed_rate']
 
-    def __init__(self, hop_length=None, num_freqs=201, fixed_rate=None):
+    def __init__(self, hop_length=None, n_freq=201, fixed_rate=None):
         super(TimeStretch, self).__init__()
 
-        n_fft = (num_freqs - 1) * 2
+        n_fft = (n_freq - 1) * 2
         hop_length = hop_length if hop_length is not None else n_fft // 2
         self.fixed_rate = fixed_rate
-        phase_advance = torch.linspace(0, math.pi * hop_length, num_freqs)[..., None]
+        phase_advance = torch.linspace(0, math.pi * hop_length, n_freq)[..., None]
 
         self.phase_advance = torch.jit.Attribute(phase_advance, torch.Tensor)
 
@@ -41,8 +41,10 @@ class TimeStretch(torch.jit.ScriptModule):
                 If no rate is passed, use ``self.fixed_rate``
 
         Returns:
-            (Tensor): Stretched complex spectrogram of dimension (*, channel, num_freqs, ceil(time/rate), complex=2)
+            (Tensor): Stretched complex spectrogram of dimension (*, channel, n_freq, ceil(time/rate), complex=2)
         """
+        assert complex_specgrams.size(-1) == 2, "complex_specgrams should be a complex tensor, shape (*, complex=2)"
+
         if overriding_rate is None:
             rate = self.fixed_rate
             if rate is None:
