@@ -319,15 +319,6 @@ class Test_Kaldi(unittest.TestCase):
             single_channel_sampled = kaldi.resample_waveform(single_channel, sample_rate, sample_rate // 2)
             self.assertTrue(torch.allclose(multi_sound_sampled[i, :], single_channel_sampled, rtol=1e-4))
 
-    def test_compute_deltas(self):
-        channel = 13
-        n_mfcc = channel * 3
-        time = 1021
-        win_length = 7
-        order = 1
-        specgram = torch.randn(channel, n_mfcc, time)
-        computed = kaldi.add_deltas(specgram, win_length=win_length, order=order)
-        self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
 if __name__ == '__main__':
     unittest.main()
