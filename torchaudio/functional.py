@@ -655,8 +655,8 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-def compute_deltas(specgram, win_length=5):
-    # type: (Tensor, int) -> Tensor
+def compute_deltas(specgram, win_length=5, mode="replicate"):
+    # type: (Tensor, int, string) -> Tensor
     r"""Compute delta coefficients of a spectrogram:
 
     .. math::
@@ -666,11 +666,10 @@ def compute_deltas(specgram, win_length=5):
     :math:`c_t` is the spectrogram coeffcients at time :math:`t`,
     :math:`N` is (`win_length`-1)//2.
 
-    The behavior at the edges is to replicate the boundaries.
-
     Args:
         specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
-        win_length (int): The window length used for computing delta.
+        win_length (int): The window length used for computing delta
+        mode (string): Mode parameter passed to padding
 
     Returns:
         deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
@@ -690,7 +689,7 @@ def compute_deltas(specgram, win_length=5):
     # twice sum of integer squared
     denom = n * (n + 1) * (2 * n + 1) / 3
 
-    specgram = torch.nn.functional.pad(specgram, (n, n), mode='replicate')
+    specgram = torch.nn.functional.pad(specgram, (n, n), mode=mode)
 
     kernel = (
         torch

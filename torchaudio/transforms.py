@@ -375,11 +375,12 @@ class ComputeDeltas(torch.jit.ScriptModule):
     Args:
         win_length (int): The window length used for computing delta.
     """
-    __constants__ = ['win_length']
+    __constants__ = ['win_length', 'mode']
 
-    def __init__(self, win_length=5):
+    def __init__(self, win_length=5, mode="replicate"):
         super(ComputeDeltas, self).__init__()
         self.win_length = win_length
+        self.mode = mode
 
     @torch.jit.script_method
     def forward(self, specgram):
@@ -390,4 +391,4 @@ class ComputeDeltas(torch.jit.ScriptModule):
         Returns:
             deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
         """
-        return F.compute_deltas(specgram, win_length=self.win_length)
+        return F.compute_deltas(specgram, win_length=self.win_length, mode=self.mode)
