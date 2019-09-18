@@ -4,7 +4,6 @@ import os
 import torch
 import torchaudio
 import torchaudio.functional as F
-import torchaudio.functional_sox_compatibility as FSOX
 import unittest
 import common_utils
 import time
@@ -35,9 +34,9 @@ class TestFunctionalFiltering(unittest.TestCase):
         Design an IIR lowpass filter using scipy.signal filter design
         https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.iirdesign.html#scipy.signal.iirdesign
 
-        from scipy.signal import iirdesign
-        b, a = iirdesign(0.2, 0.3, 1, 60)
-
+        Example
+          >>> from scipy.signal import iirdesign
+          >>> b, a = iirdesign(0.2, 0.3, 1, 60)
         """
 
         b_coeffs = torch.tensor(
@@ -70,7 +69,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert output_waveform.size(0) == waveform.size(0)
         assert output_waveform.size(1) == waveform.size(1)
 
-    def test_lowpass_sox_compliance(self):
+    def test_lowpass(self):
 
         """
         Run a biquad lowpass filter using SoX vs torchaudio's lfilter
@@ -90,11 +89,11 @@ class TestFunctionalFiltering(unittest.TestCase):
         waveform, sample_rate = torchaudio.load(
             noise_filepath, normalization=True
         )
-        output_waveform = FSOX.lowpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
+        output_waveform = F.lowpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
 
-    def test_highpass_sox_compliance(self):
+    def test_highpass(self):
         """
         Run a biquad highpass filter using SoX vs torchaudio's lfilter
         Results should be very close
@@ -113,7 +112,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         waveform, sample_rate = torchaudio.load(
             noise_filepath, normalization=True
         )
-        output_waveform = FSOX.highpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
+        output_waveform = F.highpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
 
         # TBD - this fails at the 1e-4 level, debug why
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-3)
