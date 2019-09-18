@@ -2,42 +2,65 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import math
 import torch
 
-
 __all__ = [
-    'istft',
-    'spectrogram',
-    'amplitude_to_DB',
-    'create_fb_matrix',
-    'create_dct',
-    'mu_law_encoding',
-    'mu_law_decoding',
-    'complex_norm',
-    'angle',
-    'magphase',
-    'phase_vocoder',
+    "istft",
+    "spectrogram",
+    "amplitude_to_DB",
+    "create_fb_matrix",
+    "create_dct",
+    "mu_law_encoding",
+    "mu_law_decoding",
+    "complex_norm",
+    "angle",
+    "magphase",
+    "phase_vocoder",
+    "lfilter",
+    "lowpass_biquad",
+    "highpass_biquad",
+    "biquad",
     'mask_along_axis',
     'mask_along_axis_iid'
 ]
 
-
 # TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
 @torch.jit.ignore
-def _stft(waveform, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided):
+def _stft(
+    waveform,
+    n_fft,
+    hop_length,
+    win_length,
+    window,
+    center,
+    pad_mode,
+    normalized,
+    onesided,
+):
     # type: (Tensor, int, Optional[int], Optional[int], Optional[Tensor], bool, str, bool, bool) -> Tensor
-    return torch.stft(waveform, n_fft, hop_length, win_length, window, center, pad_mode, normalized, onesided)
+    return torch.stft(
+        waveform,
+        n_fft,
+        hop_length,
+        win_length,
+        window,
+        center,
+        pad_mode,
+        normalized,
+        onesided,
+    )
 
 
-def istft(stft_matrix,          # type: Tensor
-          n_fft,                # type: int
-          hop_length=None,      # type: Optional[int]
-          win_length=None,      # type: Optional[int]
-          window=None,          # type: Optional[Tensor]
-          center=True,          # type: bool
-          pad_mode='reflect',   # type: str
-          normalized=False,     # type: bool
-          onesided=True,        # type: bool
-          length=None           # type: Optional[int]
-          ):
+def istft(
+    stft_matrix,  # type: Tensor
+    n_fft,  # type: int
+    hop_length=None,  # type: Optional[int]
+    win_length=None,  # type: Optional[int]
+    window=None,  # type: Optional[Tensor]
+    center=True,  # type: bool
+    pad_mode="reflect",  # type: str
+    normalized=False,  # type: bool
+    onesided=True,  # type: bool
+    length=None,  # type: Optional[int]
+):
     # type: (...) -> Tensor
     r"""Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.
     It has the same parameters (+ additional optional parameter of ``length``) and it should return the
@@ -92,7 +115,7 @@ def istft(stft_matrix,          # type: Tensor
         (channel, signal_length) or (signal_length)
     """
     stft_matrix_dim = stft_matrix.dim()
-    assert 3 <= stft_matrix_dim <= 4, ('Incorrect stft dimension: %d' % (stft_matrix_dim))
+    assert 3 <= stft_matrix_dim <= 4, "Incorrect stft dimension: %d" % (stft_matrix_dim)
 
     if stft_matrix_dim == 3:
         # add a channel dimension
@@ -101,9 +124,13 @@ def istft(stft_matrix,          # type: Tensor
     dtype = stft_matrix.dtype
     device = stft_matrix.device
     fft_size = stft_matrix.size(1)
-    assert (onesided and n_fft // 2 + 1 == fft_size) or (not onesided and n_fft == fft_size), (
-        'one_sided implies that n_fft // 2 + 1 == fft_size and not one_sided implies n_fft == fft_size. ' +
-        'Given values were onesided: %s, n_fft: %d, fft_size: %d' % ('True' if onesided else False, n_fft, fft_size))
+    assert (onesided and n_fft // 2 + 1 == fft_size) or (
+        not onesided and n_fft == fft_size
+    ), (
+        "one_sided implies that n_fft // 2 + 1 == fft_size and not one_sided implies n_fft == fft_size. "
+        + "Given values were onesided: %s, n_fft: %d, fft_size: %d"
+        % ("True" if onesided else False, n_fft, fft_size)
+    )
 
     # use stft defaults for Optionals
     if win_length is None:
@@ -129,8 +156,9 @@ def istft(stft_matrix,          # type: Tensor
     # win_length and n_fft are synonymous from here on
 
     stft_matrix = stft_matrix.transpose(1, 2)  # size (channel, n_frames, fft_size, 2)
-    stft_matrix = torch.irfft(stft_matrix, 1, normalized,
-                              onesided, signal_sizes=(n_fft,))  # size (channel, n_frames, n_fft)
+    stft_matrix = torch.irfft(
+        stft_matrix, 1, normalized, onesided, signal_sizes=(n_fft,)
+    )  # size (channel, n_frames, n_fft)
 
     assert stft_matrix.size(2) == n_fft
     n_frames = stft_matrix.size(1)
@@ -139,18 +167,23 @@ def istft(stft_matrix,          # type: Tensor
     # each column of a channel is a frame which needs to be overlap added at the right place
     ytmp = ytmp.transpose(1, 2)  # size (channel, n_fft, n_frames)
 
-    eye = torch.eye(n_fft, requires_grad=False,
-                    device=device, dtype=dtype).unsqueeze(1)  # size (n_fft, 1, n_fft)
+    eye = torch.eye(n_fft, requires_grad=False, device=device, dtype=dtype).unsqueeze(
+        1
+    )  # size (n_fft, 1, n_fft)
 
     # this does overlap add where the frames of ytmp are added such that the i'th frame of
     # ytmp is added starting at i*hop_length in the output
     y = torch.nn.functional.conv_transpose1d(
-        ytmp, eye, stride=hop_length, padding=0)  # size (channel, 1, expected_signal_len)
+        ytmp, eye, stride=hop_length, padding=0
+    )  # size (channel, 1, expected_signal_len)
 
     # do the same for the window function
-    window_sq = window.pow(2).view(n_fft, 1).repeat((1, n_frames)).unsqueeze(0)  # size (1, n_fft, n_frames)
+    window_sq = (
+        window.pow(2).view(n_fft, 1).repeat((1, n_frames)).unsqueeze(0)
+    )  # size (1, n_fft, n_frames)
     window_envelop = torch.nn.functional.conv_transpose1d(
-        window_sq, eye, stride=hop_length, padding=0)  # size (1, 1, expected_signal_len)
+        window_sq, eye, stride=hop_length, padding=0
+    )  # size (1, 1, expected_signal_len)
 
     expected_signal_len = n_fft + hop_length * (n_frames - 1)
     assert y.size(2) == expected_signal_len
@@ -166,7 +199,9 @@ def istft(stft_matrix,          # type: Tensor
 
     # check NOLA non-zero overlap condition
     window_envelop_lowest = window_envelop.abs().min()
-    assert window_envelop_lowest > 1e-11, ('window overlap add min: %f' % (window_envelop_lowest))
+    assert window_envelop_lowest > 1e-11, "window overlap add min: %f" % (
+        window_envelop_lowest
+    )
 
     y = (y / window_envelop).squeeze(1)  # size (channel, expected_signal_len)
 
@@ -176,7 +211,9 @@ def istft(stft_matrix,          # type: Tensor
 
 
 @torch.jit.script
-def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, normalized):
+def spectrogram(
+    waveform, pad, window, n_fft, hop_length, win_length, power, normalized
+):
     # type: (Tensor, int, Tensor, int, int, int, int, bool) -> Tensor
     r"""Create a spectrogram from a raw audio signal.
 
@@ -203,8 +240,9 @@ def spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, nor
         waveform = torch.nn.functional.pad(waveform, (pad, pad), "constant")
 
     # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = _stft(waveform, n_fft, hop_length, win_length, window,
-                   True, 'reflect', False, True)
+    spec_f = _stft(
+        waveform, n_fft, hop_length, win_length, window, True, "reflect", False, True
+    )
 
     if normalized:
         spec_f /= window.pow(2).sum().sqrt()
@@ -236,8 +274,9 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
     x_db -= multiplier * db_multiplier
 
     if top_db is not None:
-        new_x_db_max = torch.tensor(float(x_db.max()) - top_db,
-                                    dtype=x_db.dtype, device=x_db.device)
+        new_x_db_max = torch.tensor(
+            float(x_db.max()) - top_db, dtype=x_db.dtype, device=x_db.device
+        )
         x_db = torch.max(x_db, new_x_db_max)
 
     return x_db
@@ -265,17 +304,17 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
     freqs = torch.linspace(f_min, f_max, n_freqs)
     # calculate mel freq bins
     # hertz to mel(f) is 2595. * math.log10(1. + (f / 700.))
-    m_min = 0. if f_min == 0 else 2595. * math.log10(1. + (f_min / 700.))
-    m_max = 2595. * math.log10(1. + (f_max / 700.))
+    m_min = 0.0 if f_min == 0 else 2595.0 * math.log10(1.0 + (f_min / 700.0))
+    m_max = 2595.0 * math.log10(1.0 + (f_max / 700.0))
     m_pts = torch.linspace(m_min, m_max, n_mels + 2)
     # mel to hertz(mel) is 700. * (10**(mel / 2595.) - 1.)
-    f_pts = 700. * (10**(m_pts / 2595.) - 1.)
+    f_pts = 700.0 * (10 ** (m_pts / 2595.0) - 1.0)
     # calculate the difference between each mel point and each stft freq point in hertz
     f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
     slopes = f_pts.unsqueeze(0) - freqs.unsqueeze(1)  # (n_freqs, n_mels + 2)
     # create overlapping triangles
     zero = torch.zeros(1)
-    down_slopes = (-1. * slopes[:, :-2]) / f_diff[:-1]  # (n_freqs, n_mels)
+    down_slopes = (-1.0 * slopes[:, :-2]) / f_diff[:-1]  # (n_freqs, n_mels)
     up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_freqs, n_mels)
     fb = torch.max(zero, torch.min(down_slopes, up_slopes))
     return fb
@@ -303,7 +342,7 @@ def create_dct(n_mfcc, n_mels, norm):
     if norm is None:
         dct *= 2.0
     else:
-        assert norm == 'ortho'
+        assert norm == "ortho"
         dct[0] *= 1.0 / math.sqrt(2.0)
         dct *= math.sqrt(2.0 / float(n_mels))
     return dct.t()
@@ -325,12 +364,11 @@ def mu_law_encoding(x, quantization_channels):
     Returns:
         torch.Tensor: Input after mu-law encoding
     """
-    mu = quantization_channels - 1.
+    mu = quantization_channels - 1.0
     if not x.is_floating_point():
         x = x.to(torch.float)
     mu = torch.tensor(mu, dtype=x.dtype)
-    x_mu = torch.sign(x) * torch.log1p(mu *
-                                       torch.abs(x)) / torch.log1p(mu)
+    x_mu = torch.sign(x) * torch.log1p(mu * torch.abs(x)) / torch.log1p(mu)
     x_mu = ((x_mu + 1) / 2 * mu + 0.5).to(torch.int64)
     return x_mu
 
@@ -351,12 +389,12 @@ def mu_law_decoding(x_mu, quantization_channels):
     Returns:
         torch.Tensor: Input after mu-law decoding
     """
-    mu = quantization_channels - 1.
+    mu = quantization_channels - 1.0
     if not x_mu.is_floating_point():
         x_mu = x_mu.to(torch.float)
     mu = torch.tensor(mu, dtype=x_mu.dtype)
-    x = ((x_mu) / mu) * 2 - 1.
-    x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.) / mu
+    x = ((x_mu) / mu) * 2 - 1.0
+    x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.0) / mu
     return x
 
 
@@ -389,7 +427,7 @@ def angle(complex_tensor):
     return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
 
 
-def magphase(complex_tensor, power=1.):
+def magphase(complex_tensor, power=1.0):
     r"""Separate a complex-valued spectrogram with shape `(*, 2)` into its magnitude and phase.
 
     Args:
@@ -409,24 +447,21 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     # type: (Tensor, float, Tensor) -> Tensor
     r"""Given a STFT tensor, speed up in time without modifying pitch by a
     factor of ``rate``.
-
     Args:
-        complex_specgrams (torch.Tensor): Dimension of `(channel, n_freq, time, complex=2)`
+        complex_specgrams (torch.Tensor): Dimension of `(channel, freq, time, complex=2)`
         rate (float): Speed-up factor
         phase_advance (torch.Tensor): Expected phase advance in each bin. Dimension
-            of (n_freq, 1)
-
+            of (freq, 1)
     Returns:
         complex_specgrams_stretch (torch.Tensor): Dimension of `(channel,
-        n_freq, ceil(time/rate), complex=2)`
-
-    Example:
-        >>> n_freq, hop_length = 1025, 512
-        >>> # (channel, n_freq, time, complex=2)
-        >>> complex_specgrams = torch.randn(2, n_freq, 300, 2)
+        freq, ceil(time/rate), complex=2)`
+    Example
+        >>> freq, hop_length = 1025, 512
+        >>> # (channel, freq, time, complex=2)
+        >>> complex_specgrams = torch.randn(2, freq, 300, 2)
         >>> rate = 1.3 # Speed up by 30%
         >>> phase_advance = torch.linspace(
-        >>>    0, math.pi * hop_length, n_freq)[..., None]
+        >>>    0, math.pi * hop_length, freq)[..., None]
         >>> x = phase_vocoder(complex_specgrams, rate, phase_advance)
         >>> x.shape # with 231 == ceil(300 / 1.3)
         torch.Size([2, 1025, 231, 2])
@@ -438,13 +473,13 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
                               device=complex_specgrams.device,
                               dtype=complex_specgrams.dtype)
 
-    alphas = time_steps % 1.
+    alphas = time_steps % 1.0
     phase_0 = angle(complex_specgrams[:, :, :1])
 
     # Time Padding
     complex_specgrams = torch.nn.functional.pad(complex_specgrams, [0, 0, 0, 2])
 
-    # (new_bins, n_freq, 2)
+    # (new_bins, freq, 2)
     complex_specgrams_0 = complex_specgrams[:, :, time_steps.long()]
     complex_specgrams_1 = complex_specgrams[:, :, (time_steps + 1).long()]
 
@@ -470,6 +505,152 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     complex_specgrams_stretch = torch.stack([real_stretch, imag_stretch], dim=-1)
 
     return complex_specgrams_stretch
+
+
+def lfilter(waveform, a_coeffs, b_coeffs):
+    # type: (Tensor, Tensor, Tensor) -> Tensor
+    r"""
+    Performs an IIR filter by evaluating difference equation.
+
+    Args:
+        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`.  Must be normalized to -1 to 1.
+        a_coeffs (torch.Tensor): denominator coefficients of difference equation of dimension of `(n_order + 1)`.
+                                Lower delays coefficients are first, e.g. `[a0, a1, a2, ...]`.
+                                Must be same size as b_coeffs (pad with 0's as necessary).
+        b_coeffs (torch.Tensor): numerator coefficients of difference equation of dimension of `(n_order + 1)`.
+                                 Lower delays coefficients are first, e.g. `[b0, b1, b2, ...]`.
+                                 Must be same size as a_coeffs (pad with 0's as necessary).
+
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`.  Output will be clipped to -1 to 1.
+
+    """
+
+    assert(waveform.dtype == torch.float32)
+    assert(a_coeffs.size(0) == b_coeffs.size(0))
+    assert(len(waveform.size()) == 2)
+
+    n_channels, n_frames = waveform.size()
+    n_order = a_coeffs.size(0)
+    assert(n_order > 0)
+
+    # Pad the input and create output
+    padded_waveform = torch.zeros(n_channels, n_frames + n_order - 1)
+    padded_waveform[:, (n_order - 1):] = waveform
+    padded_output_waveform = torch.zeros(n_channels, n_frames + n_order - 1)
+
+    # Set up the coefficients matrix
+    # Flip order, repeat, and transpose
+    a_coeffs_filled = a_coeffs.flip(0).repeat(n_channels, 1).t()
+    b_coeffs_filled = b_coeffs.flip(0).repeat(n_channels, 1).t()
+
+    # Set up a few other utilities
+    a0_repeated = torch.ones(n_channels) * a_coeffs[0]
+    ones = torch.ones(n_channels, n_frames)
+
+    for i_frame in range(n_frames):
+
+        o0 = torch.zeros(n_channels)
+
+        windowed_input_signal = padded_waveform[:, i_frame:(i_frame + n_order)]
+        windowed_output_signal = padded_output_waveform[:, i_frame:(i_frame + n_order)]
+
+        o0.add_(torch.diag(torch.mm(windowed_input_signal, b_coeffs_filled)))
+        o0.sub_(torch.diag(torch.mm(windowed_output_signal, a_coeffs_filled)))
+
+        o0.div_(a0_repeated)
+
+        padded_output_waveform[:, i_frame + n_order - 1] = o0
+
+    return torch.min(ones, torch.max(ones * -1, padded_output_waveform[:, (n_order - 1):]))
+
+
+def biquad(waveform, b0, b1, b2, a0, a1, a2):
+    # type: (Tensor, float, float, float, float, float, float) -> Tensor
+    r"""Performs a biquad filter of input tensor.  Initial conditions set to 0.
+    https://en.wikipedia.org/wiki/Digital_biquad_filter
+
+    Args:
+        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`
+        b0 (float): numerator coefficient of current input, x[n]
+        b1 (float): numerator coefficient of input one time step ago x[n-1]
+        b2 (float): numerator coefficient of input two time steps ago x[n-2]
+        a0 (float): denominator coefficient of current output y[n], typically 1
+        a1 (float): denominator coefficient of current output y[n-1]
+        a2 (float): denominator coefficient of current output y[n-2]
+
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`
+    """
+
+    assert(waveform.dtype == torch.float32)
+
+    output_waveform = lfilter(
+        waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
+    )
+    return output_waveform
+
+
+def _dB2Linear(x):
+    return math.exp(x * math.log(10) / 20.0)
+
+
+def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
+    # type: (Tensor, int, float, Optional[float]) -> Tensor
+    r"""Designs biquad highpass filter and performs filtering.  Similar to SoX implementation.
+
+    Args:
+        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`
+        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
+        cutoff_freq (float): filter cutoff frequency
+        Q (float): https://en.wikipedia.org/wiki/Q_factor
+
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`
+    """
+
+    GAIN = 1  # TBD - add as a parameter
+    w0 = 2 * math.pi * cutoff_freq / sample_rate
+    A = math.exp(GAIN / 40.0 * math.log(10))
+    alpha = math.sin(w0) / 2 / Q
+    mult = _dB2Linear(max(GAIN, 0))
+
+    b0 = (1 + math.cos(w0)) / 2
+    b1 = -1 - math.cos(w0)
+    b2 = b0
+    a0 = 1 + alpha
+    a1 = -2 * math.cos(w0)
+    a2 = 1 - alpha
+    return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
+    # type: (Tensor, int, float, Optional[float]) -> Tensor
+    r"""Designs biquad lowpass filter and performs filtering.  Similar to SoX implementation.
+
+    Args:
+        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`
+        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
+        cutoff_freq (float): filter cutoff frequency
+        Q (float): https://en.wikipedia.org/wiki/Q_factor
+
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`
+    """
+
+    GAIN = 1
+    w0 = 2 * math.pi * cutoff_freq / sample_rate
+    A = math.exp(GAIN / 40.0 * math.log(10))
+    alpha = math.sin(w0) / 2 / Q
+    mult = _dB2Linear(max(GAIN, 0))
+
+    b0 = (1 - math.cos(w0)) / 2
+    b1 = 1 - math.cos(w0)
+    b2 = b0
+    a0 = 1 + alpha
+    a1 = -2 * math.cos(w0)
+    a2 = 1 - alpha
+    return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
 @torch.jit.script
