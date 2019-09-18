@@ -72,8 +72,7 @@ class TestFunctionalFiltering(unittest.TestCase):
     def test_lowpass(self):
 
         """
-        Run a biquad lowpass filter using SoX vs torchaudio's lfilter
-        Results should be very close
+        Test biquad lowpass filter, compare to SoX implementation
         """
 
         CUTOFF_FREQ = 3000
@@ -95,8 +94,7 @@ class TestFunctionalFiltering(unittest.TestCase):
 
     def test_highpass(self):
         """
-        Run a biquad highpass filter using SoX vs torchaudio's lfilter
-        Results should be very close
+        Test biquad highpass filter, compare to SoX implementation
         """
 
         CUTOFF_FREQ = 2000
@@ -118,13 +116,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-3)
 
     def test_perf_biquad_filtering(self):
-        """
-        Compare SoX implementation of biquad filtering with C++ implementation
-
-        Test that results are similar and how performance differs
-
-        Current results: C++ implementation approximately same speed
-        """
 
         fn_sine = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
 
