@@ -110,6 +110,12 @@ class TestFunctionalLFilterPerformance(unittest.TestCase):
                 0.8471764313073272,
                 -0.11712354962357388,
             ]
+        elif n_order_filter == 40:
+            # Create random set of 40 coefficients, will not be stable, test runtime rather than
+            # correctness
+            a_coeffs = torch.rand(40).numpy()
+            b_coeffs = torch.rand(40).numpy()
+            a_coeffs[0] = 1  # Set a0 to 1.0
 
         # Cast into Tensors
         a_coeffs = torch.tensor(a_coeffs, device="cpu", dtype=torch.float32)
@@ -149,7 +155,7 @@ class TestFunctionalLFilterPerformance(unittest.TestCase):
             # maxDeviation = torch.kthvalue(torch.abs(output_waveform_3- output_waveform_2), output_waveform_1.size(1))
             assert torch.allclose(output_waveform_1, output_waveform_2, atol=3e-4)
             assert torch.allclose(output_waveform_2, output_waveform_3, atol=3e-4)
-            print("✓ - all outputs are identical")
+            print("PASS - all outputs are identical")
             print("-" * 80)
 
     def test_lfilter_cmp(self):
@@ -172,6 +178,10 @@ class TestFunctionalLFilterPerformance(unittest.TestCase):
         self.run_test(2, 8000, 18, False)
         self.run_test(2, 80000, 18, False)
         self.run_test(2, 800000, 18, False)
+
+        self.run_test(2, 8000, 40, False)
+        self.run_test(2, 80000, 40, False)
+        self.run_test(2, 800000, 40, False)
 
 
 if __name__ == "__main__":
