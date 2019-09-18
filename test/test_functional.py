@@ -21,7 +21,7 @@ class TestFunctional(unittest.TestCase):
     specgram = torch.tensor([1., 2., 3., 4.])
 
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
-        computed = F.compute_deltas(specgram, win_length=3)
+        computed = F.compute_deltas(specgram, win_length=win_length)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         torch.testing.assert_allclose(computed, expected, atol=atol, rtol=rtol)
 
