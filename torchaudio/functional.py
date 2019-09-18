@@ -654,7 +654,7 @@ def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
 def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     # type: (Tensor, int, float, Optional[float]) -> Tensor
     r"""Designs biquad lowpass filter and performs filtering.  Similar to SoX implementation.
-    
+
     Args:
         waveform (torch.Tensor): Reference `biquad` documentation
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
