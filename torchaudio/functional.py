@@ -22,6 +22,7 @@ __all__ = [
     'mask_along_axis_iid'
 ]
 
+
 # TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
 @torch.jit.ignore
 def _stft(
@@ -723,3 +724,51 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
         raise ValueError('Only Frequency and Time masking are supported')
 
     return specgram
+
+
+@torch.jit.script
+def compute_deltas(specgram, win_length=5, mode="replicate"):
+    # type: (Tensor, int, str) -> Tensor
+    r"""Compute delta coefficients of a tensor, usually a spectrogram:
+
+    .. math::
+        d_t = \frac{\sum_{n=1}^{\text{N}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{N} n^2}
+
+    where :math:`d_t` is the deltas at time :math:`t`,
+    :math:`c_t` is the spectrogram coeffcients at time :math:`t`,
+    :math:`N` is (`win_length`-1)//2.
+
+    Args:
+        specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
+        win_length (int): The window length used for computing delta
+        mode (str): Mode parameter passed to padding
+
+    Returns:
+        deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
+
+    Example
+        >>> specgram = torch.randn(1, 40, 1000)
+        >>> delta = compute_deltas(specgram)
+        >>> delta2 = compute_deltas(delta)
+    """
+
+    assert win_length >= 3
+    assert specgram.dim() == 3
+    assert not specgram.shape[1] % specgram.shape[0]
+
+    n = (win_length - 1) // 2
+
+    # twice sum of integer squared
+    denom = n * (n + 1) * (2 * n + 1) / 3
+
+    specgram = torch.nn.functional.pad(specgram, (n, n), mode=mode)
+
+    kernel = (
+        torch
+        .arange(-n, n + 1, 1, device=specgram.device, dtype=specgram.dtype)
+        .repeat(specgram.shape[1], specgram.shape[0], 1)
+    )
+
+    return torch.nn.functional.conv1d(
+        specgram, kernel, groups=specgram.shape[1] // specgram.shape[0]
+    ) / denom

@@ -4,8 +4,9 @@ import os
 
 import torch
 import torchaudio
-from torchaudio.common_utils import IMPORT_LIBROSA, IMPORT_SCIPY
 import torchaudio.transforms as transforms
+import torchaudio.functional as F
+from torchaudio.common_utils import IMPORT_LIBROSA, IMPORT_SCIPY
 import unittest
 import common_utils
 
@@ -280,6 +281,38 @@ class Tester(unittest.TestCase):
 
         # we expect the downsampled signal to have half as many samples
         self.assertTrue(down_sampled.size(-1) == waveform.size(-1) // 2)
+
+    def test_compute_deltas(self):
+        channel = 13
+        n_mfcc = channel * 3
+        time = 1021
+        win_length = 2 * 7 + 1
+        specgram = torch.randn(channel, n_mfcc, time)
+        transform = transforms.ComputeDeltas(win_length=win_length)
+        computed = transform(specgram)
+        self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
+
+    def test_compute_deltas_transform_same_as_functional(self, atol=1e-6, rtol=1e-8):
+        channel = 13
+        n_mfcc = channel * 3
+        time = 1021
+        win_length = 2 * 7 + 1
+        specgram = torch.randn(channel, n_mfcc, time)
+
+        transform = transforms.ComputeDeltas(win_length=win_length)
+        computed_transform = transform(specgram)
+
+        computed_functional = F.compute_deltas(specgram, win_length=win_length)
+        torch.testing.assert_allclose(computed_functional, computed_transform, atol=atol, rtol=rtol)
+
+    def test_compute_deltas_twochannel(self):
+        specgram = torch.tensor([1., 2., 3., 4.]).repeat(1, 2, 1)
+        expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5],
+                                  [0.5, 1.0, 1.0, 0.5]]])
+        transform = transforms.ComputeDeltas()
+        computed = transform(specgram)
+        self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
+
 
 if __name__ == '__main__':
     unittest.main()

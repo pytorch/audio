@@ -388,3 +388,30 @@ class ComplexNorm(torch.jit.ScriptModule):
             Tensor: norm of the input tensor, shape of `(*, )`
         """
         return F.complex_norm(complex_tensor, self.power)
+
+
+class ComputeDeltas(torch.jit.ScriptModule):
+    r"""Compute delta coefficients of a tensor, usually a spectrogram.
+
+    See `torchaudio.functional.compute_deltas` for more details.
+
+    Args:
+        win_length (int): The window length used for computing delta.
+    """
+    __constants__ = ['win_length']
+
+    def __init__(self, win_length=5, mode="replicate"):
+        super(ComputeDeltas, self).__init__()
+        self.win_length = win_length
+        self.mode = torch.jit.Attribute(mode, str)
+
+    @torch.jit.script_method
+    def forward(self, specgram):
+        r"""
+        Args:
+            specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
+
+        Returns:
+            deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
+        """
+        return F.compute_deltas(specgram, win_length=self.win_length, mode=self.mode)

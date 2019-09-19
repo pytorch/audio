@@ -319,5 +319,6 @@ class Test_Kaldi(unittest.TestCase):
             single_channel_sampled = kaldi.resample_waveform(single_channel, sample_rate, sample_rate // 2)
             self.assertTrue(torch.allclose(multi_sound_sampled[i, :], single_channel_sampled, rtol=1e-4))
 
+
 if __name__ == '__main__':
     unittest.main()
