@@ -50,8 +50,6 @@ def load(filepath,
             audio type cannot be automatically determined. (Default: ``None``)
         filetype (str, optional): A filetype or extension to be set if sox cannot determine it
             automatically. (Default: ``None``)
-        device (torch.device, optional): A device type can be passed in to create output tensor on, otherwise
-            default to CPU
 
     Returns:
         Tuple[torch.Tensor, int]: An output tensor of size `[C x L]` or `[L x C]` where L is the number
@@ -80,7 +78,7 @@ def load(filepath,
         check_input(out)
     else:
         out = torch.FloatTensor()
-        
+
     if num_frames < -1:
         raise ValueError("Expected value for num_samples -1 (entire file) or >=0")
     if offset < 0:
