@@ -12,7 +12,7 @@ import time
 class TestFunctionalFiltering(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
 
-    def _test_lfilter_basic(self, device):
+    def _test_lfilter_basic(self, dtype, device):
         """
         Create a very basic signal,
         Then make a simple 4th order delay
@@ -20,25 +20,22 @@ class TestFunctionalFiltering(unittest.TestCase):
         """
 
         torch.random.manual_seed(42)
-        waveform = torch.rand(2, 44100 * 1, device=device)
-        b_coeffs = torch.tensor([0, 0, 0, 1], dtype=torch.float32, device=device)
-        a_coeffs = torch.tensor([1, 0, 0, 0], dtype=torch.float32, device=device)
+        waveform = torch.rand(2, 44100 * 1, dtype=dtype, device=device)
+        b_coeffs = torch.tensor([0, 0, 0, 1], dtype=dtype, device=device)
+        a_coeffs = torch.tensor([1, 0, 0, 0], dtype=dtype, device=device)
         output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
 
         assert torch.allclose(waveform[:, 0:-3], output_waveform[:, 3:], atol=1e-5)
 
     def test_lfilter_basic(self):
-        """
-        Will a basic difference engine run, on CPU
-        and GPU (if available)
-        """
+        self._test_lfilter_basic(torch.float32, torch.device("cpu"))
 
-        cpu = torch.device("cpu")
-        self._test_lfilter_basic(cpu)
+    def test_lfilter_basic_double(self):
+        self._test_lfilter_basic(torch.float64, torch.device("cpu"))
 
+    def test_lfilter_basic_gpu(self):
         if torch.cuda.is_available():
-            cuda0 = torch.device("cuda:0")
-            self._test_lfilter_basic(cuda0)
+            self._test_lfilter_basic(torch.float32, torch.device("cuda:0"))
         else:
             print("skipping GPU test for lfilter_basic because device not available")
             pass
@@ -88,10 +85,12 @@ class TestFunctionalFiltering(unittest.TestCase):
         filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
-        cpu = torch.device("cpu")
-        self._test_lfilter(waveform, cpu)
+        self._test_lfilter(waveform, torch.device("cpu"))
 
+    def test_lfilter_gpu(self):  
         if torch.cuda.is_available():
+            filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+            waveform, _ = torchaudio.load(filepath, normalization=True)
             cuda0 = torch.device("cuda:0")
             cuda_waveform = waveform.cuda(device=cuda0)
             self._test_lfilter(cuda_waveform, cuda0)
