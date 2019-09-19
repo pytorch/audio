@@ -87,7 +87,7 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         self._test_lfilter(waveform, torch.device("cpu"))
 
-    def test_lfilter_gpu(self):  
+    def test_lfilter_gpu(self):
         if torch.cuda.is_available():
             filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
             waveform, _ = torchaudio.load(filepath, normalization=True)

@@ -600,7 +600,6 @@ def biquad(waveform, b0, b1, b2, a0, a1, a2):
 
 
 def _dB2Linear(x):
-    import math
     return math.exp(x * math.log(10) / 20.0)
 
 
