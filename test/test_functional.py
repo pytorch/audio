@@ -307,8 +307,6 @@ def test_mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
 
     mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
 
-    torch.save(mask_specgrams, 'ex.pth')
-
     other_axis = 2 if axis == 3 else 3
 
     masked_columns = (mask_specgrams == mask_value).sum(other_axis)
