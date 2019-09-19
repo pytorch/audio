@@ -657,7 +657,7 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
 
 def compute_deltas(specgram, win_length=5, mode="replicate"):
     # type: (Tensor, int, str) -> Tensor
-    r"""Compute delta coefficients of a spectrogram:
+    r"""Compute delta coefficients of a tensor, usually a spectrogram:
 
     .. math::
         d_t = \frac{\sum_{n=1}^{\text{N}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{N} n^2}
