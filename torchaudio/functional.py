@@ -511,7 +511,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 def lfilter(waveform, a_coeffs, b_coeffs):
     # type: (Tensor, Tensor, Tensor) -> Tensor
     r"""
-    Performs an IIR filter by evaluating difference equation.
+    Performs an IIR filter by evaluating difference equation.  All input tensors should be on the same device.
 
     Args:
         waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`.  Must be normalized to -1 to 1.
@@ -523,22 +523,26 @@ def lfilter(waveform, a_coeffs, b_coeffs):
                                  Must be same size as a_coeffs (pad with 0's as necessary).
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`.  Output will be clipped to -1 to 1.
+        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`.  Output will be clipped to -1 to 1. 
+                                        Will be on the same device as the inputs.
 
     """
 
     assert(waveform.dtype == torch.float32)
     assert(a_coeffs.size(0) == b_coeffs.size(0))
     assert(len(waveform.size()) == 2)
+    assert(waveform.device == a_coeffs.device)
+    assert(b_coeffs.device == a_coeffs.device)
 
+    device = waveform.device
     n_channels, n_frames = waveform.size()
     n_order = a_coeffs.size(0)
     assert(n_order > 0)
 
     # Pad the input and create output
-    padded_waveform = torch.zeros(n_channels, n_frames + n_order - 1)
+    padded_waveform = torch.zeros(n_channels, n_frames + n_order - 1, device=device)
     padded_waveform[:, (n_order - 1):] = waveform
-    padded_output_waveform = torch.zeros(n_channels, n_frames + n_order - 1)
+    padded_output_waveform = torch.zeros(n_channels, n_frames + n_order - 1, device=device)
 
     # Set up the coefficients matrix
     # Flip order, repeat, and transpose
@@ -546,12 +550,12 @@ def lfilter(waveform, a_coeffs, b_coeffs):
     b_coeffs_filled = b_coeffs.flip(0).repeat(n_channels, 1).t()
 
     # Set up a few other utilities
-    a0_repeated = torch.ones(n_channels) * a_coeffs[0]
-    ones = torch.ones(n_channels, n_frames)
+    a0_repeated = torch.ones(n_channels, device=device) * a_coeffs[0]
+    ones = torch.ones(n_channels, n_frames, device=device)
 
     for i_frame in range(n_frames):
 
-        o0 = torch.zeros(n_channels)
+        o0 = torch.zeros(n_channels, device=device)
 
         windowed_input_signal = padded_waveform[:, i_frame:(i_frame + n_order)]
         windowed_output_signal = padded_output_waveform[:, i_frame:(i_frame + n_order)]
