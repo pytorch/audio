@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import torch
+from _torch_filtering import _lfilter_tensor_matrix, _lfilter_element_wise
 
 __all__ = [
     "istft",
@@ -15,6 +16,7 @@ __all__ = [
     "magphase",
     "phase_vocoder",
     "lfilter",
+    "lfilter_cpp_impl",
     "lowpass_biquad",
     "highpass_biquad",
     "biquad",
@@ -564,6 +566,77 @@ def lfilter(waveform, a_coeffs, b_coeffs):
         padded_output_waveform[:, i_frame + n_order - 1] = o0
 
     return torch.min(ones, torch.max(ones * -1, padded_output_waveform[:, (n_order - 1):]))
+
+
+def lfilter_cpp_impl(waveform, a_coeffs, b_coeffs, execution_method):
+    # type: (Tensor, Tensor, Tensor, string) -> Tensor
+    r"""
+    See lfilter documentation. Execution method can be either `element_wise` or `matrix`.
+    """
+
+    # Perform sanity checks, input check, and memory allocation in python
+
+    # Current limitations to be removed in future
+    assert(waveform.dtype == torch.float32)
+    assert(waveform.device.type == 'cpu')
+    assert(waveform.device == a_coeffs.device)
+    assert(waveform.device == b_coeffs.device)
+
+    # Use these parameters for any calculations
+    device = waveform.device
+    dtype = waveform.dtype
+
+    # Check filter orders
+    n_order = a_coeffs.size(0)
+    assert(b_coeffs.size(0) == n_order)
+    assert(n_order > 0)
+    assert(a_coeffs[0] != 0)  # a0 coeff for y[n] can not be 0
+
+    # Check waveform size
+    assert(len(waveform.size()) == 2)
+    n_channels = waveform.size(0)
+    n_frames = waveform.size(1)
+    n_padded_frames = n_frames + n_order - 1
+
+    # Allocate temporary data structures
+    # First, the input waveform should be padded by the order of the filter
+    #   N.B. Should we look to how we can avoid copying
+    padded_waveform = torch.zeros(n_channels, n_padded_frames, dtype=dtype, device=device)
+    padded_output_waveform = torch.zeros(n_channels, n_padded_frames, dtype=dtype, device=device)
+    padded_waveform[:, (n_order - 1):] = waveform
+
+    # More temporary data structures
+    o0 = torch.zeros(n_channels, 1, dtype=dtype, device=device)
+    normalization_a0 = a_coeffs[0].unsqueeze(0).repeat(n_channels, 1)
+    ones = torch.ones(n_channels, n_padded_frames, dtype=dtype, device=device)
+
+    # Run through assertion size checks
+    assert(normalization_a0.size(0) == n_channels)
+
+    if execution_method == 'element_wise':
+        _lfilter_element_wise(padded_waveform,
+                              padded_output_waveform,
+                              a_coeffs,
+                              b_coeffs,
+                              o0
+                              )
+    elif execution_method == 'matrix':
+        # From [n_order] a_coeffs, create a [n_channel, n_order] tensor
+        # lowest order coefficients e.g. a0, b0 should be at the "bottom"
+        # used for matrix multiply later
+        a_coeffs_filled = a_coeffs.flip(0).repeat(n_channels, 1).t()
+        b_coeffs_filled = b_coeffs.flip(0).repeat(n_channels, 1).t()
+        _lfilter_tensor_matrix(padded_waveform,
+                               padded_output_waveform,
+                               a_coeffs_filled,
+                               b_coeffs_filled,
+                               o0,
+                               normalization_a0,
+                               )
+    else:
+        raise Exception("invalid lfilter execution method %s" % execution_method)
+
+    return torch.min(ones, torch.max(ones * -1, padded_output_waveform))[:, (n_order - 1):]
 
 
 def biquad(waveform, b0, b1, b2, a0, a1, a2):

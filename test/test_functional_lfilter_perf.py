@@ -6,8 +6,7 @@ import torchaudio
 import unittest
 import common_utils
 
-from torchaudio.functional import lfilter
-from _torch_filtering import _lfilter_tensor_matrix, _lfilter_element_wise
+from torchaudio.functional import lfilter, lfilter_cpp_impl
 
 
 class TestFunctionalLFilterPerformance(unittest.TestCase):
@@ -16,8 +15,6 @@ class TestFunctionalLFilterPerformance(unittest.TestCase):
     @staticmethod
     def run_test(n_channels, n_frames, n_order_filter, assertClose=True):
         waveform = torch.rand(n_channels, n_frames, device="cpu")
-        b_coeffs = torch.rand(n_order_filter, dtype=torch.float32, device="cpu")
-        a_coeffs = torch.rand(n_order_filter, dtype=torch.float32, device="cpu")
 
         if n_order_filter == 8:
             # Eighth Order Filter
@@ -133,10 +130,10 @@ class TestFunctionalLFilterPerformance(unittest.TestCase):
             lambda: lfilter(waveform, a_coeffs, b_coeffs)
         )
         (output_waveform_2, run_time_2) = time_and_output(
-            lambda: _lfilter_element_wise(waveform, a_coeffs, b_coeffs)
+            lambda: lfilter_cpp_impl(waveform, a_coeffs, b_coeffs, 'element_wise')
         )
         (output_waveform_3, run_time_3) = time_and_output(
-            lambda: _lfilter_tensor_matrix(waveform, a_coeffs, b_coeffs)
+            lambda: lfilter_cpp_impl(waveform, a_coeffs, b_coeffs, 'matrix')
         )
 
         print("-" * 80)
@@ -152,11 +149,21 @@ class TestFunctionalLFilterPerformance(unittest.TestCase):
         print("Ratio Python / CPP ElementWise : %10.2f x" % (run_time_1 / run_time_2))
 
         if assertClose:
-            # maxDeviation = torch.kthvalue(torch.abs(output_waveform_3- output_waveform_2), output_waveform_1.size(1))
+            # maxDeviation = torch.kthvalue(torch.abs(output_waveform_2- output_waveform_1), output_waveform_1.size(1))
+
             assert torch.allclose(output_waveform_1, output_waveform_2, atol=3e-4)
             assert torch.allclose(output_waveform_2, output_waveform_3, atol=3e-4)
             print("PASS - all outputs are identical")
             print("-" * 80)
+
+    def test_cpp_lfilter_runs(self):
+        waveform = torch.rand(2, 1000)
+        b_coeffs = torch.rand(2, dtype=torch.float32)
+        a_coeffs = torch.rand(2, dtype=torch.float32)
+        a_coeffs[0] = 1
+
+        output_waveform = lfilter_cpp_impl(waveform, a_coeffs, b_coeffs, 'element_wise')
+        output_waveform = lfilter_cpp_impl(waveform, a_coeffs, b_coeffs, 'matrix')
 
     def test_lfilter_cmp(self):
         """
