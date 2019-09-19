@@ -20,7 +20,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         """
 
         torch.random.manual_seed(42)
-        waveform = torch.rand(2, 44100 * 10, device=device)
+        waveform = torch.rand(2, 44100 * 1, device=device)
         b_coeffs = torch.tensor([0, 0, 0, 1], dtype=torch.float32, device=device)
         a_coeffs = torch.tensor([1, 0, 0, 0], dtype=torch.float32, device=device)
         output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
@@ -43,7 +43,7 @@ class TestFunctionalFiltering(unittest.TestCase):
             print("skipping GPU test for lfilter_basic because device not available")
             pass
 
-    def _test_lfilter(self, device):
+    def _test_lfilter(self, waveform, device):
         """
         Design an IIR lowpass filter using scipy.signal filter design
         https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.iirdesign.html#scipy.signal.iirdesign
@@ -78,10 +78,6 @@ class TestFunctionalFiltering(unittest.TestCase):
             device=device,
         )
 
-        filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
-        waveform, sample_rate = torchaudio.load(
-            filepath, normalization=True, device=device
-        )
         output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
         assert len(output_waveform.size()) == 2
         assert output_waveform.size(0) == waveform.size(0)
@@ -89,12 +85,16 @@ class TestFunctionalFiltering(unittest.TestCase):
 
     def test_lfilter(self):
 
+        filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        waveform, _ = torchaudio.load(filepath, normalization=True)
+
         cpu = torch.device("cpu")
-        self._test_lfilter(cpu)
+        self._test_lfilter(waveform, cpu)
 
         if torch.cuda.is_available():
             cuda0 = torch.device("cuda:0")
-            self._test_lfilter(cuda0)
+            cuda_waveform = waveform.cuda(device=cuda0)
+            self._test_lfilter(cuda_waveform, cuda0)
         else:
             print("skipping GPU test for lfilter because device not available")
             pass

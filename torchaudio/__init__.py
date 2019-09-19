@@ -27,8 +27,7 @@ def load(filepath,
          offset=0,
          signalinfo=None,
          encodinginfo=None,
-         filetype=None,
-         device=None):
+         filetype=None):
     r"""Loads an audio file from disk into a tensor
 
     Args:
@@ -80,11 +79,8 @@ def load(filepath,
     if out is not None:
         check_input(out)
     else:
-        if device is None:
-            out = torch.FloatTensor()
-        else:
-            out = torch.FloatTensor(device=device)
-
+        out = torch.FloatTensor()
+        
     if num_frames < -1:
         raise ValueError("Expected value for num_samples -1 (entire file) or >=0")
     if offset < 0:
