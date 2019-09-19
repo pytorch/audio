@@ -18,6 +18,32 @@ if IMPORT_LIBROSA:
 class TestFunctional(unittest.TestCase):
     data_sizes = [(2, 20), (3, 15), (4, 10)]
     number_of_trials = 100
+    specgram = torch.tensor([1., 2., 3., 4.])
+
+    def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
+        computed = F.compute_deltas(specgram, win_length=win_length)
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        torch.testing.assert_allclose(computed, expected, atol=atol, rtol=rtol)
+
+    def test_compute_deltas_onechannel(self):
+        specgram = self.specgram.unsqueeze(0).unsqueeze(0)
+        expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5]]])
+        self._test_compute_deltas(specgram, expected)
+
+    def test_compute_deltas_twochannel(self):
+        specgram = self.specgram.repeat(1, 2, 1)
+        expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5],
+                                  [0.5, 1.0, 1.0, 0.5]]])
+        self._test_compute_deltas(specgram, expected)
+
+    def test_compute_deltas_randn(self):
+        channel = 13
+        n_mfcc = channel * 3
+        time = 1021
+        win_length = 2 * 7 + 1
+        specgram = torch.randn(channel, n_mfcc, time)
+        computed = F.compute_deltas(specgram, win_length=win_length)
+        self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
     def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
         # trim sound for case when constructed signal is shorter than original
