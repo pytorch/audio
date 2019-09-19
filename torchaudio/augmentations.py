@@ -88,7 +88,7 @@ class _AxisMasking(torch.jit.ScriptModule):
             specgram (torch.Tensor): Tensor of dimension (*, channel, freq, time)
 
         Returns:
-            torch.Tensor: Masked scpectogram of dimensions (*, channel, freq, time)
+            torch.Tensor: Masked spectrogram of dimensions (*, channel, freq, time)
         """
 
         # if iid_masks flag marked and specgram has a batch dimension
