@@ -99,7 +99,6 @@ class TestFunctionalFiltering(unittest.TestCase):
             print("skipping GPU test for lfilter because device not available")
             pass
 
-    @unittest.skip
     def test_lowpass(self):
 
         """
@@ -119,7 +118,6 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
 
-    @unittest.skip
     def test_highpass(self):
         """
         Test biquad highpass filter, compare to SoX implementation
@@ -139,7 +137,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         # TBD - this fails at the 1e-4 level, debug why
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-3)
 
-    @unittest.skip
     def test_perf_biquad_filtering(self):
 
         fn_sine = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
