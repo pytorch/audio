@@ -523,7 +523,7 @@ def lfilter(waveform, a_coeffs, b_coeffs):
                                  Must be same size as a_coeffs (pad with 0's as necessary).
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`.  Output will be clipped to -1 to 1. 
+        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`.  Output will be clipped to -1 to 1.
                                         Will be on the same device as the inputs.
 
     """
