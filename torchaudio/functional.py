@@ -18,6 +18,8 @@ __all__ = [
     "lowpass_biquad",
     "highpass_biquad",
     "biquad",
+    'mask_along_axis',
+    'mask_along_axis_iid'
 ]
 
 
@@ -228,8 +230,8 @@ def spectrogram(
         normalized (bool): Whether to normalize by magnitude after stft
 
     Returns:
-        torch.Tensor: Dimension (channel, freq, time), where channel
-        is unchanged, freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
+        torch.Tensor: Dimension (channel, n_freq, time), where channel
+        is unchanged, n_freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frames).
     """
     assert waveform.dim() == 2
@@ -397,7 +399,9 @@ def mu_law_decoding(x_mu, quantization_channels):
     return x
 
 
+@torch.jit.script
 def complex_norm(complex_tensor, power=1.0):
+    # type: (Tensor, float) -> Tensor
     r"""Compute the norm of complex tensor input.
 
     Args:
@@ -439,64 +443,59 @@ def magphase(complex_tensor, power=1.0):
     return mag, phase
 
 
+@torch.jit.script
 def phase_vocoder(complex_specgrams, rate, phase_advance):
+    # type: (Tensor, float, Tensor) -> Tensor
     r"""Given a STFT tensor, speed up in time without modifying pitch by a
     factor of ``rate``.
-
     Args:
-        complex_specgrams (torch.Tensor): Dimension of `(*, channel, freq, time, complex=2)`
+        complex_specgrams (torch.Tensor): Dimension of `(channel, freq, time, complex=2)`
         rate (float): Speed-up factor
         phase_advance (torch.Tensor): Expected phase advance in each bin. Dimension
             of (freq, 1)
-
     Returns:
-        complex_specgrams_stretch (torch.Tensor): Dimension of `(*, channel,
+        complex_specgrams_stretch (torch.Tensor): Dimension of `(channel,
         freq, ceil(time/rate), complex=2)`
-
     Example
-        >>> num_freqs, hop_length = 1025, 512
-        >>> # (batch, channel, num_freqs, time, complex=2)
-        >>> complex_specgrams = torch.randn(16, 1, num_freqs, 300, 2)
-        >>> rate = 1.3 # Slow down by 30%
+        >>> freq, hop_length = 1025, 512
+        >>> # (channel, freq, time, complex=2)
+        >>> complex_specgrams = torch.randn(2, freq, 300, 2)
+        >>> rate = 1.3 # Speed up by 30%
         >>> phase_advance = torch.linspace(
-        >>>    0, math.pi * hop_length, num_freqs)[..., None]
+        >>>    0, math.pi * hop_length, freq)[..., None]
         >>> x = phase_vocoder(complex_specgrams, rate, phase_advance)
         >>> x.shape # with 231 == ceil(300 / 1.3)
-        torch.Size([16, 1, 1025, 231, 2])
+        torch.Size([2, 1025, 231, 2])
     """
-    ndim = complex_specgrams.dim()
-    time_slice = [slice(None)] * (ndim - 2)
 
-    time_steps = torch.arange(
-        0,
-        complex_specgrams.size(-2),
-        rate,
-        device=complex_specgrams.device,
-        dtype=complex_specgrams.dtype,
-    )
+    time_steps = torch.arange(0,
+                              complex_specgrams.size(-2),
+                              rate,
+                              device=complex_specgrams.device,
+                              dtype=complex_specgrams.dtype)
 
     alphas = time_steps % 1.0
-    phase_0 = angle(complex_specgrams[time_slice + [slice(1)]])
+    phase_0 = angle(complex_specgrams[:, :, :1])
 
     # Time Padding
     complex_specgrams = torch.nn.functional.pad(complex_specgrams, [0, 0, 0, 2])
 
-    # (new_bins, num_freqs, 2)
-    complex_specgrams_0 = complex_specgrams[time_slice + [time_steps.long()]]
-    complex_specgrams_1 = complex_specgrams[time_slice + [(time_steps + 1).long()]]
+    # (new_bins, freq, 2)
+    complex_specgrams_0 = complex_specgrams[:, :, time_steps.long()]
+    complex_specgrams_1 = complex_specgrams[:, :, (time_steps + 1).long()]
 
     angle_0 = angle(complex_specgrams_0)
     angle_1 = angle(complex_specgrams_1)
 
-    norm_0 = torch.norm(complex_specgrams_0, dim=-1)
-    norm_1 = torch.norm(complex_specgrams_1, dim=-1)
+    norm_0 = torch.norm(complex_specgrams_0, p=2, dim=-1)
+    norm_1 = torch.norm(complex_specgrams_1, p=2, dim=-1)
 
     phase = angle_1 - angle_0 - phase_advance
     phase = phase - 2 * math.pi * torch.round(phase / (2 * math.pi))
 
     # Compute Phase Accum
     phase = phase + phase_advance
-    phase = torch.cat([phase_0, phase[time_slice + [slice(-1)]]], dim=-1)
+    phase = torch.cat([phase_0, phase[:, :, :-1]], dim=-1)
     phase_acc = torch.cumsum(phase, -1)
 
     mag = alphas * norm_1 + (1 - alphas) * norm_0
@@ -662,6 +661,79 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
+@torch.jit.script
+def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
+    # type: (Tensor, int, float, int) -> Tensor
+    r"""
+    Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
+    ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.
+    All examples will have the same mask interval.
+
+    Args:
+        specgrams (Tensor): Real spectrograms (batch, channel, n_freq, time)
+        mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
+        mask_value (float): Value to assign to the masked columns
+        axis (int): Axis to apply masking on (2 -> frequency, 3 -> time)
+
+    Returns:
+        torch.Tensor: Masked spectrograms of dimensions (batch, channel, n_freq, time)
+    """
+
+    if axis != 2 and axis != 3:
+        raise ValueError('Only Frequency and Time masking are supported')
+
+    value = torch.rand(specgrams.shape[:2]) * mask_param
+    min_value = torch.rand(specgrams.shape[:2]) * (specgrams.size(axis) - value)
+
+    # Create broadcastable mask
+    mask_start = (min_value.long())[..., None, None].float()
+    mask_end = (min_value.long() + value.long())[..., None, None].float()
+    mask = torch.arange(0, specgrams.size(axis)).float()
+
+    # Per batch example masking
+    specgrams = specgrams.transpose(axis, -1)
+    specgrams.masked_fill_((mask >= mask_start) & (mask < mask_end), mask_value)
+    specgrams = specgrams.transpose(axis, -1)
+
+    return specgrams
+
+
+@torch.jit.script
+def mask_along_axis(specgram, mask_param, mask_value, axis):
+    # type: (Tensor, int, float, int) -> Tensor
+    r"""
+    Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
+    ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.
+    All examples will have the same mask interval.
+
+    Args:
+        specgram (Tensor): Real spectrogram (channel, n_freq, time)
+        mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
+        mask_value (float): Value to assign to the masked columns
+        axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
+
+    Returns:
+        torch.Tensor: Masked spectrogram of dimensions (channel, n_freq, time)
+    """
+
+    value = torch.rand(1) * mask_param
+    min_value = torch.rand(1) * (specgram.size(axis) - value)
+
+    mask_start = (min_value.long()).squeeze()
+    mask_end = (min_value.long() + value.long()).squeeze()
+
+    assert mask_end - mask_start < mask_param
+    if axis == 1:
+        specgram[:, mask_start:mask_end] = mask_value
+    elif axis == 2:
+        specgram[:, :, mask_start:mask_end] = mask_value
+    else:
+        raise ValueError('Only Frequency and Time masking are supported')
+
+    return specgram
+
+
+@torch.jit.script
 def compute_deltas(specgram, win_length=5, mode="replicate"):
     # type: (Tensor, int, str) -> Tensor
     r"""Compute delta coefficients of a tensor, usually a spectrogram:

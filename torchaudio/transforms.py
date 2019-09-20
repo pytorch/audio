@@ -16,6 +16,7 @@ __all__ = [
     'MuLawEncoding',
     'MuLawDecoding',
     'Resample',
+    'ComplexNorm'
 ]
 
 
@@ -365,6 +366,28 @@ class Resample(torch.nn.Module):
             return kaldi.resample_waveform(waveform, self.orig_freq, self.new_freq)
 
         raise ValueError('Invalid resampling method: %s' % (self.resampling_method))
+
+
+class ComplexNorm(torch.jit.ScriptModule):
+    r"""Compute the norm of complex tensor input
+    Args:
+        power (float): Power of the norm. Defaults to `1.0`.
+    """
+    __constants__ = ['power']
+
+    def __init__(self, power=1.0):
+        super(ComplexNorm, self).__init__()
+        self.power = power
+
+    @torch.jit.script_method
+    def forward(self, complex_tensor):
+        r"""
+        Args:
+            complex_tensor (Tensor): Tensor shape of `(*, complex=2)`
+        Returns:
+            Tensor: norm of the input tensor, shape of `(*, )`
+        """
+        return F.complex_norm(complex_tensor, self.power)
 
 
 class ComputeDeltas(torch.jit.ScriptModule):

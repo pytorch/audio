@@ -223,8 +223,7 @@ def _num_stft_bins(signal_len, fft_len, hop_length, pad):
 
 
 @pytest.mark.parametrize('complex_specgrams', [
-    torch.randn(1, 2, 1025, 400, 2),
-    torch.randn(1, 1025, 400, 2)
+    torch.randn(2, 1025, 400, 2)
 ])
 @pytest.mark.parametrize('rate', [0.5, 1.01, 1.3])
 @pytest.mark.parametrize('hop_length', [256])
@@ -275,6 +274,46 @@ def test_complex_norm(complex_tensor, power):
     norm_tensor = F.complex_norm(complex_tensor, power)
 
     assert torch.allclose(expected_norm_tensor, norm_tensor, atol=1e-5)
+
+
+@pytest.mark.parametrize('specgram', [
+    torch.randn(2, 1025, 400),
+    torch.randn(1, 201, 100)
+])
+@pytest.mark.parametrize('mask_param', [100])
+@pytest.mark.parametrize('mask_value', [0., 30.])
+@pytest.mark.parametrize('axis', [1, 2])
+def test_mask_along_axis(specgram, mask_param, mask_value, axis):
+
+    mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis)
+
+    other_axis = 1 if axis == 2 else 2
+
+    masked_columns = (mask_specgram == mask_value).sum(other_axis)
+    num_masked_columns = (masked_columns == mask_specgram.size(other_axis)).sum()
+    num_masked_columns /= mask_specgram.size(0)
+
+    assert mask_specgram.size() == specgram.size()
+    assert num_masked_columns < mask_param
+
+
+@pytest.mark.parametrize('specgrams', [
+    torch.randn(4, 2, 1025, 400),
+])
+@pytest.mark.parametrize('mask_param', [100])
+@pytest.mark.parametrize('mask_value', [0., 30.])
+@pytest.mark.parametrize('axis', [2, 3])
+def test_mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
+
+    mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
+
+    other_axis = 2 if axis == 3 else 3
+
+    masked_columns = (mask_specgrams == mask_value).sum(other_axis)
+    num_masked_columns = (masked_columns == mask_specgrams.size(other_axis)).sum(-1)
+
+    assert mask_specgrams.size() == specgrams.size()
+    assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
 
 
 if __name__ == '__main__':
