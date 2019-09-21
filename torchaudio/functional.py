@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import torch
-from _torch_filtering import _lfilter_tensor_matrix, _lfilter_element_wise
+from _torch_filtering import _lfilter_tensor_matrix, _lfilter_element_wise_float, _lfilter_element_wise_double
 
 __all__ = [
     "istft",
@@ -599,10 +599,13 @@ def lfilter_cpp_impl(waveform, a_coeffs, b_coeffs, execution_method):
     # Perform sanity checks, input check, and memory allocation in python
 
     # Current limitations to be removed in future
-    assert(waveform.dtype == torch.float32)
+    assert(waveform.dtype == torch.float32 or waveform.dtype == torch.float64)
     assert(waveform.device.type == 'cpu')
+
     assert(waveform.device == a_coeffs.device)
     assert(waveform.device == b_coeffs.device)
+    assert(waveform.dtype == a_coeffs.dtype)
+    assert(waveform.dtype == b_coeffs.dtype)
 
     # Use these parameters for any calculations
     device = waveform.device
@@ -636,12 +639,20 @@ def lfilter_cpp_impl(waveform, a_coeffs, b_coeffs, execution_method):
     assert(normalization_a0.size(0) == n_channels)
 
     if execution_method == 'element_wise':
-        _lfilter_element_wise(padded_waveform,
-                              padded_output_waveform,
-                              a_coeffs,
-                              b_coeffs,
-                              o0
-                              )
+        if (dtype == torch.float32):
+            _lfilter_element_wise_float(padded_waveform,
+                                        padded_output_waveform,
+                                        a_coeffs,
+                                        b_coeffs,
+                                        )
+        elif (dtype == torch.float64):
+            _lfilter_element_wise_double(padded_waveform,
+                                         padded_output_waveform,
+                                         a_coeffs,
+                                         b_coeffs,
+                                         )
+        else:
+            raise Exception("lfilter not supported for type ", dtype)
     elif execution_method == 'matrix':
         # From [n_order] a_coeffs, create a [n_channel, n_order] tensor
         # lowest order coefficients e.g. a0, b0 should be at the "bottom"

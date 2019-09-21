@@ -1,7 +1,6 @@
 #include <torch/extension.h>
 // TBD - for CUDA support #include <ATen/cuda/CUDAContext.h>
 // TBD - Compile on CUDA
-// TBD - Expand to other data types outside float32?
 
 namespace torch {
 namespace audio {
@@ -15,14 +14,13 @@ void _lfilter_tensor_matrix(
     at::Tensor & o0,
     at::Tensor const & normalization_a0
   ) {
-    int n_order = a_coeffs_filled.size(0);
-    int n_frames = padded_waveform.size(1) - n_order + 1;
-    int n_channels = padded_waveform.size(0);
+    int64_t n_order = a_coeffs_filled.size(0);
+    int64_t n_frames = padded_waveform.size(1) - n_order + 1;
+    int64_t n_channels = padded_waveform.size(0);
 
     for (int64_t i_frame = 0; i_frame < n_frames; ++i_frame) {
-      // calculate the output at time i_frame for all channels
-      o0 = torch::zeros({n_channels, 1},
-                        torch::TensorOptions().dtype(torch::kFloat32));
+      // reset all o0
+      o0.fill_(0.0);
 
       // time window of input and output, size [n_channels, n_order]
       at::Tensor const & input_window =
@@ -55,30 +53,29 @@ void _lfilter_tensor_matrix(
     }
   }
 
-
-
+  template <typename T>
   void _lfilter_element_wise(
     at::Tensor const & padded_waveform,
     at::Tensor & padded_output_waveform,
     at::Tensor const & a_coeffs,
-    at::Tensor const & b_coeffs,
-    at::Tensor & o0
+    at::Tensor const & b_coeffs
   ) {
-    int n_order = a_coeffs.size(0);
-    int n_frames = padded_waveform.size(1) - n_order + 1;
-    int n_channels = padded_waveform.size(0);
+    int64_t n_order = a_coeffs.size(0);
+    int64_t n_frames = padded_waveform.size(1) - n_order + 1;
+    int64_t n_channels = padded_waveform.size(0);
 
     // Create CPU accessors for fast access
     // https://pytorch.org/cppdocs/notes/tensor_basics.html
-    auto input_accessor = padded_waveform.accessor<float, 2>();
-    auto output_accessor = padded_output_waveform.accessor<float, 2>();
-    auto a_coeffs_accessor = a_coeffs.accessor<float, 1>();
-    auto b_coeffs_accessor = b_coeffs.accessor<float, 1>();
+    auto input_accessor = padded_waveform.accessor<T, 2>();
+    auto output_accessor = padded_output_waveform.accessor<T, 2>();
+    auto a_coeffs_accessor = a_coeffs.accessor<T, 1>();
+    auto b_coeffs_accessor = b_coeffs.accessor<T, 1>();
+    T o0;
 
     for (int64_t i_channel = 0; i_channel < n_channels; ++i_channel) {
       for (int64_t i_frame = 0; i_frame < n_frames; ++i_frame) {
         // execute the difference equation
-        float o0 = 0;
+        o0 = 0;
         for (int i_offset = 0; i_offset < n_order; ++i_offset) {
           o0 += input_accessor[i_channel][i_frame + i_offset] *
                 b_coeffs_accessor[n_order - i_offset - 1];
@@ -105,7 +102,11 @@ PYBIND11_MODULE(_torch_filtering, m) {
       &torch::audio::_lfilter_tensor_matrix,
       "Executes difference equation with tensor");
   m.def(
-      "_lfilter_element_wise",
-      &torch::audio::_lfilter_element_wise,
+      "_lfilter_element_wise_float",
+      &torch::audio::_lfilter_element_wise<float>,
+      "Executes difference equation with tensor");
+  m.def(
+      "_lfilter_element_wise_double",
+      &torch::audio::_lfilter_element_wise<double>,
       "Executes difference equation with tensor");
 }

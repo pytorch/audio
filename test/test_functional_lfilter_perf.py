@@ -149,21 +149,26 @@ class TestFunctionalLFilterPerformance(unittest.TestCase):
         print("Ratio Python / CPP ElementWise : %10.2f x" % (run_time_1 / run_time_2))
 
         if assertClose:
-            # maxDeviation = torch.kthvalue(torch.abs(output_waveform_2- output_waveform_1), output_waveform_1.size(1))
-
+            # maxDeviation = torch.kthvalue(torch.abs(output_waveform_2- output_waveform_3), output_waveform_1.size(1))
             assert torch.allclose(output_waveform_1, output_waveform_2, atol=3e-4)
             assert torch.allclose(output_waveform_2, output_waveform_3, atol=3e-4)
             print("PASS - all outputs are identical")
             print("-" * 80)
 
     def test_cpp_lfilter_runs(self):
-        waveform = torch.rand(2, 1000)
+        waveform = torch.rand(2, 1000, dtype=torch.float32)
         b_coeffs = torch.rand(2, dtype=torch.float32)
         a_coeffs = torch.rand(2, dtype=torch.float32)
         a_coeffs[0] = 1
 
+        double_waveform = torch.rand(2, 1000, dtype=torch.float64)
+        double_b_coeffs = torch.rand(5, dtype=torch.float64)
+        double_a_coeffs = torch.rand(5, dtype=torch.float64)
+        double_a_coeffs[0] = 1
+
         output_waveform = lfilter_cpp_impl(waveform, a_coeffs, b_coeffs, 'element_wise')
         output_waveform = lfilter_cpp_impl(waveform, a_coeffs, b_coeffs, 'matrix')
+        output_waveform = lfilter_cpp_impl(double_waveform, double_a_coeffs, double_b_coeffs, 'element_wise')
 
     def test_lfilter_cmp(self):
         """
