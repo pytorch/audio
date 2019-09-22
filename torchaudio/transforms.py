@@ -132,7 +132,7 @@ class MelScale(torch.jit.ScriptModule):
         assert f_min <= self.f_max, 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
         self.f_min = f_min
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
-            n_stft, self.f_min, self.f_max, self.n_mels)
+            n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
         self.fb = torch.jit.Attribute(fb, torch.Tensor)
 
     @torch.jit.script_method
@@ -145,7 +145,7 @@ class MelScale(torch.jit.ScriptModule):
             torch.Tensor: Mel frequency spectrogram of size (channel, ``n_mels``, time)
         """
         if self.fb.numel() == 0:
-            tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max, self.n_mels)
+            tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max, self.n_mels, self.sample_rate)
             # Attributes cannot be reassigned outside __init__ so workaround
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)

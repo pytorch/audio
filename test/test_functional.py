@@ -217,10 +217,26 @@ class TestFunctional(unittest.TestCase):
         self._test_istft_of_sine(amplitude=80, L=9, n=6)
         self._test_istft_of_sine(amplitude=99, L=10, n=7)
 
+    def _test_create_fb(self, n_mels=40, sample_rate=22050, n_fft=2048, fmin=0.0, fmax=8000.0):
+        # Using a decorator here causes parametrize to fail on Python 2
+        if not IMPORT_LIBROSA:
+            raise unittest.SkipTest('Librosa is not available')
+
+        librosa_fb = librosa.filters.mel(sr=sample_rate, n_fft=n_fft, n_mels=n_mels, fmax=fmax, fmin=fmin, htk=True, norm=None)
+        fb = torchaudio.transforms.MelScale(sample_rate=sample_rate, n_mels=n_mels, f_max=fmax, f_min=fmin, n_stft=(n_fft//2+1)).fb
+
+        for i_mel_bank in range(n_mels):
+            assert torch.allclose(fb[:, i_mel_bank], torch.tensor(librosa_fb[i_mel_bank]), atol=1e-4)
+
+    def test_create_fb(self):
+        self._test_create_fb()
+        self._test_create_fb(n_mels=128, sample_rate=44100)
+        self._test_create_fb(n_mels=128, fmin=2000.0, fmax=5000.0)
+        self._test_create_fb(n_mels=56, fmin=100.0, fmax=9000.0)
+
 
 def _num_stft_bins(signal_len, fft_len, hop_length, pad):
     return (signal_len + 2 * pad - fft_len + hop_length) // hop_length
-
 
 @pytest.mark.parametrize('complex_specgrams', [
     torch.randn(2, 1025, 400, 2)
@@ -262,6 +278,7 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
     complex_stretch = complex_stretch[..., 0] + 1j * complex_stretch[..., 1]
 
     assert np.allclose(complex_stretch, expected_complex_stretch, atol=1e-5)
+
 
 
 @pytest.mark.parametrize('complex_tensor', [
