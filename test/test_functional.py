@@ -245,6 +245,7 @@ class TestFunctional(unittest.TestCase):
         self._test_create_fb(n_mels=56, fmin=100.0, fmax=9000.0)
         self._test_create_fb(n_mels=56, fmin=800.0, fmax=900.0)
         self._test_create_fb(n_mels=56, fmin=1900.0, fmax=900.0)
+        self._test_create_fb(n_mels=10, fmin=1900.0, fmax=900.0)
 
 
 def _num_stft_bins(signal_len, fft_len, hop_length, pad):
