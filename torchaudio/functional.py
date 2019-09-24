@@ -313,7 +313,7 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate):
     """
     # freq bins
     # Equivalent filterbank construction by Librosa
-    all_freqs = torch.linspace(0.0, float(sample_rate) / 2., n_freqs)
+    all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
     i_freqs = all_freqs.ge(f_min) & all_freqs.le(f_max)
     freqs = all_freqs[i_freqs]
 
