@@ -12,8 +12,6 @@ pushd /tmp/torchaudio-deps
 
 
 # Curl Settings
-# 3 minutes is the absolute max for the curl command
-# Retry up to 10 times, wait to connect at most 5s per time
 CURL_OPTS="-L --retry 10 --connect-timeout 5 --max-time 180"
 
 curl $CURL_OPTS -o sox-14.4.2.tar.bz2 "https://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2"
