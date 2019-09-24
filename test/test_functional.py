@@ -229,11 +229,11 @@ class TestFunctional(unittest.TestCase):
                                          fmin=fmin,
                                          htk=True,
                                          norm=None)
-        fb = torchaudio.transforms.MelScale(sample_rate=sample_rate,
-                                            n_mels=n_mels,
-                                            f_max=fmax,
-                                            f_min=fmin,
-                                            n_stft=(n_fft // 2 + 1)).fb
+        fb = F.create_fb_matrix(sample_rate=sample_rate,
+                                n_mels=n_mels,
+                                f_max=fmax,
+                                f_min=fmin,
+                                n_freqs=(n_fft // 2 + 1))
 
         for i_mel_bank in range(n_mels):
             assert torch.allclose(fb[:, i_mel_bank], torch.tensor(librosa_fb[i_mel_bank]), atol=1e-4)
@@ -244,6 +244,7 @@ class TestFunctional(unittest.TestCase):
         self._test_create_fb(n_mels=128, fmin=2000.0, fmax=5000.0)
         self._test_create_fb(n_mels=56, fmin=100.0, fmax=9000.0)
         self._test_create_fb(n_mels=56, fmin=800.0, fmax=900.0)
+        self._test_create_fb(n_mels=56, fmin=1900.0, fmax=900.0)
 
 
 def _num_stft_bins(signal_len, fft_len, hop_length, pad):
