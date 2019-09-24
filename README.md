@@ -85,8 +85,8 @@ Quick Usage
 
 ```python
 import torchaudio
-sound, sample_rate = torchaudio.load('foo.mp3')
-torchaudio.save('foo_save.mp3', sound, sample_rate) # saves tensor to file
+waveform, sample_rate = torchaudio.load('foo.mp3')  # load tensor from file
+torchaudio.save('foo_save.mp3', waveform, sample_rate)  # save tensor to file
 ```
 
 API Reference
@@ -118,7 +118,7 @@ dimension (channel, time)")
 * `win_length`: the length of the STFT window
 * `window_fn`: for functions that creates windows e.g. `torch.hann_window`
 
-Transforms expect the following dimensions.
+Transforms expect and return the following dimensions.
 
 * `Spectrogram`: (channel, time) -> (channel, freq, time)
 * `AmplitudeToDB`: (channel, freq, time) -> (channel, freq, time)
