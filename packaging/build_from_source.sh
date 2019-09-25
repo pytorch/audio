@@ -12,13 +12,11 @@ pushd /tmp/torchaudio-deps
 
 
 # Curl Settings
-# 3 minutes is the absolute max for the curl command
-# Retry up to 10 times, wait to connect at most 5s per time
 CURL_OPTS="-L --retry 10 --connect-timeout 5 --max-time 180"
 
-curl $CURL_OPTS -o sox-14.4.2.tar.bz2 "http://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2"
-curl $CURL_OPTS -o lame-3.99.5.tar.gz "http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz"
-curl $CURL_OPTS -o flac-1.3.2.tar.xz "https://superb-dca2.dl.sourceforge.net/project/flac/flac-src/flac-1.3.2.tar.xz"
+curl $CURL_OPTS -o sox-14.4.2.tar.bz2 "https://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2"
+curl $CURL_OPTS -o lame-3.99.5.tar.gz "https://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz"
+curl $CURL_OPTS -o flac-1.3.2.tar.xz "https://downloads.sourceforge.net/project/flac/flac-src/flac-1.3.2.tar.xz"
 curl $CURL_OPTS -o libmad-0.15.1b.tar.gz "https://downloads.sourceforge.net/project/mad/libmad/0.15.1b/libmad-0.15.1b.tar.gz"
 
 # unpack the dependencies
