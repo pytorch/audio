@@ -290,18 +290,19 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
 
 
 @torch.jit.script
-def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
-    # type: (int, float, float, int) -> Tensor
+def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate):
+    # type: (int, float, float, int, int) -> Tensor
     r"""
-    create_fb_matrix(n_freqs, f_min, f_max, n_mels)
+    create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate)
 
     Create a frequency bin conversion matrix.
 
     Args:
         n_freqs (int): Number of frequencies to highlight/apply
-        f_min (float): Minimum frequency
-        f_max (float): Maximum frequency
+        f_min (float): Minimum frequency (Hz)
+        f_max (float): Maximum frequency (Hz)
         n_mels (int): Number of mel filterbanks
+        sample_rate (int): Sample rate of the audio waveform
 
     Returns:
         torch.Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)
@@ -311,17 +312,21 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels):
         ``A * create_fb_matrix(A.size(-1), ...)``.
     """
     # freq bins
-    freqs = torch.linspace(f_min, f_max, n_freqs)
+    # Equivalent filterbank construction by Librosa
+    all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
+    i_freqs = all_freqs.ge(f_min) & all_freqs.le(f_max)
+    freqs = all_freqs[i_freqs]
+
     # calculate mel freq bins
     # hertz to mel(f) is 2595. * math.log10(1. + (f / 700.))
-    m_min = 0.0 if f_min == 0 else 2595.0 * math.log10(1.0 + (f_min / 700.0))
+    m_min = 2595.0 * math.log10(1.0 + (f_min / 700.0))
     m_max = 2595.0 * math.log10(1.0 + (f_max / 700.0))
     m_pts = torch.linspace(m_min, m_max, n_mels + 2)
     # mel to hertz(mel) is 700. * (10**(mel / 2595.) - 1.)
     f_pts = 700.0 * (10 ** (m_pts / 2595.0) - 1.0)
     # calculate the difference between each mel point and each stft freq point in hertz
     f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
-    slopes = f_pts.unsqueeze(0) - freqs.unsqueeze(1)  # (n_freqs, n_mels + 2)
+    slopes = f_pts.unsqueeze(0) - all_freqs.unsqueeze(1)  # (n_freqs, n_mels + 2)
     # create overlapping triangles
     zero = torch.zeros(1)
     down_slopes = (-1.0 * slopes[:, :-2]) / f_diff[:-1]  # (n_freqs, n_mels)
