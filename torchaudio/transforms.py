@@ -62,7 +62,7 @@ class Spectrogram(torch.jit.ScriptModule):
         Returns:
             torch.Tensor: Dimension (channel, freq, time), where channel
             is unchanged, freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
-            Fourier bins, and time is the number of window hops (n_frame).
+            Fourier bins, and time is the number of window hops (n_frames).
         """
         return F.spectrogram(waveform, self.pad, self.window, self.n_fft, self.hop_length,
                              self.win_length, self.power, self.normalized)

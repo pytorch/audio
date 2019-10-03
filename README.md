@@ -86,7 +86,7 @@ Quick Usage
 ```python
 import torchaudio
 waveform, sample_rate = torchaudio.load('foo.mp3') # load tensor from file
-torchaudio.save('foo_save.mp3', waveform, sample_rate) # save tensor to file
+torchaudio.save('foo_save.mp3', waveform, sample_rate) # saves tensor to file
 ```
 
 API Reference
@@ -107,8 +107,8 @@ dimension (channel, time)")
 
 * `waveform`: a tensor of audio samples with dimensions (channel, time)
 * `sample_rate`: the rate of audio samples per second (Hz)
-* `n_sample` : the number of time samples
-* `n_channel` : the number of channels (e.g. 1 for mono, 2 for stereo)
+* `n_samples` : the number of time samples
+* `n_channels` : the number of channels (e.g. 1 for mono, 2 for stereo)
 * `specgram`: a tensor of spectrogram with dimensions (channel, freq, time)
 * `mel_specgram`: a mel spectrogram with dimensions (channel, mel, time)
 * `hop_length`: the number of samples between the starts of consecutive frames
