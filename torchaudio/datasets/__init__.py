@@ -1,4 +1,6 @@
-from .yesno import YESNO
+from .commonvoice import COMMONVOICE
+from .librispeech import LIBRISPEECH
 from .vctk import VCTK
+from .yesno import YESNO
 
-__all__ = ('YESNO', 'VCTK')
+__all__ = ("COMMONVOICE", "LIBRISPEECH", "VCTK", "YESNO")
