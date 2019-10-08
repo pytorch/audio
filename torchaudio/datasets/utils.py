@@ -92,49 +92,6 @@ def download_url(url, root, filename=None, md5=None):
                 raise e
 
 
-def list_dir(root, prefix=False):
-    """List all directories at a given root
-
-    Args:
-        root (str): Path to directory whose folders need to be listed
-        prefix (bool, optional): If true, prepends the path to each result, otherwise
-            only returns the name of the directories found
-    """
-    root = os.path.expanduser(root)
-    directories = list(
-        filter(lambda p: os.path.isdir(os.path.join(root, p)), os.listdir(root))
-    )
-
-    if prefix is True:
-        directories = [os.path.join(root, d) for d in directories]
-
-    return directories
-
-
-def list_files(root, suffix, prefix=False):
-    """List all files ending with a suffix at a given root
-
-    Args:
-        root (str): Path to directory whose folders need to be listed
-        suffix (str or tuple): Suffix of the files to match, e.g. '.png' or ('.jpg', '.png').
-            It uses the Python "str.endswith" method and is passed directly
-        prefix (bool, optional): If true, prepends the path to each result, otherwise
-            only returns the name of the files found
-    """
-    root = os.path.expanduser(root)
-    files = list(
-        filter(
-            lambda p: os.path.isfile(os.path.join(root, p)) and p.endswith(suffix),
-            os.listdir(root),
-        )
-    )
-
-    if prefix is True:
-        files = [os.path.join(root, d) for d in files]
-
-    return files
-
-
 def download_file_from_google_drive(file_id, root, filename=None, md5=None):
     """Download a Google Drive file from  and place it in root.
 
@@ -233,59 +190,6 @@ def extract_archive(from_path, to_path=None, remove_finished=False):
         os.remove(from_path)
 
 
-def download_and_extract_archive(
-    url,
-    download_root,
-    extract_root=None,
-    filename=None,
-    md5=None,
-    remove_finished=False,
-):
-    download_root = os.path.expanduser(download_root)
-    if extract_root is None:
-        extract_root = download_root
-    if not filename:
-        filename = os.path.basename(url)
-
-    download_url(url, download_root, filename, md5)
-
-    archive = os.path.join(download_root, filename)
-    print("Extracting {} to {}".format(archive, extract_root))
-    extract_archive(archive, extract_root, remove_finished)
-
-
-def iterable_to_str(iterable):
-    return "'" + "', '".join([str(item) for item in iterable]) + "'"
-
-
-def verify_str_arg(value, arg=None, valid_values=None, custom_msg=None):
-    if not isinstance(value, torch._six.string_classes):
-        if arg is None:
-            msg = "Expected type str, but got type {type}."
-        else:
-            msg = "Expected type str for argument {arg}, but got type {type}."
-        msg = msg.format(type=type(value), arg=arg)
-        raise ValueError(msg)
-
-    if valid_values is None:
-        return value
-
-    if value not in valid_values:
-        if custom_msg is not None:
-            msg = custom_msg
-        else:
-            msg = (
-                "Unknown value '{value}' for argument {arg}. "
-                "Valid values are {{{valid_values}}}."
-            )
-            msg = msg.format(
-                value=value, arg=arg, valid_values=iterable_to_str(valid_values)
-            )
-        raise ValueError(msg)
-
-    return value
-
-
 class Cache:
     """
     Wrap a generator so that, whenever a new item is returned, it is saved to disk in a pickle.
@@ -313,7 +217,7 @@ class Cache:
             file = os.path.join(self.location, file)
             self._cache.append(file)
 
-            os.makedirs(self.location, exist_ok=True)
+            makedir_exist_ok(self.location)
             with open(file, "wb") as file:
                 pickle.dump(item, file)
 
@@ -408,7 +312,7 @@ def shuffle(generator):
     Output: generator
     """
 
-    # Load whole generator in memory
+    # load whole generator in memory
     generator = list(generator)
     # print(len(generator))
     random.shuffle(generator)
@@ -416,25 +320,16 @@ def shuffle(generator):
         yield g
 
 
-def filtering(fileids, reference):
+def generator_length(generator):
     """
-    Skip fileids that are not present in given reference file.
+    Iterate through generator with length.
 
-    Output: (path, file) generator, reference file
-    Output: path, file
+    Input: generator
+    Output: generator
     """
 
-    path_old = ""
-
-    for path, fileid in fileids:
-
-        # Check if same path to avoid reloading the file constantly
-        if path != path_old:
-            ref = os.path.join(path, reference)
-            with open(ref) as ref:
-                r = "".join(ref.readlines())
-            path_old = path
-
-        # It would be more efficient to loop through the reference file instead
-        if fileid in r:
-            yield path, fileid
+    # load whole generator in memory
+    generator = list(generator)
+    l = len(generator)
+    for g in generator:
+        yield g, l
