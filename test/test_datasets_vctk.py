@@ -5,7 +5,7 @@ import torch
 import torchaudio
 import unittest
 import common_utils
-import torchaudio.datasets.vctk as vctk
+import torchaudio.datasets.legacy.vctk as vctk
 
 
 class TestVCTK(unittest.TestCase):

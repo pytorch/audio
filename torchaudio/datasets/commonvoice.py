@@ -1,7 +1,7 @@
 import os
 
 import torchaudio
-from torchaudio.dataset.utils import download, extract, filtering, shuffle, walk
+from torchaudio.dataset.utils import download, extract, shuffle, walk
 
 
 def load_commonvoice(fileids, tsv):
@@ -83,5 +83,4 @@ def COMMONVOICE(root, language="tatar", tsv="train.tsv"):
     path = extract(path)
     path = walk(path, extension=".mp3")
     path = shuffle(path)
-    path = filtering(path, reference=tsv)
     return load_commonvoice(path, tsv=tsv)
