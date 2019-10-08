@@ -251,13 +251,6 @@ class Buffer:
         while len(self._cache) <= self.capacity:
             self._cache.append(next(self.generator))
 
-    def __getitem__(self, n):
-        try:
-            return self._cache[n]
-        except IndexError:
-            self._fill()
-            return self._cache[n]
-
     def __iter__(self):
         return self
 
