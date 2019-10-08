@@ -247,20 +247,26 @@ class Buffer:
         self._fill()
 
     def _fill(self):
+        # TODO non-blocking after the first item
         while len(self._cache) <= self.capacity:
             self._cache.append(next(self.generator))
 
     def __getitem__(self, n):
-        self._fill()
-        return self._cache[n]
+        try:
+            return self._cache[n]
+        except IndexError:
+            self._fill()
+            return self._cache[n]
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        item = self._cache.pop(0)
-        self._fill()
-        return item
+        try:
+            return self._cache.pop(0)
+        except IndexError:
+            self._fill()
+            return self._cache.pop(0)
 
 
 def download(urls, root_path):
