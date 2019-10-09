@@ -1,7 +1,7 @@
 import os
 
 import torchaudio
-from torchaudio.dataset.utils import download, extract, shuffle, walk
+from torchaudio.datasets.utils import download, extract, shuffle, walk
 
 
 def load_yesno(fileids):
@@ -23,7 +23,7 @@ def load_yesno(fileids):
 
 def YESNO(root):
     """
-    Cache a pipeline loading YESNO.
+    Create a generator for YESNO.
     """
 
     url = [("http://www.openslr.org/resources/1/waves_yesno.tar.gz", "waves_yesno")]
@@ -31,5 +31,6 @@ def YESNO(root):
     path = download(url, root_path=root)
     path = extract(path)
     path = walk(path, extension=".wav")
-    path = shuffle(path)
+    # path = shuffle(path)
+    # path, l = generator_length(path)
     return load_yesno(path)

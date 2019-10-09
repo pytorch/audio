@@ -2,7 +2,7 @@ import os
 from warnings import warn
 
 import torchaudio
-from torchaudio.dataset.utils import download, extract, shuffle, walk
+from torchaudio.datasets.utils import download, extract, shuffle, walk
 
 
 def load_vctk(fileids):
@@ -46,7 +46,7 @@ def load_vctk(fileids):
 
 def VCTK(root):
     """
-    Cache a pipeline loading VCTK.
+    Create a generator for VCTK.
     """
 
     url = [
@@ -59,5 +59,6 @@ def VCTK(root):
     path = download(url, root_path=root)
     path = extract(path)
     path = walk(path, extension=".wav")
-    path = shuffle(path)
+    # path = shuffle(path)
+    # path, l = generator_length(path)
     return load_vctk(path)

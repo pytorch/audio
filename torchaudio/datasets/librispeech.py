@@ -1,7 +1,7 @@
 import os
 
 import torchaudio
-from torchaudio.dataset.utils import download, extract, shuffle, walk
+from torchaudio.datasets.utils import download, extract, shuffle, walk
 
 
 def load_librispeech(fileids):
@@ -30,10 +30,8 @@ def load_librispeech(fileids):
                 found = True
                 break
         if not found:
-            from warnings import warn
-
-            warn("Translation not found for {}.".format(fileid))
-            continue
+            # Translation not found
+            raise ValueError
 
         yield {
             "id": fileid,
@@ -45,7 +43,7 @@ def load_librispeech(fileids):
 
 def LIBRISPEECH(root, selection):
     """
-    Cache a pipeline loading LIBRISPEECH.
+    Create a generator for LibriSpeech.
     """
 
     selections = [
@@ -68,5 +66,6 @@ def LIBRISPEECH(root, selection):
     path = download(url, root_path=root)
     path = extract(path)
     path = walk(path, extension=".flac")
-    path = shuffle(path)
+    # path = shuffle(path)
+    # path, l = generator_length(path)
     return load_librispeech(path)

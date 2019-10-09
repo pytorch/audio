@@ -1,10 +1,16 @@
 import os
 
 import torchaudio
-from torchaudio.dataset.utils import download, extract, shuffle, walk
+from torchaudio.datasets.utils import (
+    download,
+    extract,
+    shuffle,
+    unicode_csv_reader,
+    walk,
+)
 
 
-def load_commonvoice(fileids, tsv):
+def load_commonvoice(fileids, tsv_file):
     """
     Load data corresponding to each COMMONVOICE fileids.
 
@@ -14,19 +20,21 @@ def load_commonvoice(fileids, tsv):
 
     for path, fileid in fileids:
         filename = os.path.join(path, "clips", fileid)
-        tsv = os.path.join(path, tsv)
+        tsv = os.path.join(path, tsv_file)
 
         found = False
         with open(tsv) as tsv:
-            header = next(tsv).strip().split("\t")
-            for line in tsv:
+            first_line = True
+            for line in unicode_csv_reader(tsv, delimiter="\t"):
+                if first_line:
+                    header = line
+                    first_line = False
+                    continue
                 if fileid in line:
-                    # client_id, path, sentence, up_votes, down_votes, age, gender, accent
-                    line = line.strip().split("\t")
                     found = True
                     break
-            if not found:
-                continue
+        if not found:
+            continue
 
         waveform, sample_rate = torchaudio.load(filename)
 
@@ -37,9 +45,9 @@ def load_commonvoice(fileids, tsv):
         yield dic
 
 
-def COMMONVOICE(root, language="tatar", tsv="train.tsv"):
+def COMMONVOICE(root, language, tsv_file):
     """
-    Cache a pipeline loading COMMONVOICE.
+    Create a generator for CommonVoice.
     """
 
     web = "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/"
@@ -82,5 +90,6 @@ def COMMONVOICE(root, language="tatar", tsv="train.tsv"):
     path = download(url, root_path=root)
     path = extract(path)
     path = walk(path, extension=".mp3")
-    path = shuffle(path)
-    return load_commonvoice(path, tsv=tsv)
+    # path = shuffle(path)
+    # path, l = generator_length(path)
+    return load_commonvoice(path, tsv_file)
