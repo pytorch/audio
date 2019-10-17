@@ -109,7 +109,7 @@ def load_commonvoice_item(line, header, path, folder_audio):
     return dic
 
 
-class COMMONVOICE2(data.Dataset):
+class COMMONVOICE2(data.IterableDataset):
 
     _ext_txt = ".txt"
     _ext_audio = ".mp3"
@@ -160,15 +160,15 @@ class COMMONVOICE2(data.Dataset):
 
         if not os.path.isdir(self._path):
             if not os.path.isfile(archive):
-                torchaudio.datasets.utils.download_url(_url, root)
+                torchaudio.datasets.utils.download_url(url, root)
             torchaudio.datasets.utils.extract_archive(archive)
 
         # Read header and all lines in tsv file
         tsv = os.path.join(root, tsv)
         with open(tsv) as tsv:
-            reader = unicode_csv_reader(tsv, delimiter="\t")
-            self._header = next(reader)
-            self._list = list(line for line in reader)
+            walker = unicode_csv_reader(tsv, delimiter="\t")
+            self._header = next(walker)
+            self._list = list(walker)
 
     def __getitem__(self, n):
         line = self._list[n]

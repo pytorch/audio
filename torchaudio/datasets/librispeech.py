@@ -83,7 +83,7 @@ def LIBRISPEECH(root, selection):
     return load_librispeech(path)
 
 
-class LIBRISPEECH2(data.Dataset):
+class LIBRISPEECH2(data.IterableDataset):
 
     _ext_txt = ".trans.txt"
     _ext_audio = ".flac"

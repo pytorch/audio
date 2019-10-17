@@ -46,7 +46,7 @@ def YESNO(root):
     return load_yesno(path)
 
 
-class YESNO2(data.Dataset):
+class YESNO2(data.IterableDataset):
 
     _ext_audio = ".wav"
 

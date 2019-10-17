@@ -74,7 +74,7 @@ def VCTK(root):
     return load_vctk(path)
 
 
-class VCTK2(data.Dataset):
+class VCTK2(data.IterableDataset):
 
     _folder_txt = "txt"
     _folder_audio = "wav48"
