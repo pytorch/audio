@@ -1,5 +1,6 @@
 import os
 
+import torch.utils.data as data
 import torchaudio
 from torchaudio.datasets.utils import (
     download,
@@ -22,7 +23,6 @@ def load_commonvoice(fileids, tsv_file):
         filename = os.path.join(path, "clips", fileid)
         tsv = os.path.join(path, tsv_file)
 
-        found = False
         with open(tsv) as tsv:
             first_line = True
             for line in unicode_csv_reader(tsv, delimiter="\t"):
@@ -31,10 +31,9 @@ def load_commonvoice(fileids, tsv_file):
                     first_line = False
                     continue
                 if fileid in line:
-                    found = True
                     break
-        if not found:
-            continue
+            else:
+                continue
 
         waveform, sample_rate = torchaudio.load(filename)
 
@@ -93,3 +92,82 @@ def COMMONVOICE(root, language, tsv_file):
     # path = shuffle(path)
     # path, l = generator_length(path)
     return load_commonvoice(path, tsv_file)
+
+
+class COMMONVOICE2(data.Dataset):
+
+    _ext_txt = ".txt"
+    _ext_audio = ".mp3"
+    _folder_audio = "clips"
+
+    def __init__(self, root, language, tsv):
+
+        base = "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/"
+
+        languages = {
+            "tatar": "tt",
+            "english": "en",
+            "german": "de",
+            "french": "fr",
+            "welsh": "cy",
+            "breton": "br",
+            "chuvash": "cv",
+            "turkish": "tr",
+            "kyrgyz": "ky",
+            "irish": "ga-IE",
+            "kabyle": "kab",
+            "catalan": "ca",
+            "taiwanese": "zh-TW",
+            "slovenian": "sl",
+            "italian": "it",
+            "dutch": "nl",
+            "hakha chin": "cnh",
+            "esperanto": "eo",
+            "estonian": "et",
+            "persian": "fa",
+            "basque": "eu",
+            "spanish": "es",
+            "chinese": "zh-CN",
+            "mongolian": "mn",
+            "sakha": "sah",
+            "dhivehi": "dv",
+            "kinyarwanda": "rw",
+            "swedish": "sv-SE",
+            "russian": "ru",
+        }
+
+        ext_archive = ".tar.gz"
+        url = base + languages[language] + ext_archive
+
+        # torchaudio.datasets.utils.download_url(url, root)
+
+        filename = os.path.basename(url)
+        filename = os.path.join(root, filename)
+        # torchaudio.datasets.utils.extract_archive(filename)
+
+        self._path = root
+
+        # Read header and all lines in tsv file
+        tsv = os.path.join(root, tsv)
+        with open(tsv) as tsv:
+            reader = unicode_csv_reader(tsv, delimiter="\t")
+            self._header = next(reader)
+            self._list = [line for line in reader]
+
+    def __getitem__(self, n):
+
+        line = self._list[n]
+        fileid = line[1]
+
+        filename = os.path.join(self._path, self._folder_audio, fileid)
+
+        waveform, sample_rate = torchaudio.load(filename)
+
+        dic = dict(zip(self._header, line))
+        dic["waveform"] = waveform
+        dic["sample_rate"] = sample_rate
+
+        return dic
+
+    def __len__(self):
+        return len(self._list)

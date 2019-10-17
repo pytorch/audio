@@ -8,11 +8,10 @@ import sys
 import tarfile
 import zipfile
 
-import torch
-from torch.utils.model_zoo import tqdm
-
 import six
+import torch
 import torchaudio
+from torch.utils.model_zoo import tqdm
 
 
 def unicode_csv_reader(unicode_csv_data, **kwargs):
@@ -501,3 +500,24 @@ def generator_length(generator):
     l = len(generator)
     for g in generator:
         yield g, l
+
+
+def list_files_recursively(root, suffix, prefix=False, remove_suffix=False):
+    """List recursively all files ending with a suffix at a given root
+    Args:
+        root (str): Path to directory whose folders need to be listed
+        suffix (str or tuple): Suffix of the files to match, e.g. '.png' or ('.jpg', '.png').
+            It uses the Python "str.endswith" method and is passed directly
+        prefix (bool, optional): If true, prepends the path to each result, otherwise
+            only returns the name of the files found
+    """
+    root = os.path.expanduser(root)
+    files = [f for _, _, fn in os.walk(root) for f in fn if f.endswith(suffix)]
+
+    if remove_suffix:
+        files = [f[:-len(suffix)] for f in files]
+
+    if prefix:
+        files = [os.path.join(root, d) for d in files]
+
+    return files

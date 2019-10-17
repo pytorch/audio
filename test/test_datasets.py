@@ -1,10 +1,10 @@
 import unittest
 from pprint import pprint
 
-from torchaudio.datasets.commonvoice import COMMONVOICE
-from torchaudio.datasets.librispeech import LIBRISPEECH
-from torchaudio.datasets.vctk import VCTK
-from torchaudio.datasets.yesno import YESNO
+from torchaudio.datasets.commonvoice import COMMONVOICE, COMMONVOICE2
+from torchaudio.datasets.librispeech import LIBRISPEECH, LIBRISPEECH2
+from torchaudio.datasets.vctk import VCTK, VCTK2
+from torchaudio.datasets.yesno import YESNO, YESNO2
 
 
 class TestDatasets(unittest.TestCase):
@@ -27,6 +27,26 @@ class TestDatasets(unittest.TestCase):
         data = COMMONVOICE("./commonvoicetest/", "tatar", "train.tsv")
         pprint("COMMONVOICE")
         pprint(next(data))
+
+    def test_yesno2(self):
+        data = YESNO2("./yesnotest")
+        pprint("YESNO2")
+        pprint(data[0])
+
+    def test_vctk2(self):
+        data = VCTK2("./vctktest/")
+        pprint("VCTK2")
+        pprint(data[0])
+
+    def test_librispeech2(self):
+        data = LIBRISPEECH2("./librispeechtest/", "dev-clean")
+        pprint("LIBRISPEECH2")
+        pprint(data[0])
+
+    def test_commonvoice2(self):
+        data = COMMONVOICE2("./commonvoicetest/", "tatar", "train.tsv")
+        pprint("COMMONVOICE2")
+        pprint(data[0])
 
 
 if __name__ == "__main__":
