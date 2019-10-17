@@ -1,6 +1,7 @@
 import os
 
 import torch.utils.data as data
+
 import torchaudio
 from torchaudio.datasets.utils import (
     download,
@@ -153,7 +154,7 @@ class COMMONVOICE2(data.Dataset):
         with open(tsv) as tsv:
             reader = unicode_csv_reader(tsv, delimiter="\t")
             self._header = next(reader)
-            self._list = [line for line in reader]
+            self._list = list(line for line in reader)
 
     def __getitem__(self, n):
 

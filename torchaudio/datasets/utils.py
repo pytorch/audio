@@ -475,7 +475,7 @@ def generator_length(generator):
         yield g, l
 
 
-def list_files_recursively(root, suffix, prefix=False, remove_suffix=False):
+def walk_files(root, suffix, prefix=False, remove_suffix=False):
     """List recursively all files ending with a suffix at a given root
     Args:
         root (str): Path to directory whose folders need to be listed
@@ -484,13 +484,17 @@ def list_files_recursively(root, suffix, prefix=False, remove_suffix=False):
         prefix (bool, optional): If true, prepends the path to each result, otherwise
             only returns the name of the files found
     """
+
     root = os.path.expanduser(root)
-    files = [f for _, _, fn in os.walk(root) for f in fn if f.endswith(suffix)]
 
-    if remove_suffix:
-        files = [f[: -len(suffix)] for f in files]
+    for _, _, fn in os.walk(root):
+        for f in fn:
+            if f.endswith(suffix):
 
-    if prefix:
-        files = [os.path.join(root, d) for d in files]
+                if remove_suffix:
+                    f = f[: -len(suffix)]
 
-    return files
+                if prefix:
+                    f = os.path.join(root, f)
+
+                yield f

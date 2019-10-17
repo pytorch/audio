@@ -95,8 +95,10 @@ class VCTK2(data.Dataset):
                 torchaudio.datasets.utils.download_url(_url, root)
             torchaudio.datasets.utils.extract_archive(archive)
 
-        self._list = torchaudio.datasets.utils.list_files_recursively(
-            self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
+        self._list = list(
+            torchaudio.datasets.utils.walk_files(
+                self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
+            )
         )
 
     def __getitem__(self, n):
