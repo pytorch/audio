@@ -5,6 +5,37 @@ import torchaudio
 from torchaudio.datasets.utils import download, extract, shuffle, walk
 
 
+def load_librispeech_item(fileid, path, ext_audio, ext_txt):
+
+    speaker, chapter, snippet = fileid.split("-")
+
+    file_text = speaker + "-" + chapter + ext_txt
+    file_text = os.path.join(path, speaker, chapter, file_text)
+    file_audio = speaker + "-" + chapter + "-" + snippet + ext_audio
+    file_audio = os.path.join(path, speaker, chapter, file_audio)
+
+    # Load audio
+    waveform, sample_rate = torchaudio.load(file_audio)
+
+    # Load text
+    for line in open(file_text):
+        fileid_text, content = line.strip().split(" ", 1)
+        if file_audio == fileid_text:
+            break
+    else:
+        # Translation not found
+        raise ValueError
+
+    return {
+        "speaker": speaker,
+        "chapter": chapter,
+        "snippet": snippet,
+        "content": content,
+        "waveform": waveform,
+        "sample_rate": sample_rate,
+    }
+
+
 def load_librispeech(fileids):
     """
     Load data corresponding to each LIBRISPEECH fileids.
@@ -15,29 +46,10 @@ def load_librispeech(fileids):
 
     text_extension = ".trans.txt"
     audio_extension = ".flac"
+
     for data_path, fileid in fileids:
         fileid = os.path.basename(fileid).split(".")[0]
-        folder1, folder2, file = fileid.split("-")
-        file_text = folder1 + "-" + folder2 + text_extension
-        file_text = os.path.join(data_path, folder1, folder2, file_text)
-        file_audio = folder1 + "-" + folder2 + "-" + file + audio_extension
-        file_audio = os.path.join(data_path, folder1, folder2, file_audio)
-        waveform, sample_rate = torchaudio.load(file_audio)
-
-        for line in open(file_text):
-            fileid_text, content = line.strip().split(" ", 1)
-            if fileid == fileid_text:
-                break
-        else:
-            # Translation not found
-            raise ValueError
-
-        yield {
-            "id": fileid,
-            "content": content,
-            "waveform": waveform,
-            "sample_rate": sample_rate,
-        }
+        yield load_librispeech_item(fileid, data_path, audio_extension, text_extension)
 
 
 def LIBRISPEECH(root, selection):
@@ -106,35 +118,8 @@ class LIBRISPEECH2(data.Dataset):
         )
 
     def __getitem__(self, n):
-
         fileid = self._list[n]
-        speaker, chapter, transcription = fileid.split("-")
-
-        file_text = speaker + "-" + chapter + self._ext_txt
-        file_text = os.path.join(self._path, speaker, chapter, file_text)
-        file_audio = speaker + "-" + chapter + "-" + transcription + self._ext_audio
-        file_audio = os.path.join(self._path, speaker, chapter, file_audio)
-
-        # Load audio
-        waveform, sample_rate = torchaudio.load(file_audio)
-
-        # Load text
-        for line in open(file_text):
-            fileid_text, content = line.strip().split(" ", 1)
-            if file_audio == fileid_text:
-                break
-        else:
-            # Translation not found
-            raise ValueError
-
-        return {
-            "speaker": speaker,
-            "chapter": chapter,
-            "transcription": transcription,
-            "content": content,
-            "waveform": waveform,
-            "sample_rate": sample_rate,
-        }
+        return load_librispeech_item(fileid, self._path, self._ext_audio, self._ext_txt)
 
     def __len__(self):
         return len(self._list)
