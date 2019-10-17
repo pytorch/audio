@@ -95,6 +95,20 @@ def COMMONVOICE(root, language, tsv_file):
     return load_commonvoice(path, tsv_file)
 
 
+def load_commonvoice_item(line, header, path, folder_audio):
+    fileid = line[1]
+
+    filename = os.path.join(path, folder_audio, fileid)
+
+    waveform, sample_rate = torchaudio.load(filename)
+
+    dic = dict(zip(header, line))
+    dic["waveform"] = waveform
+    dic["sample_rate"] = sample_rate
+
+    return dic
+
+
 class COMMONVOICE2(data.Dataset):
 
     _ext_txt = ".txt"
@@ -157,19 +171,14 @@ class COMMONVOICE2(data.Dataset):
             self._list = list(line for line in reader)
 
     def __getitem__(self, n):
-
         line = self._list[n]
-        fileid = line[1]
+        return load_commonvoice_item(line, self._header, self._path, self._folder_audio)
 
-        filename = os.path.join(self._path, self._folder_audio, fileid)
-
-        waveform, sample_rate = torchaudio.load(filename)
-
-        dic = dict(zip(self._header, line))
-        dic["waveform"] = waveform
-        dic["sample_rate"] = sample_rate
-
-        return dic
+    def __iter__(self):
+        for line in self._list:
+            yield load_commonvoice_item(
+                line, self._header, self._path, self._folder_audio
+            )
 
     def __len__(self):
         return len(self._list)

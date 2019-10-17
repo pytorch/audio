@@ -64,15 +64,18 @@ class YESNO2(data.Dataset):
                 torchaudio.datasets.utils.download_url(_url, root)
             torchaudio.datasets.utils.extract_archive(archive)
 
-        self._list = list(
-            torchaudio.datasets.utils.walk_files(
-                self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
-            )
+        walker = torchaudio.datasets.utils.walk_files(
+            self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
         )
+        self._list = list(walker)
 
     def __getitem__(self, n):
         fileid = self._list[n]
         return load_yesno_item(fileid, self._path, self._ext_audio)
+
+    def __iter__(self):
+        for fileid in self._list:
+            yield load_yesno_item(fileid, self._path, self._ext_audio)
 
     def __len__(self):
         return len(self._list)
