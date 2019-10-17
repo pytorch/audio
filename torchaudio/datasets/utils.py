@@ -2,16 +2,17 @@ import csv
 import errno
 import gzip
 import hashlib
+import logging
 import os
-import os.path
 import sys
 import tarfile
 import zipfile
 
-import six
 import torch
-import torchaudio
 from torch.utils.model_zoo import tqdm
+
+import six
+import torchaudio
 
 
 def unicode_csv_reader(unicode_csv_data, **kwargs):
@@ -332,35 +333,9 @@ def extract_archive(from_path, to_path=None, overwrite=False):
         )
 
 
-def extract_archive(from_path, to_path=None, remove_finished=False):
-    if to_path is None:
-        to_path = os.path.dirname(from_path)
-
-    if _is_tar(from_path):
-        with tarfile.open(from_path, "r") as tar:
-            tar.extractall(path=to_path)
-    elif _is_targz(from_path):
-        with tarfile.open(from_path, "r:gz") as tar:
-            tar.extractall(path=to_path)
-    elif _is_gzip(from_path):
-        to_path = os.path.join(
-            to_path, os.path.splitext(os.path.basename(from_path))[0]
-        )
-        with open(to_path, "wb") as out_f, gzip.GzipFile(from_path) as zip_f:
-            out_f.write(zip_f.read())
-    elif _is_zip(from_path):
-        with zipfile.ZipFile(from_path, "r") as z:
-            z.extractall(to_path)
-    else:
-        raise ValueError("Extraction of {} not supported".format(from_path))
-
-    if remove_finished:
-        os.remove(from_path)
-
-
 class Cache:
     """
-    Wrap a generator so that, whenever a new item is returned, it is saved to disk in a pickle.
+    Wrap a generator so that, whenever a new item is returned, it is saved to disk.
     """
 
     def __init__(self, generator, location):
@@ -386,16 +361,14 @@ class Cache:
             self._cache.append(file)
 
             makedir_exist_ok(self.location)
-            with open(file, "wb") as file:
-                pickle.dump(item, file)
+            torch.save(item, file)
 
         self._internal_index += 1
         return item
 
     def __getitem__(self, index):
         file = self._cache[index]
-        with open(file, "rb") as file:
-            item = pickle.load(file)
+        item = torch.load(file)
         return item
 
     def __len__(self):
@@ -465,7 +438,7 @@ def walk(paths, extension):
     Output: path, file name identifying a row of data
     """
     for path in paths:
-        for dp, dn, fn in os.walk(path):
+        for _, _, fn in os.walk(path):
             for f in fn:
                 if extension in f:
                     yield path, f
@@ -515,7 +488,7 @@ def list_files_recursively(root, suffix, prefix=False, remove_suffix=False):
     files = [f for _, _, fn in os.walk(root) for f in fn if f.endswith(suffix)]
 
     if remove_suffix:
-        files = [f[:-len(suffix)] for f in files]
+        files = [f[: -len(suffix)] for f in files]
 
     if prefix:
         files = [os.path.join(root, d) for d in files]
