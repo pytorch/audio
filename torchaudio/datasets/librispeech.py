@@ -105,13 +105,14 @@ class LIBRISPEECH2(data.Dataset):
         url = os.path.join(base, selection + ext_archive)
         folder_in_archive = os.path.join("LibriSpeech", selection)
 
-        # torchaudio.datasets.utils.download_url(url, root)
-
-        filename = os.path.basename(url)
-        filename = os.path.join(root, filename)
-        # torchaudio.datasets.utils.extract_archive(filename)
-
+        archive = os.path.basename(url)
+        archive = os.path.join(root, archive)
         self._path = os.path.join(root, folder_in_archive)
+
+        if not os.path.isdir(self._path):
+            if not os.path.isfile(archive):
+                torchaudio.datasets.utils.download_url(_url, root)
+            torchaudio.datasets.utils.extract_archive(archive)
 
         self._list = torchaudio.datasets.utils.list_files_recursively(
             self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True

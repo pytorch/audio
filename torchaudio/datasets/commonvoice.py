@@ -139,13 +139,14 @@ class COMMONVOICE2(data.Dataset):
         ext_archive = ".tar.gz"
         url = base + languages[language] + ext_archive
 
-        # torchaudio.datasets.utils.download_url(url, root)
-
-        filename = os.path.basename(url)
-        filename = os.path.join(root, filename)
-        # torchaudio.datasets.utils.extract_archive(filename)
-
+        archive = os.path.basename(url)
+        archive = os.path.join(root, archive)
         self._path = root
+
+        if not os.path.isdir(self._path):
+            if not os.path.isfile(archive):
+                torchaudio.datasets.utils.download_url(_url, root)
+            torchaudio.datasets.utils.extract_archive(archive)
 
         # Read header and all lines in tsv file
         tsv = os.path.join(root, tsv)
