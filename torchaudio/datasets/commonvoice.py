@@ -163,22 +163,17 @@ class COMMONVOICE2(data.IterableDataset):
                 torchaudio.datasets.utils.download_url(url, root)
             torchaudio.datasets.utils.extract_archive(archive)
 
-        # Read header and all lines in tsv file
-        tsv = os.path.join(root, tsv)
-        with open(tsv) as tsv:
-            walker = unicode_csv_reader(tsv, delimiter="\t")
-            self._header = next(walker)
-            self._list = list(walker)
+        self._tsv = os.path.join(root, tsv)
 
-    def __getitem__(self, n):
-        line = self._list[n]
-        return load_commonvoice_item(line, self._header, self._path, self._folder_audio)
+        # Read header and all lines in tsv file
+
+
 
     def __iter__(self):
-        for line in self._list:
-            yield load_commonvoice_item(
-                line, self._header, self._path, self._folder_audio
-            )
-
-    def __len__(self):
-        return len(self._list)
+        with open(self._tsv, "r") as tsv:
+            walker = unicode_csv_reader(tsv, delimiter="\t")
+            self._header = next(walker)
+            for line in walker:
+                yield load_commonvoice_item(
+                    line, self._header, self._path, self._folder_audio
+                )

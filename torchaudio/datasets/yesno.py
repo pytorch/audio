@@ -67,15 +67,9 @@ class YESNO2(data.IterableDataset):
         walker = torchaudio.datasets.utils.walk_files(
             self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
         )
-        self._list = list(walker)
-
-    def __getitem__(self, n):
-        fileid = self._list[n]
-        return load_yesno_item(fileid, self._path, self._ext_audio)
+        self._walker = walker
 
     def __iter__(self):
-        for fileid in self._list:
+        for fileid in self._walker:
             yield load_yesno_item(fileid, self._path, self._ext_audio)
 
-    def __len__(self):
-        return len(self._list)

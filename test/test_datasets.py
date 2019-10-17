@@ -31,22 +31,30 @@ class TestDatasets(unittest.TestCase):
     def test_yesno2(self):
         data = YESNO2("./yesnotest")
         pprint("YESNO2")
-        pprint(data[0])
+        for d in data:
+            pprint(d)
+            break
 
     def test_vctk2(self):
         data = VCTK2("./vctktest/")
         pprint("VCTK2")
-        pprint(data[0])
+        for d in data:
+            pprint(d)
+            break
 
     def test_librispeech2(self):
         data = LIBRISPEECH2("./librispeechtest/", "dev-clean")
         pprint("LIBRISPEECH2")
-        pprint(data[0])
+        for d in data:
+            pprint(d)
+            break
 
     def test_commonvoice2(self):
         data = COMMONVOICE2("./commonvoicetest/", "tatar", "train.tsv")
         pprint("COMMONVOICE2")
-        pprint(data[0])
+        for d in data:
+            pprint(d)
+            break
 
 
 if __name__ == "__main__":
