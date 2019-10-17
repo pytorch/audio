@@ -28,53 +28,7 @@ def load_vctk_item(fileid, path, ext_audio, ext_txt, folder_audio, folder_txt):
     }
 
 
-def load_vctk(fileids):
-    """
-    Load data corresponding to each VCTK fileids.
-
-    Input: path, file name identifying a row of data
-    Output: dictionary with id, content, waveform, sample_rate
-    """
-
-    txt_folder = "txt"
-    txt_extension = ".txt"
-
-    audio_folder = "wav48"
-    audio_extension = ".wav"
-
-    for path, fileid in fileids:
-
-        fileid = os.path.basename(fileid).split(".")[0]
-        try:
-            yield load_vctk_item(
-                fileid, path, audio_extension, txt_extension, audio_folder, txt_folder
-            )
-        except FileNotFoundError:
-            warn("Translation not found for {}".format(fileid))
-            continue
-
-
-def VCTK(root):
-    """
-    Create a generator for VCTK.
-    """
-
-    url = [
-        (
-            "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz",
-            "VCTK-Corpus/",
-        )
-    ]
-
-    path = download(url, root_path=root)
-    path = extract(path)
-    path = walk(path, extension=".wav")
-    # path = shuffle(path)
-    # path, l = generator_length(path)
-    return load_vctk(path)
-
-
-class VCTK2(data.IterableDataset):
+class VCTK(data.IterableDataset):
 
     _folder_txt = "txt"
     _folder_audio = "wav48"
@@ -110,4 +64,3 @@ class VCTK2(data.IterableDataset):
                 self._folder_audio,
                 self._folder_txt,
             )
-

@@ -17,36 +17,7 @@ def load_yesno_item(fileid, path, ext_audio):
     return {"label": label, "waveform": waveform, "sample_rate": sample_rate}
 
 
-def load_yesno(fileids):
-    """
-    Load data corresponding to each YESNO fileids.
-
-    Input: path, file name identifying a row of data
-    Output: dictinoary with label, waveform, sample_rate
-    """
-
-    extension = ".wav"
-    for path, fileid in fileids:
-        fileid = os.path.basename(fileid).split(".")[0]
-        yield load_yesno_item(fileid, path, extension)
-
-
-def YESNO(root):
-    """
-    Create a generator for YESNO.
-    """
-
-    url = [("http://www.openslr.org/resources/1/waves_yesno.tar.gz", "waves_yesno")]
-
-    path = download(url, root_path=root)
-    path = extract(path)
-    path = walk(path, extension=".wav")
-    # path = shuffle(path)
-    # path, l = generator_length(path)
-    return load_yesno(path)
-
-
-class YESNO2(data.IterableDataset):
+class YESNO(data.IterableDataset):
 
     _ext_audio = ".wav"
 
@@ -72,4 +43,3 @@ class YESNO2(data.IterableDataset):
     def __iter__(self):
         for fileid in self._walker:
             yield load_yesno_item(fileid, self._path, self._ext_audio)
-

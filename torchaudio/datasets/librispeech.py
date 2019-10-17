@@ -37,53 +37,7 @@ def load_librispeech_item(fileid, path, ext_audio, ext_txt):
     }
 
 
-def load_librispeech(fileids):
-    """
-    Load data corresponding to each LIBRISPEECH fileids.
-
-    Input: path, file name identifying a row of data
-    Output: dictionary with id, waveform, sample_rate, translation
-    """
-
-    text_extension = ".trans.txt"
-    audio_extension = ".flac"
-
-    for data_path, fileid in fileids:
-        fileid = os.path.basename(fileid).split(".")[0]
-        yield load_librispeech_item(fileid, data_path, audio_extension, text_extension)
-
-
-def LIBRISPEECH(root, selection):
-    """
-    Create a generator for LibriSpeech.
-    """
-
-    selections = [
-        "dev-clean",
-        "test-clean",
-        "test-other",
-        "train-clean-100",
-        "train-clean-360",
-        "train-other-500",
-    ]
-
-    base = "http://www.openslr.org/resources/12/"
-    url = [
-        (
-            os.path.join(base, selection + ".tar.gz"),
-            os.path.join("LibriSpeech", selection),
-        )
-    ]
-
-    path = download(url, root_path=root)
-    path = extract(path)
-    path = walk(path, extension=".flac")
-    # path = shuffle(path)
-    # path, l = generator_length(path)
-    return load_librispeech(path)
-
-
-class LIBRISPEECH2(data.IterableDataset):
+class LIBRISPEECH(data.IterableDataset):
 
     _ext_txt = ".trans.txt"
     _ext_audio = ".flac"
@@ -125,4 +79,3 @@ class LIBRISPEECH2(data.IterableDataset):
             yield load_librispeech_item(
                 fileid, self._path, self._ext_audio, self._ext_txt
             )
-
