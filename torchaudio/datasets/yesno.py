@@ -1,9 +1,11 @@
 import os
 
 import torchaudio
-from torchaudio.datasets.utils import data, download_url, extract_archive, walk_files
+from torch.utils.data import Dataset
+from torchaudio.datasets.utils import download_url, extract_archive, walk_files
 
-DEFAULT_URL = "http://www.openslr.org/resources/1/waves_yesno.tar.gz"
+URL = "http://www.openslr.org/resources/1/waves_yesno.tar.gz"
+FOLDER_IN_ARCHIVE = "waves_yesno"
 
 
 def load_yesno_item(fileid, path, ext_audio):
@@ -17,13 +19,13 @@ def load_yesno_item(fileid, path, ext_audio):
     return {"label": label, "waveform": waveform, "sample_rate": sample_rate}
 
 
-class YESNO(data.Dataset):
+class YESNO(Dataset):
 
     _ext_audio = ".wav"
 
-    def __init__(self, root, url=DEFAULT_URL):
+    def __init__(self, root, url=None, folder_in_archive=FOLDER_IN_ARCHIVE):
 
-        folder_in_archive = "waves_yesno"
+        url = url or URL
 
         archive = os.path.basename(url)
         archive = os.path.join(root, archive)

@@ -1,9 +1,11 @@
 import os
 
 import torchaudio
-from torchaudio.datasets.utils import data, download_url, extract_archive, walk_files
+from torch.utils.data import Dataset
+from torchaudio.datasets.utils import download_url, extract_archive, walk_files
 
-DEFAULT_URL = "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz"
+URL = "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz"
+FOLDER_IN_ARCHIVE = "VCTK-Corpus"
 
 
 def load_vctk_item(fileid, path, ext_audio, ext_txt, folder_audio, folder_txt):
@@ -27,16 +29,16 @@ def load_vctk_item(fileid, path, ext_audio, ext_txt, folder_audio, folder_txt):
     }
 
 
-class VCTK(data.Dataset):
+class VCTK(Dataset):
 
     _folder_txt = "txt"
     _folder_audio = "wav48"
     _ext_txt = ".txt"
     _ext_audio = ".wav"
 
-    def __init__(self, root, url=DEFAULT_URL):
+    def __init__(self, root, url=None, folder_in_archive=FOLDER_IN_ARCHIVE):
 
-        folder_in_archive = "VCTK-Corpus/"
+        url = url or URL
 
         archive = os.path.basename(url)
         archive = os.path.join(root, archive)

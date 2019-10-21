@@ -1,17 +1,8 @@
 import os
 
 import torchaudio
-from torchaudio.datasets.utils import (
-    data,
-    download_url,
-    extract_archive,
-    unicode_csv_reader,
-)
-
-DEFAULT_BASE_URL = (
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4"
-    + ".s3.amazonaws.com/cv-corpus-3/"
-)
+from torch.utils.data import Dataset
+from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
 
 
 def load_commonvoice_item(line, header, path, folder_audio):
@@ -28,50 +19,65 @@ def load_commonvoice_item(line, header, path, folder_audio):
     return dic
 
 
-class COMMONVOICE(data.Dataset):
+class COMMONVOICE(Dataset):
 
     _ext_txt = ".txt"
     _ext_audio = ".mp3"
     _folder_audio = "clips"
 
-    def __init__(self, root, language, tsv, base_url=DEFAULT_BASE_URL):
+    def __init__(self, root, tsv, language=None, url=None):
 
-        languages = {
-            "tatar": "tt",
-            "english": "en",
-            "german": "de",
-            "french": "fr",
-            "welsh": "cy",
-            "breton": "br",
-            "chuvash": "cv",
-            "turkish": "tr",
-            "kyrgyz": "ky",
-            "irish": "ga-IE",
-            "kabyle": "kab",
-            "catalan": "ca",
-            "taiwanese": "zh-TW",
-            "slovenian": "sl",
-            "italian": "it",
-            "dutch": "nl",
-            "hakha chin": "cnh",
-            "esperanto": "eo",
-            "estonian": "et",
-            "persian": "fa",
-            "basque": "eu",
-            "spanish": "es",
-            "chinese": "zh-CN",
-            "mongolian": "mn",
-            "sakha": "sah",
-            "dhivehi": "dv",
-            "kinyarwanda": "rw",
-            "swedish": "sv-SE",
-            "russian": "ru",
-        }
+        if url is None:
+            ext_archive = ".tar.gz"
+            languages = {
+                "tatar": "tt",
+                "english": "en",
+                "german": "de",
+                "french": "fr",
+                "welsh": "cy",
+                "breton": "br",
+                "chuvash": "cv",
+                "turkish": "tr",
+                "kyrgyz": "ky",
+                "irish": "ga-IE",
+                "kabyle": "kab",
+                "catalan": "ca",
+                "taiwanese": "zh-TW",
+                "slovenian": "sl",
+                "italian": "it",
+                "dutch": "nl",
+                "hakha chin": "cnh",
+                "esperanto": "eo",
+                "estonian": "et",
+                "persian": "fa",
+                "basque": "eu",
+                "spanish": "es",
+                "chinese": "zh-CN",
+                "mongolian": "mn",
+                "sakha": "sah",
+                "dhivehi": "dv",
+                "kinyarwanda": "rw",
+                "swedish": "sv-SE",
+                "russian": "ru",
+            }
+            language = languages.get(language, language)
 
-        language = languages.get(language, language)
+            base_url = (
+                "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4"
+                + ".s3.amazonaws.com/cv-corpus-3/"
+            )
+            url = base_url + language + ext_archive
 
-        ext_archive = ".tar.gz"
-        url = base_url + language + ext_archive
+        tsvs = [
+            "dev.tsv",
+            "invalidated.tsv",
+            "other.tsv",
+            "test.tsv",
+            "train.tsv",
+            "validated.tsv",
+        ]
+
+        assert tsv in tsvs
 
         archive = os.path.basename(url)
         archive = os.path.join(root, archive)

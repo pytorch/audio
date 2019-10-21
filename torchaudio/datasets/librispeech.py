@@ -1,15 +1,16 @@
 import os
 
 import torchaudio
+from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
-    data,
     download_url,
     extract_archive,
     unicode_csv_reader,
     walk_files,
 )
 
-DEFAULT_BASE_URL = "http://www.openslr.org/resources/12/"
+FOLDER_IN_ARCHIVE = "LibriSpeech"
+SELECTION = "train-clean-100"
 
 
 def load_librispeech_item(fileid, path, ext_audio, ext_txt):
@@ -43,27 +44,33 @@ def load_librispeech_item(fileid, path, ext_audio, ext_txt):
     }
 
 
-class LIBRISPEECH(data.Dataset):
+class LIBRISPEECH(Dataset):
 
     _ext_txt = ".trans.txt"
     _ext_audio = ".flac"
 
-    def __init__(self, root, selection, base_url=DEFAULT_BASE_URL):
+    def __init__(
+        self, root, selection=SELECTION, url=None, folder_in_archive=FOLDER_IN_ARCHIVE
+    ):
 
-        selections = [
-            "dev-clean",
-            "test-clean",
-            "test-other",
-            "train-clean-100",
-            "train-clean-360",
-            "train-other-500",
-        ]
+        if url is None:
+            selections = [
+                "dev-clean",
+                "test-clean",
+                "test-other",
+                "train-clean-100",
+                "train-clean-360",
+                "train-other-500",
+            ]
 
-        assert selection in selections
+            assert selection in selections
 
-        ext_archive = ".tar.gz"
-        url = os.path.join(base_url, selection + ext_archive)
-        folder_in_archive = os.path.join("LibriSpeech", selection)
+            ext_archive = ".tar.gz"
+            base_url = "http://www.openslr.org/resources/12/"
+
+            url = os.path.join(base_url, selection + ext_archive)
+
+        folder_in_archive = os.path.join(folder_in_archive, selection)
 
         archive = os.path.basename(url)
         archive = os.path.join(root, archive)

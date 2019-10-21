@@ -21,7 +21,7 @@ class TestDatasets(unittest.TestCase):
         data[0]
 
     def test_commonvoice(self):
-        data = COMMONVOICE("./commonvoicetest/", "tatar", "train.tsv")
+        data = COMMONVOICE("./commonvoicetest/", "train.tsv", "tatar")
         data[0]
 
 
