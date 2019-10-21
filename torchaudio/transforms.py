@@ -62,7 +62,7 @@ class Spectrogram(torch.jit.ScriptModule):
         Returns:
             torch.Tensor: Dimension (channel, freq, time), where channel
             is unchanged, freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
-            Fourier bins, and time is the number of window hops (n_frames).
+            Fourier bins, and time is the number of window hops (n_frame).
         """
         return F.spectrogram(waveform, self.pad, self.window, self.n_fft, self.hop_length,
                              self.win_length, self.power, self.normalized)
@@ -409,9 +409,9 @@ class ComputeDeltas(torch.jit.ScriptModule):
     def forward(self, specgram):
         r"""
         Args:
-            specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
+            specgram (torch.Tensor): Tensor of audio of dimension (channel, freq, time)
 
         Returns:
-            deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
+            deltas (torch.Tensor): Tensor of audio of dimension (channel, freq, time)
         """
         return F.compute_deltas(specgram, win_length=self.win_length, mode=self.mode)

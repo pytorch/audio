@@ -83,7 +83,7 @@ def istft(
     Example: Suppose the last window is:
     [17, 18, 0, 0, 0] vs [18, 0, 0, 0, 0]
 
-    The n_frames, hop_length, win_length are all the same which prevents the calculation of right padding.
+    The n_frame, hop_length, win_length are all the same which prevents the calculation of right padding.
     These additional values could be zeros or a reflection of the signal so providing ``length``
     could be useful. If ``length`` is ``None`` then padding will be aggressively removed
     (some loss of signal).
@@ -93,8 +93,8 @@ def istft(
 
     Args:
         stft_matrix (torch.Tensor): Output of stft where each row of a channel is a frequency and each
-            column is a window. it has a size of either (channel, fft_size, n_frames, 2) or (
-            fft_size, n_frames, 2)
+            column is a window. it has a size of either (channel, fft_size, n_frame, 2) or (
+            fft_size, n_frame, 2)
         n_fft (int): Size of Fourier transform
         hop_length (Optional[int]): The distance between neighboring sliding window frames.
             (Default: ``win_length // 4``)
@@ -156,17 +156,17 @@ def istft(
         assert window.size(0) == n_fft
     # win_length and n_fft are synonymous from here on
 
-    stft_matrix = stft_matrix.transpose(1, 2)  # size (channel, n_frames, fft_size, 2)
+    stft_matrix = stft_matrix.transpose(1, 2)  # size (channel, n_frame, fft_size, 2)
     stft_matrix = torch.irfft(
         stft_matrix, 1, normalized, onesided, signal_sizes=(n_fft,)
-    )  # size (channel, n_frames, n_fft)
+    )  # size (channel, n_frame, n_fft)
 
     assert stft_matrix.size(2) == n_fft
-    n_frames = stft_matrix.size(1)
+    n_frame = stft_matrix.size(1)
 
-    ytmp = stft_matrix * window.view(1, 1, n_fft)  # size (channel, n_frames, n_fft)
+    ytmp = stft_matrix * window.view(1, 1, n_fft)  # size (channel, n_frame, n_fft)
     # each column of a channel is a frame which needs to be overlap added at the right place
-    ytmp = ytmp.transpose(1, 2)  # size (channel, n_fft, n_frames)
+    ytmp = ytmp.transpose(1, 2)  # size (channel, n_fft, n_frame)
 
     eye = torch.eye(n_fft, requires_grad=False, device=device, dtype=dtype).unsqueeze(
         1
@@ -180,13 +180,13 @@ def istft(
 
     # do the same for the window function
     window_sq = (
-        window.pow(2).view(n_fft, 1).repeat((1, n_frames)).unsqueeze(0)
-    )  # size (1, n_fft, n_frames)
+        window.pow(2).view(n_fft, 1).repeat((1, n_frame)).unsqueeze(0)
+    )  # size (1, n_fft, n_frame)
     window_envelop = torch.nn.functional.conv_transpose1d(
         window_sq, eye, stride=hop_length, padding=0
     )  # size (1, 1, expected_signal_len)
 
-    expected_signal_len = n_fft + hop_length * (n_frames - 1)
+    expected_signal_len = n_fft + hop_length * (n_frame - 1)
     assert y.size(2) == expected_signal_len
     assert window_envelop.size(2) == expected_signal_len
 
@@ -233,9 +233,9 @@ def spectrogram(
         normalized (bool): Whether to normalize by magnitude after stft
 
     Returns:
-        torch.Tensor: Dimension (channel, n_freq, time), where channel
-        is unchanged, n_freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
-        Fourier bins, and time is the number of window hops (n_frames).
+        torch.Tensor: Dimension (channel, freq, time), where channel
+        is unchanged, freq is ``n_fft // 2 + 1`` and ``n_fft`` is the number of
+        Fourier bins, and time is the number of window hops (n_frame).
     """
     assert waveform.dim() == 2
 
@@ -537,7 +537,7 @@ def lfilter(waveform, a_coeffs, b_coeffs):
     Performs an IIR filter by evaluating difference equation.
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`.  Must be normalized to -1 to 1.
+        waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`.  Must be normalized to -1 to 1.
         a_coeffs (torch.Tensor): denominator coefficients of difference equation of dimension of `(n_order + 1)`.
                                 Lower delays coefficients are first, e.g. `[a0, a1, a2, ...]`.
                                 Must be same size as b_coeffs (pad with 0's as necessary).
@@ -546,8 +546,7 @@ def lfilter(waveform, a_coeffs, b_coeffs):
                                  Must be same size as a_coeffs (pad with 0's as necessary).
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`.  Output will be clipped to -1 to 1.
-                                        Will be on the same device as the inputs.
+        output_waveform (torch.Tensor): Dimension of `(channel, time)`.  Output will be clipped to -1 to 1.
 
     """
 
@@ -558,37 +557,37 @@ def lfilter(waveform, a_coeffs, b_coeffs):
 
     device = waveform.device
     dtype = waveform.dtype
-    n_channels, n_frames = waveform.size()
+    n_channel, n_sample = waveform.size()
     n_order = a_coeffs.size(0)
     assert(n_order > 0)
 
     # Pad the input and create output
-    padded_waveform = torch.zeros(n_channels, n_frames + n_order - 1, dtype=dtype, device=device)
+    padded_waveform = torch.zeros(n_channel, n_sample + n_order - 1, dtype=dtype, device=device)
     padded_waveform[:, (n_order - 1):] = waveform
-    padded_output_waveform = torch.zeros(n_channels, n_frames + n_order - 1, dtype=dtype, device=device)
+    padded_output_waveform = torch.zeros(n_channel, n_sample + n_order - 1, dtype=dtype, device=device)
 
     # Set up the coefficients matrix
     # Flip order, repeat, and transpose
-    a_coeffs_filled = a_coeffs.flip(0).repeat(n_channels, 1).t()
-    b_coeffs_filled = b_coeffs.flip(0).repeat(n_channels, 1).t()
+    a_coeffs_filled = a_coeffs.flip(0).repeat(n_channel, 1).t()
+    b_coeffs_filled = b_coeffs.flip(0).repeat(n_channel, 1).t()
 
     # Set up a few other utilities
-    a0_repeated = torch.ones(n_channels, dtype=dtype, device=device) * a_coeffs[0]
-    ones = torch.ones(n_channels, n_frames, dtype=dtype, device=device)
+    a0_repeated = torch.ones(n_channel, dtype=dtype, device=device) * a_coeffs[0]
+    ones = torch.ones(n_channel, n_sample, dtype=dtype, device=device)
 
-    for i_frame in range(n_frames):
+    for i_sample in range(n_sample):
 
-        o0 = torch.zeros(n_channels, dtype=dtype, device=device)
+        o0 = torch.zeros(n_channel, dtype=dtype, device=device)
 
-        windowed_input_signal = padded_waveform[:, i_frame:(i_frame + n_order)]
-        windowed_output_signal = padded_output_waveform[:, i_frame:(i_frame + n_order)]
+        windowed_input_signal = padded_waveform[:, i_sample:(i_sample + n_order)]
+        windowed_output_signal = padded_output_waveform[:, i_sample:(i_sample + n_order)]
 
         o0.add_(torch.diag(torch.mm(windowed_input_signal, b_coeffs_filled)))
         o0.sub_(torch.diag(torch.mm(windowed_output_signal, a_coeffs_filled)))
 
         o0.div_(a0_repeated)
 
-        padded_output_waveform[:, i_frame + n_order - 1] = o0
+        padded_output_waveform[:, i_sample + n_order - 1] = o0
 
     return torch.min(ones, torch.max(ones * -1, padded_output_waveform[:, (n_order - 1):]))
 
@@ -599,7 +598,7 @@ def biquad(waveform, b0, b1, b2, a0, a1, a2):
     https://en.wikipedia.org/wiki/Digital_biquad_filter
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`
+        waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
         b0 (float): numerator coefficient of current input, x[n]
         b1 (float): numerator coefficient of input one time step ago x[n-1]
         b2 (float): numerator coefficient of input two time steps ago x[n-2]
@@ -608,7 +607,7 @@ def biquad(waveform, b0, b1, b2, a0, a1, a2):
         a2 (float): denominator coefficient of current output y[n-2]
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`
+        output_waveform (torch.Tensor): Dimension of `(channel, time)`
     """
 
     device = waveform.device
@@ -631,13 +630,13 @@ def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     r"""Designs biquad highpass filter and performs filtering.  Similar to SoX implementation.
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`
+        waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
         cutoff_freq (float): filter cutoff frequency
         Q (float): https://en.wikipedia.org/wiki/Q_factor
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`
+        output_waveform (torch.Tensor): Dimension of `(channel, time)`
     """
 
     GAIN = 1  # TBD - add as a parameter
@@ -660,13 +659,13 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     r"""Designs biquad lowpass filter and performs filtering.  Similar to SoX implementation.
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(n_channel, n_frames)`
+        waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
         cutoff_freq (float): filter cutoff frequency
         Q (float): https://en.wikipedia.org/wiki/Q_factor
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(n_channel, n_frames)`
+        output_waveform (torch.Tensor): Dimension of `(channel, time)`
     """
 
     GAIN = 1
@@ -693,13 +692,13 @@ def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
     All examples will have the same mask interval.
 
     Args:
-        specgrams (Tensor): Real spectrograms (batch, channel, n_freq, time)
+        specgrams (Tensor): Real spectrograms (batch, channel, freq, time)
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (2 -> frequency, 3 -> time)
 
     Returns:
-        torch.Tensor: Masked spectrograms of dimensions (batch, channel, n_freq, time)
+        torch.Tensor: Masked spectrograms of dimensions (batch, channel, freq, time)
     """
 
     if axis != 2 and axis != 3:
@@ -730,13 +729,13 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
     All examples will have the same mask interval.
 
     Args:
-        specgram (Tensor): Real spectrogram (channel, n_freq, time)
+        specgram (Tensor): Real spectrogram (channel, freq, time)
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
 
     Returns:
-        torch.Tensor: Masked spectrogram of dimensions (channel, n_freq, time)
+        torch.Tensor: Masked spectrogram of dimensions (channel, freq, time)
     """
 
     value = torch.rand(1) * mask_param
@@ -769,12 +768,12 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
     :math:`N` is (`win_length`-1)//2.
 
     Args:
-        specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
+        specgram (torch.Tensor): Tensor of audio of dimension (channel, freq, time)
         win_length (int): The window length used for computing delta
         mode (str): Mode parameter passed to padding
 
     Returns:
-        deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
+        deltas (torch.Tensor): Tensor of audio of dimension (channel, freq, time)
 
     Example
         >>> specgram = torch.randn(1, 40, 1000)
