@@ -1,10 +1,9 @@
 import os
-from warnings import warn
-
-import torch.utils.data as data
 
 import torchaudio
-from torchaudio.datasets.utils import download, extract, shuffle, walk
+from torchaudio.datasets.utils import data, download_url, extract_archive, walk_files
+
+DEFAULT_URL = "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz"
 
 
 def load_vctk_item(fileid, path, ext_audio, ext_txt, folder_audio, folder_txt):
@@ -28,16 +27,15 @@ def load_vctk_item(fileid, path, ext_audio, ext_txt, folder_audio, folder_txt):
     }
 
 
-class VCTK(data.IterableDataset):
+class VCTK(data.Dataset):
 
     _folder_txt = "txt"
     _folder_audio = "wav48"
     _ext_txt = ".txt"
     _ext_audio = ".wav"
 
-    def __init__(self, root):
+    def __init__(self, root, url=DEFAULT_URL):
 
-        url = "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz"
         folder_in_archive = "VCTK-Corpus/"
 
         archive = os.path.basename(url)
@@ -46,21 +44,24 @@ class VCTK(data.IterableDataset):
 
         if not os.path.isdir(self._path):
             if not os.path.isfile(archive):
-                torchaudio.datasets.utils.download_url(_url, root)
-            torchaudio.datasets.utils.extract_archive(archive)
+                download_url(url, root)
+            extract_archive(archive)
 
-        walker = torchaudio.datasets.utils.walk_files(
+        walker = walk_files(
             self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
         )
-        self._walker = walker
+        self._walker = list(walker)
 
-    def __iter__(self):
-        for fileid in self._walker:
-            yield load_vctk_item(
-                fileid,
-                self._path,
-                self._ext_audio,
-                self._ext_txt,
-                self._folder_audio,
-                self._folder_txt,
-            )
+    def __getitem__(self, n):
+        fileid = self._walker[n]
+        return load_vctk_item(
+            fileid,
+            self._path,
+            self._ext_audio,
+            self._ext_txt,
+            self._folder_audio,
+            self._folder_txt,
+        )
+
+    def __len__(self):
+        return len(self._walker)

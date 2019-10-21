@@ -1,9 +1,9 @@
 import os
 
-import torch.utils.data as data
-
 import torchaudio
-from torchaudio.datasets.utils import download, extract, shuffle, walk
+from torchaudio.datasets.utils import data, download_url, extract_archive, walk_files
+
+DEFAULT_URL = "http://www.openslr.org/resources/1/waves_yesno.tar.gz"
 
 
 def load_yesno_item(fileid, path, ext_audio):
@@ -17,13 +17,12 @@ def load_yesno_item(fileid, path, ext_audio):
     return {"label": label, "waveform": waveform, "sample_rate": sample_rate}
 
 
-class YESNO(data.IterableDataset):
+class YESNO(data.Dataset):
 
     _ext_audio = ".wav"
 
-    def __init__(self, root):
+    def __init__(self, root, url=DEFAULT_URL):
 
-        url = "http://www.openslr.org/resources/1/waves_yesno.tar.gz"
         folder_in_archive = "waves_yesno"
 
         archive = os.path.basename(url)
@@ -32,14 +31,17 @@ class YESNO(data.IterableDataset):
 
         if not os.path.isdir(self._path):
             if not os.path.isfile(archive):
-                torchaudio.datasets.utils.download_url(_url, root)
-            torchaudio.datasets.utils.extract_archive(archive)
+                download_url(url, root)
+            extract_archive(archive)
 
-        walker = torchaudio.datasets.utils.walk_files(
+        walker = walk_files(
             self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
         )
-        self._walker = walker
+        self._walker = list(walker)
 
-    def __iter__(self):
-        for fileid in self._walker:
-            yield load_yesno_item(fileid, self._path, self._ext_audio)
+    def __getitem__(self, n):
+        fileid = self._walker[n]
+        return load_yesno_item(fileid, self._path, self._ext_audio)
+
+    def __len__(self):
+        return len(self._walker)

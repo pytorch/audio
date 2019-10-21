@@ -1,9 +1,15 @@
 import os
 
-import torch.utils.data as data
-
 import torchaudio
-from torchaudio.datasets.utils import download, extract, shuffle, walk
+from torchaudio.datasets.utils import (
+    data,
+    download_url,
+    extract_archive,
+    unicode_csv_reader,
+    walk_files,
+)
+
+DEFAULT_BASE_URL = "http://www.openslr.org/resources/12/"
 
 
 def load_librispeech_item(fileid, path, ext_audio, ext_txt):
@@ -37,12 +43,12 @@ def load_librispeech_item(fileid, path, ext_audio, ext_txt):
     }
 
 
-class LIBRISPEECH(data.IterableDataset):
+class LIBRISPEECH(data.Dataset):
 
     _ext_txt = ".trans.txt"
     _ext_audio = ".flac"
 
-    def __init__(self, root, selection):
+    def __init__(self, root, selection, base_url=DEFAULT_BASE_URL):
 
         selections = [
             "dev-clean",
@@ -56,8 +62,7 @@ class LIBRISPEECH(data.IterableDataset):
         assert selection in selections
 
         ext_archive = ".tar.gz"
-        base = "http://www.openslr.org/resources/12/"
-        url = os.path.join(base, selection + ext_archive)
+        url = os.path.join(base_url, selection + ext_archive)
         folder_in_archive = os.path.join("LibriSpeech", selection)
 
         archive = os.path.basename(url)
@@ -66,16 +71,17 @@ class LIBRISPEECH(data.IterableDataset):
 
         if not os.path.isdir(self._path):
             if not os.path.isfile(archive):
-                torchaudio.datasets.utils.download_url(_url, root)
-            torchaudio.datasets.utils.extract_archive(archive)
+                download_url(url, root)
+            extract_archive(archive)
 
-        walker = torchaudio.datasets.utils.walk_files(
+        walker = walk_files(
             self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
         )
-        self._walker = walker
+        self._walker = list(walker)
 
-    def __iter__(self):
-        for fileid in self._walker:
-            yield load_librispeech_item(
-                fileid, self._path, self._ext_audio, self._ext_txt
-            )
+    def __getitem__(self, n):
+        fileid = self._walker[n]
+        return load_librispeech_item(fileid, self._path, self._ext_audio, self._ext_txt)
+
+    def __len__(self):
+        return len(self._walker)

@@ -1,14 +1,16 @@
 import os
 
-import torch.utils.data as data
-
 import torchaudio
 from torchaudio.datasets.utils import (
-    download,
-    extract,
-    shuffle,
+    data,
+    download_url,
+    extract_archive,
     unicode_csv_reader,
-    walk,
+)
+
+DEFAULT_BASE_URL = (
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4"
+    + ".s3.amazonaws.com/cv-corpus-3/"
 )
 
 
@@ -26,15 +28,13 @@ def load_commonvoice_item(line, header, path, folder_audio):
     return dic
 
 
-class COMMONVOICE(data.IterableDataset):
+class COMMONVOICE(data.Dataset):
 
     _ext_txt = ".txt"
     _ext_audio = ".mp3"
     _folder_audio = "clips"
 
-    def __init__(self, root, language, tsv):
-
-        base = "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/"
+    def __init__(self, root, language, tsv, base_url=DEFAULT_BASE_URL):
 
         languages = {
             "tatar": "tt",
@@ -68,8 +68,10 @@ class COMMONVOICE(data.IterableDataset):
             "russian": "ru",
         }
 
+        language = languages.get(language, language)
+
         ext_archive = ".tar.gz"
-        url = base + languages[language] + ext_archive
+        url = base_url + language + ext_archive
 
         archive = os.path.basename(url)
         archive = os.path.join(root, archive)
@@ -77,16 +79,19 @@ class COMMONVOICE(data.IterableDataset):
 
         if not os.path.isdir(self._path):
             if not os.path.isfile(archive):
-                torchaudio.datasets.utils.download_url(url, root)
-            torchaudio.datasets.utils.extract_archive(archive)
+                download_url(url, root)
+            extract_archive(archive)
 
         self._tsv = os.path.join(root, tsv)
 
-    def __iter__(self):
         with open(self._tsv, "r") as tsv:
             walker = unicode_csv_reader(tsv, delimiter="\t")
             self._header = next(walker)
-            for line in walker:
-                yield load_commonvoice_item(
-                    line, self._header, self._path, self._folder_audio
-                )
+            self._walker = list(walker)
+
+    def __getitem__(self, n):
+        line = self._walker[n]
+        return load_commonvoice_item(line, self._header, self._path, self._folder_audio)
+
+    def __len__(self):
+        return len(self._walker)

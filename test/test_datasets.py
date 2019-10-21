@@ -10,31 +10,19 @@ from torchaudio.datasets.yesno import YESNO
 class TestDatasets(unittest.TestCase):
     def test_yesno(self):
         data = YESNO("./yesnotest")
-        pprint("YESNO")
-        for d in data:
-            pprint(d)
-            break
+        data[0]
 
     def test_vctk(self):
         data = VCTK("./vctktest/")
-        pprint("VCTK")
-        for d in data:
-            pprint(d)
-            break
+        data[0]
 
     def test_librispeech(self):
         data = LIBRISPEECH("./librispeechtest/", "dev-clean")
-        pprint("LIBRISPEECH")
-        for d in data:
-            pprint(d)
-            break
+        data[0]
 
     def test_commonvoice(self):
         data = COMMONVOICE("./commonvoicetest/", "tatar", "train.tsv")
-        pprint("COMMONVOICE")
-        for d in data:
-            pprint(d)
-            break
+        data[0]
 
 
 if __name__ == "__main__":
