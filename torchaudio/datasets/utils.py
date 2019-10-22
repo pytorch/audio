@@ -132,9 +132,9 @@ def extract_archive(from_path, to_path=None, overwrite=False):
     if to_path is None:
         to_path = os.path.dirname(from_path)
 
-    if from_path.endswith((".tar.gz", ".tgz")):
-        logging.info("Opening tar file {}.".format(from_path))
+    try:
         with tarfile.open(from_path, "r") as tar:
+            logging.info("Opened tar file {}.".format(from_path))
             files = []
             for file_ in tar:
                 file_path = os.path.join(to_path, file_.name)
@@ -146,11 +146,12 @@ def extract_archive(from_path, to_path=None, overwrite=False):
                             continue
                 tar.extract(file_, to_path)
             return files
+    except tarfile.ReadError:
+        pass
 
-    elif from_path.endswith(".zip"):
-        assert zipfile.is_zipfile(from_path), from_path
-        logging.info("Opening zip file {}.".format(from_path))
+    try:
         with zipfile.ZipFile(from_path, "r") as zfile:
+            logging.info("Opened zip file {}.".format(from_path))
             files = zfile.namelist()
             for file_ in files:
                 file_path = os.path.join(to_path, file_)
@@ -160,11 +161,10 @@ def extract_archive(from_path, to_path=None, overwrite=False):
                         continue
                 zfile.extract(file_, to_path)
         return files
+    except zipfile.BadZipFile:
+        pass
 
-    else:
-        raise NotImplementedError(
-            "We currently only support tar.gz, .tgz and zip achives."
-        )
+    raise NotImplementedError("We currently only support tar.gz, tgz, and zip achives.")
 
 
 def walk_files(root, suffix, prefix=False, remove_suffix=False):
