@@ -28,7 +28,7 @@ class YESNO(data.Dataset):
     raw_folder = 'yesno/raw'
     processed_folder = 'yesno/processed'
     url = 'http://www.openslr.org/resources/1/waves_yesno.tar.gz'
-    dset_path = 'waves_yesno'
+    dest_path = 'waves_yesno'
     processed_file = 'yesno.pt'
 
     def __init__(self, root, transform=None, target_transform=None, download=False, dev_mode=False):
@@ -85,8 +85,8 @@ class YESNO(data.Dataset):
 
         raw_abs_dir = os.path.join(self.root, self.raw_folder)
         processed_abs_dir = os.path.join(self.root, self.processed_folder)
-        dset_abs_path = os.path.join(
-            self.root, self.raw_folder, self.dset_path)
+        dest_abs_path = os.path.join(
+            self.root, self.raw_folder, self.dest_path)
 
         # download files
         try:
@@ -106,7 +106,7 @@ class YESNO(data.Dataset):
             urllib.request.urlretrieve(url, file_path)
         else:
             print("Tar file already downloaded")
-        if not os.path.exists(dset_abs_path):
+        if not os.path.exists(dest_abs_path):
             with tarfile.open(file_path) as zip_f:
                 zip_f.extractall(raw_abs_dir)
         else:
@@ -118,16 +118,16 @@ class YESNO(data.Dataset):
         # process and save as torch files
         print('Processing...')
         shutil.copyfile(
-            os.path.join(dset_abs_path, "README"),
+            os.path.join(dest_abs_path, "README"),
             os.path.join(processed_abs_dir, "YESNO_README")
         )
-        audios = [x for x in os.listdir(dset_abs_path) if ".wav" in x]
+        audios = [x for x in os.listdir(dest_abs_path) if ".wav" in x]
         print("Found {} audio files".format(len(audios)))
         tensors = []
         labels = []
         lengths = []
         for i, f in enumerate(audios):
-            full_path = os.path.join(dset_abs_path, f)
+            full_path = os.path.join(dest_abs_path, f)
             sig, sr = torchaudio.load(full_path)
             tensors.append(sig)
             lengths.append(sig.size(1))
