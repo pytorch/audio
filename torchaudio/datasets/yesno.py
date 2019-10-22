@@ -43,6 +43,14 @@ class YESNO(Dataset):
                 DeprecationWarning,
             )
 
+        if transform is not None or target_transform is not None:
+            warnings.warn(
+                "In the next version, transforms will not be part of the dataset. "
+                "Please remove the option `transform=True` and "
+                "`target_transform=True` to suppress this warning.",
+                DeprecationWarning,
+            )
+
         self.transform = transform
         self.target_transform = target_transform
         self.return_dict = return_dict
