@@ -5,6 +5,7 @@ from torchaudio.datasets.commonvoice import COMMONVOICE
 from torchaudio.datasets.librispeech import LIBRISPEECH
 from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.yesno import YESNO
+from torchaudio.datasets.utils import DiskCache
 
 
 class TestDatasets(unittest.TestCase):
@@ -22,6 +23,14 @@ class TestDatasets(unittest.TestCase):
 
     def test_commonvoice(self):
         data = COMMONVOICE("./commonvoicetest/", "train.tsv", "tatar")
+        data[0]
+
+    def test_commonvoice_diskcache(self):
+        data = COMMONVOICE("./commonvoicetest/", "train.tsv", "tatar")
+        data = DiskCache(data)
+        # Save
+        data[0]
+        # Load
         data[0]
 
 
