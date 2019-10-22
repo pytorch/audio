@@ -90,7 +90,7 @@ class VCTK(data.Dataset):
     raw_folder = 'vctk/raw'
     processed_folder = 'vctk/processed'
     url = 'http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz'
-    dset_path = 'VCTK-Corpus'
+    dest_path = 'VCTK-Corpus'
 
     def __init__(self, root, downsample=True, transform=None, target_transform=None, download=False, dev_mode=False):
         self.root = os.path.expanduser(root)
@@ -169,8 +169,8 @@ class VCTK(data.Dataset):
 
         raw_abs_dir = os.path.join(self.root, self.raw_folder)
         processed_abs_dir = os.path.join(self.root, self.processed_folder)
-        dset_abs_path = os.path.join(
-            self.root, self.raw_folder, self.dset_path)
+        dest_abs_path = os.path.join(
+            self.root, self.raw_folder, self.dest_path)
 
         # download files
         try:
@@ -188,7 +188,7 @@ class VCTK(data.Dataset):
         file_path = os.path.join(self.root, self.raw_folder, filename)
         if not os.path.isfile(file_path):
             urllib.request.urlretrieve(url, file_path)
-        if not os.path.exists(dset_abs_path):
+        if not os.path.exists(dest_abs_path):
             with tarfile.open(file_path) as zip_f:
                 zip_f.extractall(raw_abs_dir)
         else:
@@ -200,11 +200,11 @@ class VCTK(data.Dataset):
         torchaudio.initialize_sox()
         print('Processing...')
         shutil.copyfile(
-            os.path.join(dset_abs_path, "COPYING"),
+            os.path.join(dest_abs_path, "COPYING"),
             os.path.join(processed_abs_dir, "VCTK_COPYING")
         )
-        audios = make_manifest(dset_abs_path)
-        utterences = load_txts(dset_abs_path)
+        audios = make_manifest(dest_abs_path)
+        utterences = load_txts(dest_abs_path)
         self.max_len = 0
         print("Found {} audio files and {} utterences".format(
             len(audios), len(utterences)))
