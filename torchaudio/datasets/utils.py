@@ -22,7 +22,7 @@ def unicode_csv_reader(unicode_csv_data, **kwargs):
     Arguments:
         unicode_csv_data: unicode csv data (see example below)
     Examples:
-        >>> from torchtext.utils import unicode_csv_reader
+        >>> from torchaudio.datasets.utils import unicode_csv_reader
         >>> import io
         >>> with io.open(data_path, encoding="utf8") as f:
         >>>     reader = unicode_csv_reader(f)
@@ -125,8 +125,8 @@ def extract_archive(from_path, to_path=None, overwrite=False):
         >>> url = 'http://www.quest.dcs.shef.ac.uk/wmt16_files_mmt/validation.tar.gz'
         >>> from_path = './validation.tar.gz'
         >>> to_path = './'
-        >>> torchtext.utils.download_from_url(url, from_path)
-        >>> torchtext.utils.extract_archive(from_path, to_path)
+        >>> torchaudio.datasets.utils.download_from_url(url, from_path)
+        >>> torchaudio.datasets.utils.extract_archive(from_path, to_path)
     """
 
     if to_path is None:
