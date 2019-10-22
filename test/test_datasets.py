@@ -10,11 +10,11 @@ from torchaudio.datasets.utils import DiskCache
 
 class TestDatasets(unittest.TestCase):
     def test_yesno(self):
-        data = YESNO("./yesnotest")
+        data = YESNO("./yesnotest", return_dict=True)
         data[0]
 
     def test_vctk(self):
-        data = VCTK("./vctktest/")
+        data = VCTK("./vctktest/", return_dict=True)
         data[0]
 
     def test_librispeech(self):
