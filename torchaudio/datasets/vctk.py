@@ -1,243 +1,144 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-import torch.utils.data as data
 import os
-import os.path
-import shutil
-import errno
-import torch
+import warnings
+
 import torchaudio
+from torch.utils.data import Dataset
+from torchaudio.datasets.utils import download_url, extract_archive, walk_files
 
-AUDIO_EXTENSIONS = [
-    '.wav', '.mp3', '.flac', '.sph', '.ogg', '.opus',
-    '.WAV', '.MP3', '.FLAC', '.SPH', '.OGG', '.OPUS',
-]
-
-
-def is_audio_file(filename):
-    return any(filename.endswith(extension) for extension in AUDIO_EXTENSIONS)
+URL = "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz"
+FOLDER_IN_ARCHIVE = "VCTK-Corpus"
 
 
-def make_manifest(dir):
-    audios = []
-    dir = os.path.expanduser(dir)
-    for target in sorted(os.listdir(dir)):
-        d = os.path.join(dir, target)
-        if not os.path.isdir(d):
-            continue
+def load_vctk_item(
+    fileid, path, ext_audio, ext_txt, folder_audio, folder_txt, downsample=False
+):
+    speaker, utterance = fileid.split("_")
 
-        for root, _, fnames in sorted(os.walk(d)):
-            for fname in fnames:
-                if is_audio_file(fname):
-                    path = os.path.join(root, fname)
-                    item = path
-                    audios.append(item)
-    return audios
+    # Read text
+    file_txt = os.path.join(path, folder_txt, speaker, fileid + ext_txt)
+    with open(file_txt) as file_text:
+        content = file_text.readlines()[0]
 
-
-def read_audio(fp, downsample=True):
+    # Read wav
+    file_audio = os.path.join(path, folder_audio, speaker, fileid + ext_audio)
     if downsample:
+        # Legacy
         E = torchaudio.sox_effects.SoxEffectsChain()
-        E.set_input_file(fp)
+        E.set_input_file(file_audio)
         E.append_effect_to_chain("gain", ["-h"])
         E.append_effect_to_chain("channels", [1])
         E.append_effect_to_chain("rate", [16000])
         E.append_effect_to_chain("gain", ["-rh"])
         E.append_effect_to_chain("dither", ["-s"])
-        sig, sr = E.sox_build_flow_effects()
+        waveform, sample_rate = E.sox_build_flow_effects()
     else:
-        sig, sr = torchaudio.load(fp)
-    sig = sig.contiguous()
-    return sig, sr
+        waveform, sample_rate = torchaudio.load(file_audio)
+
+    return {
+        "speaker_id": speaker,
+        "utterance_id": utterance,
+        "utterance": content,
+        "waveform": waveform,
+        "sample_rate": sample_rate,
+    }
 
 
-def load_txts(dir):
-    """Create a dictionary with all the text of the audio transcriptions."""
-    utterences = dict()
-    dir = os.path.expanduser(dir)
-    for target in sorted(os.listdir(dir)):
-        d = os.path.join(dir, target)
-        if not os.path.isdir(d):
-            continue
+class VCTK(Dataset):
 
-        for root, _, fnames in sorted(os.walk(d)):
-            for fname in fnames:
-                if fname.endswith(".txt"):
-                    with open(os.path.join(root, fname), "r") as f:
-                        fname_no_ext = os.path.basename(
-                            fname).rsplit(".", 1)[0]
-                        utterences[fname_no_ext] = f.readline()
-    return utterences
+    _folder_txt = "txt"
+    _folder_audio = "wav48"
+    _ext_txt = ".txt"
+    _ext_audio = ".wav"
 
+    def __init__(
+        self,
+        root,
+        url=URL,
+        folder_in_archive=FOLDER_IN_ARCHIVE,
+        download=False,
+        downsample=False,
+        transform=None,
+        target_transform=None,
+        return_dict=False,
+    ):
 
-class VCTK(data.Dataset):
-    r"""`VCTK <http://homepages.inf.ed.ac.uk/jyamagis/page3/page58/page58.html>`_ Dataset.
-    `alternate url <http://datashare.is.ed.ac.uk/handle/10283/2651>`_
+        if not return_dict:
+            warnings.warn(
+                "In the next version, the item returned will be a dictionary. "
+                "Please use `return_dict=True` to enable this behavior now, "
+                "and suppress this warning.",
+                DeprecationWarning,
+            )
 
-    Args:
-        root (str): Root directory of dataset where ``processed/training.pt``
-            and  ``processed/test.pt`` exist.
-        downsample (bool, optional): Whether to downsample the signal (Default: ``True``)
-        transform (Callable, optional): A function/transform that takes in an raw audio
-            and returns a transformed version. E.g, ``transforms.Spectrogram``. (Default: ``None``)
-        target_transform (callable, optional): A function/transform that takes in the
-            target and transforms it. (Default: ``None``)
-        download (bool, optional): If true, downloads the dataset from the internet and
-            puts it in root directory. If dataset is already downloaded, it is not
-            downloaded again. (Default: ``True``)
-        dev_mode(bool, optional): If true, clean up is not performed on downloaded
-            files.  Useful to keep raw audio and transcriptions. (Default: ``False``)
-    """
-    raw_folder = 'vctk/raw'
-    processed_folder = 'vctk/processed'
-    url = 'http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz'
-    dset_path = 'VCTK-Corpus'
+        if downsample:
+            warnings.warn(
+                "In the next version, transforms will not be part of the dataset. "
+                "Please use `downsample=False` to enable this behavior now, ",
+                "and suppress this warning.",
+                DeprecationWarning,
+            )
 
-    def __init__(self, root, downsample=True, transform=None, target_transform=None, download=False, dev_mode=False):
-        self.root = os.path.expanduser(root)
+        if transform is not None or target_transform is not None:
+            warnings.warn(
+                "In the next version, transforms will not be part of the dataset. "
+                "Please remove the option `transform=True` and "
+                "`target_transform=True` to suppress this warning.",
+                DeprecationWarning,
+            )
+
         self.downsample = downsample
         self.transform = transform
         self.target_transform = target_transform
-        self.dev_mode = dev_mode
-        self.data = []
-        self.labels = []
-        self.chunk_size = 1000
-        self.num_samples = 0
-        self.max_len = 0
-        self.cached_pt = 0
+        self.return_dict = return_dict
+
+        archive = os.path.basename(url)
+        archive = os.path.join(root, archive)
+        self._path = os.path.join(root, folder_in_archive)
 
         if download:
-            self.download()
+            if not os.path.isdir(self._path):
+                if not os.path.isfile(archive):
+                    download_url(url, root)
+                extract_archive(archive)
 
-        if not self._check_exists():
-            raise RuntimeError('Dataset not found.' +
-                               ' You can use download=True to download it')
-        self._read_info()
-        self.data, self.labels = torch.load(os.path.join(
-            self.root, self.processed_folder, "vctk_{:04d}.pt".format(self.cached_pt)))
+        if not os.path.isdir(self._path):
+            raise RuntimeError(
+                "Dataset not found. Please use `download=True` to download it."
+            )
 
-    def __getitem__(self, index):
-        """
-        Args:
-            index (int): Index
+        walker = walk_files(
+            self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
+        )
+        self._walker = list(walker)
 
-        Returns:
-            Tuple[torch.Tensor, int]: The output tuple (image, target) where target
-            is index of the target class.
-        """
-        if self.cached_pt != index // self.chunk_size:
-            self.cached_pt = int(index // self.chunk_size)
-            self.data, self.labels = torch.load(os.path.join(
-                self.root, self.processed_folder, "vctk_{:04d}.pt".format(self.cached_pt)))
-        index = index % self.chunk_size
-        audio, target = self.data[index], self.labels[index]
+    def __getitem__(self, n):
+        fileid = self._walker[n]
+        item = load_vctk_item(
+            fileid,
+            self._path,
+            self._ext_audio,
+            self._ext_txt,
+            self._folder_audio,
+            self._folder_txt,
+        )
 
+        # Legacy
+        waveform = item["waveform"]
         if self.transform is not None:
-            audio = self.transform(audio)
+            waveform = self.transform(waveform)
+        item["waveform"] = waveform
 
+        # Legacy
+        utterance = item["utterance"]
         if self.target_transform is not None:
-            target = self.target_transform(target)
+            utterance = self.target_transform(utterance)
+        item["utterance"] = utterance
 
-        return audio, target
+        if self.return_dict:
+            return item
+
+        # Legacy
+        return item["waveform"], item["utterance"]
 
     def __len__(self):
-        return self.num_samples
-
-    def _check_exists(self):
-        return os.path.exists(os.path.join(self.root, self.processed_folder, "vctk_info.txt"))
-
-    def _write_info(self, num_items):
-        info_path = os.path.join(
-            self.root, self.processed_folder, "vctk_info.txt")
-        with open(info_path, "w") as f:
-            f.write("num_samples,{}\n".format(num_items))
-            f.write("max_len,{}\n".format(self.max_len))
-
-    def _read_info(self):
-        info_path = os.path.join(
-            self.root, self.processed_folder, "vctk_info.txt")
-        with open(info_path, "r") as f:
-            self.num_samples = int(f.readline().split(",")[1])
-            self.max_len = int(f.readline().split(",")[1])
-
-    def download(self):
-        """Download the VCTK data if it doesn't exist in processed_folder already."""
-        from six.moves import urllib
-        import tarfile
-
-        if self._check_exists():
-            return
-
-        raw_abs_dir = os.path.join(self.root, self.raw_folder)
-        processed_abs_dir = os.path.join(self.root, self.processed_folder)
-        dset_abs_path = os.path.join(
-            self.root, self.raw_folder, self.dset_path)
-
-        # download files
-        try:
-            os.makedirs(os.path.join(self.root, self.processed_folder))
-            os.makedirs(os.path.join(self.root, self.raw_folder))
-        except OSError as e:
-            if e.errno == errno.EEXIST:
-                pass
-            else:
-                raise
-
-        url = self.url
-        print('Downloading ' + url)
-        filename = url.rpartition('/')[2]
-        file_path = os.path.join(self.root, self.raw_folder, filename)
-        if not os.path.isfile(file_path):
-            urllib.request.urlretrieve(url, file_path)
-        if not os.path.exists(dset_abs_path):
-            with tarfile.open(file_path) as zip_f:
-                zip_f.extractall(raw_abs_dir)
-        else:
-            print("Using existing raw folder")
-        if not self.dev_mode:
-            os.unlink(file_path)
-
-        # process and save as torch files
-        torchaudio.initialize_sox()
-        print('Processing...')
-        shutil.copyfile(
-            os.path.join(dset_abs_path, "COPYING"),
-            os.path.join(processed_abs_dir, "VCTK_COPYING")
-        )
-        audios = make_manifest(dset_abs_path)
-        utterences = load_txts(dset_abs_path)
-        self.max_len = 0
-        print("Found {} audio files and {} utterences".format(
-            len(audios), len(utterences)))
-        for n in range(len(audios) // self.chunk_size + 1):
-            tensors = []
-            labels = []
-            lengths = []
-            st_idx = n * self.chunk_size
-            end_idx = st_idx + self.chunk_size
-            for i, f in enumerate(audios[st_idx:end_idx]):
-                txt_dir = os.path.dirname(f).replace("wav48", "txt")
-                if os.path.exists(txt_dir):
-                    f_rel_no_ext = os.path.basename(f).rsplit(".", 1)[0]
-                    sig = read_audio(f, downsample=self.downsample)[0]
-                    tensors.append(sig)
-                    lengths.append(sig.size(1))
-                    labels.append(utterences[f_rel_no_ext])
-                    self.max_len = sig.size(1) if sig.size(
-                        1) > self.max_len else self.max_len
-            # sort sigs/labels: longest -> shortest
-            tensors, labels = zip(*[(b, c) for (a, b, c) in sorted(
-                zip(lengths, tensors, labels), key=lambda x: x[0], reverse=True)])
-            data = (tensors, labels)
-            torch.save(
-                data,
-                os.path.join(
-                    self.root,
-                    self.processed_folder,
-                    "vctk_{:04d}.pt".format(n)
-                )
-            )
-        self._write_info((n * self.chunk_size) + i + 1)
-        if not self.dev_mode:
-            shutil.rmtree(raw_abs_dir, ignore_errors=True)
-        torchaudio.shutdown_sox()
-        print('Done!')
+        return len(self._walker)
