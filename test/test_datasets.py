@@ -1,32 +1,36 @@
+import os
 import unittest
-from pprint import pprint
 
 from torchaudio.datasets.commonvoice import COMMONVOICE
 from torchaudio.datasets.librispeech import LIBRISPEECH
+from torchaudio.datasets.utils import DiskCache
 from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.yesno import YESNO
-from torchaudio.datasets.utils import DiskCache
 
 
 class TestDatasets(unittest.TestCase):
+    path = "assets"
+
     def test_yesno(self):
-        data = YESNO("./yesnotest", return_dict=True)
+        data = YESNO(self.path, return_dict=True)
         data[0]
 
     def test_vctk(self):
-        data = VCTK("./vctktest/", return_dict=True)
+        data = VCTK(self.path, return_dict=True)
         data[0]
 
     def test_librispeech(self):
-        data = LIBRISPEECH("./librispeechtest/", "dev-clean")
+        data = LIBRISPEECH(self.path, "dev-clean")
         data[0]
 
     def test_commonvoice(self):
-        data = COMMONVOICE("./commonvoicetest/", "train.tsv", "tatar")
+        path = os.path.join(self.path, "commonvoice")
+        data = COMMONVOICE(path, "train.tsv", "tatar")
         data[0]
 
     def test_commonvoice_diskcache(self):
-        data = COMMONVOICE("./commonvoicetest/", "train.tsv", "tatar")
+        path = os.path.join(self.path, "commonvoice")
+        data = COMMONVOICE(path, "train.tsv", "tatar")
         data = DiskCache(data)
         # Save
         data[0]
