@@ -46,6 +46,9 @@ def compute_nccf(waveform, sample_rate, frame_time=10 ** -2):
 
 
 def _combine_max(a, b, thresh=0.99):
+    """
+    Take value from first if bigger than a multiplicative factor of the second, elementwise.
+    """
     mask = (a[0] > thresh * b[0]).to(int)
     values = mask * a[0] + (1 - mask) * b[0]
     indices = mask * a[1] + (1 - mask) * b[1]
@@ -53,6 +56,13 @@ def _combine_max(a, b, thresh=0.99):
 
 
 def find_max_per_frame(nccf, sample_rate, smoothing_window=30):
+    """
+    For each frame, take the highest value of NCCF,
+    apply centered median smoothing, and convert to frequency.
+
+    Note: If the max among all the lags is very close
+    to the first half of lags, then the latter is taken.
+    """
     EPSILON = 10 ** (-9)
 
     # https://en.wikipedia.org/wiki/Voice_frequency
