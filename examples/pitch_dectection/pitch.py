@@ -6,7 +6,7 @@ import torchaudio
 
 def compute_nccf(waveform, sample_rate, frame_time=10 ** -2):
     """
-    Compute Normalize Cross-Correlation Function (NCCF).
+    Compute Normalized Cross-Correlation Function (NCCF).
     """
     EPSILON = 10 ** (-9)
 
