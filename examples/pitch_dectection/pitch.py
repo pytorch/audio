@@ -8,6 +8,7 @@ def compute_correllogram(waveform, sample_rate, frame_time=10 ** -2):
     """
     Compute correlogram.
     """
+    EPSILON = 10 ** (-9)
 
     # https://en.wikipedia.org/wiki/Voice_frequency
     # Usable voice frequencies for telephony: 30-3400 Hz
@@ -17,7 +18,6 @@ def compute_correllogram(waveform, sample_rate, frame_time=10 ** -2):
     lags = math.ceil(sample_rate / 85)  # Around 500 samples
 
     frame_size = int(math.ceil(sample_rate * frame_time))
-    EPSILON = 10 ** (-9)
 
     w = waveform.view(-1)
     waveform_length = w.size()[-1]
@@ -65,12 +65,11 @@ def find_max_per_frame(correlogram, sample_rate, smoothing_window=30):
     # Find near enough max that is smallest
 
     best = torch.max(correlogram[:, lag_min:], -1)
-    half = torch.max(correlogram[:, lag_min: correlogram.shape[-1] // 2], -1)
-    # quarter = torch.max(correlogram[:, lag_min: correlogram.shape[-1] // 4], -1)
+
+    half_size = correlogram.shape[-1] // 2
+    half = torch.max(correlogram[:, lag_min: half_size], -1)
 
     best = _combine_max(half, best)
-    # best = _combine_max(quarter, best)
-
     indices = best[1]
 
     # Add back minimal lag
@@ -80,30 +79,15 @@ def find_max_per_frame(correlogram, sample_rate, smoothing_window=30):
 
     # Median smoothing
 
-    # Online
-    # indices = torch.nn.functional.pad(indices, (smoothing_window-1,0), mode="constant", value=indices[0])
     # Centered
     indices = torch.nn.functional.pad(
         indices, ((smoothing_window - 1) // 2, 0), mode="constant", value=indices[0]
     )
     roll = indices.unfold(0, smoothing_window, 1)
     values, _ = torch.median(roll, -1)
+
     freq = sample_rate / (EPSILON + values.to(torch.float))
-
     return freq
-
-
-def reconstruct_waveform(frames, waveform, frame_size):
-    z = torch.zeros(waveform.shape, dtype=waveform.dtype, device=waveform.device)
-
-    # Convert to waveform
-    n_frames = len(frames)
-    for i in range(n_frames):
-        z[0, i * frame_size: (i + 1) * frame_size] = frames[i]
-
-    # Extend with what was last detected
-    z[0, n_frames * frame_size:] = frames[-1]
-    return z
 
 
 if __name__ == "__main__":
@@ -120,7 +104,6 @@ if __name__ == "__main__":
 
         correlogram, frame_size = compute_correllogram(waveform, sample_rate)
         freq = find_max_per_frame(correlogram, sample_rate)
-        # freq = reconstruct_waveform(freq, waveform, frame_size)
 
         threshold = 1
         print(((freq - freq_ref).abs() > threshold).sum())
