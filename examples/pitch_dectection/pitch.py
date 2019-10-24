@@ -42,7 +42,7 @@ def compute_nccf(waveform, sample_rate, frame_time=10 ** -2):
 
     nccf = torch.cat(output_lag, 1)
 
-    return nccf, frame_size
+    return nccf
 
 
 def _combine_max(a, b, thresh=0.99):
@@ -67,7 +67,7 @@ def find_max_per_frame(nccf, sample_rate, smoothing_window=30):
     best = torch.max(nccf[:, lag_min:], -1)
 
     half_size = nccf.shape[-1] // 2
-    half = torch.max(nccf[:, lag_min: half_size], -1)
+    half = torch.max(nccf[:, lag_min:half_size], -1)
 
     best = _combine_max(half, best)
     indices = best[1]
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         waveform, sample_rate = torchaudio.load(filename)
         waveform = waveform.mean(0).view(1, -1)
 
-        nccf, frame_size = compute_nccf(waveform, sample_rate)
+        nccf = compute_nccf(waveform, sample_rate)
         freq = find_max_per_frame(nccf, sample_rate)
 
         threshold = 1
