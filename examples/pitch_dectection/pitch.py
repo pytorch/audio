@@ -10,12 +10,12 @@ def compute_nccf(waveform, sample_rate, frame_time=10 ** -2):
     """
     EPSILON = 10 ** (-9)
 
-    # https://en.wikipedia.org/wiki/Voice_frequency
-    # Usable voice frequencies for telephony: 30-3400 Hz
-    # Fundamental Frequency: 85-180 Hz or 165-255 Hz
-
     # Number of lags to check
-    lags = math.ceil(sample_rate / 85)  # Around 500 samples
+    # Empirically determined lower voice frequency threshold
+    # based on fundamental frequency for human voice: 85-180 Hz or 165-255 Hz
+    # https://en.wikipedia.org/wiki/Voice_frequency
+    freq_low = 85
+    lags = math.ceil(sample_rate / freq_low)  # around 500 samples
 
     frame_size = int(math.ceil(sample_rate * frame_time))
 
@@ -65,12 +65,11 @@ def find_max_per_frame(nccf, sample_rate, smoothing_window=30):
     """
     EPSILON = 10 ** (-9)
 
+    # Empirically determined upper voice frequency threshold
+    # based on usable voice frequencies for telephony: 30-3400 Hz
     # https://en.wikipedia.org/wiki/Voice_frequency
-    # Usable voice frequencies for telephony: 30-3400 Hz
-    # Fundamental Frequency: 85-180 Hz or 165-255 Hz
-
-    # Voice frequency is no shorter
-    lag_min = math.ceil(sample_rate / 3400)  # Around 10 samples
+    freq_high = 3400
+    lag_min = math.ceil(sample_rate / freq_high)  # around 10 samples
 
     # Find near enough max that is smallest
 
