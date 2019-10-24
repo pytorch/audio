@@ -106,4 +106,5 @@ if __name__ == "__main__":
         freq = find_max_per_frame(correlogram, sample_rate)
 
         threshold = 1
-        print(((freq - freq_ref).abs() > threshold).sum())
+        if not ((freq - freq_ref).abs() > threshold).sum():
+            print("Test passed with " + filename)
