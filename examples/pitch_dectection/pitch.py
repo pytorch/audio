@@ -4,9 +4,9 @@ import torch
 import torchaudio
 
 
-def compute_correllogram(waveform, sample_rate, frame_time=10 ** -2):
+def compute_nccf(waveform, sample_rate, frame_time=10 ** -2):
     """
-    Compute correlogram.
+    Compute Normalize Cross-Correlation Function (NCCF).
     """
     EPSILON = 10 ** (-9)
 
@@ -40,9 +40,9 @@ def compute_correllogram(waveform, sample_rate, frame_time=10 ** -2):
 
         output_lag.append(output_frames.view(-1, 1))
 
-    correlogram = torch.cat(output_lag, 1)
+    nccf = torch.cat(output_lag, 1)
 
-    return correlogram, frame_size
+    return nccf, frame_size
 
 
 def _combine_max(a, b, thresh=0.99):
@@ -52,7 +52,7 @@ def _combine_max(a, b, thresh=0.99):
     return values, indices
 
 
-def find_max_per_frame(correlogram, sample_rate, smoothing_window=30):
+def find_max_per_frame(nccf, sample_rate, smoothing_window=30):
     EPSILON = 10 ** (-9)
 
     # https://en.wikipedia.org/wiki/Voice_frequency
@@ -64,10 +64,10 @@ def find_max_per_frame(correlogram, sample_rate, smoothing_window=30):
 
     # Find near enough max that is smallest
 
-    best = torch.max(correlogram[:, lag_min:], -1)
+    best = torch.max(nccf[:, lag_min:], -1)
 
-    half_size = correlogram.shape[-1] // 2
-    half = torch.max(correlogram[:, lag_min: half_size], -1)
+    half_size = nccf.shape[-1] // 2
+    half = torch.max(nccf[:, lag_min: half_size], -1)
 
     best = _combine_max(half, best)
     indices = best[1]
@@ -102,8 +102,8 @@ if __name__ == "__main__":
         waveform, sample_rate = torchaudio.load(filename)
         waveform = waveform.mean(0).view(1, -1)
 
-        correlogram, frame_size = compute_correllogram(waveform, sample_rate)
-        freq = find_max_per_frame(correlogram, sample_rate)
+        nccf, frame_size = compute_nccf(waveform, sample_rate)
+        freq = find_max_per_frame(nccf, sample_rate)
 
         threshold = 1
         if not ((freq - freq_ref).abs() > threshold).sum():
