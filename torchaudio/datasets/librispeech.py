@@ -1,7 +1,8 @@
 import os
 
-import torchaudio
 from torch.utils.data import Dataset
+
+import torchaudio
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
@@ -32,7 +33,7 @@ def load_librispeech_item(fileid, path, ext_audio, ext_txt):
             break
     else:
         # Translation not found
-        raise ValueError
+        raise FileNotFoundError("Translation not found for " + file_audio)
 
     return {
         "speaker_id": speaker,
