@@ -91,7 +91,6 @@ def find_max_per_frame(nccf, sample_rate, smoothing_window=30):
 
     # Median smoothing
 
-    # TODO: Implement n-dimensional replication pad
     pad_length = (smoothing_window - 1) // 2  # Centered
     indices = torch.nn.functional.pad(
         indices,
