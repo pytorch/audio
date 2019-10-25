@@ -89,19 +89,25 @@ def find_max_per_frame(nccf, sample_rate, freq_high=3400):
     return indices
 
 
-def median_smoothing(indices, smoothing_window=30):
-    # Median smoothing
+def median_smoothing(indices, window_length=30):
+    """
+    Apply median smoothing to the 1D tensor over the given window.
+    """
 
-    pad_length = (smoothing_window - 1) // 2  # Centered
+    # Centered windowed
+    pad_length = (window_length - 1) // 2
+
+    # "replicate" padding in any dimension
     indices = torch.nn.functional.pad(
         indices, (pad_length, 0), mode="constant", value=0
     )
+
     idx = [1] * indices.dim()
     idx[-1] = pad_length
     indices[..., :pad_length] = indices[..., pad_length].unsqueeze(-1).repeat(*idx)
-    roll = indices.unfold(-1, smoothing_window, 1)
-    values, _ = torch.median(roll, -1)
+    roll = indices.unfold(-1, window_length, 1)
 
+    values, _ = torch.median(roll, -1)
     return values
 
 
