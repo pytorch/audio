@@ -19,18 +19,17 @@ def compute_nccf(waveform, sample_rate, frame_time=10 ** -2):
 
     frame_size = int(math.ceil(sample_rate * frame_time))
 
-    w = waveform.view(-1)
-    waveform_length = w.size()[-1]
+    waveform_length = waveform.size()[-1]
     num_of_frames = math.ceil(waveform_length / frame_size)
 
     p = lags + num_of_frames * frame_size - waveform_length
-    w = torch.nn.functional.pad(w, (0, p))
+    waveform = torch.nn.functional.pad(waveform, (0, p))
 
     # Compute lags
     output_lag = []
     for lag in range(1, lags + 1):
-        s1 = w[:-lag].unfold(0, frame_size, frame_size)[:num_of_frames, :]
-        s2 = w[lag:].unfold(0, frame_size, frame_size)[:num_of_frames, :]
+        s1 = waveform[...,:-lag].unfold(-1, frame_size, frame_size)[...,:num_of_frames, :]
+        s2 = waveform[...,lag:].unfold(-1, frame_size, frame_size)[...,:num_of_frames, :]
 
         output_frames = (
             (s1 * s2).sum(-1)
@@ -38,9 +37,9 @@ def compute_nccf(waveform, sample_rate, frame_time=10 ** -2):
             / (EPSILON + s2.norm(dim=-1))
         )
 
-        output_lag.append(output_frames.view(-1, 1))
+        output_lag.append(output_frames.unsqueeze(-1))
 
-    nccf = torch.cat(output_lag, 1)
+    nccf = torch.cat(output_lag, -1)
 
     return nccf
 
@@ -73,10 +72,10 @@ def find_max_per_frame(nccf, sample_rate, smoothing_window=30):
 
     # Find near enough max that is smallest
 
-    best = torch.max(nccf[:, lag_min:], -1)
+    best = torch.max(nccf[..., lag_min:], -1)
 
     half_size = nccf.shape[-1] // 2
-    half = torch.max(nccf[:, lag_min:half_size], -1)
+    half = torch.max(nccf[..., lag_min:half_size], -1)
 
     best = _combine_max(half, best)
     indices = best[1]
@@ -88,11 +87,13 @@ def find_max_per_frame(nccf, sample_rate, smoothing_window=30):
 
     # Median smoothing
 
-    # Centered
+    # TODO: Implement n-dimensional replication pad
+    pad_length = (smoothing_window - 1) // 2 # Centered
     indices = torch.nn.functional.pad(
-        indices, ((smoothing_window - 1) // 2, 0), mode="constant", value=indices[0]
+        indices, (pad_length, 0), mode="constant", value=0
     )
-    roll = indices.unfold(0, smoothing_window, 1)
+    indices[..., :pad_length] = indices[..., pad_length]
+    roll = indices.unfold(-1, smoothing_window, 1)
     values, _ = torch.median(roll, -1)
 
     freq = sample_rate / (EPSILON + values.to(torch.float))
