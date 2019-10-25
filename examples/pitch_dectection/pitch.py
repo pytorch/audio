@@ -28,8 +28,12 @@ def compute_nccf(waveform, sample_rate, frame_time=10 ** -2):
     # Compute lags
     output_lag = []
     for lag in range(1, lags + 1):
-        s1 = waveform[...,:-lag].unfold(-1, frame_size, frame_size)[...,:num_of_frames, :]
-        s2 = waveform[...,lag:].unfold(-1, frame_size, frame_size)[...,:num_of_frames, :]
+        s1 = waveform[..., :-lag].unfold(-1, frame_size, frame_size)[
+            ..., :num_of_frames, :
+        ]
+        s2 = waveform[..., lag:].unfold(-1, frame_size, frame_size)[
+            ..., :num_of_frames, :
+        ]
 
         output_frames = (
             (s1 * s2).sum(-1)
@@ -88,11 +92,16 @@ def find_max_per_frame(nccf, sample_rate, smoothing_window=30):
     # Median smoothing
 
     # TODO: Implement n-dimensional replication pad
-    pad_length = (smoothing_window - 1) // 2 # Centered
+    pad_length = (smoothing_window - 1) // 2  # Centered
     indices = torch.nn.functional.pad(
-        indices, (pad_length, 0), mode="constant", value=0
+        indices,
+        (pad_length, 0),
+        mode="constant",
+        value=0
     )
-    indices[..., :pad_length] = indices[..., pad_length]
+    idx = [1] * indices.dim()
+    idx[-1] = pad_length
+    indices[..., :pad_length] = indices[..., pad_length].unsqueeze(-1).repeat(*idx)
     roll = indices.unfold(-1, smoothing_window, 1)
     values, _ = torch.median(roll, -1)
 
@@ -110,7 +119,7 @@ if __name__ == "__main__":
 
     for filename, freq_ref in tests:
         waveform, sample_rate = torchaudio.load(filename)
-        waveform = waveform.mean(0).view(1, -1)
+        waveform = waveform.repeat(2, 1, 1)
 
         nccf = compute_nccf(waveform, sample_rate)
         freq = find_max_per_frame(nccf, sample_rate)
