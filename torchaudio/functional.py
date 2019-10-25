@@ -17,6 +17,7 @@ __all__ = [
     "lfilter",
     "lowpass_biquad",
     "highpass_biquad",
+    "equalizer_biquad",
     "biquad",
     'mask_along_axis',
     'mask_along_axis_iid'
@@ -682,6 +683,35 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     a2 = 1 - alpha
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
+
+def equalizer_biquad(waveform, sample_rate, center_freq, Q, gain):
+    # type: (Tensor, int, float, float, float) -> Tensor
+    r"""Designs biquad peaking equalizer filter and performs filtering.  Similar to SoX implementation.
+    
+    Args:
+        waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
+        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
+        center_freq (float): filter’s central frequency
+        Q (float): https://en.wikipedia.org/wiki/Q_factor
+        gain (float): desired gain at the boost (or cut) 
+
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(channel, time)`
+    """
+    w0 = 2 * math.pi * center_freq / sample_rate
+    A = math.exp(gain / 40.0 * math.log(10))
+    alpha = math.sin(w0) / 2 / Q
+    mult = _dB2Linear(max(gain, 0))
+    
+    if A == 1:
+        return waveform
+    b0 = 1 + alpha * A
+    b1 = -2 * math.cos(w0)
+    b2 = 1 - alpha * A
+    a0 = 1 + alpha / A
+    a1 = -2 * math.cos(w0)
+    a2 = 1 - alpha / A
+    return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 @torch.jit.script
 def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
