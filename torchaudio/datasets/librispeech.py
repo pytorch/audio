@@ -20,7 +20,9 @@ def load_librispeech_item(fileid, path, ext_audio, ext_txt):
 
     file_text = speaker + "-" + chapter + ext_txt
     file_text = os.path.join(path, speaker, chapter, file_text)
-    file_audio = speaker + "-" + chapter + "-" + utterance + ext_audio
+
+    fileid_audio = speaker + "-" + chapter + "-" + utterance
+    file_audio = file_audio + ext_audio
     file_audio = os.path.join(path, speaker, chapter, file_audio)
 
     # Load audio
@@ -29,7 +31,7 @@ def load_librispeech_item(fileid, path, ext_audio, ext_txt):
     # Load text
     for line in open(file_text):
         fileid_text, content = line.strip().split(" ", 1)
-        if file_audio == fileid_text:
+        if fileid_audio == fileid_text:
             break
     else:
         # Translation not found
