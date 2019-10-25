@@ -115,5 +115,7 @@ if __name__ == "__main__":
         freq = find_max_per_frame(nccf, sample_rate)
 
         threshold = 1
-        if not ((freq - freq_ref).abs() > threshold).sum():
+        if ((freq - freq_ref).abs() > threshold).sum():
+            print("Test failed with " + filename)
+        else:
             print("Test passed with " + filename)
