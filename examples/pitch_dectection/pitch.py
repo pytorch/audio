@@ -119,6 +119,8 @@ if __name__ == "__main__":
 
     for filename, freq_ref in tests:
         waveform, sample_rate = torchaudio.load(filename)
+
+        # Convert to stereo for testing purposes
         waveform = waveform.repeat(2, 1, 1)
 
         nccf = compute_nccf(waveform, sample_rate)
