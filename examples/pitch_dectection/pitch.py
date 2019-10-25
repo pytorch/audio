@@ -1,21 +1,21 @@
 import math
 
 import torch
+
 import torchaudio
 
 
-def compute_nccf(waveform, sample_rate, frame_time=10 ** -2):
+def compute_nccf(waveform, sample_rate, frame_time=10 ** -2, freq_low=85):
     """
     Compute Normalized Cross-Correlation Function (NCCF).
     """
     EPSILON = 10 ** (-9)
 
     # Number of lags to check
-    # Empirically determined lower voice frequency threshold
+    # Empirically determined default lower voice frequency threshold
     # based on fundamental frequency for human voice: 85-180 Hz or 165-255 Hz
     # https://en.wikipedia.org/wiki/Voice_frequency
-    freq_low = 85
-    lags = math.ceil(sample_rate / freq_low)  # around 500 samples
+    lags = math.ceil(sample_rate / freq_low)
 
     frame_size = int(math.ceil(sample_rate * frame_time))
 
@@ -58,7 +58,7 @@ def _combine_max(a, b, thresh=0.99):
     return values, indices
 
 
-def find_max_per_frame(nccf, sample_rate, smoothing_window=30):
+def find_max_per_frame(nccf, sample_rate, freq_high=3400):
     """
     For each frame, take the highest value of NCCF,
     apply centered median smoothing, and convert to frequency.
@@ -66,13 +66,11 @@ def find_max_per_frame(nccf, sample_rate, smoothing_window=30):
     Note: If the max among all the lags is very close
     to the first half of lags, then the latter is taken.
     """
-    EPSILON = 10 ** (-9)
 
-    # Empirically determined upper voice frequency threshold
+    # Empirically determined default upper voice frequency threshold
     # based on usable voice frequencies for telephony: 30-3400 Hz
     # https://en.wikipedia.org/wiki/Voice_frequency
-    freq_high = 3400
-    lag_min = math.ceil(sample_rate / freq_high)  # around 10 samples
+    lag_min = math.ceil(sample_rate / freq_high)
 
     # Find near enough max that is smallest
 
@@ -89,14 +87,15 @@ def find_max_per_frame(nccf, sample_rate, smoothing_window=30):
     # Add 1 empirical calibration offset
     indices += 1
 
+    return indices
+
+
+def median_smoothing(indices, smoothing_window=30):
     # Median smoothing
 
     pad_length = (smoothing_window - 1) // 2  # Centered
     indices = torch.nn.functional.pad(
-        indices,
-        (pad_length, 0),
-        mode="constant",
-        value=0
+        indices, (pad_length, 0), mode="constant", value=0
     )
     idx = [1] * indices.dim()
     idx[-1] = pad_length
@@ -104,7 +103,12 @@ def find_max_per_frame(nccf, sample_rate, smoothing_window=30):
     roll = indices.unfold(-1, smoothing_window, 1)
     values, _ = torch.median(roll, -1)
 
-    freq = sample_rate / (EPSILON + values.to(torch.float))
+    return values
+
+
+def convert_indices_to_freq(indices, sample_rate):
+    EPSILON = 10 ** (-9)
+    freq = sample_rate / (EPSILON + indices.to(torch.float))
     return freq
 
 
@@ -123,7 +127,9 @@ if __name__ == "__main__":
         waveform = waveform.repeat(2, 1, 1)
 
         nccf = compute_nccf(waveform, sample_rate)
-        freq = find_max_per_frame(nccf, sample_rate)
+        indices = find_max_per_frame(nccf, sample_rate)
+        indices = median_smoothing(indices)
+        freq = convert_indices_to_freq(indices, sample_rate)
 
         threshold = 1
         if ((freq - freq_ref).abs() > threshold).sum():
