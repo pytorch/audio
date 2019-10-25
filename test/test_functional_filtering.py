@@ -135,7 +135,7 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         # TBD - this fails at the 1e-4 level, debug why
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-3)
-        
+
     def test_equalizer(self):
         """
         Test biquad peaking equalizer filter, compare to SoX implementation
