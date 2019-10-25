@@ -22,7 +22,7 @@ def load_librispeech_item(fileid, path, ext_audio, ext_txt):
     file_text = os.path.join(path, speaker, chapter, file_text)
 
     fileid_audio = speaker + "-" + chapter + "-" + utterance
-    file_audio = file_audio + ext_audio
+    file_audio = fileid_audio + ext_audio
     file_audio = os.path.join(path, speaker, chapter, file_audio)
 
     # Load audio
@@ -35,7 +35,7 @@ def load_librispeech_item(fileid, path, ext_audio, ext_txt):
             break
     else:
         # Translation not found
-        raise FileNotFoundError("Translation not found for " + file_audio)
+        raise FileNotFoundError("Translation not found for " + fileid_audio)
 
     return {
         "speaker_id": speaker,
