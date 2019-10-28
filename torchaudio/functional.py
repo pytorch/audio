@@ -857,6 +857,16 @@ def _compute_nccf(waveform, sample_rate, frame_time, freq_low):
     return nccf
 
 
+def _combine_max(a, b, thresh=0.99):
+    """
+    Take value from first if bigger than a multiplicative factor of the second, elementwise.
+    """
+    mask = (a[0] > thresh * b[0]).to(int)
+    values = mask * a[0] + (1 - mask) * b[0]
+    indices = mask * a[1] + (1 - mask) * b[1]
+    return values, indices
+
+
 def _find_max_per_frame(nccf, sample_rate, freq_high):
     # type: (Tensor, int, int) -> Tensor
     r"""
@@ -866,15 +876,6 @@ def _find_max_per_frame(nccf, sample_rate, freq_high):
     Note: If the max among all the lags is very close
     to the first half of lags, then the latter is taken.
     """
-
-    def _combine_max(a, b, thresh=0.99):
-        """
-        Take value from first if bigger than a multiplicative factor of the second, elementwise.
-        """
-        mask = (a[0] > thresh * b[0]).to(int)
-        values = mask * a[0] + (1 - mask) * b[0]
-        indices = mask * a[1] + (1 - mask) * b[1]
-        return values, indices
 
     lag_min = math.ceil(sample_rate / freq_high)
 
@@ -943,13 +944,12 @@ def detect_pitch_frequency(
         freq (torch.Tensor): Tensor of audio of dimension (channel, frame)
     """
 
-    def _convert_indices_to_freq(indices, sample_rate):
-        EPSILON = 10 ** (-9)
-        freq = sample_rate / (EPSILON + indices.to(torch.float))
-        return freq
-
     nccf = _compute_nccf(waveform, sample_rate, frame_time, freq_low)
     indices = _find_max_per_frame(nccf, sample_rate, freq_high)
     indices = _median_smoothing(indices, win_length)
-    freq = _convert_indices_to_freq(indices, sample_rate)
+
+    # Convert indices to frequency
+    EPSILON = 10 ** (-9)
+    freq = sample_rate / (EPSILON + indices.to(torch.float))
+
     return freq
