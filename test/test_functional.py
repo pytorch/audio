@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
+import os
 
 import torch
 import torchaudio
@@ -246,6 +247,30 @@ class TestFunctional(unittest.TestCase):
         self._test_create_fb(n_mels=56, fmin=800.0, fmax=900.0)
         self._test_create_fb(n_mels=56, fmin=1900.0, fmax=900.0)
         self._test_create_fb(n_mels=10, fmin=1900.0, fmax=900.0)
+
+    def test_pitch(self):
+
+        test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+        test_filepath_100 = os.path.join(test_dirpath, 'assets', "100Hz_44100Hz_16bit_05sec.wav")
+        test_filepath_440 = os.path.join(test_dirpath, 'assets', "440Hz_44100Hz_16bit_05sec.wav")
+
+        # Files from https://www.mediacollege.com/audio/tone/download/
+        tests = [
+            (test_filepath_100, 100),
+            (test_filepath_440, 440),
+        ]
+
+        for filename, freq_ref in tests:
+            waveform, sample_rate = torchaudio.load(filename)
+
+            # Convert to stereo for testing purposes
+            waveform = waveform.repeat(2, 1, 1)
+
+            freq = torchaudio.functional.detect_pitch_frequency(waveform, sample_rate)
+
+            threshold = 1
+            s = ((freq - freq_ref).abs() > threshold).sum()
+            self.assertFalse(s)
 
 
 def _num_stft_bins(signal_len, fft_len, hop_length, pad):
