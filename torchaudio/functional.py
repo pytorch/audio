@@ -846,8 +846,8 @@ def _compute_nccf(waveform, sample_rate, frame_time, freq_low):
 
         output_frames = (
             (s1 * s2).sum(-1)
-            / (EPSILON + s1.norm(dim=-1))
-            / (EPSILON + s2.norm(dim=-1))
+            / (EPSILON + torch.norm(s1, p=2, dim=-1)).pow(2)
+            / (EPSILON + torch.norm(s2, p=2, dim=-1)).pow(2)
         )
 
         output_lag.append(output_frames.unsqueeze(-1))
@@ -858,12 +858,13 @@ def _compute_nccf(waveform, sample_rate, frame_time, freq_low):
 
 
 def _combine_max(a, b, thresh=0.99):
+    # type: (Tuple[Tensor, Tensor], Tuple[Tensor, Tensor], float) -> Tuple[Tensor, Tensor]
     """
     Take value from first if bigger than a multiplicative factor of the second, elementwise.
     """
-    mask = (a[0] > thresh * b[0]).to(int)
-    values = mask * a[0] + (1 - mask) * b[0]
-    indices = mask * a[1] + (1 - mask) * b[1]
+    mask = (a[0] > thresh * b[0])
+    values = mask * a[0] + ~mask * b[0]
+    indices = mask * a[1] + ~mask * b[1]
     return values, indices
 
 
@@ -908,18 +909,17 @@ def _median_smoothing(indices, win_length):
 
     # "replicate" padding in any dimension
     indices = torch.nn.functional.pad(
-        indices, (pad_length, 0), mode="constant", value=0
+        indices, (pad_length, 0), mode="constant", value=0.
     )
 
-    idx = [1] * indices.dim()
-    idx[-1] = pad_length
-    indices[..., :pad_length] = indices[..., pad_length].unsqueeze(-1).repeat(*idx)
+    indices[..., :pad_length] = torch.cat(pad_length * [indices[..., pad_length].unsqueeze(-1)], dim=-1)
     roll = indices.unfold(-1, win_length, 1)
 
     values, _ = torch.median(roll, -1)
     return values
 
 
+@torch.jit.script
 def detect_pitch_frequency(
     waveform,
     sample_rate,
