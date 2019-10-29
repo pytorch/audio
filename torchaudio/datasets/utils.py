@@ -6,7 +6,9 @@ import logging
 import os
 import sys
 import tarfile
+import threading
 import zipfile
+from queue import Queue
 
 import six
 import torch
@@ -221,3 +223,26 @@ class DiskCache(Dataset):
 
     def __len__(self):
         return len(self.dataset)
+
+
+class BackgroundGenerator(threading.Thread):
+    def __init__(self, generator, queue_length=1):
+        threading.Thread.__init__(self)
+        self.queue = Queue(queue_length)
+        self.generator = generator
+        self.daemon = True
+        self.start()
+
+    def run(self):
+        for item in self.generator:
+            self.queue.put(item)
+        self.queue.put(None)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        next_item = self.queue.get()
+        if next_item is None:
+            raise StopIteration
+        return next_item
