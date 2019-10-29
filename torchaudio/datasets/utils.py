@@ -11,7 +11,6 @@ import zipfile
 import six
 import torch
 import torchaudio
-from torch.utils.data import Dataset
 from torch.utils.model_zoo import tqdm
 
 
@@ -190,34 +189,3 @@ def walk_files(root, suffix, prefix=False, remove_suffix=False):
                     f = os.path.join(root, f)
 
                 yield f
-
-
-class DiskCache(Dataset):
-    """
-    Wrap a dataset so that, whenever a new item is returned, it is saved to disk.
-    """
-
-    def __init__(self, dataset, location=".cached"):
-        self.dataset = dataset
-        self.location = location
-
-        self._id = id(self)
-        self._cache = [None] * len(dataset)
-
-    def __getitem__(self, n):
-        if self._cache[n]:
-            f = self._cache[n]
-            return torch.load(f)
-
-        f = str(self._id) + "-" + str(n)
-        f = os.path.join(self.location, f)
-        item = self.dataset[n]
-
-        self._cache[n] = f
-        makedir_exist_ok(self.location)
-        torch.save(item, f)
-
-        return item
-
-    def __len__(self):
-        return len(self.dataset)

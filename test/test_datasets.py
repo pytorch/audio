@@ -1,11 +1,7 @@
 import os
 import unittest
 
-from torchaudio.datasets.commonvoice import COMMONVOICE
-from torchaudio.datasets.librispeech import LIBRISPEECH
-from torchaudio.datasets.utils import DiskCache
-from torchaudio.datasets.vctk import VCTK
-from torchaudio.datasets.yesno import YESNO
+from torchaudio.datasets import COMMONVOICE, LIBRISPEECH, VCTK, YESNO, DiskCache
 
 
 class TestDatasets(unittest.TestCase):
