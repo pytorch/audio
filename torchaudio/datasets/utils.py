@@ -10,9 +10,11 @@ import threading
 import zipfile
 from queue import Queue
 
+import requests
 import six
 import torch
 import torchaudio
+from six.moves import urllib
 from torch.utils.data import Dataset
 from torch.utils.model_zoo import tqdm
 
@@ -53,18 +55,6 @@ def unicode_csv_reader(unicode_csv_data, **kwargs):
             yield line
 
 
-def gen_bar_updater():
-    pbar = tqdm(total=None)
-
-    def bar_update(count, block_size, total_size):
-        if pbar.total is None and total_size:
-            pbar.total = total_size
-        progress_bytes = count * block_size
-        pbar.update(progress_bytes - pbar.n)
-
-    return bar_update
-
-
 def makedir_exist_ok(dirpath):
     """
     Python2 support for os.makedirs(.., exist_ok=True)
@@ -78,41 +68,113 @@ def makedir_exist_ok(dirpath):
             raise
 
 
-def download_url(url, root, filename=None, md5=None):
-    """Download a file from a url and place it in root.
+def download_url_resume(url, download_folder, resume_byte_pos=None):
+    """Download url to disk with possible resumption.
 
     Args:
-        url (str): URL to download file from
-        root (str): Directory to place downloaded file in
-        filename (str, optional): Name to save the file under. If None, use the basename of the URL
-        md5 (str, optional): MD5 checksum of the download. If None, do not check
+        url (str): Url.
+        download_folder (str): Folder to download file.
+        resume_byte_pos (int): Position of byte from where to resume the download.
     """
-    from six.moves import urllib
+    # Get size of file
+    r = requests.head(url)
+    file_size = int(r.headers.get("content-length", 0))
 
-    root = os.path.expanduser(root)
-    if not filename:
-        filename = os.path.basename(url)
-    fpath = os.path.join(root, filename)
+    # Append information to resume download at specific byte position to header
+    resume_header = (
+        {"Range": "bytes={}-".format(resume_byte_pos)} if resume_byte_pos else None
+    )
 
-    makedir_exist_ok(root)
+    # Establish connection
+    r = requests.get(url, stream=True, headers=resume_header)
 
-    # downloads file
-    if os.path.isfile(fpath):
-        print("Using downloaded file: " + fpath)
-    else:
-        try:
-            print("Downloading " + url + " to " + fpath)
-            urllib.request.urlretrieve(url, fpath, reporthook=gen_bar_updater())
-        except (urllib.error.URLError, IOError) as e:
-            if url[:5] == "https":
-                url = url.replace("https:", "http:")
-                print(
-                    "Failed download. Trying https -> http instead."
-                    " Downloading " + url + " to " + fpath
-                )
-                urllib.request.urlretrieve(url, fpath, reporthook=gen_bar_updater())
+    # Set configuration
+    n_block = 32
+    block_size = 1024
+    initial_pos = resume_byte_pos if resume_byte_pos else 0
+    mode = "ab" if resume_byte_pos else "wb"
+
+    filename = os.path.basename(url)
+    filepath = os.path.join(download_folder, os.path.basename(url))
+
+    with open(filepath, mode) as f:
+        with tqdm(
+            unit="B", unit_scale=True, unit_divisor=1024, total=file_size
+        ) as pbar:
+            for chunk in r.iter_content(n_block * block_size):
+                f.write(chunk)
+                pbar.update(len(chunk))
+
+
+def download_url(url, download_folder, hash_value=None, hash_type="sha256"):
+    """Execute the correct download operation.
+    Depending on the size of the file online and offline, resume the
+    download if the file offline is smaller than online.
+
+    Args:
+        url (str): Url.
+        download_folder (str): Folder to download file.
+        hash_value (str): Hash for url.
+        hash_type (str): Hash type.
+    """
+    # Establish connection to header of file
+    r = requests.head(url)
+
+    # Get filesize of online and offline file
+    file_size_online = int(r.headers.get("content-length", 0))
+    filepath = os.path.join(download_folder, os.path.basename(url))
+
+    if os.path.exists(filepath):
+        file_size_offline = os.path.getsize(filepath)
+
+        if file_size_online != file_size_offline:
+            # Resume download
+            print("File {} is incomplete. Resume download.".format(filepath))
+            download_url_resume(url, download_folder, file_size_offline)
+        elif hash_value:
+            if validate_download_url(url, download_folder, hash_value, hash_type):
+                print("File {} is validated. Skip download.".format(filepath))
             else:
-                raise e
+                print(
+                    "File {} is corrupt. Delete it manually and retry.".format(filepath)
+                )
+        else:
+            # Skip download
+            print("File {} is complete. Skip download.".format(filepath))
+    else:
+        # Start download
+        print("File {} has not been downloaded. Start download.".format(filepath))
+        download_url_resume(url, download_folder)
+
+
+def validate_download_url(url, download_folder, hash_value, hash_type="sha256"):
+    """Validate a given file with its hash.
+    The downloaded file is hashed and compared to a pre-registered
+    has value to validate the download procedure.
+
+    Args:
+        url (str): Url.
+        download_folder (str): Folder to download file.
+        hash_value (str): Hash for url.
+        hash_type (str): Hash type.
+    """
+    filepath = os.path.join(download_folder, os.path.basename(url))
+
+    if hash_type == "sha256":
+        sha = hashlib.sha256()
+    elif hash_type == "md5":
+        sha = hashlib.md5()
+    else:
+        raise ValueError
+
+    with open(filepath, "rb") as f:
+        while True:
+            chunk = f.read(1000 * 1000)  # 1MB so that memory is not exhausted
+            if not chunk:
+                break
+            sha.update(chunk)
+
+    return sha.hexdigest() == hash_value
 
 
 def extract_archive(from_path, to_path=None, overwrite=False):

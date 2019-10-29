@@ -18,3 +18,5 @@ pytest
 
 # Testing only Py3 compat
 backports.tempfile
+
+requests
