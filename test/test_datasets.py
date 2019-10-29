@@ -7,9 +7,12 @@ from torchaudio.datasets.utils import DiskCache
 from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.yesno import YESNO
 
+import common_utils
+
 
 class TestDatasets(unittest.TestCase):
-    path = "assets"
+    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    path = os.path.join(test_dirpath, "assets")
 
     def test_yesno(self):
         data = YESNO(self.path, return_dict=True)
