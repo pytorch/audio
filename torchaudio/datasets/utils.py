@@ -126,13 +126,11 @@ def download_url(
         resume (bool): Enable resuming download.
     """
 
-    # Detect filename
-    if filename is None:
-        req = urllib.request.Request(url, method="HEAD")
-        filename = urllib.request.urlopen(
-            req
-        ).info().get_filename() or os.path.basename(url)
+    req = urllib.request.Request(url, method="HEAD")
+    req_info = urllib.request.urlopen(req).info()
 
+    # Detect filename
+    filename = filename or req_info.get_filename() or os.path.basename(url)
     filepath = os.path.join(download_folder, filename)
 
     if resume and os.path.exists(filepath):
@@ -146,17 +144,26 @@ def download_url(
         mode = "wb"
         local_size = None
 
-    # If we already have the whole file, there is no need to download it again
+    if hash_value and local_size == int(req_info.get("Content-Length", -1)):
+        if validate_file(filepath, hash_value, hash_type):
+            return
+        else:
+            raise RuntimeError(
+                "The hash of {} does not match. Delete the file manually and retry.".format(
+                    filepath
+                )
+            )
+
+    with open(filepath, mode) as fpointer:
+        for chunk in stream_url(url, start_byte=local_size, progress_bar=progress_bar):
+            fpointer.write(chunk)
+
     if hash_value and not validate_file(filepath, hash_value, hash_type):
         raise RuntimeError(
             "The hash of {} does not match. Delete the file manually and retry.".format(
                 filepath
             )
         )
-
-    with open(filepath, mode) as fpointer:
-        for chunk in stream_url(url, start_byte=local_size, progress_bar=progress_bar):
-            fpointer.write(chunk)
 
 
 def validate_file(filepath, hash_value, hash_type="sha256"):
