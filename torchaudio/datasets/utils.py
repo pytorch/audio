@@ -67,58 +67,96 @@ def makedir_exist_ok(dirpath):
             raise
 
 
-def download_url(url, download_folder, hash_value=None, hash_type="sha256"):
-    """Execute the correct download operation.
-    Depending on the size of the file online and offline, resume the
-    download if the file offline is smaller than online.
+def stream_url(url, start_byte=None, block_size=32 * 1024, progress_bar=True):
+    """Stream url by chunk
 
     Args:
         url (str): Url.
-        download_folder (str): Folder to download file.
-        hash_value (str): Hash for url.
-        hash_type (str): Hash type.
+        start_byte (Optional[int]): Start streaming at that point.
+        block_size (int): Size of chunks to stream.
+        progress_bar (bool): Display a progress bar.
     """
 
-    filepath = os.path.join(download_folder, os.path.basename(url))
+    # If we already have the whole file, there is no need to download it again
+    req = urllib.request.Request(url, method="HEAD")
+    url_size = int(urllib.request.urlopen(req).info().get("Content-Length", -1))
+    if url_size == start_byte:
+        raise StopIteration
 
     req = urllib.request.Request(url)
-    if os.path.exists(filepath):
-        mode = "ab"
-        local_size = os.path.getsize(filepath)
+    if start_byte:
+        req.headers["Range"] = "bytes={}-".format(start_byte)
 
-        # If the file exists, then download only the remainder
-        req.headers["Range"] = "bytes={}-".format(local_size)
-    else:
-        mode = "wb"
-        local_size = 0
-
-    # If we already have the whole file, there is no need to download it again
-    url_size = int(urllib.request.urlopen(url).info().get("Content-Length", -1))
-    if url_size == local_size:
-        if hash_value and not validate_download_url(filepath, hash_value, hash_type):
-            raise RuntimeError(
-                "The hash of {} does not match. Delete the file manually and retry.".format(
-                    filepath
-                )
-            )
-
-        return
-
-    with open(filepath, mode) as fpointer, urllib.request.urlopen(
-        req
-    ) as upointer, tqdm(
-        unit="B", unit_scale=True, unit_divisor=1024, total=url_size
+    with urllib.request.urlopen(req) as upointer, tqdm(
+        unit="B",
+        unit_scale=True,
+        unit_divisor=1024,
+        total=url_size,
+        disable=not progress_bar,
     ) as pbar:
 
         num_bytes = 0
-        block_size = 32 * 1024
         while True:
             chunk = upointer.read(block_size)
             if not chunk:
                 break
-            fpointer.write(chunk)
+            yield chunk
             num_bytes += len(chunk)
             pbar.update(len(chunk))
+
+
+def download_url(
+    url,
+    download_folder,
+    filename=None,
+    hash_value=None,
+    hash_type="sha256",
+    progress_bar=True,
+    resume=False,
+):
+    """Download file to disk.
+
+    Args:
+        url (str): Url.
+        download_folder (str): Folder to download file.
+        filename (str): Name of downloaded file. If None, it is inferred from the url.
+        hash_value (str): Hash for url.
+        hash_type (str): Hash type.
+        progress_bar (bool): Display a progress bar.
+        resume (bool): Enable resuming download.
+    """
+
+    # Detect filename
+    if filename is None:
+        req = urllib.request.Request(url, method="HEAD")
+        filename = urllib.request.urlopen(
+            req
+        ).info().get_filename() or os.path.basename(url)
+
+    filepath = os.path.join(download_folder, filename)
+
+    if resume and os.path.exists(filepath):
+        mode = "ab"
+        local_size = os.path.getsize(filepath)
+    elif resume and os.path.exists(filepath):
+        raise RuntimeError(
+            "{} already exists. Delete the file manually and retry.".format(filepath)
+        )
+    else:
+        mode = "wb"
+        local_size = None
+
+    # If we already have the whole file, there is no need to download it again
+    if hash_value and not validate_file(filepath, hash_value, hash_type):
+        raise RuntimeError(
+            "The hash of {} does not match. Delete the file manually and retry.".format(
+                filepath
+            )
+        )
+
+    with open(filepath, mode) as fpointer:
+        for chunk in stream_url(url, start_byte=local_size, progress_bar=progress_bar):
+            fpointer.write(chunk)
 
 
 def validate_download_url(filepath, hash_value, hash_type="sha256"):
