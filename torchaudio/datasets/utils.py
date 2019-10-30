@@ -159,31 +159,31 @@ def download_url(
             fpointer.write(chunk)
 
 
-def validate_download_url(filepath, hash_value, hash_type="sha256"):
+def validate_file(filepath, hash_value, hash_type="sha256"):
     """Validate a given file with its hash.
 
     Args:
-        url (str): Url.
-        download_folder (str): Folder to download file.
+        filepath (str): File to read.
         hash_value (str): Hash for url.
         hash_type (str): Hash type.
     """
 
     if hash_type == "sha256":
-        sha = hashlib.sha256()
+        hash_func = hashlib.sha256()
     elif hash_type == "md5":
-        sha = hashlib.md5()
+        hash_func = hashlib.md5()
     else:
         raise ValueError
 
     with open(filepath, "rb") as f:
         while True:
-            chunk = f.read(1000 * 1000)  # 1MB so that memory is not exhausted
+            # Read by chunk to avoid filling memory
+            chunk = f.read(1024 ** 2)
             if not chunk:
                 break
-            sha.update(chunk)
+            hash_func.update(chunk)
 
-    return sha.hexdigest() == hash_value
+    return hash_func.hexdigest() == hash_value
 
 
 def extract_archive(from_path, to_path=None, overwrite=False):
