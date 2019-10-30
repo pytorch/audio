@@ -120,7 +120,7 @@ def download_single_url(
         download_folder (str): Folder to download file.
         filename (str): Name of downloaded file. If None, it is inferred from the url.
         hash_value (str): Hash for url.
-        hash_type (str): Hash type.
+        hash_type (str): Hash type, among "sha256" and "md5".
         progress_bar (bool): Display a progress bar.
         resume (bool): Enable resuming download.
     """
