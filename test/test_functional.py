@@ -267,7 +267,7 @@ class TestFunctional(unittest.TestCase):
         }
         data_size = (2, 12, 7, 2)
         self._test_linearity_of_istft(data_size, kwargs3)
-    #
+
     def test_linearity_of_istft4(self):
         # hamming_window, not centered, not normalized, onesided
         kwargs4 = {
