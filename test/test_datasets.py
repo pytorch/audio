@@ -3,7 +3,7 @@ import unittest
 
 from torchaudio.datasets.commonvoice import COMMONVOICE
 from torchaudio.datasets.librispeech import LIBRISPEECH
-from torchaudio.datasets.utils import DiskCache
+from torchaudio.datasets.utils import DiskCache, BackgroundGenerator
 from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.yesno import YESNO
 
@@ -39,6 +39,13 @@ class TestDatasets(unittest.TestCase):
         data[0]
         # Load
         data[0]
+
+    def test_commonvoice_backgroundgenerator(self):
+        path = os.path.join(self.path, "commonvoice")
+        data = COMMONVOICE(path, "train.tsv", "tatar")
+        data = BackgroundGenerator(data)
+        for i, d in enumerate(data):
+            pass
 
 
 if __name__ == "__main__":
