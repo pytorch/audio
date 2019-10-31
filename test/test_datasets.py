@@ -44,7 +44,7 @@ class TestDatasets(unittest.TestCase):
         path = os.path.join(self.path, "commonvoice")
         data = COMMONVOICE(path, "train.tsv", "tatar")
         data = BackgroundGenerator(data)
-        for i, d in enumerate(data):
+        for d in data:
             pass
 
 
