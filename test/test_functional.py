@@ -226,7 +226,7 @@ class TestFunctional(unittest.TestCase):
             istft1 = torchaudio.functional.istft(tensor1, **kwargs)
             istft2 = torchaudio.functional.istft(tensor2, **kwargs)
             istft = a * istft1 + b * istft2
-            estimate = torchaudio.functional.istft(a * tensor1 + b * tensor2,  **kwargs)
+            estimate = torchaudio.functional.istft(a * tensor1 + b * tensor2, **kwargs)
             self._compare_estimate(istft, estimate)
 
     def test_linearity_of_istft1(self):
