@@ -801,3 +801,33 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
     return torch.nn.functional.conv1d(
         specgram, kernel, groups=specgram.shape[1] // specgram.shape[0]
     ) / denom
+
+def _adjust_to_interval(data, interval):
+  # type: (Tensor, float) -> Tensor
+  abs_max = torch.max(torch.abs(data))
+  ratio = abs_max/interval
+  
+  return data / ratio
+
+def scale_to_interval(waveform, interval=1):
+    r"""Scales waveform to an interval.
+
+    Args:
+       waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
+       interval (float): The bounds of the interval, where the float indicates
+           the upper bound and the negative of the float indicates the lower
+           bound (Default: `1.0`)
+           
+           Example: interval=1.0 -> [-1.0, 1.0]
+
+    Returns:
+       torch.Tensor: waveform scaled to interval
+    """
+    assert waveform.dim() == 2
+    
+    waveform[0] = _adjust_to_interval(waveform[0], interval)
+    waveform[1] = _adjust_to_interval(waveform[1], interval)
+    
+    assert torch.max(torch.abs(waveform)) == interval
+    
+    return waveform
