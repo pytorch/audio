@@ -218,7 +218,7 @@ class TestFunctional(unittest.TestCase):
         self._test_istft_of_sine(amplitude=80, L=9, n=6)
         self._test_istft_of_sine(amplitude=99, L=10, n=7)
 
-    def _test_linearity_of_istft(self, data_size, kwargs):
+    def _test_linearity_of_istft(self, data_size, kwargs, atol=1e-6, rtol=1e-8):
         for i in range(self.number_of_trials):
             tensor1 = common_utils.random_float_tensor(i, data_size)
             tensor2 = common_utils.random_float_tensor(i * 2, data_size)
@@ -227,7 +227,7 @@ class TestFunctional(unittest.TestCase):
             istft2 = torchaudio.functional.istft(tensor2, **kwargs)
             istft = a * istft1 + b * istft2
             estimate = torchaudio.functional.istft(a * tensor1 + b * tensor2, **kwargs)
-            self._compare_estimate(istft, estimate)
+            self._compare_estimate(istft, estimate, atol, rtol)
 
     def test_linearity_of_istft1(self):
         # hann_window, centered, normalized, onesided
@@ -279,7 +279,7 @@ class TestFunctional(unittest.TestCase):
             'onesided': True,
         }
         data_size = (2, 7, 3, 2)
-        self._test_linearity_of_istft(data_size, kwargs4)
+        self._test_linearity_of_istft(data_size, kwargs4, atol=1e-5, rtol=1e-8)
 
     def _test_create_fb(self, n_mels=40, sample_rate=22050, n_fft=2048, fmin=0.0, fmax=8000.0):
         # Using a decorator here causes parametrize to fail on Python 2
