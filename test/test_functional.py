@@ -218,6 +218,69 @@ class TestFunctional(unittest.TestCase):
         self._test_istft_of_sine(amplitude=80, L=9, n=6)
         self._test_istft_of_sine(amplitude=99, L=10, n=7)
 
+    def _test_linearity_of_istft(self, data_size, kwargs, atol=1e-6, rtol=1e-8):
+        for i in range(self.number_of_trials):
+            tensor1 = common_utils.random_float_tensor(i, data_size)
+            tensor2 = common_utils.random_float_tensor(i * 2, data_size)
+            a, b = torch.rand(2)
+            istft1 = torchaudio.functional.istft(tensor1, **kwargs)
+            istft2 = torchaudio.functional.istft(tensor2, **kwargs)
+            istft = a * istft1 + b * istft2
+            estimate = torchaudio.functional.istft(a * tensor1 + b * tensor2, **kwargs)
+            self._compare_estimate(istft, estimate, atol, rtol)
+
+    def test_linearity_of_istft1(self):
+        # hann_window, centered, normalized, onesided
+        kwargs1 = {
+            'n_fft': 12,
+            'window': torch.hann_window(12),
+            'center': True,
+            'pad_mode': 'reflect',
+            'normalized': True,
+            'onesided': True,
+        }
+        data_size = (2, 7, 7, 2)
+        self._test_linearity_of_istft(data_size, kwargs1)
+
+    def test_linearity_of_istft2(self):
+        # hann_window, centered, not normalized, not onesided
+        kwargs2 = {
+            'n_fft': 12,
+            'window': torch.hann_window(12),
+            'center': True,
+            'pad_mode': 'reflect',
+            'normalized': False,
+            'onesided': False,
+        }
+        data_size = (2, 12, 7, 2)
+        self._test_linearity_of_istft(data_size, kwargs2)
+
+    def test_linearity_of_istft3(self):
+        # hamming_window, centered, normalized, not onesided
+        kwargs3 = {
+            'n_fft': 12,
+            'window': torch.hamming_window(12),
+            'center': True,
+            'pad_mode': 'constant',
+            'normalized': True,
+            'onesided': False,
+        }
+        data_size = (2, 12, 7, 2)
+        self._test_linearity_of_istft(data_size, kwargs3)
+
+    def test_linearity_of_istft4(self):
+        # hamming_window, not centered, not normalized, onesided
+        kwargs4 = {
+            'n_fft': 12,
+            'window': torch.hamming_window(12),
+            'center': False,
+            'pad_mode': 'constant',
+            'normalized': False,
+            'onesided': True,
+        }
+        data_size = (2, 7, 3, 2)
+        self._test_linearity_of_istft(data_size, kwargs4, atol=1e-5, rtol=1e-8)
+
     def _test_create_fb(self, n_mels=40, sample_rate=22050, n_fft=2048, fmin=0.0, fmax=8000.0):
         # Using a decorator here causes parametrize to fail on Python 2
         if not IMPORT_LIBROSA:
