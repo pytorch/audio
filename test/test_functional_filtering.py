@@ -141,7 +141,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         Test biquad peaking equalizer filter, compare to SoX implementation
         """
 
-        CENTER_FREQ = 1000
+        CENTER_FREQ = 300
         Q = 0.707
         GAIN = 1
 
@@ -152,7 +152,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.equalizer_biquad(waveform, sample_rate, CENTER_FREQ, Q, GAIN)
+        output_waveform = F.equalizer_biquad(waveform, sample_rate, CENTER_FREQ, GAIN, Q)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
 
