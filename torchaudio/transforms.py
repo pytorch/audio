@@ -62,7 +62,7 @@ class Spectrogram(torch.jit.ScriptModule):
         Returns:
             torch.Tensor: Dimension (channel, freq, time), where channel
             is unchanged, freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
-            Fourier bins, and time is the number of window hops (n_frames).
+            Fourier bins, and time is the number of window hops (n_frame).
         """
         return F.spectrogram(waveform, self.pad, self.window, self.n_fft, self.hop_length,
                              self.win_length, self.power, self.normalized)
@@ -132,7 +132,7 @@ class MelScale(torch.jit.ScriptModule):
         assert f_min <= self.f_max, 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
         self.f_min = f_min
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
-            n_stft, self.f_min, self.f_max, self.n_mels)
+            n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
         self.fb = torch.jit.Attribute(fb, torch.Tensor)
 
     @torch.jit.script_method
@@ -145,7 +145,7 @@ class MelScale(torch.jit.ScriptModule):
             torch.Tensor: Mel frequency spectrogram of size (channel, ``n_mels``, time)
         """
         if self.fb.numel() == 0:
-            tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max, self.n_mels)
+            tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max, self.n_mels, self.sample_rate)
             # Attributes cannot be reassigned outside __init__ so workaround
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)
@@ -409,9 +409,9 @@ class ComputeDeltas(torch.jit.ScriptModule):
     def forward(self, specgram):
         r"""
         Args:
-            specgram (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
+            specgram (torch.Tensor): Tensor of audio of dimension (channel, freq, time)
 
         Returns:
-            deltas (torch.Tensor): Tensor of audio of dimension (channel, n_mfcc, time)
+            deltas (torch.Tensor): Tensor of audio of dimension (channel, freq, time)
         """
         return F.compute_deltas(specgram, win_length=self.win_length, mode=self.mode)

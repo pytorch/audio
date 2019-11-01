@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
+import os
 
 import torch
 import torchaudio
@@ -216,6 +217,123 @@ class TestFunctional(unittest.TestCase):
         self._test_istft_of_sine(amplitude=145, L=8, n=5)
         self._test_istft_of_sine(amplitude=80, L=9, n=6)
         self._test_istft_of_sine(amplitude=99, L=10, n=7)
+
+    def _test_linearity_of_istft(self, data_size, kwargs, atol=1e-6, rtol=1e-8):
+        for i in range(self.number_of_trials):
+            tensor1 = common_utils.random_float_tensor(i, data_size)
+            tensor2 = common_utils.random_float_tensor(i * 2, data_size)
+            a, b = torch.rand(2)
+            istft1 = torchaudio.functional.istft(tensor1, **kwargs)
+            istft2 = torchaudio.functional.istft(tensor2, **kwargs)
+            istft = a * istft1 + b * istft2
+            estimate = torchaudio.functional.istft(a * tensor1 + b * tensor2, **kwargs)
+            self._compare_estimate(istft, estimate, atol, rtol)
+
+    def test_linearity_of_istft1(self):
+        # hann_window, centered, normalized, onesided
+        kwargs1 = {
+            'n_fft': 12,
+            'window': torch.hann_window(12),
+            'center': True,
+            'pad_mode': 'reflect',
+            'normalized': True,
+            'onesided': True,
+        }
+        data_size = (2, 7, 7, 2)
+        self._test_linearity_of_istft(data_size, kwargs1)
+
+    def test_linearity_of_istft2(self):
+        # hann_window, centered, not normalized, not onesided
+        kwargs2 = {
+            'n_fft': 12,
+            'window': torch.hann_window(12),
+            'center': True,
+            'pad_mode': 'reflect',
+            'normalized': False,
+            'onesided': False,
+        }
+        data_size = (2, 12, 7, 2)
+        self._test_linearity_of_istft(data_size, kwargs2)
+
+    def test_linearity_of_istft3(self):
+        # hamming_window, centered, normalized, not onesided
+        kwargs3 = {
+            'n_fft': 12,
+            'window': torch.hamming_window(12),
+            'center': True,
+            'pad_mode': 'constant',
+            'normalized': True,
+            'onesided': False,
+        }
+        data_size = (2, 12, 7, 2)
+        self._test_linearity_of_istft(data_size, kwargs3)
+
+    def test_linearity_of_istft4(self):
+        # hamming_window, not centered, not normalized, onesided
+        kwargs4 = {
+            'n_fft': 12,
+            'window': torch.hamming_window(12),
+            'center': False,
+            'pad_mode': 'constant',
+            'normalized': False,
+            'onesided': True,
+        }
+        data_size = (2, 7, 3, 2)
+        self._test_linearity_of_istft(data_size, kwargs4, atol=1e-5, rtol=1e-8)
+
+    def _test_create_fb(self, n_mels=40, sample_rate=22050, n_fft=2048, fmin=0.0, fmax=8000.0):
+        # Using a decorator here causes parametrize to fail on Python 2
+        if not IMPORT_LIBROSA:
+            raise unittest.SkipTest('Librosa is not available')
+
+        librosa_fb = librosa.filters.mel(sr=sample_rate,
+                                         n_fft=n_fft,
+                                         n_mels=n_mels,
+                                         fmax=fmax,
+                                         fmin=fmin,
+                                         htk=True,
+                                         norm=None)
+        fb = F.create_fb_matrix(sample_rate=sample_rate,
+                                n_mels=n_mels,
+                                f_max=fmax,
+                                f_min=fmin,
+                                n_freqs=(n_fft // 2 + 1))
+
+        for i_mel_bank in range(n_mels):
+            assert torch.allclose(fb[:, i_mel_bank], torch.tensor(librosa_fb[i_mel_bank]), atol=1e-4)
+
+    def test_create_fb(self):
+        self._test_create_fb()
+        self._test_create_fb(n_mels=128, sample_rate=44100)
+        self._test_create_fb(n_mels=128, fmin=2000.0, fmax=5000.0)
+        self._test_create_fb(n_mels=56, fmin=100.0, fmax=9000.0)
+        self._test_create_fb(n_mels=56, fmin=800.0, fmax=900.0)
+        self._test_create_fb(n_mels=56, fmin=1900.0, fmax=900.0)
+        self._test_create_fb(n_mels=10, fmin=1900.0, fmax=900.0)
+
+    def test_pitch(self):
+
+        test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+        test_filepath_100 = os.path.join(test_dirpath, 'assets', "100Hz_44100Hz_16bit_05sec.wav")
+        test_filepath_440 = os.path.join(test_dirpath, 'assets', "440Hz_44100Hz_16bit_05sec.wav")
+
+        # Files from https://www.mediacollege.com/audio/tone/download/
+        tests = [
+            (test_filepath_100, 100),
+            (test_filepath_440, 440),
+        ]
+
+        for filename, freq_ref in tests:
+            waveform, sample_rate = torchaudio.load(filename)
+
+            # Convert to stereo for testing purposes
+            waveform = waveform.repeat(2, 1, 1)
+
+            freq = torchaudio.functional.detect_pitch_frequency(waveform, sample_rate)
+
+            threshold = 1
+            s = ((freq - freq_ref).abs() > threshold).sum()
+            self.assertFalse(s)
 
 
 def _num_stft_bins(signal_len, fft_len, hop_length, pad):
