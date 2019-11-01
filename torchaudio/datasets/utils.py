@@ -202,7 +202,7 @@ def validate_file(filepath, hash_value, hash_type="sha256"):
     Args:
         filepath (str): File to read.
         hash_value (str): Hash for url.
-        hash_type (str): Hash type.
+        hash_type (str): Hash type, among "sha256" and "md5".
     """
 
     if hash_type == "sha256":
