@@ -225,7 +225,7 @@ class DiskCache(Dataset):
         return len(self.dataset)
 
 
-class bg_iterator(threading.Thread):
+class _ThreadedIterator(threading.Thread):
     """
     Prefetch the next queue_length items from iterator in a background thread.
 
@@ -237,9 +237,9 @@ class bg_iterator(threading.Thread):
     class _End:
         pass
 
-    def __init__(self, generator, queue_length):
+    def __init__(self, generator, maxsize):
         threading.Thread.__init__(self)
-        self.queue = Queue(queue_length)
+        self.queue = Queue(maxsize)
         self.generator = generator
         self.daemon = True
         self.start()
@@ -257,3 +257,7 @@ class bg_iterator(threading.Thread):
         if next_item == self._End:
             raise StopIteration
         return next_item
+
+
+def bg_iterator(iterable, maxsize):
+    return _ThreadedIterator(iterable, maxsize=maxsize)
