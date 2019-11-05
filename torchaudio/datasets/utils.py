@@ -234,7 +234,7 @@ class bg_iterator(threading.Thread):
     >>     print(i)
     """
 
-    class _EndOfQueue:
+    class _End:
         pass
 
     def __init__(self, generator, queue_length):
@@ -247,13 +247,13 @@ class bg_iterator(threading.Thread):
     def run(self):
         for item in self.generator:
             self.queue.put(item)
-        self.queue.put(self._EndOfQueue())
+        self.queue.put(self._End)
 
     def __iter__(self):
         return self
 
     def __next__(self):
         next_item = self.queue.get()
-        if isinstance(next_item, self._EndOfQueue):
+        if next_item == self._End:
             raise StopIteration
         return next_item
