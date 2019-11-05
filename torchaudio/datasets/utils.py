@@ -135,7 +135,7 @@ def download_single_url(
     if resume and os.path.exists(filepath):
         mode = "ab"
         local_size = os.path.getsize(filepath)
-    elif resume and os.path.exists(filepath):
+    elif not resume and os.path.exists(filepath):
         raise RuntimeError(
             "{} already exists. Delete the file manually and retry.".format(filepath)
         )
