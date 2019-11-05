@@ -29,13 +29,14 @@ def load_librispeech_item(fileid, path, ext_audio, ext_txt):
     waveform, sample_rate = torchaudio.load(file_audio)
 
     # Load text
-    for line in open(file_text):
-        fileid_text, content = line.strip().split(" ", 1)
-        if fileid_audio == fileid_text:
-            break
-    else:
-        # Translation not found
-        raise FileNotFoundError("Translation not found for " + fileid_audio)
+    with open(file_text) as ft:
+        for line in ft:
+            fileid_text, content = line.strip().split(" ", 1)
+            if fileid_audio == fileid_text:
+                break
+        else:
+            # Translation not found
+            raise FileNotFoundError("Translation not found for " + fileid_audio)
 
     return {
         "speaker_id": speaker,
