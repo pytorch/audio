@@ -1,7 +1,14 @@
 from .commonvoice import COMMONVOICE
 from .librispeech import LIBRISPEECH
+from .utils import bg_iterator, diskcache_iterator
 from .vctk import VCTK
 from .yesno import YESNO
-from .utils import DiskCache
 
-__all__ = ("COMMONVOICE", "LIBRISPEECH", "VCTK", "YESNO", "DiskCache", "bg_iterator")
+__all__ = (
+    "COMMONVOICE",
+    "LIBRISPEECH",
+    "VCTK",
+    "YESNO",
+    "diskcache_iterator",
+    "bg_iterator",
+)

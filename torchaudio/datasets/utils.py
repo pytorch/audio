@@ -194,7 +194,7 @@ def walk_files(root, suffix, prefix=False, remove_suffix=False):
                 yield f
 
 
-class DiskCache(Dataset):
+class _DiskCache(Dataset):
     """
     Wrap a dataset so that, whenever a new item is returned, it is saved to disk.
     """
@@ -223,6 +223,10 @@ class DiskCache(Dataset):
 
     def __len__(self):
         return len(self.dataset)
+
+
+def diskcache_iterator(dataset, location=".cached"):
+    return _DiskCache(dataset, location)
 
 
 class _ThreadedIterator(threading.Thread):
