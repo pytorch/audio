@@ -104,7 +104,7 @@ def stream_url(url, start_byte=None, block_size=32 * 1024, progress_bar=True):
             pbar.update(len(chunk))
 
 
-def download_single_url(
+def download_url(
     url,
     download_folder,
     filename=None,
@@ -162,38 +162,6 @@ def download_single_url(
                 filepath
             )
         )
-
-
-def download_url(urls, *args, max_workers=5, **kwargs):
-    """Download urls to disk. The other arguments are passed to download_single_url.
-
-    Args:
-        urls (str or List[str]): List of urls.
-        max_workers (int): Maximum number of workers.
-    """
-
-    if isinstance(urls, str):
-        return download_single_url(urls, *args, **kwargs)
-
-    # Turn arguments into lists
-    args = list(args)
-    for i, item in enumerate(args):
-        if not isinstance(item, list):
-            args[i] = [item] * len(urls)
-    args = list(zip(*args))
-
-    # Turn keyword arguments into lists
-    for key, value in kwargs.items():
-        if not isinstance(value, list):
-            kwargs[key] = [value] * len(urls)
-    kwargs = [dict(zip(kwargs.keys(), values)) for values in zip(*(kwargs.values()))]
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = [
-            executor.submit(download_single_url, url, *arg, **kwarg)
-            for url, arg, kwarg in zip(urls, args, kwargs)
-        ]
-        return concurrent.futures.as_completed(futures)
 
 
 def validate_file(filepath, hash_value, hash_type="sha256"):
