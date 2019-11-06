@@ -1,8 +1,7 @@
 import os
 
-from torch.utils.data import Dataset
-
 import torchaudio
+from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
@@ -16,38 +15,43 @@ FOLDER_IN_ARCHIVE = "LibriSpeech"
 
 def load_librispeech_item(fileid, path, ext_audio, ext_txt):
 
-    speaker, chapter, utterance = fileid.split("-")
+    speaker_id, chapter_id, utterance_id = fileid.split("-")
 
-    file_text = speaker + "-" + chapter + ext_txt
-    file_text = os.path.join(path, speaker, chapter, file_text)
+    file_text = speaker_id + "-" + chapter_id + ext_txt
+    file_text = os.path.join(path, speaker_id, chapter_id, file_text)
 
-    fileid_audio = speaker + "-" + chapter + "-" + utterance
+    fileid_audio = speaker_id + "-" + chapter_id + "-" + utterance_id
     file_audio = fileid_audio + ext_audio
-    file_audio = os.path.join(path, speaker, chapter, file_audio)
+    file_audio = os.path.join(path, speaker_id, chapter_id, file_audio)
 
     # Load audio
     waveform, sample_rate = torchaudio.load(file_audio)
 
     # Load text
-    for line in open(file_text):
-        fileid_text, content = line.strip().split(" ", 1)
-        if fileid_audio == fileid_text:
-            break
-    else:
-        # Translation not found
-        raise FileNotFoundError("Translation not found for " + fileid_audio)
+    with open(file_text) as ft:
+        for line in ft:
+            fileid_text, utterance = line.strip().split(" ", 1)
+            if fileid_audio == fileid_text:
+                break
+        else:
+            # Translation not found
+            raise FileNotFoundError("Translation not found for " + fileid_audio)
 
-    return {
-        "speaker_id": speaker,
-        "chapter_id": chapter,
-        "utterance_id": utterance,
-        "utterance": content,
-        "waveform": waveform,
-        "sample_rate": sample_rate,
-    }
+    return (
+        waveform,
+        sample_rate,
+        utterance,
+        int(speaker_id),
+        int(chapter_id),
+        int(utterance_id),
+    )
 
 
 class LIBRISPEECH(Dataset):
+    """
+    Create a Dataset for LibriSpeech. Each item is a tuple of the form:
+    waveform, sample_rate, utterance, speaker_id, chapter_id, utterance_id
+    """
 
     _ext_txt = ".trans.txt"
     _ext_audio = ".flac"

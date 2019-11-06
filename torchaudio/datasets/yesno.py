@@ -11,16 +11,20 @@ FOLDER_IN_ARCHIVE = "waves_yesno"
 
 def load_yesno_item(fileid, path, ext_audio):
     # Read label
-    label = fileid.split("_")
+    labels = [int(c) for c in fileid.split("_")]
 
     # Read wav
     file_audio = os.path.join(path, fileid + ext_audio)
     waveform, sample_rate = torchaudio.load(file_audio)
 
-    return {"label": label, "waveform": waveform, "sample_rate": sample_rate}
+    return waveform, sample_rate, labels
 
 
 class YESNO(Dataset):
+    """
+    Create a Dataset for YesNo. Each item is a tuple of the form:
+    (waveform, sample_rate, labels)
+    """
 
     _ext_audio = ".wav"
 
@@ -32,16 +36,7 @@ class YESNO(Dataset):
         download=False,
         transform=None,
         target_transform=None,
-        return_dict=False,
     ):
-
-        if not return_dict:
-            warnings.warn(
-                "In the next version, the item returned will be a dictionary. "
-                "Please use `return_dict=True` to enable this behavior now, "
-                "and suppress this warning.",
-                DeprecationWarning,
-            )
 
         if transform is not None or target_transform is not None:
             warnings.warn(
@@ -53,7 +48,6 @@ class YESNO(Dataset):
 
         self.transform = transform
         self.target_transform = target_transform
-        self.return_dict = return_dict
 
         archive = os.path.basename(url)
         archive = os.path.join(root, archive)
@@ -79,20 +73,15 @@ class YESNO(Dataset):
         fileid = self._walker[n]
         item = load_yesno_item(fileid, self._path, self._ext_audio)
 
-        waveform = item["waveform"]
+        # TODO Upon deprecation, uncomment line below and remove following code
+        # return item
+
+        waveform, sample_rate, labels = item
         if self.transform is not None:
             waveform = self.transform(waveform)
-        item["waveform"] = waveform
-
-        label = item["label"]
         if self.target_transform is not None:
-            label = self.target_transform(label)
-        item["label"] = label
-
-        if self.return_dict:
-            return item
-
-        return item["waveform"], item["label"]
+            labels = self.target_transform(labels)
+        return waveform, sample_rate, labels
 
     def __len__(self):
         return len(self._walker)

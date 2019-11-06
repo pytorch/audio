@@ -15,11 +15,11 @@ class TestDatasets(unittest.TestCase):
     path = os.path.join(test_dirpath, "assets")
 
     def test_yesno(self):
-        data = YESNO(self.path, return_dict=True)
+        data = YESNO(self.path)
         data[0]
 
     def test_vctk(self):
-        data = VCTK(self.path, return_dict=True)
+        data = VCTK(self.path)
         data[0]
 
     def test_librispeech(self):

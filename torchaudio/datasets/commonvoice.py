@@ -1,7 +1,8 @@
 import os
 
-import torchaudio
 from torch.utils.data import Dataset
+
+import torchaudio
 from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
 
 # Default TSV should be one of
@@ -17,6 +18,10 @@ TSV = "train.tsv"
 
 
 def load_commonvoice_item(line, header, path, folder_audio):
+    # Each line as the following data:
+    # client_id, path, sentence, up_votes, down_votes, age, gender, accent
+
+    assert header[1] == "path"
     fileid = line[1]
 
     filename = os.path.join(path, folder_audio, fileid)
@@ -24,13 +29,17 @@ def load_commonvoice_item(line, header, path, folder_audio):
     waveform, sample_rate = torchaudio.load(filename)
 
     dic = dict(zip(header, line))
-    dic["waveform"] = waveform
-    dic["sample_rate"] = sample_rate
 
-    return dic
+    return waveform, sample_rate, dic
 
 
 class COMMONVOICE(Dataset):
+    """
+    Create a Dataset for CommonVoice. Each item is a tuple of the form:
+    (waveform, sample_rate, dictionary)
+    where dictionary is a dictionary built from the tsv file with the following keys:
+    client_id, path, sentence, up_votes, down_votes, age, gender, accent.
+    """
 
     _ext_txt = ".txt"
     _ext_audio = ".mp3"

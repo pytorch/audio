@@ -12,15 +12,15 @@ FOLDER_IN_ARCHIVE = "VCTK-Corpus"
 def load_vctk_item(
     fileid, path, ext_audio, ext_txt, folder_audio, folder_txt, downsample=False
 ):
-    speaker, utterance = fileid.split("_")
+    speaker_id, utterance_id = fileid.split("_")
 
     # Read text
-    file_txt = os.path.join(path, folder_txt, speaker, fileid + ext_txt)
+    file_txt = os.path.join(path, folder_txt, speaker_id, fileid + ext_txt)
     with open(file_txt) as file_text:
-        content = file_text.readlines()[0]
+        utterance = file_text.readlines()[0]
 
     # Read wav
-    file_audio = os.path.join(path, folder_audio, speaker, fileid + ext_audio)
+    file_audio = os.path.join(path, folder_audio, speaker_id, fileid + ext_audio)
     if downsample:
         # Legacy
         E = torchaudio.sox_effects.SoxEffectsChain()
@@ -34,16 +34,14 @@ def load_vctk_item(
     else:
         waveform, sample_rate = torchaudio.load(file_audio)
 
-    return {
-        "speaker_id": speaker,
-        "utterance_id": utterance,
-        "utterance": content,
-        "waveform": waveform,
-        "sample_rate": sample_rate,
-    }
+    return waveform, sample_rate, utterance, speaker_id, utterance_id
 
 
 class VCTK(Dataset):
+    """
+    Create a Dataset for VCTK. Each item is a tuple of the form:
+    (waveform, sample_rate, utterance, speaker_id, utterance_id)
+    """
 
     _folder_txt = "txt"
     _folder_audio = "wav48"
@@ -59,16 +57,7 @@ class VCTK(Dataset):
         downsample=False,
         transform=None,
         target_transform=None,
-        return_dict=False,
     ):
-
-        if not return_dict:
-            warnings.warn(
-                "In the next version, the item returned will be a dictionary. "
-                "Please use `return_dict=True` to enable this behavior now, "
-                "and suppress this warning.",
-                DeprecationWarning,
-            )
 
         if downsample:
             warnings.warn(
@@ -89,7 +78,6 @@ class VCTK(Dataset):
         self.downsample = downsample
         self.transform = transform
         self.target_transform = target_transform
-        self.return_dict = return_dict
 
         archive = os.path.basename(url)
         archive = os.path.join(root, archive)
@@ -122,23 +110,15 @@ class VCTK(Dataset):
             self._folder_txt,
         )
 
-        # Legacy
-        waveform = item["waveform"]
+        # TODO Upon deprecation, uncomment line below and remove following code
+        # return item
+
+        waveform, sample_rate, utterance, speaker_id, utterance_id = item
         if self.transform is not None:
             waveform = self.transform(waveform)
-        item["waveform"] = waveform
-
-        # Legacy
-        utterance = item["utterance"]
         if self.target_transform is not None:
             utterance = self.target_transform(utterance)
-        item["utterance"] = utterance
-
-        if self.return_dict:
-            return item
-
-        # Legacy
-        return item["waveform"], item["utterance"]
+        return waveform, sample_rate, utterance, speaker_id, utterance_id
 
     def __len__(self):
         return len(self._walker)
