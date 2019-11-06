@@ -36,8 +36,8 @@ def load_commonvoice_item(line, header, path, folder_audio):
 class COMMONVOICE(Dataset):
     """
     Create a Dataset for CommonVoice. Each item is a tuple of the form:
-    (waveform, sample_rate, dict)
-    where dict is a dictionary built from the tsv file with the following keys:
+    (waveform, sample_rate, dictionary)
+    where dictionary is a dictionary built from the tsv file with the following keys:
     client_id, path, sentence, up_votes, down_votes, age, gender, accent.
     """
 
