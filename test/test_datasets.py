@@ -3,7 +3,7 @@ import unittest
 
 from torchaudio.datasets.commonvoice import COMMONVOICE
 from torchaudio.datasets.librispeech import LIBRISPEECH
-from torchaudio.datasets.utils import DiskCache
+from torchaudio.datasets.utils import diskcache_iterator, bg_iterator
 from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.yesno import YESNO
 
@@ -34,11 +34,18 @@ class TestDatasets(unittest.TestCase):
     def test_commonvoice_diskcache(self):
         path = os.path.join(self.path, "commonvoice")
         data = COMMONVOICE(path, "train.tsv", "tatar")
-        data = DiskCache(data)
+        data = diskcache_iterator(data)
         # Save
         data[0]
         # Load
         data[0]
+
+    def test_commonvoice_bg(self):
+        path = os.path.join(self.path, "commonvoice")
+        data = COMMONVOICE(path, "train.tsv", "tatar")
+        data = bg_iterator(data, 5)
+        for d in data:
+            pass
 
 
 if __name__ == "__main__":
