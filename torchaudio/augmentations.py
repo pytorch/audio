@@ -41,7 +41,7 @@ class TimeStretch(torch.jit.ScriptModule):
                 If no rate is passed, use ``self.fixed_rate``
 
         Returns:
-            (Tensor): Stretched complex spectrogram of dimension (*, channel, n_freq, ceil(time/rate), complex=2)
+            (Tensor): Stretched complex spectrogram of dimension (*, channel, freq, ceil(time/rate), complex=2)
         """
         assert complex_specgrams.size(-1) == 2, "complex_specgrams should be a complex tensor, shape (*, complex=2)"
 
