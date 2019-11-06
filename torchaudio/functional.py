@@ -539,6 +539,36 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 
 
 @torch.jit.script
+def stft(waveform, pad, window, n_fft, hop_length, win_length):
+    # type: (Tensor, int, Tensor, int, int, int) -> Tensor
+    r"""Create a spectrogram from a raw audio signal.
+
+    Args:
+        waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
+        pad (int): Two sided padding of signal
+        window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
+        n_fft (int): Size of FFT
+        hop_length (int): Length of hop between STFT windows
+        win_length (int): Window size
+
+    Returns:
+        torch.Tensor: Dimension (channel, freq, time), where channel
+        is unchanged, freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
+        Fourier bins, and time is the number of window hops (n_frames).
+    """
+    assert waveform.dim() == 2
+
+    if pad > 0:
+        # TODO add "with torch.no_grad():" back when JIT supports it
+        waveform = torch.nn.functional.pad(waveform, (pad, pad), "constant")
+
+    # default values are consistent with librosa.core.spectrum._spectrogram
+    spec_f = _stft(waveform, n_fft, hop_length, win_length, window,
+                   True, 'reflect', False, True)
+    return spec_f
+
+
+@torch.jit.script
 def lfilter(waveform, a_coeffs, b_coeffs):
     # type: (Tensor, Tensor, Tensor) -> Tensor
     r"""

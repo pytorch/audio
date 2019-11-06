@@ -16,6 +16,7 @@ __all__ = [
     'MuLawEncoding',
     'MuLawDecoding',
     'Resample',
+    'STFT',
     'ComplexNorm'
 ]
 
@@ -366,6 +367,51 @@ class Resample(torch.nn.Module):
             return kaldi.resample_waveform(waveform, self.orig_freq, self.new_freq)
 
         raise ValueError('Invalid resampling method: %s' % (self.resampling_method))
+
+
+class STFT(torch.jit.ScriptModule):
+    r"""Create a complex stft from a audio signal
+
+    Args:
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins
+        win_length (int): Window size. (Default: ``n_fft``)
+        hop_length (int, optional): Length of hop between STFT windows. (
+            Default: ``win_length // 2``)
+        pad (int): Two sided padding of signal. (Default: ``0``)
+        window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
+            that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
+    """
+    __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad']
+
+    def __init__(self, n_fft=400, win_length=None, hop_length=None,
+                 pad=0, window_fn=torch.hann_window, wkwargs=None):
+        super(STFT, self).__init__()
+        self.n_fft = n_fft
+        # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
+        # number of frequecies due to onesided=True in torch.stft
+        self.win_length = win_length if win_length is not None else n_fft
+        self.hop_length = hop_length if hop_length is not None else self.win_length // 2
+        window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
+        self.window = torch.jit.Attribute(window, torch.Tensor)
+        self.pad = pad
+
+    @torch.jit.script_method
+    def forward(self, waveform):
+        r"""
+        Args:
+            waveform (torch.Tensor): Tensor of audio of dimension (*, channel, time)
+
+        Returns:
+            torch.Tensor: Dimension (*, channel, freq, time, complex=2), where channel
+            is unchanged, freq is ``n_fft // 2 + 1`` where ``n_fft`` is the number of
+            Fourier bins, and time is the number of window hops (n_frames).
+        """
+        shape = waveform.size()
+        waveform = waveform.reshape(-1, shape[-1])
+        complex_specgrams = F.stft(waveform, self.pad, self.window, self.n_fft, self.hop_length, self.win_length)
+
+        return complex_specgrams.reshape(shape[:-1] + complex_specgrams.shape[-3:])
 
 
 class ComplexNorm(torch.jit.ScriptModule):
