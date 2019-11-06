@@ -218,7 +218,7 @@ def istft(
 def spectrogram(
     waveform, pad, window, n_fft, hop_length, win_length, power, normalized
 ):
-    # type: (Tensor, int, Tensor, int, int, int, int, bool) -> Tensor
+    # type: (Tensor, int, Tensor, int, int, int, Optional[int], bool) -> Tensor
     r"""
     spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, normalized)
 
@@ -233,6 +233,7 @@ def spectrogram(
         win_length (int): Window size
         power (int): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
+            If None, then the complex spectrum is returned.
         normalized (bool): Whether to normalize by magnitude after stft
 
     Returns:
@@ -246,14 +247,22 @@ def spectrogram(
         # TODO add "with torch.no_grad():" back when JIT supports it
         waveform = torch.nn.functional.pad(waveform, (pad, pad), "constant")
 
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.reshape(-1, shape[-1])
+
     # default values are consistent with librosa.core.spectrum._spectrogram
     spec_f = _stft(
         waveform, n_fft, hop_length, win_length, window, True, "reflect", False, True
     )
 
+    # unpack batch
+    spec_f = spec_f.reshape(shape[:-1] + spec_f.shape[-3:])
+
     if normalized:
         spec_f /= window.pow(2).sum().sqrt()
-    spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor
+    if power is not None:
+        spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor
     return spec_f
 
 
