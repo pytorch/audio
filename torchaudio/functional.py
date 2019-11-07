@@ -241,7 +241,6 @@ def spectrogram(
         is unchanged, freq is ``n_fft // 2 + 1`` and ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frame).
     """
-    assert waveform.dim() == 2
 
     if pad > 0:
         # TODO add "with torch.no_grad():" back when JIT supports it
