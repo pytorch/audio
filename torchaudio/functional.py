@@ -225,7 +225,7 @@ def spectrogram(
     Create a spectrogram from a raw audio signal.
 
     Args:
-        waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
+        waveform (torch.Tensor): Tensor of audio of dimension ([batch,] channel, time)
         pad (int): Two sided padding of signal
         window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT
@@ -237,7 +237,7 @@ def spectrogram(
         normalized (bool): Whether to normalize by magnitude after stft
 
     Returns:
-        torch.Tensor: Dimension (channel, freq, time), where channel
+        torch.Tensor: Dimension ([batch,] channel, freq, time), where channel
         is unchanged, freq is ``n_fft // 2 + 1`` and ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frame).
     """
@@ -262,6 +262,7 @@ def spectrogram(
         spec_f /= window.pow(2).sum().sqrt()
     if power is not None:
         spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor
+
     return spec_f
 
 
