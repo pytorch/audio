@@ -21,6 +21,10 @@ class TestFunctional(unittest.TestCase):
     number_of_trials = 100
     specgram = torch.tensor([1., 2., 3., 4.])
 
+    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    test_filepath = os.path.join(test_dirpath, 'assets',
+                                 'steam-train-whistle-daniel_simon.mp3')
+
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
         computed = F.compute_deltas(specgram, win_length=win_length)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
@@ -45,6 +49,22 @@ class TestFunctional(unittest.TestCase):
         specgram = torch.randn(channel, n_mfcc, time)
         computed = F.compute_deltas(specgram, win_length=win_length)
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
+
+    def _test_batch(self, transform):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+
+        # Single then transform then batch
+        expected = transform(waveform).unsqueeze(0).repeat(3,1,1,1)
+
+        # Batch then transform
+        waveform = waveform.unsqueeze(0).repeat(3,1,1)
+        computed = transform(waveform)
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
+    def test_batch_spectrogram(self):
+        self._test_batch(F.spectrogram)
 
     def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
         # trim sound for case when constructed signal is shorter than original

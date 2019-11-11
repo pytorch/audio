@@ -115,15 +115,18 @@ def istft(
             original signal length). (Default: whole signal)
 
     Returns:
-        torch.Tensor: Least squares estimation of the original signal of size
-        (channel, signal_length) or (signal_length)
+        torch.Tensor: Least squares estimation of the original signal of size (*, signal_length)
     """
     stft_matrix_dim = stft_matrix.dim()
-    assert 3 <= stft_matrix_dim <= 4, "Incorrect stft dimension: %d" % (stft_matrix_dim)
+    assert 3 <= stft_matrix_dim, "Incorrect stft dimension: %d" % (stft_matrix_dim)
 
     if stft_matrix_dim == 3:
         # add a channel dimension
         stft_matrix = stft_matrix.unsqueeze(0)
+
+    # pack batch
+    shape = stft_matrix.size()
+    stft_matrix = stft_matrix.reshape(-1, *shape[-3:])
 
     dtype = stft_matrix.dtype
     device = stft_matrix.device
@@ -211,6 +214,10 @@ def istft(
 
     if stft_matrix_dim == 3:  # remove the channel dimension
         y = y.squeeze(0)
+
+    # unpack batch
+    y = y.reshape(shape[:-2] + y.shape[-3:])
+
     return y
 
 
@@ -505,14 +512,14 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
                               dtype=complex_specgrams.dtype)
 
     alphas = time_steps % 1.0
-    phase_0 = angle(complex_specgrams[:, :, :1])
+    phase_0 = angle(complex_specgrams[..., :1])
 
     # Time Padding
     complex_specgrams = torch.nn.functional.pad(complex_specgrams, [0, 0, 0, 2])
 
     # (new_bins, freq, 2)
-    complex_specgrams_0 = complex_specgrams[:, :, time_steps.long()]
-    complex_specgrams_1 = complex_specgrams[:, :, (time_steps + 1).long()]
+    complex_specgrams_0 = complex_specgrams[..., time_steps.long()]
+    complex_specgrams_1 = complex_specgrams[..., (time_steps + 1).long()]
 
     angle_0 = angle(complex_specgrams_0)
     angle_1 = angle(complex_specgrams_1)
@@ -525,7 +532,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 
     # Compute Phase Accum
     phase = phase + phase_advance
-    phase = torch.cat([phase_0, phase[:, :, :-1]], dim=-1)
+    phase = torch.cat([phase_0, phase[..., :-1]], dim=-1)
     phase_acc = torch.cumsum(phase, -1)
 
     mag = alphas * norm_1 + (1 - alphas) * norm_0
@@ -545,7 +552,7 @@ def lfilter(waveform, a_coeffs, b_coeffs):
     Performs an IIR filter by evaluating difference equation.
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`.  Must be normalized to -1 to 1.
+        waveform (torch.Tensor): audio waveform of dimension of `(*, channel, time)`.  Must be normalized to -1 to 1.
         a_coeffs (torch.Tensor): denominator coefficients of difference equation of dimension of `(n_order + 1)`.
                                 Lower delays coefficients are first, e.g. `[a0, a1, a2, ...]`.
                                 Must be same size as b_coeffs (pad with 0's as necessary).
@@ -554,9 +561,15 @@ def lfilter(waveform, a_coeffs, b_coeffs):
                                  Must be same size as a_coeffs (pad with 0's as necessary).
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(channel, time)`.  Output will be clipped to -1 to 1.
+        output_waveform (torch.Tensor): Dimension of `(*, channel, time)`.  Output will be clipped to -1 to 1.
 
     """
+
+    dim = waveform.dim()
+
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.reshape(-1, shape[-1])
 
     assert(a_coeffs.size(0) == b_coeffs.size(0))
     assert(len(waveform.size()) == 2)
@@ -597,7 +610,14 @@ def lfilter(waveform, a_coeffs, b_coeffs):
 
         padded_output_waveform[:, i_sample + n_order - 1] = o0
 
-    return torch.min(ones, torch.max(ones * -1, padded_output_waveform[:, (n_order - 1):]))
+    output = torch.min(
+        ones, torch.max(ones * -1, padded_output_waveform[:, (n_order - 1):])
+    )
+
+    # unpack batch
+    output = output.reshape(shape[:-1] + output.shape[-1:])
+
+    return output
 
 
 @torch.jit.script
@@ -808,18 +828,24 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
     :math:`N` is (`win_length`-1)//2.
 
     Args:
-        specgram (torch.Tensor): Tensor of audio of dimension (channel, freq, time)
+        specgram (torch.Tensor): Tensor of audio of dimension (*, channel, freq, time)
         win_length (int): The window length used for computing delta
         mode (str): Mode parameter passed to padding
 
     Returns:
-        deltas (torch.Tensor): Tensor of audio of dimension (channel, freq, time)
+        deltas (torch.Tensor): Tensor of audio of dimension (*, channel, freq, time)
 
     Example
         >>> specgram = torch.randn(1, 40, 1000)
         >>> delta = compute_deltas(specgram)
         >>> delta2 = compute_deltas(delta)
     """
+
+    dim = waveform.dim()
+
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.reshape(-1, shape[-2], shape[-1])
 
     assert win_length >= 3
     assert specgram.dim() == 3
@@ -838,9 +864,14 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
         .repeat(specgram.shape[1], specgram.shape[0], 1)
     )
 
-    return torch.nn.functional.conv1d(
+    output = torch.nn.functional.conv1d(
         specgram, kernel, groups=specgram.shape[1] // specgram.shape[0]
     ) / denom
+
+    # unpack batch
+    output = output.reshape(shape[:-1] + output.shape[-1:])
+
+    return output
 
 
 @torch.jit.script
@@ -973,15 +1004,21 @@ def detect_pitch_frequency(
     It is implemented using normalized cross-correlation function and median smoothing.
 
     Args:
-        waveform (torch.Tensor): Tensor of audio of dimension (channel, freq, time)
+        waveform (torch.Tensor): Tensor of audio of dimension (*, channel, freq, time)
         sample_rate (int): The sample rate of the waveform (Hz)
         win_length (int): The window length for median smoothing (in number of frames)
         freq_low (int): Lowest frequency that can be detected (Hz)
         freq_high (int): Highest frequency that can be detected (Hz)
 
     Returns:
-        freq (torch.Tensor): Tensor of audio of dimension (channel, frame)
+        freq (torch.Tensor): Tensor of audio of dimension (*, channel, frame)
     """
+
+    dim = waveform.dim()
+
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.reshape(-1, shape[-2], shape[-1])
 
     nccf = _compute_nccf(waveform, sample_rate, frame_time, freq_low)
     indices = _find_max_per_frame(nccf, sample_rate, freq_high)
@@ -990,5 +1027,8 @@ def detect_pitch_frequency(
     # Convert indices to frequency
     EPSILON = 10 ** (-9)
     freq = sample_rate / (EPSILON + indices.to(torch.float))
+
+    # unpack batch
+    freq = freq.reshape(shape[:-2] + freq.shape[-1:])
 
     return freq

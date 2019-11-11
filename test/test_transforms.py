@@ -313,6 +313,40 @@ class Tester(unittest.TestCase):
         computed = transform(specgram)
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
+    def _test_batch(self, Transform):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
+
+        # Single then transform then batch
+        expected = Transform()(waveform).unsqueeze(0).repeat(3, 1, 1, 1)
+
+        # Batch then transform
+        waveform = waveform.unsqueeze(0).repeat(3, 1, 1)
+        computed = Transform()(waveform)
+
+        # shape = (3, 2, 201, 1394)
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
+    def test_batch(self):
+        self._test_batch(Spectrogram)
+        self._test_batch(MuLawEncoding)
+        self._test_batch(ComputeDeltas)
+
+    def test_batch_mulawdecoding(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
+
+        # Single then transform then batch
+        specgram = MuLawEncoding()(specgram)
+        expected = MuLawEncoding()(specgram).unsqueeze(0).repeat(3, 1, 1, 1, 1)
+
+        # Batch then transform
+        waveform = waveform.unsqueeze(0).repeat(3, 1, 1, 1)
+        computed = MuLawEncoding()(waveform)
+
+        # shape = (3, 2, 201, 1394)
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
 
 if __name__ == '__main__':
     unittest.main()
