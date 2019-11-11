@@ -221,7 +221,8 @@ def spectrogram(
     r"""
     spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, normalized)
 
-    Create a spectrogram from a raw audio signal.
+    Create a spectrogram or a batch of spectrograms from a raw audio signal.
+    The spectrogram can be either magnitude-only or complex.
 
     Args:
         waveform (torch.Tensor): Tensor of audio of dimension (*, channel, time)
@@ -232,7 +233,7 @@ def spectrogram(
         win_length (int): Window size
         power (int): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
-            If None, then the complex spectrum is returned.
+            If None, then the complex spectrum is returned instead.
         normalized (bool): Whether to normalize by magnitude after stft
 
     Returns:
