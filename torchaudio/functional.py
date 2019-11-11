@@ -96,8 +96,7 @@ def istft(
 
     Args:
         stft_matrix (torch.Tensor): Output of stft where each row of a channel is a frequency and each
-            column is a window. it has a size of either (channel, fft_size, n_frame, 2) or (
-            fft_size, n_frame, 2)
+            column is a window. it has a size of either (*, fft_size, n_frame, 2)
         n_fft (int): Size of Fourier transform
         hop_length (Optional[int]): The distance between neighboring sliding window frames.
             (Default: ``win_length // 4``)
@@ -225,7 +224,7 @@ def spectrogram(
     Create a spectrogram from a raw audio signal.
 
     Args:
-        waveform (torch.Tensor): Tensor of audio of dimension ([batch,] channel, time)
+        waveform (torch.Tensor): Tensor of audio of dimension (*, channel, time)
         pad (int): Two sided padding of signal
         window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT
@@ -237,7 +236,7 @@ def spectrogram(
         normalized (bool): Whether to normalize by magnitude after stft
 
     Returns:
-        torch.Tensor: Dimension ([batch,] channel, freq, time), where channel
+        torch.Tensor: Dimension (*, channel, freq, time), where channel
         is unchanged, freq is ``n_fft // 2 + 1`` and ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frame).
     """

@@ -317,10 +317,10 @@ class Tester(unittest.TestCase):
         waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
 
         # Single then transform then batch
-        expected = transforms.Spectrogram()(waveform).unsqueeze(0).repeat(3,1,1,1)
+        expected = Transform()(waveform).unsqueeze(0).repeat(3, 1, 1, 1)
 
         # Batch then transform
-        waveform = waveform.unsqueeze(0).repeat(3,1,1)
+        waveform = waveform.unsqueeze(0).repeat(3, 1, 1)
         computed = transforms.Spectrogram()(waveform)
 
         # shape = (3, 2, 201, 1394)
