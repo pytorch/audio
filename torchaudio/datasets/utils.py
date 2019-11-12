@@ -1,4 +1,3 @@
-import concurrent.futures
 import csv
 import errno
 import hashlib
