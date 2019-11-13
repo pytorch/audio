@@ -143,8 +143,9 @@ def download_url(
         local_size = None
 
     if hash_value and local_size == int(req_info.get("Content-Length", -1)):
-        if validate_file(filepath, hash_value, hash_type):
-            return
+        with open(filepath, "rb") as file_obj:
+            if validate_file(file_obj, hash_value, hash_type):
+                return
         raise RuntimeError(
             "The hash of {} does not match. Delete the file manually and retry.".format(
                 filepath
@@ -155,19 +156,20 @@ def download_url(
         for chunk in stream_url(url, start_byte=local_size, progress_bar=progress_bar):
             fpointer.write(chunk)
 
-    if hash_value and not validate_file(filepath, hash_value, hash_type):
-        raise RuntimeError(
-            "The hash of {} does not match. Delete the file manually and retry.".format(
-                filepath
+    with open(filepath, "rb") as file_obj:
+        if hash_value and not validate_file(file_obj, hash_value, hash_type):
+            raise RuntimeError(
+                "The hash of {} does not match. Delete the file manually and retry.".format(
+                    filepath
+                )
             )
-        )
 
 
-def validate_file(filepath, hash_value, hash_type="sha256"):
-    """Validate a given file with its hash.
+def validate_file(file_obj, hash_value, hash_type="sha256"):
+    """Validate a given file object with its hash.
 
     Args:
-        filepath (str): File to read.
+        file_obj: File object to read from.
         hash_value (str): Hash for url.
         hash_type (str): Hash type, among "sha256" and "md5".
     """
@@ -179,13 +181,12 @@ def validate_file(filepath, hash_value, hash_type="sha256"):
     else:
         raise ValueError
 
-    with open(filepath, "rb") as f:
-        while True:
-            # Read by chunk to avoid filling memory
-            chunk = f.read(1024 ** 2)
-            if not chunk:
-                break
-            hash_func.update(chunk)
+    while True:
+        # Read by chunk to avoid filling memory
+        chunk = f.read(1024 ** 2)
+        if not chunk:
+            break
+        hash_func.update(chunk)
 
     return hash_func.hexdigest() == hash_value
 
