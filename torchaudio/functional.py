@@ -96,8 +96,7 @@ def istft(
 
     Args:
         stft_matrix (torch.Tensor): Output of stft where each row of a channel is a frequency and each
-            column is a window. it has a size of either (channel, fft_size, n_frame, 2) or (
-            fft_size, n_frame, 2)
+            column is a window. it has a size of either (..., fft_size, n_frame, 2)
         n_fft (int): Size of Fourier transform
         hop_length (Optional[int]): The distance between neighboring sliding window frames.
             (Default: ``win_length // 4``)
@@ -115,10 +114,11 @@ def istft(
             original signal length). (Default: whole signal)
 
     Returns:
-        torch.Tensor: Least squares estimation of the original signal of size (*, signal_length)
+        torch.Tensor: Least squares estimation of the original signal of size (..., signal_length)
     """
     stft_matrix_dim = stft_matrix.dim()
     assert 3 <= stft_matrix_dim, "Incorrect stft dimension: %d" % (stft_matrix_dim)
+    assert stft_matrix.nelement() > 0
 
     if stft_matrix_dim == 3:
         # add a channel dimension
@@ -212,11 +212,11 @@ def istft(
 
     y = (y / window_envelop).squeeze(1)  # size (channel, expected_signal_len)
 
+    # unpack batch
+    y = y.reshape(shape[:-3] + y.shape[-1:])
+
     if stft_matrix_dim == 3:  # remove the channel dimension
         y = y.squeeze(0)
-
-    # unpack batch
-    y = y.reshape(shape[:-2] + y.shape[-3:])
 
     return y
 
@@ -518,8 +518,8 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     complex_specgrams = torch.nn.functional.pad(complex_specgrams, [0, 0, 0, 2])
 
     # (new_bins, freq, 2)
-    complex_specgrams_0 = complex_specgrams[..., time_steps.long()]
-    complex_specgrams_1 = complex_specgrams[..., (time_steps + 1).long()]
+    complex_specgrams_0 = complex_specgrams.index_select(-1, time_steps.long())
+    complex_specgrams_1 = complex_specgrams.index_select(-1, (time_steps + 1).long())
 
     angle_0 = angle(complex_specgrams_0)
     angle_1 = angle(complex_specgrams_1)
@@ -841,11 +841,11 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
         >>> delta2 = compute_deltas(delta)
     """
 
-    dim = waveform.dim()
+    dim = specgram.dim()
 
     # pack batch
-    shape = waveform.size()
-    waveform = waveform.reshape(-1, shape[-2], shape[-1])
+    shape = specgram.size()
+    waveform = specgram.reshape(-1, shape[-2], shape[-1])
 
     assert win_length >= 3
     assert specgram.dim() == 3
@@ -1018,7 +1018,7 @@ def detect_pitch_frequency(
 
     # pack batch
     shape = waveform.size()
-    waveform = waveform.reshape(-1, shape[-2], shape[-1])
+    waveform = waveform.reshape([-1] + shape[-1:])
 
     nccf = _compute_nccf(waveform, sample_rate, frame_time, freq_low)
     indices = _find_max_per_frame(nccf, sample_rate, freq_high)
@@ -1029,6 +1029,6 @@ def detect_pitch_frequency(
     freq = sample_rate / (EPSILON + indices.to(torch.float))
 
     # unpack batch
-    freq = freq.reshape(shape[:-2] + freq.shape[-1:])
+    freq = freq.reshape(shape[:-1] + freq.shape[-1:])
 
     return freq
