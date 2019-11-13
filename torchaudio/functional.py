@@ -438,11 +438,11 @@ def complex_norm(complex_tensor, power=1.0):
     r"""Compute the norm of complex tensor input.
 
     Args:
-        complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
+        complex_tensor (torch.Tensor): Tensor shape of `(..., complex=2)`
         power (float): Power of the norm. (Default: `1.0`).
 
     Returns:
-        torch.Tensor: Power of the normed input tensor. Shape of `(*, )`
+        torch.Tensor: Power of the normed input tensor. Shape of `(..., )`
     """
     if power == 1.0:
         return torch.norm(complex_tensor, 2, -1)
@@ -455,10 +455,10 @@ def angle(complex_tensor):
     r"""Compute the angle of complex tensor input.
 
     Args:
-        complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
+        complex_tensor (torch.Tensor): Tensor shape of `(..., complex=2)`
 
     Return:
-        torch.Tensor: Angle of a complex tensor. Shape of `(*, )`
+        torch.Tensor: Angle of a complex tensor. Shape of `(..., )`
     """
     return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
 
@@ -466,10 +466,10 @@ def angle(complex_tensor):
 @torch.jit.script
 def magphase(complex_tensor, power=1.0):
     # type: (Tensor, float) -> Tuple[Tensor, Tensor]
-    r"""Separate a complex-valued spectrogram with shape `(*, 2)` into its magnitude and phase.
+    r"""Separate a complex-valued spectrogram with shape `(..., 2)` into its magnitude and phase.
 
     Args:
-        complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
+        complex_tensor (torch.Tensor): Tensor shape of `(..., complex=2)`
         power (float): Power of the norm. (Default: `1.0`)
 
     Returns:
@@ -552,7 +552,7 @@ def lfilter(waveform, a_coeffs, b_coeffs):
     Performs an IIR filter by evaluating difference equation.
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(*, channel, time)`.  Must be normalized to -1 to 1.
+        waveform (torch.Tensor): audio waveform of dimension of `(..., time)`.  Must be normalized to -1 to 1.
         a_coeffs (torch.Tensor): denominator coefficients of difference equation of dimension of `(n_order + 1)`.
                                 Lower delays coefficients are first, e.g. `[a0, a1, a2, ...]`.
                                 Must be same size as b_coeffs (pad with 0's as necessary).
@@ -561,7 +561,7 @@ def lfilter(waveform, a_coeffs, b_coeffs):
                                  Must be same size as a_coeffs (pad with 0's as necessary).
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(*, channel, time)`.  Output will be clipped to -1 to 1.
+        output_waveform (torch.Tensor): Dimension of `(..., time)`.  Output will be clipped to -1 to 1.
 
     """
 
@@ -828,12 +828,12 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
     :math:`N` is (`win_length`-1)//2.
 
     Args:
-        specgram (torch.Tensor): Tensor of audio of dimension (*, channel, freq, time)
+        specgram (torch.Tensor): Tensor of audio of dimension (..., freq, time)
         win_length (int): The window length used for computing delta
         mode (str): Mode parameter passed to padding
 
     Returns:
-        deltas (torch.Tensor): Tensor of audio of dimension (*, channel, freq, time)
+        deltas (torch.Tensor): Tensor of audio of dimension (..., freq, time)
 
     Example
         >>> specgram = torch.randn(1, 40, 1000)
@@ -1004,14 +1004,14 @@ def detect_pitch_frequency(
     It is implemented using normalized cross-correlation function and median smoothing.
 
     Args:
-        waveform (torch.Tensor): Tensor of audio of dimension (*, channel, freq, time)
+        waveform (torch.Tensor): Tensor of audio of dimension (..., freq, time)
         sample_rate (int): The sample rate of the waveform (Hz)
         win_length (int): The window length for median smoothing (in number of frames)
         freq_low (int): Lowest frequency that can be detected (Hz)
         freq_high (int): Highest frequency that can be detected (Hz)
 
     Returns:
-        freq (torch.Tensor): Tensor of audio of dimension (*, channel, frame)
+        freq (torch.Tensor): Tensor of audio of dimension (..., frame)
     """
 
     dim = waveform.dim()
