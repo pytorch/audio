@@ -512,7 +512,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
                               dtype=complex_specgrams.dtype)
 
     alphas = time_steps % 1.0
-    phase_0 = angle(complex_specgrams[..., :1])
+    phase_0 = angle(complex_specgrams)
 
     # Time Padding
     complex_specgrams = torch.nn.functional.pad(complex_specgrams, [0, 0, 0, 2])
