@@ -313,34 +313,55 @@ class Tester(unittest.TestCase):
         computed = transform(specgram)
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
-    def _test_batch(self, Transform):
+    def test_batch_compute_deltas(self):
         waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
 
         # Single then transform then batch
-        expected = Transform()(waveform).unsqueeze(0).repeat(3, 1, 1, 1)
+        expected = transforms.ComputeDeltas()(waveform).unsqueeze(0).repeat(3, 1, 1, 1)
 
         # Batch then transform
         waveform = waveform.unsqueeze(0).repeat(3, 1, 1)
-        computed = Transform()(waveform)
+        computed = transforms.ComputeDeltas()(waveform)
 
         # shape = (3, 2, 201, 1394)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
 
-    def test_batch(self):
-        self._test_batch(transforms.Spectrogram)
-        self._test_batch(transforms.ComputeDeltas)
-
-    def test_batch_mulawdecoding(self):
+    def test_batch_spectrogram(self):
         waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
 
         # Single then transform then batch
-        specgram = transforms.MuLawEncoding()(specgram)
-        expected = transforms.MuLawEncoding()(specgram).unsqueeze(0).repeat(3, 1, 1, 1, 1)
+        expected = transforms.Spectrogram()(waveform).unsqueeze(0).repeat(3, 1, 1, 1)
 
         # Batch then transform
-        waveform = waveform.unsqueeze(0).repeat(3, 1, 1, 1)
-        computed = transforms.MuLawEncoding()(waveform)
+        waveform = waveform.unsqueeze(0).repeat(3, 1, 1)
+        computed = transforms.Spectrogram()(waveform)
+
+        # shape = (3, 2, 201, 1394)
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
+    def test_batch_mulaw(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
+
+        # Single then transform then batch
+        waveform_encoded = transforms.MuLawEncoding()(waveform)
+        expected = waveform_encoded.unsqueeze(0).repeat(3, 1, 1)
+
+        # Batch then transform
+        waveform_batched = waveform.unsqueeze(0).repeat(3, 1, 1)
+        computed = transforms.MuLawEncoding()(waveform_batched)
+
+        # shape = (3, 2, 201, 1394)
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
+        # Single then transform then batch
+        waveform_decoded = transforms.MuLawDecoding()(waveform_encoded)
+        expected = waveform_decoded.unsqueeze(0).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = transforms.MuLawDecoding()(computed)
 
         # shape = (3, 2, 201, 1394)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))

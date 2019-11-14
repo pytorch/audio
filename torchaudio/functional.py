@@ -845,7 +845,7 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
 
     # pack batch
     shape = specgram.size()
-    waveform = specgram.reshape(-1, shape[-2], shape[-1])
+    specgram = specgram.reshape(-1, shape[-2], shape[-1])
 
     assert win_length >= 3
     assert specgram.dim() == 3
