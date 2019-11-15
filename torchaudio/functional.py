@@ -841,15 +841,11 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
         >>> delta2 = compute_deltas(delta)
     """
 
-    dim = specgram.dim()
-
     # pack batch
     shape = specgram.size()
-    specgram = specgram.reshape(-1, shape[-2], shape[-1])
+    specgram = specgram.reshape(1, -1, shape[-1])
 
     assert win_length >= 3
-    assert specgram.dim() == 3
-    assert not specgram.shape[1] % specgram.shape[0]
 
     n = (win_length - 1) // 2
 
@@ -861,15 +857,13 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
     kernel = (
         torch
         .arange(-n, n + 1, 1, device=specgram.device, dtype=specgram.dtype)
-        .repeat(specgram.shape[1], specgram.shape[0], 1)
+        .repeat(specgram.shape[1], 1, 1)
     )
 
-    output = torch.nn.functional.conv1d(
-        specgram, kernel, groups=specgram.shape[1] // specgram.shape[0]
-    ) / denom
+    output = torch.nn.functional.conv1d(specgram, kernel, groups=specgram.shape[1]) / denom
 
     # unpack batch
-    output = output.reshape(shape[:-1] + output.shape[-1:])
+    output = output.reshape(shape)
 
     return output
 
