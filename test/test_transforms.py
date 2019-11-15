@@ -314,16 +314,14 @@ class Tester(unittest.TestCase):
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
     def test_batch_spectrogram(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
 
         # Single then transform then batch
-        expected = Transform()(waveform).unsqueeze(0).repeat(3, 1, 1, 1)
+        expected = transforms.Spectrogram()(waveform).repeat(3, 1, 1, 1)
 
         # Batch then transform
-        waveform = waveform.unsqueeze(0).repeat(3, 1, 1)
-        computed = transforms.Spectrogram()(waveform)
+        computed = transforms.Spectrogram()(waveform.repeat(3, 1, 1))
 
-        # shape = (3, 2, 201, 1394)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
 
