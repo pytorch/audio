@@ -314,7 +314,7 @@ class Tester(unittest.TestCase):
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
     def test_batch_compute_deltas(self):
-        specgram = torch.randn(2, 311, 278746)
+        specgram = torch.randn(2, 31, 2786)
 
         # Single then transform then batch
         expected = transforms.ComputeDeltas()(specgram).repeat(3, 1, 1, 1)
