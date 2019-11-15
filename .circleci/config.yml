@@ -47,7 +47,7 @@ jobs:
   binary_linux_wheel:
     <<: *binary_common
     docker:
-      - image: "soumith/manylinux-cuda100"
+      - image: "pytorch/manylinux-cuda100"
     resource_class: 2xlarge+
     steps:
       - checkout
@@ -62,7 +62,7 @@ jobs:
   binary_linux_conda:
     <<: *binary_common
     docker:
-      - image: "soumith/conda-cuda"
+      - image: "pytorch/conda-cuda"
     resource_class: 2xlarge+
     steps:
       - checkout
