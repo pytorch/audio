@@ -314,14 +314,13 @@ class Tester(unittest.TestCase):
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
     def test_batch_compute_deltas(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
+        specgram = torch.randn(2, 311, 278746)
 
         # Single then transform then batch
-        expected = transforms.ComputeDeltas()(waveform).unsqueeze(0).repeat(3, 1, 1, 1)
+        expected = transforms.ComputeDeltas()(specgram).repeat(3, 1, 1, 1)
 
         # Batch then transform
-        waveform = waveform.unsqueeze(0).repeat(3, 1, 1)
-        computed = transforms.ComputeDeltas()(waveform)
+        computed = transforms.ComputeDeltas()(specgram.repeat(3, 1, 1, 1))
 
         # shape = (3, 2, 201, 1394)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
