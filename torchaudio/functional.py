@@ -703,7 +703,7 @@ def equalizer_biquad(waveform, sample_rate, center_freq, gain, Q=0.707):
     Args:
         waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
-        center_freq (float): filter’s central frequency
+        center_freq (float): filter's central frequency
         gain (float): desired gain at the boost (or attenuation) in dB
         q_factor (float): https://en.wikipedia.org/wiki/Q_factor
 
