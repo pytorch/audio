@@ -55,10 +55,10 @@ class TestFunctional(unittest.TestCase):
 
         # Single then transform then batch
         expected = F.detect_pitch_frequency(waveform, sample_rate)
-        expected = expected.unsqueeze(0).repeat(3,1,1)
+        expected = expected.unsqueeze(0).repeat(3, 1, 1)
 
         # Batch then transform
-        waveform = waveform.unsqueeze(0).repeat(3,1,1)
+        waveform = waveform.unsqueeze(0).repeat(3, 1, 1)
         computed = F.detect_pitch_frequency(waveform, sample_rate)
 
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
