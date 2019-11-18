@@ -1,4 +1,4 @@
-# Contributing to torchaudio
+# Contributing to audio
 We want to make contributing to this project as easy and transparent as
 possible.
 
@@ -27,5 +27,5 @@ disclosure of security bugs. In those cases, please go through the process
 outlined on that page and do not file a public issue.
 
 ## License
-By contributing to torchaudio, you agree that your contributions will be licensed
+By contributing to audio, you agree that your contributions will be licensed
 under the LICENSE file in the root directory of this source tree.
