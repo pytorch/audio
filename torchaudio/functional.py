@@ -725,7 +725,7 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-# @torch.jit.script
+@torch.jit.script
 def equalizer_biquad(waveform, sample_rate, center_freq, gain, Q=0.707):
     # type: (Tensor, int, float, float, float) -> Tensor
     r"""Designs biquad peaking equalizer filter and performs filtering.  Similar to SoX implementation.
