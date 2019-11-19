@@ -981,7 +981,6 @@ def _median_smoothing(indices, win_length):
     return values
 
 
-@torch.jit.script
 def detect_pitch_frequency(
     waveform,
     sample_rate,
@@ -1009,7 +1008,7 @@ def detect_pitch_frequency(
     dim = waveform.dim()
 
     # pack batch
-    shape = waveform.size()
+    shape = list(waveform.size())
     waveform = waveform.reshape([-1] + shape[-1:])
 
     nccf = _compute_nccf(waveform, sample_rate, frame_time, freq_low)
@@ -1021,6 +1020,6 @@ def detect_pitch_frequency(
     freq = sample_rate / (EPSILON + indices.to(torch.float))
 
     # unpack batch
-    freq = freq.reshape(shape[:-1] + freq.shape[-1:])
+    freq = freq.reshape(shape[:-1] + list(freq.shape[-1:]))
 
     return freq

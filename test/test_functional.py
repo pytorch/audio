@@ -16,6 +16,15 @@ if IMPORT_LIBROSA:
     import librosa
 
 
+def _test_torchscript_functional(py_method, *args, **kwargs):
+    jit_method = torch.jit.script(py_method)
+
+    jit_out = jit_method(*args, **kwargs)
+    py_out = py_method(*args, **kwargs)
+
+    assert torch.allclose(jit_out, py_out)
+
+
 class TestFunctional(unittest.TestCase):
     data_sizes = [(2, 20), (3, 15), (4, 10)]
     number_of_trials = 100
@@ -24,6 +33,21 @@ class TestFunctional(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, 'assets',
                                  'steam-train-whistle-daniel_simon.mp3')
+
+    def test_torchscript_spectrogram(self):
+
+        tensor = torch.rand((1, 1000))
+        n_fft = 400
+        ws = 400
+        hop = 200
+        pad = 0
+        window = torch.hann_window(ws)
+        power = 2
+        normalize = False
+
+        _test_torchscript_functional(
+            F.spectrogram, tensor, pad, window, n_fft, hop, ws, power, normalize
+        )
 
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
         computed = F.compute_deltas(specgram, win_length=win_length)
@@ -49,6 +73,7 @@ class TestFunctional(unittest.TestCase):
         specgram = torch.randn(channel, n_mfcc, time)
         computed = F.compute_deltas(specgram, win_length=win_length)
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
+        _test_torchscript_functional(F.compute_deltas, specgram, win_length=win_length)
 
     def test_batch_pitch(self):
         waveform, sample_rate = torchaudio.load(self.test_filepath)
@@ -63,6 +88,7 @@ class TestFunctional(unittest.TestCase):
 
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
+        _test_torchscript_functional(F.detect_pitch_frequency, waveform, sample_rate)
 
     def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
         # trim sound for case when constructed signal is shorter than original

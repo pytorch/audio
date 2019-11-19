@@ -31,27 +31,6 @@ class Test_JIT(unittest.TestCase):
 
         self.assertTrue(torch.allclose(jit_out, py_out))
 
-    def _test_torchscript_functional(self, py_method, *args):
-        jit_out = torch.jit.script(py_method)
-
-        jit_out = jit_method(*args)
-        py_out = py_method(*args)
-
-        self.assertTrue(torch.allclose(jit_out, py_out))
-
-    def test_torchscript_spectrogram(self):
-
-        tensor = torch.rand((1, 1000))
-        n_fft = 400
-        ws = 400
-        hop = 200
-        pad = 0
-        window = torch.hann_window(ws)
-        power = 2
-        normalize = False
-
-        self._test_torscript_functional(tensor, pad, window, n_fft, hop, ws, power, normalize)
-
     @unittest.skipIf(not RUN_CUDA, "no CUDA")
     def test_scriptmodule_Spectrogram(self):
         tensor = torch.rand((1, 1000), device="cuda")
