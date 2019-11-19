@@ -96,8 +96,7 @@ def istft(
 
     Args:
         stft_matrix (torch.Tensor): Output of stft where each row of a channel is a frequency and each
-            column is a window. it has a size of either (channel, fft_size, n_frame, 2) or (
-            fft_size, n_frame, 2)
+            column is a window. it has a size of either (..., fft_size, n_frame, 2)
         n_fft (int): Size of Fourier transform
         hop_length (Optional[int]): The distance between neighboring sliding window frames.
             (Default: ``win_length // 4``)
@@ -115,15 +114,19 @@ def istft(
             original signal length). (Default: whole signal)
 
     Returns:
-        torch.Tensor: Least squares estimation of the original signal of size
-        (channel, signal_length) or (signal_length)
+        torch.Tensor: Least squares estimation of the original signal of size (..., signal_length)
     """
     stft_matrix_dim = stft_matrix.dim()
-    assert 3 <= stft_matrix_dim <= 4, "Incorrect stft dimension: %d" % (stft_matrix_dim)
+    assert 3 <= stft_matrix_dim, "Incorrect stft dimension: %d" % (stft_matrix_dim)
+    assert stft_matrix.nelement() > 0
 
     if stft_matrix_dim == 3:
         # add a channel dimension
         stft_matrix = stft_matrix.unsqueeze(0)
+
+    # pack batch
+    shape = stft_matrix.size()
+    stft_matrix = stft_matrix.reshape(-1, *shape[-3:])
 
     dtype = stft_matrix.dtype
     device = stft_matrix.device
@@ -209,8 +212,12 @@ def istft(
 
     y = (y / window_envelop).squeeze(1)  # size (channel, expected_signal_len)
 
+    # unpack batch
+    y = y.reshape(shape[:-3] + y.shape[-1:])
+
     if stft_matrix_dim == 3:  # remove the channel dimension
         y = y.squeeze(0)
+
     return y
 
 
@@ -218,14 +225,15 @@ def istft(
 def spectrogram(
     waveform, pad, window, n_fft, hop_length, win_length, power, normalized
 ):
-    # type: (Tensor, int, Tensor, int, int, int, int, bool) -> Tensor
+    # type: (Tensor, int, Tensor, int, int, int, Optional[int], bool) -> Tensor
     r"""
     spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, normalized)
 
-    Create a spectrogram from a raw audio signal.
+    Create a spectrogram or a batch of spectrograms from a raw audio signal.
+    The spectrogram can be either magnitude-only or complex.
 
     Args:
-        waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
+        waveform (torch.Tensor): Tensor of audio of dimension (..., channel, time)
         pad (int): Two sided padding of signal
         window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT
@@ -233,27 +241,36 @@ def spectrogram(
         win_length (int): Window size
         power (int): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
+            If None, then the complex spectrum is returned instead.
         normalized (bool): Whether to normalize by magnitude after stft
 
     Returns:
-        torch.Tensor: Dimension (channel, freq, time), where channel
+        torch.Tensor: Dimension (..., channel, freq, time), where channel
         is unchanged, freq is ``n_fft // 2 + 1`` and ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frame).
     """
-    assert waveform.dim() == 2
 
     if pad > 0:
         # TODO add "with torch.no_grad():" back when JIT supports it
         waveform = torch.nn.functional.pad(waveform, (pad, pad), "constant")
+
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.reshape(-1, shape[-1])
 
     # default values are consistent with librosa.core.spectrum._spectrogram
     spec_f = _stft(
         waveform, n_fft, hop_length, win_length, window, True, "reflect", False, True
     )
 
+    # unpack batch
+    spec_f = spec_f.reshape(shape[:-1] + spec_f.shape[-3:])
+
     if normalized:
         spec_f /= window.pow(2).sum().sqrt()
-    spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor
+    if power is not None:
+        spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor
+
     return spec_f
 
 
@@ -431,11 +448,11 @@ def complex_norm(complex_tensor, power=1.0):
     r"""Compute the norm of complex tensor input.
 
     Args:
-        complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
+        complex_tensor (torch.Tensor): Tensor shape of `(..., complex=2)`
         power (float): Power of the norm. (Default: `1.0`).
 
     Returns:
-        torch.Tensor: Power of the normed input tensor. Shape of `(*, )`
+        torch.Tensor: Power of the normed input tensor. Shape of `(..., )`
     """
     if power == 1.0:
         return torch.norm(complex_tensor, 2, -1)
@@ -448,10 +465,10 @@ def angle(complex_tensor):
     r"""Compute the angle of complex tensor input.
 
     Args:
-        complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
+        complex_tensor (torch.Tensor): Tensor shape of `(..., complex=2)`
 
     Return:
-        torch.Tensor: Angle of a complex tensor. Shape of `(*, )`
+        torch.Tensor: Angle of a complex tensor. Shape of `(..., )`
     """
     return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
 
@@ -459,10 +476,10 @@ def angle(complex_tensor):
 @torch.jit.script
 def magphase(complex_tensor, power=1.0):
     # type: (Tensor, float) -> Tuple[Tensor, Tensor]
-    r"""Separate a complex-valued spectrogram with shape `(*, 2)` into its magnitude and phase.
+    r"""Separate a complex-valued spectrogram with shape `(..., 2)` into its magnitude and phase.
 
     Args:
-        complex_tensor (torch.Tensor): Tensor shape of `(*, complex=2)`
+        complex_tensor (torch.Tensor): Tensor shape of `(..., complex=2)`
         power (float): Power of the norm. (Default: `1.0`)
 
     Returns:
@@ -505,14 +522,14 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
                               dtype=complex_specgrams.dtype)
 
     alphas = time_steps % 1.0
-    phase_0 = angle(complex_specgrams[:, :, :1])
+    phase_0 = angle(complex_specgrams[..., :1, :])
 
     # Time Padding
     complex_specgrams = torch.nn.functional.pad(complex_specgrams, [0, 0, 0, 2])
 
     # (new_bins, freq, 2)
-    complex_specgrams_0 = complex_specgrams[:, :, time_steps.long()]
-    complex_specgrams_1 = complex_specgrams[:, :, (time_steps + 1).long()]
+    complex_specgrams_0 = complex_specgrams.index_select(-2, time_steps.long())
+    complex_specgrams_1 = complex_specgrams.index_select(-2, (time_steps + 1).long())
 
     angle_0 = angle(complex_specgrams_0)
     angle_1 = angle(complex_specgrams_1)
@@ -525,7 +542,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 
     # Compute Phase Accum
     phase = phase + phase_advance
-    phase = torch.cat([phase_0, phase[:, :, :-1]], dim=-1)
+    phase = torch.cat([phase_0, phase[..., :-1]], dim=-1)
     phase_acc = torch.cumsum(phase, -1)
 
     mag = alphas * norm_1 + (1 - alphas) * norm_0
@@ -545,7 +562,7 @@ def lfilter(waveform, a_coeffs, b_coeffs):
     Performs an IIR filter by evaluating difference equation.
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`.  Must be normalized to -1 to 1.
+        waveform (torch.Tensor): audio waveform of dimension of `(..., time)`.  Must be normalized to -1 to 1.
         a_coeffs (torch.Tensor): denominator coefficients of difference equation of dimension of `(n_order + 1)`.
                                 Lower delays coefficients are first, e.g. `[a0, a1, a2, ...]`.
                                 Must be same size as b_coeffs (pad with 0's as necessary).
@@ -554,9 +571,15 @@ def lfilter(waveform, a_coeffs, b_coeffs):
                                  Must be same size as a_coeffs (pad with 0's as necessary).
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(channel, time)`.  Output will be clipped to -1 to 1.
+        output_waveform (torch.Tensor): Dimension of `(..., time)`.  Output will be clipped to -1 to 1.
 
     """
+
+    dim = waveform.dim()
+
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.reshape(-1, shape[-1])
 
     assert(a_coeffs.size(0) == b_coeffs.size(0))
     assert(len(waveform.size()) == 2)
@@ -597,7 +620,14 @@ def lfilter(waveform, a_coeffs, b_coeffs):
 
         padded_output_waveform[:, i_sample + n_order - 1] = o0
 
-    return torch.min(ones, torch.max(ones * -1, padded_output_waveform[:, (n_order - 1):]))
+    output = torch.min(
+        ones, torch.max(ones * -1, padded_output_waveform[:, (n_order - 1):])
+    )
+
+    # unpack batch
+    output = output.reshape(shape[:-1] + output.shape[-1:])
+
+    return output
 
 
 @torch.jit.script
@@ -703,7 +733,7 @@ def equalizer_biquad(waveform, sample_rate, center_freq, gain, Q=0.707):
     Args:
         waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
-        center_freq (float): filter’s central frequency
+        center_freq (float): filter's central frequency
         gain (float): desired gain at the boost (or attenuation) in dB
         q_factor (float): https://en.wikipedia.org/wiki/Q_factor
 
@@ -808,12 +838,12 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
     :math:`N` is (`win_length`-1)//2.
 
     Args:
-        specgram (torch.Tensor): Tensor of audio of dimension (channel, freq, time)
+        specgram (torch.Tensor): Tensor of audio of dimension (..., freq, time)
         win_length (int): The window length used for computing delta
         mode (str): Mode parameter passed to padding
 
     Returns:
-        deltas (torch.Tensor): Tensor of audio of dimension (channel, freq, time)
+        deltas (torch.Tensor): Tensor of audio of dimension (..., freq, time)
 
     Example
         >>> specgram = torch.randn(1, 40, 1000)
@@ -821,9 +851,11 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
         >>> delta2 = compute_deltas(delta)
     """
 
+    # pack batch
+    shape = specgram.size()
+    specgram = specgram.reshape(1, -1, shape[-1])
+
     assert win_length >= 3
-    assert specgram.dim() == 3
-    assert not specgram.shape[1] % specgram.shape[0]
 
     n = (win_length - 1) // 2
 
@@ -835,12 +867,15 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
     kernel = (
         torch
         .arange(-n, n + 1, 1, device=specgram.device, dtype=specgram.dtype)
-        .repeat(specgram.shape[1], specgram.shape[0], 1)
+        .repeat(specgram.shape[1], 1, 1)
     )
 
-    return torch.nn.functional.conv1d(
-        specgram, kernel, groups=specgram.shape[1] // specgram.shape[0]
-    ) / denom
+    output = torch.nn.functional.conv1d(specgram, kernel, groups=specgram.shape[1]) / denom
+
+    # unpack batch
+    output = output.reshape(shape)
+
+    return output
 
 
 @torch.jit.script
@@ -973,15 +1008,21 @@ def detect_pitch_frequency(
     It is implemented using normalized cross-correlation function and median smoothing.
 
     Args:
-        waveform (torch.Tensor): Tensor of audio of dimension (channel, freq, time)
+        waveform (torch.Tensor): Tensor of audio of dimension (..., freq, time)
         sample_rate (int): The sample rate of the waveform (Hz)
         win_length (int): The window length for median smoothing (in number of frames)
         freq_low (int): Lowest frequency that can be detected (Hz)
         freq_high (int): Highest frequency that can be detected (Hz)
 
     Returns:
-        freq (torch.Tensor): Tensor of audio of dimension (channel, frame)
+        freq (torch.Tensor): Tensor of audio of dimension (..., frame)
     """
+
+    dim = waveform.dim()
+
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.reshape([-1] + shape[-1:])
 
     nccf = _compute_nccf(waveform, sample_rate, frame_time, freq_low)
     indices = _find_max_per_frame(nccf, sample_rate, freq_high)
@@ -990,5 +1031,8 @@ def detect_pitch_frequency(
     # Convert indices to frequency
     EPSILON = 10 ** (-9)
     freq = sample_rate / (EPSILON + indices.to(torch.float))
+
+    # unpack batch
+    freq = freq.reshape(shape[:-1] + freq.shape[-1:])
 
     return freq

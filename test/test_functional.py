@@ -21,6 +21,10 @@ class TestFunctional(unittest.TestCase):
     number_of_trials = 100
     specgram = torch.tensor([1., 2., 3., 4.])
 
+    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    test_filepath = os.path.join(test_dirpath, 'assets',
+                                 'steam-train-whistle-daniel_simon.mp3')
+
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
         computed = F.compute_deltas(specgram, win_length=win_length)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
@@ -46,6 +50,20 @@ class TestFunctional(unittest.TestCase):
         computed = F.compute_deltas(specgram, win_length=win_length)
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
+    def test_batch_pitch(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+
+        # Single then transform then batch
+        expected = F.detect_pitch_frequency(waveform, sample_rate)
+        expected = expected.unsqueeze(0).repeat(3, 1, 1)
+
+        # Batch then transform
+        waveform = waveform.unsqueeze(0).repeat(3, 1, 1)
+        computed = F.detect_pitch_frequency(waveform, sample_rate)
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
     def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
         # trim sound for case when constructed signal is shorter than original
         sound = sound[..., :estimate.size(-1)]
@@ -58,11 +76,21 @@ class TestFunctional(unittest.TestCase):
         # operation to check whether we can reconstruct signal
         for data_size in self.data_sizes:
             for i in range(self.number_of_trials):
+
+                # Non-batch
                 sound = common_utils.random_float_tensor(i, data_size)
 
                 stft = torch.stft(sound, **kwargs)
                 estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
 
+                self._compare_estimate(sound, estimate)
+
+                # Batch
+                stft = torch.stft(sound, **kwargs)
+                stft = stft.repeat(3, 1, 1, 1, 1)
+                sound = sound.repeat(3, 1, 1)
+
+                estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
                 self._compare_estimate(sound, estimate)
 
     def test_istft_is_inverse_of_stft1(self):
@@ -326,14 +354,29 @@ class TestFunctional(unittest.TestCase):
         for filename, freq_ref in tests:
             waveform, sample_rate = torchaudio.load(filename)
 
-            # Convert to stereo for testing purposes
-            waveform = waveform.repeat(2, 1, 1)
-
             freq = torchaudio.functional.detect_pitch_frequency(waveform, sample_rate)
 
             threshold = 1
             s = ((freq - freq_ref).abs() > threshold).sum()
             self.assertFalse(s)
+
+            # Convert to stereo and batch for testing purposes
+            freq = freq.repeat(3, 2, 1, 1)
+            waveform = waveform.repeat(3, 2, 1, 1)
+
+            freq2 = torchaudio.functional.detect_pitch_frequency(waveform, sample_rate)
+
+            assert torch.allclose(freq, freq2, atol=1e-5)
+
+    def _test_batch(self, functional):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
+
+        # Single then transform then batch
+        expected = functional(waveform).unsqueeze(0).repeat(3, 1, 1, 1)
+
+        # Batch then transform
+        waveform = waveform.unsqueeze(0).repeat(3, 1, 1)
+        computed = functional(waveform)
 
 
 def _num_stft_bins(signal_len, fft_len, hop_length, pad):
