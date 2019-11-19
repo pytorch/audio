@@ -25,8 +25,8 @@ def _test_script_module(f, tensor, *args):
     py_method = f(*args)
     jit_method = torch.jit.script(py_method)
 
-    jit_out = jit_method(tensor)
     py_out = py_method(tensor)
+    jit_out = jit_method(tensor)
 
     assert torch.allclose(jit_out, py_out)
 
@@ -34,11 +34,11 @@ def _test_script_module(f, tensor, *args):
 
         tensor = tensor.to("cuda")
 
-        jit_method = _get_script_module(f, *args).cuda()
-        py_method = f(*args).cuda()
+        py_method = py_method.cuda()
+        jit_method = torch.jit.script(py_method)
 
-        jit_out = jit_method(tensor)
         py_out = py_method(tensor)
+        jit_out = jit_method(tensor)
 
         assert torch.allclose(jit_out, py_out)
 
