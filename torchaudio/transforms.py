@@ -126,10 +126,10 @@ class MelScale(torch.nn.Module):
         super(MelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
-        self.f_max = f_max = f_max if f_max is not None else float(sample_rate // 2)
+        self.f_max = f_max if f_max is not None else float(sample_rate // 2)
         self.f_min = f_min
 
-        assert f_min <= f_max, 'Require f_min: %f < f_max: %f' % (f_min, f_max)
+        assert float(f_min) <= float(self.f_max), 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
 
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
