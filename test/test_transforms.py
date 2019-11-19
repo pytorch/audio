@@ -16,6 +16,48 @@ if IMPORT_LIBROSA:
 if IMPORT_SCIPY:
     import scipy
 
+RUN_CUDA = torch.cuda.is_available()
+print("Run test with cuda:", RUN_CUDA)
+
+
+def _get_script_module(self, f, *args):
+    # takes a transform function `f` and wraps it in a script module
+    class MyModule(torch.jit.ScriptModule):
+        def __init__(self):
+            super(MyModule, self).__init__()
+            self.module = f(*args)
+            self.module.eval()
+
+        @torch.jit.script_method
+        def forward(self, tensor):
+            return self.module(tensor)
+
+    return MyModule()
+
+
+def _test_script_module(py_method, tensor, f, *args):
+    # tests a script module that wraps a transform function `f` by feeding
+    # the tensor into the forward function
+    jit_method = _get_script_module(f, *args)
+    py_method = f(*args)
+
+    jit_out = jit_method(tensor)
+    py_out = py_method(tensor)
+
+    self.assertTrue(torch.allclose(jit_out, py_out))
+
+    if RUN_CUDA:
+
+        tensor = tensor.to("cuda")
+
+        jit_method = _get_script_module(f, *args).cuda()
+        py_method = f(*args).cuda()
+
+        jit_out = jit_method(tensor)
+        py_out = py_method(tensor)
+
+        self.assertTrue(torch.allclose(jit_out, py_out))
+
 
 class Tester(unittest.TestCase):
 
@@ -37,6 +79,11 @@ class Tester(unittest.TestCase):
             waveform = waveform.to(torch.get_default_dtype())
         return waveform / factor
 
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_Spectrogram(self):
+        tensor = torch.rand((1, 1000), device="cuda")
+        self._test_script_module(tensor, transforms.Spectrogram)
+
     def test_mu_law_companding(self):
 
         quantization_channels = 256
@@ -51,6 +98,18 @@ class Tester(unittest.TestCase):
         waveform_exp = transforms.MuLawDecoding(quantization_channels)(waveform_mu)
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
 
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_AmplitudeToDB(self):
+        spec = torch.rand((6, 201), device="cuda")
+
+        self._test_script_module(spec, transforms.AmplitudeToDB)
+
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_MelScale(self):
+        spec_f = torch.rand((1, 6, 201), device="cuda")
+
+        self._test_script_module(spec_f, transforms.MelScale)
+
     def test_melscale_load_save(self):
         specgram = torch.ones(1, 1000, 100)
         melscale_transform = transforms.MelScale()
@@ -64,6 +123,12 @@ class Tester(unittest.TestCase):
 
         self.assertEqual(fb_copy.size(), (1000, 128))
         self.assertTrue(torch.allclose(fb, fb_copy))
+
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_MelSpectrogram(self):
+        tensor = torch.rand((1, 1000), device="cuda")
+
+        self._test_script_module(tensor, transforms.MelSpectrogram)
 
     def test_melspectrogram_load_save(self):
         waveform = self.waveform.float()
@@ -122,6 +187,12 @@ class Tester(unittest.TestCase):
         self.assertTrue(fb_matrix_transform.fb.sum(1).le(1.).all())
         self.assertTrue(fb_matrix_transform.fb.sum(1).ge(0.).all())
         self.assertEqual(fb_matrix_transform.fb.size(), (400, 100))
+
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_MFCC(self):
+        tensor = torch.rand((1, 1000), device="cuda")
+
+        self._test_script_module(tensor, transforms.MFCC)
 
     def test_mfcc(self):
         audio_orig = self.waveform.clone()
@@ -325,6 +396,18 @@ class Tester(unittest.TestCase):
         # shape = (3, 2, 201, 1394)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
+
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_MuLawEncoding(self):
+        tensor = torch.rand((1, 10), device="cuda")
+
+        self._test_script_module(tensor, transforms.MuLawEncoding)
+
+    @unittest.skipIf(not RUN_CUDA, "no CUDA")
+    def test_scriptmodule_MuLawDecoding(self):
+        tensor = torch.rand((1, 10), device="cuda")
+
+        self._test_script_module(tensor, transforms.MuLawDecoding)
 
     def test_batch_mulaw(self):
         waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
