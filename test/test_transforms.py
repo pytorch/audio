@@ -20,16 +20,10 @@ RUN_CUDA = torch.cuda.is_available()
 print("Run test with cuda:", RUN_CUDA)
 
 
-def _get_script_module(f, *args):
-    return torch.jit.script(f())
-
-
 def _test_script_module(f, tensor, *args):
-    # tests a script module that wraps a transform function `f` by feeding
-    # the tensor into the forward function
 
-    jit_method = _get_script_module(f, *args)
     py_method = f(*args)
+    jit_method = torch.jit.script(py_method)
 
     jit_out = jit_method(tensor)
     py_out = py_method(tensor)
