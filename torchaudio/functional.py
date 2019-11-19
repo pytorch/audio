@@ -452,7 +452,6 @@ def complex_norm(complex_tensor, power=1.0):
     return torch.norm(complex_tensor, 2, -1).pow(power)
 
 
-@torch.jit.script
 def angle(complex_tensor):
     # type: (Tensor) -> Tensor
     r"""Compute the angle of complex tensor input.
@@ -466,7 +465,6 @@ def angle(complex_tensor):
     return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
 
 
-@torch.jit.script
 def magphase(complex_tensor, power=1.0):
     # type: (Tensor, float) -> Tuple[Tensor, Tensor]
     r"""Separate a complex-valued spectrogram with shape `(..., 2)` into its magnitude and phase.
@@ -547,7 +545,6 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     return complex_specgrams_stretch
 
 
-@torch.jit.script
 def lfilter(waveform, a_coeffs, b_coeffs):
     # type: (Tensor, Tensor, Tensor) -> Tensor
     r"""
@@ -622,7 +619,6 @@ def lfilter(waveform, a_coeffs, b_coeffs):
     return output
 
 
-@torch.jit.script
 def biquad(waveform, b0, b1, b2, a0, a1, a2):
     # type: (Tensor, float, float, float, float, float, float) -> Tensor
     r"""Performs a biquad filter of input tensor.  Initial conditions set to 0.
@@ -657,7 +653,6 @@ def _dB2Linear(x):
     return math.exp(x * math.log(10) / 20.0)
 
 
-@torch.jit.script
 def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     # type: (Tensor, int, float, float) -> Tensor
     r"""Designs biquad highpass filter and performs filtering.  Similar to SoX implementation.
@@ -687,7 +682,6 @@ def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-@torch.jit.script
 def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     # type: (Tensor, int, float, float) -> Tensor
     r"""Designs biquad lowpass filter and performs filtering.  Similar to SoX implementation.
@@ -866,7 +860,6 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
     return output
 
 
-@torch.jit.script
 def _compute_nccf(waveform, sample_rate, frame_time, freq_low):
     # type: (Tensor, int, float, int) -> Tensor
     r"""
