@@ -21,18 +21,7 @@ print("Run test with cuda:", RUN_CUDA)
 
 
 def _get_script_module(f, *args):
-    # takes a transform function `f` and wraps it in a script module
-    class MyModule(torch.jit.ScriptModule):
-        def __init__(self):
-            super(MyModule, self).__init__()
-            self.module = f(*args)
-            self.module.eval()
-
-        @torch.jit.script_method
-        def forward(self, tensor):
-            return self.module(tensor)
-
-    return MyModule()
+    return torch.jit.script(f())
 
 
 def _test_script_module(f, tensor, *args):

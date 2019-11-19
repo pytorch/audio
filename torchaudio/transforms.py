@@ -48,7 +48,7 @@ class Spectrogram(torch.nn.Module):
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
-        self.window = torch.jit.Attribute(window, torch.Tensor)
+        self.window = window
         self.pad = pad
         self.power = power
         self.normalized = normalized
@@ -67,7 +67,7 @@ class Spectrogram(torch.nn.Module):
                              self.win_length, self.power, self.normalized)
 
 
-class AmplitudeToDB(torch.nn.Module):
+class AmplitudeToDB(torch.jit.ScriptModule):
     r"""Turns a tensor from the power/amplitude scale to the decibel scale.
 
     This output depends on the maximum value in the input tensor, and so
@@ -84,7 +84,7 @@ class AmplitudeToDB(torch.nn.Module):
 
     def __init__(self, stype='power', top_db=None):
         super(AmplitudeToDB, self).__init__()
-        self.stype = torch.jit.Attribute(stype, str)
+        self.stype = stype
         if top_db is not None and top_db < 0:
             raise ValueError('top_db must be positive value')
         self.top_db = torch.jit.Attribute(top_db, Optional[float])
@@ -129,17 +129,12 @@ class MelScale(torch.nn.Module):
         self.f_max = f_max if f_max is not None else float(sample_rate // 2)
         self.f_min = f_min
 
-        print(f_min)
-        print(self.f_max)
-
-        a = float(f_min)
-        b = float(self.f_max)
 
         assert f_min <= self.f_max, 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
 
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
-        self.fb = torch.jit.Attribute(fb, torch.Tensor)
+        self.fb = fb
 
     def forward(self, specgram):
         r"""
@@ -199,7 +194,7 @@ class MelSpectrogram(torch.nn.Module):
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         self.pad = pad
         self.n_mels = n_mels  # number of mel frequency bins
-        self.f_max = torch.jit.Attribute(f_max, Optional[float])
+        self.f_max = f_max
         self.f_min = f_min
         self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
                                        hop_length=self.hop_length,
@@ -251,7 +246,7 @@ class MFCC(torch.nn.Module):
         self.sample_rate = sample_rate
         self.n_mfcc = n_mfcc
         self.dct_type = dct_type
-        self.norm = torch.jit.Attribute(norm, Optional[str])
+        self.norm = norm
         self.top_db = 80.0
         self.amplitude_to_DB = AmplitudeToDB('power', self.top_db)
 
@@ -263,7 +258,7 @@ class MFCC(torch.nn.Module):
         if self.n_mfcc > self.MelSpectrogram.n_mels:
             raise ValueError('Cannot select more MFCC coefficients than # mel bins')
         dct_mat = F.create_dct(self.n_mfcc, self.MelSpectrogram.n_mels, self.norm)
-        self.dct_mat = torch.jit.Attribute(dct_mat, torch.Tensor)
+        self.dct_mat = dct_mat
         self.log_mels = log_mels
 
     def forward(self, waveform):
@@ -403,7 +398,7 @@ class ComputeDeltas(torch.nn.Module):
     def __init__(self, win_length=5, mode="replicate"):
         super(ComputeDeltas, self).__init__()
         self.win_length = win_length
-        self.mode = torch.jit.Attribute(mode, str)
+        self.mode = mode
 
     def forward(self, specgram):
         r"""
