@@ -492,7 +492,7 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
 
         _test_torchscript_functional(F.mu_law_decoding, tensor, qc)
 
-    def test_torchscript_mu_law_decoding(self):
+    def test_torchscript_complex_norm(self):
 
         complex_tensor = torch.randn(1, 2, 1025, 400, 2),
         power = 2

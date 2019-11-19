@@ -197,7 +197,7 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         assert torch.allclose(waveform_sox_out, waveform_lfilter_out, atol=1e-4)
         _test_torchscript_functional(
-                F.lfilter, waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
+            F.lfilter, waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
         )
 
 
