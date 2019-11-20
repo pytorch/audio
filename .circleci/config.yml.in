@@ -155,6 +155,27 @@ jobs:
               aws s3 cp "$pkg" "s3://pytorch/whl/nightly/" --acl public-read
             done
 
+  smoke_test_linux_conda:
+    <<: *binary_common
+    docker:
+      - image: 308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable
+    steps:
+      - run:
+        command: |
+        conda activate python${PYTHON_VERSION}
+        conda install -y -c pytorch-nightly torchaudio
+        python -c "import torchaudio"
+
+  smoke_test_linux_pip:
+    <<: *binary_common
+    docker:
+      - image: 308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable
+    steps:
+      - run:
+        command: |
+        conda activate python${PYTHON_VERSION}
+        pip install torchaudio_nightly -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+        python -c "import torchaudio"
 
 {%- macro workflow(btype, os, python_version, unicode, prefix='', filter_branch=None, upload=False) %}
       - binary_{{os}}_{{btype}}:
@@ -175,6 +196,18 @@ jobs:
           context: org-member
           requires:
             - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}
+{%-       if filter_branch == 'nightly' %}
+      - smoke_test_linux_pip:
+        name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_smoke_test_pip
+        python_version: "{{python_version}}"
+        requires:
+          - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_upload
+      - smoke_test_linux_conda:
+        name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_smoke_test_conda
+        python_version: "{{python_version}}"
+        requires:
+          - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_upload
+{%-       endif %}
 {%-   if filter_branch %}
           filters:
             branches:
