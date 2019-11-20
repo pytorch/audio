@@ -68,7 +68,7 @@ class Spectrogram(torch.nn.Module):
 
 
 class AmplitudeToDB(torch.jit.ScriptModule):
-    r"""Turns a tensor from the power/amplitude scale to the decibel scale.
+    r"""Turn a tensor from the power/amplitude scale to the decibel scale.
 
     This output depends on the maximum value in the input tensor, and so
     may return different values for an audio clip split into snippets vs. a
@@ -107,7 +107,7 @@ class AmplitudeToDB(torch.jit.ScriptModule):
 
 
 class MelScale(torch.nn.Module):
-    r"""This turns a normal STFT into a mel frequency STFT, using a conversion
+    r"""Turn a normal STFT into a mel frequency STFT, using a conversion
     matrix.  This uses triangular filter banks.
 
     User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).
@@ -335,7 +335,7 @@ class MuLawDecoding(torch.nn.Module):
 
 
 class Resample(torch.nn.Module):
-    r"""Resamples a signal from one frequency to another. A resampling method can
+    r"""Resample a signal from one frequency to another. A resampling method can
     be given.
 
     Args:
