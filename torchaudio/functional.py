@@ -221,7 +221,6 @@ def istft(
     return y
 
 
-@torch.jit.script
 def spectrogram(
     waveform, pad, window, n_fft, hop_length, win_length, power, normalized
 ):
@@ -274,7 +273,6 @@ def spectrogram(
     return spec_f
 
 
-@torch.jit.script
 def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
     # type: (Tensor, float, float, float, Optional[float]) -> Tensor
     r"""
@@ -309,7 +307,6 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
     return x_db
 
 
-@torch.jit.script
 def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate):
     # type: (int, float, float, int, int) -> Tensor
     r"""
@@ -355,7 +352,6 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate):
     return fb
 
 
-@torch.jit.script
 def create_dct(n_mfcc, n_mels, norm):
     # type: (int, int, Optional[str]) -> Tensor
     r"""
@@ -386,7 +382,6 @@ def create_dct(n_mfcc, n_mels, norm):
     return dct.t()
 
 
-@torch.jit.script
 def mu_law_encoding(x, quantization_channels):
     # type: (Tensor, int) -> Tensor
     r"""
@@ -414,7 +409,6 @@ def mu_law_encoding(x, quantization_channels):
     return x_mu
 
 
-@torch.jit.script
 def mu_law_decoding(x_mu, quantization_channels):
     # type: (Tensor, int) -> Tensor
     r"""
@@ -442,7 +436,6 @@ def mu_law_decoding(x_mu, quantization_channels):
     return x
 
 
-@torch.jit.script
 def complex_norm(complex_tensor, power=1.0):
     # type: (Tensor, float) -> Tensor
     r"""Compute the norm of complex tensor input.
@@ -459,7 +452,6 @@ def complex_norm(complex_tensor, power=1.0):
     return torch.norm(complex_tensor, 2, -1).pow(power)
 
 
-@torch.jit.script
 def angle(complex_tensor):
     # type: (Tensor) -> Tensor
     r"""Compute the angle of complex tensor input.
@@ -473,7 +465,6 @@ def angle(complex_tensor):
     return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
 
 
-@torch.jit.script
 def magphase(complex_tensor, power=1.0):
     # type: (Tensor, float) -> Tuple[Tensor, Tensor]
     r"""Separate a complex-valued spectrogram with shape `(..., 2)` into its magnitude and phase.
@@ -490,7 +481,6 @@ def magphase(complex_tensor, power=1.0):
     return mag, phase
 
 
-@torch.jit.script
 def phase_vocoder(complex_specgrams, rate, phase_advance):
     # type: (Tensor, float, Tensor) -> Tensor
     r"""Given a STFT tensor, speed up in time without modifying pitch by a
@@ -555,7 +545,6 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     return complex_specgrams_stretch
 
 
-@torch.jit.script
 def lfilter(waveform, a_coeffs, b_coeffs):
     # type: (Tensor, Tensor, Tensor) -> Tensor
     r"""
@@ -630,7 +619,6 @@ def lfilter(waveform, a_coeffs, b_coeffs):
     return output
 
 
-@torch.jit.script
 def biquad(waveform, b0, b1, b2, a0, a1, a2):
     # type: (Tensor, float, float, float, float, float, float) -> Tensor
     r"""Performs a biquad filter of input tensor.  Initial conditions set to 0.
@@ -665,7 +653,6 @@ def _dB2Linear(x):
     return math.exp(x * math.log(10) / 20.0)
 
 
-@torch.jit.script
 def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     # type: (Tensor, int, float, float) -> Tensor
     r"""Designs biquad highpass filter and performs filtering.  Similar to SoX implementation.
@@ -695,7 +682,6 @@ def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-@torch.jit.script
 def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     # type: (Tensor, int, float, float) -> Tensor
     r"""Designs biquad lowpass filter and performs filtering.  Similar to SoX implementation.
@@ -725,7 +711,6 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-@torch.jit.script
 def equalizer_biquad(waveform, sample_rate, center_freq, gain, Q=0.707):
     # type: (Tensor, int, float, float, float) -> Tensor
     r"""Designs biquad peaking equalizer filter and performs filtering.  Similar to SoX implementation.
@@ -753,7 +738,6 @@ def equalizer_biquad(waveform, sample_rate, center_freq, gain, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-@torch.jit.script
 def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
     # type: (Tensor, int, float, int) -> Tensor
     r"""
@@ -790,7 +774,6 @@ def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
     return specgrams
 
 
-@torch.jit.script
 def mask_along_axis(specgram, mask_param, mask_value, axis):
     # type: (Tensor, int, float, int) -> Tensor
     r"""
@@ -825,7 +808,6 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
     return specgram
 
 
-@torch.jit.script
 def compute_deltas(specgram, win_length=5, mode="replicate"):
     # type: (Tensor, int, str) -> Tensor
     r"""Compute delta coefficients of a tensor, usually a spectrogram:
@@ -878,7 +860,6 @@ def compute_deltas(specgram, win_length=5, mode="replicate"):
     return output
 
 
-@torch.jit.script
 def _compute_nccf(waveform, sample_rate, frame_time, freq_low):
     # type: (Tensor, int, float, int) -> Tensor
     r"""
@@ -993,7 +974,6 @@ def _median_smoothing(indices, win_length):
     return values
 
 
-@torch.jit.script
 def detect_pitch_frequency(
     waveform,
     sample_rate,
@@ -1021,7 +1001,7 @@ def detect_pitch_frequency(
     dim = waveform.dim()
 
     # pack batch
-    shape = waveform.size()
+    shape = list(waveform.size())
     waveform = waveform.reshape([-1] + shape[-1:])
 
     nccf = _compute_nccf(waveform, sample_rate, frame_time, freq_low)
@@ -1033,6 +1013,6 @@ def detect_pitch_frequency(
     freq = sample_rate / (EPSILON + indices.to(torch.float))
 
     # unpack batch
-    freq = freq.reshape(shape[:-1] + freq.shape[-1:])
+    freq = freq.reshape(shape[:-1] + list(freq.shape[-1:]))
 
     return freq
