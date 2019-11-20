@@ -24,14 +24,13 @@ class TimeStretch(torch.jit.ScriptModule):
     def __init__(self, hop_length=None, n_freq=201, fixed_rate=None):
         super(TimeStretch, self).__init__()
 
+        self.fixed_rate = fixed_rate
+
         n_fft = (n_freq - 1) * 2
         hop_length = hop_length if hop_length is not None else n_fft // 2
-        self.fixed_rate = fixed_rate
         phase_advance = torch.linspace(0, math.pi * hop_length, n_freq)[..., None]
-
         self.phase_advance = torch.jit.Attribute(phase_advance, torch.Tensor)
 
-    @torch.jit.script_method
     def forward(self, complex_specgrams, overriding_rate=None):
         # type: (Tensor, Optional[float]) -> Tensor
         r"""
@@ -63,7 +62,7 @@ class TimeStretch(torch.jit.ScriptModule):
         return complex_specgrams.reshape(shape[:-3] + complex_specgrams.shape[-3:])
 
 
-class _AxisMasking(torch.jit.ScriptModule):
+class _AxisMasking(torch.nn.Module):
     r"""
     Apply masking to a spectrogram.
     Args:
@@ -80,7 +79,6 @@ class _AxisMasking(torch.jit.ScriptModule):
         self.axis = axis
         self.iid_masks = iid_masks
 
-    @torch.jit.script_method
     def forward(self, specgram, mask_value=0.):
         # type: (Tensor, float) -> Tensor
         r"""

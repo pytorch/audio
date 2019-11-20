@@ -4,6 +4,7 @@ import os
 
 import torch
 import torchaudio
+import torchaudio.augmentations as A
 import torchaudio.transforms as transforms
 import torchaudio.functional as F
 from torchaudio.common_utils import IMPORT_LIBROSA, IMPORT_SCIPY
@@ -20,9 +21,9 @@ RUN_CUDA = torch.cuda.is_available()
 print("Run test with cuda:", RUN_CUDA)
 
 
-def _test_script_module(f, tensor, *args):
+def _test_script_module(f, tensor, *args, **kwargs):
 
-    py_method = f(*args)
+    py_method = f(*args, **kwargs)
     jit_method = torch.jit.script(py_method)
 
     py_out = py_method(tensor)
@@ -417,6 +418,21 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
+
+    def test_scriptmodule_TimeStretch(self):
+        n_freq = 400
+        hop_length = 512
+        fixed_rate = 1.3
+        tensor = torch.rand((10, 2, n_freq, 10, 2))
+        _test_script_module(A.TimeStretch, tensor, n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate)
+
+    def test_scriptmodule_FrequencyMasking(self):
+        tensor = torch.rand((10, 2, 50, 10, 2))
+        _test_script_module(A.FrequencyMasking, tensor, freq_mask_param=60, iid_masks=False)
+
+    def test_scriptmodule_TimeMasking(self):
+        tensor = torch.rand((10, 2, 50, 10, 2))
+        _test_script_module(A.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
 
 
 if __name__ == '__main__':
