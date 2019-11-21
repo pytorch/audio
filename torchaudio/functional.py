@@ -532,7 +532,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     complex_specgrams_stretch = torch.stack([real_stretch, imag_stretch], dim=-1)
 
     # unpack batch
-    complex_specgrams_stretch = complex_specgrams_stretch.reshape(shape[:-3] + complex_specgrams.shape[-3:])
+    complex_specgrams_stretch = complex_specgrams_stretch.reshape(shape[:-3] + complex_specgrams_stretch.shape[1:])
 
     return complex_specgrams_stretch
 
