@@ -82,3 +82,28 @@ Functions to perform common audio operations.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: highpass_biquad
+
+:hidden:`equalizer_biquad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: equalizer_biquad
+
+:hidden:`mask_along_axis`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: mask_along_axis
+
+:hidden:`mask_along_axis_iid`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: mask_along_axis_iid
+
+:hidden:`compute_deltas`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: compute_deltas
+
+:hidden:`detect_pitch_frequency`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: detect_pitch_frequency
