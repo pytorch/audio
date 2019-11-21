@@ -165,12 +165,13 @@ jobs:
             done
 
   smoke_test_linux_conda:
-    <<: *binary_common
+
     docker:
       - image: "308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable"
         aws_auth:
           aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
           aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
+    <<: *binary_common
     steps:
       - run:
           command: |
@@ -179,12 +180,12 @@ jobs:
             python -c "import torchaudio"
 
   smoke_test_linux_pip:
-    <<: *binary_common
     docker:
       - image: "308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable"
         aws_auth:
           aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
           aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
+    <<: *binary_common
     steps:
       - run:
           command: |
