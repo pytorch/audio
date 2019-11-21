@@ -4,7 +4,7 @@ import os.path
 import torch
 import _torch_sox
 
-from torchaudio import transforms, datasets, kaldi_io, sox_effects, compliance, _docs
+from torchaudio import transforms, datasets, kaldi_io, sox_effects, compliance
 
 try:
     from .version import __version__, git_version  # noqa: F401
