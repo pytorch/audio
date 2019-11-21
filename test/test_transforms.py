@@ -4,6 +4,7 @@ import os
 
 import torch
 import torchaudio
+import torchaudio.augmentations as A
 import torchaudio.transforms as transforms
 import torchaudio.functional as F
 from torchaudio.common_utils import IMPORT_LIBROSA, IMPORT_SCIPY
@@ -15,6 +16,32 @@ if IMPORT_LIBROSA:
 
 if IMPORT_SCIPY:
     import scipy
+
+RUN_CUDA = torch.cuda.is_available()
+print("Run test with cuda:", RUN_CUDA)
+
+
+def _test_script_module(f, tensor, *args, **kwargs):
+
+    py_method = f(*args, **kwargs)
+    jit_method = torch.jit.script(py_method)
+
+    py_out = py_method(tensor)
+    jit_out = jit_method(tensor)
+
+    assert torch.allclose(jit_out, py_out)
+
+    if RUN_CUDA:
+
+        tensor = tensor.to("cuda")
+
+        py_method = py_method.cuda()
+        jit_method = torch.jit.script(py_method)
+
+        py_out = py_method(tensor)
+        jit_out = jit_method(tensor)
+
+        assert torch.allclose(jit_out, py_out)
 
 
 class Tester(unittest.TestCase):
@@ -37,6 +64,10 @@ class Tester(unittest.TestCase):
             waveform = waveform.to(torch.get_default_dtype())
         return waveform / factor
 
+    def test_scriptmodule_Spectrogram(self):
+        tensor = torch.rand((1, 1000))
+        _test_script_module(transforms.Spectrogram, tensor)
+
     def test_mu_law_companding(self):
 
         quantization_channels = 256
@@ -51,6 +82,14 @@ class Tester(unittest.TestCase):
         waveform_exp = transforms.MuLawDecoding(quantization_channels)(waveform_mu)
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
 
+    def test_scriptmodule_AmplitudeToDB(self):
+        spec = torch.rand((6, 201))
+        _test_script_module(transforms.AmplitudeToDB, spec)
+
+    def test_scriptmodule_MelScale(self):
+        spec_f = torch.rand((1, 6, 201))
+        _test_script_module(transforms.MelScale, spec_f)
+
     def test_melscale_load_save(self):
         specgram = torch.ones(1, 1000, 100)
         melscale_transform = transforms.MelScale()
@@ -64,6 +103,10 @@ class Tester(unittest.TestCase):
 
         self.assertEqual(fb_copy.size(), (1000, 128))
         self.assertTrue(torch.allclose(fb, fb_copy))
+
+    def test_scriptmodule_MelSpectrogram(self):
+        tensor = torch.rand((1, 1000))
+        _test_script_module(transforms.MelSpectrogram, tensor)
 
     def test_melspectrogram_load_save(self):
         waveform = self.waveform.float()
@@ -122,6 +165,10 @@ class Tester(unittest.TestCase):
         self.assertTrue(fb_matrix_transform.fb.sum(1).le(1.).all())
         self.assertTrue(fb_matrix_transform.fb.sum(1).ge(0.).all())
         self.assertEqual(fb_matrix_transform.fb.size(), (400, 100))
+
+    def test_scriptmodule_MFCC(self):
+        tensor = torch.rand((1, 1000))
+        _test_script_module(transforms.MFCC, tensor)
 
     def test_mfcc(self):
         audio_orig = self.waveform.clone()
@@ -326,6 +373,14 @@ class Tester(unittest.TestCase):
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
 
+    def test_scriptmodule_MuLawEncoding(self):
+        tensor = torch.rand((1, 10))
+        _test_script_module(transforms.MuLawEncoding, tensor)
+
+    def test_scriptmodule_MuLawDecoding(self):
+        tensor = torch.rand((1, 10))
+        _test_script_module(transforms.MuLawDecoding, tensor)
+
     def test_batch_mulaw(self):
         waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
 
@@ -363,6 +418,21 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
+
+    def test_scriptmodule_TimeStretch(self):
+        n_freq = 400
+        hop_length = 512
+        fixed_rate = 1.3
+        tensor = torch.rand((10, 2, n_freq, 10, 2))
+        _test_script_module(A.TimeStretch, tensor, n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate)
+
+    def test_scriptmodule_FrequencyMasking(self):
+        tensor = torch.rand((10, 2, 50, 10, 2))
+        _test_script_module(A.FrequencyMasking, tensor, freq_mask_param=60, iid_masks=False)
+
+    def test_scriptmodule_TimeMasking(self):
+        tensor = torch.rand((10, 2, 50, 10, 2))
+        _test_script_module(A.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
 
 
 if __name__ == '__main__':

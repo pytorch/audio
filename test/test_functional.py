@@ -16,6 +16,15 @@ if IMPORT_LIBROSA:
     import librosa
 
 
+def _test_torchscript_functional(py_method, *args, **kwargs):
+    jit_method = torch.jit.script(py_method)
+
+    jit_out = jit_method(*args, **kwargs)
+    py_out = py_method(*args, **kwargs)
+
+    assert torch.allclose(jit_out, py_out)
+
+
 class TestFunctional(unittest.TestCase):
     data_sizes = [(2, 20), (3, 15), (4, 10)]
     number_of_trials = 100
@@ -24,6 +33,21 @@ class TestFunctional(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, 'assets',
                                  'steam-train-whistle-daniel_simon.mp3')
+
+    def test_torchscript_spectrogram(self):
+
+        tensor = torch.rand((1, 1000))
+        n_fft = 400
+        ws = 400
+        hop = 200
+        pad = 0
+        window = torch.hann_window(ws)
+        power = 2
+        normalize = False
+
+        _test_torchscript_functional(
+            F.spectrogram, tensor, pad, window, n_fft, hop, ws, power, normalize
+        )
 
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
         computed = F.compute_deltas(specgram, win_length=win_length)
@@ -49,6 +73,7 @@ class TestFunctional(unittest.TestCase):
         specgram = torch.randn(channel, n_mfcc, time)
         computed = F.compute_deltas(specgram, win_length=win_length)
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
+        _test_torchscript_functional(F.compute_deltas, specgram, win_length=win_length)
 
     def test_batch_pitch(self):
         waveform, sample_rate = torchaudio.load(self.test_filepath)
@@ -63,6 +88,7 @@ class TestFunctional(unittest.TestCase):
 
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
+        _test_torchscript_functional(F.detect_pitch_frequency, waveform, sample_rate)
 
     def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
         # trim sound for case when constructed signal is shorter than original
@@ -423,6 +449,74 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
     complex_stretch = complex_stretch[..., 0] + 1j * complex_stretch[..., 1]
 
     assert np.allclose(complex_stretch, expected_complex_stretch, atol=1e-5)
+
+    def test_torchscript_create_fb_matrix(self):
+
+        n_stft = 100
+        f_min = 0.0
+        f_max = 20.0
+        n_mels = 10
+        sample_rate = 16000
+
+        _test_torchscript_functional(F.create_fb_matrix, n_stft, f_min, f_max, n_mels, sample_rate)
+
+    def test_torchscript_amplitude_to_DB(self):
+
+        spec = torch.rand((6, 201))
+        multiplier = 10.0
+        amin = 1e-10
+        db_multiplier = 0.0
+        top_db = 80.0
+
+        _test_torchscript_functional(F.amplitude_to_DB, spec, multiplier, amin, db_multiplier, top_db)
+
+    def test_torchscript_create_dct(self):
+
+        n_mfcc = 40
+        n_mels = 128
+        norm = "ortho"
+
+        _test_torchscript_functional(F.create_dct, n_mfcc, n_mels, norm)
+
+    def test_torchscript_mu_law_encoding(self):
+
+        tensor = torch.rand((1, 10))
+        qc = 256
+
+        _test_torchscript_functional(F.mu_law_encoding, tensor, qc)
+
+    def test_torchscript_mu_law_decoding(self):
+
+        tensor = torch.rand((1, 10))
+        qc = 256
+
+        _test_torchscript_functional(F.mu_law_decoding, tensor, qc)
+
+    def test_torchscript_complex_norm(self):
+
+        complex_tensor = torch.randn(1, 2, 1025, 400, 2),
+        power = 2
+
+        _test_torchscript_functional(F.complex_norm, complex_tensor, power)
+
+    def test_mask_along_axis(self):
+
+        specgram = torch.randn(2, 1025, 400),
+        mask_param = 100
+        mask_value = 30.
+        axis = 2
+
+        _test_torchscript_functional(F.mask_along_axis, specgram, mask_param, mask_value, axis)
+
+    def test_mask_along_axis_iid(self):
+
+        specgram = torch.randn(2, 1025, 400),
+        specgrams = torch.randn(4, 2, 1025, 400),
+        mask_param = 100
+        mask_value = 30.
+        axis = 2
+
+        _test_torchscript_functional(F.mask_along_axis_iid, specgrams, mask_param, mask_value, axis)
 
 
 @pytest.mark.parametrize('complex_tensor', [

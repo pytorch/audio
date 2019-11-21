@@ -20,7 +20,7 @@ __all__ = [
 ]
 
 
-class Spectrogram(torch.jit.ScriptModule):
+class Spectrogram(torch.nn.Module):
     r"""Create a spectrogram from a audio signal
 
     Args:
@@ -48,12 +48,11 @@ class Spectrogram(torch.jit.ScriptModule):
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
-        self.window = torch.jit.Attribute(window, torch.Tensor)
+        self.window = window
         self.pad = pad
         self.power = power
         self.normalized = normalized
 
-    @torch.jit.script_method
     def forward(self, waveform):
         r"""
         Args:
@@ -85,7 +84,7 @@ class AmplitudeToDB(torch.jit.ScriptModule):
 
     def __init__(self, stype='power', top_db=None):
         super(AmplitudeToDB, self).__init__()
-        self.stype = torch.jit.Attribute(stype, str)
+        self.stype = stype
         if top_db is not None and top_db < 0:
             raise ValueError('top_db must be positive value')
         self.top_db = torch.jit.Attribute(top_db, Optional[float])
@@ -94,7 +93,6 @@ class AmplitudeToDB(torch.jit.ScriptModule):
         self.ref_value = 1.0
         self.db_multiplier = math.log10(max(self.amin, self.ref_value))
 
-    @torch.jit.script_method
     def forward(self, x):
         r"""Numerically stable implementation from Librosa
         https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
@@ -108,7 +106,7 @@ class AmplitudeToDB(torch.jit.ScriptModule):
         return F.amplitude_to_DB(x, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
 
-class MelScale(torch.jit.ScriptModule):
+class MelScale(torch.nn.Module):
     r"""This turns a normal STFT into a mel frequency STFT, using a conversion
     matrix.  This uses triangular filter banks.
 
@@ -129,13 +127,14 @@ class MelScale(torch.jit.ScriptModule):
         self.n_mels = n_mels
         self.sample_rate = sample_rate
         self.f_max = f_max if f_max is not None else float(sample_rate // 2)
-        assert f_min <= self.f_max, 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
         self.f_min = f_min
+
+        assert f_min <= self.f_max, 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
+
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
-        self.fb = torch.jit.Attribute(fb, torch.Tensor)
+        self.fb = fb
 
-    @torch.jit.script_method
     def forward(self, specgram):
         r"""
         Args:
@@ -156,7 +155,7 @@ class MelScale(torch.jit.ScriptModule):
         return mel_specgram
 
 
-class MelSpectrogram(torch.jit.ScriptModule):
+class MelSpectrogram(torch.nn.Module):
     r"""Create MelSpectrogram for a raw audio signal. This is a composition of Spectrogram
     and MelScale.
 
@@ -194,7 +193,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         self.pad = pad
         self.n_mels = n_mels  # number of mel frequency bins
-        self.f_max = torch.jit.Attribute(f_max, Optional[float])
+        self.f_max = f_max
         self.f_min = f_min
         self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
                                        hop_length=self.hop_length,
@@ -202,7 +201,6 @@ class MelSpectrogram(torch.jit.ScriptModule):
                                        normalized=False, wkwargs=wkwargs)
         self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1)
 
-    @torch.jit.script_method
     def forward(self, waveform):
         r"""
         Args:
@@ -216,7 +214,7 @@ class MelSpectrogram(torch.jit.ScriptModule):
         return mel_specgram
 
 
-class MFCC(torch.jit.ScriptModule):
+class MFCC(torch.nn.Module):
     r"""Create the Mel-frequency cepstrum coefficients from an audio signal
 
     By default, this calculates the MFCC on the DB-scaled Mel spectrogram.
@@ -247,7 +245,7 @@ class MFCC(torch.jit.ScriptModule):
         self.sample_rate = sample_rate
         self.n_mfcc = n_mfcc
         self.dct_type = dct_type
-        self.norm = torch.jit.Attribute(norm, Optional[str])
+        self.norm = norm
         self.top_db = 80.0
         self.amplitude_to_DB = AmplitudeToDB('power', self.top_db)
 
@@ -259,10 +257,9 @@ class MFCC(torch.jit.ScriptModule):
         if self.n_mfcc > self.MelSpectrogram.n_mels:
             raise ValueError('Cannot select more MFCC coefficients than # mel bins')
         dct_mat = F.create_dct(self.n_mfcc, self.MelSpectrogram.n_mels, self.norm)
-        self.dct_mat = torch.jit.Attribute(dct_mat, torch.Tensor)
+        self.dct_mat = dct_mat
         self.log_mels = log_mels
 
-    @torch.jit.script_method
     def forward(self, waveform):
         r"""
         Args:
@@ -283,7 +280,7 @@ class MFCC(torch.jit.ScriptModule):
         return mfcc
 
 
-class MuLawEncoding(torch.jit.ScriptModule):
+class MuLawEncoding(torch.nn.Module):
     r"""Encode signal based on mu-law companding.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
@@ -299,7 +296,6 @@ class MuLawEncoding(torch.jit.ScriptModule):
         super(MuLawEncoding, self).__init__()
         self.quantization_channels = quantization_channels
 
-    @torch.jit.script_method
     def forward(self, x):
         r"""
         Args:
@@ -311,7 +307,7 @@ class MuLawEncoding(torch.jit.ScriptModule):
         return F.mu_law_encoding(x, self.quantization_channels)
 
 
-class MuLawDecoding(torch.jit.ScriptModule):
+class MuLawDecoding(torch.nn.Module):
     r"""Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
@@ -327,7 +323,6 @@ class MuLawDecoding(torch.jit.ScriptModule):
         super(MuLawDecoding, self).__init__()
         self.quantization_channels = quantization_channels
 
-    @torch.jit.script_method
     def forward(self, x_mu):
         r"""
         Args:
@@ -368,7 +363,7 @@ class Resample(torch.nn.Module):
         raise ValueError('Invalid resampling method: %s' % (self.resampling_method))
 
 
-class ComplexNorm(torch.jit.ScriptModule):
+class ComplexNorm(torch.nn.Module):
     r"""Compute the norm of complex tensor input
     Args:
         power (float): Power of the norm. Defaults to `1.0`.
@@ -379,7 +374,6 @@ class ComplexNorm(torch.jit.ScriptModule):
         super(ComplexNorm, self).__init__()
         self.power = power
 
-    @torch.jit.script_method
     def forward(self, complex_tensor):
         r"""
         Args:
@@ -390,7 +384,7 @@ class ComplexNorm(torch.jit.ScriptModule):
         return F.complex_norm(complex_tensor, self.power)
 
 
-class ComputeDeltas(torch.jit.ScriptModule):
+class ComputeDeltas(torch.nn.Module):
     r"""Compute delta coefficients of a tensor, usually a spectrogram.
 
     See `torchaudio.functional.compute_deltas` for more details.
@@ -403,9 +397,8 @@ class ComputeDeltas(torch.jit.ScriptModule):
     def __init__(self, win_length=5, mode="replicate"):
         super(ComputeDeltas, self).__init__()
         self.win_length = win_length
-        self.mode = torch.jit.Attribute(mode, str)
+        self.mode = mode
 
-    @torch.jit.script_method
     def forward(self, specgram):
         r"""
         Args:

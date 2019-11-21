@@ -9,6 +9,15 @@ import common_utils
 import time
 
 
+def _test_torchscript_functional(py_method, *args, **kwargs):
+    jit_method = torch.jit.script(py_method)
+
+    jit_out = jit_method(*args, **kwargs)
+    py_out = py_method(*args, **kwargs)
+
+    assert torch.allclose(jit_out, py_out)
+
+
 class TestFunctionalFiltering(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
 
@@ -79,6 +88,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert len(output_waveform.size()) == 2
         assert output_waveform.size(0) == waveform.size(0)
         assert output_waveform.size(1) == waveform.size(1)
+        _test_torchscript_functional(F.lfilter, waveform, a_coeffs, b_coeffs)
 
     def test_lfilter(self):
 
@@ -116,6 +126,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.lowpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
+        _test_torchscript_functional(F.lowpass_biquad, waveform, sample_rate, CUTOFF_FREQ)
 
     def test_highpass(self):
         """
@@ -135,6 +146,7 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         # TBD - this fails at the 1e-4 level, debug why
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-3)
+        _test_torchscript_functional(F.highpass_biquad, waveform, sample_rate, CUTOFF_FREQ)
 
     def test_equalizer(self):
         """
@@ -155,6 +167,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.equalizer_biquad(waveform, sample_rate, CENTER_FREQ, GAIN, Q)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
+        _test_torchscript_functional(F.equalizer_biquad, waveform, sample_rate, CENTER_FREQ, GAIN, Q)
 
     def test_perf_biquad_filtering(self):
 
@@ -183,6 +196,9 @@ class TestFunctionalFiltering(unittest.TestCase):
         _timing_lfilter_run_time = time.time() - _timing_lfilter_filtering
 
         assert torch.allclose(waveform_sox_out, waveform_lfilter_out, atol=1e-4)
+        _test_torchscript_functional(
+            F.lfilter, waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
+        )
 
 
 if __name__ == "__main__":
