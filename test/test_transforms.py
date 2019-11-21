@@ -4,7 +4,6 @@ import os
 
 import torch
 import torchaudio
-import torchaudio.augmentations as A
 import torchaudio.transforms as transforms
 import torchaudio.functional as F
 from torchaudio.common_utils import IMPORT_LIBROSA, IMPORT_SCIPY
