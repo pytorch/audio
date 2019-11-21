@@ -35,11 +35,10 @@ binary_common: &binary_common
 smoke_test_common: &smoke_test_common
   <<: *binary_common
   docker:
-    - image: "308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable"
+    - image: 308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable
       aws_auth:
-        aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
-        aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
-
+        aws_access_key_id: "${ECR_AWS_ACCESS_KEY}"
+        aws_secret_access_key: "${ECR_AWS_SECRET_ACCESS_KEY}"
 
 jobs:
   circleci_consistency:
@@ -165,13 +164,7 @@ jobs:
             done
 
   smoke_test_linux_conda:
-
-    docker:
-      - image: "308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable"
-        aws_auth:
-          aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
-          aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
-    <<: *binary_common
+    <<: *smoke_test_common
     steps:
       - run:
           command: |
@@ -180,12 +173,7 @@ jobs:
             python -c "import torchaudio"
 
   smoke_test_linux_pip:
-    docker:
-      - image: "308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable"
-        aws_auth:
-          aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
-          aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
-    <<: *binary_common
+    <<: *smoke_test_common
     steps:
       - run:
           command: |
@@ -222,16 +210,7 @@ jobs:
           requires:
             - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}
 {%-       if filter_branch == 'nightly' %}
-      - smoke_test_linux_pip:
-          name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_smoke_test_pip
-          python_version: "{{python_version}}"
-          requires:
-            - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_upload
-      - smoke_test_linux_conda:
-          name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_smoke_test_conda
-          python_version: "{{python_version}}"
-          requires:
-            - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_upload
+
 {%-       endif %}
 {%-   if filter_branch %}
           filters:

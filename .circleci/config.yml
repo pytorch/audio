@@ -35,11 +35,10 @@ binary_common: &binary_common
 smoke_test_common: &smoke_test_common
   <<: *binary_common
   docker:
-    - image: "308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable"
+    - image: 308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable
       aws_auth:
-        aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
-        aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
-
+        aws_access_key_id: "${ECR_AWS_ACCESS_KEY}"
+        aws_secret_access_key: "${ECR_AWS_SECRET_ACCESS_KEY}"
 
 jobs:
   circleci_consistency:
@@ -165,13 +164,7 @@ jobs:
             done
 
   smoke_test_linux_conda:
-
-    docker:
-      - image: "308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable"
-        aws_auth:
-          aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
-          aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
-    <<: *binary_common
+    <<: *smoke_test_common
     steps:
       - run:
           command: |
@@ -180,12 +173,7 @@ jobs:
             python -c "import torchaudio"
 
   smoke_test_linux_pip:
-    docker:
-      - image: "308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable"
-        aws_auth:
-          aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
-          aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
-    <<: *binary_common
+    <<: *smoke_test_common
     steps:
       - run:
           command: |
@@ -340,16 +328,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py2.7
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_wheel_py2.7_smoke_test_pip
-          python_version: "2.7"
-          requires:
-            - nightly_binary_linux_wheel_py2.7_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py2.7_smoke_test_conda
-          python_version: "2.7"
-          requires:
-            - nightly_binary_linux_wheel_py2.7_upload
           filters:
             branches:
               only: nightly
@@ -372,16 +350,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py2.7_unicode
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_wheel_py2.7_unicode_smoke_test_pip
-          python_version: "2.7"
-          requires:
-            - nightly_binary_linux_wheel_py2.7_unicode_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py2.7_unicode_smoke_test_conda
-          python_version: "2.7"
-          requires:
-            - nightly_binary_linux_wheel_py2.7_unicode_upload
           filters:
             branches:
               only: nightly
@@ -403,16 +371,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py3.5
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_wheel_py3.5_smoke_test_pip
-          python_version: "3.5"
-          requires:
-            - nightly_binary_linux_wheel_py3.5_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py3.5_smoke_test_conda
-          python_version: "3.5"
-          requires:
-            - nightly_binary_linux_wheel_py3.5_upload
           filters:
             branches:
               only: nightly
@@ -434,16 +392,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py3.6
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_wheel_py3.6_smoke_test_pip
-          python_version: "3.6"
-          requires:
-            - nightly_binary_linux_wheel_py3.6_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py3.6_smoke_test_conda
-          python_version: "3.6"
-          requires:
-            - nightly_binary_linux_wheel_py3.6_upload
           filters:
             branches:
               only: nightly
@@ -465,16 +413,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py3.7
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_wheel_py3.7_smoke_test_pip
-          python_version: "3.7"
-          requires:
-            - nightly_binary_linux_wheel_py3.7_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py3.7_smoke_test_conda
-          python_version: "3.7"
-          requires:
-            - nightly_binary_linux_wheel_py3.7_upload
           filters:
             branches:
               only: nightly
@@ -489,16 +427,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_macos_wheel_py2.7
-      - smoke_test_linux_pip:
-          name: nightly_binary_macos_wheel_py2.7_smoke_test_pip
-          python_version: "2.7"
-          requires:
-            - nightly_binary_macos_wheel_py2.7_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_macos_wheel_py2.7_smoke_test_conda
-          python_version: "2.7"
-          requires:
-            - nightly_binary_macos_wheel_py2.7_upload
           filters:
             branches:
               only: nightly
@@ -514,16 +442,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_macos_wheel_py2.7_unicode
-      - smoke_test_linux_pip:
-          name: nightly_binary_macos_wheel_py2.7_unicode_smoke_test_pip
-          python_version: "2.7"
-          requires:
-            - nightly_binary_macos_wheel_py2.7_unicode_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_macos_wheel_py2.7_unicode_smoke_test_conda
-          python_version: "2.7"
-          requires:
-            - nightly_binary_macos_wheel_py2.7_unicode_upload
           filters:
             branches:
               only: nightly
@@ -538,16 +456,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_macos_wheel_py3.5
-      - smoke_test_linux_pip:
-          name: nightly_binary_macos_wheel_py3.5_smoke_test_pip
-          python_version: "3.5"
-          requires:
-            - nightly_binary_macos_wheel_py3.5_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_macos_wheel_py3.5_smoke_test_conda
-          python_version: "3.5"
-          requires:
-            - nightly_binary_macos_wheel_py3.5_upload
           filters:
             branches:
               only: nightly
@@ -562,16 +470,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_macos_wheel_py3.6
-      - smoke_test_linux_pip:
-          name: nightly_binary_macos_wheel_py3.6_smoke_test_pip
-          python_version: "3.6"
-          requires:
-            - nightly_binary_macos_wheel_py3.6_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_macos_wheel_py3.6_smoke_test_conda
-          python_version: "3.6"
-          requires:
-            - nightly_binary_macos_wheel_py3.6_upload
           filters:
             branches:
               only: nightly
@@ -586,16 +484,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_macos_wheel_py3.7
-      - smoke_test_linux_pip:
-          name: nightly_binary_macos_wheel_py3.7_smoke_test_pip
-          python_version: "3.7"
-          requires:
-            - nightly_binary_macos_wheel_py3.7_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_macos_wheel_py3.7_smoke_test_conda
-          python_version: "3.7"
-          requires:
-            - nightly_binary_macos_wheel_py3.7_upload
           filters:
             branches:
               only: nightly
@@ -617,16 +505,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py2.7
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_conda_py2.7_smoke_test_pip
-          python_version: "2.7"
-          requires:
-            - nightly_binary_linux_conda_py2.7_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_conda_py2.7_smoke_test_conda
-          python_version: "2.7"
-          requires:
-            - nightly_binary_linux_conda_py2.7_upload
           filters:
             branches:
               only: nightly
@@ -648,16 +526,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py3.5
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_conda_py3.5_smoke_test_pip
-          python_version: "3.5"
-          requires:
-            - nightly_binary_linux_conda_py3.5_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_conda_py3.5_smoke_test_conda
-          python_version: "3.5"
-          requires:
-            - nightly_binary_linux_conda_py3.5_upload
           filters:
             branches:
               only: nightly
@@ -679,16 +547,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py3.6
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_conda_py3.6_smoke_test_pip
-          python_version: "3.6"
-          requires:
-            - nightly_binary_linux_conda_py3.6_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_conda_py3.6_smoke_test_conda
-          python_version: "3.6"
-          requires:
-            - nightly_binary_linux_conda_py3.6_upload
           filters:
             branches:
               only: nightly
@@ -710,16 +568,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py3.7
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_conda_py3.7_smoke_test_pip
-          python_version: "3.7"
-          requires:
-            - nightly_binary_linux_conda_py3.7_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_conda_py3.7_smoke_test_conda
-          python_version: "3.7"
-          requires:
-            - nightly_binary_linux_conda_py3.7_upload
           filters:
             branches:
               only: nightly
@@ -734,16 +582,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_macos_conda_py2.7
-      - smoke_test_linux_pip:
-          name: nightly_binary_macos_conda_py2.7_smoke_test_pip
-          python_version: "2.7"
-          requires:
-            - nightly_binary_macos_conda_py2.7_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_macos_conda_py2.7_smoke_test_conda
-          python_version: "2.7"
-          requires:
-            - nightly_binary_macos_conda_py2.7_upload
           filters:
             branches:
               only: nightly
@@ -758,16 +596,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_macos_conda_py3.5
-      - smoke_test_linux_pip:
-          name: nightly_binary_macos_conda_py3.5_smoke_test_pip
-          python_version: "3.5"
-          requires:
-            - nightly_binary_macos_conda_py3.5_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_macos_conda_py3.5_smoke_test_conda
-          python_version: "3.5"
-          requires:
-            - nightly_binary_macos_conda_py3.5_upload
           filters:
             branches:
               only: nightly
@@ -782,16 +610,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_macos_conda_py3.6
-      - smoke_test_linux_pip:
-          name: nightly_binary_macos_conda_py3.6_smoke_test_pip
-          python_version: "3.6"
-          requires:
-            - nightly_binary_macos_conda_py3.6_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_macos_conda_py3.6_smoke_test_conda
-          python_version: "3.6"
-          requires:
-            - nightly_binary_macos_conda_py3.6_upload
           filters:
             branches:
               only: nightly
@@ -806,16 +624,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_macos_conda_py3.7
-      - smoke_test_linux_pip:
-          name: nightly_binary_macos_conda_py3.7_smoke_test_pip
-          python_version: "3.7"
-          requires:
-            - nightly_binary_macos_conda_py3.7_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_macos_conda_py3.7_smoke_test_conda
-          python_version: "3.7"
-          requires:
-            - nightly_binary_macos_conda_py3.7_upload
           filters:
             branches:
               only: nightly
