@@ -168,6 +168,7 @@ jobs:
     steps:
       - run:
           command: |
+            set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             conda install -y -c pytorch-nightly torchaudio
             python -c "import torchaudio"
@@ -177,6 +178,7 @@ jobs:
     steps:
       - run:
           command: |
+            set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             pip install torchaudio_nightly -f https://download.pytorch.org/whl/nightly/torch_nightly.html
             python -c "import torchaudio"
