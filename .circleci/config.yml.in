@@ -41,6 +41,18 @@ smoke_test_common: &smoke_test_common
   <<: *binary_common
 
 jobs:
+  test_job:
+    docker:
+      - image: 308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable
+        aws_auth:
+          aws_access_key_id: "${ECR_AWS_ACCESS_KEY}"
+          aws_secret_access_key: "${ECR_AWS_SECRET_ACCESS_KEY}"
+    steps:
+      - checkout
+      - run:
+          command: |
+            echo hello
+
   circleci_consistency:
     docker:
       - image: circleci/python:3.7
@@ -234,13 +246,5 @@ jobs:
 
 workflows:
   build:
-{%- if True %}
     jobs:
-      - circleci_consistency
-      {{ workflows() }}
-
-  nightly:
-{%- endif %}
-    jobs:
-      - circleci_consistency
-      {{ workflows(prefix="nightly_", filter_branch="nightly", upload=True) }}
+      - test_job
