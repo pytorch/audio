@@ -458,11 +458,7 @@ class TimeStretch(torch.jit.ScriptModule):
         if rate == 1.0:
             return complex_specgrams
 
-        shape = complex_specgrams.size()
-        complex_specgrams = complex_specgrams.reshape([-1] + list(shape[-3:]))
-        complex_specgrams = F.phase_vocoder(complex_specgrams, rate, self.phase_advance)
-
-        return complex_specgrams.reshape(shape[:-3] + complex_specgrams.shape[-3:])
+        return F.phase_vocoder(complex_specgrams, rate, self.phase_advance)
 
 
 class _AxisMasking(torch.nn.Module):
@@ -496,11 +492,7 @@ class _AxisMasking(torch.nn.Module):
         if self.iid_masks and specgram.dim() == 4:
             return F.mask_along_axis_iid(specgram, self.mask_param, mask_value, self.axis + 1)
         else:
-            shape = specgram.size()
-            specgram = specgram.reshape([-1] + list(shape[-2:]))
-            specgram = F.mask_along_axis(specgram, self.mask_param, mask_value, self.axis)
-
-            return specgram.reshape(shape[:-2] + specgram.shape[-2:])
+            return F.mask_along_axis(specgram, self.mask_param, mask_value, self.axis)
 
 
 class FrequencyMasking(_AxisMasking):
