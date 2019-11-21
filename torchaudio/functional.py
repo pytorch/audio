@@ -225,10 +225,7 @@ def spectrogram(
     waveform, pad, window, n_fft, hop_length, win_length, power, normalized
 ):
     # type: (Tensor, int, Tensor, int, int, int, Optional[int], bool) -> Tensor
-    r"""
-    spectrogram(waveform, pad, window, n_fft, hop_length, win_length, power, normalized)
-
-    Create a spectrogram or a batch of spectrograms from a raw audio signal.
+    r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
 
     Args:
@@ -275,10 +272,7 @@ def spectrogram(
 
 def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
     # type: (Tensor, float, float, float, Optional[float]) -> Tensor
-    r"""
-    amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None)
-
-    Turns a tensor from the power/amplitude scale to the decibel scale.
+    r"""Turn a tensor from the power/amplitude scale to the decibel scale.
 
     This output depends on the maximum value in the input tensor, and so
     may return different values for an audio clip split into snippets vs. a
@@ -309,10 +303,7 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
 
 def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate):
     # type: (int, float, float, int, int) -> Tensor
-    r"""
-    create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate)
-
-    Create a frequency bin conversion matrix.
+    r"""Create a frequency bin conversion matrix.
 
     Args:
         n_freqs (int): Number of frequencies to highlight/apply
@@ -354,10 +345,7 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate):
 
 def create_dct(n_mfcc, n_mels, norm):
     # type: (int, int, Optional[str]) -> Tensor
-    r"""
-    create_dct(n_mfcc, n_mels, norm)
-
-    Creates a DCT transformation matrix with shape (``n_mels``, ``n_mfcc``),
+    r"""Create a DCT transformation matrix with shape (``n_mels``, ``n_mfcc``),
     normalized depending on norm.
 
     Args:
@@ -384,10 +372,7 @@ def create_dct(n_mfcc, n_mels, norm):
 
 def mu_law_encoding(x, quantization_channels):
     # type: (Tensor, int) -> Tensor
-    r"""
-    mu_law_encoding(x, quantization_channels)
-
-    Encode signal based on mu-law companding.  For more info see the
+    r"""Encode signal based on mu-law companding.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
     This algorithm assumes the signal has been scaled to between -1 and 1 and
@@ -411,10 +396,7 @@ def mu_law_encoding(x, quantization_channels):
 
 def mu_law_decoding(x_mu, quantization_channels):
     # type: (Tensor, int) -> Tensor
-    r"""
-    mu_law_decoding(x_mu, quantization_channels)
-
-    Decode mu-law encoded signal.  For more info see the
+    r"""Decode mu-law encoded signal.  For more info see the
     `Wikipedia Entry <https://en.wikipedia.org/wiki/%CE%9C-law_algorithm>`_
 
     This expects an input with values between 0 and quantization_channels - 1
@@ -485,14 +467,17 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     # type: (Tensor, float, Tensor) -> Tensor
     r"""Given a STFT tensor, speed up in time without modifying pitch by a
     factor of ``rate``.
+
     Args:
         complex_specgrams (torch.Tensor): Dimension of `(channel, freq, time, complex=2)`
         rate (float): Speed-up factor
         phase_advance (torch.Tensor): Expected phase advance in each bin. Dimension
             of (freq, 1)
+
     Returns:
         complex_specgrams_stretch (torch.Tensor): Dimension of `(channel,
         freq, ceil(time/rate), complex=2)`
+
     Example
         >>> freq, hop_length = 1025, 512
         >>> # (channel, freq, time, complex=2)
@@ -547,8 +532,7 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
 
 def lfilter(waveform, a_coeffs, b_coeffs):
     # type: (Tensor, Tensor, Tensor) -> Tensor
-    r"""
-    Performs an IIR filter by evaluating difference equation.
+    r"""Perform an IIR filter by evaluating difference equation.
 
     Args:
         waveform (torch.Tensor): audio waveform of dimension of `(..., time)`.  Must be normalized to -1 to 1.
@@ -621,7 +605,7 @@ def lfilter(waveform, a_coeffs, b_coeffs):
 
 def biquad(waveform, b0, b1, b2, a0, a1, a2):
     # type: (Tensor, float, float, float, float, float, float) -> Tensor
-    r"""Performs a biquad filter of input tensor.  Initial conditions set to 0.
+    r"""Perform a biquad filter of input tensor.  Initial conditions set to 0.
     https://en.wikipedia.org/wiki/Digital_biquad_filter
 
     Args:
@@ -655,7 +639,7 @@ def _dB2Linear(x):
 
 def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     # type: (Tensor, int, float, float) -> Tensor
-    r"""Designs biquad highpass filter and performs filtering.  Similar to SoX implementation.
+    r"""Design biquad highpass filter and perform filtering.  Similar to SoX implementation.
 
     Args:
         waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
@@ -684,7 +668,7 @@ def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
 
 def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     # type: (Tensor, int, float, float) -> Tensor
-    r"""Designs biquad lowpass filter and performs filtering.  Similar to SoX implementation.
+    r"""Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.
 
     Args:
         waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
@@ -713,7 +697,7 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
 
 def equalizer_biquad(waveform, sample_rate, center_freq, gain, Q=0.707):
     # type: (Tensor, int, float, float, float) -> Tensor
-    r"""Designs biquad peaking equalizer filter and performs filtering.  Similar to SoX implementation.
+    r"""Design biquad peaking equalizer filter and perform filtering.  Similar to SoX implementation.
 
     Args:
         waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
