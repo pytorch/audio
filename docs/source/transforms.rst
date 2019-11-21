@@ -64,3 +64,38 @@ Transforms are common audio transforms. They can be chained together using :clas
 .. autoclass:: Resample
 
   .. automethod:: torchaudio._docs.Resample.forward
+
+:hidden:`ComplexNorm`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ComplexNorm
+
+  .. automethod:: torchaudio._docs.ComplexNorm.forward
+
+:hidden:`ComputeDeltas`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ComputeDeltas
+
+  .. automethod:: torchaudio._docs.ComputeDeltas.forward
+
+:hidden:`TimeStretch`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: TimeStretch
+
+  .. automethod:: torchaudio._docs.TimeStretch.forward
+
+:hidden:`FrequencyMasking`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: FrequencyMasking
+
+  .. automethod:: torchaudio._docs.FrequencyMasking.forward
+
+:hidden:`TimeMasking`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: TimeMasking
+
+  .. automethod:: torchaudio._docs.TimeMasking.forward

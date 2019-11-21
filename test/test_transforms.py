@@ -424,15 +424,15 @@ class Tester(unittest.TestCase):
         hop_length = 512
         fixed_rate = 1.3
         tensor = torch.rand((10, 2, n_freq, 10, 2))
-        _test_script_module(A.TimeStretch, tensor, n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate)
+        _test_script_module(transforms.TimeStretch, tensor, n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate)
 
     def test_scriptmodule_FrequencyMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
-        _test_script_module(A.FrequencyMasking, tensor, freq_mask_param=60, iid_masks=False)
+        _test_script_module(transforms.FrequencyMasking, tensor, freq_mask_param=60, iid_masks=False)
 
     def test_scriptmodule_TimeMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
-        _test_script_module(A.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
+        _test_script_module(transforms.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
 
 
 if __name__ == '__main__':
