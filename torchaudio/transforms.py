@@ -380,9 +380,9 @@ class ComplexNorm(torch.nn.Module):
     def forward(self, complex_tensor):
         r"""
         Args:
-            complex_tensor (Tensor): Tensor shape of `(*, complex=2)`
+            complex_tensor (Tensor): Tensor shape of `(\*, complex=2)`
         Returns:
-            Tensor: norm of the input tensor, shape of `(*, )`
+            Tensor: norm of the input tensor, shape of `(\*, )`
         """
         return F.complex_norm(complex_tensor, self.power)
 
@@ -435,17 +435,16 @@ class TimeStretch(torch.jit.ScriptModule):
         self.phase_advance = torch.jit.Attribute(phase_advance, torch.Tensor)
 
     def forward(self, complex_specgrams, overriding_rate=None):
-        # type: (Tensor, Optional[float]) -> Tensor
         r"""
         Args:
-            complex_specgrams (Tensor): complex spectrogram (*, channel, freq, time, complex=2)
+            complex_specgrams (Tensor): complex spectrogram (\*, channel, freq, time, complex=2)
             overriding_rate (float or None): speed up to apply to this batch.
                 If no rate is passed, use ``self.fixed_rate``
 
         Returns:
-            (Tensor): Stretched complex spectrogram of dimension (*, channel, freq, ceil(time/rate), complex=2)
+            (Tensor): Stretched complex spectrogram of dimension (\*, channel, freq, ceil(time/rate), complex=2)
         """
-        assert complex_specgrams.size(-1) == 2, "complex_specgrams should be a complex tensor, shape (*, complex=2)"
+        assert complex_specgrams.size(-1) == 2, "complex_specgrams should be a complex tensor, shape (\*, complex=2)"
 
         if overriding_rate is None:
             rate = self.fixed_rate
@@ -466,8 +465,8 @@ class TimeStretch(torch.jit.ScriptModule):
 
 
 class _AxisMasking(torch.nn.Module):
-    r"""
-    Apply masking to a spectrogram.
+    r"""Apply masking to a spectrogram.
+
     Args:
         mask_param (int): Maximum possible length of the mask
         axis: What dimension the mask is applied on
@@ -483,13 +482,12 @@ class _AxisMasking(torch.nn.Module):
         self.iid_masks = iid_masks
 
     def forward(self, specgram, mask_value=0.):
-        # type: (Tensor, float) -> Tensor
         r"""
         Args:
-            specgram (torch.Tensor): Tensor of dimension (*, channel, freq, time)
+            specgram (torch.Tensor): Tensor of dimension (\*, channel, freq, time)
 
         Returns:
-            torch.Tensor: Masked spectrogram of dimensions (*, channel, freq, time)
+            torch.Tensor: Masked spectrogram of dimensions (\*, channel, freq, time)
         """
 
         # if iid_masks flag marked and specgram has a batch dimension
@@ -504,8 +502,8 @@ class _AxisMasking(torch.nn.Module):
 
 
 class FrequencyMasking(_AxisMasking):
-    r"""
-    Apply masking to a spectrogram in the frequency domain.
+    r"""Apply masking to a spectrogram in the frequency domain.
+
     Args:
         freq_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, freq_mask_param).
@@ -518,8 +516,8 @@ class FrequencyMasking(_AxisMasking):
 
 
 class TimeMasking(_AxisMasking):
-    r"""
-    Apply masking to a spectrogram in the time domain.
+    r"""Apply masking to a spectrogram in the time domain.
+
     Args:
         time_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, time_mask_param).
