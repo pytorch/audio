@@ -35,7 +35,7 @@ binary_common: &binary_common
 smoke_test_common: &smoke_test_common
   <<: *binary_common
   docker:
-    - image: 308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:stable
+    - image: 308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:d26af7d0-8458-44f6-9b32-84239b5c75c0
       aws_auth:
         aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
         aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
@@ -835,5 +835,12 @@ workflows:
             branches:
               only: nightly
   docker_build:
+    triggers:
+      - schedule:
+          cron: "0 10 * * 0"
+          filters:
+            branches:
+              only:
+                - master
     jobs:
       - docker_image_build
