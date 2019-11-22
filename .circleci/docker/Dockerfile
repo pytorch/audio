@@ -21,8 +21,8 @@ RUN conda create -y --name python3.5 python=3.5
 RUN conda create -y --name python3.6 python=3.6
 RUN conda create -y --name python3.7 python=3.7
 SHELL [ "/bin/bash", "-c" ]
-RUN source /usr/local/etc/profile.d/conda.sh && conda activate python2.7 && conda install -y -c conda-forge sox
-RUN source /usr/local/etc/profile.d/conda.sh && conda activate python3.5 && conda install -y -c conda-forge sox
+RUN source /usr/local/etc/profile.d/conda.sh && conda activate python2.7 && conda install -y -c conda-forge sox future
+RUN source /usr/local/etc/profile.d/conda.sh && conda activate python3.5 && conda install -y -c conda-forge sox six
 RUN source /usr/local/etc/profile.d/conda.sh && conda activate python3.6 && conda install -y -c conda-forge sox
 RUN source /usr/local/etc/profile.d/conda.sh && conda activate python3.7 && conda install -y -c conda-forge sox
 RUN echo "source /usr/local/etc/profile.d/conda.sh" >> ~/.bashrc
