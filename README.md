@@ -49,6 +49,11 @@ Installation
 
 ### Binaries
 
+To install the latest version using anaconda, run:
+```
+conda install -c pytorch torchaudio
+```
+
 To install the latest pip wheels, run:
 
 ```
