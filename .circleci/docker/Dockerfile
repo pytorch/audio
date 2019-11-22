@@ -11,7 +11,7 @@
 
 FROM ubuntu:latest
 
-RUN apt-get -qq update && apt-get -qq -y install curl bzip2 \
+RUN apt-get -qq update && apt-get -qq -y install curl bzip2 sox libsox-dev libsox-fmt-all \
     && curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh \
     && bash /tmp/miniconda.sh -bfp /usr/local \
     && rm -rf /tmp/miniconda.sh \
@@ -25,8 +25,6 @@ RUN apt-get -qq update && apt-get -qq -y install curl bzip2 \
 
 ENV PATH /opt/conda/bin:$PATH
 
-RUN apt update
-RUN apt install -y sox libsox-dev libsox-fmt-all
 RUN conda create -y --name python2.7 python=2.7
 RUN conda create -y --name python3.5 python=3.5
 RUN conda create -y --name python3.6 python=3.6
