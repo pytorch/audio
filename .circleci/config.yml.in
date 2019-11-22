@@ -220,15 +220,6 @@ jobs:
             branches:
               only: {{filter_branch}}
 {%-   endif %}
-{%-       if os == 'linux' %}
-
-      - smoke_test_linux_pip:
-          name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_smoke_test_pip
-          python_version: "{{python_version}}"
-      - smoke_test_linux_conda:
-          name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_smoke_test_conda
-          python_version: "{{python_version}}"
-{%-       endif %}
 
 {%-   if upload %}
       - binary_{{btype}}_upload:
@@ -237,6 +228,7 @@ jobs:
           requires:
             - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}
 {%-       if filter_branch == 'nightly' %}
+{%-         if os == 'linux' %}
       - smoke_test_linux_pip:
           name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_smoke_test_pip
           python_version: "{{python_version}}"
@@ -247,6 +239,7 @@ jobs:
           python_version: "{{python_version}}"
           requires:
             - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_upload
+{%-         endif %}
 {%-       endif %}
 {%-   if filter_branch %}
           filters:
