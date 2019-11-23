@@ -469,13 +469,13 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     factor of ``rate``.
 
     Args:
-        complex_specgrams (torch.Tensor): Dimension of `(channel, freq, time, complex=2)`
+        complex_specgrams (torch.Tensor): Dimension of `(..., freq, time, complex=2)`
         rate (float): Speed-up factor
         phase_advance (torch.Tensor): Expected phase advance in each bin. Dimension
             of (freq, 1)
 
     Returns:
-        complex_specgrams_stretch (torch.Tensor): Dimension of `(channel,
+        complex_specgrams_stretch (torch.Tensor): Dimension of `(...,
         freq, ceil(time/rate), complex=2)`
 
     Example
@@ -489,6 +489,10 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
         >>> x.shape # with 231 == ceil(300 / 1.3)
         torch.Size([2, 1025, 231, 2])
     """
+
+    # pack batch
+    shape = complex_specgrams.size()
+    complex_specgrams = complex_specgrams.reshape([-1] + list(shape[-3:]))
 
     time_steps = torch.arange(0,
                               complex_specgrams.size(-2),
@@ -526,6 +530,9 @@ def phase_vocoder(complex_specgrams, rate, phase_advance):
     imag_stretch = mag * torch.sin(phase_acc)
 
     complex_specgrams_stretch = torch.stack([real_stretch, imag_stretch], dim=-1)
+
+    # unpack batch
+    complex_specgrams_stretch = complex_specgrams_stretch.reshape(shape[:-3] + complex_specgrams_stretch.shape[1:])
 
     return complex_specgrams_stretch
 
@@ -775,6 +782,10 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
         torch.Tensor: Masked spectrogram of dimensions (channel, freq, time)
     """
 
+    # pack batch
+    shape = specgram.size()
+    specgram = specgram.reshape([-1] + list(shape[-2:]))
+
     value = torch.rand(1) * mask_param
     min_value = torch.rand(1) * (specgram.size(axis) - value)
 
@@ -789,7 +800,10 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
     else:
         raise ValueError('Only Frequency and Time masking are supported')
 
-    return specgram
+    # unpack batch
+    specgram = specgram.reshape(shape[:-2] + specgram.shape[-2:])
+
+    return specgram.reshape(shape[:-2] + specgram.shape[-2:])
 
 
 def compute_deltas(specgram, win_length=5, mode="replicate"):
