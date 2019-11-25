@@ -1,6 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import torch
-import _torch_sox
 
 import torchaudio
 
@@ -13,6 +12,7 @@ def effect_names():
     Example
         >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
     """
+    import _torch_sox
     return _torch_sox.get_effect_names()
 
 
@@ -23,6 +23,7 @@ def SoxEffect():
         SoxEffect: An object with the following attributes: ename (str) which is the
         name of effect, and eopts (List[str]) which is a list of effect options.
     """
+    import _torch_sox
     return _torch_sox.SoxEffect()
 
 
@@ -130,6 +131,8 @@ class SoxEffectsChain(object):
             self.chain.append(e)
 
         # print("effect options:", [x.eopts for x in self.chain])
+
+        import _torch_sox
         sr = _torch_sox.build_flow_effects(self.input_file,
                                            out,
                                            self.channels_first,
