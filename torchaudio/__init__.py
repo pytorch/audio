@@ -2,7 +2,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import os.path
 
 import torch
-import _torch_sox
 
 from torchaudio import transforms, datasets, kaldi_io, sox_effects, compliance
 
@@ -84,6 +83,7 @@ def load(filepath,
     if offset < 0:
         raise ValueError("Expected positive offset value")
 
+    import _torch_sox
     sample_rate = _torch_sox.read_audio_file(filepath,
                                              out,
                                              channels_first,
@@ -203,6 +203,8 @@ def save_encinfo(filepath,
         src = src.transpose(1, 0)
     # save data to file
     src = src.contiguous()
+
+    import _torch_sox
     _torch_sox.write_audio_file(filepath, src, signalinfo, encodinginfo, filetype)
 
 
@@ -220,6 +222,7 @@ def info(filepath):
          >>> si, ei = torchaudio.info('foo.wav')
          >>> rate, channels, encoding = si.rate, si.channels, ei.encoding
      """
+    import _torch_sox
     return _torch_sox.get_info(filepath)
 
 
@@ -242,6 +245,7 @@ def sox_signalinfo_t():
         >>> si.precision = 16
         >>> si.length = 0
     """
+    import _torch_sox
     return _torch_sox.sox_signalinfo_t()
 
 
@@ -274,6 +278,7 @@ def sox_encodinginfo_t():
         >>> ei.opposite_endian = torchaudio.get_sox_bool(0)
 
     """
+    import _torch_sox
     ei = _torch_sox.sox_encodinginfo_t()
     sdo = get_sox_option_t(2)  # sox_default_option
     ei.reverse_bytes = sdo
@@ -292,6 +297,9 @@ def get_sox_encoding_t(i=None):
     Returns:
         sox_encoding_t: A sox_encoding_t type for output encoding
     """
+
+    import _torch_sox
+
     if i is None:
         # one can see all possible values using the .__members__ attribute
         return _torch_sox.sox_encoding_t
@@ -309,6 +317,9 @@ def get_sox_option_t(i=2):
     Returns:
         sox_option_t: A sox_option_t type
     """
+
+    import _torch_sox
+
     if i is None:
         return _torch_sox.sox_option_t
     else:
@@ -326,6 +337,9 @@ def get_sox_bool(i=0):
     Returns:
         sox_bool: A sox_bool type
     """
+
+    import _torch_sox
+
     if i is None:
         return _torch_sox.sox_bool
     else:
@@ -337,6 +351,7 @@ def initialize_sox():
     loading.  Importantly, only run `initialize_sox` once and do not shutdown
     after each effect chain, but rather once you are finished with all effects chains.
     """
+    import _torch_sox
     return _torch_sox.initialize_sox()
 
 
@@ -344,6 +359,7 @@ def shutdown_sox():
     """Showdown sox for effects chain.  Not required for simple loading.  Importantly,
     only call once.  Attempting to re-initialize sox will result in seg faults.
     """
+    import _torch_sox
     return _torch_sox.shutdown_sox()
 
 
