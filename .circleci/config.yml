@@ -32,6 +32,14 @@ binary_common: &binary_common
     UNICODE_ABI: << parameters.unicode_abi >>
     CU_VERSION: cpu
 
+smoke_test_common: &smoke_test_common
+  <<: *binary_common
+  docker:
+    - image: 308535385114.dkr.ecr.us-east-1.amazonaws.com/torchaudio/smoke_test:d26af7d0-8458-face-book-84239b5c75c0
+      aws_auth:
+        aws_access_key_id: ${ECR_AWS_ACCESS_KEY}
+        aws_secret_access_key: ${ECR_AWS_SECRET_ACCESS_KEY}
+
 jobs:
   circleci_consistency:
     docker:
@@ -155,6 +163,51 @@ jobs:
               aws s3 cp "$pkg" "s3://pytorch/whl/nightly/" --acl public-read
             done
 
+  smoke_test_linux_conda:
+    <<: *smoke_test_common
+    steps:
+      - run:
+          command: |
+            set -x
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            conda install -y -c pytorch-nightly torchaudio
+            python -c "import torchaudio"
+
+  smoke_test_linux_pip:
+    <<: *smoke_test_common
+    steps:
+      - run:
+          command: |
+            set -x
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            pip install torchaudio_nightly -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+            python -c "import torchaudio"
+
+  docker_image_build:
+    machine:
+      image: ubuntu-1604:201903-01
+    resource_class: large
+    environment:
+      image_name: torchaudio/smoke_test
+    steps:
+      - checkout
+      - run:
+          name: build_docker image
+          no_output_timeout: "1h"
+          command: |
+            cd .circleci/docker && docker build . -t ${image_name}:${CIRCLE_WORKFLOW_ID}
+      - run:
+          name: upload docker image
+          no_output_timeout: "1h"
+          command: |
+            set +x
+            export AWS_ACCESS_KEY_ID=${ECR_AWS_ACCESS_KEY}
+            export AWS_SECRET_ACCESS_KEY=${ECR_AWS_SECRET_ACCESS_KEY}
+            eval $(aws ecr get-login --region us-east-1 --no-include-email)
+            set -x
+            docker tag ${image_name}:${CIRCLE_WORKFLOW_ID} 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
+            docker push 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
+
 workflows:
   build:
     jobs:
@@ -232,6 +285,16 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py2.7
+      - smoke_test_linux_pip:
+          name: nightly_binary_linux_wheel_py2.7_smoke_test_pip
+          python_version: "2.7"
+          requires:
+            - nightly_binary_linux_wheel_py2.7_upload
+      - smoke_test_linux_conda:
+          name: nightly_binary_linux_wheel_py2.7_smoke_test_conda
+          python_version: "2.7"
+          requires:
+            - nightly_binary_linux_wheel_py2.7_upload
           filters:
             branches:
               only: nightly
@@ -247,6 +310,16 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py2.7_unicode
+      - smoke_test_linux_pip:
+          name: nightly_binary_linux_wheel_py2.7_unicode_smoke_test_pip
+          python_version: "2.7"
+          requires:
+            - nightly_binary_linux_wheel_py2.7_unicode_upload
+      - smoke_test_linux_conda:
+          name: nightly_binary_linux_wheel_py2.7_unicode_smoke_test_conda
+          python_version: "2.7"
+          requires:
+            - nightly_binary_linux_wheel_py2.7_unicode_upload
           filters:
             branches:
               only: nightly
@@ -261,6 +334,16 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py3.5
+      - smoke_test_linux_pip:
+          name: nightly_binary_linux_wheel_py3.5_smoke_test_pip
+          python_version: "3.5"
+          requires:
+            - nightly_binary_linux_wheel_py3.5_upload
+      - smoke_test_linux_conda:
+          name: nightly_binary_linux_wheel_py3.5_smoke_test_conda
+          python_version: "3.5"
+          requires:
+            - nightly_binary_linux_wheel_py3.5_upload
           filters:
             branches:
               only: nightly
@@ -275,6 +358,16 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py3.6
+      - smoke_test_linux_pip:
+          name: nightly_binary_linux_wheel_py3.6_smoke_test_pip
+          python_version: "3.6"
+          requires:
+            - nightly_binary_linux_wheel_py3.6_upload
+      - smoke_test_linux_conda:
+          name: nightly_binary_linux_wheel_py3.6_smoke_test_conda
+          python_version: "3.6"
+          requires:
+            - nightly_binary_linux_wheel_py3.6_upload
           filters:
             branches:
               only: nightly
@@ -289,6 +382,16 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py3.7
+      - smoke_test_linux_pip:
+          name: nightly_binary_linux_wheel_py3.7_smoke_test_pip
+          python_version: "3.7"
+          requires:
+            - nightly_binary_linux_wheel_py3.7_upload
+      - smoke_test_linux_conda:
+          name: nightly_binary_linux_wheel_py3.7_smoke_test_conda
+          python_version: "3.7"
+          requires:
+            - nightly_binary_linux_wheel_py3.7_upload
           filters:
             branches:
               only: nightly
@@ -374,6 +477,16 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py2.7
+      - smoke_test_linux_pip:
+          name: nightly_binary_linux_conda_py2.7_smoke_test_pip
+          python_version: "2.7"
+          requires:
+            - nightly_binary_linux_conda_py2.7_upload
+      - smoke_test_linux_conda:
+          name: nightly_binary_linux_conda_py2.7_smoke_test_conda
+          python_version: "2.7"
+          requires:
+            - nightly_binary_linux_conda_py2.7_upload
           filters:
             branches:
               only: nightly
@@ -388,6 +501,16 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py3.5
+      - smoke_test_linux_pip:
+          name: nightly_binary_linux_conda_py3.5_smoke_test_pip
+          python_version: "3.5"
+          requires:
+            - nightly_binary_linux_conda_py3.5_upload
+      - smoke_test_linux_conda:
+          name: nightly_binary_linux_conda_py3.5_smoke_test_conda
+          python_version: "3.5"
+          requires:
+            - nightly_binary_linux_conda_py3.5_upload
           filters:
             branches:
               only: nightly
@@ -402,6 +525,16 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py3.6
+      - smoke_test_linux_pip:
+          name: nightly_binary_linux_conda_py3.6_smoke_test_pip
+          python_version: "3.6"
+          requires:
+            - nightly_binary_linux_conda_py3.6_upload
+      - smoke_test_linux_conda:
+          name: nightly_binary_linux_conda_py3.6_smoke_test_conda
+          python_version: "3.6"
+          requires:
+            - nightly_binary_linux_conda_py3.6_upload
           filters:
             branches:
               only: nightly
@@ -416,6 +549,16 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py3.7
+      - smoke_test_linux_pip:
+          name: nightly_binary_linux_conda_py3.7_smoke_test_pip
+          python_version: "3.7"
+          requires:
+            - nightly_binary_linux_conda_py3.7_upload
+      - smoke_test_linux_conda:
+          name: nightly_binary_linux_conda_py3.7_smoke_test_conda
+          python_version: "3.7"
+          requires:
+            - nightly_binary_linux_conda_py3.7_upload
           filters:
             branches:
               only: nightly
@@ -475,3 +618,13 @@ workflows:
           filters:
             branches:
               only: nightly
+  docker_build:
+    triggers:
+      - schedule:
+          cron: "0 10 * * 0"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - docker_image_build
