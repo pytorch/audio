@@ -585,3 +585,21 @@ class AddDimension(object):
     def __call__(self, tensor):
         tensor = tensor.unsqueeze(self.dim)
         return tensor
+
+
+class ToTensor(object):
+    """Convert a ``numpy.ndarray`` to tensor.
+    """
+
+    def __call__(self, array):
+        """
+        Args:
+            array: a numpy array or array to be converted
+
+        Returns:
+            Tensor: Converted sound.
+        """
+        return torch.tensor(array)
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
