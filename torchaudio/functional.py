@@ -921,7 +921,7 @@ def _add_noise_shaping(dithered_waveform, waveform):
     return noise_shaped.reshape(dithered_shape[:-1] + noise_shaped.shape[-1:])
 
 
-def _probability_distribution(waveform, density_function="TPDF"):
+def _apply_probability_distribution(waveform, density_function="TPDF"):
     # type: (Tensor, str) -> Tensor
     r"""Apply a probability distribution function on a waveform.
 
@@ -1006,7 +1006,7 @@ def dither(waveform, density_function="TPDF", noise_shaping=False):
     Returns:
        torch.Tensor: waveform dithered
     """
-    dithered = _probability_distribution(waveform, density_function=density_function)
+    dithered = _apply_probability_distribution(waveform, density_function=density_function)
 
     if noise_shaping:
         return _add_noise_shaping(dithered, waveform)
