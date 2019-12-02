@@ -877,7 +877,7 @@ def gain(waveform, gain_db=1.0):
     return waveform * ratio
 
 
-def scale_to_interval(waveform, interval_max=1.0):
+def _scale_to_interval(waveform, interval_max=1.0):
     # type: (Tensor, float) -> Tensor
     r"""Scale the waveform to the interval [-interval_max, interval_max] across all dimensions.
 
@@ -921,7 +921,7 @@ def _add_noise_shaping(dithered_waveform, waveform):
     return noise_shaped.reshape(dithered_shape[:-1] + noise_shaped.shape[-1:])
 
 
-def probability_distribution(waveform, density_function="TPDF"):
+def _probability_distribution(waveform, density_function="TPDF"):
     # type: (Tensor, str) -> Tensor
     r"""Apply a probability distribution function on a waveform.
 
@@ -1006,7 +1006,7 @@ def dither(waveform, density_function="TPDF", noise_shaping=False):
     Returns:
        torch.Tensor: waveform dithered
     """
-    dithered = probability_distribution(waveform, density_function=density_function)
+    dithered = _probability_distribution(waveform, density_function=density_function)
 
     if noise_shaping:
         return _add_noise_shaping(dithered, waveform)
