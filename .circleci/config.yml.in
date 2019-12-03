@@ -228,7 +228,7 @@ jobs:
           requires:
             - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}
 {%-       if filter_branch == 'nightly' %}
-{%-         if os == 'linux' %}
+{%-         if os == 'linux' and not python_version.startswith("2.") %}
       - smoke_test_linux_pip:
           name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_smoke_test_pip
           python_version: "{{python_version}}"
