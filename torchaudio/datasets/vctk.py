@@ -21,18 +21,16 @@ def load_vctk_item(
 
     # Read wav
     file_audio = os.path.join(path, folder_audio, speaker_id, fileid + ext_audio)
+    waveform, sample_rate = torchaudio.load(file_audio)
     if downsample:
-        # Legacy
-        E = torchaudio.sox_effects.SoxEffectsChain()
-        E.set_input_file(file_audio)
-        E.append_effect_to_chain("gain", ["-h"])
-        E.append_effect_to_chain("channels", [1])
-        E.append_effect_to_chain("rate", [16000])
-        E.append_effect_to_chain("gain", ["-rh"])
-        E.append_effect_to_chain("dither", ["-s"])
-        waveform, sample_rate = E.sox_build_flow_effects()
-    else:
-        waveform, sample_rate = torchaudio.load(file_audio)
+        # TODO Remove this parameter after deprecation
+        F = torchaudio.functional
+        T = torchaudio.transforms
+        # rate
+        sample = T.Resample(sample_rate, 16000, resampling_method='sinc_interpolation')
+        waveform = sample(waveform)
+        # dither
+        waveform = F.dither(waveform, noise_shaping=True)
 
     return waveform, sample_rate, utterance, speaker_id, utterance_id
 
