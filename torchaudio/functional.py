@@ -877,27 +877,6 @@ def gain(waveform, gain_db=1.0):
     return waveform * ratio
 
 
-def _scale_to_interval(waveform, interval_max=1.0):
-    # type: (Tensor, float) -> Tensor
-    r"""Scale the waveform to the interval [-interval_max, interval_max] across all dimensions.
-
-    Args:
-       waveform (torch.Tensor): Tensor of audio of dimension (channel, time).
-       interval_max (float): The bounds of the interval, where the float indicates
-           the upper bound and the negative of the float indicates the lower
-           bound (Default: `1.0`).
-           Example: interval=1.0 -> [-1.0, 1.0]
-
-    Returns:
-       torch.Tensor: the whole waveform scaled to interval.
-    """
-    abs_max = torch.max(torch.abs(waveform))
-    ratio = abs_max / interval_max
-    waveform /= ratio
-
-    return waveform
-
-
 def _add_noise_shaping(dithered_waveform, waveform):
     r"""Noise shaping is calculated by error:
     error[n] = dithered[n] - original[n]

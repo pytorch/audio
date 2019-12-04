@@ -285,16 +285,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py2.7
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_wheel_py2.7_smoke_test_pip
-          python_version: "2.7"
-          requires:
-            - nightly_binary_linux_wheel_py2.7_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py2.7_smoke_test_conda
-          python_version: "2.7"
-          requires:
-            - nightly_binary_linux_wheel_py2.7_upload
           filters:
             branches:
               only: nightly
@@ -310,16 +300,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_wheel_py2.7_unicode
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_wheel_py2.7_unicode_smoke_test_pip
-          python_version: "2.7"
-          requires:
-            - nightly_binary_linux_wheel_py2.7_unicode_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py2.7_unicode_smoke_test_conda
-          python_version: "2.7"
-          requires:
-            - nightly_binary_linux_wheel_py2.7_unicode_upload
           filters:
             branches:
               only: nightly
@@ -477,16 +457,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py2.7
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_conda_py2.7_smoke_test_pip
-          python_version: "2.7"
-          requires:
-            - nightly_binary_linux_conda_py2.7_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_conda_py2.7_smoke_test_conda
-          python_version: "2.7"
-          requires:
-            - nightly_binary_linux_conda_py2.7_upload
           filters:
             branches:
               only: nightly

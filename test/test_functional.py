@@ -379,13 +379,6 @@ class TestFunctional(unittest.TestCase):
 
         self.assertTrue(torch.allclose(waveform_gain, sox_gain_waveform, atol=1e-04))
 
-    def test_scale_to_interval(self):
-        scaled = 5.5  # [-5.5, 5.5]
-        waveform_scaled = F._scale_to_interval(self.waveform_train, scaled)
-
-        self.assertTrue(torch.max(waveform_scaled) <= scaled)
-        self.assertTrue(torch.min(waveform_scaled) >= -scaled)
-
     def test_dither(self):
         waveform_dithered = F.dither(self.waveform_train)
         waveform_dithered_noiseshaped = F.dither(self.waveform_train, noise_shaping=True)
@@ -581,12 +574,6 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
         gainDB = 2.0
 
         _test_torchscript_functional(F.gain, tensor, gainDB)
-
-    def test_torchscript_scale_to_interval(self):
-        tensor = torch.rand((1, 1000))
-        scaled = 3.5
-
-        _test_torchscript_functional(F._scale_to_interval, tensor, scaled)
 
     def test_torchscript_dither(self):
         tensor = torch.rand((1, 1000))
