@@ -80,7 +80,6 @@ class SoxEffectsChain(object):
 
     """
 
-    EFFECTS_AVAILABLE = set(effect_names())
     EFFECTS_UNIMPLEMENTED = set(["spectrogram", "splice", "noiseprof", "fir"])
 
     def __init__(self, normalization=True, channels_first=True, out_siginfo=None, out_encinfo=None, filetype="raw"):
@@ -92,6 +91,9 @@ class SoxEffectsChain(object):
         self.filetype = filetype
         self.normalization = normalization
         self.channels_first = channels_first
+
+        # Define in __init__ to avoid calling at import time
+        self.EFFECTS_AVAILABLE = set(effect_names())
 
     def append_effect_to_chain(self, ename, eargs=None):
         r"""Append effect to a sox effects chain.
