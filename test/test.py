@@ -7,12 +7,32 @@ import math
 import os
 
 
+class AudioBackendScope:
+    def __init__(self, backend):
+        self.new_backend = backend
+        self.previous_backend = torchaudio.get_audio_backend()
+
+    def __enter__(self):
+        torchaudio.set_audio_backend(self.new_backend)
+        return self.new_backend
+
+    def __exit__(self, type, value, traceback):
+        backend = self.previous_backend
+        torchaudio.set_audio_backend(backend)
+
+
 class Test_LoadSave(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, "assets",
                                  "steam-train-whistle-daniel_simon.mp3")
 
     def test_1_save(self):
+        for backend in ["sox"]:
+            with self.subTest():
+                with AudioBackendScope(backend):
+                    self._test_1_save()
+
+    def _test_1_save(self):
         # load signal
         x, sr = torchaudio.load(self.test_filepath, normalization=False)
 
@@ -78,6 +98,12 @@ class Test_LoadSave(unittest.TestCase):
         os.unlink(new_filepath)
 
     def test_2_load(self):
+        for backend in ["sox"]:
+            with self.subTest():
+                with AudioBackendScope(backend):
+                    self._test_2_load()
+
+    def _test_2_load(self):
         # check normal loading
         x, sr = torchaudio.load(self.test_filepath)
         self.assertEqual(sr, 44100)
@@ -117,6 +143,12 @@ class Test_LoadSave(unittest.TestCase):
             torchaudio.load(tdir)
 
     def test_3_load_and_save_is_identity(self):
+        for backend in ["sox", "pysoundfile"]:
+            with self.subTest():
+                with AudioBackendScope(backend):
+                    self._test_3_load_and_save_is_identity()
+
+    def _test_3_load_and_save_is_identity(self):
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
         tensor, sample_rate = torchaudio.load(input_path)
         output_path = os.path.join(self.test_dirpath, 'test.wav')
@@ -127,6 +159,12 @@ class Test_LoadSave(unittest.TestCase):
         os.unlink(output_path)
 
     def test_4_load_partial(self):
+        for backend in ["sox"]:
+            with self.subTest():
+                with AudioBackendScope(backend):
+                    self._test_4_load_partial()
+
+    def _test_4_load_partial(self):
         num_frames = 101
         offset = 201
         # load entire mono sinewave wav file, load a partial copy and then compare
