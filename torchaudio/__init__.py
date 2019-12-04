@@ -11,6 +11,30 @@ except ImportError:
     pass
 
 
+_audio_backend = "sox"
+
+
+def set_audio_backend(backend):
+    """
+    Specifies the package used to load.
+    Args:
+        backend (string): Name of the backend. one of {'sox'}.
+    """
+    global _audio_backend
+    if backend not in ["sox"]:
+        raise ValueError(
+            "Invalid backend '{}'. Options are 'sox'.".format(backend)
+        )
+    _audio_backend = backend
+
+
+def get_audio_backend():
+    """
+    Gets the name of the package used to load.
+    """
+    return _audio_backend
+
+
 def check_input(src):
     if not torch.is_tensor(src):
         raise TypeError('Expected a tensor, got %s' % type(src))
@@ -83,15 +107,20 @@ def load(filepath,
     if offset < 0:
         raise ValueError("Expected positive offset value")
 
-    import _torch_sox
-    sample_rate = _torch_sox.read_audio_file(filepath,
-                                             out,
-                                             channels_first,
-                                             num_frames,
-                                             offset,
-                                             signalinfo,
-                                             encodinginfo,
-                                             filetype)
+    if get_audio_backend() == "sox":
+        import _torch_sox
+        sample_rate = _torch_sox.read_audio_file(
+            filepath,
+            out,
+            channels_first,
+            num_frames,
+            offset,
+            signalinfo,
+            encodinginfo,
+            filetype
+        )
+    else:
+        raise ImportError
 
     # normalize if needed
     _audio_normalization(out, normalization)
@@ -204,8 +233,11 @@ def save_encinfo(filepath,
     # save data to file
     src = src.contiguous()
 
-    import _torch_sox
-    _torch_sox.write_audio_file(filepath, src, signalinfo, encodinginfo, filetype)
+    if get_audio_backend() == "sox":
+        import _torch_sox
+        _torch_sox.write_audio_file(filepath, src, signalinfo, encodinginfo, filetype)
+    else:
+        raise ImportError
 
 
 def info(filepath):
@@ -222,8 +254,12 @@ def info(filepath):
          >>> si, ei = torchaudio.info('foo.wav')
          >>> rate, channels, encoding = si.rate, si.channels, ei.encoding
      """
-    import _torch_sox
-    return _torch_sox.get_info(filepath)
+
+    if get_audio_backend() == "sox":
+        import _torch_sox
+        return _torch_sox.get_info(filepath)
+    else:
+        raise ImportError
 
 
 def sox_signalinfo_t():
@@ -245,6 +281,10 @@ def sox_signalinfo_t():
         >>> si.precision = 16
         >>> si.length = 0
     """
+
+    if get_audio_backend() != "sox":
+        raise ImportError
+
     import _torch_sox
     return _torch_sox.sox_signalinfo_t()
 
@@ -278,6 +318,10 @@ def sox_encodinginfo_t():
         >>> ei.opposite_endian = torchaudio.get_sox_bool(0)
 
     """
+
+    if get_audio_backend() != "sox":
+        raise ImportError
+
     import _torch_sox
     ei = _torch_sox.sox_encodinginfo_t()
     sdo = get_sox_option_t(2)  # sox_default_option
@@ -298,8 +342,10 @@ def get_sox_encoding_t(i=None):
         sox_encoding_t: A sox_encoding_t type for output encoding
     """
 
-    import _torch_sox
+    if get_audio_backend() != "sox":
+        raise ImportError
 
+    import _torch_sox
     if i is None:
         # one can see all possible values using the .__members__ attribute
         return _torch_sox.sox_encoding_t
@@ -318,8 +364,10 @@ def get_sox_option_t(i=2):
         sox_option_t: A sox_option_t type
     """
 
-    import _torch_sox
+    if get_audio_backend() != "sox":
+        raise ImportError
 
+    import _torch_sox
     if i is None:
         return _torch_sox.sox_option_t
     else:
@@ -338,8 +386,10 @@ def get_sox_bool(i=0):
         sox_bool: A sox_bool type
     """
 
-    import _torch_sox
+    if get_audio_backend() != "sox":
+        raise ImportError
 
+    import _torch_sox
     if i is None:
         return _torch_sox.sox_bool
     else:
@@ -351,6 +401,10 @@ def initialize_sox():
     loading.  Importantly, only run `initialize_sox` once and do not shutdown
     after each effect chain, but rather once you are finished with all effects chains.
     """
+
+    if get_audio_backend() != "sox":
+        raise ImportError
+
     import _torch_sox
     return _torch_sox.initialize_sox()
 
@@ -359,6 +413,10 @@ def shutdown_sox():
     """Showdown sox for effects chain.  Not required for simple loading.  Importantly,
     only call once.  Attempting to re-initialize sox will result in seg faults.
     """
+
+    if get_audio_backend() != "sox":
+        raise ImportError
+
     import _torch_sox
     return _torch_sox.shutdown_sox()
 
