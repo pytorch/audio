@@ -12,18 +12,19 @@ except ImportError:
 
 
 _audio_backend = "sox"
+_audio_backends = ["sox", "pysoundfile"]
 
 
 def set_audio_backend(backend):
     """
     Specifies the package used to load.
     Args:
-        backend (string): Name of the backend. one of {'sox'}.
-    """
+        backend (string): Name of the backend. One of {}.
+    """.format(_audio_backends)
     global _audio_backend
-    if backend not in ["sox"]:
+    if backend not in _audio_backends:
         raise ValueError(
-            "Invalid backend '{}'. Options are 'sox'.".format(backend)
+            "Invalid backend '{}'. Options are {}.".format(backend, _audio_backends)
         )
     _audio_backend = backend
 
