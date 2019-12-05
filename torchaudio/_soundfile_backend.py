@@ -42,7 +42,7 @@ def load(
     out, sample_rate = soundfile.read(
         filepath, frames=num_frames, start=offset, always_2d=True
     )
-    out = torch.tensor(out).t()
+    out = torch.from_numpy(out).t()
 
     # normalize if needed
     # _audio_normalization(out, normalization)
