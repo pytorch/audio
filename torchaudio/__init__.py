@@ -3,7 +3,15 @@ import os.path
 
 import torch
 
-from torchaudio import transforms, datasets, kaldi_io, sox_effects, compliance
+from torchaudio import (
+    _soundfile_backend,
+    _sox_backend,
+    compliance,
+    datasets,
+    kaldi_io,
+    sox_effects,
+    transforms,
+)
 
 try:
     from .version import __version__, git_version  # noqa: F401
@@ -91,42 +99,25 @@ def load(filepath,
         1.
 
     """
-    # stringify if `pathlib.Path` (noop if already `str`)
-    filepath = str(filepath)
-    # check if valid file
-    if not os.path.isfile(filepath):
-        raise OSError("{} not found or is a directory".format(filepath))
-
-    # initialize output tensor
-    if out is not None:
-        check_input(out)
-    else:
-        out = torch.FloatTensor()
-
-    if num_frames < -1:
-        raise ValueError("Expected value for num_samples -1 (entire file) or >=0")
-    if offset < 0:
-        raise ValueError("Expected positive offset value")
 
     if get_audio_backend() == "sox":
-        import _torch_sox
-        sample_rate = _torch_sox.read_audio_file(
-            filepath,
-            out,
-            channels_first,
-            num_frames,
-            offset,
-            signalinfo,
-            encodinginfo,
-            filetype
-        )
+        func = _sox_backend.load
+    elif get_audio_backend() == "pysoundfile":
+        func = _soundfile_backend.load
     else:
         raise ImportError
 
-    # normalize if needed
-    _audio_normalization(out, normalization)
-
-    return out, sample_rate
+    return func(
+        filepath,
+        out=out,
+        normalization=normalization,
+        channels_first=channels_first,
+        num_frames=num_frames,
+        offset=offset,
+        signalinfo=signalinfo,
+        encodinginfo=encodinginfo,
+        filetype=filetype,
+    )
 
 
 def load_wav(filepath, **kwargs):
@@ -158,13 +149,17 @@ def save(filepath, src, sample_rate, precision=16, channels_first=True):
         channels_first (bool): Set channels first or length first in result. (
             Default: ``True``)
     """
-    si = sox_signalinfo_t()
-    ch_idx = 0 if channels_first else 1
-    si.rate = sample_rate
-    si.channels = 1 if src.dim() == 1 else src.size(ch_idx)
-    si.length = src.numel()
-    si.precision = precision
-    return save_encinfo(filepath, src, channels_first, si)
+
+    if get_audio_backend() == "sox":
+        func = _sox_backend.save
+    elif get_audio_backend() == "pysoundfile":
+        func = _soundfile_backend.save
+    else:
+        raise ImportError
+
+    return func(
+        filepath, src, sample_rate, precision=precision, channels_first=channels_first
+    )
 
 
 def save_encinfo(filepath,
@@ -257,10 +252,13 @@ def info(filepath):
      """
 
     if get_audio_backend() == "sox":
-        import _torch_sox
-        return _torch_sox.get_info(filepath)
+        func = _sox_backend.info
+    elif get_audio_backend() == "pysoundfile":
+        func = _soundfile_backend.info
     else:
         raise ImportError
+
+    return func(filepath)
 
 
 def sox_signalinfo_t():
