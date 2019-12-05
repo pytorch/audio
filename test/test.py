@@ -209,5 +209,21 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(si.rate, rate)
         self.assertEqual(ei.bits_per_sample, precision)
 
+    def test_5_get_info_soundfile(self):
+        for backend in ["soundfile"]:
+            with self.subTest():
+                with AudioBackendScope(backend):
+                    self._test_5_get_info_soundfile()
+
+    def _test_5_get_info_soundfile(self):
+        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        channels, samples, rate, precision = (1, 64000, 16000, 16)
+        si = torchaudio.info(input_path)
+        self.assertEqual(si.channels, channels)
+        self.assertEqual(si.frames, samples)
+        self.assertEqual(si.samplerate, rate)
+        self.assertEqual(int(si.subtype[-2:]), precision)
+
+
 if __name__ == '__main__':
     unittest.main()
