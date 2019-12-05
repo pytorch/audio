@@ -57,7 +57,7 @@ def load(
     return out, sample_rate
 
 
-def save(filepath, src, sample_rate, channels_first=True, **_):
+def save(filepath, src, sample_rate, precision=16, channels_first=True, **_):
     r"""See torchaudio.save"""
 
     if channels_first:
@@ -67,8 +67,10 @@ def save(filepath, src, sample_rate, channels_first=True, **_):
         # Soundfile doesn't support int64
         src = src.type(torch.int32)
 
+    precision = "PCM_S8" if precision == 8 else "PCM_" + str(precision)
+
     import soundfile
-    return soundfile.write(filepath, src, sample_rate)
+    return soundfile.write(filepath, src, sample_rate, precision)
 
 
 def info(filepath, **_):

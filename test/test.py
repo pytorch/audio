@@ -7,6 +7,10 @@ import math
 import os
 
 
+def _extract_digits(s):
+        return int("".join([i for i in s if i.isdigit()]))
+
+
 class AudioBackendScope:
     def __init__(self, backend):
         self.new_backend = backend
@@ -132,9 +136,9 @@ class Test_LoadSave(unittest.TestCase):
         torchaudio.save(new_filepath, y, sr, new_precision)
 
         si32 = torchaudio.info(new_filepath)
-        si_precision = int(si.subtype[-2:])
+        si_precision = _extract_digits(si.subtype)
         self.assertEqual(si_precision, 16)
-        si32_precision = int(si32.subtype[-2:])
+        si32_precision = _extract_digits(si32.subtype)
         self.assertEqual(si32_precision, new_precision)
         os.unlink(new_filepath)
 
@@ -265,7 +269,7 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(si.channels, channels)
         self.assertEqual(si.frames, samples)
         self.assertEqual(si.samplerate, rate)
-        si_precision = int(si.subtype[-2:])
+        si_precision = _extract_digits(si.subtype)
         self.assertEqual(si_precision, precision)
 
         torchaudio.set_audio_backend(self.default_audio_backend)
