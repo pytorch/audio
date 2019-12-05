@@ -22,6 +22,9 @@ class AudioBackendScope:
 
 
 class Test_LoadSave(unittest.TestCase):
+
+    default_audio_backend = torchaudio.get_audio_backend()
+
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, "assets",
                                  "steam-train-whistle-daniel_simon.mp3")
@@ -72,6 +75,10 @@ class Test_LoadSave(unittest.TestCase):
                                         "test.wav")
             torchaudio.save(new_filepath, x, sr)
 
+    def test_1_save_sox_sine(self):
+
+        torchaudio.set_audio_backend("sox")
+
         # save created file
         sinewave_filepath = os.path.join(self.test_dirpath, "assets",
                                          "sinewave.wav")
@@ -96,6 +103,42 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(si.precision, 16)
         self.assertEqual(si32.precision, new_precision)
         os.unlink(new_filepath)
+
+        torchaudio.set_audio_backend(self.default_audio_backend)
+
+    def test_1_save_soundfile_sine(self):
+
+        torchaudio.set_audio_backend("soundfile")
+
+        # save created file
+        sinewave_filepath = os.path.join(self.test_dirpath, "assets",
+                                         "sinewave.wav")
+        sr = 16000
+        freq = 440
+        volume = 0.3
+
+        y = (torch.cos(
+            2 * math.pi * torch.arange(0, 4 * sr).float() * freq / sr))
+        y.unsqueeze_(0)
+        # y is between -1 and 1, so must scale
+        y = (y * volume * (2**31)).long()
+        torchaudio.save(sinewave_filepath, y, sr)
+        self.assertTrue(os.path.isfile(sinewave_filepath))
+
+        # test precision
+        new_precision = 32
+        new_filepath = os.path.join(self.test_dirpath, "test.wav")
+        si = torchaudio.info(sinewave_filepath)
+        torchaudio.save(new_filepath, y, sr, new_precision)
+
+        si32 = torchaudio.info(new_filepath)
+        si_precision = int(si.subtype[-2:])
+        self.assertEqual(si_precision, 16)
+        si32_precision = int(si32.subtype[-2:])
+        self.assertEqual(si32_precision, new_precision)
+        os.unlink(new_filepath)
+
+        torchaudio.set_audio_backend(self.default_audio_backend)
 
     def test_2_load(self):
         for backend in ["sox"]:
@@ -200,7 +243,9 @@ class Test_LoadSave(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             torchaudio.load(input_sine_path, offset=100000)
 
-    def test_5_get_info(self):
+    def test_5_get_info_sox(self):
+        torchaudio.set_audio_backend("sox")
+
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
         channels, samples, rate, precision = (1, 64000, 16000, 16)
         si, ei = torchaudio.info(input_path)
@@ -209,21 +254,21 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(si.rate, rate)
         self.assertEqual(ei.bits_per_sample, precision)
 
-    def test_5_get_info_soundfile(self):
-        for backend in ["soundfile"]:
-            with self.subTest():
-                with AudioBackendScope(backend):
-                    self._test_5_get_info_soundfile()
+        torchaudio.set_audio_backend(self.default_audio_backend)
 
     def _test_5_get_info_soundfile(self):
+        torchaudio.set_audio_backend("soundfile")
+
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
         channels, samples, rate, precision = (1, 64000, 16000, 16)
         si = torchaudio.info(input_path)
         self.assertEqual(si.channels, channels)
         self.assertEqual(si.frames, samples)
         self.assertEqual(si.samplerate, rate)
-        self.assertEqual(int(si.subtype[-2:]), precision)
+        si_precision = int(si.subtype[-2:])
+        self.assertEqual(si_precision, precision)
 
+        torchaudio.set_audio_backend(self.default_audio_backend)
 
 if __name__ == '__main__':
     unittest.main()
