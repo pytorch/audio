@@ -63,6 +63,10 @@ def save(filepath, src, sample_rate, channels_first=True, **_):
     if channels_first:
         src = src.t()
 
+    if src.dtype == torch.int64:
+        # Soundfile doesn't support int64
+        src = src.type(torch.int32)
+
     import soundfile
     return soundfile.write(filepath, src, sample_rate)
 
