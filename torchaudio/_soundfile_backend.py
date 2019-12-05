@@ -12,7 +12,6 @@ def check_input(src):
 
 def load(
     filepath,
-    out=None,
     normalization=True,
     channels_first=True,
     num_frames=0,
@@ -40,16 +39,10 @@ def load(
 
     # initialize output tensor
     # TODO call libsoundfile directly to avoid numpy
-    if out is not None:
-        check_input(out)
-        _, sample_rate = soundfile.read(
-            filepath, frames=num_frames, start=offset, always_2d=True, out=out
-        )
-    else:
-        out, sample_rate = soundfile.read(
-            filepath, frames=num_frames, start=offset, always_2d=True
-        )
-        out = torch.tensor(out).t()
+    out, sample_rate = soundfile.read(
+        filepath, frames=num_frames, start=offset, always_2d=True
+    )
+    out = torch.tensor(out).t()
 
     # normalize if needed
     # _audio_normalization(out, normalization)
