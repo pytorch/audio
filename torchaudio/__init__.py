@@ -20,7 +20,7 @@ except ImportError:
 
 
 _audio_backend = "sox"
-_audio_backends = ["sox", "pysoundfile"]
+_audio_backends = ["sox", "soundfile"]
 
 
 def set_audio_backend(backend):
@@ -102,7 +102,7 @@ def load(filepath,
 
     if get_audio_backend() == "sox":
         func = _sox_backend.load
-    elif get_audio_backend() == "pysoundfile":
+    elif get_audio_backend() == "soundfile":
         func = _soundfile_backend.load
     else:
         raise ImportError
@@ -152,7 +152,7 @@ def save(filepath, src, sample_rate, precision=16, channels_first=True):
 
     if get_audio_backend() == "sox":
         func = _sox_backend.save
-    elif get_audio_backend() == "pysoundfile":
+    elif get_audio_backend() == "soundfile":
         func = _soundfile_backend.save
     else:
         raise ImportError
@@ -253,7 +253,7 @@ def info(filepath):
 
     if get_audio_backend() == "sox":
         func = _sox_backend.info
-    elif get_audio_backend() == "pysoundfile":
+    elif get_audio_backend() == "soundfile":
         func = _soundfile_backend.info
     else:
         raise ImportError

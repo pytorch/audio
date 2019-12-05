@@ -143,7 +143,7 @@ class Test_LoadSave(unittest.TestCase):
             torchaudio.load(tdir)
 
     def test_3_load_and_save_is_identity(self):
-        for backend in ["sox", "pysoundfile"]:
+        for backend in ["sox", "soundfile"]:
             with self.subTest():
                 with AudioBackendScope(backend):
                     self._test_3_load_and_save_is_identity()
