@@ -8,7 +8,7 @@ import os
 
 
 def _extract_digits(s):
-        return int("".join([i for i in s if i.isdigit()]))
+    return int("".join([i for i in s if i.isdigit()]))
 
 
 class AudioBackendScope:
