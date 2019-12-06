@@ -59,6 +59,7 @@ def load(
     r"""See torchaudio.load"""
 
     assert out is None
+    assert normalization
     assert signalinfo is None
     assert encodinginfo is None
 

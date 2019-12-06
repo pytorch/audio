@@ -39,16 +39,16 @@ class Test_LoadSave(unittest.TestCase):
         for backend in ["sox"]:
             with self.subTest():
                 with AudioBackendScope(backend):
-                    self._test_1_save(self.test_filepath)
+                    self._test_1_save(self.test_filepath, False)
 
         for backend in ["sox", "soundfile"]:
             with self.subTest():
                 with AudioBackendScope(backend):
-                    self._test_1_save(self.test_filepath_wav)
+                    self._test_1_save(self.test_filepath_wav, True)
 
-    def _test_1_save(self, test_filepath):
+    def _test_1_save(self, test_filepath, normalization):
         # load signal
-        x, sr = torchaudio.load(test_filepath, normalization=False)
+        x, sr = torchaudio.load(test_filepath)
 
         # check save
         new_filepath = os.path.join(self.test_dirpath, "test.wav")
@@ -136,11 +136,6 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(sr, 44100)
         self.assertEqual(x.size(), (2, length))
 
-        # check no normalizing
-        x, _ = torchaudio.load(test_filepath, normalization=False)
-        self.assertTrue(x.min() <= -1.0)
-        self.assertTrue(x.max() >= 1.0)
-
         # check offset
         offset = 15
         x, _ = torchaudio.load(test_filepath)
@@ -156,10 +151,6 @@ class Test_LoadSave(unittest.TestCase):
         x, _ = torchaudio.load(test_filepath, channels_first=False)
         self.assertEqual(x.size(), (length, 2))
 
-        # check different input tensor type
-        x, _ = torchaudio.load(test_filepath, torch.LongTensor(), normalization=False)
-        self.assertTrue(isinstance(x, torch.LongTensor))
-
         # check raising errors
         with self.assertRaises(OSError):
             torchaudio.load("file-does-not-exist.mp3")
@@ -168,6 +159,23 @@ class Test_LoadSave(unittest.TestCase):
             tdir = os.path.join(
                 os.path.dirname(self.test_dirpath), "torchaudio")
             torchaudio.load(tdir)
+
+    def test_2_load_nonormalization(self):
+        for backend in ["sox"]:
+            with self.subTest():
+                with AudioBackendScope(backend):
+                    self._test_2_load_nonormalization(self.test_filepath, 278756)
+
+    def _test_2_load_nonormalization(self, test_filepath, length):
+
+        # check no normalizing
+        x, _ = torchaudio.load(test_filepath, normalization=False)
+        self.assertTrue(x.min() <= -1.0)
+        self.assertTrue(x.max() >= 1.0)
+
+        # check different input tensor type
+        x, _ = torchaudio.load(test_filepath, torch.LongTensor(), normalization=False)
+        self.assertTrue(isinstance(x, torch.LongTensor))
 
     def test_3_load_and_save_is_identity(self):
         for backend in ["sox", "soundfile"]:
