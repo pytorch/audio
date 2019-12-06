@@ -20,7 +20,7 @@ except ImportError:
 
 
 _audio_backend = "sox"
-_audio_backends = ["sox", "soundfile"]
+_audio_backends = {"sox": _sox_backend, "soundfile": _soundfile_backend}
 
 
 def set_audio_backend(backend):
@@ -28,11 +28,11 @@ def set_audio_backend(backend):
     Specifies the package used to load.
     Args:
         backend (string): Name of the backend. One of {}.
-    """.format(_audio_backends)
+    """.format(_audio_backends.keys())
     global _audio_backend
     if backend not in _audio_backends:
         raise ValueError(
-            "Invalid backend '{}'. Options are {}.".format(backend, _audio_backends)
+            "Invalid backend '{}'. Options are {}.".format(backend, _audio_backends.keys())
         )
     _audio_backend = backend
 
@@ -42,6 +42,14 @@ def get_audio_backend():
     Gets the name of the package used to load.
     """
     return _audio_backend
+
+
+def _get_audio_backend_module():
+    """
+    Gets the module backend to load.
+    """
+    backend = get_audio_backend()
+    return _audio_backends[backend]
 
 
 def check_input(src):
@@ -100,14 +108,8 @@ def load(filepath,
 
     """
 
-    if get_audio_backend() == "sox":
-        func = _sox_backend.load
-    elif get_audio_backend() == "soundfile":
-        func = _soundfile_backend.load
-    else:
-        raise ImportError
-
-    return func(
+    load = getattr(_get_audio_backend_module(), 'load')
+    return load(
         filepath,
         out=out,
         normalization=normalization,
@@ -150,14 +152,8 @@ def save(filepath, src, sample_rate, precision=16, channels_first=True):
             Default: ``True``)
     """
 
-    if get_audio_backend() == "sox":
-        func = _sox_backend.save
-    elif get_audio_backend() == "soundfile":
-        func = _soundfile_backend.save
-    else:
-        raise ImportError
-
-    return func(
+    save = getattr(_get_audio_backend_module(), 'save')
+    return save(
         filepath, src, sample_rate, precision=precision, channels_first=channels_first
     )
 
@@ -251,14 +247,8 @@ def info(filepath):
          >>> rate, channels, encoding = si.rate, si.channels, ei.encoding
      """
 
-    if get_audio_backend() == "sox":
-        func = _sox_backend.info
-    elif get_audio_backend() == "soundfile":
-        func = _soundfile_backend.info
-    else:
-        raise ImportError
-
-    return func(filepath)
+    info = getattr(_get_audio_backend_module() , 'info')
+    return info(filepath)
 
 
 def sox_signalinfo_t():
