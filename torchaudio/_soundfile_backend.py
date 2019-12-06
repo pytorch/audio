@@ -44,6 +44,9 @@ def load(
     )
     out = torch.from_numpy(out).t()
 
+    if not channels_first:
+        out = out.t()
+
     # normalize if needed
     # _audio_normalization(out, normalization)
 
@@ -52,6 +55,23 @@ def load(
 
 def save(filepath, src, sample_rate, precision=16, channels_first=True, **_):
     r"""See torchaudio.save"""
+
+    ch_idx, len_idx = (0, 1) if channels_first else (1, 0)
+
+    # check if save directory exists
+    abs_dirpath = os.path.dirname(os.path.abspath(filepath))
+    if not os.path.isdir(abs_dirpath):
+        raise OSError("Directory does not exist: {}".format(abs_dirpath))
+    # check that src is a CPU tensor
+    check_input(src)
+    # Check/Fix shape of source data
+    if src.dim() == 1:
+        # 1d tensors as assumed to be mono signals
+        src.unsqueeze_(ch_idx)
+    elif src.dim() > 2 or src.size(ch_idx) > 16:
+        # assumes num_channels < 16
+        raise ValueError(
+            "Expected format where C < 16, but found {}".format(src.size()))
 
     if channels_first:
         src = src.t()

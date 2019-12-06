@@ -32,16 +32,23 @@ class Test_LoadSave(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, "assets",
                                  "steam-train-whistle-daniel_simon.mp3")
+    test_filepath_wav = os.path.join(test_dirpath, "assets",
+                                 "steam-train-whistle-daniel_simon.wav")
 
     def test_1_save(self):
         for backend in ["sox"]:
             with self.subTest():
                 with AudioBackendScope(backend):
-                    self._test_1_save()
+                    self._test_1_save(self.test_filepath)
 
-    def _test_1_save(self):
+        for backend in ["sox", "soundfile"]:
+            with self.subTest():
+                with AudioBackendScope(backend):
+                    self._test_1_save(self.test_filepath_wav)
+
+    def _test_1_save(self, test_filepath):
         # load signal
-        x, sr = torchaudio.load(self.test_filepath, normalization=False)
+        x, sr = torchaudio.load(test_filepath, normalization=False)
 
         # check save
         new_filepath = os.path.join(self.test_dirpath, "test.wav")
@@ -63,7 +70,7 @@ class Test_LoadSave(unittest.TestCase):
         os.unlink(new_filepath)
 
         # don't allow invalid sizes as inputs
-        with self.assertRaises(ValueError):
+        with self.assertRaises(Exception):
             x.unsqueeze_(1)  # L x C not C x L
             torchaudio.save(new_filepath, x, sr)
 
@@ -148,9 +155,14 @@ class Test_LoadSave(unittest.TestCase):
         for backend in ["sox"]:
             with self.subTest():
                 with AudioBackendScope(backend):
-                    self._test_2_load()
+                    self._test_2_load_mp3()
 
-    def _test_2_load(self):
+        for backend in ["sox", "soundfile"]:
+            with self.subTest():
+                with AudioBackendScope(backend):
+                    self._test_2_load_wav()
+
+    def _test_2_load_mp3(self):
         # check normal loading
         x, sr = torchaudio.load(self.test_filepath)
         self.assertEqual(sr, 44100)
@@ -179,6 +191,36 @@ class Test_LoadSave(unittest.TestCase):
         # check different input tensor type
         x, _ = torchaudio.load(self.test_filepath, torch.LongTensor(), normalization=False)
         self.assertTrue(isinstance(x, torch.LongTensor))
+
+        # check raising errors
+        with self.assertRaises(OSError):
+            torchaudio.load("file-does-not-exist.mp3")
+
+        with self.assertRaises(OSError):
+            tdir = os.path.join(
+                os.path.dirname(self.test_dirpath), "torchaudio")
+            torchaudio.load(tdir)
+
+    def _test_2_load_wav(self):
+        # check normal loading
+        x, sr = torchaudio.load(self.test_filepath_wav)
+        self.assertEqual(sr, 44100)
+        self.assertEqual(x.size(), (2, 276858))
+
+        # check offset
+        offset = 15
+        x, _ = torchaudio.load(self.test_filepath_wav)
+        x_offset, _ = torchaudio.load(self.test_filepath_wav, offset=offset)
+        self.assertTrue(x[:, offset:].allclose(x_offset))
+
+        # check number of frames
+        n = 201
+        x, _ = torchaudio.load(self.test_filepath_wav, num_frames=n)
+        self.assertTrue(x.size(), (2, n))
+
+        # check channels first
+        x, _ = torchaudio.load(self.test_filepath_wav, channels_first=False)
+        self.assertEqual(x.size(), (276858, 2))
 
         # check raising errors
         with self.assertRaises(OSError):
