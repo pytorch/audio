@@ -86,12 +86,11 @@ class Test_LoadSave(unittest.TestCase):
                                         "test.wav")
             torchaudio.save(new_filepath, x, sr)
 
-    def test_1_save_sox_sine(self):
+    def test_1_save_sine(self):
         for backend in ["sox", "soundfile"]:
             with self.subTest():
                 with AudioBackendScope(backend):
-                    self._test_1_save(self.test_filepath_wav)
-
+                    self._test_1_save_sine()
 
     def _test_1_save_sine(self):
 
