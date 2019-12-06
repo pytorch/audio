@@ -2,6 +2,41 @@ import os
 
 import torch
 
+_subtype_to_precision = {
+    'PCM_S8': 8,
+    'PCM_16': 16,
+    'PCM_24': 24,
+    'PCM_32': 32,
+    'PCM_U8': 8
+}
+
+
+class SignalInfo:
+    def __init__(self, channels=None, rate=None, precision=None, length=None):
+        self.channels = channels
+        self.rate = rate
+        self.precision = precision
+        self.length = length
+
+class EncodingInfo:
+    def __init__(
+            self,
+            encoding=None,
+            bits_per_sample=None,
+            compression=None,
+            reverse_bytes=None,
+            reverse_nibbles=None,
+            reverse_bits=None,
+            opposite_endian=None
+    ):
+        self.encoding = encoding
+        self.bits_per_sample = bits_per_sample
+        self.compression = compression
+        self.reverse_bytes = reverse_bytes
+        self.reverse_nibbles = reverse_nibbles
+        self.reverse_bits = reverse_bits
+        self.opposite_endian = opposite_endian
+
 
 def check_input(src):
     if not torch.is_tensor(src):
@@ -90,4 +125,9 @@ def info(filepath, **_):
     r"""See torchaudio.info"""
 
     import soundfile
-    return soundfile.info(filepath)
+    sfi = soundfile.info(filepath)
+
+    precision = _subtype_to_precision[sfi.subtype]
+    si = SignalInfo(sfi.channels, sfi.samplerate, precision, sfi.frames)
+    ei = EncodingInfo(bits_per_sample = precision)
+    return si, ei
