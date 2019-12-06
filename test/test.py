@@ -44,7 +44,7 @@ class Test_LoadSave(unittest.TestCase):
 
     def _test_1_save(self, test_filepath, normalization):
         # load signal
-        x, sr = torchaudio.load(test_filepath)
+        x, sr = torchaudio.load(test_filepath, normalization=normalization)
 
         # check save
         new_filepath = os.path.join(self.test_dirpath, "test.wav")
