@@ -23,8 +23,6 @@ class AudioBackendScope:
 
 class Test_LoadSave(unittest.TestCase):
 
-    default_audio_backend = torchaudio.get_audio_backend()
-
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, "assets",
                                  "steam-train-whistle-daniel_simon.mp3")
