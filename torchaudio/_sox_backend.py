@@ -14,7 +14,7 @@ def load(filepath,
          signalinfo=None,
          encodinginfo=None,
          filetype=None,
-         **_):
+    ):
     r"""See torchaudio.load"""
 
     # stringify if `pathlib.Path` (noop if already `str`)
@@ -52,7 +52,7 @@ def load(filepath,
     return out, sample_rate
 
 
-def save(filepath, src, sample_rate, precision=16, channels_first=True, **_):
+def save(filepath, src, sample_rate, precision=16, channels_first=True):
     r"""See torchaudio.save"""
 
     si = torchaudio.sox_signalinfo_t()
@@ -64,7 +64,7 @@ def save(filepath, src, sample_rate, precision=16, channels_first=True, **_):
     return torchaudio.save_encinfo(filepath, src, channels_first, si)
 
 
-def info(filepath, **_):
+def info(filepath):
     r"""See torchaudio.info"""
 
     import _torch_sox

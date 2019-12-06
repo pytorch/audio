@@ -47,14 +47,20 @@ def check_input(src):
 
 def load(
     filepath,
+    out=None,
     normalization=True,
     channels_first=True,
     num_frames=0,
     offset=0,
+    signalinfo=None,
+    encodinginfo=None,
     filetype=None,
-    **_
 ):
     r"""See torchaudio.load"""
+
+    assert out is None
+    assert signalinfo is None
+    assert encodinginfo is None
 
     # stringify if `pathlib.Path` (noop if already `str`)
     filepath = str(filepath)
@@ -88,7 +94,7 @@ def load(
     return out, sample_rate
 
 
-def save(filepath, src, sample_rate, precision=16, channels_first=True, **_):
+def save(filepath, src, sample_rate, precision=16, channels_first=True):
     r"""See torchaudio.save"""
 
     ch_idx, len_idx = (0, 1) if channels_first else (1, 0)
@@ -121,7 +127,7 @@ def save(filepath, src, sample_rate, precision=16, channels_first=True, **_):
     return soundfile.write(filepath, src, sample_rate, precision)
 
 
-def info(filepath, **_):
+def info(filepath):
     r"""See torchaudio.info"""
 
     import soundfile
