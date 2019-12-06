@@ -22,7 +22,6 @@ class AudioBackendScope:
 
 
 class Test_LoadSave(unittest.TestCase):
-
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, "assets",
                                  "steam-train-whistle-daniel_simon.mp3")
@@ -243,7 +242,6 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(si.length, samples)
         self.assertEqual(si.rate, rate)
         self.assertEqual(ei.bits_per_sample, precision)
-
 
 if __name__ == '__main__':
     unittest.main()
