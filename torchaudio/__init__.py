@@ -108,8 +108,7 @@ def load(filepath,
 
     """
 
-    load = getattr(_get_audio_backend_module(), 'load')
-    return load(
+    return getattr(_get_audio_backend_module(), 'load')(
         filepath,
         out=out,
         normalization=normalization,
@@ -152,8 +151,7 @@ def save(filepath, src, sample_rate, precision=16, channels_first=True):
             Default: ``True``)
     """
 
-    save = getattr(_get_audio_backend_module(), 'save')
-    return save(
+    return getattr(_get_audio_backend_module(), 'save')(
         filepath, src, sample_rate, precision=precision, channels_first=channels_first
     )
 
@@ -247,8 +245,7 @@ def info(filepath):
          >>> rate, channels, encoding = si.rate, si.channels, ei.encoding
      """
 
-    info = getattr(_get_audio_backend_module(), 'info')
-    return info(filepath)
+    return getattr(_get_audio_backend_module(), 'info')(filepath)
 
 
 def sox_signalinfo_t():
