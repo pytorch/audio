@@ -18,6 +18,7 @@ class SignalInfo:
         self.precision = precision
         self.length = length
 
+
 class EncodingInfo:
     def __init__(
             self,
@@ -136,5 +137,5 @@ def info(filepath):
 
     precision = _subtype_to_precision[sfi.subtype]
     si = SignalInfo(sfi.channels, sfi.samplerate, precision, sfi.frames)
-    ei = EncodingInfo(bits_per_sample = precision)
+    ei = EncodingInfo(bits_per_sample=precision)
     return si, ei

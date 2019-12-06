@@ -247,7 +247,7 @@ def info(filepath):
          >>> rate, channels, encoding = si.rate, si.channels, ei.encoding
      """
 
-    info = getattr(_get_audio_backend_module() , 'info')
+    info = getattr(_get_audio_backend_module(), 'info')
     return info(filepath)
 
 

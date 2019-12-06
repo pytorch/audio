@@ -7,10 +7,6 @@ import math
 import os
 
 
-def _extract_digits(s):
-    return int("".join([i for i in s if i.isdigit()]))
-
-
 class AudioBackendScope:
     def __init__(self, backend):
         self.new_backend = backend
@@ -33,7 +29,7 @@ class Test_LoadSave(unittest.TestCase):
     test_filepath = os.path.join(test_dirpath, "assets",
                                  "steam-train-whistle-daniel_simon.mp3")
     test_filepath_wav = os.path.join(test_dirpath, "assets",
-                                 "steam-train-whistle-daniel_simon.wav")
+                                     "steam-train-whistle-daniel_simon.wav")
 
     def test_1_save(self):
         for backend in ["sox"]:
@@ -240,7 +236,6 @@ class Test_LoadSave(unittest.TestCase):
             with self.subTest():
                 with AudioBackendScope(backend):
                     self._test_5_get_info()
-
 
     def _test_5_get_info(self):
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')

@@ -5,16 +5,17 @@ import torch
 import torchaudio
 
 
-def load(filepath,
-         out=None,
-         normalization=True,
-         channels_first=True,
-         num_frames=0,
-         offset=0,
-         signalinfo=None,
-         encodinginfo=None,
-         filetype=None,
-    ):
+def load(
+    filepath,
+    out=None,
+    normalization=True,
+    channels_first=True,
+    num_frames=0,
+    offset=0,
+    signalinfo=None,
+    encodinginfo=None,
+    filetype=None,
+):
     r"""See torchaudio.load"""
 
     # stringify if `pathlib.Path` (noop if already `str`)
