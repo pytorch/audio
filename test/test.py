@@ -66,7 +66,7 @@ class Test_LoadSave(unittest.TestCase):
         os.unlink(new_filepath)
 
         # don't allow invalid sizes as inputs
-        with self.assertRaises(Exception):
+        with self.assertRaises(ValueError):
             x.unsqueeze_(1)  # L x C not C x L
             torchaudio.save(new_filepath, x, sr)
 
