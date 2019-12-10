@@ -333,7 +333,7 @@ workflows:
           name: nightly_binary_linux_wheel_py3.5_smoke_test_pip
           python_version: "3.5"
           requires:
-            - nightly_binary_linux_wheel_py3.5
+            - nightly_binary_linux_wheel_py3.5_upload
           filters:
             branches:
               only: nightly
@@ -352,7 +352,7 @@ workflows:
           name: nightly_binary_linux_wheel_py3.6_smoke_test_pip
           python_version: "3.6"
           requires:
-            - nightly_binary_linux_wheel_py3.6
+            - nightly_binary_linux_wheel_py3.6_upload
           filters:
             branches:
               only: nightly
@@ -371,7 +371,7 @@ workflows:
           name: nightly_binary_linux_wheel_py3.7_smoke_test_pip
           python_version: "3.7"
           requires:
-            - nightly_binary_linux_wheel_py3.7
+            - nightly_binary_linux_wheel_py3.7_upload
           filters:
             branches:
               only: nightly
@@ -475,7 +475,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.5_smoke_test_conda
           python_version: "3.5"
           requires:
-            - nightly_binary_linux_conda_py3.5
+            - nightly_binary_linux_conda_py3.5_upload
           filters:
             branches:
               only: nightly
@@ -494,7 +494,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.6_smoke_test_conda
           python_version: "3.6"
           requires:
-            - nightly_binary_linux_conda_py3.6
+            - nightly_binary_linux_conda_py3.6_upload
           filters:
             branches:
               only: nightly
@@ -513,7 +513,7 @@ workflows:
           name: nightly_binary_linux_conda_py3.7_smoke_test_conda
           python_version: "3.7"
           requires:
-            - nightly_binary_linux_conda_py3.7
+            - nightly_binary_linux_conda_py3.7_upload
           filters:
             branches:
               only: nightly
