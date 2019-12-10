@@ -285,7 +285,7 @@ workflows:
 {%- endif %}
     jobs:
       - circleci_consistency
-      {{ workflows(prefix="nightly_", filter_branch="nightly", upload=True) }}
+      {{ workflows(prefix="nightly_", filter_branch="nightly", upload=False) }}
   docker_build:
     triggers:
       - schedule:
