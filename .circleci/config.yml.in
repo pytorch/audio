@@ -233,6 +233,20 @@ jobs:
             branches:
               only: {{filter_branch}}
 {%-   endif %}
+### this section is for test only, will remove in official PR
+{%-         if os == 'linux' and not python_version.startswith("2.") %}
+      - smoke_test_linux_pip:
+          name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_smoke_test_pip
+          python_version: "{{python_version}}"
+          requires:
+            - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}
+      - smoke_test_linux_conda:
+          name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_smoke_test_conda
+          python_version: "{{python_version}}"
+          requires:
+            - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}
+{%-         endif %}
+
 
 {%-   if upload %}
       - binary_{{btype}}_upload:
@@ -285,7 +299,7 @@ workflows:
 {%- endif %}
     jobs:
       - circleci_consistency
-      {{ workflows(prefix="nightly_", filter_branch="nightly", upload=False) }}
+      {{ workflows(prefix="nightly_", filter_branch="nightly", upload=True) }}
   docker_build:
     triggers:
       - schedule:
