@@ -178,6 +178,7 @@ jobs:
       - run:
           name: smoke test
           command: |
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             python -c "import torchaudio"
 
   smoke_test_linux_pip:
@@ -194,6 +195,7 @@ jobs:
       - run:
           name: smoke test
           command: |
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             python -c "import torchaudio"
 
   docker_image_build:
@@ -244,11 +246,6 @@ workflows:
           python_version: "3.5"
           requires:
             - binary_linux_wheel_py3.5
-      - smoke_test_linux_conda:
-          name: binary_linux_wheel_py3.5_smoke_test_conda
-          python_version: "3.5"
-          requires:
-            - binary_linux_wheel_py3.5
       - binary_linux_wheel:
           name: binary_linux_wheel_py3.6
           python_version: "3.6"
@@ -258,22 +255,12 @@ workflows:
           python_version: "3.6"
           requires:
             - binary_linux_wheel_py3.6
-      - smoke_test_linux_conda:
-          name: binary_linux_wheel_py3.6_smoke_test_conda
-          python_version: "3.6"
-          requires:
-            - binary_linux_wheel_py3.6
       - binary_linux_wheel:
           name: binary_linux_wheel_py3.7
           python_version: "3.7"
 ### this section is for test only, will remove in official PR
       - smoke_test_linux_pip:
           name: binary_linux_wheel_py3.7_smoke_test_pip
-          python_version: "3.7"
-          requires:
-            - binary_linux_wheel_py3.7
-      - smoke_test_linux_conda:
-          name: binary_linux_wheel_py3.7_smoke_test_conda
           python_version: "3.7"
           requires:
             - binary_linux_wheel_py3.7
@@ -306,11 +293,6 @@ workflows:
           name: binary_linux_conda_py3.5
           python_version: "3.5"
 ### this section is for test only, will remove in official PR
-      - smoke_test_linux_pip:
-          name: binary_linux_conda_py3.5_smoke_test_pip
-          python_version: "3.5"
-          requires:
-            - binary_linux_conda_py3.5
       - smoke_test_linux_conda:
           name: binary_linux_conda_py3.5_smoke_test_conda
           python_version: "3.5"
@@ -320,11 +302,6 @@ workflows:
           name: binary_linux_conda_py3.6
           python_version: "3.6"
 ### this section is for test only, will remove in official PR
-      - smoke_test_linux_pip:
-          name: binary_linux_conda_py3.6_smoke_test_pip
-          python_version: "3.6"
-          requires:
-            - binary_linux_conda_py3.6
       - smoke_test_linux_conda:
           name: binary_linux_conda_py3.6_smoke_test_conda
           python_version: "3.6"
@@ -334,11 +311,6 @@ workflows:
           name: binary_linux_conda_py3.7
           python_version: "3.7"
 ### this section is for test only, will remove in official PR
-      - smoke_test_linux_pip:
-          name: binary_linux_conda_py3.7_smoke_test_pip
-          python_version: "3.7"
-          requires:
-            - binary_linux_conda_py3.7
       - smoke_test_linux_conda:
           name: binary_linux_conda_py3.7_smoke_test_conda
           python_version: "3.7"
@@ -408,11 +380,6 @@ workflows:
           python_version: "3.5"
           requires:
             - nightly_binary_linux_wheel_py3.5
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py3.5_smoke_test_conda
-          python_version: "3.5"
-          requires:
-            - nightly_binary_linux_wheel_py3.5
       - binary_wheel_upload:
           name: nightly_binary_linux_wheel_py3.5_upload
           context: org-member
@@ -443,11 +410,6 @@ workflows:
           python_version: "3.6"
           requires:
             - nightly_binary_linux_wheel_py3.6
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py3.6_smoke_test_conda
-          python_version: "3.6"
-          requires:
-            - nightly_binary_linux_wheel_py3.6
       - binary_wheel_upload:
           name: nightly_binary_linux_wheel_py3.6_upload
           context: org-member
@@ -475,11 +437,6 @@ workflows:
 ### this section is for test only, will remove in official PR
       - smoke_test_linux_pip:
           name: nightly_binary_linux_wheel_py3.7_smoke_test_pip
-          python_version: "3.7"
-          requires:
-            - nightly_binary_linux_wheel_py3.7
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py3.7_smoke_test_conda
           python_version: "3.7"
           requires:
             - nightly_binary_linux_wheel_py3.7
@@ -599,11 +556,6 @@ workflows:
             branches:
               only: nightly
 ### this section is for test only, will remove in official PR
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_conda_py3.5_smoke_test_pip
-          python_version: "3.5"
-          requires:
-            - nightly_binary_linux_conda_py3.5
       - smoke_test_linux_conda:
           name: nightly_binary_linux_conda_py3.5_smoke_test_conda
           python_version: "3.5"
@@ -634,11 +586,6 @@ workflows:
             branches:
               only: nightly
 ### this section is for test only, will remove in official PR
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_conda_py3.6_smoke_test_pip
-          python_version: "3.6"
-          requires:
-            - nightly_binary_linux_conda_py3.6
       - smoke_test_linux_conda:
           name: nightly_binary_linux_conda_py3.6_smoke_test_conda
           python_version: "3.6"
@@ -669,11 +616,6 @@ workflows:
             branches:
               only: nightly
 ### this section is for test only, will remove in official PR
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_conda_py3.7_smoke_test_pip
-          python_version: "3.7"
-          requires:
-            - nightly_binary_linux_conda_py3.7
       - smoke_test_linux_conda:
           name: nightly_binary_linux_conda_py3.7_smoke_test_conda
           python_version: "3.7"
