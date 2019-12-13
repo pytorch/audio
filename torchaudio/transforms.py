@@ -9,6 +9,7 @@ from .compliance import kaldi
 
 __all__ = [
     'Spectrogram',
+    'GriffinLim',
     'AmplitudeToDB',
     'MelScale',
     'MelSpectrogram',
@@ -68,6 +69,117 @@ class Spectrogram(torch.nn.Module):
         """
         return F.spectrogram(waveform, self.pad, self.window, self.n_fft, self.hop_length,
                              self.win_length, self.power, self.normalized)
+
+
+class GriffinLim(torch.nn.Module):
+    r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
+        Implementation ported from `librosa`.
+
+    .. [1] McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto.
+        "librosa: Audio and music signal analysis in python."
+        In Proceedings of the 14th python in science conference, pp. 18-25. 2015.
+
+    .. [2] Perraudin, N., Balazs, P., & Søndergaard, P. L.
+        "A fast Griffin-Lim algorithm,"
+        IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (pp. 1-4),
+        Oct. 2013.
+
+    .. [3] D. W. Griffin and J. S. Lim,
+        "Signal estimation from modified short-time Fourier transform,"
+        IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
+
+    Args:
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins
+        win_length (int): Window size. (Default: ``n_fft``)
+        hop_length (int, optional): Length of hop between STFT windows. (
+            Default: ``win_length // 2``)
+        pad (int): Two sided padding of signal. (Default: ``0``)
+        window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
+            that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        power (int): Exponent for the magnitude spectrogram,
+            (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
+        normalized (bool): Whether to normalize by magnitude after stft. (Default: ``False``)
+        wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
+        length (int): Array length of the expected output. (Default: ``None``)
+        momentum (float): The momentum parameter for fast Griffin-Lim.
+        Setting this to 0 recovers the original Griffin-Lim method.
+        Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: 0.99)
+    """
+    __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power', 'normalized',
+                     'length', 'momentum']
+
+    def __init__(self, n_fft=400, n_iter=32, hop_length=None, win_length=None,
+                 window_fn=torch.hann_window, wkwargs=None, normalized=False,
+                 power=2., length=None, momentum=0.99):
+        super(GriffinLim, self).__init__()
+
+        assert momentum < 1, f'momentum={momentum} > 1 can be unstable'
+        assert momentum > 0, f'momentum={momentum} < 0'
+
+        self.n_fft = n_fft
+        self.n_iter = n_iter
+        self.win_length = win_length if win_length is not None else n_fft
+        self.hop_length = hop_length if hop_length is not None else self.win_length // 2
+        self.window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
+        self.normalized = normalized
+        self.length = length
+        self.power = power
+        self.momentum = momentum / (1 + momentum)
+
+    def forward(self, S):
+        r"""
+        Args:
+            S (torch.Tensor): A magnitude-only STFT spectrogram of dimension (channel, freq, frames),
+            where freq is ``n_fft // 2 + 1``.
+
+        Returns:
+            torch.Tensor: waveform of (channel, time), where time equals the ``length`` parameter if given.
+        """
+        self.window = self.window.to(dtype=S.dtype, device=S.device)
+
+        S = S.pow(1/self.power)
+        if self.normalized:
+            S *= self.window.pow(2).sum().sqrt()
+
+        # randomly initialize the phase
+        batch, freq, frames = S.size()
+        angles = 2 * math.pi * torch.rand(batch, freq, frames)
+        angles = torch.stack([angles.cos(), angles.sin()], dim=-1).to(dtype=S.dtype, device=S.device)
+        S = S.unsqueeze(-1).expand_as(angles)
+
+        # And initialize the previous iterate to 0
+        rebuilt = 0.
+
+        for _ in range(self.n_iter):
+            # Store the previous iterate
+            tprev = rebuilt
+
+            # Invert with our current estimate of the phases
+            inverse = F.istft(S * angles,
+                              n_fft=self.n_fft,
+                              hop_length=self.hop_length,
+                              win_length=self.win_length,
+                              window=self.window,
+                              length=self.length).float()
+
+            # Rebuild the spectrogram
+            rebuilt = inverse.stft(n_fft=self.n_fft,
+                                   hop_length=self.hop_length,
+                                   win_length=self.win_length,
+                                   window=self.window,
+                                   pad_mode='reflect')
+
+            # Update our phase estimates
+            angles = rebuilt.sub(self.momentum).mul_(tprev)
+            angles = angles.div_(F.complex_norm(angles).add_(1e-16).unsqueeze(-1).expand_as(angles))
+
+        # Return the final phase estimates
+        return F.istft(S * angles,
+                       n_fft=self.n_fft,
+                       hop_length=self.hop_length,
+                       win_length=self.win_length,
+                       window=self.window,
+                       length=self.length)
 
 
 class AmplitudeToDB(torch.jit.ScriptModule):
