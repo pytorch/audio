@@ -186,6 +186,31 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(sample_rate, sample_rate2)
         os.unlink(output_path)
 
+    def test_3_load_and_save_is_identity_across_backend(self):
+        with self.subTest():
+            self._test_3_load_and_save_is_identity_across_backend("sox", "soundfile")
+        with self.subTest():
+            self._test_3_load_and_save_is_identity_across_backend("soundfile", "sox")
+
+    def _test_3_load_and_save_is_identity_across_backend(self, backend1, backend2):
+        with AudioBackendScope(backend1):
+
+            input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+            tensor1, sample_rate1 = torchaudio.load(input_path)
+
+            output_path = os.path.join(self.test_dirpath, 'test.wav')
+            torchaudio.save(output_path, tensor1, sample_rate1)
+
+        with AudioBackendScope(backend2):
+            tensor2, sample_rate2 = torchaudio.load(output_path)
+
+        # tensor1 = tensor1.type(torch.FloatTensor)
+        # tensor2 = tensor2.type(torch.FloatTensor)
+
+        self.assertTrue(tensor1.allclose(tensor2))
+        self.assertEqual(sample_rate1, sample_rate2)
+        os.unlink(output_path)
+
     def test_4_load_partial(self):
         for backend in ["sox"]:
             with self.subTest():

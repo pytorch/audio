@@ -83,7 +83,7 @@ def load(
     # initialize output tensor
     # TODO call libsoundfile directly to avoid numpy
     out, sample_rate = soundfile.read(
-        filepath, frames=num_frames, start=offset, always_2d=True
+        filepath, frames=num_frames, start=offset, dtype="float32", always_2d=True
     )
     out = torch.from_numpy(out).t()
 
