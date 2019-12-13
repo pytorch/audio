@@ -113,8 +113,8 @@ class GriffinLim(torch.nn.Module):
                  power=2., length=None, momentum=0.99):
         super(GriffinLim, self).__init__()
 
-        assert momentum < 1, f'momentum={momentum} > 1 can be unstable'
-        assert momentum > 0, f'momentum={momentum} < 0'
+        assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
+        assert momentum > 0, 'momentum=%s < 0' % momentum
 
         self.n_fft = n_fft
         self.n_iter = n_iter
