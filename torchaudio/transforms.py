@@ -14,6 +14,7 @@ __all__ = [
     'GriffinLim',
     'AmplitudeToDB',
     'MelScale',
+    'InverseMelScale',
     'MelSpectrogram',
     'MFCC',
     'MuLawEncoding',
@@ -231,6 +232,73 @@ class MelScale(torch.nn.Module):
         mel_specgram = mel_specgram.view(shape[:-2] + mel_specgram.shape[-2:])
 
         return mel_specgram
+
+
+class InverseMelScale(torch.nn.Module):
+    r"""Solve for a normal STFT from a mel frequency STFT, using a conversion
+    matrix.  This uses triangular filter banks.
+
+    User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).
+
+    Args:
+        n_mels (int): Number of mel filterbanks. (Default: ``128``)
+        sample_rate (int): Sample rate of audio signal. (Default: ``16000``)
+        f_min (float): Minimum frequency. (Default: ``0.``)
+        f_max (float, optional): Maximum frequency. (Default: ``sample_rate // 2``)
+        n_stft (int, optional): Number of bins in STFT. Calculated from first input
+            if None is given.  See ``n_fft`` in :class:`Spectrogram`.
+    """
+    __constants__ = ['n_mels', 'sample_rate', 'f_min', 'f_max']
+
+    def __init__(self, n_mels=128, sample_rate=16000, f_min=0., f_max=None, n_stft=None):
+        super(InverseMelScale, self).__init__()
+        self.n_mels = n_mels
+        self.sample_rate = sample_rate
+        self.f_max = f_max if f_max is not None else float(sample_rate // 2)
+        self.f_min = f_min
+
+        assert f_min <= self.f_max, 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
+
+        fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
+            n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
+        self.fb = fb
+
+    def forward(self, melspec):
+        r"""
+        Args:
+            melspec (torch.Tensor): A Mel frequency spectrogram of dimension (channel, ``n_mels``, time)
+
+        Returns:
+            torch.Tensor: Linear scale spectrogram of size (channel, freq, time)
+        """
+        if self.fb.numel() == 0:
+            tmp_fb = F.create_fb_matrix(melspec.size(1), self.f_min, self.f_max, self.n_mels, self.sample_rate)
+            # Attributes cannot be reassigned outside __init__ so workaround
+            self.fb.resize_(tmp_fb.size())
+            self.fb.copy_(tmp_fb)
+
+
+        freq, _ = self.fb.size()  # (freq, n_mels) 
+        channel, n_mels, time = melspec.size()  # (channel, n_mels, time)
+
+        assert self.n_mels == n_mels
+        
+        specgram = torch.zeros(channel, time, freq, requires_grad=True,
+                               dtype=melspec.dtype, device=melspec.device)
+        optim = torch.optim.LBFGS([specgram])
+
+        def step_func():
+            optim.zero_grad()
+            diff = melspec - specgram.matmul(self.fb)
+            loss = diff.pow(2).sum().mul(0.5)
+            loss.backward()
+            return loss
+
+        for _ in range(self.n_mels): 
+            optim.step(step_func)
+
+        specgram.requires_grad_(False)
+        return specgram.clamp(min=0).transpose(-1, -2)
 
 
 class MelSpectrogram(torch.nn.Module):
