@@ -118,7 +118,7 @@ def istft(
     """
     stft_matrix_dim = stft_matrix.dim()
     assert 3 <= stft_matrix_dim, "Incorrect stft dimension: %d" % (stft_matrix_dim)
-    assert stft_matrix.nelement() > 0
+    assert stft_matrix.numel() > 0
 
     if stft_matrix_dim == 3:
         # add a channel dimension
@@ -126,7 +126,7 @@ def istft(
 
     # pack batch
     shape = stft_matrix.size()
-    stft_matrix = stft_matrix.reshape(-1, *shape[-3:])
+    stft_matrix = stft_matrix.reshape(-1, shape[-3], shape[-2], shape[-1]) # *shape[-3:])
 
     dtype = stft_matrix.dtype
     device = stft_matrix.device
@@ -151,7 +151,9 @@ def istft(
     assert 0 < win_length <= n_fft
 
     if window is None:
-        window = torch.ones(win_length, requires_grad=False, device=device, dtype=dtype)
+       window = torch.ones(win_length)
+       window.to(device=device, dtype=dtype)
+       # window.requires_grad_(False) 
 
     assert window.dim() == 1 and window.size(0) == win_length
 
@@ -174,9 +176,8 @@ def istft(
     # each column of a channel is a frame which needs to be overlap added at the right place
     ytmp = ytmp.transpose(1, 2)  # size (channel, n_fft, n_frame)
 
-    eye = torch.eye(n_fft, requires_grad=False, device=device, dtype=dtype).unsqueeze(
-        1
-    )  # size (n_fft, 1, n_fft)
+    eye = torch.eye(n_fft) # requires_grad=False
+    eye = eye.to(device=device, dtype=dtype).unsqueeze(1)  # size (n_fft, 1, n_fft)
 
     # this does overlap add where the frames of ytmp are added such that the i'th frame of
     # ytmp is added starting at i*hop_length in the output
