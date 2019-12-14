@@ -650,8 +650,8 @@ def mfcc(
 
 
 def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, window_width,
-    # type: (float, float, int, float, float, int) -> Tuple[Tensor, Tensor]
                                 lowpass_cutoff, lowpass_filter_width):
+    # type: (float, float, int, float, float, int) -> Tuple[Tensor, Tensor]
     r"""Based on LinearResample::SetIndexesAndWeights where it retrieves the weights for
     resampling as well as the indices in which they are valid. LinearResample (LR) means
     that the output signal is at linearly spaced intervals (i.e the output signal has a
