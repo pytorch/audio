@@ -244,14 +244,12 @@ class Test_Kaldi(unittest.TestCase):
         # Passing in an empty tensor should result in an error
         self.assertRaises(AssertionError, kaldi.mfcc, torch.empty(0))
 
-    def test_torchscript_resample_waveform(self):
-        sound = torch.rand((2, 1000))
-        sample_rate = 100
-        sample_rate_2 = 50
+    def test_resample_waveform(self):
+        def get_output_fn(sound, args):
+            output = kaldi.resample_waveform(sound, args[1], args[2])
+            return output
 
-        _test_torchscript_functional(
-            kaldi.resample_waveform, sound, sample_rate, sample_rate_2
-        )
+        self._compliance_test_helper(self.test_8000_filepath, 'resample', 32, 3, get_output_fn, atol=1e-2, rtol=1e-5)
 
     def test_resample_waveform_upsample_size(self):
         sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)
