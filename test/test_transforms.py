@@ -308,6 +308,13 @@ class Tester(unittest.TestCase):
         _test_librosa_consistency_helper(**kwargs2)
         _test_librosa_consistency_helper(**kwargs3)
 
+    def test_scriptmodule_Resample(self):
+        tensor = torch.rand((2, 1000))
+        sample_rate = 100
+        sample_rate_2 = 50
+
+        _test_script_module(transforms.Spectrogram, tensor, sample_rate, sample_rate_2)
+
     def test_resample_size(self):
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
         waveform, sample_rate = torchaudio.load(input_path)

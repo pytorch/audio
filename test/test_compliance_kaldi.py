@@ -9,15 +9,6 @@ import torchaudio.compliance.kaldi as kaldi
 import unittest
 
 
-def _test_torchscript_functional(py_method, *args, **kwargs):
-    jit_method = torch.jit.script(py_method)
-
-    jit_out = jit_method(*args, **kwargs)
-    py_out = py_method(*args, **kwargs)
-
-    assert torch.allclose(jit_out, py_out)
-
-
 def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
     # just a copy of ExtractWindow from feature-window.cc in python
     def first_sample_of_frame(frame, window_size, window_shift, snip_edges):
@@ -252,13 +243,6 @@ class Test_Kaldi(unittest.TestCase):
     def test_mfcc_empty(self):
         # Passing in an empty tensor should result in an error
         self.assertRaises(AssertionError, kaldi.mfcc, torch.empty(0))
-
-    def test_resample_waveform(self):
-        def get_output_fn(sound, args):
-            output = kaldi.resample_waveform(sound, args[1], args[2])
-            return output
-
-        self._compliance_test_helper(self.test_8000_filepath, 'resample', 32, 3, get_output_fn, atol=1e-2, rtol=1e-5)
 
     def test_torchscript_resample_waveform(self):
         sound = torch.rand((2, 1000))
