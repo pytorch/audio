@@ -294,7 +294,7 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
 
     if top_db is not None:
         x_db = x_db.clamp(min=x_db.max().item() - top_db)
-        
+
     return x_db
 
 
