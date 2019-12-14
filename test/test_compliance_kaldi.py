@@ -9,6 +9,15 @@ import torchaudio.compliance.kaldi as kaldi
 import unittest
 
 
+def _test_torchscript_functional(py_method, *args, **kwargs):
+    jit_method = torch.jit.script(py_method)
+
+    jit_out = jit_method(*args, **kwargs)
+    py_out = py_method(*args, **kwargs)
+
+    assert torch.allclose(jit_out, py_out)
+
+
 def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
     # just a copy of ExtractWindow from feature-window.cc in python
     def first_sample_of_frame(frame, window_size, window_shift, snip_edges):
@@ -250,6 +259,15 @@ class Test_Kaldi(unittest.TestCase):
             return output
 
         self._compliance_test_helper(self.test_8000_filepath, 'resample', 32, 3, get_output_fn, atol=1e-2, rtol=1e-5)
+
+    def test_torchscript_resample_waveform(self):
+        sound = torch.rand((2, 1000))
+        sample_rate = 100
+        sample_rate_2 = 50
+
+        _test_torchscript_functional(
+            kaldi.resample_waveform, sound, sample_rate, sample_rate_2
+        )
 
     def test_resample_waveform_upsample_size(self):
         sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)
