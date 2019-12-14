@@ -52,6 +52,23 @@ class TestFunctional(unittest.TestCase):
             F.spectrogram, tensor, pad, window, n_fft, hop, ws, power, normalize
         )
 
+    def test_torchscript_griffinlim(self):
+        tensor = torch.rand((1, 201, 6))
+        n_fft = 400
+        ws = 400
+        hop = 200
+        window = torch.hann_window(ws)
+        power = 2
+        normalize = False
+        momentum = 0.99
+        n_iter = 32
+        length = 1000
+        rand_init = False
+
+        _test_torchscript_functional(
+            F.griffinlim, tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, rand_init
+        )
+
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
         computed = F.compute_deltas(specgram, win_length=win_length)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))

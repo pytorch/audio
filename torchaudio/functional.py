@@ -7,6 +7,7 @@ import torch
 __all__ = [
     "istft",
     "spectrogram",
+    "griffinlim",
     "amplitude_to_DB",
     "create_fb_matrix",
     "create_dct",
@@ -268,6 +269,96 @@ def spectrogram(
         spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor
 
     return spec_f
+
+
+def griffinlim(
+    spectrogram, window, n_fft, hop_length, win_length, power, normalized, n_iter, momentum, length, rand_init
+): 
+    # type: (Tensor, Tensor, int, int, int, int, bool, int, float, Optional[int], bool) -> Tensor 
+    r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
+        Implementation ported from `librosa`.
+
+    .. [1] McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto.
+        "librosa: Audio and music signal analysis in python."
+        In Proceedings of the 14th python in science conference, pp. 18-25. 2015.
+
+    .. [2] Perraudin, N., Balazs, P., & Søndergaard, P. L.
+        "A fast Griffin-Lim algorithm,"
+        IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (pp. 1-4),
+        Oct. 2013.
+
+    .. [3] D. W. Griffin and J. S. Lim,
+        "Signal estimation from modified short-time Fourier transform,"
+        IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
+
+    Args:
+        spectrogram (torch.Tensor): A magnitude-only STFT spectrogram of dimension (channel, freq, frames)
+            where freq is ``n_fft // 2 + 1``.
+        window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
+        n_fft (int): Size of FFT, creates ``n_fft // 2 + 1`` bins
+        hop_length (int): Length of hop between STFT windows. (
+            Default: ``win_length // 2``)
+        win_length (int): Window size. (Default: ``n_fft``)
+        power (int): Exponent for the magnitude spectrogram,
+            (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
+        normalized (bool): Whether to normalize by magnitude after stft. (Default: ``False``)
+        n_iter (int): Number of iteration for phase recovery process.
+        momentum (float): The momentum parameter for fast Griffin-Lim.
+            Setting this to 0 recovers the original Griffin-Lim method.
+            Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: 0.99) 
+        length (Optional[int]): Array length of the expected output. (Default: ``None``)
+        rand_init (bool): Initializes phase randomly if true and to zero otherwise.
+
+    Returns:
+        torch.Tensor: waveform of (channel, time), where time equals the ``length`` parameter if given.
+    """
+    assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
+    assert momentum > 0, 'momentum=%s < 0' % momentum
+
+    spectrogram = spectrogram.pow(1/power)
+    if normalized:
+        spectrogram *= window.pow(2).sum().sqrt()
+
+    # randomly initialize the phase
+    batch, freq, frames = spectrogram.size()
+    if rand_init:
+        angles = 2 * math.pi * torch.rand(batch, freq, frames)
+    else:
+        angles = torch.zeros(batch, freq, frames)
+    angles = torch.stack([angles.cos(), angles.sin()], dim=-1) \
+                  .to(dtype=spectrogram.dtype, device=spectrogram.device)
+    spectrogram = spectrogram.unsqueeze(-1).expand_as(angles)
+
+    # And initialize the previous iterate to 0
+    rebuilt = torch.tensor(0.)
+
+    for _ in range(n_iter):
+        # Store the previous iterate
+        tprev = rebuilt
+
+        # Invert with our current estimate of the phases
+        inverse = istft(spectrogram * angles,
+                        n_fft=n_fft,
+                        hop_length=hop_length,
+                        win_length=win_length,
+                        window=window,
+                        length=length).float()
+
+        # Rebuild the spectrogram
+        rebuilt = _stft(inverse, n_fft, hop_length, win_length, window,
+                        True, 'reflect', False, True)
+
+        # Update our phase estimates
+        angles = rebuilt.sub(momentum).mul_(tprev)
+        angles = angles.div_(complex_norm(angles).add_(1e-16).unsqueeze(-1).expand_as(angles))
+
+    # Return the final phase estimates
+    return istft(spectrogram * angles,
+                 n_fft=n_fft,
+                 hop_length=hop_length,
+                 win_length=win_length,
+                 window=window,
+                 length=length)
 
 
 def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):

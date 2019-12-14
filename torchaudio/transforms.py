@@ -90,27 +90,28 @@ class GriffinLim(torch.nn.Module):
 
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins
+        n_iter (int, optional): Number of iteration for phase recovery process.
         win_length (int): Window size. (Default: ``n_fft``)
         hop_length (int, optional): Length of hop between STFT windows. (
             Default: ``win_length // 2``)
-        pad (int): Two sided padding of signal. (Default: ``0``)
         window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         power (int): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
         normalized (bool): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
-        length (int): Array length of the expected output. (Default: ``None``)
         momentum (float): The momentum parameter for fast Griffin-Lim.
-        Setting this to 0 recovers the original Griffin-Lim method.
-        Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: 0.99)
+            Setting this to 0 recovers the original Griffin-Lim method.
+            Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: 0.99)
+        length (int, optional): Array length of the expected output. (Default: ``None``)
+        rand_init(bool): 
     """
     __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power', 'normalized',
                      'length', 'momentum']
 
     def __init__(self, n_fft=400, n_iter=32, hop_length=None, win_length=None,
                  window_fn=torch.hann_window, wkwargs=None, normalized=False,
-                 power=2., length=None, momentum=0.99):
+                 power=2, length=None, momentum=0.99, rand_init=True):
         super(GriffinLim, self).__init__()
 
         assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
@@ -125,61 +126,11 @@ class GriffinLim(torch.nn.Module):
         self.length = length
         self.power = power
         self.momentum = momentum / (1 + momentum)
+        self.rand_init = rand_init
 
     def forward(self, S):
-        r"""
-        Args:
-            S (torch.Tensor): A magnitude-only STFT spectrogram of dimension (channel, freq, frames),
-            where freq is ``n_fft // 2 + 1``.
-
-        Returns:
-            torch.Tensor: waveform of (channel, time), where time equals the ``length`` parameter if given.
-        """
-        self.window = self.window.to(dtype=S.dtype, device=S.device)
-
-        S = S.pow(1/self.power)
-        if self.normalized:
-            S *= self.window.pow(2).sum().sqrt()
-
-        # randomly initialize the phase
-        batch, freq, frames = S.size()
-        angles = 2 * math.pi * torch.rand(batch, freq, frames)
-        angles = torch.stack([angles.cos(), angles.sin()], dim=-1).to(dtype=S.dtype, device=S.device)
-        S = S.unsqueeze(-1).expand_as(angles)
-
-        # And initialize the previous iterate to 0
-        rebuilt = 0.
-
-        for _ in range(self.n_iter):
-            # Store the previous iterate
-            tprev = rebuilt
-
-            # Invert with our current estimate of the phases
-            inverse = F.istft(S * angles,
-                              n_fft=self.n_fft,
-                              hop_length=self.hop_length,
-                              win_length=self.win_length,
-                              window=self.window,
-                              length=self.length).float()
-
-            # Rebuild the spectrogram
-            rebuilt = inverse.stft(n_fft=self.n_fft,
-                                   hop_length=self.hop_length,
-                                   win_length=self.win_length,
-                                   window=self.window,
-                                   pad_mode='reflect')
-
-            # Update our phase estimates
-            angles = rebuilt.sub(self.momentum).mul_(tprev)
-            angles = angles.div_(F.complex_norm(angles).add_(1e-16).unsqueeze(-1).expand_as(angles))
-
-        # Return the final phase estimates
-        return F.istft(S * angles,
-                       n_fft=self.n_fft,
-                       hop_length=self.hop_length,
-                       win_length=self.win_length,
-                       window=self.window,
-                       length=self.length)
+        return F.griffinlim(S, self.window, self.n_fft, self.hop_length, self.win_length,
+                     self.power, self.normalized, self.n_iter, self.momentum, self.length, self.rand_init)
 
 
 class AmplitudeToDB(torch.jit.ScriptModule):
