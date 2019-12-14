@@ -699,7 +699,7 @@ def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, win
         which correspond with min_input_index, size (``output_samples_in_unit``, ``max_weight_width``)).
     """
     assert lowpass_cutoff < min(orig_freq, new_freq) / 2
-    output_t = torch.arange(0, output_samples_in_unit) / new_freq
+    output_t = torch.arange(0., output_samples_in_unit) / new_freq
     min_t = output_t - window_width
     max_t = output_t + window_width
 
