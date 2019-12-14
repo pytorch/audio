@@ -32,6 +32,22 @@ BLACKMAN = 'blackman'
 WINDOWS = [HAMMING, HANNING, POVEY, RECTANGULAR, BLACKMAN]
 
 
+def gcd(a, b):
+    # type: (int, int) -> int
+    """Calculate the Greatest Common Divisor of a and b.
+
+    Unless b==0, the result will have the same sign as b (so that when
+    b is divided by it, the result comes out positive).
+    """
+
+    try:
+        return math.gcd(a, b)
+    except AttributeError:
+        while b:
+            a, b = b, a % b
+        return a
+
+
 def _next_power_of_2(x):
     r"""Returns the smallest power of 2 that is greater than x
     """
@@ -733,7 +749,7 @@ def _get_LR_indices_and_weights(orig_freq, new_freq, output_samples_in_unit, win
 
 def _lcm(a, b):
     # type: (int, int) -> int
-    return abs(a * b) // math.gcd(a, b)
+    return abs(a * b) // gcd(a, b)
 
 
 def _get_num_LR_output_samples(input_num_samp, samp_rate_in, samp_rate_out):
@@ -810,7 +826,7 @@ def resample_waveform(waveform, orig_freq, new_freq, lowpass_filter_width=6):
 
     assert lowpass_cutoff * 2 <= min_freq
 
-    base_freq = math.gcd(int(orig_freq), int(new_freq))
+    base_freq = gcd(int(orig_freq), int(new_freq))
     input_samples_in_unit = int(orig_freq) // base_freq
     output_samples_in_unit = int(new_freq) // base_freq
 
