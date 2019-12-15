@@ -202,28 +202,10 @@ class InverseMelScale(torch.nn.Module):
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)
 
-
-        freq, _ = self.fb.size()  # (freq, n_mels) 
-        channel, n_mels, time = melspec.size()  # (channel, n_mels, time)
-
-        assert self.n_mels == n_mels
-        
-        specgram = torch.zeros(channel, time, freq, requires_grad=True,
-                               dtype=melspec.dtype, device=melspec.device)
-        optim = torch.optim.LBFGS([specgram])
-
-        def step_func():
-            optim.zero_grad()
-            diff = melspec - specgram.matmul(self.fb)
-            loss = diff.pow(2).sum().mul(0.5)
-            loss.backward()
-            return loss
-
-        for _ in range(self.n_mels): 
-            optim.step(step_func)
-
-        specgram.requires_grad_(False)
-        return specgram.clamp(min=0).transpose(-1, -2)
+        U, S, V = fb.svd()
+        Z = (1 / S).diag_embed()
+        fb_inv = V.matmul(Z).matmul(U.transpose(-1, -2))
+        return melspec.transpose(-1, -2).matmul(fb_inv).transpose(-1, -2)
 
 
 class MelSpectrogram(torch.nn.Module):
