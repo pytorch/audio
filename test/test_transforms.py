@@ -89,10 +89,6 @@ class Tester(unittest.TestCase):
         spec_f = torch.rand((1, 6, 201))
         _test_script_module(transforms.MelScale, spec_f)
 
-    def test_scriptmodule_InverseMelScale(self):
-        spec_f = torch.rand((1, 128, 6))
-        _test_script_module(transforms.InverseMelScale, spec_f, n_stft=201)
-
     def test_melscale_load_save(self):
         specgram = torch.ones(1, 1000, 100)
         melscale_transform = transforms.MelScale()
