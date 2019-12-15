@@ -239,7 +239,7 @@ class InverseMelScale(torch.nn.Module):
     matrix.  This uses triangular filter banks.
 
     It minimizes the euclidian norm between the input mel-spectrogram and the product between
-    the estimated spectrogram and the filter banks using SGD. 
+    the estimated spectrogram and the filter banks using SGD.
 
     Args:
         n_mels (int): Number of mel filterbanks. (Default: ``128``)
@@ -288,19 +288,19 @@ class InverseMelScale(torch.nn.Module):
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)
 
-        freq, _ = self.fb.size()  # (freq, n_mels) 
+        freq, _ = self.fb.size()  # (freq, n_mels)
         channel, n_mels, time = melspec.size()  # (channel, n_mels, time)
         melspec = melspec.transpose(-1, -2)
 
         assert self.n_mels == n_mels
-        
+
         specgram = torch.rand(channel, time, freq, requires_grad=True,
                               dtype=melspec.dtype, device=melspec.device)
-                
+
         optim = torch.optim.SGD([specgram], **self.sgdargs)
 
         loss = float('inf')
-        for _ in range(self.max_iter): 
+        for _ in range(self.max_iter):
             optim.zero_grad()
             diff = melspec - specgram.matmul(self.fb)
             new_loss = diff.pow(2).sum()
