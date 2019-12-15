@@ -166,21 +166,36 @@ jobs:
   smoke_test_linux_conda:
     <<: *smoke_test_common
     steps:
+      - attach_workspace:
+          at: ~/workspace
       - run:
+          name: install binaries
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            conda install -y -c pytorch-nightly torchaudio
+            conda install -v -y -c pytorch-nightly pytorch
+            conda install -v -y $(ls ~/workspace/torchaudio*.tar.bz2)
+      - run:
+          name: smoke test
+          command: |
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             python -c "import torchaudio"
 
   smoke_test_linux_pip:
     <<: *smoke_test_common
     steps:
+      - attach_workspace:
+          at: ~/workspace
       - run:
+          name: install binaries
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            pip install torchaudio_nightly -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+            pip install $(ls ~/workspace/torchaudio*.whl) -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+      - run:
+          name: smoke test
+          command: |
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             python -c "import torchaudio"
 
   docker_image_build:
@@ -319,11 +334,6 @@ workflows:
           python_version: "3.5"
           requires:
             - nightly_binary_linux_wheel_py3.5_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py3.5_smoke_test_conda
-          python_version: "3.5"
-          requires:
-            - nightly_binary_linux_wheel_py3.5_upload
           filters:
             branches:
               only: nightly
@@ -343,11 +353,6 @@ workflows:
           python_version: "3.6"
           requires:
             - nightly_binary_linux_wheel_py3.6_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py3.6_smoke_test_conda
-          python_version: "3.6"
-          requires:
-            - nightly_binary_linux_wheel_py3.6_upload
           filters:
             branches:
               only: nightly
@@ -364,11 +369,6 @@ workflows:
             - nightly_binary_linux_wheel_py3.7
       - smoke_test_linux_pip:
           name: nightly_binary_linux_wheel_py3.7_smoke_test_pip
-          python_version: "3.7"
-          requires:
-            - nightly_binary_linux_wheel_py3.7_upload
-      - smoke_test_linux_conda:
-          name: nightly_binary_linux_wheel_py3.7_smoke_test_conda
           python_version: "3.7"
           requires:
             - nightly_binary_linux_wheel_py3.7_upload
@@ -471,11 +471,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py3.5
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_conda_py3.5_smoke_test_pip
-          python_version: "3.5"
-          requires:
-            - nightly_binary_linux_conda_py3.5_upload
       - smoke_test_linux_conda:
           name: nightly_binary_linux_conda_py3.5_smoke_test_conda
           python_version: "3.5"
@@ -495,11 +490,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py3.6
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_conda_py3.6_smoke_test_pip
-          python_version: "3.6"
-          requires:
-            - nightly_binary_linux_conda_py3.6_upload
       - smoke_test_linux_conda:
           name: nightly_binary_linux_conda_py3.6_smoke_test_conda
           python_version: "3.6"
@@ -519,11 +509,6 @@ workflows:
           context: org-member
           requires:
             - nightly_binary_linux_conda_py3.7
-      - smoke_test_linux_pip:
-          name: nightly_binary_linux_conda_py3.7_smoke_test_pip
-          python_version: "3.7"
-          requires:
-            - nightly_binary_linux_conda_py3.7_upload
       - smoke_test_linux_conda:
           name: nightly_binary_linux_conda_py3.7_smoke_test_conda
           python_version: "3.7"
