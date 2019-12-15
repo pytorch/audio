@@ -127,7 +127,7 @@ def istft(
 
     # pack batch
     shape = stft_matrix.size()
-    stft_matrix = stft_matrix.reshape(-1, shape[-3], shape[-2], shape[-1]) # *shape[-3:])
+    stft_matrix = stft_matrix.reshape(-1, shape[-3], shape[-2], shape[-1])
 
     dtype = stft_matrix.dtype
     device = stft_matrix.device
@@ -152,8 +152,8 @@ def istft(
     assert 0 < win_length <= n_fft
 
     if window is None:
-       window = torch.ones(win_length)
-       window.to(device=device, dtype=dtype)
+        window = torch.ones(win_length)
+        window.to(device=device, dtype=dtype)
 
     assert window.dim() == 1 and window.size(0) == win_length
 
@@ -273,8 +273,8 @@ def spectrogram(
 
 def griffinlim(
     spectrogram, window, n_fft, hop_length, win_length, power, normalized, n_iter, momentum, length, rand_init
-): 
-    # type: (Tensor, Tensor, int, int, int, int, bool, int, float, Optional[int], bool) -> Tensor 
+):
+    # type: (Tensor, Tensor, int, int, int, int, bool, int, float, Optional[int], bool) -> Tensor
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
         Implementation ported from `librosa`.
 
@@ -305,7 +305,7 @@ def griffinlim(
         n_iter (int): Number of iteration for phase recovery process.
         momentum (float): The momentum parameter for fast Griffin-Lim.
             Setting this to 0 recovers the original Griffin-Lim method.
-            Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: 0.99) 
+            Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: 0.99)
         length (Optional[int]): Array length of the expected output. (Default: ``None``)
         rand_init (bool): Initializes phase randomly if true and to zero otherwise.
 
@@ -315,7 +315,7 @@ def griffinlim(
     assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
     assert momentum > 0, 'momentum=%s < 0' % momentum
 
-    spectrogram = spectrogram.pow(1/power)
+    spectrogram = spectrogram.pow(1 / power)
     if normalized:
         spectrogram *= window.pow(2).sum().sqrt()
 
