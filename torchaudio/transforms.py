@@ -163,7 +163,8 @@ class InverseMelScale(torch.nn.Module):
     r"""Solve for a normal STFT from a mel frequency STFT, using a conversion
     matrix.  This uses triangular filter banks.
 
-    User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).
+    It minimizes the euclidian norm between the input mel-spectrogram and the product between
+    the estimated spectrogram and the filter banks using SGD. 
 
     Args:
         n_mels (int): Number of mel filterbanks. (Default: ``128``)
@@ -172,15 +173,25 @@ class InverseMelScale(torch.nn.Module):
         f_max (float, optional): Maximum frequency. (Default: ``sample_rate // 2``)
         n_stft (int, optional): Number of bins in STFT. Calculated from first input
             if None is given.  See ``n_fft`` in :class:`Spectrogram`.
+        max_iter (int): Maximum number of optimization iterations.
+        tolerance_loss (float): Value of loss to stop optimization at.
+        tolerance_change (float): Difference in losses to stop optimization at.
+        sgdargs (dict): Arguments for the SGD optimizer.
     """
-    __constants__ = ['n_mels', 'sample_rate', 'f_min', 'f_max']
+    __constants__ = ['n_mels', 'sample_rate', 'f_min', 'f_max', 'max_iter', 'tolerance_loss',
+                     'tolerance_change', 'sgdargs']
 
-    def __init__(self, n_mels=128, sample_rate=16000, f_min=0., f_max=None, n_stft=None):
+    def __init__(self, n_mels=128, sample_rate=16000, f_min=0., f_max=None, n_stft=None, max_iter=100000,
+                 tolerance_loss=1e-5, tolerance_change=1e-8, sgdargs={'lr': 0.1, 'momentum': 0.9}):
         super(InverseMelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
         self.f_max = f_max if f_max is not None else float(sample_rate // 2)
         self.f_min = f_min
+        self.max_iter = max_iter
+        self.tolerance_loss = tolerance_loss
+        self.tolerance_change = tolerance_change
+        self.sgdargs = sgdargs
 
         assert f_min <= self.f_max, 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
 
@@ -202,10 +213,31 @@ class InverseMelScale(torch.nn.Module):
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)
 
-        U, S, V = self.fb.svd()
-        Z = (1 / S).diag_embed()
-        fb_inv = V.matmul(Z).matmul(U.transpose(-1, -2))
-        return melspec.transpose(-1, -2).matmul(fb_inv).transpose(-1, -2)
+        freq, _ = self.fb.size()  # (freq, n_mels) 
+        channel, n_mels, time = melspec.size()  # (channel, n_mels, time)
+        melspec = melspec.transpose(-1, -2)
+
+        assert self.n_mels == n_mels
+        
+        specgram = torch.rand(channel, time, freq, requires_grad=True,
+                              dtype=melspec.dtype, device=melspec.device)
+                
+        optim = torch.optim.SGD([specgram], **self.sgdargs)
+
+        loss = float('inf')
+        for _ in range(self.max_iter): 
+            optim.zero_grad()
+            diff = melspec - specgram.matmul(self.fb)
+            new_loss = diff.pow(2).sum()
+            new_loss.backward()
+            optim.step()
+            specgram.data = specgram.data.clamp(min=0)
+
+            if new_loss < self.tolerance_loss and new_loss - loss < self.tolerance_change:
+                break
+
+        specgram.requires_grad_(False)
+        return specgram.clamp(min=0).transpose(-1, -2)
 
 
 class MelSpectrogram(torch.nn.Module):
