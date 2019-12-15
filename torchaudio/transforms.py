@@ -261,7 +261,7 @@ class InverseMelScale(torch.nn.Module):
 
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
-        self.fb = fb
+        self.register_buffer('fb', fb)
 
     def forward(self, melspec):
         r"""
@@ -277,7 +277,7 @@ class InverseMelScale(torch.nn.Module):
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)
 
-        U, S, V = fb.svd()
+        U, S, V = self.fb.svd()
         Z = (1 / S).diag_embed()
         fb_inv = V.matmul(Z).matmul(U.transpose(-1, -2))
         return melspec.transpose(-1, -2).matmul(fb_inv).transpose(-1, -2)
