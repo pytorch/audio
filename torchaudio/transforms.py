@@ -104,7 +104,7 @@ class GriffinLim(torch.nn.Module):
             Setting this to 0 recovers the original Griffin-Lim method.
             Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: 0.99)
         length (int, optional): Array length of the expected output. (Default: ``None``)
-        rand_init(bool): 
+        rand_init(bool): Initializes phase randomly if true and to zero otherwise.
     """
     __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power', 'normalized',
                      'length', 'momentum']
@@ -121,7 +121,8 @@ class GriffinLim(torch.nn.Module):
         self.n_iter = n_iter
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
-        self.window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
+        window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
+        self.register_buffer('window', window)
         self.normalized = normalized
         self.length = length
         self.power = power
@@ -129,8 +130,8 @@ class GriffinLim(torch.nn.Module):
         self.rand_init = rand_init
 
     def forward(self, S):
-        return F.griffinlim(S, self.window, self.n_fft, self.hop_length, self.win_length,
-                     self.power, self.normalized, self.n_iter, self.momentum, self.length, self.rand_init)
+        return F.griffinlim(S, self.window, self.n_fft, self.hop_length, self.win_length, self.power,
+                            self.normalized, self.n_iter, self.momentum, self.length, self.rand_init)
 
 
 class AmplitudeToDB(torch.jit.ScriptModule):
