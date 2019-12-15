@@ -82,7 +82,7 @@ class Tester(unittest.TestCase):
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
 
     def test_scriptmodule_AmplitudeToDB(self):
-        spec = torch.rand((6, 201))
+        spec = torch.rand((1, 201, 6))
         _test_script_module(transforms.AmplitudeToDB, spec)
 
     def test_scriptmodule_MelScale(self):
