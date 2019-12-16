@@ -581,7 +581,6 @@ def lfilter(waveform, a_coeffs, b_coeffs):
 
     # Set up a few other utilities
     a0_repeated = torch.ones(n_channel, dtype=dtype, device=device) * a_coeffs[0]
-    ones = torch.ones(n_channel, n_sample, dtype=dtype, device=device)
 
     for i_sample in range(n_sample):
 
@@ -597,9 +596,7 @@ def lfilter(waveform, a_coeffs, b_coeffs):
 
         padded_output_waveform[:, i_sample + n_order - 1] = o0
 
-    output = torch.min(
-        ones, torch.max(ones * -1, padded_output_waveform[:, (n_order - 1):])
-    )
+    output = torch.clamp(padded_output_waveform[:, (n_order - 1):], min=-1., max=1.)
 
     # unpack batch
     output = output.reshape(shape[:-1] + output.shape[-1:])
