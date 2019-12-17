@@ -3,7 +3,10 @@ import torch
 
 import torchaudio
 
+from torchaudio import _audio_backend_guard
 
+
+@_audio_backend_guard("sox")
 def effect_names():
     """Gets list of valid sox effect names
 
@@ -13,13 +16,11 @@ def effect_names():
         >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
     """
 
-    if torchaudio.get_audio_backend() != "sox":
-        raise ImportError
-
     import _torch_sox
     return _torch_sox.get_effect_names()
 
 
+@_audio_backend_guard("sox")
 def SoxEffect():
     r"""Create an object for passing sox effect information between python and c++
 
@@ -27,9 +28,6 @@ def SoxEffect():
         SoxEffect: An object with the following attributes: ename (str) which is the
         name of effect, and eopts (List[str]) which is a list of effect options.
     """
-
-    if torchaudio.get_audio_backend() != "sox":
-        raise ImportError
 
     import _torch_sox
     return _torch_sox.SoxEffect()
@@ -118,6 +116,7 @@ class SoxEffectsChain(object):
         e.eopts = eargs
         self.chain.append(e)
 
+    @_audio_backend_guard("sox")
     def sox_build_flow_effects(self, out=None):
         r"""Build effects chain and flow effects from input file to output tensor
 
@@ -141,9 +140,6 @@ class SoxEffectsChain(object):
             self.chain.append(e)
 
         # print("effect options:", [x.eopts for x in self.chain])
-
-        if torchaudio.get_audio_backend() != "sox":
-            raise ImportError
 
         import _torch_sox
         sr = _torch_sox.build_flow_effects(self.input_file,
