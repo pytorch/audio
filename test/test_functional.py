@@ -17,9 +17,6 @@ if IMPORT_LIBROSA:
     import librosa
 
 
-RUN_LONG_TESTS = False
-
-
 def _test_torchscript_functional(py_method, *args, **kwargs):
     jit_method = torch.jit.script(py_method)
 
@@ -81,7 +78,6 @@ class TestFunctional(unittest.TestCase):
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
         _test_torchscript_functional(F.compute_deltas, specgram, win_length=win_length)
 
-    @unittest.skipIf(RUN_LONG_TESTS, "Not running long tests")
     def test_batch_pitch(self):
         waveform, sample_rate = torchaudio.load(self.test_filepath)
 
