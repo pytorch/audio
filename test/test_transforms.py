@@ -86,7 +86,7 @@ class Tester(unittest.TestCase):
         _test_script_module(transforms.AmplitudeToDB, spec)
 
     def test_scriptmodule_MelScale(self):
-        spec_f = torch.rand((1, 201, 6))
+        spec_f = torch.rand((1, 6, 201))
         _test_script_module(transforms.MelScale, spec_f)
 
     def test_melscale_load_save(self):
