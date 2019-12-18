@@ -137,7 +137,7 @@ Transforms expect and return the following dimensions.
 
 * `Spectrogram`: (channel, time) -> (channel, freq, time)
 * `AmplitudeToDB`: (channel, freq, time) -> (channel, freq, time)
-* `MelScale`: (channel, time) -> (channel, mel, time)
+* `MelScale`: (channel, freq, time) -> (channel, mel, time)
 * `MelSpectrogram`: (channel, time) -> (channel, mel, time)
 * `MFCC`: (channel, time) -> (channel, mfcc, time)
 * `MuLawEncode`: (channel, time) -> (channel, time)
