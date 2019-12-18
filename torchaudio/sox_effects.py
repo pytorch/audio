@@ -3,7 +3,7 @@ import torch
 
 import torchaudio
 
-from torchaudio import _audio_backend_guard
+from torchaudio._backend import _audio_backend_guard
 
 
 @_audio_backend_guard("sox")
