@@ -204,9 +204,6 @@ class Test_LoadSave(unittest.TestCase):
         with AudioBackendScope(backend2):
             tensor2, sample_rate2 = torchaudio.load(output_path)
 
-        # tensor1 = tensor1.type(torch.FloatTensor)
-        # tensor2 = tensor2.type(torch.FloatTensor)
-
         self.assertTrue(tensor1.allclose(tensor2))
         self.assertEqual(sample_rate1, sample_rate2)
         os.unlink(output_path)
