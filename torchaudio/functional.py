@@ -576,23 +576,24 @@ def lfilter(waveform, a_coeffs, b_coeffs):
 
     # Set up the coefficients matrix
     # Flip order, repeat, and transpose
-    a_coeffs_filled = a_coeffs.flip(0).repeat(n_channel, 1).t()
-    b_coeffs_filled = b_coeffs.flip(0).repeat(n_channel, 1).t()
+    a_coeffs_flipped = a_coeffs.flip(0)
+    b_coeffs_flipped = b_coeffs.flip(0)
 
-    # Set up a few other utilities
-    a0_repeated = torch.ones(n_channel, dtype=dtype, device=device) * a_coeffs[0]
+    # calculate windowed_input_signal in parallel
+    window_idxs = torch.arange(n_sample)[None, :] + torch.arange(n_order)[:, None]
+    window_idxs = window_idxs.repeat(n_channel, 1, 1)
+    window_idxs += (torch.arange(n_channel)[:, None, None] * padded_waveform.size(1))
+    input_signal_windows = torch.matmul(b_coeffs_flipped, torch.take(padded_waveform, window_idxs.long()))
 
-    for i_sample in range(n_sample):
+    for i_sample, i_window in enumerate(input_signal_windows.t()):
 
         o0 = torch.zeros(n_channel, dtype=dtype, device=device)
 
-        windowed_input_signal = padded_waveform[:, i_sample:(i_sample + n_order)]
         windowed_output_signal = padded_output_waveform[:, i_sample:(i_sample + n_order)]
 
-        o0.add_(torch.diag(torch.mm(windowed_input_signal, b_coeffs_filled)))
-        o0.sub_(torch.diag(torch.mm(windowed_output_signal, a_coeffs_filled)))
-
-        o0.div_(a0_repeated)
+        o0 = i_window
+        o0.sub_(torch.mv(windowed_output_signal, a_coeffs_flipped))
+        o0.div_(a_coeffs[0])
 
         padded_output_waveform[:, i_sample + n_order - 1] = o0
 
