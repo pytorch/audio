@@ -1,10 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import torch
-import _torch_sox
 
 import torchaudio
 
+from torchaudio._backend import _audio_backend_guard
 
+
+@_audio_backend_guard("sox")
 def effect_names():
     """Gets list of valid sox effect names
 
@@ -13,9 +15,12 @@ def effect_names():
     Example
         >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
     """
+
+    import _torch_sox
     return _torch_sox.get_effect_names()
 
 
+@_audio_backend_guard("sox")
 def SoxEffect():
     r"""Create an object for passing sox effect information between python and c++
 
@@ -23,6 +28,8 @@ def SoxEffect():
         SoxEffect: An object with the following attributes: ename (str) which is the
         name of effect, and eopts (List[str]) which is a list of effect options.
     """
+
+    import _torch_sox
     return _torch_sox.SoxEffect()
 
 
@@ -71,7 +78,6 @@ class SoxEffectsChain(object):
 
     """
 
-    EFFECTS_AVAILABLE = set(effect_names())
     EFFECTS_UNIMPLEMENTED = set(["spectrogram", "splice", "noiseprof", "fir"])
 
     def __init__(self, normalization=True, channels_first=True, out_siginfo=None, out_encinfo=None, filetype="raw"):
@@ -83,6 +89,9 @@ class SoxEffectsChain(object):
         self.filetype = filetype
         self.normalization = normalization
         self.channels_first = channels_first
+
+        # Define in __init__ to avoid calling at import time
+        self.EFFECTS_AVAILABLE = set(effect_names())
 
     def append_effect_to_chain(self, ename, eargs=None):
         r"""Append effect to a sox effects chain.
@@ -107,6 +116,7 @@ class SoxEffectsChain(object):
         e.eopts = eargs
         self.chain.append(e)
 
+    @_audio_backend_guard("sox")
     def sox_build_flow_effects(self, out=None):
         r"""Build effects chain and flow effects from input file to output tensor
 
@@ -130,6 +140,8 @@ class SoxEffectsChain(object):
             self.chain.append(e)
 
         # print("effect options:", [x.eopts for x in self.chain])
+
+        import _torch_sox
         sr = _torch_sox.build_flow_effects(self.input_file,
                                            out,
                                            self.channels_first,
