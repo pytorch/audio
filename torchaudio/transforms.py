@@ -178,10 +178,10 @@ class InverseMelScale(torch.nn.Module):
         tolerance_change (float): Difference in losses to stop optimization at.
         sgdargs (dict): Arguments for the SGD optimizer.
     """
-    __constants__ = ['n_mels', 'sample_rate', 'f_min', 'f_max', 'max_iter', 'tolerance_loss',
+    __constants__ = ['n_stft', 'n_mels', 'sample_rate', 'f_min', 'f_max', 'max_iter', 'tolerance_loss',
                      'tolerance_change', 'sgdargs']
 
-    def __init__(self, n_mels=128, sample_rate=16000, f_min=0., f_max=None, n_stft=None, max_iter=100000,
+    def __init__(self, n_stft=None, n_mels=128, sample_rate=16000, f_min=0., f_max=None, max_iter=100000,
                  tolerance_loss=1e-5, tolerance_change=1e-8, sgdargs={'lr': 0.1, 'momentum': 0.9}):
         super(InverseMelScale, self).__init__()
         self.n_mels = n_mels
@@ -194,9 +194,9 @@ class InverseMelScale(torch.nn.Module):
         self.sgdargs = sgdargs
 
         assert f_min <= self.f_max, 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
+        assert n_stft is not None, 'n_stft not set'
 
-        fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
-            n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
+        fb = F.create_fb_matrix(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
         self.register_buffer('fb', fb)
 
     def forward(self, melspec):
@@ -207,12 +207,6 @@ class InverseMelScale(torch.nn.Module):
         Returns:
             torch.Tensor: Linear scale spectrogram of size (channel, freq, time)
         """
-        if self.fb.numel() == 0:
-            tmp_fb = F.create_fb_matrix(melspec.size(1), self.f_min, self.f_max, self.n_mels, self.sample_rate)
-            # Attributes cannot be reassigned outside __init__ so workaround
-            self.fb.resize_(tmp_fb.size())
-            self.fb.copy_(tmp_fb)
-
         freq, _ = self.fb.size()  # (freq, n_mels)
         channel, n_mels, time = melspec.size()  # (channel, n_mels, time)
         melspec = melspec.transpose(-1, -2)
