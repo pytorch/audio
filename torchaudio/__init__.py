@@ -2,21 +2,27 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import os.path
 
 import torch
-import _torch_sox
 
-from torchaudio import transforms, datasets, kaldi_io, sox_effects, compliance
+from torchaudio import (
+    compliance,
+    datasets,
+    kaldi_io,
+    sox_effects,
+    transforms,
+)
+
+from torchaudio._backend import (
+    check_input,
+    _audio_backend_guard,
+    _get_audio_backend_module,
+    get_audio_backend,
+    set_audio_backend,
+)
 
 try:
     from .version import __version__, git_version  # noqa: F401
 except ImportError:
     pass
-
-
-def check_input(src):
-    if not torch.is_tensor(src):
-        raise TypeError('Expected a tensor, got %s' % type(src))
-    if src.is_cuda:
-        raise TypeError('Expected a CPU based tensor, got %s' % type(src))
 
 
 def load(filepath,
@@ -67,36 +73,18 @@ def load(filepath,
         1.
 
     """
-    # stringify if `pathlib.Path` (noop if already `str`)
-    filepath = str(filepath)
-    # check if valid file
-    if not os.path.isfile(filepath):
-        raise OSError("{} not found or is a directory".format(filepath))
 
-    # initialize output tensor
-    if out is not None:
-        check_input(out)
-    else:
-        out = torch.FloatTensor()
-
-    if num_frames < -1:
-        raise ValueError("Expected value for num_samples -1 (entire file) or >=0")
-    if offset < 0:
-        raise ValueError("Expected positive offset value")
-
-    sample_rate = _torch_sox.read_audio_file(filepath,
-                                             out,
-                                             channels_first,
-                                             num_frames,
-                                             offset,
-                                             signalinfo,
-                                             encodinginfo,
-                                             filetype)
-
-    # normalize if needed
-    _audio_normalization(out, normalization)
-
-    return out, sample_rate
+    return getattr(_get_audio_backend_module(), 'load')(
+        filepath,
+        out=out,
+        normalization=normalization,
+        channels_first=channels_first,
+        num_frames=num_frames,
+        offset=offset,
+        signalinfo=signalinfo,
+        encodinginfo=encodinginfo,
+        filetype=filetype,
+    )
 
 
 def load_wav(filepath, **kwargs):
@@ -128,15 +116,13 @@ def save(filepath, src, sample_rate, precision=16, channels_first=True):
         channels_first (bool): Set channels first or length first in result. (
             Default: ``True``)
     """
-    si = sox_signalinfo_t()
-    ch_idx = 0 if channels_first else 1
-    si.rate = sample_rate
-    si.channels = 1 if src.dim() == 1 else src.size(ch_idx)
-    si.length = src.numel()
-    si.precision = precision
-    return save_encinfo(filepath, src, channels_first, si)
+
+    return getattr(_get_audio_backend_module(), 'save')(
+        filepath, src, sample_rate, precision=precision, channels_first=channels_first
+    )
 
 
+@_audio_backend_guard("sox")
 def save_encinfo(filepath,
                  src,
                  channels_first=True,
@@ -203,6 +189,8 @@ def save_encinfo(filepath,
         src = src.transpose(1, 0)
     # save data to file
     src = src.contiguous()
+
+    import _torch_sox
     _torch_sox.write_audio_file(filepath, src, signalinfo, encodinginfo, filetype)
 
 
@@ -220,9 +208,11 @@ def info(filepath):
          >>> si, ei = torchaudio.info('foo.wav')
          >>> rate, channels, encoding = si.rate, si.channels, ei.encoding
      """
-    return _torch_sox.get_info(filepath)
+
+    return getattr(_get_audio_backend_module(), 'info')(filepath)
 
 
+@_audio_backend_guard("sox")
 def sox_signalinfo_t():
     r"""Create a sox_signalinfo_t object. This object can be used to set the sample
     rate, number of channels, length, bit precision and headroom multiplier
@@ -242,9 +232,12 @@ def sox_signalinfo_t():
         >>> si.precision = 16
         >>> si.length = 0
     """
+
+    import _torch_sox
     return _torch_sox.sox_signalinfo_t()
 
 
+@_audio_backend_guard("sox")
 def sox_encodinginfo_t():
     r"""Create a sox_encodinginfo_t object.  This object can be used to set the encoding
     type, bit precision, compression factor, reverse bytes, reverse nibbles,
@@ -274,6 +267,8 @@ def sox_encodinginfo_t():
         >>> ei.opposite_endian = torchaudio.get_sox_bool(0)
 
     """
+
+    import _torch_sox
     ei = _torch_sox.sox_encodinginfo_t()
     sdo = get_sox_option_t(2)  # sox_default_option
     ei.reverse_bytes = sdo
@@ -282,6 +277,7 @@ def sox_encodinginfo_t():
     return ei
 
 
+@_audio_backend_guard("sox")
 def get_sox_encoding_t(i=None):
     r"""Get enum of sox_encoding_t for sox encodings.
 
@@ -292,6 +288,8 @@ def get_sox_encoding_t(i=None):
     Returns:
         sox_encoding_t: A sox_encoding_t type for output encoding
     """
+
+    import _torch_sox
     if i is None:
         # one can see all possible values using the .__members__ attribute
         return _torch_sox.sox_encoding_t
@@ -299,6 +297,7 @@ def get_sox_encoding_t(i=None):
         return _torch_sox.sox_encoding_t(i)
 
 
+@_audio_backend_guard("sox")
 def get_sox_option_t(i=2):
     r"""Get enum of sox_option_t for sox encodinginfo options.
 
@@ -309,12 +308,15 @@ def get_sox_option_t(i=2):
     Returns:
         sox_option_t: A sox_option_t type
     """
+
+    import _torch_sox
     if i is None:
         return _torch_sox.sox_option_t
     else:
         return _torch_sox.sox_option_t(i)
 
 
+@_audio_backend_guard("sox")
 def get_sox_bool(i=0):
     r"""Get enum of sox_bool for sox encodinginfo options.
 
@@ -326,24 +328,32 @@ def get_sox_bool(i=0):
     Returns:
         sox_bool: A sox_bool type
     """
+
+    import _torch_sox
     if i is None:
         return _torch_sox.sox_bool
     else:
         return _torch_sox.sox_bool(i)
 
 
+@_audio_backend_guard("sox")
 def initialize_sox():
     """Initialize sox for use with effects chains.  This is not required for simple
     loading.  Importantly, only run `initialize_sox` once and do not shutdown
     after each effect chain, but rather once you are finished with all effects chains.
     """
+
+    import _torch_sox
     return _torch_sox.initialize_sox()
 
 
+@_audio_backend_guard("sox")
 def shutdown_sox():
     """Showdown sox for effects chain.  Not required for simple loading.  Importantly,
     only call once.  Attempting to re-initialize sox will result in seg faults.
     """
+
+    import _torch_sox
     return _torch_sox.shutdown_sox()
 
 

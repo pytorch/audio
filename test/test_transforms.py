@@ -16,6 +16,7 @@ if IMPORT_LIBROSA:
 if IMPORT_SCIPY:
     import scipy
 
+SKIP_LIBROSA_CONSISTENCY_TEST = True
 RUN_CUDA = torch.cuda.is_available()
 print("Run test with cuda:", RUN_CUDA)
 
@@ -205,7 +206,10 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(torch_mfcc_norm_none.allclose(norm_check))
 
-    @unittest.skipIf(not IMPORT_LIBROSA or not IMPORT_SCIPY, 'Librosa and scipy are not available')
+    @unittest.skipIf(
+        SKIP_LIBROSA_CONSISTENCY_TEST or not IMPORT_LIBROSA or not IMPORT_SCIPY,
+        'Librosa and scipy are not available, or consisency test disabled'
+    )
     def test_librosa_consistency(self):
         def _test_librosa_consistency_helper(n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
             input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
