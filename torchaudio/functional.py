@@ -307,7 +307,7 @@ def griffinlim(
             Setting this to 0 recovers the original Griffin-Lim method.
             Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: 0.99)
         length (Optional[int]): Array length of the expected output. (Default: ``None``)
-        rand_init (bool): Initializes phase randomly if true and to zero otherwise.
+        rand_init (bool): Initializes phase randomly if True, to zero otherwise. (Default: ``True``)
 
     Returns:
         torch.Tensor: waveform of (channel, time), where time equals the ``length`` parameter if given.
@@ -316,8 +316,6 @@ def griffinlim(
     assert momentum > 0, 'momentum=%s < 0' % momentum
 
     spectrogram = spectrogram.pow(1 / power)
-    if normalized:
-        spectrogram *= window.pow(2).sum().sqrt()
 
     # randomly initialize the phase
     batch, freq, frames = spectrogram.size()
@@ -349,7 +347,7 @@ def griffinlim(
                         True, 'reflect', False, True)
 
         # Update our phase estimates
-        angles = rebuilt.sub(momentum).mul_(tprev)
+        angles = rebuilt - tprev.mul_(momentum / (1 + momentum))
         angles = angles.div_(complex_norm(angles).add_(1e-16).unsqueeze(-1).expand_as(angles))
 
     # Return the final phase estimates

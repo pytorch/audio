@@ -63,11 +63,38 @@ class TestFunctional(unittest.TestCase):
         momentum = 0.99
         n_iter = 32
         length = 1000
-        rand_init = False
+        init = 0
 
         _test_torchscript_functional(
-            F.griffinlim, tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, rand_init
+            F.griffinlim, tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, 0
         )
+
+    @unittest.skipIf(not IMPORT_LIBROSA, 'Librosa not available')
+    def test_griffinlim(self):
+        tensor = torch.rand((1, 1000))
+
+        n_fft = 400
+        ws = 400
+        hop = 100
+        window = torch.hann_window(ws)
+        normalize = False
+        momentum = 0.99
+        n_iter = 8
+        length = 1000
+        rand_init = False
+        init = 'random' if rand_init else None
+
+        specgram = F.spectrogram(tensor, 0, window, n_fft, hop, ws, 2, normalize).sqrt()
+        ta_out = F.griffinlim(specgram, window, n_fft, hop, ws, 1, normalize,
+                              n_iter, momentum, length, rand_init)
+        lr_out = librosa.griffinlim(specgram.squeeze(0).numpy(), n_iter=n_iter, hop_length=hop,
+                                    momentum=momentum, init=init, length=length)
+        lr_out = torch.from_numpy(lr_out).unsqueeze(0)
+
+        ta_spec = F.spectrogram(ta_out, 0, window, n_fft, hop, ws, 2, normalize).sqrt()
+        lr_spec = F.spectrogram(lr_out, 0, window, n_fft, hop, ws, 2, normalize).sqrt()
+
+        self.assertTrue(torch.allclose(ta_spec, lr_spec, atol=5e-3))
 
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
         computed = F.compute_deltas(specgram, win_length=win_length)

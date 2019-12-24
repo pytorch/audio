@@ -104,10 +104,10 @@ class GriffinLim(torch.nn.Module):
             Setting this to 0 recovers the original Griffin-Lim method.
             Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: 0.99)
         length (int, optional): Array length of the expected output. (Default: ``None``)
-        rand_init(bool): Initializes phase randomly if true and to zero otherwise.
+        rand_init (bool): Initializes phase randomly if True and to zero otherwise. (Default: ``True``)
     """
     __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power', 'normalized',
-                     'length', 'momentum']
+                     'length', 'momentum', 'rand_init']
 
     def __init__(self, n_fft=400, n_iter=32, hop_length=None, win_length=None,
                  window_fn=torch.hann_window, wkwargs=None, normalized=False,
