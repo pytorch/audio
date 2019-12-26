@@ -152,8 +152,7 @@ def istft(
     assert 0 < win_length <= n_fft
 
     if window is None:
-        window = torch.ones(win_length)
-        window.to(device=device, dtype=dtype)
+        window = torch.ones(win_length, device=device, dtype=dtype)
 
     assert window.dim() == 1 and window.size(0) == win_length
 
@@ -176,8 +175,7 @@ def istft(
     # each column of a channel is a frame which needs to be overlap added at the right place
     ytmp = ytmp.transpose(1, 2)  # size (channel, n_fft, n_frame)
 
-    eye = torch.eye(n_fft)
-    eye = eye.to(device=device, dtype=dtype).unsqueeze(1)  # size (n_fft, 1, n_fft)
+    eye = torch.eye(n_fft, device=device, dtype=dtype).unsqueeze(1)  # size (n_fft, 1, n_fft)
 
     # this does overlap add where the frames of ytmp are added such that the i'th frame of
     # ytmp is added starting at i*hop_length in the output
