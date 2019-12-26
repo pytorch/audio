@@ -48,7 +48,7 @@ jobs:
       - checkout
       - run:
           command: |
-            pip install --user --progress-bar off jinja2
+            pip install --user --progress-bar off jinja2 pyyaml
             python .circleci/regenerate.py
             git diff --exit-code || (echo ".circleci/config.yml not in sync with config.yml.in! Run .circleci/regenerate.py to update config"; exit 1)
 
@@ -222,62 +222,6 @@ jobs:
             set -x
             docker tag ${image_name}:${CIRCLE_WORKFLOW_ID} 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
             docker push 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
-
-{%- macro workflow(btype, os, python_version, unicode, prefix='', filter_branch=None, upload=False) %}
-      - binary_{{os}}_{{btype}}:
-          name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}
-          python_version: "{{python_version}}"
-{%-   if unicode %}
-          unicode_abi: "1"
-{%-   endif %}
-{%-   if filter_branch %}
-          filters:
-            branches:
-              only: {{filter_branch}}
-{%-   endif %}
-
-{%-   if upload %}
-      - binary_{{btype}}_upload:
-          name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_upload
-          context: org-member
-          requires:
-            - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}
-{%-       if filter_branch == 'nightly' %}
-{%-         if os == 'linux' and not python_version.startswith("2.") %}
-{%-            if btype == 'wheel' %}
-      - smoke_test_linux_pip:
-          name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_smoke_test_pip
-          python_version: "{{python_version}}"
-          requires:
-            - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_upload
-{%-            else %}
-      - smoke_test_linux_conda:
-          name: {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_smoke_test_conda
-          python_version: "{{python_version}}"
-          requires:
-            - {{prefix}}binary_{{os}}_{{btype}}_py{{python_version}}{{ "_unicode" if unicode }}_upload
-{%-            endif %}
-{%-         endif %}
-{%-       endif %}
-{%-   if filter_branch %}
-          filters:
-            branches:
-              only: {{filter_branch}}
-{%-   endif %}
-{%-   endif %}
-{%- endmacro %}
-
-{%- macro workflows(prefix='', filter_branch=None, upload=False) %}
-{%- for btype in ["wheel", "conda"] -%}
-{%-   for os in ["linux", "macos"] -%}
-{%-     for python_version in ["2.7", "3.5", "3.6", "3.7"] -%}
-{%-       for unicode in ([False, True] if btype == "wheel" and python_version == "2.7" else [False]) -%}
-          {{ workflow(btype, os, python_version, unicode, prefix=prefix, filter_branch=filter_branch, upload=upload) }}
-{%-       endfor -%}
-{%-     endfor -%}
-{%-   endfor -%}
-{%- endfor %}
-{%- endmacro %}
 
 workflows:
   build:
