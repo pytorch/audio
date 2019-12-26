@@ -68,6 +68,10 @@ class Tester(unittest.TestCase):
         tensor = torch.rand((1, 1000))
         _test_script_module(transforms.Spectrogram, tensor)
 
+    def test_scriptmodule_GriffinLim(self):
+        tensor = torch.rand((1, 201, 6))
+        _test_script_module(transforms.GriffinLim, tensor, length=1000, rand_init=False)
+
     def test_mu_law_companding(self):
 
         quantization_channels = 256

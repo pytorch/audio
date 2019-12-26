@@ -16,6 +16,13 @@ Transforms are common audio transforms. They can be chained together using :clas
 
   .. automethod:: forward
 
+:hidden:`GriffinLim`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: GriffinLim 
+
+  .. automethod:: forward
+
 :hidden:`AmplitudeToDB`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
