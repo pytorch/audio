@@ -109,9 +109,9 @@ class GriffinLim(torch.nn.Module):
     __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power', 'normalized',
                      'length', 'momentum', 'rand_init']
 
-    def __init__(self, n_fft=400, n_iter=32, hop_length=None, win_length=None,
-                 window_fn=torch.hann_window, wkwargs=None, normalized=False,
-                 power=2, length=None, momentum=0.99, rand_init=True):
+    def __init__(self, n_fft=400, n_iter=32, win_length=None, hop_length=None,
+                 window_fn=torch.hann_window, power=2, normalized=False, wkwargs=None,
+                 momentum=0.99, length=None, rand_init=True):
         super(GriffinLim, self).__init__()
 
         assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
