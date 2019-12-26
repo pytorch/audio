@@ -91,10 +91,7 @@ class TestFunctional(unittest.TestCase):
                                     momentum=momentum, init=init, length=length)
         lr_out = torch.from_numpy(lr_out).unsqueeze(0)
 
-        ta_spec = F.spectrogram(ta_out, 0, window, n_fft, hop, ws, 2, normalize).sqrt()
-        lr_spec = F.spectrogram(lr_out, 0, window, n_fft, hop, ws, 2, normalize).sqrt()
-
-        self.assertTrue(torch.allclose(ta_spec, lr_spec, atol=5e-3))
+        self.assertTrue(torch.allclose(ta_out, lr_out, atol=5e-5))
 
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
         computed = F.compute_deltas(specgram, win_length=win_length)
