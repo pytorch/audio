@@ -42,6 +42,12 @@ def unicode_csv_reader(unicode_csv_data, **kwargs):
     csv.field_size_limit(maxInt)
 
     if six.PY2:
+        # Implementation borrowed from docs:
+        # https://docs.python.org/3.0/library/csv.html#examples
+        def utf_8_encoder(unicode_csv_data):
+            for line in unicode_csv_data:
+                yield line.encode('utf-8')
+
         # csv.py doesn't do Unicode; encode temporarily as UTF-8:
         csv_reader = csv.reader(utf_8_encoder(unicode_csv_data), **kwargs)
         for row in csv_reader:
