@@ -1149,7 +1149,7 @@ def _find_max_per_frame(nccf, sample_rate, freq_high):
     to the first half of lags, then the latter is taken.
     """
 
-    lag_min = math.ceil(sample_rate / freq_high)
+    lag_min = int(math.ceil(sample_rate / freq_high))
 
     # Find near enough max that is smallest
 
