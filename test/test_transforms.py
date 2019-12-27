@@ -68,6 +68,10 @@ class Tester(unittest.TestCase):
         tensor = torch.rand((1, 1000))
         _test_script_module(transforms.Spectrogram, tensor)
 
+    def test_scriptmodule_GriffinLim(self):
+        tensor = torch.rand((1, 201, 6))
+        _test_script_module(transforms.GriffinLim, tensor, length=1000, rand_init=False)
+
     def test_mu_law_companding(self):
 
         quantization_channels = 256
@@ -307,6 +311,13 @@ class Tester(unittest.TestCase):
         _test_librosa_consistency_helper(**kwargs1)
         _test_librosa_consistency_helper(**kwargs2)
         _test_librosa_consistency_helper(**kwargs3)
+
+    def test_scriptmodule_Resample(self):
+        tensor = torch.rand((2, 1000))
+        sample_rate = 100
+        sample_rate_2 = 50
+
+        _test_script_module(transforms.Spectrogram, tensor, sample_rate, sample_rate_2)
 
     def test_resample_size(self):
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')

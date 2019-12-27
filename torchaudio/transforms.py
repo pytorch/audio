@@ -9,6 +9,7 @@ from .compliance import kaldi
 
 __all__ = [
     'Spectrogram',
+    'GriffinLim',
     'AmplitudeToDB',
     'MelScale',
     'MelSpectrogram',
@@ -68,6 +69,69 @@ class Spectrogram(torch.nn.Module):
         """
         return F.spectrogram(waveform, self.pad, self.window, self.n_fft, self.hop_length,
                              self.win_length, self.power, self.normalized)
+
+
+class GriffinLim(torch.nn.Module):
+    r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
+        Implementation ported from `librosa`.
+
+    .. [1] McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto.
+        "librosa: Audio and music signal analysis in python."
+        In Proceedings of the 14th python in science conference, pp. 18-25. 2015.
+
+    .. [2] Perraudin, N., Balazs, P., & Søndergaard, P. L.
+        "A fast Griffin-Lim algorithm,"
+        IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (pp. 1-4),
+        Oct. 2013.
+
+    .. [3] D. W. Griffin and J. S. Lim,
+        "Signal estimation from modified short-time Fourier transform,"
+        IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
+
+    Args:
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins
+        n_iter (int, optional): Number of iteration for phase recovery process.
+        win_length (int): Window size. (Default: ``n_fft``)
+        hop_length (int, optional): Length of hop between STFT windows. (
+            Default: ``win_length // 2``)
+        window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
+            that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        power (int): Exponent for the magnitude spectrogram,
+            (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
+        normalized (bool): Whether to normalize by magnitude after stft. (Default: ``False``)
+        wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
+        momentum (float): The momentum parameter for fast Griffin-Lim.
+            Setting this to 0 recovers the original Griffin-Lim method.
+            Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: 0.99)
+        length (int, optional): Array length of the expected output. (Default: ``None``)
+        rand_init (bool): Initializes phase randomly if True and to zero otherwise. (Default: ``True``)
+    """
+    __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power', 'normalized',
+                     'length', 'momentum', 'rand_init']
+
+    def __init__(self, n_fft=400, n_iter=32, win_length=None, hop_length=None,
+                 window_fn=torch.hann_window, power=2, normalized=False, wkwargs=None,
+                 momentum=0.99, length=None, rand_init=True):
+        super(GriffinLim, self).__init__()
+
+        assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
+        assert momentum > 0, 'momentum=%s < 0' % momentum
+
+        self.n_fft = n_fft
+        self.n_iter = n_iter
+        self.win_length = win_length if win_length is not None else n_fft
+        self.hop_length = hop_length if hop_length is not None else self.win_length // 2
+        window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
+        self.register_buffer('window', window)
+        self.normalized = normalized
+        self.length = length
+        self.power = power
+        self.momentum = momentum / (1 + momentum)
+        self.rand_init = rand_init
+
+    def forward(self, S):
+        return F.griffinlim(S, self.window, self.n_fft, self.hop_length, self.win_length, self.power,
+                            self.normalized, self.n_iter, self.momentum, self.length, self.rand_init)
 
 
 class AmplitudeToDB(torch.jit.ScriptModule):
