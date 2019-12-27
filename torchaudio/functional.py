@@ -7,6 +7,7 @@ import torch
 __all__ = [
     "istft",
     "spectrogram",
+    "griffinlim",
     "amplitude_to_DB",
     "create_fb_matrix",
     "create_dct",
@@ -118,7 +119,7 @@ def istft(
     """
     stft_matrix_dim = stft_matrix.dim()
     assert 3 <= stft_matrix_dim, "Incorrect stft dimension: %d" % (stft_matrix_dim)
-    assert stft_matrix.nelement() > 0
+    assert stft_matrix.numel() > 0
 
     if stft_matrix_dim == 3:
         # add a channel dimension
@@ -126,7 +127,7 @@ def istft(
 
     # pack batch
     shape = stft_matrix.size()
-    stft_matrix = stft_matrix.reshape(-1, *shape[-3:])
+    stft_matrix = stft_matrix.reshape(-1, shape[-3], shape[-2], shape[-1])
 
     dtype = stft_matrix.dtype
     device = stft_matrix.device
@@ -151,7 +152,7 @@ def istft(
     assert 0 < win_length <= n_fft
 
     if window is None:
-        window = torch.ones(win_length, requires_grad=False, device=device, dtype=dtype)
+        window = torch.ones(win_length, device=device, dtype=dtype)
 
     assert window.dim() == 1 and window.size(0) == win_length
 
@@ -174,9 +175,7 @@ def istft(
     # each column of a channel is a frame which needs to be overlap added at the right place
     ytmp = ytmp.transpose(1, 2)  # size (channel, n_fft, n_frame)
 
-    eye = torch.eye(n_fft, requires_grad=False, device=device, dtype=dtype).unsqueeze(
-        1
-    )  # size (n_fft, 1, n_fft)
+    eye = torch.eye(n_fft, device=device, dtype=dtype).unsqueeze(1)  # size (n_fft, 1, n_fft)
 
     # this does overlap add where the frames of ytmp are added such that the i'th frame of
     # ytmp is added starting at i*hop_length in the output
@@ -268,6 +267,94 @@ def spectrogram(
         spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor
 
     return spec_f
+
+
+def griffinlim(
+    spectrogram, window, n_fft, hop_length, win_length, power, normalized, n_iter, momentum, length, rand_init
+):
+    # type: (Tensor, Tensor, int, int, int, int, bool, int, float, Optional[int], bool) -> Tensor
+    r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
+        Implementation ported from `librosa`.
+
+    .. [1] McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto.
+        "librosa: Audio and music signal analysis in python."
+        In Proceedings of the 14th python in science conference, pp. 18-25. 2015.
+
+    .. [2] Perraudin, N., Balazs, P., & Søndergaard, P. L.
+        "A fast Griffin-Lim algorithm,"
+        IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (pp. 1-4),
+        Oct. 2013.
+
+    .. [3] D. W. Griffin and J. S. Lim,
+        "Signal estimation from modified short-time Fourier transform,"
+        IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
+
+    Args:
+        spectrogram (torch.Tensor): A magnitude-only STFT spectrogram of dimension (channel, freq, frames)
+            where freq is ``n_fft // 2 + 1``.
+        window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
+        n_fft (int): Size of FFT, creates ``n_fft // 2 + 1`` bins
+        hop_length (int): Length of hop between STFT windows. (
+            Default: ``win_length // 2``)
+        win_length (int): Window size. (Default: ``n_fft``)
+        power (int): Exponent for the magnitude spectrogram,
+            (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
+        normalized (bool): Whether to normalize by magnitude after stft. (Default: ``False``)
+        n_iter (int): Number of iteration for phase recovery process.
+        momentum (float): The momentum parameter for fast Griffin-Lim.
+            Setting this to 0 recovers the original Griffin-Lim method.
+            Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: 0.99)
+        length (Optional[int]): Array length of the expected output. (Default: ``None``)
+        rand_init (bool): Initializes phase randomly if True, to zero otherwise. (Default: ``True``)
+
+    Returns:
+        torch.Tensor: waveform of (channel, time), where time equals the ``length`` parameter if given.
+    """
+    assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
+    assert momentum > 0, 'momentum=%s < 0' % momentum
+
+    spectrogram = spectrogram.pow(1 / power)
+
+    # randomly initialize the phase
+    batch, freq, frames = spectrogram.size()
+    if rand_init:
+        angles = 2 * math.pi * torch.rand(batch, freq, frames)
+    else:
+        angles = torch.zeros(batch, freq, frames)
+    angles = torch.stack([angles.cos(), angles.sin()], dim=-1) \
+                  .to(dtype=spectrogram.dtype, device=spectrogram.device)
+    spectrogram = spectrogram.unsqueeze(-1).expand_as(angles)
+
+    # And initialize the previous iterate to 0
+    rebuilt = torch.tensor(0.)
+
+    for _ in range(n_iter):
+        # Store the previous iterate
+        tprev = rebuilt
+
+        # Invert with our current estimate of the phases
+        inverse = istft(spectrogram * angles,
+                        n_fft=n_fft,
+                        hop_length=hop_length,
+                        win_length=win_length,
+                        window=window,
+                        length=length).float()
+
+        # Rebuild the spectrogram
+        rebuilt = _stft(inverse, n_fft, hop_length, win_length, window,
+                        True, 'reflect', False, True)
+
+        # Update our phase estimates
+        angles = rebuilt - tprev.mul_(momentum / (1 + momentum))
+        angles = angles.div_(complex_norm(angles).add_(1e-16).unsqueeze(-1).expand_as(angles))
+
+    # Return the final phase estimates
+    return istft(spectrogram * angles,
+                 n_fft=n_fft,
+                 hop_length=hop_length,
+                 win_length=win_length,
+                 window=window,
+                 length=length)
 
 
 def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
