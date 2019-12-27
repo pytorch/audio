@@ -344,6 +344,10 @@ class _ThreadedIterator(threading.Thread):
             raise StopIteration
         return next_item
 
+    # Required for Python 2.7 compatibility
+    def next(self):
+        return self.__next__()
+
 
 def bg_iterator(iterable, maxsize):
     return _ThreadedIterator(iterable, maxsize=maxsize)
