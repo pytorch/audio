@@ -1095,12 +1095,12 @@ def _compute_nccf(waveform, sample_rate, frame_time, freq_low):
     EPSILON = 10 ** (-9)
 
     # Number of lags to check
-    lags = math.ceil(sample_rate / freq_low)
+    lags = int(math.ceil(sample_rate / freq_low))
 
     frame_size = int(math.ceil(sample_rate * frame_time))
 
     waveform_length = waveform.size()[-1]
-    num_of_frames = math.ceil(waveform_length / frame_size)
+    num_of_frames = int(math.ceil(waveform_length / frame_size))
 
     p = lags + num_of_frames * frame_size - waveform_length
     waveform = torch.nn.functional.pad(waveform, (0, p))
