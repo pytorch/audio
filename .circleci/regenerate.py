@@ -47,10 +47,7 @@ def workflow_pair(btype, os_type, python_version, unicode, filter_branch, prefix
 
         is_py3_linux = os_type == 'linux' and not python_version.startswith("2.")
 
-        # XXX This logic is suspect...
-        upload_job_filter_branch = not is_py3_linux and filter_branch
-
-        w.append(generate_upload_workflow(base_workflow_name, upload_job_filter_branch, btype))
+        w.append(generate_upload_workflow(base_workflow_name, filter_branch, btype))
 
         if filter_branch == 'nightly' and is_py3_linux:
             pydistro = 'pip' if btype == 'wheel' else 'conda'
