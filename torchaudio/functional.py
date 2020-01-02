@@ -99,7 +99,7 @@ def istft(
 
     Args:
         stft_matrix (torch.Tensor): Output of stft where each row of a channel is a frequency and each
-            column is a window. it has a size of either (..., fft_size, n_frame, 2)
+            column is a window. It has a size of either (..., fft_size, n_frame, 2)
         n_fft (int): Size of Fourier transform
         hop_length (Optional[int]): The distance between neighboring sliding window frames.
             (Default: ``win_length // 4``)
@@ -230,7 +230,7 @@ def spectrogram(
     The spectrogram can be either magnitude-only or complex.
 
     Args:
-        waveform (torch.Tensor): Tensor of audio of dimension (..., channel, time)
+        waveform (torch.Tensor): Tensor of audio of dimension (..., time)
         pad (int): Two sided padding of signal
         window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT
@@ -242,8 +242,8 @@ def spectrogram(
         normalized (bool): Whether to normalize by magnitude after stft
 
     Returns:
-        torch.Tensor: Dimension (..., channel, freq, time), where channel
-        is unchanged, freq is ``n_fft // 2 + 1`` and ``n_fft`` is the number of
+        torch.Tensor: Dimension (..., freq, time), freq is
+        ``n_fft // 2 + 1`` and ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frame).
     """
 
@@ -292,7 +292,7 @@ def griffinlim(
         IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
 
     Args:
-        specgram (torch.Tensor): A magnitude-only STFT spectrogram of dimension (channel, freq, frames)
+        specgram (torch.Tensor): A magnitude-only STFT spectrogram of dimension (..., freq, frames)
             where freq is ``n_fft // 2 + 1``.
         window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT, creates ``n_fft // 2 + 1`` bins
@@ -310,10 +310,14 @@ def griffinlim(
         rand_init (bool): Initializes phase randomly if True, to zero otherwise. (Default: ``True``)
 
     Returns:
-        torch.Tensor: waveform of (channel, time), where time equals the ``length`` parameter if given.
+        torch.Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.
     """
     assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
     assert momentum > 0, 'momentum=%s < 0' % momentum
+
+    # pack batch
+    shape = specgram.size()
+    specgram = specgram.reshape([-1] + list(shape[-2:]))
 
     specgram = specgram.pow(1 / power)
 
@@ -351,12 +355,17 @@ def griffinlim(
         angles = angles.div_(complex_norm(angles).add_(1e-16).unsqueeze(-1).expand_as(angles))
 
     # Return the final phase estimates
-    return istft(specgram * angles,
-                 n_fft=n_fft,
-                 hop_length=hop_length,
-                 win_length=win_length,
-                 window=window,
-                 length=length)
+    waveform = istft(specgram * angles,
+                     n_fft=n_fft,
+                     hop_length=hop_length,
+                     win_length=win_length,
+                     window=window,
+                     length=length)
+
+    # unpack batch
+    waveform = waveform.reshape(shape[:-2] + waveform.shape[-1:])
+
+    return waveform
 
 
 def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
@@ -699,7 +708,7 @@ def biquad(waveform, b0, b1, b2, a0, a1, a2):
     https://en.wikipedia.org/wiki/Digital_biquad_filter
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
+        waveform (torch.Tensor): audio waveform of dimension of `(..., time)`
         b0 (float): numerator coefficient of current input, x[n]
         b1 (float): numerator coefficient of input one time step ago x[n-1]
         b2 (float): numerator coefficient of input two time steps ago x[n-2]
@@ -708,7 +717,7 @@ def biquad(waveform, b0, b1, b2, a0, a1, a2):
         a2 (float): denominator coefficient of current output y[n-2]
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(channel, time)`
+        output_waveform (torch.Tensor): Dimension of `(..., time)`
     """
 
     device = waveform.device
@@ -732,13 +741,13 @@ def highpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     r"""Design biquad highpass filter and perform filtering.  Similar to SoX implementation.
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
+        waveform (torch.Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
         cutoff_freq (float): filter cutoff frequency
         Q (float): https://en.wikipedia.org/wiki/Q_factor
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(channel, time)`
+        output_waveform (torch.Tensor): Dimension of `(..., time)`
     """
 
     GAIN = 1.
@@ -761,13 +770,13 @@ def lowpass_biquad(waveform, sample_rate, cutoff_freq, Q=0.707):
     r"""Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
+        waveform (torch.Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
         cutoff_freq (float): filter cutoff frequency
         Q (float): https://en.wikipedia.org/wiki/Q_factor
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(channel, time)`
+        output_waveform (torch.Tensor): Dimension of `(..., time)`
     """
 
     GAIN = 1.
@@ -790,14 +799,14 @@ def equalizer_biquad(waveform, sample_rate, center_freq, gain, Q=0.707):
     r"""Design biquad peaking equalizer filter and perform filtering.  Similar to SoX implementation.
 
     Args:
-        waveform (torch.Tensor): audio waveform of dimension of `(channel, time)`
+        waveform (torch.Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
         center_freq (float): filter's central frequency
         gain (float): desired gain at the boost (or attenuation) in dB
         q_factor (float): https://en.wikipedia.org/wiki/Q_factor
 
     Returns:
-        output_waveform (torch.Tensor): Dimension of `(channel, time)`
+        output_waveform (torch.Tensor): Dimension of `(..., time)`
     """
     w0 = 2 * math.pi * center_freq / sample_rate
     A = math.exp(gain / 40.0 * math.log(10))
@@ -856,13 +865,13 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
     All examples will have the same mask interval.
 
     Args:
-        specgram (Tensor): Real spectrogram (channel, freq, time)
+        specgram (Tensor): Real spectrogram (..., freq, time)
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
 
     Returns:
-        torch.Tensor: Masked spectrogram of dimensions (channel, freq, time)
+        torch.Tensor: Masked spectrogram of dimensions (..., freq, time)
     """
 
     # pack batch
@@ -946,7 +955,7 @@ def gain(waveform, gain_db=1.0):
     r"""Apply amplification or attenuation to the whole waveform.
 
     Args:
-       waveform (torch.Tensor): Tensor of audio of dimension (channel, time).
+       waveform (torch.Tensor): Tensor of audio of dimension (..., time).
        gain_db (float) Gain adjustment in decibels (dB) (Default: `1.0`).
 
     Returns:
@@ -999,7 +1008,7 @@ def _apply_probability_distribution(waveform, density_function="TPDF"):
     The relationship of probabilities of results follows a bell-shaped,
     or Gaussian curve, typical of dither generated by analog sources.
     Args:
-        waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
+        waveform (torch.Tensor): Tensor of audio of dimension (..., time)
         probability_density_function (string): The density function of a
            continuous random variable (Default: `TPDF`)
            Options: Triangular Probability Density Function - `TPDF`
@@ -1008,6 +1017,8 @@ def _apply_probability_distribution(waveform, density_function="TPDF"):
     Returns:
         torch.Tensor: waveform dithered with TPDF
     """
+
+    # pack batch
     shape = waveform.size()
     waveform = waveform.reshape(-1, shape[-1])
 
@@ -1047,6 +1058,8 @@ def _apply_probability_distribution(waveform, density_function="TPDF"):
 
     quantised_signal_scaled = torch.round(signal_scaled_dis)
     quantised_signal = quantised_signal_scaled / down_scaling
+
+    # unpack batch
     return quantised_signal.reshape(shape[:-1] + quantised_signal.shape[-1:])
 
 
@@ -1056,7 +1069,7 @@ def dither(waveform, density_function="TPDF", noise_shaping=False):
     particular bit-depth by eliminating nonlinear truncation distortion
     (i.e. adding minimally perceived noise to mask distortion caused by quantization).
     Args:
-       waveform (torch.Tensor): Tensor of audio of dimension (channel, time)
+       waveform (torch.Tensor): Tensor of audio of dimension (..., time)
        density_function (string): The density function of a
            continuous random variable (Default: `TPDF`)
            Options: Triangular Probability Density Function - `TPDF`

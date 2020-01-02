@@ -374,6 +374,19 @@ class Tester(unittest.TestCase):
         computed = transform(specgram)
         self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
 
+    def test_batch_MelScale(self):
+        specgram = torch.randn(2, 31, 2786)
+
+        # Single then transform then batch
+        expected = transforms.MelScale()(specgram).repeat(3, 1, 1, 1)
+
+        # Batch then transform
+        computed = transforms.MelScale()(specgram.repeat(3, 1, 1, 1))
+
+        # shape = (3, 2, 201, 1394)
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
     def test_batch_compute_deltas(self):
         specgram = torch.randn(2, 31, 2786)
 
@@ -432,6 +445,30 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
+
+    def test_batch_melspectrogram(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+
+        # Single then transform then batch
+        expected = transforms.MelSpectrogram()(waveform).repeat(3, 1, 1, 1)
+
+        # Batch then transform
+        computed = transforms.MelSpectrogram()(waveform.repeat(3, 1, 1))
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
+    def test_batch_mfcc(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+
+        # Single then transform then batch
+        expected = transforms.MFCC()(waveform).repeat(3, 1, 1, 1)
+
+        # Batch then transform
+        computed = transforms.MFCC()(waveform.repeat(3, 1, 1))
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected, atol=1e-5))
 
     def test_scriptmodule_TimeStretch(self):
         n_freq = 400

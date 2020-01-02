@@ -103,6 +103,19 @@ class TestFunctional(unittest.TestCase):
 
         self.assertTrue(torch.allclose(ta_out, lr_out, atol=5e-5))
 
+        # test batch
+
+        # Single then transform then batch
+        expected = ta_out.unsqueeze(0).repeat(3, 1, 1)
+
+        # Batch then transform
+        specgram = specgram.unsqueeze(0).repeat(3, 1, 1, 1)
+        computed = F.griffinlim(specgram, window, n_fft, hop, ws, 1, normalize,
+                                n_iter, momentum, length, rand_init)
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
         computed = F.compute_deltas(specgram, win_length=win_length)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
