@@ -1164,7 +1164,7 @@ def _find_max_per_frame(nccf, sample_rate, freq_high):
     # Add back minimal lag
     indices += lag_min
     # Add 1 empirical calibration offset
-    indices += 1
+    indices += 2
 
     return indices
 
