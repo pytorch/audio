@@ -838,6 +838,8 @@ def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
         torch.Tensor: Masked spectrograms of dimensions (batch, channel, freq, time)
     """
 
+    # TODO Introduce batch support
+
     if axis != 2 and axis != 3:
         raise ValueError('Only Frequency and Time masking are supported')
 
