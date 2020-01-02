@@ -16,7 +16,7 @@ if IMPORT_LIBROSA:
 if IMPORT_SCIPY:
     import scipy
 
-SKIP_LIBROSA_CONSISTENCY_TEST = True
+SKIP_LIBROSA_CONSISTENCY_TEST = False
 RUN_CUDA = torch.cuda.is_available()
 print("Run test with cuda:", RUN_CUDA)
 
@@ -221,11 +221,11 @@ class Tester(unittest.TestCase):
             sound_librosa = sound.cpu().numpy().squeeze()  # (64000)
 
             # test core spectrogram
-            spect_transform = torchaudio.transforms.Spectrogram(n_fft=n_fft, hop_length=hop_length, power=2)
+            spect_transform = torchaudio.transforms.Spectrogram(n_fft=n_fft, hop_length=hop_length, power=power)
             out_librosa, _ = librosa.core.spectrum._spectrogram(y=sound_librosa,
                                                                 n_fft=n_fft,
                                                                 hop_length=hop_length,
-                                                                power=2)
+                                                                power=power)
 
             out_torch = spect_transform(sound).squeeze().cpu()
             self.assertTrue(torch.allclose(out_torch, torch.from_numpy(out_librosa), atol=1e-5))
@@ -308,9 +308,19 @@ class Tester(unittest.TestCase):
             'sample_rate': 24000
         }
 
+        kwargs4 = {
+            'n_fft': 400,
+            'hop_length': 200,
+            'power': 3.0,
+            'n_mels': 128,
+            'n_mfcc': 40,
+            'sample_rate': 16000
+        }
+
         _test_librosa_consistency_helper(**kwargs1)
         _test_librosa_consistency_helper(**kwargs2)
         _test_librosa_consistency_helper(**kwargs3)
+        _test_librosa_consistency_helper(**kwargs4)
 
     def test_scriptmodule_Resample(self):
         tensor = torch.rand((2, 1000))

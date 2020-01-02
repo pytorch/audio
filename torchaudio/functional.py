@@ -225,7 +225,7 @@ def istft(
 def spectrogram(
     waveform, pad, window, n_fft, hop_length, win_length, power, normalized
 ):
-    # type: (Tensor, int, Tensor, int, int, int, Optional[int], bool) -> Tensor
+    # type: (Tensor, int, Tensor, int, int, int, Optional[float], bool) -> Tensor
     r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
 
@@ -236,7 +236,7 @@ def spectrogram(
         n_fft (int): Size of FFT
         hop_length (int): Length of hop between STFT windows
         win_length (int): Window size
-        power (int): Exponent for the magnitude spectrogram,
+        power (float): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
             If None, then the complex spectrum is returned instead.
         normalized (bool): Whether to normalize by magnitude after stft
@@ -264,9 +264,9 @@ def spectrogram(
     spec_f = spec_f.reshape(shape[:-1] + spec_f.shape[-3:])
 
     if normalized:
-        spec_f /= window.pow(2).sum().sqrt()
+        spec_f /= window.pow(2.).sum().sqrt()
     if power is not None:
-        spec_f = spec_f.pow(power).sum(-1)  # get power of "complex" tensor
+        spec_f = complex_norm(spec_f, power=power)
 
     return spec_f
 
@@ -274,7 +274,7 @@ def spectrogram(
 def griffinlim(
     spectrogram, window, n_fft, hop_length, win_length, power, normalized, n_iter, momentum, length, rand_init
 ):
-    # type: (Tensor, Tensor, int, int, int, int, bool, int, float, Optional[int], bool) -> Tensor
+    # type: (Tensor, Tensor, int, int, int, float, bool, int, float, Optional[int], bool) -> Tensor
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
         Implementation ported from `librosa`.
 
@@ -299,7 +299,7 @@ def griffinlim(
         hop_length (int): Length of hop between STFT windows. (
             Default: ``win_length // 2``)
         win_length (int): Window size. (Default: ``n_fft``)
-        power (int): Exponent for the magnitude spectrogram,
+        power (float): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
         normalized (bool): Whether to normalize by magnitude after stft. (Default: ``False``)
         n_iter (int): Number of iteration for phase recovery process.
