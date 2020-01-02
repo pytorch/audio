@@ -272,7 +272,7 @@ def spectrogram(
 
 
 def griffinlim(
-    spectrogram, window, n_fft, hop_length, win_length, power, normalized, n_iter, momentum, length, rand_init
+    specgram, window, n_fft, hop_length, win_length, power, normalized, n_iter, momentum, length, rand_init
 ):
     # type: (Tensor, Tensor, int, int, int, int, bool, int, float, Optional[int], bool) -> Tensor
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
@@ -292,7 +292,7 @@ def griffinlim(
         IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
 
     Args:
-        spectrogram (torch.Tensor): A magnitude-only STFT spectrogram of dimension (channel, freq, frames)
+        specgram (torch.Tensor): A magnitude-only STFT spectrogram of dimension (channel, freq, frames)
             where freq is ``n_fft // 2 + 1``.
         window (torch.Tensor): Window tensor that is applied/multiplied to each frame/window
         n_fft (int): Size of FFT, creates ``n_fft // 2 + 1`` bins
@@ -315,17 +315,17 @@ def griffinlim(
     assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
     assert momentum > 0, 'momentum=%s < 0' % momentum
 
-    spectrogram = spectrogram.pow(1 / power)
+    specgram = specgram.pow(1 / power)
 
     # randomly initialize the phase
-    batch, freq, frames = spectrogram.size()
+    batch, freq, frames = specgram.size()
     if rand_init:
         angles = 2 * math.pi * torch.rand(batch, freq, frames)
     else:
         angles = torch.zeros(batch, freq, frames)
     angles = torch.stack([angles.cos(), angles.sin()], dim=-1) \
-                  .to(dtype=spectrogram.dtype, device=spectrogram.device)
-    spectrogram = spectrogram.unsqueeze(-1).expand_as(angles)
+                  .to(dtype=specgram.dtype, device=specgram.device)
+    specgram = specgram.unsqueeze(-1).expand_as(angles)
 
     # And initialize the previous iterate to 0
     rebuilt = torch.tensor(0.)
@@ -335,7 +335,7 @@ def griffinlim(
         tprev = rebuilt
 
         # Invert with our current estimate of the phases
-        inverse = istft(spectrogram * angles,
+        inverse = istft(specgram * angles,
                         n_fft=n_fft,
                         hop_length=hop_length,
                         win_length=win_length,
@@ -351,7 +351,7 @@ def griffinlim(
         angles = angles.div_(complex_norm(angles).add_(1e-16).unsqueeze(-1).expand_as(angles))
 
     # Return the final phase estimates
-    return istft(spectrogram * angles,
+    return istft(specgram * angles,
                  n_fft=n_fft,
                  hop_length=hop_length,
                  win_length=win_length,
