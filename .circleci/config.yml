@@ -324,6 +324,9 @@ workflows:
           python_version: '3.5'
       - binary_wheel_upload:
           context: org-member
+          filters:
+            branches:
+              only: nightly
           name: nightly_binary_linux_wheel_py3.5_upload
           requires:
           - nightly_binary_linux_wheel_py3.5
@@ -343,6 +346,9 @@ workflows:
           python_version: '3.6'
       - binary_wheel_upload:
           context: org-member
+          filters:
+            branches:
+              only: nightly
           name: nightly_binary_linux_wheel_py3.6_upload
           requires:
           - nightly_binary_linux_wheel_py3.6
@@ -362,6 +368,9 @@ workflows:
           python_version: '3.7'
       - binary_wheel_upload:
           context: org-member
+          filters:
+            branches:
+              only: nightly
           name: nightly_binary_linux_wheel_py3.7_upload
           requires:
           - nightly_binary_linux_wheel_py3.7
@@ -466,6 +475,9 @@ workflows:
           python_version: '3.5'
       - binary_conda_upload:
           context: org-member
+          filters:
+            branches:
+              only: nightly
           name: nightly_binary_linux_conda_py3.5_upload
           requires:
           - nightly_binary_linux_conda_py3.5
@@ -485,6 +497,9 @@ workflows:
           python_version: '3.6'
       - binary_conda_upload:
           context: org-member
+          filters:
+            branches:
+              only: nightly
           name: nightly_binary_linux_conda_py3.6_upload
           requires:
           - nightly_binary_linux_conda_py3.6
@@ -504,6 +519,9 @@ workflows:
           python_version: '3.7'
       - binary_conda_upload:
           context: org-member
+          filters:
+            branches:
+              only: nightly
           name: nightly_binary_linux_conda_py3.7_upload
           requires:
           - nightly_binary_linux_conda_py3.7
