@@ -71,6 +71,10 @@ class TestFunctional(unittest.TestCase):
 
     @unittest.skipIf(not IMPORT_LIBROSA, 'Librosa not available')
     def test_griffinlim(self):
+
+        # NOTE: This test is flaky without a fixed random seed
+        # See https://github.com/pytorch/audio/issues/382
+        torch.random.manual_seed(42)
         tensor = torch.rand((1, 1000))
 
         n_fft = 400
