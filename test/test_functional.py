@@ -114,7 +114,7 @@ class TestFunctional(unittest.TestCase):
                                 n_iter, momentum, length, rand_init)
 
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
+        self.assertTrue(torch.allclose(computed, expected, atol=5e-5))
 
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
         computed = F.compute_deltas(specgram, win_length=win_length)
