@@ -91,7 +91,7 @@ jobs:
       name: win/default
       shell: bash.exe
     steps:
-      - checkout_merge
+      - checkout
       - run:
           command: |
             choco install miniconda3
