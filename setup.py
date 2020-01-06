@@ -83,7 +83,7 @@ if pytorch_package_version is not None:
 if platform.system() == 'Windows':
     ext_modules = None
 else:
-    ext_modules=[
+    ext_modules = [
         CppExtension(
             '_torch_sox',
             ['torchaudio/torch_sox.cpp'],
