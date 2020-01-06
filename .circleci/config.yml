@@ -6,6 +6,9 @@ version: 2.1
 #     - Replace binary_linux_wheel_py3.7 with the name of the job you want to test.
 #       Job names are 'name:' key.
 
+orbs:
+  win: circleci/windows@2.0.0
+
 binary_common: &binary_common
   parameters:
     # Edit these defaults to do a release
@@ -81,6 +84,22 @@ jobs:
           root: /opt/conda/conda-bld/linux-64
           paths:
             - "*"
+
+  binary_win_conda:
+    <<: *binary_common
+    executor:
+      name: win/default
+      shell: bash.exe
+    steps:
+      - checkout_merge
+      - run:
+          command: |
+            choco install miniconda3
+            (& "C:\tools\miniconda3\Scripts\conda.exe" "shell.powershell" "hook") | Out-String | Invoke-Expression
+            conda activate base
+            conda install -yq conda-build "conda-package-handling!=1.5.0"
+            bash packaging/build_conda.sh
+          shell: powershell.exe
 
   binary_macos_wheel:
     <<: *binary_common
@@ -283,6 +302,10 @@ workflows:
       - binary_macos_conda:
           name: binary_macos_conda_py3.7
           python_version: '3.7'
+      - binary_win_conda:
+          name: torchvision_win_py3.6_cpu
+          python_version: "3.6"
+          cu_version: "cpu"
 
   nightly:
     jobs:
