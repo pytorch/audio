@@ -249,9 +249,8 @@ workflows:
       - circleci_consistency
       {{ workflows() }}
       - binary_win_conda:
-          name: torchvision_win_py3.6_cpu
+          name: torchvision_win_py3.6
           python_version: "3.6"
-          cu_version: "cpu"
 
   nightly:
 {%- endif %}
