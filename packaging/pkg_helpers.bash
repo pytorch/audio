@@ -185,9 +185,6 @@ setup_conda_pytorch_constraint() {
   else
     export CONDA_CHANNEL_FLAGS="-c pytorch -c pytorch-nightly"
   fi
-  if [[ "$OSTYPE" == "msys" ]]; then
-    export CONDA_CHANNEL_FLAGS="$CONDA_CHANNEL_FLAGS -c defaults -c conda-forge"
-  fi
   if [[ "$CU_VERSION" == cpu ]]; then
     export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==$PYTORCH_VERSION${PYTORCH_VERSION_SUFFIX}"
     export CONDA_PYTORCH_CONSTRAINT="- pytorch==$PYTORCH_VERSION"

@@ -19,7 +19,6 @@ requirements:
   run:
     - python
     - typing
-    - pysoundfile # [win]
     {{ environ.get('CONDA_PYTORCH_CONSTRAINT') }}
 
 build:
