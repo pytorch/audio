@@ -303,7 +303,7 @@ workflows:
           name: binary_macos_conda_py3.7
           python_version: '3.7'
       - binary_win_conda:
-          name: torchvision_win_py3.6
+          name: torchaudio_win_py3.6
           python_version: "3.6"
 
   nightly:
