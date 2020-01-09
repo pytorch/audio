@@ -24,14 +24,11 @@ def _test_torchscript_functional_shape(py_method, *args, **kwargs):
     py_out = py_method(*args, **kwargs)
 
     assert jit_out.shape == py_out.shape
+    return jit_out, py_out
 
 
 def _test_torchscript_functional(py_method, *args, **kwargs):
-    jit_method = torch.jit.script(py_method)
-
-    jit_out = jit_method(*args, **kwargs)
-    py_out = py_method(*args, **kwargs)
-
+    jit_out, py_out = _test_torchscript_functional_shape(py_method, *args, **kwargs)
     assert torch.allclose(jit_out, py_out)
 
 
