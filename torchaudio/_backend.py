@@ -1,11 +1,12 @@
 from functools import wraps
 
+import platform
 import torch
 
 from . import _soundfile_backend, _sox_backend
 
 
-_audio_backend = "sox"
+_audio_backend = "soundfile" if platform.system() == "Windows" else "sox"
 _audio_backends = {"sox": _sox_backend, "soundfile": _soundfile_backend}
 
 
