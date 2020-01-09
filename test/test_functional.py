@@ -509,6 +509,26 @@ class TestFunctional(unittest.TestCase):
 
             assert torch.allclose(freq, freq2, atol=1e-5)
 
+    def test_batch_mask_along_axis_iid(self):
+
+        specgram = torch.randn(2, 5, 5)
+        mask_param = 2
+        mask_value = 30.
+        axis = 2
+
+        torch.manual_seed(42)
+
+        # Single then transform then batch
+        expected = F.mask_along_axis_iid(specgram, mask_param=mask_param, mask_value=mask_value, axis=axis)
+        expected = expected.unsqueeze(0).unsqueeze(0)
+
+        # Batch then transform
+        specgrams = specgram.unsqueeze(0).unsqueeze(0)
+        computed = F.mask_along_axis_iid(specgrams, mask_param=mask_param, mask_value=mask_value, axis=axis)
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
     def _test_batch(self, functional):
         waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
 

@@ -835,16 +835,21 @@ def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
         axis (int): Axis to apply masking on (2 -> frequency, 3 -> time)
 
     Returns:
-        torch.Tensor: Masked spectrograms of dimensions (batch, channel, freq, time)
+        torch.Tensor: Masked spectrograms of dimensions (..., channel, freq, time)
     """
 
-    # TODO Introduce batch support
+    # pack batch
+    shape = specgrams.size()
+    specgrams = specgrams.reshape([-1] + list(shape[-3:]))
 
     if axis != 2 and axis != 3:
         raise ValueError('Only Frequency and Time masking are supported')
 
-    value = torch.rand(specgrams.shape[:2]) * mask_param
-    min_value = torch.rand(specgrams.shape[:2]) * (specgrams.size(axis) - value)
+    # Shift so as to start from the end
+    axis -= 4
+
+    value = torch.rand(specgrams.shape[:-2]) * mask_param
+    min_value = torch.rand(specgrams.shape[:-2]) * (specgrams.size(axis) - value)
 
     # Create broadcastable mask
     mask_start = (min_value.long())[..., None, None].float()
@@ -855,6 +860,9 @@ def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
     specgrams = specgrams.transpose(axis, -1)
     specgrams.masked_fill_((mask >= mask_start) & (mask < mask_end), mask_value)
     specgrams = specgrams.transpose(axis, -1)
+
+    # unpack batch
+    specgrams = specgrams.reshape(shape[:-3] + specgrams.shape[-3:])
 
     return specgrams
 
@@ -873,12 +881,12 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
         axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
 
     Returns:
-        torch.Tensor: Masked spectrogram of dimensions (..., freq, time)
+        torch.Tensor: Masked spectrogram of dimensions (..., channel, freq, time)
     """
 
     # pack batch
     shape = specgram.size()
-    specgram = specgram.reshape([-1] + list(shape[-2:]))
+    specgram = specgram.reshape([-1] + list(shape[-3:]))
 
     value = torch.rand(1) * mask_param
     min_value = torch.rand(1) * (specgram.size(axis) - value)
@@ -895,9 +903,9 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
         raise ValueError('Only Frequency and Time masking are supported')
 
     # unpack batch
-    specgram = specgram.reshape(shape[:-2] + specgram.shape[-2:])
+    specgram = specgram.reshape(shape[:-3] + specgram.shape[-3:])
 
-    return specgram.reshape(shape[:-2] + specgram.shape[-2:])
+    return specgram
 
 
 def compute_deltas(specgram, win_length=5, mode="replicate"):
