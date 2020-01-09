@@ -1,5 +1,8 @@
 torch>=1.2.0
 
+# Required for Windows because it's the only available backend
+SoundFile; sys_platform == 'win32'
+
 # Optional for torchaudio.kaldi_io
 numpy
 kaldi_io
