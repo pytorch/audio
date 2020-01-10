@@ -501,7 +501,7 @@ class TestFunctional(unittest.TestCase):
             self.assertFalse(s)
 
             # Convert to stereo and batch for testing purposes
-            self._test_batch(F.detect_pitch_frequency, waveform, sample_rate) # , atol=1e-5)
+            self._test_batch(F.detect_pitch_frequency, waveform, sample_rate)
 
     def _test_batch_shape(self, functional, tensor, *args, **kwargs):
 
@@ -544,16 +544,6 @@ class TestFunctional(unittest.TestCase):
         axis = 2
 
         self._test_batch_shape(F.mask_along_axis_iid, tensor, mask_param=mask_param, mask_value=mask_value, axis=axis)
-
-    def _test_batch(self, functional):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
-
-        # Single then transform then batch
-        expected = functional(waveform).unsqueeze(0).repeat(3, 1, 1, 1)
-
-        # Batch then transform
-        waveform = waveform.unsqueeze(0).repeat(3, 1, 1)
-        computed = functional(waveform)
 
     def test_torchscript_create_fb_matrix(self):
 
