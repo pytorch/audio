@@ -820,16 +820,16 @@ def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
     All examples will have the same mask interval.
 
     Args:
-        specgrams (Tensor): Real spectrograms (batch, channel, freq, time)
+        specgrams (Tensor): Real spectrograms (..., freq, time)
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
-        axis (int): Axis to apply masking on (2 -> frequency, 3 -> time)
+        axis (int): Axis to apply masking on (-2 -> frequency, -1 -> time)
 
     Returns:
-        torch.Tensor: Masked spectrograms of dimensions (batch, channel, freq, time)
+        torch.Tensor: Masked spectrograms of dimensions (..., freq, time)
     """
 
-    if axis != 2 and axis != 3:
+    if axis != -2 and axis != -1:
         raise ValueError('Only Frequency and Time masking are supported')
 
     value = torch.rand(specgrams.shape[:2]) * mask_param
@@ -859,7 +859,7 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
         specgram (Tensor): Real spectrogram (channel, freq, time)
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
-        axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
+        axis (int): Axis to apply masking on (-2 -> frequency, -1 -> time)
 
     Returns:
         torch.Tensor: Masked spectrogram of dimensions (channel, freq, time)
@@ -876,9 +876,9 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
     mask_end = (min_value.long() + value.long()).squeeze()
 
     assert mask_end - mask_start < mask_param
-    if axis == 1:
+    if axis == -2:
         specgram[:, mask_start:mask_end] = mask_value
-    elif axis == 2:
+    elif axis == -1:
         specgram[:, :, mask_start:mask_end] = mask_value
     else:
         raise ValueError('Only Frequency and Time masking are supported')

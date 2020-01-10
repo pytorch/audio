@@ -556,7 +556,7 @@ class _AxisMasking(torch.nn.Module):
 
         # if iid_masks flag marked and specgram has a batch dimension
         if self.iid_masks and specgram.dim() == 4:
-            return F.mask_along_axis_iid(specgram, self.mask_param, mask_value, self.axis + 1)
+            return F.mask_along_axis_iid(specgram, self.mask_param, mask_value, self.axis)
         else:
             return F.mask_along_axis(specgram, self.mask_param, mask_value, self.axis)
 
@@ -572,7 +572,7 @@ class FrequencyMasking(_AxisMasking):
     """
 
     def __init__(self, freq_mask_param, iid_masks=False):
-        super(FrequencyMasking, self).__init__(freq_mask_param, 1, iid_masks)
+        super(FrequencyMasking, self).__init__(freq_mask_param, -2, iid_masks)
 
 
 class TimeMasking(_AxisMasking):
@@ -586,4 +586,4 @@ class TimeMasking(_AxisMasking):
     """
 
     def __init__(self, time_mask_param, iid_masks=False):
-        super(TimeMasking, self).__init__(time_mask_param, 2, iid_masks)
+        super(TimeMasking, self).__init__(time_mask_param, -1, iid_masks)
