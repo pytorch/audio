@@ -820,13 +820,13 @@ def mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
     All examples will have the same mask interval.
 
     Args:
-        specgrams (Tensor): Real spectrograms (..., freq, time)
+        specgrams (Tensor): Real spectrograms (batch, channel, freq, time)
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (-2 -> frequency, -1 -> time)
 
     Returns:
-        torch.Tensor: Masked spectrograms of dimensions (..., freq, time)
+        torch.Tensor: Masked spectrograms of dimensions (batch, channel, freq, time)
     """
 
     if axis != -2 and axis != -1:
