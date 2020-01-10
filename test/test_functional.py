@@ -560,28 +560,6 @@ class TestFunctional(unittest.TestCase):
         torch.random.manual_seed(42)
         computed = functional(tensors.clone(), *args, **kwargs)
 
-        self._compare_estimate(computed, expected, **kwargs_compare)
-
-    def test_batch_mask_along_axis_iid(self):
-
-        mask_param = 2
-        mask_value = 30.
-        axis = 2
-
-        tensor = torch.rand(2, 5, 5)
-
-        self._test_batch(F.mask_along_axis_iid, tensor, mask_param=mask_param, mask_value=mask_value, axis=axis, atol=1e-1, rtol=1e-1)
-
-    def test_batch_mask_along_axis(self):
-
-        tensor = torch.rand(2, 5, 5)
-
-        mask_param = 2
-        mask_value = 30.
-        axis = 2
-
-        self._test_batch(F.mask_along_axis, tensor, mask_param=mask_param, mask_value=mask_value, axis=axis)
-
     def test_torchscript_create_fb_matrix(self):
 
         n_stft = 100
