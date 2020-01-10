@@ -118,7 +118,7 @@ class TestFunctional(unittest.TestCase):
         n_iter = 32
         length = 1000
 
-        self._test_batch(F.griffinlim, tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, 0)
+        self._test_batch(F.griffinlim, tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, 0, atol=5e-5)
 
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
         computed = F.compute_deltas(specgram, win_length=win_length)
@@ -506,6 +506,18 @@ class TestFunctional(unittest.TestCase):
 
     def _test_batch_shape(self, functional, tensor, *args, **kwargs):
 
+        kwargs_compare = {}
+        if 'atol' in kwargs:
+            atol = kwargs['atol']
+            del kwargs['atol']
+            kwargs_compare['atol'] = atol
+            print(kwargs)
+
+        if 'rtol' in kwargs:
+            rtol = kwargs['rtol']
+            del kwargs['rtol']
+            kwargs_compare['rtol'] = rtol
+
         # Single then transform then batch
 
         expected = functional(tensor, *args, **kwargs)
@@ -516,13 +528,24 @@ class TestFunctional(unittest.TestCase):
         tensors = tensor.unsqueeze(0).unsqueeze(0)
         computed = functional(tensors, *args, **kwargs)
 
-        self._compare_estimate(computed, expected)
+        self._compare_estimate(computed, expected, **kwargs_compare)
 
         return tensors, expected
 
     def _test_batch(self, functional, tensor, *args, **kwargs):
 
         tensors, expected = self._test_batch_shape(functional, tensor, *args, **kwargs)
+
+        kwargs_compare = {}
+        if 'atol' in kwargs:
+            atol = kwargs['atol']
+            del kwargs['atol']
+            kwargs_compare['atol'] = atol
+
+        if 'rtol' in kwargs:
+            rtol = kwargs['rtol']
+            del kwargs['rtol']
+            kwargs_compare['rtol'] = rtol
 
         # 3-Batch then transform
 
@@ -534,7 +557,7 @@ class TestFunctional(unittest.TestCase):
 
         computed = functional(tensors, *args, **kwargs)
 
-        self._compare_estimate(computed, expected)
+        self._compare_estimate(computed, expected, **kwargs_compare)
 
     def test_batch_mask_along_axis_iid(self):
 
