@@ -105,6 +105,7 @@ class TestFunctional(unittest.TestCase):
 
     def test_batch_griffinlim(self):
 
+        torch.random.manual_seed(42)
         tensor = torch.rand((1, 201, 6))
 
         n_fft = 400
