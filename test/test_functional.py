@@ -511,7 +511,6 @@ class TestFunctional(unittest.TestCase):
             atol = kwargs['atol']
             del kwargs['atol']
             kwargs_compare['atol'] = atol
-            print(kwargs)
 
         if 'rtol' in kwargs:
             rtol = kwargs['rtol']
@@ -520,13 +519,16 @@ class TestFunctional(unittest.TestCase):
 
         # Single then transform then batch
 
-        expected = functional(tensor, *args, **kwargs)
+        torch.random.manual_seed(42)
+        expected = functional(tensor.clone(), *args, **kwargs)
         expected = expected.unsqueeze(0).unsqueeze(0)
 
         # 1-Batch then transform
 
         tensors = tensor.unsqueeze(0).unsqueeze(0)
-        computed = functional(tensors, *args, **kwargs)
+
+        torch.random.manual_seed(42)
+        computed = functional(tensors.clone(), *args, **kwargs)
 
         self._compare_estimate(computed, expected, **kwargs_compare)
 
@@ -555,11 +557,22 @@ class TestFunctional(unittest.TestCase):
         ind = [3] + [1] * (int(expected.dim()) - 1)
         expected = expected.repeat(*ind)
 
-        computed = functional(tensors, *args, **kwargs)
+        torch.random.manual_seed(42)
+        computed = functional(tensors.clone(), *args, **kwargs)
 
         self._compare_estimate(computed, expected, **kwargs_compare)
 
     def test_batch_mask_along_axis_iid(self):
+
+        mask_param = 2
+        mask_value = 30.
+        axis = 2
+
+        tensor = torch.rand(2, 5, 5)
+
+        self._test_batch(F.mask_along_axis_iid, tensor, mask_param=mask_param, mask_value=mask_value, axis=axis, atol=1e-1, rtol=1e-1)
+
+    def test_batch_mask_along_axis(self):
 
         tensor = torch.rand(2, 5, 5)
 
@@ -567,7 +580,7 @@ class TestFunctional(unittest.TestCase):
         mask_value = 30.
         axis = 2
 
-        self._test_batch_shape(F.mask_along_axis_iid, tensor, mask_param=mask_param, mask_value=mask_value, axis=axis)
+        self._test_batch(F.mask_along_axis, tensor, mask_param=mask_param, mask_value=mask_value, axis=axis)
 
     def test_torchscript_create_fb_matrix(self):
 

@@ -875,7 +875,7 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
     All examples will have the same mask interval.
 
     Args:
-        specgram (Tensor): Real spectrogram (..., freq, time)
+        specgram (Tensor): Real spectrogram (..., channel, freq, time)
         mask_param (int): Number of columns to be masked will be uniformly sampled from [0, mask_param]
         mask_value (float): Value to assign to the masked columns
         axis (int): Axis to apply masking on (1 -> frequency, 2 -> time)
