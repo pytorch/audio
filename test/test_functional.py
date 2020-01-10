@@ -118,7 +118,9 @@ class TestFunctional(unittest.TestCase):
         n_iter = 32
         length = 1000
 
-        self._test_batch(F.griffinlim, tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, 0, atol=5e-5)
+        self._test_batch(
+            F.griffinlim, tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, 0, atol=5e-5
+        )
 
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
         computed = F.compute_deltas(specgram, win_length=win_length)
