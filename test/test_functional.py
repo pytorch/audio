@@ -560,7 +560,7 @@ class TestFunctional(unittest.TestCase):
         specgram = torch.randn(2, 1025, 400)
         mask_param = 100
         mask_value = 30.
-        axis = 2
+        axis = -1
 
         _test_torchscript_functional(F.mask_along_axis, specgram, mask_param, mask_value, axis)
 
@@ -569,7 +569,7 @@ class TestFunctional(unittest.TestCase):
         specgrams = torch.randn(4, 2, 1025, 400)
         mask_param = 100
         mask_value = 30.
-        axis = 2
+        axis = -2
 
         _test_torchscript_functional(F.mask_along_axis_iid, specgrams, mask_param, mask_value, axis)
 
@@ -651,7 +651,7 @@ def test_complex_norm(complex_tensor, power):
 ])
 @pytest.mark.parametrize('mask_param', [100])
 @pytest.mark.parametrize('mask_value', [0., 30.])
-@pytest.mark.parametrize('axis', [1, 2])
+@pytest.mark.parametrize('axis', [-2, -1])
 def test_mask_along_axis(specgram, mask_param, mask_value, axis):
 
     mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis)
@@ -671,7 +671,7 @@ def test_mask_along_axis(specgram, mask_param, mask_value, axis):
 ])
 @pytest.mark.parametrize('mask_param', [100])
 @pytest.mark.parametrize('mask_value', [0., 30.])
-@pytest.mark.parametrize('axis', [2, 3])
+@pytest.mark.parametrize('axis', [-2, -1])
 def test_mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
 
     mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
