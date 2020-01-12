@@ -590,7 +590,7 @@ class TimeMasking(_AxisMasking):
         super(TimeMasking, self).__init__(time_mask_param, 2, iid_masks)
 
 
-class RandomCropping(torch.nn.Module):
+class RandomCrop(torch.nn.Module):
     r"""Crop the given Audio at a random location with fixed length
 
     Args:
@@ -606,7 +606,7 @@ class RandomCropping(torch.nn.Module):
     __constants__ = ['constant', 'reflect', 'replicate', 'circular']
 
     def __init__(self, length=1, freq=16000, padding_mode='constant', fill=0):
-        super(RandomCropping, self).__init__()
+        super(RandomCrop, self).__init__()
         # Check Correctness
         if length <= 0:
             raise ValueError(f"Audio length cannot be less than equal to 0")
