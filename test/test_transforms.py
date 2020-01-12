@@ -22,7 +22,6 @@ print("Run test with cuda:", RUN_CUDA)
 
 
 def _test_script_module(f, tensor, *args, **kwargs):
-
     py_method = f(*args, **kwargs)
     jit_method = torch.jit.script(py_method)
 
@@ -32,7 +31,6 @@ def _test_script_module(f, tensor, *args, **kwargs):
     assert torch.allclose(jit_out, py_out)
 
     if RUN_CUDA:
-
         tensor = tensor.to("cuda")
 
         py_method = py_method.cuda()
@@ -45,20 +43,19 @@ def _test_script_module(f, tensor, *args, **kwargs):
 
 
 class Tester(unittest.TestCase):
-
     # create a sinewave signal for testing
     sample_rate = 16000
     freq = 440
     volume = .3
     waveform = (torch.cos(2 * math.pi * torch.arange(0, 4 * sample_rate).float() * freq / sample_rate))
     waveform.unsqueeze_(0)  # (1, 64000)
-    waveform = (waveform * volume * 2**31).long()
+    waveform = (waveform * volume * 2 ** 31).long()
     # file for stereo stft test
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, 'assets',
                                  'steam-train-whistle-daniel_simon.mp3')
 
-    def scale(self, waveform, factor=float(2**31)):
+    def scale(self, waveform, factor=float(2 ** 31)):
         # scales a waveform by a factor
         if not waveform.is_floating_point():
             waveform = waveform.to(torch.get_default_dtype())
@@ -73,7 +70,6 @@ class Tester(unittest.TestCase):
         _test_script_module(transforms.GriffinLim, tensor, length=1000, rand_init=False)
 
     def test_mu_law_companding(self):
-
         quantization_channels = 256
 
         waveform = self.waveform.clone()
@@ -266,14 +262,14 @@ class Tester(unittest.TestCase):
             # function body in https://librosa.github.io/librosa/_modules/librosa/feature/spectral.html#melspectrogram
             # to mirror this function call with correct args:
 
-    #         librosa_mfcc = librosa.feature.mfcc(y=sound_librosa,
-    #                                             sr=sample_rate,
-    #                                             n_mfcc = n_mfcc,
-    #                                             hop_length=hop_length,
-    #                                             n_fft=n_fft,
-    #                                             htk=True,
-    #                                             norm=None,
-    #                                             n_mels=n_mels)
+            #         librosa_mfcc = librosa.feature.mfcc(y=sound_librosa,
+            #                                             sr=sample_rate,
+            #                                             n_mfcc = n_mfcc,
+            #                                             hop_length=hop_length,
+            #                                             n_fft=n_fft,
+            #                                             htk=True,
+            #                                             norm=None,
+            #                                             n_mels=n_mels)
 
             librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm='ortho')[:n_mfcc]
             librosa_mfcc_tensor = torch.from_numpy(librosa_mfcc)
@@ -447,6 +443,19 @@ class Tester(unittest.TestCase):
     def test_scriptmodule_TimeMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
         _test_script_module(transforms.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
+
+    def test_random_cropping_size(self):
+        import numpy as np
+        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        waveform, sample_rate = torchaudio.load(input_path)
+        length = 2
+        channels, total_samples = waveform.shape[0], waveform.shape[1]
+        random_cropper = torchaudio.transforms.RandomCropping(length=length, freq=sample_rate)
+        # Test waveform size is correct
+        self.assertTrue(random_cropper(waveform).shape == torch.Size([channels, length * sample_rate]))
+        # Test waveform is subset of the original waveform
+        self.assertTrue(
+            np.sum(np.isin(waveform, random_cropper(waveform), assume_unique=True)) >= length * sample_rate * channels)
 
 
 if __name__ == '__main__':

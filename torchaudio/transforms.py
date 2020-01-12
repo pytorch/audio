@@ -8,7 +8,6 @@ from typing import Optional
 from . import functional as F
 from .compliance import kaldi
 
-
 __all__ = [
     'Spectrogram',
     'GriffinLim',
@@ -23,6 +22,7 @@ __all__ = [
     'TimeStretch',
     'FrequencyMasking',
     'TimeMasking',
+    'RandomCropping',
 ]
 
 
@@ -412,6 +412,7 @@ class Resample(torch.nn.Module):
         new_freq (float): The desired frequency. (Default: ``16000``)
         resampling_method (str): The resampling method (Default: ``'sinc_interpolation'``)
     """
+
     def __init__(self, orig_freq=16000, new_freq=16000, resampling_method='sinc_interpolation'):
         super(Resample, self).__init__()
         self.orig_freq = orig_freq
@@ -587,3 +588,53 @@ class TimeMasking(_AxisMasking):
 
     def __init__(self, time_mask_param, iid_masks=False):
         super(TimeMasking, self).__init__(time_mask_param, 2, iid_masks)
+
+
+class RandomCropping(torch.nn.Module):
+    r"""Crop the given Audio at a random location with fixed length
+
+    Args:
+        length (float, optional): Length of the Audio to crop in seconds
+        freq (float): The frequency of the signal. (Default: ``16000``)
+        padding_mode (string): Type of padding. Should be: ``'constant'``, ``'reflect'``, ``'replicate'`` or ``'circular'``.
+            Default: ``'constant'``
+            - constant: pads with a constant value, this value is specified with fill
+            - edge: pads with the last value on the edge of the audio
+            - repeat: pads with repetition of audio
+        fill (float/int): fill value for constant fill. Default is 0.
+    """
+    __constants__ = ['constant', 'reflect', 'replicate', 'circular']
+
+    def __init__(self, length=1, freq=16000, padding_mode='constant', fill=0):
+        super(RandomCropping, self).__init__()
+        # Check Correctness
+        if length <= 0:
+            raise ValueError(f"Audio length cannot be less than equal to 0")
+        if freq <= 0:
+            raise ValueError(f"Audio frequency cannot be less than equal to 0")
+        if padding_mode not in self.__constants__:
+            raise ValueError(f"Audio padding mode does not exist, pick on of these: {str(self.__constants__)}")
+        # Assign Values
+        self.length = length
+        self.freq = freq
+        self.padding_mode = padding_mode
+        self.fill = fill
+
+    def forward(self, waveform):
+        r"""
+        Args:
+            waveform (torch.Tensor): The input signal of dimension (channel, total_audio_length x freq)
+
+        Returns:
+            torch.Tensor: Output signal of dimension (channel, length x freq)
+        """
+        n_samples = int(self.length * self.freq)
+        total_samples = waveform.shape[1]
+        if total_samples == n_samples:
+            return waveform
+        elif total_samples < n_samples:
+            n_pad = n_samples - total_samples
+            return torch.nn.functional.pad(waveform, [0, n_pad], mode=self.padding_mode, value=self.fill)
+        else:
+            s_index = torch.randint(low=0, high=total_samples - n_samples - 1, size=[1]).item()
+            return waveform[:, s_index:s_index + n_samples]
