@@ -37,7 +37,7 @@ class Spectrogram(torch.nn.Module):
         pad (int): Two sided padding of signal. (Default: ``0``)
         window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
-        power (int): Exponent for the magnitude spectrogram,
+        power (float): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
         normalized (bool): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
@@ -46,7 +46,7 @@ class Spectrogram(torch.nn.Module):
 
     def __init__(self, n_fft=400, win_length=None, hop_length=None,
                  pad=0, window_fn=torch.hann_window,
-                 power=2, normalized=False, wkwargs=None):
+                 power=2., normalized=False, wkwargs=None):
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -98,7 +98,7 @@ class GriffinLim(torch.nn.Module):
             Default: ``win_length // 2``)
         window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
-        power (int): Exponent for the magnitude spectrogram,
+        power (float): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
         normalized (bool): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
@@ -112,7 +112,7 @@ class GriffinLim(torch.nn.Module):
                      'length', 'momentum', 'rand_init']
 
     def __init__(self, n_fft=400, n_iter=32, win_length=None, hop_length=None,
-                 window_fn=torch.hann_window, power=2, normalized=False, wkwargs=None,
+                 window_fn=torch.hann_window, power=2., normalized=False, wkwargs=None,
                  momentum=0.99, length=None, rand_init=True):
         super(GriffinLim, self).__init__()
 
@@ -266,7 +266,7 @@ class MelSpectrogram(torch.nn.Module):
         self.f_min = f_min
         self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
                                        hop_length=self.hop_length,
-                                       pad=self.pad, window_fn=window_fn, power=2,
+                                       pad=self.pad, window_fn=window_fn, power=2.,
                                        normalized=False, wkwargs=wkwargs)
         self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1)
 
