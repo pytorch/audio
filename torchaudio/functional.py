@@ -874,6 +874,10 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
         torch.Tensor: Masked spectrogram of dimensions (channel, freq, time)
     """
 
+    # pack batch
+    shape = specgram.size()
+    specgram = specgram.reshape([-1] + list(shape[-2:]))
+
     value = torch.rand(1) * mask_param
     min_value = torch.rand(1) * (specgram.size(axis) - value)
 
@@ -887,6 +891,9 @@ def mask_along_axis(specgram, mask_param, mask_value, axis):
         specgram[:, :, mask_start:mask_end] = mask_value
     else:
         raise ValueError('Only Frequency and Time masking are supported')
+
+    # unpack batch
+    specgram = specgram.reshape(shape[:-2] + specgram.shape[-2:])
 
     return specgram
 
