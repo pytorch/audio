@@ -315,7 +315,7 @@ class Tester(unittest.TestCase):
 
         _test_librosa_consistency_helper(**kwargs1)
         _test_librosa_consistency_helper(**kwargs2)
-        # XXX Test started failing
+        # NOTE Test passes offline, but fails on CircleCI, see #372.
         # _test_librosa_consistency_helper(**kwargs3)
         _test_librosa_consistency_helper(**kwargs4)
 
