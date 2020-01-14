@@ -61,16 +61,14 @@ class VCTK(Dataset):
             warnings.warn(
                 "In the next version, transforms will not be part of the dataset. "
                 "Please use `downsample=False` to enable this behavior now, ",
-                "and suppress this warning.",
-                DeprecationWarning,
+                "and suppress this warning."
             )
 
         if transform is not None or target_transform is not None:
             warnings.warn(
                 "In the next version, transforms will not be part of the dataset. "
                 "Please remove the option `transform=True` and "
-                "`target_transform=True` to suppress this warning.",
-                DeprecationWarning,
+                "`target_transform=True` to suppress this warning."
             )
 
         self.downsample = downsample
