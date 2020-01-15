@@ -215,7 +215,7 @@ class MelScale(torch.nn.Module):
 
         # pack batch
         shape = specgram.size()
-        specgram = specgram.reshape(-1, shape[-2], shape[-1])
+        specgram = specgram.view(-1, shape[-2], shape[-1])
 
         if self.fb.numel() == 0:
             tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max, self.n_mels, self.sample_rate)
@@ -228,7 +228,7 @@ class MelScale(torch.nn.Module):
         mel_specgram = torch.matmul(specgram.transpose(1, 2), self.fb).transpose(1, 2)
 
         # unpack batch
-        mel_specgram = mel_specgram.reshape(shape[:-2] + mel_specgram.shape[-2:])
+        mel_specgram = mel_specgram.view(shape[:-2] + mel_specgram.shape[-2:])
 
         return mel_specgram
 
@@ -349,7 +349,7 @@ class MFCC(torch.nn.Module):
 
         # pack batch
         shape = waveform.size()
-        waveform = waveform.reshape(-1, shape[-1])
+        waveform = waveform.view(-1, shape[-1])
 
         mel_specgram = self.MelSpectrogram(waveform)
         if self.log_mels:
@@ -362,7 +362,7 @@ class MFCC(torch.nn.Module):
         mfcc = torch.matmul(mel_specgram.transpose(1, 2), self.dct_mat).transpose(1, 2)
 
         # unpack batch
-        mfcc = mfcc.reshape(shape[:-1] + mfcc.shape[-2:])
+        mfcc = mfcc.view(shape[:-1] + mfcc.shape[-2:])
 
         return mfcc
 
