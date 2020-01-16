@@ -445,7 +445,6 @@ class Tester(unittest.TestCase):
         _test_script_module(transforms.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
 
     def test_random_crop_size(self):
-        import numpy as np
         input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
         waveform, sample_rate = torchaudio.load(input_path)
         length = 2
@@ -453,6 +452,14 @@ class Tester(unittest.TestCase):
         random_cropper = torchaudio.transforms.RandomCrop(length=length, freq=sample_rate)
         # Test waveform size is correct
         self.assertTrue(random_cropper(waveform).shape == torch.Size([channels, length * sample_rate]))
+
+    def test_random_crop_content(self):
+        import numpy as np
+        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        waveform, sample_rate = torchaudio.load(input_path)
+        length = 2
+        channels, total_samples = waveform.shape[0], waveform.shape[1]
+        random_cropper = torchaudio.transforms.RandomCrop(length=length, freq=sample_rate)
         # Test waveform is subset of the original waveform
         self.assertTrue(
             np.sum(np.isin(waveform, random_cropper(waveform), assume_unique=True)) >= length * sample_rate * channels)
