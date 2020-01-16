@@ -29,13 +29,33 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 </head>
 
 <div class="container-fluid header-holder tutorials-header" id="header-holder">
@@ -50,11 +70,25 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/features">Features</a>
+            <div class="ecosystem-dropdown">
+              <a id="dropdownMenuButton" data-toggle="ecosystem-dropdown">
+                Ecosystem
+              </a>
+              <div class="ecosystem-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub"">
+                  <span class=dropdown-title>Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
+                  <span class=dropdown-title>Tools & Libraries</span>
+                  <p>Explore the ecosystem of tools and libraries</p>
+                </a>
+              </div>
+            </div>
           </li>
 
           <li>
-            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+            <a href="https://pytorch.org/mobile">Mobile</a>
           </li>
 
           <li>
@@ -70,7 +104,21 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/resources">Resources</a>
+            <div class="resources-dropdown">
+              <a id="resourcesDropdownButton" data-toggle="resources-dropdown">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources"">
+                  <span class=dropdown-title>Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class=dropdown-title>About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+              </div>
+            </div>
           </li>
 
           <li>
@@ -217,11 +265,14 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#_"><strong>_</strong></a>
- | <a href="#A"><strong>A</strong></a>
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
@@ -233,18 +284,6 @@
  | <a href="#Y"><strong>Y</strong></a>
  
 </div>
-<h2 id="_">_</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="datasets.html#torchaudio.datasets.VCTK.__getitem__">__getitem__() (torchaudio.datasets.VCTK method)</a>
-
-      <ul>
-        <li><a href="datasets.html#torchaudio.datasets.YESNO.__getitem__">(torchaudio.datasets.YESNO method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -261,18 +300,50 @@
   </ul></td>
 </tr></table>
 
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="functional.html#torchaudio.functional.biquad">biquad() (in module torchaudio.functional)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.clear_chain">clear_chain() (torchaudio.sox_effects.SoxEffectsChain method)</a>
 </li>
+      <li><a href="datasets.html#torchaudio.datasets.COMMONVOICE">COMMONVOICE (class in torchaudio.datasets)</a>
+</li>
       <li><a href="functional.html#torchaudio.functional.complex_norm">complex_norm() (in module torchaudio.functional)</a>
+</li>
+      <li><a href="transforms.html#torchaudio.transforms.ComplexNorm">ComplexNorm (class in torchaudio.transforms)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="functional.html#torchaudio.functional.compute_deltas">compute_deltas() (in module torchaudio.functional)</a>
+</li>
+      <li><a href="transforms.html#torchaudio.transforms.ComputeDeltas">ComputeDeltas (class in torchaudio.transforms)</a>
+</li>
       <li><a href="functional.html#torchaudio.functional.create_dct">create_dct() (in module torchaudio.functional)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.create_fb_matrix">create_fb_matrix() (in module torchaudio.functional)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="functional.html#torchaudio.functional.detect_pitch_frequency">detect_pitch_frequency() (in module torchaudio.functional)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="functional.html#torchaudio.functional.equalizer_biquad">equalizer_biquad() (in module torchaudio.functional)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -282,24 +353,38 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compliance.kaldi.html#torchaudio.compliance.kaldi.fbank">fbank() (in module torchaudio.compliance.kaldi)</a>
 </li>
-      <li><a href="transforms.html#torchaudio._docs.AmplitudeToDB.forward">forward() (torchaudio._docs.AmplitudeToDB method)</a>
+      <li><a href="transforms.html#torchaudio.transforms.AmplitudeToDB.forward">forward() (torchaudio.transforms.AmplitudeToDB method)</a>
 
       <ul>
-        <li><a href="transforms.html#torchaudio._docs.MFCC.forward">(torchaudio._docs.MFCC method)</a>
+        <li><a href="transforms.html#torchaudio.transforms.ComplexNorm.forward">(torchaudio.transforms.ComplexNorm method)</a>
 </li>
-        <li><a href="transforms.html#torchaudio._docs.MelScale.forward">(torchaudio._docs.MelScale method)</a>
+        <li><a href="transforms.html#torchaudio.transforms.ComputeDeltas.forward">(torchaudio.transforms.ComputeDeltas method)</a>
 </li>
-        <li><a href="transforms.html#torchaudio._docs.MelSpectrogram.forward">(torchaudio._docs.MelSpectrogram method)</a>
+        <li><a href="transforms.html#torchaudio.transforms.FrequencyMasking.forward">(torchaudio.transforms.FrequencyMasking method)</a>
 </li>
-        <li><a href="transforms.html#torchaudio._docs.MuLawDecoding.forward">(torchaudio._docs.MuLawDecoding method)</a>
+        <li><a href="transforms.html#torchaudio.transforms.MelScale.forward">(torchaudio.transforms.MelScale method)</a>
 </li>
-        <li><a href="transforms.html#torchaudio._docs.MuLawEncoding.forward">(torchaudio._docs.MuLawEncoding method)</a>
+        <li><a href="transforms.html#torchaudio.transforms.MelSpectrogram.forward">(torchaudio.transforms.MelSpectrogram method)</a>
 </li>
-        <li><a href="transforms.html#torchaudio._docs.Resample.forward">(torchaudio._docs.Resample method)</a>
+        <li><a href="transforms.html#torchaudio.transforms.MFCC.forward">(torchaudio.transforms.MFCC method)</a>
 </li>
-        <li><a href="transforms.html#torchaudio._docs.Spectrogram.forward">(torchaudio._docs.Spectrogram method)</a>
+        <li><a href="transforms.html#torchaudio.transforms.MuLawDecoding.forward">(torchaudio.transforms.MuLawDecoding method)</a>
+</li>
+        <li><a href="transforms.html#torchaudio.transforms.MuLawEncoding.forward">(torchaudio.transforms.MuLawEncoding method)</a>
+</li>
+        <li><a href="transforms.html#torchaudio.transforms.Resample.forward">(torchaudio.transforms.Resample method)</a>
+</li>
+        <li><a href="transforms.html#torchaudio.transforms.Spectrogram.forward">(torchaudio.transforms.Spectrogram method)</a>
+</li>
+        <li><a href="transforms.html#torchaudio.transforms.TimeMasking.forward">(torchaudio.transforms.TimeMasking method)</a>
+</li>
+        <li><a href="transforms.html#torchaudio.transforms.TimeStretch.forward">(torchaudio.transforms.TimeStretch method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="transforms.html#torchaudio.transforms.FrequencyMasking">FrequencyMasking (class in torchaudio.transforms)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -313,6 +398,14 @@
       <li><a href="index.html#torchaudio.get_sox_encoding_t">get_sox_encoding_t() (in module torchaudio)</a>
 </li>
       <li><a href="index.html#torchaudio.get_sox_option_t">get_sox_option_t() (in module torchaudio)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="functional.html#torchaudio.functional.highpass_biquad">highpass_biquad() (in module torchaudio.functional)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -334,11 +427,17 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#torchaudio.load">load() (in module torchaudio)</a>
+      <li><a href="functional.html#torchaudio.functional.lfilter">lfilter() (in module torchaudio.functional)</a>
+</li>
+      <li><a href="datasets.html#torchaudio.datasets.LIBRISPEECH">LIBRISPEECH (class in torchaudio.datasets)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="index.html#torchaudio.load">load() (in module torchaudio)</a>
+</li>
       <li><a href="index.html#torchaudio.load_wav">load_wav() (in module torchaudio)</a>
+</li>
+      <li><a href="functional.html#torchaudio.functional.lowpass_biquad">lowpass_biquad() (in module torchaudio.functional)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -348,14 +447,18 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="functional.html#torchaudio.functional.magphase">magphase() (in module torchaudio.functional)</a>
 </li>
+      <li><a href="functional.html#torchaudio.functional.mask_along_axis">mask_along_axis() (in module torchaudio.functional)</a>
+</li>
+      <li><a href="functional.html#torchaudio.functional.mask_along_axis_iid">mask_along_axis_iid() (in module torchaudio.functional)</a>
+</li>
       <li><a href="transforms.html#torchaudio.transforms.MelScale">MelScale (class in torchaudio.transforms)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.MelSpectrogram">MelSpectrogram (class in torchaudio.transforms)</a>
 </li>
-      <li><a href="transforms.html#torchaudio.transforms.MFCC">MFCC (class in torchaudio.transforms)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="transforms.html#torchaudio.transforms.MFCC">MFCC (class in torchaudio.transforms)</a>
+</li>
       <li><a href="compliance.kaldi.html#torchaudio.compliance.kaldi.mfcc">mfcc() (in module torchaudio.compliance.kaldi)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.mu_law_decoding">mu_law_decoding() (in module torchaudio.functional)</a>
@@ -436,6 +539,12 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="transforms.html#torchaudio.transforms.TimeMasking">TimeMasking (class in torchaudio.transforms)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="transforms.html#torchaudio.transforms.TimeStretch">TimeStretch (class in torchaudio.transforms)</a>
+</li>
       <li><a href="index.html#module-torchaudio">torchaudio (module)</a>
 </li>
   </ul></td>
@@ -509,8 +618,8 @@
          <script type="text/javascript" src="_static/underscore.js"></script>
          <script type="text/javascript" src="_static/doctools.js"></script>
          <script type="text/javascript" src="_static/language_data.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js"></script>
+         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
+         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js"></script>
          <script type="text/javascript" src="_static/katex_autorenderer.js"></script>
      
 
@@ -652,15 +761,23 @@
       <div class="main-menu">
         <ul>
           <li>
-            <a href="#">Get Started</a>
+            <a href="https://pytorch.org/get-started">Get Started</a>
           </li>
 
           <li>
-            <a href="#">Features</a>
+            <a href="https://pytorch.org/features">Features</a>
           </li>
 
           <li>
-            <a href="#">Ecosystem</a>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -699,6 +816,7 @@
       sideMenus.bind();
       scrollToAnchor.bind();
       highlightNavigation.bind();
+      mainMenuDropdown.bind();
 
       // Add class to links that have code blocks, since we cannot create links in code blocks
       $("article.pytorch-article a span.pre").each(function(e) {

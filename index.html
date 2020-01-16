@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -36,6 +36,26 @@
 
   
   <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 </head>
 
 <div class="container-fluid header-holder tutorials-header" id="header-holder">
@@ -50,11 +70,25 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/features">Features</a>
+            <div class="ecosystem-dropdown">
+              <a id="dropdownMenuButton" data-toggle="ecosystem-dropdown">
+                Ecosystem
+              </a>
+              <div class="ecosystem-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub"">
+                  <span class=dropdown-title>Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
+                  <span class=dropdown-title>Tools & Libraries</span>
+                  <p>Explore the ecosystem of tools and libraries</p>
+                </a>
+              </div>
+            </div>
           </li>
 
           <li>
-            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+            <a href="https://pytorch.org/mobile">Mobile</a>
           </li>
 
           <li>
@@ -70,7 +104,21 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/resources">Resources</a>
+            <div class="resources-dropdown">
+              <a id="resourcesDropdownButton" data-toggle="resources-dropdown">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources"">
+                  <span class=dropdown-title>Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class=dropdown-title>About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+              </div>
+            </div>
           </li>
 
           <li>
@@ -227,6 +275,8 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#commonvoice">COMMONVOICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#librispeech">LIBRISPEECH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="datasets.html#vctk">VCTK</a></li>
 <li class="toctree-l2"><a class="reference internal" href="datasets.html#yesno">YESNO</a></li>
 </ul>
@@ -249,6 +299,11 @@
 <li class="toctree-l2"><a class="reference internal" href="transforms.html#mulawencoding"><span class="hidden-section">MuLawEncoding</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="transforms.html#mulawdecoding"><span class="hidden-section">MuLawDecoding</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="transforms.html#resample"><span class="hidden-section">Resample</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="transforms.html#complexnorm"><span class="hidden-section">ComplexNorm</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="transforms.html#computedeltas"><span class="hidden-section">ComputeDeltas</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="transforms.html#timestretch"><span class="hidden-section">TimeStretch</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="transforms.html#frequencymasking"><span class="hidden-section">FrequencyMasking</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="transforms.html#timemasking"><span class="hidden-section">TimeMasking</span></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a><ul>
@@ -263,6 +318,15 @@
 <li class="toctree-l2"><a class="reference internal" href="functional.html#angle"><span class="hidden-section">angle</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="functional.html#magphase"><span class="hidden-section">magphase</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="functional.html#phase-vocoder"><span class="hidden-section">phase_vocoder</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functional.html#lfilter"><span class="hidden-section">lfilter</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functional.html#biquad"><span class="hidden-section">biquad</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functional.html#lowpass-biquad"><span class="hidden-section">lowpass_biquad</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functional.html#highpass-biquad"><span class="hidden-section">highpass_biquad</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functional.html#equalizer-biquad"><span class="hidden-section">equalizer_biquad</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functional.html#mask-along-axis"><span class="hidden-section">mask_along_axis</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functional.html#mask-along-axis-iid"><span class="hidden-section">mask_along_axis_iid</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functional.html#compute-deltas"><span class="hidden-section">compute_deltas</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functional.html#detect-pitch-frequency"><span class="hidden-section">detect_pitch_frequency</span></a></li>
 </ul>
 </li>
 </ul>
@@ -273,7 +337,7 @@
 <dd><p>Get enum of sox_bool for sox encodinginfo options.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Choose type or get a dict with all possible options
+<dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Choose type or get a dict with all possible options
 use <code class="docutils literal notranslate"><span class="pre">__members__</span></code> to see all options when not specified. (Default:
 <code class="docutils literal notranslate"><span class="pre">sox_false</span></code> or <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p>
 </dd>
@@ -292,7 +356,7 @@ use <code class="docutils literal notranslate"><span class="pre">__members__</sp
 <dd><p>Get enum of sox_encoding_t for sox encodings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Choose type or get a dict with all possible options
+<dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Choose type or get a dict with all possible options
 use <code class="docutils literal notranslate"><span class="pre">__members__</span></code> to see all options when not specified. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -310,7 +374,7 @@ use <code class="docutils literal notranslate"><span class="pre">__members__</sp
 <dd><p>Get enum of sox_option_t for sox encodinginfo options.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Choose type or get a dict with all possible options
+<dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Choose type or get a dict with all possible options
 use <code class="docutils literal notranslate"><span class="pre">__members__</span></code> to see all options when not specified.
 (Default: <code class="docutils literal notranslate"><span class="pre">sox_option_default</span></code> or <code class="docutils literal notranslate"><span class="pre">2</span></code>)</p>
 </dd>
@@ -329,7 +393,7 @@ use <code class="docutils literal notranslate"><span class="pre">__members__</sp
 <dd><p>Gets metadata from an audio file without loading the signal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to audio file</p>
+<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to audio file</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A si (sox_signalinfo_t) signal
@@ -363,24 +427,24 @@ after each effect chain, but rather once you are finished with all effects chain
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.7)"><em>pathlib.Path</em></a>) – Path to audio file</p></li>
-<li><p><strong>out</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a><em>, </em><em>optional</em>) – An output tensor to use instead of creating one. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>normalization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>number</em><em>, or </em><em>callable</em><em>, </em><em>optional</em>) – If boolean <cite>True</cite>, then output is divided by <cite>1 &lt;&lt; 31</cite>
-(assumes signed 32-bit audio), and normalizes to <cite>[0, 1]</cite>.
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.8)"><em>pathlib.Path</em></a>) – Path to audio file</p></li>
+<li><p><strong>out</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.4.0a0+bb32d52 ))"><em>torch.Tensor</em></a><em>, </em><em>optional</em>) – An output tensor to use instead of creating one. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>normalization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>number</em><em>, or </em><em>callable</em><em>, </em><em>optional</em>) – If boolean <cite>True</cite>, then output is divided by <cite>1 &lt;&lt; 31</cite>
+(assumes signed 32-bit audio), and normalizes to <cite>[-1, 1]</cite>.
 If <cite>number</cite>, then output is divided by that number
 If <cite>callable</cite>, then the output is passed as a parameter
 to the given function, then the output is divided by
 the result. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Set channels first or length first in result. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of frames to load.  0 to load everything after the offset.
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Set channels first or length first in result. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of frames to load.  0 to load everything after the offset.
 (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
-<li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of frames from the start of the file to begin data loading.
+<li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of frames from the start of the file to begin data loading.
 (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
 <li><p><strong>signalinfo</strong> (<em>sox_signalinfo_t</em><em>, </em><em>optional</em>) – A sox_signalinfo_t type, which could be helpful if the
 audio type cannot be automatically determined. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>encodinginfo</strong> (<em>sox_encodinginfo_t</em><em>, </em><em>optional</em>) – A sox_encodinginfo_t type, which could be set if the
 audio type cannot be automatically determined. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>filetype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – A filetype or extension to be set if sox cannot determine it
+<li><p><strong>filetype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – A filetype or extension to be set if sox cannot determine it
 automatically. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
 </dd>
@@ -390,7 +454,7 @@ of audio frames and C is the number of channels. An integer which is the sample 
 audio (as listed in the metadata of the file)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>]</p>
+<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.4.0a0+bb32d52 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a>]</p>
 </dd>
 </dl>
 <dl>
@@ -415,7 +479,7 @@ audio (as listed in the metadata of the file)</p>
 the input right by 16 bits.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.7)"><em>pathlib.Path</em></a>) – Path to audio file</p>
+<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.8)"><em>pathlib.Path</em></a>) – Path to audio file</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>An output tensor of size <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is the number
@@ -423,7 +487,7 @@ of audio frames and C is the number of channels. An integer which is the sample 
 audio (as listed in the metadata of the file)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>]</p>
+<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.4.0a0+bb32d52 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -435,13 +499,13 @@ audio (as listed in the metadata of the file)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to audio file</p></li>
-<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – An input 2D tensor of shape <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to audio file</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.4.0a0+bb32d52 ))"><em>torch.Tensor</em></a>) – An input 2D tensor of shape <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is
 the number of audio frames, C is the number of channels</p></li>
-<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – An integer which is the sample rate of the
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – An integer which is the sample rate of the
 audio (as listed in the metadata of the file)</p></li>
-<li><p><strong>precision</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Bit precision (Default: <code class="docutils literal notranslate"><span class="pre">16</span></code>)</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Set channels first or length first in result. (
+<li><p><strong>precision</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Bit precision (Default: <code class="docutils literal notranslate"><span class="pre">16</span></code>)</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Set channels first or length first in result. (
 Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
 </ul>
 </dd>
@@ -455,15 +519,15 @@ Default: <code class="docutils literal notranslate"><span class="pre">True</span
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to audio file</p></li>
-<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.2.0a0+8554416 ))"><em>torch.Tensor</em></a>) – An input 2D tensor of shape <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to audio file</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.4.0a0+bb32d52 ))"><em>torch.Tensor</em></a>) – An input 2D tensor of shape <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is
 the number of audio frames, C is the number of channels</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Set channels first or length first in result. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Set channels first or length first in result. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
 <li><p><strong>signalinfo</strong> (<em>sox_signalinfo_t</em>) – A sox_signalinfo_t type, which could be helpful if the
 audio type cannot be automatically determined. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 <li><p><strong>encodinginfo</strong> (<em>sox_encodinginfo_t</em><em>, </em><em>optional</em>) – A sox_encodinginfo_t type, which could be set if the
 audio type cannot be automatically determined. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>filetype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – A filetype or extension to be set if sox cannot determine it
+<li><p><strong>filetype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – A filetype or extension to be set if sox cannot determine it
 automatically. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
 </dd>
@@ -608,8 +672,8 @@ primarily for effects</p>
          <script type="text/javascript" src="_static/underscore.js"></script>
          <script type="text/javascript" src="_static/doctools.js"></script>
          <script type="text/javascript" src="_static/language_data.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js"></script>
+         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
+         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js"></script>
          <script type="text/javascript" src="_static/katex_autorenderer.js"></script>
      
 
@@ -751,15 +815,23 @@ primarily for effects</p>
       <div class="main-menu">
         <ul>
           <li>
-            <a href="#">Get Started</a>
+            <a href="https://pytorch.org/get-started">Get Started</a>
           </li>
 
           <li>
-            <a href="#">Features</a>
+            <a href="https://pytorch.org/features">Features</a>
           </li>
 
           <li>
-            <a href="#">Ecosystem</a>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -798,6 +870,7 @@ primarily for effects</p>
       sideMenus.bind();
       scrollToAnchor.bind();
       highlightNavigation.bind();
+      mainMenuDropdown.bind();
 
       // Add class to links that have code blocks, since we cannot create links in code blocks
       $("article.pytorch-article a span.pre").each(function(e) {
