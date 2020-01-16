@@ -12,11 +12,11 @@ binary_common: &binary_common
     build_version:
       description: "version number of release binary; by default, build a nightly"
       type: string
-      default: ""
+      default: "0.4.0"
     pytorch_version:
       description: "PyTorch version to build against; by default, use a nightly"
       type: string
-      default: ""
+      default: "1.4.0"
     # Don't edit these
     python_version:
       description: "Python version to build against (e.g., 3.7)"
@@ -231,59 +231,149 @@ workflows:
       - binary_linux_wheel:
           name: binary_linux_wheel_py2.7
           python_version: "2.7"
+      - binary_wheel_upload:
+          name: binary_linux_wheel_py2.7_upload
+          context: org-member
+          requires:
+            - binary_linux_wheel_py2.7
       - binary_linux_wheel:
           name: binary_linux_wheel_py2.7_unicode
           python_version: "2.7"
           unicode_abi: "1"
+      - binary_wheel_upload:
+          name: binary_linux_wheel_py2.7_unicode_upload
+          context: org-member
+          requires:
+            - binary_linux_wheel_py2.7_unicode
       - binary_linux_wheel:
           name: binary_linux_wheel_py3.5
           python_version: "3.5"
+      - binary_wheel_upload:
+          name: binary_linux_wheel_py3.5_upload
+          context: org-member
+          requires:
+            - binary_linux_wheel_py3.5
       - binary_linux_wheel:
           name: binary_linux_wheel_py3.6
           python_version: "3.6"
+      - binary_wheel_upload:
+          name: binary_linux_wheel_py3.6_upload
+          context: org-member
+          requires:
+            - binary_linux_wheel_py3.6
       - binary_linux_wheel:
           name: binary_linux_wheel_py3.7
           python_version: "3.7"
+      - binary_wheel_upload:
+          name: binary_linux_wheel_py3.7_upload
+          context: org-member
+          requires:
+            - binary_linux_wheel_py3.7
       - binary_macos_wheel:
           name: binary_macos_wheel_py2.7
           python_version: "2.7"
+      - binary_wheel_upload:
+          name: binary_macos_wheel_py2.7_upload
+          context: org-member
+          requires:
+            - binary_macos_wheel_py2.7
       - binary_macos_wheel:
           name: binary_macos_wheel_py2.7_unicode
           python_version: "2.7"
           unicode_abi: "1"
+      - binary_wheel_upload:
+          name: binary_macos_wheel_py2.7_unicode_upload
+          context: org-member
+          requires:
+            - binary_macos_wheel_py2.7_unicode
       - binary_macos_wheel:
           name: binary_macos_wheel_py3.5
           python_version: "3.5"
+      - binary_wheel_upload:
+          name: binary_macos_wheel_py3.5_upload
+          context: org-member
+          requires:
+            - binary_macos_wheel_py3.5
       - binary_macos_wheel:
           name: binary_macos_wheel_py3.6
           python_version: "3.6"
+      - binary_wheel_upload:
+          name: binary_macos_wheel_py3.6_upload
+          context: org-member
+          requires:
+            - binary_macos_wheel_py3.6
       - binary_macos_wheel:
           name: binary_macos_wheel_py3.7
           python_version: "3.7"
+      - binary_wheel_upload:
+          name: binary_macos_wheel_py3.7_upload
+          context: org-member
+          requires:
+            - binary_macos_wheel_py3.7
       - binary_linux_conda:
           name: binary_linux_conda_py2.7
           python_version: "2.7"
+      - binary_conda_upload:
+          name: binary_linux_conda_py2.7_upload
+          context: org-member
+          requires:
+            - binary_linux_conda_py2.7
       - binary_linux_conda:
           name: binary_linux_conda_py3.5
           python_version: "3.5"
+      - binary_conda_upload:
+          name: binary_linux_conda_py3.5_upload
+          context: org-member
+          requires:
+            - binary_linux_conda_py3.5
       - binary_linux_conda:
           name: binary_linux_conda_py3.6
           python_version: "3.6"
+      - binary_conda_upload:
+          name: binary_linux_conda_py3.6_upload
+          context: org-member
+          requires:
+            - binary_linux_conda_py3.6
       - binary_linux_conda:
           name: binary_linux_conda_py3.7
           python_version: "3.7"
+      - binary_conda_upload:
+          name: binary_linux_conda_py3.7_upload
+          context: org-member
+          requires:
+            - binary_linux_conda_py3.7
       - binary_macos_conda:
           name: binary_macos_conda_py2.7
           python_version: "2.7"
+      - binary_conda_upload:
+          name: binary_macos_conda_py2.7_upload
+          context: org-member
+          requires:
+            - binary_macos_conda_py2.7
       - binary_macos_conda:
           name: binary_macos_conda_py3.5
           python_version: "3.5"
+      - binary_conda_upload:
+          name: binary_macos_conda_py3.5_upload
+          context: org-member
+          requires:
+            - binary_macos_conda_py3.5
       - binary_macos_conda:
           name: binary_macos_conda_py3.6
           python_version: "3.6"
+      - binary_conda_upload:
+          name: binary_macos_conda_py3.6_upload
+          context: org-member
+          requires:
+            - binary_macos_conda_py3.6
       - binary_macos_conda:
           name: binary_macos_conda_py3.7
           python_version: "3.7"
+      - binary_conda_upload:
+          name: binary_macos_conda_py3.7_upload
+          context: org-member
+          requires:
+            - binary_macos_conda_py3.7
 
   nightly:
     jobs:
