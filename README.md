@@ -20,7 +20,7 @@ to use and feel like a natural extension.
     - [Kaldi (ark/scp)](http://pytorch.org/audio/kaldi_io.html)
 - [Dataloaders for common audio datasets (VCTK, YesNo)](http://pytorch.org/audio/datasets.html)
 - Common audio transforms
-    - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/transforms.html)
+    - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample, RandomCrop](http://pytorch.org/audio/transforms.html)
 - Compliance interfaces: Run code using PyTorch that align with other libraries
     - [Kaldi: spectrogram, fbank, mfcc, resample_waveform](https://pytorch.org/audio/compliance.kaldi.html)
 
@@ -143,6 +143,7 @@ Transforms expect and return the following dimensions.
 * `MuLawEncode`: (channel, time) -> (channel, time)
 * `MuLawDecode`: (channel, time) -> (channel, time)
 * `Resample`: (channel, time) -> (channel, time)
+* `RandomCrop`: (channel, time) -> (channel, time)
 
 Complex numbers are supported via tensors of dimension (..., 2), and torchaudio provides `complex_norm` and `angle` to convert such a tensor into its magnitude and phase. Here, and in the documentation, we use an ellipsis "..." as a placeholder for the rest of the dimensions of a tensor, e.g. optional batching and channel dimensions.
 
