@@ -72,6 +72,13 @@ Transforms are common audio transforms. They can be chained together using :clas
 
   .. automethod:: forward
 
+:hidden:`RandomCrop`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: RandomCrop
+
+  .. automethod:: forward
+
 :hidden:`ComplexNorm`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
