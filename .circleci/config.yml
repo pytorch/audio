@@ -247,13 +247,6 @@ workflows:
     jobs:
       - circleci_consistency
       - binary_linux_wheel:
-          name: binary_linux_wheel_py2.7
-          python_version: '2.7'
-      - binary_linux_wheel:
-          name: binary_linux_wheel_py2.7_unicode
-          python_version: '2.7'
-          unicode_abi: '1'
-      - binary_linux_wheel:
           name: binary_linux_wheel_py3.5
           python_version: '3.5'
       - binary_linux_wheel:
@@ -262,13 +255,6 @@ workflows:
       - binary_linux_wheel:
           name: binary_linux_wheel_py3.7
           python_version: '3.7'
-      - binary_macos_wheel:
-          name: binary_macos_wheel_py2.7
-          python_version: '2.7'
-      - binary_macos_wheel:
-          name: binary_macos_wheel_py2.7_unicode
-          python_version: '2.7'
-          unicode_abi: '1'
       - binary_macos_wheel:
           name: binary_macos_wheel_py3.5
           python_version: '3.5'
@@ -279,9 +265,6 @@ workflows:
           name: binary_macos_wheel_py3.7
           python_version: '3.7'
       - binary_linux_conda:
-          name: binary_linux_conda_py2.7
-          python_version: '2.7'
-      - binary_linux_conda:
           name: binary_linux_conda_py3.5
           python_version: '3.5'
       - binary_linux_conda:
@@ -290,9 +273,6 @@ workflows:
       - binary_linux_conda:
           name: binary_linux_conda_py3.7
           python_version: '3.7'
-      - binary_macos_conda:
-          name: binary_macos_conda_py2.7
-          python_version: '2.7'
       - binary_macos_conda:
           name: binary_macos_conda_py3.5
           python_version: '3.5'
@@ -309,35 +289,6 @@ workflows:
   nightly:
     jobs:
       - circleci_consistency
-      - binary_linux_wheel:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py2.7
-          python_version: '2.7'
-      - binary_wheel_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py2.7_upload
-          requires:
-          - nightly_binary_linux_wheel_py2.7
-      - binary_linux_wheel:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py2.7_unicode
-          python_version: '2.7'
-          unicode_abi: '1'
-      - binary_wheel_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py2.7_unicode_upload
-          requires:
-          - nightly_binary_linux_wheel_py2.7_unicode
       - binary_linux_wheel:
           filters:
             branches:
@@ -408,35 +359,6 @@ workflows:
           filters:
             branches:
               only: nightly
-          name: nightly_binary_macos_wheel_py2.7
-          python_version: '2.7'
-      - binary_wheel_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_macos_wheel_py2.7_upload
-          requires:
-          - nightly_binary_macos_wheel_py2.7
-      - binary_macos_wheel:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_macos_wheel_py2.7_unicode
-          python_version: '2.7'
-          unicode_abi: '1'
-      - binary_wheel_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_macos_wheel_py2.7_unicode_upload
-          requires:
-          - nightly_binary_macos_wheel_py2.7_unicode
-      - binary_macos_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_wheel_py3.5
           python_version: '3.5'
       - binary_wheel_upload:
@@ -475,20 +397,6 @@ workflows:
           name: nightly_binary_macos_wheel_py3.7_upload
           requires:
           - nightly_binary_macos_wheel_py3.7
-      - binary_linux_conda:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_conda_py2.7
-          python_version: '2.7'
-      - binary_conda_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_conda_py2.7_upload
-          requires:
-          - nightly_binary_linux_conda_py2.7
       - binary_linux_conda:
           filters:
             branches:
@@ -555,20 +463,6 @@ workflows:
           python_version: '3.7'
           requires:
           - nightly_binary_linux_conda_py3.7_upload
-      - binary_macos_conda:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_macos_conda_py2.7
-          python_version: '2.7'
-      - binary_conda_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_macos_conda_py2.7_upload
-          requires:
-          - nightly_binary_macos_conda_py2.7
       - binary_macos_conda:
           filters:
             branches:
