@@ -29,6 +29,11 @@ __all__ = [
 ]
 
 
+# TODO: remove once https://github.com/pytorch/pytorch/issues/32358#issuecomment-576909755 is resolved
+def _bartlett_window(x: int):
+    return torch.bartlett_window(x, dtype=torch.float)
+
+
 # TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
 @torch.jit.ignore
 def _stft(
@@ -1051,7 +1056,7 @@ def _apply_probability_distribution(waveform, density_function="TPDF"):
 
         signal_scaled_dis = signal_scaled + gaussian
     else:
-        TPDF = torch.bartlett_window(time_size + 1)
+        TPDF = _bartlett_window(time_size + 1)
         TPDF = TPDF.repeat((channel_size + 1), 1)
         signal_scaled_dis = signal_scaled + TPDF
 
