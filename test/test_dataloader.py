@@ -8,6 +8,9 @@ import math
 import os
 
 
+BACKENDS = torchaudio._backend._audio_backends
+
+
 class TORCHAUDIODS(Dataset):
 
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
@@ -33,6 +36,7 @@ class TORCHAUDIODS(Dataset):
         return len(self.data)
 
 
+@unittest.skipIf("sox" not in BACKENDS, "sox not available")
 class Test_DataLoader(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
