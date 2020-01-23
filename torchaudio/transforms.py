@@ -618,16 +618,19 @@ class Silence(torch.nn.Module):
             else, would remove samples that are higher than the threshold. (Default: ``True``)
         periods (str): Indicate whether to remove silence from the beginning, middle,
             or end of the audio (Default: ``'all'``)
-            - beginning: trim silence from the beginning of the audio until we encounter sound lasting more than ``threshold_duration`` seconds in duration.
-            - middle: trim silence from the beginning of the audio until we encounter sound lasting more than ``threshold_duration`` seconds in duration.
-            - end: trim silence until we encounter sound lasting more than ``threshold_duration`` seconds in duration.
+            - beginning: trim silence from the beginning of the audio until we encounter sound
+                lasting more than ``threshold_duration`` seconds in duration.
+            - middle: trim silence from the middle of the audio until we encounter sound in both directions
+                (left and right) lasting more than ``threshold_duration`` seconds in duration.
+            - end: trim silence from the end of the audio until we encounter sound lasting more than
+                ``threshold_duration`` seconds in duration.
             - all: trim all silent sounds.
         threshold_duration (int): if `periods` == [`beginning`, `middle`, `end`], this is the number of samples that
             it will need to encounter of non-silent sound to stop trimming. (Default: ``0``)
-        min_duration_silence (int): Minimum number of samples of continuous silence required to remove that segment of audio.
-            if 0, then it remove silence samples of any length. (Default: ``0``)
+        min_duration_silence (int): Minimum number of samples of continuous silence required to remove that segment
+            of audio. If 0, then it remove silence samples of any length. (Default: ``0``)
         max_duration_silence (int): Maximum number of samples of continuous silence to remove from the audio.
-            if 0, then it remove silence samples of any length. (Default: ``0``)
+            If 0, then it remove silence samples of any length. (Default: ``0``)
     """
 
     __constants__ = ['beginning', 'middle', 'end', 'all']
