@@ -5,7 +5,6 @@ import torch
 import torchaudio
 import math
 import os
-import sys
 
 
 class AudioBackendScope:
@@ -29,7 +28,6 @@ class Test_LoadSave(unittest.TestCase):
     test_filepath_wav = os.path.join(test_dirpath, "assets",
                                      "steam-train-whistle-daniel_simon.wav")
 
-    @unittest.skipIf(sys.version_info < (3, 4), "subTest unavailable for this Python version")
     def test_1_save(self):
         for backend in ["sox"]:
             with self.subTest():
@@ -81,7 +79,6 @@ class Test_LoadSave(unittest.TestCase):
                                         "test.wav")
             torchaudio.save(new_filepath, x, sr)
 
-    @unittest.skipIf(sys.version_info < (3, 4), "subTest unavailable for this Python version")
     def test_1_save_sine(self):
         for backend in ["sox", "soundfile"]:
             with self.subTest():
@@ -115,7 +112,6 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(si32.precision, new_precision)
         os.unlink(new_filepath)
 
-    @unittest.skipIf(sys.version_info < (3, 4), "subTest unavailable for this Python version")
     def test_2_load(self):
         for backend in ["sox"]:
             with self.subTest():
@@ -157,7 +153,6 @@ class Test_LoadSave(unittest.TestCase):
                 os.path.dirname(self.test_dirpath), "torchaudio")
             torchaudio.load(tdir)
 
-    @unittest.skipIf(sys.version_info < (3, 4), "subTest unavailable for this Python version")
     def test_2_load_nonormalization(self):
         for backend in ["sox"]:
             with self.subTest():
@@ -175,7 +170,6 @@ class Test_LoadSave(unittest.TestCase):
         x, _ = torchaudio.load(test_filepath, torch.LongTensor(), normalization=False)
         self.assertTrue(isinstance(x, torch.LongTensor))
 
-    @unittest.skipIf(sys.version_info < (3, 4), "subTest unavailable for this Python version")
     def test_3_load_and_save_is_identity(self):
         for backend in ["sox", "soundfile"]:
             with self.subTest():
@@ -192,7 +186,6 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(sample_rate, sample_rate2)
         os.unlink(output_path)
 
-    @unittest.skipIf(sys.version_info < (3, 4), "subTest unavailable for this Python version")
     def test_3_load_and_save_is_identity_across_backend(self):
         with self.subTest():
             self._test_3_load_and_save_is_identity_across_backend("sox", "soundfile")
@@ -215,7 +208,6 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(sample_rate1, sample_rate2)
         os.unlink(output_path)
 
-    @unittest.skipIf(sys.version_info < (3, 4), "subTest unavailable for this Python version")
     def test_4_load_partial(self):
         for backend in ["sox"]:
             with self.subTest():
@@ -258,7 +250,6 @@ class Test_LoadSave(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             torchaudio.load(input_sine_path, offset=100000)
 
-    @unittest.skipIf(sys.version_info < (3, 4), "subTest unavailable for this Python version")
     def test_5_get_info(self):
         for backend in ["sox", "soundfile"]:
             with self.subTest():
