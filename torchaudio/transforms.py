@@ -8,7 +8,6 @@ from typing import Optional
 from . import functional as F
 from .compliance import kaldi
 
-
 __all__ = [
     'Spectrogram',
     'GriffinLim',
@@ -430,6 +429,7 @@ class Resample(torch.nn.Module):
         new_freq (float): The desired frequency. (Default: ``16000``)
         resampling_method (str): The resampling method (Default: ``'sinc_interpolation'``)
     """
+
     def __init__(self, orig_freq=16000, new_freq=16000, resampling_method='sinc_interpolation'):
         super(Resample, self).__init__()
         self.orig_freq = orig_freq
@@ -605,3 +605,54 @@ class TimeMasking(_AxisMasking):
 
     def __init__(self, time_mask_param, iid_masks=False):
         super(TimeMasking, self).__init__(time_mask_param, 2, iid_masks)
+
+
+class Silence(torch.nn.Module):
+    r"""Silence removes a signal from the beginning, middle, or end of the audio that is below a specified threshold.
+    One use case for this is to remove background noise from an audio.
+
+    Args:
+        threshold (float):  Indicate the ratio of the sample value you should treat as silence. (Default: ``0.1``)
+        direction (bool): if ``True`` remove samples that are lower than equal the threshold,
+            else, would remove samples that are higher than the threshold. (Default: ``True``)
+        periods (str): Indicate whether to remove silence from the beginning, middle,
+            or end of the audio (Default: ``'all'``)
+            - beginning: trim silence from the beginning of the audio until we encounter sound lasting more than ``threshold_duration`` seconds in duration.
+            - middle: trim silence from the beginning of the audio until we encounter sound lasting more than ``threshold_duration`` seconds in duration.
+            - end: trim silence until we encounter sound lasting more than ``threshold_duration`` seconds in duration.
+            - all: trim all silent sounds.
+        threshold_duration (float): if `periods` == [`beginning`, `middle`, `end`], this is the number of samples that
+            it will need to encounter of non-silent sound to stop trimming. (Default: ``0``)
+        min_duration_silence (int): Minimum number of samples of continuous silence required to remove that segment of audio.
+            if 0, then it remove silence samples of any length. (Default: ``0``)
+        max_duration_silence (int): Maximum number of samples of continuous silence to remove from the audio.
+            if 0, then it remove silence samples of any length. (Default: ``0``)
+    """
+
+    __constants__ = ['beginning', 'middle', 'end', 'all']
+
+    def __init__(self, threshold=0.1, direction=True, periods='all', min_duration_silence=0, max_duration_silence=0):
+        super(Silence, self).__init__()
+
+        # check correctness
+        assert (periods in self.__constants__), 'Invalid periods method: %s \n pick one of these: %s' % (
+            periods, str(self.__constants__))
+        assert min_duration_silence > 0, 'Invalid min_duration value: %i, pick a value that is greater than 0.' % min_duration_silence
+        assert max_duration_silence > 0, 'Invalid max_duration value: %i, pick a value that is greater than 0.' % max_duration_silence
+
+        # assign class variables
+        self.threshold = threshold
+        self.direction = direction
+        self.periods = periods
+        self.min_duration_silence = min_duration_silence
+        self.max_duration_silence = max_duration_silence
+
+    def forward(self, waveform):
+        r"""
+        Args:
+            waveform (torch.Tensor): The input signal of dimension (..., time)
+
+        Returns:
+            torch.Tensor: Output signal of dimension (..., time)
+        """
+        raise NotImplementedError()
