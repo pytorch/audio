@@ -22,6 +22,7 @@ __all__ = [
     'TimeStretch',
     'FrequencyMasking',
     'TimeMasking',
+    'Silence'
 ]
 
 
@@ -621,7 +622,7 @@ class Silence(torch.nn.Module):
             - middle: trim silence from the beginning of the audio until we encounter sound lasting more than ``threshold_duration`` seconds in duration.
             - end: trim silence until we encounter sound lasting more than ``threshold_duration`` seconds in duration.
             - all: trim all silent sounds.
-        threshold_duration (float): if `periods` == [`beginning`, `middle`, `end`], this is the number of samples that
+        threshold_duration (int): if `periods` == [`beginning`, `middle`, `end`], this is the number of samples that
             it will need to encounter of non-silent sound to stop trimming. (Default: ``0``)
         min_duration_silence (int): Minimum number of samples of continuous silence required to remove that segment of audio.
             if 0, then it remove silence samples of any length. (Default: ``0``)
@@ -631,14 +632,19 @@ class Silence(torch.nn.Module):
 
     __constants__ = ['beginning', 'middle', 'end', 'all']
 
-    def __init__(self, threshold=0.1, direction=True, periods='all', min_duration_silence=0, max_duration_silence=0):
+    def __init__(self, threshold=0.1, direction=True, periods='all', threshold_duration=0, min_duration_silence=0,
+                 max_duration_silence=0):
         super(Silence, self).__init__()
 
         # check correctness
         assert (periods in self.__constants__), 'Invalid periods method: %s \n pick one of these: %s' % (
             periods, str(self.__constants__))
-        assert min_duration_silence > 0, 'Invalid min_duration value: %i, pick a value that is greater than 0.' % min_duration_silence
-        assert max_duration_silence > 0, 'Invalid max_duration value: %i, pick a value that is greater than 0.' % max_duration_silence
+        assert min_duration_silence >= 0, 'Invalid min_duration value: %i, ' \
+                                          'pick a value that is greater than equal to 0.' % min_duration_silence
+        assert max_duration_silence >= 0, 'Invalid max_duration value: %i, ' \
+                                          'pick a value that is greater than equal to 0.' % max_duration_silence
+        assert threshold_duration >= 0, 'Invalid threshold_duration value: %i, ' \
+                                        'pick a value that is greater than equal to 0.' % threshold_duration
 
         # assign class variables
         self.threshold = threshold
@@ -646,6 +652,7 @@ class Silence(torch.nn.Module):
         self.periods = periods
         self.min_duration_silence = min_duration_silence
         self.max_duration_silence = max_duration_silence
+        self.threshold_duration = threshold_duration
 
     def forward(self, waveform):
         r"""
