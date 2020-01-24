@@ -502,11 +502,20 @@ class Tester(unittest.TestCase):
         threshold = 0.1
         direction = True
         periods = 'all'
-        default_silence_settings = torchaudio.transforms.Silence(threshold=threshold, direction=direction,
+        silence_all = torchaudio.transforms.Silence(threshold=threshold, direction=direction,
                                                                  periods=periods)
 
         # Testing that there are no values less than equal to the threshold
-        self.assertTrue((default_silence_settings(waveform).abs() <= threshold).sum().item() == 0)
+        self.assertTrue((silence_all(waveform).sum(0).abs() <= threshold).sum().item() == 0)
+
+        threshold = 0.1
+        direction = True
+        periods = 'beginning'
+        silence_beginning = torchaudio.transforms.Silence(threshold=threshold, direction=direction,
+                                                                 periods=periods)
+
+        # Testing that there are no values less than equal to the threshold
+        self.assertTrue(silence_beginning(waveform)[0, 0].item() != 0)
 
 if __name__ == '__main__':
     unittest.main()

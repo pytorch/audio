@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from warnings import warn
 import math
 import torch
+import operator
 from typing import Optional
 from . import functional as F
 from .compliance import kaldi
@@ -651,7 +652,7 @@ class Silence(torch.nn.Module):
 
         # assign class variables
         self.threshold = threshold
-        self.direction = direction
+        self.direction = operator.gt if direction else operator.le
         self.periods = periods
         self.min_duration_silence = min_duration_silence
         self.max_duration_silence = max_duration_silence
@@ -666,7 +667,7 @@ class Silence(torch.nn.Module):
             torch.Tensor: Output signal of dimension (..., time)
         """
         if self.periods == 'all':
-            if self.direction:
-                return waveform[waveform.abs() > self.threshold]
-            else:
-                return waveform[waveform.abs() <= self.threshold]
+            return waveform[:, self.direction(waveform.abs(), self.threshold).sum(0).bool()]
+        elif self.periods == 'beginning':
+            index = self.direction(waveform.abs(), self.threshold).sum(0).bool().nonzero()[0].item()
+            return waveform[:, index:]
