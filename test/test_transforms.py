@@ -496,6 +496,17 @@ class Tester(unittest.TestCase):
         tensor = torch.rand((10, 2, 50, 10, 2))
         _test_script_module(transforms.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
 
+    def test_silence(self):
+        input_path = os.path.join(self.test_dirpath, 'assets', 'dtmf_30s_stereo.mp3')
+        waveform, sample_rate = torchaudio.load(input_path)
+        threshold = 0.1
+        direction = True
+        periods = 'all'
+        default_silence_settings = torchaudio.transforms.Silence(threshold=threshold, direction=direction,
+                                                                 periods=periods)
+
+        # Testing that there are no values less than equal to the threshold
+        self.assertTrue((default_silence_settings(waveform).abs() <= threshold).sum().item() == 0)
 
 if __name__ == '__main__':
     unittest.main()

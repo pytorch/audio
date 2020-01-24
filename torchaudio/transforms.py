@@ -665,4 +665,8 @@ class Silence(torch.nn.Module):
         Returns:
             torch.Tensor: Output signal of dimension (..., time)
         """
-        raise NotImplementedError()
+        if self.periods == 'all':
+            if self.direction:
+                return waveform[waveform.abs() > self.threshold]
+            else:
+                return waveform[waveform.abs() <= self.threshold]
