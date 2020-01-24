@@ -671,3 +671,6 @@ class Silence(torch.nn.Module):
         elif self.periods == 'beginning':
             index = self.direction(waveform.abs(), self.threshold).sum(0).bool().nonzero()[0].item()
             return waveform[:, index:]
+        elif self.periods == 'end':
+            index = self.direction(waveform.abs(), self.threshold).sum(0).bool().nonzero()[-1].item()
+            return waveform[:, :index]
