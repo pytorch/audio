@@ -515,7 +515,7 @@ class Tester(unittest.TestCase):
                                                                  periods=periods)
 
         # Testing if the first value is less than the threshold
-        self.assertTrue(silence_beginning(waveform)[0, 0].item() < threshold)
+        self.assertTrue((silence_beginning(waveform)[:, 0].abs() > threshold).max().item())
 
         threshold = 0.1
         direction = True
@@ -524,7 +524,7 @@ class Tester(unittest.TestCase):
                                                           periods=periods)
 
         # Testing if the last value is less than the threshold
-        self.assertTrue(silence_beginning(waveform)[0, 0].item() < threshold)
+        self.assertTrue((silence_beginning(waveform)[:, -1].abs() > threshold).max().item())
 
 if __name__ == '__main__':
     unittest.main()

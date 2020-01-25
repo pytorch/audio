@@ -612,6 +612,7 @@ class TimeMasking(_AxisMasking):
 class Silence(torch.nn.Module):
     r"""Silence removes a signal from the beginning, middle, or end of the audio that is below a specified threshold.
     One use case for this is to remove background noise from an audio.
+    Expect an input of shape: (channels, samples)
 
     Args:
         threshold (float):  Indicate the ratio of the sample value you should treat as silence. (Default: ``0.1``)
@@ -667,10 +668,10 @@ class Silence(torch.nn.Module):
             torch.Tensor: Output signal of dimension (..., time)
         """
         if self.periods == 'all':
-            return waveform[:, self.direction(waveform.abs(), self.threshold).sum(0).bool()]
+            return waveform[:, self.direction(waveform.abs(), self.threshold).max(0).values]
         elif self.periods == 'beginning':
-            index = self.direction(waveform.abs(), self.threshold).sum(0).bool().nonzero()[0].item()
+            index = self.direction(waveform.abs(), self.threshold).max(0).values.nonzero()[0].item()
             return waveform[:, index:]
         elif self.periods == 'end':
-            index = self.direction(waveform.abs(), self.threshold).sum(0).bool().nonzero()[-1].item()
+            index = self.direction(waveform.abs(), self.threshold).max(0).values.nonzero()[-1].item()
             return waveform[:, :index]
