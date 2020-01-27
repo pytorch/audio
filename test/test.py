@@ -265,5 +265,62 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(si.rate, rate)
         self.assertEqual(ei.bits_per_sample, precision)
 
+    def test_batch_save(self):
+        # create audio function
+        def create_sinewave(sr=16000, freq=440, volume=0.3):
+            y = (torch.cos(
+                2 * math.pi * torch.arange(0, 4 * sr).float() * freq / sr))
+            y.unsqueeze_(0)
+            # y is between -1 and 1, so must scale
+            return (y * volume * (2 ** 31)).long().view(1, 1, -1)
+
+        # save in one file.
+        sinewave_filepath = os.path.join(self.test_dirpath, "assets",
+                                         "sinewaves.wav")
+        sr = 16000
+        numberofsamples = 10
+        single_file = True
+        extension = 'wav'
+
+        batched_tensor = create_sinewave()
+        for sample in range(numberofsamples - 1):
+            batched_tensor = torch.cat([batched_tensor, create_sinewave()], 0)
+
+        torchaudio.save_batch(sinewave_filepath, batched_tensor, sr, single_file=single_file,
+            extension=extension)
+        self.assertTrue(os.path.isfile(sinewave_filepath))
+
+        # save in folder using random names.
+        sinewave_folderpath = os.path.join(self.test_dirpath, "assets",
+                                         "batch_save_random")
+        os.makedirs(sinewave_folderpath, exist_ok=True)
+
+        single_file = False
+        torchaudio.save_batch(sinewave_folderpath, batched_tensor, sr, single_file=single_file,
+                              extension=extension)
+
+        self.assertTrue(os.path.isdir(sinewave_folderpath))
+        self.assertTrue(len(os.listdir(sinewave_folderpath)) == numberofsamples)
+
+        # File naming function
+        def naming(sample_idx):
+            return f"{sample_idx}"
+
+        # Save in folder using supplied naming function.
+        sinewave_folderpath = os.path.join(self.test_dirpath, "assets",
+                                           "batch_save_non_random")
+        os.makedirs(sinewave_folderpath, exist_ok=True)
+
+        single_file = False
+        torchaudio.save_batch(sinewave_folderpath, batched_tensor, sr, single_file=single_file,
+                              name_generator=naming, extension=extension)
+
+        self.assertTrue(os.path.isdir(sinewave_folderpath))
+        print(sinewave_folderpath)
+        self.assertTrue(len(os.listdir(sinewave_folderpath)) == numberofsamples)
+
+
+
+
 if __name__ == '__main__':
     unittest.main()

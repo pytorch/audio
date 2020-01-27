@@ -142,7 +142,8 @@ def save_batch(path, src, sample_rate, precision=16, channels_first=True, single
             name_generator (function): A function with one parameter (sample index), would return a
                 file name without a file extension. If ``None``, it would name the audio files
                 randomly using uuid. (Default: ``None``)
-            extension (str): Type of audio file to save, that is, wav, mp3, etc... (Default: ``wav``)
+            extension (str): Type of audio file to save, that is, wav, mp3, etc...
+                Needed only when dealing with folder saving. (Default: ``wav``)
         """
     ch_idx = 1 if channels_first else 2
     if single_file:
@@ -153,12 +154,12 @@ def save_batch(path, src, sample_rate, precision=16, channels_first=True, single
         extension = '' if '.' in extension else '.' + extension
         if name_generator is not None:
             for sample_idx in range(src.shape[0]):
-                save(os.path.join(path, name_generator(sample_idx), extension), src[sample_idx],
+                save(os.path.join(path, name_generator(sample_idx) + extension), src[sample_idx],
                      sample_rate, precision=precision, channels_first=True)
         else:
             import uuid
             for sample_idx in range(src.shape[0]):
-                save(os.path.join(path, str(uuid.uuid1), extension),
+                save(os.path.join(path, str(uuid.uuid1()) + extension),
                      src[sample_idx], sample_rate, precision=precision, channels_first=True)
 
 
