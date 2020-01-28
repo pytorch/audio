@@ -316,7 +316,6 @@ class Test_LoadSave(unittest.TestCase):
                               name_generator=naming, extension=extension)
 
         self.assertTrue(os.path.isdir(sinewave_folderpath))
-        print(sinewave_folderpath)
         self.assertTrue(len(os.listdir(sinewave_folderpath)) == numberofsamples)
 
 
