@@ -18,7 +18,7 @@ requirements:
 
   run:
     - python
-    - typing
+    - typing # [py2k]
     {{ environ.get('CONDA_PYTORCH_CONSTRAINT') }}
 
 build:
