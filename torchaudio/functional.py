@@ -1051,7 +1051,8 @@ def _apply_probability_distribution(waveform, density_function="TPDF"):
 
         signal_scaled_dis = signal_scaled + gaussian
     else:
-        TPDF = torch.bartlett_window(time_size + 1)
+        # dtype needed for https://github.com/pytorch/pytorch/issues/32358
+        TPDF = torch.bartlett_window(time_size + 1, dtype=torch.float)
         TPDF = TPDF.repeat((channel_size + 1), 1)
         signal_scaled_dis = signal_scaled + TPDF
 
