@@ -211,7 +211,7 @@ class Tester(unittest.TestCase):
 
     @unittest.skipIf(not IMPORT_LIBROSA or not IMPORT_SCIPY, 'Librosa and scipy are not available')
     def test_librosa_consistency(self):
-        def _test_librosa_consistency_helper(n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
+        def _test_librosa_consistency_helper(n_fft, hop_length, power, n_mels, n_mfcc, sample_rate, mel_norm=None):
             input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
             sound, sample_rate = torchaudio.load(input_path)
             sound_librosa = sound.cpu().numpy().squeeze()  # (64000)
@@ -229,10 +229,10 @@ class Tester(unittest.TestCase):
             # test mel spectrogram
             melspect_transform = torchaudio.transforms.MelSpectrogram(
                 sample_rate=sample_rate, window_fn=torch.hann_window,
-                hop_length=hop_length, n_mels=n_mels, n_fft=n_fft)
+                hop_length=hop_length, n_mels=n_mels, n_fft=n_fft, normalized=mel_norm == "slaney")
             librosa_mel = librosa.feature.melspectrogram(y=sound_librosa, sr=sample_rate,
                                                          n_fft=n_fft, hop_length=hop_length, n_mels=n_mels,
-                                                         htk=True, norm=None)
+                                                         htk=True, norm=mel_norm)
             librosa_mel_tensor = torch.from_numpy(librosa_mel)
             torch_mel = melspect_transform(sound).squeeze().cpu()
 
@@ -251,7 +251,7 @@ class Tester(unittest.TestCase):
             self.assertTrue(torch.allclose(db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3))
 
             # test MFCC
-            melkwargs = {'hop_length': hop_length, 'n_fft': n_fft}
+            melkwargs = {'hop_length': hop_length, 'n_fft': n_fft, 'normalized': mel_norm == "slaney"}
             mfcc_transform = torchaudio.transforms.MFCC(sample_rate=sample_rate,
                                                         n_mfcc=n_mfcc,
                                                         norm='ortho',
@@ -313,11 +313,23 @@ class Tester(unittest.TestCase):
             'sample_rate': 16000
         }
 
+        kwargs5 = {
+            'n_fft': 400,
+            'hop_length': 200,
+            'power': 3.0,
+            'n_mels': 128,
+            'n_mfcc': 40,
+            'sample_rate': 22050,
+            'mel_norm': 'slaney'
+        }
+
         _test_librosa_consistency_helper(**kwargs1)
         _test_librosa_consistency_helper(**kwargs2)
         # NOTE Test passes offline, but fails on CircleCI, see #372.
         # _test_librosa_consistency_helper(**kwargs3)
         _test_librosa_consistency_helper(**kwargs4)
+        _test_librosa_consistency_helper(**kwargs5)
+
 
     def test_scriptmodule_Resample(self):
         tensor = torch.rand((2, 1000))

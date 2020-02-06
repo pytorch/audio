@@ -396,8 +396,8 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
     return x_db
 
 
-def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate):
-    # type: (int, float, float, int, int) -> Tensor
+def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate, normalized):
+    # type: (int, float, float, int, int, bool) -> Tensor
     r"""Create a frequency bin conversion matrix.
 
     Args:
@@ -406,6 +406,7 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate):
         f_max (float): Maximum frequency (Hz)
         n_mels (int): Number of mel filterbanks
         sample_rate (int): Sample rate of the audio waveform
+        normalized (bool): Divide the triangular mel weights by the width of mel band if True
 
     Returns:
         torch.Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)
@@ -435,6 +436,11 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate):
     down_slopes = (-1.0 * slopes[:, :-2]) / f_diff[:-1]  # (n_freqs, n_mels)
     up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_freqs, n_mels)
     fb = torch.max(zero, torch.min(down_slopes, up_slopes))
+
+    if normalized:
+        widths = 2.0 / (f_pts[2:] - f_pts[:-2])  # (n_mels)
+        fb *= widths
+
     return fb
 
 

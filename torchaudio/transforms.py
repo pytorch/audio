@@ -188,20 +188,23 @@ class MelScale(torch.nn.Module):
         f_max (float, optional): Maximum frequency. (Default: ``sample_rate // 2``)
         n_stft (int, optional): Number of bins in STFT. Calculated from first input
             if None is given.  See ``n_fft`` in :class:`Spectrogram`.
+        normalized (bool, optional): area-normalize the FB, so that each filter has equal area
     """
     __constants__ = ['n_mels', 'sample_rate', 'f_min', 'f_max']
 
-    def __init__(self, n_mels=128, sample_rate=16000, f_min=0., f_max=None, n_stft=None):
+    def __init__(self, n_mels=128, sample_rate=16000, f_min=0., f_max=None, n_stft=None,
+                 normalized=False):
         super(MelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
         self.f_max = f_max if f_max is not None else float(sample_rate // 2)
         self.f_min = f_min
+        self.normalized = normalized
 
         assert f_min <= self.f_max, 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
 
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
-            n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
+            n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.normalized)
         self.register_buffer('fb', fb)
 
     def forward(self, specgram):
@@ -218,7 +221,8 @@ class MelScale(torch.nn.Module):
         specgram = specgram.view(-1, shape[-2], shape[-1])
 
         if self.fb.numel() == 0:
-            tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max, self.n_mels, self.sample_rate)
+            tmp_fb = F.create_fb_matrix(
+                specgram.size(1), self.f_min, self.f_max, self.n_mels, self.sample_rate, self.normalized)
             # Attributes cannot be reassigned outside __init__ so workaround
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)
@@ -255,15 +259,16 @@ class MelSpectrogram(torch.nn.Module):
         window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
+        normalized (bool, optional): area-normalize the FB, so that each filter has equal area
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
         >>> mel_specgram = transforms.MelSpectrogram(sample_rate)(waveform)  # (channel, n_mels, time)
     """
-    __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min']
+    __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad', 'n_mels', 'f_min', 'normalized']
 
     def __init__(self, sample_rate=16000, n_fft=400, win_length=None, hop_length=None, f_min=0., f_max=None,
-                 pad=0, n_mels=128, window_fn=torch.hann_window, wkwargs=None):
+                 pad=0, n_mels=128, window_fn=torch.hann_window, wkwargs=None, normalized=False):
         super(MelSpectrogram, self).__init__()
         self.sample_rate = sample_rate
         self.n_fft = n_fft
@@ -273,11 +278,13 @@ class MelSpectrogram(torch.nn.Module):
         self.n_mels = n_mels  # number of mel frequency bins
         self.f_max = f_max
         self.f_min = f_min
+        self.normalized = normalized
         self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
                                        hop_length=self.hop_length,
                                        pad=self.pad, window_fn=window_fn, power=2.,
                                        normalized=False, wkwargs=wkwargs)
-        self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1)
+        n_stft = self.n_fft // 2 + 1
+        self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, n_stft, self.normalized)
 
     def forward(self, waveform):
         r"""
