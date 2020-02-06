@@ -396,7 +396,7 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
     return x_db
 
 
-def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate, normalized):
+def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate, normalized=False):
     # type: (int, float, float, int, int, bool) -> Tensor
     r"""Create a frequency bin conversion matrix.
 
@@ -406,7 +406,7 @@ def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate, normalized):
         f_max (float): Maximum frequency (Hz)
         n_mels (int): Number of mel filterbanks
         sample_rate (int): Sample rate of the audio waveform
-        normalized (bool): Divide the triangular mel weights by the width of mel band if True
+        normalized (bool, optional): area-normalize the FB, so that each filter has equal area
 
     Returns:
         torch.Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)
