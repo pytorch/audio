@@ -39,7 +39,7 @@ class TestFunctional(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
 
     test_filepath = os.path.join(test_dirpath, 'assets',
-                                 'steam-train-whistle-daniel_simon.mp3')
+                                 'steam-train-whistle-daniel_simon.wav')
     waveform_train, sr_train = torchaudio.load(test_filepath)
 
     def test_torchscript_spectrogram(self):

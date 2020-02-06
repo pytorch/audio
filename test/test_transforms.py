@@ -18,6 +18,8 @@ if IMPORT_SCIPY:
 RUN_CUDA = torch.cuda.is_available()
 print("Run test with cuda:", RUN_CUDA)
 
+BACKENDS = torchaudio._backend._audio_backends
+
 
 def _test_script_module(f, tensor, *args, **kwargs):
 
@@ -54,7 +56,7 @@ class Tester(unittest.TestCase):
     # file for stereo stft test
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, 'assets',
-                                 'steam-train-whistle-daniel_simon.mp3')
+                                 'steam-train-whistle-daniel_simon.wav')
 
     def scale(self, waveform, factor=float(2**31)):
         # scales a waveform by a factor
@@ -530,8 +532,12 @@ class Tester(unittest.TestCase):
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
 
+    @unittest.skipIf(set("sox") not in set(BACKENDS), "sox are not available")
     def test_batch_mfcc(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
+        test_filepath = os.path.join(
+            test_dirpath, 'assets', 'steam-train-whistle-daniel_simon.mp3'
+        )
+        waveform, sample_rate = torchaudio.load(test_filepath)
 
         # Single then transform then batch
         expected = transforms.MFCC()(waveform).repeat(3, 1, 1, 1)
