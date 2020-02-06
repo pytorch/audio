@@ -330,7 +330,6 @@ class Tester(unittest.TestCase):
         _test_librosa_consistency_helper(**kwargs4)
         _test_librosa_consistency_helper(**kwargs5)
 
-
     def test_scriptmodule_Resample(self):
         tensor = torch.rand((2, 1000))
         sample_rate = 100
