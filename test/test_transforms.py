@@ -532,7 +532,7 @@ class Tester(unittest.TestCase):
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
 
-    @unittest.skipIf(set("sox") not in set(BACKENDS), "sox are not available")
+    @unittest.skipIf("sox" not in BACKENDS, "sox are not available")
     def test_batch_mfcc(self):
         test_filepath = os.path.join(
             test_dirpath, 'assets', 'steam-train-whistle-daniel_simon.mp3'

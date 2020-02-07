@@ -8,6 +8,9 @@ import torchaudio.compliance.kaldi as kaldi
 import unittest
 
 
+BACKENDS = torchaudio._backend._audio_backends
+
+
 def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
     # just a copy of ExtractWindow from feature-window.cc in python
     def first_sample_of_frame(frame, window_size, window_shift, snip_edges):
@@ -159,6 +162,7 @@ class Test_Kaldi(unittest.TestCase):
             self.assertTrue(output.shape, kaldi_output.shape)
             self.assertTrue(torch.allclose(output, kaldi_output, atol=atol, rtol=rtol))
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox is not available")
     def test_spectrogram(self):
         def get_output_fn(sound, args):
             output = kaldi.spectrogram(
@@ -209,6 +213,7 @@ class Test_Kaldi(unittest.TestCase):
 
         self._compliance_test_helper(self.test_filepath, 'fbank', 97, 22, get_output_fn, atol=1e-3, rtol=1e-1)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox is not available")
     def test_mfcc(self):
         def get_output_fn(sound, args):
             output = kaldi.mfcc(

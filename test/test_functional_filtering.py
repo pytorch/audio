@@ -92,6 +92,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert output_waveform.size(1) == waveform.size(1)
         _test_torchscript_functional(F.lfilter, waveform, a_coeffs, b_coeffs)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox is not available")
     def test_lfilter(self):
 
         filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
@@ -99,6 +100,7 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         self._test_lfilter(waveform, torch.device("cpu"))
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox is not available")
     def test_lfilter_gpu(self):
         if torch.cuda.is_available():
             filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
