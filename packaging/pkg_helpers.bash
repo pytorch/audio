@@ -139,6 +139,7 @@ setup_wheel_python() {
       3.5) python_abi=cp35-cp35m ;;
       3.6) python_abi=cp36-cp36m ;;
       3.7) python_abi=cp37-cp37m ;;
+      3.8) python_abi=cp38-cp38 ;;
       *)
         echo "Unrecognized PYTHON_VERSION=$PYTHON_VERSION"
         exit 1
@@ -168,7 +169,7 @@ setup_pip_pytorch_version() {
       export PYTORCH_VERSION="$(pip show torch | grep ^Version: | sed 's/Version:  *//')"
     fi
   else
-    pip_install "torch==$PYTORCH_VERSION$CUDA_SUFFIX" \
+    pip_install "torch==$PYTORCH_VERSION$PYTORCH_VERSION_SUFFIX" \
       -f https://download.pytorch.org/whl/torch_stable.html \
       -f https://download.pytorch.org/whl/nightly/torch_nightly.html
   fi
@@ -177,7 +178,7 @@ setup_pip_pytorch_version() {
 # Fill PYTORCH_VERSION with the latest conda nightly version, and
 # CONDA_CHANNEL_FLAGS with appropriate flags to retrieve these versions
 #
-# You MUST have populated CUDA_SUFFIX before hand.
+# You MUST have populated PYTORCH_VERSION_SUFFIX before hand.
 setup_conda_pytorch_constraint() {
   if [[ -z "$PYTORCH_VERSION" ]]; then
     export CONDA_CHANNEL_FLAGS="-c pytorch-nightly"

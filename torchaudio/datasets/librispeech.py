@@ -62,6 +62,7 @@ class LIBRISPEECH(Dataset):
 
         if url in [
             "dev-clean",
+            "dev-other",
             "test-clean",
             "test-other",
             "train-clean-100",

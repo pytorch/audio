@@ -55,7 +55,7 @@ else:
 
 # Creating the version file
 cwd = os.path.dirname(os.path.abspath(__file__))
-version = '0.4.0a0'
+version = '0.5.0a0'
 sha = 'Unknown'
 
 try:
@@ -79,6 +79,20 @@ pytorch_package_version = os.getenv('PYTORCH_VERSION')
 pytorch_package_dep = 'torch'
 if pytorch_package_version is not None:
     pytorch_package_dep += "==" + pytorch_package_version
+
+if platform.system() == 'Windows':
+    ext_modules = None
+else:
+    ext_modules = [
+        CppExtension(
+            '_torch_sox',
+            ['torchaudio/torch_sox.cpp'],
+            libraries=libraries,
+            include_dirs=include_dirs,
+            extra_compile_args=eca,
+            extra_objects=extra_objects,
+            extra_link_args=ela),
+    ]
 
 setup(
     name="torchaudio",
@@ -104,16 +118,7 @@ setup(
     ],
     # Exclude the build files.
     packages=find_packages(exclude=["build"]),
-    ext_modules=[
-        CppExtension(
-            '_torch_sox',
-            ['torchaudio/torch_sox.cpp'],
-            libraries=libraries,
-            include_dirs=include_dirs,
-            extra_compile_args=eca,
-            extra_objects=extra_objects,
-            extra_link_args=ela),
-    ],
+    ext_modules=ext_modules,
     cmdclass={'build_ext': BuildExtension},
     install_requires=[pytorch_package_dep]
 )

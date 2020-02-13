@@ -8,12 +8,11 @@ cache:
   directories:
   - /home/travis/download
 
-# This matrix tests that the code works on Python 2.7, 3.5, 3.6, 3.7, passes
+# This matrix tests that the code works on Python 3.5, 3.6, 3.7, passes
 # lint and example tests.
 matrix:
   fast_finish: true
   include:
-    - env: PYTHON_VERSION="2.7"
     - env: PYTHON_VERSION="3.5"
     - env: PYTHON_VERSION="3.6"
     - env: PYTHON_VERSION="3.7"
