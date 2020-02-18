@@ -15,6 +15,8 @@ if IMPORT_LIBROSA:
     import numpy as np
     import librosa
 
+BACKENDS = torchaudio._backend._audio_backends
+
 
 def _test_torchscript_functional_shape(py_method, *args, **kwargs):
     jit_method = torch.jit.script(py_method)
