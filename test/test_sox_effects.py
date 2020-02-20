@@ -5,11 +5,10 @@ import torchaudio
 import math
 import os
 
+from _test import AudioBackendScope
 
-BACKENDS = torchaudio._backend._audio_backends
 
-
-@unittest.skipIf("sox" not in BACKENDS, "sox not available")
+# @AudioBackendScope("sox")
 class Test_SoxEffectsChain(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, "assets",

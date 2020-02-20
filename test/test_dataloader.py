@@ -11,6 +11,18 @@ import os
 BACKENDS = torchaudio._backend._audio_backends
 
 
+@contextmanager
+def AudioBackendScope(new_backend):
+    previous_backend = torchaudio.get_audio_backend()
+    try:
+        unittest.skipIf(not new_backend, "No backend supporting this test.")
+        unittest.skipIf(new_backend not in BACKENDS, new_backend + " is not available.")
+        torchaudio.set_audio_backend(new_backend)
+        yield
+    finally:
+        torchaudio.set_audio_backend(previous_backend)
+
+
 class TORCHAUDIODS(Dataset):
 
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
@@ -36,7 +48,7 @@ class TORCHAUDIODS(Dataset):
         return len(self.data)
 
 
-@unittest.skipIf("sox" not in BACKENDS, "sox not available")
+@AudioBackendScope("sox")
 class Test_DataLoader(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -4,24 +4,7 @@ import torch
 import torchaudio
 import math
 import os
-
-
-BACKENDS = torchaudio._backend._audio_backends
-BACKENDS_MP3 = ["sox"] if "sox" in BACKENDS else []
-
-
-class AudioBackendScope:
-    def __init__(self, backend):
-        self.new_backend = backend
-        self.previous_backend = torchaudio.get_audio_backend()
-
-    def __enter__(self):
-        torchaudio.set_audio_backend(self.new_backend)
-        return self.new_backend
-
-    def __exit__(self, type, value, traceback):
-        backend = self.previous_backend
-        torchaudio.set_audio_backend(backend)
+from _test import AudioBackendScope, BACKENDS, BACKENDS_MP3
 
 
 class Test_LoadSave(unittest.TestCase):

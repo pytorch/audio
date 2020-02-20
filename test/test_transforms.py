@@ -8,6 +8,7 @@ import torchaudio.functional as F
 from torchaudio.common_utils import IMPORT_LIBROSA, IMPORT_SCIPY
 import unittest
 import common_utils
+from _test import AudioBackendScope, BACKENDS, BACKENDS_MP3, FIRST_BACKEND_MP3
 
 if IMPORT_LIBROSA:
     import librosa
@@ -17,8 +18,6 @@ if IMPORT_SCIPY:
 
 RUN_CUDA = torch.cuda.is_available()
 print("Run test with cuda:", RUN_CUDA)
-
-BACKENDS = torchaudio._backend._audio_backends
 
 
 def _test_script_module(f, tensor, *args, **kwargs):
@@ -532,10 +531,10 @@ class Tester(unittest.TestCase):
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox are not available")
+    @AudioBackendScope(FIRST_BACKEND_MP3)
     def test_batch_mfcc(self):
         test_filepath = os.path.join(
-            test_dirpath, 'assets', 'steam-train-whistle-daniel_simon.mp3'
+            self.test_dirpath, 'assets', 'steam-train-whistle-daniel_simon.mp3'
         )
         waveform, sample_rate = torchaudio.load(test_filepath)
 

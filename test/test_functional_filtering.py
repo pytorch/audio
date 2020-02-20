@@ -6,9 +6,7 @@ import torchaudio.functional as F
 import unittest
 import common_utils
 import time
-
-
-BACKENDS = torchaudio._backend._audio_backends
+from _test import AudioBackendScope, BACKENDS, BACKENDS_MP3, FIRST_BACKEND_MP3
 
 
 def _test_torchscript_functional(py_method, *args, **kwargs):
@@ -92,15 +90,13 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert output_waveform.size(1) == waveform.size(1)
         _test_torchscript_functional(F.lfilter, waveform, a_coeffs, b_coeffs)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox is not available")
+    @AudioBackendScope(FIRST_BACKEND_MP3)
     def test_lfilter(self):
-
         filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
         waveform, _ = torchaudio.load(filepath, normalization=True)
-
         self._test_lfilter(waveform, torch.device("cpu"))
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox is not available")
+    @AudioBackendScope(FIRST_BACKEND_MP3)
     def test_lfilter_gpu(self):
         if torch.cuda.is_available():
             filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
@@ -112,7 +108,7 @@ class TestFunctionalFiltering(unittest.TestCase):
             print("skipping GPU test for lfilter because device not available")
             pass
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_lowpass(self):
 
         """
@@ -133,7 +129,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.lowpass_biquad, waveform, sample_rate, CUTOFF_FREQ)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_highpass(self):
         """
         Test biquad highpass filter, compare to SoX implementation
@@ -333,7 +329,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.riaa_biquad, waveform, sample_rate)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_equalizer(self):
         """
         Test biquad peaking equalizer filter, compare to SoX implementation
@@ -355,7 +351,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.equalizer_biquad, waveform, sample_rate, CENTER_FREQ, GAIN, Q)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_perf_biquad_filtering(self):
 
         fn_sine = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
