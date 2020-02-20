@@ -1,11 +1,29 @@
 import os
+import csv
 
 import torchaudio
-from torchaudio.datasets.utils import download_url, extract_archive, walk_files
+from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
 from torch.utils.data import Dataset
 
 URL = "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"
 FOLDER_IN_ARCHIVE = "wavs"
+
+
+def load_ljspeech_item(line, path, ext_audio):
+    assert len(line) == 3
+    fileid, transcript, normalized_transcript = line
+    fileid_audio = fileid + ext_audio
+    fileid_audio = os.path.join(path, fileid_audio)
+
+    # Load audio
+    waveform, sample_rate = torchaudio.load(fileid_audio)
+
+    return (
+        waveform,
+        sample_rate,
+        transcript,
+        normalized_transcript,
+    )
 
 
 class LJSPEECH(Dataset):
@@ -36,44 +54,13 @@ class LJSPEECH(Dataset):
                     download_url(url, root)
                 extract_archive(archive)
 
-        walker = walk_files(
-            self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
-        )
-        self._walker = list(walker)
-        self._metadata = self._load_metadata()
-
-    def _load_metadata(self):
-        metadata = dict()
-        with open(self._metadata_path, 'r') as f:
-            for row in f:
-                fileid, transcript, normalized_transcript = row.strip().split('|')
-                metadata[fileid] = {'transcript': transcript,
-                                    'normalized_transcript': normalized_transcript}
-        return metadata
-
-    def load_ljspeech_item(self, fileid, path, ext_audio):
-
-        fileid_audio = fileid + ext_audio
-        fileid_audio = os.path.join(path, fileid_audio)
-
-        # Load audio
-        waveform, sample_rate = torchaudio.load(fileid_audio)
-
-        # Load transcription
-        fileid_metadata = self._metadata.get(fileid, None)
-        if fileid_metadata is None:
-            raise ValueError("Transcription not found for " + fileid_audio)
-
-        return (
-            waveform,
-            sample_rate,
-            fileid_metadata['transcript'],
-            fileid_metadata['normalized_transcript'],
-        )
+        with open(self._metadata_path, "r") as metadata:
+            walker = unicode_csv_reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
+            self._walker = list(walker)
 
     def __getitem__(self, n):
-        fileid = self._walker[n]
-        return self.load_ljspeech_item(fileid, self._path, self._ext_audio)
+        line = self._walker[n]
+        return load_ljspeech_item(line, self._path, self._ext_audio)
 
     def __len__(self):
         return len(self._walker)
