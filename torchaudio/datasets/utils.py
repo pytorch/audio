@@ -260,7 +260,7 @@ def walk_files(root, suffix, prefix=False, remove_suffix=False):
         prefix (bool, optional): If true, prepends the path to each result, otherwise
             only returns the name of the files found
         remove_suffix (bool, optional): If true, removes the suffix to each result defined in suffix,
-         otherwise will return the result as found.
+            otherwise will return the result as found.
     """
 
     root = os.path.expanduser(root)
