@@ -21,10 +21,8 @@ def load_speechcommands_item(filepath, path):
     speaker_id, utterance_number = speaker.split(HASH_DIVIDER)
     utterance_number = int(utterance_number)
 
-    file_audio = os.path.join(path, filepath)
-
     # Load audio
-    waveform, sample_rate = torchaudio.load(file_audio)
+    waveform, sample_rate = torchaudio.load(filepath)
     return waveform, sample_rate, label, speaker_id, utterance_number
 
 
