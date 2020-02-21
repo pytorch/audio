@@ -10,23 +10,28 @@ from torchaudio.datasets.utils import (
 
 FOLDER_IN_ARCHIVE = "SpeechCommands"
 URL = "speech_commands_v0.02"
+HASH_DIVIDER = "_nohash_"
 
 
 def load_speechcommand_item(filepath, path):
-    label, filename = os.path.split(filepath)
-    speaker_id, _ = os.path.splitext(filename)
+    relpath = os.path.relpath(filepath, path)
+    label, filename = os.path.split(relpath)
+    speaker, _ = os.path.splitext(filename)
+
+    speaker_id, utterance_number = speaker.split(HASH_DIVIDER)
+    utterance_number = int(utterance_number)
 
     file_audio = os.path.join(path, filepath)
 
     # Load audio
     waveform, sample_rate = torchaudio.load(file_audio)
-    return waveform, sample_rate, label, speaker_id
+    return waveform, sample_rate, label, speaker_id, utterance_number
 
 
 class SPEECHCOMMANDS(Dataset):
     """
     Create a Dataset for Speech Commands. Each item is a tuple of the form:
-    waveform, sample_rate, label, speaker_id
+    waveform, sample_rate, label, speaker_id, utterance_number
     """
 
     def __init__(
@@ -60,7 +65,7 @@ class SPEECHCOMMANDS(Dataset):
                 extract_archive(archive, self._path)
 
         walker = walk_files(self._path, suffix=".wav", prefix=True)
-        self._walker = [os.path.join(*sample_path.split(os.sep)[-2:]) for sample_path in walker]
+        self._walker = list(walker)
 
     def __getitem__(self, n):
         fileid = self._walker[n]
