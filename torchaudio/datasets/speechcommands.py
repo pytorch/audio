@@ -1,12 +1,11 @@
 import os
-import glob
 
 import torchaudio
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    unicode_csv_reader
+    walk_files
 )
 
 FOLDER_IN_ARCHIVE = "SpeechCommands"
@@ -15,9 +14,8 @@ URL = "speech_commands_v0.02"
 
 def load_speechcommand_item(filepath, path):
     label, filename = os.path.split(filepath)
-    filename, _ = os.path.splitext(filename)
+    speaker_id, _ = os.path.splitext(filename)
 
-    speaker_id = filename.split("_")[0]
     file_audio = os.path.join(path, filepath)
 
     # Load audio
@@ -34,14 +32,10 @@ class SPEECHCOMMANDS(Dataset):
     def __init__(
             self,
             root,
-            subset=None,
             url=URL,
             folder_in_archive=FOLDER_IN_ARCHIVE,
             download=False
     ):
-        subsets = ["validation", "testing", "training"]
-        suffix_subset_file = "_list.txt"
-
         if url in [
             "speech_commands_v0.01",
             "speech_commands_v0.02",
@@ -65,25 +59,8 @@ class SPEECHCOMMANDS(Dataset):
                     download_url(url, root)
                 extract_archive(archive, self._path)
 
-        walker = glob.glob(os.path.join(self._path, "**/*.wav"), recursive=True)
-        self._walker = [os.path.relpath(sample_path, self._path) for sample_path in walker]
-
-        if subset in subsets:
-            if subset == "training":
-                subsets.remove("training")
-                for subset in subsets:
-                    dataset_path = os.path.join(self._path, subset + suffix_subset_file)
-
-                    with open(dataset_path, "r") as f:
-                        walker = [sample[0] for sample in unicode_csv_reader(f)]
-                        self._walker = list(set(self._walker).difference(walker))
-
-            else:
-                dataset_path = os.path.join(self._path, subset + suffix_subset_file)
-
-                with open(dataset_path, "r") as f:
-                    walker = [sample[0] for sample in unicode_csv_reader(f)]
-                    self._walker = list(set(self._walker).intersection(walker))
+        walker = walk_files(self._path, suffix=".wav", prefix=True)
+        self._walker = [os.path.join(*sample_path.split(os.sep)[-2:]) for sample_path in walker]
 
     def __getitem__(self, n):
         fileid = self._walker[n]
