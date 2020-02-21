@@ -54,8 +54,7 @@ class TestDatasets(unittest.TestCase):
         data[0]
 
     def test_speechcommands(self):
-        path = os.path.join(self.path, "speechcommands")
-        data = SPEECHCOMMANDS(path)
+        data = SPEECHCOMMANDS(self.path)
         data[0]
 
 
