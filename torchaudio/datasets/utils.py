@@ -263,7 +263,7 @@ def walk_files(root, suffix, prefix=False, remove_suffix=False):
 
     root = os.path.expanduser(root)
 
-    for _, _, fn in os.walk(root):
+    for dirpath, _, fn in os.walk(root):
         for f in fn:
             if f.endswith(suffix):
 
@@ -271,7 +271,7 @@ def walk_files(root, suffix, prefix=False, remove_suffix=False):
                     f = f[: -len(suffix)]
 
                 if prefix:
-                    f = os.path.join(root, f)
+                    f = os.path.join(dirpath, f)
 
                 yield f
 
