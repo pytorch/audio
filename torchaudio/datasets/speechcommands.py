@@ -13,7 +13,7 @@ URL = "speech_commands_v0.02"
 HASH_DIVIDER = "_nohash_"
 
 
-def load_speechcommand_item(filepath, path):
+def load_speechcommands_item(filepath, path):
     relpath = os.path.relpath(filepath, path)
     label, filename = os.path.split(relpath)
     speaker, _ = os.path.splitext(filename)
@@ -69,7 +69,7 @@ class SPEECHCOMMANDS(Dataset):
 
     def __getitem__(self, n):
         fileid = self._walker[n]
-        return load_speechcommand_item(fileid, self._path)
+        return load_speechcommands_item(fileid, self._path)
 
     def __len__(self):
         return len(self._walker)
