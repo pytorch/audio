@@ -11,6 +11,7 @@ from torchaudio.datasets.utils import (
 FOLDER_IN_ARCHIVE = "SpeechCommands"
 URL = "speech_commands_v0.02"
 HASH_DIVIDER = "_nohash_"
+EXCEPT_FOLDER = "_background_noise_"
 
 
 def load_speechcommands_item(filepath, path):
@@ -63,6 +64,7 @@ class SPEECHCOMMANDS(Dataset):
                 extract_archive(archive, self._path)
 
         walker = walk_files(self._path, suffix=".wav", prefix=True)
+        walker = filter(lambda w: HASH_DIVIDER in w and EXCEPT_FOLDER not in w, walker)
         self._walker = list(walker)
 
     def __getitem__(self, n):
