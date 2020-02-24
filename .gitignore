@@ -100,6 +100,10 @@ ENV/
 # Rope project settings
 .ropeproject
 
+# Pycharm Project settings
+*.idea
+.DS_Store
+
 # mkdocs documentation
 /site
 
