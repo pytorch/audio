@@ -555,6 +555,85 @@ class TimeStretch(torch.jit.ScriptModule):
         return F.phase_vocoder(complex_specgrams, rate, self.phase_advance)
 
 
+class PitchShift(torch.nn.Module):
+    r"""Shift the pitch of a waveform by `n_steps` semitones.
+
+    Args:
+        sample_rate(int): waveform sampling rate
+        fixed_n_steps(int, optional): how many (fractional) half-steps to shift waveform
+        bins_per_octave(int, optional): how many steps per octave
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins
+        win_length (int, optional): Window size. (Default: ``n_fft``)
+        hop_length (int, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
+    """
+
+    def __init__(self,
+                 sample_rate,
+                 fixed_n_steps=None,
+                 bins_per_octave=12,
+                 n_fft=400,
+                 win_length=None,
+                 hop_length=None,
+                 ):
+        super(PitchShift, self).__init__()
+
+        self.sample_rate = sample_rate
+        self.fixed_n_steps = fixed_n_steps
+        self.bins_per_octave = bins_per_octave
+        self.n_fft = n_fft
+        self.win_length = win_length
+        self.hop_length = hop_length
+
+        if bins_per_octave < 1:
+            raise ValueError('bins_per_octave must be a positive integer.')
+
+        self.Spectrogram = Spectrogram(power=None,
+                                       n_fft=self.n_fft,
+                                       win_length=self.win_length,
+                                       hop_length=self.hop_length)
+
+        n_freq = n_fft // 2 + 1
+        self.TimeStretch = TimeStretch(hop_length=None, n_freq=n_freq)
+
+    def forward(self, waveform, overriding_n_steps=None):
+        # type: (Tensor, Optional[float]) -> Tensor
+        r"""
+        Args:
+            waveform (torch.Tensor): The input signal of dimension (..., time)
+            overriding_n_steps (float or None, optional): Pitch shift apply to this batch.
+                If no overriding_n_steps is passed, use ``self.fixed_rate``
+
+        Returns:
+            torch.Tensor: Output signal of dimension (..., time)
+        """
+        if overriding_n_steps is None:
+            n_steps = self.fixed_n_steps
+            if n_steps is None:
+                raise ValueError("If no fixed_n_steps is specified"
+                                 ", must pass a valid n_step to the forward method.")
+        else:
+            n_steps = overriding_n_steps
+
+        rate = 2.0 ** (-float(n_steps) / self.bins_per_octave)
+        ResampleWavform = Resample(float(self.sample_rate) / rate, self.sample_rate)
+
+        complex_specgrams = self.Spectrogram(waveform)
+        complex_specgrams_stretch = self.TimeStretch(complex_specgrams, overriding_rate=rate)
+        waveform_stretch = F.istft(complex_specgrams_stretch, n_fft=400,
+                                  hop_length=self.hop_length,
+                                  win_length=self.win_length)
+
+        waveform_shift = ResampleWavform(waveform_stretch)
+
+        waveform_length = waveform.size(-1)
+        waveform_shift_length = waveform_shift.size(-1)
+
+        if waveform_length < waveform_shift_length:
+            return waveform_shift[..., :waveform_length]
+
+        return torch.nn.functional.pad(waveform_shift, [0, waveform_length - waveform_shift_length])
+
+
 class _AxisMasking(torch.nn.Module):
     r"""Apply masking to a spectrogram.
 

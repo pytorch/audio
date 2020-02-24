@@ -500,6 +500,12 @@ class Tester(unittest.TestCase):
         tensor = torch.rand((10, 2, n_freq, 10, 2))
         _test_script_module(transforms.TimeStretch, tensor, n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate)
 
+    def test_scriptmodule_PitchShift(self):
+        sample_rate = 8000
+        fixed_n_steps = 4
+        tensor = torch.rand((10, 8000))
+        _test_script_module(transforms.PitchShift, tensor, sample_rate=sample_rate, fixed_n_steps=fixed_n_steps)
+
     def test_scriptmodule_FrequencyMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
         _test_script_module(transforms.FrequencyMasking, tensor, freq_mask_param=60, iid_masks=False)
