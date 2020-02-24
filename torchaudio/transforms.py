@@ -556,13 +556,13 @@ class TimeStretch(torch.jit.ScriptModule):
 
 
 class PitchShift(torch.nn.Module):
-    r"""Shift the pitch of a waveform by `n_steps` semitones.
+    r"""Shift the pitch of a waveform by n_steps semitones.
 
     Args:
-        sample_rate(int): waveform sampling rate
-        fixed_n_steps(int, optional): how many (fractional) half-steps to shift waveform
-        bins_per_octave(int, optional): how many steps per octave
-        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins
+        sample_rate(int): waveform sampling rate.
+        fixed_n_steps(int, optional): how many (fractional) half-steps to shift waveform.
+        bins_per_octave(int, optional): how many steps per octave.
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins.
         win_length (int, optional): Window size. (Default: ``n_fft``)
         hop_length (int, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
     """
@@ -573,7 +573,7 @@ class PitchShift(torch.nn.Module):
                  bins_per_octave=12,
                  n_fft=400,
                  win_length=None,
-                 hop_length=None,
+                 hop_length=None
                  ):
         super(PitchShift, self).__init__()
 
@@ -593,7 +593,7 @@ class PitchShift(torch.nn.Module):
                                        hop_length=self.hop_length)
 
         n_freq = n_fft // 2 + 1
-        self.TimeStretch = TimeStretch(hop_length=None, n_freq=n_freq)
+        self.TimeStretch = TimeStretch(hop_length=self.hop_length, n_freq=n_freq)
 
     def forward(self, waveform, overriding_n_steps=None):
         # type: (Tensor, Optional[float]) -> Tensor
@@ -619,9 +619,10 @@ class PitchShift(torch.nn.Module):
 
         complex_specgrams = self.Spectrogram(waveform)
         complex_specgrams_stretch = self.TimeStretch(complex_specgrams, overriding_rate=rate)
-        waveform_stretch = F.istft(complex_specgrams_stretch, n_fft=400,
-                                  hop_length=self.hop_length,
-                                  win_length=self.win_length)
+        waveform_stretch = F.istft(complex_specgrams_stretch,
+                                   n_fft=self.n_fft,
+                                   hop_length=self.hop_length,
+                                   win_length=self.win_length)
 
         waveform_shift = ResampleWavform(waveform_stretch)
 
