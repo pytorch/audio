@@ -584,6 +584,11 @@ class PitchShift(torch.nn.Module):
         self.win_length = win_length
         self.hop_length = hop_length
 
+        if not self.win_length:
+            self.win_length = self.n_fft
+        if not self.hop_length:
+            self.hop_length = self.win_length // 2
+
         if bins_per_octave < 1:
             raise ValueError('bins_per_octave must be a positive integer.')
 
