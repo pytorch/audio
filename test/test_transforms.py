@@ -321,10 +321,10 @@ class Tester(unittest.TestCase):
 
     def test_scriptmodule_Resample(self):
         tensor = torch.rand((2, 1000))
-        sample_rate = 100
-        sample_rate_2 = 50
+        sample_rate = 100.
+        sample_rate_2 = 50.
 
-        _test_script_module(transforms.Spectrogram, tensor, sample_rate, sample_rate_2)
+        _test_script_module(transforms.Resample, tensor, sample_rate, sample_rate_2)
 
     def test_batch_Resample(self):
         waveform = torch.randn(2, 2786)
