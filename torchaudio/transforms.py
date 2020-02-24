@@ -5,8 +5,8 @@ from warnings import warn
 import math
 import torch
 from typing import Optional
-from . import functional as F
-from .compliance import kaldi
+from torchaudio import functional as F
+from torchaudio.compliance import kaldi
 
 
 __all__ = [
@@ -32,16 +32,17 @@ class Spectrogram(torch.nn.Module):
 
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins
-        win_length (int): Window size. (Default: ``n_fft``)
-        hop_length (int, optional): Length of hop between STFT windows. (
+        win_length (int or None, optional): Window size. (Default: ``n_fft``)
+        hop_length (int or None, optional): Length of hop between STFT windows. (
             Default: ``win_length // 2``)
-        pad (int): Two sided padding of signal. (Default: ``0``)
-        window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
+        pad (int, optional): Two sided padding of signal. (Default: ``0``)
+        window_fn (Callable[[...], torch.Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
-        power (float): Exponent for the magnitude spectrogram,
+        power (float or None, optional): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
-        normalized (bool): Whether to normalize by magnitude after stft. (Default: ``False``)
-        wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
+            If None, then the complex spectrum is returned instead.
+        normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
+        wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -94,20 +95,20 @@ class GriffinLim(torch.nn.Module):
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins
         n_iter (int, optional): Number of iteration for phase recovery process.
-        win_length (int): Window size. (Default: ``n_fft``)
-        hop_length (int, optional): Length of hop between STFT windows. (
+        win_length (int or None, optional): Window size. (Default: ``n_fft``)
+        hop_length (int or None, optional): Length of hop between STFT windows. (
             Default: ``win_length // 2``)
-        window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
+        window_fn (Callable[[...], torch.Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
-        power (float): Exponent for the magnitude spectrogram,
+        power (float, optional): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
-        normalized (bool): Whether to normalize by magnitude after stft. (Default: ``False``)
-        wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
-        momentum (float): The momentum parameter for fast Griffin-Lim.
+        normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
+        wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
+        momentum (float, optional): The momentum parameter for fast Griffin-Lim.
             Setting this to 0 recovers the original Griffin-Lim method.
             Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: 0.99)
         length (int, optional): Array length of the expected output. (Default: ``None``)
-        rand_init (bool): Initializes phase randomly if True and to zero otherwise. (Default: ``True``)
+        rand_init (bool, optional): Initializes phase randomly if True and to zero otherwise. (Default: ``True``)
     """
     __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power', 'normalized',
                      'length', 'momentum', 'rand_init']
@@ -145,7 +146,7 @@ class AmplitudeToDB(torch.nn.Module):
     a full clip.
 
     Args:
-        stype (str): scale of input tensor ('power' or 'magnitude'). The
+        stype (str, optional): scale of input tensor ('power' or 'magnitude'). The
             power being the elementwise square of the magnitude. (Default: ``'power'``)
         top_db (float, optional): minimum negative cut-off in decibels.  A reasonable number
             is 80. (Default: ``None``)
@@ -183,10 +184,10 @@ class MelScale(torch.nn.Module):
     User can control which device the filter bank (`fb`) is (e.g. fb.to(spec_f.device)).
 
     Args:
-        n_mels (int): Number of mel filterbanks. (Default: ``128``)
-        sample_rate (int): Sample rate of audio signal. (Default: ``16000``)
-        f_min (float): Minimum frequency. (Default: ``0.``)
-        f_max (float, optional): Maximum frequency. (Default: ``sample_rate // 2``)
+        n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)
+        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
+        f_min (float, optional): Minimum frequency. (Default: ``0.``)
+        f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
         n_stft (int, optional): Number of bins in STFT. Calculated from first input
             if None is given.  See ``n_fft`` in :class:`Spectrogram`.
     """
@@ -328,18 +329,18 @@ class MelSpectrogram(torch.nn.Module):
         * http://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html
 
     Args:
-        sample_rate (int): Sample rate of audio signal. (Default: ``16000``)
-        win_length (int): Window size. (Default: ``n_fft``)
-        hop_length (int, optional): Length of hop between STFT windows. (
+        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
+        win_length (int or None, optional): Window size. (Default: ``n_fft``)
+        hop_length (int or None, optional): Length of hop between STFT windows. (
             Default: ``win_length // 2``)
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins
-        f_min (float): Minimum frequency. (Default: ``0.``)
-        f_max (float, optional): Maximum frequency. (Default: ``None``)
-        pad (int): Two sided padding of signal. (Default: ``0``)
-        n_mels (int): Number of mel filterbanks. (Default: ``128``)
-        window_fn (Callable[[...], torch.Tensor]): A function to create a window tensor
+        f_min (float, optional): Minimum frequency. (Default: ``0.``)
+        f_max (float or None, optional): Maximum frequency. (Default: ``None``)
+        pad (int, optional): Two sided padding of signal. (Default: ``0``)
+        n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)
+        window_fn (Callable[[...], torch.Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
-        wkwargs (Dict[..., ...]): Arguments for window function. (Default: ``None``)
+        wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
@@ -389,11 +390,11 @@ class MFCC(torch.nn.Module):
     a full clip.
 
     Args:
-        sample_rate (int): Sample rate of audio signal. (Default: ``16000``)
-        n_mfcc (int): Number of mfc coefficients to retain. (Default: ``40``)
-        dct_type (int): type of DCT (discrete cosine transform) to use. (Default: ``2``)
+        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
+        n_mfcc (int, optional): Number of mfc coefficients to retain. (Default: ``40``)
+        dct_type (int, optional): type of DCT (discrete cosine transform) to use. (Default: ``2``)
         norm (str, optional): norm to use. (Default: ``'ortho'``)
-        log_mels (bool): whether to use log-mel spectrograms instead of db-scaled. (Default:
+        log_mels (bool, optional): whether to use log-mel spectrograms instead of db-scaled. (Default:
             ``False``)
         melkwargs (dict, optional): arguments for MelSpectrogram. (Default: ``None``)
     """
@@ -460,7 +461,7 @@ class MuLawEncoding(torch.nn.Module):
     returns a signal encoded with values from 0 to quantization_channels - 1
 
     Args:
-        quantization_channels (int): Number of channels (Default: ``256``)
+        quantization_channels (int, optional): Number of channels (Default: ``256``)
     """
     __constants__ = ['quantization_channels']
 
@@ -487,7 +488,7 @@ class MuLawDecoding(torch.nn.Module):
     and returns a signal scaled between -1 and 1.
 
     Args:
-        quantization_channels (int): Number of channels (Default: ``256``)
+        quantization_channels (int, optional): Number of channels (Default: ``256``)
     """
     __constants__ = ['quantization_channels']
 
@@ -511,10 +512,11 @@ class Resample(torch.nn.Module):
     be given.
 
     Args:
-        orig_freq (float): The original frequency of the signal. (Default: ``16000``)
-        new_freq (float): The desired frequency. (Default: ``16000``)
-        resampling_method (str): The resampling method (Default: ``'sinc_interpolation'``)
+        orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)
+        new_freq (float, optional): The desired frequency. (Default: ``16000``)
+        resampling_method (str, optional): The resampling method (Default: ``'sinc_interpolation'``)
     """
+
     def __init__(self, orig_freq=16000, new_freq=16000, resampling_method='sinc_interpolation'):
         super(Resample, self).__init__()
         self.orig_freq = orig_freq
@@ -548,7 +550,7 @@ class Resample(torch.nn.Module):
 class ComplexNorm(torch.nn.Module):
     r"""Compute the norm of complex tensor input
     Args:
-        power (float): Power of the norm. Defaults to `1.0`.
+        power (float, optional): Power of the norm. Defaults to `1.0`.
     """
     __constants__ = ['power']
 
@@ -596,9 +598,9 @@ class TimeStretch(torch.nn.Module):
     r"""Stretch stft in time without modifying pitch for a given rate.
 
     Args:
-        hop_length (int): Number audio of frames between STFT columns. (Default: ``n_fft // 2``)
+        hop_length (int or None, optional): Number audio of frames between STFT columns. (Default: ``n_fft // 2``)
         n_freq (int, optional): number of filter banks from stft. (Default: ``201``)
-        fixed_rate (float): rate to speed up or slow down by.
+        fixed_rate (float or None, optional): rate to speed up or slow down by.
             If None is provided, rate must be passed to the forward method. (Default: ``None``)
     """
     __constants__ = ['fixed_rate']
@@ -617,7 +619,7 @@ class TimeStretch(torch.nn.Module):
         r"""
         Args:
             complex_specgrams (Tensor): complex spectrogram (..., freq, time, complex=2)
-            overriding_rate (float or None): speed up to apply to this batch.
+            overriding_rate (float or None, optional): speed up to apply to this batch.
                 If no rate is passed, use ``self.fixed_rate``
 
         Returns:
@@ -644,7 +646,7 @@ class _AxisMasking(torch.nn.Module):
 
     Args:
         mask_param (int): Maximum possible length of the mask
-        axis: What dimension the mask is applied on
+        axis (int): What dimension the mask is applied on
         iid_masks (bool): Applies iid masks to each of the examples in the batch dimension
     """
     __constants__ = ['mask_param', 'axis', 'iid_masks']
@@ -679,7 +681,7 @@ class FrequencyMasking(_AxisMasking):
     Args:
         freq_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, freq_mask_param).
-        iid_masks (bool): weather to apply the same mask to all
+        iid_masks (bool, optional): weather to apply the same mask to all
             the examples/channels in the batch. (Default: False)
     """
 
@@ -693,7 +695,7 @@ class TimeMasking(_AxisMasking):
     Args:
         time_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, time_mask_param).
-        iid_masks (bool): weather to apply the same mask to all
+        iid_masks (bool, optional): weather to apply the same mask to all
             the examples/channels in the batch. Defaults to False.
     """
 
