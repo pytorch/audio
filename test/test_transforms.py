@@ -11,6 +11,7 @@ import unittest
 import common_utils
 
 if IMPORT_LIBROSA:
+    import numpy as np
     import librosa
 
 if IMPORT_SCIPY:
@@ -507,6 +508,131 @@ class Tester(unittest.TestCase):
     def test_scriptmodule_TimeMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
         _test_script_module(transforms.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
+
+
+class TestLibrosaConsistency(unittest.TestCase):
+    test_dirpath = None
+    test_dir = None
+
+    @classmethod
+    def setUpClass(cls):
+        cls.test_dirpath, cls.test_dir = common_utils.create_temp_assets_dir()
+
+    def _to_librosa(self, sound):
+        return sound.cpu().numpy().squeeze()
+
+    def _get_sample_data(self, *asset_paths, **kwargs):
+        file_path = os.path.join(self.test_dirpath, 'assets', *asset_paths)
+
+        sound, sample_rate = torchaudio.load(file_path, **kwargs)
+        return sound.mean(dim=0, keepdim=True), sample_rate
+
+    @unittest.skipIf(not IMPORT_LIBROSA, 'Librosa is not available')
+    def test_MelScale(self):
+        """MelScale transform is comparable to that of librosa"""
+        n_fft = 2048
+        n_mels = 256
+        hop_length = n_fft // 4
+
+        # Prepare spectrogram input. We use torchaudio to compute one.
+        sound, sample_rate = self._get_sample_data('whitenoise_1min.mp3')
+        spec_ta = F.spectrogram(
+            sound, pad=0, window=torch.hann_window(n_fft), n_fft=n_fft,
+            hop_length=hop_length, win_length=n_fft, power=2, normalized=False)
+        spec_lr = spec_ta.cpu().numpy().squeeze()
+        # Perform MelScale with torchaudio and librosa
+        melspec_ta = transforms.MelScale(n_mels=n_mels, sample_rate=sample_rate)(spec_ta)
+        melspec_lr = librosa.feature.melspectrogram(
+            S=spec_lr, sr=sample_rate, n_fft=n_fft, hop_length=hop_length,
+            win_length=n_fft, center=True, window='hann', n_mels=n_mels, htk=True, norm=None)
+        # Note: Using relaxed rtol instead of atol
+        assert torch.allclose(melspec_ta, torch.from_numpy(melspec_lr[None, ...]), rtol=1e-3)
+
+    @unittest.skipIf(not IMPORT_LIBROSA, 'Librosa is not available')
+    def test_InverseMelScale(self):
+        """InverseMelScale transform is comparable to that of librosa"""
+        n_fft = 2048
+        n_mels = 256
+        n_stft = n_fft // 2 + 1
+        hop_length = n_fft // 4
+
+        # Prepare mel spectrogram input. We use torchaudio to compute one.
+        sound, sample_rate = self._get_sample_data(
+            'steam-train-whistle-daniel_simon.wav', offset=2**10, num_frames=2**14)
+        spec_orig = F.spectrogram(
+            sound, pad=0, window=torch.hann_window(n_fft), n_fft=n_fft,
+            hop_length=hop_length, win_length=n_fft, power=2, normalized=False)
+        melspec_ta = transforms.MelScale(n_mels=n_mels, sample_rate=sample_rate)(spec_orig)
+        melspec_lr = melspec_ta.cpu().numpy().squeeze()
+        # Perform InverseMelScale with torch audio and librosa
+        spec_ta = transforms.InverseMelScale(
+            n_stft, n_mels=n_mels, sample_rate=sample_rate)(melspec_ta)
+        spec_lr = librosa.feature.inverse.mel_to_stft(
+            melspec_lr, sr=sample_rate, n_fft=n_fft, power=2.0, htk=True, norm=None)
+        spec_lr = torch.from_numpy(spec_lr[None, ...])
+
+        # Align dimensions
+        # librosa does not return power spectrogram
+        spec_orig = spec_orig.sqrt()
+        spec_ta = spec_ta.sqrt()
+
+        # For debug
+        # _plot_melspecs(sample_rate, spec_orig, spec_ta, spec_lr)
+
+        # The spectrograms reconstructed by librosa and torchaudio are not very comparable elementwise.
+        threshold = 2.5
+        # This is because they use different approximation algorithms and resulting values can live
+        # in different magniude.
+        # See https://github.com/pytorch/audio/pull/366 for the discussion of the choice of algorithm
+        # To get this number do the following and pick something bigger than that;
+        # print('p1 dist (  lr <-> ta):', torch.dist(spec_lr, spec_ta, p=float('inf')))
+        assert torch.allclose(spec_ta, spec_lr, atol=threshold)
+
+        threshold = 1500.0
+        # This threshold was choosen empirically, based on the following observations
+        # print('p1 dist (orig <-> ta):', torch.dist(spec_orig, spec_ta, p=1))
+        # print('p1 dist (orig <-> lr):', torch.dist(spec_orig, spec_lr, p=1))
+        # print('p1 dist (  lr <-> ta):', torch.dist(spec_lr, spec_ta, p=1))
+        # >>> p1 dist (orig <-> ta): tensor(1482.1917)
+        # >>> p1 dist (orig <-> lr): tensor(1420.7103)
+        # >>> p1 dist (  lr <-> ta): tensor(881.7889)
+        assert torch.dist(spec_orig, spec_ta, p=1) < threshold
+
+
+def _plot_melspecs(sample_rate, spec_original, spec_ta, spec_lr):
+    """Helper function for debugging test_InverseMelScale. Plot spectrogram
+
+    # Taken from https://gist.github.com/jaeyeun97/8651dff509d5b084636ac6c3a7547108
+    # Thanks @jaeyeun97
+    """
+    def log_mag(spec):
+        ref = spec.max().clamp(1e-16).log10_()
+        spec = spec.clamp(1e-16).log10().sub_(ref).mul_(20).clamp(min=-80)
+        return spec.squeeze().numpy()
+
+    spec_original = log_mag(spec_original)
+    spec_ta = log_mag(spec_ta)
+    spec_lr = log_mag(spec_lr)
+
+    import librosa.display
+    import matplotlib
+    import matplotlib.pyplot as plt
+
+    matplotlib.use('TkAgg')
+    plt.figure(figsize=(20, 10))
+
+    plt.subplot(3, 1, 1)
+    librosa.display.specshow(spec_original, sr=sample_rate)
+    plt.title('Original')
+
+    plt.subplot(3, 1, 2)
+    librosa.display.specshow(spec_lr, sr=sample_rate)
+    plt.title('Librosa')
+
+    plt.subplot(3, 1, 3)
+    librosa.display.specshow(spec_ta, sr=sample_rate)
+    plt.title('Torchaudio')
+    plt.savefig(f'test_InverseMelScale.png')
 
 
 if __name__ == '__main__':
