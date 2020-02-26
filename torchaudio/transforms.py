@@ -556,18 +556,32 @@ class TimeStretch(torch.jit.ScriptModule):
 
 
 class Fade(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, fade_pos="start"):
         super(Fade, self).__init__()
+        self.fade_pos = fade_pos
 
     def forward(self, waveform):
-        n_audios, waveform_length = waveform.size()
-        fade_duration = waveform_length
+        self.n_audios, self.waveform_length = waveform.size()
+        self.fade_duration = self.waveform_length
 
-        fade = torch.linspace(0, 1, fade_duration)
-        ones = torch.ones(waveform_length - fade_duration)
-        applied_fade = torch.cat((fade, ones)).repeat(n_audios, 1)
+        if self.fade_pos == "start":
+            applied_fade = self._fade_at_start()
+        if self.fade_pos == "end":
+            applied_fade = self._fade_at_end()
+        else:
+            applied_fade = self._fade_at_start() * self._fade_at_end()
 
         return waveform * applied_fade
+
+    def _fade_at_start(self):
+        fade = torch.linspace(0, 1, self.fade_duration)
+        ones = torch.ones(self.waveform_length - self.fade_duration)
+        return torch.cat((fade, ones)).repeat(self.n_audios, 1)
+
+    def _fade_at_end(self):
+        fade = torch.linspace(1, 0, self.fade_duration)
+        ones = torch.ones(self.waveform_length - self.fade_duration)
+        return torch.cat((fade, ones)).repeat(self.n_audios, 1)
 
 
 class _AxisMasking(torch.nn.Module):
