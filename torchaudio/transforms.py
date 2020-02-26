@@ -555,6 +555,21 @@ class TimeStretch(torch.jit.ScriptModule):
         return F.phase_vocoder(complex_specgrams, rate, self.phase_advance)
 
 
+class Fade(torch.nn.Module):
+    def __init__(self):
+        super(Fade, self).__init__()
+
+    def forward(self, waveform):
+        n_audios, waveform_length = waveform.size()
+        fade_duration = waveform_length
+
+        fade = torch.linspace(0, 1, fade_duration)
+        ones = torch.ones(waveform_length - fade_duration)
+        applied_fade = torch.cat((fade, ones)).repeat(n_audios, 1)
+
+        return waveform * applied_fade
+
+
 class _AxisMasking(torch.nn.Module):
     r"""Apply masking to a spectrogram.
 
