@@ -559,10 +559,10 @@ class PitchShift(torch.nn.Module):
     r"""Shift the pitch of a waveform by n_steps semitones.
 
     Args:
-        sample_rate(int): waveform sampling rate.
-        fixed_n_steps(int, optional): how many (fractional) half-steps to shift waveform.
-        bins_per_octave(int, optional): how many steps per octave.
-        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins.
+        sample_rate(int): Waveform sampling rate.
+        fixed_n_steps(int, optional): How many (fractional) half-steps to shift waveform. (Default: ``None``)
+        bins_per_octave(int, optional): How many steps per octave. (Default: ``12``)
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
         win_length (int, optional): Window size. (Default: ``n_fft``)
         hop_length (int, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
     """
@@ -584,13 +584,13 @@ class PitchShift(torch.nn.Module):
         self.win_length = win_length
         self.hop_length = hop_length
 
+        if bins_per_octave < 1:
+            raise ValueError('bins_per_octave must be a positive integer.')
+
         if not self.win_length:
             self.win_length = self.n_fft
         if not self.hop_length:
             self.hop_length = self.win_length // 2
-
-        if bins_per_octave < 1:
-            raise ValueError('bins_per_octave must be a positive integer.')
 
         self.Spectrogram = Spectrogram(power=None,
                                        n_fft=self.n_fft,
@@ -604,12 +604,12 @@ class PitchShift(torch.nn.Module):
         # type: (Tensor, Optional[float]) -> Tensor
         r"""
         Args:
-            waveform (torch.Tensor): The input signal of dimension (..., time)
+            waveform (torch.Tensor): Tensor of audio of dimension (..., time).
             overriding_n_steps (float or None, optional): Pitch shift apply to this batch.
-                If no overriding_n_steps is passed, use ``self.fixed_rate``
+                If no overriding_n_steps is passed, use ``self.fixed_rate`` (Default: ``None``).
 
         Returns:
-            torch.Tensor: Output signal of dimension (..., time)
+            torch.Tensor: Output signal of dimension (..., time).
         """
         if overriding_n_steps is None:
             n_steps = self.fixed_n_steps
