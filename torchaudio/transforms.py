@@ -556,15 +556,56 @@ class TimeStretch(torch.jit.ScriptModule):
 
 
 class Fade(torch.nn.Module):
-    def __init__(self, fade_pos="start"):
-    def __init__(self, fade_in_len=0.0, fade_out_len=0.0, fade_type="linear"):
-        super(Fade, self).__init__()
-        self.fade_in_len = fade_in_len
-        self.fade_out_len = fade_out_len
-        self.fade_type = fade_type
+    r"""Add a fade in and/or fade out to an waveform.
 
-    def forward(self, waveform):
+    Args:
+        fixed_fade_in_len (int, optional): Length of fade-in (time frames). (Default: ``0``)
+        fixed_fade_out_len (int, optional): Length of fade-out (time frames). (Default: ``0``)
+        fixed_fade_shape (str, optional): Shape of fade. Must be one of:
+                                                    "q" for quarter sine,
+                                                    "h" for half sine,
+                                                    "t" for linear,
+                                                    "l" for logarithmic
+                                                    "e" for exponential. (Default: ``"t"``)
+    """
+    def __init__(self, fixed_fade_in_len=0, fixed_fade_out_len=0, fixed_fade_shape="t"):
+        super(Fade, self).__init__()
+        self.fixed_fade_in_len = fixed_fade_in_len
+        self.fixed_fade_out_len = fixed_fade_out_len
+        self.fixed_fade_shape = fixed_fade_shape
+
+    def forward(self,
+                waveform,
+                overriding_fade_in_len=None,
+                overriding_fade_out_len=None,
+                overriding_fade_shape=None):
+        # type: (Tensor, Optional[float], Optional[float], Optional[str]) -> Tensor
+        r"""
+        Args:
+            waveform (torch.Tensor): The input signal of dimension (..., time)
+            overriding_fade_in_len (int, optional): Length of fade-in (time frames) to apply to this batch.
+                If no fade_in_len is passed, use ``self.fixed_fade_in_len``. (Default: ``None``)
+            overriding_fade_out_len (int, optional): Length of fade-out (time frames) to apply to this batch.
+                If no fade_out_len is passed, use ``self.fixed_fade_out_len``. (Default: ``None``)
+            overriding_fade_shape (str, optional): Shape of fade to apply to this batch.
+                If no fade_shape is passed, use ``self.fixed_fade_shape``. (Default: ``None``)
+
+        Returns:
+            torch.Tensor: Output signal of dimension (..., time)
+        """
         self.n_audios, self.waveform_length = waveform.size()
+
+        self.fade_in_len = self.fixed_fade_in_len
+        if overriding_fade_in_len:
+            self.fade_in_len = overriding_fade_in_len
+
+        self.fade_out_len = self.fixed_fade_out_len
+        if overriding_fade_out_len:
+            self.fade_out_len = overriding_fade_out_len
+
+        self.fade_shape = self.fixed_fade_shape
+        if overriding_fade_shape:
+            self.fade_shape = overriding_fade_shape
 
         if self.fade_in_len > 0 and self.fade_out_len > 0:
             return self._fade_in() * self._fade_out() * waveform
@@ -581,19 +622,19 @@ class Fade(torch.nn.Module):
         fade = torch.linspace(0, 1, self.fade_in_len)
         ones = torch.ones(self.waveform_length - self.fade_in_len)
 
-        if self.fade_type == "linear":
+        if self.fade_shape == "t":
             fade = fade
 
-        if self.fade_type == "exponential":
+        if self.fade_shape == "e":
             fade = torch.pow(2, (fade - 1)) * fade
 
-        if self.fade_type == "logarithm":
+        if self.fade_shape == "l":
             fade = torch.log10(.1 + fade) + 1
 
-        if self.fade_type == "quarter-sin":
+        if self.fade_shape == "q":
             fade = torch.sin(fade * math.pi / 2)
 
-        if self.fade_type == "half-sin":
+        if self.fade_shape == "h":
             fade = torch.sin(fade * math.pi - math.pi / 2) / 2 + 0.5
 
         return torch.cat((fade, ones)).repeat(self.n_audios, 1).clamp_(0, 1)
@@ -602,19 +643,19 @@ class Fade(torch.nn.Module):
         fade = torch.linspace(0, 1, self.fade_out_len)
         ones = torch.ones(self.waveform_length - self.fade_out_len)
 
-        if self.fade_type == "linear":
+        if self.fade_shape == "t":
             fade = - fade + 1
 
-        if self.fade_type == "exponential":
+        if self.fade_shape == "e":
             fade = torch.pow(2, - fade) * (1 - fade)
 
-        if self.fade_type == "logarithm":
+        if self.fade_shape == "l":
             fade = torch.log10(1.1 - fade) + 1
 
-        if self.fade_type == "quarter-sin":
+        if self.fade_shape == "q":
             fade = torch.sin(fade * math.pi / 2 + math.pi / 2)
 
-        if self.fade_type == "half-sin":
+        if self.fade_shape == "h":
             fade = torch.sin(fade * math.pi + math.pi / 2) / 2 + 0.5
 
         return torch.cat((ones, fade)).repeat(self.n_audios, 1).clamp_(0, 1)
