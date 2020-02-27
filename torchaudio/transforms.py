@@ -557,31 +557,67 @@ class TimeStretch(torch.jit.ScriptModule):
 
 class Fade(torch.nn.Module):
     def __init__(self, fade_pos="start"):
+    def __init__(self, fade_in_len=0.0, fade_out_len=0.0, fade_type="linear"):
         super(Fade, self).__init__()
-        self.fade_pos = fade_pos
+        self.fade_in_len = fade_in_len
+        self.fade_out_len = fade_out_len
+        self.fade_type = fade_type
 
     def forward(self, waveform):
         self.n_audios, self.waveform_length = waveform.size()
-        self.fade_duration = self.waveform_length
 
-        if self.fade_pos == "start":
-            applied_fade = self._fade_at_start()
-        if self.fade_pos == "end":
-            applied_fade = self._fade_at_end()
-        else:
-            applied_fade = self._fade_at_start() * self._fade_at_end()
+        if self.fade_in_len > 0 and self.fade_out_len > 0:
+            return self._fade_in() * self._fade_out() * waveform
 
-        return waveform * applied_fade
+        if self.fade_in_len > 0:
+            return self._fade_in() * waveform
 
-    def _fade_at_start(self):
-        fade = torch.linspace(0, 1, self.fade_duration)
-        ones = torch.ones(self.waveform_length - self.fade_duration)
-        return torch.cat((fade, ones)).repeat(self.n_audios, 1)
+        if self.fade_out_len > 0:
+            return self._fade_out() * waveform
 
-    def _fade_at_end(self):
-        fade = torch.linspace(1, 0, self.fade_duration)
-        ones = torch.ones(self.waveform_length - self.fade_duration)
-        return torch.cat((fade, ones)).repeat(self.n_audios, 1)
+        return waveform
+
+    def _fade_in(self):
+        fade = torch.linspace(0, 1, self.fade_in_len)
+        ones = torch.ones(self.waveform_length - self.fade_in_len)
+
+        if self.fade_type == "linear":
+            fade = fade
+
+        if self.fade_type == "exponential":
+            fade = torch.pow(2, (fade - 1)) * fade
+
+        if self.fade_type == "logarithm":
+            fade = torch.log10(.1 + fade) + 1
+
+        if self.fade_type == "quarter-sin":
+            fade = torch.sin(fade * math.pi / 2)
+
+        if self.fade_type == "half-sin":
+            fade = torch.sin(fade * math.pi - math.pi / 2) / 2 + 0.5
+
+        return torch.cat((fade, ones)).repeat(self.n_audios, 1).clamp_(0, 1)
+
+    def _fade_out(self):
+        fade = torch.linspace(0, 1, self.fade_out_len)
+        ones = torch.ones(self.waveform_length - self.fade_out_len)
+
+        if self.fade_type == "linear":
+            fade = - fade + 1
+
+        if self.fade_type == "exponential":
+            fade = torch.pow(2, - fade) * (1 - fade)
+
+        if self.fade_type == "logarithm":
+            fade = torch.log10(1.1 - fade) + 1
+
+        if self.fade_type == "quarter-sin":
+            fade = torch.sin(fade * math.pi / 2 + math.pi / 2)
+
+        if self.fade_type == "half-sin":
+            fade = torch.sin(fade * math.pi + math.pi / 2) / 2 + 0.5
+
+        return torch.cat((ones, fade)).repeat(self.n_audios, 1).clamp_(0, 1)
 
 
 class _AxisMasking(torch.nn.Module):
