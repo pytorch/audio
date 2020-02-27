@@ -607,16 +607,7 @@ class Fade(torch.nn.Module):
         if overriding_fade_shape:
             self.fade_shape = overriding_fade_shape
 
-        if self.fade_in_len > 0 and self.fade_out_len > 0:
-            return self._fade_in() * self._fade_out() * waveform
-
-        if self.fade_in_len > 0:
-            return self._fade_in() * waveform
-
-        if self.fade_out_len > 0:
-            return self._fade_out() * waveform
-
-        return waveform
+        return self._fade_in() * self._fade_out() * waveform
 
     def _fade_in(self):
         fade = torch.linspace(0, 1, self.fade_in_len)
