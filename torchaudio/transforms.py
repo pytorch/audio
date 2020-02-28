@@ -521,7 +521,17 @@ class Resample(torch.nn.Module):
             torch.Tensor: Output signal of dimension (..., time)
         """
         if self.resampling_method == 'sinc_interpolation':
-            return kaldi.resample_waveform(waveform, self.orig_freq, self.new_freq)
+
+            # pack batch
+            shape = waveform.size()
+            waveform = waveform.view(-1, shape[-1])
+
+            waveform = kaldi.resample_waveform(waveform, self.orig_freq, self.new_freq)
+
+            # unpack batch
+            waveform = waveform.view(shape[:-1] + waveform.shape[-1:])
+
+            return waveform
 
         raise ValueError('Invalid resampling method: %s' % (self.resampling_method))
 

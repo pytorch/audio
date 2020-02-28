@@ -321,10 +321,22 @@ class Tester(unittest.TestCase):
 
     def test_scriptmodule_Resample(self):
         tensor = torch.rand((2, 1000))
-        sample_rate = 100
-        sample_rate_2 = 50
+        sample_rate = 100.
+        sample_rate_2 = 50.
 
-        _test_script_module(transforms.Spectrogram, tensor, sample_rate, sample_rate_2)
+        _test_script_module(transforms.Resample, tensor, sample_rate, sample_rate_2)
+
+    def test_batch_Resample(self):
+        waveform = torch.randn(2, 2786)
+
+        # Single then transform then batch
+        expected = transforms.Resample()(waveform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = transforms.Resample()(waveform.repeat(3, 1, 1))
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
 
     def test_scriptmodule_ComplexNorm(self):
         tensor = torch.rand((1, 2, 201, 2))

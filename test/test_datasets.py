@@ -3,9 +3,11 @@ import unittest
 
 from torchaudio.datasets.commonvoice import COMMONVOICE
 from torchaudio.datasets.librispeech import LIBRISPEECH
+from torchaudio.datasets.speechcommands import SPEECHCOMMANDS
 from torchaudio.datasets.utils import diskcache_iterator, bg_iterator
 from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.yesno import YESNO
+from torchaudio.datasets.ljspeech import LJSPEECH
 
 import common_utils
 
@@ -46,6 +48,14 @@ class TestDatasets(unittest.TestCase):
         data = bg_iterator(data, 5)
         for d in data:
             pass
+
+    def test_ljspeech(self):
+        data = LJSPEECH(self.path)
+        data[0]
+
+    def test_speechcommands(self):
+        data = SPEECHCOMMANDS(self.path)
+        data[0]
 
 
 if __name__ == "__main__":
