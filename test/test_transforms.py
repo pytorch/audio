@@ -576,63 +576,30 @@ class TestLibrosaConsistency(unittest.TestCase):
         spec_orig = spec_orig.sqrt()
         spec_ta = spec_ta.sqrt()
 
-        # For debug
-        # _plot_melspecs(sample_rate, spec_orig, spec_ta, spec_lr)
-
-        # The spectrograms reconstructed by librosa and torchaudio are not very comparable elementwise.
         threshold = 2.5
+        # This threshold was choosen empirically, based on the following observation
+        #
+        # torch.dist(spec_lr, spec_ta, p=float('inf'))
+        # >>> tensor(2.3826)
+        #
+        # The spectrograms reconstructed by librosa and torchaudio are not very comparable elementwise.
         # This is because they use different approximation algorithms and resulting values can live
-        # in different magniude.
+        # in different magnitude. (although most of them are very close)
         # See https://github.com/pytorch/audio/pull/366 for the discussion of the choice of algorithm
-        # To get this number do the following and pick something bigger than that;
-        # print('p1 dist (  lr <-> ta):', torch.dist(spec_lr, spec_ta, p=float('inf')))
+        # See https://github.com/pytorch/audio/pull/448/files#r385747021 for the distribution of P-inf
+        # distance over frequencies.
         assert torch.allclose(spec_ta, spec_lr, atol=threshold)
 
         threshold = 1500.0
         # This threshold was choosen empirically, based on the following observations
-        # print('p1 dist (orig <-> ta):', torch.dist(spec_orig, spec_ta, p=1))
-        # print('p1 dist (orig <-> lr):', torch.dist(spec_orig, spec_lr, p=1))
-        # print('p1 dist (  lr <-> ta):', torch.dist(spec_lr, spec_ta, p=1))
-        # >>> p1 dist (orig <-> ta): tensor(1482.1917)
-        # >>> p1 dist (orig <-> lr): tensor(1420.7103)
-        # >>> p1 dist (  lr <-> ta): tensor(881.7889)
+        #
+        # torch.dist(spec_orig, spec_ta, p=1)
+        # >>> tensor(1482.1917)
+        # torch.dist(spec_orig, spec_lr, p=1)
+        # >>> tensor(1420.7103)
+        # torch.dist(spec_lr, spec_ta, p=1)
+        # >>> tensor(881.7889)
         assert torch.dist(spec_orig, spec_ta, p=1) < threshold
-
-
-def _plot_melspecs(sample_rate, spec_original, spec_ta, spec_lr):
-    """Helper function for debugging test_InverseMelScale. Plot spectrogram
-
-    # Taken from https://gist.github.com/jaeyeun97/8651dff509d5b084636ac6c3a7547108
-    # Thanks @jaeyeun97
-    """
-    def log_mag(spec):
-        ref = spec.max().clamp(1e-16).log10_()
-        spec = spec.clamp(1e-16).log10().sub_(ref).mul_(20).clamp(min=-80)
-        return spec.squeeze().numpy()
-
-    spec_original = log_mag(spec_original)
-    spec_ta = log_mag(spec_ta)
-    spec_lr = log_mag(spec_lr)
-
-    import librosa.display
-    import matplotlib
-    import matplotlib.pyplot as plt
-
-    matplotlib.use('TkAgg')
-    plt.figure(figsize=(20, 10))
-
-    plt.subplot(3, 1, 1)
-    librosa.display.specshow(spec_original, sr=sample_rate)
-    plt.title('Original')
-
-    plt.subplot(3, 1, 2)
-    librosa.display.specshow(spec_lr, sr=sample_rate)
-    plt.title('Librosa')
-
-    plt.subplot(3, 1, 3)
-    librosa.display.specshow(spec_ta, sr=sample_rate)
-    plt.title('Torchaudio')
-    plt.savefig(f'test_InverseMelScale.png')
 
 
 if __name__ == '__main__':
