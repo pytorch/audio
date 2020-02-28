@@ -500,6 +500,20 @@ class Tester(unittest.TestCase):
         tensor = torch.rand((10, 2, n_freq, 10, 2))
         _test_script_module(transforms.TimeStretch, tensor, n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate)
 
+    def test_batch_Fade(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+        fixed_fade_in_len = 3000
+        fixed_fade_out_len = 3000
+
+        # Single then transform then batch
+        expected = transforms.Fade(fixed_fade_in_len, fixed_fade_out_len)(waveform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = transforms.Fade(fixed_fade_in_len, fixed_fade_out_len)(waveform.repeat(3, 1, 1))
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
     def test_scriptmodule_FrequencyMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
         _test_script_module(transforms.FrequencyMasking, tensor, freq_mask_param=60, iid_masks=False)
