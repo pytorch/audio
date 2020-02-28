@@ -594,11 +594,11 @@ class TestLibrosaConsistency(unittest.TestCase):
         spec_orig = spec_orig.sqrt()
         spec_ta = spec_ta.sqrt()
 
-        threshold = 2.5
+        threshold = 2.0
         # This threshold was choosen empirically, based on the following observation
         #
         # torch.dist(spec_lr, spec_ta, p=float('inf'))
-        # >>> tensor(2.3826)
+        # >>> tensor(1.9666)
         #
         # The spectrograms reconstructed by librosa and torchaudio are not very comparable elementwise.
         # This is because they use different approximation algorithms and resulting values can live
@@ -608,15 +608,15 @@ class TestLibrosaConsistency(unittest.TestCase):
         # distance over frequencies.
         assert torch.allclose(spec_ta, spec_lr, atol=threshold)
 
-        threshold = 1500.0
+        threshold = 1700.0
         # This threshold was choosen empirically, based on the following observations
         #
         # torch.dist(spec_orig, spec_ta, p=1)
-        # >>> tensor(1482.1917)
+        # >>> tensor(1644.3516)
         # torch.dist(spec_orig, spec_lr, p=1)
         # >>> tensor(1420.7103)
         # torch.dist(spec_lr, spec_ta, p=1)
-        # >>> tensor(881.7889)
+        # >>> tensor(943.2759)
         assert torch.dist(spec_orig, spec_ta, p=1) < threshold
 
 
