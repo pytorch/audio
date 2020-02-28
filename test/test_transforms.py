@@ -11,7 +11,6 @@ import unittest
 import common_utils
 
 if IMPORT_LIBROSA:
-    import numpy as np
     import librosa
 
 if IMPORT_SCIPY:
@@ -411,6 +410,25 @@ class Tester(unittest.TestCase):
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
 
+    def test_batch_InverseMelScale(self):
+        n_fft = 8
+        n_mels = 32
+        n_stft = 5
+        mel_spec = torch.randn(2, n_mels, 32) ** 2
+
+        # Single then transform then batch
+        expected = transforms.InverseMelScale(n_stft, n_mels)(mel_spec).repeat(3, 1, 1, 1)
+
+        # Batch then transform
+        computed = transforms.InverseMelScale(n_stft, n_mels)(mel_spec.repeat(3, 1, 1, 1))
+
+        # shape = (3, 2, n_mels, 32)
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+
+        # Because InverseMelScale runs SGD on randomly initialized values so they do not yield
+        # exactly same result. For this reason, tolerance is very relaxed here.
+        self.assertTrue(torch.allclose(computed, expected, atol=1.0))
+
     def test_batch_compute_deltas(self):
         specgram = torch.randn(2, 31, 2786)
 
@@ -572,7 +590,7 @@ class TestLibrosaConsistency(unittest.TestCase):
         spec_lr = torch.from_numpy(spec_lr[None, ...])
 
         # Align dimensions
-        # librosa does not return power spectrogram
+        # librosa does not return power spectrogram while torchaudio returns power spectrogram
         spec_orig = spec_orig.sqrt()
         spec_ta = spec_ta.sqrt()
 

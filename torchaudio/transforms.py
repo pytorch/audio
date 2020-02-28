@@ -281,12 +281,14 @@ class InverseMelScale(torch.nn.Module):
             torch.Tensor: Linear scale spectrogram of size (channel, freq, time)
         """
         freq, _ = self.fb.size()  # (freq, n_mels)
-        *batch, n_mels, time = melspec.size()
+        shape = melspec.size()
+        n_mels, time = shape[-2], shape[-1]
         melspec = melspec.transpose(-1, -2)
 
         assert self.n_mels == n_mels
 
-        specgram = torch.rand(*batch, time, freq, requires_grad=True,
+        spec_shape = list(shape[:-2]) + [time, freq]
+        specgram = torch.rand(spec_shape, requires_grad=True,
                               dtype=melspec.dtype, device=melspec.device)
 
         optim = torch.optim.SGD([specgram], **self.sgdargs)
