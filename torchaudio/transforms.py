@@ -298,13 +298,15 @@ class InverseMelScale(torch.nn.Module):
         for _ in range(self.max_iter):
             optim.zero_grad()
             diff = melspec - specgram.matmul(self.fb)
-            new_loss = diff.pow(2).sum()
+            new_loss = diff.pow(2).sum(axis=2).mean()
             new_loss.backward()
             optim.step()
             specgram.data = specgram.data.clamp(min=0)
 
-            if new_loss < self.tolerance_loss and new_loss - loss < self.tolerance_change:
+            new_loss = new_loss.item()
+            if new_loss < self.tolerance_loss or abs(loss - new_loss) < self.tolerance_change:
                 break
+            loss = new_loss
 
         specgram.requires_grad_(False)
         specgram = specgram.clamp(min=0).transpose(-1, -2)
