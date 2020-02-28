@@ -579,7 +579,7 @@ class Fade(torch.nn.Module):
                 overriding_fade_in_len=None,
                 overriding_fade_out_len=None,
                 overriding_fade_shape=None):
-        # type: (Tensor, Optional[float], Optional[float], Optional[str]) -> Tensor
+        # type: (Tensor, Optional[int], Optional[int], Optional[str]) -> Tensor
         r"""
         Args:
             waveform (torch.Tensor): The input signal of dimension (..., time)
