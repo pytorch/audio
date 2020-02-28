@@ -275,10 +275,10 @@ class InverseMelScale(torch.nn.Module):
     def forward(self, melspec):
         r"""
         Args:
-            melspec (torch.Tensor): A Mel frequency spectrogram of dimension (channel, ``n_mels``, time)
+            melspec (torch.Tensor): A Mel frequency spectrogram of dimension (..., ``n_mels``, time)
 
         Returns:
-            torch.Tensor: Linear scale spectrogram of size (channel, freq, time)
+            torch.Tensor: Linear scale spectrogram of size (..., freq, time)
         """
         # pack batch
         shape = melspec.size()
@@ -298,7 +298,9 @@ class InverseMelScale(torch.nn.Module):
         for _ in range(self.max_iter):
             optim.zero_grad()
             diff = melspec - specgram.matmul(self.fb)
-            new_loss = diff.pow(2).sum(axis=2).mean()
+            new_loss = diff.pow(2).sum(axis=-1).mean()
+            # take sum over mel-frequency then average over other dimensions
+            # so that loss threshold is applied par unit timeframe
             new_loss.backward()
             optim.step()
             specgram.data = specgram.data.clamp(min=0)
