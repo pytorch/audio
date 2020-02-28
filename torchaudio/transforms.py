@@ -593,7 +593,8 @@ class Fade(torch.nn.Module):
         Returns:
             torch.Tensor: Output signal of dimension (..., time)
         """
-        self.n_audios, self.waveform_length = waveform.size()
+        shape = waveform.size()
+        self.waveform_length = shape[-1]
 
         self.fade_in_len = self.fixed_fade_in_len
         if overriding_fade_in_len:
@@ -628,7 +629,7 @@ class Fade(torch.nn.Module):
         if self.fade_shape == "h":
             fade = torch.sin(fade * math.pi - math.pi / 2) / 2 + 0.5
 
-        return torch.cat((fade, ones)).repeat(self.n_audios, 1).clamp_(0, 1)
+        return torch.cat((fade, ones)).clamp_(0, 1)
 
     def _fade_out(self):
         fade = torch.linspace(0, 1, self.fade_out_len)
@@ -649,7 +650,7 @@ class Fade(torch.nn.Module):
         if self.fade_shape == "h":
             fade = torch.sin(fade * math.pi + math.pi / 2) / 2 + 0.5
 
-        return torch.cat((ones, fade)).repeat(self.n_audios, 1).clamp_(0, 1)
+        return torch.cat((ones, fade)).clamp_(0, 1)
 
 
 class _AxisMasking(torch.nn.Module):
