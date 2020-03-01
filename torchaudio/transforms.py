@@ -21,6 +21,7 @@ __all__ = [
     'Resample',
     'ComplexNorm',
     'TimeStretch',
+    'Fade',
     'FrequencyMasking',
     'TimeMasking',
 ]
