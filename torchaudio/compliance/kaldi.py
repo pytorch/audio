@@ -194,7 +194,7 @@ def _subtract_column_mean(tensor, subtract_mean):
 
 
 def spectrogram(
-        waveform, blackman_coeff=0.42, channel=-1, dither=1.0, energy_floor=0.0,
+        waveform, blackman_coeff=0.42, channel=-1, dither=0.0, energy_floor=1.0,
         frame_length=25.0, frame_shift=10.0, min_duration=0.0,
         preemphasis_coefficient=0.97, raw_energy=True, remove_dc_offset=True,
         round_to_power_of_two=True, sample_frequency=16000.0, snip_edges=True,
@@ -429,7 +429,7 @@ def get_mel_banks(num_bins, window_length_padded, sample_freq,
 
 
 def fbank(
-        waveform, blackman_coeff=0.42, channel=-1, dither=1.0, energy_floor=0.0,
+        waveform, blackman_coeff=0.42, channel=-1, dither=0.0, energy_floor=1.0,
         frame_length=25.0, frame_shift=10.0, high_freq=0.0, htk_compat=False, low_freq=20.0,
         min_duration=0.0, num_mel_bins=23, preemphasis_coefficient=0.97, raw_energy=True,
         remove_dc_offset=True, round_to_power_of_two=True, sample_frequency=16000.0,
@@ -547,8 +547,8 @@ def _get_lifter_coeffs(num_ceps, cepstral_lifter):
 
 
 def mfcc(
-        waveform, blackman_coeff=0.42, cepstral_lifter=22.0, channel=-1, dither=1.0,
-        energy_floor=0.0, frame_length=25.0, frame_shift=10.0, high_freq=0.0, htk_compat=False,
+        waveform, blackman_coeff=0.42, cepstral_lifter=22.0, channel=-1, dither=0.0,
+        energy_floor=1.0, frame_length=25.0, frame_shift=10.0, high_freq=0.0, htk_compat=False,
         low_freq=20.0, num_ceps=13, min_duration=0.0, num_mel_bins=23, preemphasis_coefficient=0.97,
         raw_energy=True, remove_dc_offset=True, round_to_power_of_two=True,
         sample_frequency=16000.0, snip_edges=True, subtract_mean=False, use_energy=False,
