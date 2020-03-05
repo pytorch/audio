@@ -534,11 +534,11 @@ class Tester(unittest.TestCase):
         self.assertTrue(torch.allclose(computed, expected))
 
     def test_scriptmodule_Fade(self):
-        tensor = torch.rand((1, 10000))
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
         fade_in_len = 3000
         fade_out_len = 3000
 
-        _test_script_module(transforms.Fade, tensor, fade_in_len, fade_out_len)
+        _test_script_module(transforms.Fade, waveform, fade_in_len, fade_out_len)
 
     def test_scriptmodule_FrequencyMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
