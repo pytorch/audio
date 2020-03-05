@@ -83,6 +83,11 @@ Functions to perform common audio operations.
 
 .. autofunction:: highpass_biquad
 
+:hidden:`allpass_biquad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: allpass_biquad
+
 :hidden:`equalizer_biquad`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
