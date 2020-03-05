@@ -610,7 +610,7 @@ class TimeStretch(torch.nn.Module):
 
         n_fft = (n_freq - 1) * 2
         hop_length = hop_length if hop_length is not None else n_fft // 2
-        self.phase_advance = torch.linspace(0, math.pi * hop_length, n_freq)[..., None]
+        self.register_buffer('phase_advance', torch.linspace(0, math.pi * hop_length, n_freq)[..., None])
 
     def forward(self, complex_specgrams, overriding_rate=None):
         # type: (Tensor, Optional[float]) -> Tensor
