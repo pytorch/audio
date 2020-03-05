@@ -207,10 +207,10 @@ def spectrogram(
         blackman_coeff (float): Constant coefficient for generalized Blackman window. (Default: ``0.42``)
         channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (Default: ``-1``)
         dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
-            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``1.0``)
+            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``0.0``)
         energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
             this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
-            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (Default: ``0.0``)
+            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (Default: ``1.0``)
         frame_length (float): Frame length in milliseconds (Default: ``25.0``)
         frame_shift (float): Frame shift in milliseconds (Default: ``10.0``)
         min_duration (float): Minimum duration of segments to process (in seconds). (Default: ``0.0``)
@@ -443,10 +443,10 @@ def fbank(
         blackman_coeff (float): Constant coefficient for generalized Blackman window. (Default: ``0.42``)
         channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (Default: ``-1``)
         dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
-            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``1.0``)
+            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``0.0``)
         energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
             this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
-            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (Default: ``0.0``)
+            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (Default: ``1.0``)
         frame_length (float): Frame length in milliseconds (Default: ``25.0``)
         frame_shift (float): Frame shift in milliseconds (Default: ``10.0``)
         high_freq (float): High cutoff frequency for mel bins (if <= 0, offset from Nyquist) (Default: ``0.0``)
@@ -562,10 +562,10 @@ def mfcc(
         cepstral_lifter (float): Constant that controls scaling of MFCCs (Default: ``22.0``)
         channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (Default: ``-1``)
         dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
-            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``1.0``)
+            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``0.0``)
         energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
             this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
-            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (Default: ``0.0``)
+            individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (Default: ``1.0``)
         frame_length (float): Frame length in milliseconds (Default: ``25.0``)
         frame_shift (float): Frame shift in milliseconds (Default: ``10.0``)
         high_freq (float): High cutoff frequency for mel bins (if <= 0, offset from Nyquist) (Default: ``0.0``)
