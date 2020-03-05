@@ -321,10 +321,10 @@ class Tester(unittest.TestCase):
 
     def test_scriptmodule_Resample(self):
         tensor = torch.rand((2, 1000))
-        sample_rate = 100
-        sample_rate_2 = 50
+        sample_rate = 100.
+        sample_rate_2 = 50.
 
-        _test_script_module(transforms.Spectrogram, tensor, sample_rate, sample_rate_2)
+        _test_script_module(transforms.Resample, tensor, sample_rate, sample_rate_2)
 
     def test_batch_Resample(self):
         waveform = torch.randn(2, 2786)
@@ -409,6 +409,25 @@ class Tester(unittest.TestCase):
         # shape = (3, 2, 201, 1394)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
+
+    def test_batch_InverseMelScale(self):
+        n_fft = 8
+        n_mels = 32
+        n_stft = 5
+        mel_spec = torch.randn(2, n_mels, 32) ** 2
+
+        # Single then transform then batch
+        expected = transforms.InverseMelScale(n_stft, n_mels)(mel_spec).repeat(3, 1, 1, 1)
+
+        # Batch then transform
+        computed = transforms.InverseMelScale(n_stft, n_mels)(mel_spec.repeat(3, 1, 1, 1))
+
+        # shape = (3, 2, n_mels, 32)
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+
+        # Because InverseMelScale runs SGD on randomly initialized values so they do not yield
+        # exactly same result. For this reason, tolerance is very relaxed here.
+        self.assertTrue(torch.allclose(computed, expected, atol=1.0))
 
     def test_batch_compute_deltas(self):
         specgram = torch.randn(2, 31, 2786)
@@ -521,6 +540,98 @@ class Tester(unittest.TestCase):
     def test_scriptmodule_TimeMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
         _test_script_module(transforms.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
+
+
+class TestLibrosaConsistency(unittest.TestCase):
+    test_dirpath = None
+    test_dir = None
+
+    @classmethod
+    def setUpClass(cls):
+        cls.test_dirpath, cls.test_dir = common_utils.create_temp_assets_dir()
+
+    def _to_librosa(self, sound):
+        return sound.cpu().numpy().squeeze()
+
+    def _get_sample_data(self, *asset_paths, **kwargs):
+        file_path = os.path.join(self.test_dirpath, 'assets', *asset_paths)
+
+        sound, sample_rate = torchaudio.load(file_path, **kwargs)
+        return sound.mean(dim=0, keepdim=True), sample_rate
+
+    @unittest.skipIf(not IMPORT_LIBROSA, 'Librosa is not available')
+    def test_MelScale(self):
+        """MelScale transform is comparable to that of librosa"""
+        n_fft = 2048
+        n_mels = 256
+        hop_length = n_fft // 4
+
+        # Prepare spectrogram input. We use torchaudio to compute one.
+        sound, sample_rate = self._get_sample_data('whitenoise_1min.mp3')
+        spec_ta = F.spectrogram(
+            sound, pad=0, window=torch.hann_window(n_fft), n_fft=n_fft,
+            hop_length=hop_length, win_length=n_fft, power=2, normalized=False)
+        spec_lr = spec_ta.cpu().numpy().squeeze()
+        # Perform MelScale with torchaudio and librosa
+        melspec_ta = transforms.MelScale(n_mels=n_mels, sample_rate=sample_rate)(spec_ta)
+        melspec_lr = librosa.feature.melspectrogram(
+            S=spec_lr, sr=sample_rate, n_fft=n_fft, hop_length=hop_length,
+            win_length=n_fft, center=True, window='hann', n_mels=n_mels, htk=True, norm=None)
+        # Note: Using relaxed rtol instead of atol
+        assert torch.allclose(melspec_ta, torch.from_numpy(melspec_lr[None, ...]), rtol=1e-3)
+
+    @unittest.skipIf(not IMPORT_LIBROSA, 'Librosa is not available')
+    def test_InverseMelScale(self):
+        """InverseMelScale transform is comparable to that of librosa"""
+        n_fft = 2048
+        n_mels = 256
+        n_stft = n_fft // 2 + 1
+        hop_length = n_fft // 4
+
+        # Prepare mel spectrogram input. We use torchaudio to compute one.
+        sound, sample_rate = self._get_sample_data(
+            'steam-train-whistle-daniel_simon.wav', offset=2**10, num_frames=2**14)
+        spec_orig = F.spectrogram(
+            sound, pad=0, window=torch.hann_window(n_fft), n_fft=n_fft,
+            hop_length=hop_length, win_length=n_fft, power=2, normalized=False)
+        melspec_ta = transforms.MelScale(n_mels=n_mels, sample_rate=sample_rate)(spec_orig)
+        melspec_lr = melspec_ta.cpu().numpy().squeeze()
+        # Perform InverseMelScale with torch audio and librosa
+        spec_ta = transforms.InverseMelScale(
+            n_stft, n_mels=n_mels, sample_rate=sample_rate)(melspec_ta)
+        spec_lr = librosa.feature.inverse.mel_to_stft(
+            melspec_lr, sr=sample_rate, n_fft=n_fft, power=2.0, htk=True, norm=None)
+        spec_lr = torch.from_numpy(spec_lr[None, ...])
+
+        # Align dimensions
+        # librosa does not return power spectrogram while torchaudio returns power spectrogram
+        spec_orig = spec_orig.sqrt()
+        spec_ta = spec_ta.sqrt()
+
+        threshold = 2.0
+        # This threshold was choosen empirically, based on the following observation
+        #
+        # torch.dist(spec_lr, spec_ta, p=float('inf'))
+        # >>> tensor(1.9666)
+        #
+        # The spectrograms reconstructed by librosa and torchaudio are not very comparable elementwise.
+        # This is because they use different approximation algorithms and resulting values can live
+        # in different magnitude. (although most of them are very close)
+        # See https://github.com/pytorch/audio/pull/366 for the discussion of the choice of algorithm
+        # See https://github.com/pytorch/audio/pull/448/files#r385747021 for the distribution of P-inf
+        # distance over frequencies.
+        assert torch.allclose(spec_ta, spec_lr, atol=threshold)
+
+        threshold = 1700.0
+        # This threshold was choosen empirically, based on the following observations
+        #
+        # torch.dist(spec_orig, spec_ta, p=1)
+        # >>> tensor(1644.3516)
+        # torch.dist(spec_orig, spec_lr, p=1)
+        # >>> tensor(1420.7103)
+        # torch.dist(spec_lr, spec_ta, p=1)
+        # >>> tensor(943.2759)
+        assert torch.dist(spec_orig, spec_ta, p=1) < threshold
 
 
 if __name__ == '__main__':
