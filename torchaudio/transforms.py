@@ -592,7 +592,7 @@ class ComputeDeltas(torch.nn.Module):
         return F.compute_deltas(specgram, win_length=self.win_length, mode=self.mode)
 
 
-class TimeStretch(torch.jit.ScriptModule):
+class TimeStretch(torch.nn.Module):
     r"""Stretch stft in time without modifying pitch for a given rate.
 
     Args:
@@ -610,8 +610,7 @@ class TimeStretch(torch.jit.ScriptModule):
 
         n_fft = (n_freq - 1) * 2
         hop_length = hop_length if hop_length is not None else n_fft // 2
-        phase_advance = torch.linspace(0, math.pi * hop_length, n_freq)[..., None]
-        self.phase_advance = torch.jit.Attribute(phase_advance, torch.Tensor)
+        self.phase_advance = torch.linspace(0, math.pi * hop_length, n_freq)[..., None]
 
     def forward(self, complex_specgrams, overriding_rate=None):
         # type: (Tensor, Optional[float]) -> Tensor
