@@ -646,7 +646,7 @@ class PitchShift(torch.nn.Module):
 
     Args:
         sample_rate(int): Waveform sampling rate.
-        fixed_n_steps(int, optional): How many (fractional) half-steps to shift waveform. (Default: ``None``)
+        n_steps(int, optional): How many (fractional) half-steps to shift waveform. (Default: ``4``)
         bins_per_octave(int, optional): How many steps per octave. (Default: ``12``)
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
         win_length (int, optional): Window size. (Default: ``n_fft``)
@@ -655,16 +655,16 @@ class PitchShift(torch.nn.Module):
 
     def __init__(self,
                  sample_rate,
-                 fixed_n_steps=None,
+                 n_steps=4,
                  bins_per_octave=12,
                  n_fft=400,
                  win_length=None,
-                 hop_length=None
+                 hop_length=None,
                  ):
         super(PitchShift, self).__init__()
 
         self.sample_rate = sample_rate
-        self.fixed_n_steps = fixed_n_steps
+        self.n_steps = n_steps
         self.bins_per_octave = bins_per_octave
         self.n_fft = n_fft
         self.win_length = win_length
@@ -684,38 +684,28 @@ class PitchShift(torch.nn.Module):
                                        hop_length=self.hop_length)
 
         n_freq = n_fft // 2 + 1
-        self.TimeStretch = TimeStretch(hop_length=self.hop_length, n_freq=n_freq)
+        self.rate = 2.0 ** (-n_steps / self.bins_per_octave)
 
-    def forward(self, waveform, overriding_n_steps=None):
-        # type: (Tensor, Optional[float]) -> Tensor
+        self.TimeStretch = TimeStretch(hop_length=self.hop_length, n_freq=n_freq, fixed_rate=self.rate)
+        self.Resample = Resample(self.sample_rate / self.rate, self.sample_rate)
+
+    def forward(self, waveform):
+        # type: (Tensor) -> Tensor
         r"""
         Args:
             waveform (torch.Tensor): Tensor of audio of dimension (..., time).
-            overriding_n_steps (float or None, optional): Pitch shift apply to this batch.
-                If no overriding_n_steps is passed, use ``self.fixed_rate`` (Default: ``None``).
 
         Returns:
-            torch.Tensor: Output signal of dimension (..., time).
+            torch.Tensor: Tensor of audio of dimension (..., time).
         """
-        if overriding_n_steps is None:
-            n_steps = self.fixed_n_steps
-            if n_steps is None:
-                raise ValueError("If no fixed_n_steps is specified"
-                                 ", must pass a valid n_step to the forward method.")
-        else:
-            n_steps = overriding_n_steps
-
-        rate = 2.0 ** (-float(n_steps) / self.bins_per_octave)
-        ResampleWavform = Resample(float(self.sample_rate) / rate, self.sample_rate)
-
         complex_specgrams = self.Spectrogram(waveform)
-        complex_specgrams_stretch = self.TimeStretch(complex_specgrams, overriding_rate=rate)
+        complex_specgrams_stretch = self.TimeStretch(complex_specgrams)
         waveform_stretch = F.istft(complex_specgrams_stretch,
                                    n_fft=self.n_fft,
                                    hop_length=self.hop_length,
                                    win_length=self.win_length)
 
-        waveform_shift = ResampleWavform(waveform_stretch)
+        waveform_shift = self.Resample(waveform_stretch)
 
         waveform_length = waveform.size(-1)
         waveform_shift_length = waveform_shift.size(-1)
