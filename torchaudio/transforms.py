@@ -669,8 +669,7 @@ class Fade(torch.nn.Module):
         Returns:
             torch.Tensor: Output signal of dimension (..., time)
         """
-        shape = waveform.size()
-        waveform_length = shape[-1]
+        waveform_length = waveform.size()[-1]
 
         return self._fade_in(waveform_length) * self._fade_out(waveform_length) * waveform
 
