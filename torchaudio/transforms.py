@@ -645,60 +645,39 @@ class Fade(torch.nn.Module):
     r"""Add a fade in and/or fade out to an waveform.
 
     Args:
-        fixed_fade_in_len (int, optional): Length of fade-in (time frames). (Default: ``0``)
-        fixed_fade_out_len (int, optional): Length of fade-out (time frames). (Default: ``0``)
-        fixed_fade_shape (str, optional): Shape of fade. Must be one of:
+        fade_in_len (int, optional): Length of fade-in (time frames). (Default: ``0``)
+        fade_out_len (int, optional): Length of fade-out (time frames). (Default: ``0``)
+        fade_shape (str, optional): Shape of fade. Must be one of:
                                                     "q" for quarter sine,
                                                     "h" for half sine,
                                                     "t" for linear,
                                                     "l" for logarithmic
                                                     "e" for exponential. (Default: ``"t"``)
     """
-    def __init__(self, fixed_fade_in_len=0, fixed_fade_out_len=0, fixed_fade_shape="t"):
+    def __init__(self, fade_in_len=0, fade_out_len=0, fade_shape="t"):
         super(Fade, self).__init__()
-        self.fixed_fade_in_len = fixed_fade_in_len
-        self.fixed_fade_out_len = fixed_fade_out_len
-        self.fixed_fade_shape = fixed_fade_shape
+        self.fade_in_len = fade_in_len
+        self.fade_out_len = fade_out_len
+        self.fade_shape = fade_shape
 
-    def forward(self,
-                waveform,
-                overriding_fade_in_len=None,
-                overriding_fade_out_len=None,
-                overriding_fade_shape=None):
-        # type: (Tensor, Optional[int], Optional[int], Optional[str]) -> Tensor
+    def forward(self, waveform):
+        # type: (Tensor) -> Tensor
         r"""
         Args:
             waveform (torch.Tensor): The input signal of dimension (..., time)
-            overriding_fade_in_len (int, optional): Length of fade-in (time frames) to apply to this batch.
-                If no fade_in_len is passed, use ``self.fixed_fade_in_len``. (Default: ``None``)
-            overriding_fade_out_len (int, optional): Length of fade-out (time frames) to apply to this batch.
-                If no fade_out_len is passed, use ``self.fixed_fade_out_len``. (Default: ``None``)
-            overriding_fade_shape (str, optional): Shape of fade to apply to this batch.
-                If no fade_shape is passed, use ``self.fixed_fade_shape``. (Default: ``None``)
 
         Returns:
             torch.Tensor: Output signal of dimension (..., time)
         """
         shape = waveform.size()
-        self.waveform_length = shape[-1]
+        waveform_length = shape[-1]
 
-        self.fade_in_len = self.fixed_fade_in_len
-        if overriding_fade_in_len:
-            self.fade_in_len = overriding_fade_in_len
+        return self._fade_in(waveform_length) * self._fade_out(waveform_length) * waveform
 
-        self.fade_out_len = self.fixed_fade_out_len
-        if overriding_fade_out_len:
-            self.fade_out_len = overriding_fade_out_len
-
-        self.fade_shape = self.fixed_fade_shape
-        if overriding_fade_shape:
-            self.fade_shape = overriding_fade_shape
-
-        return self._fade_in() * self._fade_out() * waveform
-
-    def _fade_in(self):
+    def _fade_in(self, waveform_length):
+        # type: (int) -> Tensor
         fade = torch.linspace(0, 1, self.fade_in_len)
-        ones = torch.ones(self.waveform_length - self.fade_in_len)
+        ones = torch.ones(waveform_length - self.fade_in_len)
 
         if self.fade_shape == "t":
             fade = fade
@@ -717,9 +696,10 @@ class Fade(torch.nn.Module):
 
         return torch.cat((fade, ones)).clamp_(0, 1)
 
-    def _fade_out(self):
+    def _fade_out(self, waveform_length):
+        # type: (int) -> Tensor
         fade = torch.linspace(0, 1, self.fade_out_len)
-        ones = torch.ones(self.waveform_length - self.fade_out_len)
+        ones = torch.ones(waveform_length - self.fade_out_len)
 
         if self.fade_shape == "t":
             fade = - fade + 1
