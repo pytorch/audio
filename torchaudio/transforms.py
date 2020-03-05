@@ -664,10 +664,10 @@ class Fade(torch.nn.Module):
         # type: (Tensor) -> Tensor
         r"""
         Args:
-            waveform (torch.Tensor): The input signal of dimension (..., time)
+            waveform (torch.Tensor): Tensor of audio of dimension (..., time).
 
         Returns:
-            torch.Tensor: Output signal of dimension (..., time)
+            torch.Tensor: Tensor of audio of dimension (..., time).
         """
         waveform_length = waveform.size()[-1]
 
