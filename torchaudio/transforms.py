@@ -137,7 +137,7 @@ class GriffinLim(torch.nn.Module):
                             self.normalized, self.n_iter, self.momentum, self.length, self.rand_init)
 
 
-class AmplitudeToDB(torch.jit.ScriptModule):
+class AmplitudeToDB(torch.nn.Module):
     r"""Turn a tensor from the power/amplitude scale to the decibel scale.
 
     This output depends on the maximum value in the input tensor, and so
@@ -157,7 +157,7 @@ class AmplitudeToDB(torch.jit.ScriptModule):
         self.stype = stype
         if top_db is not None and top_db < 0:
             raise ValueError('top_db must be positive value')
-        self.top_db = torch.jit.Attribute(top_db, Optional[float])
+        self.top_db = top_db
         self.multiplier = 10.0 if stype == 'power' else 20.0
         self.amin = 1e-10
         self.ref_value = 1.0
