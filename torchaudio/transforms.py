@@ -647,14 +647,10 @@ class Fade(torch.nn.Module):
     Args:
         fade_in_len (int, optional): Length of fade-in (time frames). (Default: ``0``)
         fade_out_len (int, optional): Length of fade-out (time frames). (Default: ``0``)
-        fade_shape (str, optional): Shape of fade. Must be one of:
-                                                    "q" for quarter sine,
-                                                    "h" for half sine,
-                                                    "t" for linear,
-                                                    "l" for logarithmic
-                                                    "e" for exponential. (Default: ``"t"``)
+        fade_shape (str, optional): Shape of fade. Must be one of: "quarter_sine",
+            "half_sine", "linear", "logarithmic", "exponential". (Default: ``"linear"``)
     """
-    def __init__(self, fade_in_len=0, fade_out_len=0, fade_shape="t"):
+    def __init__(self, fade_in_len=0, fade_out_len=0, fade_shape="linear"):
         super(Fade, self).__init__()
         self.fade_in_len = fade_in_len
         self.fade_out_len = fade_out_len
@@ -678,19 +674,19 @@ class Fade(torch.nn.Module):
         fade = torch.linspace(0, 1, self.fade_in_len)
         ones = torch.ones(waveform_length - self.fade_in_len)
 
-        if self.fade_shape == "t":
+        if self.fade_shape == "linear":
             fade = fade
 
-        if self.fade_shape == "e":
+        if self.fade_shape == "exponential":
             fade = torch.pow(2, (fade - 1)) * fade
 
-        if self.fade_shape == "l":
+        if self.fade_shape == "logarithmic":
             fade = torch.log10(.1 + fade) + 1
 
-        if self.fade_shape == "q":
+        if self.fade_shape == "quarter_sine":
             fade = torch.sin(fade * math.pi / 2)
 
-        if self.fade_shape == "h":
+        if self.fade_shape == "half_sine":
             fade = torch.sin(fade * math.pi - math.pi / 2) / 2 + 0.5
 
         return torch.cat((fade, ones)).clamp_(0, 1)
@@ -700,19 +696,19 @@ class Fade(torch.nn.Module):
         fade = torch.linspace(0, 1, self.fade_out_len)
         ones = torch.ones(waveform_length - self.fade_out_len)
 
-        if self.fade_shape == "t":
+        if self.fade_shape == "linear":
             fade = - fade + 1
 
-        if self.fade_shape == "e":
+        if self.fade_shape == "exponential":
             fade = torch.pow(2, - fade) * (1 - fade)
 
-        if self.fade_shape == "l":
+        if self.fade_shape == "logarithmic":
             fade = torch.log10(1.1 - fade) + 1
 
-        if self.fade_shape == "q":
+        if self.fade_shape == "quarter_sine":
             fade = torch.sin(fade * math.pi / 2 + math.pi / 2)
 
-        if self.fade_shape == "h":
+        if self.fade_shape == "half_sine":
             fade = torch.sin(fade * math.pi + math.pi / 2) / 2 + 0.5
 
         return torch.cat((ones, fade)).clamp_(0, 1)
