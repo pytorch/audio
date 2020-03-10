@@ -549,6 +549,27 @@ class Tester(unittest.TestCase):
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected, atol=1e-5))
 
+    def test_batch_Fade(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+        fade_in_len = 3000
+        fade_out_len = 3000
+
+        # Single then transform then batch
+        expected = transforms.Fade(fade_in_len, fade_out_len)(waveform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = transforms.Fade(fade_in_len, fade_out_len)(waveform.repeat(3, 1, 1))
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
+    def test_scriptmodule_Fade(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+        fade_in_len = 3000
+        fade_out_len = 3000
+
+        _test_script_module(transforms.Fade, waveform, fade_in_len, fade_out_len)
+
     def test_scriptmodule_FrequencyMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
         _test_script_module(transforms.FrequencyMasking, tensor, freq_mask_param=60, iid_masks=False)

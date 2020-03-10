@@ -22,6 +22,7 @@ __all__ = [
     'Resample',
     'ComplexNorm',
     'TimeStretch',
+    'Fade',
     'FrequencyMasking',
     'TimeMasking',
 ]
@@ -637,6 +638,79 @@ class TimeStretch(torch.nn.Module):
             return complex_specgrams
 
         return F.phase_vocoder(complex_specgrams, rate, self.phase_advance)
+
+
+class Fade(torch.nn.Module):
+    r"""Add a fade in and/or fade out to an waveform.
+
+    Args:
+        fade_in_len (int, optional): Length of fade-in (time frames). (Default: ``0``)
+        fade_out_len (int, optional): Length of fade-out (time frames). (Default: ``0``)
+        fade_shape (str, optional): Shape of fade. Must be one of: "quarter_sine",
+            "half_sine", "linear", "logarithmic", "exponential". (Default: ``"linear"``)
+    """
+    def __init__(self, fade_in_len=0, fade_out_len=0, fade_shape="linear"):
+        super(Fade, self).__init__()
+        self.fade_in_len = fade_in_len
+        self.fade_out_len = fade_out_len
+        self.fade_shape = fade_shape
+
+    def forward(self, waveform):
+        # type: (Tensor) -> Tensor
+        r"""
+        Args:
+            waveform (torch.Tensor): Tensor of audio of dimension (..., time).
+
+        Returns:
+            torch.Tensor: Tensor of audio of dimension (..., time).
+        """
+        waveform_length = waveform.size()[-1]
+
+        return self._fade_in(waveform_length) * self._fade_out(waveform_length) * waveform
+
+    def _fade_in(self, waveform_length):
+        # type: (int) -> Tensor
+        fade = torch.linspace(0, 1, self.fade_in_len)
+        ones = torch.ones(waveform_length - self.fade_in_len)
+
+        if self.fade_shape == "linear":
+            fade = fade
+
+        if self.fade_shape == "exponential":
+            fade = torch.pow(2, (fade - 1)) * fade
+
+        if self.fade_shape == "logarithmic":
+            fade = torch.log10(.1 + fade) + 1
+
+        if self.fade_shape == "quarter_sine":
+            fade = torch.sin(fade * math.pi / 2)
+
+        if self.fade_shape == "half_sine":
+            fade = torch.sin(fade * math.pi - math.pi / 2) / 2 + 0.5
+
+        return torch.cat((fade, ones)).clamp_(0, 1)
+
+    def _fade_out(self, waveform_length):
+        # type: (int) -> Tensor
+        fade = torch.linspace(0, 1, self.fade_out_len)
+        ones = torch.ones(waveform_length - self.fade_out_len)
+
+        if self.fade_shape == "linear":
+            fade = - fade + 1
+
+        if self.fade_shape == "exponential":
+            fade = torch.pow(2, - fade) * (1 - fade)
+
+        if self.fade_shape == "logarithmic":
+            fade = torch.log10(1.1 - fade) + 1
+
+        if self.fade_shape == "quarter_sine":
+            fade = torch.sin(fade * math.pi / 2 + math.pi / 2)
+
+        if self.fade_shape == "half_sine":
+            fade = torch.sin(fade * math.pi + math.pi / 2) / 2 + 0.5
+
+        return torch.cat((ones, fade)).clamp_(0, 1)
 
 
 class _AxisMasking(torch.nn.Module):
