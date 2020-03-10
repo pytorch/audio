@@ -228,6 +228,22 @@ class Test_SoxEffectsChain(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             E.sox_build_flow_effects()
 
+    def test_fade(self):
+        x_orig, _ = torchaudio.load(self.test_filepath)
+        fade_in_len = 44100
+        fade_out_len = 44100
+
+        for fade_shape_sox, fade_shape_torchaudio in (("q", "quarter_sine"), ("h", "half_sine"), ("t", "linear")):
+            E = torchaudio.sox_effects.SoxEffectsChain()
+            E.set_input_file(self.test_filepath)
+            E.append_effect_to_chain("fade", [fade_shape_sox, 1, "0", 1])
+            x, sr = E.sox_build_flow_effects()
+
+            fade = torchaudio.transforms.Fade(fade_in_len, fade_out_len, fade_shape_torchaudio)
+
+            # check if effect worked
+            self.assertTrue(x.allclose(fade(x_orig), rtol=1e-4, atol=1e-4))
+
 
 if __name__ == '__main__':
     unittest.main()
