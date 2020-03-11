@@ -5,20 +5,15 @@ __all_ = ["Wav2Letter", "wav2letter"]
 
 
 class Wav2Letter(nn.Module):
-    r"""Create the Mel-frequency cepstrum coefficients from an audio signal.
-
-    By default, this calculates the MFCC on the DB-scaled Mel spectrogram.
-    This is not the textbook implementation, but is implemented here to
-    give consistency with librosa.
-
-    This output depends on the maximum value in the input spectrogram, and so
-    may return different values for an audio clip split into snippets vs. a
-    a full clip.
+    r"""Wav2Letter model architecture from the `"Wav2Letter: an End-to-End ConvNet-based Speech Recognition System"
+     <https://arxiv.org/abs/1609.03193>`_ paper.
 
     Args:
-        num_classes (int, optional): . (Default: ``40``)
-        version (str, optional):. (Default: ``waveform``)
-        n_input_features (int, optional): . (Default: ``None``)
+        num_classes (int, optional): Number of classes to be classified. (Default: ``40``)
+        version (str, optional): Wav2Letter can use as input: ``waveform``, ```power_spectrum``
+         or ```mfcc``. (Default: ``waveform``)
+        n_input_features (int, optional): If is used ``power_spectrum`` or ```mfcc`` must be
+        specified the number of features that were extracted. (Default: ``None``)
     """
 
     def __init__(self, num_classes=40, version="waveform", n_input_features=None):
@@ -64,10 +59,10 @@ class Wav2Letter(nn.Module):
         # type: (Tensor) -> Tensor
         r"""
         Args:
-            x (torch.Tensor):
+            x (torch.Tensor): Tensor of dimension (batch_size, n_features, input_length).
 
         Returns:
-            torch.Tensor:
+            torch.Tensor: Predictor tensor of dimension (input_length, batch_size, number_of_classes).
         """
 
         x = self.acoustic_model(x)
@@ -77,8 +72,8 @@ class Wav2Letter(nn.Module):
 
 
 def wav2letter(**kwargs):
-    r"""Wav2Letter model architecture from the
-    `"Wav2Letter: an End-to-End ConvNet-based Speech Recognition System" <https://arxiv.org/abs/1609.03193>`_ paper.
+    r"""Wav2Letter model architecture from the `"Wav2Letter: an End-to-End ConvNet-based Speech Recognition System"
+     <https://arxiv.org/abs/1609.03193>`_ paper.
     """
     model = Wav2Letter(**kwargs)
     return model
