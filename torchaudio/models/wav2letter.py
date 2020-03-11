@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-__all_ = ["Wav2Letter", "wav2letter"]
+__all__ = ["Wav2Letter", "wav2letter"]
 
 
 class Wav2Letter(nn.Module):
@@ -66,8 +66,8 @@ class Wav2Letter(nn.Module):
         """
 
         x = self.acoustic_model(x)
+        x = nn.functional.log_softmax(x, dim=1)
         x = x.permute(2, 0, 1)
-        x = nn.functional.log_softmax(x, dim=2)
         return x
 
 
