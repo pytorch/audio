@@ -89,6 +89,35 @@ class Tester(unittest.TestCase):
         spec = torch.rand((6, 201))
         _test_script_module(transforms.AmplitudeToDB, spec)
 
+    def test_batch_AmplitudeToDB(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+
+        # Single then transform then batch
+        expected = transforms.AmplitudeToDB()(waveform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = transforms.AmplitudeToDB()(waveform.repeat(3, 1, 1))
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
+    def test_AmplitudeToDB(self):
+        spec = torch.rand((6, 201))
+
+        # Power to DB
+        ta_out = transforms.AmplitudeToDB(stype='power', top_db=80)(spec)
+        lr_out = librosa.core.power_to_db(spec.numpy())
+        lr_out = torch.from_numpy(lr_out).unsqueeze(0)
+
+        self.assertTrue(torch.allclose(ta_out, lr_out, atol=5e-5))
+
+        # Amplitude to DB
+        ta_out =transforms.AmplitudeToDB(stype='magnitude', top_db=80)(spec)
+        lr_out = librosa.core.amplitude_to_db(spec.numpy())
+        lr_out = torch.from_numpy(lr_out).unsqueeze(0)
+
+        self.assertTrue(torch.allclose(ta_out, lr_out, atol=5e-5))
+
     def test_scriptmodule_MelScale(self):
         spec_f = torch.rand((1, 6, 201))
         _test_script_module(transforms.MelScale, spec_f)
