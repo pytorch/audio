@@ -101,23 +101,6 @@ class Tester(unittest.TestCase):
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
 
-    def test_AmplitudeToDB(self):
-        spec = torch.rand((6, 201))
-
-        # Power to DB
-        ta_out = transforms.AmplitudeToDB(stype='power', top_db=80)(spec)
-        lr_out = librosa.core.power_to_db(spec.numpy())
-        lr_out = torch.from_numpy(lr_out).unsqueeze(0)
-
-        self.assertTrue(torch.allclose(ta_out, lr_out, atol=5e-5))
-
-        # Amplitude to DB
-        ta_out =transforms.AmplitudeToDB(stype='magnitude', top_db=80)(spec)
-        lr_out = librosa.core.amplitude_to_db(spec.numpy())
-        lr_out = torch.from_numpy(lr_out).unsqueeze(0)
-
-        self.assertTrue(torch.allclose(ta_out, lr_out, atol=5e-5))
-
     def test_scriptmodule_MelScale(self):
         spec_f = torch.rand((1, 6, 201))
         _test_script_module(transforms.MelScale, spec_f)
@@ -272,6 +255,12 @@ class Tester(unittest.TestCase):
             db_torch = db_transform(spect_transform(sound)).squeeze().cpu()
             db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
             self.assertTrue(torch.allclose(db_torch, torch.from_numpy(db_librosa), atol=5e-3))
+
+            # test s2db
+            db_transform_mag = torchaudio.transforms.AmplitudeToDB('magnitude', 80.)
+            db_torch_mag = db_transform_mag(spect_transform(sound)).squeeze().cpu()
+            db_librosa_mag = librosa.core.spectrum.amplitude_to_db(out_librosa)
+            self.assertTrue(torch.allclose(db_torch_mag, torch.from_numpy(db_librosa_mag), atol=5e-3))
 
             db_torch = db_transform(melspect_transform(sound)).squeeze().cpu()
             db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
