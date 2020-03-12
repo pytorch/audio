@@ -90,13 +90,13 @@ class Tester(unittest.TestCase):
         _test_script_module(transforms.AmplitudeToDB, spec)
 
     def test_batch_AmplitudeToDB(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
+        spec = torch.rand((6, 201))
 
         # Single then transform then batch
-        expected = transforms.AmplitudeToDB()(waveform).repeat(3, 1, 1)
+        expected = transforms.AmplitudeToDB()(spec).repeat(3, 1, 1)
 
         # Batch then transform
-        computed = transforms.AmplitudeToDB()(waveform.repeat(3, 1, 1))
+        computed = transforms.AmplitudeToDB()(spec.repeat(3, 1, 1))
 
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))

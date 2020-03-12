@@ -607,8 +607,6 @@ class TestFunctional(unittest.TestCase):
 
         self.assertTrue(torch.allclose(ta_out, lr_out, atol=5e-5))
 
-
-
     def test_torchscript_create_dct(self):
 
         n_mfcc = 40
