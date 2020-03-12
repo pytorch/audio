@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-__all__ = ["Wav2Letter", "wav2letter"]
+__all__ = ["Wav2Letter"]
 
 
 class Wav2Letter(nn.Module):
@@ -37,7 +37,7 @@ class Wav2Letter(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv1d(in_channels=250, out_channels=250, kernel_size=7, stride=1, padding=3),
             nn.ReLU(inplace=True),
-            nn.Conv1d(in_channels=250, out_channels=2000, kernel_size=32, stride=1, padding=15),
+            nn.Conv1d(in_channels=250, out_channels=2000, kernel_size=32, stride=1, padding=16),
             nn.ReLU(inplace=True),
             nn.Conv1d(in_channels=2000, out_channels=2000, kernel_size=1, stride=1, padding=0),
             nn.ReLU(inplace=True),
@@ -69,11 +69,3 @@ class Wav2Letter(nn.Module):
         x = nn.functional.log_softmax(x, dim=1)
         x = x.permute(2, 0, 1)
         return x
-
-
-def wav2letter(**kwargs):
-    r"""Wav2Letter model architecture from the `"Wav2Letter: an End-to-End ConvNet-based Speech Recognition System"
-     <https://arxiv.org/abs/1609.03193>`_ paper.
-    """
-    model = Wav2Letter(**kwargs)
-    return model
