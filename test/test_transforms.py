@@ -256,11 +256,13 @@ class Tester(unittest.TestCase):
             db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
             self.assertTrue(torch.allclose(db_torch, torch.from_numpy(db_librosa), atol=5e-3))
 
-            # test s2db
             db_transform_mag = torchaudio.transforms.AmplitudeToDB('magnitude', 80.)
             db_torch_mag = db_transform_mag(spect_transform(sound)).squeeze().cpu()
             db_librosa_mag = librosa.core.spectrum.amplitude_to_db(out_librosa)
             self.assertTrue(torch.allclose(db_torch_mag, torch.from_numpy(db_librosa_mag), atol=5e-3))
+
+            db_torch_mag = db_transform_mag(torch.sqrt(spect_transform(sound))).squeeze().cpu()
+            self.assertTrue(torch.allclose(db_torch_mag, db_torch, atol=5e-3))
 
             db_torch = db_transform(melspect_transform(sound)).squeeze().cpu()
             db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
