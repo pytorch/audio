@@ -270,12 +270,16 @@ class Tester(unittest.TestCase):
             mag_to_db_transform = torchaudio.transforms.AmplitudeToDB('magnitude', 80.)
             mag_to_db_torch = mag_to_db_transform(torch.abs(sound)).squeeze().cpu()
             mag_to_db_librosa = librosa.core.spectrum.amplitude_to_db(sound_librosa)
-            self.assertTrue(torch.allclose(mag_to_db_torch, torch.from_numpy(mag_to_db_librosa), atol=5e-3))
+            self.assertTrue(
+                torch.allclose(mag_to_db_torch, torch.from_numpy(mag_to_db_librosa), atol=5e-3)
+            )
 
             power_to_db_torch = power_to_db_transform(melspect_transform(sound)).squeeze().cpu()
             db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
             db_librosa_tensor = torch.from_numpy(db_librosa)
-            self.assertTrue(torch.allclose(power_to_db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3))
+            self.assertTrue(
+                torch.allclose(power_to_db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3)
+            )
 
             # test MFCC
             melkwargs = {'hop_length': hop_length, 'n_fft': n_fft}
