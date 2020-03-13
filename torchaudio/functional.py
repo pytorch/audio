@@ -23,6 +23,7 @@ __all__ = [
     "lowpass_biquad",
     "highpass_biquad",
     "allpass_biquad",
+    "bandpass_biquad",
     "equalizer_biquad",
     "biquad",
     'mask_along_axis',
@@ -818,6 +819,35 @@ def allpass_biquad(waveform, sample_rate, central_freq, Q=0.707):
     b0 = 1 - alpha
     b1 = -2 * math.cos(w0)
     b2 = 1 + alpha
+    a0 = 1 + alpha
+    a1 = -2 * math.cos(w0)
+    a2 = 1 - alpha
+    return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def bandpass_biquad(waveform, sample_rate, central_freq, Q=0.707):
+    # type: (Tensor, int, float, float) -> Tensor
+    r"""Design two-pole band-pass filter.  Similar to SoX implementation.
+
+    Args:
+        waveform(torch.Tensor): audio waveform of dimension of `(..., time)`
+        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
+        central_freq (float): central frequency (in Hz)
+        q_factor (float): https://en.wikipedia.org/wiki/Q_factor
+
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    """
+    w0 = 2 * math.pi * central_freq / sample_rate
+    alpha = math.sin(w0) / 2 / Q
+
+    b0 = math.sin(w0) / 2
+    b1 = 0
+    b2 = -math.sin(w0) / 2
     a0 = 1 + alpha
     a1 = -2 * math.cos(w0)
     a2 = 1 - alpha
