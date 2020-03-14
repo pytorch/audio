@@ -24,6 +24,7 @@ __all__ = [
     "highpass_biquad",
     "allpass_biquad",
     "bandpass_biquad",
+    "bandreject_biquad",
     "equalizer_biquad",
     "biquad",
     'mask_along_axis',
@@ -825,9 +826,41 @@ def allpass_biquad(waveform, sample_rate, central_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-def bandpass_biquad(waveform, sample_rate, central_freq, Q=0.707):
-    # type: (Tensor, int, float, float) -> Tensor
+def bandpass_biquad(waveform, sample_rate, central_freq, Q=0.707, use_csg=False):
+    # type: (Tensor, int, float, float, bool) -> Tensor
     r"""Design two-pole band-pass filter.  Similar to SoX implementation.
+
+    Args:
+        waveform(torch.Tensor): audio waveform of dimension of `(..., time)`
+        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
+        central_freq (float): central frequency (in Hz)
+        q_factor (float): https://en.wikipedia.org/wiki/Q_factor
+        use_csg (bool) : When True : uses a constant skirt gain (peak gain = Q)
+                        When False(default): uses a constant 0dB peak gain.
+
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    """
+    w0 = 2 * math.pi * central_freq / sample_rate
+    alpha = math.sin(w0) / 2 / Q
+
+    temp = math.sin(w0) / 2 if use_csg else alpha
+    b0 = temp
+    b1 = 0.
+    b2 = -temp
+    a0 = 1 + alpha
+    a1 = -2 * math.cos(w0)
+    a2 = 1 - alpha
+    return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def bandreject_biquad(waveform, sample_rate, central_freq, Q=0.707):
+    # type: (Tensor, int, float, float) -> Tensor
+    r"""Design two-pole band-reject filter.  Similar to SoX implementation.
 
     Args:
         waveform(torch.Tensor): audio waveform of dimension of `(..., time)`
@@ -845,9 +878,9 @@ def bandpass_biquad(waveform, sample_rate, central_freq, Q=0.707):
     w0 = 2 * math.pi * central_freq / sample_rate
     alpha = math.sin(w0) / 2 / Q
 
-    b0 = math.sin(w0) / 2
-    b1 = 0
-    b2 = -math.sin(w0) / 2
+    b0 = 1.
+    b1 = -2 * math.cos(w0)
+    b2 = 1.
     a0 = 1 + alpha
     a1 = -2 * math.cos(w0)
     a2 = 1 - alpha
