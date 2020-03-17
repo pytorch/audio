@@ -175,7 +175,7 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         CENTRAL_FREQ = 1000
         Q = 0.707
-        USE_CSG = True
+        CONST_SKIRT_GAIN = True
 
         noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
         E = torchaudio.sox_effects.SoxEffectsChain()
@@ -184,10 +184,10 @@ class TestFunctionalFiltering(unittest.TestCase):
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.bandpass_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, USE_CSG)
+        output_waveform = F.bandpass_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, CONST_SKIRT_GAIN)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.bandpass_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, USE_CSG)
+        _test_torchscript_functional(F.bandpass_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, CONST_SKIRT_GAIN)
 
     def test_bandpass_without_csg(self):
         """
@@ -196,7 +196,7 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         CENTRAL_FREQ = 1000
         Q = 0.707
-        USE_CSG = False
+        CONST_SKIRT_GAIN = False
 
         noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
         E = torchaudio.sox_effects.SoxEffectsChain()
@@ -205,10 +205,10 @@ class TestFunctionalFiltering(unittest.TestCase):
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.bandpass_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, USE_CSG)
+        output_waveform = F.bandpass_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, CONST_SKIRT_GAIN)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.bandpass_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, USE_CSG)
+        _test_torchscript_functional(F.bandpass_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, CONST_SKIRT_GAIN)
 
     def test_bandreject(self):
         """

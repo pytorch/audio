@@ -826,7 +826,7 @@ def allpass_biquad(waveform, sample_rate, central_freq, Q=0.707):
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
-def bandpass_biquad(waveform, sample_rate, central_freq, Q=0.707, use_csg=False):
+def bandpass_biquad(waveform, sample_rate, central_freq, Q=0.707, const_skirt_gain=False):
     # type: (Tensor, int, float, float, bool) -> Tensor
     r"""Design two-pole band-pass filter.  Similar to SoX implementation.
 
@@ -835,8 +835,8 @@ def bandpass_biquad(waveform, sample_rate, central_freq, Q=0.707, use_csg=False)
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
         central_freq (float): central frequency (in Hz)
         q_factor (float): https://en.wikipedia.org/wiki/Q_factor
-        use_csg (bool) : When True : uses a constant skirt gain (peak gain = Q)
-                        When False(default): uses a constant 0dB peak gain.
+        const_skirt_gain (bool) : If ``True``, uses a constant skirt gain (peak gain = Q).
+            If ``False``, uses a constant 0dB peak gain. (Default: ``False``)
 
     Returns:
         output_waveform (torch.Tensor): Dimension of `(..., time)`
@@ -848,7 +848,7 @@ def bandpass_biquad(waveform, sample_rate, central_freq, Q=0.707, use_csg=False)
     w0 = 2 * math.pi * central_freq / sample_rate
     alpha = math.sin(w0) / 2 / Q
 
-    temp = math.sin(w0) / 2 if use_csg else alpha
+    temp = math.sin(w0) / 2 if const_skirt_gain else alpha
     b0 = temp
     b1 = 0.
     b2 = -temp
