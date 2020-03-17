@@ -813,4 +813,10 @@ class Vol(torch.nn.Module):
             waveform_amp = torch.sqrt(torch.pow(10, 0.1 * waveform_db))
             waveform = waveform_amp / (torch.abs(waveform) + 1e-10) * waveform
 
+        if self.gain_type == "power":
+            waveform_power = torch.pow(10.0, (AmplitudeToDB("amplitude", top_db=80)(torch.abs(waveform)) / 10)) * self.gain
+            waveform_db = 10 * torch.log10(waveform_power)
+            waveform_amp = torch.sqrt(torch.pow(10, 0.1 * waveform_db))
+            waveform = waveform_amp / (torch.abs(waveform) + 1e-10) * waveform
+
         return waveform

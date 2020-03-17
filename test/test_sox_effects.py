@@ -247,7 +247,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
     def test_vol(self):
         x_orig, _ = torchaudio.load(self.test_filepath)
 
-        for gain, gain_type in ((1.1, "amplitude"), (2, "db")):
+        for gain, gain_type in ((1.1, "amplitude"), (2, "db"), (2, "power")):
             E = torchaudio.sox_effects.SoxEffectsChain()
             E.set_input_file(self.test_filepath)
             E.append_effect_to_chain("vol", [gain, gain_type])
