@@ -774,3 +774,37 @@ class TimeMasking(_AxisMasking):
 
     def __init__(self, time_mask_param, iid_masks=False):
         super(TimeMasking, self).__init__(time_mask_param, 2, iid_masks)
+
+
+class Vol(torch.nn.Module):
+    r"""Add a fade in and/or fade out to an waveform.
+
+    Args:
+        gain (float): Interpreted according to the given gain_type:
+            If `gain_type’ = ‘amplitude’, `gain’ is a positive amplitude ratio.
+            If `gain_type’ = ‘power’, `gain’ is a power (voltage squared).
+            If `gain_type’ = ‘db’, `gain’ is in decibels..
+        gain_type (str, optional): Type of gain. One of: ‘amplitude’, ‘power’, ‘db’ (Default: ``"amplitude"``)
+        limiter_gain (float, optional): If specified, a limiter is invoked on peaks greater
+         than limiter_gain’ to prevent clipping. `limiter_gain should be a positive value
+         much less than 1. (Default: ``None``)
+    """
+
+    def __init__(self, gain, gain_type='amplitude', limiter_gain=None):
+        super(Vol, self).__init__()
+        self.gain = gain
+        self.gain_type = gain_type
+        self.limiter_gain = limiter_gain
+
+    def forward(self, waveform):
+        # type: (Tensor) -> Tensor
+        r"""
+        Args:
+            waveform (torch.Tensor): Tensor of audio of dimension (..., time).
+
+        Returns:
+            torch.Tensor: Tensor of audio of dimension (..., time).
+        """
+        if self.gain_type == "amplitude":
+            waveform = waveform * self.gain
+        return waveform
