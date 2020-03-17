@@ -247,16 +247,16 @@ class Test_SoxEffectsChain(unittest.TestCase):
     def test_vol(self):
         x_orig, _ = torchaudio.load(self.test_filepath)
 
-        for gain, gain_type in ((1.1, "amplitude"),):
+        for gain, gain_type in ((1.1, "amplitude"), (2, "db")):
             E = torchaudio.sox_effects.SoxEffectsChain()
             E.set_input_file(self.test_filepath)
             E.append_effect_to_chain("vol", [gain, gain_type])
             x, sr = E.sox_build_flow_effects()
 
-            fade = torchaudio.transforms.Vol(gain, gain_type)
-
+            vol = torchaudio.transforms.Vol(gain, gain_type)
+            z = vol(x_orig)
             # check if effect worked
-            self.assertTrue(x.allclose(fade(x_orig), rtol=1e-4, atol=1e-4))
+            self.assertTrue(x.allclose(vol(x_orig), rtol=1e-4, atol=1e-4))
 
 
 if __name__ == '__main__':

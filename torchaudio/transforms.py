@@ -807,4 +807,10 @@ class Vol(torch.nn.Module):
         """
         if self.gain_type == "amplitude":
             waveform = waveform * self.gain
+
+        if self.gain_type == "db":
+            waveform_db = AmplitudeToDB("amplitude", top_db=80)(torch.abs(waveform)) + self.gain
+            waveform_amp = torch.sqrt(torch.pow(10, 0.1 * waveform_db))
+            waveform = waveform_amp / (torch.abs(waveform) + 1e-10) * waveform
+
         return waveform
