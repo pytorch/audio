@@ -1,7 +1,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 from shutil import copytree
-import backports.tempfile as tempfile
+import platform
+_MAJOR, _MINOR, _PATCH = platform.python_version_tuple()
+if _MAJOR == '2' or (_MAJOR == '3' and int(_MINOR) < 7):
+    import backports.tempfile as tempfile
+else:
+    import tempfile
+
 import torch
 
 TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
