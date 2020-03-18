@@ -796,6 +796,11 @@ class Vol(torch.nn.Module):
         self.gain_type = gain_type
         self.limiter_gain = limiter_gain
 
+        self.top_db = 80
+        self.amin = 1e-10
+        self.ref_value = 1.0
+        self.db_multiplier = math.log10(max(self.amin, self.ref_value))
+
     def forward(self, waveform):
         # type: (Tensor) -> Tensor
         r"""
@@ -809,14 +814,33 @@ class Vol(torch.nn.Module):
             waveform = waveform * self.gain
 
         if self.gain_type == "db":
-            waveform_db = AmplitudeToDB("amplitude", top_db=80)(torch.abs(waveform)) + self.gain
-            waveform_amp = torch.sqrt(torch.pow(10, 0.1 * waveform_db))
+            waveform_db = self._amplitude_to_db(waveform)
+            waveform_db = waveform_db + self.gain
+            waveform_amp = F.DB_to_amplitude(waveform_db, ref=1., power=0.5)
             waveform = waveform_amp / (torch.abs(waveform) + 1e-10) * waveform
 
         if self.gain_type == "power":
-            waveform_power = torch.pow(10.0, (AmplitudeToDB("amplitude", top_db=80)(torch.abs(waveform)) / 10)) * self.gain
-            waveform_db = 10 * torch.log10(waveform_power)
-            waveform_amp = torch.sqrt(torch.pow(10, 0.1 * waveform_db))
+            waveform_db = self._amplitude_to_db(waveform)
+            waveform_power = F.DB_to_amplitude(waveform_db, ref=1., power=1) * self.gain
+            waveform_db = self._power_to_db(waveform_power)
+
+            waveform_amp = F.DB_to_amplitude(waveform_db, ref=1., power=0.5)
             waveform = waveform_amp / (torch.abs(waveform) + 1e-10) * waveform
 
         return waveform
+
+    def _amplitude_to_db(self, waveform):
+        multiplier = 20
+        return F.amplitude_to_DB(torch.abs(waveform),
+                                 multiplier,
+                                 self.amin,
+                                 self.db_multiplier,
+                                 self.top_db)
+
+    def _power_to_db(self, waveform):
+        multiplier = 10
+        return F.amplitude_to_DB(torch.abs(waveform),
+                                 multiplier,
+                                 self.amin,
+                                 self.db_multiplier,
+                                 self.top_db)
