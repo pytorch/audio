@@ -399,6 +399,21 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
     return x_db
 
 
+def DB_to_amplitude(x, ref, power):
+    # type: (Tensor, float) -> Tensor
+    r"""Turn a tensor from the decibel scale to the power/amplitude scale.
+
+    Args:
+        x (torch.Tensor): Input tensor before being converted to power/amplitude scale.
+        ref (float): Reference which the output will be scaled by.
+        power (float): If power equal to 1 will compute DB to power if 0.5 will compute DB to magnitude.
+
+    Returns:
+        torch.Tensor: Output tensor in power/amplitude scale.
+    """
+    return torch.pow(ref * torch.pow(10.0, 0.1 * x), power)
+
+
 def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate):
     # type: (int, float, float, int, int) -> Tensor
     r"""Create a frequency bin conversion matrix.
