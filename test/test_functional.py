@@ -582,6 +582,14 @@ class TestFunctional(unittest.TestCase):
 
         _test_torchscript_functional(F.amplitude_to_DB, spec, multiplier, amin, db_multiplier, top_db)
 
+    def test_torchscript_DB_to_amplitude(self):
+
+        x = torch.rand((1, 100))
+        ref = 1.
+        power = 1.
+
+        _test_torchscript_functional(F.DB_to_amplitude, x, ref, power)
+
     def test_torchscript_create_dct(self):
 
         n_mfcc = 40

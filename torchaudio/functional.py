@@ -400,7 +400,7 @@ def amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None):
 
 
 def DB_to_amplitude(x, ref, power):
-    # type: (Tensor, float) -> Tensor
+    # type: (Tensor, float, float) -> Tensor
     r"""Turn a tensor from the decibel scale to the power/amplitude scale.
 
     Args:
