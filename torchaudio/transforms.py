@@ -777,13 +777,13 @@ class TimeMasking(_AxisMasking):
 
 
 class Vol(torch.nn.Module):
-    r"""Add a fade in and/or fade out to an waveform.
+    r"""Add a volume to an waveform.
 
     Args:
         gain (float): Interpreted according to the given gain_type:
             If `gain_type’ = ‘amplitude’, `gain’ is a positive amplitude ratio.
             If `gain_type’ = ‘power’, `gain’ is a power (voltage squared).
-            If `gain_type’ = ‘db’, `gain’ is in decibels..
+            If `gain_type’ = ‘db’, `gain’ is in decibels.
         gain_type (str, optional): Type of gain. One of: ‘amplitude’, ‘power’, ‘db’ (Default: ``"amplitude"``)
     """
 
