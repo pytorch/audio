@@ -590,23 +590,45 @@ class TestFunctional(unittest.TestCase):
 
         _test_torchscript_functional(F.DB_to_amplitude, x, ref, power)
 
-    @unittest.skipIf(not IMPORT_LIBROSA, 'Librosa not available')
     def test_DB_to_amplitude(self):
-        NOISE_FLOOR = 1e-6
-
         # Make some noise
-        x = torch.abs(torch.randn(1000)) + NOISE_FLOOR
+        x = torch.rand(1000)
+        spectrogram = torchaudio.transforms.Spectrogram()
+        spec = spectrogram(x)
 
-        multiplier = 20.
         amin = 1e-10
         ref = 1.0
-        power = 0.5
         db_multiplier = math.log10(max(amin, ref))
+
+        # Waveform amplitude -> DB -> amplitude
+        multiplier = 20.
+        power = 0.5
+
+        db = F.amplitude_to_DB(torch.abs(x), multiplier, amin, db_multiplier, top_db=None)
+        x2 = F.DB_to_amplitude(db, ref, power)
+
+        self.assertTrue(torch.allclose(torch.abs(x), x2, atol=5e-5))
+
+        # Spectrogram amplitude -> DB -> amplitude
+        db = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db=None)
+        x2 = F.DB_to_amplitude(db, ref, power)
+
+        self.assertTrue(torch.allclose(spec, x2, atol=5e-5))
+
+        # Waveform power -> DB -> power
+        multiplier = 10.
+        power = 1.
 
         db = F.amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(x, x2, atol=5e-5))
+        self.assertTrue(torch.allclose(torch.abs(x), x2, atol=5e-5))
+
+        # Spectrogram power -> DB -> power
+        db = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db=None)
+        x2 = F.DB_to_amplitude(db, ref, power)
+
+        self.assertTrue(torch.allclose(spec, x2, atol=5e-5))
 
     def test_torchscript_create_dct(self):
 

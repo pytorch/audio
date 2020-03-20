@@ -405,7 +405,7 @@ def DB_to_amplitude(x, ref, power):
 
     Args:
         x (torch.Tensor): Input tensor before being converted to power/amplitude scale.
-        ref (float): Reference which the output will be scaled by.
+        ref (float): Reference which the output will be scaled by. If computing DB to amplitude ref should be ref**2.
         power (float): If power equal to 1 will compute DB to power, if 0.5 will compute DB to amplitude.
 
     Returns:
