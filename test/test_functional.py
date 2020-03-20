@@ -590,6 +590,24 @@ class TestFunctional(unittest.TestCase):
 
         _test_torchscript_functional(F.DB_to_amplitude, x, ref, power)
 
+    @unittest.skipIf(not IMPORT_LIBROSA, 'Librosa not available')
+    def test_DB_to_amplitude(self):
+        NOISE_FLOOR = 1e-6
+
+        # Make some noise
+        x = torch.abs(torch.randn(1000)) + NOISE_FLOOR
+
+        multiplier = 20.
+        amin = 1e-10
+        ref = 1.0
+        power = 0.5
+        db_multiplier = math.log10(max(amin, ref))
+
+        db = F.amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None)
+        x2 = F.DB_to_amplitude(db, ref, power)
+
+        self.assertTrue(torch.allclose(x, x2, atol=5e-5))
+
     def test_torchscript_create_dct(self):
 
         n_mfcc = 40
