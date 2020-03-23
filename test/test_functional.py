@@ -573,7 +573,6 @@ class TestFunctional(unittest.TestCase):
         _test_torchscript_functional(F.create_fb_matrix, n_stft, f_min, f_max, n_mels, sample_rate)
 
     def test_torchscript_amplitude_to_DB(self):
-
         spec = torch.rand((6, 201))
         multiplier = 10.0
         amin = 1e-10
@@ -581,6 +580,32 @@ class TestFunctional(unittest.TestCase):
         top_db = 80.0
 
         _test_torchscript_functional(F.amplitude_to_DB, spec, multiplier, amin, db_multiplier, top_db)
+
+    @unittest.skipIf(not IMPORT_LIBROSA, 'Librosa not available')
+    def test_amplitude_to_DB(self):
+        spec = torch.rand((6, 201))
+
+        amin = 1e-10
+        db_multiplier = 0.0
+        top_db = 80.0
+
+        # Power to DB
+        multiplier = 10.0
+
+        ta_out = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db)
+        lr_out = librosa.core.power_to_db(spec.numpy())
+        lr_out = torch.from_numpy(lr_out).unsqueeze(0)
+
+        self.assertTrue(torch.allclose(ta_out, lr_out, atol=5e-5))
+
+        # Amplitude to DB
+        multiplier = 20.0
+
+        ta_out = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db)
+        lr_out = librosa.core.amplitude_to_db(spec.numpy())
+        lr_out = torch.from_numpy(lr_out).unsqueeze(0)
+
+        self.assertTrue(torch.allclose(ta_out, lr_out, atol=5e-5))
 
     def test_torchscript_create_dct(self):
 
