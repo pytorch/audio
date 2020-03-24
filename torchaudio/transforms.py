@@ -754,7 +754,7 @@ class FrequencyMasking(_AxisMasking):
     Args:
         freq_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, freq_mask_param).
-        iid_masks (bool, optional): weather to apply the same mask to all
+        iid_masks (bool, optional): whether to apply the same mask to all
             the examples/channels in the batch. (Default: ``False``)
     """
 
@@ -768,7 +768,7 @@ class TimeMasking(_AxisMasking):
     Args:
         time_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, time_mask_param).
-        iid_masks (bool, optional): weather to apply the same mask to all
+        iid_masks (bool, optional): whether to apply the same mask to all
             the examples/channels in the batch. (Default: ``False``)
     """
 
