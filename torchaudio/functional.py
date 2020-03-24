@@ -180,21 +180,19 @@ def istft(
     # each column of a channel is a frame which needs to be overlap added at the right place
     ytmp = ytmp.transpose(1, 2)  # size (channel, n_fft, n_frame)
 
-    eye = torch.eye(n_fft, device=device, dtype=dtype).unsqueeze(1)  # size (n_fft, 1, n_fft)
-
     # this does overlap add where the frames of ytmp are added such that the i'th frame of
     # ytmp is added starting at i*hop_length in the output
-    y = torch.nn.functional.conv_transpose1d(
-        ytmp, eye, stride=hop_length, padding=0
-    )  # size (channel, 1, expected_signal_len)
+    y = torch.nn.functional.fold(
+        ytmp, (1, (n_frame - 1) * hop_length + n_fft), (1, n_fft), stride=(1, hop_length)
+    ).squeeze(2)
 
     # do the same for the window function
     window_sq = (
         window.pow(2).view(n_fft, 1).repeat((1, n_frame)).unsqueeze(0)
     )  # size (1, n_fft, n_frame)
-    window_envelop = torch.nn.functional.conv_transpose1d(
-        window_sq, eye, stride=hop_length, padding=0
-    )  # size (1, 1, expected_signal_len)
+    window_envelop = torch.nn.functional.fold(
+        window_sq, (1, (n_frame - 1) * hop_length + n_fft), (1, n_fft), stride=(1, hop_length)
+    ).squeeze(2)  # size (1, 1, expected_signal_len)
 
     expected_signal_len = n_fft + hop_length * (n_frame - 1)
     assert y.size(2) == expected_signal_len
