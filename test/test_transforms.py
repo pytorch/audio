@@ -609,6 +609,23 @@ class Tester(unittest.TestCase):
         tensor = torch.rand((10, 2, 50, 10, 2))
         _test_script_module(transforms.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
 
+    def test_scriptmodule_Vol(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+
+        _test_script_module(transforms.Vol, waveform, 1.1)
+
+    def test_batch_Vol(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+
+        # Single then transform then batch
+        expected = transforms.Vol(gain=1.1)(waveform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = transforms.Vol(gain=1.1)(waveform.repeat(3, 1, 1))
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
 
 class TestLibrosaConsistency(unittest.TestCase):
     test_dirpath = None
