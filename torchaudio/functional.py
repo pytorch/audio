@@ -26,6 +26,10 @@ __all__ = [
     "bandpass_biquad",
     "bandreject_biquad",
     "equalizer_biquad",
+    "band_biquad",
+    "treble_biquad",
+    "deemph_biquad",
+    "riaa_biquad",
     "biquad",
     'mask_along_axis',
     'mask_along_axis_iid'
@@ -180,21 +184,19 @@ def istft(
     # each column of a channel is a frame which needs to be overlap added at the right place
     ytmp = ytmp.transpose(1, 2)  # size (channel, n_fft, n_frame)
 
-    eye = torch.eye(n_fft, device=device, dtype=dtype).unsqueeze(1)  # size (n_fft, 1, n_fft)
-
     # this does overlap add where the frames of ytmp are added such that the i'th frame of
     # ytmp is added starting at i*hop_length in the output
-    y = torch.nn.functional.conv_transpose1d(
-        ytmp, eye, stride=hop_length, padding=0
-    )  # size (channel, 1, expected_signal_len)
+    y = torch.nn.functional.fold(
+        ytmp, (1, (n_frame - 1) * hop_length + n_fft), (1, n_fft), stride=(1, hop_length)
+    ).squeeze(2)
 
     # do the same for the window function
     window_sq = (
         window.pow(2).view(n_fft, 1).repeat((1, n_frame)).unsqueeze(0)
     )  # size (1, n_fft, n_frame)
-    window_envelop = torch.nn.functional.conv_transpose1d(
-        window_sq, eye, stride=hop_length, padding=0
-    )  # size (1, 1, expected_signal_len)
+    window_envelop = torch.nn.functional.fold(
+        window_sq, (1, (n_frame - 1) * hop_length + n_fft), (1, n_fft), stride=(1, hop_length)
+    ).squeeze(2)  # size (1, 1, expected_signal_len)
 
     expected_signal_len = n_fft + hop_length * (n_frame - 1)
     assert y.size(2) == expected_signal_len
@@ -911,6 +913,188 @@ def equalizer_biquad(waveform, sample_rate, center_freq, gain, Q=0.707):
     a0 = 1 + alpha / A
     a1 = -2 * math.cos(w0)
     a2 = 1 - alpha / A
+    return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def band_biquad(waveform, sample_rate, central_freq, Q=0.707, noise=False):
+    # type: (Tensor, int, float, float, bool) -> Tensor
+    r"""Design two-pole band filter.  Similar to SoX implementation.
+
+    Args:
+        waveform(torch.Tensor): audio waveform of dimension of `(..., time)`
+        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
+        central_freq (float): central frequency (in Hz)
+        q_factor (float): https://en.wikipedia.org/wiki/Q_factor
+        noise (bool) : If ``True``, uses the alternate mode for un-pitched audio (e.g. percussion).
+            If ``False``, uses mode oriented to pitched audio, i.e. voice, singing,
+            or instrumental music. (Default: ``False``)
+
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    """
+    w0 = 2 * math.pi * central_freq / sample_rate
+    alpha = math.sin(w0) / 2 / Q
+    bw_Hz = central_freq / Q
+
+    a0 = 1.
+    a2 = math.exp(-2 * math.pi * bw_Hz / sample_rate)
+    a1 = -4 * a2 / (1 + a2) * math.cos(w0)
+
+    b0 = math.sqrt(1 - a1 * a1 / (4 * a2)) * (1 - a2)
+
+    if noise:
+        mult = math.sqrt(((1 + a2) * (1 + a2) - a1 * a1) * (1 - a2) / (1 + a2)) / b0
+        b0 *= mult
+
+    b1 = 0.
+    b2 = 0.
+
+    return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def treble_biquad(waveform, sample_rate, gain, central_freq=3000, Q=0.707):
+    # type: (Tensor, int, float, float, float) -> Tensor
+    r"""Design a treble tone-control effect.  Similar to SoX implementation.
+
+    Args:
+        waveform(torch.Tensor): audio waveform of dimension of `(..., time)`
+        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
+        gain (float): desired gain at the boost (or attenuation) in dB.
+        central_freq (float): central frequency (in Hz). (Default: ``3000``)
+        q_factor (float): https://en.wikipedia.org/wiki/Q_factor
+
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    """
+    w0 = 2 * math.pi * central_freq / sample_rate
+    alpha = math.sin(w0) / 2 / Q
+    A = math.exp(gain / 40 * math.log(10))
+
+    temp1 = 2 * math.sqrt(A) * alpha
+    temp2 = (A - 1) * math.cos(w0)
+    temp3 = (A + 1) * math.cos(w0)
+
+    b0 = A * ((A + 1) + temp2 + temp1)
+    b1 = -2 * A * ((A - 1) + temp3)
+    b2 = A * ((A + 1) + temp2 - temp1)
+    a0 = (A + 1) - temp2 + temp1
+    a1 = 2 * ((A - 1) - temp3)
+    a2 = (A + 1) - temp2 - temp1
+
+    return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def deemph_biquad(waveform, sample_rate):
+    # type: (Tensor, int) -> Tensor
+    r"""Apply ISO 908 CD de-emphasis (shelving) IIR filter.  Similar to SoX implementation.
+
+    Args:
+        waveform(torch.Tensor): audio waveform of dimension of `(..., time)`
+        sample_rate (int): sampling rate of the waveform, Allowed sample rate ``44100`` or ``48000``
+
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    """
+
+    if sample_rate == 44100:
+        central_freq = 5283
+        width_slope = 0.4845
+        gain = -9.477
+    elif sample_rate == 48000:
+        central_freq = 5356
+        width_slope = 0.479
+        gain = -9.62
+    else:
+        raise ValueError("Sample rate must be 44100 (audio-CD) or 48000 (DAT)")
+
+    w0 = 2 * math.pi * central_freq / sample_rate
+    A = math.exp(gain / 40.0 * math.log(10))
+    alpha = math.sin(w0) / 2 * math.sqrt((A + 1 / A) * (1 / width_slope - 1) + 2)
+
+    temp1 = 2 * math.sqrt(A) * alpha
+    temp2 = (A - 1) * math.cos(w0)
+    temp3 = (A + 1) * math.cos(w0)
+
+    b0 = A * ((A + 1) + temp2 + temp1)
+    b1 = -2 * A * ((A - 1) + temp3)
+    b2 = A * ((A + 1) + temp2 - temp1)
+    a0 = (A + 1) - temp2 + temp1
+    a1 = 2 * ((A - 1) - temp3)
+    a2 = (A + 1) - temp2 - temp1
+
+    return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def riaa_biquad(waveform, sample_rate):
+    # type: (Tensor, int) -> Tensor
+    r"""Apply RIAA vinyl playback equalisation.  Similar to SoX implementation.
+
+    Args:
+        waveform(torch.Tensor): audio waveform of dimension of `(..., time)`
+        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz).
+            Allowed sample rates in Hz : ``44100``,``48000``,``88200``,``96000``
+
+    Returns:
+        output_waveform (torch.Tensor): Dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    """
+
+    if (sample_rate == 44100):
+        zeros = [-0.2014898, 0.9233820]
+        poles = [0.7083149, 0.9924091]
+
+    elif (sample_rate == 48000):
+        zeros = [-0.1766069, 0.9321590]
+        poles = [0.7396325, 0.9931330]
+
+    elif (sample_rate == 88200):
+        zeros = [-0.1168735, 0.9648312]
+        poles = [0.8590646, 0.9964002]
+
+    elif (sample_rate == 96000):
+        zeros = [-0.1141486, 0.9676817]
+        poles = [0.8699137, 0.9966946]
+
+    else:
+        raise ValueError("Sample rate must be 44.1k, 48k, 88.2k, or 96k")
+
+    # polynomial coefficients with roots zeros[0] and zeros[1]
+    b0 = 1.
+    b1 = -(zeros[0] + zeros[1])
+    b2 = (zeros[0] * zeros[1])
+
+    # polynomial coefficients with roots poles[0] and poles[1]
+    a0 = 1.
+    a1 = -(poles[0] + poles[1])
+    a2 = (poles[0] * poles[1])
+
+    # Normalise to 0dB at 1kHz
+    y = 2 * math.pi * 1000 / sample_rate
+    b_re = b0 + b1 * math.cos(-y) + b2 * math.cos(-2 * y)
+    a_re = a0 + a1 * math.cos(-y) + a2 * math.cos(-2 * y)
+    b_im = b1 * math.sin(-y) + b2 * math.sin(-2 * y)
+    a_im = a1 * math.sin(-y) + a2 * math.sin(-2 * y)
+    g = 1 / math.sqrt((b_re**2 + b_im**2) / (a_re**2 + a_im**2))
+
+    b0 *= g
+    b1 *= g
+    b2 *= g
+
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 

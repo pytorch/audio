@@ -121,3 +121,10 @@ Transforms are common audio transforms. They can be chained together using :clas
 .. autoclass:: TimeMasking
 
   .. automethod:: forward
+
+:hidden:`Vol`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Vol
+
+  .. automethod:: forward

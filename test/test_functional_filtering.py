@@ -230,6 +230,103 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.bandreject_biquad, waveform, sample_rate, CENTRAL_FREQ, Q)
 
+    def test_band_with_noise(self):
+        """
+        Test biquad band filter with noise mode, compare to SoX implementation
+        """
+
+        CENTRAL_FREQ = 1000
+        Q = 0.707
+        NOISE = True
+
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("band", ["-n", CENTRAL_FREQ, str(Q) + 'q'])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.band_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, NOISE)
+
+        assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
+        _test_torchscript_functional(F.band_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, NOISE)
+
+    def test_band_without_noise(self):
+        """
+        Test biquad band filter without noise mode, compare to SoX implementation
+        """
+
+        CENTRAL_FREQ = 1000
+        Q = 0.707
+        NOISE = False
+
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("band", [CENTRAL_FREQ, str(Q) + 'q'])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.band_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, NOISE)
+
+        assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
+        _test_torchscript_functional(F.band_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, NOISE)
+
+    def test_treble(self):
+        """
+        Test biquad treble filter, compare to SoX implementation
+        """
+
+        CENTRAL_FREQ = 1000
+        Q = 0.707
+        GAIN = 40
+
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("treble", [GAIN, CENTRAL_FREQ, str(Q) + 'q'])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.treble_biquad(waveform, sample_rate, GAIN, CENTRAL_FREQ, Q)
+
+        assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
+        _test_torchscript_functional(F.treble_biquad, waveform, sample_rate, GAIN, CENTRAL_FREQ, Q)
+
+    def test_deemph(self):
+        """
+        Test biquad deemph filter, compare to SoX implementation
+        """
+
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("deemph")
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.deemph_biquad(waveform, sample_rate)
+
+        assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
+        _test_torchscript_functional(F.deemph_biquad, waveform, sample_rate)
+
+    def test_riaa(self):
+        """
+        Test biquad riaa filter, compare to SoX implementation
+        """
+
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("riaa")
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.riaa_biquad(waveform, sample_rate)
+
+        assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
+        _test_torchscript_functional(F.riaa_biquad, waveform, sample_rate)
+
     def test_equalizer(self):
         """
         Test biquad peaking equalizer filter, compare to SoX implementation
