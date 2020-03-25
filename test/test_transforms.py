@@ -89,6 +89,29 @@ class Tester(unittest.TestCase):
         spec = torch.rand((6, 201))
         _test_script_module(transforms.AmplitudeToDB, spec)
 
+    def test_batch_AmplitudeToDB(self):
+        spec = torch.rand((6, 201))
+
+        # Single then transform then batch
+        expected = transforms.AmplitudeToDB()(spec).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = transforms.AmplitudeToDB()(spec.repeat(3, 1, 1))
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
+
+    def test_AmplitudeToDB(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+
+        mag_to_db_transform = transforms.AmplitudeToDB('magnitude', 80.)
+        power_to_db_transform = transforms.AmplitudeToDB('power', 80.)
+
+        mag_to_db_torch = mag_to_db_transform(torch.abs(waveform))
+        power_to_db_torch = power_to_db_transform(torch.pow(waveform, 2))
+
+        self.assertTrue(torch.allclose(mag_to_db_torch, power_to_db_torch))
+
     def test_scriptmodule_MelScale(self):
         spec_f = torch.rand((1, 6, 201))
         _test_script_module(transforms.MelScale, spec_f)
@@ -239,16 +262,24 @@ class Tester(unittest.TestCase):
             self.assertTrue(torch.allclose(torch_mel.type(librosa_mel_tensor.dtype), librosa_mel_tensor, atol=5e-3))
 
             # test s2db
-            db_transform = torchaudio.transforms.AmplitudeToDB('power', 80.)
-            db_torch = db_transform(spect_transform(sound)).squeeze().cpu()
-            db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
-            self.assertTrue(torch.allclose(db_torch, torch.from_numpy(db_librosa), atol=5e-3))
+            power_to_db_transform = torchaudio.transforms.AmplitudeToDB('power', 80.)
+            power_to_db_torch = power_to_db_transform(spect_transform(sound)).squeeze().cpu()
+            power_to_db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
+            self.assertTrue(torch.allclose(power_to_db_torch, torch.from_numpy(power_to_db_librosa), atol=5e-3))
 
-            db_torch = db_transform(melspect_transform(sound)).squeeze().cpu()
+            mag_to_db_transform = torchaudio.transforms.AmplitudeToDB('magnitude', 80.)
+            mag_to_db_torch = mag_to_db_transform(torch.abs(sound)).squeeze().cpu()
+            mag_to_db_librosa = librosa.core.spectrum.amplitude_to_db(sound_librosa)
+            self.assertTrue(
+                torch.allclose(mag_to_db_torch, torch.from_numpy(mag_to_db_librosa), atol=5e-3)
+            )
+
+            power_to_db_torch = power_to_db_transform(melspect_transform(sound)).squeeze().cpu()
             db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
             db_librosa_tensor = torch.from_numpy(db_librosa)
-
-            self.assertTrue(torch.allclose(db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3))
+            self.assertTrue(
+                torch.allclose(power_to_db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3)
+            )
 
             # test MFCC
             melkwargs = {'hop_length': hop_length, 'n_fft': n_fft}
@@ -577,6 +608,23 @@ class Tester(unittest.TestCase):
     def test_scriptmodule_TimeMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
         _test_script_module(transforms.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
+
+    def test_scriptmodule_Vol(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+
+        _test_script_module(transforms.Vol, waveform, 1.1)
+
+    def test_batch_Vol(self):
+        waveform, sample_rate = torchaudio.load(self.test_filepath)
+
+        # Single then transform then batch
+        expected = transforms.Vol(gain=1.1)(waveform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = transforms.Vol(gain=1.1)(waveform.repeat(3, 1, 1))
+
+        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
+        self.assertTrue(torch.allclose(computed, expected))
 
 
 class TestLibrosaConsistency(unittest.TestCase):
