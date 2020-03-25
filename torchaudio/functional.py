@@ -405,13 +405,13 @@ def DB_to_amplitude(x, ref, power):
 
     Args:
         x (torch.Tensor): Input tensor before being converted to power/amplitude scale.
-        ref (float): Reference which the output will be scaled by. If computing DB to amplitude ref should be ref**2.
-        power (float): If power equal to 1 will compute DB to power, if 0.5 will compute DB to amplitude.
+        ref (float): Reference which the output will be scaled by.
+        power (float): If power equals 1, will compute DB to power. If 0.5, will compute DB to amplitude.
 
     Returns:
         torch.Tensor: Output tensor in power/amplitude scale.
     """
-    return torch.pow(ref * torch.pow(10.0, 0.1 * x), power)
+    return ref * torch.pow(torch.pow(10.0, 0.1 * x), power)
 
 
 def create_fb_matrix(n_freqs, f_min, f_max, n_mels, sample_rate):
