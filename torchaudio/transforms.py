@@ -814,3 +814,46 @@ class Vol(torch.nn.Module):
             waveform = F.gain(waveform, 10 * math.log10(self.gain))
 
         return torch.clamp(waveform, -1, 1)
+
+
+class Synth(torch.nn.Module):
+    r"""This effect can be used to generate fixed or swept frequency audio tones with various wave shapes,
+     or to generate wide-band noise of various ‘colours’.
+
+    Args:
+        sample_rate (int, optional): Sample rate of audio signal (Default: ``16000``).
+        duration (float, optional): Duration in seconds of audio to synthesise (Default: ``1.0``).
+            a value of 0 indicated to use the input length, which is also the default.
+        wave_type (str, optional): is one of sine, square, triangle, sawtooth, trapezium and exp (Default: ``"sine"``).
+        freq (int or tuple, optional) are the frequencies at the beginning/end of synthesis in Hz (Default: ``440``).
+        amp (foat): Maximum amplitude (Default: ```1.0``).
+        offset (float): indicates where in its period the signal starts; offset is in units of radians.
+    """
+
+    def __init__(self, sample_rate=16000, duration=1.0, wave_type="sine", freq=400, amp=1.0, offset=0):
+        super(Synth, self).__init__()
+        self.sample_rate = sample_rate
+        self.duration = duration
+        self.wave_type = wave_type
+        self.freq = freq
+        self.amp = amp
+        self.offset = offset
+
+    def forward(self, waveform=None):
+        # type: (Optional[Tensor]) -> Tensor
+        r"""
+        Args:
+            waveform (torch.Tensor): Tensor of audio of dimension (..., time).
+
+        Returns:
+            torch.Tensor: Tensor of audio of dimension (..., time).
+        """
+
+        if self.wave_type is "sine":
+            return self._signal(torch.sin)
+
+    def _signal(self, func):
+        n = round(self.duration * self.sample_rate)
+        ts = torch.linspace(0, n-1, n) / self.sample_rate
+        ys = func(2 * math.pi * self.freq * ts + self.offset) * self.amp
+        return ys
