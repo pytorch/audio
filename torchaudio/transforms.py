@@ -851,8 +851,21 @@ class Synth(torch.nn.Module):
         if self.wave_type is "sine":
             return self._signal(torch.sin)
 
+        if self.wave_type is "triangle":
+            return self._triangle()
+
     def _signal(self, func):
         n = round(self.duration * self.sample_rate)
         ts = torch.arange(n, dtype=torch.float) / self.sample_rate
+
         ys = func(2 * math.pi * self.freq * ts + self.offset) * self.amp
+        return ys
+
+    def _triangle(self):
+        n = round(self.duration * self.sample_rate)
+        ts = torch.arange(n, dtype=torch.float) / self.sample_rate
+
+        cycles = self.freq * ts + 0.5 + self.offset / math.pi
+        frac = torch.remainder(cycles, 1)
+        ys = (torch.abs(frac - 0.5) * 4 - 1) * self.amp
         return ys
