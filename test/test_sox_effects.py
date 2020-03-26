@@ -8,7 +8,7 @@ import os
 from _test import AudioBackendScope
 
 
-# @AudioBackendScope("sox")
+@unittest.skipIf("sox" not in BACKENDS, "sox not available")
 class Test_SoxEffectsChain(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, "assets",
@@ -262,4 +262,5 @@ class Test_SoxEffectsChain(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    with AudioBackendScope("sox"):
+        unittest.main()
