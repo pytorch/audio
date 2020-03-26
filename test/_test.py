@@ -41,4 +41,3 @@ def get_backends_with_mp3(backends):
 
 
 BACKENDS_MP3 = get_backends_with_mp3(BACKENDS)
-FIRST_BACKEND_MP3 = BACKENDS_MP3[0] if BACKENDS_MP3 else None
