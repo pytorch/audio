@@ -6,7 +6,7 @@ import torchaudio.functional as F
 import unittest
 import common_utils
 import time
-from _test import AudioBackendScope, BACKENDS, BACKENDS_MP3, FIRST_BACKEND_MP3
+from _test import AudioBackendScope, BACKENDS
 
 
 def _test_torchscript_functional(py_method, *args, **kwargs):
@@ -90,16 +90,16 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert output_waveform.size(1) == waveform.size(1)
         _test_torchscript_functional(F.lfilter, waveform, a_coeffs, b_coeffs)
 
-    @AudioBackendScope(FIRST_BACKEND_MP3)
     def test_lfilter(self):
-        filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+
+        filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
+
         self._test_lfilter(waveform, torch.device("cpu"))
 
-    @AudioBackendScope(FIRST_BACKEND_MP3)
     def test_lfilter_gpu(self):
         if torch.cuda.is_available():
-            filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+            filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
             waveform, _ = torchaudio.load(filepath, normalization=True)
             cuda0 = torch.device("cuda:0")
             cuda_waveform = waveform.cuda(device=cuda0)
@@ -108,6 +108,7 @@ class TestFunctionalFiltering(unittest.TestCase):
             print("skipping GPU test for lfilter because device not available")
             pass
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
     def test_lowpass(self):
 
@@ -117,7 +118,7 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         CUTOFF_FREQ = 3000
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("lowpass", [CUTOFF_FREQ])
@@ -129,6 +130,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.lowpass_biquad, waveform, sample_rate, CUTOFF_FREQ)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
     def test_highpass(self):
         """
@@ -137,7 +139,7 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         CUTOFF_FREQ = 2000
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("highpass", [CUTOFF_FREQ])
@@ -150,6 +152,8 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-3)
         _test_torchscript_functional(F.highpass_biquad, waveform, sample_rate, CUTOFF_FREQ)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_allpass(self):
         """
         Test biquad allpass filter, compare to SoX implementation
@@ -158,7 +162,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         CENTRAL_FREQ = 1000
         Q = 0.707
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("allpass", [CENTRAL_FREQ, str(Q) + 'q'])
@@ -170,6 +174,8 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.allpass_biquad, waveform, sample_rate, CENTRAL_FREQ, Q)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_bandpass_with_csg(self):
         """
         Test biquad bandpass filter, compare to SoX implementation
@@ -179,7 +185,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         Q = 0.707
         CONST_SKIRT_GAIN = True
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("bandpass", ["-c", CENTRAL_FREQ, str(Q) + 'q'])
@@ -191,6 +197,8 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.bandpass_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, CONST_SKIRT_GAIN)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_bandpass_without_csg(self):
         """
         Test biquad bandpass filter, compare to SoX implementation
@@ -200,7 +208,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         Q = 0.707
         CONST_SKIRT_GAIN = False
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("bandpass", [CENTRAL_FREQ, str(Q) + 'q'])
@@ -212,6 +220,8 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.bandpass_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, CONST_SKIRT_GAIN)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_bandreject(self):
         """
         Test biquad bandreject filter, compare to SoX implementation
@@ -220,7 +230,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         CENTRAL_FREQ = 1000
         Q = 0.707
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("bandreject", [CENTRAL_FREQ, str(Q) + 'q'])
@@ -232,6 +242,8 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.bandreject_biquad, waveform, sample_rate, CENTRAL_FREQ, Q)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_band_with_noise(self):
         """
         Test biquad band filter with noise mode, compare to SoX implementation
@@ -241,7 +253,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         Q = 0.707
         NOISE = True
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("band", ["-n", CENTRAL_FREQ, str(Q) + 'q'])
@@ -253,6 +265,8 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.band_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, NOISE)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_band_without_noise(self):
         """
         Test biquad band filter without noise mode, compare to SoX implementation
@@ -262,7 +276,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         Q = 0.707
         NOISE = False
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("band", [CENTRAL_FREQ, str(Q) + 'q'])
@@ -274,6 +288,8 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.band_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, NOISE)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_treble(self):
         """
         Test biquad treble filter, compare to SoX implementation
@@ -283,7 +299,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         Q = 0.707
         GAIN = 40
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("treble", [GAIN, CENTRAL_FREQ, str(Q) + 'q'])
@@ -295,12 +311,14 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.treble_biquad, waveform, sample_rate, GAIN, CENTRAL_FREQ, Q)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_deemph(self):
         """
         Test biquad deemph filter, compare to SoX implementation
         """
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("deemph")
@@ -312,12 +330,14 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.deemph_biquad, waveform, sample_rate)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_riaa(self):
         """
         Test biquad riaa filter, compare to SoX implementation
         """
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("riaa")
@@ -329,6 +349,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.riaa_biquad, waveform, sample_rate)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
     def test_equalizer(self):
         """
@@ -339,7 +360,7 @@ class TestFunctionalFiltering(unittest.TestCase):
         Q = 0.707
         GAIN = 1
 
-        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        noise_filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("equalizer", [CENTER_FREQ, Q, GAIN])
@@ -351,10 +372,11 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
         _test_torchscript_functional(F.equalizer_biquad, waveform, sample_rate, CENTER_FREQ, GAIN, Q)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
     def test_perf_biquad_filtering(self):
 
-        fn_sine = os.path.join(self.test_dirpath, "assets", "whitenoise.mp3")
+        fn_sine = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
 
         b0 = 0.4
         b1 = 0.2
