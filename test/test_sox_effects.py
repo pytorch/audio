@@ -262,7 +262,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
         test_filepath = os.path.join(self.test_dirpath, "assets", "silence.wav")
         x_orig, _ = torchaudio.load(test_filepath)
 
-        for params in ((1, "sine", 400),(1, "triangle", 400)):
+        for params in ((1, "sine", 400), (1, "triangle", 400), (0.05, "square", 400)):
             E = torchaudio.sox_effects.SoxEffectsChain()
             E.set_input_file(test_filepath)
             E.append_effect_to_chain("synth", [*params])
@@ -271,7 +271,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
             synth = torchaudio.transforms.Synth(sr, *params)
 
             # check if effect worked
-            self.assertTrue(x.allclose(synth() + x_orig[..., :sr], rtol=1e-3, atol=1e-3))
+            self.assertTrue(x.allclose(synth(), rtol=1e-3, atol=1e-3))
 
 
 if __name__ == '__main__':
