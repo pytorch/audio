@@ -18,18 +18,18 @@ def AudioBackendScope(new_backend):
 
 
 def get_backends_with_mp3(backends):
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    test_dirpath, _ = common_utils.create_temp_assets_dir()
     test_filepath = os.path.join(
         test_dirpath, "assets", "steam-train-whistle-daniel_simon.mp3"
     )
 
     backends_mp3 = []
 
-    for b in backends:
+    for backend in backends:
         try:
-            with AudioBackendScope(b):
-                waveform, sample_rate = torchaudio.load(test_filepath)
-            backends_mp3.append(b)
+            with AudioBackendScope(backend):
+                torchaudio.load(test_filepath)
+            backends_mp3.append(backend)
         except RuntimeError:
             pass
 
