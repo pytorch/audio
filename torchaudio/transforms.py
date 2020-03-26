@@ -823,7 +823,6 @@ class Synth(torch.nn.Module):
     Args:
         sample_rate (int, optional): Sample rate of audio signal (Default: ``16000``).
         duration (float, optional): Duration in seconds of audio to synthesise (Default: ``1.0``).
-            a value of 0 indicated to use the input length, which is also the default.
         wave_type (str, optional): is one of sine, square, triangle, sawtooth, trapezium and exp (Default: ``"sine"``).
         freq (int or tuple, optional) are the frequencies at the beginning/end of synthesis in Hz (Default: ``440``).
         amp (foat): Maximum amplitude (Default: ```1.0``).
@@ -854,6 +853,6 @@ class Synth(torch.nn.Module):
 
     def _signal(self, func):
         n = round(self.duration * self.sample_rate)
-        ts = torch.linspace(0, n-1, n) / self.sample_rate
+        ts = torch.arange(n, dtype=torch.float) / self.sample_rate
         ys = func(2 * math.pi * self.freq * ts + self.offset) * self.amp
         return ys
