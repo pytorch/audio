@@ -26,7 +26,6 @@ def get_backends_with_mp3(backends):
     backends_mp3 = []
 
     for b in backends:
-        torchaudio.load(test_filepath)
         try:
             with AudioBackendScope(b):
                 waveform, sample_rate = torchaudio.load(test_filepath)
