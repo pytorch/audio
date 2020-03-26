@@ -8,7 +8,7 @@ import torchaudio.functional as F
 from torchaudio.common_utils import IMPORT_LIBROSA, IMPORT_SCIPY
 import unittest
 import common_utils
-from _test import AudioBackendScope, BACKENDS, BACKENDS_MP3, FIRST_BACKEND_MP3
+from _test import AudioBackendScope, BACKENDS
 
 if IMPORT_LIBROSA:
     import librosa
@@ -531,7 +531,8 @@ class Tester(unittest.TestCase):
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
 
-    @AudioBackendScope(FIRST_BACKEND_MP3)
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_batch_mfcc(self):
         test_filepath = os.path.join(
             self.test_dirpath, 'assets', 'steam-train-whistle-daniel_simon.mp3'
@@ -649,6 +650,8 @@ class TestLibrosaConsistency(unittest.TestCase):
         return sound.mean(dim=0, keepdim=True), sample_rate
 
     @unittest.skipIf(not IMPORT_LIBROSA, 'Librosa is not available')
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_MelScale(self):
         """MelScale transform is comparable to that of librosa"""
         n_fft = 2048
