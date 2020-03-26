@@ -60,29 +60,29 @@ class TestFunctionalFiltering(unittest.TestCase):
         """
 
         b_coeffs = torch.tensor(
-                [
-                    0.00299893,
-                    -0.0051152,
-                    0.00841964,
-                    -0.00747802,
-                    0.00841964,
-                    -0.0051152,
-                    0.00299893,
-                    ],
-                device=device,
-                )
+            [
+                0.00299893,
+                -0.0051152,
+                0.00841964,
+                -0.00747802,
+                0.00841964,
+                -0.0051152,
+                0.00299893,
+            ],
+            device=device,
+        )
         a_coeffs = torch.tensor(
-                [
-                    1.0,
-                    -4.8155751,
-                    10.2217618,
-                    -12.14481273,
-                    8.49018171,
-                    -3.3066882,
-                    0.56088705,
-                    ],
-                device=device,
-                )
+            [
+                1.0,
+                -4.8155751,
+                10.2217618,
+                -12.14481273,
+                8.49018171,
+                -3.3066882,
+                0.56088705,
+            ],
+            device=device,
+        )
 
         output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
         assert len(output_waveform.size()) == 2
