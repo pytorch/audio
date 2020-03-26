@@ -1,5 +1,4 @@
 import os
-import unittest
 from contextlib import contextmanager
 
 import common_utils
@@ -12,8 +11,6 @@ BACKENDS = torchaudio._backend._audio_backends
 def AudioBackendScope(new_backend):
     previous_backend = torchaudio.get_audio_backend()
     try:
-        # unittest.skipIf(not new_backend, "No backend supporting this test.")
-        # unittest.skipIf(new_backend not in BACKENDS, new_backend + " is not available.")
         torchaudio.set_audio_backend(new_backend)
         yield
     finally:
