@@ -857,6 +857,9 @@ class Synth(torch.nn.Module):
         if self.wave_type is "square":
             return self._square()
 
+        if self.wave_type is "sawtooth":
+            return self._sawtooth()
+
     def _signal(self, func):
         n = round(self.duration * self.sample_rate)
         ts = torch.arange(n, dtype=torch.float) / self.sample_rate
@@ -880,4 +883,13 @@ class Synth(torch.nn.Module):
         cycles = self.freq * ts + 0.5 + self.offset / math.pi
         frac = torch.remainder(cycles, 1) + 1e-4
         ys = torch.sign(frac - 0.5) * self.amp
+        return ys
+
+    def _sawtooth(self):
+        n = round(self.duration * self.sample_rate)
+        ts = torch.arange(n, dtype=torch.float) / self.sample_rate
+
+        cycles = self.freq * ts + self.offset / math.pi
+        frac = torch.remainder(cycles, 1)
+        ys = frac * 2 - 1
         return ys
