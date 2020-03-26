@@ -5,7 +5,7 @@ import torchaudio
 import math
 import os
 
-from _test import AudioBackendScope
+from _test import AudioBackendScope, BACKENDS
 
 
 @unittest.skipIf("sox" not in BACKENDS, "sox not available")
