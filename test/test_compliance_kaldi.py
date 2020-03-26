@@ -6,7 +6,6 @@ import torch
 import torchaudio
 import torchaudio.compliance.kaldi as kaldi
 import unittest
-from contextlib import contextmanager
 from _test import AudioBackendScope, BACKENDS
 
 
