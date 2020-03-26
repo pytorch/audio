@@ -31,7 +31,7 @@ def get_backends_with_mp3(backends):
             with AudioBackendScope(b):
                 waveform, sample_rate = torchaudio.load(test_filepath)
             backends_mp3.append(b)
-        except:
+        except RuntimeError:
             pass
 
     return backends_mp3
