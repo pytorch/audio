@@ -849,7 +849,7 @@ class Synth(torch.nn.Module):
         """
 
         if self.wave_type is "sine":
-            return self._signal(torch.sin)
+            return self._sine()
 
         if self.wave_type is "triangle":
             return self._triangle()
@@ -860,11 +860,14 @@ class Synth(torch.nn.Module):
         if self.wave_type is "sawtooth":
             return self._sawtooth()
 
-    def _signal(self, func):
+        if self.wave_type is "exp":
+            return self._exp()
+
+    def _sine(self):
         n = round(self.duration * self.sample_rate)
         ts = torch.arange(n, dtype=torch.float) / self.sample_rate
 
-        ys = func(2 * math.pi * self.freq * ts + self.offset) * self.amp
+        ys = torch.sin(2 * math.pi * self.freq * ts + self.offset) * self.amp
         return ys
 
     def _triangle(self):
@@ -892,4 +895,10 @@ class Synth(torch.nn.Module):
         cycles = self.freq * ts + self.offset / math.pi
         frac = torch.remainder(cycles, 1)
         ys = frac * 2 - 1
+        return ys
+
+    def _exp(self):
+        triangle = self._triangle()
+        exp = torch.exp(triangle * 5.7564)
+        ys = (exp/torch.max(exp) -0.5) * 2
         return ys
