@@ -259,24 +259,27 @@ class Test_SoxEffectsChain(unittest.TestCase):
             self.assertTrue(x.allclose(vol(x_orig), rtol=1e-4, atol=1e-4))
 
     def test_transform_synth(self):
-        test_filepath = os.path.join(self.test_dirpath, "assets", "silence.wav")
-        x_orig, _ = torchaudio.load(test_filepath)
 
-        for params in ((1, "sine", 400),
-                       (1, "triangle", 400),
-                       (0.05, "square", 400),
-                       (0.05, "sawtooth", 400),
-                       (0.05, "exp", 400),
-                       (0.05, "trapezium", 400)):
-            E = torchaudio.sox_effects.SoxEffectsChain()
-            E.set_input_file(test_filepath)
-            E.append_effect_to_chain("synth", [*params])
-            x, sr = E.sox_build_flow_effects()
+        test_filepath_8000 = os.path.join(self.test_dirpath, "assets", "silence_8000.wav")
+        test_filepath_16000 = os.path.join(self.test_dirpath, "assets", "silence_16000.wav")
+        for test_filepath in (test_filepath_8000, test_filepath_16000):
+            x_orig, _ = torchaudio.load(test_filepath)
 
-            synth = torchaudio.transforms.Synth(sr, *params)
+            for params in ((1, "sine", 400),
+                           (1, "triangle", 400),
+                           (0.05, "square", 400),
+                           (0.05, "sawtooth", 400),
+                           (0.05, "exp", 400),
+                           (0.05, "trapezium", 400)):
+                E = torchaudio.sox_effects.SoxEffectsChain()
+                E.set_input_file(test_filepath)
+                E.append_effect_to_chain("synth", [*params])
+                x, sr = E.sox_build_flow_effects()
 
-            # check if effect worked
-            self.assertTrue(x.allclose(synth(), rtol=1e-3, atol=1e-3))
+                synth = torchaudio.transforms.Synth(sr, *params)
+
+                # check if effect worked
+                self.assertTrue(x.allclose(synth(), rtol=1e-3, atol=1e-3))
 
 
 if __name__ == '__main__':
