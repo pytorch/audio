@@ -863,6 +863,9 @@ class Synth(torch.nn.Module):
         if self.wave_type is "exp":
             return self._exp()
 
+        if self.wave_type is "trapezium":
+            return self._trapezium()
+
     def _sine(self):
         n = round(self.duration * self.sample_rate)
         ts = torch.arange(n, dtype=torch.float) / self.sample_rate
@@ -901,4 +904,10 @@ class Synth(torch.nn.Module):
         triangle = self._triangle()
         exp = torch.exp(triangle * 5.7564)
         ys = (exp/torch.max(exp) -0.5) * 2
+        return ys
+
+    def _trapezium(self):
+        self.offset = 0.2 * math.pi
+        triangle = torch.clamp(self._triangle() * 5, -1, 1)
+        ys = triangle
         return ys
