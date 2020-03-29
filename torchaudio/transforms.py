@@ -867,11 +867,18 @@ class Synth(torch.nn.Module):
             return self._trapezium()
 
     def _sine(self):
+    def evaluate(self):
         n = round(self.duration * self.sample_rate)
         ts = torch.arange(n, dtype=torch.float) / self.sample_rate
+        freqs = torch.linspace(self.freq[0], self.freq[1], len(ts) - 1)
+        return self._evaluate_linear(ts, freqs)
 
-        ys = torch.sin(2 * math.pi * self.freq * ts + self.offset) * self.amp
-        return ys
+    def _evaluate_linear(self, ts, freqs):
+        dts = ts[..., 1:] - ts[..., :-1]
+        dphis = 2 * math.pi * freqs * dts
+        phases = torch.cumsum(dphis, -1)
+        phases = torch.cat((torch.zeros(1), phases))
+        return phases
 
     def _triangle(self):
         n = round(self.duration * self.sample_rate)
