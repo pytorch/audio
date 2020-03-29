@@ -825,16 +825,27 @@ class Synth(torch.nn.Module):
         duration (float, optional): Duration in seconds of audio to synthesise (Default: ``1.0``).
         wave_type (str, optional): is one of sine, square, triangle, sawtooth, trapezium and exp (Default: ``"sine"``).
         freq (int or tuple, optional) are the frequencies at the beginning/end of synthesis in Hz (Default: ``440``).
+        freq (int or tuple, optional): are the frequencies at the beginning/end of synthesis in Hz (Default: ``440``).
+        freq_change (str, optional): If `freq` defined the variation between to frequencies it can be changed `linear`,
+            `square` and `exp` (Default: ```linear``).
         amp (foat): Maximum amplitude (Default: ```1.0``).
         offset (float): indicates where in its period the signal starts; offset is in units of radians.
     """
 
-    def __init__(self, sample_rate=16000, duration=1.0, wave_type="sine", freq=400, amp=1.0, offset=0):
+    def __init__(self,
+                 sample_rate=16000,
+                 duration=1.0,
+                 wave_type="sine",
+                 freq=400,
+                 freq_change="linear",
+                 amp=1.0,
+                 offset=0):
         super(Synth, self).__init__()
         self.sample_rate = sample_rate
         self.duration = duration
         self.wave_type = wave_type
         self.freq = freq
+        self.freq_change = freq_change
         self.amp = amp
         self.offset = offset
 
@@ -847,9 +858,10 @@ class Synth(torch.nn.Module):
         Returns:
             torch.Tensor: Tensor of audio of dimension (..., time).
         """
-
         if self.wave_type is "sine":
-            return self._sine()
+            if isinstance(self.freq, int):
+                self.freq = (self.freq, self.freq)
+            return self.amp * torch.sin(self.evaluate())
 
         if self.wave_type is "triangle":
             return self._triangle()
@@ -866,7 +878,6 @@ class Synth(torch.nn.Module):
         if self.wave_type is "trapezium":
             return self._trapezium()
 
-    def _sine(self):
     def evaluate(self):
         n = round(self.duration * self.sample_rate)
         ts = torch.arange(n, dtype=torch.float) / self.sample_rate
