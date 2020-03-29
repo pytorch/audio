@@ -858,25 +858,26 @@ class Synth(torch.nn.Module):
         Returns:
             torch.Tensor: Tensor of audio of dimension (..., time).
         """
+        if isinstance(self.freq, int):
+            self.freq = (self.freq, self.freq)
+
         if self.wave_type is "sine":
-            if isinstance(self.freq, int):
-                self.freq = (self.freq, self.freq)
             return self.amp * torch.sin(self.evaluate())
 
         if self.wave_type is "triangle":
-            return self._triangle()
+            return self.amp * self._triangle(self.evaluate())
 
         if self.wave_type is "square":
-            return self._square()
+            return self._square(self.evaluate())
 
         if self.wave_type is "sawtooth":
-            return self._sawtooth()
+            return self._sawtooth(self.evaluate())
 
         if self.wave_type is "exp":
-            return self._exp()
+            return self._exp(self.evaluate())
 
         if self.wave_type is "trapezium":
-            return self._trapezium()
+            return self._trapezium(self.evaluate())
 
     def evaluate(self):
         n = round(self.duration * self.sample_rate)
@@ -891,41 +892,28 @@ class Synth(torch.nn.Module):
         phases = torch.cat((torch.zeros(1), phases))
         return phases
 
-    def _triangle(self):
-        n = round(self.duration * self.sample_rate)
-        ts = torch.arange(n, dtype=torch.float) / self.sample_rate
-
-        cycles = self.freq * ts + 0.5 + self.offset / math.pi
-        frac = torch.remainder(cycles, 1)
+    def _triangle(self, phases):
+        frac = torch.remainder((phases + math.pi) / (math.pi * 2), 1)
         ys = (torch.abs(frac - 0.5) * 4 - 1) * self.amp
         return ys
 
-    def _square(self):
-        n = round(self.duration * self.sample_rate)
-        ts = torch.arange(n, dtype=torch.float) / self.sample_rate
-
-        cycles = self.freq * ts + 0.5 + self.offset / math.pi
-        frac = torch.remainder(cycles, 1) + 1e-4
+    def _square(self, phases):
+        frac = torch.remainder((phases + math.pi) / (math.pi * 2), 1) + 1e-4
         ys = torch.sign(frac - 0.5) * self.amp
         return ys
 
-    def _sawtooth(self):
-        n = round(self.duration * self.sample_rate)
-        ts = torch.arange(n, dtype=torch.float) / self.sample_rate
-
-        cycles = self.freq * ts + self.offset / math.pi
-        frac = torch.remainder(cycles, 1)
+    def _sawtooth(self, phases):
+        frac = torch.remainder(phases / (math.pi * 2), 1)
         ys = frac * 2 - 1
         return ys
 
-    def _exp(self):
-        triangle = self._triangle()
+    def _exp(self, phases):
+        triangle = self._triangle(phases)
         exp = torch.exp(triangle * 5.7564)
-        ys = (exp/torch.max(exp) -0.5) * 2
+        ys = (exp/torch.max(exp) - 0.5) * 2
         return ys
 
-    def _trapezium(self):
-        self.offset = 0.2 * math.pi
-        triangle = torch.clamp(self._triangle() * 5, -1, 1)
+    def _trapezium(self, phases):
+        triangle = torch.clamp(self._triangle(phases + 0.4 * math.pi) * 5, -1, 1)
         ys = triangle
         return ys
