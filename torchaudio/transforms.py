@@ -864,6 +864,8 @@ class Synth(torch.nn.Module):
             self.evaluate = self.evaluate_linear()
         elif self.freq_change == "exp":
             self.evaluate = self.evaluate_exp()
+        elif self.freq_change == "square":
+            self.evaluate = self.evaluate_square()
 
         if self.wave_type is "sine":
             return self.amp * torch.sin(self.evaluate)
@@ -895,6 +897,12 @@ class Synth(torch.nn.Module):
         freqs = torch.logspace(math.log10(self.freq[0]),
                                math.log10(self.freq[1]), len(ts) - 1)
         return self._evaluate(ts, freqs)
+
+    def evaluate_square(self):
+        n = round(self.duration * self.sample_rate)
+        ts = torch.arange(n, dtype=torch.float) / self.sample_rate
+        freqs = torch.pow(ts, 2) * (self.freq[1] - self.freq[0]) + self.freq[0]
+        return self._evaluate(ts, freqs[:-1])
 
     def _evaluate(self, ts, freqs):
         dts = ts[..., 1:] - ts[..., :-1]
