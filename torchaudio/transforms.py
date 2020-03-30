@@ -827,8 +827,7 @@ class Synth(torch.nn.Module):
         freq (int or tuple, optional): are the frequencies at the beginning/end of synthesis in Hz (Default: ``440``).
         chirp (str, optional): If `freq` defined the variation between to frequencies can be changed `linear`,
             `square` or `exp` (Default: ```linear``).
-        amp (foat): Maximum amplitude (Default: ```1.0``).
-        offset (float): indicates where in its period the signal starts; offset is in units of radians.
+        amp (float, optional): Maximum amplitude (Default: ```1.0``).
     """
 
     def __init__(self,
@@ -837,8 +836,7 @@ class Synth(torch.nn.Module):
                  wave_type="sine",
                  freq=400,
                  chirp="linear",
-                 amp=1.0,
-                 offset=0):
+                 amp=1.0):
         super(Synth, self).__init__()
         self.sample_rate = sample_rate
         self.duration = duration
@@ -846,7 +844,6 @@ class Synth(torch.nn.Module):
         self.freq = freq
         self.chirp = chirp
         self.amp = amp
-        self.offset = offset
 
     def forward(self, waveform=None):
         # type: (Optional[Tensor]) -> Tensor
