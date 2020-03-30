@@ -1,14 +1,13 @@
 import unittest
-import common_utils
 import torch
 import torchaudio
 import math
 import os
-from _test import AudioBackendScope, BACKENDS, BACKENDS_MP3
+from common_utils import AudioBackendScope, BACKENDS, BACKENDS_MP3, create_temp_assets_dir
 
 
 class Test_LoadSave(unittest.TestCase):
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    test_dirpath, test_dir = create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, "assets",
                                  "steam-train-whistle-daniel_simon.mp3")
     test_filepath_wav = os.path.join(test_dirpath, "assets",

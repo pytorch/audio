@@ -9,7 +9,7 @@ import pytest
 import unittest
 import common_utils
 
-from _test import AudioBackendScope, BACKENDS
+from common_utils import AudioBackendScope, BACKENDS
 from torchaudio.common_utils import IMPORT_LIBROSA
 
 if IMPORT_LIBROSA:

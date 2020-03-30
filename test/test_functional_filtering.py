@@ -4,9 +4,8 @@ import torch
 import torchaudio
 import torchaudio.functional as F
 import unittest
-import common_utils
 import time
-from _test import AudioBackendScope, BACKENDS
+from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
 
 
 def _test_torchscript_functional(py_method, *args, **kwargs):
@@ -19,7 +18,7 @@ def _test_torchscript_functional(py_method, *args, **kwargs):
 
 
 class TestFunctionalFiltering(unittest.TestCase):
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    test_dirpath, test_dir = create_temp_assets_dir()
 
     def _test_lfilter_basic(self, dtype, device):
         """

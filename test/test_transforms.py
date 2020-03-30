@@ -7,8 +7,7 @@ import torchaudio.transforms as transforms
 import torchaudio.functional as F
 from torchaudio.common_utils import IMPORT_LIBROSA, IMPORT_SCIPY
 import unittest
-import common_utils
-from _test import AudioBackendScope, BACKENDS
+from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
 
 if IMPORT_LIBROSA:
     import librosa
@@ -53,7 +52,7 @@ class Tester(unittest.TestCase):
     waveform.unsqueeze_(0)  # (1, 64000)
     waveform = (waveform * volume * 2**31).long()
     # file for stereo stft test
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    test_dirpath, test_dir = create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, 'assets',
                                  'steam-train-whistle-daniel_simon.wav')
 
@@ -638,7 +637,7 @@ class TestLibrosaConsistency(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.test_dirpath, cls.test_dir = common_utils.create_temp_assets_dir()
+        cls.test_dirpath, cls.test_dir = create_temp_assets_dir()
 
     def _to_librosa(self, sound):
         return sound.cpu().numpy().squeeze()
