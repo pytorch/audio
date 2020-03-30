@@ -1,13 +1,15 @@
 import unittest
-import common_utils
 import torch
 import torchaudio
 import math
 import os
 
+from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
 
+
+@unittest.skipIf("sox" not in BACKENDS, "sox not available")
 class Test_SoxEffectsChain(unittest.TestCase):
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    test_dirpath, test_dir = create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, "assets",
                                  "steam-train-whistle-daniel_simon.mp3")
 
@@ -259,4 +261,5 @@ class Test_SoxEffectsChain(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    with AudioBackendScope("sox"):
+        unittest.main()

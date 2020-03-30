@@ -7,7 +7,7 @@ import torchaudio.transforms as transforms
 import torchaudio.functional as F
 from torchaudio.common_utils import IMPORT_LIBROSA, IMPORT_SCIPY
 import unittest
-import common_utils
+from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
 
 if IMPORT_LIBROSA:
     import librosa
@@ -52,9 +52,9 @@ class Tester(unittest.TestCase):
     waveform.unsqueeze_(0)  # (1, 64000)
     waveform = (waveform * volume * 2**31).long()
     # file for stereo stft test
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    test_dirpath, test_dir = create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, 'assets',
-                                 'steam-train-whistle-daniel_simon.mp3')
+                                 'steam-train-whistle-daniel_simon.wav')
 
     def scale(self, waveform, factor=float(2**31)):
         # scales a waveform by a factor
@@ -530,8 +530,13 @@ class Tester(unittest.TestCase):
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
         self.assertTrue(torch.allclose(computed, expected))
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_batch_mfcc(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
+        test_filepath = os.path.join(
+            self.test_dirpath, 'assets', 'steam-train-whistle-daniel_simon.mp3'
+        )
+        waveform, sample_rate = torchaudio.load(test_filepath)
 
         # Single then transform then batch
         expected = transforms.MFCC()(waveform).repeat(3, 1, 1, 1)
@@ -632,7 +637,7 @@ class TestLibrosaConsistency(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.test_dirpath, cls.test_dir = common_utils.create_temp_assets_dir()
+        cls.test_dirpath, cls.test_dir = create_temp_assets_dir()
 
     def _to_librosa(self, sound):
         return sound.cpu().numpy().squeeze()
@@ -644,6 +649,8 @@ class TestLibrosaConsistency(unittest.TestCase):
         return sound.mean(dim=0, keepdim=True), sample_rate
 
     @unittest.skipIf(not IMPORT_LIBROSA, 'Librosa is not available')
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_MelScale(self):
         """MelScale transform is comparable to that of librosa"""
         n_fft = 2048

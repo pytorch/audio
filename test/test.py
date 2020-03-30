@@ -1,39 +1,25 @@
 import unittest
-import common_utils
 import torch
 import torchaudio
 import math
 import os
-
-
-class AudioBackendScope:
-    def __init__(self, backend):
-        self.new_backend = backend
-        self.previous_backend = torchaudio.get_audio_backend()
-
-    def __enter__(self):
-        torchaudio.set_audio_backend(self.new_backend)
-        return self.new_backend
-
-    def __exit__(self, type, value, traceback):
-        backend = self.previous_backend
-        torchaudio.set_audio_backend(backend)
+from common_utils import AudioBackendScope, BACKENDS, BACKENDS_MP3, create_temp_assets_dir
 
 
 class Test_LoadSave(unittest.TestCase):
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    test_dirpath, test_dir = create_temp_assets_dir()
     test_filepath = os.path.join(test_dirpath, "assets",
                                  "steam-train-whistle-daniel_simon.mp3")
     test_filepath_wav = os.path.join(test_dirpath, "assets",
                                      "steam-train-whistle-daniel_simon.wav")
 
     def test_1_save(self):
-        for backend in ["sox"]:
+        for backend in BACKENDS_MP3:
             with self.subTest():
                 with AudioBackendScope(backend):
                     self._test_1_save(self.test_filepath, False)
 
-        for backend in ["sox", "soundfile"]:
+        for backend in BACKENDS:
             with self.subTest():
                 with AudioBackendScope(backend):
                     self._test_1_save(self.test_filepath_wav, True)
@@ -79,7 +65,7 @@ class Test_LoadSave(unittest.TestCase):
             torchaudio.save(new_filepath, x, sr)
 
     def test_1_save_sine(self):
-        for backend in ["sox", "soundfile"]:
+        for backend in BACKENDS:
             with self.subTest():
                 with AudioBackendScope(backend):
                     self._test_1_save_sine()
@@ -112,12 +98,12 @@ class Test_LoadSave(unittest.TestCase):
         os.unlink(new_filepath)
 
     def test_2_load(self):
-        for backend in ["sox"]:
+        for backend in BACKENDS_MP3:
             with self.subTest():
                 with AudioBackendScope(backend):
                     self._test_2_load(self.test_filepath, 278756)
 
-        for backend in ["sox", "soundfile"]:
+        for backend in BACKENDS:
             with self.subTest():
                 with AudioBackendScope(backend):
                     self._test_2_load(self.test_filepath_wav, 276858)
@@ -153,7 +139,7 @@ class Test_LoadSave(unittest.TestCase):
             torchaudio.load(tdir)
 
     def test_2_load_nonormalization(self):
-        for backend in ["sox"]:
+        for backend in BACKENDS_MP3:
             with self.subTest():
                 with AudioBackendScope(backend):
                     self._test_2_load_nonormalization(self.test_filepath, 278756)
@@ -170,7 +156,7 @@ class Test_LoadSave(unittest.TestCase):
         self.assertTrue(isinstance(x, torch.LongTensor))
 
     def test_3_load_and_save_is_identity(self):
-        for backend in ["sox", "soundfile"]:
+        for backend in BACKENDS:
             with self.subTest():
                 with AudioBackendScope(backend):
                     self._test_3_load_and_save_is_identity()
@@ -185,6 +171,7 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(sample_rate, sample_rate2)
         os.unlink(output_path)
 
+    @unittest.skipIf(set(["sox", "soundfile"]) not in set(BACKENDS), "sox and soundfile are not available")
     def test_3_load_and_save_is_identity_across_backend(self):
         with self.subTest():
             self._test_3_load_and_save_is_identity_across_backend("sox", "soundfile")
@@ -208,7 +195,7 @@ class Test_LoadSave(unittest.TestCase):
         os.unlink(output_path)
 
     def test_4_load_partial(self):
-        for backend in ["sox"]:
+        for backend in BACKENDS_MP3:
             with self.subTest():
                 with AudioBackendScope(backend):
                     self._test_4_load_partial()
@@ -250,7 +237,7 @@ class Test_LoadSave(unittest.TestCase):
             torchaudio.load(input_sine_path, offset=100000)
 
     def test_5_get_info(self):
-        for backend in ["sox", "soundfile"]:
+        for backend in BACKENDS:
             with self.subTest():
                 with AudioBackendScope(backend):
                     self._test_5_get_info()

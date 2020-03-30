@@ -9,6 +9,7 @@ import pytest
 import unittest
 import common_utils
 
+from common_utils import AudioBackendScope, BACKENDS
 from torchaudio.common_utils import IMPORT_LIBROSA
 
 if IMPORT_LIBROSA:
@@ -39,7 +40,7 @@ class TestFunctional(unittest.TestCase):
     test_dirpath, test_dir = common_utils.create_temp_assets_dir()
 
     test_filepath = os.path.join(test_dirpath, 'assets',
-                                 'steam-train-whistle-daniel_simon.mp3')
+                                 'steam-train-whistle-daniel_simon.wav')
     waveform_train, sr_train = torchaudio.load(test_filepath)
 
     def test_torchscript_spectrogram(self):
@@ -433,6 +434,8 @@ class TestFunctional(unittest.TestCase):
         self._test_create_fb(n_mels=56, fmin=1900.0, fmax=900.0)
         self._test_create_fb(n_mels=10, fmin=1900.0, fmax=900.0)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_gain(self):
         waveform_gain = F.gain(self.waveform_train, 3)
         self.assertTrue(waveform_gain.abs().max().item(), 1.)
@@ -444,6 +447,8 @@ class TestFunctional(unittest.TestCase):
 
         self.assertTrue(torch.allclose(waveform_gain, sox_gain_waveform, atol=1e-04))
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_dither(self):
         waveform_dithered = F.dither(self.waveform_train)
         waveform_dithered_noiseshaped = F.dither(self.waveform_train, noise_shaping=True)
@@ -461,6 +466,8 @@ class TestFunctional(unittest.TestCase):
 
         self.assertTrue(torch.allclose(waveform_dithered_noiseshaped, sox_dither_waveform_ns, atol=1e-02))
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_vctk_transform_pipeline(self):
         test_filepath_vctk = os.path.join(self.test_dirpath, "assets/VCTK-Corpus/wav48/p224/", "p224_002.wav")
         wf_vctk, sr_vctk = torchaudio.load(test_filepath_vctk)
