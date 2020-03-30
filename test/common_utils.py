@@ -1,10 +1,13 @@
 import os
-from shutil import copytree
 import tempfile
+from contextlib import contextmanager
+from shutil import copytree
 
 import torch
+import torchaudio
 
 TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+BACKENDS = torchaudio._backend._audio_backends
 
 
 def create_temp_assets_dir():
@@ -48,3 +51,35 @@ def random_int_tensor(seed, size, low=0, high=2 ** 32, a=22695477, c=1, m=2 ** 3
     """ Same as random_float_tensor but integers between [low, high)
     """
     return torch.floor(random_float_tensor(seed, size, a, c, m) * (high - low)) + low
+
+
+@contextmanager
+def AudioBackendScope(new_backend):
+    previous_backend = torchaudio.get_audio_backend()
+    try:
+        torchaudio.set_audio_backend(new_backend)
+        yield
+    finally:
+        torchaudio.set_audio_backend(previous_backend)
+
+
+def filter_backends_with_mp3(backends):
+    test_dirpath, _ = create_temp_assets_dir()
+    test_filepath = os.path.join(
+        test_dirpath, "assets", "steam-train-whistle-daniel_simon.mp3"
+    )
+
+    backends_mp3 = []
+
+    for backend in backends:
+        try:
+            with AudioBackendScope(backend):
+                torchaudio.load(test_filepath)
+            backends_mp3.append(backend)
+        except RuntimeError:
+            pass
+
+    return backends_mp3
+
+
+BACKENDS_MP3 = filter_backends_with_mp3(BACKENDS)
