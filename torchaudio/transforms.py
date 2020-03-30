@@ -825,8 +825,8 @@ class Synth(torch.nn.Module):
         duration (float, optional): Duration in seconds of audio to synthesise (Default: ``1.0``).
         wave_type (str, optional): is one of sine, square, triangle, sawtooth, trapezium and exp (Default: ``"sine"``).
         freq (int or tuple, optional): are the frequencies at the beginning/end of synthesis in Hz (Default: ``440``).
-        freq_change (str, optional): If `freq` defined the variation between to frequencies it can be changed `linear`,
-            `square` and `exp` (Default: ```linear``).
+        chirp (str, optional): If `freq` defined the variation between to frequencies can be changed `linear`,
+            `square` or `exp` (Default: ```linear``).
         amp (foat): Maximum amplitude (Default: ```1.0``).
         offset (float): indicates where in its period the signal starts; offset is in units of radians.
     """
@@ -836,7 +836,7 @@ class Synth(torch.nn.Module):
                  duration=1.0,
                  wave_type="sine",
                  freq=400,
-                 freq_change="linear",
+                 chirp="linear",
                  amp=1.0,
                  offset=0):
         super(Synth, self).__init__()
@@ -844,7 +844,7 @@ class Synth(torch.nn.Module):
         self.duration = duration
         self.wave_type = wave_type
         self.freq = freq
-        self.freq_change = freq_change
+        self.chirp = chirp
         self.amp = amp
         self.offset = offset
 
@@ -860,11 +860,11 @@ class Synth(torch.nn.Module):
         if isinstance(self.freq, int):
             self.freq = (self.freq, self.freq)
 
-        if self.freq_change == "linear":
+        if self.chirp == "linear":
             self.evaluate = self.evaluate_linear()
-        elif self.freq_change == "exp":
+        elif self.chirp == "exp":
             self.evaluate = self.evaluate_exp()
-        elif self.freq_change == "square":
+        elif self.chirp == "square":
             self.evaluate = self.evaluate_square()
 
         if self.wave_type is "sine":
