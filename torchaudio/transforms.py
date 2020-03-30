@@ -824,7 +824,6 @@ class Synth(torch.nn.Module):
         sample_rate (int, optional): Sample rate of audio signal (Default: ``16000``).
         duration (float, optional): Duration in seconds of audio to synthesise (Default: ``1.0``).
         wave_type (str, optional): is one of sine, square, triangle, sawtooth, trapezium and exp (Default: ``"sine"``).
-        freq (int or tuple, optional) are the frequencies at the beginning/end of synthesis in Hz (Default: ``440``).
         freq (int or tuple, optional): are the frequencies at the beginning/end of synthesis in Hz (Default: ``440``).
         freq_change (str, optional): If `freq` defined the variation between to frequencies it can be changed `linear`,
             `square` and `exp` (Default: ```linear``).
@@ -861,31 +860,43 @@ class Synth(torch.nn.Module):
         if isinstance(self.freq, int):
             self.freq = (self.freq, self.freq)
 
+        if self.freq_change == "linear":
+            self.evaluate = self.evaluate_linear()
+        elif self.freq_change == "exp":
+            self.evaluate = self.evaluate_exp()
+
         if self.wave_type is "sine":
-            return self.amp * torch.sin(self.evaluate())
+            return self.amp * torch.sin(self.evaluate)
 
-        if self.wave_type is "triangle":
-            return self.amp * self._triangle(self.evaluate())
+        elif self.wave_type is "triangle":
+            return self.amp * self._triangle(self.evaluate)
 
-        if self.wave_type is "square":
-            return self._square(self.evaluate())
+        elif self.wave_type is "square":
+            return self._square(self.evaluate)
 
-        if self.wave_type is "sawtooth":
-            return self._sawtooth(self.evaluate())
+        elif self.wave_type is "sawtooth":
+            return self._sawtooth(self.evaluate)
 
-        if self.wave_type is "exp":
-            return self._exp(self.evaluate())
+        elif self.wave_type is "exp":
+            return self._exp(self.evaluate)
 
-        if self.wave_type is "trapezium":
-            return self._trapezium(self.evaluate())
+        elif self.wave_type is "trapezium":
+            return self._trapezium(self.evaluate)
 
-    def evaluate(self):
+    def evaluate_linear(self):
         n = round(self.duration * self.sample_rate)
         ts = torch.arange(n, dtype=torch.float) / self.sample_rate
         freqs = torch.linspace(self.freq[0], self.freq[1], len(ts) - 1)
-        return self._evaluate_linear(ts, freqs)
+        return self._evaluate(ts, freqs)
 
-    def _evaluate_linear(self, ts, freqs):
+    def evaluate_exp(self):
+        n = round(self.duration * self.sample_rate)
+        ts = torch.arange(n, dtype=torch.float) / self.sample_rate
+        freqs = torch.logspace(math.log10(self.freq[0]),
+                               math.log10(self.freq[1]), len(ts) - 1)
+        return self._evaluate(ts, freqs)
+
+    def _evaluate(self, ts, freqs):
         dts = ts[..., 1:] - ts[..., :-1]
         dphis = 2 * math.pi * freqs * dts
         phases = torch.cumsum(dphis, -1)
