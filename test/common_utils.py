@@ -64,22 +64,22 @@ def AudioBackendScope(new_backend):
 
 
 def filter_backends_with_mp3(backends):
+    # Filter out backends that do not support mp3
+
     test_dirpath, _ = create_temp_assets_dir()
     test_filepath = os.path.join(
         test_dirpath, "assets", "steam-train-whistle-daniel_simon.mp3"
     )
 
-    backends_mp3 = []
-
-    for backend in backends:
+    def supports_mp3(backend):
         try:
             with AudioBackendScope(backend):
                 torchaudio.load(test_filepath)
-            backends_mp3.append(backend)
+            return True
         except RuntimeError:
-            pass
+            return False
 
-    return backends_mp3
+    return [backend for backend in backends if supports_mp3(backend)]
 
 
 BACKENDS_MP3 = filter_backends_with_mp3(BACKENDS)
