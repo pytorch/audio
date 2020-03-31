@@ -43,7 +43,7 @@ def _stft(
         n_fft: int,
         hop_length: Optional[int],
         win_length: Optional[int],
-        window: Optional[int],
+        window: Optional[Tensor],
         center: bool,
         pad_mode: str,
         normalized: bool,
@@ -613,7 +613,7 @@ def magphase(
     """
     mag = complex_norm(complex_tensor, power)
     phase = angle(complex_tensor)
-    return (mag, phase)
+    return mag, phase
 
 
 def phase_vocoder(
@@ -630,7 +630,7 @@ def phase_vocoder(
         phase_advance (Tensor): Expected phase advance in each bin. Dimension of (freq, 1)
 
     Returns:
-        complex_specgrams_stretch (Tensor): Dimension of `(..., freq, ceil(time/rate), complex=2)`
+        Tensor: Complex Specgrams Stretch with dimension of `(..., freq, ceil(time/rate), complex=2)`
 
     Example
         >>> freq, hop_length = 1025, 512
