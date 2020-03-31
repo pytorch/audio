@@ -261,7 +261,7 @@ def walk_files(root, suffix, prefix=False, remove_suffix=False, ignore=None):
             only returns the name of the files found (Default: ``False``)
         remove_suffix (bool, optional): If true, removes the suffix to each result defined in suffix,
             otherwise will return the result as found (Default: ``False``).
-        ignore (list, optional): List with the folders names to be ignored (Default: ``None``).
+        ignore (list or None, optional): List with the folders names to be ignored (Default: ``None``).
     """
 
     root = os.path.expanduser(root)
