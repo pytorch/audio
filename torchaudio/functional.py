@@ -140,11 +140,11 @@ def istft(
     device = stft_matrix.device
     fft_size = stft_matrix.size(1)
     assert (onesided and n_fft // 2 + 1 == fft_size) or (
-            not onesided and n_fft == fft_size
+        not onesided and n_fft == fft_size
     ), (
-            "one_sided implies that n_fft // 2 + 1 == fft_size and not one_sided implies n_fft == fft_size. "
-            + "Given values were onesided: %s, n_fft: %d, fft_size: %d"
-            % ("True" if onesided else False, n_fft, fft_size)
+        "one_sided implies that n_fft // 2 + 1 == fft_size and not one_sided implies n_fft == fft_size. "
+        + "Given values were onesided: %s, n_fft: %d, fft_size: %d"
+        % ("True" if onesided else False, n_fft, fft_size)
     )
 
     # use stft defaults for Optionals
@@ -1326,11 +1326,7 @@ def compute_deltas(
 
     specgram = torch.nn.functional.pad(specgram, (n, n), mode=mode)
 
-    kernel = (
-        torch
-            .arange(-n, n + 1, 1, device=specgram.device, dtype=specgram.dtype)
-            .repeat(specgram.shape[1], 1, 1)
-    )
+    kernel = (torch.arange(-n, n + 1, 1, device=specgram.device, dtype=specgram.dtype).repeat(specgram.shape[1], 1, 1))
 
     output = torch.nn.functional.conv1d(specgram, kernel, groups=specgram.shape[1]) / denom
 
@@ -1524,17 +1520,13 @@ def _compute_nccf(
     # Compute lags
     output_lag = []
     for lag in range(1, lags + 1):
-        s1 = waveform[..., :-lag].unfold(-1, frame_size, frame_size)[
-             ..., :num_of_frames, :
-             ]
-        s2 = waveform[..., lag:].unfold(-1, frame_size, frame_size)[
-             ..., :num_of_frames, :
-             ]
+        s1 = waveform[..., :-lag].unfold(-1, frame_size, frame_size)[..., :num_of_frames, :]
+        s2 = waveform[..., lag:].unfold(-1, frame_size, frame_size)[..., :num_of_frames, :]
 
         output_frames = (
-                (s1 * s2).sum(-1)
-                / (EPSILON + torch.norm(s1, p=2, dim=-1)).pow(2)
-                / (EPSILON + torch.norm(s2, p=2, dim=-1)).pow(2)
+            (s1 * s2).sum(-1)
+            / (EPSILON + torch.norm(s1, p=2, dim=-1)).pow(2)
+            / (EPSILON + torch.norm(s2, p=2, dim=-1)).pow(2)
         )
 
         output_lag.append(output_frames.unsqueeze(-1))
