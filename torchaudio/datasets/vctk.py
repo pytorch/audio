@@ -91,7 +91,7 @@ class VCTK(Dataset):
             )
 
         walker = walk_files(
-            self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
+            self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True, ignore=["p315"]
         )
         self._walker = list(walker)
 
