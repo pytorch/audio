@@ -21,7 +21,7 @@ def effect_names() -> List[str]:
 
 
 @_audio_backend_guard("sox")
-def SoxEffect() -> Any:
+def SoxEffect():
     r"""Create an object for passing sox effect information between python and c++
 
     Returns:
