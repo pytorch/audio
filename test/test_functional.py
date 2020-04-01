@@ -23,25 +23,6 @@ class TestFunctional(unittest.TestCase):
                                  'steam-train-whistle-daniel_simon.wav')
     waveform_train, sr_train = torchaudio.load(test_filepath)
 
-    def test_batch_griffinlim(self):
-
-        torch.random.manual_seed(42)
-        tensor = torch.rand((1, 201, 6))
-
-        n_fft = 400
-        ws = 400
-        hop = 200
-        window = torch.hann_window(ws)
-        power = 2
-        normalize = False
-        momentum = 0.99
-        n_iter = 32
-        length = 1000
-
-        self._test_batch(
-            F.griffinlim, tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, 0, atol=5e-5
-        )
-
     def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
         computed = F.compute_deltas(specgram, win_length=win_length)
         self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
@@ -57,10 +38,6 @@ class TestFunctional(unittest.TestCase):
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5],
                                   [0.5, 1.0, 1.0, 0.5]]])
         self._test_compute_deltas(specgram, expected)
-
-    def test_batch_pitch(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
-        self._test_batch(F.detect_pitch_frequency, waveform, sample_rate)
 
     def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
         # trim sound for case when constructed signal is shorter than original
@@ -298,16 +275,6 @@ class TestFunctional(unittest.TestCase):
         data_size = (2, 7, 3, 2)
         self._test_linearity_of_istft(data_size, kwargs4, atol=1e-5, rtol=1e-8)
 
-    def test_batch_istft(self):
-
-        stft = torch.tensor([
-            [[4., 0.], [4., 0.], [4., 0.], [4., 0.], [4., 0.]],
-            [[0., 0.], [0., 0.], [0., 0.], [0., 0.], [0., 0.]],
-            [[0., 0.], [0., 0.], [0., 0.], [0., 0.], [0., 0.]]
-        ])
-
-        self._test_batch(F.istft, stft, n_fft=4, length=4)
-
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
     def test_gain(self):
@@ -382,65 +349,6 @@ class TestFunctional(unittest.TestCase):
             threshold = 1
             s = ((freq - freq_ref).abs() > threshold).sum()
             self.assertFalse(s)
-
-            # Convert to stereo and batch for testing purposes
-            self._test_batch(F.detect_pitch_frequency, waveform, sample_rate)
-
-    def _test_batch_shape(self, functional, tensor, *args, **kwargs):
-
-        kwargs_compare = {}
-        if 'atol' in kwargs:
-            atol = kwargs['atol']
-            del kwargs['atol']
-            kwargs_compare['atol'] = atol
-
-        if 'rtol' in kwargs:
-            rtol = kwargs['rtol']
-            del kwargs['rtol']
-            kwargs_compare['rtol'] = rtol
-
-        # Single then transform then batch
-
-        torch.random.manual_seed(42)
-        expected = functional(tensor.clone(), *args, **kwargs)
-        expected = expected.unsqueeze(0).unsqueeze(0)
-
-        # 1-Batch then transform
-
-        tensors = tensor.unsqueeze(0).unsqueeze(0)
-
-        torch.random.manual_seed(42)
-        computed = functional(tensors.clone(), *args, **kwargs)
-
-        self._compare_estimate(computed, expected, **kwargs_compare)
-
-        return tensors, expected
-
-    def _test_batch(self, functional, tensor, *args, **kwargs):
-
-        tensors, expected = self._test_batch_shape(functional, tensor, *args, **kwargs)
-
-        kwargs_compare = {}
-        if 'atol' in kwargs:
-            atol = kwargs['atol']
-            del kwargs['atol']
-            kwargs_compare['atol'] = atol
-
-        if 'rtol' in kwargs:
-            rtol = kwargs['rtol']
-            del kwargs['rtol']
-            kwargs_compare['rtol'] = rtol
-
-        # 3-Batch then transform
-
-        ind = [3] + [1] * (int(tensors.dim()) - 1)
-        tensors = tensor.repeat(*ind)
-
-        ind = [3] + [1] * (int(expected.dim()) - 1)
-        expected = expected.repeat(*ind)
-
-        torch.random.manual_seed(42)
-        computed = functional(tensors.clone(), *args, **kwargs)
 
     def test_DB_to_amplitude(self):
         # Make some noise
