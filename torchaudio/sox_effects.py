@@ -1,12 +1,13 @@
+from typing import Any, Callable, List, Optional, Tuple, Union
+
 import torch
-
 import torchaudio
-
+from torch import Tensor
 from torchaudio._backend import _audio_backend_guard
 
 
 @_audio_backend_guard("sox")
-def effect_names():
+def effect_names() -> List[str]:
     """Gets list of valid sox effect names
 
     Returns: list[str]
@@ -20,7 +21,7 @@ def effect_names():
 
 
 @_audio_backend_guard("sox")
-def SoxEffect():
+def SoxEffect() -> Any:
     r"""Create an object for passing sox effect information between python and c++
 
     Returns:
@@ -49,7 +50,7 @@ class SoxEffectsChain(object):
             automatically. . (Default: ``'raw'``)
 
     Returns:
-        Tuple[torch.Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number
+        Tuple[Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number
         of audio frames and C is the number of channels. An integer which is the sample rate of the
         audio (as listed in the metadata of the file)
 
@@ -77,9 +78,14 @@ class SoxEffectsChain(object):
 
     """
 
-    EFFECTS_UNIMPLEMENTED = set(["spectrogram", "splice", "noiseprof", "fir"])
+    EFFECTS_UNIMPLEMENTED = {"spectrogram", "splice", "noiseprof", "fir"}
 
-    def __init__(self, normalization=True, channels_first=True, out_siginfo=None, out_encinfo=None, filetype="raw"):
+    def __init__(self,
+                 normalization: Union[bool, float, Callable] = True,
+                 channels_first: bool = True,
+                 out_siginfo: Any = None,
+                 out_encinfo: Any = None,
+                 filetype: str = "raw") -> None:
         self.input_file = None
         self.chain = []
         self.MAX_EFFECT_OPTS = 20
@@ -92,12 +98,14 @@ class SoxEffectsChain(object):
         # Define in __init__ to avoid calling at import time
         self.EFFECTS_AVAILABLE = set(effect_names())
 
-    def append_effect_to_chain(self, ename, eargs=None):
+    def append_effect_to_chain(self,
+                               ename: str,
+                               eargs: Optional[List[str]] = None) -> None:
         r"""Append effect to a sox effects chain.
 
         Args:
             ename (str): which is the name of effect
-            eargs (List[str]): which is a list of effect options. (Default: ``None``)
+            eargs (List[str], optional): which is a list of effect options. (Default: ``None``)
         """
         e = SoxEffect()
         # check if we have a valid effect
@@ -116,14 +124,15 @@ class SoxEffectsChain(object):
         self.chain.append(e)
 
     @_audio_backend_guard("sox")
-    def sox_build_flow_effects(self, out=None):
+    def sox_build_flow_effects(self,
+                               out: Tensor = None) -> Tuple[Tensor, int]:
         r"""Build effects chain and flow effects from input file to output tensor
 
         Args:
-            out (torch.Tensor): Where the output will be written to. (Default: ``None``)
+            out (Tensor): Where the output will be written to. (Default: ``None``)
 
         Returns:
-            Tuple[torch.Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number
+            Tuple[Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number
             of audio frames and C is the number of channels. An integer which is the sample rate of the
             audio (as listed in the metadata of the file)
         """
@@ -154,12 +163,12 @@ class SoxEffectsChain(object):
 
         return out, sr
 
-    def clear_chain(self):
+    def clear_chain(self) -> None:
         r"""Clear effects chain in python
         """
         self.chain = []
 
-    def set_input_file(self, input_file):
+    def set_input_file(self, input_file: str) -> None:
         r"""Set input file for input of chain
 
         Args:
@@ -167,7 +176,7 @@ class SoxEffectsChain(object):
         """
         self.input_file = input_file
 
-    def _check_effect(self, e):
+    def _check_effect(self, e: str) -> str:
         if e.lower() in self.EFFECTS_UNIMPLEMENTED:
             raise NotImplementedError("This effect ({}) is not implement in torchaudio".format(e))
         elif e.lower() not in self.EFFECTS_AVAILABLE:
@@ -176,7 +185,7 @@ class SoxEffectsChain(object):
 
     # https://stackoverflow.com/questions/12472338/flattening-a-list-recursively
     # convenience function to flatten list recursively
-    def _flatten(self, x):
+    def _flatten(self, x: list) -> list:
         if x == []:
             return []
         if isinstance(x[0], list):
