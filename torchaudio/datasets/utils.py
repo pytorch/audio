@@ -9,9 +9,8 @@ import threading
 import zipfile
 from queue import Queue
 
-import six
 import torch
-from six.moves import urllib
+import urllib
 from torch.utils.data import Dataset
 from torch.utils.model_zoo import tqdm
 
@@ -41,21 +40,8 @@ def unicode_csv_reader(unicode_csv_data, **kwargs):
             maxInt = int(maxInt / 10)
     csv.field_size_limit(maxInt)
 
-    if six.PY2:
-        # Implementation borrowed from docs:
-        # https://docs.python.org/3.0/library/csv.html#examples
-        def utf_8_encoder(unicode_csv_data):
-            for line in unicode_csv_data:
-                yield line.encode('utf-8')
-
-        # csv.py doesn't do Unicode; encode temporarily as UTF-8:
-        csv_reader = csv.reader(utf_8_encoder(unicode_csv_data), **kwargs)
-        for row in csv_reader:
-            # decode UTF-8 back to Unicode, cell by cell:
-            yield [cell.decode("utf-8") for cell in row]
-    else:
-        for line in csv.reader(unicode_csv_data, **kwargs):
-            yield line
+    for line in csv.reader(unicode_csv_data, **kwargs):
+        yield line
 
 
 def makedir_exist_ok(dirpath):
