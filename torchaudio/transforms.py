@@ -36,13 +36,13 @@ class Spectrogram(torch.nn.Module):
         win_length (int or None, optional): Window size. (Default: ``n_fft``)
         hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
         pad (int, optional): Two sided padding of signal. (Default: ``0``)
-        window_fn (Callable[[...], torch.Tensor], optional): A function to create a window tensor
+        window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         power (float or None, optional): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
             If None, then the complex spectrum is returned instead. (Default: ``2``)
         normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
-        wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
+        wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -70,10 +70,10 @@ class Spectrogram(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (torch.Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension (..., time).
 
         Returns:
-            torch.Tensor: Dimension (..., freq, time), where freq is
+            Tensor: Dimension (..., freq, time), where freq is
             ``n_fft // 2 + 1`` where ``n_fft`` is the number of
             Fourier bins, and time is the number of window hops (n_frame).
         """
@@ -103,12 +103,12 @@ class GriffinLim(torch.nn.Module):
         n_iter (int, optional): Number of iteration for phase recovery process. (Default: ``32``)
         win_length (int or None, optional): Window size. (Default: ``n_fft``)
         hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
-        window_fn (Callable[[...], torch.Tensor], optional): A function to create a window tensor
+        window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         power (float, optional): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
         normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
-        wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
+        wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
         momentum (float, optional): The momentum parameter for fast Griffin-Lim.
             Setting this to 0 recovers the original Griffin-Lim method.
             Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: ``0.99``)
@@ -191,10 +191,10 @@ class AmplitudeToDB(torch.nn.Module):
         https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
 
         Args:
-            x (torch.Tensor): Input tensor before being converted to decibel scale.
+            x (Tensor): Input tensor before being converted to decibel scale.
 
         Returns:
-            torch.Tensor: Output tensor in decibel scale.
+            Tensor: Output tensor in decibel scale.
         """
         return F.amplitude_to_DB(x, self.multiplier, self.amin, self.db_multiplier, self.top_db)
 
@@ -236,10 +236,10 @@ class MelScale(torch.nn.Module):
     def forward(self, specgram: Tensor) -> Tensor:
         r"""
         Args:
-            specgram (torch.Tensor): A spectrogram STFT of dimension (..., freq, time).
+            specgram (Tensor): A spectrogram STFT of dimension (..., freq, time).
 
         Returns:
-            torch.Tensor: Mel frequency spectrogram of size (..., ``n_mels``, time).
+            Tensor: Mel frequency spectrogram of size (..., ``n_mels``, time).
         """
 
         # pack batch
@@ -271,14 +271,14 @@ class InverseMelScale(torch.nn.Module):
 
     Args:
         n_stft (int): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`.
-        n_mels (int): Number of mel filterbanks. (Default: ``128``)
-        sample_rate (int): Sample rate of audio signal. (Default: ``16000``)
-        f_min (float): Minimum frequency. (Default: ``0.``)
-        f_max (float, optional): Maximum frequency. (Default: ``sample_rate // 2``)
-        max_iter (int): Maximum number of optimization iterations.
-        tolerance_loss (float): Value of loss to stop optimization at.
-        tolerance_change (float): Difference in losses to stop optimization at.
-        sgdargs (dict): Arguments for the SGD optimizer.
+        n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)
+        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
+        f_min (float, optional): Minimum frequency. (Default: ``0.``)
+        f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
+        max_iter (int, optional): Maximum number of optimization iterations. (Default: ``100000``)
+        tolerance_loss (float, optional): Value of loss to stop optimization at. (Default: ``1e-5``)
+        tolerance_change (float, optional: Difference in losses to stop optimization at. (Default: ``1e-8``)
+        sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)
     """
     __constants__ = ['n_stft', 'n_mels', 'sample_rate', 'f_min', 'f_max', 'max_iter', 'tolerance_loss',
                      'tolerance_change', 'sgdargs']
@@ -311,10 +311,10 @@ class InverseMelScale(torch.nn.Module):
     def forward(self, melspec: Tensor) -> Tensor:
         r"""
         Args:
-            melspec (torch.Tensor): A Mel frequency spectrogram of dimension (..., ``n_mels``, time)
+            melspec (Tensor): A Mel frequency spectrogram of dimension (..., ``n_mels``, time)
 
         Returns:
-            torch.Tensor: Linear scale spectrogram of size (..., freq, time)
+            Tensor: Linear scale spectrogram of size (..., freq, time)
         """
         # pack batch
         shape = melspec.size()
@@ -372,7 +372,7 @@ class MelSpectrogram(torch.nn.Module):
         f_max (float or None, optional): Maximum frequency. (Default: ``None``)
         pad (int, optional): Two sided padding of signal. (Default: ``0``)
         n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)
-        window_fn (Callable[[...], torch.Tensor], optional): A function to create a window tensor
+        window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
 
@@ -411,10 +411,10 @@ class MelSpectrogram(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (torch.Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension (..., time).
 
         Returns:
-            torch.Tensor: Mel frequency spectrogram of size (..., ``n_mels``, time).
+            Tensor: Mel frequency spectrogram of size (..., ``n_mels``, time).
         """
         specgram = self.spectrogram(waveform)
         mel_specgram = self.mel_scale(specgram)
@@ -438,7 +438,7 @@ class MFCC(torch.nn.Module):
         dct_type (int, optional): type of DCT (discrete cosine transform) to use. (Default: ``2``)
         norm (str, optional): norm to use. (Default: ``'ortho'``)
         log_mels (bool, optional): whether to use log-mel spectrograms instead of db-scaled. (Default: ``False``)
-        melkwargs (dict, optional): arguments for MelSpectrogram. (Default: ``None``)
+        melkwargs (dict or None, optional): arguments for MelSpectrogram. (Default: ``None``)
     """
     __constants__ = ['sample_rate', 'n_mfcc', 'dct_type', 'top_db', 'log_mels']
 
@@ -474,10 +474,10 @@ class MFCC(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (torch.Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension (..., time).
 
         Returns:
-            torch.Tensor: specgram_mel_db of size (..., ``n_mfcc``, time).
+            Tensor: specgram_mel_db of size (..., ``n_mfcc``, time).
         """
 
         # pack batch
@@ -519,10 +519,10 @@ class MuLawEncoding(torch.nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         r"""
         Args:
-            x (torch.Tensor): A signal to be encoded.
+            x (Tensor): A signal to be encoded.
 
         Returns:
-            x_mu (torch.Tensor): An encoded signal.
+            x_mu (Tensor): An encoded signal.
         """
         return F.mu_law_encoding(x, self.quantization_channels)
 
@@ -546,10 +546,10 @@ class MuLawDecoding(torch.nn.Module):
     def forward(self, x_mu: Tensor) -> Tensor:
         r"""
         Args:
-            x_mu (torch.Tensor): A mu-law encoded signal which needs to be decoded.
+            x_mu (Tensor): A mu-law encoded signal which needs to be decoded.
 
         Returns:
-            torch.Tensor: The signal decoded.
+            Tensor: The signal decoded.
         """
         return F.mu_law_decoding(x_mu, self.quantization_channels)
 
@@ -575,10 +575,10 @@ class Resample(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (torch.Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension (..., time).
 
         Returns:
-            torch.Tensor: Output signal of dimension (..., time).
+            Tensor: Output signal of dimension (..., time).
         """
         if self.resampling_method == 'sinc_interpolation':
 
@@ -638,10 +638,10 @@ class ComputeDeltas(torch.nn.Module):
     def forward(self, specgram: Tensor) -> Tensor:
         r"""
         Args:
-            specgram (torch.Tensor): Tensor of audio of dimension (..., freq, time).
+            specgram (Tensor): Tensor of audio of dimension (..., freq, time).
 
         Returns:
-            deltas (torch.Tensor): Tensor of audio of dimension (..., freq, time).
+            Tensor: Tensor of deltas of dimension (..., freq, time).
         """
         return F.compute_deltas(specgram, win_length=self.win_length, mode=self.mode)
 
@@ -677,7 +677,7 @@ class TimeStretch(torch.nn.Module):
                 If no rate is passed, use ``self.fixed_rate``. (Default: ``None``)
 
         Returns:
-            (Tensor): Stretched complex spectrogram of dimension (..., freq, ceil(time/rate), complex=2).
+            Tensor: Stretched complex spectrogram of dimension (..., freq, ceil(time/rate), complex=2).
         """
         assert complex_specgrams.size(-1) == 2, "complex_specgrams should be a complex tensor, shape (..., complex=2)"
 
@@ -716,10 +716,10 @@ class Fade(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (torch.Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension (..., time).
 
         Returns:
-            torch.Tensor: Tensor of audio of dimension (..., time).
+            Tensor: Tensor of audio of dimension (..., time).
         """
         waveform_length = waveform.size()[-1]
 
@@ -853,10 +853,10 @@ class Vol(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (torch.Tensor): Tensor of audio of dimension (..., time).
+            waveform (Tensor): Tensor of audio of dimension (..., time).
 
         Returns:
-            torch.Tensor: Tensor of audio of dimension (..., time).
+            Tensor: Tensor of audio of dimension (..., time).
         """
         if self.gain_type == "amplitude":
             waveform = waveform * self.gain
