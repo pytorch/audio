@@ -125,11 +125,11 @@ class SoxEffectsChain(object):
 
     @_audio_backend_guard("sox")
     def sox_build_flow_effects(self,
-                               out: Tensor = None) -> Tuple[Tensor, int]:
+                               out: Optional[Tensor] = None) -> Tuple[Tensor, int]:
         r"""Build effects chain and flow effects from input file to output tensor
 
         Args:
-            out (Tensor): Where the output will be written to. (Default: ``None``)
+            out (Tensor, optional): Where the output will be written to. (Default: ``None``)
 
         Returns:
             Tuple[Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number
