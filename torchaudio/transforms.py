@@ -4,7 +4,7 @@ from warnings import warn
 import math
 import torch
 from torch import Tensor
-from typing import Any, Callable, Optional
+from typing import Callable, Optional
 from torchaudio import functional as F
 from torchaudio.compliance import kaldi
 
@@ -54,7 +54,7 @@ class Spectrogram(torch.nn.Module):
                  window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: Optional[float] = 2.,
                  normalized: bool = False,
-                 wkwargs: Any = None) -> None:
+                 wkwargs: Optional[dict] = None) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -126,7 +126,7 @@ class GriffinLim(torch.nn.Module):
                  window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: float = 2.,
                  normalized: bool = False,
-                 wkwargs: Any = None,
+                 wkwargs: Optional[dict] = None,
                  momentum: float = 0.99,
                  length: Optional[int] = None,
                  rand_init: bool = True) -> None:
@@ -148,7 +148,14 @@ class GriffinLim(torch.nn.Module):
         self.rand_init = rand_init
 
     def forward(self, specgram: Tensor) -> Tensor:
-        return F.griffinlim(S, self.window, self.n_fft, self.hop_length, self.win_length, self.power,
+        r"""
+        Args:
+            specgram (Tensor): A magnitude-only STFT spectrogram of dimension (..., freq, frames)
+            where freq is ``n_fft // 2 + 1``.
+
+        Returns:
+            Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.
+        """
         return F.griffinlim(specgram, self.window, self.n_fft, self.hop_length, self.win_length, self.power,
                             self.normalized, self.n_iter, self.momentum, self.length, self.rand_init)
 
@@ -285,7 +292,7 @@ class InverseMelScale(torch.nn.Module):
                  max_iter: int = 100000,
                  tolerance_loss: float = 1e-5,
                  tolerance_change: float = 1e-8,
-                 sgdargs: Any = None) -> None:
+                 sgdargs: Optional[dict] = None) -> None:
         super(InverseMelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
@@ -441,7 +448,7 @@ class MFCC(torch.nn.Module):
                  dct_type: int = 2,
                  norm: str = 'ortho',
                  log_mels: bool = False,
-                 melkwargs: Any = None) -> None:
+                 melkwargs: Optional[dict] = None) -> None:
         super(MFCC, self).__init__()
         supported_dct_types = [2]
         if dct_type not in supported_dct_types:
