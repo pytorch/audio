@@ -4,7 +4,7 @@ from warnings import warn
 import math
 import torch
 from torch import Tensor
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 from torchaudio import functional as F
 from torchaudio.compliance import kaldi
 
@@ -51,10 +51,10 @@ class Spectrogram(torch.nn.Module):
                  win_length: Optional[int] = None,
                  hop_length: Optional[int] = None,
                  pad: int = 0,
-                 window_fn: Callable = torch.hann_window,
+                 window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: Optional[float] = 2.,
                  normalized: bool = False,
-                 wkwargs: Optional[dict] = None) -> None:
+                 wkwargs: Any = None) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -67,7 +67,7 @@ class Spectrogram(torch.nn.Module):
         self.power = power
         self.normalized = normalized
 
-    def forward(self, waveform):
+    def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
             waveform (torch.Tensor): Tensor of audio of dimension (..., time).
@@ -123,10 +123,10 @@ class GriffinLim(torch.nn.Module):
                  n_iter: int = 32,
                  win_length: Optional[int] = None,
                  hop_length: Optional[int] = None,
-                 window_fn: Callable = torch.hann_window,
+                 window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: float = 2.,
                  normalized: bool = False,
-                 wkwargs: Optional[dict] = None,
+                 wkwargs: Any = None,
                  momentum: float = 0.99,
                  length: Optional[int] = None,
                  rand_init: bool = True) -> None:
@@ -147,8 +147,9 @@ class GriffinLim(torch.nn.Module):
         self.momentum = momentum / (1 + momentum)
         self.rand_init = rand_init
 
-    def forward(self, S: Tensor) -> Tensor:
+    def forward(self, specgram: Tensor) -> Tensor:
         return F.griffinlim(S, self.window, self.n_fft, self.hop_length, self.win_length, self.power,
+        return F.griffinlim(specgram, self.window, self.n_fft, self.hop_length, self.win_length, self.power,
                             self.normalized, self.n_iter, self.momentum, self.length, self.rand_init)
 
 
@@ -284,7 +285,7 @@ class InverseMelScale(torch.nn.Module):
                  max_iter: int = 100000,
                  tolerance_loss: float = 1e-5,
                  tolerance_change: float = 1e-8,
-                 sgdargs: Optional[dict] = None) -> None:
+                 sgdargs: Any = None) -> None:
         super(InverseMelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
@@ -383,7 +384,7 @@ class MelSpectrogram(torch.nn.Module):
                  f_max: Optional[float] = None,
                  pad: int = 0,
                  n_mels: int = 128,
-                 window_fn: Callable = torch.hann_window,
+                 window_fn: Callable[..., Tensor] = torch.hann_window,
                  wkwargs: Optional[dict] = None) -> None:
         super(MelSpectrogram, self).__init__()
         self.sample_rate = sample_rate
@@ -440,7 +441,7 @@ class MFCC(torch.nn.Module):
                  dct_type: int = 2,
                  norm: str = 'ortho',
                  log_mels: bool = False,
-                 melkwargs: Optional[dict] = None) -> None:
+                 melkwargs: Any = None) -> None:
         super(MFCC, self).__init__()
         supported_dct_types = [2]
         if dct_type not in supported_dct_types:
