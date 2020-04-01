@@ -278,7 +278,7 @@ class InverseMelScale(torch.nn.Module):
         f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
         max_iter (int, optional): Maximum number of optimization iterations. (Default: ``100000``)
         tolerance_loss (float, optional): Value of loss to stop optimization at. (Default: ``1e-5``)
-        tolerance_change (float, optional: Difference in losses to stop optimization at. (Default: ``1e-8``)
+        tolerance_change (float, optional): Difference in losses to stop optimization at. (Default: ``1e-8``)
         sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)
     """
     __constants__ = ['n_stft', 'n_mels', 'sample_rate', 'f_min', 'f_max', 'max_iter', 'tolerance_loss',
