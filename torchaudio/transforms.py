@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from warnings import warn
 import math
+from typing import Callable, Optional
+from warnings import warn
+
 import torch
 from torch import Tensor
-from typing import Callable, Optional
 from torchaudio import functional as F
 from torchaudio.compliance import kaldi
 
@@ -785,15 +786,14 @@ class _AxisMasking(torch.nn.Module):
         self.axis = axis
         self.iid_masks = iid_masks
 
-    def forward(self, specgram, mask_value=0.):
-        # type: (Tensor, float) -> Tensor
+    def forward(self, specgram: Tensor, mask_value: float = 0.) -> Tensor:
         r"""
         Args:
-            specgram (torch.Tensor): Tensor of dimension (..., freq, time).
+            specgram (Tensor): Tensor of dimension (..., freq, time).
             mask_value (float): Value to assign to the masked columns.
 
         Returns:
-            torch.Tensor: Masked spectrogram of dimensions (..., freq, time).
+            Tensor: Masked spectrogram of dimensions (..., freq, time).
         """
 
         # if iid_masks flag marked and specgram has a batch dimension
