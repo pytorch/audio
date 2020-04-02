@@ -7,7 +7,6 @@ from torchaudio.datasets.utils import download_url, extract_archive, walk_files
 
 URL = "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz"
 FOLDER_IN_ARCHIVE = "VCTK-Corpus"
-EXCEPT_FOLDER = "p315"
 
 
 def load_vctk_item(
@@ -49,6 +48,7 @@ class VCTK(Dataset):
     _folder_audio = "wav48"
     _ext_txt = ".txt"
     _ext_audio = ".wav"
+    _except_folder = "p315"
 
     def __init__(
         self,
@@ -98,7 +98,7 @@ class VCTK(Dataset):
             self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
         )
 
-        walker = filter(lambda w: EXCEPT_FOLDER not in w, walker)
+        walker = filter(lambda w: self._except_folder not in w, walker)
 
         self._walker = list(walker)
 
