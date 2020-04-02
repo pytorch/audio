@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlparse
 
 from torch.utils.data import Dataset
 
@@ -13,7 +14,9 @@ from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv
 # train.tsv
 # validated.tsv
 
-URL = "english"
+FOLDER_IN_ARCHIVE = "CommonVoice"
+LANGUAGE = "english"
+VERSION = "cv-corpus-4-2019-12-10"
 TSV = "train.tsv"
 
 
@@ -45,7 +48,7 @@ class COMMONVOICE(Dataset):
     _ext_audio = ".mp3"
     _folder_audio = "clips"
 
-    def __init__(self, root, tsv=TSV, url=URL, download=False):
+    def __init__(self, root, tsv=TSV, language=LANGUAGE, folder_in_archive=FOLDER_IN_ARCHIVE, version=VERSION, download=False):
 
         languages = {
             "tatar": "tt",
@@ -68,6 +71,7 @@ class COMMONVOICE(Dataset):
             "esperanto": "eo",
             "estonian": "et",
             "persian": "fa",
+            "portuguese": "pt",
             "basque": "eu",
             "spanish": "es",
             "chinese": "zh-CN",
@@ -79,25 +83,26 @@ class COMMONVOICE(Dataset):
             "russian": "ru",
         }
 
-        if url is languages:
+        if language in languages:
             ext_archive = ".tar.gz"
-            language = languages[url]
+            language = languages[language]
 
-            base_url = (
-                "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4"
-                + ".s3.amazonaws.com/cv-corpus-3/"
-            )
-            url = base_url + language + ext_archive
+            base_url = "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com"
+            url = os.path.join(base_url, version, language + ext_archive)
 
-        archive = os.path.basename(url)
-        archive = os.path.join(root, archive)
-        self._path = root
+        basename = os.path.basename(urlparse(url).path)
+        archive = os.path.join(root, basename)
+
+        basename = basename.rsplit(".", 2)[0]
+        folder_in_archive = os.path.join(folder_in_archive, version, basename)
+
+        self._path = os.path.join(root, folder_in_archive)
 
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     download_url(url, root)
-                extract_archive(archive)
+                extract_archive(archive, self._path)
 
         self._tsv = os.path.join(root, tsv)
 
