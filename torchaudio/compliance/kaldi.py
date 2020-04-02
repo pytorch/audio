@@ -33,18 +33,18 @@ BLACKMAN = 'blackman'
 WINDOWS = [HAMMING, HANNING, POVEY, RECTANGULAR, BLACKMAN]
 
 
-def _next_power_of_2(x):
+def _next_power_of_2(x: int) -> int:
     r"""Returns the smallest power of 2 that is greater than x
     """
     return 1 if x == 0 else 2 ** (x - 1).bit_length()
 
 
-def _get_strided(waveform, window_size, window_shift, snip_edges):
+def _get_strided(waveform: Tensor, window_size: int, window_shift: int, snip_edges: bool) -> Tensor:
     r"""Given a waveform (1D tensor of size ``num_samples``), it returns a 2D tensor (m, ``window_size``)
     representing how the window is shifted along the waveform. Each row is a frame.
 
     Args:
-        waveform (torch.Tensor): Tensor of size ``num_samples``
+        waveform (Tensor): Tensor of size ``num_samples``
         window_size (int): Frame length
         window_shift (int): Frame shift
         snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit
@@ -52,7 +52,7 @@ def _get_strided(waveform, window_size, window_shift, snip_edges):
             depends only on the frame_shift, and we reflect the data at the ends.
 
     Returns:
-        torch.Tensor: 2D tensor of size (m, ``window_size``) where each row is a frame
+        Tensor: 2D tensor of size (m, ``window_size``) where each row is a frame
     """
     assert waveform.dim() == 1
     num_samples = waveform.size(0)
@@ -81,7 +81,9 @@ def _get_strided(waveform, window_size, window_shift, snip_edges):
     return waveform.as_strided(sizes, strides)
 
 
-def _feature_window_function(window_type, window_size, blackman_coeff):
+def _feature_window_function(window_type: str,
+                             window_size: int,
+                             blackman_coeff: float) -> Tensor:
     r"""Returns a window function with the given type and size
     """
     if window_type == HANNING:
@@ -97,13 +99,15 @@ def _feature_window_function(window_type, window_size, blackman_coeff):
         a = 2 * math.pi / (window_size - 1)
         window_function = torch.arange(window_size)
         # can't use torch.blackman_window as they use different coefficients
-        return blackman_coeff - 0.5 * torch.cos(a * window_function) + \
+        return blackman_coeff - 0.5 * torch.cos(a * window_function) +\
                (0.5 - blackman_coeff) * torch.cos(2 * a * window_function)
     else:
         raise Exception('Invalid window type ' + window_type)
 
 
-def _get_log_energy(strided_input, epsilon, energy_floor):
+def _get_log_energy(strided_input: Tensor,
+                    epsilon: Tensor,
+                    energy_floor: float) -> Tensor:
     r"""Returns the log energy of size (m) for a strided_input (m,*)
     """
     log_energy = torch.max(strided_input.pow(2).sum(1), epsilon).log()  # size (m)
@@ -114,8 +118,13 @@ def _get_log_energy(strided_input, epsilon, energy_floor):
                          torch.tensor(math.log(energy_floor)))
 
 
-def _get_waveform_and_window_properties(waveform, channel, sample_frequency, frame_shift,
-                                        frame_length, round_to_power_of_two, preemphasis_coefficient):
+def _get_waveform_and_window_properties(waveform: Tensor,
+                                        channel: int,
+                                        sample_frequency: float,
+                                        frame_shift: float,
+                                        frame_length: float,
+                                        round_to_power_of_two: bool,
+                                        preemphasis_coefficient: float) -> Tuple[Tensor, int, int, int]:
     r"""Gets the waveform and window properties
     """
     channel = max(channel, 0)
@@ -134,13 +143,22 @@ def _get_waveform_and_window_properties(waveform, channel, sample_frequency, fra
     return waveform, window_shift, window_size, padded_window_size
 
 
-def _get_window(waveform, padded_window_size, window_size, window_shift, window_type, blackman_coeff,
-                snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient):
+def _get_window(waveform: Tensor,
+                padded_window_size: int,
+                window_size: int,
+                window_shift: int,
+                window_type: str,
+                blackman_coeff: float,
+                snip_edges: bool,
+                raw_energy: bool,
+                energy_floor: float,
+                dither: float,
+                remove_dc_offset: bool,
+                preemphasis_coefficient: float) -> Tuple[Tensor, Tensor]:
     r"""Gets a window and its log energy
 
     Returns:
-        strided_input (torch.Tensor): size (m, ``padded_window_size``)
-        signal_log_energy (torch.Tensor): size (m)
+        (Tensor, Tensor): strided_input of size (m, ``padded_window_size``) and signal_log_energy of size (m)
     """
     # size (m, window_size)
     strided_input = _get_strided(waveform, window_size, window_shift, snip_edges)
@@ -185,7 +203,7 @@ def _get_window(waveform, padded_window_size, window_size, window_shift, window_
     return strided_input, signal_log_energy
 
 
-def _subtract_column_mean(tensor, subtract_mean):
+def _subtract_column_mean(tensor: Tensor, subtract_mean: bool) -> Tensor:
     # subtracts the column mean of the tensor size (m, n) if subtract_mean=True
     # it returns size (m, n)
     if subtract_mean:
@@ -194,43 +212,53 @@ def _subtract_column_mean(tensor, subtract_mean):
     return tensor
 
 
-def spectrogram(
-        waveform, blackman_coeff=0.42, channel=-1, dither=0.0, energy_floor=1.0,
-        frame_length=25.0, frame_shift=10.0, min_duration=0.0,
-        preemphasis_coefficient=0.97, raw_energy=True, remove_dc_offset=True,
-        round_to_power_of_two=True, sample_frequency=16000.0, snip_edges=True,
-        subtract_mean=False, window_type=POVEY):
+def spectrogram(waveform: Tensor,
+                blackman_coeff: float = 0.42,
+                channel: int = -1,
+                dither: float = 0.0,
+                energy_floor: float = 1.0,
+                frame_length: float = 25.0,
+                frame_shift: float = 10.0,
+                min_duration: float = 0.0,
+                preemphasis_coefficient: float = 0.97,
+                raw_energy: bool = True,
+                remove_dc_offset: bool = True,
+                round_to_power_of_two: bool = True,
+                sample_frequency: float = 16000.0,
+                snip_edges: bool = True,
+                subtract_mean: bool = False,
+                window_type: str = POVEY) -> Tensor:
     r"""Create a spectrogram from a raw audio signal. This matches the input/output of Kaldi's
     compute-spectrogram-feats.
 
     Args:
-        waveform (torch.Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
-        blackman_coeff (float): Constant coefficient for generalized Blackman window. (Default: ``0.42``)
-        channel (int): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (Default: ``-1``)
-        dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set
+        waveform (Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)
+        blackman_coeff (float, optional): Constant coefficient for generalized Blackman window. (Default: ``0.42``)
+        channel (int, optional): Channel to extract (-1 -> expect mono, 0 -> left, 1 -> right) (Default: ``-1``)
+        dither (float, optional): Dithering constant (0.0 means no dither). If you turn this off, you should set
             the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``0.0``)
-        energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
+        energy_floor (float, optional): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:
             this floor is applied to the zeroth component, representing the total signal energy.  The floor on the
             individual spectrogram elements is fixed at std::numeric_limits<float>::epsilon(). (Default: ``1.0``)
-        frame_length (float): Frame length in milliseconds (Default: ``25.0``)
-        frame_shift (float): Frame shift in milliseconds (Default: ``10.0``)
-        min_duration (float): Minimum duration of segments to process (in seconds). (Default: ``0.0``)
-        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (Default: ``0.97``)
-        raw_energy (bool): If True, compute energy before preemphasis and windowing (Default: ``True``)
-        remove_dc_offset: Subtract mean from waveform on each frame (Default: ``True``)
-        round_to_power_of_two (bool): If True, round window size to power of two by zero-padding input
+        frame_length (float, optional): Frame length in milliseconds (Default: ``25.0``)
+        frame_shift (float, optional): Frame shift in milliseconds (Default: ``10.0``)
+        min_duration (float, optional): Minimum duration of segments to process (in seconds). (Default: ``0.0``)
+        preemphasis_coefficient (float, optional): Coefficient for use in signal preemphasis (Default: ``0.97``)
+        raw_energy (bool, optional): If True, compute energy before preemphasis and windowing (Default: ``True``)
+        remove_dc_offset (bool, optional): Subtract mean from waveform on each frame (Default: ``True``)
+        round_to_power_of_two (bool, optional): If True, round window size to power of two by zero-padding input
             to FFT. (Default: ``True``)
-        sample_frequency (float): Waveform data sample frequency (must match the waveform file, if
+        sample_frequency (float, optional): Waveform data sample frequency (must match the waveform file, if
             specified there) (Default: ``16000.0``)
-        snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit
+        snip_edges (bool, optional): If True, end effects will be handled by outputting only frames that completely fit
             in the file, and the number of frames depends on the frame_length.  If False, the number of frames
             depends only on the frame_shift, and we reflect the data at the ends. (Default: ``True``)
-        subtract_mean (bool): Subtract mean of each feature file [CMS]; not recommended to do
+        subtract_mean (bool, optional): Subtract mean of each feature file [CMS]; not recommended to do
             it this way.  (Default: ``False``)
-        window_type (str): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (Default: ``'povey'``)
+        window_type (str, optional): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (Default: ``'povey'``)
 
     Returns:
-        torch.Tensor: A spectrogram identical to what Kaldi would output. The shape is
+        Tensor: A spectrogram identical to what Kaldi would output. The shape is
         (m, ``padded_window_size // 2 + 1``) where m is calculated in _get_strided
     """
     waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
@@ -255,21 +283,19 @@ def spectrogram(
     return power_spectrum
 
 
-def inverse_mel_scale_scalar(mel_freq):
-    # type: (float) -> float
+def inverse_mel_scale_scalar(mel_freq: float) -> float:
     return 700.0 * (math.exp(mel_freq / 1127.0) - 1.0)
 
 
-def inverse_mel_scale(mel_freq):
+def inverse_mel_scale(mel_freq: Tensor) -> Tensor:
     return 700.0 * ((mel_freq / 1127.0).exp() - 1.0)
 
 
-def mel_scale_scalar(freq):
-    # type: (float) -> float
+def mel_scale_scalar(freq: float) -> float:
     return 1127.0 * math.log(1.0 + freq / 700.0)
 
 
-def mel_scale(freq):
+def mel_scale(freq: Tensor) -> Tensor:
     return 1127.0 * (1.0 + freq / 700.0).log()
 
 
@@ -350,7 +376,7 @@ def vtln_warp_mel_freq(vtln_low_cutoff: float,
                        vtln_high_cutoff: float,
                        low_freq, high_freq: float,
                        vtln_warp_factor: float,
-                       mel_freq: Tensor) -> Tuple:
+                       mel_freq: Tensor) -> Tensor:
     r"""
     Args:
         vtln_low_cutoff (float): Lower frequency cutoffs for VTLN
