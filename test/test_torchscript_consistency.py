@@ -5,6 +5,7 @@ import unittest
 import torch
 import torchaudio
 import torchaudio.functional as F
+import torchaudio.transforms
 
 import common_utils
 
@@ -149,3 +150,109 @@ class TestFunctional(unittest.TestCase):
         _test_torchscript_functional_shape(F.dither, tensor)
         _test_torchscript_functional_shape(F.dither, tensor, "RPDF")
         _test_torchscript_functional_shape(F.dither, tensor, "GPDF")
+
+
+RUN_CUDA = torch.cuda.is_available()
+print("Run test with cuda:", RUN_CUDA)
+
+
+def _test_script_module(f, tensor, *args, **kwargs):
+
+    py_method = f(*args, **kwargs)
+    jit_method = torch.jit.script(py_method)
+
+    py_out = py_method(tensor)
+    jit_out = jit_method(tensor)
+
+    assert torch.allclose(jit_out, py_out)
+
+    if RUN_CUDA:
+
+        tensor = tensor.to("cuda")
+
+        py_method = py_method.cuda()
+        jit_method = torch.jit.script(py_method)
+
+        py_out = py_method(tensor)
+        jit_out = jit_method(tensor)
+
+        assert torch.allclose(jit_out, py_out)
+
+
+class TestTransforms(unittest.TestCase):
+    def test_Spectrogram(self):
+        tensor = torch.rand((1, 1000))
+        _test_script_module(torchaudio.transforms.Spectrogram, tensor)
+
+    def test_GriffinLim(self):
+        tensor = torch.rand((1, 201, 6))
+        _test_script_module(torchaudio.transforms.GriffinLim, tensor, length=1000, rand_init=False)
+
+    def test_AmplitudeToDB(self):
+        spec = torch.rand((6, 201))
+        _test_script_module(torchaudio.transforms.AmplitudeToDB, spec)
+
+    def test_MelScale(self):
+        spec_f = torch.rand((1, 6, 201))
+        _test_script_module(torchaudio.transforms.MelScale, spec_f)
+
+    def test_MelSpectrogram(self):
+        tensor = torch.rand((1, 1000))
+        _test_script_module(torchaudio.transforms.MelSpectrogram, tensor)
+
+    def test_MFCC(self):
+        tensor = torch.rand((1, 1000))
+        _test_script_module(torchaudio.transforms.MFCC, tensor)
+
+    def test_Resample(self):
+        tensor = torch.rand((2, 1000))
+        sample_rate = 100.
+        sample_rate_2 = 50.
+
+        _test_script_module(torchaudio.transforms.Resample, tensor, sample_rate, sample_rate_2)
+
+    def test_ComplexNorm(self):
+        tensor = torch.rand((1, 2, 201, 2))
+        _test_script_module(torchaudio.transforms.ComplexNorm, tensor)
+
+    def test_MuLawEncoding(self):
+        tensor = torch.rand((1, 10))
+        _test_script_module(torchaudio.transforms.MuLawEncoding, tensor)
+
+    def test_MuLawDecoding(self):
+        tensor = torch.rand((1, 10))
+        _test_script_module(torchaudio.transforms.MuLawDecoding, tensor)
+
+    def test_TimeStretch(self):
+        n_freq = 400
+        hop_length = 512
+        fixed_rate = 1.3
+        tensor = torch.rand((10, 2, n_freq, 10, 2))
+        _test_script_module(
+            torchaudio.transforms.TimeStretch,
+            tensor, n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate)
+
+    def test_Fade(self):
+        test_filepath = os.path.join(
+            common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.wav')
+        waveform, _ = torchaudio.load(test_filepath)
+        fade_in_len = 3000
+        fade_out_len = 3000
+
+        _test_script_module(torchaudio.transforms.Fade, waveform, fade_in_len, fade_out_len)
+
+    def test_FrequencyMasking(self):
+        tensor = torch.rand((10, 2, 50, 10, 2))
+        _test_script_module(
+            torchaudio.transforms.FrequencyMasking, tensor, freq_mask_param=60, iid_masks=False)
+
+    def test_TimeMasking(self):
+        tensor = torch.rand((10, 2, 50, 10, 2))
+        _test_script_module(
+            torchaudio.transforms.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
+
+    def test_Vol(self):
+        test_filepath = os.path.join(
+            common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.wav')
+        waveform, _ = torchaudio.load(test_filepath)
+        _test_script_module(torchaudio.transforms.Vol, waveform, 1.1)
