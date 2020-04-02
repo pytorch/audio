@@ -99,8 +99,8 @@ def _feature_window_function(window_type: str,
         a = 2 * math.pi / (window_size - 1)
         window_function = torch.arange(window_size)
         # can't use torch.blackman_window as they use different coefficients
-        return blackman_coeff - 0.5 * torch.cos(a * window_function) +\
-               (0.5 - blackman_coeff) * torch.cos(2 * a * window_function)
+        return (blackman_coeff - 0.5 * torch.cos(a * window_function) +
+                (0.5 - blackman_coeff) * torch.cos(2 * a * window_function))
     else:
         raise Exception('Invalid window type ' + window_type)
 
@@ -136,8 +136,8 @@ def _get_waveform_and_window_properties(waveform: Tensor,
 
     assert 2 <= window_size <= len(waveform), ('choose a window size %d that is [2, %d]' % (window_size, len(waveform)))
     assert 0 < window_shift, '`window_shift` must be greater than 0'
-    assert padded_window_size % 2 == 0, 'the padded ' \
-                                        '`window_size` must be divisible by two. use `round_to_power_of_two` or change `frame_length`'
+    assert padded_window_size % 2 == 0, 'the padded `window_size` must be divisible by two.' \
+                                        ' use `round_to_power_of_two` or change `frame_length`'
     assert 0. <= preemphasis_coefficient <= 1.0, '`preemphasis_coefficient` must be between [0,1]'
     assert sample_frequency > 0, '`sample_frequency` must be greater than zero'
     return waveform, window_shift, window_size, padded_window_size
@@ -255,7 +255,8 @@ def spectrogram(waveform: Tensor,
             depends only on the frame_shift, and we reflect the data at the ends. (Default: ``True``)
         subtract_mean (bool, optional): Subtract mean of each feature file [CMS]; not recommended to do
             it this way.  (Default: ``False``)
-        window_type (str, optional): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman') (Default: ``'povey'``)
+        window_type (str, optional): Type of window ('hamming'|'hanning'|'povey'|'rectangular'|'blackman')
+         (Default: ``'povey'``)
 
     Returns:
         Tensor: A spectrogram identical to what Kaldi would output. The shape is
@@ -400,7 +401,7 @@ def get_mel_banks(num_bins: int,
                   high_freq: float,
                   vtln_low: float,
                   vtln_high: float,
-                  vtln_warp_factor: float) -> Tuple[Tensor, Tuple]:
+                  vtln_warp_factor: float) -> Tuple[Tensor, Tensor]:
     """
     Returns:
         (Tensor, Tensor): The tuple consists of ``bins`` (which is
@@ -658,10 +659,10 @@ def mfcc(
         num_mel_bins (int, optional): Number of triangular mel-frequency bins (Default: ``23``)
         preemphasis_coefficient (float, optional): Coefficient for use in signal preemphasis (Default: ``0.97``)
         raw_energy (bool, optional): If True, compute energy before preemphasis and windowing (Default: ``True``)
-        remove_dc_offset: Subtract mean from waveform on each frame (Default: ``True``)
+        remove_dc_offset (bool, optional): Subtract mean from waveform on each frame (Default: ``True``)
         round_to_power_of_two (bool, optional): If True, round window size to power of two by zero-padding input
             to FFT. (Default: ``True``)
-        sample_frequency (float): Waveform data sample frequency (must match the waveform file, if
+        sample_frequency (float, optional): Waveform data sample frequency (must match the waveform file, if
             specified there) (Default: ``16000.0``)
         snip_edges (bool, optional): If True, end effects will be handled by outputting only frames that completely fit
             in the file, and the number of frames depends on the frame_length.  If False, the number of frames
