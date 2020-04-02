@@ -80,7 +80,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, tensor)
 
     def test_detect_pitch_frequency(self):
-        filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.mp3')
+        filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(filepath)
 
         def func(tensor):
