@@ -7,6 +7,7 @@ from torchaudio.datasets.utils import download_url, extract_archive, walk_files
 
 URL = "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz"
 FOLDER_IN_ARCHIVE = "VCTK-Corpus"
+EXCEPT_FOLDER = "p315"
 
 
 def load_vctk_item(
@@ -39,6 +40,9 @@ class VCTK(Dataset):
     """
     Create a Dataset for VCTK. Each item is a tuple of the form:
     (waveform, sample_rate, utterance, speaker_id, utterance_id)
+
+    Folder `p315` will be ignored due to the non-existent corresponding text files.
+    For more information about the dataset visit: https://datashare.is.ed.ac.uk/handle/10283/3443
     """
 
     _folder_txt = "txt"
@@ -91,8 +95,11 @@ class VCTK(Dataset):
             )
 
         walker = walk_files(
-            self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True, ignore=["p315"]
+            self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
         )
+
+        walker = filter(lambda w: EXCEPT_FOLDER not in w, walker)
+
         self._walker = list(walker)
 
     def __getitem__(self, n):

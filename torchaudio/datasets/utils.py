@@ -251,7 +251,7 @@ def extract_archive(from_path, to_path=None, overwrite=False):
     raise NotImplementedError("We currently only support tar.gz, tgz, and zip achives.")
 
 
-def walk_files(root, suffix, prefix=False, remove_suffix=False, ignore=None):
+def walk_files(root, suffix, prefix=False, remove_suffix=False):
     """List recursively all files ending with a suffix at a given root
     Args:
         root (str): Path to directory whose folders need to be listed
@@ -261,14 +261,10 @@ def walk_files(root, suffix, prefix=False, remove_suffix=False, ignore=None):
             only returns the name of the files found (Default: ``False``)
         remove_suffix (bool, optional): If true, removes the suffix to each result defined in suffix,
             otherwise will return the result as found (Default: ``False``).
-        ignore (list or None, optional): List with the folders names to be ignored (Default: ``None``).
     """
 
     root = os.path.expanduser(root)
     for dirpath, _, files in os.walk(root):
-        if ignore and os.path.split(dirpath)[1] in ignore:
-            continue
-
         for f in files:
             if f.endswith(suffix):
 
