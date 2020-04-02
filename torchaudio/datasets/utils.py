@@ -264,6 +264,7 @@ def walk_files(root, suffix, prefix=False, remove_suffix=False):
     """
 
     root = os.path.expanduser(root)
+    
     for dirpath, _, files in os.walk(root):
         for f in files:
             if f.endswith(suffix):
