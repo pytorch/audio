@@ -70,8 +70,6 @@ build nightlies based on PyTorch nightlies by hand following the instructions in
 
 ```
 pip install numpy
-pip install future # only on python 2.7
-pip install six    # only on python 3.5
 pip install torchaudio_nightly -f https://download.pytorch.org/whl/nightly/torch_nightly.html
 ```
 
