@@ -42,6 +42,9 @@ test:
     - scipy
     - cpuonly
 
+  commands: 
+    pytest . --verbose
+
 about:
   home: https://github.com/pytorch/audio
   license: BSD
