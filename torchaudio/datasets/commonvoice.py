@@ -104,7 +104,7 @@ class COMMONVOICE(Dataset):
                     download_url(url, root)
                 extract_archive(archive, self._path)
 
-        self._tsv = os.path.join(root, tsv)
+        self._tsv = os.path.join(root, folder_in_archive, tsv)
 
         with open(self._tsv, "r") as tsv:
             walker = unicode_csv_reader(tsv, delimiter="\t")
