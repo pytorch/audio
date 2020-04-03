@@ -48,7 +48,12 @@ class COMMONVOICE(Dataset):
     _ext_audio = ".mp3"
     _folder_audio = "clips"
 
-    def __init__(self, root, tsv=TSV, language=LANGUAGE, folder_in_archive=FOLDER_IN_ARCHIVE, version=VERSION, download=False):
+    def __init__(self, root,
+                 tsv=TSV,
+                 language=LANGUAGE,
+                 folder_in_archive=FOLDER_IN_ARCHIVE,
+                 version=VERSION,
+                 download=False):
 
         languages = {
             "tatar": "tt",
@@ -81,6 +86,16 @@ class COMMONVOICE(Dataset):
             "kinyarwanda": "rw",
             "swedish": "sv-SE",
             "russian": "ru",
+            "indonesian": "id",
+            "arabic": "ar",
+            "tamil": "ta",
+            "interlingua": "ia",
+            "latvian": "lv",
+            "japanese": "ja",
+            "votic": "vot",
+            "abkhaz": "ab",
+            "cantonese": "zh-HK",
+            "romansh sursilvan": "rm-sursilv"
         }
 
         if language in languages:
