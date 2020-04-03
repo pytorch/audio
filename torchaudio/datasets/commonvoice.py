@@ -1,5 +1,4 @@
 import os
-from urllib.parse import urlparse
 
 from torch.utils.data import Dataset
 
@@ -105,7 +104,7 @@ class COMMONVOICE(Dataset):
             base_url = "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com"
             url = os.path.join(base_url, version, language + ext_archive)
 
-        basename = os.path.basename(urlparse(url).path)
+        basename = os.path.basename(url)
         archive = os.path.join(root, basename)
 
         basename = basename.rsplit(".", 2)[0]
@@ -132,3 +131,5 @@ class COMMONVOICE(Dataset):
 
     def __len__(self):
         return len(self._walker)
+
+COMMONVOICE("/Users/tomas.osorio/Downloads/", url="abkhaz", download=True)
