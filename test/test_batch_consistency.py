@@ -64,7 +64,10 @@ def _test_batch(functional, tensor, *args, **kwargs):
     expected = expected.repeat(*ind)
 
     torch.random.manual_seed(42)
-    _ = functional(tensors.clone(), *args, **kwargs)
+    computed = functional(tensors.clone(), *args, **kwargs)
+
+    assert expected.shape == computed.shape, (expected.shape, computed.shape)
+    assert torch.allclose(expected, computed, **kwargs_compare)
 
 
 class TestFunctional(unittest.TestCase):
