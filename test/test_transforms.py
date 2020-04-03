@@ -212,11 +212,12 @@ class Tester(unittest.TestCase):
 
     def test_compute_deltas_twochannel(self):
         specgram = torch.tensor([1., 2., 3., 4.]).repeat(1, 2, 1)
-        _ = torch.tensor([[[0.5, 1.0, 1.0, 0.5],
-                           [0.5, 1.0, 1.0, 0.5]]])
-        transform = transforms.ComputeDeltas()
+        expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5],
+                                  [0.5, 1.0, 1.0, 0.5]]])
+        transform = transforms.ComputeDeltas(win_length=3)
         computed = transform(specgram)
-        self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
+        assert computed.shape == expected.shape, (computed.shape, expected.shape)
+        assert torch.allclose(computed, expected, atol=1e-6, rtol=1e-8)
 
 
 if __name__ == '__main__':
