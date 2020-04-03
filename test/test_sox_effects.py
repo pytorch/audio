@@ -257,7 +257,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
             vol = torchaudio.transforms.Vol(gain, gain_type)
             z = vol(x_orig)
             # check if effect worked
-            self.assertTrue(x.allclose(vol(x_orig), rtol=1e-4, atol=1e-4))
+            self.assertTrue(x.allclose(z, rtol=1e-4, atol=1e-4))
 
 
 if __name__ == '__main__':
