@@ -5,11 +5,9 @@ import unittest
 import torch
 import torchaudio
 import torchaudio.functional as F
-import torchaudio.transforms as T
 import pytest
 
 import common_utils
-from common_utils import AudioBackendScope, BACKENDS
 
 
 class TestFunctional(unittest.TestCase):
@@ -274,61 +272,6 @@ class TestFunctional(unittest.TestCase):
         }
         data_size = (2, 7, 3, 2)
         self._test_linearity_of_istft(data_size, kwargs4, atol=1e-5, rtol=1e-8)
-
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
-    def test_gain(self):
-        waveform_gain = F.gain(self.waveform_train, 3)
-        self.assertTrue(waveform_gain.abs().max().item(), 1.)
-
-        E = torchaudio.sox_effects.SoxEffectsChain()
-        E.set_input_file(self.test_filepath)
-        E.append_effect_to_chain("gain", [3])
-        sox_gain_waveform = E.sox_build_flow_effects()[0]
-
-        self.assertTrue(torch.allclose(waveform_gain, sox_gain_waveform, atol=1e-04))
-
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
-    def test_dither(self):
-        waveform_dithered = F.dither(self.waveform_train)
-        waveform_dithered_noiseshaped = F.dither(self.waveform_train, noise_shaping=True)
-
-        E = torchaudio.sox_effects.SoxEffectsChain()
-        E.set_input_file(self.test_filepath)
-        E.append_effect_to_chain("dither", [])
-        sox_dither_waveform = E.sox_build_flow_effects()[0]
-
-        self.assertTrue(torch.allclose(waveform_dithered, sox_dither_waveform, atol=1e-04))
-        E.clear_chain()
-
-        E.append_effect_to_chain("dither", ["-s"])
-        sox_dither_waveform_ns = E.sox_build_flow_effects()[0]
-
-        self.assertTrue(torch.allclose(waveform_dithered_noiseshaped, sox_dither_waveform_ns, atol=1e-02))
-
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
-    def test_vctk_transform_pipeline(self):
-        test_filepath_vctk = os.path.join(self.test_dirpath, "assets/VCTK-Corpus/wav48/p224/", "p224_002.wav")
-        wf_vctk, sr_vctk = torchaudio.load(test_filepath_vctk)
-
-        # rate
-        sample = T.Resample(sr_vctk, 16000, resampling_method='sinc_interpolation')
-        wf_vctk = sample(wf_vctk)
-        # dither
-        wf_vctk = F.dither(wf_vctk, noise_shaping=True)
-
-        E = torchaudio.sox_effects.SoxEffectsChain()
-        E.set_input_file(test_filepath_vctk)
-        E.append_effect_to_chain("gain", ["-h"])
-        E.append_effect_to_chain("channels", [1])
-        E.append_effect_to_chain("rate", [16000])
-        E.append_effect_to_chain("gain", ["-rh"])
-        E.append_effect_to_chain("dither", ["-s"])
-        wf_vctk_sox = E.sox_build_flow_effects()[0]
-
-        self.assertTrue(torch.allclose(wf_vctk, wf_vctk_sox, rtol=1e-03, atol=1e-03))
 
     def test_pitch(self):
         test_dirpath, test_dir = common_utils.create_temp_assets_dir()
