@@ -15,7 +15,7 @@ from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv
 # validated.tsv
 
 FOLDER_IN_ARCHIVE = "CommonVoice"
-LANGUAGE = "english"
+URL = "english"
 VERSION = "cv-corpus-4-2019-12-10"
 TSV = "train.tsv"
 
@@ -50,7 +50,7 @@ class COMMONVOICE(Dataset):
 
     def __init__(self, root,
                  tsv=TSV,
-                 language=LANGUAGE,
+                 url=URL,
                  folder_in_archive=FOLDER_IN_ARCHIVE,
                  version=VERSION,
                  download=False):
@@ -98,9 +98,9 @@ class COMMONVOICE(Dataset):
             "romansh sursilvan": "rm-sursilv"
         }
 
-        if language in languages:
+        if url in languages:
             ext_archive = ".tar.gz"
-            language = languages[language]
+            language = languages[url]
 
             base_url = "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com"
             url = os.path.join(base_url, version, language + ext_archive)
