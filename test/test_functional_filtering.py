@@ -1,5 +1,4 @@
 import os
-import time
 import unittest
 
 import torch
@@ -450,17 +449,13 @@ class TestFunctionalFiltering(unittest.TestCase):
         # SoX method
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(fn_sine)
-        _timing_sox = time.time()
         E.append_effect_to_chain("biquad", [b0, b1, b2, a0, a1, a2])
-        waveform_sox_out, sr = E.sox_build_flow_effects()
-        _timing_sox_run_time = time.time() - _timing_sox
+        waveform_sox_out, _ = E.sox_build_flow_effects()
 
-        _timing_lfilter_filtering = time.time()
-        waveform, sample_rate = torchaudio.load(fn_sine, normalization=True)
+        waveform, _ = torchaudio.load(fn_sine, normalization=True)
         waveform_lfilter_out = F.lfilter(
             waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
         )
-        _timing_lfilter_run_time = time.time() - _timing_lfilter_filtering
 
         assert torch.allclose(waveform_sox_out, waveform_lfilter_out, atol=1e-4)
         _test_torchscript_functional(
