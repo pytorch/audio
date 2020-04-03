@@ -265,7 +265,7 @@ def walk_files(root, suffix, prefix=False, remove_suffix=False):
 
 
 def get_checksum(dataset, url):
-    """Get checksum of file at a URL corresponding a Dataset
+    """Get checksum of file at the URL corresponding to the Dataset
 
     Args:
         dataset (str): Name of dataset . Should match a file name(without extension) in 'datasets/checksums' folder
