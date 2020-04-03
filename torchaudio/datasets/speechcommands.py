@@ -1,7 +1,9 @@
 import os
+from typing import Tuple
 
 import torchaudio
 from torch.utils.data import Dataset
+from torch import Tensor
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
@@ -14,7 +16,7 @@ HASH_DIVIDER = "_nohash_"
 EXCEPT_FOLDER = "_background_noise_"
 
 
-def load_speechcommands_item(filepath, path):
+def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str, str, int]:
     relpath = os.path.relpath(filepath, path)
     label, filename = os.path.split(relpath)
     speaker, _ = os.path.splitext(filename)
@@ -33,13 +35,11 @@ class SPEECHCOMMANDS(Dataset):
     waveform, sample_rate, label, speaker_id, utterance_number
     """
 
-    def __init__(
-            self,
-            root,
-            url=URL,
-            folder_in_archive=FOLDER_IN_ARCHIVE,
-            download=False
-    ):
+    def __init__(self,
+                 root: str,
+                 url: str = URL,
+                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
+                 download: bool = False) -> None:
         if url in [
             "speech_commands_v0.01",
             "speech_commands_v0.02",
@@ -67,9 +67,9 @@ class SPEECHCOMMANDS(Dataset):
         walker = filter(lambda w: HASH_DIVIDER in w and EXCEPT_FOLDER not in w, walker)
         self._walker = list(walker)
 
-    def __getitem__(self, n):
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:
         fileid = self._walker[n]
         return load_speechcommands_item(fileid, self._path)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._walker)
