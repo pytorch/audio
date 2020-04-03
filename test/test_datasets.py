@@ -29,13 +29,11 @@ class TestDatasets(unittest.TestCase):
         data[0]
 
     def test_commonvoice(self):
-        path = os.path.join(self.path, "commonvoice")
-        data = COMMONVOICE(path, "train.tsv", "tatar")
+        data = COMMONVOICE(self.path, url="tatar")
         data[0]
 
     def test_commonvoice_diskcache(self):
-        path = os.path.join(self.path, "commonvoice")
-        data = COMMONVOICE(path, "train.tsv", "tatar")
+        data = COMMONVOICE(self.path, url="tatar")
         data = diskcache_iterator(data)
         # Save
         data[0]
@@ -43,8 +41,7 @@ class TestDatasets(unittest.TestCase):
         data[0]
 
     def test_commonvoice_bg(self):
-        path = os.path.join(self.path, "commonvoice")
-        data = COMMONVOICE(path, "train.tsv", "tatar")
+        data = COMMONVOICE(self.path, url="tatar")
         data = bg_iterator(data, 5)
         for _ in data:
             pass
