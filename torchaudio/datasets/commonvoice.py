@@ -131,5 +131,3 @@ class COMMONVOICE(Dataset):
 
     def __len__(self):
         return len(self._walker)
-
-COMMONVOICE("/Users/tomas.osorio/Downloads/", url="abkhaz", download=True)
