@@ -73,7 +73,7 @@ def load(filepath,
 
     """
 
-    return getattr(_get_audio_backend_module(), 'load')(
+    return _get_audio_backend_module().load(
         filepath,
         out=out,
         normalization=normalization,
@@ -116,7 +116,7 @@ def save(filepath, src, sample_rate, precision=16, channels_first=True):
             Default: ``True``)
     """
 
-    return getattr(_get_audio_backend_module(), 'save')(
+    return _get_audio_backend_module().save(
         filepath, src, sample_rate, precision=precision, channels_first=channels_first
     )
 
@@ -208,7 +208,7 @@ def info(filepath):
          >>> rate, channels, encoding = si.rate, si.channels, ei.encoding
      """
 
-    return getattr(_get_audio_backend_module(), 'info')(filepath)
+    return _get_audio_backend_module().info(filepath)
 
 
 @_audio_backend_guard("sox")

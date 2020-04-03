@@ -24,7 +24,7 @@ class Tester(unittest.TestCase):
     test_filepath = os.path.join(test_dirpath, 'assets',
                                  'steam-train-whistle-daniel_simon.wav')
 
-    def scale(self, waveform, factor=float(2**31)):
+    def scale(self, waveform, factor=2.0**31):
         # scales a waveform by a factor
         if not waveform.is_floating_point():
             waveform = waveform.to(torch.get_default_dtype())

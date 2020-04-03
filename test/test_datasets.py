@@ -46,7 +46,7 @@ class TestDatasets(unittest.TestCase):
         path = os.path.join(self.path, "commonvoice")
         data = COMMONVOICE(path, "train.tsv", "tatar")
         data = bg_iterator(data, 5)
-        for d in data:
+        for _ in data:
             pass
 
     def test_ljspeech(self):
