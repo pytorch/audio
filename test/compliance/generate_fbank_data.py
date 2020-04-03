@@ -10,7 +10,7 @@ import utils
 
 def run(exe_path, scp_path, out_dir, wave_len, num_outputs, remove_files, log_level):
     logging.basicConfig(level=log_level)
-    for i in range(num_outputs):
+    for _ in range(num_outputs):
         try:
             nyquist = 16000 // 2
             high_freq = random.randint(1, nyquist)
