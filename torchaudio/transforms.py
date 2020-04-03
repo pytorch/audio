@@ -723,8 +723,9 @@ class Fade(torch.nn.Module):
             Tensor: Tensor of audio of dimension (..., time).
         """
         waveform_length = waveform.size()[-1]
-
-        return self._fade_in(waveform_length) * self._fade_out(waveform_length) * waveform
+        device = waveform.device
+        return self._fade_in(waveform_length).to(device) * \
+            self._fade_out(waveform_length).to(device) * waveform
 
     def _fade_in(self, waveform_length: int) -> Tensor:
         fade = torch.linspace(0, 1, self.fade_in_len)
