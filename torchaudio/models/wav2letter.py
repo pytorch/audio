@@ -1,4 +1,6 @@
-import torch
+from typing import Optional
+
+from torch import Tensor
 from torch import nn
 
 __all__ = ["Wav2Letter"]
@@ -10,13 +12,15 @@ class Wav2Letter(nn.Module):
 
     Args:
         num_classes (int, optional): Number of classes to be classified. (Default: ``40``)
-        version (str, optional): Wav2Letter can use as input: ``waveform``, ```power_spectrum``
-         or ```mfcc``. (Default: ``waveform``)
-        n_input_features (int, optional): If is used ``power_spectrum`` or ```mfcc`` must be
+        version (str, optional): Wav2Letter can use as input: ``waveform``, ``power_spectrum``
+         or ``mfcc``. (Default: ``waveform``)
+        n_input_features (int, optional): If is used ``power_spectrum`` or ``mfcc`` must be
         specified the number of features that were extracted. (Default: ``None``)
     """
 
-    def __init__(self, num_classes=40, version="waveform", n_input_features=None):
+    def __init__(self, num_classes: int = 40,
+                 version: str = "waveform",
+                 n_input_features: Optional[int] = None) -> None:
         super(Wav2Letter, self).__init__()
         n_input_features = 250 if not n_input_features else n_input_features
 
@@ -55,17 +59,15 @@ class Wav2Letter(nn.Module):
         if version in ["power_spectrum", "mfcc"]:
             self.acoustic_model = acoustic_model
 
-    def forward(self, x):
-        # type: (Tensor) -> Tensor
+    def forward(self, x: Tensor) -> Tensor:
         r"""
         Args:
-            x (torch.Tensor): Tensor of dimension (batch_size, n_features, input_length).
+            x (Tensor): Tensor of dimension (batch_size, n_features, input_length).
 
         Returns:
-            torch.Tensor: Predictor tensor of dimension (input_length, batch_size, number_of_classes).
+            Tensor: Predictor tensor of dimension (input_length, batch_size, number_of_classes).
         """
 
         x = self.acoustic_model(x)
         x = nn.functional.log_softmax(x, dim=1)
-        x = x.permute(2, 0, 1)
         return x
