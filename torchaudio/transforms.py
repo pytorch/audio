@@ -6,7 +6,6 @@ from warnings import warn
 
 import torch
 from torch import Tensor
-from torch import device as Device
 from torchaudio import functional as F
 from torchaudio.compliance import kaldi
 
