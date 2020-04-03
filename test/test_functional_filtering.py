@@ -1,10 +1,12 @@
-import math
 import os
+import time
+import unittest
+
 import torch
 import torchaudio
 import torchaudio.functional as F
-import unittest
-import time
+import torchaudio.transforms as T
+
 from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
 
 
@@ -106,6 +108,67 @@ class TestFunctionalFiltering(unittest.TestCase):
         else:
             print("skipping GPU test for lfilter because device not available")
             pass
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
+    def test_gain(self):
+        test_filepath = os.path.join(self.test_dirpath, "assets", "steam-train-whistle-daniel_simon.wav")
+        waveform, _ = torchaudio.load(test_filepath)
+
+        waveform_gain = F.gain(waveform, 3)
+        self.assertTrue(waveform_gain.abs().max().item(), 1.)
+
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(test_filepath)
+        E.append_effect_to_chain("gain", [3])
+        sox_gain_waveform = E.sox_build_flow_effects()[0]
+
+        assert torch.allclose(waveform_gain, sox_gain_waveform, atol=1e-04)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
+    def test_dither(self):
+        test_filepath = os.path.join(self.test_dirpath, "assets", "steam-train-whistle-daniel_simon.wav")
+        waveform, _ = torchaudio.load(test_filepath)
+
+        waveform_dithered = F.dither(waveform)
+        waveform_dithered_noiseshaped = F.dither(waveform, noise_shaping=True)
+
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(test_filepath)
+        E.append_effect_to_chain("dither", [])
+        sox_dither_waveform = E.sox_build_flow_effects()[0]
+
+        assert torch.allclose(waveform_dithered, sox_dither_waveform, atol=1e-04)
+        E.clear_chain()
+
+        E.append_effect_to_chain("dither", ["-s"])
+        sox_dither_waveform_ns = E.sox_build_flow_effects()[0]
+
+        assert torch.allclose(waveform_dithered_noiseshaped, sox_dither_waveform_ns, atol=1e-02)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
+    def test_vctk_transform_pipeline(self):
+        test_filepath_vctk = os.path.join(self.test_dirpath, "assets/VCTK-Corpus/wav48/p224/", "p224_002.wav")
+        wf_vctk, sr_vctk = torchaudio.load(test_filepath_vctk)
+
+        # rate
+        sample = T.Resample(sr_vctk, 16000, resampling_method='sinc_interpolation')
+        wf_vctk = sample(wf_vctk)
+        # dither
+        wf_vctk = F.dither(wf_vctk, noise_shaping=True)
+
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(test_filepath_vctk)
+        E.append_effect_to_chain("gain", ["-h"])
+        E.append_effect_to_chain("channels", [1])
+        E.append_effect_to_chain("rate", [16000])
+        E.append_effect_to_chain("gain", ["-rh"])
+        E.append_effect_to_chain("dither", ["-s"])
+        wf_vctk_sox = E.sox_build_flow_effects()[0]
+
+        assert torch.allclose(wf_vctk, wf_vctk_sox, rtol=1e-03, atol=1e-03)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
