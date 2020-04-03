@@ -30,7 +30,7 @@ RUN conda create -y --name python3.6 python=3.6
 RUN conda create -y --name python3.7 python=3.7
 SHELL [ "/bin/bash", "-c" ]
 RUN echo "source /usr/local/etc/profile.d/conda.sh" >> ~/.bashrc
-RUN source /usr/local/etc/profile.d/conda.sh && conda activate python3.5 && conda install -y -c conda-forge sox && conda install -y numpy six
+RUN source /usr/local/etc/profile.d/conda.sh && conda activate python3.5 && conda install -y -c conda-forge sox && conda install -y numpy
 RUN source /usr/local/etc/profile.d/conda.sh && conda activate python3.6 && conda install -y -c conda-forge sox && conda install -y numpy
 RUN source /usr/local/etc/profile.d/conda.sh && conda activate python3.7 && conda install -y -c conda-forge sox && conda install -y numpy
 CMD [ "/bin/bash"]

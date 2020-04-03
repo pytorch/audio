@@ -70,8 +70,6 @@ build nightlies based on PyTorch nightlies by hand following the instructions in
 
 ```
 pip install numpy
-pip install future # only on python 2.7
-pip install six    # only on python 3.5
 pip install torchaudio_nightly -f https://download.pytorch.org/whl/nightly/torch_nightly.html
 ```
 
@@ -144,6 +142,7 @@ Transforms expect and return the following dimensions.
 * `MuLawDecode`: (channel, time) -> (channel, time)
 * `Resample`: (channel, time) -> (channel, time)
 * `Fade`: (channel, time) -> (channel, time)
+* `Vol`: (channel, time) -> (channel, time)
 
 Complex numbers are supported via tensors of dimension (..., 2), and torchaudio provides `complex_norm` and `angle` to convert such a tensor into its magnitude and phase. Here, and in the documentation, we use an ellipsis "..." as a placeholder for the rest of the dimensions of a tensor, e.g. optional batching and channel dimensions.
 

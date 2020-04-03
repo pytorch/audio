@@ -1,17 +1,17 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
 import unittest
-import common_utils
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import torchaudio
 import math
 import os
+from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
 
 
+@unittest.skipIf("sox" not in BACKENDS, "sox not available")
 class TORCHAUDIODS(Dataset):
 
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    test_dirpath, test_dir = create_temp_assets_dir()
 
     def __init__(self):
         self.asset_dirpath = os.path.join(self.test_dirpath, "assets")
@@ -34,6 +34,7 @@ class TORCHAUDIODS(Dataset):
         return len(self.data)
 
 
+@unittest.skipIf("sox" not in BACKENDS, "sox not available")
 class Test_DataLoader(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -51,4 +52,5 @@ class Test_DataLoader(unittest.TestCase):
             self.assertTrue(x.size() == expected_size)
 
 if __name__ == '__main__':
-    unittest.main()
+    with AudioBackendScope("sox"):
+        unittest.main()
