@@ -315,3 +315,7 @@ class TestTransforms(unittest.TestCase):
 
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
         assert torch.allclose(computed, expected)
+
+
+if __name__ == '__main__':
+    unittest.main()

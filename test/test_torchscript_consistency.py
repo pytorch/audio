@@ -408,3 +408,7 @@ class TestTransforms(unittest.TestCase):
             common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)
         _test_script_module(torchaudio.transforms.Vol, waveform, 1.1)
+
+
+if __name__ == '__main__':
+    unittest.main()
