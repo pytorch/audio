@@ -264,6 +264,18 @@ def walk_files(root, suffix, prefix=False, remove_suffix=False):
                 yield f
 
 
+def get_checksum_dict(dataset):
+    """Get Checksum dictionary of the Dataset from 'datasets/checksums' folder
+
+    Args:
+        dataset (str): Name of dataset . Should match a file name(without extension) in 'datasets/checksums' folder
+    """
+    checksum_file = "./checksums/" + dataset + ".txt"
+    with open(checksum_file) as f:
+        checksum_dict = {k: v for line in f for k, v in [line.strip().split()]}
+        return checksum_dict
+
+
 class _DiskCache(Dataset):
     """
     Wrap a dataset so that, whenever a new item is returned, it is saved to disk.

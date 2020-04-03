@@ -80,9 +80,10 @@ class VCTK(Dataset):
         self._path = os.path.join(root, folder_in_archive)
 
         if download:
+            checksum = get_checksum_dict(dataset=__class__.__name__)
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    download_url(url, root)
+                    download_url(url, root, hash_value=checksum[url], hash_type="md5")
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):

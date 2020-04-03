@@ -3,7 +3,7 @@ import warnings
 
 import torchaudio
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import download_url, extract_archive, walk_files
+from torchaudio.datasets.utils import download_url, extract_archive, walk_files, get_checksum_dict
 
 URL = "http://www.openslr.org/resources/1/waves_yesno.tar.gz"
 FOLDER_IN_ARCHIVE = "waves_yesno"
@@ -53,9 +53,10 @@ class YESNO(Dataset):
         self._path = os.path.join(root, folder_in_archive)
 
         if download:
+            checksum = get_checksum_dict(dataset=__class__.__name__)
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    download_url(url, root)
+                    download_url(url, root, hash_value=checksum[url], hash_type="md5")
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):
