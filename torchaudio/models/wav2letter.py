@@ -10,22 +10,22 @@ class Wav2Letter(nn.Module):
     r"""Wav2Letter model architecture from the `"Wav2Letter: an End-to-End ConvNet-based Speech Recognition System"
      <https://arxiv.org/abs/1609.03193>`_ paper.
 
+     :math:`\text{padding} = \frac{\text{ceil}(\text{kernel} - \text{stride})}{2}`
+
     Args:
         num_classes (int, optional): Number of classes to be classified. (Default: ``40``)
         version (str, optional): Wav2Letter can use as input: ``waveform``, ``power_spectrum``
-         or ``mfcc``. (Default: ``waveform``)
-        n_input_features (int, optional): If is used ``power_spectrum`` or ``mfcc`` must be
-        specified the number of features that were extracted. (Default: ``None``)
+         or ``mfcc`` (Default: ``waveform``).
+        num_features (int, optional): Number of input features that the network will receive (Default: ``1``).
     """
 
     def __init__(self, num_classes: int = 40,
                  version: str = "waveform",
-                 n_input_features: Optional[int] = None) -> None:
+                 num_features: Optional[int] = 1) -> None:
         super(Wav2Letter, self).__init__()
-        n_input_features = 250 if not n_input_features else n_input_features
 
         acoustic_model = nn.Sequential(
-            nn.Conv1d(in_channels=n_input_features, out_channels=250, kernel_size=48, stride=2, padding=23),
+            nn.Conv1d(in_channels=num_features, out_channels=250, kernel_size=48, stride=2, padding=23),
             nn.ReLU(inplace=True),
             nn.Conv1d(in_channels=250, out_channels=250, kernel_size=7, stride=1, padding=3),
             nn.ReLU(inplace=True),
@@ -51,7 +51,7 @@ class Wav2Letter(nn.Module):
 
         if version == "waveform":
             waveform_model = nn.Sequential(
-                nn.Conv1d(in_channels=1, out_channels=250, kernel_size=250, stride=160, padding=45),
+                nn.Conv1d(in_channels=num_features, out_channels=250, kernel_size=250, stride=160, padding=45),
                 nn.ReLU(inplace=True)
             )
             self.acoustic_model = nn.Sequential(waveform_model, acoustic_model)
