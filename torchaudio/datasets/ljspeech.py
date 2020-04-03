@@ -2,7 +2,12 @@ import os
 import csv
 
 import torchaudio
-from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader, get_checksum_dict
+from torchaudio.datasets.utils import (
+    download_url,
+    extract_archive,
+    unicode_csv_reader,
+    get_checksum
+)
 from torch.utils.data import Dataset
 
 URL = "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"
@@ -49,10 +54,10 @@ class LJSPEECH(Dataset):
         self._metadata_path = os.path.join(root, basename, 'metadata.csv')
 
         if download:
-            checksum = get_checksum_dict(dataset=__class__.__name__)
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    download_url(url, root, hash_value=checksum[url])
+                    checksum = get_checksum(dataset=__class__.__name__, url=url)
+                    download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
         with open(self._metadata_path, "r") as metadata:

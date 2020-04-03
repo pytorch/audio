@@ -7,7 +7,7 @@ from torchaudio.datasets.utils import (
     extract_archive,
     unicode_csv_reader,
     walk_files,
-    get_checksum_dict
+    get_checksum
 )
 
 URL = "train-clean-100"
@@ -85,10 +85,10 @@ class LIBRISPEECH(Dataset):
         self._path = os.path.join(root, folder_in_archive)
 
         if download:
-            checksum = get_checksum_dict(dataset=__class__.__name__)
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    download_url(url, root, hash_value=checksum[url])
+                    checksum = get_checksum(dataset=__class__.__name__, url=url)
+                    download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
         walker = walk_files(

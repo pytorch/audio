@@ -3,7 +3,12 @@ import os
 from torch.utils.data import Dataset
 
 import torchaudio
-from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
+from torchaudio.datasets.utils import (
+    download_url,
+    extract_archive,
+    unicode_csv_reader,
+    get_checksum
+)
 
 # Default TSV should be one of
 # dev.tsv
@@ -96,7 +101,8 @@ class COMMONVOICE(Dataset):
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    download_url(url, root)
+                    checksum = get_checksum(dataset=__class__.__name__, url=url)
+                    download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
         self._tsv = os.path.join(root, tsv)
