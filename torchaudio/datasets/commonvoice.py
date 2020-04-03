@@ -1,9 +1,10 @@
 import os
-
-from torch.utils.data import Dataset
+from typing import List, Dict, Tuple
 
 import torchaudio
 from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
+from torch import Tensor
+from torch.utils.data import Dataset
 
 # Default TSV should be one of
 # dev.tsv
@@ -19,7 +20,10 @@ VERSION = "cv-corpus-4-2019-12-10"
 TSV = "train.tsv"
 
 
-def load_commonvoice_item(line, header, path, folder_audio):
+def load_commonvoice_item(line: List[str],
+                          header: List[str],
+                          path: str,
+                          folder_audio: str) -> Tuple[Tensor, int, Dict[str, str]]:
     # Each line as the following data:
     # client_id, path, sentence, up_votes, down_votes, age, gender, accent
 
@@ -47,12 +51,13 @@ class COMMONVOICE(Dataset):
     _ext_audio = ".mp3"
     _folder_audio = "clips"
 
-    def __init__(self, root,
-                 tsv=TSV,
-                 url=URL,
-                 folder_in_archive=FOLDER_IN_ARCHIVE,
-                 version=VERSION,
-                 download=False):
+    def __init__(self,
+                 root: str,
+                 tsv: str = TSV,
+                 url: str = URL,
+                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
+                 version: str = VERSION,
+                 download: bool = False) -> None:
 
         languages = {
             "tatar": "tt",
@@ -125,9 +130,9 @@ class COMMONVOICE(Dataset):
             self._header = next(walker)
             self._walker = list(walker)
 
-    def __getitem__(self, n):
+    def __getitem__(self, n: int):
         line = self._walker[n]
         return load_commonvoice_item(line, self._header, self._path, self._folder_audio)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._walker)
