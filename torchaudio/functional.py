@@ -463,8 +463,6 @@ def create_fb_matrix(
     # freq bins
     # Equivalent filterbank construction by Librosa
     all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
-    i_freqs = all_freqs.ge(f_min) & all_freqs.le(f_max)
-    freqs = all_freqs[i_freqs]
 
     # calculate mel freq bins
     # hertz to mel(f) is 2595. * math.log10(1. + (f / 700.))
@@ -710,9 +708,6 @@ def lfilter(
     Returns:
         Tensor: Waveform with dimension of `(..., time)`.  Output will be clipped to -1 to 1.
     """
-
-    dim = waveform.dim()
-
     # pack batch
     shape = waveform.size()
     waveform = waveform.view(-1, shape[-1])
@@ -820,12 +815,8 @@ def highpass_biquad(
     Returns:
         Tensor: Waveform dimension of `(..., time)`
     """
-
-    GAIN = 1.
     w0 = 2 * math.pi * cutoff_freq / sample_rate
-    A = math.exp(GAIN / 40.0 * math.log(10))
     alpha = math.sin(w0) / 2. / Q
-    mult = _dB2Linear(max(GAIN, 0))
 
     b0 = (1 + math.cos(w0)) / 2
     b1 = -1 - math.cos(w0)
@@ -853,12 +844,8 @@ def lowpass_biquad(
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
     """
-
-    GAIN = 1.
     w0 = 2 * math.pi * cutoff_freq / sample_rate
-    A = math.exp(GAIN / 40.0 * math.log(10))
     alpha = math.sin(w0) / 2 / Q
-    mult = _dB2Linear(max(GAIN, 0))
 
     b0 = (1 - math.cos(w0)) / 2
     b1 = 1 - math.cos(w0)
@@ -1030,7 +1017,6 @@ def band_biquad(
         https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
     w0 = 2 * math.pi * central_freq / sample_rate
-    alpha = math.sin(w0) / 2 / Q
     bw_Hz = central_freq / Q
 
     a0 = 1.
