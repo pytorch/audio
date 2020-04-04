@@ -1,20 +1,12 @@
-import math
 import os
+import unittest
+
 import torch
 import torchaudio
 import torchaudio.functional as F
-import unittest
-import time
+import torchaudio.transforms as T
+
 from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
-
-
-def _test_torchscript_functional(py_method, *args, **kwargs):
-    jit_method = torch.jit.script(py_method)
-
-    jit_out = jit_method(*args, **kwargs)
-    py_out = py_method(*args, **kwargs)
-
-    assert torch.allclose(jit_out, py_out)
 
 
 class TestFunctionalFiltering(unittest.TestCase):
@@ -87,7 +79,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         assert len(output_waveform.size()) == 2
         assert output_waveform.size(0) == waveform.size(0)
         assert output_waveform.size(1) == waveform.size(1)
-        _test_torchscript_functional(F.lfilter, waveform, a_coeffs, b_coeffs)
 
     def test_lfilter(self):
 
@@ -109,6 +100,67 @@ class TestFunctionalFiltering(unittest.TestCase):
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
+    def test_gain(self):
+        test_filepath = os.path.join(self.test_dirpath, "assets", "steam-train-whistle-daniel_simon.wav")
+        waveform, _ = torchaudio.load(test_filepath)
+
+        waveform_gain = F.gain(waveform, 3)
+        self.assertTrue(waveform_gain.abs().max().item(), 1.)
+
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(test_filepath)
+        E.append_effect_to_chain("gain", [3])
+        sox_gain_waveform = E.sox_build_flow_effects()[0]
+
+        assert torch.allclose(waveform_gain, sox_gain_waveform, atol=1e-04)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
+    def test_dither(self):
+        test_filepath = os.path.join(self.test_dirpath, "assets", "steam-train-whistle-daniel_simon.wav")
+        waveform, _ = torchaudio.load(test_filepath)
+
+        waveform_dithered = F.dither(waveform)
+        waveform_dithered_noiseshaped = F.dither(waveform, noise_shaping=True)
+
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(test_filepath)
+        E.append_effect_to_chain("dither", [])
+        sox_dither_waveform = E.sox_build_flow_effects()[0]
+
+        assert torch.allclose(waveform_dithered, sox_dither_waveform, atol=1e-04)
+        E.clear_chain()
+
+        E.append_effect_to_chain("dither", ["-s"])
+        sox_dither_waveform_ns = E.sox_build_flow_effects()[0]
+
+        assert torch.allclose(waveform_dithered_noiseshaped, sox_dither_waveform_ns, atol=1e-02)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
+    def test_vctk_transform_pipeline(self):
+        test_filepath_vctk = os.path.join(self.test_dirpath, "assets/VCTK-Corpus/wav48/p224/", "p224_002.wav")
+        wf_vctk, sr_vctk = torchaudio.load(test_filepath_vctk)
+
+        # rate
+        sample = T.Resample(sr_vctk, 16000, resampling_method='sinc_interpolation')
+        wf_vctk = sample(wf_vctk)
+        # dither
+        wf_vctk = F.dither(wf_vctk, noise_shaping=True)
+
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(test_filepath_vctk)
+        E.append_effect_to_chain("gain", ["-h"])
+        E.append_effect_to_chain("channels", [1])
+        E.append_effect_to_chain("rate", [16000])
+        E.append_effect_to_chain("gain", ["-rh"])
+        E.append_effect_to_chain("dither", ["-s"])
+        wf_vctk_sox = E.sox_build_flow_effects()[0]
+
+        assert torch.allclose(wf_vctk, wf_vctk_sox, rtol=1e-03, atol=1e-03)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_lowpass(self):
 
         """
@@ -127,7 +179,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.lowpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.lowpass_biquad, waveform, sample_rate, CUTOFF_FREQ)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -149,7 +200,6 @@ class TestFunctionalFiltering(unittest.TestCase):
 
         # TBD - this fails at the 1e-4 level, debug why
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-3)
-        _test_torchscript_functional(F.highpass_biquad, waveform, sample_rate, CUTOFF_FREQ)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -171,7 +221,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.allpass_biquad(waveform, sample_rate, CENTRAL_FREQ, Q)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.allpass_biquad, waveform, sample_rate, CENTRAL_FREQ, Q)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -194,7 +243,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.bandpass_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, CONST_SKIRT_GAIN)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.bandpass_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, CONST_SKIRT_GAIN)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -217,7 +265,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.bandpass_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, CONST_SKIRT_GAIN)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.bandpass_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, CONST_SKIRT_GAIN)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -239,7 +286,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.bandreject_biquad(waveform, sample_rate, CENTRAL_FREQ, Q)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.bandreject_biquad, waveform, sample_rate, CENTRAL_FREQ, Q)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -262,7 +308,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.band_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, NOISE)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.band_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, NOISE)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -285,7 +330,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.band_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, NOISE)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.band_biquad, waveform, sample_rate, CENTRAL_FREQ, Q, NOISE)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -308,7 +352,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.treble_biquad(waveform, sample_rate, GAIN, CENTRAL_FREQ, Q)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.treble_biquad, waveform, sample_rate, GAIN, CENTRAL_FREQ, Q)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -327,7 +370,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.deemph_biquad(waveform, sample_rate)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.deemph_biquad, waveform, sample_rate)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -346,7 +388,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.riaa_biquad(waveform, sample_rate)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.riaa_biquad, waveform, sample_rate)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -369,7 +410,6 @@ class TestFunctionalFiltering(unittest.TestCase):
         output_waveform = F.equalizer_biquad(waveform, sample_rate, CENTER_FREQ, GAIN, Q)
 
         assert torch.allclose(sox_output_waveform, output_waveform, atol=1e-4)
-        _test_torchscript_functional(F.equalizer_biquad, waveform, sample_rate, CENTER_FREQ, GAIN, Q)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -387,22 +427,15 @@ class TestFunctionalFiltering(unittest.TestCase):
         # SoX method
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(fn_sine)
-        _timing_sox = time.time()
         E.append_effect_to_chain("biquad", [b0, b1, b2, a0, a1, a2])
-        waveform_sox_out, sr = E.sox_build_flow_effects()
-        _timing_sox_run_time = time.time() - _timing_sox
+        waveform_sox_out, _ = E.sox_build_flow_effects()
 
-        _timing_lfilter_filtering = time.time()
-        waveform, sample_rate = torchaudio.load(fn_sine, normalization=True)
+        waveform, _ = torchaudio.load(fn_sine, normalization=True)
         waveform_lfilter_out = F.lfilter(
             waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
         )
-        _timing_lfilter_run_time = time.time() - _timing_lfilter_filtering
 
         assert torch.allclose(waveform_sox_out, waveform_lfilter_out, atol=1e-4)
-        _test_torchscript_functional(
-            F.lfilter, waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
-        )
 
 
 if __name__ == "__main__":
