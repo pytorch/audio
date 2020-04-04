@@ -264,25 +264,6 @@ def walk_files(root, suffix, prefix=False, remove_suffix=False):
                 yield f
 
 
-def get_checksum(dataset, url):
-    """Get checksum of file at the URL corresponding to the Dataset
-
-    Args:
-        dataset (str): Name of dataset . Should match a file name(without extension) in 'datasets/checksums' folder
-        url (str): URL for the file to be downloaded
-    """
-    relative_path = "checksums/" + dataset + ".txt"
-    checksum_file = os.path.join(os.path.dirname(__file__), relative_path)
-    with open(checksum_file) as f:
-        checksum_dict = {k: v for line in f for k, v in [line.strip().split()]}
-        try:
-            checksum = checksum_dict[url]
-        except KeyError:
-            checksum = None
-            pass
-        return checksum
-
-
 class _DiskCache(Dataset):
     """
     Wrap a dataset so that, whenever a new item is returned, it is saved to disk.

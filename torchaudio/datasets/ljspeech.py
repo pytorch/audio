@@ -5,13 +5,16 @@ import torchaudio
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    unicode_csv_reader,
-    get_checksum
+    unicode_csv_reader
 )
 from torch.utils.data import Dataset
 
 URL = "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"
 FOLDER_IN_ARCHIVE = "wavs"
+_CHECKSUMS = {
+    "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2":
+    "be1a30453f28eb8dd26af4101ae40cbf2c50413b1bb21936cbcdc6fae3de8aa5"
+}
 
 
 def load_ljspeech_item(line, path, ext_audio):
@@ -56,7 +59,7 @@ class LJSPEECH(Dataset):
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    checksum = get_checksum(dataset=__class__.__name__, url=url)
+                    checksum = _CHECKSUMS.get(url, None)
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 

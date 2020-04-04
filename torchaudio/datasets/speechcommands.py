@@ -5,14 +5,19 @@ from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    walk_files,
-    get_checksum
+    walk_files
 )
 
 FOLDER_IN_ARCHIVE = "SpeechCommands"
 URL = "speech_commands_v0.02"
 HASH_DIVIDER = "_nohash_"
 EXCEPT_FOLDER = "_background_noise_"
+_CHECKSUMS = {
+    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz":
+    "3cd23799cb2bbdec517f1cc028f8d43c",
+    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz":
+    "6b74f3901214cb2c2934e98196829835",
+}
 
 
 def load_speechcommands_item(filepath, path):
@@ -61,7 +66,7 @@ class SPEECHCOMMANDS(Dataset):
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    checksum = get_checksum(dataset=__class__.__name__, url=url)
+                    checksum = _CHECKSUMS.get(url, None)
                     download_url(url, root, hash_value=checksum, hash_type="md5")
                 extract_archive(archive, self._path)
 
