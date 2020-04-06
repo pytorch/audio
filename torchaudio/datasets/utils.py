@@ -63,7 +63,7 @@ def makedir_exist_ok(dirpath: str) -> None:
 def stream_url(url: str,
                start_byte: Optional[int] = None,
                block_size: int = 32 * 1024,
-               progress_bar=True):
+               progress_bar: bool = True) -> None:
     """Stream url by chunk
 
     Args:
@@ -307,7 +307,7 @@ class _DiskCache(Dataset):
         return len(self.dataset)
 
 
-def diskcache_iterator(dataset: Dataset, location=".cached") -> Dataset:
+def diskcache_iterator(dataset: Dataset, location: str = ".cached") -> Dataset:
     return _DiskCache(dataset, location)
 
 
