@@ -281,7 +281,7 @@ class _DiskCache(Dataset):
     Wrap a dataset so that, whenever a new item is returned, it is saved to disk.
     """
 
-    def __init__(self, dataset: Dataset, location=".cached") -> None:
+    def __init__(self, dataset: Dataset, location: str = ".cached") -> None:
         self.dataset = dataset
         self.location = location
 
