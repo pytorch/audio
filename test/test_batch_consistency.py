@@ -23,8 +23,7 @@ def _test_batch_shape(functional, tensor, *args, atol=1e-8, rtol=1e-5, **kwargs)
     torch.random.manual_seed(42)
     computed = functional(tensors.clone(), *args, **kwargs)
 
-    assert expected.shape == computed.shape, (expected.shape, computed.shape)
-    assert torch.allclose(expected, computed, atol=atol, rtol=rtol)
+    torch.testing.assert_allclose(computed, expected, rtol=rtol, atol=atol)
 
     return tensors, expected
 
@@ -43,8 +42,7 @@ def _test_batch(functional, tensor, *args, atol=1e-8, rtol=1e-5, **kwargs):
     torch.random.manual_seed(42)
     computed = functional(tensors.clone(), *args, **kwargs)
 
-    assert expected.shape == computed.shape, (expected.shape, computed.shape)
-    assert torch.allclose(expected, computed, atol=atol, rtol=rtol)
+    torch.testing.assert_allclose(computed, expected, rtol=rtol, atol=atol)
 
 
 class TestFunctional(unittest.TestCase):
@@ -96,8 +94,7 @@ class TestTransforms(unittest.TestCase):
         # Batch then transform
         computed = torchaudio.transforms.AmplitudeToDB()(spec.repeat(3, 1, 1))
 
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_Resample(self):
         waveform = torch.randn(2, 2786)
@@ -108,8 +105,7 @@ class TestTransforms(unittest.TestCase):
         # Batch then transform
         computed = torchaudio.transforms.Resample()(waveform.repeat(3, 1, 1))
 
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_MelScale(self):
         specgram = torch.randn(2, 31, 2786)
@@ -121,8 +117,7 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.MelScale()(specgram.repeat(3, 1, 1, 1))
 
         # shape = (3, 2, 201, 1394)
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_InverseMelScale(self):
         n_mels = 32
@@ -136,11 +131,10 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.InverseMelScale(n_stft, n_mels)(mel_spec.repeat(3, 1, 1, 1))
 
         # shape = (3, 2, n_mels, 32)
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
 
         # Because InverseMelScale runs SGD on randomly initialized values so they do not yield
         # exactly same result. For this reason, tolerance is very relaxed here.
-        assert torch.allclose(computed, expected, atol=1.0)
+        torch.testing.assert_allclose(computed, expected, atol=1.0, rtol=1e-5)
 
     def test_batch_compute_deltas(self):
         specgram = torch.randn(2, 31, 2786)
@@ -152,8 +146,7 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.ComputeDeltas()(specgram.repeat(3, 1, 1, 1))
 
         # shape = (3, 2, 201, 1394)
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_mulaw(self):
         test_filepath = os.path.join(
@@ -169,8 +162,7 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.MuLawEncoding()(waveform_batched)
 
         # shape = (3, 2, 201, 1394)
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
         # Single then transform then batch
         waveform_decoded = torchaudio.transforms.MuLawDecoding()(waveform_encoded)
@@ -180,8 +172,7 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.MuLawDecoding()(computed)
 
         # shape = (3, 2, 201, 1394)
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_spectrogram(self):
         test_filepath = os.path.join(
@@ -193,9 +184,7 @@ class TestTransforms(unittest.TestCase):
 
         # Batch then transform
         computed = torchaudio.transforms.Spectrogram()(waveform.repeat(3, 1, 1))
-
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_melspectrogram(self):
         test_filepath = os.path.join(
@@ -207,9 +196,7 @@ class TestTransforms(unittest.TestCase):
 
         # Batch then transform
         computed = torchaudio.transforms.MelSpectrogram()(waveform.repeat(3, 1, 1))
-
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -223,9 +210,7 @@ class TestTransforms(unittest.TestCase):
 
         # Batch then transform
         computed = torchaudio.transforms.MFCC()(waveform.repeat(3, 1, 1))
-
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected, atol=1e-5)
+        torch.testing.assert_allclose(computed, expected, atol=1e-5, rtol=1e-5)
 
     def test_batch_TimeStretch(self):
         test_filepath = os.path.join(
@@ -260,8 +245,7 @@ class TestTransforms(unittest.TestCase):
             hop_length=512,
         )(complex_specgrams.repeat(3, 1, 1, 1, 1))
 
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected, atol=1e-5)
+        torch.testing.assert_allclose(computed, expected, atol=1e-5, rtol=1e-5)
 
     def test_batch_Fade(self):
         test_filepath = os.path.join(
@@ -275,9 +259,7 @@ class TestTransforms(unittest.TestCase):
 
         # Batch then transform
         computed = torchaudio.transforms.Fade(fade_in_len, fade_out_len)(waveform.repeat(3, 1, 1))
-
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_Vol(self):
         test_filepath = os.path.join(
@@ -289,9 +271,7 @@ class TestTransforms(unittest.TestCase):
 
         # Batch then transform
         computed = torchaudio.transforms.Vol(gain=1.1)(waveform.repeat(3, 1, 1))
-
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
 
 if __name__ == '__main__':

@@ -22,7 +22,7 @@ def _test_torchscript_functional_shape(py_method, *args, **kwargs):
 
 def _test_torchscript_functional(py_method, *args, **kwargs):
     jit_out, py_out = _test_torchscript_functional_shape(py_method, *args, **kwargs)
-    assert torch.allclose(jit_out, py_out)
+    torch.testing.assert_allclose(jit_out, py_out)
 
 
 def _test_lfilter(waveform):
@@ -316,7 +316,7 @@ def _test_script_module(f, tensor, *args, **kwargs):
     py_out = py_method(tensor)
     jit_out = jit_method(tensor)
 
-    assert torch.allclose(jit_out, py_out)
+    torch.testing.assert_allclose(jit_out, py_out)
 
     if RUN_CUDA:
 
@@ -328,7 +328,7 @@ def _test_script_module(f, tensor, *args, **kwargs):
         py_out = py_method(tensor)
         jit_out = jit_method(tensor)
 
-        assert torch.allclose(jit_out, py_out)
+        torch.testing.assert_allclose(jit_out, py_out)
 
 
 class TestTransforms(unittest.TestCase):
