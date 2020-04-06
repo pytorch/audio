@@ -17,7 +17,7 @@ from torch.utils.data import Dataset
 from torch.utils.model_zoo import tqdm
 
 
-def unicode_csv_reader(unicode_csv_data: TextIOWrapper, **kwargs) -> str:
+def unicode_csv_reader(unicode_csv_data: TextIOWrapper, **kwargs: Any) -> str:
     r"""Since the standard csv library does not handle unicode in Python 2, we need a wrapper.
     Borrowed and slightly modified from the Python docs:
     https://docs.python.org/2/library/csv.html#csv-examples
