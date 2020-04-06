@@ -130,7 +130,7 @@ class COMMONVOICE(Dataset):
             self._header = next(walker)
             self._walker = list(walker)
 
-    def __getitem__(self, n: int):
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, Dict[str, str]]:
         line = self._walker[n]
         return load_commonvoice_item(line, self._header, self._path, self._folder_audio)
 
