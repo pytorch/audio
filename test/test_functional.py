@@ -308,13 +308,13 @@ class TestDB_to_amplitude(unittest.TestCase):
         db = F.amplitude_to_DB(torch.abs(x), multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(torch.abs(x), x2, atol=5e-5))
+        torch.testing.assert_allclose(torch.abs(x), x2, atol=5e-5)
 
         # Spectrogram amplitude -> DB -> amplitude
         db = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(spec, x2, atol=5e-5))
+        torch.testing.assert_allclose(spec, x2, atol=5e-5)
 
         # Waveform power -> DB -> power
         multiplier = 10.
@@ -323,13 +323,13 @@ class TestDB_to_amplitude(unittest.TestCase):
         db = F.amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(torch.abs(x), x2, atol=5e-5))
+        torch.testing.assert_allclose(torch.abs(x), x2, atol=5e-5)
 
         # Spectrogram power -> DB -> power
         db = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(spec, x2, atol=5e-5))
+        torch.testing.assert_allclose(spec, x2, atol=5e-5)
 
 
 @pytest.mark.parametrize('complex_tensor', [

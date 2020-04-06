@@ -53,7 +53,7 @@ class Tester(unittest.TestCase):
         mag_to_db_torch = mag_to_db_transform(torch.abs(waveform))
         power_to_db_torch = power_to_db_transform(torch.pow(waveform, 2))
 
-        self.assertTrue(torch.allclose(mag_to_db_torch, power_to_db_torch))
+        torch.testing.assert_allclose(mag_to_db_torch, power_to_db_torch)
 
     def test_melscale_load_save(self):
         specgram = torch.ones(1, 1000, 100)
@@ -67,7 +67,7 @@ class Tester(unittest.TestCase):
         fb_copy = melscale_transform_copy.fb
 
         self.assertEqual(fb_copy.size(), (1000, 128))
-        self.assertTrue(torch.allclose(fb, fb_copy))
+        torch.testing.assert_allclose(fb, fb_copy)
 
     def test_melspectrogram_load_save(self):
         waveform = self.waveform.float()
@@ -83,10 +83,10 @@ class Tester(unittest.TestCase):
         fb = mel_spectrogram_transform.mel_scale.fb
         fb_copy = mel_spectrogram_transform_copy.mel_scale.fb
 
-        self.assertTrue(torch.allclose(window, window_copy))
+        torch.testing.assert_allclose(window, window_copy)
         # the default for n_fft = 400 and n_mels = 128
         self.assertEqual(fb_copy.size(), (201, 128))
-        self.assertTrue(torch.allclose(fb, fb_copy))
+        torch.testing.assert_allclose(fb, fb_copy)
 
     def test_mel2(self):
         top_db = 80.
