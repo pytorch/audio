@@ -1,15 +1,17 @@
 import os
 import csv
+from typing import List, Tuple
 
 import torchaudio
 from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
+from torch import Tensor
 from torch.utils.data import Dataset
 
 URL = "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"
 FOLDER_IN_ARCHIVE = "wavs"
 
 
-def load_ljspeech_item(line, path, ext_audio):
+def load_ljspeech_item(line: List[str], path: str, ext_audio: str) -> Tuple[Tensor, int, str, str]:
     assert len(line) == 3
     fileid, transcript, normalized_transcript = line
     fileid_audio = fileid + ext_audio
@@ -35,9 +37,11 @@ class LJSPEECH(Dataset):
     _ext_audio = ".wav"
     _ext_archive = '.tar.bz2'
 
-    def __init__(
-            self, root, url=URL, folder_in_archive=FOLDER_IN_ARCHIVE, download=False
-    ):
+    def __init__(self,
+                 root: str,
+                 url: str = URL,
+                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
+                 download: bool = False) -> None:
 
         basename = os.path.basename(url)
         archive = os.path.join(root, basename)
@@ -58,9 +62,9 @@ class LJSPEECH(Dataset):
             walker = unicode_csv_reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
             self._walker = list(walker)
 
-    def __getitem__(self, n):
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
         line = self._walker[n]
         return load_ljspeech_item(line, self._path, self._ext_audio)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._walker)
