@@ -217,7 +217,7 @@ class Tester(unittest.TestCase):
         transform = transforms.ComputeDeltas(win_length=3)
         computed = transform(specgram)
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected, atol=1e-6, rtol=1e-8)
+        torch.testing.assert_allclose(computed, expected, atol=1e-6, rtol=1e-8)
 
 
 if __name__ == '__main__':

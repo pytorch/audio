@@ -24,7 +24,7 @@ def _test_batch_shape(functional, tensor, *args, atol=1e-8, rtol=1e-5, **kwargs)
     computed = functional(tensors.clone(), *args, **kwargs)
 
     assert expected.shape == computed.shape, (expected.shape, computed.shape)
-    assert torch.allclose(expected, computed, atol=atol, rtol=rtol)
+    torch.testing.assert_allclose(expected, computed, rtol=rtol, atol=atol)
 
     return tensors, expected
 
@@ -44,7 +44,7 @@ def _test_batch(functional, tensor, *args, atol=1e-8, rtol=1e-5, **kwargs):
     computed = functional(tensors.clone(), *args, **kwargs)
 
     assert expected.shape == computed.shape, (expected.shape, computed.shape)
-    assert torch.allclose(expected, computed, atol=atol, rtol=rtol)
+    torch.testing.assert_allclose(expected, computed, rtol=rtol, atol=atol)
 
 
 class TestFunctional(unittest.TestCase):
@@ -97,7 +97,7 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.AmplitudeToDB()(spec.repeat(3, 1, 1))
 
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_Resample(self):
         waveform = torch.randn(2, 2786)
@@ -109,7 +109,7 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.Resample()(waveform.repeat(3, 1, 1))
 
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_MelScale(self):
         specgram = torch.randn(2, 31, 2786)
@@ -122,7 +122,7 @@ class TestTransforms(unittest.TestCase):
 
         # shape = (3, 2, 201, 1394)
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_InverseMelScale(self):
         n_mels = 32
@@ -140,7 +140,7 @@ class TestTransforms(unittest.TestCase):
 
         # Because InverseMelScale runs SGD on randomly initialized values so they do not yield
         # exactly same result. For this reason, tolerance is very relaxed here.
-        assert torch.allclose(computed, expected, atol=1.0)
+        torch.testing.assert_allclose(computed, expected, atol=1.0)
 
     def test_batch_compute_deltas(self):
         specgram = torch.randn(2, 31, 2786)
@@ -153,7 +153,7 @@ class TestTransforms(unittest.TestCase):
 
         # shape = (3, 2, 201, 1394)
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_mulaw(self):
         test_filepath = os.path.join(
@@ -170,7 +170,7 @@ class TestTransforms(unittest.TestCase):
 
         # shape = (3, 2, 201, 1394)
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
         # Single then transform then batch
         waveform_decoded = torchaudio.transforms.MuLawDecoding()(waveform_encoded)
@@ -181,7 +181,7 @@ class TestTransforms(unittest.TestCase):
 
         # shape = (3, 2, 201, 1394)
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_spectrogram(self):
         test_filepath = os.path.join(
@@ -195,7 +195,7 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.Spectrogram()(waveform.repeat(3, 1, 1))
 
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_melspectrogram(self):
         test_filepath = os.path.join(
@@ -209,7 +209,7 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.MelSpectrogram()(waveform.repeat(3, 1, 1))
 
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
@@ -225,7 +225,7 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.MFCC()(waveform.repeat(3, 1, 1))
 
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected, atol=1e-5)
+        torch.testing.assert_allclose(computed, expected, atol=1e-5)
 
     def test_batch_TimeStretch(self):
         test_filepath = os.path.join(
@@ -261,7 +261,7 @@ class TestTransforms(unittest.TestCase):
         )(complex_specgrams.repeat(3, 1, 1, 1, 1))
 
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected, atol=1e-5)
+        torch.testing.assert_allclose(computed, expected, atol=1e-5)
 
     def test_batch_Fade(self):
         test_filepath = os.path.join(
@@ -277,7 +277,7 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.Fade(fade_in_len, fade_out_len)(waveform.repeat(3, 1, 1))
 
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_batch_Vol(self):
         test_filepath = os.path.join(
@@ -291,7 +291,7 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.Vol(gain=1.1)(waveform.repeat(3, 1, 1))
 
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
 
 if __name__ == '__main__':

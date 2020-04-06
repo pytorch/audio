@@ -17,7 +17,7 @@ class TestComputeDeltas(unittest.TestCase):
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5]]])
         computed = F.compute_deltas(specgram, win_length=3)
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_two_channels(self):
         specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0],
@@ -26,7 +26,7 @@ class TestComputeDeltas(unittest.TestCase):
                                   [0.5, 1.0, 1.0, 0.5]]])
         computed = F.compute_deltas(specgram, win_length=3)
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
 
 def _compare_estimate(sound, estimate, atol=1e-6, rtol=1e-8):
@@ -34,7 +34,7 @@ def _compare_estimate(sound, estimate, atol=1e-6, rtol=1e-8):
     sound = sound[..., :estimate.size(-1)]
 
     assert sound.shape == estimate.shape, (sound.shape, estimate.shape)
-    assert torch.allclose(sound, estimate, atol=atol, rtol=rtol)
+    torch.testing.assert_allclose(sound, estimate, atol=atol, rtol=rtol)
 
 
 def _test_istft_is_inverse_of_stft(kwargs):
@@ -341,7 +341,7 @@ def test_complex_norm(complex_tensor, power):
     expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
     norm_tensor = F.complex_norm(complex_tensor, power)
 
-    assert torch.allclose(expected_norm_tensor, norm_tensor, atol=1e-5)
+    torch.testing.assert_allclose(expected_norm_tensor, norm_tensor, atol=1e-5)
 
 
 @pytest.mark.parametrize('specgram', [
