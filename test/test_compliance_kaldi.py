@@ -156,7 +156,6 @@ class Test_Kaldi(unittest.TestCase):
             output = get_output_fn(sound, args)
 
             self._print_diagnostic(output, kaldi_output)
-            self.assertTrue(output.shape, kaldi_output.shape)
             torch.testing.assert_allclose(output, kaldi_output, atol=atol, rtol=rtol)
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
@@ -299,7 +298,7 @@ class Test_Kaldi(unittest.TestCase):
         ground_truth = ground_truth[..., n_to_trim:-n_to_trim]
         estimate = estimate[..., n_to_trim:-n_to_trim]
 
-        torch.testing.assert_allclose(ground_truth, estimate, atol=atol, rtol=rtol)
+        torch.testing.assert_allclose(estimate, ground_truth, atol=atol, rtol=rtol)
 
     def test_resample_waveform_downsample_accuracy(self):
         for i in range(1, 20):
@@ -324,7 +323,7 @@ class Test_Kaldi(unittest.TestCase):
         for i in range(num_channels):
             single_channel = sound * (i + 1) * 1.5
             single_channel_sampled = kaldi.resample_waveform(single_channel, sample_rate, sample_rate // 2)
-            torch.testing.assert_allclose(multi_sound_sampled[i, :], single_channel_sampled, rtol=1e-4)
+            torch.testing.assert_allclose(multi_sound_sampled[i, :], single_channel_sampled[0], rtol=1e-4, atol=1e-8)
 
 
 if __name__ == '__main__':
