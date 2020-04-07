@@ -84,11 +84,11 @@ def stream_url(url: str,
         req.headers["Range"] = "bytes={}-".format(start_byte)
 
     with urllib.request.urlopen(req) as upointer, tqdm(
-            unit="B",
-            unit_scale=True,
-            unit_divisor=1024,
-            total=url_size,
-            disable=not progress_bar,
+        unit="B",
+        unit_scale=True,
+        unit_divisor=1024,
+        total=url_size,
+        disable=not progress_bar,
     ) as pbar:
 
         num_bytes = 0
