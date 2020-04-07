@@ -166,17 +166,18 @@ def save_encinfo(filepath: str,
             "Expected format where C < 16, but found {}".format(src.size()))
     # sox stores the sample rate as a float, though practically sample rates are almost always integers
     # convert integers to floats
-    if not isinstance(signalinfo.rate, float):
-        if float(signalinfo.rate) == signalinfo.rate:
-            signalinfo.rate = float(signalinfo.rate)
-        else:
-            raise TypeError('Sample rate should be a float or int')
-    # check if the bit precision (i.e. bits per sample) is an integer
-    if not isinstance(signalinfo.precision, int):
-        if int(signalinfo.precision) == signalinfo.precision:
-            signalinfo.precision = int(signalinfo.precision)
-        else:
-            raise TypeError('Bit precision should be an integer')
+    if signalinfo:
+        if not isinstance(signalinfo.rate, float):
+            if float(signalinfo.rate) == signalinfo.rate:
+                signalinfo.rate = float(signalinfo.rate)
+            else:
+                raise TypeError('Sample rate should be a float or int')
+        # check if the bit precision (i.e. bits per sample) is an integer
+        if not isinstance(signalinfo.precision, int):
+            if int(signalinfo.precision) == signalinfo.precision:
+                signalinfo.precision = int(signalinfo.precision)
+            else:
+                raise TypeError('Bit precision should be an integer')
     # programs such as librosa normalize the signal, unnormalize if detected
     if src.min() >= -1.0 and src.max() <= 1.0:
         src = src * (1 << 31)
