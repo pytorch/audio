@@ -22,7 +22,7 @@ def unicode_csv_reader(unicode_csv_data: TextIOWrapper, **kwargs: Any) -> str:
     Borrowed and slightly modified from the Python docs:
     https://docs.python.org/2/library/csv.html#csv-examples
     Args:
-        unicode_csv_data : unicode csv data (see example below)
+        unicode_csv_data (TextIOWrapper): unicode csv data (see example below)
 
     Examples:
         >>> from torchaudio.datasets.utils import unicode_csv_reader
