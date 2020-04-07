@@ -1,7 +1,9 @@
 import os
 import warnings
+from typing import Any, List, Tuple
 
 import torchaudio
+from torch import Tensor
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
@@ -17,7 +19,7 @@ _CHECKSUMS = {
 }
 
 
-def load_yesno_item(fileid, path, ext_audio):
+def load_yesno_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, int, List[int]]:
     # Read label
     labels = [int(c) for c in fileid.split("_")]
 
@@ -36,15 +38,13 @@ class YESNO(Dataset):
 
     _ext_audio = ".wav"
 
-    def __init__(
-        self,
-        root,
-        url=URL,
-        folder_in_archive=FOLDER_IN_ARCHIVE,
-        download=False,
-        transform=None,
-        target_transform=None,
-    ):
+    def __init__(self,
+                 root: str,
+                 url: str = URL,
+                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
+                 download: bool = False,
+                 transform: Any = None,
+                 target_transform: Any = None) -> None:
 
         if transform is not None or target_transform is not None:
             warnings.warn(
@@ -77,7 +77,7 @@ class YESNO(Dataset):
         )
         self._walker = list(walker)
 
-    def __getitem__(self, n):
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, List[int]]:
         fileid = self._walker[n]
         item = load_yesno_item(fileid, self._path, self._ext_audio)
 
@@ -91,5 +91,5 @@ class YESNO(Dataset):
             labels = self.target_transform(labels)
         return waveform, sample_rate, labels
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._walker)

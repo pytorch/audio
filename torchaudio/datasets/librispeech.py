@@ -1,12 +1,13 @@
 import os
+from typing import Tuple
 
 import torchaudio
+from torch import Tensor
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    unicode_csv_reader,
-    walk_files
+    walk_files,
 )
 
 URL = "train-clean-100"
@@ -29,8 +30,10 @@ _CHECKSUMS = {
 }
 
 
-def load_librispeech_item(fileid, path, ext_audio, ext_txt):
-
+def load_librispeech_item(fileid: str,
+                          path: str,
+                          ext_audio: str,
+                          ext_txt: str) -> Tuple[Tensor, int, str, int, int, int]:
     speaker_id, chapter_id, utterance_id = fileid.split("-")
 
     file_text = speaker_id + "-" + chapter_id + ext_txt
@@ -72,9 +75,11 @@ class LIBRISPEECH(Dataset):
     _ext_txt = ".trans.txt"
     _ext_audio = ".flac"
 
-    def __init__(
-        self, root, url=URL, folder_in_archive=FOLDER_IN_ARCHIVE, download=False
-    ):
+    def __init__(self,
+                 root: str,
+                 url: str = URL,
+                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
+                 download: bool = False) -> None:
 
         if url in [
             "dev-clean",
@@ -111,9 +116,9 @@ class LIBRISPEECH(Dataset):
         )
         self._walker = list(walker)
 
-    def __getitem__(self, n):
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
         fileid = self._walker[n]
         return load_librispeech_item(fileid, self._path, self._ext_audio, self._ext_txt)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._walker)

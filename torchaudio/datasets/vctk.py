@@ -1,7 +1,9 @@
 import os
 import warnings
+from typing import Any, Tuple
 
 import torchaudio
+from torch import Tensor
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
@@ -17,9 +19,13 @@ _CHECKSUMS = {
 }
 
 
-def load_vctk_item(
-    fileid, path, ext_audio, ext_txt, folder_audio, folder_txt, downsample=False
-):
+def load_vctk_item(fileid: str,
+                   path: str,
+                   ext_audio: str,
+                   ext_txt: str,
+                   folder_audio: str,
+                   folder_txt: str,
+                   downsample: bool = False) -> Tuple[Tensor, int, str, str, str]:
     speaker_id, utterance_id = fileid.split("_")
 
     # Read text
@@ -58,16 +64,14 @@ class VCTK(Dataset):
     _ext_audio = ".wav"
     _except_folder = "p315"
 
-    def __init__(
-        self,
-        root,
-        url=URL,
-        folder_in_archive=FOLDER_IN_ARCHIVE,
-        download=False,
-        downsample=False,
-        transform=None,
-        target_transform=None,
-    ):
+    def __init__(self,
+                 root: str,
+                 url: str = URL,
+                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
+                 download: bool = False,
+                 downsample: bool = False,
+                 transform: Any = None,
+                 target_transform: Any = None) -> None:
 
         if downsample:
             warnings.warn(
@@ -109,7 +113,7 @@ class VCTK(Dataset):
         walker = filter(lambda w: self._except_folder not in w, walker)
         self._walker = list(walker)
 
-    def __getitem__(self, n):
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, str]:
         fileid = self._walker[n]
         item = load_vctk_item(
             fileid,
@@ -130,5 +134,5 @@ class VCTK(Dataset):
             utterance = self.target_transform(utterance)
         return waveform, sample_rate, utterance, speaker_id, utterance_id
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._walker)

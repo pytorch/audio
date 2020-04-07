@@ -745,7 +745,7 @@ def lfilter(
 
     for i_sample, o0 in enumerate(input_signal_windows.t()):
         windowed_output_signal = padded_output_waveform[:, i_sample:(i_sample + n_order)]
-        o0.sub_(torch.mv(windowed_output_signal, a_coeffs_flipped))
+        o0.addmv_(windowed_output_signal, a_coeffs_flipped, alpha=-1)
         o0.div_(a_coeffs[0])
 
         padded_output_waveform[:, i_sample + n_order - 1] = o0

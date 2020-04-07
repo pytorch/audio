@@ -16,8 +16,7 @@ class TestComputeDeltas(unittest.TestCase):
         specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0]]])
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5]]])
         computed = F.compute_deltas(specgram, win_length=3)
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
     def test_two_channels(self):
         specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0],
@@ -25,16 +24,13 @@ class TestComputeDeltas(unittest.TestCase):
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5],
                                   [0.5, 1.0, 1.0, 0.5]]])
         computed = F.compute_deltas(specgram, win_length=3)
-        assert computed.shape == expected.shape, (computed.shape, expected.shape)
-        assert torch.allclose(computed, expected)
+        torch.testing.assert_allclose(computed, expected)
 
 
 def _compare_estimate(sound, estimate, atol=1e-6, rtol=1e-8):
     # trim sound for case when constructed signal is shorter than original
     sound = sound[..., :estimate.size(-1)]
-
-    assert sound.shape == estimate.shape, (sound.shape, estimate.shape)
-    assert torch.allclose(sound, estimate, atol=atol, rtol=rtol)
+    torch.testing.assert_allclose(estimate, sound, atol=atol, rtol=rtol)
 
 
 def _test_istft_is_inverse_of_stft(kwargs):
@@ -308,13 +304,13 @@ class TestDB_to_amplitude(unittest.TestCase):
         db = F.amplitude_to_DB(torch.abs(x), multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(torch.abs(x), x2, atol=5e-5))
+        torch.testing.assert_allclose(x2, torch.abs(x), atol=5e-5, rtol=1e-5)
 
         # Spectrogram amplitude -> DB -> amplitude
         db = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(spec, x2, atol=5e-5))
+        torch.testing.assert_allclose(x2, spec, atol=5e-5, rtol=1e-5)
 
         # Waveform power -> DB -> power
         multiplier = 10.
@@ -323,13 +319,13 @@ class TestDB_to_amplitude(unittest.TestCase):
         db = F.amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(torch.abs(x), x2, atol=5e-5))
+        torch.testing.assert_allclose(x2, torch.abs(x), atol=5e-5, rtol=1e-5)
 
         # Spectrogram power -> DB -> power
         db = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(spec, x2, atol=5e-5))
+        torch.testing.assert_allclose(x2, spec, atol=5e-5, rtol=1e-5)
 
 
 @pytest.mark.parametrize('complex_tensor', [
@@ -341,7 +337,7 @@ def test_complex_norm(complex_tensor, power):
     expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
     norm_tensor = F.complex_norm(complex_tensor, power)
 
-    assert torch.allclose(expected_norm_tensor, norm_tensor, atol=1e-5)
+    torch.testing.assert_allclose(norm_tensor, expected_norm_tensor, atol=1e-5, rtol=1e-5)
 
 
 @pytest.mark.parametrize('specgram', [
