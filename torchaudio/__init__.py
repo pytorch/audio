@@ -18,6 +18,7 @@ from torchaudio._backend import (
     get_audio_backend,
     set_audio_backend,
 )
+from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
 
 try:
     from .version import __version__, git_version  # noqa: F401
@@ -31,8 +32,8 @@ def load(filepath: Union[str, Path],
          channels_first: bool = True,
          num_frames: int = 0,
          offset: int = 0,
-         signalinfo: Any = None,
-         encodinginfo: Any = None,
+         signalinfo: Optional[SignalInfo] = None,
+         encodinginfo: Optional[EncodingInfo] = None,
          filetype: Optional[str] = None) -> Tuple[Tensor, int]:
     r"""Loads an audio file from disk into a tensor
 
@@ -125,8 +126,8 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
 @_audio_backend_guard("sox")
 def save_encinfo(filepath: str,
                  src: Tensor,
-                 signalinfo: Any,
-                 encodinginfo: Any,
+                 signalinfo: SignalInfo,
+                 encodinginfo: EncodingInfo,
                  channels_first: bool = True,
                  filetype: Optional[str] = None) -> None:
     r"""Saves a tensor of an audio signal to disk as a standard format like mp3, wav, etc.
@@ -192,7 +193,7 @@ def save_encinfo(filepath: str,
     _torch_sox.write_audio_file(filepath, src, signalinfo, encodinginfo, filetype)
 
 
-def info(filepath: str) -> Any:
+def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
     r"""Gets metadata from an audio file without loading the signal.
 
      Args:
@@ -211,7 +212,7 @@ def info(filepath: str) -> Any:
 
 
 @_audio_backend_guard("sox")
-def sox_signalinfo_t() -> Any:
+def sox_signalinfo_t() -> SignalInfo:
     r"""Create a sox_signalinfo_t object. This object can be used to set the sample
     rate, number of channels, length, bit precision and headroom multiplier
     primarily for effects
@@ -236,7 +237,7 @@ def sox_signalinfo_t() -> Any:
 
 
 @_audio_backend_guard("sox")
-def sox_encodinginfo_t() -> Any:
+def sox_encodinginfo_t() -> EncodingInfo:
     r"""Create a sox_encodinginfo_t object.  This object can be used to set the encoding
     type, bit precision, compression factor, reverse bytes, reverse nibbles,
     reverse bits and endianness.  This can be used in an effects chain to encode the
@@ -276,7 +277,7 @@ def sox_encodinginfo_t() -> Any:
 
 
 @_audio_backend_guard("sox")
-def get_sox_encoding_t(i: int = None) -> Any:
+def get_sox_encoding_t(i: int = None) -> EncodingInfo:
     r"""Get enum of sox_encoding_t for sox encodings.
 
     Args:
