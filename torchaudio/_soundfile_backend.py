@@ -60,7 +60,7 @@ def load(filepath: str,
          offset: int = 0,
          signalinfo: SignalInfo = None,
          encodinginfo: EncodingInfo = None,
-         filetype: Optional[str] = None) -> Union[Tensor, int]:
+         filetype: Optional[str] = None) -> Tuple[Tensor, int]:
     r"""See torchaudio.load"""
 
     assert out is None
