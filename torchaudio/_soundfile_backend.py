@@ -1,6 +1,8 @@
 import os
+from typing import Any, Optional, Tuple, Union
 
 import torch
+from torch import Tensor
 
 _subtype_to_precision = {
     'PCM_S8': 8,
@@ -12,7 +14,11 @@ _subtype_to_precision = {
 
 
 class SignalInfo:
-    def __init__(self, channels=None, rate=None, precision=None, length=None):
+    def __init__(self,
+                 channels: Optional[int] = None,
+                 rate: Optional[float] = None,
+                 precision: Optional[int] = None,
+                 length: Optional[int] = None) -> None:
         self.channels = channels
         self.rate = rate
         self.precision = precision
@@ -20,16 +26,14 @@ class SignalInfo:
 
 
 class EncodingInfo:
-    def __init__(
-            self,
-            encoding=None,
-            bits_per_sample=None,
-            compression=None,
-            reverse_bytes=None,
-            reverse_nibbles=None,
-            reverse_bits=None,
-            opposite_endian=None
-    ):
+    def __init__(self,
+                 encoding: Any = None,
+                 bits_per_sample: Optional[int] = None,
+                 compression: Optional[float] = None,
+                 reverse_bytes: Any = None,
+                 reverse_nibbles: Any = None,
+                 reverse_bits: Any = None,
+                 opposite_endian: Optional[bool] = None) -> None:
         self.encoding = encoding
         self.bits_per_sample = bits_per_sample
         self.compression = compression
@@ -39,24 +43,22 @@ class EncodingInfo:
         self.opposite_endian = opposite_endian
 
 
-def check_input(src):
+def check_input(src: Tensor) -> None:
     if not torch.is_tensor(src):
         raise TypeError("Expected a tensor, got %s" % type(src))
     if src.is_cuda:
         raise TypeError("Expected a CPU based tensor, got %s" % type(src))
 
 
-def load(
-    filepath,
-    out=None,
-    normalization=True,
-    channels_first=True,
-    num_frames=0,
-    offset=0,
-    signalinfo=None,
-    encodinginfo=None,
-    filetype=None,
-):
+def load(filepath: str,
+         out: Optional[Tensor] = None,
+         normalization: Optional[bool] = True,
+         channels_first: Optional[bool] = True,
+         num_frames: int = 0,
+         offset: int = 0,
+         signalinfo: SignalInfo = None,
+         encodinginfo: EncodingInfo = None,
+         filetype: Optional[str] = None) -> Tuple[Tensor, int]:
     r"""See torchaudio.load"""
 
     assert out is None
@@ -96,7 +98,7 @@ def load(
     return out, sample_rate
 
 
-def save(filepath, src, sample_rate, precision=16, channels_first=True):
+def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, channels_first: bool = True) -> None:
     r"""See torchaudio.save"""
 
     ch_idx, len_idx = (0, 1) if channels_first else (1, 0)
@@ -129,7 +131,7 @@ def save(filepath, src, sample_rate, precision=16, channels_first=True):
     return soundfile.write(filepath, src, sample_rate, precision)
 
 
-def info(filepath):
+def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
     r"""See torchaudio.info"""
 
     import soundfile
