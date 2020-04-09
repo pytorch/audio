@@ -222,7 +222,7 @@ class _FunctionalTestMixin:
             #
             # Example
             #     >>> from scipy.signal import iirdesign
-            # >>> b, a = iirdesign(0.2, 0.3, 1, 60)
+            #     >>> b, a = iirdesign(0.2, 0.3, 1, 60)
             b_coeffs = torch.tensor(
                 [
                     0.00299893,
