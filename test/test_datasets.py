@@ -1,4 +1,3 @@
-import os
 import unittest
 
 from torchaudio.datasets.commonvoice import COMMONVOICE
@@ -13,8 +12,7 @@ import common_utils
 
 
 class TestDatasets(unittest.TestCase):
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
-    path = os.path.join(test_dirpath, "assets")
+    path = common_utils.get_asset_path()
 
     def test_yesno(self):
         data = YESNO(self.path)

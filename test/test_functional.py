@@ -1,5 +1,4 @@
 import math
-import os
 import unittest
 
 import torch
@@ -301,10 +300,8 @@ class TestIstft(unittest.TestCase):
 
 class TestDetectPitchFrequency(unittest.TestCase):
     def test_pitch(self):
-        test_filepath_100 = os.path.join(
-            common_utils.TEST_DIR_PATH, 'assets', "100Hz_44100Hz_16bit_05sec.wav")
-        test_filepath_440 = os.path.join(
-            common_utils.TEST_DIR_PATH, 'assets', "440Hz_44100Hz_16bit_05sec.wav")
+        test_filepath_100 = common_utils.get_asset_path("100Hz_44100Hz_16bit_05sec.wav")
+        test_filepath_440 = common_utils.get_asset_path("440Hz_44100Hz_16bit_05sec.wav")
 
         # Files from https://www.mediacollege.com/audio/tone/download/
         tests = [

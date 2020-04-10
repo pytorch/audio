@@ -5,7 +5,9 @@ import torch
 import torchaudio
 import torchaudio.compliance.kaldi as kaldi
 import unittest
-from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
+
+import common_utils
+from common_utils import AudioBackendScope, BACKENDS
 
 
 def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
@@ -45,10 +47,9 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
 
 
 class Test_Kaldi(unittest.TestCase):
-    test_dirpath, test_dir = create_temp_assets_dir()
-    test_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file.wav')
-    test_8000_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file_8000.wav')
-    kaldi_output_dir = os.path.join(test_dirpath, 'assets', 'kaldi')
+    test_filepath = common_utils.get_asset_path('kaldi_file.wav')
+    test_8000_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
+    kaldi_output_dir = common_utils.get_asset_path('kaldi')
     test_filepaths = {prefix: [] for prefix in compliance.utils.TEST_PREFIX}
 
     # separating test files by their types (e.g 'spec', 'fbank', etc.)
@@ -90,8 +91,7 @@ class Test_Kaldi(unittest.TestCase):
 
     def _create_data_set(self):
         # used to generate the dataset to test on. this is not used in testing (offline procedure)
-        test_dirpath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        test_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file.wav')
+        test_filepath = common_utils.get_asset_path('kaldi_file.wav')
         sr = 16000
         x = torch.arange(0, 20).float()
         # between [-6,6]

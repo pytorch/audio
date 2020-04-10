@@ -1,5 +1,4 @@
 """Test suites for jit-ability and its numerical compatibility"""
-import os
 import unittest
 
 import torch
@@ -81,8 +80,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, tensor)
 
     def test_detect_pitch_frequency(self):
-        filepath = os.path.join(
-            common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.mp3')
+        filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.mp3')
         waveform, _ = torchaudio.load(filepath)
 
         def func(tensor):
@@ -213,7 +211,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, tensor, shape_only=True)
 
     def test_lfilter(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, 'assets', 'whitenoise.wav')
+        filepath = common_utils.get_asset_path('whitenoise.wav')
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -254,7 +252,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_lowpass(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, 'assets', 'whitenoise.wav')
+        filepath = common_utils.get_asset_path('whitenoise.wav')
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -265,7 +263,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_highpass(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, 'assets', 'whitenoise.wav')
+        filepath = common_utils.get_asset_path('whitenoise.wav')
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -276,7 +274,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_allpass(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, 'assets', 'whitenoise.wav')
+        filepath = common_utils.get_asset_path('whitenoise.wav')
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -288,7 +286,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_bandpass_with_csg(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, "assets", "whitenoise.wav")
+        filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -301,7 +299,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_bandpass_withou_csg(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, "assets", "whitenoise.wav")
+        filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -314,7 +312,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_bandreject(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, "assets", "whitenoise.wav")
+        filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -326,7 +324,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_band_with_noise(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, "assets", "whitenoise.wav")
+        filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -339,7 +337,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_band_without_noise(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, "assets", "whitenoise.wav")
+        filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -352,7 +350,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_treble(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, "assets", "whitenoise.wav")
+        filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -365,7 +363,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_deemph(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, "assets", "whitenoise.wav")
+        filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -375,7 +373,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_riaa(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, "assets", "whitenoise.wav")
+        filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -385,7 +383,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_equalizer(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, "assets", "whitenoise.wav")
+        filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -398,7 +396,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_perf_biquad_filtering(self):
-        filepath = os.path.join(common_utils.TEST_DIR_PATH, "assets", "whitenoise.wav")
+        filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
@@ -469,8 +467,7 @@ class _TransformsTestMixin:
         )
 
     def test_Fade(self):
-        test_filepath = os.path.join(
-            common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.wav')
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)
         fade_in_len = 3000
         fade_out_len = 3000
@@ -485,8 +482,7 @@ class _TransformsTestMixin:
         self._assert_consistency(T.TimeMasking(time_mask_param=30, iid_masks=False), tensor)
 
     def test_Vol(self):
-        test_filepath = os.path.join(
-            common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.wav')
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)
         self._assert_consistency(T.Vol(1.1), waveform)
 
