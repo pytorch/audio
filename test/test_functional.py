@@ -10,6 +10,42 @@ import pytest
 import common_utils
 
 
+class _LfilterMixin:
+    device = None
+    dtype = None
+
+    def test_simple(self):
+        """
+        Create a very basic signal,
+        Then make a simple 4th order delay
+        The output should be same as the input but shifted
+        """
+
+        torch.random.manual_seed(42)
+        waveform = torch.rand(2, 44100 * 1, dtype=self.dtype, device=self.device)
+        b_coeffs = torch.tensor([0, 0, 0, 1], dtype=self.dtype, device=self.device)
+        a_coeffs = torch.tensor([1, 0, 0, 0], dtype=self.dtype, device=self.device)
+        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
+
+        torch.testing.assert_allclose(output_waveform[:, 3:], waveform[:, 0:-3], atol=1e-5, rtol=1e-5)
+
+
+class TestLfilterFloat32CPU(_LfilterMixin, unittest.TestCase):
+    device = torch.device('cpu')
+    dtype = torch.float32
+
+
+class TestLfilterFloat64CPU(_LfilterMixin, unittest.TestCase):
+    device = torch.device('cpu')
+    dtype = torch.float64
+
+
+@unittest.skipIf(not torch.cuda.is_available(), "CUDA not available")
+class TestLfilterFloat32CUDA(_LfilterMixin, unittest.TestCase):
+    device = torch.device('cuda')
+    dtype = torch.float32
+
+
 class TestComputeDeltas(unittest.TestCase):
     """Test suite for correctness of compute_deltas"""
     def test_one_channel(self):
