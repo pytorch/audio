@@ -361,13 +361,12 @@ def test_mask_along_axis(specgram, mask_param, mask_value, axis):
     assert num_masked_columns < mask_param
 
 
-@pytest.mark.parametrize('specgrams', [
-    torch.randn(4, 2, 1025, 400),
-])
 @pytest.mark.parametrize('mask_param', [100])
 @pytest.mark.parametrize('mask_value', [0., 30.])
 @pytest.mark.parametrize('axis', [2, 3])
-def test_mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
+def test_mask_along_axis_iid(mask_param, mask_value, axis):
+    torch.random.manual_seed(42)
+    specgrams = torch.randn(4, 2, 1025, 400)
 
     mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
 

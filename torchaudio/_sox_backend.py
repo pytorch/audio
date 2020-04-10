@@ -1,21 +1,21 @@
 import os.path
+from typing import Any, Optional, Tuple, Union
 
 import torch
-
+from torch import Tensor
 import torchaudio
+from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
 
 
-def load(
-    filepath,
-    out=None,
-    normalization=True,
-    channels_first=True,
-    num_frames=0,
-    offset=0,
-    signalinfo=None,
-    encodinginfo=None,
-    filetype=None,
-):
+def load(filepath: str,
+         out: Optional[Tensor] = None,
+         normalization: Optional[bool] = True,
+         channels_first: Optional[bool] = True,
+         num_frames: int = 0,
+         offset: int = 0,
+         signalinfo: SignalInfo = None,
+         encodinginfo: EncodingInfo = None,
+         filetype: Optional[str] = None) -> Tuple[Tensor, int]:
     r"""See torchaudio.load"""
 
     # stringify if `pathlib.Path` (noop if already `str`)
@@ -53,7 +53,7 @@ def load(
     return out, sample_rate
 
 
-def save(filepath, src, sample_rate, precision=16, channels_first=True):
+def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, channels_first: bool = True) -> None:
     r"""See torchaudio.save"""
 
     si = torchaudio.sox_signalinfo_t()
@@ -65,7 +65,7 @@ def save(filepath, src, sample_rate, precision=16, channels_first=True):
     return torchaudio.save_encinfo(filepath, src, channels_first, si)
 
 
-def info(filepath):
+def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
     r"""See torchaudio.info"""
 
     import _torch_sox
