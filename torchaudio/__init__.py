@@ -126,9 +126,9 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
 @_audio_backend_guard("sox")
 def save_encinfo(filepath: str,
                  src: Tensor,
-                 signalinfo: SignalInfo,
-                 encodinginfo: EncodingInfo,
                  channels_first: bool = True,
+                 signalinfo: Optional[SignalInfo] = None,
+                 encodinginfo: Optional[EncodingInfo] = None,
                  filetype: Optional[str] = None) -> None:
     r"""Saves a tensor of an audio signal to disk as a standard format like mp3, wav, etc.
 
@@ -136,9 +136,9 @@ def save_encinfo(filepath: str,
         filepath (str): Path to audio file
         src (Tensor): An input 2D tensor of shape `[C x L]` or `[L x C]` where L is
             the number of audio frames, C is the number of channels
-        signalinfo (sox_signalinfo_t): A sox_signalinfo_t type.
-        encodinginfo (sox_encodinginfo_t): A sox_encodinginfo_t type.
         channels_first (bool, optional): Set channels first or length first in result. (Default: ``True``)
+        signalinfo (sox_signalinfo_t, optional): A sox_signalinfo_t type (Default: ``None``).
+        encodinginfo (sox_encodinginfo_t, optional): A sox_encodinginfo_t type (Default: ``None``).
         filetype (str, optional): A filetype or extension to be set if sox cannot determine it
             automatically. (Default: ``None``)
 
@@ -165,17 +165,18 @@ def save_encinfo(filepath: str,
             "Expected format where C < 16, but found {}".format(src.size()))
     # sox stores the sample rate as a float, though practically sample rates are almost always integers
     # convert integers to floats
-    if not isinstance(signalinfo.rate, float):
-        if float(signalinfo.rate) == signalinfo.rate:
-            signalinfo.rate = float(signalinfo.rate)
-        else:
-            raise TypeError('Sample rate should be a float or int')
-    # check if the bit precision (i.e. bits per sample) is an integer
-    if not isinstance(signalinfo.precision, int):
-        if int(signalinfo.precision) == signalinfo.precision:
-            signalinfo.precision = int(signalinfo.precision)
-        else:
-            raise TypeError('Bit precision should be an integer')
+    if signalinfo:
+        if not isinstance(signalinfo.rate, float):
+            if float(signalinfo.rate) == signalinfo.rate:
+                signalinfo.rate = float(signalinfo.rate)
+            else:
+                raise TypeError('Sample rate should be a float or int')
+        # check if the bit precision (i.e. bits per sample) is an integer
+        if not isinstance(signalinfo.precision, int):
+            if int(signalinfo.precision) == signalinfo.precision:
+                signalinfo.precision = int(signalinfo.precision)
+            else:
+                raise TypeError('Bit precision should be an integer')
     # programs such as librosa normalize the signal, unnormalize if detected
     if src.min() >= -1.0 and src.max() <= 1.0:
         src = src * (1 << 31)
