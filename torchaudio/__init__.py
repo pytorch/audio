@@ -137,8 +137,10 @@ def save_encinfo(filepath: str,
         src (Tensor): An input 2D tensor of shape `[C x L]` or `[L x C]` where L is
             the number of audio frames, C is the number of channels
         channels_first (bool, optional): Set channels first or length first in result. (Default: ``True``)
-        signalinfo (sox_signalinfo_t, optional): A sox_signalinfo_t type (Default: ``None``).
-        encodinginfo (sox_encodinginfo_t, optional): A sox_encodinginfo_t type (Default: ``None``).
+        signalinfo (sox_signalinfo_t, optional): A sox_signalinfo_t type, which could be helpful if the
+            audio type cannot be automatically determined (Default: ``None``).
+        encodinginfo (sox_encodinginfo_t, optional): A sox_encodinginfo_t type, which could be set if the
+            audio type cannot be automatically determined (Default: ``None``).
         filetype (str, optional): A filetype or extension to be set if sox cannot determine it
             automatically. (Default: ``None``)
 
