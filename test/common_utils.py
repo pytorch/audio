@@ -76,7 +76,7 @@ def filter_backends_with_mp3(backends):
             with AudioBackendScope(backend):
                 torchaudio.load(test_filepath)
             return True
-        except RuntimeError:
+        except (RuntimeError, ImportError):
             return False
 
     return [backend for backend in backends if supports_mp3(backend)]
