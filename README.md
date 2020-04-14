@@ -13,7 +13,7 @@ having all the computations be through Pytorch operations which makes it easy
 to use and feel like a natural extension.
 
 - [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/)
-  - Load the following formats into a torch Tensor using sox
+  - Load the following formats into a torch Tensor using SoX
     - mp3, wav, aac, ogg, flac, avr, cdda, cvs/vms,
     - aiff, au, amr, mp2, mp4, ac3, avi, wmv,
     - mpeg, ircam and any other format supported by libsox.
@@ -98,9 +98,27 @@ Quick Usage
 
 ```python
 import torchaudio
-waveform, sample_rate = torchaudio.load('foo.mp3')  # load tensor from file
-torchaudio.save('foo_save.mp3', waveform, sample_rate)  # save tensor to file
+
+waveform, sample_rate = torchaudio.load('foo.wav')  # load tensor from file
+torchaudio.save('foo_save.wav', waveform, sample_rate)  # save tensor to file
 ```
+
+Backend Dispatch
+----------------
+
+By default in OSX and Linux, torchaudio uses SoX as a backend to load and save files.
+The backend can be changed to [SoundFile](https://pysoundfile.readthedocs.io/en/latest/)
+using the following, if installed.
+
+```python
+import torchaudio
+torchaudio.set_audio_backend("soundfile")  # switch backend
+
+waveform, sample_rate = torchaudio.load('foo.wav')  # load tensor from file, as usual
+torchaudio.save('foo_save.wav', waveform, sample_rate)  # save tensor to file, as usual
+```
+
+Unlike SoX, SoundFile does not currently support mp3.
 
 API Reference
 -------------
