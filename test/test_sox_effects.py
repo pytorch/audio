@@ -2,16 +2,14 @@ import unittest
 import torch
 import torchaudio
 import math
-import os
 
-from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
+import common_utils
+from common_utils import AudioBackendScope, BACKENDS
 
 
 @unittest.skipIf("sox" not in BACKENDS, "sox not available")
 class Test_SoxEffectsChain(unittest.TestCase):
-    test_dirpath, test_dir = create_temp_assets_dir()
-    test_filepath = os.path.join(test_dirpath, "assets",
-                                 "steam-train-whistle-daniel_simon.mp3")
+    test_filepath = common_utils.get_asset_path("steam-train-whistle-daniel_simon.mp3")
 
     @classmethod
     def setUpClass(cls):
@@ -22,7 +20,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
         torchaudio.shutdown_sox()
 
     def test_single_channel(self):
-        fn_sine = os.path.join(self.test_dirpath, "assets", "sinewave.wav")
+        fn_sine = common_utils.get_asset_path("sinewave.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(fn_sine)
         E.append_effect_to_chain("echos", [0.8, 0.7, 40, 0.25, 63, 0.3])

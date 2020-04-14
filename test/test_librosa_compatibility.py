@@ -149,7 +149,7 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
 
 
 def _load_audio_asset(*asset_paths, **kwargs):
-    file_path = os.path.join(common_utils.TEST_DIR_PATH, 'assets', *asset_paths)
+    file_path = common_utils.get_asset_path(*asset_paths)
     sound, sample_rate = torchaudio.load(file_path, **kwargs)
     return sound, sample_rate
 
