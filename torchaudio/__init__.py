@@ -168,8 +168,8 @@ def save_encinfo(filepath: str,
     # sox stores the sample rate as a float, though practically sample rates are almost always integers
     # convert integers to floats
     if signalinfo:
-        if not isinstance(signalinfo.rate, float):
-            if signalinfo.rate and float(signalinfo.rate) == signalinfo.rate:
+        if signalinfo.rate and not isinstance(signalinfo.rate, float):
+            if float(signalinfo.rate) == signalinfo.rate:
                 signalinfo.rate = float(signalinfo.rate)
             else:
                 raise TypeError('Sample rate should be a float or int')
