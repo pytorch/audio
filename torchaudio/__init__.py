@@ -169,12 +169,12 @@ def save_encinfo(filepath: str,
     # convert integers to floats
     if signalinfo:
         if not isinstance(signalinfo.rate, float):
-            if float(signalinfo.rate) == signalinfo.rate:
+            if signalinfo.rate and float(signalinfo.rate) == signalinfo.rate:
                 signalinfo.rate = float(signalinfo.rate)
             else:
                 raise TypeError('Sample rate should be a float or int')
         # check if the bit precision (i.e. bits per sample) is an integer
-        if not isinstance(signalinfo.precision, int):
+        if signalinfo.precision and not isinstance(signalinfo.precision, int):
             if int(signalinfo.precision) == signalinfo.precision:
                 signalinfo.precision = int(signalinfo.precision)
             else:

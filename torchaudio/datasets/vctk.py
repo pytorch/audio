@@ -68,7 +68,7 @@ class VCTK(Dataset):
         if downsample:
             warnings.warn(
                 "In the next version, transforms will not be part of the dataset. "
-                "Please use `downsample=False` to enable this behavior now, ",
+                "Please use `downsample=False` to enable this behavior now, "
                 "and suppress this warning."
             )
 
