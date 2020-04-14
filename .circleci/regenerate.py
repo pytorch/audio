@@ -49,7 +49,7 @@ def workflow_pair(btype, os_type, python_version, unicode, filter_branch, prefix
 
         w.append(generate_upload_workflow(base_workflow_name, filter_branch, btype))
 
-        if filter_branch == 'nightly' and is_py3_linux:
+        if is_py3_linux:
             pydistro = 'pip' if btype == 'wheel' else 'conda'
             w.append(generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, python_version))
 
