@@ -12,61 +12,6 @@ from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
 class TestFunctionalFiltering(unittest.TestCase):
     test_dirpath, test_dir = create_temp_assets_dir()
 
-    def _test_lfilter(self, waveform, device):
-        """
-        Design an IIR lowpass filter using scipy.signal filter design
-        https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.iirdesign.html#scipy.signal.iirdesign
-
-        Example
-          >>> from scipy.signal import iirdesign
-          >>> b, a = iirdesign(0.2, 0.3, 1, 60)
-        """
-
-        b_coeffs = torch.tensor(
-            [
-                0.00299893,
-                -0.0051152,
-                0.00841964,
-                -0.00747802,
-                0.00841964,
-                -0.0051152,
-                0.00299893,
-            ],
-            device=device,
-        )
-        a_coeffs = torch.tensor(
-            [
-                1.0,
-                -4.8155751,
-                10.2217618,
-                -12.14481273,
-                8.49018171,
-                -3.3066882,
-                0.56088705,
-            ],
-            device=device,
-        )
-
-        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
-        assert len(output_waveform.size()) == 2
-        assert output_waveform.size(0) == waveform.size(0)
-        assert output_waveform.size(1) == waveform.size(1)
-
-    def test_lfilter(self):
-
-        filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
-
-        self._test_lfilter(waveform, torch.device("cpu"))
-
-    @unittest.skipIf(not torch.cuda.is_available(), "CUDA not available")
-    def test_lfilter_gpu(self):
-        filepath = os.path.join(self.test_dirpath, "assets", "whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
-        cuda0 = torch.device("cuda:0")
-        cuda_waveform = waveform.cuda(device=cuda0)
-        self._test_lfilter(cuda_waveform, cuda0)
-
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
     def test_gain(self):
