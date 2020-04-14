@@ -98,6 +98,8 @@ Quick Usage
 
 ```python
 import torchaudio
+# torchaudio.set_audio_backend("soundfile")  # optionally change backend from sox to soundfile
+
 waveform, sample_rate = torchaudio.load('foo.mp3')  # load tensor from file
 torchaudio.save('foo_save.mp3', waveform, sample_rate)  # save tensor to file
 ```
