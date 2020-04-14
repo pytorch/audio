@@ -12,31 +12,6 @@ from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
 class TestFunctionalFiltering(unittest.TestCase):
     test_dirpath, test_dir = create_temp_assets_dir()
 
-    def _test_lfilter_basic(self, dtype, device):
-        """
-        Create a very basic signal,
-        Then make a simple 4th order delay
-        The output should be same as the input but shifted
-        """
-
-        torch.random.manual_seed(42)
-        waveform = torch.rand(2, 44100 * 1, dtype=dtype, device=device)
-        b_coeffs = torch.tensor([0, 0, 0, 1], dtype=dtype, device=device)
-        a_coeffs = torch.tensor([1, 0, 0, 0], dtype=dtype, device=device)
-        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
-
-        torch.testing.assert_allclose(output_waveform[:, 3:], waveform[:, 0:-3], atol=1e-5, rtol=1e-5)
-
-    def test_lfilter_basic(self):
-        self._test_lfilter_basic(torch.float32, torch.device("cpu"))
-
-    def test_lfilter_basic_double(self):
-        self._test_lfilter_basic(torch.float64, torch.device("cpu"))
-
-    @unittest.skipIf(not torch.cuda.is_available(), "CUDA not available")
-    def test_lfilter_basic_gpu(self):
-        self._test_lfilter_basic(torch.float32, torch.device("cuda:0"))
-
     def _test_lfilter(self, waveform, device):
         """
         Design an IIR lowpass filter using scipy.signal filter design
