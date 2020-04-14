@@ -36,32 +36,6 @@ __all__ = [
 ]
 
 
-# TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
-@torch.jit.ignore
-def _stft(
-        waveform: Tensor,
-        n_fft: int,
-        hop_length: Optional[int],
-        win_length: Optional[int],
-        window: Optional[Tensor],
-        center: bool,
-        pad_mode: str,
-        normalized: bool,
-        onesided: bool
-) -> Tensor:
-    return torch.stft(
-        waveform,
-        n_fft,
-        hop_length,
-        win_length,
-        window,
-        center,
-        pad_mode,
-        normalized,
-        onesided,
-    )
-
-
 def istft(
         stft_matrix: Tensor,
         n_fft: int,
@@ -265,7 +239,7 @@ def spectrogram(
     waveform = waveform.view(-1, shape[-1])
 
     # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = _stft(
+    spec_f = torch.stft(
         waveform, n_fft, hop_length, win_length, window, True, "reflect", False, True
     )
 
@@ -365,8 +339,8 @@ def griffinlim(
                         length=length).float()
 
         # Rebuild the spectrogram
-        rebuilt = _stft(inverse, n_fft, hop_length, win_length, window,
-                        True, 'reflect', False, True)
+        rebuilt = torch.stft(inverse, n_fft, hop_length, win_length, window,
+                             True, 'reflect', False, True)
 
         # Update our phase estimates
         angles = rebuilt - tprev.mul_(momentum / (1 + momentum))
