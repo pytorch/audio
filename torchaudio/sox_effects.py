@@ -100,7 +100,7 @@ class SoxEffectsChain(object):
 
     def append_effect_to_chain(self,
                                ename: str,
-                               eargs:  Optional[Union[List[str], str]] = None) -> None:
+                               eargs: Optional[Union[List[str], str]] = None) -> None:
         r"""Append effect to a sox effects chain.
 
         Args:
