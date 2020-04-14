@@ -26,6 +26,7 @@ __all__ = [
     'Fade',
     'FrequencyMasking',
     'TimeMasking',
+    "SlidingWindowCmn",
 ]
 
 
@@ -705,6 +706,7 @@ class Fade(torch.nn.Module):
         fade_shape (str, optional): Shape of fade. Must be one of: "quarter_sine",
             "half_sine", "linear", "logarithmic", "exponential". (Default: ``"linear"``)
     """
+
     def __init__(self,
                  fade_in_len: int = 0,
                  fade_out_len: int = 0,
@@ -869,3 +871,34 @@ class Vol(torch.nn.Module):
             waveform = F.gain(waveform, 10 * math.log10(self.gain))
 
         return torch.clamp(waveform, -1, 1)
+
+
+class SlidingWindowCmn(torch.nn.Module):
+    r"""
+    Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
+
+    Args:
+        cmvn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
+        min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start). Only applicable if center == false, ignored if center==true (int, default = 100)
+        center (bool, optional): If true, use a window centered on the current frame (to the extent possible, modulo end effects). If false, window is to the left. (bool, default = false)
+        norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
+    """
+
+    def __init__(self, cmvn_window: int = 600, min_cmn_window: int = 100, center: bool = False, norm_vars: bool = False):
+        super(SlidingWindowCmn, self).__init__()
+        self.cmvn_window = cmvn_window
+        self.min_cmn_window = min_cmn_window
+        self.center = center
+        self.norm_vars = norm_vars
+
+    def forward(self, waveform: Tensor) -> Tensor:
+        r"""
+        Args:
+            waveform (Tensor): Tensor of audio of dimension (..., time).
+
+        Returns:
+            Tensor: Tensor of audio of dimension (..., time).
+        """
+        cmvn_waveform = F.sliding_window_cmn_internal(
+            waveform, self.cmvn_window, self.min_cmn_window, self.center, self.norm_vars)
+        return cmvn_waveform
