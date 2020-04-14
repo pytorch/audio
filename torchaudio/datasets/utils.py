@@ -9,7 +9,6 @@ import threading
 import zipfile
 from _io import TextIOWrapper
 from queue import Queue
-from tarfile import TarInfo
 from typing import Any, Iterable, List, Optional, Tuple, Union
 
 import torch
@@ -131,7 +130,8 @@ def download_url(url: str,
 
     if resume and os.path.exists(filepath):
         mode = "ab"
-        local_size: Optional[int] = os.path.getsize(filepath)
+        local_size = os.path.getsize(filepath)  # type: Optional[int]
+
     elif not resume and os.path.exists(filepath):
         raise RuntimeError(
             "{} already exists. Delete the file manually and retry.".format(filepath)
@@ -217,8 +217,7 @@ def extract_archive(from_path: str, to_path: Optional[str] = None, overwrite: bo
         with tarfile.open(from_path, "r") as tar:
             logging.info("Opened tar file {}.".format(from_path))
             files = []
-            file_: Union[TarInfo, str]
-            for file_ in tar:
+            for file_ in tar:  # type: Any
                 file_path = os.path.join(to_path, file_.name)
                 if file_.isfile():
                     files.append(file_path)
@@ -289,7 +288,7 @@ class _DiskCache(Dataset):
         self.location = location
 
         self._id = id(self)
-        self._cache: List = [None] * len(dataset)
+        self._cache = [None] * len(dataset)   # type: List
 
     def __getitem__(self, n: int) -> Any:
         if self._cache[n]:
@@ -328,7 +327,7 @@ class _ThreadedIterator(threading.Thread):
 
     def __init__(self, generator: Iterable, maxsize: int) -> None:
         threading.Thread.__init__(self)
-        self.queue: Queue = Queue(maxsize)
+        self.queue = Queue(maxsize)  # type: Queue
         self.generator = generator
         self.daemon = True
         self.start()
