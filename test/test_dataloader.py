@@ -1,23 +1,19 @@
 import unittest
-import torch
-import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
+
 import torchaudio
-import math
-import os
-from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
+from torch.utils.data import Dataset, DataLoader
+
+import common_utils
+from common_utils import AudioBackendScope, BACKENDS
 
 
 @unittest.skipIf("sox" not in BACKENDS, "sox not available")
 class TORCHAUDIODS(Dataset):
 
-    test_dirpath, test_dir = create_temp_assets_dir()
-
     def __init__(self):
-        self.asset_dirpath = os.path.join(self.test_dirpath, "assets")
         sound_files = ["sinewave.wav", "steam-train-whistle-daniel_simon.mp3"]
-        self.data = [os.path.join(self.asset_dirpath, fn) for fn in sound_files]
-        self.si, self.ei = torchaudio.info(os.path.join(self.asset_dirpath, "sinewave.wav"))
+        self.data = [common_utils.get_asset_path(fn) for fn in sound_files]
+        self.si, self.ei = torchaudio.info(common_utils.get_asset_path("sinewave.wav"))
         self.si.precision = 16
         self.E = torchaudio.sox_effects.SoxEffectsChain()
         self.E.append_effect_to_chain("rate", [self.si.rate])  # resample to 16000hz

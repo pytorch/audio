@@ -1,5 +1,4 @@
 import math
-import os
 import unittest
 
 import torch
@@ -7,7 +6,7 @@ import torchaudio
 import torchaudio.transforms as transforms
 import torchaudio.functional as F
 
-from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
+import common_utils
 
 
 class Tester(unittest.TestCase):
@@ -19,10 +18,6 @@ class Tester(unittest.TestCase):
     waveform = (torch.cos(2 * math.pi * torch.arange(0, 4 * sample_rate).float() * freq / sample_rate))
     waveform.unsqueeze_(0)  # (1, 64000)
     waveform = (waveform * volume * 2**31).long()
-    # file for stereo stft test
-    test_dirpath, test_dir = create_temp_assets_dir()
-    test_filepath = os.path.join(test_dirpath, 'assets',
-                                 'steam-train-whistle-daniel_simon.wav')
 
     def scale(self, waveform, factor=2.0**31):
         # scales a waveform by a factor
@@ -45,7 +40,8 @@ class Tester(unittest.TestCase):
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
 
     def test_AmplitudeToDB(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
+        filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
+        waveform, sample_rate = torchaudio.load(filepath)
 
         mag_to_db_transform = transforms.AmplitudeToDB('magnitude', 80.)
         power_to_db_transform = transforms.AmplitudeToDB('power', 80.)
@@ -114,7 +110,8 @@ class Tester(unittest.TestCase):
         self.assertTrue(mel_transform2.mel_scale.fb.sum(1).le(1.).all())
         self.assertTrue(mel_transform2.mel_scale.fb.sum(1).ge(0.).all())
         # check on multi-channel audio
-        x_stereo, sr_stereo = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
+        filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
+        x_stereo, sr_stereo = torchaudio.load(filepath)  # (2, 278756), 44100
         spectrogram_stereo = s2db(mel_transform(x_stereo))  # (2, 128, 1394)
         self.assertTrue(spectrogram_stereo.dim() == 3)
         self.assertTrue(spectrogram_stereo.size(0) == 2)
@@ -164,7 +161,7 @@ class Tester(unittest.TestCase):
         self.assertTrue(torch_mfcc_norm_none.allclose(norm_check))
 
     def test_resample_size(self):
-        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        input_path = common_utils.get_asset_path('sinewave.wav')
         waveform, sample_rate = torchaudio.load(input_path)
 
         upsample_rate = sample_rate * 2
