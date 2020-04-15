@@ -108,7 +108,8 @@ Backend Dispatch
 
 By default in OSX and Linux, torchaudio uses SoX as a backend to load and save files.
 The backend can be changed to [SoundFile](https://pysoundfile.readthedocs.io/en/latest/)
-using the following, if installed.
+using the following. See [SoundFile](https://pysoundfile.readthedocs.io/en/latest/)
+for installation instructions.
 
 ```python
 import torchaudio
