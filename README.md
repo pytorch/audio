@@ -70,7 +70,7 @@ build nightlies based on PyTorch nightlies by hand following the instructions in
 
 ```
 pip install numpy
-pip install torchaudio -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+pip install --pre torchaudio -f https://download.pytorch.org/whl/nightly/torch_nightly.html
 ```
 
 To install the latest nightly via conda, run:
