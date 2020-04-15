@@ -1654,7 +1654,7 @@ def sliding_window_cmn_internal(
         cmvn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
         min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start). 
             Only applicable if center == false, ignored if center==true (int, default = 100)
-        center (bool, optional): If true, use a window centered on the current frame 
+        center (bool, optional): If true, use a window centered on the current frame
             (to the extent possible, modulo end effects). If false, window is to the left. (bool, default = false)
         norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
 

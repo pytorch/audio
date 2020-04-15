@@ -489,7 +489,7 @@ class _TransformsTestMixin:
             common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)
         self._assert_consistency(T.Vol(1.1), waveform)
-    
+
     def test_SlidingWindowCmn(self):
         tensor = torch.rand((1000, 10))
         self._assert_consistency(T.SlidingWindowCmn(), tensor)

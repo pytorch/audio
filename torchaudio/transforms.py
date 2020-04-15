@@ -878,18 +878,18 @@ class SlidingWindowCmn(torch.nn.Module):
 
     Args:
         cmvn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
-        min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start). 
+        min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).
             Only applicable if center == false, ignored if center==true (int, default = 100)
-        center (bool, optional): If true, use a window centered on the current frame 
+        center (bool, optional): If true, use a window centered on the current frame
             (to the extent possible, modulo end effects). If false, window is to the left. (bool, default = false)
         norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
     """
 
-    def __init__(self, 
-                cmvn_window: int = 600, 
-                min_cmn_window: int = 100, 
-                center: bool = False, 
-                norm_vars: bool = False) -> None:
+    def __init__(self,
+                 cmvn_window: int = 600,
+                 min_cmn_window: int = 100,
+                 center: bool = False,
+                 norm_vars: bool = False) -> None:
         super().__init__()
         self.cmvn_window = cmvn_window
         self.min_cmn_window = min_cmn_window
