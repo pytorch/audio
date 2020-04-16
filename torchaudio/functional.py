@@ -1181,7 +1181,7 @@ def contrast(
         http://sox.sourceforge.net/sox.html
     """
 
-    if (enhancement_amount < 0 or enhancement_amount > 100):
+    if not 0 <= enhancement_amount <= 100:
         raise ValueError("Allowed range of values for enhancement_amount : 0-100")
 
     contrast = enhancement_amount / 750.

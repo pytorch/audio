@@ -406,6 +406,16 @@ class _FunctionalTestMixin:
 
         self._assert_consistency(func, waveform)
 
+    def test_contrast(self):
+        filepath = common_utils.get_asset_path("whitenoise.wav")
+        waveform, _ = torchaudio.load(filepath, normalization=True)
+
+        def func(tensor):
+            enhancement_amount = 80.
+            return F.contrast(tensor, enhancement_amount)
+
+        self._assert_consistency(func, waveform)
+
 
 class _TransformsTestMixin:
     """Implements test for Transforms that are performed for different devices"""
