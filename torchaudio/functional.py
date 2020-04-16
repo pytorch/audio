@@ -33,7 +33,7 @@ __all__ = [
     "biquad",
     'mask_along_axis',
     'mask_along_axis_iid',
-    'sliding_window_cmn_internal',
+    'sliding_window_cmn',
 ]
 
 
@@ -1639,9 +1639,9 @@ def detect_pitch_frequency(
     return freq
 
 
-def sliding_window_cmn_internal(
+def sliding_window_cmn(
     waveform: Tensor,
-    cmvn_window: int = 600,
+    cmn_window: int = 600,
     min_cmn_window: int = 100,
     center: bool = False,
     norm_vars: bool = False,
@@ -1651,7 +1651,7 @@ def sliding_window_cmn_internal(
 
     Args:
         waveform (Tensor): Tensor of audio of dimension (..., freq, time)
-        cmvn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
+        cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
         min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).
             Only applicable if center == false, ignored if center==true (int, default = 100)
         center (bool, optional): If true, use a window centered on the current frame
@@ -1667,16 +1667,16 @@ def sliding_window_cmn_internal(
     num_frames, num_feats = waveform.shape
     cur_sum = torch.zeros(num_feats, dtype=dtype, device=device)
     cur_sumsq = torch.zeros(num_feats, dtype=dtype, device=device)
-    cmvn_waveform = torch.zeros(
+    cmn_waveform = torch.zeros(
         num_frames, num_feats, dtype=dtype, device=device)
     for t in range(num_frames):
         window_start = 0
         window_end = 0
         if center:
-            window_start = t - cmvn_window // 2
-            window_end = window_start + cmvn_window
+            window_start = t - cmn_window // 2
+            window_end = window_start + cmn_window
         else:
-            window_start = t - cmvn_window
+            window_start = t - cmn_window
             window_end = t + 1
         if window_start < 0:
             window_end -= window_start
@@ -1708,15 +1708,15 @@ def sliding_window_cmn_internal(
         window_frames = window_end - window_start
         last_window_start = window_start
         last_window_end = window_end
-        cmvn_waveform[t] = waveform[t] - cur_sum / window_frames
+        cmn_waveform[t] = waveform[t] - cur_sum / window_frames
         if norm_vars:
             if window_frames == 1:
-                cmvn_waveform[t] = torch.zeros(
+                cmn_waveform[t] = torch.zeros(
                     num_feats, dtype=dtype, device=device)
             else:
                 variance = cur_sumsq
                 variance = variance / window_frames
                 variance -= ((cur_sum ** 2) / (window_frames ** 2))
                 variance = torch.pow(variance, -0.5)
-                cmvn_waveform[t] *= variance
-    return cmvn_waveform
+                cmn_waveform[t] *= variance
+    return cmn_waveform

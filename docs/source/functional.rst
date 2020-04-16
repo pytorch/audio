@@ -113,7 +113,7 @@ Functions to perform common audio operations.
 
 .. autofunction:: detect_pitch_frequency
 
-:hidden:`sliding_window_cmn_internal`
+:hidden:`sliding_window_cmn`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: sliding_window_cmn_internal
+.. autofunction:: sliding_window_cmn

@@ -408,6 +408,41 @@ class _FunctionalTestMixin:
 
         self._assert_consistency(func, waveform)
 
+    def test_sliding_window_cmn(self):
+        def func(tensor):
+            cmn_window = 600
+            min_cmn_window = 100
+            center = False
+            norm_vars = False
+            a = torch.tensor(
+                [
+                    [
+                        -1.915875792503357,
+                        1.147700309753418
+                    ],
+                    [
+                        1.8242558240890503,
+                        1.3869990110397339
+                    ]
+                ],
+                device=tensor.device,
+                dtype=tensor.dtype
+            )
+            return F.sliding_window_cmn(a, cmn_window, min_cmn_window, center, norm_vars)
+        b = torch.tensor(
+            [
+                [
+                    -1.8701,
+                    -0.1196
+                ],
+                [
+                    1.8701,
+                    0.1196
+                ]
+            ]
+        )
+        self._assert_consistency(func, b)
+
 
 class _TransformsTestMixin:
     """Implements test for Transforms that are performed for different devices"""
