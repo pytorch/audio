@@ -904,6 +904,6 @@ class SlidingWindowCmn(torch.nn.Module):
         Returns:
             Tensor: Tensor of audio of dimension (..., time).
         """
-        cmn_waveform = F.sliding_window_cmn_internal(
+        cmn_waveform = F.sliding_window_cmn(
             waveform, self.cmn_window, self.min_cmn_window, self.center, self.norm_vars)
         return cmn_waveform
