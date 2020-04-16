@@ -31,6 +31,7 @@ __all__ = [
     "deemph_biquad",
     "riaa_biquad",
     "biquad",
+    "contrast",
     'mask_along_axis',
     'mask_along_axis_iid'
 ]
@@ -1158,6 +1159,38 @@ def riaa_biquad(
     b2 *= g
 
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def contrast(
+        waveform: Tensor,
+        enhancement_amount: float = 75.
+) -> Tensor:
+    r"""Apply contrast effect.  Similar to SoX implementation.
+    Comparable with compression, this effect modifies an audio signal to make it sound louder
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        enhancement_amount (float): controls the amount of the enhancement
+            Allowed range of values for enhancement_amount : 0-100
+            Note that enhancement_amount = 0 still gives a significant contrast enhancement
+
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+    """
+
+    if not 0 <= enhancement_amount <= 100:
+        raise ValueError("Allowed range of values for enhancement_amount : 0-100")
+
+    contrast = enhancement_amount / 750.
+
+    temp1 = waveform * (math.pi / 2)
+    temp2 = contrast * torch.sin(temp1 * 4)
+    output_waveform = torch.sin(temp1 + temp2)
+
+    return output_waveform
 
 
 def mask_along_axis_iid(
