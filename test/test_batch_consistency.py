@@ -66,16 +66,8 @@ class TestFunctional(unittest.TestCase):
         _test_batch(F.istft, stft, n_fft=4, length=4)
 
     def test_contrast(self):
-        filenames = [
-            'steam-train-whistle-daniel_simon.wav',  # 2ch 44100Hz
-            # Files from https://www.mediacollege.com/audio/tone/download/
-            '100Hz_44100Hz_16bit_05sec.wav',  # 1ch
-            '440Hz_44100Hz_16bit_05sec.wav',  # 1ch
-        ]
-        for filename in filenames:
-            filepath = common_utils.get_asset_path(filename)
-            waveform, sample_rate = torchaudio.load(filepath)
-            _test_batch(F.contrast, waveform, enhancement_amount=80.)
+        waveform = torch.rand(2, 100) - 0.5
+        _test_batch(F.contrast, waveform, enhancement_amount=80.)
 
 
 class TestTransforms(unittest.TestCase):

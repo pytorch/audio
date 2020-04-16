@@ -306,15 +306,15 @@ class TestFunctionalFiltering(unittest.TestCase):
         """
         Test contrast effect, compare to SoX implementation
         """
-        ENHANCEMENT_AMOUNT = 80.
+        enhancement_amount = 80.
         noise_filepath = common_utils.get_asset_path('whitenoise.wav')
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
-        E.append_effect_to_chain("contrast", [ENHANCEMENT_AMOUNT])
+        E.append_effect_to_chain("contrast", [enhancement_amount])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.contrast(waveform, ENHANCEMENT_AMOUNT)
+        output_waveform = F.contrast(waveform, enhancement_amount)
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
