@@ -406,6 +406,41 @@ class _FunctionalTestMixin:
 
         self._assert_consistency(func, waveform)
 
+    def test_sliding_window_cmn(self):
+        def func(tensor):
+            cmn_window = 600
+            min_cmn_window = 100
+            center = False
+            norm_vars = False
+            a = torch.tensor(
+                [
+                    [
+                        -1.915875792503357,
+                        1.147700309753418
+                    ],
+                    [
+                        1.8242558240890503,
+                        1.3869990110397339
+                    ]
+                ],
+                device=tensor.device,
+                dtype=tensor.dtype
+            )
+            return F.sliding_window_cmn(a, cmn_window, min_cmn_window, center, norm_vars)
+        b = torch.tensor(
+            [
+                [
+                    -1.8701,
+                    -0.1196
+                ],
+                [
+                    1.8701,
+                    0.1196
+                ]
+            ]
+        )
+        self._assert_consistency(func, b)
+
     def test_contrast(self):
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -506,6 +541,10 @@ class _TransformsTestMixin:
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)
         self._assert_consistency(T.Vol(1.1), waveform)
+
+    def test_SlidingWindowCmn(self):
+        tensor = torch.rand((1000, 10))
+        self._assert_consistency(T.SlidingWindowCmn(), tensor)
 
 
 class TestFunctionalCPU(_FunctionalTestMixin, unittest.TestCase):
