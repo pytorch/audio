@@ -1198,8 +1198,8 @@ def dcshift(
         shift: float,
         limiter_gain: float = 0.
 ) -> Tensor:
-    r"""Apply dcshift effect.  Similar to SoX implementation.
-    Apply a DC shift to the audio. This can be useful to remove a DC offset
+    r"""Apply a DC shift to the audio. Similar to SoX implementation.
+    This can be useful to remove a DC offset
     (caused perhaps by a hardware problem in the recording chain) from the audio
 
     Args:
@@ -1234,7 +1234,7 @@ def dcshift(
         output_waveform[mask] = (temp - limiter_threshold + shift).clamp(min=-limiter_threshold)
         output_waveform[~mask] = (waveform[~mask] + shift).clamp(min=-1, max=+1)
     else:
-        output_waveform = (waveform + shift).clamp_(min=-1, max=+1)
+        output_waveform = (waveform + shift).clamp(min=-1, max=+1)
 
     return output_waveform
 
