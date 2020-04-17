@@ -416,6 +416,17 @@ class _FunctionalTestMixin:
 
         self._assert_consistency(func, waveform)
 
+    def test_dcshift(self):
+        filepath = common_utils.get_asset_path("whitenoise.wav")
+        waveform, _ = torchaudio.load(filepath, normalization=True)
+
+        def func(tensor):
+            shift = 0.5
+            limiter_gain = 0.05
+            return F.dcshift(tensor, shift, limiter_gain)
+
+        self._assert_consistency(func, waveform)
+
 
 class _TransformsTestMixin:
     """Implements test for Transforms that are performed for different devices"""
