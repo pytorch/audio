@@ -1196,7 +1196,7 @@ def contrast(
 def dcshift(
         waveform: Tensor,
         shift: float,
-        limiter_gain: float = 0.
+        limiter_gain: float = None
 ) -> Tensor:
     r"""Apply a DC shift to the audio. Similar to SoX implementation.
     This can be useful to remove a DC offset
@@ -1219,7 +1219,7 @@ def dcshift(
     limiter_threshold = 0.
     use_limiter = False
 
-    if limiter_gain != 0.0:
+    if limiter_gain:
         use_limiter = True
         limiter_threshold = 1.0 - (abs(shift) - limiter_gain)
 
@@ -1227,14 +1227,14 @@ def dcshift(
         mask = waveform > limiter_threshold
         temp = (waveform[mask] - limiter_threshold) * limiter_gain / (1 - limiter_threshold)
         output_waveform[mask] = (temp + limiter_threshold + shift).clamp(max=limiter_threshold)
-        output_waveform[~mask] = (waveform[~mask] + shift).clamp(min=-1, max=+1)
+        output_waveform[~mask] = (waveform[~mask] + shift).clamp(min=-1, max=1)
     elif use_limiter and shift < 0:
         mask = waveform < -limiter_threshold
         temp = (waveform[mask] + limiter_threshold) * limiter_gain / (1 - limiter_threshold)
         output_waveform[mask] = (temp - limiter_threshold + shift).clamp(min=-limiter_threshold)
-        output_waveform[~mask] = (waveform[~mask] + shift).clamp(min=-1, max=+1)
+        output_waveform[~mask] = (waveform[~mask] + shift).clamp(min=-1, max=1)
     else:
-        output_waveform = (waveform + shift).clamp(min=-1, max=+1)
+        output_waveform = (waveform + shift).clamp(min=-1, max=1)
 
     return output_waveform
 
