@@ -84,3 +84,14 @@ def filter_backends_with_mp3(backends):
 
 
 BACKENDS_MP3 = filter_backends_with_mp3(BACKENDS)
+
+
+_IS_SOX_INITIALIZED = False
+
+
+def initialize_sox():
+    """Initialize sox backend only if it has not yet."""
+    global _IS_SOX_INITIALIZED
+    if not _IS_SOX_INITIALIZED:
+        torchaudio.initialize_sox()
+        _IS_SOX_INITIALIZED = True

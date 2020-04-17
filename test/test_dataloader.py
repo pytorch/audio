@@ -7,9 +7,7 @@ import common_utils
 from common_utils import AudioBackendScope, BACKENDS
 
 
-@unittest.skipIf("sox" not in BACKENDS, "sox not available")
 class TORCHAUDIODS(Dataset):
-
     def __init__(self):
         sound_files = ["sinewave.wav", "steam-train-whistle-daniel_simon.mp3"]
         self.data = [common_utils.get_asset_path(fn) for fn in sound_files]
@@ -34,11 +32,7 @@ class TORCHAUDIODS(Dataset):
 class Test_DataLoader(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        torchaudio.initialize_sox()
-
-    @classmethod
-    def tearDownClass(cls):
-        torchaudio.shutdown_sox()
+        common_utils.initialize_sox()
 
     def test_1(self):
         expected_size = (2, 1, 16000)
@@ -46,6 +40,7 @@ class Test_DataLoader(unittest.TestCase):
         dl = DataLoader(ds, batch_size=2)
         for x in dl:
             self.assertTrue(x.size() == expected_size)
+
 
 if __name__ == '__main__':
     with AudioBackendScope("sox"):
