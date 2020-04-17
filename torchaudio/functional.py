@@ -32,6 +32,7 @@ __all__ = [
     "riaa_biquad",
     "biquad",
     "contrast",
+    "dcshift",
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
