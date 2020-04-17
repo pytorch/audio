@@ -31,36 +31,11 @@ __all__ = [
     "deemph_biquad",
     "riaa_biquad",
     "biquad",
+    "contrast",
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
 ]
-
-
-# TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
-@torch.jit.ignore
-def _stft(
-        waveform: Tensor,
-        n_fft: int,
-        hop_length: Optional[int],
-        win_length: Optional[int],
-        window: Optional[Tensor],
-        center: bool,
-        pad_mode: str,
-        normalized: bool,
-        onesided: bool
-) -> Tensor:
-    return torch.stft(
-        waveform,
-        n_fft,
-        hop_length,
-        win_length,
-        window,
-        center,
-        pad_mode,
-        normalized,
-        onesided,
-    )
 
 
 def istft(
@@ -266,7 +241,7 @@ def spectrogram(
     waveform = waveform.view(-1, shape[-1])
 
     # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = _stft(
+    spec_f = torch.stft(
         waveform, n_fft, hop_length, win_length, window, True, "reflect", False, True
     )
 
@@ -366,8 +341,8 @@ def griffinlim(
                         length=length).float()
 
         # Rebuild the spectrogram
-        rebuilt = _stft(inverse, n_fft, hop_length, win_length, window,
-                        True, 'reflect', False, True)
+        rebuilt = torch.stft(inverse, n_fft, hop_length, win_length, window,
+                             True, 'reflect', False, True)
 
         # Update our phase estimates
         angles = rebuilt - tprev.mul_(momentum / (1 + momentum))
@@ -1185,6 +1160,38 @@ def riaa_biquad(
     b2 *= g
 
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def contrast(
+        waveform: Tensor,
+        enhancement_amount: float = 75.
+) -> Tensor:
+    r"""Apply contrast effect.  Similar to SoX implementation.
+    Comparable with compression, this effect modifies an audio signal to make it sound louder
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        enhancement_amount (float): controls the amount of the enhancement
+            Allowed range of values for enhancement_amount : 0-100
+            Note that enhancement_amount = 0 still gives a significant contrast enhancement
+
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+    """
+
+    if not 0 <= enhancement_amount <= 100:
+        raise ValueError("Allowed range of values for enhancement_amount : 0-100")
+
+    contrast = enhancement_amount / 750.
+
+    temp1 = waveform * (math.pi / 2)
+    temp2 = contrast * torch.sin(temp1 * 4)
+    output_waveform = torch.sin(temp1 + temp2)
+
+    return output_waveform
 
 
 def mask_along_axis_iid(

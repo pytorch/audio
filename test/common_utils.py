@@ -6,8 +6,13 @@ from shutil import copytree
 import torch
 import torchaudio
 
-TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+_TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 BACKENDS = torchaudio._backend._audio_backends
+
+
+def get_asset_path(*paths):
+    """Return full path of a test asset"""
+    return os.path.join(_TEST_DIR_PATH, 'assets', *paths)
 
 
 def create_temp_assets_dir():
@@ -17,7 +22,7 @@ def create_temp_assets_dir():
     and object.
     """
     tmp_dir = tempfile.TemporaryDirectory()
-    copytree(os.path.join(TEST_DIR_PATH, "assets"),
+    copytree(os.path.join(_TEST_DIR_PATH, "assets"),
              os.path.join(tmp_dir.name, "assets"))
     return tmp_dir.name, tmp_dir
 
@@ -65,18 +70,14 @@ def AudioBackendScope(new_backend):
 
 def filter_backends_with_mp3(backends):
     # Filter out backends that do not support mp3
-
-    test_dirpath, _ = create_temp_assets_dir()
-    test_filepath = os.path.join(
-        test_dirpath, "assets", "steam-train-whistle-daniel_simon.mp3"
-    )
+    test_filepath = get_asset_path('steam-train-whistle-daniel_simon.mp3')
 
     def supports_mp3(backend):
         try:
             with AudioBackendScope(backend):
                 torchaudio.load(test_filepath)
             return True
-        except RuntimeError:
+        except (RuntimeError, ImportError):
             return False
 
     return [backend for backend in backends if supports_mp3(backend)]

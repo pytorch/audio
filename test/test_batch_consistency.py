@@ -1,5 +1,4 @@
 """Test numerical consistency among single input and batched input."""
-import os
 import unittest
 
 import torch
@@ -54,7 +53,7 @@ class TestFunctional(unittest.TestCase):
             '440Hz_44100Hz_16bit_05sec.wav',  # 1ch
         ]
         for filename in filenames:
-            filepath = os.path.join(common_utils.TEST_DIR_PATH, 'assets', filename)
+            filepath = common_utils.get_asset_path(filename)
             waveform, sample_rate = torchaudio.load(filepath)
             _test_batch(F.detect_pitch_frequency, waveform, sample_rate)
 
@@ -65,6 +64,10 @@ class TestFunctional(unittest.TestCase):
             [[0., 0.], [0., 0.], [0., 0.], [0., 0.], [0., 0.]]
         ])
         _test_batch(F.istft, stft, n_fft=4, length=4)
+
+    def test_contrast(self):
+        waveform = torch.rand(2, 100) - 0.5
+        _test_batch(F.contrast, waveform, enhancement_amount=80.)
 
 
 class TestTransforms(unittest.TestCase):
@@ -133,8 +136,7 @@ class TestTransforms(unittest.TestCase):
         torch.testing.assert_allclose(computed, expected)
 
     def test_batch_mulaw(self):
-        test_filepath = os.path.join(
-            common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.wav')
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
 
         # Single then transform then batch
@@ -159,8 +161,7 @@ class TestTransforms(unittest.TestCase):
         torch.testing.assert_allclose(computed, expected)
 
     def test_batch_spectrogram(self):
-        test_filepath = os.path.join(
-            common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.wav')
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
 
         # Single then transform then batch
@@ -171,8 +172,7 @@ class TestTransforms(unittest.TestCase):
         torch.testing.assert_allclose(computed, expected)
 
     def test_batch_melspectrogram(self):
-        test_filepath = os.path.join(
-            common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.wav')
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
 
         # Single then transform then batch
@@ -185,8 +185,7 @@ class TestTransforms(unittest.TestCase):
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
     def test_batch_mfcc(self):
-        test_filepath = os.path.join(
-            common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.mp3')
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.mp3')
         waveform, _ = torchaudio.load(test_filepath)
 
         # Single then transform then batch
@@ -197,8 +196,7 @@ class TestTransforms(unittest.TestCase):
         torch.testing.assert_allclose(computed, expected, atol=1e-5, rtol=1e-5)
 
     def test_batch_TimeStretch(self):
-        test_filepath = os.path.join(
-            common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.wav')
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
 
         kwargs = {
@@ -232,8 +230,7 @@ class TestTransforms(unittest.TestCase):
         torch.testing.assert_allclose(computed, expected, atol=1e-5, rtol=1e-5)
 
     def test_batch_Fade(self):
-        test_filepath = os.path.join(
-            common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.wav')
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
         fade_in_len = 3000
         fade_out_len = 3000
@@ -246,8 +243,7 @@ class TestTransforms(unittest.TestCase):
         torch.testing.assert_allclose(computed, expected)
 
     def test_batch_Vol(self):
-        test_filepath = os.path.join(
-            common_utils.TEST_DIR_PATH, 'assets', 'steam-train-whistle-daniel_simon.wav')
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
 
         # Single then transform then batch
