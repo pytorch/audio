@@ -78,16 +78,16 @@ class TestFunctionalFiltering(unittest.TestCase):
         Test biquad lowpass filter, compare to SoX implementation
         """
 
-        CUTOFF_FREQ = 3000
+        cutoff_freq = 3000
 
         noise_filepath = common_utils.get_asset_path('whitenoise.wav')
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
-        E.append_effect_to_chain("lowpass", [CUTOFF_FREQ])
+        E.append_effect_to_chain("lowpass", [cutoff_freq])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.lowpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
+        output_waveform = F.lowpass_biquad(waveform, sample_rate, cutoff_freq)
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -98,16 +98,16 @@ class TestFunctionalFiltering(unittest.TestCase):
         Test biquad highpass filter, compare to SoX implementation
         """
 
-        CUTOFF_FREQ = 2000
+        cutoff_freq = 2000
 
         noise_filepath = common_utils.get_asset_path('whitenoise.wav')
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
-        E.append_effect_to_chain("highpass", [CUTOFF_FREQ])
+        E.append_effect_to_chain("highpass", [cutoff_freq])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.highpass_biquad(waveform, sample_rate, CUTOFF_FREQ)
+        output_waveform = F.highpass_biquad(waveform, sample_rate, cutoff_freq)
 
         # TBD - this fails at the 1e-4 level, debug why
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-3, rtol=1e-5)
@@ -119,17 +119,17 @@ class TestFunctionalFiltering(unittest.TestCase):
         Test biquad allpass filter, compare to SoX implementation
         """
 
-        CENTRAL_FREQ = 1000
-        Q = 0.707
+        central_freq = 1000
+        q = 0.707
 
         noise_filepath = common_utils.get_asset_path('whitenoise.wav')
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
-        E.append_effect_to_chain("allpass", [CENTRAL_FREQ, str(Q) + 'q'])
+        E.append_effect_to_chain("allpass", [central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.allpass_biquad(waveform, sample_rate, CENTRAL_FREQ, Q)
+        output_waveform = F.allpass_biquad(waveform, sample_rate, central_freq, q)
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -140,18 +140,18 @@ class TestFunctionalFiltering(unittest.TestCase):
         Test biquad bandpass filter, compare to SoX implementation
         """
 
-        CENTRAL_FREQ = 1000
-        Q = 0.707
-        CONST_SKIRT_GAIN = True
+        central_freq = 1000
+        q = 0.707
+        const_skirt_gain = True
 
         noise_filepath = common_utils.get_asset_path('whitenoise.wav')
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
-        E.append_effect_to_chain("bandpass", ["-c", CENTRAL_FREQ, str(Q) + 'q'])
+        E.append_effect_to_chain("bandpass", ["-c", central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.bandpass_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, CONST_SKIRT_GAIN)
+        output_waveform = F.bandpass_biquad(waveform, sample_rate, central_freq, q, const_skirt_gain)
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -162,18 +162,18 @@ class TestFunctionalFiltering(unittest.TestCase):
         Test biquad bandpass filter, compare to SoX implementation
         """
 
-        CENTRAL_FREQ = 1000
-        Q = 0.707
-        CONST_SKIRT_GAIN = False
+        central_freq = 1000
+        q = 0.707
+        const_skirt_gain = False
 
         noise_filepath = common_utils.get_asset_path('whitenoise.wav')
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
-        E.append_effect_to_chain("bandpass", [CENTRAL_FREQ, str(Q) + 'q'])
+        E.append_effect_to_chain("bandpass", [central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.bandpass_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, CONST_SKIRT_GAIN)
+        output_waveform = F.bandpass_biquad(waveform, sample_rate, central_freq, q, const_skirt_gain)
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -184,17 +184,17 @@ class TestFunctionalFiltering(unittest.TestCase):
         Test biquad bandreject filter, compare to SoX implementation
         """
 
-        CENTRAL_FREQ = 1000
-        Q = 0.707
+        central_freq = 1000
+        q = 0.707
 
         noise_filepath = common_utils.get_asset_path('whitenoise.wav')
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
-        E.append_effect_to_chain("bandreject", [CENTRAL_FREQ, str(Q) + 'q'])
+        E.append_effect_to_chain("bandreject", [central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.bandreject_biquad(waveform, sample_rate, CENTRAL_FREQ, Q)
+        output_waveform = F.bandreject_biquad(waveform, sample_rate, central_freq, q)
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -205,18 +205,18 @@ class TestFunctionalFiltering(unittest.TestCase):
         Test biquad band filter with noise mode, compare to SoX implementation
         """
 
-        CENTRAL_FREQ = 1000
-        Q = 0.707
-        NOISE = True
+        central_freq = 1000
+        q = 0.707
+        noise = True
 
         noise_filepath = common_utils.get_asset_path('whitenoise.wav')
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
-        E.append_effect_to_chain("band", ["-n", CENTRAL_FREQ, str(Q) + 'q'])
+        E.append_effect_to_chain("band", ["-n", central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.band_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, NOISE)
+        output_waveform = F.band_biquad(waveform, sample_rate, central_freq, q, noise)
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -227,18 +227,18 @@ class TestFunctionalFiltering(unittest.TestCase):
         Test biquad band filter without noise mode, compare to SoX implementation
         """
 
-        CENTRAL_FREQ = 1000
-        Q = 0.707
-        NOISE = False
+        central_freq = 1000
+        q = 0.707
+        noise = False
 
         noise_filepath = common_utils.get_asset_path('whitenoise.wav')
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
-        E.append_effect_to_chain("band", [CENTRAL_FREQ, str(Q) + 'q'])
+        E.append_effect_to_chain("band", [central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.band_biquad(waveform, sample_rate, CENTRAL_FREQ, Q, NOISE)
+        output_waveform = F.band_biquad(waveform, sample_rate, central_freq, q, noise)
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -249,18 +249,18 @@ class TestFunctionalFiltering(unittest.TestCase):
         Test biquad treble filter, compare to SoX implementation
         """
 
-        CENTRAL_FREQ = 1000
-        Q = 0.707
-        GAIN = 40
+        central_freq = 1000
+        q = 0.707
+        gain = 40
 
         noise_filepath = common_utils.get_asset_path('whitenoise.wav')
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
-        E.append_effect_to_chain("treble", [GAIN, CENTRAL_FREQ, str(Q) + 'q'])
+        E.append_effect_to_chain("treble", [gain, central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.treble_biquad(waveform, sample_rate, GAIN, CENTRAL_FREQ, Q)
+        output_waveform = F.treble_biquad(waveform, sample_rate, gain, central_freq, q)
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -325,18 +325,18 @@ class TestFunctionalFiltering(unittest.TestCase):
         Test biquad peaking equalizer filter, compare to SoX implementation
         """
 
-        CENTER_FREQ = 300
-        Q = 0.707
-        GAIN = 1
+        center_freq = 300
+        q = 0.707
+        gain = 1
 
         noise_filepath = common_utils.get_asset_path('whitenoise.wav')
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
-        E.append_effect_to_chain("equalizer", [CENTER_FREQ, Q, GAIN])
+        E.append_effect_to_chain("equalizer", [center_freq, q, gain])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
-        output_waveform = F.equalizer_biquad(waveform, sample_rate, CENTER_FREQ, GAIN, Q)
+        output_waveform = F.equalizer_biquad(waveform, sample_rate, center_freq, gain, q)
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 

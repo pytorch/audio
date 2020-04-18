@@ -6,7 +6,6 @@ import torchaudio
 import torchaudio.functional as F
 
 import common_utils
-from common_utils import AudioBackendScope, BACKENDS
 
 
 def _test_batch_consistency(functional, tensor, *args, batch_size=1, atol=1e-8, rtol=1e-5, **kwargs):
@@ -182,10 +181,8 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.MelSpectrogram()(waveform.repeat(3, 1, 1))
         torch.testing.assert_allclose(computed, expected)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_batch_mfcc(self):
-        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.mp3')
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)
 
         # Single then transform then batch
