@@ -128,6 +128,11 @@ Functions to perform common audio operations.
 
 .. autofunction:: contrast
 
+:hidden:`dcshift`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: dcshift
+
 :hidden:`mask_along_axis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

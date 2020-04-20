@@ -68,6 +68,10 @@ class TestFunctional(unittest.TestCase):
         waveform = torch.rand(2, 100) - 0.5
         _test_batch(F.contrast, waveform, enhancement_amount=80.)
 
+    def test_dcshift(self):
+        waveform = torch.rand(2, 100) - 0.5
+        _test_batch(F.dcshift, waveform, shift=0.5, limiter_gain=0.05)
+
 
 class TestTransforms(unittest.TestCase):
     """Test suite for classes defined in `transforms` module"""
