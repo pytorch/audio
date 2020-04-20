@@ -72,6 +72,10 @@ class TestFunctional(unittest.TestCase):
         waveform = torch.rand(2, 100) - 0.5
         _test_batch(F.dcshift, waveform, shift=0.5, limiter_gain=0.05)
 
+    def test_overdrive(self):
+        waveform = torch.rand(2, 100) - 0.5
+        _test_batch(F.overdrive, waveform, gain=45, colour=30)
+
 
 class TestTransforms(unittest.TestCase):
     """Test suite for classes defined in `transforms` module"""

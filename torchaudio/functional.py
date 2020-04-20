@@ -33,6 +33,7 @@ __all__ = [
     "biquad",
     "contrast",
     "dcshift",
+    "overdrive",
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
@@ -1237,6 +1238,59 @@ def dcshift(
         output_waveform = (waveform + shift).clamp(min=-1, max=1)
 
     return output_waveform
+
+
+def overdrive(
+        waveform: Tensor,
+        gain: float = 20,
+        colour: float = 20
+) -> Tensor:
+    r"""Apply a overdrive effect to the audio. Similar to SoX implementation.
+    This effect applies a non linear distortion to the audio signal.
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        gain (float): desired gain at the boost (or attenuation) in dB
+            Allowed range of values are 0 to 100
+        colour (float):  controls the amount of even harmonic content in the over-driven output
+            Allowed range of values are 0 to 100
+
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+    """
+    actual_shape = waveform.shape
+
+    if len(actual_shape) == 2:
+        waveform = waveform.unsqueeze(0)
+
+    gain = _dB2Linear(gain)
+    colour = colour / 200
+    last_in = 0.
+    last_out = 0.
+
+    temp = waveform * gain + colour
+
+    mask1 = temp < -1
+    temp[mask1] = waveform[mask1] * 0 + (-2 / 3)
+
+    mask2 = temp > 1
+    temp[mask2] = waveform[mask2] * 0 + (2 / 3)
+
+    mask3 = (~mask1 & ~mask2)
+    temp[mask3] = temp[mask3] - (temp[mask3]**3) * (1. / 3)
+
+    output_waveform = torch.zeros_like(waveform)
+
+    # TODO: Implement a torch CPP extension
+    for i in range(waveform.shape[-1]):
+        last_out = temp[:, :, i] - last_in + 0.995 * last_out
+        last_in = temp[:, :, i]
+        output_waveform[:, :, i] = waveform[:, :, i] * 0.5 + last_out * 0.75
+
+    return output_waveform.clamp(min=-1, max=1).view(actual_shape)
 
 
 def mask_along_axis_iid(
