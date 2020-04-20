@@ -263,16 +263,16 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.sox_effects</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
 <span class="kn">import</span> <span class="nn">torch</span>
-
 <span class="kn">import</span> <span class="nn">torchaudio</span>
-
+<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torchaudio._backend</span> <span class="k">import</span> <span class="n">_audio_backend_guard</span>
 
 
 <span class="nd">@_audio_backend_guard</span><span class="p">(</span><span class="s2">&quot;sox&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">effect_names</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">effect_names</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Gets list of valid sox effect names</span>
 
 <span class="sd">    Returns: list[str]</span>
@@ -315,7 +315,7 @@
 <span class="sd">            automatically. . (Default: ``&#39;raw&#39;``)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tuple[torch.Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number</span>
+<span class="sd">        Tuple[Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number</span>
 <span class="sd">        of audio frames and C is the number of channels. An integer which is the sample rate of the</span>
 <span class="sd">        audio (as listed in the metadata of the file)</span>
 
@@ -343,9 +343,14 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">EFFECTS_UNIMPLEMENTED</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;spectrogram&quot;</span><span class="p">,</span> <span class="s2">&quot;splice&quot;</span><span class="p">,</span> <span class="s2">&quot;noiseprof&quot;</span><span class="p">,</span> <span class="s2">&quot;fir&quot;</span><span class="p">])</span>
+    <span class="n">EFFECTS_UNIMPLEMENTED</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;spectrogram&quot;</span><span class="p">,</span> <span class="s2">&quot;splice&quot;</span><span class="p">,</span> <span class="s2">&quot;noiseprof&quot;</span><span class="p">,</span> <span class="s2">&quot;fir&quot;</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">out_siginfo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_encinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s2">&quot;raw&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">normalization</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">out_siginfo</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">out_encinfo</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">filetype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;raw&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">MAX_EFFECT_OPTS</span> <span class="o">=</span> <span class="mi">20</span>
@@ -358,12 +363,14 @@
         <span class="c1"># Define in __init__ to avoid calling at import time</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">EFFECTS_AVAILABLE</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">effect_names</span><span class="p">())</span>
 
-<div class="viewcode-block" id="SoxEffectsChain.append_effect_to_chain"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.append_effect_to_chain">[docs]</a>    <span class="k">def</span> <span class="nf">append_effect_to_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ename</span><span class="p">,</span> <span class="n">eargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SoxEffectsChain.append_effect_to_chain"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.append_effect_to_chain">[docs]</a>    <span class="k">def</span> <span class="nf">append_effect_to_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                               <span class="n">ename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                               <span class="n">eargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append effect to a sox effects chain.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ename (str): which is the name of effect</span>
-<span class="sd">            eargs (List[str]): which is a list of effect options. (Default: ``None``)</span>
+<span class="sd">            eargs (List[str], optional): which is a list of effect options. (Default: ``None``)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">SoxEffect</span><span class="p">()</span>
         <span class="c1"># check if we have a valid effect</span>
@@ -382,14 +389,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SoxEffectsChain.sox_build_flow_effects"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.sox_build_flow_effects">[docs]</a>    <span class="nd">@_audio_backend_guard</span><span class="p">(</span><span class="s2">&quot;sox&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">sox_build_flow_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">sox_build_flow_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                               <span class="n">out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Build effects chain and flow effects from input file to output tensor</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            out (torch.Tensor): Where the output will be written to. (Default: ``None``)</span>
+<span class="sd">            out (Tensor, optional): Where the output will be written to. (Default: ``None``)</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tuple[torch.Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number</span>
+<span class="sd">            Tuple[Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number</span>
 <span class="sd">            of audio frames and C is the number of channels. An integer which is the sample rate of the</span>
 <span class="sd">            audio (as listed in the metadata of the file)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -420,12 +428,12 @@
 
         <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">sr</span></div>
 
-<div class="viewcode-block" id="SoxEffectsChain.clear_chain"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.clear_chain">[docs]</a>    <span class="k">def</span> <span class="nf">clear_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SoxEffectsChain.clear_chain"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.clear_chain">[docs]</a>    <span class="k">def</span> <span class="nf">clear_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clear effects chain in python</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="p">[]</span></div>
 
-<div class="viewcode-block" id="SoxEffectsChain.set_input_file"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.set_input_file">[docs]</a>    <span class="k">def</span> <span class="nf">set_input_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="p">):</span>
+<div class="viewcode-block" id="SoxEffectsChain.set_input_file"><a class="viewcode-back" href="../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.set_input_file">[docs]</a>    <span class="k">def</span> <span class="nf">set_input_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set input file for input of chain</span>
 
 <span class="sd">        Args:</span>
@@ -433,7 +441,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="n">input_file</span></div>
 
-    <span class="k">def</span> <span class="nf">_check_effect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_check_effect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">EFFECTS_UNIMPLEMENTED</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This effect (</span><span class="si">{}</span><span class="s2">) is not implement in torchaudio&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">EFFECTS_AVAILABLE</span><span class="p">:</span>
@@ -442,7 +450,7 @@
 
     <span class="c1"># https://stackoverflow.com/questions/12472338/flattening-a-list-recursively</span>
     <span class="c1"># convenience function to flatten list recursively</span>
-    <span class="k">def</span> <span class="nf">_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="p">[]:</span>
             <span class="k">return</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>

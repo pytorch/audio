@@ -278,7 +278,9 @@
 <span class="c1"># train.tsv</span>
 <span class="c1"># validated.tsv</span>
 
+<span class="n">FOLDER_IN_ARCHIVE</span> <span class="o">=</span> <span class="s2">&quot;CommonVoice&quot;</span>
 <span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;english&quot;</span>
+<span class="n">VERSION</span> <span class="o">=</span> <span class="s2">&quot;cv-corpus-4-2019-12-10&quot;</span>
 <span class="n">TSV</span> <span class="o">=</span> <span class="s2">&quot;train.tsv&quot;</span>
 
 
@@ -310,7 +312,12 @@
     <span class="n">_ext_audio</span> <span class="o">=</span> <span class="s2">&quot;.mp3&quot;</span>
     <span class="n">_folder_audio</span> <span class="o">=</span> <span class="s2">&quot;clips&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">tsv</span><span class="o">=</span><span class="n">TSV</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">URL</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span>
+                 <span class="n">tsv</span><span class="o">=</span><span class="n">TSV</span><span class="p">,</span>
+                 <span class="n">url</span><span class="o">=</span><span class="n">URL</span><span class="p">,</span>
+                 <span class="n">folder_in_archive</span><span class="o">=</span><span class="n">FOLDER_IN_ARCHIVE</span><span class="p">,</span>
+                 <span class="n">version</span><span class="o">=</span><span class="n">VERSION</span><span class="p">,</span>
+                 <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 
         <span class="n">languages</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;tatar&quot;</span><span class="p">:</span> <span class="s2">&quot;tt&quot;</span><span class="p">,</span>
@@ -333,6 +340,7 @@
             <span class="s2">&quot;esperanto&quot;</span><span class="p">:</span> <span class="s2">&quot;eo&quot;</span><span class="p">,</span>
             <span class="s2">&quot;estonian&quot;</span><span class="p">:</span> <span class="s2">&quot;et&quot;</span><span class="p">,</span>
             <span class="s2">&quot;persian&quot;</span><span class="p">:</span> <span class="s2">&quot;fa&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;portuguese&quot;</span><span class="p">:</span> <span class="s2">&quot;pt&quot;</span><span class="p">,</span>
             <span class="s2">&quot;basque&quot;</span><span class="p">:</span> <span class="s2">&quot;eu&quot;</span><span class="p">,</span>
             <span class="s2">&quot;spanish&quot;</span><span class="p">:</span> <span class="s2">&quot;es&quot;</span><span class="p">,</span>
             <span class="s2">&quot;chinese&quot;</span><span class="p">:</span> <span class="s2">&quot;zh-CN&quot;</span><span class="p">,</span>
@@ -342,29 +350,40 @@
             <span class="s2">&quot;kinyarwanda&quot;</span><span class="p">:</span> <span class="s2">&quot;rw&quot;</span><span class="p">,</span>
             <span class="s2">&quot;swedish&quot;</span><span class="p">:</span> <span class="s2">&quot;sv-SE&quot;</span><span class="p">,</span>
             <span class="s2">&quot;russian&quot;</span><span class="p">:</span> <span class="s2">&quot;ru&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;indonesian&quot;</span><span class="p">:</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;arabic&quot;</span><span class="p">:</span> <span class="s2">&quot;ar&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tamil&quot;</span><span class="p">:</span> <span class="s2">&quot;ta&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;interlingua&quot;</span><span class="p">:</span> <span class="s2">&quot;ia&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;latvian&quot;</span><span class="p">:</span> <span class="s2">&quot;lv&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;japanese&quot;</span><span class="p">:</span> <span class="s2">&quot;ja&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;votic&quot;</span><span class="p">:</span> <span class="s2">&quot;vot&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;abkhaz&quot;</span><span class="p">:</span> <span class="s2">&quot;ab&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cantonese&quot;</span><span class="p">:</span> <span class="s2">&quot;zh-HK&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;romansh sursilvan&quot;</span><span class="p">:</span> <span class="s2">&quot;rm-sursilv&quot;</span>
         <span class="p">}</span>
 
-        <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="n">languages</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
             <span class="n">ext_archive</span> <span class="o">=</span> <span class="s2">&quot;.tar.gz&quot;</span>
             <span class="n">language</span> <span class="o">=</span> <span class="n">languages</span><span class="p">[</span><span class="n">url</span><span class="p">]</span>
 
-            <span class="n">base_url</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4&quot;</span>
-                <span class="o">+</span> <span class="s2">&quot;.s3.amazonaws.com/cv-corpus-3/&quot;</span>
-            <span class="p">)</span>
-            <span class="n">url</span> <span class="o">=</span> <span class="n">base_url</span> <span class="o">+</span> <span class="n">language</span> <span class="o">+</span> <span class="n">ext_archive</span>
+            <span class="n">base_url</span> <span class="o">=</span> <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com&quot;</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">language</span> <span class="o">+</span> <span class="n">ext_archive</span><span class="p">)</span>
 
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">archive</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">root</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
+
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">basename</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">folder_in_archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_in_archive</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">archive</span><span class="p">):</span>
                     <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">root</span><span class="p">)</span>
-                <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">)</span>
+                <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_tsv</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">tsv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tsv</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">,</span> <span class="n">tsv</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tsv</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tsv</span><span class="p">:</span>
             <span class="n">walker</span> <span class="o">=</span> <span class="n">unicode_csv_reader</span><span class="p">(</span><span class="n">tsv</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>

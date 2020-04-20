@@ -263,12 +263,12 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.compliance.kaldi</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Tuple</span>
+
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">fractions</span>
-<span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">Tensor</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;get_mel_banks&#39;</span><span class="p">,</span>
@@ -285,7 +285,7 @@
 <span class="p">]</span>
 
 <span class="c1"># numeric_limits&lt;float&gt;::epsilon() 1.1920928955078125e-07</span>
-<span class="n">EPSILON</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">get_default_dtype</span><span class="p">())</span>
+<span class="n">EPSILON</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
 <span class="c1"># 1 milliseconds = 0.001 seconds</span>
 <span class="n">MILLISECONDS_TO_SECONDS</span> <span class="o">=</span> <span class="mf">0.001</span>
 
@@ -298,18 +298,18 @@
 <span class="n">WINDOWS</span> <span class="o">=</span> <span class="p">[</span><span class="n">HAMMING</span><span class="p">,</span> <span class="n">HANNING</span><span class="p">,</span> <span class="n">POVEY</span><span class="p">,</span> <span class="n">RECTANGULAR</span><span class="p">,</span> <span class="n">BLACKMAN</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_next_power_of_2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_next_power_of_2</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the smallest power of 2 that is greater than x</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_get_strided</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">,</span> <span class="n">snip_edges</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_strided</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">snip_edges</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Given a waveform (1D tensor of size ``num_samples``), it returns a 2D tensor (m, ``window_size``)</span>
 <span class="sd">    representing how the window is shifted along the waveform. Each row is a frame.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        waveform (torch.Tensor): Tensor of size ``num_samples``</span>
+<span class="sd">        waveform (Tensor): Tensor of size ``num_samples``</span>
 <span class="sd">        window_size (int): Frame length</span>
 <span class="sd">        window_shift (int): Frame shift</span>
 <span class="sd">        snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit</span>
@@ -317,7 +317,7 @@
 <span class="sd">            depends only on the frame_shift, and we reflect the data at the ends.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.Tensor: 2D tensor of size (m, ``window_size``) where each row is a frame</span>
+<span class="sd">        Tensor: 2D tensor of size (m, ``window_size``) where each row is a frame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
     <span class="n">num_samples</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -346,7 +346,9 @@
     <span class="k">return</span> <span class="n">waveform</span><span class="o">.</span><span class="n">as_strided</span><span class="p">(</span><span class="n">sizes</span><span class="p">,</span> <span class="n">strides</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_feature_window_function</span><span class="p">(</span><span class="n">window_type</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">blackman_coeff</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_feature_window_function</span><span class="p">(</span><span class="n">window_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                             <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                             <span class="n">blackman_coeff</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns a window function with the given type and size</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">window_type</span> <span class="o">==</span> <span class="n">HANNING</span><span class="p">:</span>
@@ -357,18 +359,20 @@
         <span class="c1"># like hanning but goes to zero at edges</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">0.85</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">window_type</span> <span class="o">==</span> <span class="n">RECTANGULAR</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">get_default_dtype</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">window_type</span> <span class="o">==</span> <span class="n">BLACKMAN</span><span class="p">:</span>
         <span class="n">a</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="n">window_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">window_function</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">get_default_dtype</span><span class="p">())</span>
+        <span class="n">window_function</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
         <span class="c1"># can&#39;t use torch.blackman_window as they use different coefficients</span>
-        <span class="k">return</span> <span class="n">blackman_coeff</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">window_function</span><span class="p">)</span> <span class="o">+</span> \
-            <span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">blackman_coeff</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">window_function</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">blackman_coeff</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">window_function</span><span class="p">)</span> <span class="o">+</span>
+                <span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">blackman_coeff</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">window_function</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Invalid window type &#39;</span> <span class="o">+</span> <span class="n">window_type</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_log_energy</span><span class="p">(</span><span class="n">strided_input</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">energy_floor</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_log_energy</span><span class="p">(</span><span class="n">strided_input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+                    <span class="n">epsilon</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+                    <span class="n">energy_floor</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the log energy of size (m) for a strided_input (m,*)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">log_energy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">strided_input</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">epsilon</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>  <span class="c1"># size (m)</span>
@@ -376,11 +380,16 @@
         <span class="k">return</span> <span class="n">log_energy</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">log_energy</span><span class="p">,</span>
-                         <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">energy_floor</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">get_default_dtype</span><span class="p">()))</span>
+                         <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">energy_floor</span><span class="p">)))</span>
 
 
-<span class="k">def</span> <span class="nf">_get_waveform_and_window_properties</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="p">,</span> <span class="n">frame_shift</span><span class="p">,</span>
-                                        <span class="n">frame_length</span><span class="p">,</span> <span class="n">round_to_power_of_two</span><span class="p">,</span> <span class="n">preemphasis_coefficient</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_waveform_and_window_properties</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+                                        <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                                        <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                                        <span class="n">frame_shift</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                                        <span class="n">frame_length</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                                        <span class="n">round_to_power_of_two</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                                        <span class="n">preemphasis_coefficient</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gets the waveform and window properties</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">channel</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -392,20 +401,29 @@
 
     <span class="k">assert</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">window_size</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">waveform</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;choose a window size </span><span class="si">%d</span><span class="s1"> that is [2, </span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">waveform</span><span class="p">)))</span>
     <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">window_shift</span><span class="p">,</span> <span class="s1">&#39;`window_shift` must be greater than 0&#39;</span>
-    <span class="k">assert</span> <span class="n">padded_window_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;the padded &#39;</span> \
-        <span class="s1">&#39;`window_size` must be divisible by two. use `round_to_power_of_two` or change `frame_length`&#39;</span>
+    <span class="k">assert</span> <span class="n">padded_window_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;the padded `window_size` must be divisible by two.&#39;</span> \
+                                        <span class="s1">&#39; use `round_to_power_of_two` or change `frame_length`&#39;</span>
     <span class="k">assert</span> <span class="mf">0.</span> <span class="o">&lt;=</span> <span class="n">preemphasis_coefficient</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;`preemphasis_coefficient` must be between [0,1]&#39;</span>
     <span class="k">assert</span> <span class="n">sample_frequency</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;`sample_frequency` must be greater than zero&#39;</span>
     <span class="k">return</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">padded_window_size</span>
 
 
-<span class="k">def</span> <span class="nf">_get_window</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">padded_window_size</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">,</span> <span class="n">window_type</span><span class="p">,</span> <span class="n">blackman_coeff</span><span class="p">,</span>
-                <span class="n">snip_edges</span><span class="p">,</span> <span class="n">raw_energy</span><span class="p">,</span> <span class="n">energy_floor</span><span class="p">,</span> <span class="n">dither</span><span class="p">,</span> <span class="n">remove_dc_offset</span><span class="p">,</span> <span class="n">preemphasis_coefficient</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_window</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+                <span class="n">padded_window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                <span class="n">window_shift</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                <span class="n">window_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                <span class="n">blackman_coeff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                <span class="n">snip_edges</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                <span class="n">raw_energy</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                <span class="n">energy_floor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                <span class="n">dither</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                <span class="n">remove_dc_offset</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                <span class="n">preemphasis_coefficient</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gets a window and its log energy</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        strided_input (torch.Tensor): size (m, ``padded_window_size``)</span>
-<span class="sd">        signal_log_energy (torch.Tensor): size (m)</span>
+<span class="sd">        (Tensor, Tensor): strided_input of size (m, ``padded_window_size``) and signal_log_energy of size (m)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># size (m, window_size)</span>
     <span class="n">strided_input</span> <span class="o">=</span> <span class="n">_get_strided</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">,</span> <span class="n">snip_edges</span><span class="p">)</span>
@@ -450,7 +468,7 @@
     <span class="k">return</span> <span class="n">strided_input</span><span class="p">,</span> <span class="n">signal_log_energy</span>
 
 
-<span class="k">def</span> <span class="nf">_subtract_column_mean</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">subtract_mean</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_subtract_column_mean</span><span class="p">(</span><span class="n">tensor</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">subtract_mean</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="c1"># subtracts the column mean of the tensor size (m, n) if subtract_mean=True</span>
     <span class="c1"># it returns size (m, n)</span>
     <span class="k">if</span> <span class="n">subtract_mean</span><span class="p">:</span>
@@ -459,43 +477,54 @@
     <span class="k">return</span> <span class="n">tensor</span>
 
 
-<div class="viewcode-block" id="spectrogram"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.spectrogram">[docs]</a><span class="k">def</span> <span class="nf">spectrogram</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">,</span> <span class="n">blackman_coeff</span><span class="o">=</span><span class="mf">0.42</span><span class="p">,</span> <span class="n">channel</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dither</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">energy_floor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">frame_length</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span> <span class="n">frame_shift</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">min_duration</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">preemphasis_coefficient</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span> <span class="n">raw_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_dc_offset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">round_to_power_of_two</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="o">=</span><span class="mf">16000.0</span><span class="p">,</span> <span class="n">snip_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">subtract_mean</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">window_type</span><span class="o">=</span><span class="n">POVEY</span><span class="p">):</span>
+<div class="viewcode-block" id="spectrogram"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.spectrogram">[docs]</a><span class="k">def</span> <span class="nf">spectrogram</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+                <span class="n">blackman_coeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.42</span><span class="p">,</span>
+                <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">dither</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="n">energy_floor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+                <span class="n">frame_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">25.0</span><span class="p">,</span>
+                <span class="n">frame_shift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+                <span class="n">min_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="n">preemphasis_coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.97</span><span class="p">,</span>
+                <span class="n">raw_energy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="n">remove_dc_offset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="n">round_to_power_of_two</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">16000.0</span><span class="p">,</span>
+                <span class="n">snip_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="n">subtract_mean</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="n">window_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">POVEY</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a spectrogram from a raw audio signal. This matches the input/output of Kaldi&#39;s</span>
 <span class="sd">    compute-spectrogram-feats.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        waveform (torch.Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)</span>
-<span class="sd">        blackman_coeff (float): Constant coefficient for generalized Blackman window. (Default: ``0.42``)</span>
-<span class="sd">        channel (int): Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (Default: ``-1``)</span>
-<span class="sd">        dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set</span>
-<span class="sd">            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``1.0``)</span>
-<span class="sd">        energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:</span>
+<span class="sd">        waveform (Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)</span>
+<span class="sd">        blackman_coeff (float, optional): Constant coefficient for generalized Blackman window. (Default: ``0.42``)</span>
+<span class="sd">        channel (int, optional): Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (Default: ``-1``)</span>
+<span class="sd">        dither (float, optional): Dithering constant (0.0 means no dither). If you turn this off, you should set</span>
+<span class="sd">            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``0.0``)</span>
+<span class="sd">        energy_floor (float, optional): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:</span>
 <span class="sd">            this floor is applied to the zeroth component, representing the total signal energy.  The floor on the</span>
-<span class="sd">            individual spectrogram elements is fixed at std::numeric_limits&lt;float&gt;::epsilon(). (Default: ``0.0``)</span>
-<span class="sd">        frame_length (float): Frame length in milliseconds (Default: ``25.0``)</span>
-<span class="sd">        frame_shift (float): Frame shift in milliseconds (Default: ``10.0``)</span>
-<span class="sd">        min_duration (float): Minimum duration of segments to process (in seconds). (Default: ``0.0``)</span>
-<span class="sd">        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (Default: ``0.97``)</span>
-<span class="sd">        raw_energy (bool): If True, compute energy before preemphasis and windowing (Default: ``True``)</span>
-<span class="sd">        remove_dc_offset: Subtract mean from waveform on each frame (Default: ``True``)</span>
-<span class="sd">        round_to_power_of_two (bool): If True, round window size to power of two by zero-padding input</span>
+<span class="sd">            individual spectrogram elements is fixed at std::numeric_limits&lt;float&gt;::epsilon(). (Default: ``1.0``)</span>
+<span class="sd">        frame_length (float, optional): Frame length in milliseconds (Default: ``25.0``)</span>
+<span class="sd">        frame_shift (float, optional): Frame shift in milliseconds (Default: ``10.0``)</span>
+<span class="sd">        min_duration (float, optional): Minimum duration of segments to process (in seconds). (Default: ``0.0``)</span>
+<span class="sd">        preemphasis_coefficient (float, optional): Coefficient for use in signal preemphasis (Default: ``0.97``)</span>
+<span class="sd">        raw_energy (bool, optional): If True, compute energy before preemphasis and windowing (Default: ``True``)</span>
+<span class="sd">        remove_dc_offset (bool, optional): Subtract mean from waveform on each frame (Default: ``True``)</span>
+<span class="sd">        round_to_power_of_two (bool, optional): If True, round window size to power of two by zero-padding input</span>
 <span class="sd">            to FFT. (Default: ``True``)</span>
-<span class="sd">        sample_frequency (float): Waveform data sample frequency (must match the waveform file, if</span>
+<span class="sd">        sample_frequency (float, optional): Waveform data sample frequency (must match the waveform file, if</span>
 <span class="sd">            specified there) (Default: ``16000.0``)</span>
-<span class="sd">        snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit</span>
+<span class="sd">        snip_edges (bool, optional): If True, end effects will be handled by outputting only frames that completely fit</span>
 <span class="sd">            in the file, and the number of frames depends on the frame_length.  If False, the number of frames</span>
 <span class="sd">            depends only on the frame_shift, and we reflect the data at the ends. (Default: ``True``)</span>
-<span class="sd">        subtract_mean (bool): Subtract mean of each feature file [CMS]; not recommended to do</span>
+<span class="sd">        subtract_mean (bool, optional): Subtract mean of each feature file [CMS]; not recommended to do</span>
 <span class="sd">            it this way.  (Default: ``False``)</span>
-<span class="sd">        window_type (str): Type of window (&#39;hamming&#39;|&#39;hanning&#39;|&#39;povey&#39;|&#39;rectangular&#39;|&#39;blackman&#39;) (Default: ``&#39;povey&#39;``)</span>
+<span class="sd">        window_type (str, optional): Type of window (&#39;hamming&#39;|&#39;hanning&#39;|&#39;povey&#39;|&#39;rectangular&#39;|&#39;blackman&#39;)</span>
+<span class="sd">         (Default: ``&#39;povey&#39;``)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.Tensor: A spectrogram identical to what Kaldi would output. The shape is</span>
+<span class="sd">        Tensor: A spectrogram identical to what Kaldi would output. The shape is</span>
 <span class="sd">        (m, ``padded_window_size // 2 + 1``) where m is calculated in _get_strided</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">waveform</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">padded_window_size</span> <span class="o">=</span> <span class="n">_get_waveform_and_window_properties</span><span class="p">(</span>
@@ -520,26 +549,28 @@
     <span class="k">return</span> <span class="n">power_spectrum</span></div>
 
 
-<span class="k">def</span> <span class="nf">inverse_mel_scale_scalar</span><span class="p">(</span><span class="n">mel_freq</span><span class="p">):</span>
-    <span class="c1"># type: (float) -&gt; float</span>
+<span class="k">def</span> <span class="nf">inverse_mel_scale_scalar</span><span class="p">(</span><span class="n">mel_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="k">return</span> <span class="mf">700.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mel_freq</span> <span class="o">/</span> <span class="mf">1127.0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">inverse_mel_scale</span><span class="p">(</span><span class="n">mel_freq</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">inverse_mel_scale</span><span class="p">(</span><span class="n">mel_freq</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="k">return</span> <span class="mf">700.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">mel_freq</span> <span class="o">/</span> <span class="mf">1127.0</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">mel_scale_scalar</span><span class="p">(</span><span class="n">freq</span><span class="p">):</span>
-    <span class="c1"># type: (float) -&gt; float</span>
+<span class="k">def</span> <span class="nf">mel_scale_scalar</span><span class="p">(</span><span class="n">freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="k">return</span> <span class="mf">1127.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">freq</span> <span class="o">/</span> <span class="mf">700.0</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">mel_scale</span><span class="p">(</span><span class="n">freq</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">mel_scale</span><span class="p">(</span><span class="n">freq</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="k">return</span> <span class="mf">1127.0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">freq</span> <span class="o">/</span> <span class="mf">700.0</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">vtln_warp_freq</span><span class="p">(</span><span class="n">vtln_low_cutoff</span><span class="p">,</span> <span class="n">vtln_high_cutoff</span><span class="p">,</span> <span class="n">low_freq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">,</span>
-                   <span class="n">vtln_warp_factor</span><span class="p">,</span> <span class="n">freq</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">vtln_warp_freq</span><span class="p">(</span><span class="n">vtln_low_cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                   <span class="n">vtln_high_cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                   <span class="n">low_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                   <span class="n">high_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                   <span class="n">vtln_warp_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                   <span class="n">freq</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;This computes a VTLN warping function that is not the same as HTK&#39;s one,</span>
 <span class="sd">    but has similar inputs (this function has the advantage of never producing</span>
 <span class="sd">    empty bins).</span>
@@ -571,10 +602,10 @@
 <span class="sd">        low_freq (float): Lower frequency cutoffs in mel computation</span>
 <span class="sd">        high_freq (float): Upper frequency cutoffs in mel computation</span>
 <span class="sd">        vtln_warp_factor (float): Vtln warp factor</span>
-<span class="sd">        freq (torch.Tensor): given frequency in Hz</span>
+<span class="sd">        freq (Tensor): given frequency in Hz</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.Tensor: Freq after vtln warp</span>
+<span class="sd">        Tensor: Freq after vtln warp</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">vtln_low_cutoff</span> <span class="o">&gt;</span> <span class="n">low_freq</span><span class="p">,</span> <span class="s1">&#39;be sure to set the vtln_low option higher than low_freq&#39;</span>
     <span class="k">assert</span> <span class="n">vtln_high_cutoff</span> <span class="o">&lt;</span> <span class="n">high_freq</span><span class="p">,</span> <span class="s1">&#39;be sure to set the vtln_high option lower than high_freq [or negative]&#39;</span>
@@ -607,8 +638,11 @@
     <span class="k">return</span> <span class="n">res</span>
 
 
-<span class="k">def</span> <span class="nf">vtln_warp_mel_freq</span><span class="p">(</span><span class="n">vtln_low_cutoff</span><span class="p">,</span> <span class="n">vtln_high_cutoff</span><span class="p">,</span> <span class="n">low_freq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">,</span>
-                       <span class="n">vtln_warp_factor</span><span class="p">,</span> <span class="n">mel_freq</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">vtln_warp_mel_freq</span><span class="p">(</span><span class="n">vtln_low_cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                       <span class="n">vtln_high_cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                       <span class="n">low_freq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                       <span class="n">vtln_warp_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                       <span class="n">mel_freq</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
 <span class="sd">        vtln_low_cutoff (float): Lower frequency cutoffs for VTLN</span>
@@ -616,21 +650,26 @@
 <span class="sd">        low_freq (float): Lower frequency cutoffs in mel computation</span>
 <span class="sd">        high_freq (float): Upper frequency cutoffs in mel computation</span>
 <span class="sd">        vtln_warp_factor (float): Vtln warp factor</span>
-<span class="sd">        mel_freq (torch.Tensor): Given frequency in Mel</span>
+<span class="sd">        mel_freq (Tensor): Given frequency in Mel</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.Tensor: ``mel_freq`` after vtln warp</span>
+<span class="sd">        Tensor: ``mel_freq`` after vtln warp</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">mel_scale</span><span class="p">(</span><span class="n">vtln_warp_freq</span><span class="p">(</span><span class="n">vtln_low_cutoff</span><span class="p">,</span> <span class="n">vtln_high_cutoff</span><span class="p">,</span> <span class="n">low_freq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">,</span>
                                     <span class="n">vtln_warp_factor</span><span class="p">,</span> <span class="n">inverse_mel_scale</span><span class="p">(</span><span class="n">mel_freq</span><span class="p">)))</span>
 
 
-<span class="k">def</span> <span class="nf">get_mel_banks</span><span class="p">(</span><span class="n">num_bins</span><span class="p">,</span> <span class="n">window_length_padded</span><span class="p">,</span> <span class="n">sample_freq</span><span class="p">,</span>
-                  <span class="n">low_freq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">,</span> <span class="n">vtln_low</span><span class="p">,</span> <span class="n">vtln_high</span><span class="p">,</span> <span class="n">vtln_warp_factor</span><span class="p">):</span>
-    <span class="c1"># type: (int, int, float, float, float, float, float)</span>
+<span class="k">def</span> <span class="nf">get_mel_banks</span><span class="p">(</span><span class="n">num_bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                  <span class="n">window_length_padded</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                  <span class="n">sample_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                  <span class="n">low_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                  <span class="n">high_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                  <span class="n">vtln_low</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                  <span class="n">vtln_high</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                  <span class="n">vtln_warp_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns:</span>
-<span class="sd">        Tuple[torch.Tensor, torch.Tensor]: The tuple consists of ``bins`` (which is</span>
+<span class="sd">        (Tensor, Tensor): The tuple consists of ``bins`` (which is</span>
 <span class="sd">        melbank of size (``num_bins``, ``num_fft_bins``)) and ``center_freqs`` (which is</span>
 <span class="sd">        center frequencies of bins of size (``num_bins``)).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -660,9 +699,9 @@
     <span class="k">assert</span> <span class="n">vtln_warp_factor</span> <span class="o">==</span> <span class="mf">1.0</span> <span class="ow">or</span> <span class="p">((</span><span class="n">low_freq</span> <span class="o">&lt;</span> <span class="n">vtln_low</span> <span class="o">&lt;</span> <span class="n">high_freq</span><span class="p">)</span> <span class="ow">and</span>
                                        <span class="p">(</span><span class="mf">0.0</span> <span class="o">&lt;</span> <span class="n">vtln_high</span> <span class="o">&lt;</span> <span class="n">high_freq</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">vtln_low</span> <span class="o">&lt;</span> <span class="n">vtln_high</span><span class="p">)),</span> \
         <span class="p">(</span><span class="s1">&#39;Bad values in options: vtln-low </span><span class="si">%f</span><span class="s1"> and vtln-high </span><span class="si">%f</span><span class="s1">, versus low-freq </span><span class="si">%f</span><span class="s1"> and high-freq </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span>
-            <span class="p">(</span><span class="n">vtln_low</span><span class="p">,</span> <span class="n">vtln_high</span><span class="p">,</span> <span class="n">low_freq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">))</span>
+         <span class="p">(</span><span class="n">vtln_low</span><span class="p">,</span> <span class="n">vtln_high</span><span class="p">,</span> <span class="n">low_freq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">))</span>
 
-    <span class="nb">bin</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_bins</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">get_default_dtype</span><span class="p">())</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">bin</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_bins</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">left_mel</span> <span class="o">=</span> <span class="n">mel_low_freq</span> <span class="o">+</span> <span class="nb">bin</span> <span class="o">*</span> <span class="n">mel_freq_delta</span>  <span class="c1"># size(num_bins, 1)</span>
     <span class="n">center_mel</span> <span class="o">=</span> <span class="n">mel_low_freq</span> <span class="o">+</span> <span class="p">(</span><span class="nb">bin</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">mel_freq_delta</span>  <span class="c1"># size(num_bins, 1)</span>
     <span class="n">right_mel</span> <span class="o">=</span> <span class="n">mel_low_freq</span> <span class="o">+</span> <span class="p">(</span><span class="nb">bin</span> <span class="o">+</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">mel_freq_delta</span>  <span class="c1"># size(num_bins, 1)</span>
@@ -674,7 +713,7 @@
 
     <span class="n">center_freqs</span> <span class="o">=</span> <span class="n">inverse_mel_scale</span><span class="p">(</span><span class="n">center_mel</span><span class="p">)</span>  <span class="c1"># size (num_bins)</span>
     <span class="c1"># size(1, num_fft_bins)</span>
-    <span class="n">mel</span> <span class="o">=</span> <span class="n">mel_scale</span><span class="p">(</span><span class="n">fft_bin_width</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_fft_bins</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">get_default_dtype</span><span class="p">()))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">mel</span> <span class="o">=</span> <span class="n">mel_scale</span><span class="p">(</span><span class="n">fft_bin_width</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_fft_bins</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="c1"># size (num_bins, num_fft_bins)</span>
     <span class="n">up_slope</span> <span class="o">=</span> <span class="p">(</span><span class="n">mel</span> <span class="o">-</span> <span class="n">left_mel</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">center_mel</span> <span class="o">-</span> <span class="n">left_mel</span><span class="p">)</span>
@@ -694,56 +733,77 @@
     <span class="k">return</span> <span class="n">bins</span><span class="p">,</span> <span class="n">center_freqs</span>
 
 
-<div class="viewcode-block" id="fbank"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.fbank">[docs]</a><span class="k">def</span> <span class="nf">fbank</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">,</span> <span class="n">blackman_coeff</span><span class="o">=</span><span class="mf">0.42</span><span class="p">,</span> <span class="n">channel</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dither</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">energy_floor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">frame_length</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span> <span class="n">frame_shift</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">high_freq</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">htk_compat</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">low_freq</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
-        <span class="n">min_duration</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">num_mel_bins</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">preemphasis_coefficient</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span> <span class="n">raw_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">remove_dc_offset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">round_to_power_of_two</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="o">=</span><span class="mf">16000.0</span><span class="p">,</span>
-        <span class="n">snip_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">subtract_mean</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_log_fbank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_power</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">vtln_high</span><span class="o">=-</span><span class="mf">500.0</span><span class="p">,</span> <span class="n">vtln_low</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">vtln_warp</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">window_type</span><span class="o">=</span><span class="n">POVEY</span><span class="p">):</span>
+<div class="viewcode-block" id="fbank"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.fbank">[docs]</a><span class="k">def</span> <span class="nf">fbank</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+          <span class="n">blackman_coeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.42</span><span class="p">,</span>
+          <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+          <span class="n">dither</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+          <span class="n">energy_floor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+          <span class="n">frame_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">25.0</span><span class="p">,</span>
+          <span class="n">frame_shift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+          <span class="n">high_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+          <span class="n">htk_compat</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+          <span class="n">low_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+          <span class="n">min_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+          <span class="n">num_mel_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">23</span><span class="p">,</span>
+          <span class="n">preemphasis_coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.97</span><span class="p">,</span>
+          <span class="n">raw_energy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+          <span class="n">remove_dc_offset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+          <span class="n">round_to_power_of_two</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+          <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">16000.0</span><span class="p">,</span>
+          <span class="n">snip_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+          <span class="n">subtract_mean</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+          <span class="n">use_energy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+          <span class="n">use_log_fbank</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+          <span class="n">use_power</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+          <span class="n">vtln_high</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">500.0</span><span class="p">,</span>
+          <span class="n">vtln_low</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">100.0</span><span class="p">,</span>
+          <span class="n">vtln_warp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+          <span class="n">window_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">POVEY</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a fbank from a raw audio signal. This matches the input/output of Kaldi&#39;s</span>
 <span class="sd">    compute-fbank-feats.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        waveform (torch.Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)</span>
-<span class="sd">        blackman_coeff (float): Constant coefficient for generalized Blackman window. (Default: ``0.42``)</span>
-<span class="sd">        channel (int): Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (Default: ``-1``)</span>
-<span class="sd">        dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set</span>
-<span class="sd">            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``1.0``)</span>
-<span class="sd">        energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:</span>
+<span class="sd">        waveform (Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)</span>
+<span class="sd">        blackman_coeff (float, optional): Constant coefficient for generalized Blackman window. (Default: ``0.42``)</span>
+<span class="sd">        channel (int, optional): Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (Default: ``-1``)</span>
+<span class="sd">        dither (float, optional): Dithering constant (0.0 means no dither). If you turn this off, you should set</span>
+<span class="sd">            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``0.0``)</span>
+<span class="sd">        energy_floor (float, optional): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:</span>
 <span class="sd">            this floor is applied to the zeroth component, representing the total signal energy.  The floor on the</span>
-<span class="sd">            individual spectrogram elements is fixed at std::numeric_limits&lt;float&gt;::epsilon(). (Default: ``0.0``)</span>
-<span class="sd">        frame_length (float): Frame length in milliseconds (Default: ``25.0``)</span>
-<span class="sd">        frame_shift (float): Frame shift in milliseconds (Default: ``10.0``)</span>
-<span class="sd">        high_freq (float): High cutoff frequency for mel bins (if &lt;= 0, offset from Nyquist) (Default: ``0.0``)</span>
-<span class="sd">        htk_compat (bool): If true, put energy last.  Warning: not sufficient to get HTK compatible features (need</span>
-<span class="sd">            to change other parameters). (Default: ``False``)</span>
-<span class="sd">        low_freq (float): Low cutoff frequency for mel bins (Default: ``20.0``)</span>
-<span class="sd">        min_duration (float): Minimum duration of segments to process (in seconds). (Default: ``0.0``)</span>
-<span class="sd">        num_mel_bins (int): Number of triangular mel-frequency bins (Default: ``23``)</span>
-<span class="sd">        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (Default: ``0.97``)</span>
-<span class="sd">        raw_energy (bool): If True, compute energy before preemphasis and windowing (Default: ``True``)</span>
-<span class="sd">        remove_dc_offset: Subtract mean from waveform on each frame (Default: ``True``)</span>
-<span class="sd">        round_to_power_of_two (bool): If True, round window size to power of two by zero-padding input</span>
+<span class="sd">            individual spectrogram elements is fixed at std::numeric_limits&lt;float&gt;::epsilon(). (Default: ``1.0``)</span>
+<span class="sd">        frame_length (float, optional): Frame length in milliseconds (Default: ``25.0``)</span>
+<span class="sd">        frame_shift (float, optional): Frame shift in milliseconds (Default: ``10.0``)</span>
+<span class="sd">        high_freq (float, optional): High cutoff frequency for mel bins (if &lt;= 0, offset from Nyquist)</span>
+<span class="sd">         (Default: ``0.0``)</span>
+<span class="sd">        htk_compat (bool, optional): If true, put energy last.  Warning: not sufficient to get HTK compatible features</span>
+<span class="sd">         (need to change other parameters). (Default: ``False``)</span>
+<span class="sd">        low_freq (float, optional): Low cutoff frequency for mel bins (Default: ``20.0``)</span>
+<span class="sd">        min_duration (float, optional): Minimum duration of segments to process (in seconds). (Default: ``0.0``)</span>
+<span class="sd">        num_mel_bins (int, optional): Number of triangular mel-frequency bins (Default: ``23``)</span>
+<span class="sd">        preemphasis_coefficient (float, optional): Coefficient for use in signal preemphasis (Default: ``0.97``)</span>
+<span class="sd">        raw_energy (bool, optional): If True, compute energy before preemphasis and windowing (Default: ``True``)</span>
+<span class="sd">        remove_dc_offset (bool, optional): Subtract mean from waveform on each frame (Default: ``True``)</span>
+<span class="sd">        round_to_power_of_two (bool, optional): If True, round window size to power of two by zero-padding input</span>
 <span class="sd">            to FFT. (Default: ``True``)</span>
-<span class="sd">        sample_frequency (float): Waveform data sample frequency (must match the waveform file, if</span>
+<span class="sd">        sample_frequency (float, optional): Waveform data sample frequency (must match the waveform file, if</span>
 <span class="sd">            specified there) (Default: ``16000.0``)</span>
-<span class="sd">        snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit</span>
+<span class="sd">        snip_edges (bool, optional): If True, end effects will be handled by outputting only frames that completely fit</span>
 <span class="sd">            in the file, and the number of frames depends on the frame_length.  If False, the number of frames</span>
 <span class="sd">            depends only on the frame_shift, and we reflect the data at the ends. (Default: ``True``)</span>
-<span class="sd">        subtract_mean (bool): Subtract mean of each feature file [CMS]; not recommended to do</span>
+<span class="sd">        subtract_mean (bool, optional): Subtract mean of each feature file [CMS]; not recommended to do</span>
 <span class="sd">            it this way.  (Default: ``False``)</span>
-<span class="sd">        use_energy (bool): Add an extra dimension with energy to the FBANK output. (Default: ``False``)</span>
-<span class="sd">        use_log_fbank (bool):If true, produce log-filterbank, else produce linear. (Default: ``True``)</span>
-<span class="sd">        use_power (bool): If true, use power, else use magnitude. (Default: ``True``)</span>
-<span class="sd">        vtln_high (float): High inflection point in piecewise linear VTLN warping function (if</span>
+<span class="sd">        use_energy (bool, optional): Add an extra dimension with energy to the FBANK output. (Default: ``False``)</span>
+<span class="sd">        use_log_fbank (bool, optional):If true, produce log-filterbank, else produce linear. (Default: ``True``)</span>
+<span class="sd">        use_power (bool, optional): If true, use power, else use magnitude. (Default: ``True``)</span>
+<span class="sd">        vtln_high (float, optional): High inflection point in piecewise linear VTLN warping function (if</span>
 <span class="sd">            negative, offset from high-mel-freq (Default: ``-500.0``)</span>
-<span class="sd">        vtln_low (float): Low inflection point in piecewise linear VTLN warping function (Default: ``100.0``)</span>
-<span class="sd">        vtln_warp (float): Vtln warp factor (only applicable if vtln_map not specified) (Default: ``1.0``)</span>
-<span class="sd">        window_type (str): Type of window (&#39;hamming&#39;|&#39;hanning&#39;|&#39;povey&#39;|&#39;rectangular&#39;|&#39;blackman&#39;) (Default: ``&#39;povey&#39;``)</span>
+<span class="sd">        vtln_low (float, optional): Low inflection point in piecewise linear VTLN warping function (Default: ``100.0``)</span>
+<span class="sd">        vtln_warp (float, optional): Vtln warp factor (only applicable if vtln_map not specified) (Default: ``1.0``)</span>
+<span class="sd">        window_type (str, optional): Type of window (&#39;hamming&#39;|&#39;hanning&#39;|&#39;povey&#39;|&#39;rectangular&#39;|&#39;blackman&#39;)</span>
+<span class="sd">         (Default: ``&#39;povey&#39;``)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.Tensor: A fbank identical to what Kaldi would output. The shape is (m, ``num_mel_bins + use_energy``)</span>
+<span class="sd">        Tensor: A fbank identical to what Kaldi would output. The shape is (m, ``num_mel_bins + use_energy``)</span>
 <span class="sd">        where m is calculated in _get_strided</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">waveform</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">padded_window_size</span> <span class="o">=</span> <span class="n">_get_waveform_and_window_properties</span><span class="p">(</span>
@@ -791,7 +851,7 @@
     <span class="k">return</span> <span class="n">mel_energies</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_dct_matrix</span><span class="p">(</span><span class="n">num_ceps</span><span class="p">,</span> <span class="n">num_mel_bins</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_dct_matrix</span><span class="p">(</span><span class="n">num_ceps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_mel_bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="c1"># returns a dct matrix of size (num_mel_bins, num_ceps)</span>
     <span class="c1"># size (num_mel_bins, num_mel_bins)</span>
     <span class="n">dct_matrix</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">create_dct</span><span class="p">(</span><span class="n">num_mel_bins</span><span class="p">,</span> <span class="n">num_mel_bins</span><span class="p">,</span> <span class="s1">&#39;ortho&#39;</span><span class="p">)</span>
@@ -804,64 +864,86 @@
     <span class="k">return</span> <span class="n">dct_matrix</span>
 
 
-<span class="k">def</span> <span class="nf">_get_lifter_coeffs</span><span class="p">(</span><span class="n">num_ceps</span><span class="p">,</span> <span class="n">cepstral_lifter</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_lifter_coeffs</span><span class="p">(</span><span class="n">num_ceps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cepstral_lifter</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="c1"># returns size (num_ceps)</span>
     <span class="c1"># Compute liftering coefficients (scaling on cepstral coeffs)</span>
     <span class="c1"># coeffs are numbered slightly differently from HTK: the zeroth index is C0, which is not affected.</span>
-    <span class="n">i</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_ceps</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">get_default_dtype</span><span class="p">())</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_ceps</span><span class="p">)</span>
     <span class="k">return</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">cepstral_lifter</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">i</span> <span class="o">/</span> <span class="n">cepstral_lifter</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="mfcc"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.mfcc">[docs]</a><span class="k">def</span> <span class="nf">mfcc</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">,</span> <span class="n">blackman_coeff</span><span class="o">=</span><span class="mf">0.42</span><span class="p">,</span> <span class="n">cepstral_lifter</span><span class="o">=</span><span class="mf">22.0</span><span class="p">,</span> <span class="n">channel</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dither</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-        <span class="n">energy_floor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">frame_length</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span> <span class="n">frame_shift</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">high_freq</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">htk_compat</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">low_freq</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">num_ceps</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">min_duration</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">num_mel_bins</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">preemphasis_coefficient</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span>
-        <span class="n">raw_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_dc_offset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">round_to_power_of_two</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">sample_frequency</span><span class="o">=</span><span class="mf">16000.0</span><span class="p">,</span> <span class="n">snip_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">subtract_mean</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">vtln_high</span><span class="o">=-</span><span class="mf">500.0</span><span class="p">,</span> <span class="n">vtln_low</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">vtln_warp</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">window_type</span><span class="o">=</span><span class="n">POVEY</span><span class="p">):</span>
+        <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">blackman_coeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.42</span><span class="p">,</span>
+        <span class="n">cepstral_lifter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">22.0</span><span class="p">,</span>
+        <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">dither</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">energy_floor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">frame_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">25.0</span><span class="p">,</span>
+        <span class="n">frame_shift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+        <span class="n">high_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">htk_compat</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">low_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+        <span class="n">num_ceps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">13</span><span class="p">,</span>
+        <span class="n">min_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">num_mel_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">23</span><span class="p">,</span>
+        <span class="n">preemphasis_coefficient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.97</span><span class="p">,</span>
+        <span class="n">raw_energy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">remove_dc_offset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">round_to_power_of_two</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">16000.0</span><span class="p">,</span>
+        <span class="n">snip_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">subtract_mean</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">use_energy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">vtln_high</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">500.0</span><span class="p">,</span>
+        <span class="n">vtln_low</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">100.0</span><span class="p">,</span>
+        <span class="n">vtln_warp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">window_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">POVEY</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a mfcc from a raw audio signal. This matches the input/output of Kaldi&#39;s</span>
 <span class="sd">    compute-mfcc-feats.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        waveform (torch.Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)</span>
-<span class="sd">        blackman_coeff (float): Constant coefficient for generalized Blackman window. (Default: ``0.42``)</span>
-<span class="sd">        cepstral_lifter (float): Constant that controls scaling of MFCCs (Default: ``22.0``)</span>
-<span class="sd">        channel (int): Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (Default: ``-1``)</span>
-<span class="sd">        dither (float): Dithering constant (0.0 means no dither). If you turn this off, you should set</span>
-<span class="sd">            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``1.0``)</span>
-<span class="sd">        energy_floor (float): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:</span>
+<span class="sd">        waveform (Tensor): Tensor of audio of size (c, n) where c is in the range [0,2)</span>
+<span class="sd">        blackman_coeff (float, optional): Constant coefficient for generalized Blackman window. (Default: ``0.42``)</span>
+<span class="sd">        cepstral_lifter (float, optional): Constant that controls scaling of MFCCs (Default: ``22.0``)</span>
+<span class="sd">        channel (int, optional): Channel to extract (-1 -&gt; expect mono, 0 -&gt; left, 1 -&gt; right) (Default: ``-1``)</span>
+<span class="sd">        dither (float, optional): Dithering constant (0.0 means no dither). If you turn this off, you should set</span>
+<span class="sd">            the energy_floor option, e.g. to 1.0 or 0.1 (Default: ``0.0``)</span>
+<span class="sd">        energy_floor (float, optional): Floor on energy (absolute, not relative) in Spectrogram computation.  Caution:</span>
 <span class="sd">            this floor is applied to the zeroth component, representing the total signal energy.  The floor on the</span>
-<span class="sd">            individual spectrogram elements is fixed at std::numeric_limits&lt;float&gt;::epsilon(). (Default: ``0.0``)</span>
-<span class="sd">        frame_length (float): Frame length in milliseconds (Default: ``25.0``)</span>
-<span class="sd">        frame_shift (float): Frame shift in milliseconds (Default: ``10.0``)</span>
-<span class="sd">        high_freq (float): High cutoff frequency for mel bins (if &lt;= 0, offset from Nyquist) (Default: ``0.0``)</span>
-<span class="sd">        htk_compat (bool): If true, put energy last.  Warning: not sufficient to get HTK compatible features (need</span>
-<span class="sd">            to change other parameters). (Default: ``False``)</span>
-<span class="sd">        low_freq (float): Low cutoff frequency for mel bins (Default: ``20.0``)</span>
-<span class="sd">        num_ceps (int): Number of cepstra in MFCC computation (including C0) (Default: ``13``)</span>
-<span class="sd">        min_duration (float): Minimum duration of segments to process (in seconds). (Default: ``0.0``)</span>
-<span class="sd">        num_mel_bins (int): Number of triangular mel-frequency bins (Default: ``23``)</span>
-<span class="sd">        preemphasis_coefficient (float): Coefficient for use in signal preemphasis (Default: ``0.97``)</span>
-<span class="sd">        raw_energy (bool): If True, compute energy before preemphasis and windowing (Default: ``True``)</span>
-<span class="sd">        remove_dc_offset: Subtract mean from waveform on each frame (Default: ``True``)</span>
-<span class="sd">        round_to_power_of_two (bool): If True, round window size to power of two by zero-padding input</span>
+<span class="sd">            individual spectrogram elements is fixed at std::numeric_limits&lt;float&gt;::epsilon(). (Default: ``1.0``)</span>
+<span class="sd">        frame_length (float, optional): Frame length in milliseconds (Default: ``25.0``)</span>
+<span class="sd">        frame_shift (float, optional): Frame shift in milliseconds (Default: ``10.0``)</span>
+<span class="sd">        high_freq (float, optional): High cutoff frequency for mel bins (if &lt;= 0, offset from Nyquist)</span>
+<span class="sd">         (Default: ``0.0``)</span>
+<span class="sd">        htk_compat (bool, optional): If true, put energy last.  Warning: not sufficient to get HTK compatible</span>
+<span class="sd">         features (need to change other parameters). (Default: ``False``)</span>
+<span class="sd">        low_freq (float, optional): Low cutoff frequency for mel bins (Default: ``20.0``)</span>
+<span class="sd">        num_ceps (int, optional): Number of cepstra in MFCC computation (including C0) (Default: ``13``)</span>
+<span class="sd">        min_duration (float, optional): Minimum duration of segments to process (in seconds). (Default: ``0.0``)</span>
+<span class="sd">        num_mel_bins (int, optional): Number of triangular mel-frequency bins (Default: ``23``)</span>
+<span class="sd">        preemphasis_coefficient (float, optional): Coefficient for use in signal preemphasis (Default: ``0.97``)</span>
+<span class="sd">        raw_energy (bool, optional): If True, compute energy before preemphasis and windowing (Default: ``True``)</span>
+<span class="sd">        remove_dc_offset (bool, optional): Subtract mean from waveform on each frame (Default: ``True``)</span>
+<span class="sd">        round_to_power_of_two (bool, optional): If True, round window size to power of two by zero-padding input</span>
 <span class="sd">            to FFT. (Default: ``True``)</span>
-<span class="sd">        sample_frequency (float): Waveform data sample frequency (must match the waveform file, if</span>
+<span class="sd">        sample_frequency (float, optional): Waveform data sample frequency (must match the waveform file, if</span>
 <span class="sd">            specified there) (Default: ``16000.0``)</span>
-<span class="sd">        snip_edges (bool): If True, end effects will be handled by outputting only frames that completely fit</span>
+<span class="sd">        snip_edges (bool, optional): If True, end effects will be handled by outputting only frames that completely fit</span>
 <span class="sd">            in the file, and the number of frames depends on the frame_length.  If False, the number of frames</span>
 <span class="sd">            depends only on the frame_shift, and we reflect the data at the ends. (Default: ``True``)</span>
-<span class="sd">        subtract_mean (bool): Subtract mean of each feature file [CMS]; not recommended to do</span>
+<span class="sd">        subtract_mean (bool, optional): Subtract mean of each feature file [CMS]; not recommended to do</span>
 <span class="sd">            it this way.  (Default: ``False``)</span>
-<span class="sd">        use_energy (bool): Add an extra dimension with energy to the FBANK output. (Default: ``False``)</span>
-<span class="sd">        vtln_high (float): High inflection point in piecewise linear VTLN warping function (if</span>
+<span class="sd">        use_energy (bool, optional): Add an extra dimension with energy to the FBANK output. (Default: ``False``)</span>
+<span class="sd">        vtln_high (float, optional): High inflection point in piecewise linear VTLN warping function (if</span>
 <span class="sd">            negative, offset from high-mel-freq (Default: ``-500.0``)</span>
-<span class="sd">        vtln_low (float): Low inflection point in piecewise linear VTLN warping function (Default: ``100.0``)</span>
-<span class="sd">        vtln_warp (float): Vtln warp factor (only applicable if vtln_map not specified) (Default: ``1.0``)</span>
-<span class="sd">        window_type (str): Type of window (&#39;hamming&#39;|&#39;hanning&#39;|&#39;povey&#39;|&#39;rectangular&#39;|&#39;blackman&#39;) (Default: ``&#39;povey&#39;``)</span>
+<span class="sd">        vtln_low (float, optional): Low inflection point in piecewise linear VTLN warping function (Default: ``100.0``)</span>
+<span class="sd">        vtln_warp (float, optional): Vtln warp factor (only applicable if vtln_map not specified) (Default: ``1.0``)</span>
+<span class="sd">        window_type (str, optional): Type of window (&#39;hamming&#39;|&#39;hanning&#39;|&#39;povey&#39;|&#39;rectangular&#39;|&#39;blackman&#39;)</span>
+<span class="sd">         (Default: ``&quot;povey&quot;``)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.Tensor: A mfcc identical to what Kaldi would output. The shape is (m, ``num_ceps``)</span>
+<span class="sd">        Tensor: A mfcc identical to what Kaldi would output. The shape is (m, ``num_ceps``)</span>
 <span class="sd">        where m is calculated in _get_strided</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">num_ceps</span> <span class="o">&lt;=</span> <span class="n">num_mel_bins</span><span class="p">,</span> <span class="s1">&#39;num_ceps cannot be larger than num_mel_bins: </span><span class="si">%d</span><span class="s1"> vs </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num_ceps</span><span class="p">,</span> <span class="n">num_mel_bins</span><span class="p">)</span>
@@ -915,8 +997,12 @@
     <span class="k">return</span> <span class="n">feature</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_LR_indices_and_weights</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">output_samples_in_unit</span><span class="p">,</span> <span class="n">window_width</span><span class="p">,</span>
-                                <span class="n">lowpass_cutoff</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_LR_indices_and_weights</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                                <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                                <span class="n">output_samples_in_unit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                                <span class="n">window_width</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                                <span class="n">lowpass_cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                                <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Based on LinearResample::SetIndexesAndWeights where it retrieves the weights for</span>
 <span class="sd">    resampling as well as the indices in which they are valid. LinearResample (LR) means</span>
 <span class="sd">    that the output signal is at linearly spaced intervals (i.e the output signal has a</span>
@@ -959,12 +1045,12 @@
 <span class="sd">            efficient. We suggest around 4 to 10 for normal use</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tuple[torch.Tensor, torch.Tensor]: A tuple of ``min_input_index`` (which is the minimum indices</span>
+<span class="sd">        (Tensor, Tensor): A tuple of ``min_input_index`` (which is the minimum indices</span>
 <span class="sd">        where the window is valid, size (``output_samples_in_unit``)) and ``weights`` (which is the weights</span>
 <span class="sd">        which correspond with min_input_index, size (``output_samples_in_unit``, ``max_weight_width``)).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">lowpass_cutoff</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
-    <span class="n">output_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">output_samples_in_unit</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">get_default_dtype</span><span class="p">())</span> <span class="o">/</span> <span class="n">new_freq</span>
+    <span class="n">output_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">output_samples_in_unit</span><span class="p">)</span> <span class="o">/</span> <span class="n">new_freq</span>
     <span class="n">min_t</span> <span class="o">=</span> <span class="n">output_t</span> <span class="o">-</span> <span class="n">window_width</span>
     <span class="n">max_t</span> <span class="o">=</span> <span class="n">output_t</span> <span class="o">+</span> <span class="n">window_width</span>
 
@@ -982,7 +1068,7 @@
     <span class="n">inside_window_indices</span> <span class="o">=</span> <span class="n">delta_t</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="n">window_width</span><span class="p">)</span>
     <span class="c1"># raised-cosine (Hanning) window with width `window_width`</span>
     <span class="n">weights</span><span class="p">[</span><span class="n">inside_window_indices</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">lowpass_cutoff</span> <span class="o">/</span>
-                                            <span class="n">lowpass_filter_width</span> <span class="o">*</span> <span class="n">delta_t</span><span class="p">[</span><span class="n">inside_window_indices</span><span class="p">]))</span>
+                                                          <span class="n">lowpass_filter_width</span> <span class="o">*</span> <span class="n">delta_t</span><span class="p">[</span><span class="n">inside_window_indices</span><span class="p">]))</span>
 
     <span class="n">t_eq_zero_indices</span> <span class="o">=</span> <span class="n">delta_t</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
     <span class="n">t_not_eq_zero_indices</span> <span class="o">=</span> <span class="o">~</span><span class="n">t_eq_zero_indices</span>
@@ -996,11 +1082,13 @@
     <span class="k">return</span> <span class="n">min_input_index</span><span class="p">,</span> <span class="n">weights</span>
 
 
-<span class="k">def</span> <span class="nf">_lcm</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span> <span class="o">//</span> <span class="n">fractions</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_lcm</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span> <span class="o">//</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_num_LR_output_samples</span><span class="p">(</span><span class="n">input_num_samp</span><span class="p">,</span> <span class="n">samp_rate_in</span><span class="p">,</span> <span class="n">samp_rate_out</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_num_LR_output_samples</span><span class="p">(</span><span class="n">input_num_samp</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                               <span class="n">samp_rate_in</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                               <span class="n">samp_rate_out</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Based on LinearResample::GetNumOutputSamples. LinearResample (LR) means that</span>
 <span class="sd">    the output signal is at linearly spaced intervals (i.e the output signal has a</span>
 <span class="sd">    frequency of ``new_freq``). It uses sinc/bandlimited interpolation to upsample/downsample</span>
@@ -1044,7 +1132,10 @@
     <span class="k">return</span> <span class="n">num_output_samp</span>
 
 
-<div class="viewcode-block" id="resample_waveform"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.resample_waveform">[docs]</a><span class="k">def</span> <span class="nf">resample_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+<div class="viewcode-block" id="resample_waveform"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.resample_waveform">[docs]</a><span class="k">def</span> <span class="nf">resample_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+                      <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                      <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                      <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency. This matches Kaldi&#39;s OfflineFeatureTpl ResampleWaveform</span>
 <span class="sd">    which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample</span>
 <span class="sd">    a signal). LinearResample (LR) means that the output signal is at linearly spaced intervals (i.e</span>
@@ -1055,14 +1146,14 @@
 <span class="sd">    https://github.com/kaldi-asr/kaldi/blob/master/src/feat/resample.h#L56</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        waveform (torch.Tensor): The input signal of size (c, n)</span>
+<span class="sd">        waveform (Tensor): The input signal of size (c, n)</span>
 <span class="sd">        orig_freq (float): The original frequency of the signal</span>
 <span class="sd">        new_freq (float): The desired frequency</span>
-<span class="sd">        lowpass_filter_width (int): Controls the sharpness of the filter, more == sharper</span>
+<span class="sd">        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper</span>
 <span class="sd">            but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.Tensor: The waveform at the new frequency</span>
+<span class="sd">        Tensor: The waveform at the new frequency</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span>
     <span class="k">assert</span> <span class="n">orig_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">new_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
@@ -1072,7 +1163,7 @@
 
     <span class="k">assert</span> <span class="n">lowpass_cutoff</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">min_freq</span>
 
-    <span class="n">base_freq</span> <span class="o">=</span> <span class="n">fractions</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">))</span>
+    <span class="n">base_freq</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">))</span>
     <span class="n">input_samples_in_unit</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">base_freq</span>
     <span class="n">output_samples_in_unit</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">base_freq</span>
 
