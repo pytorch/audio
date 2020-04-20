@@ -720,11 +720,11 @@ def lfilter(
     # (n_order, ) matmul (n_channel, n_order, n_sample) -> (n_channel, n_sample)
     input_signal_windows = torch.matmul(b_coeffs_flipped, torch.take(padded_waveform, window_idxs))
 
+    input_signal_windows.div_(a_coeffs[0])
+    a_coeffs_flipped.div_(a_coeffs[0])
     for i_sample, o0 in enumerate(input_signal_windows.t()):
         windowed_output_signal = padded_output_waveform[:, i_sample:(i_sample + n_order)]
         o0.addmv_(windowed_output_signal, a_coeffs_flipped, alpha=-1)
-        o0.div_(a_coeffs[0])
-
         padded_output_waveform[:, i_sample + n_order - 1] = o0
 
     output = torch.clamp(padded_output_waveform[:, (n_order - 1):], min=-1., max=1.)
