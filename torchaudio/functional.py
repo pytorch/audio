@@ -37,6 +37,7 @@ __all__ = [
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
+    "vad",
 ]
 
 
@@ -1836,3 +1837,49 @@ def sliding_window_cmn(
     if len(input_shape) == 2:
         cmn_waveform = cmn_waveform.squeeze(0)
     return cmn_waveform
+
+
+def vad(
+    waveform: Tensor,
+    location: int = 1,
+    normalized : bool = True,
+    activity_threshold: float = 7.0,
+    min_activity_duration: float = 0.25,
+    initial_search_buffer: float = 1.0,
+    max_gap: float = 0.25,
+    initial_pad: float = 0.0
+    ) -> Tensor:
+    r"""Voice Activity Detector. Similar to SoX implementation.
+    Attempts to trim silence and quiet background sounds from the ends of recordings of speech.
+    The algorithm currently uses a simple cepstral power measurement to detect voice,
+    so may be fooled by other things, especially music.
+
+    The effect can trim only from the front of the audio,
+    so in order to trim from the back, the reverse effect must also be used.
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        location (int, optional): 1 or -1. If 1, trims silence from the beginning.
+            If -1, trims silence from the end. (Default: 1)
+        normalized (bool, optional): If true, normalizes audio before processing. (Default: True)
+        activity_threshold (float, optional): The measurement level used to trigger activity detection.
+            This may need to be cahnged depending on the noise level, signal level,
+            and other characteristics of the input audio. (Default: 7.0)
+        min_activity_duration (float, optional): The time constant (in seconds)
+            used to help ignore short bursts of sound. (Default: 0.25)
+        initial_search_buffer (float, optional): The amount of audio (in seconds)
+            to search for quieter/shorter bursts of audio to include prior
+            to the detected trigger point. (Default: 1.0)
+        max_gap (float, optional): The allowed gap (in seconds) between
+            quiteter/shorter bursts of audio to include prior
+            to the detected trigger point. (Default: 0.25)
+        initial_pad (float, optional): The amount of audio (in seconds) to preserve
+            before the trigger point and any found quieter/shorter bursts. (Default: 0.0)
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+        https://pysox.readthedocs.io/en/latest/api.html#sox.transform.Transformer.vad
+    """
+    return waveform

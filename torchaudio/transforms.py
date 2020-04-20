@@ -907,3 +907,29 @@ class SlidingWindowCmn(torch.nn.Module):
         cmn_waveform = F.sliding_window_cmn(
             waveform, self.cmn_window, self.min_cmn_window, self.center, self.norm_vars)
         return cmn_waveform
+
+
+class Vad(torch.nn.Module):
+    __constants__ = [
+        "location", "normalized", "activity_threshold",
+        "min_activity_duration", "initial_search_buffer", "max_gap", "initial_pad"]
+
+    def __init__(self,
+                location: int = 1,
+                normalized: bool = True,
+                activity_threshold: float = 7.0,
+                min_activity_duration: float = 0.25,
+                initial_search_buffer: float = 1.0,
+                max_gap: float = 0.25,
+                initial_pad: float = 0.0) -> None:
+        super(Vad, self).__init__()
+        self.location = location
+        self.normalized = normalized
+        self.activity_threshold = activity_threshold
+        self.min_activity_duration = min_activity_duration
+        self.initial_search_buffer = initial_search_buffer
+        self.max_gap = max_gap
+        self.initial_pad = initial_pad
+
+    def forward(self, waveform: Tensor) -> Tensor:
+        return F.vad(waveform)
