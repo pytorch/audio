@@ -52,12 +52,6 @@ def random_float_tensor(seed, size, a=22695477, c=1, m=2 ** 32):
     return torch.tensor(arr).float().view(size) / m
 
 
-def random_int_tensor(seed, size, low=0, high=2 ** 32, a=22695477, c=1, m=2 ** 32):
-    """ Same as random_float_tensor but integers between [low, high)
-    """
-    return torch.floor(random_float_tensor(seed, size, a, c, m) * (high - low)) + low
-
-
 @contextmanager
 def AudioBackendScope(new_backend):
     previous_backend = torchaudio.get_audio_backend()
