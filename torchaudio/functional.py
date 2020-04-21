@@ -1268,17 +1268,17 @@ def overdrive(
 
     gain = _dB2Linear(gain)
     colour = colour / 200
-    last_in = torch.zeros(waveform.shape[0],waveform.shape[1])
-    last_out = torch.zeros(waveform.shape[0],waveform.shape[1])
+    last_in = torch.zeros(waveform.shape[0], waveform.shape[1])
+    last_out = torch.zeros(waveform.shape[0], waveform.shape[1])
 
     temp = waveform * gain + colour
 
     mask1 = temp < -1
     temp[mask1] = temp[mask1] * 0 - 2 / 3
-    #Above redundant multiplcation to accomadate torchscript issue
+    # Above redundant multiplcation to accomadate torchscript issue
 
     mask2 = temp > 1
-    temp[mask2] =  temp[mask2] * 0 + 2 / 3
+    temp[mask2] = temp[mask2] * 0 + 2 / 3
 
     mask3 = (~mask1 & ~mask2)
     temp[mask3] = temp[mask3] - (temp[mask3]**3) * (1. / 3)
