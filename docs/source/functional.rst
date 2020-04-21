@@ -93,6 +93,46 @@ Functions to perform common audio operations.
 
 .. autofunction:: equalizer_biquad
 
+:hidden:`bandpass_biquad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: bandpass_biquad
+
+:hidden:`bandreject_biquad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: bandreject_biquad
+
+:hidden:`band_biquad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: band_biquad
+
+:hidden:`treble_biquad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: treble_biquad
+
+:hidden:`deemph_biquad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: deemph_biquad
+
+:hidden:`riaa_biquad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: riaa_biquad
+
+:hidden:`contrast`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: contrast
+
+:hidden:`dcshift`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: dcshift
+
 :hidden:`mask_along_axis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -112,3 +152,8 @@ Functions to perform common audio operations.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: detect_pitch_frequency
+
+:hidden:`sliding_window_cmn`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: sliding_window_cmn

@@ -1,5 +1,4 @@
 import math
-import os
 import unittest
 
 import torch
@@ -7,7 +6,7 @@ import torchaudio
 import torchaudio.transforms as transforms
 import torchaudio.functional as F
 
-from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
+import common_utils
 
 
 class Tester(unittest.TestCase):
@@ -19,12 +18,8 @@ class Tester(unittest.TestCase):
     waveform = (torch.cos(2 * math.pi * torch.arange(0, 4 * sample_rate).float() * freq / sample_rate))
     waveform.unsqueeze_(0)  # (1, 64000)
     waveform = (waveform * volume * 2**31).long()
-    # file for stereo stft test
-    test_dirpath, test_dir = create_temp_assets_dir()
-    test_filepath = os.path.join(test_dirpath, 'assets',
-                                 'steam-train-whistle-daniel_simon.wav')
 
-    def scale(self, waveform, factor=float(2**31)):
+    def scale(self, waveform, factor=2.0**31):
         # scales a waveform by a factor
         if not waveform.is_floating_point():
             waveform = waveform.to(torch.get_default_dtype())
@@ -44,20 +39,9 @@ class Tester(unittest.TestCase):
         waveform_exp = transforms.MuLawDecoding(quantization_channels)(waveform_mu)
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
 
-    def test_batch_AmplitudeToDB(self):
-        spec = torch.rand((6, 201))
-
-        # Single then transform then batch
-        expected = transforms.AmplitudeToDB()(spec).repeat(3, 1, 1)
-
-        # Batch then transform
-        computed = transforms.AmplitudeToDB()(spec.repeat(3, 1, 1))
-
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
     def test_AmplitudeToDB(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
+        filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
+        waveform, sample_rate = torchaudio.load(filepath)
 
         mag_to_db_transform = transforms.AmplitudeToDB('magnitude', 80.)
         power_to_db_transform = transforms.AmplitudeToDB('power', 80.)
@@ -65,7 +49,7 @@ class Tester(unittest.TestCase):
         mag_to_db_torch = mag_to_db_transform(torch.abs(waveform))
         power_to_db_torch = power_to_db_transform(torch.pow(waveform, 2))
 
-        self.assertTrue(torch.allclose(mag_to_db_torch, power_to_db_torch))
+        torch.testing.assert_allclose(mag_to_db_torch, power_to_db_torch)
 
     def test_melscale_load_save(self):
         specgram = torch.ones(1, 1000, 100)
@@ -79,7 +63,7 @@ class Tester(unittest.TestCase):
         fb_copy = melscale_transform_copy.fb
 
         self.assertEqual(fb_copy.size(), (1000, 128))
-        self.assertTrue(torch.allclose(fb, fb_copy))
+        torch.testing.assert_allclose(fb, fb_copy)
 
     def test_melspectrogram_load_save(self):
         waveform = self.waveform.float()
@@ -95,10 +79,10 @@ class Tester(unittest.TestCase):
         fb = mel_spectrogram_transform.mel_scale.fb
         fb_copy = mel_spectrogram_transform_copy.mel_scale.fb
 
-        self.assertTrue(torch.allclose(window, window_copy))
+        torch.testing.assert_allclose(window, window_copy)
         # the default for n_fft = 400 and n_mels = 128
         self.assertEqual(fb_copy.size(), (201, 128))
-        self.assertTrue(torch.allclose(fb, fb_copy))
+        torch.testing.assert_allclose(fb, fb_copy)
 
     def test_mel2(self):
         top_db = 80.
@@ -126,7 +110,8 @@ class Tester(unittest.TestCase):
         self.assertTrue(mel_transform2.mel_scale.fb.sum(1).le(1.).all())
         self.assertTrue(mel_transform2.mel_scale.fb.sum(1).ge(0.).all())
         # check on multi-channel audio
-        x_stereo, sr_stereo = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
+        filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
+        x_stereo, sr_stereo = torchaudio.load(filepath)  # (2, 278756), 44100
         spectrogram_stereo = s2db(mel_transform(x_stereo))  # (2, 128, 1394)
         self.assertTrue(spectrogram_stereo.dim() == 3)
         self.assertTrue(spectrogram_stereo.size(0) == 2)
@@ -175,20 +160,8 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(torch_mfcc_norm_none.allclose(norm_check))
 
-    def test_batch_Resample(self):
-        waveform = torch.randn(2, 2786)
-
-        # Single then transform then batch
-        expected = transforms.Resample()(waveform).repeat(3, 1, 1)
-
-        # Batch then transform
-        computed = transforms.Resample()(waveform.repeat(3, 1, 1))
-
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
     def test_resample_size(self):
-        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        input_path = common_utils.get_asset_path('sinewave.wav')
         waveform, sample_rate = torchaudio.load(input_path)
 
         upsample_rate = sample_rate * 2
@@ -238,177 +211,10 @@ class Tester(unittest.TestCase):
         specgram = torch.tensor([1., 2., 3., 4.]).repeat(1, 2, 1)
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5],
                                   [0.5, 1.0, 1.0, 0.5]]])
-        transform = transforms.ComputeDeltas()
+        transform = transforms.ComputeDeltas(win_length=3)
         computed = transform(specgram)
-        self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
-
-    def test_batch_MelScale(self):
-        specgram = torch.randn(2, 31, 2786)
-
-        # Single then transform then batch
-        expected = transforms.MelScale()(specgram).repeat(3, 1, 1, 1)
-
-        # Batch then transform
-        computed = transforms.MelScale()(specgram.repeat(3, 1, 1, 1))
-
-        # shape = (3, 2, 201, 1394)
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-    def test_batch_InverseMelScale(self):
-        n_fft = 8
-        n_mels = 32
-        n_stft = 5
-        mel_spec = torch.randn(2, n_mels, 32) ** 2
-
-        # Single then transform then batch
-        expected = transforms.InverseMelScale(n_stft, n_mels)(mel_spec).repeat(3, 1, 1, 1)
-
-        # Batch then transform
-        computed = transforms.InverseMelScale(n_stft, n_mels)(mel_spec.repeat(3, 1, 1, 1))
-
-        # shape = (3, 2, n_mels, 32)
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-
-        # Because InverseMelScale runs SGD on randomly initialized values so they do not yield
-        # exactly same result. For this reason, tolerance is very relaxed here.
-        self.assertTrue(torch.allclose(computed, expected, atol=1.0))
-
-    def test_batch_compute_deltas(self):
-        specgram = torch.randn(2, 31, 2786)
-
-        # Single then transform then batch
-        expected = transforms.ComputeDeltas()(specgram).repeat(3, 1, 1, 1)
-
-        # Batch then transform
-        computed = transforms.ComputeDeltas()(specgram.repeat(3, 1, 1, 1))
-
-        # shape = (3, 2, 201, 1394)
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-    def test_batch_mulaw(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
-
-        # Single then transform then batch
-        waveform_encoded = transforms.MuLawEncoding()(waveform)
-        expected = waveform_encoded.unsqueeze(0).repeat(3, 1, 1)
-
-        # Batch then transform
-        waveform_batched = waveform.unsqueeze(0).repeat(3, 1, 1)
-        computed = transforms.MuLawEncoding()(waveform_batched)
-
-        # shape = (3, 2, 201, 1394)
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-        # Single then transform then batch
-        waveform_decoded = transforms.MuLawDecoding()(waveform_encoded)
-        expected = waveform_decoded.unsqueeze(0).repeat(3, 1, 1)
-
-        # Batch then transform
-        computed = transforms.MuLawDecoding()(computed)
-
-        # shape = (3, 2, 201, 1394)
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-    def test_batch_spectrogram(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
-
-        # Single then transform then batch
-        expected = transforms.Spectrogram()(waveform).repeat(3, 1, 1, 1)
-
-        # Batch then transform
-        computed = transforms.Spectrogram()(waveform.repeat(3, 1, 1))
-
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-    def test_batch_melspectrogram(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
-
-        # Single then transform then batch
-        expected = transforms.MelSpectrogram()(waveform).repeat(3, 1, 1, 1)
-
-        # Batch then transform
-        computed = transforms.MelSpectrogram()(waveform.repeat(3, 1, 1))
-
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
-    def test_batch_mfcc(self):
-        test_filepath = os.path.join(
-            self.test_dirpath, 'assets', 'steam-train-whistle-daniel_simon.mp3'
-        )
-        waveform, sample_rate = torchaudio.load(test_filepath)
-
-        # Single then transform then batch
-        expected = transforms.MFCC()(waveform).repeat(3, 1, 1, 1)
-
-        # Batch then transform
-        computed = transforms.MFCC()(waveform.repeat(3, 1, 1))
-
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected, atol=1e-5))
-
-    def test_batch_TimeStretch(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
-
-        kwargs = {
-            'n_fft': 2048,
-            'hop_length': 512,
-            'win_length': 2048,
-            'window': torch.hann_window(2048),
-            'center': True,
-            'pad_mode': 'reflect',
-            'normalized': True,
-            'onesided': True,
-        }
-        rate = 2
-
-        complex_specgrams = torch.stft(waveform, **kwargs)
-
-        # Single then transform then batch
-        expected = transforms.TimeStretch(fixed_rate=rate,
-                                          n_freq=1025,
-                                          hop_length=512)(complex_specgrams).repeat(3, 1, 1, 1, 1)
-
-        # Batch then transform
-        computed = transforms.TimeStretch(fixed_rate=rate,
-                                          n_freq=1025,
-                                          hop_length=512)(complex_specgrams.repeat(3, 1, 1, 1, 1))
-
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected, atol=1e-5))
-
-    def test_batch_Fade(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
-        fade_in_len = 3000
-        fade_out_len = 3000
-
-        # Single then transform then batch
-        expected = transforms.Fade(fade_in_len, fade_out_len)(waveform).repeat(3, 1, 1)
-
-        # Batch then transform
-        computed = transforms.Fade(fade_in_len, fade_out_len)(waveform.repeat(3, 1, 1))
-
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-    def test_batch_Vol(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
-
-        # Single then transform then batch
-        expected = transforms.Vol(gain=1.1)(waveform).repeat(3, 1, 1)
-
-        # Batch then transform
-        computed = transforms.Vol(gain=1.1)(waveform.repeat(3, 1, 1))
-
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
+        assert computed.shape == expected.shape, (computed.shape, expected.shape)
+        torch.testing.assert_allclose(computed, expected, atol=1e-6, rtol=1e-8)
 
 
 if __name__ == '__main__':

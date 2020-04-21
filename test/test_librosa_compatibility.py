@@ -51,7 +51,7 @@ class TestFunctional(_LibrosaMixin, unittest.TestCase):
                                     momentum=momentum, init=init, length=length)
         lr_out = torch.from_numpy(lr_out).unsqueeze(0)
 
-        assert torch.allclose(ta_out, lr_out, atol=5e-5)
+        torch.testing.assert_allclose(ta_out, lr_out, atol=5e-5, rtol=1e-5)
 
     def _test_create_fb(self, n_mels=40, sample_rate=22050, n_fft=2048, fmin=0.0, fmax=8000.0):
         librosa_fb = librosa.filters.mel(sr=sample_rate,
@@ -68,7 +68,8 @@ class TestFunctional(_LibrosaMixin, unittest.TestCase):
                                 n_freqs=(n_fft // 2 + 1))
 
         for i_mel_bank in range(n_mels):
-            assert torch.allclose(fb[:, i_mel_bank], torch.tensor(librosa_fb[i_mel_bank]), atol=1e-4)
+            torch.testing.assert_allclose(fb[:, i_mel_bank], torch.tensor(librosa_fb[i_mel_bank]),
+                                          atol=1e-4, rtol=1e-5)
 
     def test_create_fb(self):
         self._test_create_fb()
@@ -91,18 +92,18 @@ class TestFunctional(_LibrosaMixin, unittest.TestCase):
 
         ta_out = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db)
         lr_out = librosa.core.power_to_db(spec.numpy())
-        lr_out = torch.from_numpy(lr_out).unsqueeze(0)
+        lr_out = torch.from_numpy(lr_out)
 
-        assert torch.allclose(ta_out, lr_out, atol=5e-5)
+        torch.testing.assert_allclose(ta_out, lr_out, atol=5e-5, rtol=1e-5)
 
         # Amplitude to DB
         multiplier = 20.0
 
         ta_out = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db)
         lr_out = librosa.core.amplitude_to_db(spec.numpy())
-        lr_out = torch.from_numpy(lr_out).unsqueeze(0)
+        lr_out = torch.from_numpy(lr_out)
 
-        assert torch.allclose(ta_out, lr_out, atol=5e-5)
+        torch.testing.assert_allclose(ta_out, lr_out, atol=5e-5, rtol=1e-5)
 
 
 @pytest.mark.parametrize('complex_specgrams', [
@@ -148,7 +149,7 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
 
 
 def _load_audio_asset(*asset_paths, **kwargs):
-    file_path = os.path.join(common_utils.TEST_DIR_PATH, 'assets', *asset_paths)
+    file_path = common_utils.get_asset_path(*asset_paths)
     sound, sample_rate = torchaudio.load(file_path, **kwargs)
     return sound, sample_rate
 
@@ -164,7 +165,7 @@ def _test_compatibilities(n_fft, hop_length, power, n_mels, n_mfcc, sample_rate)
         y=sound_librosa, n_fft=n_fft, hop_length=hop_length, power=power)
 
     out_torch = spect_transform(sound).squeeze().cpu()
-    assert torch.allclose(out_torch, torch.from_numpy(out_librosa), atol=1e-5)
+    torch.testing.assert_allclose(out_torch, torch.from_numpy(out_librosa), atol=1e-5, rtol=1e-5)
 
     # test mel spectrogram
     melspect_transform = torchaudio.transforms.MelSpectrogram(
@@ -175,25 +176,25 @@ def _test_compatibilities(n_fft, hop_length, power, n_mels, n_mfcc, sample_rate)
         hop_length=hop_length, n_mels=n_mels, htk=True, norm=None)
     librosa_mel_tensor = torch.from_numpy(librosa_mel)
     torch_mel = melspect_transform(sound).squeeze().cpu()
-    assert torch.allclose(
-        torch_mel.type(librosa_mel_tensor.dtype), librosa_mel_tensor, atol=5e-3)
+    torch.testing.assert_allclose(
+        torch_mel.type(librosa_mel_tensor.dtype), librosa_mel_tensor, atol=5e-3, rtol=1e-5)
 
     # test s2db
     power_to_db_transform = torchaudio.transforms.AmplitudeToDB('power', 80.)
     power_to_db_torch = power_to_db_transform(spect_transform(sound)).squeeze().cpu()
     power_to_db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
-    assert torch.allclose(power_to_db_torch, torch.from_numpy(power_to_db_librosa), atol=5e-3)
+    torch.testing.assert_allclose(power_to_db_torch, torch.from_numpy(power_to_db_librosa), atol=5e-3, rtol=1e-5)
 
     mag_to_db_transform = torchaudio.transforms.AmplitudeToDB('magnitude', 80.)
     mag_to_db_torch = mag_to_db_transform(torch.abs(sound)).squeeze().cpu()
     mag_to_db_librosa = librosa.core.spectrum.amplitude_to_db(sound_librosa)
-    assert torch.allclose(mag_to_db_torch, torch.from_numpy(mag_to_db_librosa), atol=5e-3)
+    torch.testing.assert_allclose(mag_to_db_torch, torch.from_numpy(mag_to_db_librosa), atol=5e-3, rtol=1e-5)
 
     power_to_db_torch = power_to_db_transform(melspect_transform(sound)).squeeze().cpu()
     db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
     db_librosa_tensor = torch.from_numpy(db_librosa)
-    assert torch.allclose(
-        power_to_db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3)
+    torch.testing.assert_allclose(
+        power_to_db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3, rtol=1e-5)
 
     # test MFCC
     melkwargs = {'hop_length': hop_length, 'n_fft': n_fft}
@@ -214,8 +215,8 @@ def _test_compatibilities(n_fft, hop_length, power, n_mels, n_mfcc, sample_rate)
     librosa_mfcc_tensor = torch.from_numpy(librosa_mfcc)
     torch_mfcc = mfcc_transform(sound).squeeze().cpu()
 
-    assert torch.allclose(
-        torch_mfcc.type(librosa_mfcc_tensor.dtype), librosa_mfcc_tensor, atol=5e-3)
+    torch.testing.assert_allclose(
+        torch_mfcc.type(librosa_mfcc_tensor.dtype), librosa_mfcc_tensor, atol=5e-3, rtol=1e-5)
 
 
 class TestTransforms(_LibrosaMixin, unittest.TestCase):
@@ -289,7 +290,7 @@ class TestTransforms(_LibrosaMixin, unittest.TestCase):
             S=spec_lr, sr=sample_rate, n_fft=n_fft, hop_length=hop_length,
             win_length=n_fft, center=True, window='hann', n_mels=n_mels, htk=True, norm=None)
         # Note: Using relaxed rtol instead of atol
-        assert torch.allclose(melspec_ta, torch.from_numpy(melspec_lr[None, ...]), rtol=1e-3)
+        torch.testing.assert_allclose(melspec_ta, torch.from_numpy(melspec_lr[None, ...]), atol=1e-8, rtol=1e-3)
 
     def test_InverseMelScale(self):
         """InverseMelScale transform is comparable to that of librosa"""
@@ -332,7 +333,7 @@ class TestTransforms(_LibrosaMixin, unittest.TestCase):
         # https://github.com/pytorch/audio/pull/366 for the discussion of the choice of algorithm
         # https://github.com/pytorch/audio/pull/448/files#r385747021 for the distribution of P-inf
         # distance over frequencies.
-        assert torch.allclose(spec_ta, spec_lr, atol=threshold)
+        torch.testing.assert_allclose(spec_ta, spec_lr, atol=threshold, rtol=1e-5)
 
         threshold = 1700.0
         # This threshold was choosen empirically, based on the following observations
@@ -344,3 +345,7 @@ class TestTransforms(_LibrosaMixin, unittest.TestCase):
         # torch.dist(spec_lr, spec_ta, p=1)
         # >>> tensor(943.2759)
         assert torch.dist(spec_orig, spec_ta, p=1) < threshold
+
+
+if __name__ == '__main__':
+    unittest.main()

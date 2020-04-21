@@ -1,63 +1,90 @@
 import math
-import os
 import unittest
 
 import torch
 import torchaudio
 import torchaudio.functional as F
-import torchaudio.transforms as T
 import pytest
 
 import common_utils
-from common_utils import AudioBackendScope, BACKENDS
 
 
-class TestFunctional(unittest.TestCase):
-    data_sizes = [(2, 20), (3, 15), (4, 10)]
-    number_of_trials = 100
-    specgram = torch.tensor([1., 2., 3., 4.])
+class _LfilterMixin:
+    device = None
+    dtype = None
 
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
+    def test_simple(self):
+        """
+        Create a very basic signal,
+        Then make a simple 4th order delay
+        The output should be same as the input but shifted
+        """
 
-    test_filepath = os.path.join(test_dirpath, 'assets',
-                                 'steam-train-whistle-daniel_simon.wav')
-    waveform_train, sr_train = torchaudio.load(test_filepath)
+        torch.random.manual_seed(42)
+        waveform = torch.rand(2, 44100 * 1, dtype=self.dtype, device=self.device)
+        b_coeffs = torch.tensor([0, 0, 0, 1], dtype=self.dtype, device=self.device)
+        a_coeffs = torch.tensor([1, 0, 0, 0], dtype=self.dtype, device=self.device)
+        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
 
-    def _test_compute_deltas(self, specgram, expected, win_length=3, atol=1e-6, rtol=1e-8):
-        computed = F.compute_deltas(specgram, win_length=win_length)
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        torch.testing.assert_allclose(computed, expected, atol=atol, rtol=rtol)
+        torch.testing.assert_allclose(output_waveform[:, 3:], waveform[:, 0:-3], atol=1e-5, rtol=1e-5)
 
-    def test_compute_deltas_onechannel(self):
-        specgram = self.specgram.unsqueeze(0).unsqueeze(0)
+
+class TestLfilterFloat32CPU(_LfilterMixin, unittest.TestCase):
+    device = torch.device('cpu')
+    dtype = torch.float32
+
+
+class TestLfilterFloat64CPU(_LfilterMixin, unittest.TestCase):
+    device = torch.device('cpu')
+    dtype = torch.float64
+
+
+@unittest.skipIf(not torch.cuda.is_available(), "CUDA not available")
+class TestLfilterFloat32CUDA(_LfilterMixin, unittest.TestCase):
+    device = torch.device('cuda')
+    dtype = torch.float32
+
+
+class TestComputeDeltas(unittest.TestCase):
+    """Test suite for correctness of compute_deltas"""
+    def test_one_channel(self):
+        specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0]]])
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5]]])
-        self._test_compute_deltas(specgram, expected)
+        computed = F.compute_deltas(specgram, win_length=3)
+        torch.testing.assert_allclose(computed, expected)
 
-    def test_compute_deltas_twochannel(self):
-        specgram = self.specgram.repeat(1, 2, 1)
+    def test_two_channels(self):
+        specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0],
+                                  [1.0, 2.0, 3.0, 4.0]]])
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5],
                                   [0.5, 1.0, 1.0, 0.5]]])
-        self._test_compute_deltas(specgram, expected)
+        computed = F.compute_deltas(specgram, win_length=3)
+        torch.testing.assert_allclose(computed, expected)
 
-    def _compare_estimate(self, sound, estimate, atol=1e-6, rtol=1e-8):
-        # trim sound for case when constructed signal is shorter than original
-        sound = sound[..., :estimate.size(-1)]
 
-        self.assertTrue(sound.shape == estimate.shape, (sound.shape, estimate.shape))
-        self.assertTrue(torch.allclose(sound, estimate, atol=atol, rtol=rtol))
+def _compare_estimate(sound, estimate, atol=1e-6, rtol=1e-8):
+    # trim sound for case when constructed signal is shorter than original
+    sound = sound[..., :estimate.size(-1)]
+    torch.testing.assert_allclose(estimate, sound, atol=atol, rtol=rtol)
 
-    def _test_istft_is_inverse_of_stft(self, kwargs):
-        # generates a random sound signal for each tril and then does the stft/istft
-        # operation to check whether we can reconstruct signal
-        for data_size in self.data_sizes:
-            for i in range(self.number_of_trials):
 
-                sound = common_utils.random_float_tensor(i, data_size)
+def _test_istft_is_inverse_of_stft(kwargs):
+    # generates a random sound signal for each tril and then does the stft/istft
+    # operation to check whether we can reconstruct signal
+    for data_size in [(2, 20), (3, 15), (4, 10)]:
+        for i in range(100):
 
-                stft = torch.stft(sound, **kwargs)
-                estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
+            sound = common_utils.random_float_tensor(i, data_size)
 
-                self._compare_estimate(sound, estimate)
+            stft = torch.stft(sound, **kwargs)
+            estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
+
+            _compare_estimate(sound, estimate)
+
+
+class TestIstft(unittest.TestCase):
+    """Test suite for correctness of istft with various input"""
+    number_of_trials = 100
 
     def test_istft_is_inverse_of_stft1(self):
         # hann_window, centered, normalized, onesided
@@ -71,8 +98,7 @@ class TestFunctional(unittest.TestCase):
             'normalized': True,
             'onesided': True,
         }
-
-        self._test_istft_is_inverse_of_stft(kwargs1)
+        _test_istft_is_inverse_of_stft(kwargs1)
 
     def test_istft_is_inverse_of_stft2(self):
         # hann_window, centered, not normalized, not onesided
@@ -86,8 +112,7 @@ class TestFunctional(unittest.TestCase):
             'normalized': False,
             'onesided': False,
         }
-
-        self._test_istft_is_inverse_of_stft(kwargs2)
+        _test_istft_is_inverse_of_stft(kwargs2)
 
     def test_istft_is_inverse_of_stft3(self):
         # hamming_window, centered, normalized, not onesided
@@ -101,8 +126,7 @@ class TestFunctional(unittest.TestCase):
             'normalized': True,
             'onesided': False,
         }
-
-        self._test_istft_is_inverse_of_stft(kwargs3)
+        _test_istft_is_inverse_of_stft(kwargs3)
 
     def test_istft_is_inverse_of_stft4(self):
         # hamming_window, not centered, not normalized, onesided
@@ -117,8 +141,7 @@ class TestFunctional(unittest.TestCase):
             'normalized': False,
             'onesided': True,
         }
-
-        self._test_istft_is_inverse_of_stft(kwargs4)
+        _test_istft_is_inverse_of_stft(kwargs4)
 
     def test_istft_is_inverse_of_stft5(self):
         # hamming_window, not centered, not normalized, not onesided
@@ -133,8 +156,7 @@ class TestFunctional(unittest.TestCase):
             'normalized': False,
             'onesided': False,
         }
-
-        self._test_istft_is_inverse_of_stft(kwargs5)
+        _test_istft_is_inverse_of_stft(kwargs5)
 
     def test_istft_of_ones(self):
         # stft = torch.stft(torch.ones(4), 4)
@@ -145,14 +167,14 @@ class TestFunctional(unittest.TestCase):
         ])
 
         estimate = torchaudio.functional.istft(stft, n_fft=4, length=4)
-        self._compare_estimate(torch.ones(4), estimate)
+        _compare_estimate(torch.ones(4), estimate)
 
     def test_istft_of_zeros(self):
         # stft = torch.stft(torch.zeros(4), 4)
         stft = torch.zeros((3, 5, 2))
 
         estimate = torchaudio.functional.istft(stft, n_fft=4, length=4)
-        self._compare_estimate(torch.zeros(4), estimate)
+        _compare_estimate(torch.zeros(4), estimate)
 
     def test_istft_requires_overlap_windows(self):
         # the window is size 1 but it hops 20 so there is a gap which throw an error
@@ -201,7 +223,7 @@ class TestFunctional(unittest.TestCase):
         estimate = torchaudio.functional.istft(stft, L, hop_length=L, win_length=L,
                                                window=torch.ones(L), center=False, normalized=False)
         # There is a larger error due to the scaling of amplitude
-        self._compare_estimate(sound, estimate, atol=1e-3)
+        _compare_estimate(sound, estimate, atol=1e-3)
 
     def test_istft_of_sine(self):
         self._test_istft_of_sine(amplitude=123, L=5, n=1)
@@ -221,7 +243,7 @@ class TestFunctional(unittest.TestCase):
             istft2 = torchaudio.functional.istft(tensor2, **kwargs)
             istft = a * istft1 + b * istft2
             estimate = torchaudio.functional.istft(a * tensor1 + b * tensor2, **kwargs)
-            self._compare_estimate(istft, estimate, atol, rtol)
+            _compare_estimate(istft, estimate, atol, rtol)
 
     def test_linearity_of_istft1(self):
         # hann_window, centered, normalized, onesided
@@ -275,65 +297,11 @@ class TestFunctional(unittest.TestCase):
         data_size = (2, 7, 3, 2)
         self._test_linearity_of_istft(data_size, kwargs4, atol=1e-5, rtol=1e-8)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
-    def test_gain(self):
-        waveform_gain = F.gain(self.waveform_train, 3)
-        self.assertTrue(waveform_gain.abs().max().item(), 1.)
 
-        E = torchaudio.sox_effects.SoxEffectsChain()
-        E.set_input_file(self.test_filepath)
-        E.append_effect_to_chain("gain", [3])
-        sox_gain_waveform = E.sox_build_flow_effects()[0]
-
-        self.assertTrue(torch.allclose(waveform_gain, sox_gain_waveform, atol=1e-04))
-
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
-    def test_dither(self):
-        waveform_dithered = F.dither(self.waveform_train)
-        waveform_dithered_noiseshaped = F.dither(self.waveform_train, noise_shaping=True)
-
-        E = torchaudio.sox_effects.SoxEffectsChain()
-        E.set_input_file(self.test_filepath)
-        E.append_effect_to_chain("dither", [])
-        sox_dither_waveform = E.sox_build_flow_effects()[0]
-
-        self.assertTrue(torch.allclose(waveform_dithered, sox_dither_waveform, atol=1e-04))
-        E.clear_chain()
-
-        E.append_effect_to_chain("dither", ["-s"])
-        sox_dither_waveform_ns = E.sox_build_flow_effects()[0]
-
-        self.assertTrue(torch.allclose(waveform_dithered_noiseshaped, sox_dither_waveform_ns, atol=1e-02))
-
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
-    def test_vctk_transform_pipeline(self):
-        test_filepath_vctk = os.path.join(self.test_dirpath, "assets/VCTK-Corpus/wav48/p224/", "p224_002.wav")
-        wf_vctk, sr_vctk = torchaudio.load(test_filepath_vctk)
-
-        # rate
-        sample = T.Resample(sr_vctk, 16000, resampling_method='sinc_interpolation')
-        wf_vctk = sample(wf_vctk)
-        # dither
-        wf_vctk = F.dither(wf_vctk, noise_shaping=True)
-
-        E = torchaudio.sox_effects.SoxEffectsChain()
-        E.set_input_file(test_filepath_vctk)
-        E.append_effect_to_chain("gain", ["-h"])
-        E.append_effect_to_chain("channels", [1])
-        E.append_effect_to_chain("rate", [16000])
-        E.append_effect_to_chain("gain", ["-rh"])
-        E.append_effect_to_chain("dither", ["-s"])
-        wf_vctk_sox = E.sox_build_flow_effects()[0]
-
-        self.assertTrue(torch.allclose(wf_vctk, wf_vctk_sox, rtol=1e-03, atol=1e-03))
-
+class TestDetectPitchFrequency(unittest.TestCase):
     def test_pitch(self):
-        test_dirpath, test_dir = common_utils.create_temp_assets_dir()
-        test_filepath_100 = os.path.join(test_dirpath, 'assets', "100Hz_44100Hz_16bit_05sec.wav")
-        test_filepath_440 = os.path.join(test_dirpath, 'assets', "440Hz_44100Hz_16bit_05sec.wav")
+        test_filepath_100 = common_utils.get_asset_path("100Hz_44100Hz_16bit_05sec.wav")
+        test_filepath_440 = common_utils.get_asset_path("440Hz_44100Hz_16bit_05sec.wav")
 
         # Files from https://www.mediacollege.com/audio/tone/download/
         tests = [
@@ -350,6 +318,8 @@ class TestFunctional(unittest.TestCase):
             s = ((freq - freq_ref).abs() > threshold).sum()
             self.assertFalse(s)
 
+
+class TestDB_to_amplitude(unittest.TestCase):
     def test_DB_to_amplitude(self):
         # Make some noise
         x = torch.rand(1000)
@@ -367,13 +337,13 @@ class TestFunctional(unittest.TestCase):
         db = F.amplitude_to_DB(torch.abs(x), multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(torch.abs(x), x2, atol=5e-5))
+        torch.testing.assert_allclose(x2, torch.abs(x), atol=5e-5, rtol=1e-5)
 
         # Spectrogram amplitude -> DB -> amplitude
         db = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(spec, x2, atol=5e-5))
+        torch.testing.assert_allclose(x2, spec, atol=5e-5, rtol=1e-5)
 
         # Waveform power -> DB -> power
         multiplier = 10.
@@ -382,13 +352,13 @@ class TestFunctional(unittest.TestCase):
         db = F.amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(torch.abs(x), x2, atol=5e-5))
+        torch.testing.assert_allclose(x2, torch.abs(x), atol=5e-5, rtol=1e-5)
 
         # Spectrogram power -> DB -> power
         db = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        self.assertTrue(torch.allclose(spec, x2, atol=5e-5))
+        torch.testing.assert_allclose(x2, spec, atol=5e-5, rtol=1e-5)
 
 
 @pytest.mark.parametrize('complex_tensor', [
@@ -400,7 +370,7 @@ def test_complex_norm(complex_tensor, power):
     expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
     norm_tensor = F.complex_norm(complex_tensor, power)
 
-    assert torch.allclose(expected_norm_tensor, norm_tensor, atol=1e-5)
+    torch.testing.assert_allclose(norm_tensor, expected_norm_tensor, atol=1e-5, rtol=1e-5)
 
 
 @pytest.mark.parametrize('specgram', [
@@ -424,13 +394,12 @@ def test_mask_along_axis(specgram, mask_param, mask_value, axis):
     assert num_masked_columns < mask_param
 
 
-@pytest.mark.parametrize('specgrams', [
-    torch.randn(4, 2, 1025, 400),
-])
 @pytest.mark.parametrize('mask_param', [100])
 @pytest.mark.parametrize('mask_value', [0., 30.])
 @pytest.mark.parametrize('axis', [2, 3])
-def test_mask_along_axis_iid(specgrams, mask_param, mask_value, axis):
+def test_mask_along_axis_iid(mask_param, mask_value, axis):
+    torch.random.manual_seed(42)
+    specgrams = torch.randn(4, 2, 1025, 400)
 
     mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
 
