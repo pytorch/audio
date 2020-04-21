@@ -130,7 +130,7 @@ def download_url(url: str,
 
     if resume and os.path.exists(filepath):
         mode = "ab"
-        local_size = os.path.getsize(filepath)  # type: Optional[int]
+        local_size: Optional[int] = os.path.getsize(filepath)
 
     elif not resume and os.path.exists(filepath):
         raise RuntimeError(
@@ -288,7 +288,7 @@ class _DiskCache(Dataset):
         self.location = location
 
         self._id = id(self)
-        self._cache = [None] * len(dataset)   # type: List
+        self._cache: List = [None] * len(dataset)
 
     def __getitem__(self, n: int) -> Any:
         if self._cache[n]:
@@ -327,7 +327,7 @@ class _ThreadedIterator(threading.Thread):
 
     def __init__(self, generator: Iterable, maxsize: int) -> None:
         threading.Thread.__init__(self)
-        self.queue = Queue(maxsize)  # type: Queue
+        self.queue: Queue = Queue(maxsize)
         self.generator = generator
         self.daemon = True
         self.start()
