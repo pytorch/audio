@@ -1,5 +1,5 @@
 import os.path
-from typing import Any, Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
@@ -9,8 +9,8 @@ from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
 
 def load(filepath: str,
          out: Optional[Tensor] = None,
-         normalization: Optional[bool] = True,
-         channels_first: Optional[bool] = True,
+         normalization: bool = True,
+         channels_first: bool = True,
          num_frames: int = 0,
          offset: int = 0,
          signalinfo: SignalInfo = None,
