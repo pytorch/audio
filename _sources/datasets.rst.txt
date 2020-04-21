@@ -41,6 +41,22 @@ LIBRISPEECH
   :special-members:
 
 
+LJSPEECH
+~~~~~~~~
+
+.. autoclass:: LJSPEECH
+  :members: __getitem__
+  :special-members:
+
+
+SPEECHCOMMANDS
+~~~~~~~~~~~~~~
+
+.. autoclass:: SPEECHCOMMANDS
+  :members: __getitem__
+  :special-members:
+
+
 VCTK
 ~~~~
 

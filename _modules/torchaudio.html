@@ -261,8 +261,7 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
-<span class="kn">import</span> <span class="nn">os.path</span>
+<span></span><span class="kn">import</span> <span class="nn">os.path</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 
@@ -337,7 +336,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_get_audio_backend_module</span><span class="p">(),</span> <span class="s1">&#39;load&#39;</span><span class="p">)(</span>
+    <span class="k">return</span> <span class="n">_get_audio_backend_module</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">,</span>
         <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
         <span class="n">normalization</span><span class="o">=</span><span class="n">normalization</span><span class="p">,</span>
@@ -380,7 +379,7 @@
 <span class="sd">            Default: ``True``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_get_audio_backend_module</span><span class="p">(),</span> <span class="s1">&#39;save&#39;</span><span class="p">)(</span>
+    <span class="k">return</span> <span class="n">_get_audio_backend_module</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span>
     <span class="p">)</span></div>
 
@@ -472,7 +471,7 @@
 <span class="sd">         &gt;&gt;&gt; rate, channels, encoding = si.rate, si.channels, ei.encoding</span>
 <span class="sd">     &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_get_audio_backend_module</span><span class="p">(),</span> <span class="s1">&#39;info&#39;</span><span class="p">)(</span><span class="n">filepath</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_get_audio_backend_module</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="sox_signalinfo_t"><a class="viewcode-back" href="../index.html#torchaudio.sox_signalinfo_t">[docs]</a><span class="nd">@_audio_backend_guard</span><span class="p">(</span><span class="s2">&quot;sox&quot;</span><span class="p">)</span>
