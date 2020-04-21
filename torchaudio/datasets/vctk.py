@@ -5,10 +5,18 @@ from typing import Any, Tuple
 import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import download_url, extract_archive, walk_files
+from torchaudio.datasets.utils import (
+    download_url,
+    extract_archive,
+    walk_files
+)
 
 URL = "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz"
 FOLDER_IN_ARCHIVE = "VCTK-Corpus"
+_CHECKSUMS = {
+    "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz":
+    "45e8dede780278ef5541fde0b82ac292"
+}
 
 
 def load_vctk_item(fileid: str,
@@ -90,7 +98,8 @@ class VCTK(Dataset):
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    download_url(url, root)
+                    checksum = _CHECKSUMS.get(url, None)
+                    download_url(url, root, hash_value=checksum, hash_type="md5")
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):

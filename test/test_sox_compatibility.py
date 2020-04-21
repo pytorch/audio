@@ -320,6 +320,43 @@ class TestFunctionalFiltering(unittest.TestCase):
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
+    def test_dcshift_with_limiter(self):
+        """
+        Test dcshift effect, compare to SoX implementation
+        """
+        shift = 0.5
+        limiter_gain = 0.05
+        noise_filepath = common_utils.get_asset_path('whitenoise.wav')
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("dcshift", [shift, limiter_gain])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, _ = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.dcshift(waveform, shift, limiter_gain)
+
+        torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
+    def test_dcshift_without_limiter(self):
+        """
+        Test dcshift effect, compare to SoX implementation
+        """
+        shift = 0.6
+        noise_filepath = common_utils.get_asset_path('whitenoise.wav')
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("dcshift", [shift])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, _ = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.dcshift(waveform, shift)
+
+        torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_equalizer(self):
         """
         Test biquad peaking equalizer filter, compare to SoX implementation
