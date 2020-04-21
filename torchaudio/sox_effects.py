@@ -86,8 +86,8 @@ class SoxEffectsChain(object):
                  out_siginfo: Any = None,
                  out_encinfo: Any = None,
                  filetype: str = "raw") -> None:
-        self.input_file = None  # type: Optional[str]
-        self.chain = []  # type: List[str]
+        self.input_file: Optional[str] = None
+        self.chain: List[str] = []
         self.MAX_EFFECT_OPTS = 20
         self.out_siginfo = out_siginfo
         self.out_encinfo = out_encinfo

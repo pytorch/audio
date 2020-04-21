@@ -127,7 +127,6 @@ def download_url(url: str,
     # Detect filename
     filename = filename or req_info.get_filename() or os.path.basename(url)
     filepath = os.path.join(download_folder, filename)
-
     if resume and os.path.exists(filepath):
         mode = "ab"
         local_size: Optional[int] = os.path.getsize(filepath)
