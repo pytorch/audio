@@ -31,8 +31,11 @@ __all__ = [
     "deemph_biquad",
     "riaa_biquad",
     "biquad",
+    "contrast",
+    "dcshift",
     'mask_along_axis',
-    'mask_along_axis_iid'
+    'mask_along_axis_iid',
+    'sliding_window_cmn',
 ]
 
 
@@ -717,11 +720,11 @@ def lfilter(
     # (n_order, ) matmul (n_channel, n_order, n_sample) -> (n_channel, n_sample)
     input_signal_windows = torch.matmul(b_coeffs_flipped, torch.take(padded_waveform, window_idxs))
 
+    input_signal_windows.div_(a_coeffs[0])
+    a_coeffs_flipped.div_(a_coeffs[0])
     for i_sample, o0 in enumerate(input_signal_windows.t()):
         windowed_output_signal = padded_output_waveform[:, i_sample:(i_sample + n_order)]
         o0.addmv_(windowed_output_signal, a_coeffs_flipped, alpha=-1)
-        o0.div_(a_coeffs[0])
-
         padded_output_waveform[:, i_sample + n_order - 1] = o0
 
     output = torch.clamp(padded_output_waveform[:, (n_order - 1):], min=-1., max=1.)
@@ -1158,6 +1161,82 @@ def riaa_biquad(
     b2 *= g
 
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def contrast(
+        waveform: Tensor,
+        enhancement_amount: float = 75.
+) -> Tensor:
+    r"""Apply contrast effect.  Similar to SoX implementation.
+    Comparable with compression, this effect modifies an audio signal to make it sound louder
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        enhancement_amount (float): controls the amount of the enhancement
+            Allowed range of values for enhancement_amount : 0-100
+            Note that enhancement_amount = 0 still gives a significant contrast enhancement
+
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+    """
+
+    if not 0 <= enhancement_amount <= 100:
+        raise ValueError("Allowed range of values for enhancement_amount : 0-100")
+
+    contrast = enhancement_amount / 750.
+
+    temp1 = waveform * (math.pi / 2)
+    temp2 = contrast * torch.sin(temp1 * 4)
+    output_waveform = torch.sin(temp1 + temp2)
+
+    return output_waveform
+
+
+def dcshift(
+        waveform: Tensor,
+        shift: float,
+        limiter_gain: Optional[float] = None
+) -> Tensor:
+    r"""Apply a DC shift to the audio. Similar to SoX implementation.
+    This can be useful to remove a DC offset
+    (caused perhaps by a hardware problem in the recording chain) from the audio
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        shift (float): indicates the amount to shift the audio
+            Allowed range of values for shift : -2.0 to +2.0
+        limiter_gain (float): It is used only on peaks to prevent clipping
+            It should have a value much less than 1 (e.g. 0.05 or 0.02)
+
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+    """
+    output_waveform = waveform
+    limiter_threshold = 0.
+
+    if limiter_gain is not None:
+        limiter_threshold = 1.0 - (abs(shift) - limiter_gain)
+
+    if limiter_gain is not None and shift > 0:
+        mask = waveform > limiter_threshold
+        temp = (waveform[mask] - limiter_threshold) * limiter_gain / (1 - limiter_threshold)
+        output_waveform[mask] = (temp + limiter_threshold + shift).clamp(max=limiter_threshold)
+        output_waveform[~mask] = (waveform[~mask] + shift).clamp(min=-1, max=1)
+    elif limiter_gain is not None and shift < 0:
+        mask = waveform < -limiter_threshold
+        temp = (waveform[mask] + limiter_threshold) * limiter_gain / (1 - limiter_threshold)
+        output_waveform[mask] = (temp - limiter_threshold + shift).clamp(min=-limiter_threshold)
+        output_waveform[~mask] = (waveform[~mask] + shift).clamp(min=-1, max=1)
+    else:
+        output_waveform = (waveform + shift).clamp(min=-1, max=1)
+
+    return output_waveform
 
 
 def mask_along_axis_iid(
@@ -1610,3 +1689,86 @@ def detect_pitch_frequency(
     freq = freq.view(shape[:-1] + list(freq.shape[-1:]))
 
     return freq
+
+
+def sliding_window_cmn(
+    waveform: Tensor,
+    cmn_window: int = 600,
+    min_cmn_window: int = 100,
+    center: bool = False,
+    norm_vars: bool = False,
+) -> Tensor:
+    r"""
+    Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
+
+    Args:
+        waveform (Tensor): Tensor of audio of dimension (..., freq, time)
+        cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
+        min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).
+            Only applicable if center == false, ignored if center==true (int, default = 100)
+        center (bool, optional): If true, use a window centered on the current frame
+            (to the extent possible, modulo end effects). If false, window is to the left. (bool, default = false)
+        norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
+
+    Returns:
+        Tensor: Tensor of freq of dimension (..., frame)
+    """
+    dtype = waveform.dtype
+    device = waveform.device
+    last_window_start = last_window_end = -1
+    num_frames, num_feats = waveform.shape
+    cur_sum = torch.zeros(num_feats, dtype=dtype, device=device)
+    cur_sumsq = torch.zeros(num_feats, dtype=dtype, device=device)
+    cmn_waveform = torch.zeros(
+        num_frames, num_feats, dtype=dtype, device=device)
+    for t in range(num_frames):
+        window_start = 0
+        window_end = 0
+        if center:
+            window_start = t - cmn_window // 2
+            window_end = window_start + cmn_window
+        else:
+            window_start = t - cmn_window
+            window_end = t + 1
+        if window_start < 0:
+            window_end -= window_start
+            window_start = 0
+        if not center:
+            if window_end > t:
+                window_end = max(t + 1, min_cmn_window)
+        if window_end > num_frames:
+            window_start -= (window_end - num_frames)
+            window_end = num_frames
+            if window_start < 0:
+                window_start = 0
+        if last_window_start == -1:
+            input_part = waveform[window_start: window_end - window_start]
+            cur_sum += torch.sum(input_part, 0)
+            if norm_vars:
+                cur_sumsq += torch.cumsum(input_part ** 2, 0)[-1]
+        else:
+            if window_start > last_window_start:
+                frame_to_remove = waveform[last_window_start]
+                cur_sum -= frame_to_remove
+                if norm_vars:
+                    cur_sumsq -= (frame_to_remove ** 2)
+            if window_end > last_window_end:
+                frame_to_add = waveform[last_window_end]
+                cur_sum += frame_to_add
+                if norm_vars:
+                    cur_sumsq += (frame_to_add ** 2)
+        window_frames = window_end - window_start
+        last_window_start = window_start
+        last_window_end = window_end
+        cmn_waveform[t] = waveform[t] - cur_sum / window_frames
+        if norm_vars:
+            if window_frames == 1:
+                cmn_waveform[t] = torch.zeros(
+                    num_feats, dtype=dtype, device=device)
+            else:
+                variance = cur_sumsq
+                variance = variance / window_frames
+                variance -= ((cur_sum ** 2) / (window_frames ** 2))
+                variance = torch.pow(variance, -0.5)
+                cmn_waveform[t] *= variance
+    return cmn_waveform
