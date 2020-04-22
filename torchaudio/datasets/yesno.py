@@ -5,10 +5,18 @@ from typing import Any, List, Tuple
 import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import download_url, extract_archive, walk_files
+from torchaudio.datasets.utils import (
+    download_url,
+    extract_archive,
+    walk_files
+)
 
 URL = "http://www.openslr.org/resources/1/waves_yesno.tar.gz"
 FOLDER_IN_ARCHIVE = "waves_yesno"
+_CHECKSUMS = {
+    "http://www.openslr.org/resources/1/waves_yesno.tar.gz":
+    "962ff6e904d2df1126132ecec6978786"
+}
 
 
 def load_yesno_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, int, List[int]]:
@@ -55,7 +63,8 @@ class YESNO(Dataset):
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    download_url(url, root)
+                    checksum = _CHECKSUMS.get(url, None)
+                    download_url(url, root, hash_value=checksum, hash_type="md5")
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):
