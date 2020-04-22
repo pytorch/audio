@@ -454,7 +454,7 @@ class MFCC(torch.nn.Module):
         super(MFCC, self).__init__()
         supported_dct_types = [2]
         if dct_type not in supported_dct_types:
-            raise ValueError('DCT type not supported'.format(dct_type))
+            raise ValueError('DCT type not supported: {}'.format(dct_type))
         self.sample_rate = sample_rate
         self.n_mfcc = n_mfcc
         self.dct_type = dct_type
