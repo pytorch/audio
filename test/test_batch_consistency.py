@@ -72,6 +72,10 @@ class TestFunctional(unittest.TestCase):
         waveform = torch.rand(2, 100) - 0.5
         _test_batch(F.dcshift, waveform, shift=0.5, limiter_gain=0.05)
 
+    def test_overdrive(self):
+        waveform = torch.rand(2, 100) - 0.5
+        _test_batch(F.overdrive, waveform, gain=45, colour=30)
+
     def test_sliding_window_cmn(self):
         waveform = torch.randn(2, 1024) - 0.5
         _test_batch(F.sliding_window_cmn, waveform, center=True, norm_vars=True)

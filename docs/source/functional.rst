@@ -133,6 +133,11 @@ Functions to perform common audio operations.
 
 .. autofunction:: dcshift
 
+:hidden:`overdrive`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: overdrive
+
 :hidden:`mask_along_axis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
