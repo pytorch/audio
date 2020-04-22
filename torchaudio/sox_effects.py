@@ -149,6 +149,7 @@ class SoxEffectsChain(object):
 
         # print("effect options:", [x.eopts for x in self.chain])
 
+        torchaudio.initialize_sox()
         import _torch_sox
         sr = _torch_sox.build_flow_effects(self.input_file,
                                            out,
