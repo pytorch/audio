@@ -1262,34 +1262,35 @@ def overdrive(
         http://sox.sourceforge.net/sox.html
     """
     actual_shape = waveform.shape
+    device, dtype = waveform.device, waveform.dtype
 
-    if len(actual_shape) == 2:
-        waveform = waveform.unsqueeze(0)
+    # convert to 2D (..,time)
+    waveform = waveform.view(-1, actual_shape[-1])
 
     gain = _dB2Linear(gain)
     colour = colour / 200
-    last_in = torch.zeros(waveform.shape[0], waveform.shape[1])
-    last_out = torch.zeros(waveform.shape[0], waveform.shape[1])
+    last_in = torch.zeros(waveform.shape[:-1], dtype=dtype, device=device)
+    last_out = torch.zeros(waveform.shape[:-1], dtype=dtype, device=device)
 
     temp = waveform * gain + colour
 
     mask1 = temp < -1
-    temp[mask1] = temp[mask1] * 0 - 2 / 3
-    # Above redundant multiplcation to accomadate torchscript issue
+    temp[mask1] = torch.tensor(-2.0 / 3.0, dtype=dtype, device=device)
+    # Wrapping the constant with Tensor is required for Torchscript
 
     mask2 = temp > 1
-    temp[mask2] = temp[mask2] * 0 + 2 / 3
+    temp[mask2] = torch.tensor(2.0 / 3.0, dtype=dtype, device=device)
 
     mask3 = (~mask1 & ~mask2)
     temp[mask3] = temp[mask3] - (temp[mask3]**3) * (1. / 3)
 
-    output_waveform = torch.zeros_like(waveform)
+    output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
 
     # TODO: Implement a torch CPP extension
     for i in range(waveform.shape[-1]):
-        last_out = temp[:, :, i] - last_in + 0.995 * last_out
-        last_in = temp[:, :, i]
-        output_waveform[:, :, i] = waveform[:, :, i] * 0.5 + last_out * 0.75
+        last_out = temp[:, i] - last_in + 0.995 * last_out
+        last_in = temp[:, i]
+        output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
 
     return output_waveform.clamp(min=-1, max=1).view(actual_shape)
 
