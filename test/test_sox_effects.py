@@ -13,11 +13,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        torchaudio.initialize_sox()
-
-    @classmethod
-    def tearDownClass(cls):
-        torchaudio.shutdown_sox()
+        common_utils.initialize_sox()
 
     def test_single_channel(self):
         fn_sine = common_utils.get_asset_path("sinewave.wav")
