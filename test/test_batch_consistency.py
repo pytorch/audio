@@ -72,6 +72,13 @@ class TestFunctional(unittest.TestCase):
         waveform = torch.rand(2, 100) - 0.5
         _test_batch(F.dcshift, waveform, shift=0.5, limiter_gain=0.05)
 
+    def test_sliding_window_cmn(self):
+        waveform = torch.randn(2, 1024) - 0.5
+        _test_batch(F.sliding_window_cmn, waveform, center=True, norm_vars=True)
+        _test_batch(F.sliding_window_cmn, waveform, center=True, norm_vars=False)
+        _test_batch(F.sliding_window_cmn, waveform, center=False, norm_vars=True)
+        _test_batch(F.sliding_window_cmn, waveform, center=False, norm_vars=False)
+
 
 class TestTransforms(unittest.TestCase):
     """Test suite for classes defined in `transforms` module"""
