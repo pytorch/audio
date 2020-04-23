@@ -251,16 +251,17 @@ class Test_SoxEffectsChain(unittest.TestCase):
 
     def test_vad(self):
         sample_file = common_utils.get_asset_path("vad-hello.wav")
-        x_orig, _ = torchaudio.load(sample_file)
+        x_orig, sample_rate = torchaudio.load(sample_file, normalization=False)
 
-        E = torchaudio.sox_effects.SoxEffectsChain()
+        E = torchaudio.sox_effects.SoxEffectsChain(normalization=False)
         E.set_input_file(sample_file)
         E.append_effect_to_chain("vad")
-        x, sr = E.sox_build_flow_effects()
+        x, _ = E.sox_build_flow_effects()
 
         vad = torchaudio.transforms.Vad()
+        y = vad(x_orig, sample_rate)
 
-        self.assertTrue(x.allclose(vad(x_orig), rtol=1e-4, atol=1e-4))
+        self.assertTrue(x.allclose(y, rtol=1e-4, atol=1e-4))
 
 
 if __name__ == '__main__':

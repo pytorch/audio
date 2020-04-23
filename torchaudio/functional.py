@@ -1841,13 +1841,11 @@ def sliding_window_cmn(
 
 def vad(
     waveform: Tensor,
-    location: int = 1,
-    normalized : bool = True,
-    activity_threshold: float = 7.0,
-    min_activity_duration: float = 0.25,
-    initial_search_buffer: float = 1.0,
-    max_gap: float = 0.25,
-    initial_pad: float = 0.0
+    trigger_level: float = 7.0,
+    trigger_time: float = 0.25,
+    search_time: float = 1.0,
+    allowed_gap: float = 0.25,
+    pre_trigger_time: float = 0.0
     ) -> Tensor:
     r"""Voice Activity Detector. Similar to SoX implementation.
     Attempts to trim silence and quiet background sounds from the ends of recordings of speech.
@@ -1859,21 +1857,18 @@ def vad(
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
-        location (int, optional): 1 or -1. If 1, trims silence from the beginning.
-            If -1, trims silence from the end. (Default: 1)
-        normalized (bool, optional): If true, normalizes audio before processing. (Default: True)
-        activity_threshold (float, optional): The measurement level used to trigger activity detection.
+        trigger_level (float, optional): The measurement level used to trigger activity detection.
             This may need to be cahnged depending on the noise level, signal level,
             and other characteristics of the input audio. (Default: 7.0)
-        min_activity_duration (float, optional): The time constant (in seconds)
+        trigger_time (float, optional): The time constant (in seconds)
             used to help ignore short bursts of sound. (Default: 0.25)
-        initial_search_buffer (float, optional): The amount of audio (in seconds)
+        search_time (float, optional): The amount of audio (in seconds)
             to search for quieter/shorter bursts of audio to include prior
             to the detected trigger point. (Default: 1.0)
-        max_gap (float, optional): The allowed gap (in seconds) between
+        allowed_gap (float, optional): The allowed gap (in seconds) between
             quiteter/shorter bursts of audio to include prior
             to the detected trigger point. (Default: 0.25)
-        initial_pad (float, optional): The amount of audio (in seconds) to preserve
+        pre_trigger_time (float, optional): The amount of audio (in seconds) to preserve
             before the trigger point and any found quieter/shorter bursts. (Default: 0.0)
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
