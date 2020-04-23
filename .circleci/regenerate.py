@@ -19,7 +19,7 @@ import yaml
 import os.path
 
 
-def workflows(prefix='', upload=False, filter_branch=None, indentation=6):
+def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
     w = []
     for btype in ["wheel", "conda"]:
         for os_type in ["linux", "macos"]:
@@ -116,4 +116,4 @@ if __name__ == "__main__":
     )
 
     with open(os.path.join(d, 'config.yml'), 'w') as f:
-        f.write(env.get_template('config.yml.in').render(workflows=workflows))
+        f.write(env.get_template('config.yml.in').render(build_workflows=build_workflows))

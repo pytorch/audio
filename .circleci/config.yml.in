@@ -237,7 +237,7 @@ workflows:
   build:
     jobs:
       - circleci_consistency
-      {{ workflows() }}
+      {{ build_workflows() }}
       - binary_win_conda:
           name: torchaudio_win_py3.6
           python_version: "3.6"
@@ -245,7 +245,7 @@ workflows:
   nightly:
     jobs:
       - circleci_consistency
-      {{ workflows(prefix="nightly_", filter_branch="nightly", upload=True) }}
+      {{ build_workflows(prefix="nightly_", filter_branch="nightly", upload=True) }}
   docker_build:
     triggers:
       - schedule:
