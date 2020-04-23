@@ -912,6 +912,34 @@ class SlidingWindowCmn(torch.nn.Module):
 
 
 class Vad(torch.nn.Module):
+    r"""Voice Activity Detector. Similar to SoX implementation.
+    Attempts to trim silence and quiet background sounds from the ends of recordings of speech.
+    The algorithm currently uses a simple cepstral power measurement to detect voice,
+    so may be fooled by other things, especially music.
+
+    The effect can trim only from the front of the audio,
+    so in order to trim from the back, the reverse effect must also be used.
+
+    Args:
+        trigger_level (float, optional): The measurement level used to trigger activity detection.
+            This may need to be cahnged depending on the noise level, signal level,
+            and other characteristics of the input audio. (Default: 7.0)
+        trigger_time (float, optional): The time constant (in seconds)
+            used to help ignore short bursts of sound. (Default: 0.25)
+        search_time (float, optional): The amount of audio (in seconds)
+            to search for quieter/shorter bursts of audio to include prior
+            to the detected trigger point. (Default: 1.0)
+        allowed_gap (float, optional): The allowed gap (in seconds) between
+            quiteter/shorter bursts of audio to include prior
+            to the detected trigger point. (Default: 0.25)
+        pre_trigger_time (float, optional): The amount of audio (in seconds) to preserve
+            before the trigger point and any found quieter/shorter bursts. (Default: 0.0)
+
+    References:
+        http://sox.sourceforge.net/sox.html
+        https://pysox.readthedocs.io/en/latest/api.html#sox.transform.Transformer.vad
+    """
+
     @dataclass
     class Channel:
         dftBuf: torch.Tensor = None
@@ -929,26 +957,27 @@ class Vad(torch.nn.Module):
             self.noiseSpectrum = torch.zeros(dftLen_ws)
             self.measures = torch.zeros(measuresLen)
 
-    # Configuration parameters
+    # These are set in __init__
+    triggerLevel: float
+    triggerTc: float
+    searchTime: float
+    gapTime: float
+    preTriggerTime: float
+
+    # Fine-tuning parameters
     bootTime: float = .35
     noiseTcUp: float = .1
     noiseTcDown: float = .01
     noiseReductionAmount: float = 1.35
 
     measureFreq: float = 20
-    measureDuration: float = 2.0 / measureFreq # 50% overlap
+    measureDuration: float = 2.0 / measureFreq  # 50% overlap
     measureTc: float = .4
-    preTriggerTime: float = 0.0
 
     hpFilterFreq: float = 50
     lpFilterFreq: float = 6000
     hpLifterFreq: float = 150
     lpLifterFreq: float = 2000
-
-    triggerTc: float = .25
-    triggerLevel: float = 7
-    searchTime: float = 1
-    gapTime: float = .25
 
     # Working variables
     samples: torch.Tensor = None
@@ -988,6 +1017,91 @@ class Vad(torch.nn.Module):
     sample_rate: InitVar[int] = None
     n_channels: InitVar[int] = None
 
+    def __init__(self,
+                 trigger_level: float = 7.0,
+                 trigger_time: float = 0.25,
+                 search_time: float = 1.0,
+                 allowed_gap: float = 0.25,
+                 pre_trigger_time: float = 0.0) -> None:
+        self.triggerLevel = trigger_level
+        self.triggerTc = trigger_time
+        self.searchTime = search_time
+        self.gapTime = allowed_gap
+        self.preTriggerTime = pre_trigger_time
+
+        super(Vad, self).__init__()
+
+    def forward(self, waveform: Tensor, sample_rate: int) -> Tensor:
+        r"""
+        Args:
+            waveform (Tensor): Tensor of audio of dimension `(..., time)`
+            sample_rate (int): Sample rate of audio signal.
+        """
+        n_channels, _ = waveform.size()
+        self._reset(n_channels, sample_rate)
+
+        return self._flowTrigger(waveform)
+
+    def _reset(self, n_channels: int, sample_rate: int):
+        self.sample_rate = sample_rate
+        self.n_channels = n_channels
+
+        fixedPreTriggerLen_ns = int(self.preTriggerTime * self.sample_rate + .5)
+        fixedPreTriggerLen_ns *= self.n_channels
+
+        self.measureLen_ws = int(self.sample_rate * self.measureDuration + .5)
+        self.measureLen_ns = self.measureLen_ws * self.n_channels
+        # for (self.dftLen_ws = 16; self.dftLen_ws < self.measureLen_ws; self.dftLen_ws <<= 1);
+        self.dftLen_ws = 16
+        while (self.dftLen_ws < self.measureLen_ws):
+            self.dftLen_ws <<= 1
+
+        self.measurePeriod_ns = int(self.sample_rate / self.measureFreq + .5)
+        self.measurePeriod_ns *= self.n_channels
+        self.measuresLen = math.ceil(self.searchTime * self.measureFreq)
+        searchPreTriggerLen_ns = self.measuresLen * self.measurePeriod_ns
+        self.gapLen = int(self.gapTime * self.measureFreq + .5)
+
+        self.samplesLen_ns = fixedPreTriggerLen_ns + searchPreTriggerLen_ns + self.measureLen_ns
+        self.samples = torch.zeros(self.samplesLen_ns)
+        self.channels = [
+            self.Channel(dftLen_ws=self.dftLen_ws, measuresLen=self.measuresLen)
+            for _ in range(self.n_channels)
+        ]
+
+        self.spectrumWindow = torch.zeros(self.measureLen_ws)
+        for i in range(self.measureLen_ws):
+            # sox.h:741 define SOX_SAMPLE_MIN (sox_sample_t)SOX_INT_MIN(32)
+            self.spectrumWindow[i] = -2. / -2147483648 / math.sqrt(float(self.measureLen_ws))
+        # lsx_apply_hann(self.spectrumWindow, (int)self.measureLen_ws);
+        self.spectrumWindow *= torch.hann_window(self.measureLen_ws)
+
+        self.spectrumStart = int(self.hpFilterFreq / self.sample_rate * self.dftLen_ws + .5)
+        self.spectrumStart = max(self.spectrumStart, 1)
+        self.spectrumEnd = int(self.lpFilterFreq / self.sample_rate * self.dftLen_ws + .5)
+        self.spectrumEnd = min(self.spectrumEnd, self.dftLen_ws / 2)
+
+        self.cepstrumWindow = torch.zeros(self.spectrumEnd - self.spectrumStart)
+        for i in range(self.spectrumEnd - self.spectrumStart):
+            self.cepstrumWindow[i] = 2. / math.sqrt(float(self.spectrumEnd) - self.spectrumStart)
+        # lsx_apply_hann(self.cepstrumWindow,(int)(self.spectrumEnd - self.spectrumStart));
+        self.cepstrumWindow *= torch.hann_window(self.spectrumEnd - self.spectrumStart)
+
+        self.cepstrumStart = math.ceil(self.sample_rate * .5 / self.lpLifterFreq)
+        self.cepstrumEnd = math.floor(self.sample_rate * .5 / self.hpLifterFreq)
+        self.cepstrumEnd = min(self.cepstrumEnd, self.dftLen_ws / 4)
+
+        assert self.cepstrumEnd > self.cepstrumStart
+
+        self.noiseTcUpMult = math.exp(-1. / (self.noiseTcUp * self.measureFreq))
+        self.noiseTcDownMult = math.exp(-1. / (self.noiseTcDown * self.measureFreq))
+        self.measureTcMult = math.exp(-1. / (self.measureTc * self.measureFreq))
+        self.triggerMeasTcMult = math.exp(-1. / (self.triggerTc * self.measureFreq))
+
+        self.bootCountMax = int(self.bootTime * self.measureFreq - .5)
+        self.measureTimer_ns = self.measureLen_ns
+        self.bootCount = self.measuresIndex = self.flushedLen_ns = self.samplesIndex_ns = 0
+
     def _measure(self, c: Channel, index_ns: int, step_ns: int, boot_count: int):
         _index_ns = [
             (index_ns + i * step_ns) % self.samplesLen_ns
@@ -1005,7 +1119,6 @@ class Vad(torch.nn.Module):
         # memset(c->dftBuf, 0, p->spectrumStart * sizeof(*c->dftBuf));
         _dftBuf[:self.spectrumStart].zero_()
 
-        _cepstrum_Buf: Tensor = torch.zeros(self.dftLen_ws >> 1)
         spectrum_range = slice(self.spectrumStart, self.spectrumEnd)
 
         mult: float = boot_count / (1. + boot_count) \
@@ -1021,17 +1134,17 @@ class Vad(torch.nn.Module):
             if boot_count >= 0 \
             else torch.where(
                 _d > c.noiseSpectrum[spectrum_range],
-                torch.tensor(self.noiseTcUpMult),  # if
-                torch.tensor(self.noiseTcDownMult) # else
+                torch.tensor(self.noiseTcUpMult),   # if
+                torch.tensor(self.noiseTcDownMult)  # else
             )
 
         c.noiseSpectrum[spectrum_range].mul_(_mult).add_(_d * (1 - _mult))
         _d = torch.sqrt(
             torch.max(
                 _zeros,
-                _d - self.noiseReductionAmount * c.noiseSpectrum[spectrum_range]
-        ))
+                _d - self.noiseReductionAmount * c.noiseSpectrum[spectrum_range]))
 
+        _cepstrum_Buf: Tensor = torch.zeros(self.dftLen_ws >> 1)
         _cepstrum_Buf[spectrum_range] = _d * self.cepstrumWindow
         _cepstrum_Buf[self.spectrumEnd:self.dftLen_ws >> 1].zero_()
 
@@ -1047,12 +1160,11 @@ class Vad(torch.nn.Module):
             if result > 0 \
             else -math.inf
 
-        return max(0, 21 + result);
+        return max(0, 21 + result)
 
     def _flowTrigger(self, waveform: torch.Tensor):
         hasTriggered: bool = False
         ilen: int = waveform.size()[-1]
-        i: int = 0
         idone: int = 0
         ibuf: int = 0
         numMeasuresToFlush: int = 0
@@ -1060,14 +1172,15 @@ class Vad(torch.nn.Module):
         while (idone < ilen and not hasTriggered):
             self.measureTimer_ns -= self.n_channels
             for i in range(self.n_channels):
-                c: Channel = self.channels[i]
+                c: self.Channel = self.channels[i]
                 self.samples[self.samplesIndex_ns] = waveform[0, ibuf]
                 self.samplesIndex_ns += 1
                 ibuf += 1
                 # if (!p->measureTimer_ns) {
                 if (self.measureTimer_ns == 0):
-                    x: int = (self.samplesIndex_ns + self.samplesLen_ns - self.measureLen_ns) % self.samplesLen_ns
-                    meas: float = self._measure(c, x, self.n_channels, self.bootCount)
+                    index_ns: int = \
+                        (self.samplesIndex_ns + self.samplesLen_ns - self.measureLen_ns) % self.samplesLen_ns
+                    meas: float = self._measure(c, index_ns, self.n_channels, self.bootCount)
                     c.measures[self.measuresIndex] = meas
                     c.meanMeas = c.meanMeas * self.triggerMeasTcMult + meas * (1. - self.triggerMeasTcMult)
 
@@ -1104,68 +1217,5 @@ class Vad(torch.nn.Module):
             if hasTriggered:
                 self.flushedLen_ns = (self.measuresLen - numMeasuresToFlush) * self.measurePeriod_ns
                 self.samplesIndex_ns = (self.samplesIndex_ns + self.flushedLen_ns) % self.samplesLen_ns
-                ilen1 = ilen - idone
 
-        return waveform[:,self.samplesIndex_ns+self.samplesLen_ns:]
-
-    def __init__(self, sample_rate: int, n_channels: int = 1) -> None:
-        super(Vad, self).__init__()
-        self.n_channels = n_channels
-        self.sample_rate = sample_rate
-        fixedPreTriggerLen_ns = int(self.preTriggerTime * sample_rate + .5)
-        fixedPreTriggerLen_ns *= n_channels
-
-        self.measureLen_ws = int(sample_rate * self.measureDuration + .5)
-        self.measureLen_ns = self.measureLen_ws * n_channels
-        # for (self.dftLen_ws = 16; self.dftLen_ws < self.measureLen_ws; self.dftLen_ws <<= 1);
-        while (self.dftLen_ws < self.measureLen_ws):
-            self.dftLen_ws <<= 1
-
-        self.measurePeriod_ns = int(sample_rate / self.measureFreq + .5)
-        self.measurePeriod_ns *= n_channels
-        self.measuresLen = math.ceil(self.searchTime * self.measureFreq)
-        searchPreTriggerLen_ns = self.measuresLen * self.measurePeriod_ns
-        self.gapLen = int(self.gapTime * self.measureFreq + .5)
-
-        self.samplesLen_ns = fixedPreTriggerLen_ns + searchPreTriggerLen_ns + self.measureLen_ns
-        self.samples = torch.zeros(self.samplesLen_ns)
-        self.channels = [
-            self.Channel(dftLen_ws=self.dftLen_ws, measuresLen=self.measuresLen)
-            for _ in range(n_channels)
-        ]
-
-        self.spectrumWindow = torch.zeros(self.measureLen_ws)
-        for i in range(self.measureLen_ws):
-            # sox.h:741 define SOX_SAMPLE_MIN (sox_sample_t)SOX_INT_MIN(32)
-            self.spectrumWindow[i] = -2. / -2147483648 / math.sqrt(float(self.measureLen_ws))
-        # lsx_apply_hann(self.spectrumWindow, (int)self.measureLen_ws);
-        self.spectrumWindow *= torch.hann_window(self.measureLen_ws)
-
-        self.spectrumStart = int(self.hpFilterFreq / sample_rate * self.dftLen_ws + .5)
-        self.spectrumStart = max(self.spectrumStart, 1)
-        self.spectrumEnd = int(self.lpFilterFreq / sample_rate * self.dftLen_ws + .5)
-        self.spectrumEnd = min(self.spectrumEnd, self.dftLen_ws / 2)
-
-        self.cepstrumWindow = torch.zeros(self.spectrumEnd - self.spectrumStart)
-        for i in range(self.spectrumEnd - self.spectrumStart):
-            self.cepstrumWindow[i] = 2. / math.sqrt(float(self.spectrumEnd) - self.spectrumStart)
-        # lsx_apply_hann(self.cepstrumWindow,(int)(self.spectrumEnd - self.spectrumStart));
-        self.cepstrumWindow *= torch.hann_window(self.spectrumEnd - self.spectrumStart)
-
-        self.cepstrumStart = math.ceil(sample_rate * .5 / self.lpLifterFreq)
-        self.cepstrumEnd  = math.floor(sample_rate * .5 / self.hpLifterFreq)
-        self.cepstrumEnd = min(self.cepstrumEnd, self.dftLen_ws / 4)
-
-        assert self.cepstrumEnd > self.cepstrumStart
-
-        self.noiseTcUpMult     = math.exp(-1. / (self.noiseTcUp   * self.measureFreq))
-        self.noiseTcDownMult   = math.exp(-1. / (self.noiseTcDown * self.measureFreq))
-        self.measureTcMult     = math.exp(-1. / (self.measureTc   * self.measureFreq))
-        self.triggerMeasTcMult = math.exp(-1. / (self.triggerTc   * self.measureFreq))
-
-        self.bootCountMax = int(self.bootTime * self.measureFreq - .5)
-        self.measureTimer_ns = self.measureLen_ns
-        self.bootCount = self.measuresIndex = self.flushedLen_ns = self.samplesIndex_ns = 0
-
-    def forward(self, waveform: Tensor) -> Tensor:
-        return self._flowTrigger(waveform)
+        return waveform[:, self.samplesIndex_ns + self.samplesLen_ns:]

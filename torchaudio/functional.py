@@ -37,7 +37,6 @@ __all__ = [
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
-    "vad",
 ]
 
 
