@@ -982,40 +982,40 @@ class Vad(torch.nn.Module):
     # Working variables
     samples: torch.Tensor = None
 
-    dftLen_ws: int = 16
-    samplesLen_ns: int = None
-    samplesIndex_ns: int = None
-    flushedLen_ns: int = None
-    gapLen: int = None
+    dftLen_ws: int
+    samplesLen_ns: int
+    samplesIndex_ns: int
+    flushedLen_ns: int
+    gapLen: int
 
-    measurePeriod_ns: int = None
-    measuresLen: int = None
-    measuresIndex: int = None
+    measurePeriod_ns: int
+    measuresLen: int
+    measuresIndex: int
 
-    measureTimer_ns: int = None
-    measureLen_ws: int = None
-    measureLen_ns: int = None
+    measureTimer_ns: int
+    measureLen_ws: int
+    measureLen_ns: int
 
-    spectrumStart: int = None
-    spectrumEnd: int = None
-    cepstrumStart: int = None
-    cepstrumEnd: int = None
+    spectrumStart: int
+    spectrumEnd: int
+    cepstrumStart: int
+    cepstrumEnd: int
 
-    bootCountMax: int = None
-    bootCount: int = None
+    bootCountMax: int
+    bootCount: int
 
-    noiseTcUpMult: float = None
-    noiseTcDownMult: float = None
+    noiseTcUpMult: float
+    noiseTcDownMult: float
 
-    measureTcMult: float = None
-    triggerMeasTcMult: float = None
+    measureTcMult: float
+    triggerMeasTcMult: float
 
-    spectrumWindow: torch.Tensor = None
-    cepstrumWindow: torch.Tensor = None
-    channels: List[Channel] = None
+    spectrumWindow: torch.Tensor
+    cepstrumWindow: torch.Tensor
+    channels: List[Channel]
 
-    sample_rate: InitVar[int] = None
-    n_channels: InitVar[int] = None
+    sample_rate: int
+    n_channels: int
 
     def __init__(self,
                  trigger_level: float = 7.0,
