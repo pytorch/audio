@@ -233,6 +233,20 @@ jobs:
             docker tag ${image_name}:${CIRCLE_WORKFLOW_ID} 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
             docker push 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
 
+  unittest_linux:
+    <<: *binary_common
+    docker:
+      - image: "pytorch/manylinux-cuda100"
+    resource_class: 2xlarge+
+    steps:
+      - checkout
+      - run:
+          name: Setup environment
+          command: .circleci/unittest/setup_env.sh
+      - run:
+          name: Run test
+          command: .circleci/unittest/run_test.sh
+
 workflows:
   build:
     jobs:
@@ -241,7 +255,9 @@ workflows:
       - binary_win_conda:
           name: torchaudio_win_py3.6
           python_version: "3.6"
-
+  unittest:
+    jobs:
+      {{ unittest_workflows() }}
   nightly:
     jobs:
       - circleci_consistency

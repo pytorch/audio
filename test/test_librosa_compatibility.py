@@ -244,9 +244,7 @@ class TestTransforms(_LibrosaMixin, unittest.TestCase):
         _test_compatibilities(**kwargs)
 
     # NOTE: Test passes offline, but fails on TravisCI, see #372.
-    @unittest.skipIf(
-        os.environ.get('CI') == 'true' and os.environ.get('TRAVIS') == 'true',
-        'Test is known to fail on TravisCI')
+    @unittest.skipIf('CI ' in os.environ('CI'), 'Test is known to fail on CI')
     def test_basics3(self):
         kwargs = {
             'n_fft': 200,
