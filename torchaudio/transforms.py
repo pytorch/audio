@@ -993,9 +993,8 @@ class Vad(torch.nn.Module):
             (index_ns + i * step_ns) % self.samplesLen_ns
             for i in range(self.measureLen_ws)
         ]
-        c.dftBuf[:self.measureLen_ws].copy_(
+        c.dftBuf[:self.measureLen_ws] = \
             self.samples[_index_ns] * self.spectrumWindow[:self.measureLen_ws]
-        )
 
         # memset(c->dftBuf + i, 0, (p->dftLen_ws - i) * sizeof(*c->dftBuf));
         c.dftBuf[self.measureLen_ws:c.dftLen_ws].zero_()
@@ -1033,7 +1032,7 @@ class Vad(torch.nn.Module):
                 _d - self.noiseReductionAmount * c.noiseSpectrum[spectrum_range]
         ))
 
-        _cepstrum_Buf[spectrum_range].copy_(_d * self.cepstrumWindow)
+        _cepstrum_Buf[spectrum_range] = _d * self.cepstrumWindow
         _cepstrum_Buf[self.spectrumEnd:self.dftLen_ws >> 1].zero_()
 
         # lsx_safe_rdft((int)p->dftLen_ws >> 1, 1, c->dftBuf);
