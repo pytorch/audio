@@ -240,9 +240,25 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - restore_cache:
+
+          keys:
+            - env-v1-{{ arch }}-<< parameters.python_version >>-{{ checksum "./packaging/build_from_source.sh" }}-{{ checksum ".circleci/unittest/environment.yml" }}
+
       - run:
-          name: Setup environment
+          name: Setup
           command: .circleci/unittest/setup_env.sh
+      - save_cache:
+
+          key: env-v1-{{ arch }}-<< parameters.python_version >>-{{ checksum "./packaging/build_from_source.sh" }}-{{ checksum ".circleci/unittest/environment.yml" }}
+
+          paths:
+            - conda
+            - env
+            - third_party
+      - run:
+          name: Installation
+          command: .circleci/unittest/install.sh
       - run:
           name: Run test
           command: .circleci/unittest/run_test.sh
