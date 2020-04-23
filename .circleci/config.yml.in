@@ -24,15 +24,10 @@ binary_common: &binary_common
     python_version:
       description: "Python version to build against (e.g., 3.8)"
       type: string
-    unicode_abi:
-      description: "Python 2.7 wheel only: whether or not we are cp27mu (default: no)"
-      type: string
-      default: ""
   environment:
     PYTHON_VERSION: << parameters.python_version >>
     BUILD_VERSION: << parameters.build_version >>
     PYTORCH_VERSION: << parameters.pytorch_version >>
-    UNICODE_ABI: << parameters.unicode_abi >>
     CU_VERSION: cpu
 
 smoke_test_common: &smoke_test_common
