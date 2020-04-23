@@ -988,8 +988,7 @@ class Vad(torch.nn.Module):
     sample_rate: InitVar[int] = None
     n_channels: InitVar[int] = None
 
-    # TODO: rename bootCount to boot_count?
-    def _measure(self, c: Channel, index_ns: int, step_ns: int, bootCount: int):
+    def _measure(self, c: Channel, index_ns: int, step_ns: int, boot_count: int):
         _index_ns = [
             (index_ns + i * step_ns) % self.samplesLen_ns
             for i in range(self.measureLen_ws)
@@ -1010,8 +1009,8 @@ class Vad(torch.nn.Module):
         _cepstrum_Buf: Tensor = torch.zeros(self.dftLen_ws >> 1)
         spectrum_range = slice(self.spectrumStart, self.spectrumEnd)
 
-        mult: float = bootCount / (1. + bootCount) \
-            if bootCount >= 0 \
+        mult: float = boot_count / (1. + boot_count) \
+            if boot_count >= 0 \
             else self.measureTcMult
 
         _d = F.complex_norm(_dftBuf[spectrum_range])
@@ -1020,7 +1019,7 @@ class Vad(torch.nn.Module):
 
         _zeros = torch.zeros(self.spectrumEnd - self.spectrumStart)
         _mult = _zeros \
-            if bootCount >= 0 \
+            if boot_count >= 0 \
             else torch.where(
                 _d > c.noiseSpectrum[spectrum_range],
                 torch.tensor(self.noiseTcUpMult),  # if
