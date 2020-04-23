@@ -990,58 +990,65 @@ class Vad(torch.nn.Module):
 
     # TODO: rename bootCount to boot_count?
     def _measure(self, c: Channel, index_ns: int, step_ns: int, bootCount: int):
-        mult: float = 0.0
-        result: float = 0.0
-        i: int = 0
+        _index_ns = [
+            (index_ns + i * step_ns) % self.samplesLen_ns
+            for i in range(self.measureLen_ws)
+        ]
+        c.dftBuf[:self.measureLen_ws].copy_(
+            self.samples[_index_ns] * self.spectrumWindow[:self.measureLen_ws]
+        )
 
-        for i in range(self.measureLen_ws):
-            c.dftBuf[i] = self.samples[index_ns] * self.spectrumWindow[i];
-            index_ns = (index_ns + step_ns) % self.samplesLen_ns
         # memset(c->dftBuf + i, 0, (p->dftLen_ws - i) * sizeof(*c->dftBuf));
-        # TODO: optimize
-        for i in range(self.measureLen_ws, c.dftLen_ws):
-            c.dftBuf[i] = 0
+        c.dftBuf[self.measureLen_ws:c.dftLen_ws].zero_()
 
         # lsx_safe_rdft((int)p->dftLen_ws, 1, c->dftBuf);
         _dftBuf = torch.rfft(c.dftBuf, 1)
 
         # memset(c->dftBuf, 0, p->spectrumStart * sizeof(*c->dftBuf));
-        # TODO: optimize
-        for i in range(self.spectrumStart):
-            _dftBuf[i] = 0
+        _dftBuf[:self.spectrumStart].zero_()
 
         _cepstrum_Buf: Tensor = torch.zeros(self.dftLen_ws >> 1)
-        # for (i = p->spectrumStart; i < p->spectrumEnd; ++i) {
-        for i in range(self.spectrumStart, self.spectrumEnd):
-            # double d = sqrt(sqr(c->dftBuf[2 * i]) + sqr(c->dftBuf[2 * i + 1]));
-            # TODO: optimize, refactor to use complex norm?
-            d: float = math.sqrt((_dftBuf[i, 0] ** 2) + (_dftBuf[i, 1] ** 2))
-            # mult = bootCount >= 0? bootCount / (1. + bootCount) : p->measureTcMult;
-            mult: float = bootCount / (1. + bootCount) if bootCount >= 0 else self.measureTcMult
-            c.spectrum[i] = c.spectrum[i] * mult + d * (1 - mult)
-            d = c.spectrum[i] ** 2
-            # mult = bootCount >= 0? 0 :
-            #     d > c->noiseSpectrum[i]? p->noiseTcUpMult : p->noiseTcDownMult;
-            mult = 0.0 if bootCount >= 0 else (
-                self.noiseTcUpMult if d > c.noiseSpectrum[i] else self.noiseTcDownMult
-            )
-            c.noiseSpectrum[i] = c.noiseSpectrum[i] * mult + d * (1 - mult)
-            d = math.sqrt(max(0.0, d - self.noiseReductionAmount * c.noiseSpectrum[i]))
-            _cepstrum_Buf[i] = d * self.cepstrumWindow[i - self.spectrumStart]
+        spectrum_range = slice(self.spectrumStart, self.spectrumEnd)
 
-        # memset(c->dftBuf + i, 0, ((p->dftLen_ws >> 1) - i) * sizeof(*c->dftBuf));
-        # TODO: optimize
-        for i in range(self.spectrumEnd, self.dftLen_ws >> 1):
-            _cepstrum_Buf[i] = 0
+        mult: float = bootCount / (1. + bootCount) \
+            if bootCount >= 0 \
+            else self.measureTcMult
+
+        _d = F.complex_norm(_dftBuf[spectrum_range])
+        c.spectrum[spectrum_range].mul_(mult).add_(_d * (1 - mult))
+        _d = c.spectrum[spectrum_range] ** 2
+
+        _zeros = torch.zeros(self.spectrumEnd - self.spectrumStart)
+        _mult = _zeros \
+            if bootCount >= 0 \
+            else torch.where(
+                _d > c.noiseSpectrum[spectrum_range],
+                torch.tensor(self.noiseTcUpMult),  # if
+                torch.tensor(self.noiseTcDownMult) # else
+            )
+
+        c.noiseSpectrum[spectrum_range].mul_(_mult).add_(_d * (1 - _mult))
+        _d = torch.sqrt(
+            torch.max(
+                _zeros,
+                _d - self.noiseReductionAmount * c.noiseSpectrum[spectrum_range]
+        ))
+
+        _cepstrum_Buf[spectrum_range].copy_(_d * self.cepstrumWindow)
+        _cepstrum_Buf[self.spectrumEnd:self.dftLen_ws >> 1].zero_()
 
         # lsx_safe_rdft((int)p->dftLen_ws >> 1, 1, c->dftBuf);
         _cepstrum_Buf = torch.rfft(_cepstrum_Buf, 1)
 
-        result: float = 0.0
-        for i in range(self.cepstrumStart, self.cepstrumEnd):
-            # TODO: optimize
-            result += (_cepstrum_Buf[i, 0] ** 2) + (_cepstrum_Buf[i, 1] ** 2)
-        result = math.log(result / (self.cepstrumEnd - self.cepstrumStart)) if result > 0 else -math.inf
+        result: float = torch.sum(
+            F.complex_norm(
+                _cepstrum_Buf[self.cepstrumStart:self.cepstrumEnd],
+                power=2.0))
+        result = \
+            math.log(result / (self.cepstrumEnd - self.cepstrumStart)) \
+            if result > 0 \
+            else -math.inf
+
         return max(0, 21 + result);
 
     def _flowTrigger(self, waveform: torch.Tensor):
@@ -1101,7 +1108,6 @@ class Vad(torch.nn.Module):
                 self.samplesIndex_ns = (self.samplesIndex_ns + self.flushedLen_ns) % self.samplesLen_ns
                 ilen1 = ilen - idone
 
-        # TODO: create a new tensor?
         return waveform[:,self.samplesIndex_ns+self.samplesLen_ns:]
 
     def __init__(self, sample_rate: int, n_channels: int = 1) -> None:
@@ -1130,7 +1136,6 @@ class Vad(torch.nn.Module):
             for _ in range(n_channels)
         ]
 
-        #   for (i = 0; i < self.measureLen_ws; ++i)
         self.spectrumWindow = torch.zeros(self.measureLen_ws)
         for i in range(self.measureLen_ws):
             # sox.h:741 define SOX_SAMPLE_MIN (sox_sample_t)SOX_INT_MIN(32)
