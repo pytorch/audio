@@ -258,8 +258,8 @@ class Test_SoxEffectsChain(unittest.TestCase):
         E.append_effect_to_chain("vad")
         x, _ = E.sox_build_flow_effects()
 
-        vad = torchaudio.transforms.Vad()
-        y = vad(x_orig, sample_rate)
+        vad = torchaudio.transforms.Vad(sample_rate = sample_rate)
+        y = vad(x_orig)
 
         self.assertTrue(x.allclose(y, rtol=1e-4, atol=1e-4))
 
