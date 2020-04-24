@@ -28,6 +28,7 @@ if [ ! -d "${env_dir}" ]; then
     printf "* Creating a test environment\n"
     conda create --prefix "${env_dir}" -y python="$PYTHON_VERSION"
 fi
+printf "* Installing dependencies (except PyTorch)\n"
 conda activate "${env_dir}"
 conda env update --file "${this_dir}/environment.yml" --prune
 

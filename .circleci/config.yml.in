@@ -243,14 +243,14 @@ jobs:
       - restore_cache:
           {% raw %}
           keys:
-            - env-v1-{{ arch }}-<< parameters.python_version >>-{{ checksum "./packaging/build_from_source.sh" }}-{{ checksum ".circleci/unittest/environment.yml" }}
+            - env-v1-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum "./packaging/build_from_source.sh" }}-{{ checksum ".circleci/unittest/environment.yml" }}
           {% endraw %}
       - run:
           name: Setup
           command: .circleci/unittest/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v1-{{ arch }}-<< parameters.python_version >>-{{ checksum "./packaging/build_from_source.sh" }}-{{ checksum ".circleci/unittest/environment.yml" }}
+          key: env-v1-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum "./packaging/build_from_source.sh" }}-{{ checksum ".circleci/unittest/environment.yml" }}
 	  {% endraw %}
           paths:
             - conda

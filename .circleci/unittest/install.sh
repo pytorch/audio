@@ -8,7 +8,7 @@ set -e
 eval "$(./conda/bin/conda shell.bash hook)"
 conda activate ./env
 
-printf "* Installing PyTorch Nightly"
+printf "* Installing PyTorch nightly build"
 conda install -c pytorch-nightly pytorch cpuonly
 
 printf "* Setting up torchaudio\n"
