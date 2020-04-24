@@ -319,7 +319,10 @@ workflows:
           python_version: '3.8'
   nightly:
     jobs:
-      - circleci_consistency
+      - circleci_consistency:
+          filters:
+            branches:
+              only: nightly
       - binary_linux_wheel:
           filters:
             branches:

@@ -276,7 +276,10 @@ workflows:
       {{ unittest_workflows() }}
   nightly:
     jobs:
-      - circleci_consistency
+      - circleci_consistency:
+          filters:
+            branches:
+              only: nightly
       {{ build_workflows(prefix="nightly_", filter_branch="nightly", upload=True) }}
   docker_build:
     triggers:
