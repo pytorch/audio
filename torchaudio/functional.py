@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
-from _torch_overdrive import  _overdrive_float
+from _torch_overdrive import _overdrive_helper
 
 __all__ = [
     "istft",
@@ -1288,7 +1288,7 @@ def overdrive(
     output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
 
     # TODO: Implement a torch CPP extension
-    _overdrive_float(waveform,temp,last_in,last_out,output_waveform)
+    _overdrive_helper(waveform, temp, last_in, last_out, output_waveform)
 
     return output_waveform.clamp(min=-1, max=1).view(actual_shape)
 
