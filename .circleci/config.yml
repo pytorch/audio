@@ -24,15 +24,10 @@ binary_common: &binary_common
     python_version:
       description: "Python version to build against (e.g., 3.8)"
       type: string
-    unicode_abi:
-      description: "Python 2.7 wheel only: whether or not we are cp27mu (default: no)"
-      type: string
-      default: ""
   environment:
     PYTHON_VERSION: << parameters.python_version >>
     BUILD_VERSION: << parameters.build_version >>
     PYTORCH_VERSION: << parameters.pytorch_version >>
-    UNICODE_ABI: << parameters.unicode_abi >>
     CU_VERSION: cpu
 
 smoke_test_common: &smoke_test_common
@@ -243,9 +238,6 @@ workflows:
     jobs:
       - circleci_consistency
       - binary_linux_wheel:
-          name: binary_linux_wheel_py3.5
-          python_version: '3.5'
-      - binary_linux_wheel:
           name: binary_linux_wheel_py3.6
           python_version: '3.6'
       - binary_linux_wheel:
@@ -254,9 +246,6 @@ workflows:
       - binary_linux_wheel:
           name: binary_linux_wheel_py3.8
           python_version: '3.8'
-      - binary_macos_wheel:
-          name: binary_macos_wheel_py3.5
-          python_version: '3.5'
       - binary_macos_wheel:
           name: binary_macos_wheel_py3.6
           python_version: '3.6'
@@ -267,9 +256,6 @@ workflows:
           name: binary_macos_wheel_py3.8
           python_version: '3.8'
       - binary_linux_conda:
-          name: binary_linux_conda_py3.5
-          python_version: '3.5'
-      - binary_linux_conda:
           name: binary_linux_conda_py3.6
           python_version: '3.6'
       - binary_linux_conda:
@@ -278,9 +264,6 @@ workflows:
       - binary_linux_conda:
           name: binary_linux_conda_py3.8
           python_version: '3.8'
-      - binary_macos_conda:
-          name: binary_macos_conda_py3.5
-          python_version: '3.5'
       - binary_macos_conda:
           name: binary_macos_conda_py3.6
           python_version: '3.6'
@@ -297,28 +280,6 @@ workflows:
   nightly:
     jobs:
       - circleci_consistency
-      - binary_linux_wheel:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py3.5
-          python_version: '3.5'
-      - binary_wheel_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py3.5_upload
-          requires:
-          - nightly_binary_linux_wheel_py3.5
-      - smoke_test_linux_pip:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py3.5_smoke_test_pip
-          python_version: '3.5'
-          requires:
-          - nightly_binary_linux_wheel_py3.5_upload
       - binary_linux_wheel:
           filters:
             branches:
@@ -389,20 +350,6 @@ workflows:
           filters:
             branches:
               only: nightly
-          name: nightly_binary_macos_wheel_py3.5
-          python_version: '3.5'
-      - binary_wheel_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_macos_wheel_py3.5_upload
-          requires:
-          - nightly_binary_macos_wheel_py3.5
-      - binary_macos_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_wheel_py3.6
           python_version: '3.6'
       - binary_wheel_upload:
@@ -441,28 +388,6 @@ workflows:
           name: nightly_binary_macos_wheel_py3.8_upload
           requires:
           - nightly_binary_macos_wheel_py3.8
-      - binary_linux_conda:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_conda_py3.5
-          python_version: '3.5'
-      - binary_conda_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_conda_py3.5_upload
-          requires:
-          - nightly_binary_linux_conda_py3.5
-      - smoke_test_linux_conda:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_conda_py3.5_smoke_test_conda
-          python_version: '3.5'
-          requires:
-          - nightly_binary_linux_conda_py3.5_upload
       - binary_linux_conda:
           filters:
             branches:
@@ -529,20 +454,6 @@ workflows:
           python_version: '3.8'
           requires:
           - nightly_binary_linux_conda_py3.8_upload
-      - binary_macos_conda:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_macos_conda_py3.5
-          python_version: '3.5'
-      - binary_conda_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_macos_conda_py3.5_upload
-          requires:
-          - nightly_binary_macos_conda_py3.5
       - binary_macos_conda:
           filters:
             branches:
