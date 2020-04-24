@@ -1,0 +1,12 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - flake8
+  - numpy
+  - pytest
+  - librosa
+  - pip
+  - pip:
+    - kaldi-io
+    - scipy
