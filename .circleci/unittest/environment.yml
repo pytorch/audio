@@ -5,6 +5,8 @@ dependencies:
   - flake8
   - numpy
   - pytest
+  - pytest-cov
+  - codecov
   - librosa
   - pip
   - pip:

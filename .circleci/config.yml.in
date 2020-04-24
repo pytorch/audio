@@ -262,6 +262,9 @@ jobs:
       - run:
           name: Run test
           command: .circleci/unittest/run_test.sh
+      - run:
+          name: Post process
+          command: .circleci/unittest/post_process.sh
       - store_test_results:
           path: test-results
 
