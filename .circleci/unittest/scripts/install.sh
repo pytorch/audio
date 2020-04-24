@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 unset PYTORCH_VERSION
-# For unittest, nightly PyTorch is used, and we do not want to fixiate on the version
+# For unittest, nightly PyTorch is used as the following section,
+# so no need to set PYTORCH_VERSION.
+# In fact, keeping PYTORCH_VERSION forces us to hardcode PyTorch version in config.
 
 set -e
 
@@ -11,5 +13,5 @@ conda activate ./env
 printf "* Installing PyTorch nightly build"
 conda install -c pytorch-nightly pytorch cpuonly
 
-printf "* Setting up torchaudio\n"
+printf "* Installing torchaudio\n"
 IS_CONDA=true python setup.py develop

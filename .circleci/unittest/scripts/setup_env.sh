@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-# This script is for setting up environment for running unit test on CircleCI.
-# To speed up the CI time, the result of environment is cached.
-# PyTorch is not included here, so that it won't be cached.
+# This script is for setting up environment in which unit test is ran.
+# To speed up the CI time, the resulting environment is cached.
+#
+# Do not install PyTorch and torchaudio here, otherwise they also get cached.
 
 set -e
 
@@ -32,8 +33,6 @@ printf "* Installing dependencies (except PyTorch)\n"
 conda activate "${env_dir}"
 conda env update --file "${this_dir}/environment.yml" --prune
 
-# 3. Build codecs at ./third_party
-if [ ! -d "./third_party" ]; then
-    printf "* Building Codecs"
-    ./packaging/build_from_source.sh "$PWD"
-fi
+# 3. Link codecs present at /third_party
+# See Dockerfile for how this is built
+ln -fs /third_party ./third_party
