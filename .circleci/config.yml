@@ -262,6 +262,8 @@ jobs:
       - run:
           name: Run test
           command: .circleci/unittest/run_test.sh
+      - store_test_results:
+          path: test-results
 
 workflows:
   build:

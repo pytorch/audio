@@ -6,4 +6,4 @@ eval "$(./conda/bin/conda shell.bash hook)"
 conda activate ./env
 
 python -m torch.utils.collect_env
-pytest -v test
+pytest  --junitxml=test-results/junit.xml -v test
