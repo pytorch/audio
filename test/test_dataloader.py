@@ -30,10 +30,6 @@ class TORCHAUDIODS(Dataset):
 
 @unittest.skipIf("sox" not in BACKENDS, "sox not available")
 class Test_DataLoader(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        common_utils.initialize_sox()
-
     def test_1(self):
         expected_size = (2, 1, 16000)
         ds = TORCHAUDIODS()
