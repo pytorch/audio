@@ -1839,19 +1839,10 @@ def sliding_window_cmn(
     return cmn_waveform
 
 
-class Channel:
-    def __init__(self, dftLen_ws, measuresLen):
-        self.dftLen_ws = dftLen_ws
-        self.measuresLen = measuresLen
-        self.dftBuf = torch.zeros(dftLen_ws)
-        self.spectrum = torch.zeros(dftLen_ws)
-        self.noiseSpectrum = torch.zeros(dftLen_ws)
-        self.measures = torch.zeros(measuresLen)
-        self.meanMeas = 0.0
-
-
 def _measure(
-    c: Channel,
+    spectrum,
+    noiseSpectrum,
+    dftLen_ws,
     samplesLen_ns,
     measureLen_ws,
     samples,
@@ -1869,20 +1860,20 @@ def _measure(
     step_ns: int,
     boot_count: int):
 
-    dftLen_ws, = c.dftBuf.size()
+    dftBuf = torch.zeros(dftLen_ws)
 
     _index_ns = [
         (index_ns + i * step_ns) % samplesLen_ns
         for i in range(measureLen_ws)
     ]
-    c.dftBuf[:measureLen_ws] = \
+    dftBuf[:measureLen_ws] = \
         samples[_index_ns] * spectrumWindow[:measureLen_ws]
 
     # memset(c->dftBuf + i, 0, (p->dftLen_ws - i) * sizeof(*c->dftBuf));
-    c.dftBuf[measureLen_ws:c.dftLen_ws].zero_()
+    dftBuf[measureLen_ws:dftLen_ws].zero_()
 
     # lsx_safe_rdft((int)p->dftLen_ws, 1, c->dftBuf);
-    _dftBuf = torch.rfft(c.dftBuf, 1)
+    _dftBuf = torch.rfft(dftBuf, 1)
 
     # memset(c->dftBuf, 0, p->spectrumStart * sizeof(*c->dftBuf));
     _dftBuf[:spectrumStart].zero_()
@@ -1894,23 +1885,23 @@ def _measure(
         else measureTcMult
 
     _d = complex_norm(_dftBuf[spectrum_range])
-    c.spectrum[spectrum_range].mul_(mult).add_(_d * (1 - mult))
-    _d = c.spectrum[spectrum_range] ** 2
+    spectrum[spectrum_range].mul_(mult).add_(_d * (1 - mult))
+    _d = spectrum[spectrum_range] ** 2
 
     _zeros = torch.zeros(spectrumEnd - spectrumStart)
     _mult = _zeros \
         if boot_count >= 0 \
         else torch.where(
-            _d > c.noiseSpectrum[spectrum_range],
+            _d > noiseSpectrum[spectrum_range],
             torch.tensor(noiseTcUpMult),   # if
             torch.tensor(noiseTcDownMult)  # else
         )
 
-    c.noiseSpectrum[spectrum_range].mul_(_mult).add_(_d * (1 - _mult))
+    noiseSpectrum[spectrum_range].mul_(_mult).add_(_d * (1 - _mult))
     _d = torch.sqrt(
         torch.max(
             _zeros,
-            _d - noiseReductionAmount * c.noiseSpectrum[spectrum_range]))
+            _d - noiseReductionAmount * noiseSpectrum[spectrum_range]))
 
     _cepstrum_Buf: Tensor = torch.zeros(dftLen_ws >> 1)
     _cepstrum_Buf[spectrum_range] = _d * cepstrumWindow
@@ -1981,10 +1972,6 @@ def vad(
 
     samplesLen_ns = fixedPreTriggerLen_ns + searchPreTriggerLen_ns + measureLen_ns
     samples = torch.zeros(samplesLen_ns)
-    channels = [
-        Channel(dftLen_ws=dftLen_ws, measuresLen=measuresLen)
-        for _ in range(n_channels)
-    ]
 
     spectrumWindow = torch.zeros(measureLen_ws)
     for i in range(measureLen_ws):
@@ -2019,25 +2006,29 @@ def vad(
     measureTimer_ns = measureLen_ns
     bootCount = measuresIndex = flushedLen_ns = samplesIndex_ns = 0
 
+    meanMeas = torch.zeros(n_channels)
+    spectrum = torch.zeros(n_channels, dftLen_ws)
+    noiseSpectrum = torch.zeros(n_channels, dftLen_ws)
+    measures = torch.zeros(n_channels, measuresLen)
+
     hasTriggered: bool = False
     ilen: int = waveform.size()[-1]
     idone: int = 0
-    ibuf: int = 0
     numMeasuresToFlush: int = 0
 
     while (idone < ilen and not hasTriggered):
         measureTimer_ns -= n_channels
         for i in range(n_channels):
-            c = channels[i]
-            samples[samplesIndex_ns] = waveform[0, ibuf]
+            samples[samplesIndex_ns] = waveform[i, idone]
             samplesIndex_ns += 1
-            ibuf += 1
             # if (!p->measureTimer_ns) {
             if (measureTimer_ns == 0):
                 index_ns: int = \
                     (samplesIndex_ns + samplesLen_ns - measureLen_ns) % samplesLen_ns
                 meas: float = _measure(
-                    c,
+                    spectrum[i],
+                    noiseSpectrum[i],
+                    dftLen_ws,
                     samplesIndex_ns,
                     measureLen_ws,
                     samples,
@@ -2052,10 +2043,10 @@ def vad(
                     noiseTcUpMult,
                     noiseTcDownMult,
                     index_ns, n_channels, bootCount)
-                c.measures[measuresIndex] = meas
-                c.meanMeas = c.meanMeas * triggerMeasTcMult + meas * (1. - triggerMeasTcMult)
+                measures[i, measuresIndex] = meas
+                meanMeas[i] = meanMeas[i] * triggerMeasTcMult + meas * (1. - triggerMeasTcMult)
 
-                hasTriggered = hasTriggered or (c.meanMeas >= triggerLevel)
+                hasTriggered = hasTriggered or (meanMeas[i] >= triggerLevel)
                 if hasTriggered:
                     n: int = measuresLen
                     k: int = measuresIndex
@@ -2063,9 +2054,9 @@ def vad(
                     jZero: int = n
 
                     for j in range(n):
-                        if (c.measures[k] >= triggerLevel) and (j <= jTrigger + gapLen):
+                        if (measures[i, k] >= triggerLevel) and (j <= jTrigger + gapLen):
                             jZero = jTrigger = j
-                        elif (c.measures[k] == 0) and (jTrigger >= jZero):
+                        elif (measures[i, k] == 0) and (jTrigger >= jZero):
                             jZero = j
                         k = (k + n - 1) % n
                     j = min(j, jZero)
