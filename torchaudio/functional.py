@@ -37,6 +37,7 @@ __all__ = [
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
+    'vad',
 ]
 
 
@@ -1836,3 +1837,256 @@ def sliding_window_cmn(
     if len(input_shape) == 2:
         cmn_waveform = cmn_waveform.squeeze(0)
     return cmn_waveform
+
+
+class Channel:
+    def __init__(self, dftLen_ws, measuresLen):
+        self.dftLen_ws = dftLen_ws
+        self.measuresLen = measuresLen
+        self.dftBuf = torch.zeros(dftLen_ws)
+        self.spectrum = torch.zeros(dftLen_ws)
+        self.noiseSpectrum = torch.zeros(dftLen_ws)
+        self.measures = torch.zeros(measuresLen)
+        self.meanMeas = 0.0
+
+
+def _measure(
+    c: Channel,
+    samplesLen_ns,
+    measureLen_ws,
+    samples,
+    spectrumWindow,
+    spectrumStart,
+    spectrumEnd,
+    noiseReductionAmount,
+    cepstrumWindow,
+    cepstrumStart,
+    cepstrumEnd,
+    measureTcMult,
+    noiseTcUpMult,
+    noiseTcDownMult,
+    index_ns: int,
+    step_ns: int,
+    boot_count: int):
+
+    dftLen_ws, = c.dftBuf.size()
+
+    _index_ns = [
+        (index_ns + i * step_ns) % samplesLen_ns
+        for i in range(measureLen_ws)
+    ]
+    c.dftBuf[:measureLen_ws] = \
+        samples[_index_ns] * spectrumWindow[:measureLen_ws]
+
+    # memset(c->dftBuf + i, 0, (p->dftLen_ws - i) * sizeof(*c->dftBuf));
+    c.dftBuf[measureLen_ws:c.dftLen_ws].zero_()
+
+    # lsx_safe_rdft((int)p->dftLen_ws, 1, c->dftBuf);
+    _dftBuf = torch.rfft(c.dftBuf, 1)
+
+    # memset(c->dftBuf, 0, p->spectrumStart * sizeof(*c->dftBuf));
+    _dftBuf[:spectrumStart].zero_()
+
+    spectrum_range = slice(spectrumStart, spectrumEnd)
+
+    mult: float = boot_count / (1. + boot_count) \
+        if boot_count >= 0 \
+        else measureTcMult
+
+    _d = complex_norm(_dftBuf[spectrum_range])
+    c.spectrum[spectrum_range].mul_(mult).add_(_d * (1 - mult))
+    _d = c.spectrum[spectrum_range] ** 2
+
+    _zeros = torch.zeros(spectrumEnd - spectrumStart)
+    _mult = _zeros \
+        if boot_count >= 0 \
+        else torch.where(
+            _d > c.noiseSpectrum[spectrum_range],
+            torch.tensor(noiseTcUpMult),   # if
+            torch.tensor(noiseTcDownMult)  # else
+        )
+
+    c.noiseSpectrum[spectrum_range].mul_(_mult).add_(_d * (1 - _mult))
+    _d = torch.sqrt(
+        torch.max(
+            _zeros,
+            _d - noiseReductionAmount * c.noiseSpectrum[spectrum_range]))
+
+    _cepstrum_Buf: Tensor = torch.zeros(dftLen_ws >> 1)
+    _cepstrum_Buf[spectrum_range] = _d * cepstrumWindow
+    _cepstrum_Buf[spectrumEnd:dftLen_ws >> 1].zero_()
+
+    # lsx_safe_rdft((int)p->dftLen_ws >> 1, 1, c->dftBuf);
+    _cepstrum_Buf = torch.rfft(_cepstrum_Buf, 1)
+
+    result: float = torch.sum(
+        complex_norm(
+            _cepstrum_Buf[cepstrumStart:cepstrumEnd],
+            power=2.0))
+    result = \
+        math.log(result / (cepstrumEnd - cepstrumStart)) \
+        if result > 0 \
+        else -math.inf
+
+    return max(0, 21 + result)
+
+
+def vad(
+    waveform: Tensor,
+    sample_rate: int,
+    trigger_level: float = 7.0,
+    trigger_time: float = 0.25,
+    search_time: float = 1.0,
+    allowed_gap: float = 0.25,
+    pre_trigger_time: float = 0.0
+) -> Tensor:
+    n_channels, _ = waveform.size()
+
+    triggerLevel = trigger_level
+    triggerTc = trigger_time
+    searchTime = search_time
+    gapTime = allowed_gap
+    preTriggerTime = pre_trigger_time
+
+    # Fine-tuning parameters
+    bootTime: float = .35
+    noiseTcUp: float = .1
+    noiseTcDown: float = .01
+    noiseReductionAmount: float = 1.35
+
+    measureFreq: float = 20
+    measureDuration: float = 2.0 / measureFreq  # 50% overlap
+    measureTc: float = .4
+
+    hpFilterFreq: float = 50
+    lpFilterFreq: float = 6000
+    hpLifterFreq: float = 150
+    lpLifterFreq: float = 2000
+
+    fixedPreTriggerLen_ns = int(preTriggerTime * sample_rate + .5)
+    fixedPreTriggerLen_ns *= n_channels
+
+    measureLen_ws = int(sample_rate * measureDuration + .5)
+    measureLen_ns = measureLen_ws * n_channels
+    # for (dftLen_ws = 16; dftLen_ws < measureLen_ws; dftLen_ws <<= 1);
+    dftLen_ws = 16
+    while (dftLen_ws < measureLen_ws):
+        dftLen_ws <<= 1
+
+    measurePeriod_ns = int(sample_rate / measureFreq + .5)
+    measurePeriod_ns *= n_channels
+    measuresLen = math.ceil(searchTime * measureFreq)
+    searchPreTriggerLen_ns = measuresLen * measurePeriod_ns
+    gapLen = int(gapTime * measureFreq + .5)
+
+    samplesLen_ns = fixedPreTriggerLen_ns + searchPreTriggerLen_ns + measureLen_ns
+    samples = torch.zeros(samplesLen_ns)
+    channels = [
+        Channel(dftLen_ws=dftLen_ws, measuresLen=measuresLen)
+        for _ in range(n_channels)
+    ]
+
+    spectrumWindow = torch.zeros(measureLen_ws)
+    for i in range(measureLen_ws):
+        # sox.h:741 define SOX_SAMPLE_MIN (sox_sample_t)SOX_INT_MIN(32)
+        spectrumWindow[i] = -2. / -2147483648 / math.sqrt(float(measureLen_ws))
+    # lsx_apply_hann(spectrumWindow, (int)measureLen_ws);
+    spectrumWindow *= torch.hann_window(measureLen_ws)
+
+    spectrumStart = int(hpFilterFreq / sample_rate * dftLen_ws + .5)
+    spectrumStart = max(spectrumStart, 1)
+    spectrumEnd = int(lpFilterFreq / sample_rate * dftLen_ws + .5)
+    spectrumEnd = min(spectrumEnd, dftLen_ws / 2)
+
+    cepstrumWindow = torch.zeros(spectrumEnd - spectrumStart)
+    for i in range(spectrumEnd - spectrumStart):
+        cepstrumWindow[i] = 2. / math.sqrt(float(spectrumEnd) - spectrumStart)
+    # lsx_apply_hann(cepstrumWindow,(int)(spectrumEnd - spectrumStart));
+    cepstrumWindow *= torch.hann_window(spectrumEnd - spectrumStart)
+
+    cepstrumStart = math.ceil(sample_rate * .5 / lpLifterFreq)
+    cepstrumEnd = math.floor(sample_rate * .5 / hpLifterFreq)
+    cepstrumEnd = min(cepstrumEnd, dftLen_ws / 4)
+
+    assert cepstrumEnd > cepstrumStart
+
+    noiseTcUpMult = math.exp(-1. / (noiseTcUp * measureFreq))
+    noiseTcDownMult = math.exp(-1. / (noiseTcDown * measureFreq))
+    measureTcMult = math.exp(-1. / (measureTc * measureFreq))
+    triggerMeasTcMult = math.exp(-1. / (triggerTc * measureFreq))
+
+    bootCountMax = int(bootTime * measureFreq - .5)
+    measureTimer_ns = measureLen_ns
+    bootCount = measuresIndex = flushedLen_ns = samplesIndex_ns = 0
+
+    hasTriggered: bool = False
+    ilen: int = waveform.size()[-1]
+    idone: int = 0
+    ibuf: int = 0
+    numMeasuresToFlush: int = 0
+
+    while (idone < ilen and not hasTriggered):
+        measureTimer_ns -= n_channels
+        for i in range(n_channels):
+            c = channels[i]
+            samples[samplesIndex_ns] = waveform[0, ibuf]
+            samplesIndex_ns += 1
+            ibuf += 1
+            # if (!p->measureTimer_ns) {
+            if (measureTimer_ns == 0):
+                index_ns: int = \
+                    (samplesIndex_ns + samplesLen_ns - measureLen_ns) % samplesLen_ns
+                meas: float = _measure(
+                    c,
+                    samplesIndex_ns,
+                    measureLen_ws,
+                    samples,
+                    spectrumWindow,
+                    spectrumStart,
+                    spectrumEnd,
+                    noiseReductionAmount,
+                    cepstrumWindow,
+                    cepstrumStart,
+                    cepstrumEnd,
+                    measureTcMult,
+                    noiseTcUpMult,
+                    noiseTcDownMult,
+                    index_ns, n_channels, bootCount)
+                c.measures[measuresIndex] = meas
+                c.meanMeas = c.meanMeas * triggerMeasTcMult + meas * (1. - triggerMeasTcMult)
+
+                hasTriggered = hasTriggered or (c.meanMeas >= triggerLevel)
+                if hasTriggered:
+                    n: int = measuresLen
+                    k: int = measuresIndex
+                    jTrigger: int = n
+                    jZero: int = n
+
+                    for j in range(n):
+                        if (c.measures[k] >= triggerLevel) and (j <= jTrigger + gapLen):
+                            jZero = jTrigger = j
+                        elif (c.measures[k] == 0) and (jTrigger >= jZero):
+                            jZero = j
+                        k = (k + n - 1) % n
+                    j = min(j, jZero)
+                    # numMeasuresToFlush = range_limit(j, numMeasuresToFlush, n);
+                    numMeasuresToFlush = (min(max(numMeasuresToFlush, j), n))
+                # end if hasTriggered
+            # end if (measureTimer_ns == 0):
+            idone += 1
+        # end for
+
+        if samplesIndex_ns == samplesLen_ns:
+            samplesIndex_ns = 0
+        if measureTimer_ns == 0:
+            measureTimer_ns = measurePeriod_ns
+            measuresIndex += 1
+            measuresIndex %= measuresLen
+            if bootCount >= 0:
+                bootCount = -1 if bootCount == bootCountMax else bootCount + 1
+
+        if hasTriggered:
+            flushedLen_ns = (measuresLen - numMeasuresToFlush) * measurePeriod_ns
+            samplesIndex_ns = (samplesIndex_ns + flushedLen_ns) % samplesLen_ns
+
+    return waveform[:, samplesIndex_ns + samplesLen_ns:]
