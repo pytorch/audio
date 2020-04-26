@@ -34,6 +34,7 @@ __all__ = [
     "contrast",
     "dcshift",
     "overdrive",
+    "phaser",
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
@@ -1293,6 +1294,135 @@ def overdrive(
         output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
 
     return output_waveform.clamp(min=-1, max=1).view(actual_shape)
+
+
+def phaser(
+        waveform: Tensor,
+        sample_rate: int,
+        gain_in: float = 0.4,
+        gain_out: float = 0.74,
+        delay_ms: float = 3.0,
+        decay: float = 0.4,
+        mod_speed: float = 0.5,
+        sinusoidal: bool = True
+) -> Tensor:
+    r"""Apply a phasing effect to the audio. Similar to SoX implementation.
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
+        gain_in (float): desired input gain at the boost (or attenuation) in dB
+            Allowed range of values are 0 to 1
+        gain_out (float): desired output gain at the boost (or attenuation) in dB
+            Allowed range of values are 0 to 1e9
+        delay_ms (float): desired delay in milli seconds
+            Allowed range of values are 0 to 5.0
+        decay (float):  desired decay relative to gain-in
+            Allowed range of values are 0 to 0.99
+        mod_speed (float):  modulation speed in Hz
+            Allowed range of values are 0.1 to 2
+        sinusoidal (bool):  If ``True``, uses sinusoidal modulation (preferable for multiple instruments)
+            If ``False``, uses triangular modulation (gives single instruments a sharper phasing effect)
+            (Default: ``True``)
+
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+        Scott Lehman, Effects Explained, http://harmony-central.com/Effects/effects-explained.html
+    """
+    actual_shape = waveform.shape
+    device, dtype = waveform.device, waveform.dtype
+
+    # convert to 2D (channels,time)
+    waveform = waveform.view(-1, actual_shape[-1])
+
+    delay_buf_len = int((delay_ms * .001 * sample_rate) + .5)
+    delay_buf = torch.zeros(waveform.shape[0], delay_buf_len)
+
+    mod_buf_len = int(sample_rate / mod_speed + .5)
+    mod_buf = torch.zeros(mod_buf_len)
+
+    if sinusoidal:
+        wave_type = 'SINE'
+    else:
+        wave_type = 'TRIANGLE'
+
+    mod_buf = _generate_wave_table(wave_type=wave_type,
+                                   data_type='INT',
+                                   table_size=mod_buf_len,
+                                   min=1.,
+                                   max=float(delay_buf_len),
+                                   phase=math.pi / 2)
+
+    delay_pos = 0
+    mod_pos = 0
+
+    output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
+
+    for i in range(waveform.shape[-1]):
+        idx = int((delay_pos + mod_buf[mod_pos]) % delay_buf_len)
+        temp = (waveform[:, i] * gain_in) + (delay_buf[:, idx] * decay)
+        mod_pos = (mod_pos + 1) % mod_buf_len
+        delay_pos = (delay_pos + 1) % delay_buf_len
+        delay_buf[:, delay_pos] = temp
+        output_waveform[:, i] = temp * gain_out
+
+    return output_waveform.clamp(min=-1, max=1).view(actual_shape)
+
+
+def _generate_wave_table(
+        wave_type: str,
+        data_type: str,
+        table_size: int,
+        min: float,
+        max: float,
+        phase: float
+) -> Tensor:
+    r"""A helper fucntion for phaser. Generates a table with given parameters
+
+    Args:
+        wave_type (str): SINE or TRIANGULAR
+        data_type (str): desired data_type ( `INT` or `FLOAT` )
+        table_size (int): desired table size
+        min (float): desired min value
+        max (float): desired max value
+        phase (float): desired phase
+
+    Returns:
+        Tensor: A 1D tensor with wave table values
+    """
+
+    phase_offset = int(phase / math.pi / 2 * table_size + 0.5)
+
+    t = torch.arange(table_size).to(torch.int32)
+
+    point = (t + phase_offset) % table_size
+
+    d = torch.zeros_like(point).to(torch.float64)
+
+    if wave_type == 'SINE':
+        d = (torch.sin(point.to(torch.float64) / table_size * 2 * math.pi) + 1) / 2
+    elif wave_type == 'TRIANGLE':
+        d = point.to(torch.float64) * 2 / table_size
+        value = 4 * point / table_size
+        d[value == 0] = d[value == 0] + 0.5
+        d[value == 1] = 1.5 - d[value == 1]
+        d[value == 2] = 1.5 - d[value == 2]
+        d[value == 3] = d[value == 3] - 1.5
+
+    d = d * (max - min) + min
+
+    if data_type == 'INT':
+        mask = d < 0
+        d[mask] = d[mask] - 0.5
+        d[~mask] = d[~mask] + 0.5
+        d = d.to(torch.int32)
+    elif data_type == 'FLOAT':
+        d = d.to(torch.float32)
+
+    return d
 
 
 def mask_along_axis_iid(
