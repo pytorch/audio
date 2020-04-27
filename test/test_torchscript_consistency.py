@@ -563,7 +563,6 @@ class _TransformsTestMixin:
         self._assert_consistency(T.Vad(32000), waveform)
 
 
-
 class TestFunctionalCPU(_FunctionalTestMixin, unittest.TestCase):
     """Test suite for Functional module on CPU"""
     device = torch.device('cpu')

@@ -975,13 +975,12 @@ class Vad(torch.nn.Module):
                  noise_down_time: float = .01,
                  noise_reduction_amount: float = 1.35,
                  measure_freq: float = 20.0,
-                 measure_duration: Optional[float] = None,  # by default, twice the measurement period; i.e. with overlap.
+                 measure_duration: Optional[float] = None,
                  measure_smooth_time: float = .4,
                  hp_filter_freq: float = 50.,
                  lp_filter_freq: float = 6000.,
                  hp_lifter_freq: float = 150.,
-                 lp_lifter_freq: float = 2000.,
-                ) -> None:
+                 lp_lifter_freq: float = 2000.) -> None:
         super().__init__()
 
         self.sample_rate = sample_rate
@@ -1015,15 +1014,15 @@ class Vad(torch.nn.Module):
             search_time=self.search_time,
             allowed_gap=self.allowed_gap,
             pre_trigger_time=self.pre_trigger_time,
-            boot_time = self.boot_time,
-            noise_up_time = self.noise_up_time,
-            noise_down_time = self.noise_up_time,
-            noise_reduction_amount = self.noise_reduction_amount,
-            measure_freq = self.measure_freq,
-            measure_duration = self.measure_duration,
-            measure_smooth_time = self.measure_smooth_time,
-            hp_filter_freq = self.hp_filter_freq,
-            lp_filter_freq = self.lp_filter_freq,
-            hp_lifter_freq = self.hp_lifter_freq,
-            lp_lifter_freq = self.lp_lifter_freq,
+            boot_time=self.boot_time,
+            noise_up_time=self.noise_up_time,
+            noise_down_time=self.noise_up_time,
+            noise_reduction_amount=self.noise_reduction_amount,
+            measure_freq=self.measure_freq,
+            measure_duration=self.measure_duration,
+            measure_smooth_time=self.measure_smooth_time,
+            hp_filter_freq=self.hp_filter_freq,
+            lp_filter_freq=self.lp_filter_freq,
+            hp_lifter_freq=self.hp_lifter_freq,
+            lp_lifter_freq=self.lp_lifter_freq,
         )
