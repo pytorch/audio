@@ -473,6 +473,16 @@ class _FunctionalTestMixin:
 
         self._assert_consistency(func, waveform)
 
+    def test_vad(self):
+        filepath = common_utils.get_asset_path("vad-hello-mono-32000.wav")
+        waveform, _ = torchaudio.load(filepath, normalization=False)
+
+        def func(tensor):
+            sample_rate = 44100
+            return F.vad(tensor, sample_rate)
+
+        self._assert_consistency(func, waveform)
+
 
 class _TransformsTestMixin:
     """Implements test for Transforms that are performed for different devices"""

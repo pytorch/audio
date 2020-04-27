@@ -1840,20 +1840,20 @@ def sliding_window_cmn(
 
 
 def _measure(
-    measure_len_ws,
-    samples,
-    spectrum,
-    noise_spectrum,
-    spectrum_window,
-    spectrum_start,
-    spectrum_end,
-    cepstrum_window,
-    cepstrum_start,
-    cepstrum_end,
-    noise_reduction_amount,
-    measure_smooth_time_mult,
-    noise_up_time_mult,
-    noise_down_time_mult,
+    measure_len_ws: int,
+    samples: Tensor,
+    spectrum: Tensor,
+    noise_spectrum: Tensor,
+    spectrum_window: Tensor,
+    spectrum_start: int,
+    spectrum_end: int,
+    cepstrum_window: Tensor,
+    cepstrum_start: int,
+    cepstrum_end: int,
+    noise_reduction_amount: float,
+    measure_smooth_time_mult: float,
+    noise_up_time_mult: float,
+    noise_down_time_mult: float,
     index_ns: int,
     boot_count: int
 ) -> float:
@@ -1865,10 +1865,10 @@ def _measure(
 
     dftBuf = torch.zeros(dft_len_ws)
 
-    _index_ns = [index_ns] + [
+    _index_ns = torch.tensor([index_ns] + [
         (index_ns + i) % samplesLen_ns
         for i in range(1, measure_len_ws)
-    ]
+    ])
     dftBuf[:measure_len_ws] = \
         samples[_index_ns] * spectrum_window[:measure_len_ws]
 
@@ -1881,42 +1881,40 @@ def _measure(
     # memset(c->dftBuf, 0, p->spectrum_start * sizeof(*c->dftBuf));
     _dftBuf[:spectrum_start].zero_()
 
-    spectrum_range = slice(spectrum_start, spectrum_end)
-
     mult: float = boot_count / (1. + boot_count) \
         if boot_count >= 0 \
         else measure_smooth_time_mult
 
-    _d = complex_norm(_dftBuf[spectrum_range])
-    spectrum[spectrum_range].mul_(mult).add_(_d * (1 - mult))
-    _d = spectrum[spectrum_range] ** 2
+    _d = complex_norm(_dftBuf[spectrum_start:spectrum_end])
+    spectrum[spectrum_start:spectrum_end].mul_(mult).add_(_d * (1 - mult))
+    _d = spectrum[spectrum_start:spectrum_end] ** 2
 
     _zeros = torch.zeros(spectrum_end - spectrum_start)
     _mult = _zeros \
         if boot_count >= 0 \
         else torch.where(
-            _d > noise_spectrum[spectrum_range],
+            _d > noise_spectrum[spectrum_start:spectrum_end],
             torch.tensor(noise_up_time_mult),   # if
             torch.tensor(noise_down_time_mult)  # else
         )
 
-    noise_spectrum[spectrum_range].mul_(_mult).add_(_d * (1 - _mult))
+    noise_spectrum[spectrum_start:spectrum_end].mul_(_mult).add_(_d * (1 - _mult))
     _d = torch.sqrt(
         torch.max(
             _zeros,
-            _d - noise_reduction_amount * noise_spectrum[spectrum_range]))
+            _d - noise_reduction_amount * noise_spectrum[spectrum_start:spectrum_end]))
 
     _cepstrum_Buf: Tensor = torch.zeros(dft_len_ws >> 1)
-    _cepstrum_Buf[spectrum_range] = _d * cepstrum_window
+    _cepstrum_Buf[spectrum_start:spectrum_end] = _d * cepstrum_window
     _cepstrum_Buf[spectrum_end:dft_len_ws >> 1].zero_()
 
     # lsx_safe_rdft((int)p->dft_len_ws >> 1, 1, c->dftBuf);
     _cepstrum_Buf = torch.rfft(_cepstrum_Buf, 1)
 
-    result: float = torch.sum(
+    result: float = float(torch.sum(
         complex_norm(
             _cepstrum_Buf[cepstrum_start:cepstrum_end],
-            power=2.0))
+            power=2.0)))
     result = \
         math.log(result / (cepstrum_end - cepstrum_start)) \
         if result > 0 \
@@ -1938,7 +1936,7 @@ def vad(
     noise_down_time: float = .01,
     noise_reduction_amount: float = 1.35,
     measure_freq: float = 20,
-    measure_duration: float = None,  # by default, twice the measurement period; i.e. with overlap.
+    measure_duration: Optional[float] = None,  # by default, twice the measurement period; i.e. with overlap.
     measure_smooth_time: float = .4,
     hp_filter_freq: float = 50,
     lp_filter_freq: float = 6000,
@@ -1948,12 +1946,13 @@ def vad(
     measure_duration: float = 2.0 / measure_freq \
         if measure_duration is None \
         else measure_duration
+
     measure_len_ws = int(sample_rate * measure_duration + .5)
     measure_len_ns = measure_len_ws
     # for (dft_len_ws = 16; dft_len_ws < measure_len_ws; dft_len_ws <<= 1);
     dft_len_ws = 16
     while (dft_len_ws < measure_len_ws):
-        dft_len_ws <<= 1
+        dft_len_ws *= 2
 
     measure_period_ns = int(sample_rate / measure_freq + .5)
     measures_len = math.ceil(search_time * measure_freq)
@@ -1968,22 +1967,22 @@ def vad(
         # sox.h:741 define SOX_SAMPLE_MIN (sox_sample_t)SOX_INT_MIN(32)
         spectrum_window[i] = -2. / -2147483648 / math.sqrt(float(measure_len_ws))
     # lsx_apply_hann(spectrum_window, (int)measure_len_ws);
-    spectrum_window *= torch.hann_window(measure_len_ws)
+    spectrum_window *= torch.hann_window(measure_len_ws, dtype=torch.float)
 
-    spectrum_start = int(hp_filter_freq / sample_rate * dft_len_ws + .5)
-    spectrum_start = max(spectrum_start, 1)
-    spectrum_end = int(lp_filter_freq / sample_rate * dft_len_ws + .5)
-    spectrum_end = min(spectrum_end, dft_len_ws / 2)
+    spectrum_start: int = int(hp_filter_freq / sample_rate * dft_len_ws + .5)
+    spectrum_start: int = max(spectrum_start, 1)
+    spectrum_end: int = int(lp_filter_freq / sample_rate * dft_len_ws + .5)
+    spectrum_end: int = min(spectrum_end, dft_len_ws // 2)
 
     cepstrum_window = torch.zeros(spectrum_end - spectrum_start)
     for i in range(spectrum_end - spectrum_start):
         cepstrum_window[i] = 2. / math.sqrt(float(spectrum_end) - spectrum_start)
     # lsx_apply_hann(cepstrum_window,(int)(spectrum_end - spectrum_start));
-    cepstrum_window *= torch.hann_window(spectrum_end - spectrum_start)
+    cepstrum_window *= torch.hann_window(spectrum_end - spectrum_start, dtype=torch.float)
 
     cepstrum_start = math.ceil(sample_rate * .5 / lp_lifter_freq)
     cepstrum_end = math.floor(sample_rate * .5 / hp_lifter_freq)
-    cepstrum_end = min(cepstrum_end, dft_len_ws / 4)
+    cepstrum_end = min(cepstrum_end, dft_len_ws // 4)
 
     assert cepstrum_end > cepstrum_start
 
@@ -2042,6 +2041,7 @@ def vad(
                     k: int = measures_index
                     jTrigger: int = n
                     jZero: int = n
+                    j: int = 0
 
                     for j in range(n):
                         if (measures[i, k] >= trigger_level) and (j <= jTrigger + gap_len):
@@ -2063,7 +2063,7 @@ def vad(
         if measure_timer_ns == 0:
             measure_timer_ns = measure_period_ns
             measures_index += 1
-            measures_index %= measures_len
+            measures_index = measures_index % measures_len
             if boot_count >= 0:
                 boot_count = -1 if boot_count == boot_count_max else boot_count + 1
 
