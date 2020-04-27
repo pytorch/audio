@@ -256,12 +256,12 @@ class Test_SoxEffectsChain(unittest.TestCase):
         ]
 
         for sample_file in sample_files:
-            E = torchaudio.sox_effects.SoxEffectsChain(normalization=False)
+            E = torchaudio.sox_effects.SoxEffectsChain()
             E.set_input_file(sample_file)
             E.append_effect_to_chain("vad")
             x, _ = E.sox_build_flow_effects()
 
-            x_orig, sample_rate = torchaudio.load(sample_file, normalization=False)
+            x_orig, sample_rate = torchaudio.load(sample_file)
             vad = torchaudio.transforms.Vad(sample_rate)
 
             y = vad(x_orig)

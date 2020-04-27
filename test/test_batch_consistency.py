@@ -83,6 +83,11 @@ class TestFunctional(unittest.TestCase):
         _test_batch(F.sliding_window_cmn, waveform, center=False, norm_vars=True)
         _test_batch(F.sliding_window_cmn, waveform, center=False, norm_vars=False)
 
+    def test_vad(self):
+        filepath = common_utils.get_asset_path("vad-hello-mono-32000.wav")
+        waveform, _ = torchaudio.load(filepath)
+        _test_batch(F.vad, waveform, sample_rate=32000)
+
 
 class TestTransforms(unittest.TestCase):
     """Test suite for classes defined in `transforms` module"""

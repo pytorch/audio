@@ -1965,7 +1965,7 @@ def vad(
     spectrum_window = torch.zeros(measure_len_ws)
     for i in range(measure_len_ws):
         # sox.h:741 define SOX_SAMPLE_MIN (sox_sample_t)SOX_INT_MIN(32)
-        spectrum_window[i] = -2. / -2147483648 / math.sqrt(float(measure_len_ws))
+        spectrum_window[i] = 2. / math.sqrt(float(measure_len_ws))
     # lsx_apply_hann(spectrum_window, (int)measure_len_ws);
     spectrum_window *= torch.hann_window(measure_len_ws, dtype=torch.float)
 
@@ -1994,6 +1994,10 @@ def vad(
     boot_count_max = int(boot_time * measure_freq - .5)
     measure_timer_ns = measure_len_ns
     boot_count = measures_index = flushedLen_ns = samplesIndex_ns = 0
+
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.view(-1, shape[-1])
 
     n_channels, ilen = waveform.size()
 
@@ -2071,4 +2075,6 @@ def vad(
             flushedLen_ns = (measures_len - num_measures_to_flush) * measure_period_ns
             samplesIndex_ns = (samplesIndex_ns + flushedLen_ns) % samplesLen_ns
 
-    return waveform[:, pos - samplesLen_ns + flushedLen_ns:]
+    res = waveform[:, pos - samplesLen_ns + flushedLen_ns:]
+    # unpack batch
+    return res.view(shape[:-1] + res.shape[-1:])

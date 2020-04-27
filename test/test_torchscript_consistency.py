@@ -475,10 +475,10 @@ class _FunctionalTestMixin:
 
     def test_vad(self):
         filepath = common_utils.get_asset_path("vad-hello-mono-32000.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=False)
+        waveform, _ = torchaudio.load(filepath)
 
         def func(tensor):
-            sample_rate = 44100
+            sample_rate = 32000
             return F.vad(tensor, sample_rate)
 
         self._assert_consistency(func, waveform)
