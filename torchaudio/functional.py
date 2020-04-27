@@ -1861,13 +1861,17 @@ def _measure(
     boot_count: int):
 
     dftBuf = torch.zeros(dftLen_ws)
+    print(f"measureLen_ws={measureLen_ws}, index_ns={index_ns}, step_ns={step_ns} samplesLen_ns={samplesLen_ns}")
 
-    _index_ns = [
+    _index_ns = [index_ns] + [
         (index_ns + i * step_ns) % samplesLen_ns
-        for i in range(measureLen_ws)
+        for i in range(1, measureLen_ws)
     ]
     dftBuf[:measureLen_ws] = \
         samples[_index_ns] * spectrumWindow[:measureLen_ws]
+
+    print(f'samples: {samples[_index_ns][:10]}')
+    print(f'buf: {dftBuf[:10]}')
 
     # memset(c->dftBuf + i, 0, (p->dftLen_ws - i) * sizeof(*c->dftBuf));
     dftBuf[measureLen_ws:dftLen_ws].zero_()
@@ -1918,7 +1922,7 @@ def _measure(
         math.log(result / (cepstrumEnd - cepstrumStart)) \
         if result > 0 \
         else -math.inf
-
+    print(f"log(result)={result}")
     return max(0, 21 + result)
 
 
@@ -1931,7 +1935,7 @@ def vad(
     allowed_gap: float = 0.25,
     pre_trigger_time: float = 0.0
 ) -> Tensor:
-    n_channels, _ = waveform.size()
+    n_channels, ilen = waveform.size()
 
     triggerLevel = trigger_level
     triggerTc = trigger_time
@@ -2022,6 +2026,7 @@ def vad(
             samples[samplesIndex_ns] = waveform[i, idone]
             samplesIndex_ns += 1
             # if (!p->measureTimer_ns) {
+            print(f"ch={i} s={samples[samplesIndex_ns-1]}")
             if (measureTimer_ns == 0):
                 index_ns: int = \
                     (samplesIndex_ns + samplesLen_ns - measureLen_ns) % samplesLen_ns
@@ -2029,7 +2034,7 @@ def vad(
                     spectrum[i],
                     noiseSpectrum[i],
                     dftLen_ws,
-                    samplesIndex_ns,
+                    samplesLen_ns,
                     measureLen_ws,
                     samples,
                     spectrumWindow,
@@ -2080,4 +2085,4 @@ def vad(
             flushedLen_ns = (measuresLen - numMeasuresToFlush) * measurePeriod_ns
             samplesIndex_ns = (samplesIndex_ns + flushedLen_ns) % samplesLen_ns
 
-    return waveform[:, samplesIndex_ns + samplesLen_ns:]
+    return waveform[:, idone - samplesLen_ns + flushedLen_ns:]

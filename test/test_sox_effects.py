@@ -250,7 +250,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
             self.assertTrue(x.allclose(z, rtol=1e-4, atol=1e-4))
 
     def test_vad(self):
-        sample_file = common_utils.get_asset_path("vad-hello.wav")
+        sample_file = common_utils.get_asset_path("vad-hello-mark.wav")
 
         E = torchaudio.sox_effects.SoxEffectsChain(normalization=False)
         E.set_input_file(sample_file)
