@@ -1,21 +1,30 @@
-import unittest
+import pytest
 
 import torch
 from torchaudio.models import Wav2Letter
 
 
-class ModelTester(unittest.TestCase):
-    def test_wav2letter(self):
-        batch_size = 2
-        n_features = 1
-        input_length = 320
-
+class TestWav2Letter:
+    @pytest.mark.parametrize('batch_size', [2])
+    @pytest.mark.parametrize('num_features', [1])
+    @pytest.mark.parametrize('num_classes', [40])
+    @pytest.mark.parametrize('input_length', [320])
+    def test_waveform(self, batch_size, num_features, num_classes, input_length):
         model = Wav2Letter()
-        x = torch.rand(batch_size, n_features, input_length)
+
+        x = torch.rand(batch_size, num_features, input_length)
         out = model(x)
 
-        assert out.size() == (2, batch_size, 40)
+        assert out.size() == (batch_size, num_classes, 2)
 
+    @pytest.mark.parametrize('batch_size', [2])
+    @pytest.mark.parametrize('num_features', [13])
+    @pytest.mark.parametrize('num_classes', [40])
+    @pytest.mark.parametrize('input_length', [2])
+    def test_mfcc(self, batch_size, num_features, num_classes, input_length):
+        model = Wav2Letter(version="mfcc", num_features=13)
 
-if __name__ == '__main__':
-    unittest.main()
+        x = torch.rand(batch_size, num_features, input_length)
+        out = model(x)
+
+        assert out.size() == (batch_size, num_classes, 2)
