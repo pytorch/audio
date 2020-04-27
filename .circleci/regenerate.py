@@ -19,29 +19,30 @@ import yaml
 import os.path
 
 
-def workflows(prefix='', upload=False, filter_branch=None, indentation=6):
+PYTHON_VERSIONS = ["3.6", "3.7", "3.8"]
+
+
+def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
     w = []
     for btype in ["wheel", "conda"]:
         for os_type in ["linux", "macos"]:
-            for python_version in ["3.5", "3.6", "3.7", "3.8"]:
-                for unicode in ([False, True] if btype == "wheel" and python_version == "2.7" else [False]):
-                    w += workflow_pair(btype, os_type, python_version, unicode, filter_branch, prefix, upload)
+            for python_version in PYTHON_VERSIONS:
+                w += build_workflow_pair(btype, os_type, python_version, filter_branch, prefix, upload)
 
     return indent(indentation, w)
 
 
-def workflow_pair(btype, os_type, python_version, unicode, filter_branch, prefix='', upload=False):
+def build_workflow_pair(btype, os_type, python_version, filter_branch, prefix='', upload=False):
 
     w = []
-    unicode_suffix = "_unicode" if unicode else ""
-    base_workflow_name = "{prefix}binary_{os_type}_{btype}_py{python_version}{unicode_suffix}".format(
+    base_workflow_name = "{prefix}binary_{os_type}_{btype}_py{python_version}".format(
         prefix=prefix,
         os_type=os_type,
         btype=btype,
         python_version=python_version,
-        unicode_suffix=unicode_suffix)
+    )
 
-    w.append(generate_base_workflow(base_workflow_name, python_version, unicode, filter_branch, os_type, btype))
+    w.append(generate_base_workflow(base_workflow_name, python_version, filter_branch, os_type, btype))
 
     if upload:
 
@@ -56,15 +57,12 @@ def workflow_pair(btype, os_type, python_version, unicode, filter_branch, prefix
     return w
 
 
-def generate_base_workflow(base_workflow_name, python_version, unicode, filter_branch, os_type, btype):
+def generate_base_workflow(base_workflow_name, python_version, filter_branch, os_type, btype):
 
     d = {
         "name": base_workflow_name,
         "python_version": python_version,
     }
-
-    if unicode:
-        d["unicode_abi"] = '1'
 
     if filter_branch:
         d["filters"] = gen_filter_branch_tree(filter_branch)
@@ -112,6 +110,19 @@ def indent(indentation, data_list):
     return ("\n" + " " * indentation).join(yaml.dump(data_list).splitlines())
 
 
+def unittest_workflows(indentation=6):
+    w = []
+    for os_type in ["linux"]:
+        for python_version in PYTHON_VERSIONS:
+            w.append({
+                f"unittest_{os_type}": {
+                    "name": f"unittest_{os_type}_py{python_version}",
+                    "python_version": python_version,
+                }
+            })
+    return indent(indentation, w)
+
+
 if __name__ == "__main__":
     d = os.path.dirname(__file__)
     env = jinja2.Environment(
@@ -121,4 +132,7 @@ if __name__ == "__main__":
     )
 
     with open(os.path.join(d, 'config.yml'), 'w') as f:
-        f.write(env.get_template('config.yml.in').render(workflows=workflows))
+        f.write(env.get_template('config.yml.in').render(
+            build_workflows=build_workflows,
+            unittest_workflows=unittest_workflows,
+        ))

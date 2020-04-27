@@ -1,3 +1,4 @@
+import atexit
 import os.path
 from pathlib import Path
 from typing import Any, Callable, Optional, Tuple, Union
@@ -168,13 +169,13 @@ def save_encinfo(filepath: str,
     # sox stores the sample rate as a float, though practically sample rates are almost always integers
     # convert integers to floats
     if signalinfo:
-        if not isinstance(signalinfo.rate, float):
+        if signalinfo.rate and not isinstance(signalinfo.rate, float):
             if float(signalinfo.rate) == signalinfo.rate:
                 signalinfo.rate = float(signalinfo.rate)
             else:
                 raise TypeError('Sample rate should be a float or int')
         # check if the bit precision (i.e. bits per sample) is an integer
-        if not isinstance(signalinfo.precision, int):
+        if signalinfo.precision and not isinstance(signalinfo.precision, int):
             if int(signalinfo.precision) == signalinfo.precision:
                 signalinfo.precision = int(signalinfo.precision)
             else:
@@ -338,25 +339,67 @@ def get_sox_bool(i: int = 0) -> Any:
         return _torch_sox.sox_bool(i)
 
 
+_SOX_INITIALIZED = False
+# This variable has a micro lifecycle. (False -> True -> None)
+# False: Not initialized
+# True: Initialized
+# None: Already shut down (should not be initialized again.)
+
+_SOX_SUCCESS_CODE = 0
+# defined at
+# https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93a9ef2b87ec303edfe40751d9a85fadeeb
+
+
 @_audio_backend_guard("sox")
 def initialize_sox() -> int:
-    """Initialize sox for use with effects chains.  This is not required for simple
-    loading.  Importantly, only run `initialize_sox` once and do not shutdown
-    after each effect chain, but rather once you are finished with all effects chains.
-    """
+    """Initialize sox for use with effects chains.
 
-    import _torch_sox
-    return _torch_sox.initialize_sox()
+    You only need to call this function once to use SoX effects chains multiple times.
+    It is safe to call this function multiple times as long as ``shutdown_sox`` is not yet called.
+    Once ``shutdown_sox`` is called, you can no longer use SoX effects and calling this function
+    results in `RuntimeError`.
+
+    Note:
+        This function is not required for simple loading.
+
+    Returns:
+        int: Code corresponding to sox_error_t enum. See
+        https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93
+    """
+    global _SOX_INITIALIZED
+    if _SOX_INITIALIZED is None:
+        raise RuntimeError('SoX effects chain has been already shut down. Can not initialize again.')
+    if not _SOX_INITIALIZED:
+        import _torch_sox
+        code = _torch_sox.initialize_sox()
+        if code == _SOX_SUCCESS_CODE:
+            _SOX_INITIALIZED = True
+            atexit.register(shutdown_sox)
+        return code
+    return _SOX_SUCCESS_CODE
 
 
 @_audio_backend_guard("sox")
 def shutdown_sox() -> int:
-    """Showdown sox for effects chain.  Not required for simple loading.  Importantly,
-    only call once.  Attempting to re-initialize sox will result in seg faults.
-    """
+    """Showdown sox for effects chain.
 
-    import _torch_sox
-    return _torch_sox.shutdown_sox()
+    You do not need to call this function as it will be called automatically
+    at the end of program execution, if ``initialize_sox`` was called.
+
+    It is safe to call this function multiple times.
+
+    Returns:
+        int: Code corresponding to sox_error_t enum. See
+        https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93
+    """
+    global _SOX_INITIALIZED
+    if _SOX_INITIALIZED:
+        import _torch_sox
+        code = _torch_sox.shutdown_sox()
+        if code == _SOX_INITIALIZED:
+            _SOX_INITIALIZED = None
+        return code
+    return _SOX_SUCCESS_CODE
 
 
 def _audio_normalization(signal: Tensor, normalization: Union[bool, float, Callable]) -> None:

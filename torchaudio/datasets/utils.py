@@ -7,17 +7,18 @@ import sys
 import tarfile
 import threading
 import zipfile
-from io import TextIOWrapper
+from _io import TextIOWrapper
 from queue import Queue
 from typing import Any, Iterable, List, Optional, Tuple, Union
 
 import torch
 import urllib
+import urllib.request
 from torch.utils.data import Dataset
 from torch.utils.model_zoo import tqdm
 
 
-def unicode_csv_reader(unicode_csv_data: TextIOWrapper, **kwargs: Any) -> str:
+def unicode_csv_reader(unicode_csv_data: TextIOWrapper, **kwargs: Any) -> Any:
     r"""Since the standard csv library does not handle unicode in Python 2, we need a wrapper.
     Borrowed and slightly modified from the Python docs:
     https://docs.python.org/2/library/csv.html#csv-examples
@@ -63,7 +64,7 @@ def makedir_exist_ok(dirpath: str) -> None:
 def stream_url(url: str,
                start_byte: Optional[int] = None,
                block_size: int = 32 * 1024,
-               progress_bar: bool = True) -> None:
+               progress_bar: bool = True) -> Iterable:
     """Stream url by chunk
 
     Args:
@@ -126,10 +127,10 @@ def download_url(url: str,
     # Detect filename
     filename = filename or req_info.get_filename() or os.path.basename(url)
     filepath = os.path.join(download_folder, filename)
-
     if resume and os.path.exists(filepath):
         mode = "ab"
-        local_size = os.path.getsize(filepath)
+        local_size: Optional[int] = os.path.getsize(filepath)
+
     elif not resume and os.path.exists(filepath):
         raise RuntimeError(
             "{} already exists. Delete the file manually and retry.".format(filepath)
@@ -215,7 +216,7 @@ def extract_archive(from_path: str, to_path: Optional[str] = None, overwrite: bo
         with tarfile.open(from_path, "r") as tar:
             logging.info("Opened tar file {}.".format(from_path))
             files = []
-            for file_ in tar:
+            for file_ in tar:  # type: Any
                 file_path = os.path.join(to_path, file_.name)
                 if file_.isfile():
                     files.append(file_path)
@@ -249,7 +250,7 @@ def extract_archive(from_path: str, to_path: Optional[str] = None, overwrite: bo
 def walk_files(root: str,
                suffix: Union[str, Tuple[str]],
                prefix: bool = False,
-               remove_suffix: bool = False) -> str:
+               remove_suffix: bool = False) -> Iterable[str]:
     """List recursively all files ending with a suffix at a given root
     Args:
         root (str): Path to directory whose folders need to be listed
@@ -286,7 +287,7 @@ class _DiskCache(Dataset):
         self.location = location
 
         self._id = id(self)
-        self._cache = [None] * len(dataset)
+        self._cache: List = [None] * len(dataset)
 
     def __getitem__(self, n: int) -> Any:
         if self._cache[n]:
@@ -325,7 +326,7 @@ class _ThreadedIterator(threading.Thread):
 
     def __init__(self, generator: Iterable, maxsize: int) -> None:
         threading.Thread.__init__(self)
-        self.queue = Queue(maxsize)
+        self.queue: Queue = Queue(maxsize)
         self.generator = generator
         self.daemon = True
         self.start()

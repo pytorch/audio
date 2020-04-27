@@ -11,14 +11,6 @@ from common_utils import AudioBackendScope, BACKENDS
 class Test_SoxEffectsChain(unittest.TestCase):
     test_filepath = common_utils.get_asset_path("steam-train-whistle-daniel_simon.mp3")
 
-    @classmethod
-    def setUpClass(cls):
-        torchaudio.initialize_sox()
-
-    @classmethod
-    def tearDownClass(cls):
-        torchaudio.shutdown_sox()
-
     def test_single_channel(self):
         fn_sine = common_utils.get_asset_path("sinewave.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()

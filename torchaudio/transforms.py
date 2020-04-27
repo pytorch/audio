@@ -454,7 +454,7 @@ class MFCC(torch.nn.Module):
         super(MFCC, self).__init__()
         supported_dct_types = [2]
         if dct_type not in supported_dct_types:
-            raise ValueError('DCT type not supported'.format(dct_type))
+            raise ValueError('DCT type not supported: {}'.format(dct_type))
         self.sample_rate = sample_rate
         self.n_mfcc = n_mfcc
         self.dct_type = dct_type
@@ -838,10 +838,10 @@ class Vol(torch.nn.Module):
 
     Args:
         gain (float): Interpreted according to the given gain_type:
-            If `gain_type’ = ‘amplitude’, `gain’ is a positive amplitude ratio.
-            If `gain_type’ = ‘power’, `gain’ is a power (voltage squared).
-            If `gain_type’ = ‘db’, `gain’ is in decibels.
-        gain_type (str, optional): Type of gain. One of: ‘amplitude’, ‘power’, ‘db’ (Default: ``"amplitude"``)
+            If ``gain_type`` = ``amplitude``, ``gain`` is a positive amplitude ratio.
+            If ``gain_type`` = ``power``, ``gain`` is a power (voltage squared).
+            If ``gain_type`` = ``db``, ``gain`` is in decibels.
+        gain_type (str, optional): Type of gain. One of: ``amplitude``, ``power``, ``db`` (Default: ``amplitude``)
     """
 
     def __init__(self, gain: float, gain_type: str = 'amplitude'):

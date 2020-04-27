@@ -24,15 +24,10 @@ binary_common: &binary_common
     python_version:
       description: "Python version to build against (e.g., 3.8)"
       type: string
-    unicode_abi:
-      description: "Python 2.7 wheel only: whether or not we are cp27mu (default: no)"
-      type: string
-      default: ""
   environment:
     PYTHON_VERSION: << parameters.python_version >>
     BUILD_VERSION: << parameters.build_version >>
     PYTORCH_VERSION: << parameters.pytorch_version >>
-    UNICODE_ABI: << parameters.unicode_abi >>
     CU_VERSION: cpu
 
 smoke_test_common: &smoke_test_common
@@ -238,19 +233,59 @@ jobs:
             docker tag ${image_name}:${CIRCLE_WORKFLOW_ID} 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
             docker push 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
 
+  unittest_linux:
+    <<: *binary_common
+    docker:
+      - image: "pytorch/manylinux-cuda100"
+    resource_class: 2xlarge+
+    steps:
+      - checkout
+      - restore_cache:
+          {% raw %}
+          keys:
+            - env-v1-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum "./packaging/build_from_source.sh" }}-{{ checksum ".circleci/unittest/environment.yml" }}
+          {% endraw %}
+      - run:
+          name: Setup
+          command: .circleci/unittest/setup_env.sh
+      - save_cache:
+          {% raw %}
+          key: env-v1-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum "./packaging/build_from_source.sh" }}-{{ checksum ".circleci/unittest/environment.yml" }}
+          {% endraw %}
+          paths:
+            - conda
+            - env
+            - third_party
+      - run:
+          name: Installation
+          command: .circleci/unittest/install.sh
+      - run:
+          name: Run test
+          command: .circleci/unittest/run_test.sh
+      - run:
+          name: Post process
+          command: .circleci/unittest/post_process.sh
+      - store_test_results:
+          path: test-results
+
 workflows:
   build:
     jobs:
       - circleci_consistency
-      {{ workflows() }}
+      {{ build_workflows() }}
       - binary_win_conda:
           name: torchaudio_win_py3.6
           python_version: "3.6"
-
+  unittest:
+    jobs:
+      {{ unittest_workflows() }}
   nightly:
     jobs:
-      - circleci_consistency
-      {{ workflows(prefix="nightly_", filter_branch="nightly", upload=True) }}
+      - circleci_consistency:
+          filters:
+            branches:
+              only: nightly
+      {{ build_workflows(prefix="nightly_", filter_branch="nightly", upload=True) }}
   docker_build:
     triggers:
       - schedule:

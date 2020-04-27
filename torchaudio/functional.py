@@ -33,6 +33,7 @@ __all__ = [
     "biquad",
     "contrast",
     "dcshift",
+    "overdrive",
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
@@ -1239,6 +1240,61 @@ def dcshift(
     return output_waveform
 
 
+def overdrive(
+        waveform: Tensor,
+        gain: float = 20,
+        colour: float = 20
+) -> Tensor:
+    r"""Apply a overdrive effect to the audio. Similar to SoX implementation.
+    This effect applies a non linear distortion to the audio signal.
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        gain (float): desired gain at the boost (or attenuation) in dB
+            Allowed range of values are 0 to 100
+        colour (float):  controls the amount of even harmonic content in the over-driven output
+            Allowed range of values are 0 to 100
+
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+    """
+    actual_shape = waveform.shape
+    device, dtype = waveform.device, waveform.dtype
+
+    # convert to 2D (..,time)
+    waveform = waveform.view(-1, actual_shape[-1])
+
+    gain = _dB2Linear(gain)
+    colour = colour / 200
+    last_in = torch.zeros(waveform.shape[:-1], dtype=dtype, device=device)
+    last_out = torch.zeros(waveform.shape[:-1], dtype=dtype, device=device)
+
+    temp = waveform * gain + colour
+
+    mask1 = temp < -1
+    temp[mask1] = torch.tensor(-2.0 / 3.0, dtype=dtype, device=device)
+    # Wrapping the constant with Tensor is required for Torchscript
+
+    mask2 = temp > 1
+    temp[mask2] = torch.tensor(2.0 / 3.0, dtype=dtype, device=device)
+
+    mask3 = (~mask1 & ~mask2)
+    temp[mask3] = temp[mask3] - (temp[mask3]**3) * (1. / 3)
+
+    output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
+
+    # TODO: Implement a torch CPP extension
+    for i in range(waveform.shape[-1]):
+        last_out = temp[:, i] - last_in + 0.995 * last_out
+        last_in = temp[:, i]
+        output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
+
+    return output_waveform.clamp(min=-1, max=1).view(actual_shape)
+
+
 def mask_along_axis_iid(
         specgrams: Tensor,
         mask_param: int,
@@ -1713,14 +1769,18 @@ def sliding_window_cmn(
     Returns:
         Tensor: Tensor of freq of dimension (..., frame)
     """
+    input_shape = waveform.shape
+    num_frames, num_feats = input_shape[-2:]
+    waveform = waveform.view(-1, num_frames, num_feats)
+    num_channels = waveform.shape[0]
+
     dtype = waveform.dtype
     device = waveform.device
     last_window_start = last_window_end = -1
-    num_frames, num_feats = waveform.shape
-    cur_sum = torch.zeros(num_feats, dtype=dtype, device=device)
-    cur_sumsq = torch.zeros(num_feats, dtype=dtype, device=device)
+    cur_sum = torch.zeros(num_channels, num_feats, dtype=dtype, device=device)
+    cur_sumsq = torch.zeros(num_channels, num_feats, dtype=dtype, device=device)
     cmn_waveform = torch.zeros(
-        num_frames, num_feats, dtype=dtype, device=device)
+        num_channels, num_frames, num_feats, dtype=dtype, device=device)
     for t in range(num_frames):
         window_start = 0
         window_end = 0
@@ -1742,33 +1802,37 @@ def sliding_window_cmn(
             if window_start < 0:
                 window_start = 0
         if last_window_start == -1:
-            input_part = waveform[window_start: window_end - window_start]
-            cur_sum += torch.sum(input_part, 0)
+            input_part = waveform[:, window_start: window_end - window_start, :]
+            cur_sum += torch.sum(input_part, 1)
             if norm_vars:
-                cur_sumsq += torch.cumsum(input_part ** 2, 0)[-1]
+                cur_sumsq += torch.cumsum(input_part ** 2, 1)[:, -1, :]
         else:
             if window_start > last_window_start:
-                frame_to_remove = waveform[last_window_start]
+                frame_to_remove = waveform[:, last_window_start, :]
                 cur_sum -= frame_to_remove
                 if norm_vars:
                     cur_sumsq -= (frame_to_remove ** 2)
             if window_end > last_window_end:
-                frame_to_add = waveform[last_window_end]
+                frame_to_add = waveform[:, last_window_end, :]
                 cur_sum += frame_to_add
                 if norm_vars:
                     cur_sumsq += (frame_to_add ** 2)
         window_frames = window_end - window_start
         last_window_start = window_start
         last_window_end = window_end
-        cmn_waveform[t] = waveform[t] - cur_sum / window_frames
+        cmn_waveform[:, t, :] = waveform[:, t, :] - cur_sum / window_frames
         if norm_vars:
             if window_frames == 1:
-                cmn_waveform[t] = torch.zeros(
-                    num_feats, dtype=dtype, device=device)
+                cmn_waveform[:, t, :] = torch.zeros(
+                    num_channels, num_feats, dtype=dtype, device=device)
             else:
                 variance = cur_sumsq
                 variance = variance / window_frames
                 variance -= ((cur_sum ** 2) / (window_frames ** 2))
                 variance = torch.pow(variance, -0.5)
-                cmn_waveform[t] *= variance
+                cmn_waveform[:, t, :] *= variance
+
+    cmn_waveform = cmn_waveform.view(input_shape[:-2] + (num_frames, num_feats))
+    if len(input_shape) == 2:
+        cmn_waveform = cmn_waveform.squeeze(0)
     return cmn_waveform
