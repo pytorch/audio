@@ -21,11 +21,12 @@ class Wav2Letter(nn.Module):
 
     def __init__(self, num_classes: int = 40,
                  version: str = "waveform",
-                 num_features: Optional[int] = 1) -> None:
+                 num_features: int = 1) -> None:
         super(Wav2Letter, self).__init__()
 
+        acoustic_num_features = 250 if version == "waveform" else num_features
         acoustic_model = nn.Sequential(
-            nn.Conv1d(in_channels=num_features, out_channels=250, kernel_size=48, stride=2, padding=23),
+            nn.Conv1d(in_channels=acoustic_num_features, out_channels=250, kernel_size=48, stride=2, padding=23),
             nn.ReLU(inplace=True),
             nn.Conv1d(in_channels=250, out_channels=250, kernel_size=7, stride=1, padding=3),
             nn.ReLU(inplace=True),
@@ -62,10 +63,10 @@ class Wav2Letter(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         r"""
         Args:
-            x (Tensor): Tensor of dimension (batch_size, n_features, input_length).
+            x (Tensor): Tensor of dimension (batch_size, num_features, input_length).
 
         Returns:
-            Tensor: Predictor tensor of dimension (input_length, batch_size, number_of_classes).
+            Tensor: Predictor tensor of dimension (batch_size, number_of_classes, input_length).
         """
 
         x = self.acoustic_model(x)
