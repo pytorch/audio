@@ -1857,13 +1857,12 @@ def _measure(
     noiseTcUpMult,
     noiseTcDownMult,
     index_ns: int,
-    step_ns: int,
     boot_count: int):
 
     dftBuf = torch.zeros(dftLen_ws)
 
     _index_ns = [index_ns] + [
-        (index_ns + i * step_ns) % samplesLen_ns
+        (index_ns + i) % samplesLen_ns
         for i in range(1, measureLen_ws)
     ]
     dftBuf[:measureLen_ws] = \
@@ -1918,7 +1917,6 @@ def _measure(
         math.log(result / (cepstrumEnd - cepstrumStart)) \
         if result > 0 \
         else -math.inf
-    print(f"log(result)={result}")
     return max(0, 21 + result)
 
 
@@ -1955,23 +1953,20 @@ def vad(
     lpLifterFreq: float = 2000
 
     fixedPreTriggerLen_ns = int(preTriggerTime * sample_rate + .5)
-    fixedPreTriggerLen_ns *= n_channels
 
     measureLen_ws = int(sample_rate * measureDuration + .5)
-    measureLen_ns = measureLen_ws * n_channels
+    measureLen_ns = measureLen_ws
     # for (dftLen_ws = 16; dftLen_ws < measureLen_ws; dftLen_ws <<= 1);
     dftLen_ws = 16
     while (dftLen_ws < measureLen_ws):
         dftLen_ws <<= 1
 
     measurePeriod_ns = int(sample_rate / measureFreq + .5)
-    measurePeriod_ns *= n_channels
     measuresLen = math.ceil(searchTime * measureFreq)
     searchPreTriggerLen_ns = measuresLen * measurePeriod_ns
     gapLen = int(gapTime * measureFreq + .5)
 
     samplesLen_ns = fixedPreTriggerLen_ns + searchPreTriggerLen_ns + measureLen_ns
-    samples = torch.zeros(samplesLen_ns)
 
     spectrumWindow = torch.zeros(measureLen_ws)
     for i in range(measureLen_ws):
@@ -2007,21 +2002,19 @@ def vad(
     bootCount = measuresIndex = flushedLen_ns = samplesIndex_ns = 0
 
     meanMeas = torch.zeros(n_channels)
+    samples = torch.zeros(n_channels, samplesLen_ns)
     spectrum = torch.zeros(n_channels, dftLen_ws)
     noiseSpectrum = torch.zeros(n_channels, dftLen_ws)
     measures = torch.zeros(n_channels, measuresLen)
 
     hasTriggered: bool = False
-    ilen: int = waveform.size()[-1] * n_channels
-    idone: int = 0
     numMeasuresToFlush: int = 0
     pos: int = 0
 
-    while (idone < ilen and not hasTriggered):
-        measureTimer_ns -= n_channels
+    while (pos < ilen and not hasTriggered):
+        measureTimer_ns -= 1
         for i in range(n_channels):
-            samples[samplesIndex_ns] = waveform[i, pos]
-            samplesIndex_ns += 1
+            samples[i, samplesIndex_ns] = waveform[i, pos]
             # if (!p->measureTimer_ns) {
             if (measureTimer_ns == 0):
                 index_ns: int = \
@@ -2032,7 +2025,7 @@ def vad(
                     dftLen_ws,
                     samplesLen_ns,
                     measureLen_ws,
-                    samples,
+                    samples[i],
                     spectrumWindow,
                     spectrumStart,
                     spectrumEnd,
@@ -2043,7 +2036,8 @@ def vad(
                     measureTcMult,
                     noiseTcUpMult,
                     noiseTcDownMult,
-                    index_ns, n_channels, bootCount)
+                    index_ns,
+                    bootCount)
                 measures[i, measuresIndex] = meas
                 meanMeas[i] = meanMeas[i] * triggerMeasTcMult + meas * (1. - triggerMeasTcMult)
 
@@ -2065,9 +2059,8 @@ def vad(
                     numMeasuresToFlush = (min(max(numMeasuresToFlush, j), n))
                 # end if hasTriggered
             # end if (measureTimer_ns == 0):
-            idone += 1
-
         # end for
+        samplesIndex_ns += 1
         pos += 1
     # end while
         if samplesIndex_ns == samplesLen_ns:
@@ -2082,4 +2075,4 @@ def vad(
         if hasTriggered:
             flushedLen_ns = (measuresLen - numMeasuresToFlush) * measurePeriod_ns
             samplesIndex_ns = (samplesIndex_ns + flushedLen_ns) % samplesLen_ns
-    return waveform[:, (idone - samplesLen_ns + flushedLen_ns) // n_channels:]
+    return waveform[:, pos - samplesLen_ns + flushedLen_ns:]
