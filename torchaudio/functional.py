@@ -1855,7 +1855,8 @@ def _measure(
     noise_up_time_mult,
     noise_down_time_mult,
     index_ns: int,
-    boot_count: int):
+    boot_count: int
+) -> float:
 
     assert spectrum.size()[-1] == noise_spectrum.size()[-1]
 
@@ -1945,7 +1946,7 @@ def vad(
     lp_lifter_freq: float = 2000,
 ) -> Tensor:
     measure_duration: float = 2.0 / measure_freq \
-        if measure_duration == None \
+        if measure_duration is None \
         else measure_duration
     measure_len_ws = int(sample_rate * measure_duration + .5)
     measure_len_ns = measure_len_ws
