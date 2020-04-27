@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import math
-from dataclasses import dataclass, InitVar
-from typing import Callable, Optional, List
+from typing import Callable, Optional
 from warnings import warn
 
 import torch
