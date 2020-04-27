@@ -14,17 +14,17 @@ class Wav2Letter(nn.Module):
 
     Args:
         num_classes (int, optional): Number of classes to be classified. (Default: ``40``)
-        version (str, optional): Wav2Letter can use as input: ``waveform``, ``power_spectrum``
+        input_type (str, optional): Wav2Letter can use as input: ``waveform``, ``power_spectrum``
          or ``mfcc`` (Default: ``waveform``).
         num_features (int, optional): Number of input features that the network will receive (Default: ``1``).
     """
 
     def __init__(self, num_classes: int = 40,
-                 version: str = "waveform",
+                 input_type: str = "waveform",
                  num_features: int = 1) -> None:
         super(Wav2Letter, self).__init__()
 
-        acoustic_num_features = 250 if version == "waveform" else num_features
+        acoustic_num_features = 250 if input_type == "waveform" else num_features
         acoustic_model = nn.Sequential(
             nn.Conv1d(in_channels=acoustic_num_features, out_channels=250, kernel_size=48, stride=2, padding=23),
             nn.ReLU(inplace=True),
@@ -50,14 +50,14 @@ class Wav2Letter(nn.Module):
             nn.ReLU(inplace=True)
         )
 
-        if version == "waveform":
+        if input_type == "waveform":
             waveform_model = nn.Sequential(
                 nn.Conv1d(in_channels=num_features, out_channels=250, kernel_size=250, stride=160, padding=45),
                 nn.ReLU(inplace=True)
             )
             self.acoustic_model = nn.Sequential(waveform_model, acoustic_model)
 
-        if version in ["power_spectrum", "mfcc"]:
+        if input_type in ["power_spectrum", "mfcc"]:
             self.acoustic_model = acoustic_model
 
     def forward(self, x: Tensor) -> Tensor:

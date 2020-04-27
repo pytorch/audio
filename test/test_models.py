@@ -22,7 +22,7 @@ class TestWav2Letter:
     @pytest.mark.parametrize('num_classes', [40])
     @pytest.mark.parametrize('input_length', [2])
     def test_mfcc(self, batch_size, num_features, num_classes, input_length):
-        model = Wav2Letter(version="mfcc", num_features=13)
+        model = Wav2Letter(input_type="mfcc", num_features=13)
 
         x = torch.rand(batch_size, num_features, input_length)
         out = model(x)
