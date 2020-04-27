@@ -473,16 +473,6 @@ class _FunctionalTestMixin:
 
         self._assert_consistency(func, waveform)
 
-    def test_vad(self):
-        filepath = common_utils.get_asset_path("vad-hello-mono-32000.wav")
-        waveform, _ = torchaudio.load(filepath)
-
-        def func(tensor):
-            sample_rate = 32000
-            return F.vad(tensor, sample_rate)
-
-        self._assert_consistency(func, waveform)
-
 
 class _TransformsTestMixin:
     """Implements test for Transforms that are performed for different devices"""
@@ -566,6 +556,12 @@ class _TransformsTestMixin:
     def test_SlidingWindowCmn(self):
         tensor = torch.rand((1000, 10))
         self._assert_consistency(T.SlidingWindowCmn(), tensor)
+
+    def test_Vad(self):
+        filepath = common_utils.get_asset_path("vad-hello-mono-32000.wav")
+        waveform, _ = torchaudio.load(filepath)
+        self._assert_consistency(T.Vad(32000), waveform)
+
 
 
 class TestFunctionalCPU(_FunctionalTestMixin, unittest.TestCase):
