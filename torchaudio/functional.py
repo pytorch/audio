@@ -1861,7 +1861,6 @@ def _measure(
     boot_count: int):
 
     dftBuf = torch.zeros(dftLen_ws)
-    print(f"measureLen_ws={measureLen_ws}, index_ns={index_ns}, step_ns={step_ns} samplesLen_ns={samplesLen_ns}")
 
     _index_ns = [index_ns] + [
         (index_ns + i * step_ns) % samplesLen_ns
@@ -1869,9 +1868,6 @@ def _measure(
     ]
     dftBuf[:measureLen_ws] = \
         samples[_index_ns] * spectrumWindow[:measureLen_ws]
-
-    print(f'samples: {samples[_index_ns][:10]}')
-    print(f'buf: {dftBuf[:10]}')
 
     # memset(c->dftBuf + i, 0, (p->dftLen_ws - i) * sizeof(*c->dftBuf));
     dftBuf[measureLen_ws:dftLen_ws].zero_()
@@ -2016,17 +2012,17 @@ def vad(
     measures = torch.zeros(n_channels, measuresLen)
 
     hasTriggered: bool = False
-    ilen: int = waveform.size()[-1]
+    ilen: int = waveform.size()[-1] * n_channels
     idone: int = 0
     numMeasuresToFlush: int = 0
+    pos: int = 0
 
     while (idone < ilen and not hasTriggered):
         measureTimer_ns -= n_channels
         for i in range(n_channels):
-            samples[samplesIndex_ns] = waveform[i, idone]
+            samples[samplesIndex_ns] = waveform[i, pos]
             samplesIndex_ns += 1
             # if (!p->measureTimer_ns) {
-            print(f"ch={i} s={samples[samplesIndex_ns-1]}")
             if (measureTimer_ns == 0):
                 index_ns: int = \
                     (samplesIndex_ns + samplesLen_ns - measureLen_ns) % samplesLen_ns
@@ -2070,8 +2066,10 @@ def vad(
                 # end if hasTriggered
             # end if (measureTimer_ns == 0):
             idone += 1
-        # end for
 
+        # end for
+        pos += 1
+    # end while
         if samplesIndex_ns == samplesLen_ns:
             samplesIndex_ns = 0
         if measureTimer_ns == 0:
@@ -2084,5 +2082,4 @@ def vad(
         if hasTriggered:
             flushedLen_ns = (measuresLen - numMeasuresToFlush) * measurePeriod_ns
             samplesIndex_ns = (samplesIndex_ns + flushedLen_ns) % samplesLen_ns
-
-    return waveform[:, idone - samplesLen_ns + flushedLen_ns:]
+    return waveform[:, (idone - samplesLen_ns + flushedLen_ns) // n_channels:]
