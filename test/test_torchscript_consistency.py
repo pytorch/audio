@@ -559,8 +559,8 @@ class _TransformsTestMixin:
 
     def test_Vad(self):
         filepath = common_utils.get_asset_path("vad-hello-mono-32000.wav")
-        waveform, _ = torchaudio.load(filepath)
-        self._assert_consistency(T.Vad(32000), waveform)
+        waveform, sample_rate = torchaudio.load(filepath)
+        self._assert_consistency(T.Vad(sample_rate=sample_rate), waveform)
 
 
 class TestFunctionalCPU(_FunctionalTestMixin, unittest.TestCase):

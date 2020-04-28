@@ -1936,7 +1936,7 @@ def vad(
     noise_down_time: float = .01,
     noise_reduction_amount: float = 1.35,
     measure_freq: float = 20.0,
-    measure_duration: Optional[float] = None,  # by default, twice the measurement period; i.e. with overlap.
+    measure_duration: Optional[float] = None,
     measure_smooth_time: float = .4,
     hp_filter_freq: float = 50.,
     lp_filter_freq: float = 6000.,
