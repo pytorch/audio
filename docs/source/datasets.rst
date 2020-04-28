@@ -25,15 +25,47 @@ All the datasets have almost similar API. They all have two common arguments:
 .. currentmodule:: torchaudio.datasets 
 
 
+COMMONVOICE
+~~~~~~~~~~~
+
+.. autoclass:: COMMONVOICE
+  :members: __getitem__
+  :special-members:
+
+
+LIBRISPEECH
+~~~~~~~~~~~
+
+.. autoclass:: LIBRISPEECH
+  :members: __getitem__
+  :special-members:
+
+
+LJSPEECH
+~~~~~~~~
+
+.. autoclass:: LJSPEECH
+  :members: __getitem__
+  :special-members:
+
+
+SPEECHCOMMANDS
+~~~~~~~~~~~~~~
+
+.. autoclass:: SPEECHCOMMANDS
+  :members: __getitem__
+  :special-members:
+
+
 VCTK
-~~~~~
+~~~~
 
 .. autoclass:: VCTK
   :members: __getitem__
   :special-members:
 
 YESNO
-~~~~~~~~~~~~~
+~~~~~
 
 .. autoclass:: YESNO
   :members: __getitem__
