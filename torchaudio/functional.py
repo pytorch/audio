@@ -465,7 +465,7 @@ def create_fb_matrix(
     up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_freqs, n_mels)
     fb = torch.max(zero, torch.min(down_slopes, up_slopes))
 
-    if norm == "slaney":
+    if str(norm) == "slaney":
         # Slaney-style mel is scaled to be approx constant energy per channel
         enorm = 2.0 / (f_pts[2 : n_mels + 2] - f_pts[:n_mels])
         fb *= enorm.unsqueeze(0)
