@@ -162,3 +162,8 @@ Functions to perform common audio operations.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: sliding_window_cmn
+
+:hidden:`vad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: vad
