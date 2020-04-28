@@ -20,19 +20,15 @@ if [ ! -d "${conda_dir}" ]; then
     wget -O miniconda.sh http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     bash ./miniconda.sh -b -f -p "${conda_dir}"
 fi
-printf "* Checking conda update\n"
 eval "$(${conda_dir}/bin/conda shell.bash hook)"
-conda update -n base -c defaults conda
 
 # 2. Create test environment at ./env
 if [ ! -d "${env_dir}" ]; then
     printf "* Creating a test environment\n"
     conda create --prefix "${env_dir}" -y python="$PYTHON_VERSION"
 fi
-printf "* Installing dependencies (except PyTorch)\n"
 conda activate "${env_dir}"
-conda env update --file "${this_dir}/environment.yml" --prune
 
-# 3. Link codecs present at /third_party
-# See Dockerfile for how this is built
-ln -fs /third_party ./third_party
+# 3. Install Conda dependencies
+printf "* Installing dependencies (except PyTorch)\n"
+conda env update --file "${this_dir}/environment.yml" --prune

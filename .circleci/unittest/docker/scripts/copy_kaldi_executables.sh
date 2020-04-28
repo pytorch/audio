@@ -49,9 +49,10 @@ while read file; do
     lib_name="$(basename "${library}")"
     link_name="$(basename "${file}")"
     if [ "${lib_name}" != "${link_name}" ]; then
-        src="${lib_dir}/${lib_name}"
-        tgt="${lib_dir}/${link_name}"
-        printf "    Linking %s -> %s\n" "${src}" "${tgt}"
-        ln -s "${src}" "${tgt}"
+        printf "    Linking %s -> %s\n" "${lib_name}" "${link_name}"
+        (
+            cd "${lib_dir}"
+            ln -sf "${lib_name}" "${link_name}"
+        )
     fi
 done < <(list_kaldi_libraries "${bin_dir}" "${kaldi_root}")

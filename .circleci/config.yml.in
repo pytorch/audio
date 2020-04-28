@@ -236,7 +236,7 @@ jobs:
   unittest_linux:
     <<: *binary_common
     docker:
-      - image: "pytorch/torchaudio_unittest_base:manylinux-cuda100"
+      - image: "pytorch/torchaudio_unittest_base:manylinux"
     resource_class: 2xlarge+
     steps:
       - checkout
@@ -256,10 +256,10 @@ jobs:
             - conda
             - env
       - run:
-          name: Installation
+          name: Install torchaudio
           command: .circleci/unittest/scripts/install.sh
       - run:
-          name: Run test
+          name: Run tests
           command: .circleci/unittest/scripts/run_test.sh
       - run:
           name: Post process
