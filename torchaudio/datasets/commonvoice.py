@@ -1,9 +1,10 @@
 import os
-
-from torch.utils.data import Dataset
+from typing import List, Dict, Tuple
 
 import torchaudio
 from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
+from torch import Tensor
+from torch.utils.data import Dataset
 
 # Default TSV should be one of
 # dev.tsv
@@ -17,9 +18,72 @@ FOLDER_IN_ARCHIVE = "CommonVoice"
 URL = "english"
 VERSION = "cv-corpus-4-2019-12-10"
 TSV = "train.tsv"
+_CHECKSUMS = {
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/tt.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/en.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/de.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/fr.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/cy.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/br.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/cv.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/tr.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/ky.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/ga-IE.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/kab.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/ca.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/zh-TW.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/sl.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/it.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/nl.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/cnh.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/eo.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/et.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/fa.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/eu.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/es.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/zh-CN.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/mn.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/sah.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/dv.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/rw.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/sv-SE.tar.gz":
+    None,
+    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/ru.tar.gz":
+    None
+}
 
 
-def load_commonvoice_item(line, header, path, folder_audio):
+def load_commonvoice_item(line: List[str],
+                          header: List[str],
+                          path: str,
+                          folder_audio: str) -> Tuple[Tensor, int, Dict[str, str]]:
     # Each line as the following data:
     # client_id, path, sentence, up_votes, down_votes, age, gender, accent
 
@@ -47,12 +111,13 @@ class COMMONVOICE(Dataset):
     _ext_audio = ".mp3"
     _folder_audio = "clips"
 
-    def __init__(self, root,
-                 tsv=TSV,
-                 url=URL,
-                 folder_in_archive=FOLDER_IN_ARCHIVE,
-                 version=VERSION,
-                 download=False):
+    def __init__(self,
+                 root: str,
+                 tsv: str = TSV,
+                 url: str = URL,
+                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
+                 version: str = VERSION,
+                 download: bool = False) -> None:
 
         languages = {
             "tatar": "tt",
@@ -115,8 +180,9 @@ class COMMONVOICE(Dataset):
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    download_url(url, root)
-                extract_archive(archive, self._path)
+                    checksum = _CHECKSUMS.get(url, None)
+                    download_url(url, root, hash_value=checksum)
+                extract_archive(archive)
 
         self._tsv = os.path.join(root, folder_in_archive, tsv)
 
@@ -125,9 +191,9 @@ class COMMONVOICE(Dataset):
             self._header = next(walker)
             self._walker = list(walker)
 
-    def __getitem__(self, n):
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, Dict[str, str]]:
         line = self._walker[n]
         return load_commonvoice_item(line, self._header, self._path, self._folder_audio)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._walker)

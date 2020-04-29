@@ -2,27 +2,17 @@ import unittest
 import torch
 import torchaudio
 import math
-import os
 
-from common_utils import AudioBackendScope, BACKENDS, create_temp_assets_dir
+import common_utils
+from common_utils import AudioBackendScope, BACKENDS
 
 
 @unittest.skipIf("sox" not in BACKENDS, "sox not available")
 class Test_SoxEffectsChain(unittest.TestCase):
-    test_dirpath, test_dir = create_temp_assets_dir()
-    test_filepath = os.path.join(test_dirpath, "assets",
-                                 "steam-train-whistle-daniel_simon.mp3")
-
-    @classmethod
-    def setUpClass(cls):
-        torchaudio.initialize_sox()
-
-    @classmethod
-    def tearDownClass(cls):
-        torchaudio.shutdown_sox()
+    test_filepath = common_utils.get_asset_path("steam-train-whistle-daniel_simon.mp3")
 
     def test_single_channel(self):
-        fn_sine = os.path.join(self.test_dirpath, "assets", "sinewave.wav")
+        fn_sine = common_utils.get_asset_path("sinewave.wav")
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(fn_sine)
         E.append_effect_to_chain("echos", [0.8, 0.7, 40, 0.25, 63, 0.3])
@@ -258,6 +248,24 @@ class Test_SoxEffectsChain(unittest.TestCase):
             z = vol(x_orig)
             # check if effect worked
             self.assertTrue(x.allclose(z, rtol=1e-4, atol=1e-4))
+
+    def test_vad(self):
+        sample_files = [
+            common_utils.get_asset_path("vad-hello-stereo-44100.wav"),
+            common_utils.get_asset_path("vad-hello-mono-32000.wav")
+        ]
+
+        for sample_file in sample_files:
+            E = torchaudio.sox_effects.SoxEffectsChain()
+            E.set_input_file(sample_file)
+            E.append_effect_to_chain("vad")
+            x, _ = E.sox_build_flow_effects()
+
+            x_orig, sample_rate = torchaudio.load(sample_file)
+            vad = torchaudio.transforms.Vad(sample_rate)
+
+            y = vad(x_orig)
+            self.assertTrue(x.allclose(y, rtol=1e-4, atol=1e-4))
 
 
 if __name__ == '__main__':

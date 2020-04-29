@@ -26,6 +26,8 @@ __all__ = [
     'Fade',
     'FrequencyMasking',
     'TimeMasking',
+    'SlidingWindowCmn',
+    'Vad',
 ]
 
 
@@ -453,7 +455,7 @@ class MFCC(torch.nn.Module):
         super(MFCC, self).__init__()
         supported_dct_types = [2]
         if dct_type not in supported_dct_types:
-            raise ValueError('DCT type not supported'.format(dct_type))
+            raise ValueError('DCT type not supported: {}'.format(dct_type))
         self.sample_rate = sample_rate
         self.n_mfcc = n_mfcc
         self.dct_type = dct_type
@@ -837,10 +839,10 @@ class Vol(torch.nn.Module):
 
     Args:
         gain (float): Interpreted according to the given gain_type:
-            If `gain_type’ = ‘amplitude’, `gain’ is a positive amplitude ratio.
-            If `gain_type’ = ‘power’, `gain’ is a power (voltage squared).
-            If `gain_type’ = ‘db’, `gain’ is in decibels.
-        gain_type (str, optional): Type of gain. One of: ‘amplitude’, ‘power’, ‘db’ (Default: ``"amplitude"``)
+            If ``gain_type`` = ``amplitude``, ``gain`` is a positive amplitude ratio.
+            If ``gain_type`` = ``power``, ``gain`` is a power (voltage squared).
+            If ``gain_type`` = ``db``, ``gain`` is in decibels.
+        gain_type (str, optional): Type of gain. One of: ``amplitude``, ``power``, ``db`` (Default: ``amplitude``)
     """
 
     def __init__(self, gain: float, gain_type: str = 'amplitude'):
@@ -869,3 +871,157 @@ class Vol(torch.nn.Module):
             waveform = F.gain(waveform, 10 * math.log10(self.gain))
 
         return torch.clamp(waveform, -1, 1)
+
+
+class SlidingWindowCmn(torch.nn.Module):
+    r"""
+    Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
+
+    Args:
+        cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
+        min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).
+            Only applicable if center == false, ignored if center==true (int, default = 100)
+        center (bool, optional): If true, use a window centered on the current frame
+            (to the extent possible, modulo end effects). If false, window is to the left. (bool, default = false)
+        norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
+    """
+
+    def __init__(self,
+                 cmn_window: int = 600,
+                 min_cmn_window: int = 100,
+                 center: bool = False,
+                 norm_vars: bool = False) -> None:
+        super().__init__()
+        self.cmn_window = cmn_window
+        self.min_cmn_window = min_cmn_window
+        self.center = center
+        self.norm_vars = norm_vars
+
+    def forward(self, waveform: Tensor) -> Tensor:
+        r"""
+        Args:
+            waveform (Tensor): Tensor of audio of dimension (..., time).
+
+        Returns:
+            Tensor: Tensor of audio of dimension (..., time).
+        """
+        cmn_waveform = F.sliding_window_cmn(
+            waveform, self.cmn_window, self.min_cmn_window, self.center, self.norm_vars)
+        return cmn_waveform
+
+
+class Vad(torch.nn.Module):
+    r"""Voice Activity Detector. Similar to SoX implementation.
+    Attempts to trim silence and quiet background sounds from the ends of recordings of speech.
+    The algorithm currently uses a simple cepstral power measurement to detect voice,
+    so may be fooled by other things, especially music.
+
+    The effect can trim only from the front of the audio,
+    so in order to trim from the back, the reverse effect must also be used.
+
+    Args:
+        sample_rate (int): Sample rate of audio signal.
+        trigger_level (float, optional): The measurement level used to trigger activity detection.
+            This may need to be cahnged depending on the noise level, signal level,
+            and other characteristics of the input audio. (Default: 7.0)
+        trigger_time (float, optional): The time constant (in seconds)
+            used to help ignore short bursts of sound. (Default: 0.25)
+        search_time (float, optional): The amount of audio (in seconds)
+            to search for quieter/shorter bursts of audio to include prior
+            to the detected trigger point. (Default: 1.0)
+        allowed_gap (float, optional): The allowed gap (in seconds) between
+            quiteter/shorter bursts of audio to include prior
+            to the detected trigger point. (Default: 0.25)
+        pre_trigger_time (float, optional): The amount of audio (in seconds) to preserve
+            before the trigger point and any found quieter/shorter bursts. (Default: 0.0)
+        boot_time (float, optional) The algorithm (internally) uses adaptive noise
+            estimation/reduction in order to detect the start of the wanted audio.
+            This option sets the time for the initial noise estimate. (Default: 0.35)
+        noise_up_time (float, optional) Time constant used by the adaptive noise estimator
+            for when the noise level is increasing. (Default: 0.1)
+        noise_down_time (float, optional) Time constant used by the adaptive noise estimator
+            for when the noise level is decreasing. (Default: 0.01)
+        noise_reduction_amount (float, optional) Amount of noise reduction to use in
+            the detection algorithm (e.g. 0, 0.5, ...). (Default: 1.35)
+        measure_freq (float, optional) Frequency of the algorithm’s
+            processing/measurements. (Default: 20.0)
+        measure_duration: (float, optional) Measurement duration.
+            (Default: Twice the measurement period; i.e. with overlap.)
+        measure_smooth_time (float, optional) Time constant used to smooth
+            spectral measurements. (Default: 0.4)
+        hp_filter_freq (float, optional) "Brick-wall" frequency of high-pass filter applied
+            at the input to the detector algorithm. (Default: 50.0)
+        lp_filter_freq (float, optional) "Brick-wall" frequency of low-pass filter applied
+            at the input to the detector algorithm. (Default: 6000.0)
+        hp_lifter_freq (float, optional) "Brick-wall" frequency of high-pass lifter used
+            in the detector algorithm. (Default: 150.0)
+        lp_lifter_freq (float, optional) "Brick-wall" frequency of low-pass lifter used
+            in the detector algorithm. (Default: 2000.0)
+
+    References:
+        http://sox.sourceforge.net/sox.html
+    """
+
+    def __init__(self,
+                 sample_rate: int,
+                 trigger_level: float = 7.0,
+                 trigger_time: float = 0.25,
+                 search_time: float = 1.0,
+                 allowed_gap: float = 0.25,
+                 pre_trigger_time: float = 0.0,
+                 boot_time: float = .35,
+                 noise_up_time: float = .1,
+                 noise_down_time: float = .01,
+                 noise_reduction_amount: float = 1.35,
+                 measure_freq: float = 20.0,
+                 measure_duration: Optional[float] = None,
+                 measure_smooth_time: float = .4,
+                 hp_filter_freq: float = 50.,
+                 lp_filter_freq: float = 6000.,
+                 hp_lifter_freq: float = 150.,
+                 lp_lifter_freq: float = 2000.) -> None:
+        super().__init__()
+
+        self.sample_rate = sample_rate
+        self.trigger_level = trigger_level
+        self.trigger_time = trigger_time
+        self.search_time = search_time
+        self.allowed_gap = allowed_gap
+        self.pre_trigger_time = pre_trigger_time
+        self.boot_time = boot_time
+        self.noise_up_time = noise_up_time
+        self.noise_down_time = noise_up_time
+        self.noise_reduction_amount = noise_reduction_amount
+        self.measure_freq = measure_freq
+        self.measure_duration = measure_duration
+        self.measure_smooth_time = measure_smooth_time
+        self.hp_filter_freq = hp_filter_freq
+        self.lp_filter_freq = lp_filter_freq
+        self.hp_lifter_freq = hp_lifter_freq
+        self.lp_lifter_freq = lp_lifter_freq
+
+    def forward(self, waveform: Tensor) -> Tensor:
+        r"""
+        Args:
+            waveform (Tensor): Tensor of audio of dimension `(..., time)`
+        """
+        return F.vad(
+            waveform=waveform,
+            sample_rate=self.sample_rate,
+            trigger_level=self.trigger_level,
+            trigger_time=self.trigger_time,
+            search_time=self.search_time,
+            allowed_gap=self.allowed_gap,
+            pre_trigger_time=self.pre_trigger_time,
+            boot_time=self.boot_time,
+            noise_up_time=self.noise_up_time,
+            noise_down_time=self.noise_up_time,
+            noise_reduction_amount=self.noise_reduction_amount,
+            measure_freq=self.measure_freq,
+            measure_duration=self.measure_duration,
+            measure_smooth_time=self.measure_smooth_time,
+            hp_filter_freq=self.hp_filter_freq,
+            lp_filter_freq=self.lp_filter_freq,
+            hp_lifter_freq=self.hp_lifter_freq,
+            lp_lifter_freq=self.lp_lifter_freq,
+        )

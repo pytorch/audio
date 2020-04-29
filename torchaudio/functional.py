@@ -31,35 +31,14 @@ __all__ = [
     "deemph_biquad",
     "riaa_biquad",
     "biquad",
+    "contrast",
+    "dcshift",
+    "overdrive",
     'mask_along_axis',
-    'mask_along_axis_iid'
+    'mask_along_axis_iid',
+    'sliding_window_cmn',
+    'vad',
 ]
-
-
-# TODO: remove this once https://github.com/pytorch/pytorch/issues/21478 gets solved
-@torch.jit.ignore
-def _stft(
-        waveform: Tensor,
-        n_fft: int,
-        hop_length: Optional[int],
-        win_length: Optional[int],
-        window: Optional[Tensor],
-        center: bool,
-        pad_mode: str,
-        normalized: bool,
-        onesided: bool
-) -> Tensor:
-    return torch.stft(
-        waveform,
-        n_fft,
-        hop_length,
-        win_length,
-        window,
-        center,
-        pad_mode,
-        normalized,
-        onesided,
-    )
 
 
 def istft(
@@ -265,7 +244,7 @@ def spectrogram(
     waveform = waveform.view(-1, shape[-1])
 
     # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = _stft(
+    spec_f = torch.stft(
         waveform, n_fft, hop_length, win_length, window, True, "reflect", False, True
     )
 
@@ -365,8 +344,8 @@ def griffinlim(
                         length=length).float()
 
         # Rebuild the spectrogram
-        rebuilt = _stft(inverse, n_fft, hop_length, win_length, window,
-                        True, 'reflect', False, True)
+        rebuilt = torch.stft(inverse, n_fft, hop_length, win_length, window,
+                             True, 'reflect', False, True)
 
         # Update our phase estimates
         angles = rebuilt - tprev.mul_(momentum / (1 + momentum))
@@ -743,11 +722,11 @@ def lfilter(
     # (n_order, ) matmul (n_channel, n_order, n_sample) -> (n_channel, n_sample)
     input_signal_windows = torch.matmul(b_coeffs_flipped, torch.take(padded_waveform, window_idxs))
 
+    input_signal_windows.div_(a_coeffs[0])
+    a_coeffs_flipped.div_(a_coeffs[0])
     for i_sample, o0 in enumerate(input_signal_windows.t()):
         windowed_output_signal = padded_output_waveform[:, i_sample:(i_sample + n_order)]
-        o0.sub_(torch.mv(windowed_output_signal, a_coeffs_flipped))
-        o0.div_(a_coeffs[0])
-
+        o0.addmv_(windowed_output_signal, a_coeffs_flipped, alpha=-1)
         padded_output_waveform[:, i_sample + n_order - 1] = o0
 
     output = torch.clamp(padded_output_waveform[:, (n_order - 1):], min=-1., max=1.)
@@ -1186,6 +1165,137 @@ def riaa_biquad(
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
+def contrast(
+        waveform: Tensor,
+        enhancement_amount: float = 75.
+) -> Tensor:
+    r"""Apply contrast effect.  Similar to SoX implementation.
+    Comparable with compression, this effect modifies an audio signal to make it sound louder
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        enhancement_amount (float): controls the amount of the enhancement
+            Allowed range of values for enhancement_amount : 0-100
+            Note that enhancement_amount = 0 still gives a significant contrast enhancement
+
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+    """
+
+    if not 0 <= enhancement_amount <= 100:
+        raise ValueError("Allowed range of values for enhancement_amount : 0-100")
+
+    contrast = enhancement_amount / 750.
+
+    temp1 = waveform * (math.pi / 2)
+    temp2 = contrast * torch.sin(temp1 * 4)
+    output_waveform = torch.sin(temp1 + temp2)
+
+    return output_waveform
+
+
+def dcshift(
+        waveform: Tensor,
+        shift: float,
+        limiter_gain: Optional[float] = None
+) -> Tensor:
+    r"""Apply a DC shift to the audio. Similar to SoX implementation.
+    This can be useful to remove a DC offset
+    (caused perhaps by a hardware problem in the recording chain) from the audio
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        shift (float): indicates the amount to shift the audio
+            Allowed range of values for shift : -2.0 to +2.0
+        limiter_gain (float): It is used only on peaks to prevent clipping
+            It should have a value much less than 1 (e.g. 0.05 or 0.02)
+
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+    """
+    output_waveform = waveform
+    limiter_threshold = 0.
+
+    if limiter_gain is not None:
+        limiter_threshold = 1.0 - (abs(shift) - limiter_gain)
+
+    if limiter_gain is not None and shift > 0:
+        mask = waveform > limiter_threshold
+        temp = (waveform[mask] - limiter_threshold) * limiter_gain / (1 - limiter_threshold)
+        output_waveform[mask] = (temp + limiter_threshold + shift).clamp(max=limiter_threshold)
+        output_waveform[~mask] = (waveform[~mask] + shift).clamp(min=-1, max=1)
+    elif limiter_gain is not None and shift < 0:
+        mask = waveform < -limiter_threshold
+        temp = (waveform[mask] + limiter_threshold) * limiter_gain / (1 - limiter_threshold)
+        output_waveform[mask] = (temp - limiter_threshold + shift).clamp(min=-limiter_threshold)
+        output_waveform[~mask] = (waveform[~mask] + shift).clamp(min=-1, max=1)
+    else:
+        output_waveform = (waveform + shift).clamp(min=-1, max=1)
+
+    return output_waveform
+
+
+def overdrive(
+        waveform: Tensor,
+        gain: float = 20,
+        colour: float = 20
+) -> Tensor:
+    r"""Apply a overdrive effect to the audio. Similar to SoX implementation.
+    This effect applies a non linear distortion to the audio signal.
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        gain (float): desired gain at the boost (or attenuation) in dB
+            Allowed range of values are 0 to 100
+        colour (float):  controls the amount of even harmonic content in the over-driven output
+            Allowed range of values are 0 to 100
+
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+    """
+    actual_shape = waveform.shape
+    device, dtype = waveform.device, waveform.dtype
+
+    # convert to 2D (..,time)
+    waveform = waveform.view(-1, actual_shape[-1])
+
+    gain = _dB2Linear(gain)
+    colour = colour / 200
+    last_in = torch.zeros(waveform.shape[:-1], dtype=dtype, device=device)
+    last_out = torch.zeros(waveform.shape[:-1], dtype=dtype, device=device)
+
+    temp = waveform * gain + colour
+
+    mask1 = temp < -1
+    temp[mask1] = torch.tensor(-2.0 / 3.0, dtype=dtype, device=device)
+    # Wrapping the constant with Tensor is required for Torchscript
+
+    mask2 = temp > 1
+    temp[mask2] = torch.tensor(2.0 / 3.0, dtype=dtype, device=device)
+
+    mask3 = (~mask1 & ~mask2)
+    temp[mask3] = temp[mask3] - (temp[mask3]**3) * (1. / 3)
+
+    output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
+
+    # TODO: Implement a torch CPP extension
+    for i in range(waveform.shape[-1]):
+        last_out = temp[:, i] - last_in + 0.995 * last_out
+        last_in = temp[:, i]
+        output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
+
+    return output_waveform.clamp(min=-1, max=1).view(actual_shape)
+
+
 def mask_along_axis_iid(
         specgrams: Tensor,
         mask_param: int,
@@ -1210,13 +1320,16 @@ def mask_along_axis_iid(
     if axis != 2 and axis != 3:
         raise ValueError('Only Frequency and Time masking are supported')
 
-    value = torch.rand(specgrams.shape[:2]) * mask_param
-    min_value = torch.rand(specgrams.shape[:2]) * (specgrams.size(axis) - value)
+    device = specgrams.device
+    dtype = specgrams.dtype
+
+    value = torch.rand(specgrams.shape[:2], device=device, dtype=dtype) * mask_param
+    min_value = torch.rand(specgrams.shape[:2], device=device, dtype=dtype) * (specgrams.size(axis) - value)
 
     # Create broadcastable mask
-    mask_start = (min_value.long())[..., None, None].float()
-    mask_end = (min_value.long() + value.long())[..., None, None].float()
-    mask = torch.arange(0, specgrams.size(axis)).float()
+    mask_start = min_value[..., None, None]
+    mask_end = (min_value + value)[..., None, None]
+    mask = torch.arange(0, specgrams.size(axis), device=device, dtype=dtype)
 
     # Per batch example masking
     specgrams = specgrams.transpose(axis, -1)
@@ -1298,6 +1411,8 @@ def compute_deltas(
         >>> delta = compute_deltas(specgram)
         >>> delta2 = compute_deltas(delta)
     """
+    device = specgram.device
+    dtype = specgram.dtype
 
     # pack batch
     shape = specgram.size()
@@ -1312,7 +1427,7 @@ def compute_deltas(
 
     specgram = torch.nn.functional.pad(specgram, (n, n), mode=mode)
 
-    kernel = (torch.arange(-n, n + 1, 1, device=specgram.device, dtype=specgram.dtype).repeat(specgram.shape[1], 1, 1))
+    kernel = torch.arange(-n, n + 1, 1, device=device, dtype=dtype).repeat(specgram.shape[1], 1, 1)
 
     output = torch.nn.functional.conv1d(specgram, kernel, groups=specgram.shape[1]) / denom
 
@@ -1431,7 +1546,7 @@ def _apply_probability_distribution(
         signal_scaled_dis = signal_scaled + gaussian
     else:
         # dtype needed for https://github.com/pytorch/pytorch/issues/32358
-        TPDF = torch.bartlett_window(time_size + 1, dtype=torch.float)
+        TPDF = torch.bartlett_window(time_size + 1, dtype=signal_scaled.dtype, device=signal_scaled.device)
         TPDF = TPDF.repeat((channel_size + 1), 1)
         signal_scaled_dis = signal_scaled + TPDF
 
@@ -1631,3 +1746,390 @@ def detect_pitch_frequency(
     freq = freq.view(shape[:-1] + list(freq.shape[-1:]))
 
     return freq
+
+
+def sliding_window_cmn(
+    waveform: Tensor,
+    cmn_window: int = 600,
+    min_cmn_window: int = 100,
+    center: bool = False,
+    norm_vars: bool = False,
+) -> Tensor:
+    r"""
+    Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
+
+    Args:
+        waveform (Tensor): Tensor of audio of dimension (..., freq, time)
+        cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)
+        min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).
+            Only applicable if center == false, ignored if center==true (int, default = 100)
+        center (bool, optional): If true, use a window centered on the current frame
+            (to the extent possible, modulo end effects). If false, window is to the left. (bool, default = false)
+        norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
+
+    Returns:
+        Tensor: Tensor of freq of dimension (..., frame)
+    """
+    input_shape = waveform.shape
+    num_frames, num_feats = input_shape[-2:]
+    waveform = waveform.view(-1, num_frames, num_feats)
+    num_channels = waveform.shape[0]
+
+    dtype = waveform.dtype
+    device = waveform.device
+    last_window_start = last_window_end = -1
+    cur_sum = torch.zeros(num_channels, num_feats, dtype=dtype, device=device)
+    cur_sumsq = torch.zeros(num_channels, num_feats, dtype=dtype, device=device)
+    cmn_waveform = torch.zeros(
+        num_channels, num_frames, num_feats, dtype=dtype, device=device)
+    for t in range(num_frames):
+        window_start = 0
+        window_end = 0
+        if center:
+            window_start = t - cmn_window // 2
+            window_end = window_start + cmn_window
+        else:
+            window_start = t - cmn_window
+            window_end = t + 1
+        if window_start < 0:
+            window_end -= window_start
+            window_start = 0
+        if not center:
+            if window_end > t:
+                window_end = max(t + 1, min_cmn_window)
+        if window_end > num_frames:
+            window_start -= (window_end - num_frames)
+            window_end = num_frames
+            if window_start < 0:
+                window_start = 0
+        if last_window_start == -1:
+            input_part = waveform[:, window_start: window_end - window_start, :]
+            cur_sum += torch.sum(input_part, 1)
+            if norm_vars:
+                cur_sumsq += torch.cumsum(input_part ** 2, 1)[:, -1, :]
+        else:
+            if window_start > last_window_start:
+                frame_to_remove = waveform[:, last_window_start, :]
+                cur_sum -= frame_to_remove
+                if norm_vars:
+                    cur_sumsq -= (frame_to_remove ** 2)
+            if window_end > last_window_end:
+                frame_to_add = waveform[:, last_window_end, :]
+                cur_sum += frame_to_add
+                if norm_vars:
+                    cur_sumsq += (frame_to_add ** 2)
+        window_frames = window_end - window_start
+        last_window_start = window_start
+        last_window_end = window_end
+        cmn_waveform[:, t, :] = waveform[:, t, :] - cur_sum / window_frames
+        if norm_vars:
+            if window_frames == 1:
+                cmn_waveform[:, t, :] = torch.zeros(
+                    num_channels, num_feats, dtype=dtype, device=device)
+            else:
+                variance = cur_sumsq
+                variance = variance / window_frames
+                variance -= ((cur_sum ** 2) / (window_frames ** 2))
+                variance = torch.pow(variance, -0.5)
+                cmn_waveform[:, t, :] *= variance
+
+    cmn_waveform = cmn_waveform.view(input_shape[:-2] + (num_frames, num_feats))
+    if len(input_shape) == 2:
+        cmn_waveform = cmn_waveform.squeeze(0)
+    return cmn_waveform
+
+
+def _measure(
+    measure_len_ws: int,
+    samples: Tensor,
+    spectrum: Tensor,
+    noise_spectrum: Tensor,
+    spectrum_window: Tensor,
+    spectrum_start: int,
+    spectrum_end: int,
+    cepstrum_window: Tensor,
+    cepstrum_start: int,
+    cepstrum_end: int,
+    noise_reduction_amount: float,
+    measure_smooth_time_mult: float,
+    noise_up_time_mult: float,
+    noise_down_time_mult: float,
+    index_ns: int,
+    boot_count: int
+) -> float:
+
+    assert spectrum.size()[-1] == noise_spectrum.size()[-1]
+
+    samplesLen_ns = samples.size()[-1]
+    dft_len_ws = spectrum.size()[-1]
+
+    dftBuf = torch.zeros(dft_len_ws)
+
+    _index_ns = torch.tensor([index_ns] + [
+        (index_ns + i) % samplesLen_ns
+        for i in range(1, measure_len_ws)
+    ])
+    dftBuf[:measure_len_ws] = \
+        samples[_index_ns] * spectrum_window[:measure_len_ws]
+
+    # memset(c->dftBuf + i, 0, (p->dft_len_ws - i) * sizeof(*c->dftBuf));
+    dftBuf[measure_len_ws:dft_len_ws].zero_()
+
+    # lsx_safe_rdft((int)p->dft_len_ws, 1, c->dftBuf);
+    _dftBuf = torch.rfft(dftBuf, 1)
+
+    # memset(c->dftBuf, 0, p->spectrum_start * sizeof(*c->dftBuf));
+    _dftBuf[:spectrum_start].zero_()
+
+    mult: float = boot_count / (1. + boot_count) \
+        if boot_count >= 0 \
+        else measure_smooth_time_mult
+
+    _d = complex_norm(_dftBuf[spectrum_start:spectrum_end])
+    spectrum[spectrum_start:spectrum_end].mul_(mult).add_(_d * (1 - mult))
+    _d = spectrum[spectrum_start:spectrum_end] ** 2
+
+    _zeros = torch.zeros(spectrum_end - spectrum_start)
+    _mult = _zeros \
+        if boot_count >= 0 \
+        else torch.where(
+            _d > noise_spectrum[spectrum_start:spectrum_end],
+            torch.tensor(noise_up_time_mult),   # if
+            torch.tensor(noise_down_time_mult)  # else
+        )
+
+    noise_spectrum[spectrum_start:spectrum_end].mul_(_mult).add_(_d * (1 - _mult))
+    _d = torch.sqrt(
+        torch.max(
+            _zeros,
+            _d - noise_reduction_amount * noise_spectrum[spectrum_start:spectrum_end]))
+
+    _cepstrum_Buf: Tensor = torch.zeros(dft_len_ws >> 1)
+    _cepstrum_Buf[spectrum_start:spectrum_end] = _d * cepstrum_window
+    _cepstrum_Buf[spectrum_end:dft_len_ws >> 1].zero_()
+
+    # lsx_safe_rdft((int)p->dft_len_ws >> 1, 1, c->dftBuf);
+    _cepstrum_Buf = torch.rfft(_cepstrum_Buf, 1)
+
+    result: float = float(torch.sum(
+        complex_norm(
+            _cepstrum_Buf[cepstrum_start:cepstrum_end],
+            power=2.0)))
+    result = \
+        math.log(result / (cepstrum_end - cepstrum_start)) \
+        if result > 0 \
+        else -math.inf
+    return max(0, 21 + result)
+
+
+def vad(
+    waveform: Tensor,
+    sample_rate: int,
+    trigger_level: float = 7.0,
+    trigger_time: float = 0.25,
+    search_time: float = 1.0,
+    allowed_gap: float = 0.25,
+    pre_trigger_time: float = 0.0,
+    # Fine-tuning parameters
+    boot_time: float = .35,
+    noise_up_time: float = .1,
+    noise_down_time: float = .01,
+    noise_reduction_amount: float = 1.35,
+    measure_freq: float = 20.0,
+    measure_duration: Optional[float] = None,
+    measure_smooth_time: float = .4,
+    hp_filter_freq: float = 50.,
+    lp_filter_freq: float = 6000.,
+    hp_lifter_freq: float = 150.,
+    lp_lifter_freq: float = 2000.,
+) -> Tensor:
+    r"""Voice Activity Detector. Similar to SoX implementation.
+    Attempts to trim silence and quiet background sounds from the ends of recordings of speech.
+    The algorithm currently uses a simple cepstral power measurement to detect voice,
+    so may be fooled by other things, especially music.
+
+    The effect can trim only from the front of the audio,
+    so in order to trim from the back, the reverse effect must also be used.
+
+    Args:
+        waveform (Tensor): Tensor of audio of dimension `(..., time)`
+        sample_rate (int): Sample rate of audio signal.
+        trigger_level (float, optional): The measurement level used to trigger activity detection.
+            This may need to be cahnged depending on the noise level, signal level,
+            and other characteristics of the input audio. (Default: 7.0)
+        trigger_time (float, optional): The time constant (in seconds)
+            used to help ignore short bursts of sound. (Default: 0.25)
+        search_time (float, optional): The amount of audio (in seconds)
+            to search for quieter/shorter bursts of audio to include prior
+            to the detected trigger point. (Default: 1.0)
+        allowed_gap (float, optional): The allowed gap (in seconds) between
+            quiteter/shorter bursts of audio to include prior
+            to the detected trigger point. (Default: 0.25)
+        pre_trigger_time (float, optional): The amount of audio (in seconds) to preserve
+            before the trigger point and any found quieter/shorter bursts. (Default: 0.0)
+        boot_time (float, optional) The algorithm (internally) uses adaptive noise
+            estimation/reduction in order to detect the start of the wanted audio.
+            This option sets the time for the initial noise estimate. (Default: 0.35)
+        noise_up_time (float, optional) Time constant used by the adaptive noise estimator
+            for when the noise level is increasing. (Default: 0.1)
+        noise_down_time (float, optional) Time constant used by the adaptive noise estimator
+            for when the noise level is decreasing. (Default: 0.01)
+        noise_reduction_amount (float, optional) Amount of noise reduction to use in
+            the detection algorithm (e.g. 0, 0.5, ...). (Default: 1.35)
+        measure_freq (float, optional) Frequency of the algorithm’s
+            processing/measurements. (Default: 20.0)
+        measure_duration: (float, optional) Measurement duration.
+            (Default: Twice the measurement period; i.e. with overlap.)
+        measure_smooth_time (float, optional) Time constant used to smooth
+            spectral measurements. (Default: 0.4)
+        hp_filter_freq (float, optional) "Brick-wall" frequency of high-pass filter applied
+            at the input to the detector algorithm. (Default: 50.0)
+        lp_filter_freq (float, optional) "Brick-wall" frequency of low-pass filter applied
+            at the input to the detector algorithm. (Default: 6000.0)
+        hp_lifter_freq (float, optional) "Brick-wall" frequency of high-pass lifter used
+            in the detector algorithm. (Default: 150.0)
+        lp_lifter_freq (float, optional) "Brick-wall" frequency of low-pass lifter used
+            in the detector algorithm. (Default: 2000.0)
+
+    Returns:
+        Tensor: Tensor of audio of dimension (..., time).
+
+    References:
+        http://sox.sourceforge.net/sox.html
+    """
+
+    measure_duration: float = 2.0 / measure_freq \
+        if measure_duration is None \
+        else measure_duration
+
+    measure_len_ws = int(sample_rate * measure_duration + .5)
+    measure_len_ns = measure_len_ws
+    # for (dft_len_ws = 16; dft_len_ws < measure_len_ws; dft_len_ws <<= 1);
+    dft_len_ws = 16
+    while (dft_len_ws < measure_len_ws):
+        dft_len_ws *= 2
+
+    measure_period_ns = int(sample_rate / measure_freq + .5)
+    measures_len = math.ceil(search_time * measure_freq)
+    search_pre_trigger_len_ns = measures_len * measure_period_ns
+    gap_len = int(allowed_gap * measure_freq + .5)
+
+    fixed_pre_trigger_len_ns = int(pre_trigger_time * sample_rate + .5)
+    samplesLen_ns = fixed_pre_trigger_len_ns + search_pre_trigger_len_ns + measure_len_ns
+
+    spectrum_window = torch.zeros(measure_len_ws)
+    for i in range(measure_len_ws):
+        # sox.h:741 define SOX_SAMPLE_MIN (sox_sample_t)SOX_INT_MIN(32)
+        spectrum_window[i] = 2. / math.sqrt(float(measure_len_ws))
+    # lsx_apply_hann(spectrum_window, (int)measure_len_ws);
+    spectrum_window *= torch.hann_window(measure_len_ws, dtype=torch.float)
+
+    spectrum_start: int = int(hp_filter_freq / sample_rate * dft_len_ws + .5)
+    spectrum_start: int = max(spectrum_start, 1)
+    spectrum_end: int = int(lp_filter_freq / sample_rate * dft_len_ws + .5)
+    spectrum_end: int = min(spectrum_end, dft_len_ws // 2)
+
+    cepstrum_window = torch.zeros(spectrum_end - spectrum_start)
+    for i in range(spectrum_end - spectrum_start):
+        cepstrum_window[i] = 2. / math.sqrt(float(spectrum_end) - spectrum_start)
+    # lsx_apply_hann(cepstrum_window,(int)(spectrum_end - spectrum_start));
+    cepstrum_window *= torch.hann_window(spectrum_end - spectrum_start, dtype=torch.float)
+
+    cepstrum_start = math.ceil(sample_rate * .5 / lp_lifter_freq)
+    cepstrum_end = math.floor(sample_rate * .5 / hp_lifter_freq)
+    cepstrum_end = min(cepstrum_end, dft_len_ws // 4)
+
+    assert cepstrum_end > cepstrum_start
+
+    noise_up_time_mult = math.exp(-1. / (noise_up_time * measure_freq))
+    noise_down_time_mult = math.exp(-1. / (noise_down_time * measure_freq))
+    measure_smooth_time_mult = math.exp(-1. / (measure_smooth_time * measure_freq))
+    trigger_meas_time_mult = math.exp(-1. / (trigger_time * measure_freq))
+
+    boot_count_max = int(boot_time * measure_freq - .5)
+    measure_timer_ns = measure_len_ns
+    boot_count = measures_index = flushedLen_ns = samplesIndex_ns = 0
+
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.view(-1, shape[-1])
+
+    n_channels, ilen = waveform.size()
+
+    mean_meas = torch.zeros(n_channels)
+    samples = torch.zeros(n_channels, samplesLen_ns)
+    spectrum = torch.zeros(n_channels, dft_len_ws)
+    noise_spectrum = torch.zeros(n_channels, dft_len_ws)
+    measures = torch.zeros(n_channels, measures_len)
+
+    has_triggered: bool = False
+    num_measures_to_flush: int = 0
+    pos: int = 0
+
+    while (pos < ilen and not has_triggered):
+        measure_timer_ns -= 1
+        for i in range(n_channels):
+            samples[i, samplesIndex_ns] = waveform[i, pos]
+            # if (!p->measure_timer_ns) {
+            if (measure_timer_ns == 0):
+                index_ns: int = \
+                    (samplesIndex_ns + samplesLen_ns - measure_len_ns) % samplesLen_ns
+                meas: float = _measure(
+                    measure_len_ws=measure_len_ws,
+                    samples=samples[i],
+                    spectrum=spectrum[i],
+                    noise_spectrum=noise_spectrum[i],
+                    spectrum_window=spectrum_window,
+                    spectrum_start=spectrum_start,
+                    spectrum_end=spectrum_end,
+                    cepstrum_window=cepstrum_window,
+                    cepstrum_start=cepstrum_start,
+                    cepstrum_end=cepstrum_end,
+                    noise_reduction_amount=noise_reduction_amount,
+                    measure_smooth_time_mult=measure_smooth_time_mult,
+                    noise_up_time_mult=noise_up_time_mult,
+                    noise_down_time_mult=noise_down_time_mult,
+                    index_ns=index_ns,
+                    boot_count=boot_count)
+                measures[i, measures_index] = meas
+                mean_meas[i] = mean_meas[i] * trigger_meas_time_mult + meas * (1. - trigger_meas_time_mult)
+
+                has_triggered = has_triggered or (mean_meas[i] >= trigger_level)
+                if has_triggered:
+                    n: int = measures_len
+                    k: int = measures_index
+                    jTrigger: int = n
+                    jZero: int = n
+                    j: int = 0
+
+                    for j in range(n):
+                        if (measures[i, k] >= trigger_level) and (j <= jTrigger + gap_len):
+                            jZero = jTrigger = j
+                        elif (measures[i, k] == 0) and (jTrigger >= jZero):
+                            jZero = j
+                        k = (k + n - 1) % n
+                    j = min(j, jZero)
+                    # num_measures_to_flush = range_limit(j, num_measures_to_flush, n);
+                    num_measures_to_flush = (min(max(num_measures_to_flush, j), n))
+                # end if has_triggered
+            # end if (measure_timer_ns == 0):
+        # end for
+        samplesIndex_ns += 1
+        pos += 1
+    # end while
+        if samplesIndex_ns == samplesLen_ns:
+            samplesIndex_ns = 0
+        if measure_timer_ns == 0:
+            measure_timer_ns = measure_period_ns
+            measures_index += 1
+            measures_index = measures_index % measures_len
+            if boot_count >= 0:
+                boot_count = -1 if boot_count == boot_count_max else boot_count + 1
+
+        if has_triggered:
+            flushedLen_ns = (measures_len - num_measures_to_flush) * measure_period_ns
+            samplesIndex_ns = (samplesIndex_ns + flushedLen_ns) % samplesLen_ns
+
+    res = waveform[:, pos - samplesLen_ns + flushedLen_ns:]
+    # unpack batch
+    return res.view(shape[:-1] + res.shape[-1:])

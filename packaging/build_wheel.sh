@@ -6,7 +6,7 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 export BUILD_TYPE="wheel"
 export NO_CUDA_PACKAGE=1
-setup_env 0.5.0
+setup_env 0.6.0
 setup_wheel_python
 "$script_dir/build_from_source.sh" "$(pwd)"  # Build static dependencies
 pip_install numpy future

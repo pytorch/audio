@@ -1,4 +1,4 @@
-torch>=1.2.0
+torch>=1.4.0
 
 # Required for Windows because it's the only available backend
 SoundFile; sys_platform == 'win32'
@@ -18,6 +18,3 @@ scipy
 
 # Unit tests with pytest
 pytest
-
-# Testing only Py3 compat
-backports.tempfile

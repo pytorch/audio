@@ -19,7 +19,7 @@ Transforms are common audio transforms. They can be chained together using :clas
 :hidden:`GriffinLim`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: GriffinLim 
+.. autoclass:: GriffinLim
 
   .. automethod:: forward
 
@@ -126,5 +126,19 @@ Transforms are common audio transforms. They can be chained together using :clas
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Vol
+
+  .. automethod:: forward
+
+:hidden:`SlidingWindowCmn`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SlidingWindowCmn
+
+  .. automethod:: forward
+
+:hidden:`Vad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Vad
 
   .. automethod:: forward
