@@ -249,6 +249,24 @@ class Test_SoxEffectsChain(unittest.TestCase):
             # check if effect worked
             self.assertTrue(x.allclose(z, rtol=1e-4, atol=1e-4))
 
+    def test_vad(self):
+        sample_files = [
+            common_utils.get_asset_path("vad-hello-stereo-44100.wav"),
+            common_utils.get_asset_path("vad-hello-mono-32000.wav")
+        ]
+
+        for sample_file in sample_files:
+            E = torchaudio.sox_effects.SoxEffectsChain()
+            E.set_input_file(sample_file)
+            E.append_effect_to_chain("vad")
+            x, _ = E.sox_build_flow_effects()
+
+            x_orig, sample_rate = torchaudio.load(sample_file)
+            vad = torchaudio.transforms.Vad(sample_rate)
+
+            y = vad(x_orig)
+            self.assertTrue(x.allclose(y, rtol=1e-4, atol=1e-4))
+
 
 if __name__ == '__main__':
     with AudioBackendScope("sox"):

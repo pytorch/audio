@@ -557,6 +557,11 @@ class _TransformsTestMixin:
         tensor = torch.rand((1000, 10))
         self._assert_consistency(T.SlidingWindowCmn(), tensor)
 
+    def test_Vad(self):
+        filepath = common_utils.get_asset_path("vad-hello-mono-32000.wav")
+        waveform, sample_rate = torchaudio.load(filepath)
+        self._assert_consistency(T.Vad(sample_rate=sample_rate), waveform)
+
 
 class TestFunctionalCPU(_FunctionalTestMixin, unittest.TestCase):
     """Test suite for Functional module on CPU"""
