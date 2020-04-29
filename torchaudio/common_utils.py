@@ -4,7 +4,7 @@ PY3 = sys.version_info > (3, 0)
 PY34 = sys.version_info >= (3, 4)
 
 
-def _check_module_exists(name):
+def _check_module_exists(name: str) -> bool:
     r"""Returns if a top-level module with :attr:`name` exists *without**
     importing it. This is generally safer than try-catch block around a
     `import X`. It avoids third party libraries breaking assumptions of some of

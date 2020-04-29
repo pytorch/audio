@@ -86,8 +86,8 @@ class SoxEffectsChain(object):
                  out_siginfo: Any = None,
                  out_encinfo: Any = None,
                  filetype: str = "raw") -> None:
-        self.input_file = None
-        self.chain = []
+        self.input_file: Optional[str] = None
+        self.chain: List[str] = []
         self.MAX_EFFECT_OPTS = 20
         self.out_siginfo = out_siginfo
         self.out_encinfo = out_encinfo
@@ -100,12 +100,12 @@ class SoxEffectsChain(object):
 
     def append_effect_to_chain(self,
                                ename: str,
-                               eargs: Optional[List[str]] = None) -> None:
+                               eargs: Optional[Union[List[str], str]] = None) -> None:
         r"""Append effect to a sox effects chain.
 
         Args:
             ename (str): which is the name of effect
-            eargs (List[str], optional): which is a list of effect options. (Default: ``None``)
+            eargs (List[str] or str, optional): which is a list of effect options. (Default: ``None``)
         """
         e = SoxEffect()
         # check if we have a valid effect
@@ -149,6 +149,7 @@ class SoxEffectsChain(object):
 
         # print("effect options:", [x.eopts for x in self.chain])
 
+        torchaudio.initialize_sox()
         import _torch_sox
         sr = _torch_sox.build_flow_effects(self.input_file,
                                            out,
