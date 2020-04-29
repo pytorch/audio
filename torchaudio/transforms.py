@@ -1056,8 +1056,7 @@ class Synth(torch.nn.Module):
         self.chirp = chirp
         self.amp = amp
 
-    def forward(self, waveform=None):
-        # type: (Optional[Tensor]) -> Tensor
+    def forward(self, waveform: Optional[Tensor] = None) -> Tensor:
         r"""
         Args:
             waveform (torch.Tensor): Tensor of audio of dimension (..., time).
@@ -1070,8 +1069,10 @@ class Synth(torch.nn.Module):
 
         if self.chirp == "linear":
             self.evaluate = self.evaluate_linear()
+
         elif self.chirp == "exp":
             self.evaluate = self.evaluate_exp()
+
         elif self.chirp == "square":
             self.evaluate = self.evaluate_square()
 
