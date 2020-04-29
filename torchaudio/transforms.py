@@ -1057,7 +1057,7 @@ class Synth(torch.nn.Module):
         self.chirp = chirp
         self.amp = amp
 
-    def forward(self, waveform: Optional[Tensor] = None) -> Tensor:
+    def forward(self) -> Tensor:
         r"""
         Args:
             waveform (torch.Tensor): Tensor of audio of dimension (..., time).
@@ -1070,7 +1070,7 @@ class Synth(torch.nn.Module):
 
         self.evaluate = None
         if self.chirp:
-            self.evaluate = getattr(self, f"evaluate_{self.chirp}")
+            self.evaluate = getattr(self, f"evaluate_{self.chirp}")()
 
         if self.wave_type:
             return self.amp * getattr(self, f"_{self.wave_type}")(self.evaluate)
@@ -1101,7 +1101,7 @@ class Synth(torch.nn.Module):
         phases = torch.cat((torch.zeros(1), phases))
         return phases
 
-    def _sin(self, phases):
+    def _sine(self, phases):
         return torch.sin(phases)
 
     def _triangle(self, phases):

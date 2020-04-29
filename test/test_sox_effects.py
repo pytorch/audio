@@ -1,7 +1,9 @@
+import math
+import os
 import unittest
+
 import torch
 import torchaudio
-import math
 
 import common_utils
 from common_utils import AudioBackendScope, BACKENDS
@@ -268,9 +270,8 @@ class Test_SoxEffectsChain(unittest.TestCase):
             self.assertTrue(x.allclose(y, rtol=1e-4, atol=1e-4))
 
     def test_transform_synth(self):
-
-        test_filepath_8000 = os.path.join(self.test_dirpath, "assets", "silence_8000.wav")
-        test_filepath_16000 = os.path.join(self.test_dirpath, "assets", "silence_16000.wav")
+        test_filepath_8000 = common_utils.get_asset_path("silence_8000.wav")
+        test_filepath_16000 = common_utils.get_asset_path("silence_16000.wav")
         for test_filepath in (test_filepath_8000, test_filepath_16000):
             x_orig, _ = torchaudio.load(test_filepath)
 
