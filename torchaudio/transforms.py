@@ -1149,4 +1149,6 @@ class Synth(torch.nn.Module):
         return torch.rand(int(self.duration * self.sample_rate))
 
     def brownian(self):
-        return torch.cumsum(self._white(), dim=-1)
+        noise = torch.cumsum(self._white(), dim=-1)
+        high, low = abs(max(noise)), abs(min(noise))
+        return (noise - noise.mean()) / max(high, low)
