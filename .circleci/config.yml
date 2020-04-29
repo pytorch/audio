@@ -24,15 +24,10 @@ binary_common: &binary_common
     python_version:
       description: "Python version to build against (e.g., 3.8)"
       type: string
-    unicode_abi:
-      description: "Python 2.7 wheel only: whether or not we are cp27mu (default: no)"
-      type: string
-      default: ""
   environment:
     PYTHON_VERSION: << parameters.python_version >>
     BUILD_VERSION: << parameters.build_version >>
     PYTORCH_VERSION: << parameters.pytorch_version >>
-    UNICODE_ABI: << parameters.unicode_abi >>
     CU_VERSION: cpu
 
 smoke_test_common: &smoke_test_common
@@ -213,7 +208,7 @@ jobs:
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             python -c "import torchaudio"
 
-  docker_image_build:
+  smoke_test_docker_image_build:
     machine:
       image: ubuntu-1604:201903-01
     resource_class: large
@@ -225,7 +220,7 @@ jobs:
           name: build_docker image
           no_output_timeout: "1h"
           command: |
-            cd .circleci/docker && docker build . -t ${image_name}:${CIRCLE_WORKFLOW_ID}
+            cd .circleci/smoke_test/docker && docker build . -t ${image_name}:${CIRCLE_WORKFLOW_ID}
       - run:
           name: upload docker image
           no_output_timeout: "1h"
@@ -238,13 +233,45 @@ jobs:
             docker tag ${image_name}:${CIRCLE_WORKFLOW_ID} 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
             docker push 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
 
+  unittest_linux:
+    <<: *binary_common
+    docker:
+      - image: "pytorch/manylinux-cuda100"
+    resource_class: 2xlarge+
+    steps:
+      - checkout
+      - restore_cache:
+
+          keys:
+            - env-v1-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum "./packaging/build_from_source.sh" }}-{{ checksum ".circleci/unittest/environment.yml" }}
+
+      - run:
+          name: Setup
+          command: .circleci/unittest/setup_env.sh
+      - save_cache:
+
+          key: env-v1-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum "./packaging/build_from_source.sh" }}-{{ checksum ".circleci/unittest/environment.yml" }}
+
+          paths:
+            - conda
+            - env
+            - third_party
+      - run:
+          name: Installation
+          command: .circleci/unittest/install.sh
+      - run:
+          name: Run test
+          command: .circleci/unittest/run_test.sh
+      - run:
+          name: Post process
+          command: .circleci/unittest/post_process.sh
+      - store_test_results:
+          path: test-results
+
 workflows:
   build:
     jobs:
       - circleci_consistency
-      - binary_linux_wheel:
-          name: binary_linux_wheel_py3.5
-          python_version: '3.5'
       - binary_linux_wheel:
           name: binary_linux_wheel_py3.6
           python_version: '3.6'
@@ -255,9 +282,6 @@ workflows:
           name: binary_linux_wheel_py3.8
           python_version: '3.8'
       - binary_macos_wheel:
-          name: binary_macos_wheel_py3.5
-          python_version: '3.5'
-      - binary_macos_wheel:
           name: binary_macos_wheel_py3.6
           python_version: '3.6'
       - binary_macos_wheel:
@@ -267,9 +291,6 @@ workflows:
           name: binary_macos_wheel_py3.8
           python_version: '3.8'
       - binary_linux_conda:
-          name: binary_linux_conda_py3.5
-          python_version: '3.5'
-      - binary_linux_conda:
           name: binary_linux_conda_py3.6
           python_version: '3.6'
       - binary_linux_conda:
@@ -278,9 +299,6 @@ workflows:
       - binary_linux_conda:
           name: binary_linux_conda_py3.8
           python_version: '3.8'
-      - binary_macos_conda:
-          name: binary_macos_conda_py3.5
-          python_version: '3.5'
       - binary_macos_conda:
           name: binary_macos_conda_py3.6
           python_version: '3.6'
@@ -293,32 +311,23 @@ workflows:
       - binary_win_conda:
           name: torchaudio_win_py3.6
           python_version: "3.6"
-
+  unittest:
+    jobs:
+      - unittest_linux:
+          name: unittest_linux_py3.6
+          python_version: '3.6'
+      - unittest_linux:
+          name: unittest_linux_py3.7
+          python_version: '3.7'
+      - unittest_linux:
+          name: unittest_linux_py3.8
+          python_version: '3.8'
   nightly:
     jobs:
-      - circleci_consistency
-      - binary_linux_wheel:
+      - circleci_consistency:
           filters:
             branches:
               only: nightly
-          name: nightly_binary_linux_wheel_py3.5
-          python_version: '3.5'
-      - binary_wheel_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py3.5_upload
-          requires:
-          - nightly_binary_linux_wheel_py3.5
-      - smoke_test_linux_pip:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py3.5_smoke_test_pip
-          python_version: '3.5'
-          requires:
-          - nightly_binary_linux_wheel_py3.5_upload
       - binary_linux_wheel:
           filters:
             branches:
@@ -389,20 +398,6 @@ workflows:
           filters:
             branches:
               only: nightly
-          name: nightly_binary_macos_wheel_py3.5
-          python_version: '3.5'
-      - binary_wheel_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_macos_wheel_py3.5_upload
-          requires:
-          - nightly_binary_macos_wheel_py3.5
-      - binary_macos_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_wheel_py3.6
           python_version: '3.6'
       - binary_wheel_upload:
@@ -441,28 +436,6 @@ workflows:
           name: nightly_binary_macos_wheel_py3.8_upload
           requires:
           - nightly_binary_macos_wheel_py3.8
-      - binary_linux_conda:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_conda_py3.5
-          python_version: '3.5'
-      - binary_conda_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_conda_py3.5_upload
-          requires:
-          - nightly_binary_linux_conda_py3.5
-      - smoke_test_linux_conda:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_conda_py3.5_smoke_test_conda
-          python_version: '3.5'
-          requires:
-          - nightly_binary_linux_conda_py3.5_upload
       - binary_linux_conda:
           filters:
             branches:
@@ -533,20 +506,6 @@ workflows:
           filters:
             branches:
               only: nightly
-          name: nightly_binary_macos_conda_py3.5
-          python_version: '3.5'
-      - binary_conda_upload:
-          context: org-member
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_macos_conda_py3.5_upload
-          requires:
-          - nightly_binary_macos_conda_py3.5
-      - binary_macos_conda:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_conda_py3.6
           python_version: '3.6'
       - binary_conda_upload:
@@ -594,4 +553,4 @@ workflows:
               only:
                 - master
     jobs:
-      - docker_image_build
+      - smoke_test_docker_image_build

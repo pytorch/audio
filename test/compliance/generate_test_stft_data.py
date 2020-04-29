@@ -1,4 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
 import argparse
 import logging
 import os
@@ -9,7 +8,7 @@ import utils
 
 def run(exe_path, scp_path, out_dir, wave_len, num_outputs, remove_files, log_level):
     logging.basicConfig(level=log_level)
-    for i in range(num_outputs):
+    for _ in range(num_outputs):
         inputs = {
             'blackman_coeff': '%.4f' % (random.random() * 5),
             'dither': '0',

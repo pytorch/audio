@@ -1,4 +1,3 @@
-import os
 import unittest
 
 from torchaudio.datasets.commonvoice import COMMONVOICE
@@ -13,8 +12,7 @@ import common_utils
 
 
 class TestDatasets(unittest.TestCase):
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
-    path = os.path.join(test_dirpath, "assets")
+    path = common_utils.get_asset_path()
 
     def test_yesno(self):
         data = YESNO(self.path)
@@ -29,13 +27,11 @@ class TestDatasets(unittest.TestCase):
         data[0]
 
     def test_commonvoice(self):
-        path = os.path.join(self.path, "commonvoice")
-        data = COMMONVOICE(path, "train.tsv", "tatar")
+        data = COMMONVOICE(self.path, url="tatar")
         data[0]
 
     def test_commonvoice_diskcache(self):
-        path = os.path.join(self.path, "commonvoice")
-        data = COMMONVOICE(path, "train.tsv", "tatar")
+        data = COMMONVOICE(self.path, url="tatar")
         data = diskcache_iterator(data)
         # Save
         data[0]
@@ -43,10 +39,9 @@ class TestDatasets(unittest.TestCase):
         data[0]
 
     def test_commonvoice_bg(self):
-        path = os.path.join(self.path, "commonvoice")
-        data = COMMONVOICE(path, "train.tsv", "tatar")
+        data = COMMONVOICE(self.path, url="tatar")
         data = bg_iterator(data, 5)
-        for d in data:
+        for _ in data:
             pass
 
     def test_ljspeech(self):

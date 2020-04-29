@@ -1,7 +1,9 @@
 import os
+from typing import Tuple
 
 import torchaudio
 from torch.utils.data import Dataset
+from torch import Tensor
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
@@ -12,9 +14,15 @@ FOLDER_IN_ARCHIVE = "SpeechCommands"
 URL = "speech_commands_v0.02"
 HASH_DIVIDER = "_nohash_"
 EXCEPT_FOLDER = "_background_noise_"
+_CHECKSUMS = {
+    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz":
+    "3cd23799cb2bbdec517f1cc028f8d43c",
+    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz":
+    "6b74f3901214cb2c2934e98196829835",
+}
 
 
-def load_speechcommands_item(filepath, path):
+def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str, str, int]:
     relpath = os.path.relpath(filepath, path)
     label, filename = os.path.split(relpath)
     speaker, _ = os.path.splitext(filename)
@@ -33,13 +41,11 @@ class SPEECHCOMMANDS(Dataset):
     waveform, sample_rate, label, speaker_id, utterance_number
     """
 
-    def __init__(
-            self,
-            root,
-            url=URL,
-            folder_in_archive=FOLDER_IN_ARCHIVE,
-            download=False
-    ):
+    def __init__(self,
+                 root: str,
+                 url: str = URL,
+                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
+                 download: bool = False) -> None:
         if url in [
             "speech_commands_v0.01",
             "speech_commands_v0.02",
@@ -60,16 +66,17 @@ class SPEECHCOMMANDS(Dataset):
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    download_url(url, root)
+                    checksum = _CHECKSUMS.get(url, None)
+                    download_url(url, root, hash_value=checksum, hash_type="md5")
                 extract_archive(archive, self._path)
 
         walker = walk_files(self._path, suffix=".wav", prefix=True)
         walker = filter(lambda w: HASH_DIVIDER in w and EXCEPT_FOLDER not in w, walker)
         self._walker = list(walker)
 
-    def __getitem__(self, n):
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:
         fileid = self._walker[n]
         return load_speechcommands_item(fileid, self._path)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._walker)
