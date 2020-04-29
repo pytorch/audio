@@ -562,6 +562,11 @@ class _TransformsTestMixin:
         waveform, sample_rate = torchaudio.load(filepath)
         self._assert_consistency(T.Vad(sample_rate=sample_rate), waveform)
 
+    def test_Synth(self):
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
+        waveform, _ = torchaudio.load(test_filepath)
+        self._assert_consistency(T.Synth(), waveform)
+
 
 class TestFunctionalCPU(_FunctionalTestMixin, unittest.TestCase):
     """Test suite for Functional module on CPU"""

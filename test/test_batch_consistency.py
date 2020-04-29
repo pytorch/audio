@@ -270,6 +270,17 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.Vol(gain=1.1)(waveform.repeat(3, 1, 1))
         torch.testing.assert_allclose(computed, expected)
 
+    def test_batch_Synth(self):
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
+        waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
+
+        # Single then transform then batch
+        expected = torchaudio.transforms.Synth()(waveform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = torchaudio.transforms.Synth()(waveform.repeat(3, 1, 1))
+        torch.testing.assert_allclose(computed, expected)
+
 
 if __name__ == '__main__':
     unittest.main()

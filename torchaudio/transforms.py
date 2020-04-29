@@ -1053,11 +1053,11 @@ class Synth(torch.nn.Module):
         self.sample_rate = sample_rate
         self.duration = duration
         self.wave_type = wave_type
-        self.freq = freq
+        self.freq = (freq, freq) if isinstance(freq, int) else freq
         self.chirp = chirp
         self.amp = amp
 
-    def forward(self) -> Tensor:
+    def forward(self, waveform: Optional[Tensor] = None) -> Tensor:
         r"""
         Args:
             waveform (torch.Tensor): Tensor of audio of dimension (..., time).
@@ -1065,15 +1065,35 @@ class Synth(torch.nn.Module):
         Returns:
             torch.Tensor: Tensor of audio of dimension (..., time).
         """
-        if isinstance(self.freq, int):
-            self.freq = (self.freq, self.freq)
+        if isinstance(waveform, Tensor):
+            self.duration = waveform.size()[-1] / self.sample_rate
 
-        self.evaluate = None
-        if self.chirp:
-            self.evaluate = getattr(self, f"evaluate_{self.chirp}")()
+        evaluate = self.eval()
 
-        if self.wave_type:
-            return self.amp * getattr(self, f"_{self.wave_type}")(self.evaluate)
+        generated_wave = self.amp * self.wave(evaluate)
+        return waveform + generated_wave if isinstance(waveform, Tensor) else generated_wave
+
+    def eval(self):
+        if self.chirp == "linear":
+            return self.evaluate_linear()
+        elif self.chirp == "square":
+            return self.evaluate_square()
+        else:
+            return self.evaluate_exp()
+
+    def wave(self, evaluate):
+        if self.wave_type == "sine":
+            return self._sine(evaluate)
+        elif self.wave_type == "triangle":
+            return self._triangle(evaluate)
+        elif self.wave_type == "square":
+            return self._square(evaluate)
+        elif self.wave_type == "sawtooth":
+            return self._sawtooth(evaluate)
+        elif self.wave_type == "exp":
+            return self._exp(evaluate)
+        else:
+            return self._trapezium(evaluate)
 
     def evaluate_linear(self):
         n = round(self.duration * self.sample_rate)
@@ -1126,12 +1146,4 @@ class Synth(torch.nn.Module):
         return ys
 
     def _trapezium(self, phases):
-        triangle = torch.clamp(self._triangle(phases + 0.4 * math.pi) * 5, -1, 1)
-        ys = triangle
-        return ys
-
-    def _white(self, phases):
-        return torch.rand(round(self.duration * self.sample_rate))
-
-    def _brownian(self, phases):
-        return torch.cumsum(torch.rand(round(self.duration * self.sample_rate)), dim=-1)
+        return torch.clamp(self._triangle(phases + 0.4 * math.pi) * 5, -1, 1)
