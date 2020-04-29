@@ -1081,72 +1081,72 @@ class Synth(torch.nn.Module):
 
     def wave(self, evaluate):
         if self.wave_type == "sine":
-            return self._sine(evaluate)
+            return self.sine(evaluate)
         elif self.wave_type == "triangle":
-            return self._triangle(evaluate)
+            return self.triangle(evaluate)
         elif self.wave_type == "square":
-            return self._square(evaluate)
+            return self.square(evaluate)
         elif self.wave_type == "sawtooth":
-            return self._sawtooth(evaluate)
+            return self.sawtooth(evaluate)
         elif self.wave_type == "exp":
-            return self._exp(evaluate)
+            return self.exp(evaluate)
         elif self.wave_type == "trapezium":
-            return self._trapezium(evaluate)
+            return self.trapezium(evaluate)
         else:
-            return self._white()
+            return self.white()
 
-    def evaluate_linear(self):
-        ts = torch.arange(int(self.duration * self.sample_rate), dtype=torch.float) / self.sample_rate
-        freqs = torch.linspace(self.freq[0], self.freq[1], len(ts) - 1)
-        return self._evaluate(ts, freqs)
-
-    def evaluate_exp(self):
-        ts = torch.arange(int(self.duration * self.sample_rate), dtype=torch.float) / self.sample_rate
-        freqs = torch.logspace(math.log10(self.freq[0]),
-                               math.log10(self.freq[1]), len(ts) - 1)
-        return self._evaluate(ts, freqs)
-
-    def evaluate_square(self):
-        ts = torch.arange(int(self.duration * self.sample_rate), dtype=torch.float) / self.sample_rate
-        freqs = torch.pow(ts, 2) * (self.freq[1] - self.freq[0]) + self.freq[0]
-        return self._evaluate(ts, freqs[:-1])
-
-    def _evaluate(self, ts, freqs):
+    def evaluate(self, ts, freqs):
         dts = ts[..., 1:] - ts[..., :-1]
         dphis = 2 * math.pi * freqs * dts
         phases = torch.cumsum(dphis, -1)
         phases = torch.cat((torch.zeros(1), phases))
         return phases
 
-    def _sine(self, phases):
+    def evaluate_linear(self):
+        ts = torch.arange(int(self.duration * self.sample_rate), dtype=torch.float) / self.sample_rate
+        freqs = torch.linspace(self.freq[0], self.freq[1], len(ts) - 1)
+        return self.evaluate(ts, freqs)
+
+    def evaluate_exp(self):
+        ts = torch.arange(int(self.duration * self.sample_rate), dtype=torch.float) / self.sample_rate
+        freqs = torch.logspace(math.log10(self.freq[0]),
+                               math.log10(self.freq[1]), len(ts) - 1)
+        return self.evaluate(ts, freqs)
+
+    def evaluate_square(self):
+        ts = torch.arange(int(self.duration * self.sample_rate), dtype=torch.float) / self.sample_rate
+        freqs = torch.pow(ts, 2) * (self.freq[1] - self.freq[0]) + self.freq[0]
+        return self.evaluate(ts, freqs[:-1])
+
+    def sine(self, phases):
         return torch.sin(phases)
 
-    def _triangle(self, phases):
+    def triangle(self, phases):
         frac = torch.remainder((phases + math.pi) / (math.pi * 2), 1)
         ys = (torch.abs(frac - 0.5) * 4 - 1) * self.amp
         return ys
 
-    def _square(self, phases):
+    def square(self, phases):
         frac = torch.remainder((phases + math.pi) / (math.pi * 2), 1) + 1e-4
         ys = torch.sign(frac - 0.5) * self.amp
         return ys
 
-    def _sawtooth(self, phases):
+    def sawtooth(self, phases):
         frac = torch.remainder(phases / (math.pi * 2), 1)
         ys = frac * 2 - 1
         return ys
 
-    def _exp(self, phases):
-        triangle = self._triangle(phases)
+    def exp(self, phases):
+        triangle = self.triangle(phases)
         exp = torch.exp(triangle * 5.7564)
         ys = (exp / torch.max(exp) - 0.5) * 2
         return ys
 
-    def _trapezium(self, phases):
-        return torch.clamp(self._triangle(phases + 0.4 * math.pi) * 5, -1, 1)
+    def trapezium(self, phases):
+        return torch.clamp(self.triangle(phases + 0.4 * math.pi) * 5, -1, 1)
 
-    def _white(self):
+    def white(self):
         return torch.rand(int(self.duration * self.sample_rate))
 
-    def _brownian(self):
+    def brownian(self):
         return torch.cumsum(self._white(), dim=-1)
