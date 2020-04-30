@@ -672,7 +672,7 @@ def lfilter(
         waveform: Tensor,
         a_coeffs: Tensor,
         b_coeffs: Tensor,
-        clamp : bool = True,
+        clamp: bool = True,
 ) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation.
 
