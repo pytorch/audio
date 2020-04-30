@@ -687,7 +687,7 @@ def lfilter(
         clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
 
     Returns:
-        Tensor: Waveform with dimension of `(..., time)`.
+        Tensor: Waveform with dimension of ``(..., time)``.
     """
     # pack batch
     shape = waveform.size()
