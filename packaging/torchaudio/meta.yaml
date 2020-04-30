@@ -43,7 +43,8 @@ test:
     - cpuonly
 
   commands: 
-    pip install kaldi-io && pytest . --verbose --maxfail=1000000
+    - pip install kaldi-io PySoundFile
+    - pytest . --verbose --maxfail=1000000
 
 about:
   home: https://github.com/pytorch/audio
