@@ -236,35 +236,34 @@ jobs:
   unittest_linux:
     <<: *binary_common
     docker:
-      - image: "pytorch/manylinux-cuda100"
+      - image: "pytorch/torchaudio_unittest_base:manylinux"
     resource_class: 2xlarge+
     steps:
       - checkout
       - restore_cache:
 
           keys:
-            - env-v1-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum "./packaging/build_from_source.sh" }}-{{ checksum ".circleci/unittest/environment.yml" }}
+            - env-v1-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/scripts/environment.yml" }}
 
       - run:
           name: Setup
-          command: .circleci/unittest/setup_env.sh
+          command: .circleci/unittest/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v1-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum "./packaging/build_from_source.sh" }}-{{ checksum ".circleci/unittest/environment.yml" }}
+          key: env-v1-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/scripts/environment.yml" }}
 
           paths:
             - conda
             - env
-            - third_party
       - run:
-          name: Installation
-          command: .circleci/unittest/install.sh
+          name: Install torchaudio
+          command: .circleci/unittest/scripts/install.sh
       - run:
-          name: Run test
-          command: .circleci/unittest/run_test.sh
+          name: Run tests
+          command: .circleci/unittest/scripts/run_test.sh
       - run:
           name: Post process
-          command: .circleci/unittest/post_process.sh
+          command: .circleci/unittest/scripts/post_process.sh
       - store_test_results:
           path: test-results
 
