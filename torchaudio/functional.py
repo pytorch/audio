@@ -310,7 +310,7 @@ def griffinlim(
         torch.Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.
     """
     assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
-    assert momentum > 0, 'momentum=%s < 0' % momentum
+    assert momentum >= 0, 'momentum=%s < 0' % momentum
 
     # pack batch
     shape = specgram.size()
@@ -348,7 +348,9 @@ def griffinlim(
                              True, 'reflect', False, True)
 
         # Update our phase estimates
-        angles = rebuilt - tprev.mul_(momentum / (1 + momentum))
+        angles = rebuilt
+        if momentum:
+            angles = angles - tprev.mul_(momentum / (1 + momentum))
         angles = angles.div_(complex_norm(angles).add_(1e-16).unsqueeze(-1).expand_as(angles))
 
     # Return the final phase estimates
