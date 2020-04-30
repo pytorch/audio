@@ -348,7 +348,9 @@ def griffinlim(
                              True, 'reflect', False, True)
 
         # Update our phase estimates
-        angles = rebuilt - tprev.mul_(momentum / (1 + momentum))
+        angles = rebuilt
+        if momentum:
+            angles = angles - tprev.mul_(momentum / (1 + momentum))
         angles = angles.div_(complex_norm(angles).add_(1e-16).unsqueeze(-1).expand_as(angles))
 
     # Return the final phase estimates
