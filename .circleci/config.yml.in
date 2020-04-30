@@ -95,6 +95,7 @@ jobs:
             conda install -yq conda-build "conda-package-handling!=1.5.0"
             bash packaging/build_conda.sh
           shell: powershell.exe
+          no_output_timeout: "1h"
 
   binary_macos_wheel:
     <<: *binary_common
