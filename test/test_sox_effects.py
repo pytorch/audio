@@ -251,8 +251,8 @@ class Test_SoxEffectsChain(unittest.TestCase):
 
     def test_vad(self):
         sample_files = [
-            common_utils.get_asset_path("vad-hello-stereo-44100.wav"),
-            common_utils.get_asset_path("vad-hello-mono-32000.wav")
+            common_utils.get_asset_path("vad-go-stereo-44100.wav"),
+            common_utils.get_asset_path("vad-go-mono-32000.wav")
         ]
 
         for sample_file in sample_files:
