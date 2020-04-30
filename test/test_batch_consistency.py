@@ -84,7 +84,7 @@ class TestFunctional(unittest.TestCase):
         _test_batch(F.sliding_window_cmn, waveform, center=False, norm_vars=False)
 
     def test_vad(self):
-        filepath = common_utils.get_asset_path("vad-hello-mono-32000.wav")
+        filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
         waveform, sample_rate = torchaudio.load(filepath)
         _test_batch(F.vad, waveform, sample_rate=sample_rate)
 
