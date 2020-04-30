@@ -677,14 +677,14 @@ def lfilter(
     r"""Perform an IIR filter by evaluating difference equation.
 
     Args:
-        waveform (Tensor): audio waveform of dimension of `(..., time)`.  Must be normalized to -1 to 1.
-        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of `(n_order + 1)`.
-                                Lower delays coefficients are first, e.g. `[a0, a1, a2, ...]`.
+        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
+        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(n_order + 1)``.
+                                Lower delays coefficients are first, e.g. ``[a0, a1, a2, ...]``.
                                 Must be same size as b_coeffs (pad with 0's as necessary).
-        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of `(n_order + 1)`.
-                                 Lower delays coefficients are first, e.g. `[b0, b1, b2, ...]`.
+        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of ``(n_order + 1)``.
+                                 Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.
                                  Must be same size as a_coeffs (pad with 0's as necessary).
-        clamp (bool, optional): If true, clamp the output signal to be in the range [-1, 1] (Default: true)
+        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
 
     Returns:
         Tensor: Waveform with dimension of `(..., time)`.
@@ -732,6 +732,7 @@ def lfilter(
         padded_output_waveform[:, i_sample + n_order - 1] = o0
 
     output = padded_output_waveform[:, (n_order - 1):]
+
     if clamp:
         output = torch.clamp(output, min=-1., max=1.)
 
