@@ -2,7 +2,7 @@
 
 ## Structure of tests
 
-The followings are the categories of tests (and corresponding test modules) for `torchaudio`.
+The following is an overview of the tests and related modules for `torchaudio`.
 
 ### Purpose specific test suites
 
@@ -11,10 +11,12 @@ The followings are the categories of tests (and corresponding test modules) for 
     Test suite for numerical compatibility against librosa.
 - [SoX compatibility test](./test_sox_compatibility.py)
     Test suite for numerical compatibility against SoX.
+- [Kaldi compatibility test](./test_kaldi_compatibility.py)
+    Test suite for numerical compatibility against Kaldi.
 
-#### Result consistency with Pytorch framework.
-- [Torchscript consistency test](./test_torchscript_consistency.py)
-    Test suite to check 1. if an API is Torchscript-able, and 2. the results from Python and Torchscript match.
+#### Result consistency with PyTorch framework
+- [TorchScript consistency test](./test_torchscript_consistency.py)
+    Test suite to check 1. if an API is TorchScript-able, and 2. the results from Python and Torchscript match.
 - [Batch consistency test](./test_batch_consistency.py)
     Test suite to check if functionals/Transforms handle single sample input and batch input and return the same result.
 
@@ -30,10 +32,10 @@ The following test modules are defined for corresponding `torchaudio` module/fun
 - [`torchaudio.sox_effects`](test/test_sox_effects.py)
 - [`torchaudio.save`, `torchaudio.load`, `torchaudio.info`](test/test_io.py)
 
-### Others
+### Others (listing here for the sake of completeness)
 - [test_dataloader.py](./test_dataloader.py)
 
-### Non-test stuff.
+### Support files
 - [assets](./assets): Contain sample audio files.
 - [assets/kaldi](./assets/kaldi): Contains Kaldi format matrix files used in [./test_compliance_kaldi.py](./test_compliance_kaldi.py).
 - [compliance](./compliance): Scripts used to generate above Kaldi matrix files.
@@ -41,7 +43,7 @@ The following test modules are defined for corresponding `torchaudio` module/fun
 
 ## Adding test
 
-When you add a new feature(functional/Transform), consider the followings.
+When you add a new feature(functional/transform), consider the following
 
 1. When you add a new feature, please make it Torchscript-able and batch-consistent unless it degrades the performance. Please add the tests to see if the new feature meet these requirements.
 1. If the feature should be numerical compatible against existing software (SoX, Librosa, Kaldi etc), add a corresponding test.
