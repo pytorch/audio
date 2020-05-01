@@ -32,8 +32,9 @@ The following test modules are defined for corresponding `torchaudio` module/fun
 - [`torchaudio.sox_effects`](test/test_sox_effects.py)
 - [`torchaudio.save`, `torchaudio.load`, `torchaudio.info`](test/test_io.py)
 
-### Others (listing here for the sake of completeness)
+### Test modules that do not fall into the above categories
 - [test_dataloader.py](./test_dataloader.py)
+    Simple test for loading data and applying preprocessing.
 
 ### Support files
 - [assets](./assets): Contain sample audio files.
