@@ -76,6 +76,11 @@ class TestFunctional(unittest.TestCase):
         waveform = torch.rand(2, 100) - 0.5
         _test_batch(F.overdrive, waveform, gain=45, colour=30)
 
+    def test_phaser(self):
+        filepath = common_utils.get_asset_path("whitenoise.wav")
+        waveform, sample_rate = torchaudio.load(filepath)
+        _test_batch(F.phaser, waveform, sample_rate)
+
     def test_sliding_window_cmn(self):
         waveform = torch.randn(2, 1024) - 0.5
         _test_batch(F.sliding_window_cmn, waveform, center=True, norm_vars=True)
