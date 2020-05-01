@@ -558,7 +558,7 @@ class _TransformsTestMixin:
         self._assert_consistency(T.SlidingWindowCmn(), tensor)
 
     def test_Vad(self):
-        filepath = common_utils.get_asset_path("vad-hello-mono-32000.wav")
+        filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
         waveform, sample_rate = torchaudio.load(filepath)
         self._assert_consistency(T.Vad(sample_rate=sample_rate), waveform)
 

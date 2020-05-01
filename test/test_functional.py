@@ -28,6 +28,15 @@ class _LfilterMixin:
 
         torch.testing.assert_allclose(output_waveform[:, 3:], waveform[:, 0:-3], atol=1e-5, rtol=1e-5)
 
+    def test_clamp(self):
+        input_signal = torch.ones(1, 44100 * 1, dtype=self.dtype, device=self.device)
+        b_coeffs = torch.tensor([1, 0], dtype=self.dtype, device=self.device)
+        a_coeffs = torch.tensor([1, -0.95], dtype=self.dtype, device=self.device)
+        output_signal = F.lfilter(input_signal, a_coeffs, b_coeffs, clamp=True)
+        self.assertTrue(output_signal.max() <= 1)
+        output_signal = F.lfilter(input_signal, a_coeffs, b_coeffs, clamp=False)
+        self.assertTrue(output_signal.max() > 1)
+
 
 class TestLfilterFloat32CPU(_LfilterMixin, unittest.TestCase):
     device = torch.device('cpu')
