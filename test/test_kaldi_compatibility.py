@@ -11,8 +11,8 @@ import torchaudio.compliance.kaldi
 import common_utils
 
 
-def _exe_exists(cmd):
-    return shutil.which(cmd) is not None
+def _not_available(cmd):
+    return shutil.which(cmd) is None
 
 
 def _convert_args(**kwargs):
@@ -31,13 +31,15 @@ def _run_kaldi(command, input_type, input_value):
         input_type: str
             'ark' or 'scp'
         input_value:
-            Tensor for 'ark', string for 'scp'
+            Tensor for 'ark'
+            string for 'scp' (path to an audio file)
     """
+    key = 'foo'
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     if input_type == 'ark':
-        kaldi_io.write_mat(process.stdin, input_value.numpy(), key='foo')
+        kaldi_io.write_mat(process.stdin, input_value.numpy(), key=key)
     elif input_type == 'scp':
-        process.stdin.write(f'foo {input_value}'.encode('utf8'))
+        process.stdin.write(f'{key} {input_value}'.encode('utf8'))
     else:
         raise NotImplementedError('Unexpected type')
     process.stdin.close()
@@ -46,7 +48,7 @@ def _run_kaldi(command, input_type, input_value):
 
 
 class TestFunctional:
-    @unittest.skipUnless(_exe_exists('apply-cmvn-sliding'), '`apply-cmvn-sliding` not available')
+    @unittest.skipIf(_not_available('apply-cmvn-sliding'), '`apply-cmvn-sliding` not available')
     def test_sliding_window_cmn(self):
         """sliding_window_cmn should be numerically compatible with apply-cmvn-sliding"""
         kwargs = {
@@ -62,7 +64,7 @@ class TestFunctional:
         kaldi_result = _run_kaldi(command, 'ark', tensor)
         torch.testing.assert_allclose(result, kaldi_result)
 
-    @unittest.skipUnless(_exe_exists('compute-fbank-feats'), '`compute-fbank-feats` not available')
+    @unittest.skipIf(_not_available('compute-fbank-feats'), '`compute-fbank-feats` not available')
     def test_fbank(self):
         """fbank should be numerically compatible with compute-fbank-feats"""
         kwargs = {
