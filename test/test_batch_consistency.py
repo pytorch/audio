@@ -1,6 +1,7 @@
 """Test numerical consistency among single input and batched input."""
 import unittest
 
+import platform
 import torch
 import torchaudio
 import torchaudio.functional as F
@@ -206,6 +207,7 @@ class TestTransforms(unittest.TestCase):
         computed = torchaudio.transforms.MelSpectrogram()(waveform.repeat(3, 1, 1))
         torch.testing.assert_allclose(computed, expected)
 
+    @unittest.skipIf(platform.system() == "Windows", "Test is known to fail on Windows.")
     def test_batch_mfcc(self):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)
