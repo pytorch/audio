@@ -138,6 +138,11 @@ Functions to perform common audio operations.
 
 .. autofunction:: overdrive
 
+:hidden:`phaser`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: phaser
+
 :hidden:`mask_along_axis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 

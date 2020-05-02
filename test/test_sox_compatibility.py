@@ -376,6 +376,50 @@ class TestFunctionalFiltering(unittest.TestCase):
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
+    def test_phaser_sine(self):
+        """
+        Test phaser effect with sine moduldation, compare to SoX implementation
+        """
+        gain_in = 0.5
+        gain_out = 0.8
+        delay_ms = 2.0
+        decay = 0.4
+        speed = 0.5
+        noise_filepath = common_utils.get_asset_path('whitenoise.wav')
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("phaser", [gain_in, gain_out, delay_ms, decay, speed, "-s"])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.phaser(waveform, sample_rate, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=True)
+
+        torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
+    def test_phaser_triangle(self):
+        """
+        Test phaser effect with triangle modulation, compare to SoX implementation
+        """
+        gain_in = 0.5
+        gain_out = 0.8
+        delay_ms = 2.0
+        decay = 0.4
+        speed = 0.5
+        noise_filepath = common_utils.get_asset_path('whitenoise.wav')
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("phaser", [gain_in, gain_out, delay_ms, decay, speed, "-t"])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.phaser(waveform, sample_rate, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=False)
+
+        torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_equalizer(self):
         """
         Test biquad peaking equalizer filter, compare to SoX implementation

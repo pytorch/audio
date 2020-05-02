@@ -473,6 +473,21 @@ class _FunctionalTestMixin:
 
         self._assert_consistency(func, waveform)
 
+    def test_phaser(self):
+        filepath = common_utils.get_asset_path("whitenoise.wav")
+        waveform, sample_rate = torchaudio.load(filepath, normalization=True)
+
+        def func(tensor):
+            gain_in = 0.5
+            gain_out = 0.8
+            delay_ms = 2.0
+            decay = 0.4
+            speed = 0.5
+            sample_rate = 44100
+            return F.phaser(tensor, sample_rate, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=True)
+
+        self._assert_consistency(func, waveform)
+
 
 class _TransformsTestMixin:
     """Implements test for Transforms that are performed for different devices"""
