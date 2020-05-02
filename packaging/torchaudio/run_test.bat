@@ -7,7 +7,7 @@ REM pytest . --verbose --maxfail=1000000
 python test\test_batch_consistency.py -v
 python test\test_compliance_kaldi.py -v
 python test\test_dataloader.py -v
-python test\test_datasets.py -v
+REM python test\test_datasets.py -v
 python test\test_functional.py -v
 python test\test_io.py -v
 python test\test_kaldi_compatibility.py -v
