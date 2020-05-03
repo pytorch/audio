@@ -15,7 +15,7 @@ fi
 conda activate ./env
 
 printf "* Installing PyTorch nightly build"
-conda install -y -c pytorch-nightly pytorch cpuonly
+conda install -y -c pytorch-nightly -c conda-forge -c defaults pytorch cpuonly
 
 printf "* Installing torchaudio\n"
 if [[ "$(uname)" == "Linux" ]]; then
