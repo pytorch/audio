@@ -1,5 +1,5 @@
 channels:
-  - conda-forge #[not win]
+  - conda-forge
   - defaults
 dependencies:
   - flake8
@@ -10,7 +10,8 @@ dependencies:
   - librosa #[not win]
   - pip
   - pip:
-    - kaldi-io
     - scipy
-    - PySoundFile
+    - kaldi-io #[win]
+    - PySoundFile #[win]
     - librosa #[win]
+    - future #[win]
