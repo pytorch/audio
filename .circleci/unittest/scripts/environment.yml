@@ -1,5 +1,5 @@
 channels:
-  - conda-forge
+  - conda-forge #[not win]
   - defaults
 dependencies:
   - flake8
