@@ -1,6 +1,6 @@
 channels:
-  - conda-forge
   - defaults
+  - conda-forge
 dependencies:
   - flake8
   - numpy
