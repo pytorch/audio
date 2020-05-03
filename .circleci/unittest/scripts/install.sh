@@ -18,6 +18,8 @@ printf "* Installing PyTorch nightly build"
 conda install -y -c pytorch-nightly pytorch cpuonly
 
 printf "* Installing torchaudio\n"
-# Link codecs present at /third_party. See Dockerfile for how this is built
-ln -fs /third_party ./third_party
+if [[ "$(uname)" == "Linux" ]]; then
+    # Link codecs present at /third_party. See Dockerfile for how this is built
+    ln -fs /third_party ./third_party
+fi
 IS_CONDA=true python setup.py develop
