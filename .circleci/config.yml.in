@@ -80,22 +80,6 @@ jobs:
           paths:
             - "*"
 
-  binary_win_conda:
-    <<: *binary_common
-    executor:
-      name: win/default
-      shell: bash.exe
-    steps:
-      - checkout
-      - run:
-          command: |
-            choco install miniconda3
-            eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
-            conda activate base
-            conda install -yq conda-build "conda-package-handling!=1.5.0"
-            bash packaging/build_conda.sh
-          shell: bash.exe
-
   binary_macos_wheel:
     <<: *binary_common
     macos:
@@ -271,14 +255,49 @@ jobs:
       - store_test_results:
           path: test-results
 
+  unittest_windows:
+    <<: *binary_common
+    executor:
+      name: win/default
+      shell: bash.exe
+    steps:
+      - checkout
+      - run:
+          name: Generate cache key
+          # This will refresh cache on Sundays, nightly build should generate new cache.
+          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - restore_cache:
+          {% raw %}
+          keys:
+            - env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          {% endraw %}
+      - run:
+          name: Setup
+          command: .circleci/unittest/scripts/setup_env.sh
+      - save_cache:
+          {% raw %}
+          key: env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          {% endraw %}
+          paths:
+            - conda
+            - env
+      - run:
+          name: Install torchaudio
+          command: .circleci/unittest/scripts/install.sh
+      - run:
+          name: Run tests
+          command: .circleci/unittest/scripts/run_test.sh
+      - run:
+          name: Post process
+          command: .circleci/unittest/scripts/post_process.sh
+      - store_test_results:
+          path: test-results
+
 workflows:
   build:
     jobs:
       - circleci_consistency
       {{ build_workflows() }}
-      - binary_win_conda:
-          name: torchaudio_win_py3.6
-          python_version: "3.6"
   unittest:
     jobs:
       {{ unittest_workflows() }}

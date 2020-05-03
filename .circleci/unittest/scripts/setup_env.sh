@@ -17,10 +17,22 @@ cd "${root_dir}"
 # 1. Install conda at ./conda
 if [ ! -d "${conda_dir}" ]; then
     printf "* Installing conda\n"
-    wget -O miniconda.sh http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    bash ./miniconda.sh -b -f -p "${conda_dir}"
+    if [[ "$OSTYPE" == "msys" ]]; then
+        export tmp_conda="$(echo $conda_dir | tr '/' '\\')"
+        export miniconda_exe="$(echo $root_dir | tr '/' '\\')\\miniconda.exe"
+        curl --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -O
+        "$this_dir/install_conda.bat"
+    else
+        wget -O miniconda.sh http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+        bash ./miniconda.sh -b -f -p "${conda_dir}"
+    fi
 fi
-eval "$(${conda_dir}/bin/conda shell.bash hook)"
+
+if [[ "$OSTYPE" == "msys" ]]; then
+    eval "$(${conda_dir}/Scripts/conda.exe 'shell.bash' 'hook')"
+else
+    eval "$(${conda_dir}/bin/conda shell.bash hook)"
+fi
 
 # 2. Create test environment at ./env
 if [ ! -d "${env_dir}" ]; then
