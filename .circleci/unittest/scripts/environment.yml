@@ -7,9 +7,10 @@ dependencies:
   - pytest
   - pytest-cov
   - codecov
-  - librosa
+  - librosa #[not win]
   - pip
   - pip:
     - kaldi-io
     - scipy
     - PySoundFile
+    - librosa #[win]

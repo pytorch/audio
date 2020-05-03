@@ -7,7 +7,7 @@ version: 2.1
 #       Job names are 'name:' key.
 
 orbs:
-  win: circleci/windows@2.0.0
+  win: circleci/windows@2.3.0
 
 binary_common: &binary_common
   parameters:
@@ -260,6 +260,7 @@ jobs:
     executor:
       name: win/default
       shell: bash.exe
+      size: "large"
     steps:
       - checkout
       - run:
