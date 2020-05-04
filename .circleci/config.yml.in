@@ -221,7 +221,7 @@ jobs:
             docker tag ${image_name}:${CIRCLE_WORKFLOW_ID} 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
             docker push 308535385114.dkr.ecr.us-east-1.amazonaws.com/${image_name}:${CIRCLE_WORKFLOW_ID}
 
-  unittest_linux:
+  unittest_linux_cpu:
     <<: *binary_common
     docker:
       - image: "pytorch/torchaudio_unittest_base:manylinux"
@@ -259,7 +259,52 @@ jobs:
       - store_test_results:
           path: test-results
 
-  unittest_windows:
+  unittest_linux_gpu:
+    <<: *binary_common
+    machine:
+      image: ubuntu-1604-cuda-10.1:201909-23
+    resource_class: gpu.small
+    environment:
+      image_name: "pytorch/torchaudio_unittest_base:manylinux-cuda10.1"
+    steps:
+      - checkout
+      - run:
+          name: Generate cache key
+          # This will refresh cache on Sundays, nightly build should generate new cache.
+          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - restore_cache:
+          {% raw %}
+          keys:
+            - env-v1-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          {% endraw %}
+      - run:
+          name: Setup
+          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
+      - save_cache:
+          {% raw %}
+          key: env-v1-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          {% endraw %}
+          paths:
+            - conda
+            - env
+      - run:
+          name: Install torchaudio
+          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
+      - run:
+          name: Run tests
+          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
+      - run:
+          name: Post Process
+          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/post_process.sh
+      - store_test_results:
+          path: test-results
+    # filters:
+    #   branches:
+    #     only:
+    #       - master
+    #       - nightly
+
+  unittest_windows_cpu:
     <<: *binary_common
     executor:
       name: windows-cpu
