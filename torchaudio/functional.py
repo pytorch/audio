@@ -1347,10 +1347,10 @@ def phaser(
     waveform = waveform.view(-1, actual_shape[-1])
 
     delay_buf_len = int((delay_ms * .001 * sample_rate) + .5)
-    delay_buf = torch.zeros(waveform.shape[0], delay_buf_len)
+    delay_buf = torch.zeros(waveform.shape[0], delay_buf_len, dtype=dtype, device=device)
 
     mod_buf_len = int(sample_rate / mod_speed + .5)
-    mod_buf = torch.zeros(mod_buf_len)
+    mod_buf = torch.zeros(mod_buf_len, dtype=dtype, device=device)
 
     if sinusoidal:
         wave_type = 'SINE'
