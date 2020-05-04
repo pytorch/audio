@@ -7,13 +7,11 @@ unset PYTORCH_VERSION
 
 set -e
 
-eval "$(./conda/bin/conda shell.bash hook)"
+eval "$(./conda/Scripts/conda.exe 'shell.bash' 'hook')"
 conda activate ./env
 
 printf "* Installing PyTorch nightly build"
 conda install -y -c pytorch-nightly pytorch cpuonly
 
 printf "* Installing torchaudio\n"
-# Link codecs present at /third_party. See Dockerfile for how this is built
-ln -fs /third_party ./third_party
 IS_CONDA=true python setup.py develop

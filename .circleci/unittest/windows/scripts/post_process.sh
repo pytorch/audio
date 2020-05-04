@@ -2,7 +2,7 @@
 
 set -e
 
-eval "$(./conda/bin/conda shell.bash hook)"
+eval "$(./conda/Scripts/conda.exe 'shell.bash' 'hook')"
 conda activate ./env
 
 codecov

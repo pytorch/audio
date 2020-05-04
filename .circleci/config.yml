@@ -273,27 +273,27 @@ jobs:
       - restore_cache:
 
           keys:
-            - env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+            - env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
 
       - run:
           name: Setup
-          command: .circleci/unittest/scripts/setup_env.sh
+          command: .circleci/unittest/windows/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          key: env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
 
           paths:
             - conda
             - env
       - run:
           name: Install torchaudio
-          command: .circleci/unittest/scripts/install.sh
+          command: .circleci/unittest/windows/scripts/install.sh
       - run:
           name: Run tests
-          command: .circleci/unittest/scripts/run_test.sh
+          command: .circleci/unittest/windows/scripts/run_test.sh
       - run:
           name: Post process
-          command: .circleci/unittest/scripts/post_process.sh
+          command: .circleci/unittest/windows/scripts/post_process.sh
       - store_test_results:
           path: test-results
 
