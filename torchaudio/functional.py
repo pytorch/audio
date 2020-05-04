@@ -467,7 +467,7 @@ def create_fb_matrix(
 
     if str(norm) == "slaney":
         # Slaney-style mel is scaled to be approx constant energy per channel
-        enorm = 2.0 / (f_pts[2 : n_mels + 2] - f_pts[:n_mels])
+        enorm = 2.0 / (f_pts[2:n_mels + 2] - f_pts[:n_mels])
         fb *= enorm.unsqueeze(0)
 
     return fb
