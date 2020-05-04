@@ -13,3 +13,4 @@ dependencies:
     - kaldi-io
     - PySoundFile
     - librosa
+    - future
