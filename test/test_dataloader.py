@@ -28,8 +28,9 @@ class TORCHAUDIODS(Dataset):
         return len(self.data)
 
 
-@unittest.skipIf("sox" not in BACKENDS, "sox not available")
 class Test_DataLoader(unittest.TestCase):
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_1(self):
         expected_size = (2, 1, 16000)
         ds = TORCHAUDIODS()
@@ -39,5 +40,4 @@ class Test_DataLoader(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    with AudioBackendScope("sox"):
-        unittest.main()
+    unittest.main()
