@@ -1072,12 +1072,13 @@ class Synth(torch.nn.Module):
         return waveform + generated_wave if isinstance(waveform, Tensor) else generated_wave
 
     def phases(self):
+        ts = torch.arange(int(self.duration * self.sample_rate), dtype=torch.float) / self.sample_rate
         if self.chirp == "linear":
-            return self.evaluate_linear()
+            return self.evaluate_linear(ts)
         elif self.chirp == "square":
-            return self.evaluate_square()
+            return self.evaluate_square(ts)
         else:
-            return self.evaluate_exp()
+            return self.evaluate_exp(ts)
 
     def wave(self, evaluate):
         if self.wave_type == "sine":
@@ -1102,21 +1103,17 @@ class Synth(torch.nn.Module):
         phases = torch.cat((torch.zeros(1), phases))
         return phases
 
-    def evaluate_linear(self):
-        ts = torch.arange(int(self.duration * self.sample_rate), dtype=torch.float) / self.sample_rate
+    def evaluate_linear(self, ts):
         freqs = torch.linspace(self.freq[0], self.freq[1], len(ts) - 1)
         return self.evaluate(ts, freqs)
 
-    def evaluate_exp(self):
-        ts = torch.arange(int(self.duration * self.sample_rate), dtype=torch.float) / self.sample_rate
-        freqs = torch.logspace(math.log10(self.freq[0]),
-                               math.log10(self.freq[1]), len(ts) - 1)
+    def evaluate_exp(self, ts):
+        freqs = torch.logspace(math.log10(self.freq[0]), math.log10(self.freq[1]), len(ts) - 1)
         return self.evaluate(ts, freqs)
 
-    def evaluate_square(self):
-        ts = torch.arange(int(self.duration * self.sample_rate), dtype=torch.float) / self.sample_rate
-        freqs = torch.pow(ts, 2) * (self.freq[1] - self.freq[0]) + self.freq[0]
-        return self.evaluate(ts, freqs[:-1])
+    def evaluate_square(self, ts):
+        freqs = torch.pow(torch.linspace(0, 1, len(ts) - 1), 2) * (self.freq[1] - self.freq[0]) + self.freq[0]
+        return self.evaluate(ts, freqs)
 
     def sine(self, phases):
         return torch.sin(phases)
