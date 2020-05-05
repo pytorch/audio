@@ -156,6 +156,7 @@ def _load_audio_asset(*asset_paths, **kwargs):
 
 def _test_compatibilities(n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
     sound, sample_rate = _load_audio_asset('sinewave.wav')
+    sound = sound.double()
     sound_librosa = sound.cpu().numpy().squeeze()  # (64000)
 
     # test core spectrogram
