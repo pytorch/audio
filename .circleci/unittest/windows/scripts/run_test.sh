@@ -7,6 +7,7 @@ conda activate ./env
 
 python -m torch.utils.collect_env
 mkdir artifacts
-python -c "import platform;print(platform.processor())"
+pip install py-cpuinfo
+python -c "import cpuinfo;print(cpuinfo.get_cpu_info())"
 pytest --cov=torchaudio --junitxml=test-results/junit.xml -v --durations 20 test/test_librosa_compatibility.py::TestTransforms::test_basics3
 flake8 torchaudio test
