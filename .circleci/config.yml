@@ -298,11 +298,6 @@ jobs:
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/post_process.sh
       - store_test_results:
           path: test-results
-    # filters:
-    #   branches:
-    #     only:
-    #       - master
-    #       - nightly
 
   unittest_windows_cpu:
     <<: *binary_common
@@ -393,12 +388,21 @@ workflows:
           name: unittest_linux_cpu_py3.8
           python_version: '3.8'
       - unittest_linux_gpu:
+          filters:
+            branches:
+              only: master
           name: unittest_linux_gpu_py3.6
           python_version: '3.6'
       - unittest_linux_gpu:
+          filters:
+            branches:
+              only: master
           name: unittest_linux_gpu_py3.7
           python_version: '3.7'
       - unittest_linux_gpu:
+          filters:
+            branches:
+              only: master
           name: unittest_linux_gpu_py3.8
           python_version: '3.8'
       - unittest_windows_cpu:

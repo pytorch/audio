@@ -298,11 +298,6 @@ jobs:
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/post_process.sh
       - store_test_results:
           path: test-results
-    # filters:
-    #   branches:
-    #     only:
-    #       - master
-    #       - nightly
 
   unittest_windows_cpu:
     <<: *binary_common
