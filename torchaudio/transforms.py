@@ -420,6 +420,7 @@ class MelSpectrogram(torch.nn.Module):
             Tensor: Mel frequency spectrogram of size (..., ``n_mels``, time).
         """
         specgram = self.spectrogram(waveform)
+        torch.save(specgram, 'artifacts/mslspec-specgram.pt')
         mel_specgram = self.mel_scale(specgram)
         return mel_specgram
 
@@ -488,14 +489,17 @@ class MFCC(torch.nn.Module):
         waveform = waveform.reshape(-1, shape[-1])
 
         mel_specgram = self.MelSpectrogram(waveform)
+        torch.save(mel_specgram, 'artifacts/mfcc-mel_specgram.pt')
         if self.log_mels:
             log_offset = 1e-6
             mel_specgram = torch.log(mel_specgram + log_offset)
         else:
             mel_specgram = self.amplitude_to_DB(mel_specgram)
+        torch.save(mel_specgram, 'artifacts/mfcc-log_mel_specgram.pt')
         # (channel, n_mels, time).tranpose(...) dot (n_mels, n_mfcc)
         # -> (channel, time, n_mfcc).tranpose(...)
         mfcc = torch.matmul(mel_specgram.transpose(1, 2), self.dct_mat).transpose(1, 2)
+        torch.save(mel_specgram, 'artifacts/mfcc-mfcc.pt')
 
         # unpack batch
         mfcc = mfcc.reshape(shape[:-1] + mfcc.shape[-2:])

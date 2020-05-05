@@ -393,11 +393,12 @@ def amplitude_to_DB(
         Tensor: Output tensor in decibel scale
     """
     x_db = multiplier * torch.log10(torch.clamp(x, min=amin))
+    torch.save(x_db, 'artifacts/amplitude_to_DB-x-db1.pt')
     x_db -= multiplier * db_multiplier
-
+    torch.save(x_db, 'artifacts/amplitude_to_DB-x-db2.pt')
     if top_db is not None:
         x_db = x_db.clamp(min=x_db.max().item() - top_db)
-
+        torch.save(x_db, 'artifacts/amplitude_to_DB-x-db3.pt')
     return x_db
 
 
