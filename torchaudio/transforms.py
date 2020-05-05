@@ -1069,7 +1069,7 @@ class Synth(torch.nn.Module):
             self.duration = waveform.size()[-1] / self.sample_rate
 
         generated_wave = self.amp * self.wave(self.phases())
-        return waveform + generated_wave if isinstance(waveform, Tensor) else generated_wave
+        return torch.clamp(waveform + generated_wave, -1, 1) if isinstance(waveform, Tensor) else generated_wave
 
     def phases(self):
         ts = torch.arange(int(self.duration * self.sample_rate), dtype=torch.float) / self.sample_rate
@@ -1143,9 +1143,9 @@ class Synth(torch.nn.Module):
         return torch.clamp(self.triangle(phases + 0.4 * math.pi) * 5, -1, 1)
 
     def white(self):
-        return torch.rand(int(self.duration * self.sample_rate))
+        return torch.rand(int(self.duration * self.sample_rate)) * 2 - 1
 
     def brownian(self):
         noise = torch.cumsum(self._white(), dim=-1)
         high, low = abs(max(noise)), abs(min(noise))
-        return (noise - noise.mean()) / max(high, low)
+        return (noise - noise.mean()) / max(high, low) * 2 - 1
