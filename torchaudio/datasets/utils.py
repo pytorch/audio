@@ -189,7 +189,9 @@ def download_url(urls, *args, max_workers=5, **kwargs):
         if not isinstance(item, list):
             args[i] = [item] * len(urls)
     args = list(zip(*args))
-assert len(args) == len(urls)
+
+    assert len(args) == len(urls)
+
     # Turn keyword arguments into lists
     for key, value in kwargs.items():
         if not isinstance(value, list):
