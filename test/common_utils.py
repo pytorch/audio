@@ -1,10 +1,18 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
 import os
+import tempfile
+from contextlib import contextmanager
 from shutil import copytree
-import backports.tempfile as tempfile
-import torch
 
-TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+import torch
+import torchaudio
+
+_TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+BACKENDS = torchaudio._backend._audio_backends
+
+
+def get_asset_path(*paths):
+    """Return full path of a test asset"""
+    return os.path.join(_TEST_DIR_PATH, 'assets', *paths)
 
 
 def create_temp_assets_dir():
@@ -14,7 +22,7 @@ def create_temp_assets_dir():
     and object.
     """
     tmp_dir = tempfile.TemporaryDirectory()
-    copytree(os.path.join(TEST_DIR_PATH, "assets"),
+    copytree(os.path.join(_TEST_DIR_PATH, "assets"),
              os.path.join(tmp_dir.name, "assets"))
     return tmp_dir.name, tmp_dir
 
@@ -44,7 +52,29 @@ def random_float_tensor(seed, size, a=22695477, c=1, m=2 ** 32):
     return torch.tensor(arr).float().view(size) / m
 
 
-def random_int_tensor(seed, size, low=0, high=2 ** 32, a=22695477, c=1, m=2 ** 32):
-    """ Same as random_float_tensor but integers between [low, high)
-    """
-    return torch.floor(random_float_tensor(seed, size, a, c, m) * (high - low)) + low
+@contextmanager
+def AudioBackendScope(new_backend):
+    previous_backend = torchaudio.get_audio_backend()
+    try:
+        torchaudio.set_audio_backend(new_backend)
+        yield
+    finally:
+        torchaudio.set_audio_backend(previous_backend)
+
+
+def filter_backends_with_mp3(backends):
+    # Filter out backends that do not support mp3
+    test_filepath = get_asset_path('steam-train-whistle-daniel_simon.mp3')
+
+    def supports_mp3(backend):
+        try:
+            with AudioBackendScope(backend):
+                torchaudio.load(test_filepath)
+            return True
+        except (RuntimeError, ImportError):
+            return False
+
+    return [backend for backend in backends if supports_mp3(backend)]
+
+
+BACKENDS_MP3 = filter_backends_with_mp3(BACKENDS)

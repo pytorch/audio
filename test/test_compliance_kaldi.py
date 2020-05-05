@@ -1,12 +1,13 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import os
-import common_utils
 import compliance.utils
 import torch
 import torchaudio
 import torchaudio.compliance.kaldi as kaldi
 import unittest
+
+import common_utils
+from common_utils import AudioBackendScope, BACKENDS
 
 
 def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
@@ -46,10 +47,9 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
 
 
 class Test_Kaldi(unittest.TestCase):
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
-    test_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file.wav')
-    test_8000_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file_8000.wav')
-    kaldi_output_dir = os.path.join(test_dirpath, 'assets', 'kaldi')
+    test_filepath = common_utils.get_asset_path('kaldi_file.wav')
+    test_8000_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
+    kaldi_output_dir = common_utils.get_asset_path('kaldi')
     test_filepaths = {prefix: [] for prefix in compliance.utils.TEST_PREFIX}
 
     # separating test files by their types (e.g 'spec', 'fbank', etc.)
@@ -78,7 +78,7 @@ class Test_Kaldi(unittest.TestCase):
 
         for r in range(m):
             extract_window(window, waveform, r, window_size, window_shift, snip_edges)
-        self.assertTrue(torch.allclose(window, output))
+        torch.testing.assert_allclose(window, output)
 
     def test_get_strided(self):
         # generate any combination where 0 < window_size <= num_samples and
@@ -91,8 +91,7 @@ class Test_Kaldi(unittest.TestCase):
 
     def _create_data_set(self):
         # used to generate the dataset to test on. this is not used in testing (offline procedure)
-        test_dirpath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        test_filepath = os.path.join(test_dirpath, 'assets', 'kaldi_file.wav')
+        test_filepath = common_utils.get_asset_path('kaldi_file.wav')
         sr = 16000
         x = torch.arange(0, 20).float()
         # between [-6,6]
@@ -105,7 +104,7 @@ class Test_Kaldi(unittest.TestCase):
         sound, sample_rate = torchaudio.load(test_filepath, normalization=False)
         print(y >> 16)
         self.assertTrue(sample_rate == sr)
-        self.assertTrue(torch.allclose(y, sound))
+        torch.testing.assert_allclose(y, sound)
 
     def _print_diagnostic(self, output, expect_output):
         # given an output and expected output, it will print the absolute/relative errors (max and mean squared)
@@ -157,9 +156,10 @@ class Test_Kaldi(unittest.TestCase):
             output = get_output_fn(sound, args)
 
             self._print_diagnostic(output, kaldi_output)
-            self.assertTrue(output.shape, kaldi_output.shape)
-            self.assertTrue(torch.allclose(output, kaldi_output, atol=atol, rtol=rtol))
+            torch.testing.assert_allclose(output, kaldi_output, atol=atol, rtol=rtol)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_spectrogram(self):
         def get_output_fn(sound, args):
             output = kaldi.spectrogram(
@@ -180,6 +180,8 @@ class Test_Kaldi(unittest.TestCase):
 
         self._compliance_test_helper(self.test_filepath, 'spec', 131, 13, get_output_fn, atol=1e-3, rtol=0)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_fbank(self):
         def get_output_fn(sound, args):
             output = kaldi.fbank(
@@ -210,6 +212,8 @@ class Test_Kaldi(unittest.TestCase):
 
         self._compliance_test_helper(self.test_filepath, 'fbank', 97, 22, get_output_fn, atol=1e-3, rtol=1e-1)
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_mfcc(self):
         def get_output_fn(sound, args):
             output = kaldi.mfcc(
@@ -244,6 +248,8 @@ class Test_Kaldi(unittest.TestCase):
         # Passing in an empty tensor should result in an error
         self.assertRaises(AssertionError, kaldi.mfcc, torch.empty(0))
 
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_resample_waveform(self):
         def get_output_fn(sound, args):
             output = kaldi.resample_waveform(sound, args[1], args[2])
@@ -292,7 +298,7 @@ class Test_Kaldi(unittest.TestCase):
         ground_truth = ground_truth[..., n_to_trim:-n_to_trim]
         estimate = estimate[..., n_to_trim:-n_to_trim]
 
-        self.assertTrue(torch.allclose(ground_truth, estimate, atol=atol, rtol=rtol))
+        torch.testing.assert_allclose(estimate, ground_truth, atol=atol, rtol=rtol)
 
     def test_resample_waveform_downsample_accuracy(self):
         for i in range(1, 20):
@@ -317,7 +323,7 @@ class Test_Kaldi(unittest.TestCase):
         for i in range(num_channels):
             single_channel = sound * (i + 1) * 1.5
             single_channel_sampled = kaldi.resample_waveform(single_channel, sample_rate, sample_rate // 2)
-            self.assertTrue(torch.allclose(multi_sound_sampled[i, :], single_channel_sampled, rtol=1e-4))
+            torch.testing.assert_allclose(multi_sound_sampled[i, :], single_channel_sampled[0], rtol=1e-4, atol=1e-8)
 
 
 if __name__ == '__main__':

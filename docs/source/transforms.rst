@@ -19,7 +19,7 @@ Transforms are common audio transforms. They can be chained together using :clas
 :hidden:`GriffinLim`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: GriffinLim 
+.. autoclass:: GriffinLim
 
   .. automethod:: forward
 
@@ -36,6 +36,14 @@ Transforms are common audio transforms. They can be chained together using :clas
 .. autoclass:: MelScale
 
   .. automethod:: forward
+
+:hidden:`InverseMelScale`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: InverseMelScale
+
+  .. automethod:: forward
+
 
 :hidden:`MelSpectrogram`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,6 +101,13 @@ Transforms are common audio transforms. They can be chained together using :clas
 
   .. automethod:: forward
 
+:hidden:`Fade`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Fade
+
+  .. automethod:: forward
+
 :hidden:`FrequencyMasking`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -104,5 +119,26 @@ Transforms are common audio transforms. They can be chained together using :clas
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: TimeMasking
+
+  .. automethod:: forward
+
+:hidden:`Vol`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Vol
+
+  .. automethod:: forward
+
+:hidden:`SlidingWindowCmn`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SlidingWindowCmn
+
+  .. automethod:: forward
+
+:hidden:`Vad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Vad
 
   .. automethod:: forward

@@ -1,46 +1,12 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
 import math
-import os
+import unittest
 
 import torch
 import torchaudio
 import torchaudio.transforms as transforms
 import torchaudio.functional as F
-from torchaudio.common_utils import IMPORT_LIBROSA, IMPORT_SCIPY
-import unittest
+
 import common_utils
-
-if IMPORT_LIBROSA:
-    import librosa
-
-if IMPORT_SCIPY:
-    import scipy
-
-RUN_CUDA = torch.cuda.is_available()
-print("Run test with cuda:", RUN_CUDA)
-
-
-def _test_script_module(f, tensor, *args, **kwargs):
-
-    py_method = f(*args, **kwargs)
-    jit_method = torch.jit.script(py_method)
-
-    py_out = py_method(tensor)
-    jit_out = jit_method(tensor)
-
-    assert torch.allclose(jit_out, py_out)
-
-    if RUN_CUDA:
-
-        tensor = tensor.to("cuda")
-
-        py_method = py_method.cuda()
-        jit_method = torch.jit.script(py_method)
-
-        py_out = py_method(tensor)
-        jit_out = jit_method(tensor)
-
-        assert torch.allclose(jit_out, py_out)
 
 
 class Tester(unittest.TestCase):
@@ -52,24 +18,12 @@ class Tester(unittest.TestCase):
     waveform = (torch.cos(2 * math.pi * torch.arange(0, 4 * sample_rate).float() * freq / sample_rate))
     waveform.unsqueeze_(0)  # (1, 64000)
     waveform = (waveform * volume * 2**31).long()
-    # file for stereo stft test
-    test_dirpath, test_dir = common_utils.create_temp_assets_dir()
-    test_filepath = os.path.join(test_dirpath, 'assets',
-                                 'steam-train-whistle-daniel_simon.mp3')
 
-    def scale(self, waveform, factor=float(2**31)):
+    def scale(self, waveform, factor=2.0**31):
         # scales a waveform by a factor
         if not waveform.is_floating_point():
             waveform = waveform.to(torch.get_default_dtype())
         return waveform / factor
-
-    def test_scriptmodule_Spectrogram(self):
-        tensor = torch.rand((1, 1000))
-        _test_script_module(transforms.Spectrogram, tensor)
-
-    def test_scriptmodule_GriffinLim(self):
-        tensor = torch.rand((1, 201, 6))
-        _test_script_module(transforms.GriffinLim, tensor, length=1000, rand_init=False)
 
     def test_mu_law_companding(self):
 
@@ -85,13 +39,17 @@ class Tester(unittest.TestCase):
         waveform_exp = transforms.MuLawDecoding(quantization_channels)(waveform_mu)
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
 
-    def test_scriptmodule_AmplitudeToDB(self):
-        spec = torch.rand((6, 201))
-        _test_script_module(transforms.AmplitudeToDB, spec)
+    def test_AmplitudeToDB(self):
+        filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
+        waveform, sample_rate = torchaudio.load(filepath)
 
-    def test_scriptmodule_MelScale(self):
-        spec_f = torch.rand((1, 6, 201))
-        _test_script_module(transforms.MelScale, spec_f)
+        mag_to_db_transform = transforms.AmplitudeToDB('magnitude', 80.)
+        power_to_db_transform = transforms.AmplitudeToDB('power', 80.)
+
+        mag_to_db_torch = mag_to_db_transform(torch.abs(waveform))
+        power_to_db_torch = power_to_db_transform(torch.pow(waveform, 2))
+
+        torch.testing.assert_allclose(mag_to_db_torch, power_to_db_torch)
 
     def test_melscale_load_save(self):
         specgram = torch.ones(1, 1000, 100)
@@ -105,11 +63,7 @@ class Tester(unittest.TestCase):
         fb_copy = melscale_transform_copy.fb
 
         self.assertEqual(fb_copy.size(), (1000, 128))
-        self.assertTrue(torch.allclose(fb, fb_copy))
-
-    def test_scriptmodule_MelSpectrogram(self):
-        tensor = torch.rand((1, 1000))
-        _test_script_module(transforms.MelSpectrogram, tensor)
+        torch.testing.assert_allclose(fb, fb_copy)
 
     def test_melspectrogram_load_save(self):
         waveform = self.waveform.float()
@@ -125,10 +79,10 @@ class Tester(unittest.TestCase):
         fb = mel_spectrogram_transform.mel_scale.fb
         fb_copy = mel_spectrogram_transform_copy.mel_scale.fb
 
-        self.assertTrue(torch.allclose(window, window_copy))
+        torch.testing.assert_allclose(window, window_copy)
         # the default for n_fft = 400 and n_mels = 128
         self.assertEqual(fb_copy.size(), (201, 128))
-        self.assertTrue(torch.allclose(fb, fb_copy))
+        torch.testing.assert_allclose(fb, fb_copy)
 
     def test_mel2(self):
         top_db = 80.
@@ -156,7 +110,8 @@ class Tester(unittest.TestCase):
         self.assertTrue(mel_transform2.mel_scale.fb.sum(1).le(1.).all())
         self.assertTrue(mel_transform2.mel_scale.fb.sum(1).ge(0.).all())
         # check on multi-channel audio
-        x_stereo, sr_stereo = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
+        filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
+        x_stereo, sr_stereo = torchaudio.load(filepath)  # (2, 278756), 44100
         spectrogram_stereo = s2db(mel_transform(x_stereo))  # (2, 128, 1394)
         self.assertTrue(spectrogram_stereo.dim() == 3)
         self.assertTrue(spectrogram_stereo.size(0) == 2)
@@ -168,10 +123,6 @@ class Tester(unittest.TestCase):
         self.assertTrue(fb_matrix_transform.fb.sum(1).le(1.).all())
         self.assertTrue(fb_matrix_transform.fb.sum(1).ge(0.).all())
         self.assertEqual(fb_matrix_transform.fb.size(), (400, 100))
-
-    def test_scriptmodule_MFCC(self):
-        tensor = torch.rand((1, 1000))
-        _test_script_module(transforms.MFCC, tensor)
 
     def test_mfcc(self):
         audio_orig = self.waveform.clone()
@@ -209,129 +160,8 @@ class Tester(unittest.TestCase):
 
         self.assertTrue(torch_mfcc_norm_none.allclose(norm_check))
 
-    @unittest.skipIf(not IMPORT_LIBROSA or not IMPORT_SCIPY, 'Librosa and scipy are not available')
-    def test_librosa_consistency(self):
-        def _test_librosa_consistency_helper(n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
-            input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
-            sound, sample_rate = torchaudio.load(input_path)
-            sound_librosa = sound.cpu().numpy().squeeze()  # (64000)
-
-            # test core spectrogram
-            spect_transform = torchaudio.transforms.Spectrogram(n_fft=n_fft, hop_length=hop_length, power=power)
-            out_librosa, _ = librosa.core.spectrum._spectrogram(y=sound_librosa,
-                                                                n_fft=n_fft,
-                                                                hop_length=hop_length,
-                                                                power=power)
-
-            out_torch = spect_transform(sound).squeeze().cpu()
-            self.assertTrue(torch.allclose(out_torch, torch.from_numpy(out_librosa), atol=1e-5))
-
-            # test mel spectrogram
-            melspect_transform = torchaudio.transforms.MelSpectrogram(
-                sample_rate=sample_rate, window_fn=torch.hann_window,
-                hop_length=hop_length, n_mels=n_mels, n_fft=n_fft)
-            librosa_mel = librosa.feature.melspectrogram(y=sound_librosa, sr=sample_rate,
-                                                         n_fft=n_fft, hop_length=hop_length, n_mels=n_mels,
-                                                         htk=True, norm=None)
-            librosa_mel_tensor = torch.from_numpy(librosa_mel)
-            torch_mel = melspect_transform(sound).squeeze().cpu()
-
-            self.assertTrue(torch.allclose(torch_mel.type(librosa_mel_tensor.dtype), librosa_mel_tensor, atol=5e-3))
-
-            # test s2db
-            db_transform = torchaudio.transforms.AmplitudeToDB('power', 80.)
-            db_torch = db_transform(spect_transform(sound)).squeeze().cpu()
-            db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
-            self.assertTrue(torch.allclose(db_torch, torch.from_numpy(db_librosa), atol=5e-3))
-
-            db_torch = db_transform(melspect_transform(sound)).squeeze().cpu()
-            db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
-            db_librosa_tensor = torch.from_numpy(db_librosa)
-
-            self.assertTrue(torch.allclose(db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3))
-
-            # test MFCC
-            melkwargs = {'hop_length': hop_length, 'n_fft': n_fft}
-            mfcc_transform = torchaudio.transforms.MFCC(sample_rate=sample_rate,
-                                                        n_mfcc=n_mfcc,
-                                                        norm='ortho',
-                                                        melkwargs=melkwargs)
-
-            # librosa.feature.mfcc doesn't pass kwargs properly since some of the
-            # kwargs for melspectrogram and mfcc are the same. We just follow the
-            # function body in https://librosa.github.io/librosa/_modules/librosa/feature/spectral.html#melspectrogram
-            # to mirror this function call with correct args:
-
-    #         librosa_mfcc = librosa.feature.mfcc(y=sound_librosa,
-    #                                             sr=sample_rate,
-    #                                             n_mfcc = n_mfcc,
-    #                                             hop_length=hop_length,
-    #                                             n_fft=n_fft,
-    #                                             htk=True,
-    #                                             norm=None,
-    #                                             n_mels=n_mels)
-
-            librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm='ortho')[:n_mfcc]
-            librosa_mfcc_tensor = torch.from_numpy(librosa_mfcc)
-            torch_mfcc = mfcc_transform(sound).squeeze().cpu()
-
-            self.assertTrue(torch.allclose(torch_mfcc.type(librosa_mfcc_tensor.dtype), librosa_mfcc_tensor, atol=5e-3))
-
-        kwargs1 = {
-            'n_fft': 400,
-            'hop_length': 200,
-            'power': 2.0,
-            'n_mels': 128,
-            'n_mfcc': 40,
-            'sample_rate': 16000
-        }
-
-        kwargs2 = {
-            'n_fft': 600,
-            'hop_length': 100,
-            'power': 2.0,
-            'n_mels': 128,
-            'n_mfcc': 20,
-            'sample_rate': 16000
-        }
-
-        kwargs3 = {
-            'n_fft': 200,
-            'hop_length': 50,
-            'power': 2.0,
-            'n_mels': 128,
-            'n_mfcc': 50,
-            'sample_rate': 24000
-        }
-
-        kwargs4 = {
-            'n_fft': 400,
-            'hop_length': 200,
-            'power': 3.0,
-            'n_mels': 128,
-            'n_mfcc': 40,
-            'sample_rate': 16000
-        }
-
-        _test_librosa_consistency_helper(**kwargs1)
-        _test_librosa_consistency_helper(**kwargs2)
-        # NOTE Test passes offline, but fails on CircleCI, see #372.
-        # _test_librosa_consistency_helper(**kwargs3)
-        _test_librosa_consistency_helper(**kwargs4)
-
-    def test_scriptmodule_Resample(self):
-        tensor = torch.rand((2, 1000))
-        sample_rate = 100
-        sample_rate_2 = 50
-
-        _test_script_module(transforms.Spectrogram, tensor, sample_rate, sample_rate_2)
-
-    def test_scriptmodule_ComplexNorm(self):
-        tensor = torch.rand((1, 2, 201, 2))
-        _test_script_module(transforms.ComplexNorm, tensor)
-
     def test_resample_size(self):
-        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        input_path = common_utils.get_asset_path('sinewave.wav')
         waveform, sample_rate = torchaudio.load(input_path)
 
         upsample_rate = sample_rate * 2
@@ -381,120 +211,10 @@ class Tester(unittest.TestCase):
         specgram = torch.tensor([1., 2., 3., 4.]).repeat(1, 2, 1)
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5],
                                   [0.5, 1.0, 1.0, 0.5]]])
-        transform = transforms.ComputeDeltas()
+        transform = transforms.ComputeDeltas(win_length=3)
         computed = transform(specgram)
-        self.assertTrue(computed.shape == specgram.shape, (computed.shape, specgram.shape))
-
-    def test_batch_MelScale(self):
-        specgram = torch.randn(2, 31, 2786)
-
-        # Single then transform then batch
-        expected = transforms.MelScale()(specgram).repeat(3, 1, 1, 1)
-
-        # Batch then transform
-        computed = transforms.MelScale()(specgram.repeat(3, 1, 1, 1))
-
-        # shape = (3, 2, 201, 1394)
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-    def test_batch_compute_deltas(self):
-        specgram = torch.randn(2, 31, 2786)
-
-        # Single then transform then batch
-        expected = transforms.ComputeDeltas()(specgram).repeat(3, 1, 1, 1)
-
-        # Batch then transform
-        computed = transforms.ComputeDeltas()(specgram.repeat(3, 1, 1, 1))
-
-        # shape = (3, 2, 201, 1394)
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-    def test_scriptmodule_MuLawEncoding(self):
-        tensor = torch.rand((1, 10))
-        _test_script_module(transforms.MuLawEncoding, tensor)
-
-    def test_scriptmodule_MuLawDecoding(self):
-        tensor = torch.rand((1, 10))
-        _test_script_module(transforms.MuLawDecoding, tensor)
-
-    def test_batch_mulaw(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)  # (2, 278756), 44100
-
-        # Single then transform then batch
-        waveform_encoded = transforms.MuLawEncoding()(waveform)
-        expected = waveform_encoded.unsqueeze(0).repeat(3, 1, 1)
-
-        # Batch then transform
-        waveform_batched = waveform.unsqueeze(0).repeat(3, 1, 1)
-        computed = transforms.MuLawEncoding()(waveform_batched)
-
-        # shape = (3, 2, 201, 1394)
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-        # Single then transform then batch
-        waveform_decoded = transforms.MuLawDecoding()(waveform_encoded)
-        expected = waveform_decoded.unsqueeze(0).repeat(3, 1, 1)
-
-        # Batch then transform
-        computed = transforms.MuLawDecoding()(computed)
-
-        # shape = (3, 2, 201, 1394)
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-    def test_batch_spectrogram(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
-
-        # Single then transform then batch
-        expected = transforms.Spectrogram()(waveform).repeat(3, 1, 1, 1)
-
-        # Batch then transform
-        computed = transforms.Spectrogram()(waveform.repeat(3, 1, 1))
-
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-    def test_batch_melspectrogram(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
-
-        # Single then transform then batch
-        expected = transforms.MelSpectrogram()(waveform).repeat(3, 1, 1, 1)
-
-        # Batch then transform
-        computed = transforms.MelSpectrogram()(waveform.repeat(3, 1, 1))
-
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected))
-
-    def test_batch_mfcc(self):
-        waveform, sample_rate = torchaudio.load(self.test_filepath)
-
-        # Single then transform then batch
-        expected = transforms.MFCC()(waveform).repeat(3, 1, 1, 1)
-
-        # Batch then transform
-        computed = transforms.MFCC()(waveform.repeat(3, 1, 1))
-
-        self.assertTrue(computed.shape == expected.shape, (computed.shape, expected.shape))
-        self.assertTrue(torch.allclose(computed, expected, atol=1e-5))
-
-    def test_scriptmodule_TimeStretch(self):
-        n_freq = 400
-        hop_length = 512
-        fixed_rate = 1.3
-        tensor = torch.rand((10, 2, n_freq, 10, 2))
-        _test_script_module(transforms.TimeStretch, tensor, n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate)
-
-    def test_scriptmodule_FrequencyMasking(self):
-        tensor = torch.rand((10, 2, 50, 10, 2))
-        _test_script_module(transforms.FrequencyMasking, tensor, freq_mask_param=60, iid_masks=False)
-
-    def test_scriptmodule_TimeMasking(self):
-        tensor = torch.rand((10, 2, 50, 10, 2))
-        _test_script_module(transforms.TimeMasking, tensor, time_mask_param=30, iid_masks=False)
+        assert computed.shape == expected.shape, (computed.shape, expected.shape)
+        torch.testing.assert_allclose(computed, expected, atol=1e-6, rtol=1e-8)
 
 
 if __name__ == '__main__':

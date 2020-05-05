@@ -21,7 +21,7 @@ from collections import deque
 
 import numpy as np
 import torch
-from six.moves import queue
+import queue
 
 import librosa
 import pyaudio
