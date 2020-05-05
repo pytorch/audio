@@ -252,9 +252,11 @@ jobs:
           command: .circleci/unittest/linux/scripts/install.sh
       - run:
           name: Run tests
-          command: .circleci/unittest/linux/scripts/run_test.sh
+          command: |
+            .circleci/unittest/linux/scripts/run_test.sh
+            tar -cvzf artifacts.tar.gz artifacts
       - store_artifacts:
-          path: artifacts
+          path: artifacts.tar.gz
       - run:
           name: Post process
           command: .circleci/unittest/linux/scripts/post_process.sh
@@ -294,9 +296,11 @@ jobs:
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
       - run:
           name: Run tests
-          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
+          command: |
+            docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
+            tar -cvzf artifacts.tar.gz artifacts
       - store_artifacts:
-          path: artifacts
+          path: artifacts.tar.gz
       - run:
           name: Post Process
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/post_process.sh
@@ -338,9 +342,11 @@ jobs:
           command: .circleci/unittest/windows/scripts/install.sh
       - run:
           name: Run tests
-          command: .circleci/unittest/windows/scripts/run_test.sh
+          command: |
+            .circleci/unittest/windows/scripts/run_test.sh
+            tar -cvzf artifacts.tar.gz artifacts
       - store_artifacts:
-          path: artifacts
+          path: artifacts.tar.gz
       - run:
           name: Post process
           command: .circleci/unittest/windows/scripts/post_process.sh

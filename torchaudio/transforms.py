@@ -420,7 +420,7 @@ class MelSpectrogram(torch.nn.Module):
             Tensor: Mel frequency spectrogram of size (..., ``n_mels``, time).
         """
         specgram = self.spectrogram(waveform)
-        torch.save(specgram, 'artifacts/mslspec-specgram.pt')
+        torch.save(specgram, 'artifacts/melspec-specgram.pt')
         mel_specgram = self.mel_scale(specgram)
         return mel_specgram
 

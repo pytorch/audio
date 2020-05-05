@@ -7,5 +7,5 @@ conda activate ./env
 
 python -m torch.utils.collect_env
 mkdir artifacts
-pytest --cov=torchaudio --junitxml=test-results/junit.xml -v --durations 20 test/test_batch_consistency.py::TestTransforms::test_batch_mfcc
+pytest --cov=torchaudio --junitxml=test-results/junit.xml -v --durations 20 test/test_librosa_compatibility.py::TestTransforms::test_basics3
 flake8 torchaudio test
