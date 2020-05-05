@@ -187,7 +187,8 @@ def _test_compatibilities(n_fft, hop_length, power, n_mels, n_mfcc, sample_rate)
     power_to_db_transform = torchaudio.transforms.AmplitudeToDB('power', 80.)
     power_to_db_torch = power_to_db_transform(spect_transform(sound)).squeeze().cpu()
     power_to_db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
-    torch.testing.assert_allclose(power_to_db_torch, torch.from_numpy(power_to_db_librosa).double(), atol=5e-3, rtol=1e-5)
+    torch.testing.assert_allclose(
+        power_to_db_torch, torch.from_numpy(power_to_db_librosa).double(), atol=5e-3, rtol=1e-5)
 
     '''
     mag_to_db_transform = torchaudio.transforms.AmplitudeToDB('magnitude', 80.)
