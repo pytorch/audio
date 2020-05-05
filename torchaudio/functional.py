@@ -368,9 +368,6 @@ def griffinlim(
     return waveform
 
 
-ATTEMPT = 0
-
-
 def amplitude_to_DB(
         x: Tensor,
         multiplier: float,
@@ -395,15 +392,17 @@ def amplitude_to_DB(
     Returns:
         Tensor: Output tensor in decibel scale
     """
-    global ATTEMPT
-    x_db = multiplier * torch.log10(torch.clamp(x, min=amin))
-    torch.save(x_db, f'artifacts/amplitude_to_DB-x-db-{ATTEMPT}-1.pt')
+    clamped = torch.clamp(x, min=amin)
+    torch.save(clamped, f'artifacts/amplitude_to_DB-clamped.pt')
+    logarithm = torch.log10(clamped)
+    torch.save(logarithm, f'artifacts/amplitude_to_DB-log.pt')
+    x_db = multiplier * logarithm
+    torch.save(x_db, f'artifacts/amplitude_to_DB-x-db-1.pt')
     x_db -= multiplier * db_multiplier
-    torch.save(x_db, f'artifacts/amplitude_to_DB-x-db-{ATTEMPT}-2.pt')
+    torch.save(x_db, f'artifacts/amplitude_to_DB-x-db-2.pt')
     if top_db is not None:
         x_db = x_db.clamp(min=x_db.max().item() - top_db)
-        torch.save(x_db, f'artifacts/amplitude_to_DB-x-db-{ATTEMPT}-3.pt')
-    ATTEMPT += 1
+        torch.save(x_db, f'artifacts/amplitude_to_DB-x-db-3.pt')
     return x_db
 
 
