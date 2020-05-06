@@ -45,7 +45,7 @@ RUN bash /scripts/build_third_parties.sh /
 ################################################################################
 # Build the final image
 ################################################################################
-FROM ubuntu:18.04
+FROM BASE_IMAGE
 RUN apt update && apt install -y \
         g++ \
         gfortran \
