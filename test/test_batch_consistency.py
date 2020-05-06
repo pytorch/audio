@@ -1,6 +1,7 @@
 """Test numerical consistency among single input and batched input."""
 import unittest
 
+import platform
 import torch
 import torchaudio
 import torchaudio.functional as F
@@ -76,6 +77,11 @@ class TestFunctional(unittest.TestCase):
         waveform = torch.rand(2, 100) - 0.5
         _test_batch(F.overdrive, waveform, gain=45, colour=30)
 
+    def test_phaser(self):
+        filepath = common_utils.get_asset_path("whitenoise.wav")
+        waveform, sample_rate = torchaudio.load(filepath)
+        _test_batch(F.phaser, waveform, sample_rate)
+
     def test_sliding_window_cmn(self):
         waveform = torch.randn(2, 1024) - 0.5
         _test_batch(F.sliding_window_cmn, waveform, center=True, norm_vars=True)
@@ -84,7 +90,7 @@ class TestFunctional(unittest.TestCase):
         _test_batch(F.sliding_window_cmn, waveform, center=False, norm_vars=False)
 
     def test_vad(self):
-        filepath = common_utils.get_asset_path("vad-hello-mono-32000.wav")
+        filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
         waveform, sample_rate = torchaudio.load(filepath)
         _test_batch(F.vad, waveform, sample_rate=sample_rate)
 
@@ -210,7 +216,7 @@ class TestTransforms(unittest.TestCase):
 
         # Batch then transform
         computed = torchaudio.transforms.MFCC()(waveform.repeat(3, 1, 1))
-        torch.testing.assert_allclose(computed, expected, atol=1e-5, rtol=1e-5)
+        torch.testing.assert_allclose(computed, expected, atol=1e-4, rtol=1e-5)
 
     def test_batch_TimeStretch(self):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')

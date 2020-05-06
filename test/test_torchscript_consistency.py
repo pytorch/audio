@@ -80,7 +80,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, tensor)
 
     def test_detect_pitch_frequency(self):
-        filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.mp3')
+        filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(filepath)
 
         def func(tensor):
@@ -473,6 +473,21 @@ class _FunctionalTestMixin:
 
         self._assert_consistency(func, waveform)
 
+    def test_phaser(self):
+        filepath = common_utils.get_asset_path("whitenoise.wav")
+        waveform, sample_rate = torchaudio.load(filepath, normalization=True)
+
+        def func(tensor):
+            gain_in = 0.5
+            gain_out = 0.8
+            delay_ms = 2.0
+            decay = 0.4
+            speed = 0.5
+            sample_rate = 44100
+            return F.phaser(tensor, sample_rate, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=True)
+
+        self._assert_consistency(func, waveform)
+
 
 class _TransformsTestMixin:
     """Implements test for Transforms that are performed for different devices"""
@@ -558,7 +573,7 @@ class _TransformsTestMixin:
         self._assert_consistency(T.SlidingWindowCmn(), tensor)
 
     def test_Vad(self):
-        filepath = common_utils.get_asset_path("vad-hello-mono-32000.wav")
+        filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
         waveform, sample_rate = torchaudio.load(filepath)
         self._assert_consistency(T.Vad(sample_rate=sample_rate), waveform)
 

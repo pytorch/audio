@@ -1,0 +1,16 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - flake8
+  - numpy
+  - pytest
+  - pytest-cov
+  - codecov
+  - pip
+  - pip:
+    - scipy
+    - kaldi-io
+    - PySoundFile
+    - librosa
+    - future

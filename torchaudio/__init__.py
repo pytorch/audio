@@ -339,7 +339,7 @@ def get_sox_bool(i: int = 0) -> Any:
         return _torch_sox.sox_bool(i)
 
 
-_SOX_INITIALIZED = False
+_SOX_INITIALIZED: Optional[bool] = False
 # This variable has a micro lifecycle. (False -> True -> None)
 # False: Not initialized
 # True: Initialized
