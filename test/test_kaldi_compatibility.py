@@ -90,6 +90,7 @@ class TestFunctional:
             'vtln_low': 1445,
             'vtln_warp': 1.0000,
             'window_type': 'hamming',
+
         }
         wave_file = common_utils.get_asset_path('kaldi_file.wav')
         result = torchaudio.compliance.kaldi.fbank(torchaudio.load_wav(wave_file)[0], **kwargs)

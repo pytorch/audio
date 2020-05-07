@@ -30,7 +30,7 @@ def _assert_transforms_consistency(transform, tensor):
 class Functional(common_utils.TestBaseMixin):
     """Implements test for `functinoal` modul that are performed for different devices"""
     def _assert_consistency(self, func, tensor, shape_only=False):
-        tensor = tensor.to(self.device).to(self.dtype)
+        tensor = tensor.to(device=self.device, dtype=self.dtype)
         return _assert_functional_consistency(func, tensor, shape_only=shape_only)
 
     def test_spectrogram(self):
@@ -488,8 +488,8 @@ class Functional(common_utils.TestBaseMixin):
 class Transforms(common_utils.TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
     def _assert_consistency(self, transform, tensor):
-        tensor = tensor.to(self.device).to(self.dtype)
-        transform = transform.to(self.device).to(self.dtype)
+        tensor = tensor.to(device=self.device, dtype=self.dtype)
+        transform = transform.to(device=self.device, dtype=self.dtype)
         _assert_transforms_consistency(transform, tensor)
 
     def test_Spectrogram(self):
