@@ -9,8 +9,7 @@ import torchaudio.transforms as T
 import common_utils
 
 
-def _assert_functional_consistency(func, tensor, device, shape_only=False):
-    tensor = tensor.to(device)
+def _assert_functional_consistency(func, tensor, shape_only=False):
     ts_func = torch.jit.script(func)
     output = func(tensor)
     ts_output = ts_func(tensor)
@@ -21,21 +20,18 @@ def _assert_functional_consistency(func, tensor, device, shape_only=False):
         torch.testing.assert_allclose(ts_output, output)
 
 
-def _assert_transforms_consistency(transform, tensor, device):
-    tensor = tensor.to(device)
-    transform = transform.to(device)
+def _assert_transforms_consistency(transform, tensor):
     ts_transform = torch.jit.script(transform)
     output = transform(tensor)
     ts_output = ts_transform(tensor)
     torch.testing.assert_allclose(ts_output, output)
 
 
-class _FunctionalTestMixin:
+class Functional(common_utils.TestBaseMixin):
     """Implements test for `functinoal` modul that are performed for different devices"""
-    device = None
-
     def _assert_consistency(self, func, tensor, shape_only=False):
-        return _assert_functional_consistency(func, tensor, self.device, shape_only=shape_only)
+        tensor = tensor.to(self.device).to(self.dtype)
+        return _assert_functional_consistency(func, tensor, shape_only=shape_only)
 
     def test_spectrogram(self):
         def func(tensor):
@@ -159,7 +155,7 @@ class _FunctionalTestMixin:
             return F.complex_norm(tensor, power)
 
         tensor = torch.randn(1, 2, 1025, 400, 2)
-        _assert_functional_consistency(func, tensor, self.device)
+        self._assert_consistency(func, tensor)
 
     def test_mask_along_axis(self):
         def func(tensor):
@@ -489,12 +485,12 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
 
-class _TransformsTestMixin:
+class Transforms(common_utils.TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
-    device = None
-
     def _assert_consistency(self, transform, tensor):
-        _assert_transforms_consistency(transform, tensor, self.device)
+        tensor = tensor.to(self.device).to(self.dtype)
+        transform = transform.to(self.device).to(self.dtype)
+        _assert_transforms_consistency(transform, tensor)
 
     def test_Spectrogram(self):
         tensor = torch.rand((1, 1000))
@@ -578,26 +574,7 @@ class _TransformsTestMixin:
         self._assert_consistency(T.Vad(sample_rate=sample_rate), waveform)
 
 
-class TestFunctionalCPU(_FunctionalTestMixin, unittest.TestCase):
-    """Test suite for Functional module on CPU"""
-    device = torch.device('cpu')
-
-
-@unittest.skipIf(not torch.cuda.is_available(), 'CUDA not available')
-class TestFunctionalCUDA(_FunctionalTestMixin, unittest.TestCase):
-    """Test suite for Functional module on GPU"""
-    device = torch.device('cuda')
-
-
-class TestTransformsCPU(_TransformsTestMixin, unittest.TestCase):
-    """Test suite for Transforms module on CPU"""
-    device = torch.device('cpu')
-
-
-@unittest.skipIf(not torch.cuda.is_available(), 'CUDA not available')
-class TestTransformsCUDA(_TransformsTestMixin, unittest.TestCase):
-    """Test suite for Transforms module on GPU"""
-    device = torch.device('cuda')
+common_utils.define_test_suites(globals(), [Functional, Transforms])
 
 
 if __name__ == '__main__':
