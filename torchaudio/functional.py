@@ -1442,7 +1442,6 @@ def mask_along_axis_iid(
     r"""
     Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
     ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.
-    All examples will have the same mask interval.
 
     Args:
         specgrams (Tensor): Real spectrograms (batch, channel, freq, time)
