@@ -1029,7 +1029,7 @@ class Vad(torch.nn.Module):
 
 class Synth(torch.nn.Module):
     r"""This effect can be used to generate fixed or swept frequency audio tones with various wave shapes,
-     or to generate wide-band noise of various ‘colours’.
+     or to generate noise.
 
     Args:
         sample_rate (int, optional): Sample rate of audio signal (Default: ``16000``).
