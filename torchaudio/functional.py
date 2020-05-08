@@ -392,7 +392,9 @@ def amplitude_to_DB(
     Returns:
         Tensor: Output tensor in decibel scale
     """
-    x_db = multiplier * torch.log10(torch.clamp(x, min=amin))
+    # casting to float64 is necessary because log10 behaves differently for
+    # different processors when the argument is float32
+    x_db = multiplier * torch.log10(torch.clamp(x, min=amin).to(torch.float64))
     x_db -= multiplier * db_multiplier
 
     if top_db is not None:
