@@ -97,7 +97,7 @@ class Kaldi(common_utils.TestBaseMixin):
         result = torchaudio.compliance.kaldi.fbank(waveform, **kwargs)
         command = ['compute-fbank-feats'] + _convert_args(**kwargs) + ['scp:-', 'ark:-']
         kaldi_result = _run_kaldi(command, 'scp', wave_file)
-        torch.testing.assert_allclose(result.cpu(), kaldi_result.to(dtype=self.dtype))
+        torch.testing.assert_allclose(result.cpu(), kaldi_result.to(dtype=self.dtype), rtol=1e-4, atol=1e-8)
 
 
 common_utils.define_test_suites(globals(), [Kaldi])
