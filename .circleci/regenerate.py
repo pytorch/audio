@@ -111,16 +111,21 @@ def indent(indentation, data_list):
 
 
 def unittest_workflows(indentation=6):
-    w = []
+    jobs = []
     for os_type in ["linux", "windows"]:
-        for python_version in PYTHON_VERSIONS:
-            w.append({
-                f"unittest_{os_type}": {
-                    "name": f"unittest_{os_type}_py{python_version}",
+        for device_type in ["cpu", "gpu"]:
+            if os_type == 'windows' and device_type == 'gpu':
+                continue
+            for python_version in PYTHON_VERSIONS:
+                job = {
+                    "name": f"unittest_{os_type}_{device_type}_py{python_version}",
                     "python_version": python_version,
                 }
-            })
-    return indent(indentation, w)
+
+                if device_type == 'gpu':
+                    job['filters'] = gen_filter_branch_tree('master')
+                jobs.append({f"unittest_{os_type}_{device_type}": job})
+    return indent(indentation, jobs)
 
 
 if __name__ == "__main__":
