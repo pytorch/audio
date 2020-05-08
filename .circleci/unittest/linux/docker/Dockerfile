@@ -52,6 +52,9 @@ RUN apt update && apt install -y \
         git \
         libatlas3-base \
         wget \
+        curl \
+        make \
+        file \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /kaldi /kaldi
 COPY --from=builder /third_party /third_party
