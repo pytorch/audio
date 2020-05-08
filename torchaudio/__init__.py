@@ -421,3 +421,27 @@ def _audio_normalization(signal: Tensor, normalization: Union[bool, float, Calla
     elif callable(normalization):
         a = normalization(signal)
         signal /= a
+
+
+def _init_extension():
+    import importlib
+
+    # load the custom_op_library and register the custom ops
+    lib_dir = os.path.dirname(__file__)
+    loader_details = (
+        importlib.machinery.ExtensionFileLoader,
+        importlib.machinery.EXTENSION_SUFFIXES
+    )
+
+    extfinder = importlib.machinery.FileFinder(lib_dir, loader_details)
+    ext_specs = extfinder.find_spec("_torchaudio")
+    if ext_specs is None:
+        raise ImportError("_torchaudio is not found.")
+    # torch.classes.load_library(ext_specs.origin)
+    torch.ops.load_library(ext_specs.origin)
+
+
+_init_extension()
+
+
+del _init_extension

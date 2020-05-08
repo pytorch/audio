@@ -27,12 +27,12 @@ class SignalInfo:
 
 class EncodingInfo:
     def __init__(self,
-                 encoding: Any = None,
+                 encoding: Optional[int] = None,
                  bits_per_sample: Optional[int] = None,
                  compression: Optional[float] = None,
-                 reverse_bytes: Any = None,
-                 reverse_nibbles: Any = None,
-                 reverse_bits: Any = None,
+                 reverse_bytes: Optional[int] = None,
+                 reverse_nibbles: Optional[int] = None,
+                 reverse_bits: Optional[int] = None,
                  opposite_endian: Optional[bool] = None) -> None:
         self.encoding = encoding
         self.bits_per_sample = bits_per_sample

@@ -68,20 +68,6 @@ void read_audio(
 }
 } // namespace
 
-std::tuple<sox_signalinfo_t, sox_encodinginfo_t> get_info(
-    const std::string& file_name
-  ) {
-  SoxDescriptor fd(sox_open_read(
-      file_name.c_str(),
-      /*signal=*/nullptr,
-      /*encoding=*/nullptr,
-      /*filetype=*/nullptr));
-  if (fd.get() == nullptr) {
-    throw std::runtime_error("Error opening audio file");
-  }
-  return std::make_tuple(fd->signal, fd->encoding);
-}
-
 std::vector<std::string> get_effect_names() {
   sox_effect_fn_t const * fns = sox_get_effect_fns();
   std::vector<std::string> sv;
@@ -485,10 +471,6 @@ PYBIND11_MODULE(_torchaudio, m) {
       "write_audio_file",
       &torch::audio::write_audio_file,
       "Writes data from a tensor into an audio file");
-  m.def(
-      "get_info",
-      &torch::audio::get_info,
-      "Gets information about an audio file");
   m.def(
       "get_effect_names",
       &torch::audio::get_effect_names,
