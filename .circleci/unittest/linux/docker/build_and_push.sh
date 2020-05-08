@@ -20,9 +20,6 @@ fi
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
-root_dir="$(git rev-parse --show-toplevel)"
-cp "${root_dir}"/packaging/build_from_source.sh ./scripts/build_third_parties.sh
-
 # docker build also accepts reading from STDIN
 # but in that case, no context (other files) can be passed, so we write out Dockerfile
 sed "s|BASE_IMAGE|${base_image}|g" Dockerfile > Dockerfile.tmp
