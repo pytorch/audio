@@ -421,3 +421,16 @@ def _audio_normalization(signal: Tensor, normalization: Union[bool, float, Calla
     elif callable(normalization):
         a = normalization(signal)
         signal /= a
+
+
+def _init_extension():
+    torch.classes.load_library('torchaudio/_torchaudio.so')
+    torch.ops.load_library('torchaudio/_torchaudio.so')
+    print(torch.classes.loaded_libraries)
+    print(torch.ops.torchaudio.sox_get_info)
+
+
+_init_extension()
+
+
+del _init_extension

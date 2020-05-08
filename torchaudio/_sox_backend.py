@@ -67,6 +67,13 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
 
 def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
     r"""See torchaudio.info"""
-
-    from . import _torchaudio
-    return _torchaudio.get_info(filepath)
+    info = torch.ops.torchaudio.sox_get_info(filepath)
+    si = info.GetSignalInfo()
+    ei = info.GetEncodingInfo()
+    return (
+        SignalInfo(si.GetChannels(), si.GetRate(), si.GetPrecision(), si.GetLength()),
+        EncodingInfo(
+            ei.GetEncoding(), ei.GetBPS(), ei.GetCompression(),
+            ei.GetReverseBytes(), ei.GetReverseNibbles(), ei.GetReverseBits(),
+            ei.GetOppositeEndian()),
+    )
