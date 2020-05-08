@@ -618,7 +618,3 @@ class Transforms(common_utils.TestBaseMixin):
 
 
 common_utils.define_test_suites(globals(), [Functional, Transforms])
-
-
-if __name__ == '__main__':
-    unittest.main()
