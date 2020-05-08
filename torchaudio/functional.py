@@ -395,13 +395,13 @@ def amplitude_to_DB(
     # casting to float64 is necessary because log10 behaves differently for
     # different processors when the argument is float32. Make sure the result
     # is a tensor of the original type.
-    x_db = multiplier * torch.log10(torch.clamp(x, min=amin).to(torch.float64)).to(x.dtype)
+    x_db = multiplier * torch.log10(torch.clamp(x, min=amin).to(torch.float64))
     x_db -= multiplier * db_multiplier
 
     if top_db is not None:
         x_db = x_db.clamp(min=x_db.max().item() - top_db)
 
-    return x_db
+    return x_db.to(x.dtype)
 
 
 def DB_to_amplitude(
