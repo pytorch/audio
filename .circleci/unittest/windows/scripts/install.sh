@@ -20,5 +20,6 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 conda install -y -c pytorch-nightly pytorch "${cudatoolkit}"
 
 printf "* Installing torchaudio\n"
+choco install visualstudio2019-workload-vctools -y
 /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Community/VC/Auxiliary/Build/vcvarsall.bat x64
 python setup.py develop
