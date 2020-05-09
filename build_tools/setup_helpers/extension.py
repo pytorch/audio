@@ -85,8 +85,6 @@ _EXT_NAME = 'torchaudio._torchaudio'
 
 
 def get_ext_modules(debug=False):
-    if platform.system() == 'Windows':
-        return None
     return [
         CppExtension(
             _EXT_NAME,
