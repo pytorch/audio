@@ -89,7 +89,7 @@ def _feature_window_function(window_type: str,
                              window_size: int,
                              blackman_coeff: float,
                              device: torch.device,
-                             dtype: torch.dtype
+                             dtype: int
 ) -> Tensor:
     r"""Returns a window function with the given type and size
     """
@@ -752,7 +752,7 @@ def _get_LR_indices_and_weights(orig_freq: float,
                                 lowpass_cutoff: float,
                                 lowpass_filter_width: int,
                                 device: torch.device,
-                                dtype: torch.dtype) -> Tuple[Tensor, Tensor]:
+                                dtype: int) -> Tuple[Tensor, Tensor]:
     r"""Based on LinearResample::SetIndexesAndWeights where it retrieves the weights for
     resampling as well as the indices in which they are valid. LinearResample (LR) means
     that the output signal is at linearly spaced intervals (i.e the output signal has a
