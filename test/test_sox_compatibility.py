@@ -420,6 +420,102 @@ class TestFunctionalFiltering(unittest.TestCase):
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
+    def test_flanger_triangle_linear(self):
+        """
+        Test flanger effect with triangle modulation and linear interpolation, compare to SoX implementation
+        """
+        delay = 0.6
+        depth = 0.87
+        regen = 3.0
+        width = 0.9
+        speed = 0.5
+        phase = 30
+        noise_filepath = common_utils.get_asset_path('whitenoise.wav')
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("flanger", [delay, depth, regen, width, speed, "triangle", phase, "linear"])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.flanger(waveform, sample_rate, delay, depth, regen, width, speed, phase,
+                                    sinusoidal=False, linear_interpolation=True)
+
+        torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
+    def test_flanger_triangle_quad(self):
+        """
+        Test flanger effect with triangle modulation and quadratic interpolation, compare to SoX implementation
+        """
+        delay = 0.8
+        depth = 0.88
+        regen = 3.0
+        width = 0.4
+        speed = 0.5
+        phase = 40
+        noise_filepath = common_utils.get_asset_path('whitenoise.wav')
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("flanger", [delay, depth, regen, width, speed, "triangle", phase, "quadratic"])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.flanger(waveform, sample_rate, delay, depth, regen, width, speed, phase,
+                                    sinusoidal=False, linear_interpolation=False)
+
+        torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
+    def test_flanger_sine_linear(self):
+        """
+        Test flanger effect with sine modulation and linear interpolation, compare to SoX implementation
+        """
+        delay = 0.8
+        depth = 0.88
+        regen = 3.0
+        width = 0.23
+        speed = 1.3
+        phase = 60
+        noise_filepath = common_utils.get_asset_path('whitenoise.wav')
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("flanger", [delay, depth, regen, width, speed, "sine", phase, "linear"])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.flanger(waveform, sample_rate, delay, depth, regen, width, speed, phase,
+                                    sinusoidal=True, linear_interpolation=True)
+
+        torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
+    def test_flanger_sine_quad(self):
+        """
+        Test flanger effect with sine modulation and quadratic interpolation, compare to SoX implementation
+        """
+        delay = 0.9
+        depth = 0.9
+        regen = 4.0
+        width = 0.23
+        speed = 1.3
+        phase = 25
+        noise_filepath = common_utils.get_asset_path('whitenoise.wav')
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("flanger", [delay, depth, regen, width, speed, "sine", phase, "quadratic"])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.flanger(waveform, sample_rate, delay, depth, regen, width, speed, phase,
+                                    sinusoidal=True, linear_interpolation=False)
+
+        torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_equalizer(self):
         """
         Test biquad peaking equalizer filter, compare to SoX implementation
