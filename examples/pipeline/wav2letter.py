@@ -1,18 +1,8 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 # https://github.com/pytorch/pytorch/issues/13883
 import torch.multiprocessing as mp
 
 if __name__ == '__main__':
     mp.set_start_method('forkserver')
-
-
-# In[ ]:
-
 
 import argparse
 import collections
@@ -48,6 +38,7 @@ from torch.utils.data import DataLoader
 from torchaudio.datasets import LIBRISPEECH, SPEECHCOMMANDS
 from torchaudio.datasets.utils import bg_iterator, diskcache_iterator
 from torchaudio.transforms import MFCC, Resample
+from torchaudio.models.wav2letter import Wav2Letter
 from tqdm.notebook import tqdm as tqdm
 
 print("start time: {}".format(str(datetime.now())), flush=True)
@@ -65,9 +56,6 @@ torch.cuda.empty_cache()
 # Profiling performance
 pr = cProfile.Profile()
 pr.enable()
-
-
-# In[ ]:
 
 
 # Create argument parser
@@ -124,9 +112,6 @@ else:
     args = parser.parse_args()
 
 
-# In[ ]:
-
-
 if args.learning_rate < 0.:
     args.learning_rate = 10 ** random.uniform(-3, 1)
 
@@ -137,18 +122,7 @@ if args.gamma < 0.:
     args.gamma = random.uniform(.95, 1.)
 
 
-# In[ ]:
-
-
-args.batch_size = 32
-args.model = "wav2letter"
-args.dataset = "speechcommand"
-args.print_freq = 1
-
-
-# # Checkpoint
-
-# In[ ]:
+# Checkpoint
 
 
 MAIN_PID = os.getpid()
@@ -221,10 +195,7 @@ def save_checkpoint(state, is_best, filename=CHECKPOINT_filename):
         print("Checkpoint: saved")
 
 
-# # Distributed
-
-# In[ ]:
-
+# Distributed
 
 # Use #nodes as world_size
 if 'SLURM_NNODES' in os.environ:
@@ -243,17 +214,11 @@ if args.distributed:
     print('init process', flush=True)
 
 
-# # Parameters
-
-# In[ ]:
+# Parameters
 
 
 if not args.distributed or os.environ['SLURM_PROCID'] == '0':
     print(pprint.pformat(vars(args)), flush=True)
-
-
-# In[ ]:
-
 
 audio_backend = "soundfile"
 torchaudio.set_audio_backend(audio_backend)
@@ -371,10 +336,7 @@ clip_norm = 0.  # 10.
 zero_infinity = False
 
 
-# # Text encoding
-
-# In[ ]:
-
+# Text encoding
 
 class Coder:
     def __init__(self, labels):
@@ -412,151 +374,15 @@ vocab_size = coder.length
 print("vocab_size", vocab_size, flush=True)
 
 
-# # Model
-# 
-# [Wav2Letter](https://github.com/LearnedVector/Wav2Letter/blob/master/Google%20Speech%20Command%20Example.ipynb)
+# Model
 
-# In[ ]:
+model = Wav2Letter(num_features, vocab_size)
 
-
-def weight_init(m):
-    if isinstance(m, nn.Linear):
-        size = m.weight.size()
-        fan_out = size[0]  # number of rows
-        fan_in = size[1]  # number of columns
-        variance = math.sqrt(2.0/(fan_in + fan_out))
-        m.weight.data.normal_(0.0, variance)
+def model_length_function(tensor):
+    return int(tensor.shape[0])//2 + 1
 
 
-class PrintLayer(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, x):
-        print(x, flush=True)
-        return x
-
-
-class Wav2Letter(nn.Module):
-    """Wav2Letter Speech Recognition model
-        https://arxiv.org/pdf/1609.03193.pdf
-        This specific architecture accepts mfcc or power spectrums speech signals
-
-        Args:
-            num_features (int): number of mfcc features
-            num_classes (int): number of unique grapheme class labels
-    """
-
-    def __init__(self, num_features, num_classes):
-        super().__init__()
-
-        # Conv1d(in_channels, out_channels, kernel_size, stride)
-        self.layers = nn.Sequential(
-            nn.Conv1d(in_channels=num_features, out_channels=250,
-                      kernel_size=48, stride=2, padding=23),
-            nn.ReLU(inplace=True),
-            nn.Conv1d(in_channels=250, out_channels=250,
-                      kernel_size=7, stride=1, padding=3),
-            nn.ReLU(inplace=True),
-            nn.Conv1d(in_channels=250, out_channels=250,
-                      kernel_size=7, stride=1, padding=3),
-            nn.ReLU(inplace=True),
-            nn.Conv1d(in_channels=250, out_channels=250,
-                      kernel_size=7, stride=1, padding=3),
-            nn.ReLU(inplace=True),
-            nn.Conv1d(in_channels=250, out_channels=250,
-                      kernel_size=7, stride=1, padding=3),
-            nn.ReLU(inplace=True),
-            nn.Conv1d(in_channels=250, out_channels=250,
-                      kernel_size=7, stride=1, padding=3),
-            nn.ReLU(inplace=True),
-            nn.Conv1d(in_channels=250, out_channels=250,
-                      kernel_size=7, stride=1, padding=3),
-            nn.ReLU(inplace=True),
-            nn.Conv1d(in_channels=250, out_channels=250,
-                      kernel_size=7, stride=1, padding=3),
-            nn.ReLU(inplace=True),
-            nn.Conv1d(in_channels=250, out_channels=2000,
-                      kernel_size=32, stride=1, padding=16),
-            nn.ReLU(inplace=True),
-            nn.Conv1d(in_channels=2000, out_channels=2000,
-                      kernel_size=1, stride=1, padding=0),
-            nn.ReLU(inplace=True),
-            nn.Conv1d(in_channels=2000, out_channels=num_classes,
-                      kernel_size=1, stride=1, padding=0),
-            nn.ReLU(inplace=True),
-        )
-
-    def forward(self, batch):
-        """Forward pass through Wav2Letter network than
-            takes log probability of output
-        Args:
-            batch (int): mini batch of data
-            shape (batch, num_features, frame_len)
-        Returns:
-            Tensor with shape (batch_size, num_classes, output_len)
-        """
-        # batch: (batch_size, num_features, seq_len)
-        y_pred = self.layers(batch)
-        # y_pred: (batch_size, num_classes, output_len)
-        y_pred = y_pred.transpose(-1, -2)
-        # y_pred: (batch_size, output_len, num_classes)
-        return nn.functional.log_softmax(y_pred, dim=-1)
-
-
-# In[ ]:
-
-
-class LSTMModel(nn.Module):
-
-    def __init__(self, num_features, num_classes, hidden_size, num_layers, bidirectional, dropout, batch_first):
-        super().__init__()
-
-        directions = bidirectional + 1
-
-        self.layer = nn.LSTM(
-            num_features, hidden_size=hidden_size,
-            num_layers=num_layers, bidirectional=bidirectional, dropout=dropout, batch_first=batch_first
-        )
-        # self.activation = nn.ReLU(inplace=True)
-        self.hidden2class = nn.Linear(directions*hidden_size, num_classes)
-
-    def forward(self, batch):
-        self.layer.flatten_parameters()
-        # print("forward", flush=True)
-        # batch: batch, num_features, seq_len
-        # print(batch.shape, flush=True)
-        batch = batch.transpose(-1, -2).contiguous()
-        # batch: batch, seq_len, num_features
-        # print(batch.shape, flush=True)
-        outputs, _ = self.layer(batch)
-        # outputs = self.activation(outputs)
-        # outputs: batch, seq_len, directions*num_features
-        outputs = self.hidden2class(outputs)
-        # outputs: batch, seq_len, num_features
-        # print(outputs.shape, flush=True)
-        return nn.functional.log_softmax(outputs, dim=-1)
-
-
-# In[ ]:
-
-
-if args.arch == "wav2letter":
-    model = Wav2Letter(num_features, vocab_size)
-
-    def model_length_function(tensor):
-        return int(tensor.shape[0])//2 + 1
-
-elif args.arch == "lstm":
-    model = LSTMModel(num_features, vocab_size, **lstm_params)
-
-    def model_length_function(tensor):
-        return int(tensor.shape[0])
-
-
-# # Dataset
-
-# In[ ]:
+# Dataset
 
 
 class IterableMemoryCache:
@@ -628,15 +454,6 @@ class Processed(torch.utils.data.Dataset):
         return len(self.dataset)
 
 
-# In[ ]:
-
-
-# mfcc = mfcc.to(device)
-# resample = resample.to(device)
-
-# @torch.jit.script
-
-
 def process_datapoint(item):
     transformed = item[0]  # .to(device, non_blocking=non_blocking)
     target = item[2].lower()
@@ -652,9 +469,6 @@ def process_datapoint(item):
     transformed = transformed  # .to("cpu")
     target = target  # .to("cpu")
     return transformed, target
-
-
-# In[ ]:
 
 
 def datasets_librispeech():
@@ -675,9 +489,6 @@ def datasets_librispeech():
 
     return create("train-clean-100"), create("dev-clean"), None
     # return create(["train-clean-100", "train-clean-360", "train-other-500"]), create(["dev-clean", "dev-other"]), None
-
-
-# In[ ]:
 
 
 def which_set(filename, validation_percentage, testing_percentage):
@@ -760,43 +571,13 @@ def datasets_speechcommands():
     return create("training"), create("validation"), create("testing")
 
 
-# In[ ]:
-
-
 if args.dataset == "librispeech":
     training, validation, _ = datasets_librispeech()
 elif args.dataset == "speechcommand":
     training, validation, _ = datasets_speechcommands()
 
 
-# In[ ]:
-
-
-if False:
-
-    from collections import Counter
-    from collections import OrderedDict
-
-    training_unprocessed = SPEECHCOMMANDS("./", download=True)
-    training_unprocessed = filter_speechcommands(
-        training_percentage, training_unprocessed)
-
-    counter = Counter([t[2] for t in training_unprocessed])
-    counter = OrderedDict(counter.most_common())
-
-    plt.bar(counter.keys(), counter.values(), align='center')
-
-    if resample is not None:
-        waveform, sample_rate = training_unprocessed[0][0], training_unprocessed[0][1]
-
-        fn = "sound.wav"
-        torchaudio.save(fn, waveform, sample_rate_new)
-        ipd.Audio(fn)
-
-
-# # Word Decoder
-
-# In[ ]:
+# Word Decoder
 
 
 def greedy_decode(outputs):
@@ -810,9 +591,6 @@ def greedy_decode(outputs):
     """
     _, indices = topk(outputs, k=1, dim=-1)
     return indices[..., 0]
-
-
-# In[ ]:
 
 
 def build_transitions():
@@ -847,13 +625,6 @@ if args.viterbi_decoder:
     print("transitions: building", flush=True)
     transitions = build_transitions()
     print("transitions: done", flush=True)
-
-
-# In[ ]:
-
-
-# https://gist.github.com/PetrochukM/afaa3613a99a8e7213d2efdd02ae4762
-# https://github.com/napsternxg/pytorch-practice/blob/master/Viterbi%20decoding%20and%20CRF.ipynb
 
 
 def viterbi_decode(tag_sequence: torch.Tensor, transition_matrix: torch.Tensor, top_k: int = 5):
@@ -947,35 +718,6 @@ def top_batch_viterbi_decode(tag_sequence: torch.Tensor):
     return output[:, 0, :]
 
 
-# In[ ]:
-
-
-def levenshtein_distance_array(r, h):
-
-    # initialisation
-    dnew = array('d', [0] * (len(h)+1))
-    dold = array('d', [0] * (len(h)+1))
-
-    # computation
-    for i in range(1, len(r)+1):
-        for j in range(1, len(h)+1):
-
-            if r[i-1] == h[j-1]:
-                dnew[j] = dold[j-1]
-            else:
-                substitution = dold[j-1] + 1
-                insertion = dnew[j-1] + 1
-                deletion = dold[j] + 1
-                dnew[j] = min(substitution, insertion, deletion)
-
-        dnew, dold = dold, dnew
-
-    return dnew[-1]
-
-
-# In[ ]:
-
-
 def levenshtein_distance_list(r, h):
 
     # initialisation
@@ -994,12 +736,6 @@ def levenshtein_distance_list(r, h):
                 d[i].append(min(substitution, insertion, deletion))
 
     return d[len(r)][len(h)]
-
-
-# In[ ]:
-
-
-# https://martin-thoma.com/word-error-rate-calculation/
 
 
 def levenshtein_distance(r: str, h: str, device: Optional[str] = None):
@@ -1029,32 +765,7 @@ def levenshtein_distance(r: str, h: str, device: Optional[str] = None):
     return dist
 
 
-# In[ ]:
-
-
-if False:
-    r = "abcdddee"
-    h = "abcddde"
-
-    get_ipython().run_line_magic('timeit', 'levenshtein_distance(r, h)')
-
-    jitted = torch.jit.script(levenshtein_distance)
-    get_ipython().run_line_magic('timeit', 'jitted(r, h)')
-
-    get_ipython().run_line_magic('timeit', 'levenshtein_distance_list(r, h)')
-
-    jitted = torch.jit.script(levenshtein_distance_list)
-    # %timeit jitted(r, h)
-
-    get_ipython().run_line_magic('timeit', 'levenshtein_distance_array(r, h)')
-
-    jitted = torch.jit.script(levenshtein_distance_array)
-    # %timeit jitted(r, h)
-
-
-# # Train
-
-# In[ ]:
+# Train
 
 
 def collate_fn(batch):
@@ -1077,9 +788,6 @@ def collate_fn(batch):
     return tensors, targets, tensors_lengths, target_lengths
 
 
-# In[ ]:
-
-
 if args.jit:
     model = torch.jit.script(model)
 
@@ -1092,10 +800,6 @@ else:
 
 model = model.to(device, non_blocking=non_blocking)
 print('model cuda', flush=True)
-# model.apply(weight_init)
-
-
-# In[ ]:
 
 
 def count_parameters(model):
@@ -1105,28 +809,9 @@ def count_parameters(model):
 if not args.distributed or os.environ['SLURM_PROCID'] == '0':
     n = count_parameters(model)
     print(f"Number of parameters: {n}", flush=True)
-    # Each float32 is 4 bytes.
-    print(f"Approximate space taken: {n * 4 / (10 ** 6):.1f} MB", flush=True)
-
-if False:
-    print("Total memory: ", torch.cuda.get_device_properties(
-        0).total_memory / 10**6)  # Convert to MB
-
-    t = torch.cuda.get_device_properties(0).total_memory
-    c = torch.cuda.memory_cached(0)
-    a = torch.cuda.memory_allocated(0)
-    f = c-a  # free inside cache
-
-    print("Free memory inside cache: ", f)
-
-
-# In[ ]:
 
 
 print(torch.cuda.memory_summary(), flush=True)
-
-
-# In[ ]:
 
 
 optimizer = Optimizer(model.parameters(), **optimizer_params)
@@ -1140,10 +825,6 @@ criterion = torch.nn.CTCLoss(
 
 best_loss = 1.
 
-
-# In[ ]:
-
-
 loader_training = DataLoader(
     training, batch_size=batch_size, collate_fn=collate_fn, **data_loader_training_params
 )
@@ -1154,12 +835,6 @@ loader_validation = DataLoader(
 
 print("Length of data loaders: ", len(loader_training),
       len(loader_validation), flush=True)
-
-# num_features = next(iter(loader_training))[0].shape[1]
-# print(num_features, flush=True)
-
-
-# In[ ]:
 
 
 def forward_loss(inputs, targets, tensors_lengths, target_lengths):
@@ -1220,10 +895,6 @@ def forward_decode(inputs, targets, decoder):
 
     return cers, wers, cers_normalized, wers_normalized
 
-
-# In[ ]:
-
-
 history_loader = defaultdict(list)
 history_training = defaultdict(list)
 history_validation = defaultdict(list)
@@ -1257,9 +928,6 @@ else:
         'history_training': history_training,
         'history_validation': history_validation,
     }, False)
-
-
-# In[ ]:
 
 
 with tqdm(total=args.epochs, unit_scale=1, disable=args.distributed) as pbar:
@@ -1417,34 +1085,14 @@ with tqdm(total=args.epochs, unit_scale=1, disable=args.distributed) as pbar:
         open(HALT_filename, 'a').close()
 
 
-# In[ ]:
-
-
 print(tabulate(history_training, headers="keys"), flush=True)
 print(tabulate(history_validation, headers="keys"), flush=True)
 print(torch.cuda.memory_summary(), flush=True)
-
-
-# In[ ]:
-
-
 print(tabulate(history_loader, headers="keys"), flush=True)
-
-
-# In[ ]:
 
 
 plt.plot(history_loader["epoch"],
          history_loader["memory"], label="memory")
-
-
-# In[ ]:
-
-
-history_validation["epoch"]
-
-
-# In[ ]:
 
 
 if not args.distributed or os.environ['SLURM_PROCID'] == '0':
@@ -1459,9 +1107,6 @@ if not args.distributed or os.environ['SLURM_PROCID'] == '0':
     plt.savefig(os.path.join(args.figures, "cer.png")
 
 
-# In[ ]:
-
-
 if not args.distributed or os.environ['SLURM_PROCID'] == '0':
 
     if "greedy_wer" in history_validation:
@@ -1472,9 +1117,6 @@ if not args.distributed or os.environ['SLURM_PROCID'] == '0':
                  history_validation["viterbi_wer"], label="viterbi")
     plt.legend()
     plt.savefig(os.path.join(args.figures, "wer.png")
-
-
-# In[ ]:
 
 
 if not args.distributed or os.environ['SLURM_PROCID'] == '0':
@@ -1489,9 +1131,6 @@ if not args.distributed or os.environ['SLURM_PROCID'] == '0':
     plt.savefig(os.path.join(args.figures, "cer_normalized.png")
 
 
-# In[ ]:
-
-
 if not args.distributed or os.environ['SLURM_PROCID'] == '0':
 
     if "greedy_wer_normalized" in history_validation:
@@ -1504,9 +1143,6 @@ if not args.distributed or os.environ['SLURM_PROCID'] == '0':
     plt.savefig(os.path.join(args.figures, "wer_normalized.png")
 
 
-# In[ ]:
-
-
 if not args.distributed or os.environ['SLURM_PROCID'] == '0':
 
     plt.plot(history_training["epoch"],
@@ -1515,9 +1151,6 @@ if not args.distributed or os.environ['SLURM_PROCID'] == '0':
              history_validation["sum_loss"], label="validation")
     plt.legend()
     plt.savefig(os.path.join(args.figures, "sum_loss.png")
-
-
-# In[ ]:
 
 
 if not args.distributed or os.environ['SLURM_PROCID'] == '0':
@@ -1531,14 +1164,8 @@ if not args.distributed or os.environ['SLURM_PROCID'] == '0':
     plt.savefig(os.path.join(args.figures, "log_sum_loss.png")
 
 
-# In[ ]:
-
-
 if not args.distributed or os.environ['SLURM_PROCID'] == '0':
     print(torch.cuda.memory_summary(), flush=True)
-
-
-# In[ ]:
 
 
 # Print performance
