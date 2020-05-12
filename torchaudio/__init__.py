@@ -193,8 +193,8 @@ def save_encinfo(filepath: str,
     # save data to file
     src = src.contiguous()
 
-    import _torch_sox
-    _torch_sox.write_audio_file(filepath, src, signalinfo, encodinginfo, filetype)
+    from . import _torchaudio
+    _torchaudio.write_audio_file(filepath, src, signalinfo, encodinginfo, filetype)
 
 
 def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
@@ -236,8 +236,8 @@ def sox_signalinfo_t() -> SignalInfo:
         >>> si.length = 0
     """
 
-    import _torch_sox
-    return _torch_sox.sox_signalinfo_t()
+    from . import _torchaudio
+    return _torchaudio.sox_signalinfo_t()
 
 
 @_audio_backend_guard("sox")
@@ -271,8 +271,8 @@ def sox_encodinginfo_t() -> EncodingInfo:
 
     """
 
-    import _torch_sox
-    ei = _torch_sox.sox_encodinginfo_t()
+    from . import _torchaudio
+    ei = _torchaudio.sox_encodinginfo_t()
     sdo = get_sox_option_t(2)  # sox_default_option
     ei.reverse_bytes = sdo
     ei.reverse_nibbles = sdo
@@ -292,12 +292,12 @@ def get_sox_encoding_t(i: int = None) -> EncodingInfo:
         sox_encoding_t: A sox_encoding_t type for output encoding
     """
 
-    import _torch_sox
+    from . import _torchaudio
     if i is None:
         # one can see all possible values using the .__members__ attribute
-        return _torch_sox.sox_encoding_t
+        return _torchaudio.sox_encoding_t
     else:
-        return _torch_sox.sox_encoding_t(i)
+        return _torchaudio.sox_encoding_t(i)
 
 
 @_audio_backend_guard("sox")
@@ -312,11 +312,11 @@ def get_sox_option_t(i: int = 2) -> Any:
         sox_option_t: A sox_option_t type
     """
 
-    import _torch_sox
+    from . import _torchaudio
     if i is None:
-        return _torch_sox.sox_option_t
+        return _torchaudio.sox_option_t
     else:
-        return _torch_sox.sox_option_t(i)
+        return _torchaudio.sox_option_t(i)
 
 
 @_audio_backend_guard("sox")
@@ -332,11 +332,11 @@ def get_sox_bool(i: int = 0) -> Any:
         sox_bool: A sox_bool type
     """
 
-    import _torch_sox
+    from . import _torchaudio
     if i is None:
-        return _torch_sox.sox_bool
+        return _torchaudio.sox_bool
     else:
-        return _torch_sox.sox_bool(i)
+        return _torchaudio.sox_bool(i)
 
 
 _SOX_INITIALIZED: Optional[bool] = False
@@ -370,8 +370,8 @@ def initialize_sox() -> int:
     if _SOX_INITIALIZED is None:
         raise RuntimeError('SoX effects chain has been already shut down. Can not initialize again.')
     if not _SOX_INITIALIZED:
-        import _torch_sox
-        code = _torch_sox.initialize_sox()
+        from . import _torchaudio
+        code = _torchaudio.initialize_sox()
         if code == _SOX_SUCCESS_CODE:
             _SOX_INITIALIZED = True
             atexit.register(shutdown_sox)
@@ -394,8 +394,8 @@ def shutdown_sox() -> int:
     """
     global _SOX_INITIALIZED
     if _SOX_INITIALIZED:
-        import _torch_sox
-        code = _torch_sox.shutdown_sox()
+        from . import _torchaudio
+        code = _torchaudio.shutdown_sox()
         if code == _SOX_INITIALIZED:
             _SOX_INITIALIZED = None
         return code

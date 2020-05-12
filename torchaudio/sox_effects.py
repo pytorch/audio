@@ -16,8 +16,8 @@ def effect_names() -> List[str]:
         >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
     """
 
-    import _torch_sox
-    return _torch_sox.get_effect_names()
+    from . import _torchaudio
+    return _torchaudio.get_effect_names()
 
 
 @_audio_backend_guard("sox")
@@ -29,8 +29,8 @@ def SoxEffect():
         name of effect, and eopts (List[str]) which is a list of effect options.
     """
 
-    import _torch_sox
-    return _torch_sox.SoxEffect()
+    from . import _torchaudio
+    return _torchaudio.SoxEffect()
 
 
 class SoxEffectsChain(object):
@@ -150,15 +150,15 @@ class SoxEffectsChain(object):
         # print("effect options:", [x.eopts for x in self.chain])
 
         torchaudio.initialize_sox()
-        import _torch_sox
-        sr = _torch_sox.build_flow_effects(self.input_file,
-                                           out,
-                                           self.channels_first,
-                                           self.out_siginfo,
-                                           self.out_encinfo,
-                                           self.filetype,
-                                           self.chain,
-                                           self.MAX_EFFECT_OPTS)
+        from . import _torchaudio
+        sr = _torchaudio.build_flow_effects(self.input_file,
+                                            out,
+                                            self.channels_first,
+                                            self.out_siginfo,
+                                            self.out_encinfo,
+                                            self.filetype,
+                                            self.chain,
+                                            self.MAX_EFFECT_OPTS)
 
         torchaudio._audio_normalization(out, self.normalization)
 
