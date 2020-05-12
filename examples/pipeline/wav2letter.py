@@ -1,6 +1,6 @@
-# https://github.com/pytorch/pytorch/issues/13883
 import torch.multiprocessing as mp
 
+# https://github.com/pytorch/pytorch/issues/13883
 if __name__ == '__main__':
     mp.set_start_method('forkserver')
 
@@ -30,16 +30,18 @@ import torch
 import torch.distributed as dist
 import torchaudio
 from matplotlib import pyplot as plt
-from tabulate import tabulate
 from torch import nn, topk
 from torch.optim import SGD, Adadelta, Adam
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torchaudio.datasets import LIBRISPEECH, SPEECHCOMMANDS
 from torchaudio.datasets.utils import bg_iterator, diskcache_iterator
-from torchaudio.transforms import MFCC, Resample
 from torchaudio.models.wav2letter import Wav2Letter
+from torchaudio.transforms import MFCC, Resample
 from tqdm.notebook import tqdm as tqdm
+
+from tabulate import tabulate
+
 
 print("start time: {}".format(str(datetime.now())), flush=True)
 
@@ -228,16 +230,10 @@ folder_in_archive = "librispeech/062419/"
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 num_devices = torch.cuda.device_count()
-# num_devices = 1
 print(num_devices, "GPUs", flush=True)
 
 # max number of sentences per batch
 batch_size = args.batch_size
-# batch_size = 2048
-# batch_size = 512
-# batch_size = 256
-# batch_size = 64
-# batch_size = 1
 
 training_percentage = 90.
 validation_percentage = 5.
@@ -254,7 +250,7 @@ data_loader_validation_params["shuffle"] = False
 non_blocking = True
 
 
-# text preprocessing
+# Text preprocessing
 
 char_blank = "*"
 char_space = " "
@@ -550,8 +546,9 @@ def filter_speechcommands(tag, training_percentage, data):
         testing_percentage = (
             100. - training_percentage - validation_percentage)
 
-        def which_set_filter(x): return which_set(
-            x, validation_percentage, testing_percentage) == tag
+        def which_set_filter(x):
+            return which_set(x, validation_percentage, testing_percentage) == tag
+
         data._walker = list(filter(which_set_filter, data._walker))
     return data
 
@@ -1180,4 +1177,3 @@ ps = (
 )
 print(s.getvalue(), flush=True)
 print("stop time: {}".format(str(datetime.now())), flush=True)
-
