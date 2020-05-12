@@ -1461,13 +1461,13 @@ def flanger(
             Allowed range of values are 0 to 100
         speed (float):  modulation speed in Hz
             Allowed range of values are 0.1 to 10
-        phase (float):  desired phase
+        phase (float):  percentage phase-shift for multi-channel
             Allowed range of values are 0 to 100
-        sinusoidal (bool):  If ``True``, uses sinusoidal modulation (preferable for multiple instruments)
-            If ``False``, uses triangular modulation (gives single instruments a sharper phasing effect)
+        sinusoidal (bool):  If ``True``, uses sinusoidal modulation
+            If ``False``, uses triangular modulation
             (Default: ``True``)
-        linear_interpolation (bool):  If ``True``, uses linear interpolation
-            If ``False``, uses Quadrtion interpolation
+        linear_interpolation (bool):  If ``True``, uses linear interpolation for delay-line interpolation
+            If ``False``, uses Quadratic interpolation
             (Default: ``True``)
 
     Returns:
@@ -1478,7 +1478,14 @@ def flanger(
         Scott Lehman, Effects Explained, http://harmony-central.com/Effects/effects-explained.html
     """
 
+    actual_shape = waveform.shape
     device, dtype = waveform.device, waveform.dtype
+
+    if actual_shape[-2] > 4:
+        raise ValueError("Max 4 channels allowed")
+
+    # convert to 3D (batch, channels, time)
+    waveform = waveform.view(-1, actual_shape[-2], actual_shape[-1])
 
     # Scaling
     feedback_gain = regen / 100
@@ -1487,7 +1494,7 @@ def flanger(
     delay_min = delay / 1000
     delay_depth = depth / 1000
 
-    n_channels = waveform.shape[0]
+    n_channels = waveform.shape[-2]
 
     if sinusoidal:
         wave_type = 'SINE'
@@ -1504,8 +1511,8 @@ def flanger(
     delay_buf_length = int((delay_min + delay_depth) * sample_rate + 0.5)
     delay_buf_length = delay_buf_length + 2
 
-    delay_bufs = torch.zeros(n_channels, delay_buf_length, dtype=dtype, device=device)
-    delay_last = torch.zeros(n_channels, dtype=dtype, device=device)
+    delay_bufs = torch.zeros(waveform.shape[0], n_channels, delay_buf_length, dtype=dtype, device=device)
+    delay_last = torch.zeros(waveform.shape[0], n_channels, dtype=dtype, device=device)
 
     lfo_length = int(sample_rate / speed)
 
@@ -1517,11 +1524,11 @@ def flanger(
     lfo = _generate_wave_table(wave_type=wave_type,
                                data_type='FLOAT',
                                table_size=lfo_length,
-                               min=table_min,
-                               max=table_max,
+                               min=float(table_min),
+                               max=float(table_max),
                                phase=3 * math.pi / 2)
 
-    output_waveform = torch.zeros_like(waveform)
+    output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
 
     delay_buf_pos = 0
     lfo_pos = 0
@@ -1538,22 +1545,22 @@ def flanger(
 
             int_delay = int(delay)
 
-            temp = waveform[c, i]
+            temp = waveform[:, c, i]
 
-            delay_bufs[c, delay_buf_pos] = temp + delay_last[c] * feedback_gain
+            delay_bufs[:, c, delay_buf_pos] = temp + delay_last[:, c] * feedback_gain
 
-            delayed_0 = delay_bufs[c, (delay_buf_pos + int_delay) % delay_buf_length]
+            delayed_0 = delay_bufs[:, c, (delay_buf_pos + int_delay) % delay_buf_length]
 
             int_delay = int_delay + 1
 
-            delayed_1 = delay_bufs[c, (delay_buf_pos + int_delay) % delay_buf_length]
+            delayed_1 = delay_bufs[:, c, (delay_buf_pos + int_delay) % delay_buf_length]
 
             int_delay = int_delay + 1
 
             if linear_interpolation:
                 delayed = delayed_0 + (delayed_1 - delayed_0) * frac_delay
             else:
-                delayed_2 = delay_bufs[c, (delay_buf_pos + int_delay) % delay_buf_length]
+                delayed_2 = delay_bufs[:, c, (delay_buf_pos + int_delay) % delay_buf_length]
 
                 int_delay = int_delay + 1
 
@@ -1564,12 +1571,12 @@ def flanger(
 
                 delayed = delayed_0 + (a * frac_delay + b) * frac_delay
 
-            delay_last[c] = delayed
-            output_waveform[c, i] = waveform[c, i] * in_gain + delayed * delay_gain
+            delay_last[:, c] = delayed
+            output_waveform[:, c, i] = waveform[:, c, i] * in_gain + delayed * delay_gain
 
         lfo_pos = (lfo_pos + 1) % lfo_length
 
-    return output_waveform.clamp(min=-1, max=1)
+    return output_waveform.clamp(min=-1, max=1).view(actual_shape)
 
 
 def mask_along_axis_iid(

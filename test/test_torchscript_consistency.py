@@ -537,9 +537,9 @@ class Functional(common_utils.TestBaseMixin):
             regen = 3.0
             width = 0.23
             speed = 1.3
-            phase = 60
+            phase = 60.
             sample_rate = 44100
-            return F.phaser(tensor, sample_rate, delay, depth, regen, width, speed,
+            return F.flanger(tensor, sample_rate, delay, depth, regen, width, speed,
                             phase, sinusoidal=True, linear_interpolation=True)
 
         self._assert_consistency(func, waveform)
