@@ -526,10 +526,17 @@ class Functional(common_utils.TestBaseMixin):
             regen = 3.0
             width = 0.23
             speed = 1.3
+<<<<<<< HEAD
             phase = 60.
             sample_rate = 44100
             return F.flanger(tensor, sample_rate, delay, depth, regen, width, speed,
                              phase, sinusoidal=True, linear_interpolation=True)
+=======
+            phase = 60
+            sample_rate = 44100
+            return F.phaser(tensor, sample_rate, delay, depth, regen, width, speed,
+                            phase, sinusoidal=True, linear_interpolation=True)
+>>>>>>> Add flanger to functional
 
         self._assert_consistency(func, waveform)
 
