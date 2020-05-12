@@ -89,8 +89,8 @@ def _feature_window_function(window_type: str,
                              window_size: int,
                              blackman_coeff: float,
                              device: torch.device,
-                             dtype: int
-) -> Tensor:
+                             dtype: int,
+                             ) -> Tensor:
     r"""Returns a window function with the given type and size
     """
     if window_type == HANNING:
@@ -552,7 +552,7 @@ def fbank(waveform: Tensor,
         where m is calculated in _get_strided
     """
     device, dtype = waveform.device, waveform.dtype
-    
+
     waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
         waveform, channel, sample_frequency, frame_shift, frame_length, round_to_power_of_two, preemphasis_coefficient)
 
