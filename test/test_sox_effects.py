@@ -1,7 +1,10 @@
 import math
 import os
 import unittest
+from tempfile import TemporaryDirectory
 
+import numpy as np
+import soundfile
 import torch
 import torchaudio
 
@@ -309,26 +312,30 @@ class Test_SoxEffectsChain(unittest.TestCase):
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
     def test_transform_synth(self):
-        test_filepath_8000 = common_utils.get_asset_path("silence_8000.wav")
-        test_filepath_16000 = common_utils.get_asset_path("silence_16000.wav")
-        for test_filepath in (test_filepath_8000, test_filepath_16000):
-            x_orig, _ = torchaudio.load(test_filepath)
+        with TemporaryDirectory() as tmp_folder:
+            test_filepath_8000 = os.path.join(tmp_folder, "silence_8000.wav")
+            test_filepath_16000 = os.path.join(tmp_folder, "silence_16000.wav")
+            soundfile.write(test_filepath_8000, data=np.zeros(8000), samplerate=8000)
+            soundfile.write(test_filepath_16000, data=np.zeros(16000), samplerate=16000)
 
-            for params in ((0.01, "sine", 400),
-                           (0.01, "triangle", 400),
-                           (0.01, "square", 400),
-                           (0.01, "sawtooth", 400),
-                           (0.01, "exp", 400),
-                           (0.01, "trapezium", 400)):
-                E = torchaudio.sox_effects.SoxEffectsChain()
-                E.set_input_file(test_filepath)
-                E.append_effect_to_chain("synth", [*params])
-                x, sr = E.sox_build_flow_effects()
+            for test_filepath in (test_filepath_8000, test_filepath_16000):
+                x_orig, _ = torchaudio.load(test_filepath)
 
-                synth = torchaudio.transforms.Synth(sr, *params)
+                for params in ((0.01, "sine", 400),
+                               (0.01, "triangle", 400),
+                               (0.01, "square", 400),
+                               (0.01, "sawtooth", 400),
+                               (0.01, "exp", 400),
+                               (0.01, "trapezium", 400)):
+                    E = torchaudio.sox_effects.SoxEffectsChain()
+                    E.set_input_file(test_filepath)
+                    E.append_effect_to_chain("synth", [*params])
+                    x, sr = E.sox_build_flow_effects()
 
-                # check if effect worked
-                self.assertTrue(x.allclose(synth(), rtol=1e-3, atol=1e-3))
+                    synth = torchaudio.transforms.Synth(sr, *params)
+
+                    # check if effect worked
+                    torch.testing.assert_allclose(x, synth(), rtol=1e-3, atol=1e-3)
 
 
 if __name__ == '__main__':
