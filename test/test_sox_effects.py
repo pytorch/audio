@@ -309,7 +309,7 @@ class Test_SoxEffectsChain(unittest.TestCase):
             y = vad(x_orig)
             self.assertTrue(x.allclose(y, rtol=1e-4, atol=1e-4))
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @unittest.skipIf(set(["sox", "soundfile"]) not in set(BACKENDS), "sox and soundfile are not available")
     @AudioBackendScope("sox")
     def test_transform_synth(self):
         with TemporaryDirectory() as tmp_folder:
