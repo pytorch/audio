@@ -105,6 +105,16 @@ def parse_args():
     
     args = parser.parse_args()
 
+
+    # Use #nodes as world_size
+    if 'SLURM_NNODES' in os.environ:
+        args.world_size = int(os.environ['SLURM_NNODES'])
+
+    args.distributed = args.distributed or args.world_size > 1
+
+    if not args.distributed or os.environ['SLURM_PROCID'] == '0':
+        print(pprint.pformat(vars(args)), flush=True)
+
     return args
 
 
@@ -187,12 +197,6 @@ def save_checkpoint(state, is_best, filename=CHECKPOINT_filename):
 
 
 # Distributed
-
-# Use #nodes as world_size
-if 'SLURM_NNODES' in os.environ:
-    args.world_size = int(os.environ['SLURM_NNODES'])
-
-args.distributed = args.distributed or args.world_size > 1
 
 if args.distributed:
     os.environ['RANK'] = os.environ['SLURM_PROCID']
@@ -524,7 +528,7 @@ def which_set(filename, validation_percentage, testing_percentage):
     return result
 
 
-def filter_speechcommands(tag, training_percentage, data):
+def filter_speechcommands(data, tag, training_percentage, validation_percentage):
     if training_percentage < 100.:
         testing_percentage = (
             100. - training_percentage - validation_percentage)
@@ -542,7 +546,7 @@ def datasets_speechcommands():
 
     def create(tag):
         data = SPEECHCOMMANDS(root, download=True)
-        data = filter_speechcommands(tag, training_percentage, data)
+        data = filter_speechcommands(data, tag, 90, 5)
         data = Processed(process_datapoint, data)
         # data = diskcache_iterator(data)
         data = MapMemoryCache(data)
@@ -786,11 +790,11 @@ criterion = torch.nn.CTCLoss(
 best_loss = 1.
 
 loader_training = DataLoader(
-    training, batch_size=batch_size, collate_fn=collate_fn, **data_loader_training_params
+    training, batch_size=args.batch_size, collate_fn=collate_fn, **data_loader_training_params
 )
 
 loader_validation = DataLoader(
-    validation, batch_size=batch_size, collate_fn=collate_fn, **data_loader_validation_params
+    validation, batch_size=args.batch_size, collate_fn=collate_fn, **data_loader_validation_params
 )
 
 print("Length of data loaders: ", len(loader_training),
