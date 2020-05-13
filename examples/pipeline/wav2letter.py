@@ -9,17 +9,14 @@ import collections
 import cProfile
 import hashlib
 import itertools
-import math
 import os
 import pprint
 import pstats
-import random
 import re
 import shutil
 import signal
 import statistics
 import string
-from array import array
 from collections import defaultdict
 from datetime import datetime
 from io import StringIO
@@ -48,26 +45,26 @@ matplotlib.use("Agg")
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    
+
     parser.add_argument('--workers', default=0, type=int,
                         metavar='N', help='number of data loading workers')
     parser.add_argument('--resume', default='', type=str,
                         metavar='PATH', help='path to latest checkpoint')
     parser.add_argument('--figures', default='', type=str,
                         metavar='PATH', help='folder path to save figures')
-    
+
     parser.add_argument('--epochs', default=200, type=int,
                         metavar='N', help='number of total epochs to run')
     parser.add_argument('--start-epoch', default=0, type=int,
                         metavar='N', help='manual epoch number')
     parser.add_argument('--print-freq', default=10, type=int,
                         metavar='N', help='print frequency in epochs')
-    
+
     parser.add_argument('--arch', metavar='ARCH', default='wav2letter',
                         choices=["wav2letter", "lstm"], help='model architecture')
     parser.add_argument('--batch-size', default=64, type=int,
                         metavar='N', help='mini-batch size')
-    
+
     parser.add_argument('--learning-rate', default=1., type=float,
                         metavar='LR', help='initial learning rate')
     parser.add_argument('--gamma', default=.96, type=float,
@@ -77,10 +74,10 @@ def parse_args():
                         type=float, metavar='W', help='weight decay')
     parser.add_argument("--eps", metavar='EPS', type=float, default=1e-8)
     parser.add_argument("--rho", metavar='RHO', type=float, default=.95)
-    
+
     parser.add_argument('--n-bins', default=13, type=int,
                         metavar='N', help='number of bins in transforms')
-    
+
     parser.add_argument('--world-size', default=1, type=int,
                         help='number of distributed processes')
     parser.add_argument('--dist-url', default='tcp://224.66.41.62:23456',
@@ -88,12 +85,12 @@ def parse_args():
     parser.add_argument('--dist-backend', default='nccl',
                         type=str, help='distributed backend')
     parser.add_argument('--distributed', action="store_true")
-    
+
     parser.add_argument('--dataset', default='librispeech', type=str)
     parser.add_argument('--gradient', action="store_true")
     parser.add_argument('--jit', action="store_true")
     parser.add_argument('--viterbi-decoder', action="store_true")
-    
+
     args = parser.parse_args()
 
 
@@ -202,7 +199,7 @@ if args.distributed:
 
 
 class LanguageModel:
-    def __init__(self, labels):
+    def __init__(self, labels, char_blank):
         labels = [l for l in labels]
         self.length = len(labels)
         enumerated = list(enumerate(labels))
@@ -216,7 +213,7 @@ class LanguageModel:
         if isinstance(iterable, list):
             return [self.encode(i) for i in iterable]
         else:
-            return [self.mapping[i] + self.mapping[char_blank] for i in iterable]
+            return [self.mapping[i] + self.mapping[self.char_blank] for i in iterable]
 
     def decode(self, tensor):
         if isinstance(tensor[0], list):
@@ -225,7 +222,7 @@ class LanguageModel:
             # not idempotent, since clean string
             x = (self.mapping[i] for i in tensor)
             x = ''.join(i for i, _ in itertools.groupby(x))
-            x = x.replace(char_blank, "")
+            x = x.replace(self.char_blank, "")
             # x = x.strip()
             return x
 
@@ -317,13 +314,12 @@ def process_datapoint(item):
     return transformed, target
 
 
-def datasets_librispeech():
+def datasets_librispeech(root="/datasets01/", folder_in_archive="librispeech/062419/"):
 
     def create(tag):
 
         if isinstance(tag, str):
-            data = LIBRISPEECH(
-                root, tag, folder_in_archive=folder_in_archive, download=False)
+            data = LIBRISPEECH(root, tag, folder_in_archive=folder_in_archive, download=False)
         else:
             data = sum(LIBRISPEECH(root, t, folder_in_archive=folder_in_archive, download=False) for t in tag)
 
@@ -392,8 +388,7 @@ def which_set(filename, validation_percentage, testing_percentage):
 
 def filter_speechcommands(data, tag, training_percentage, validation_percentage):
     if training_percentage < 100.:
-        testing_percentage = (
-            100. - training_percentage - validation_percentage)
+        testing_percentage = (100. - training_percentage - validation_percentage)
 
         def which_set_filter(x):
             return which_set(x, validation_percentage, testing_percentage) == tag
@@ -402,9 +397,7 @@ def filter_speechcommands(data, tag, training_percentage, validation_percentage)
     return data
 
 
-def datasets_speechcommands():
-
-    root = "./"
+def datasets_speechcommands(root="./"):
 
     def create(tag):
         data = SPEECHCOMMANDS(root, download=True)
@@ -415,9 +408,6 @@ def datasets_speechcommands():
         return data
 
     return create("training"), create("validation"), create("testing")
-
-
-# Word Decoder
 
 
 def greedy_decode(outputs):
@@ -433,7 +423,7 @@ def greedy_decode(outputs):
     return indices[..., 0]
 
 
-def build_transitions():
+def build_transitions(training, vocab_size):
 
     from collections import Counter
 
@@ -455,12 +445,9 @@ def build_transitions():
 
     transitions = torch.sparse_coo_tensor(indices=ind, values=val, size=[
                                           vocab_size, vocab_size]).coalesce().to_dense()
-    transitions = (transitions/torch.max(torch.tensor(1.),
-                                         transitions.max(dim=1)[0]).unsqueeze(1))
+    transitions = (transitions / torch.max(torch.tensor(1.), transitions.max(dim=1)[0]).unsqueeze(1))
 
     return transitions
-
-
 
 
 def viterbi_decode(tag_sequence: torch.Tensor, transition_matrix: torch.Tensor, top_k: int = 5):
@@ -542,7 +529,7 @@ def batch_viterbi_decode(tag_sequence: torch.Tensor, transition_matrix: torch.Te
     outputs = []
     scores = []
     for i in range(tag_sequence.shape[1]):
-        paths, score = viterbi_decode(tag_sequence[:, i, :], transitions)
+        paths, score = viterbi_decode(tag_sequence[:, i, :], transition_matrix)
         outputs.append(paths)
         scores.append(score)
 
@@ -675,9 +662,6 @@ def main(args):
     audio_backend = "soundfile"
     torchaudio.set_audio_backend(audio_backend)
 
-    root = "/datasets01/"
-    folder_in_archive = "librispeech/062419/"
-
     device = "cuda" if torch.cuda.is_available() else "cpu"
     num_devices = torch.cuda.device_count()
     print(num_devices, "GPUs", flush=True)
@@ -720,7 +704,7 @@ def main(args):
     char_apostrophe = "'"
 
     labels = char_blank + char_space + char_apostrophe + string.ascii_lowercase
-    coder = LanguageModel(labels)
+    coder = LanguageModel(labels, char_blank)
     encode = coder.encode
     decode = coder.decode
     vocab_size = coder.length
@@ -733,7 +717,7 @@ def main(args):
 
     if args.viterbi_decoder:
         print("transitions: building", flush=True)
-        transitions = build_transitions()
+        transitions = build_transitions(training, vocab_size)
         print("transitions: done", flush=True)
 
     # Model
@@ -865,7 +849,7 @@ def main(args):
                     }, False)
                     trigger_job_requeue()
 
-                pbar.update(1/len(loader_training))
+                pbar.update(1 / len(loader_training))
 
             total_norm = (total_norm ** .5) / len(loader_training)
             if total_norm > 0:
@@ -967,7 +951,6 @@ def main(args):
         if epoch == args.epochs - 1:
             open(HALT_filename, 'a').close()
 
-
     print(tabulate(history_training, headers="keys"), flush=True)
     print(tabulate(history_validation, headers="keys"), flush=True)
     print(torch.cuda.memory_summary(), flush=True)
@@ -982,7 +965,7 @@ def main(args):
         if "viterbi_cer" in history_validation:
             plt.plot(history_validation["epoch"], history_validation["viterbi_cer"], label="viterbi")
         plt.legend()
-        plt.savefig(os.path.join(args.figures, "cer.png")
+        plt.savefig(os.path.join(args.figures, "cer.png"))
 
     if not args.distributed or os.environ['SLURM_PROCID'] == '0':
 
@@ -991,7 +974,7 @@ def main(args):
         if "viterbi_wer" in history_validation:
             plt.plot(history_validation["epoch"], history_validation["viterbi_wer"], label="viterbi")
         plt.legend()
-        plt.savefig(os.path.join(args.figures, "wer.png")
+        plt.savefig(os.path.join(args.figures, "wer.png"))
 
     if not args.distributed or os.environ['SLURM_PROCID'] == '0':
 
@@ -1000,7 +983,7 @@ def main(args):
         if "viterbi_cer_normalized" in history_validation:
             plt.plot(history_validation["epoch"], history_validation["viterbi_cer_normalized"], label="viterbi")
         plt.legend()
-        plt.savefig(os.path.join(args.figures, "cer_normalized.png")
+        plt.savefig(os.path.join(args.figures, "cer_normalized.png"))
 
     if not args.distributed or os.environ['SLURM_PROCID'] == '0':
 
@@ -1009,14 +992,14 @@ def main(args):
         if "viterbi_wer_normalized" in history_validation:
             plt.plot(history_validation["epoch"], history_validation["viterbi_wer_normalized"], label="viterbi")
         plt.legend()
-        plt.savefig(os.path.join(args.figures, "wer_normalized.png")
+        plt.savefig(os.path.join(args.figures, "wer_normalized.png"))
 
     if not args.distributed or os.environ['SLURM_PROCID'] == '0':
 
         plt.plot(history_training["epoch"], history_training["sum_loss"], label="training")
         plt.plot(history_validation["epoch"], history_validation["sum_loss"], label="validation")
         plt.legend()
-        plt.savefig(os.path.join(args.figures, "sum_loss.png")
+        plt.savefig(os.path.join(args.figures, "sum_loss.png"))
 
     if not args.distributed or os.environ['SLURM_PROCID'] == '0':
 
@@ -1024,7 +1007,7 @@ def main(args):
         plt.plot(history_validation["epoch"], history_validation["sum_loss"], label="validation")
         plt.yscale("log")
         plt.legend()
-        plt.savefig(os.path.join(args.figures, "log_sum_loss.png")
+        plt.savefig(os.path.join(args.figures, "log_sum_loss.png"))
 
     if not args.distributed or os.environ['SLURM_PROCID'] == '0':
         print(torch.cuda.memory_summary(), flush=True)
@@ -1032,7 +1015,7 @@ def main(args):
     # Print performance
     pr.disable()
     s = StringIO()
-    ps = (
+    (
         pstats
         .Stats(pr, stream=s)
         .strip_dirs()
@@ -1041,3 +1024,8 @@ def main(args):
     )
     print(s.getvalue(), flush=True)
     print("stop time: {}".format(str(datetime.now())), flush=True)
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    main(args)
