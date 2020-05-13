@@ -1,10 +1,12 @@
 import os
 import tempfile
+from typing import Type, Iterable
 from contextlib import contextmanager
 from shutil import copytree
 
 import torch
 import torchaudio
+import pytest
 
 _TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 BACKENDS = torchaudio._backend._audio_backends
@@ -78,3 +80,37 @@ def filter_backends_with_mp3(backends):
 
 
 BACKENDS_MP3 = filter_backends_with_mp3(BACKENDS)
+
+
+class TestBaseMixin:
+    dtype = None
+    device = None
+
+
+def define_test_suite(testbase: Type[TestBaseMixin], dtype: str, device: str):
+    if dtype not in ['float32', 'float64']:
+        raise NotImplementedError(f'Unexpected dtype: {dtype}')
+    if device not in ['cpu', 'cuda']:
+        raise NotImplementedError(f'Unexpected device: {device}')
+
+    name = f'Test{testbase.__name__}_{device.upper()}_{dtype.capitalize()}'
+    attrs = {'dtype': getattr(torch, dtype), 'device': torch.device(device)}
+    testsuite = type(name, (testbase,), attrs)
+
+    if device == 'cuda':
+        testsuite = pytest.mark.skipif(
+            not torch.cuda.is_available(), reason='CUDA not available')(testsuite)
+    return testsuite
+
+
+def define_test_suites(
+        scope: dict,
+        testbases: Iterable[Type[TestBaseMixin]],
+        dtypes: Iterable[str] = ('float32', 'float64'),
+        devices: Iterable[str] = ('cpu', 'cuda'),
+):
+    for suite in testbases:
+        for device in devices:
+            for dtype in dtypes:
+                t = define_test_suite(suite, dtype, device)
+                scope[t.__name__] = t

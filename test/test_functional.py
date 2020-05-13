@@ -9,10 +9,7 @@ import pytest
 import common_utils
 
 
-class _LfilterMixin:
-    device = None
-    dtype = None
-
+class Lfilter(common_utils.TestBaseMixin):
     def test_simple(self):
         """
         Create a very basic signal,
@@ -33,25 +30,12 @@ class _LfilterMixin:
         b_coeffs = torch.tensor([1, 0], dtype=self.dtype, device=self.device)
         a_coeffs = torch.tensor([1, -0.95], dtype=self.dtype, device=self.device)
         output_signal = F.lfilter(input_signal, a_coeffs, b_coeffs, clamp=True)
-        self.assertTrue(output_signal.max() <= 1)
+        assert output_signal.max() <= 1
         output_signal = F.lfilter(input_signal, a_coeffs, b_coeffs, clamp=False)
-        self.assertTrue(output_signal.max() > 1)
+        assert output_signal.max() > 1
 
 
-class TestLfilterFloat32CPU(_LfilterMixin, unittest.TestCase):
-    device = torch.device('cpu')
-    dtype = torch.float32
-
-
-class TestLfilterFloat64CPU(_LfilterMixin, unittest.TestCase):
-    device = torch.device('cpu')
-    dtype = torch.float64
-
-
-@unittest.skipIf(not torch.cuda.is_available(), "CUDA not available")
-class TestLfilterFloat32CUDA(_LfilterMixin, unittest.TestCase):
-    device = torch.device('cuda')
-    dtype = torch.float32
+common_utils.define_test_suites(globals(), [Lfilter])
 
 
 class TestComputeDeltas(unittest.TestCase):

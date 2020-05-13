@@ -1,5 +1,6 @@
 """Test suites for jit-ability and its numerical compatibility"""
 import unittest
+import pytest
 
 import torch
 import torchaudio
@@ -9,8 +10,7 @@ import torchaudio.transforms as T
 import common_utils
 
 
-def _assert_functional_consistency(func, tensor, device, shape_only=False):
-    tensor = tensor.to(device)
+def _assert_functional_consistency(func, tensor, shape_only=False):
     ts_func = torch.jit.script(func)
     output = func(tensor)
     ts_output = ts_func(tensor)
@@ -21,21 +21,18 @@ def _assert_functional_consistency(func, tensor, device, shape_only=False):
         torch.testing.assert_allclose(ts_output, output)
 
 
-def _assert_transforms_consistency(transform, tensor, device):
-    tensor = tensor.to(device)
-    transform = transform.to(device)
+def _assert_transforms_consistency(transform, tensor):
     ts_transform = torch.jit.script(transform)
     output = transform(tensor)
     ts_output = ts_transform(tensor)
     torch.testing.assert_allclose(ts_output, output)
 
 
-class _FunctionalTestMixin:
+class Functional(common_utils.TestBaseMixin):
     """Implements test for `functinoal` modul that are performed for different devices"""
-    device = None
-
     def _assert_consistency(self, func, tensor, shape_only=False):
-        return _assert_functional_consistency(func, tensor, self.device, shape_only=shape_only)
+        tensor = tensor.to(device=self.device, dtype=self.dtype)
+        return _assert_functional_consistency(func, tensor, shape_only=shape_only)
 
     def test_spectrogram(self):
         def func(tensor):
@@ -159,7 +156,7 @@ class _FunctionalTestMixin:
             return F.complex_norm(tensor, power)
 
         tensor = torch.randn(1, 2, 1025, 400, 2)
-        _assert_functional_consistency(func, tensor, self.device)
+        self._assert_consistency(func, tensor)
 
     def test_mask_along_axis(self):
         def func(tensor):
@@ -211,6 +208,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, tensor, shape_only=True)
 
     def test_lfilter(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path('whitenoise.wav')
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -252,6 +252,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_lowpass(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path('whitenoise.wav')
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -263,6 +266,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_highpass(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path('whitenoise.wav')
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -274,6 +280,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_allpass(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path('whitenoise.wav')
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -286,6 +295,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_bandpass_with_csg(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -298,7 +310,10 @@ class _FunctionalTestMixin:
 
         self._assert_consistency(func, waveform)
 
-    def test_bandpass_withou_csg(self):
+    def test_bandpass_without_csg(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -312,6 +327,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_bandreject(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -324,6 +342,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_band_with_noise(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -337,6 +358,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_band_without_noise(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -350,6 +374,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_treble(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -363,6 +390,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_deemph(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -373,6 +403,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_riaa(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -383,6 +416,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_equalizer(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -396,6 +432,9 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_perf_biquad_filtering(self):
+        if self.dtype == torch.float64:
+            pytest.xfail("This test is known to fail for float64")
+
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
 
@@ -489,12 +528,12 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
 
-class _TransformsTestMixin:
+class Transforms(common_utils.TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
-    device = None
-
     def _assert_consistency(self, transform, tensor):
-        _assert_transforms_consistency(transform, tensor, self.device)
+        tensor = tensor.to(device=self.device, dtype=self.dtype)
+        transform = transform.to(device=self.device, dtype=self.dtype)
+        _assert_transforms_consistency(transform, tensor)
 
     def test_Spectrogram(self):
         tensor = torch.rand((1, 1000))
@@ -583,27 +622,4 @@ class _TransformsTestMixin:
         self._assert_consistency(T.Synth(), waveform)
 
 
-class TestFunctionalCPU(_FunctionalTestMixin, unittest.TestCase):
-    """Test suite for Functional module on CPU"""
-    device = torch.device('cpu')
-
-
-@unittest.skipIf(not torch.cuda.is_available(), 'CUDA not available')
-class TestFunctionalCUDA(_FunctionalTestMixin, unittest.TestCase):
-    """Test suite for Functional module on GPU"""
-    device = torch.device('cuda')
-
-
-class TestTransformsCPU(_TransformsTestMixin, unittest.TestCase):
-    """Test suite for Transforms module on CPU"""
-    device = torch.device('cpu')
-
-
-@unittest.skipIf(not torch.cuda.is_available(), 'CUDA not available')
-class TestTransformsCUDA(_TransformsTestMixin, unittest.TestCase):
-    """Test suite for Transforms module on GPU"""
-    device = torch.device('cuda')
-
-
-if __name__ == '__main__':
-    unittest.main()
+common_utils.define_test_suites(globals(), [Functional, Transforms])
