@@ -88,7 +88,7 @@ else:
             '_torch_sox',
             ['torchaudio/torch_sox.cpp'],
             libraries=libraries,
-            include_dirs=include_dirs,
+            include_dirs=include_dirs + [cwd],
             extra_compile_args=eca,
             extra_objects=extra_objects,
             extra_link_args=ela),
