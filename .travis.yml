@@ -13,10 +13,6 @@ cache:
 matrix:
   fast_finish: true
   include:
-    - env: PYTHON_VERSION="3.6"
-    - env: PYTHON_VERSION="3.7"
-    - env: PYTHON_VERSION="3.8"
-    - env: PYTHON_VERSION="3.6" RUN_FLAKE8="true" SKIP_INSTALL="true" SKIP_TESTS="true"
     - env: PYTHON_VERSION="3.6" RUN_EXAMPLE_TESTS="true" SKIP_TESTS="true"
   allow_failures:
     - env: PYTHON_VERSION="3.6" RUN_EXAMPLE_TESTS="true" SKIP_TESTS="true"
