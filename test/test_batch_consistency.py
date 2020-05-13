@@ -216,7 +216,7 @@ class TestTransforms(unittest.TestCase):
 
         # Batch then transform
         computed = torchaudio.transforms.MFCC()(waveform.repeat(3, 1, 1))
-        torch.testing.assert_allclose(computed, expected, atol=1e-5, rtol=1e-5)
+        torch.testing.assert_allclose(computed, expected, atol=1e-4, rtol=1e-5)
 
     def test_batch_TimeStretch(self):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
