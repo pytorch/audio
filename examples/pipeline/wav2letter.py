@@ -43,16 +43,7 @@ from tqdm.notebook import tqdm as tqdm
 from tabulate import tabulate
 
 
-print("start time: {}".format(str(datetime.now())), flush=True)
-
 matplotlib.use("Agg")
-
-# Empty CUDA cache
-torch.cuda.empty_cache()
-
-# Profiling performance
-pr = cProfile.Profile()
-pr.enable()
 
 
 def parse_args():
@@ -115,6 +106,8 @@ def parse_args():
     if not args.distributed or os.environ['SLURM_PROCID'] == '0':
         print(pprint.pformat(vars(args)), flush=True)
 
+    args.clip_norm = 0.
+
     return args
 
 
@@ -124,7 +117,6 @@ if __name__ == "__main__":
 
 
 # Checkpoint
-
 
 MAIN_PID = os.getpid()
 CHECKPOINT_filename = args.resume if args.resume else 'checkpoint.pth.tar'
@@ -209,125 +201,7 @@ if args.distributed:
     print('init process', flush=True)
 
 
-# Parameters
-
-
-if not args.distributed or os.environ['SLURM_PROCID'] == '0':
-    print(pprint.pformat(vars(args)), flush=True)
-
-audio_backend = "soundfile"
-torchaudio.set_audio_backend(audio_backend)
-
-root = "/datasets01/"
-folder_in_archive = "librispeech/062419/"
-
-device = "cuda" if torch.cuda.is_available() else "cpu"
-num_devices = torch.cuda.device_count()
-print(num_devices, "GPUs", flush=True)
-
-# max number of sentences per batch
-batch_size = args.batch_size
-
-training_percentage = 90.
-validation_percentage = 5.
-
-data_loader_training_params = {
-    "num_workers": args.workers,
-    "pin_memory": True,
-    "shuffle": True,
-    "drop_last": True,
-}
-data_loader_validation_params = data_loader_training_params.copy()
-data_loader_validation_params["shuffle"] = False
-
-non_blocking = True
-
-
-# Text preprocessing
-
-char_blank = "*"
-char_space = " "
-char_apostrophe = "'"
-
-labels = char_blank + char_space + char_apostrophe + string.ascii_lowercase
-
-# excluded_dir = ["_background_noise_"]
-# folder_speechcommands = './SpeechCommands/speech_commands_v0.02'
-# labels = [char_blank, char_space] + [d for d in next(os.walk(folder_speechcommands))[1] if d not in excluded_dir]
-
-
-# audio
-
-sample_rate_original = 16000
-sample_rate_new = 8000
-
-n_bins = args.n_bins  # 13, 128
-melkwargs = {
-    'n_fft': 512,
-    'n_mels': 20,
-    'hop_length': 80,  # (160, 80)
-}
-
-transforms = nn.Sequential(
-    # torchaudio.transforms.Resample(sample_rate_original, sample_rate_new),
-    # torchaudio.transforms.MFCC(sample_rate=sample_rate_original, n_mfcc=n_bins, melkwargs=melkwargs),
-    torchaudio.transforms.MelSpectrogram(
-        sample_rate=sample_rate_original, n_mels=n_bins),
-    # torchaudio.transforms.FrequencyMasking(freq_mask_param=n_bins),
-    # torchaudio.transforms.TimeMasking(time_mask_param=35)
-)
-
-
-# Optimizer
-
-optimizer_params_adadelta = {
-    "lr": args.learning_rate,
-    "eps": args.eps,
-    "rho": args.rho,
-    "weight_decay": args.weight_decay,
-}
-
-optimizer_params_adam = {
-    "lr": args.learning_rate,
-    "eps": args.eps,
-    "weight_decay": args.weight_decay,
-}
-
-optimizer_params_sgd = {
-    "lr": args.learning_rate,
-    "weight_decay": args.weight_decay,
-}
-
-optimizer_params_adadelta = {
-    "lr": args.learning_rate,
-    "eps": args.eps,
-    "rho": args.rho,
-    "weight_decay": args.weight_decay,
-}
-
-Optimizer = Adadelta
-optimizer_params = optimizer_params_sgd
-
-# Model
-
-num_features = n_bins if n_bins else 1
-
-lstm_params = {
-    "hidden_size": 800,
-    "num_layers": 5,
-    "batch_first": False,
-    "bidirectional": False,
-    "dropout": 0.,
-}
-
-clip_norm = 0.  # 10.
-
-zero_infinity = False
-
-
-# Text encoding
-
-class Coder:
+class LanguageModel:
     def __init__(self, labels):
         labels = [l for l in labels]
         self.length = len(labels)
@@ -356,20 +230,8 @@ class Coder:
             return x
 
 
-coder = Coder(labels)
-encode = coder.encode
-decode = coder.decode
-vocab_size = coder.length
-print("vocab_size", vocab_size, flush=True)
-
-
-# Model
-
-model = Wav2Letter(num_features, vocab_size)
-
-
 def model_length_function(tensor):
-    return int(tensor.shape[0])//2 + 1
+    return int(tensor.shape[0]) // 2 + 1
 
 
 # Dataset
@@ -555,12 +417,6 @@ def datasets_speechcommands():
     return create("training"), create("validation"), create("testing")
 
 
-if args.dataset == "librispeech":
-    training, validation, _ = datasets_librispeech()
-elif args.dataset == "speechcommand":
-    training, validation, _ = datasets_speechcommands()
-
-
 # Word Decoder
 
 
@@ -605,10 +461,6 @@ def build_transitions():
     return transitions
 
 
-if args.viterbi_decoder:
-    print("transitions: building", flush=True)
-    transitions = build_transitions()
-    print("transitions: done", flush=True)
 
 
 def viterbi_decode(tag_sequence: torch.Tensor, transition_matrix: torch.Tensor, top_k: int = 5):
@@ -705,21 +557,21 @@ def top_batch_viterbi_decode(tag_sequence: torch.Tensor):
 def levenshtein_distance(r: str, h: str, device: Optional[str] = None):
 
     # initialisation
-    d = torch.zeros((2, len(h)+1), dtype=torch.long)  # , device=device)
+    d = torch.zeros((2, len(h) + 1), dtype=torch.long)  # , device=device)
     dold = 0
     dnew = 1
 
     # computation
-    for i in range(1, len(r)+1):
+    for i in range(1, len(r) + 1):
         d[dnew, 0] = 0
-        for j in range(1, len(h)+1):
+        for j in range(1, len(h) + 1):
 
-            if r[i-1] == h[j-1]:
-                d[dnew, j] = d[dnew-1, j-1]
+            if r[i - 1] == h[j - 1]:
+                d[dnew, j] = d[dnew - 1, j - 1]
             else:
-                substitution = d[dnew-1, j-1] + 1
-                insertion = d[dnew, j-1] + 1
-                deletion = d[dnew-1, j] + 1
+                substitution = d[dnew - 1, j - 1] + 1
+                insertion = d[dnew, j - 1] + 1
+                deletion = d[dnew - 1, j] + 1
                 d[dnew, j] = min(substitution, insertion, deletion)
 
         dnew, dold = dold, dnew
@@ -727,9 +579,6 @@ def levenshtein_distance(r: str, h: str, device: Optional[str] = None):
     dist = d[dnew, -1].item()
 
     return dist
-
-
-# Train
 
 
 def collate_fn(batch):
@@ -752,53 +601,8 @@ def collate_fn(batch):
     return tensors, targets, tensors_lengths, target_lengths
 
 
-if args.jit:
-    model = torch.jit.script(model)
-
-if not args.distributed:
-    model = torch.nn.DataParallel(model)
-else:
-    model.cuda()
-    model = torch.nn.parallel.DistributedDataParallel(model)
-    # model = torch.nn.parallel.DistributedDataParallel(model, find_unused_parameters=True)
-
-model = model.to(device, non_blocking=non_blocking)
-print('model cuda', flush=True)
-
-
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-
-if not args.distributed or os.environ['SLURM_PROCID'] == '0':
-    n = count_parameters(model)
-    print(f"Number of parameters: {n}", flush=True)
-
-
-print(torch.cuda.memory_summary(), flush=True)
-
-
-optimizer = Optimizer(model.parameters(), **optimizer_params)
-scheduler = ExponentialLR(optimizer, gamma=args.gamma)
-# scheduler = ReduceLROnPlateau(optimizer, patience=2, threshold=1e-3)
-
-criterion = torch.nn.CTCLoss(
-    blank=coder.mapping[char_blank], zero_infinity=zero_infinity)
-# criterion = nn.MSELoss()
-# criterion = torch.nn.NLLLoss()
-
-best_loss = 1.
-
-loader_training = DataLoader(
-    training, batch_size=args.batch_size, collate_fn=collate_fn, **data_loader_training_params
-)
-
-loader_validation = DataLoader(
-    validation, batch_size=args.batch_size, collate_fn=collate_fn, **data_loader_validation_params
-)
-
-print("Length of data loaders: ", len(loader_training),
-      len(loader_validation), flush=True)
 
 
 def forward_loss(inputs, targets, tensors_lengths, target_lengths):
@@ -823,9 +627,6 @@ def forward_loss(inputs, targets, tensors_lengths, target_lengths):
     return criterion(outputs, targets, tensors_lengths, target_lengths)
 
 
-inds = random.sample(range(args.batch_size), k=2)
-
-
 def forward_decode(inputs, targets, decoder):
 
     inputs = inputs.to(device, non_blocking=True)
@@ -836,14 +637,14 @@ def forward_decode(inputs, targets, decoder):
     target = decode(targets.tolist())
 
     print_length = 20
-    for i in inds:
+    for i in range(2):
         output_print = output[i].ljust(print_length)[:print_length]
         target_print = target[i].ljust(print_length)[:print_length]
         print(
             f"Epoch: {epoch:4}   Target: {target_print}   Output: {output_print}", flush=True)
 
     cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
-    cers_normalized = [d/len(a) for a, d in zip(target, cers)]
+    cers_normalized = [d / len(a) for a, d in zip(target, cers)]
     cers = statistics.mean(cers)
     cers_normalized = statistics.mean(cers_normalized)
 
@@ -851,7 +652,7 @@ def forward_decode(inputs, targets, decoder):
     target = [o.split(char_space) for o in target]
 
     wers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
-    wers_normalized = [d/len(a) for a, d in zip(target, wers)]
+    wers_normalized = [d / len(a) for a, d in zip(target, wers)]
     wers = statistics.mean(wers)
     wers_normalized = statistics.mean(wers_normalized)
 
@@ -859,288 +660,384 @@ def forward_decode(inputs, targets, decoder):
 
     return cers, wers, cers_normalized, wers_normalized
 
-history_loader = defaultdict(list)
-history_training = defaultdict(list)
-history_validation = defaultdict(list)
 
-if args.resume and os.path.isfile(CHECKPOINT_filename):
-    print("Checkpoint: loading '{}'".format(CHECKPOINT_filename))
-    checkpoint = torch.load(CHECKPOINT_filename)
+def main(args):
 
-    args.start_epoch = checkpoint['epoch']
-    best_loss = checkpoint['best_loss']
-    history_training = checkpoint['history_training']
-    history_validation = checkpoint['history_validation']
+    print("start time: {}".format(str(datetime.now())), flush=True)
 
-    model.load_state_dict(checkpoint['state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer'])
-    scheduler.load_state_dict(checkpoint['scheduler'])
+    # Empty CUDA cache
+    torch.cuda.empty_cache()
 
-    print("Checkpoint: loaded '{}' at epoch {}".format(
-        CHECKPOINT_filename, checkpoint['epoch']))
-    print(tabulate(history_training, headers="keys"), flush=True)
-    print(tabulate(history_validation, headers="keys"), flush=True)
-else:
-    print("Checkpoint: not found")
+    # Profiling performance
+    pr = cProfile.Profile()
+    pr.enable()
 
-    save_checkpoint({
-        'epoch': args.start_epoch,
-        'state_dict': model.state_dict(),
-        'best_loss': best_loss,
-        'optimizer': optimizer.state_dict(),
-        'scheduler': scheduler.state_dict(),
-        'history_training': history_training,
-        'history_validation': history_validation,
-    }, False)
+    audio_backend = "soundfile"
+    torchaudio.set_audio_backend(audio_backend)
 
+    root = "/datasets01/"
+    folder_in_archive = "librispeech/062419/"
 
-with tqdm(total=args.epochs, unit_scale=1, disable=args.distributed) as pbar:
-    for epoch in range(args.start_epoch, args.epochs):
-        torch.cuda.reset_max_memory_allocated()
-        model.train()
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    num_devices = torch.cuda.device_count()
+    print(num_devices, "GPUs", flush=True)
 
-        sum_loss = 0.
-        total_norm = 0.
-        for inputs, targets, tensors_lengths, target_lengths in bg_iterator(loader_training, maxsize=2):
+    data_loader_training_params = {
+        "num_workers": args.workers,
+        "pin_memory": True,
+        "shuffle": True,
+        "drop_last": True,
+    }
+    data_loader_validation_params = data_loader_training_params.copy()
+    data_loader_validation_params["shuffle"] = False
 
-            loss = forward_loss(
-                inputs, targets, tensors_lengths, target_lengths)
-            sum_loss += loss.item()
+    non_blocking = True
 
-            optimizer.zero_grad()
-            loss.backward()
+    # audio
 
-            norm = 0.
-            if clip_norm > 0:
-                norm = torch.nn.utils.clip_grad_norm_(
-                    model.parameters(), clip_norm)
-                total_norm += norm
-            elif args.gradient:
-                for p in list(filter(lambda p: p.grad is not None, model.parameters())):
-                    norm += p.grad.data.norm(2).item() ** 2
-                norm = norm ** .5
-                total_norm += norm
+    n_bins = args.n_bins  # 13, 128
+    melkwargs = {
+        'n_fft': 512,
+        'n_mels': 20,
+        'hop_length': 80,  # (160, 80)
+    }
 
-            optimizer.step()
+    sample_rate_original = 16000
+    sample_rate_new = 8000
 
-            memory = torch.cuda.max_memory_allocated()
-            # print(f"memory in training: {memory}", flush=True)
+    transforms = nn.Sequential(
+        # torchaudio.transforms.Resample(sample_rate_original, sample_rate_new),
+        # torchaudio.transforms.MFCC(sample_rate=sample_rate_original, n_mfcc=n_bins, melkwargs=melkwargs),
+        torchaudio.transforms.MelSpectrogram(sample_rate=sample_rate_original, n_mels=n_bins),
+        # torchaudio.transforms.FrequencyMasking(freq_mask_param=n_bins),
+        # torchaudio.transforms.TimeMasking(time_mask_param=35)
+    )
 
-            history_loader["epoch"].append(epoch)
-            history_loader["n"].append(pbar.n)
-            history_loader["memory"].append(memory)
+    # Text preprocessing
 
-            if SIGNAL_RECEIVED:
-                save_checkpoint({
-                    'epoch': epoch,
-                    'state_dict': model.state_dict(),
-                    'best_loss': best_loss,
-                    'optimizer': optimizer.state_dict(),
-                    'scheduler': scheduler.state_dict(),
-                    'history_training': history_training,
-                    'history_validation': history_validation,
-                }, False)
-                trigger_job_requeue()
+    char_blank = "*"
+    char_space = " "
+    char_apostrophe = "'"
 
-            pbar.update(1/len(loader_training))
+    labels = char_blank + char_space + char_apostrophe + string.ascii_lowercase
+    coder = LanguageModel(labels)
+    encode = coder.encode
+    decode = coder.decode
+    vocab_size = coder.length
+    print("vocab_size", vocab_size, flush=True)
 
-        total_norm = (total_norm ** .5) / len(loader_training)
-        if total_norm > 0:
-            print(
-                f"Epoch: {epoch:4}   Gradient: {total_norm:4.5f}", flush=True)
+    if args.dataset == "librispeech":
+        training, validation, _ = datasets_librispeech()
+    elif args.dataset == "speechcommand":
+        training, validation, _ = datasets_speechcommands()
 
-        # Average loss
-        sum_loss = sum_loss / len(loader_training)
-        sum_loss_str = f"Epoch: {epoch:4}   Train: {sum_loss:4.5f}"
+    if args.viterbi_decoder:
+        print("transitions: building", flush=True)
+        transitions = build_transitions()
+        print("transitions: done", flush=True)
 
-        scheduler.step()
+    # Model
 
-        memory = torch.cuda.max_memory_allocated()
-        print(f"memory after training: {memory}", flush=True)
+    num_features = n_bins if n_bins else 1
+    model = Wav2Letter(num_features, vocab_size)
 
-        history_training["epoch"].append(epoch)
-        history_training["gradient_norm"].append(total_norm)
-        history_training["sum_loss"].append(sum_loss)
-        history_training["max_memory_allocated"].append(memory)
+    if args.jit:
+        model = torch.jit.script(model)
 
-        if not epoch % args.print_freq or epoch == args.epochs - 1:
+    if not args.distributed:
+        model = torch.nn.DataParallel(model)
+    else:
+        model.cuda()
+        model = torch.nn.parallel.DistributedDataParallel(model)
+        # model = torch.nn.parallel.DistributedDataParallel(model, find_unused_parameters=True)
 
-            with torch.no_grad():
+    model = model.to(device, non_blocking=non_blocking)
 
-                # Switch to evaluation mode
-                model.eval()
+    if not args.distributed or os.environ['SLURM_PROCID'] == '0':
+        n = count_parameters(model)
+        print(f"Number of parameters: {n}", flush=True)
 
-                sum_loss = 0.
-                sum_out_greedy = [0, 0, 0, 0]
-                sum_out_viterbi = [0, 0, 0, 0]
-
-                for inputs, targets, tensors_lengths, target_lengths in bg_iterator(loader_validation, maxsize=2):
-                    sum_loss += forward_loss(inputs, targets,
-                                             tensors_lengths, target_lengths).item()
-
-                    if True:
-                        out_greedy = forward_decode(
-                            inputs, targets, greedy_decode)
-                        for i in range(len(out_greedy)):
-                            sum_out_greedy[i] += out_greedy[i]
-                    if args.viterbi_decoder:
-                        out_viterbi = forward_decode(
-                            inputs, targets, top_batch_viterbi_decode)
-                        for i in range(len(out_greedy)):
-                            sum_out_viterbi[i] += out_viterbi[i]
-
-                    if SIGNAL_RECEIVED:
-                        break
-
-                # Average loss
-                sum_loss = sum_loss / len(loader_validation)
-                sum_loss_str += f"   Validation: {sum_loss:.5f}"
-                print(sum_loss_str, flush=True)
-
-                if True:
-                    for i in range(len(out_greedy)):
-                        sum_out_greedy[i] /= len(loader_validation)
-                    print(f"greedy decoder: {sum_out_greedy}", flush=True)
-                    cer1, wer1, cern1, wern1 = sum_out_greedy
-                if args.viterbi_decoder:
-                    for i in range(len(out_viterbi)):
-                        sum_out_viterbi[i] /= len(loader_validation)
-                    print(f"viterbi decoder: {sum_out_viterbi}", flush=True)
-                    cer2, wer2, cern2, wern2 = sum_out_viterbi
-
-                memory = torch.cuda.max_memory_allocated()
-                print(f"memory after validation: {memory}", flush=True)
-
-                history_validation["epoch"].append(epoch)
-                history_validation["max_memory_allocated"].append(memory)
-                history_validation["sum_loss"].append(sum_loss)
-
-                if True:
-                    history_validation["greedy_cer"].append(cer1)
-                    history_validation["greedy_cer_normalized"].append(cern1)
-                    history_validation["greedy_wer"].append(wer1)
-                    history_validation["greedy_wer_normalized"].append(wern1)
-                if args.viterbi_decoder:
-                    history_validation["viterbi_cer"].append(cer2)
-                    history_validation["viterbi_cer_normalized"].append(cern2)
-                    history_validation["viterbi_wer"].append(wer2)
-                    history_validation["viterbi_wer_normalized"].append(wern2)
-
-                is_best = sum_loss < best_loss
-                best_loss = min(sum_loss, best_loss)
-                save_checkpoint({
-                    'epoch': epoch + 1,
-                    'state_dict': model.state_dict(),
-                    'best_loss': best_loss,
-                    'optimizer': optimizer.state_dict(),
-                    'scheduler': scheduler.state_dict(),
-                    'history_training': history_training,
-                    'history_validation': history_validation,
-                }, is_best)
-
-                print(tabulate(history_training, headers="keys"), flush=True)
-                print(tabulate(history_validation, headers="keys"), flush=True)
-                print(torch.cuda.memory_summary(), flush=True)
-
-                # scheduler.step(sum_loss)
-
-    # Create an empty file HALT_filename, mark the job as finished
-    if epoch == args.epochs - 1:
-        open(HALT_filename, 'a').close()
-
-
-print(tabulate(history_training, headers="keys"), flush=True)
-print(tabulate(history_validation, headers="keys"), flush=True)
-print(torch.cuda.memory_summary(), flush=True)
-print(tabulate(history_loader, headers="keys"), flush=True)
-
-
-plt.plot(history_loader["epoch"],
-         history_loader["memory"], label="memory")
-
-
-if not args.distributed or os.environ['SLURM_PROCID'] == '0':
-
-    if "greedy_cer" in history_validation:
-        plt.plot(history_validation["epoch"],
-                 history_validation["greedy_cer"], label="greedy")
-    if "viterbi_cer" in history_validation:
-        plt.plot(history_validation["epoch"],
-                 history_validation["viterbi_cer"], label="viterbi")
-    plt.legend()
-    plt.savefig(os.path.join(args.figures, "cer.png")
-
-
-if not args.distributed or os.environ['SLURM_PROCID'] == '0':
-
-    if "greedy_wer" in history_validation:
-        plt.plot(history_validation["epoch"],
-                 history_validation["greedy_wer"], label="greedy")
-    if "viterbi_wer" in history_validation:
-        plt.plot(history_validation["epoch"],
-                 history_validation["viterbi_wer"], label="viterbi")
-    plt.legend()
-    plt.savefig(os.path.join(args.figures, "wer.png")
-
-
-if not args.distributed or os.environ['SLURM_PROCID'] == '0':
-
-    if "greedy_cer_normalized" in history_validation:
-        plt.plot(history_validation["epoch"],
-                 history_validation["greedy_cer_normalized"], label="greedy")
-    if "viterbi_cer_normalized" in history_validation:
-        plt.plot(history_validation["epoch"],
-                 history_validation["viterbi_cer_normalized"], label="viterbi")
-    plt.legend()
-    plt.savefig(os.path.join(args.figures, "cer_normalized.png")
-
-
-if not args.distributed or os.environ['SLURM_PROCID'] == '0':
-
-    if "greedy_wer_normalized" in history_validation:
-        plt.plot(history_validation["epoch"],
-                 history_validation["greedy_wer_normalized"], label="greedy")
-    if "viterbi_wer_normalized" in history_validation:
-        plt.plot(history_validation["epoch"],
-                 history_validation["viterbi_wer_normalized"], label="viterbi")
-    plt.legend()
-    plt.savefig(os.path.join(args.figures, "wer_normalized.png")
-
-
-if not args.distributed or os.environ['SLURM_PROCID'] == '0':
-
-    plt.plot(history_training["epoch"],
-             history_training["sum_loss"], label="training")
-    plt.plot(history_validation["epoch"],
-             history_validation["sum_loss"], label="validation")
-    plt.legend()
-    plt.savefig(os.path.join(args.figures, "sum_loss.png")
-
-
-if not args.distributed or os.environ['SLURM_PROCID'] == '0':
-
-    plt.plot(history_training["epoch"],
-             history_training["sum_loss"], label="training")
-    plt.plot(history_validation["epoch"],
-             history_validation["sum_loss"], label="validation")
-    plt.yscale("log")
-    plt.legend()
-    plt.savefig(os.path.join(args.figures, "log_sum_loss.png")
-
-
-if not args.distributed or os.environ['SLURM_PROCID'] == '0':
     print(torch.cuda.memory_summary(), flush=True)
 
+    # Optimizer
 
-# Print performance
-pr.disable()
-s = StringIO()
-ps = (
-    pstats
-    .Stats(pr, stream=s)
-    .strip_dirs()
-    .sort_stats("cumtime")
-    .print_stats(20)
-)
-print(s.getvalue(), flush=True)
-print("stop time: {}".format(str(datetime.now())), flush=True)
+    optimizer_params = {
+        "lr": args.learning_rate,
+        # "eps": args.eps,
+        # "rho": args.rho,
+        "weight_decay": args.weight_decay,
+    }
+
+    Optimizer = Adadelta
+    optimizer_params = optimizer_params
+
+    optimizer = Optimizer(model.parameters(), **optimizer_params)
+    scheduler = ExponentialLR(optimizer, gamma=args.gamma)
+    # scheduler = ReduceLROnPlateau(optimizer, patience=2, threshold=1e-3)
+
+    criterion = torch.nn.CTCLoss(blank=coder.mapping[char_blank], zero_infinity=False)
+    # criterion = nn.MSELoss()
+    # criterion = torch.nn.NLLLoss()
+
+    best_loss = 1.
+
+    loader_training = DataLoader(training, batch_size=args.batch_size, collate_fn=collate_fn, **data_loader_training_params)
+    loader_validation = DataLoader(validation, batch_size=args.batch_size, collate_fn=collate_fn, **data_loader_validation_params)
+
+    print("Length of data loaders: ", len(loader_training), len(loader_validation), flush=True)
+
+    history_loader = defaultdict(list)
+    history_training = defaultdict(list)
+    history_validation = defaultdict(list)
+
+    if args.resume and os.path.isfile(CHECKPOINT_filename):
+        print("Checkpoint: loading '{}'".format(CHECKPOINT_filename))
+        checkpoint = torch.load(CHECKPOINT_filename)
+
+        args.start_epoch = checkpoint['epoch']
+        best_loss = checkpoint['best_loss']
+        history_training = checkpoint['history_training']
+        history_validation = checkpoint['history_validation']
+
+        model.load_state_dict(checkpoint['state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        scheduler.load_state_dict(checkpoint['scheduler'])
+
+        print("Checkpoint: loaded '{}' at epoch {}".format(CHECKPOINT_filename, checkpoint['epoch']))
+        print(tabulate(history_training, headers="keys"), flush=True)
+        print(tabulate(history_validation, headers="keys"), flush=True)
+    else:
+        print("Checkpoint: not found")
+
+        save_checkpoint({
+            'epoch': args.start_epoch,
+            'state_dict': model.state_dict(),
+            'best_loss': best_loss,
+            'optimizer': optimizer.state_dict(),
+            'scheduler': scheduler.state_dict(),
+            'history_training': history_training,
+            'history_validation': history_validation,
+        }, False)
+
+    with tqdm(total=args.epochs, unit_scale=1, disable=args.distributed) as pbar:
+        for epoch in range(args.start_epoch, args.epochs):
+            torch.cuda.reset_max_memory_allocated()
+            model.train()
+
+            sum_loss = 0.
+            total_norm = 0.
+            for inputs, targets, tensors_lengths, target_lengths in bg_iterator(loader_training, maxsize=2):
+
+                loss = forward_loss(inputs, targets, tensors_lengths, target_lengths)
+                sum_loss += loss.item()
+
+                optimizer.zero_grad()
+                loss.backward()
+
+                norm = 0.
+                if args.clip_norm > 0:
+                    norm = torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_norm)
+                    total_norm += norm
+                elif args.gradient:
+                    for p in list(filter(lambda p: p.grad is not None, model.parameters())):
+                        norm += p.grad.data.norm(2).item() ** 2
+                    norm = norm ** .5
+                    total_norm += norm
+
+                optimizer.step()
+
+                memory = torch.cuda.max_memory_allocated()
+                # print(f"memory in training: {memory}", flush=True)
+
+                history_loader["epoch"].append(epoch)
+                history_loader["n"].append(pbar.n)
+                history_loader["memory"].append(memory)
+
+                if SIGNAL_RECEIVED:
+                    save_checkpoint({
+                        'epoch': epoch,
+                        'state_dict': model.state_dict(),
+                        'best_loss': best_loss,
+                        'optimizer': optimizer.state_dict(),
+                        'scheduler': scheduler.state_dict(),
+                        'history_training': history_training,
+                        'history_validation': history_validation,
+                    }, False)
+                    trigger_job_requeue()
+
+                pbar.update(1/len(loader_training))
+
+            total_norm = (total_norm ** .5) / len(loader_training)
+            if total_norm > 0:
+                print(f"Epoch: {epoch:4}   Gradient: {total_norm:4.5f}", flush=True)
+
+            # Average loss
+            sum_loss = sum_loss / len(loader_training)
+            sum_loss_str = f"Epoch: {epoch:4}   Train: {sum_loss:4.5f}"
+
+            scheduler.step()
+
+            memory = torch.cuda.max_memory_allocated()
+            print(f"memory after training: {memory}", flush=True)
+
+            history_training["epoch"].append(epoch)
+            history_training["gradient_norm"].append(total_norm)
+            history_training["sum_loss"].append(sum_loss)
+            history_training["max_memory_allocated"].append(memory)
+
+            if not epoch % args.print_freq or epoch == args.epochs - 1:
+
+                with torch.no_grad():
+
+                    # Switch to evaluation mode
+                    model.eval()
+
+                    sum_loss = 0.
+                    sum_out_greedy = [0, 0, 0, 0]
+                    sum_out_viterbi = [0, 0, 0, 0]
+
+                    for inputs, targets, tensors_lengths, target_lengths in bg_iterator(loader_validation, maxsize=2):
+                        sum_loss += forward_loss(inputs, targets, tensors_lengths, target_lengths).item()
+
+                        if True:
+                            out_greedy = forward_decode(inputs, targets, greedy_decode)
+                            for i in range(len(out_greedy)):
+                                sum_out_greedy[i] += out_greedy[i]
+                        if args.viterbi_decoder:
+                            out_viterbi = forward_decode(inputs, targets, top_batch_viterbi_decode)
+                            for i in range(len(out_greedy)):
+                                sum_out_viterbi[i] += out_viterbi[i]
+
+                        if SIGNAL_RECEIVED:
+                            break
+
+                    # Average loss
+                    sum_loss = sum_loss / len(loader_validation)
+                    sum_loss_str += f"   Validation: {sum_loss:.5f}"
+                    print(sum_loss_str, flush=True)
+
+                    if True:
+                        for i in range(len(out_greedy)):
+                            sum_out_greedy[i] /= len(loader_validation)
+                        print(f"greedy decoder: {sum_out_greedy}", flush=True)
+                        cer1, wer1, cern1, wern1 = sum_out_greedy
+                    if args.viterbi_decoder:
+                        for i in range(len(out_viterbi)):
+                            sum_out_viterbi[i] /= len(loader_validation)
+                        print(f"viterbi decoder: {sum_out_viterbi}", flush=True)
+                        cer2, wer2, cern2, wern2 = sum_out_viterbi
+
+                    memory = torch.cuda.max_memory_allocated()
+                    print(f"memory after validation: {memory}", flush=True)
+
+                    history_validation["epoch"].append(epoch)
+                    history_validation["max_memory_allocated"].append(memory)
+                    history_validation["sum_loss"].append(sum_loss)
+
+                    if True:
+                        history_validation["greedy_cer"].append(cer1)
+                        history_validation["greedy_cer_normalized"].append(cern1)
+                        history_validation["greedy_wer"].append(wer1)
+                        history_validation["greedy_wer_normalized"].append(wern1)
+                    if args.viterbi_decoder:
+                        history_validation["viterbi_cer"].append(cer2)
+                        history_validation["viterbi_cer_normalized"].append(cern2)
+                        history_validation["viterbi_wer"].append(wer2)
+                        history_validation["viterbi_wer_normalized"].append(wern2)
+
+                    is_best = sum_loss < best_loss
+                    best_loss = min(sum_loss, best_loss)
+                    save_checkpoint({
+                        'epoch': epoch + 1,
+                        'state_dict': model.state_dict(),
+                        'best_loss': best_loss,
+                        'optimizer': optimizer.state_dict(),
+                        'scheduler': scheduler.state_dict(),
+                        'history_training': history_training,
+                        'history_validation': history_validation,
+                    }, is_best)
+
+                    print(tabulate(history_training, headers="keys"), flush=True)
+                    print(tabulate(history_validation, headers="keys"), flush=True)
+                    print(torch.cuda.memory_summary(), flush=True)
+
+                    # scheduler.step(sum_loss)
+
+        # Create an empty file HALT_filename, mark the job as finished
+        if epoch == args.epochs - 1:
+            open(HALT_filename, 'a').close()
+
+
+    print(tabulate(history_training, headers="keys"), flush=True)
+    print(tabulate(history_validation, headers="keys"), flush=True)
+    print(torch.cuda.memory_summary(), flush=True)
+    print(tabulate(history_loader, headers="keys"), flush=True)
+
+    plt.plot(history_loader["epoch"], history_loader["memory"], label="memory")
+
+    if not args.distributed or os.environ['SLURM_PROCID'] == '0':
+
+        if "greedy_cer" in history_validation:
+            plt.plot(history_validation["epoch"], history_validation["greedy_cer"], label="greedy")
+        if "viterbi_cer" in history_validation:
+            plt.plot(history_validation["epoch"], history_validation["viterbi_cer"], label="viterbi")
+        plt.legend()
+        plt.savefig(os.path.join(args.figures, "cer.png")
+
+    if not args.distributed or os.environ['SLURM_PROCID'] == '0':
+
+        if "greedy_wer" in history_validation:
+            plt.plot(history_validation["epoch"], history_validation["greedy_wer"], label="greedy")
+        if "viterbi_wer" in history_validation:
+            plt.plot(history_validation["epoch"], history_validation["viterbi_wer"], label="viterbi")
+        plt.legend()
+        plt.savefig(os.path.join(args.figures, "wer.png")
+
+    if not args.distributed or os.environ['SLURM_PROCID'] == '0':
+
+        if "greedy_cer_normalized" in history_validation:
+            plt.plot(history_validation["epoch"], history_validation["greedy_cer_normalized"], label="greedy")
+        if "viterbi_cer_normalized" in history_validation:
+            plt.plot(history_validation["epoch"], history_validation["viterbi_cer_normalized"], label="viterbi")
+        plt.legend()
+        plt.savefig(os.path.join(args.figures, "cer_normalized.png")
+
+    if not args.distributed or os.environ['SLURM_PROCID'] == '0':
+
+        if "greedy_wer_normalized" in history_validation:
+            plt.plot(history_validation["epoch"], history_validation["greedy_wer_normalized"], label="greedy")
+        if "viterbi_wer_normalized" in history_validation:
+            plt.plot(history_validation["epoch"], history_validation["viterbi_wer_normalized"], label="viterbi")
+        plt.legend()
+        plt.savefig(os.path.join(args.figures, "wer_normalized.png")
+
+    if not args.distributed or os.environ['SLURM_PROCID'] == '0':
+
+        plt.plot(history_training["epoch"], history_training["sum_loss"], label="training")
+        plt.plot(history_validation["epoch"], history_validation["sum_loss"], label="validation")
+        plt.legend()
+        plt.savefig(os.path.join(args.figures, "sum_loss.png")
+
+    if not args.distributed or os.environ['SLURM_PROCID'] == '0':
+
+        plt.plot(history_training["epoch"], history_training["sum_loss"], label="training")
+        plt.plot(history_validation["epoch"], history_validation["sum_loss"], label="validation")
+        plt.yscale("log")
+        plt.legend()
+        plt.savefig(os.path.join(args.figures, "log_sum_loss.png")
+
+    if not args.distributed or os.environ['SLURM_PROCID'] == '0':
+        print(torch.cuda.memory_summary(), flush=True)
+
+    # Print performance
+    pr.disable()
+    s = StringIO()
+    ps = (
+        pstats
+        .Stats(pr, stream=s)
+        .strip_dirs()
+        .sort_stats("cumtime")
+        .print_stats(20)
+    )
+    print(s.getvalue(), flush=True)
+    print("stop time: {}".format(str(datetime.now())), flush=True)
