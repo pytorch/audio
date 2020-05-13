@@ -45,12 +45,7 @@ from tabulate import tabulate
 
 print("start time: {}".format(str(datetime.now())), flush=True)
 
-try:
-    get_ipython().run_line_magic('matplotlib', 'inline')
-    in_notebook = True
-except NameError:
-    matplotlib.use("Agg")
-    in_notebook = False
+matplotlib.use("Agg")
 
 # Empty CUDA cache
 torch.cuda.empty_cache()
@@ -433,18 +428,12 @@ class Processed(torch.utils.data.Dataset):
         self.dataset = dataset
 
     def __getitem__(self, n):
-        try:
-            item = self.dataset[n]
-            return self.process_datapoint(item)
-        except (FileNotFoundError, RuntimeError):
-            return None
+        item = self.dataset[n]
+        return self.process_datapoint(item)
 
     def __next__(self):
-        try:
-            item = next(self.dataset)
-            return self.process_datapoint(item)
-        except (FileNotFoundError, RuntimeError):
-            return self.__next__()
+        item = next(self.dataset)
+        return self.process_datapoint(item)
 
     def __len__(self):
         return len(self.dataset)
@@ -475,8 +464,7 @@ def datasets_librispeech():
             data = LIBRISPEECH(
                 root, tag, folder_in_archive=folder_in_archive, download=False)
         else:
-            data = torch.utils.data.ConcatDataset([LIBRISPEECH(
-                root, t, folder_in_archive=folder_in_archive, download=False) for t in tag])
+            data = sum(LIBRISPEECH(root, t, folder_in_archive=folder_in_archive, download=False) for t in tag)
 
         data = Processed(process_datapoint, data)
         # data = diskcache_iterator(data)
@@ -713,26 +701,6 @@ def batch_viterbi_decode(tag_sequence: torch.Tensor, transition_matrix: torch.Te
 def top_batch_viterbi_decode(tag_sequence: torch.Tensor):
     output, _ = batch_viterbi_decode(tag_sequence, transitions, top_k=1)
     return output[:, 0, :]
-
-
-def levenshtein_distance_list(r, h):
-
-    # initialisation
-    d = [[0] * (len(h)+1)] * (len(r)+1)
-
-    # computation
-    for i in range(1, len(r)+1):
-        for j in range(1, len(h)+1):
-
-            if r[i-1] == h[j-1]:
-                d[i].append(d[i-1][j-1])
-            else:
-                substitution = d[i-1][j-1] + 1
-                insertion = d[i][j-1] + 1
-                deletion = d[i-1][j] + 1
-                d[i].append(min(substitution, insertion, deletion))
-
-    return d[len(r)][len(h)]
 
 
 def levenshtein_distance(r: str, h: str, device: Optional[str] = None):
