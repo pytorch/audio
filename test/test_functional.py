@@ -172,7 +172,7 @@ class TestIstft(unittest.TestCase):
     def test_istft_requires_overlap_windows(self):
         # the window is size 1 but it hops 20 so there is a gap which throw an error
         stft = torch.zeros((3, 5, 2))
-        self.assertRaises(AssertionError, torchaudio.functional.istft, stft, n_fft=4,
+        self.assertRaises(RuntimeError, torchaudio.functional.istft, stft, n_fft=4,
                           hop_length=20, win_length=1, window=torch.ones(1))
 
     def test_istft_requires_nola(self):
@@ -192,11 +192,11 @@ class TestIstft(unittest.TestCase):
         # A window of ones meets NOLA but a window of zeros does not. This should
         # throw an error.
         torchaudio.functional.istft(stft, **kwargs_ok)
-        self.assertRaises(AssertionError, torchaudio.functional.istft, stft, **kwargs_not_ok)
+        self.assertRaises(RuntimeError, torchaudio.functional.istft, stft, **kwargs_not_ok)
 
     def test_istft_requires_non_empty(self):
-        self.assertRaises(AssertionError, torchaudio.functional.istft, torch.zeros((3, 0, 2)), 2)
-        self.assertRaises(AssertionError, torchaudio.functional.istft, torch.zeros((0, 3, 2)), 2)
+        self.assertRaises(RuntimeError, torchaudio.functional.istft, torch.zeros((3, 0, 2)), 2)
+        self.assertRaises(RuntimeError, torchaudio.functional.istft, torch.zeros((0, 3, 2)), 2)
 
     def _test_istft_of_sine(self, amplitude, L, n):
         # stft of amplitude*sin(2*pi/L*n*x) with the hop length and window size equaling L
