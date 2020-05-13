@@ -120,8 +120,8 @@ def unittest_workflows(indentation=6):
                     "python_version": python_version,
                 }
 
-                # if device_type == 'gpu':
-                #     job['filters'] = gen_filter_branch_tree('master')
+                if device_type == 'gpu':
+                    job['filters'] = gen_filter_branch_tree('master')
                 jobs.append({f"unittest_{os_type}_{device_type}": job})
     return indent(indentation, jobs)
 

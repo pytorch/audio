@@ -433,12 +433,21 @@ workflows:
           name: unittest_linux_cpu_py3.8
           python_version: '3.8'
       - unittest_linux_gpu:
+          filters:
+            branches:
+              only: master
           name: unittest_linux_gpu_py3.6
           python_version: '3.6'
       - unittest_linux_gpu:
+          filters:
+            branches:
+              only: master
           name: unittest_linux_gpu_py3.7
           python_version: '3.7'
       - unittest_linux_gpu:
+          filters:
+            branches:
+              only: master
           name: unittest_linux_gpu_py3.8
           python_version: '3.8'
       - unittest_windows_cpu:
@@ -451,12 +460,21 @@ workflows:
           name: unittest_windows_cpu_py3.8
           python_version: '3.8'
       - unittest_windows_gpu:
+          filters:
+            branches:
+              only: master
           name: unittest_windows_gpu_py3.6
           python_version: '3.6'
       - unittest_windows_gpu:
+          filters:
+            branches:
+              only: master
           name: unittest_windows_gpu_py3.7
           python_version: '3.7'
       - unittest_windows_gpu:
+          filters:
+            branches:
+              only: master
           name: unittest_windows_gpu_py3.8
           python_version: '3.8'
   nightly:
