@@ -55,68 +55,62 @@ pr = cProfile.Profile()
 pr.enable()
 
 
-# Create argument parser
-parser = argparse.ArgumentParser()
-
-parser.add_argument('--workers', default=0, type=int,
-                    metavar='N', help='number of data loading workers')
-parser.add_argument('--resume', default='', type=str,
-                    metavar='PATH', help='path to latest checkpoint')
-parser.add_argument('--figures', default='', type=str,
-                    metavar='PATH', help='folder path to save figures')
-
-parser.add_argument('--epochs', default=200, type=int,
-                    metavar='N', help='number of total epochs to run')
-parser.add_argument('--start-epoch', default=0, type=int,
-                    metavar='N', help='manual epoch number')
-parser.add_argument('--print-freq', default=10, type=int,
-                    metavar='N', help='print frequency in epochs')
-
-parser.add_argument('--arch', metavar='ARCH', default='wav2letter',
-                    choices=["wav2letter", "lstm"], help='model architecture')
-parser.add_argument('--batch-size', default=64, type=int,
-                    metavar='N', help='mini-batch size')
-
-parser.add_argument('--learning-rate', default=1., type=float,
-                    metavar='LR', help='initial learning rate')
-parser.add_argument('--gamma', default=.96, type=float,
-                    metavar='GAMMA', help='learning rate exponential decay constant')
-# parser.add_argument('--momentum', default=0.9, type=float, metavar='M', help='momentum')
-parser.add_argument('--weight-decay', default=1e-5,
-                    type=float, metavar='W', help='weight decay')
-parser.add_argument("--eps", metavar='EPS', type=float, default=1e-8)
-parser.add_argument("--rho", metavar='RHO', type=float, default=.95)
-
-parser.add_argument('--n-bins', default=13, type=int,
-                    metavar='N', help='number of bins in transforms')
-
-parser.add_argument('--world-size', default=1, type=int,
-                    help='number of distributed processes')
-parser.add_argument('--dist-url', default='tcp://224.66.41.62:23456',
-                    type=str, help='url used to set up distributed training')
-parser.add_argument('--dist-backend', default='nccl',
-                    type=str, help='distributed backend')
-parser.add_argument('--distributed', action="store_true")
-
-parser.add_argument('--dataset', default='librispeech', type=str)
-parser.add_argument('--gradient', action="store_true")
-parser.add_argument('--jit', action="store_true")
-parser.add_argument('--viterbi-decoder', action="store_true")
-
-if in_notebook:
-    args, _ = parser.parse_known_args()
-else:
+def parse_args():
+    parser = argparse.ArgumentParser()
+    
+    parser.add_argument('--workers', default=0, type=int,
+                        metavar='N', help='number of data loading workers')
+    parser.add_argument('--resume', default='', type=str,
+                        metavar='PATH', help='path to latest checkpoint')
+    parser.add_argument('--figures', default='', type=str,
+                        metavar='PATH', help='folder path to save figures')
+    
+    parser.add_argument('--epochs', default=200, type=int,
+                        metavar='N', help='number of total epochs to run')
+    parser.add_argument('--start-epoch', default=0, type=int,
+                        metavar='N', help='manual epoch number')
+    parser.add_argument('--print-freq', default=10, type=int,
+                        metavar='N', help='print frequency in epochs')
+    
+    parser.add_argument('--arch', metavar='ARCH', default='wav2letter',
+                        choices=["wav2letter", "lstm"], help='model architecture')
+    parser.add_argument('--batch-size', default=64, type=int,
+                        metavar='N', help='mini-batch size')
+    
+    parser.add_argument('--learning-rate', default=1., type=float,
+                        metavar='LR', help='initial learning rate')
+    parser.add_argument('--gamma', default=.96, type=float,
+                        metavar='GAMMA', help='learning rate exponential decay constant')
+    # parser.add_argument('--momentum', default=0.9, type=float, metavar='M', help='momentum')
+    parser.add_argument('--weight-decay', default=1e-5,
+                        type=float, metavar='W', help='weight decay')
+    parser.add_argument("--eps", metavar='EPS', type=float, default=1e-8)
+    parser.add_argument("--rho", metavar='RHO', type=float, default=.95)
+    
+    parser.add_argument('--n-bins', default=13, type=int,
+                        metavar='N', help='number of bins in transforms')
+    
+    parser.add_argument('--world-size', default=1, type=int,
+                        help='number of distributed processes')
+    parser.add_argument('--dist-url', default='tcp://224.66.41.62:23456',
+                        type=str, help='url used to set up distributed training')
+    parser.add_argument('--dist-backend', default='nccl',
+                        type=str, help='distributed backend')
+    parser.add_argument('--distributed', action="store_true")
+    
+    parser.add_argument('--dataset', default='librispeech', type=str)
+    parser.add_argument('--gradient', action="store_true")
+    parser.add_argument('--jit', action="store_true")
+    parser.add_argument('--viterbi-decoder', action="store_true")
+    
     args = parser.parse_args()
 
+    return args
 
-if args.learning_rate < 0.:
-    args.learning_rate = 10 ** random.uniform(-3, 1)
 
-if args.weight_decay < 0.:
-    args.weight_decay = 10 ** random.uniform(-6, 0)
-
-if args.gamma < 0.:
-    args.gamma = random.uniform(.95, 1.)
+if __name__ == "__main__":
+    args = parse_args()
+    main(args)
 
 
 # Checkpoint
@@ -160,7 +154,7 @@ def signal_handler(a, b):
 
 def trigger_job_requeue():
     # Submit a new job to resume from checkpoint.
-    if os.path.isfile(CHECKPOINT_filename) and        os.environ['SLURM_PROCID'] == '0' and        os.getpid() == MAIN_PID:
+    if os.path.isfile(CHECKPOINT_filename) and os.environ['SLURM_PROCID'] == '0' and os.getpid() == MAIN_PID:
         print('pid: ', os.getpid(), ' ppid: ', os.getppid(), flush=True)
         print('time is up, back to slurm queue', flush=True)
         command = 'scontrol requeue ' + os.environ['SLURM_JOB_ID']
@@ -368,6 +362,7 @@ print("vocab_size", vocab_size, flush=True)
 # Model
 
 model = Wav2Letter(num_features, vocab_size)
+
 
 def model_length_function(tensor):
     return int(tensor.shape[0])//2 + 1
