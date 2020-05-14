@@ -243,13 +243,16 @@ class Test_LoadSave(unittest.TestCase):
                     self._test_5_get_info()
 
     def _test_5_get_info(self):
-        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
-        channels, samples, rate, precision = (1, 64000, 16000, 16)
-        si, ei = torchaudio.info(input_path)
-        self.assertEqual(si.channels, channels)
-        self.assertEqual(si.length, samples)
-        self.assertEqual(si.rate, rate)
-        self.assertEqual(ei.bits_per_sample, precision)
+        test_file_path_1ch = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        test_file_path_2ch = os.path.join(self.test_dirpath, 'assets', '2ch_sinewave.wav')
+        # test 1ch and 2ch vectors
+        for channels, input_path in enumerate([test_file_path_1ch, test_file_path_2ch], 1):
+            samples, rate, precision = (64000, 16000, 16)
+            si, ei = torchaudio.info(input_path)
+            self.assertEqual(si.channels, channels)
+            self.assertEqual(si.length, samples)
+            self.assertEqual(si.rate, rate)
+            self.assertEqual(ei.bits_per_sample, precision)
 
 if __name__ == '__main__':
     unittest.main()
