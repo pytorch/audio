@@ -18,9 +18,9 @@ class Functional(common_utils.TestBaseMixin):
         output = func(tensor)
         ts_output = ts_func(tensor)
         if shape_only:
-            assert ts_output.shape == output.shape, (ts_output.shape, output.shape)
-        else:
-            self.assertEqual(ts_output, output)
+            ts_output = ts_output.shape
+            output = output.shape
+        self.assertEqual(ts_output, output)
 
     def test_spectrogram(self):
         def func(tensor):
