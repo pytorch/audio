@@ -41,6 +41,8 @@ from tabulate import tabulate
 
 
 matplotlib.use("Agg")
+MAIN_PID = os.getpid()
+SIGNAL_RECEIVED = False
 
 
 def parse_args():
@@ -108,39 +110,14 @@ def parse_args():
     return args
 
 
-if __name__ == "__main__":
-    args = parse_args()
-    main(args)
-
-
-# Checkpoint
-
-MAIN_PID = os.getpid()
-CHECKPOINT_filename = args.resume if args.resume else 'checkpoint.pth.tar'
-CHECKPOINT_tempfile = CHECKPOINT_filename + '.temp'
-HALT_filename = CHECKPOINT_filename + '.HALT'
-SIGNAL_RECEIVED = False
-
-# HALT file is used as a sign of job completion.
-# Make sure no HALT file left from previous runs.
-if os.path.isfile(HALT_filename):
-    os.remove(HALT_filename)
-
-# Remove CHECKPOINT_tempfile, in case the signal arrives in the
-# middle of copying from CHECKPOINT_tempfile to CHECKPOINT_filename
-if os.path.isfile(CHECKPOINT_tempfile):
-    os.remove(CHECKPOINT_tempfile)
-
-
 def SIGTERM_handler(a, b):
     print('received sigterm')
     pass
 
 
-def signal_handler(a, b):
+def signal_handler(a, b, HALT_filename):
     global SIGNAL_RECEIVED
-    print('Signal received', a, datetime.now().strftime(
-        "%y%m%d.%H%M%S"), flush=True)
+    print('Signal received', a, datetime.now().strftime("%y%m%d.%H%M%S"), flush=True)
     SIGNAL_RECEIVED = True
 
     # If HALT file exists, which means the job is done, exit peacefully.
@@ -151,7 +128,7 @@ def signal_handler(a, b):
     return
 
 
-def trigger_job_requeue():
+def trigger_job_requeue(CHECKPOINT_filename):
     # Submit a new job to resume from checkpoint.
     if os.path.isfile(CHECKPOINT_filename) and os.environ['SLURM_PROCID'] == '0' and os.getpid() == MAIN_PID:
         print('pid: ', os.getpid(), ' ppid: ', os.getppid(), flush=True)
@@ -164,38 +141,26 @@ def trigger_job_requeue():
     exit(0)
 
 
-# Install signal handler
-signal.signal(signal.SIGUSR1, signal_handler)
-signal.signal(signal.SIGTERM, SIGTERM_handler)
-print('Signal handler installed', flush=True)
-
-
-def save_checkpoint(state, is_best, filename=CHECKPOINT_filename):
+def save_checkpoint(state, is_best, filename):
     """
     Save the model to a temporary file first,
     then copy it to filename, in case the signal interrupts
     the torch.save() process.
     """
     if not args.distributed or os.environ['SLURM_PROCID'] == '0':
+        CHECKPOINT_tempfile = filename + '.temp'
+
+        # Remove CHECKPOINT_tempfile, in case the signal arrives in the
+        # middle of copying from CHECKPOINT_tempfile to CHECKPOINT_filename
+        if os.path.isfile(CHECKPOINT_tempfile):
+            os.remove(CHECKPOINT_tempfile)
+
         torch.save(state, CHECKPOINT_tempfile)
         if os.path.isfile(CHECKPOINT_tempfile):
             os.rename(CHECKPOINT_tempfile, filename)
         if is_best:
             shutil.copyfile(filename, 'model_best.pth.tar')
         print("Checkpoint: saved")
-
-
-# Distributed
-
-if args.distributed:
-    os.environ['RANK'] = os.environ['SLURM_PROCID']
-    os.environ['WORLD_SIZE'] = str(args.world_size)
-    print('in distributed', os.environ['RANK'],
-          os.environ['MASTER_ADDR'], os.environ['MASTER_PORT'], flush=True)
-    dist.init_process_group(backend=args.dist_backend,
-                            init_method=args.dist_url, world_size=args.world_size)
-
-    print('init process', flush=True)
 
 
 class LanguageModel:
@@ -659,6 +624,30 @@ def main(args):
     pr = cProfile.Profile()
     pr.enable()
 
+    # Checkpoint
+
+    CHECKPOINT_filename = args.resume if args.resume else 'checkpoint.pth.tar'
+    HALT_filename = CHECKPOINT_filename + '.HALT'
+
+    # HALT file is used as a sign of job completion.
+    # Make sure no HALT file left from previous runs.
+    if os.path.isfile(HALT_filename):
+        os.remove(HALT_filename)
+
+    # Install signal handler
+    signal.signal(signal.SIGUSR1, lambda a, b: signal_handler(a, b, HALT_filename))
+    signal.signal(signal.SIGTERM, SIGTERM_handler)
+    print('Signal handler installed', flush=True)
+
+    # Distributed
+
+    if args.distributed:
+        os.environ['RANK'] = os.environ['SLURM_PROCID']
+        os.environ['WORLD_SIZE'] = str(args.world_size)
+        print('in distributed', os.environ['RANK'], os.environ['MASTER_ADDR'], os.environ['MASTER_PORT'], flush=True)
+        dist.init_process_group(backend=args.dist_backend, init_method=args.dist_url, world_size=args.world_size)
+        print('init process', flush=True)
+
     audio_backend = "soundfile"
     torchaudio.set_audio_backend(audio_backend)
 
@@ -801,7 +790,7 @@ def main(args):
             'scheduler': scheduler.state_dict(),
             'history_training': history_training,
             'history_validation': history_validation,
-        }, False)
+        }, False, CHECKPOINT_filename)
 
     with tqdm(total=args.epochs, unit_scale=1, disable=args.distributed) as pbar:
         for epoch in range(args.start_epoch, args.epochs):
@@ -846,8 +835,8 @@ def main(args):
                         'scheduler': scheduler.state_dict(),
                         'history_training': history_training,
                         'history_validation': history_validation,
-                    }, False)
-                    trigger_job_requeue()
+                    }, False, CHECKPOINT_filename)
+                    trigger_job_requeue(CHECKPOINT_filename)
 
                 pbar.update(1 / len(loader_training))
 
@@ -939,7 +928,7 @@ def main(args):
                         'scheduler': scheduler.state_dict(),
                         'history_training': history_training,
                         'history_validation': history_validation,
-                    }, is_best)
+                    }, is_best, CHECKPOINT_filename)
 
                     print(tabulate(history_training, headers="keys"), flush=True)
                     print(tabulate(history_validation, headers="keys"), flush=True)
