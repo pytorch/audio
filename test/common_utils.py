@@ -1,12 +1,13 @@
 import os
 import tempfile
+import unittest
 from typing import Type, Iterable
 from contextlib import contextmanager
 from shutil import copytree
 
 import torch
+from torch.testing._internal.common_utils import TestCase
 import torchaudio
-import pytest
 
 _TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 BACKENDS = torchaudio._backend._audio_backends
@@ -87,6 +88,9 @@ class TestBaseMixin:
     device = None
 
 
+_SKIP_IF_NO_CUDA = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
+
+
 def define_test_suite(testbase: Type[TestBaseMixin], dtype: str, device: str):
     if dtype not in ['float32', 'float64']:
         raise NotImplementedError(f'Unexpected dtype: {dtype}')
@@ -95,11 +99,10 @@ def define_test_suite(testbase: Type[TestBaseMixin], dtype: str, device: str):
 
     name = f'Test{testbase.__name__}_{device.upper()}_{dtype.capitalize()}'
     attrs = {'dtype': getattr(torch, dtype), 'device': torch.device(device)}
-    testsuite = type(name, (testbase,), attrs)
+    testsuite = type(name, (testbase, TestCase), attrs)
 
     if device == 'cuda':
-        testsuite = pytest.mark.skipif(
-            not torch.cuda.is_available(), reason='CUDA not available')(testsuite)
+        testsuite = _SKIP_IF_NO_CUDA(testsuite)
     return testsuite
 
 

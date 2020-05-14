@@ -1,6 +1,5 @@
 """Test suites for jit-ability and its numerical compatibility"""
 import unittest
-import pytest
 
 import torch
 import torchaudio
@@ -10,29 +9,18 @@ import torchaudio.transforms as T
 import common_utils
 
 
-def _assert_functional_consistency(func, tensor, shape_only=False):
-    ts_func = torch.jit.script(func)
-    output = func(tensor)
-    ts_output = ts_func(tensor)
-
-    if shape_only:
-        assert ts_output.shape == output.shape, (ts_output.shape, output.shape)
-    else:
-        torch.testing.assert_allclose(ts_output, output)
-
-
-def _assert_transforms_consistency(transform, tensor):
-    ts_transform = torch.jit.script(transform)
-    output = transform(tensor)
-    ts_output = ts_transform(tensor)
-    torch.testing.assert_allclose(ts_output, output)
-
-
 class Functional(common_utils.TestBaseMixin):
     """Implements test for `functinoal` modul that are performed for different devices"""
     def _assert_consistency(self, func, tensor, shape_only=False):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
-        return _assert_functional_consistency(func, tensor, shape_only=shape_only)
+
+        ts_func = torch.jit.script(func)
+        output = func(tensor)
+        ts_output = ts_func(tensor)
+        if shape_only:
+            assert ts_output.shape == output.shape, (ts_output.shape, output.shape)
+        else:
+            self.assertEqual(ts_output, output)
 
     def test_spectrogram(self):
         def func(tensor):
@@ -209,7 +197,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_lfilter(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path('whitenoise.wav')
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -253,7 +241,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_lowpass(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path('whitenoise.wav')
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -267,7 +255,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_highpass(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path('whitenoise.wav')
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -281,7 +269,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_allpass(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path('whitenoise.wav')
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -296,7 +284,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_bandpass_with_csg(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -312,7 +300,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_bandpass_without_csg(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -328,7 +316,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_bandreject(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -343,7 +331,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_band_with_noise(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -359,7 +347,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_band_without_noise(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -375,7 +363,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_treble(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -391,7 +379,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_deemph(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -404,7 +392,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_riaa(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -417,7 +405,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_equalizer(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -433,7 +421,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_perf_biquad_filtering(self):
         if self.dtype == torch.float64:
-            pytest.xfail("This test is known to fail for float64")
+            raise unittest.SkipTest("This test is known to fail for float64")
 
         filepath = common_utils.get_asset_path("whitenoise.wav")
         waveform, _ = torchaudio.load(filepath, normalization=True)
@@ -514,7 +502,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_phaser(self):
         filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, sample_rate = torchaudio.load(filepath, normalization=True)
+        waveform, _ = torchaudio.load(filepath, normalization=True)
 
         def func(tensor):
             gain_in = 0.5
@@ -533,7 +521,11 @@ class Transforms(common_utils.TestBaseMixin):
     def _assert_consistency(self, transform, tensor):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
-        _assert_transforms_consistency(transform, tensor)
+
+        ts_transform = torch.jit.script(transform)
+        output = transform(tensor)
+        ts_output = ts_transform(tensor)
+        self.assertEqual(ts_output, output)
 
     def test_Spectrogram(self):
         tensor = torch.rand((1, 1000))
