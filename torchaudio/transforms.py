@@ -395,6 +395,8 @@ class MelSpectrogram(torch.nn.Module):
                  pad: int = 0,
                  n_mels: int = 128,
                  window_fn: Callable[..., Tensor] = torch.hann_window,
+                 power: Optional[float] = 2.,
+                 normalized: bool = False,
                  wkwargs: Optional[dict] = None) -> None:
         super(MelSpectrogram, self).__init__()
         self.sample_rate = sample_rate
@@ -402,13 +404,15 @@ class MelSpectrogram(torch.nn.Module):
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         self.pad = pad
+        self.power = power
+        self.normalized = normalized
         self.n_mels = n_mels  # number of mel frequency bins
         self.f_max = f_max
         self.f_min = f_min
         self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
                                        hop_length=self.hop_length,
-                                       pad=self.pad, window_fn=window_fn, power=2.,
-                                       normalized=False, wkwargs=wkwargs)
+                                       pad=self.pad, window_fn=window_fn, power=self.power,
+                                       normalized=self.normalized, wkwargs=wkwargs)
         self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1)
 
     def forward(self, waveform: Tensor) -> Tensor:

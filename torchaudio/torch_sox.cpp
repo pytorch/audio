@@ -1,3 +1,5 @@
+#include <torchaudio/torch_sox.h>
+
 #include <torch/extension.h>
 
 #include <sox.h>
@@ -69,12 +71,6 @@ void read_audio(
   });
 }
 } // namespace
-
-struct SoxEffect {
-  SoxEffect() : ename(""), eopts({""})  { }
-  std::string ename;
-  std::vector<std::string> eopts;
-};
 
 std::tuple<sox_signalinfo_t, sox_encodinginfo_t> get_info(
     const std::string& file_name
@@ -195,7 +191,7 @@ void write_audio_file(
 }
 
 int initialize_sox() {
-  /* Initializion for sox effects.  Only initialize once  */
+  /* Initialization for sox effects.  Only initialize once  */
   return sox_init();
 }
 

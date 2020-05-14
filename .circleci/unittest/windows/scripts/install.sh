@@ -10,8 +10,14 @@ set -e
 eval "$(./conda/Scripts/conda.exe 'shell.bash' 'hook')"
 conda activate ./env
 
-printf "* Installing PyTorch nightly build"
-conda install -y -c pytorch-nightly pytorch cpuonly
+if [ -z "${CUDA_VERSION:-}" ] ; then
+    cudatoolkit="cpuonly"
+else
+    version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
+    cudatoolkit="cudatoolkit=${version}"
+fi
+printf "Installing PyTorch with %s\n" "${cudatoolkit}"
+conda install -y -c pytorch-nightly pytorch "${cudatoolkit}"
 
 printf "* Installing torchaudio\n"
 IS_CONDA=true python setup.py develop
