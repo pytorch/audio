@@ -96,7 +96,8 @@ class Functional(common_utils.TestBaseMixin):
             f_max = 20.0
             n_mels = 10
             sample_rate = 16000
-            return F.create_fb_matrix(n_stft, f_min, f_max, n_mels, sample_rate)
+            norm = ""
+            return F.create_fb_matrix(n_stft, f_min, f_max, n_mels, sample_rate, norm)
 
         dummy = torch.zeros(1, 1)
         self._assert_consistency(func, dummy)

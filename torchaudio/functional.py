@@ -335,7 +335,8 @@ def create_fb_matrix(
         f_min: float,
         f_max: float,
         n_mels: int,
-        sample_rate: int
+        sample_rate: int,
+        norm: str = "",
 ) -> Tensor:
     r"""Create a frequency bin conversion matrix.
 
@@ -345,6 +346,8 @@ def create_fb_matrix(
         f_max (float): Maximum frequency (Hz)
         n_mels (int): Number of mel filterbanks
         sample_rate (int): Sample rate of the audio waveform
+        norm (str): If 'slaney', divide the triangular mel weights by the width of the mel band
+        (area normalization). (Default: '')
 
     Returns:
         Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)
@@ -372,6 +375,12 @@ def create_fb_matrix(
     down_slopes = (-1.0 * slopes[:, :-2]) / f_diff[:-1]  # (n_freqs, n_mels)
     up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_freqs, n_mels)
     fb = torch.max(zero, torch.min(down_slopes, up_slopes))
+
+    if norm == "slaney":
+        # Slaney-style mel is scaled to be approx constant energy per channel
+        enorm = 2.0 / (f_pts[2:n_mels + 2] - f_pts[:n_mels])
+        fb *= enorm.unsqueeze(0)
+
     return fb
 
 
