@@ -1,8 +1,4 @@
-#include <torchaudio/torch_sox.h>
-
-#include <torch/extension.h>
-
-#include <sox.h>
+#include <torchaudio/csrc/sox.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -385,7 +381,7 @@ int build_flow_effects(const std::string& file_name,
 } // namespace audio
 } // namespace torch
 
-PYBIND11_MODULE(_torch_sox, m) {
+PYBIND11_MODULE(_torchaudio, m) {
   py::class_<torch::audio::SoxEffect>(m, "SoxEffect")
        .def(py::init<>())
        .def("__repr__", [](const torch::audio::SoxEffect &self) {
