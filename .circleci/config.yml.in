@@ -165,9 +165,9 @@ jobs:
             conda install -yq conda-build "conda-package-handling!=1.5.0"
             bash packaging/build_conda.sh
       - store_artifacts:
-          path: /C/tools/miniconda3/conda-bld/win-64
+          path: C:/tools/miniconda3/conda-bld/win-64
       - persist_to_workspace:
-          root: /C/tools/miniconda3/conda-bld/win-64
+          root: C:/tools/miniconda3/conda-bld/win-64
           paths:
             - "*"
 
