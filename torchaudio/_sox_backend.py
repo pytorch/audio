@@ -35,8 +35,8 @@ def load(filepath: str,
     if offset < 0:
         raise ValueError("Expected positive offset value")
 
-    import _torch_sox
-    sample_rate = _torch_sox.read_audio_file(
+    from . import _torchaudio
+    sample_rate = _torchaudio.read_audio_file(
         filepath,
         out,
         channels_first,
@@ -68,5 +68,5 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
 def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
     r"""See torchaudio.info"""
 
-    import _torch_sox
-    return _torch_sox.get_info(filepath)
+    from . import _torchaudio
+    return _torchaudio.get_info(filepath)

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import platform
-import sys
 import subprocess
 
 from setuptools import setup, find_packages
@@ -85,14 +84,15 @@ if platform.system() == 'Windows':
 else:
     ext_modules = [
         CppExtension(
-            '_torch_sox',
-            ['torchaudio/torch_sox.cpp'],
+            'torchaudio._torchaudio',
+            ['torchaudio/csrc/sox.cpp'],
             libraries=libraries,
             include_dirs=include_dirs + [cwd],
             extra_compile_args=eca,
             extra_objects=extra_objects,
             extra_link_args=ela),
     ]
+
 
 setup(
     name="torchaudio",
@@ -116,8 +116,7 @@ setup(
         "Topic :: Multimedia :: Sound/Audio",
         "Topic :: Scientific/Engineering :: Artificial Intelligence"
     ],
-    # Exclude the build files.
-    packages=find_packages(exclude=["build"]),
+    packages=find_packages(exclude=["build*", "test*", "torchaudio.csrc*"]),
     ext_modules=ext_modules,
     cmdclass={'build_ext': BuildExtension},
     install_requires=[pytorch_package_dep]

@@ -608,6 +608,3 @@ class Transforms(common_utils.TestBaseMixin):
         filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
         waveform, sample_rate = torchaudio.load(filepath)
         self._assert_consistency(T.Vad(sample_rate=sample_rate), waveform)
-
-
-common_utils.define_test_suites(globals(), [Functional, Transforms])
