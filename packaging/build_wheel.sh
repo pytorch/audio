@@ -14,4 +14,9 @@ fi
 pip_install numpy future
 setup_pip_pytorch_version
 python setup.py clean
-IS_WHEEL=1 python setup.py bdist_wheel
+if [[ "$OSTYPE" == "msys" ]]; then
+    python_tag="$(echo "cp$PYTHON_VERSION" | tr -d '.')"
+    IS_WHEEL=1 python setup.py bdist_wheel --plat-name win_amd64 --python-tag $python_tag
+else
+    IS_WHEEL=1 python setup.py bdist_wheel
+fi
