@@ -1537,42 +1537,41 @@ def flanger(
 
         delay_buf_pos = (delay_buf_pos + delay_buf_length - 1) % delay_buf_length
 
-        for c in range(0, n_channels):
+        cur_channel_phase = (torch.arange(0, n_channels) * lfo_length * channel_phase + .5).to(torch.int64)
+        delay = lfo[(lfo_pos + cur_channel_phase) % lfo_length]
+        frac_delay = torch.frac(delay)
+        delay = torch.floor(delay)
 
-            cur_channel_phase = int(c * lfo_length * channel_phase + .5)
-            delay = lfo[(lfo_pos + cur_channel_phase) % lfo_length]
-            (frac_delay, delay) = math.modf(delay)
+        int_delay = delay.to(torch.int64)
 
-            int_delay = int(delay)
+        temp = waveform[:, :, i]
 
-            temp = waveform[:, c, i]
+        delay_bufs[:, :, delay_buf_pos] = temp + delay_last * feedback_gain
 
-            delay_bufs[:, c, delay_buf_pos] = temp + delay_last[:, c] * feedback_gain
+        delayed_0 = delay_bufs[:, :, (delay_buf_pos + int_delay) % delay_buf_length]
 
-            delayed_0 = delay_bufs[:, c, (delay_buf_pos + int_delay) % delay_buf_length]
+        int_delay = int_delay + 1
+
+        delayed_1 = delay_bufs[:, :, (delay_buf_pos + int_delay) % delay_buf_length]
+
+        int_delay = int_delay + 1
+
+        if linear_interpolation:
+            delayed = delayed_0 + (delayed_1 - delayed_0) * frac_delay
+        else:
+            delayed_2 = delay_bufs[:, :, (delay_buf_pos + int_delay) % delay_buf_length]
 
             int_delay = int_delay + 1
 
-            delayed_1 = delay_bufs[:, c, (delay_buf_pos + int_delay) % delay_buf_length]
+            delayed_2 = delayed_2 - delayed_0
+            delayed_1 = delayed_1 - delayed_0
+            a = delayed_2 * .5 - delayed_1
+            b = delayed_1 * 2 - delayed_2 * .5
 
-            int_delay = int_delay + 1
+            delayed = delayed_0 + (a * frac_delay + b) * frac_delay
 
-            if linear_interpolation:
-                delayed = delayed_0 + (delayed_1 - delayed_0) * frac_delay
-            else:
-                delayed_2 = delay_bufs[:, c, (delay_buf_pos + int_delay) % delay_buf_length]
-
-                int_delay = int_delay + 1
-
-                delayed_2 = delayed_2 - delayed_0
-                delayed_1 = delayed_1 - delayed_0
-                a = delayed_2 * .5 - delayed_1
-                b = delayed_1 * 2 - delayed_2 * .5
-
-                delayed = delayed_0 + (a * frac_delay + b) * frac_delay
-
-            delay_last[:, c] = delayed
-            output_waveform[:, c, i] = waveform[:, c, i] * in_gain + delayed * delay_gain
+        delay_last = delayed
+        output_waveform[:, :, i] = waveform[:, :, i] * in_gain + delayed * delay_gain
 
         lfo_pos = (lfo_pos + 1) % lfo_length
 
