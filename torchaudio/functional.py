@@ -1548,18 +1548,18 @@ def flanger(
 
         delay_bufs[:, :, delay_buf_pos] = temp + delay_last * feedback_gain
 
-        delayed_0 = delay_bufs[:, :, (delay_buf_pos + int_delay) % delay_buf_length]
+        delayed_0 = delay_bufs[:, :, (delay_buf_pos + int_delay) % delay_buf_length].squeeze(-1)
 
         int_delay = int_delay + 1
 
-        delayed_1 = delay_bufs[:, :, (delay_buf_pos + int_delay) % delay_buf_length]
+        delayed_1 = delay_bufs[:, :, (delay_buf_pos + int_delay) % delay_buf_length].squeeze(-1)
 
         int_delay = int_delay + 1
 
         if linear_interpolation:
             delayed = delayed_0 + (delayed_1 - delayed_0) * frac_delay
         else:
-            delayed_2 = delay_bufs[:, :, (delay_buf_pos + int_delay) % delay_buf_length]
+            delayed_2 = delay_bufs[:, :, (delay_buf_pos + int_delay) % delay_buf_length].squeeze(-1)
 
             int_delay = int_delay + 1
 
