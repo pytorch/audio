@@ -79,19 +79,16 @@ pytorch_package_dep = 'torch'
 if pytorch_package_version is not None:
     pytorch_package_dep += "==" + pytorch_package_version
 
-if platform.system() == 'Windows':
-    ext_modules = None
-else:
-    ext_modules = [
-        CppExtension(
-            'torchaudio._torchaudio',
-            ['torchaudio/csrc/sox.cpp'],
-            libraries=libraries,
-            include_dirs=include_dirs + [cwd],
-            extra_compile_args=eca,
-            extra_objects=extra_objects,
-            extra_link_args=ela),
-    ]
+ext_modules = [
+    CppExtension(
+        'torchaudio._torchaudio',
+        ['torchaudio/csrc/sox.cpp'],
+        libraries=libraries,
+        include_dirs=include_dirs + [cwd],
+        extra_compile_args=eca,
+        extra_objects=extra_objects,
+        extra_link_args=ela),
+]
 
 
 setup(

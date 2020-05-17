@@ -8,7 +8,9 @@ export BUILD_TYPE="wheel"
 export NO_CUDA_PACKAGE=1
 setup_env 0.6.0
 setup_wheel_python
-if [[ "$OSTYPE" != "msys" ]]; then
+if [[ "$OSTYPE" == "msys" ]]; then
+    "$script_dir/download_deps.sh" "$(pwd)"  # Download static dependencies
+else
     "$script_dir/build_from_source.sh" "$(pwd)"  # Build static dependencies
 fi
 pip_install numpy future

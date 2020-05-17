@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <stdexcept>
 #include <vector>
+#include <memory>
 
 namespace torch {
 namespace audio {
@@ -294,11 +295,11 @@ int build_flow_effects(const std::string& file_name,
       sox_effect_options(e, 0, nullptr);
     } else {
       int num_opts = tae.eopts.size();
-      char* sox_args[max_num_eopts];
+      std::unique_ptr<char* []> sox_args(new char* [max_num_eopts]);
       for(std::vector<std::string>::size_type i = 0; i != tae.eopts.size(); i++) {
         sox_args[i] = (char*) tae.eopts[i].c_str();
       }
-      if(sox_effect_options(e, num_opts, sox_args) != SOX_SUCCESS) {
+      if(sox_effect_options(e, num_opts, sox_args.get()) != SOX_SUCCESS) {
 #ifdef __APPLE__
         unlink(tmp_name);
 #endif
