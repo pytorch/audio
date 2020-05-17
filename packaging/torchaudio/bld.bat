@@ -1,7 +1,6 @@
 @echo off
 
-echo %CD%
-sh packaging/download_deps.sh "$(pwd)"
+sh packaging/download_deps.sh '%CD%'
 if errorlevel 1 exit /b 1
 
 set IS_CONDA=1

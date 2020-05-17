@@ -23,6 +23,7 @@
 
 #include <random>
 #include <string>
+#include <vector>
 #endif
 
 namespace torch {
@@ -319,7 +320,7 @@ int build_flow_effects(const std::string& file_name,
   // create interm_signal for effects, intermediate steps change this in-place
   sox_signalinfo_t interm_signal = input->signal;
 
-#if defined(__APPLE__)
+#ifdef __APPLE__
   // According to Mozilla Deepspeech sox_open_memstream_write doesn't work
   // with OSX
   char tmp_name[] = "/tmp/fileXXXXXX";
@@ -330,10 +331,11 @@ int build_flow_effects(const std::string& file_name,
 
 #elif defined(_WIN32)
   // According to the local test results, sox_open_memstream_write doesn't work on Windows.
-  std::string tmp_name = getTempPath() + "fileXXXXXX";
-  int tmp_fd = mkstemp(tmp_name);
-  close(tmp_fd);
-  sox_format_t* output = sox_open_write(tmp_name, target_signal,
+  std::string t = get_temp_path() + "fileXXXXXX";
+  std::vector<char> tn(t.c_str(), t.c_str() + t.size() + 1);
+  int tmp_fd = mkstemp(tn.data());
+  _close(tmp_fd);
+  sox_format_t* output = sox_open_write(tn.data(), target_signal,
                                         target_encoding, "wav", nullptr, nullptr);
 #else
   // create buffer and buffer_size for output in memwrite
@@ -375,6 +377,8 @@ int build_flow_effects(const std::string& file_name,
       if(sox_effect_options(e, num_opts, sox_args.get()) != SOX_SUCCESS) {
 #ifdef __APPLE__
         unlink(tmp_name);
+#elif defined(_WIN32)
+        _unlink(tn.data());
 #endif
         throw std::runtime_error("invalid effect options, see SoX docs for details");
       }
@@ -409,6 +413,12 @@ int build_flow_effects(const std::string& file_name,
                        target_signal, target_encoding, "wav");
   // delete temporary audio file
   unlink(tmp_name);
+#elif defined(_WIN32)
+  // Same logic as MAC
+  sr = read_audio_file(tn.data(), otensor, ch_first, 0, 0,
+                       target_signal, target_encoding, "wav");
+  // delete temporary audio file
+  _unlink(tn.data());
 #else
   // Resize output tensor to desired dimensions, different effects result in output->signal.length,
   // interm_signal.length and buffer size being inconsistent with the result of the file output.
