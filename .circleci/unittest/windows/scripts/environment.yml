@@ -11,6 +11,5 @@ dependencies:
   - pip:
     - scipy
     - kaldi-io
-    - PySoundFile
     - librosa
     - future
