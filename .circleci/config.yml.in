@@ -164,6 +164,7 @@ jobs:
             conda activate base
             conda install -yq conda-build "conda-package-handling!=1.5.0"
             bash packaging/build_conda.sh
+            rm /C/tools/miniconda3/conda-bld/win-64/vs2019*.tar.bz
       - store_artifacts:
           path: C:/tools/miniconda3/conda-bld/win-64
       - persist_to_workspace:
