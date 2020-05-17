@@ -67,12 +67,13 @@ static const std::string get_temp_path() {
       MAX_PATH, // length of the buffer
       lpTempPathBuffer); // buffer for path
 
-  if (dwRetVal < MAX_PATH && dwRetVal != 0) {
+  if (dwRetVal >= MAX_PATH + 1 || dwRetVal == 0) {
     throw std::runtime_error("Error getting temporary directory using GetTempPath");
   }
 
   return std::string(lpTempPathBuffer);
 }
+static const std::string temp_dir = get_temp_path();
 #endif
 
 /// Helper struct to safely close the sox_format_t descriptor.
@@ -331,7 +332,7 @@ int build_flow_effects(const std::string& file_name,
 
 #elif defined(_WIN32)
   // According to the local test results, sox_open_memstream_write doesn't work on Windows.
-  std::string t = get_temp_path() + "fileXXXXXX";
+  std::string t = temp_dir + "fileXXXXXX";
   std::vector<char> tn(t.c_str(), t.c_str() + t.size() + 1);
   int tmp_fd = mkstemp(tn.data());
   _close(tmp_fd);
