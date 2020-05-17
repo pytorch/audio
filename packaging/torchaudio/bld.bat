@@ -1,6 +1,6 @@
 @echo off
 
-sh packaging/build_from_source.sh "$(pwd)"
+sh packaging/download_deps.sh "$(pwd)"
 
 set IS_CONDA=1
 

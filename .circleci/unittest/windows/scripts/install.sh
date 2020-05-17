@@ -27,4 +27,4 @@ conda install -y -c pytorch-nightly pytorch "${cudatoolkit}"
 printf "* Installing torchaudio\n"
 curl --retry 3 https://s3.amazonaws.com/ossci-windows/torchaudio_deps.7z --output /tmp/torchaudio_deps.7z
 7z x /tmp/torchaudio_deps.7z -othird_party
-"$this_dir/install.bat"
+IS_CONDA=true "$this_dir/install.bat"
