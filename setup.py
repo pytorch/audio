@@ -44,10 +44,19 @@ if IS_WHEEL or IS_CONDA:
     # proper link order (sox, mad, flac, lame)
     # (the most important thing is that dependencies come after a libraryl
     # e.g., sox comes first)
-    extra_objects += [os.path.join(audio_path, 'third_party/sox/lib/libsox.a')]
-    extra_objects += [os.path.join(audio_path, 'third_party/mad/lib/libmad.a')]
-    extra_objects += [os.path.join(audio_path, 'third_party/flac/lib/libFLAC.a')]
-    extra_objects += [os.path.join(audio_path, 'third_party/lame/lib/libmp3lame.a')]
+    if platform.system() == 'Windows':
+        extra_objects += [os.path.join(audio_path, 'third_party/sox/lib/sox.lib')]
+        extra_objects += [os.path.join(audio_path, 'third_party/mad/lib/mad.lib')]
+        extra_objects += [os.path.join(audio_path, 'third_party/flac/lib/FLAC.lib')]
+        extra_objects += [os.path.join(audio_path, 'third_party/lame/lib/mp3lame.lib')]
+        extra_objects += [os.path.join(audio_path, 'third_party/ogg/lib/ogg.lib')]
+        extra_objects += [os.path.join(audio_path, 'third_party/sox/lib/lpc10.lib')]
+        extra_objects += [os.path.join(audio_path, 'third_party/sox/lib/gsm.lib')]
+    else:
+        extra_objects += [os.path.join(audio_path, 'third_party/sox/lib/libsox.a')]
+        extra_objects += [os.path.join(audio_path, 'third_party/mad/lib/libmad.a')]
+        extra_objects += [os.path.join(audio_path, 'third_party/flac/lib/libFLAC.a')]
+        extra_objects += [os.path.join(audio_path, 'third_party/lame/lib/libmp3lame.a')]
 else:
     libraries += ['sox']
 
