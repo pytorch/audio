@@ -1538,11 +1538,11 @@ def flanger(
         delay_buf_pos = (delay_buf_pos + delay_buf_length - 1) % delay_buf_length
 
         cur_channel_phase = (torch.arange(0, n_channels) * lfo_length * channel_phase + .5).to(torch.int64)
-        delay = lfo[(lfo_pos + cur_channel_phase) % lfo_length]
-        frac_delay = torch.frac(delay)
-        delay = torch.floor(delay)
+        delay_tensor = lfo[(lfo_pos + cur_channel_phase) % lfo_length]
+        frac_delay = torch.frac(delay_tensor)
+        delay_tensor = torch.floor(delay_tensor)
 
-        int_delay = delay.to(torch.int64)
+        int_delay = delay_tensor.to(torch.int64)
 
         temp = waveform[:, :, i]
 
