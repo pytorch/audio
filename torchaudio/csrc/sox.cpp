@@ -2,13 +2,78 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <memory>
 #include <stdexcept>
 #include <vector>
-#include <memory>
+
+#ifdef _WIN32
+// Additional headers for implementation for mkstemp
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+#include <fcntl.h>
+#include <io.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <Windows.h>
+
+#include <random>
+#include <string>
+#endif
 
 namespace torch {
 namespace audio {
 namespace {
+#ifdef _WIN32
+int mkstemp(char* tmpl) {
+  int len;
+  char* name;
+  int fd = -1;
+  int save_errno = errno;
+
+  len = strlen(tmpl);
+  if (len < 6 ||
+      strncmp(&tmpl[len - 6], "XXXXXX", 6)) {
+    return -1;
+  }
+
+  name = &tmpl[len - 6];
+
+  std::random_device rd;
+  do {
+    for (unsigned i = 0; i < 6; ++i) {
+      name[i] = "abcdefghijklmnopqrstuvwxyz0123456789"[rd() % 36];
+    }
+
+    fd = _open(tmpl, _O_RDWR | _O_CREAT | _O_EXCL, _S_IWRITE | _S_IREAD);
+  } while (errno == EEXIST);
+
+  if (fd >= 0) {
+    errno = save_errno;
+    return fd;
+  } else {
+    return -1;
+  }
+}
+static const std::string get_temp_path() {
+  char lpTempPathBuffer[MAX_PATH];
+
+  DWORD dwRetVal = GetTempPath(
+      MAX_PATH, // length of the buffer
+      lpTempPathBuffer); // buffer for path
+
+  if (dwRetVal < MAX_PATH && dwRetVal != 0) {
+    throw std::runtime_error("Error getting temporary directory using GetTempPath");
+  }
+
+  return std::string(lpTempPathBuffer);
+}
+#endif
+
 /// Helper struct to safely close the sox_format_t descriptor.
 struct SoxDescriptor {
   explicit SoxDescriptor(sox_format_t* fd) noexcept : fd_(fd) {}
@@ -254,10 +319,18 @@ int build_flow_effects(const std::string& file_name,
   // create interm_signal for effects, intermediate steps change this in-place
   sox_signalinfo_t interm_signal = input->signal;
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
   // According to Mozilla Deepspeech sox_open_memstream_write doesn't work
   // with OSX
   char tmp_name[] = "/tmp/fileXXXXXX";
+  int tmp_fd = mkstemp(tmp_name);
+  close(tmp_fd);
+  sox_format_t* output = sox_open_write(tmp_name, target_signal,
+                                        target_encoding, "wav", nullptr, nullptr);
+
+#elif defined(_WIN32)
+  // According to the local test results, sox_open_memstream_write doesn't work on Windows.
+  std::string tmp_name = getTempPath() + "fileXXXXXX";
   int tmp_fd = mkstemp(tmp_name);
   close(tmp_fd);
   sox_format_t* output = sox_open_write(tmp_name, target_signal,
