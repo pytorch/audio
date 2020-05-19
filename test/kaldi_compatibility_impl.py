@@ -62,7 +62,7 @@ class Kaldi(common_utils.TestBaseMixin):
         result = F.sliding_window_cmn(tensor, **kwargs)
         command = ['apply-cmvn-sliding'] + _convert_args(**kwargs) + ['ark:-', 'ark:-']
         kaldi_result = _run_kaldi(command, 'ark', tensor)
-        torch.testing.assert_allclose(result.cpu(), kaldi_result.to(self.dtype))
+        self.assertEqual(result.cpu(), kaldi_result.to(self.dtype))
 
     @unittest.skipIf(_not_available('compute-fbank-feats'), '`compute-fbank-feats` not available')
     def test_fbank(self):
@@ -97,7 +97,4 @@ class Kaldi(common_utils.TestBaseMixin):
         result = torchaudio.compliance.kaldi.fbank(waveform, **kwargs)
         command = ['compute-fbank-feats'] + _convert_args(**kwargs) + ['scp:-', 'ark:-']
         kaldi_result = _run_kaldi(command, 'scp', wave_file)
-        torch.testing.assert_allclose(result.cpu(), kaldi_result.to(dtype=self.dtype), rtol=1e-4, atol=1e-8)
-
-
-common_utils.define_test_suites(globals(), [Kaldi])
+        self.assertEqual(result.cpu(), kaldi_result.to(dtype=self.dtype), rtol=1e-4, atol=1e-8)
