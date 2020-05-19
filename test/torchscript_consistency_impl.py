@@ -517,8 +517,7 @@ class Functional(common_utils.TestBaseMixin):
         self._assert_consistency(func, waveform)
 
     def test_flanger(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, sample_rate = torchaudio.load(filepath, normalization=True)
+        waveform = torch.rand(2, 100) - 0.5
 
         def func(tensor):
             delay = 0.8
