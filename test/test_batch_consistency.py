@@ -85,6 +85,7 @@ class TestFunctional(TestCase):
         self.assert_batch_consistencies(F.phaser, waveform, sample_rate)
 
     def test_flanger(self):
+        torch.random.manual_seed(40)
         waveform = torch.rand(2, 100) - 0.5
         sample_rate = 44100
         self.assert_batch_consistencies(F.flanger, waveform, sample_rate)

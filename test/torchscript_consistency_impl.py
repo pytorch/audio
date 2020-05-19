@@ -517,6 +517,7 @@ class Functional(common_utils.TestBaseMixin):
         self._assert_consistency(func, waveform)
 
     def test_flanger(self):
+        torch.random.manual_seed(40)
         waveform = torch.rand(2, 100) - 0.5
 
         def func(tensor):
