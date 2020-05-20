@@ -356,6 +356,10 @@ def create_fb_matrix(
         size (..., ``n_freqs``), the applied result would be
         ``A * create_fb_matrix(A.size(-1), ...)``.
     """
+
+    if norm is not None and norm != "slaney":
+        raise ValueError("norm must be one of None or 'slaney'")
+
     # freq bins
     # Equivalent filterbank construction by Librosa
     all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
