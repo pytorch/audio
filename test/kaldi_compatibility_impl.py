@@ -48,6 +48,10 @@ def _run_kaldi(command, input_type, input_value):
 
 
 class Kaldi(common_utils.TestBaseMixin):
+    def assert_equal(self, output, *, expected, rtol=None, atol=None):
+        expected = expected.to(dtype=self.dtype, device=self.device)
+        self.assertEqual(output, expected, rtol=rtol, atol=atol)
+
     @unittest.skipIf(_not_available('apply-cmvn-sliding'), '`apply-cmvn-sliding` not available')
     def test_sliding_window_cmn(self):
         """sliding_window_cmn should be numerically compatible with apply-cmvn-sliding"""
@@ -62,7 +66,7 @@ class Kaldi(common_utils.TestBaseMixin):
         result = F.sliding_window_cmn(tensor, **kwargs)
         command = ['apply-cmvn-sliding'] + _convert_args(**kwargs) + ['ark:-', 'ark:-']
         kaldi_result = _run_kaldi(command, 'ark', tensor)
-        self.assertEqual(result.cpu(), kaldi_result.to(self.dtype))
+        self.assert_equal(result, expected=kaldi_result)
 
     @unittest.skipIf(_not_available('compute-fbank-feats'), '`compute-fbank-feats` not available')
     def test_fbank(self):
@@ -97,4 +101,4 @@ class Kaldi(common_utils.TestBaseMixin):
         result = torchaudio.compliance.kaldi.fbank(waveform, **kwargs)
         command = ['compute-fbank-feats'] + _convert_args(**kwargs) + ['scp:-', 'ark:-']
         kaldi_result = _run_kaldi(command, 'scp', wave_file)
-        self.assertEqual(result.cpu(), kaldi_result.to(dtype=self.dtype), rtol=1e-4, atol=1e-8)
+        self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
