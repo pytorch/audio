@@ -196,9 +196,6 @@ def model_length_function(tensor):
     return int(tensor.shape[0]) // 2 + 1
 
 
-# Dataset
-
-
 class IterableMemoryCache:
 
     def __init__(self, iterable):
@@ -262,7 +259,7 @@ class Processed(torch.utils.data.Dataset):
         return len(self.dataset)
 
 
-def process_datapoint(item):
+def process_datapoint(item, transforms, encode):
     transformed = item[0]  # .to(device, non_blocking=non_blocking)
     target = item[2].lower()
 
@@ -279,7 +276,7 @@ def process_datapoint(item):
     return transformed, target
 
 
-def datasets_librispeech(root="/datasets01/", folder_in_archive="librispeech/062419/"):
+def datasets_librispeech(transforms, encode, root="/datasets01/", folder_in_archive="librispeech/062419/"):
 
     def create(tag):
 
@@ -288,7 +285,7 @@ def datasets_librispeech(root="/datasets01/", folder_in_archive="librispeech/062
         else:
             data = sum(LIBRISPEECH(root, t, folder_in_archive=folder_in_archive, download=False) for t in tag)
 
-        data = Processed(process_datapoint, data)
+        data = Processed(lambda x: process_datapoint(x, transforms, encode), data)
         # data = diskcache_iterator(data)
         data = MapMemoryCache(data)
         return data
@@ -362,12 +359,12 @@ def filter_speechcommands(data, tag, training_percentage, validation_percentage)
     return data
 
 
-def datasets_speechcommands(root="./"):
+def datasets_speechcommands(transforms, encode, root="./"):
 
     def create(tag):
         data = SPEECHCOMMANDS(root, download=True)
         data = filter_speechcommands(data, tag, 90, 5)
-        data = Processed(process_datapoint, data)
+        data = Processed(lambda x: process_datapoint(x, transforms, encode), data)
         # data = diskcache_iterator(data)
         data = MapMemoryCache(data)
         return data
@@ -501,8 +498,8 @@ def batch_viterbi_decode(tag_sequence: torch.Tensor, transition_matrix: torch.Te
     return torch.tensor(outputs).transpose(0, -1), torch.cat(scores)
 
 
-def top_batch_viterbi_decode(tag_sequence: torch.Tensor):
-    output, _ = batch_viterbi_decode(tag_sequence, transitions, top_k=1)
+def top_batch_viterbi_decode(tag_sequence: torch.Tensor, transition_matrix: torch.Tensor):
+    output, _ = batch_viterbi_decode(tag_sequence, transition_matrix, top_k=1)
     return output[:, 0, :]
 
 
@@ -700,9 +697,9 @@ def main(args):
     print("vocab_size", vocab_size, flush=True)
 
     if args.dataset == "librispeech":
-        training, validation, _ = datasets_librispeech()
+        training, validation, _ = datasets_librispeech(transforms, encode)
     elif args.dataset == "speechcommand":
-        training, validation, _ = datasets_speechcommands()
+        training, validation, _ = datasets_speechcommands(transforms, encode)
 
     if args.viterbi_decoder:
         print("transitions: building", flush=True)
