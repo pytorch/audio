@@ -171,7 +171,7 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(sample_rate, sample_rate2)
         os.unlink(output_path)
 
-    @unittest.skipIf(set(["sox", "soundfile"]) not in set(BACKENDS), "sox and soundfile are not available")
+    @unittest.skipIf(any(be not in BACKENDS for be in ["sox", "soundfile"]), "sox and soundfile are not available")
     def test_3_load_and_save_is_identity_across_backend(self):
         with self.subTest():
             self._test_3_load_and_save_is_identity_across_backend("sox", "soundfile")
