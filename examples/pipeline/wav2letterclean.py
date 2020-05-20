@@ -1,26 +1,18 @@
 import argparse
 import collections
-import cProfile
-import hashlib
 import itertools
 import os
 import pprint
-import pstats
-import re
 import shutil
 import signal
 import statistics
 import string
 from collections import defaultdict
 from datetime import datetime
-from io import StringIO
 from typing import Optional
 
-import matplotlib
 import torch
-import torch.distributed as dist
 import torchaudio
-from matplotlib import pyplot as plt
 from torch import nn, topk
 from torch.optim import SGD, Adadelta, Adam
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
@@ -30,8 +22,6 @@ from torchaudio.datasets.utils import bg_iterator, diskcache_iterator
 from torchaudio.models.wav2letter import Wav2Letter
 from torchaudio.transforms import MFCC, Resample
 from tqdm.notebook import tqdm as tqdm
-
-from tabulate import tabulate
 
 
 def parse_args():
@@ -84,17 +74,9 @@ def parse_args():
 
     args = parser.parse_args()
 
-
-    # Use #nodes as world_size
-    if 'SLURM_NNODES' in os.environ:
-        args.world_size = int(os.environ['SLURM_NNODES'])
-
-    args.distributed = args.distributed or args.world_size > 1
-
-    if not args.distributed or os.environ['SLURM_PROCID'] == '0':
-        print(pprint.pformat(vars(args)), flush=True)
-
     args.clip_norm = 0.
+
+    print(pprint.pformat(vars(args)), flush=True)
 
     return args
 
@@ -132,7 +114,10 @@ def save_checkpoint(state, is_best, filename):
 
 
 class LanguageModel:
-    def __init__(self, labels, char_blank):
+    def __init__(self, labels, char_blank, char_space):
+
+        self.char_space = char_space
+
         labels = [l for l in labels]
         self.length = len(labels)
         enumerated = list(enumerate(labels))
@@ -244,7 +229,7 @@ def process_datapoint(item, transforms, encode):
     return transformed, target
 
 
-def datasets_librispeech(transforms, encode, root="/datasets01/", folder_in_archive="librispeech/062419/"):
+def datasets_librispeech(transforms, language_model, root="/datasets01/", folder_in_archive="librispeech/062419/"):
 
     def create(tag):
 
@@ -253,7 +238,7 @@ def datasets_librispeech(transforms, encode, root="/datasets01/", folder_in_arch
         else:
             data = sum(LIBRISPEECH(root, t, folder_in_archive=folder_in_archive, download=False) for t in tag)
 
-        data = Processed(lambda x: process_datapoint(x, transforms, encode), data)
+        data = Processed(lambda x: process_datapoint(x, transforms, language_model.encode), data)
         # data = diskcache_iterator(data)
         data = MapMemoryCache(data)
         return data
@@ -297,9 +282,7 @@ def levenshtein_distance(r: str, h: str, device: Optional[str] = None):
 
         dnew, dold = dold, dnew
 
-    dist = d[dnew, -1].item()
-
-    return dist
+    return d[dnew, -1].item()
 
 
 def collate_fn(batch):
@@ -326,41 +309,7 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-def forward_decode(inputs, targets, decoder):
-
-    inputs = inputs.to(device, non_blocking=True)
-    output = model(inputs).to("cpu")
-    output = decoder(output)
-
-    output = decode(output.tolist())
-    target = decode(targets.tolist())
-
-    print_length = 20
-    for i in range(2):
-        output_print = output[i].ljust(print_length)[:print_length]
-        target_print = target[i].ljust(print_length)[:print_length]
-        print(
-            f"Epoch: {epoch:4}   Target: {target_print}   Output: {output_print}", flush=True)
-
-    cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
-    cers_normalized = [d / len(a) for a, d in zip(target, cers)]
-    cers = statistics.mean(cers)
-    cers_normalized = statistics.mean(cers_normalized)
-
-    output = [o.split(char_space) for o in output]
-    target = [o.split(char_space) for o in target]
-
-    wers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
-    wers_normalized = [d / len(a) for a, d in zip(target, wers)]
-    wers = statistics.mean(wers)
-    wers_normalized = statistics.mean(wers_normalized)
-
-    print(f"Epoch: {epoch:4}   CER: {cers:1.5f}   WER: {wers:1.5f}", flush=True)
-
-    return cers, wers, cers_normalized, wers_normalized
-
-
-def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch, print_freq, pbar=None):
+def train_one_epoch(model, criterion, optimizer, scheduler, data_loader, device, epoch, pbar=None, non_blocking=False):
 
     model.train()
 
@@ -379,7 +328,8 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch, pri
         # input_lengths: batch size
         # target_lengths: batch size
 
-        sum_loss += criterion(outputs, targets, tensors_lengths, target_lengths).item()
+        loss = criterion(outputs, targets, tensors_lengths, target_lengths)
+        sum_loss += loss.item()
 
         optimizer.zero_grad()
         loss.backward()
@@ -390,23 +340,22 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch, pri
             return
 
         if pbar is not None:
-            pbar.update(1 / len(loader_training))
+            pbar.update(1 / len(data_loader))
 
     # Average loss
-    sum_loss = sum_loss / len(loader_training)
+    sum_loss = sum_loss / len(data_loader)
     print(f"Training loss: {sum_loss:4.5f}", flush=True)
 
     scheduler.step()
 
 
-def evaluate(model, criterion, data_loader, device, print_freq=100):
+def evaluate(model, criterion, data_loader, decoder, language_model, device, non_blocking=False):
 
     with torch.no_grad():
 
         model.eval()
 
-        sum_loss = 0.
-        sum_error_rates = None
+        sums = defaultdict(lambda: 0.)
 
         for inputs, targets, tensors_lengths, target_lengths in bg_iterator(data_loader, maxsize=2):
 
@@ -422,28 +371,44 @@ def evaluate(model, criterion, data_loader, device, print_freq=100):
             # input_lengths: batch size
             # target_lengths: batch size
 
-            sum_loss += criterion(outputs, targets, tensors_lengths, target_lengths).item()
+            sums["loss"] += criterion(outputs, targets, tensors_lengths, target_lengths).item()
 
-            error_rates = forward_decode(inputs, targets, greedy_decode)
-            if sum_error_rates is None:
-                sum_error_rates = [0 for _ in error_rates]
-            for i in range(len(error_rates)):
-                sum_error_rates[i] += error_rates[i]
+            output = outputs.transpose(0, 1).to("cpu")
+            output = decoder(output)
+
+            output = language_model.decode(output.tolist())
+            target = language_model.decode(targets.tolist())
+
+            print_length = 20
+            for i in range(2):
+                output_print = output[i].ljust(print_length)[:print_length]
+                target_print = target[i].ljust(print_length)[:print_length]
+                print(f"Target: {target_print}   Output: {output_print}", flush=True)
+
+            cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
+            # cers_normalized = [d / len(a) for a, d in zip(target, cers)]
+            cers = statistics.mean(cers)
+            sums["cer"] += cers
+
+            output = [o.split(language_model.char_space) for o in output]
+            target = [o.split(language_model.char_space) for o in target]
+
+            wers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
+            # wers_normalized = [d / len(a) for a, d in zip(target, wers)]
+            wers = statistics.mean(wers)
+            sums["wer"] += wers
 
             if SIGNAL_RECEIVED:
                 break
 
-            # Average loss
-            sum_loss = sum_loss / len(loader_validation)
-            print(f"Validation loss: {sum_loss:.5f}", flush=True)
+        # Average loss
+        for k in sums.keys():
+            sums[k] /= len(data_loader)
 
-            for i in range(len(error_rates)):
-                sum_error_rates[i] /= len(data_loader)
-            print(f"Decoder: {sum_error_rates}", flush=True)
-            cer1, wer1, cern1, wern1 = sum_error_rates
-            print(f"CER: {cer}  WER: {wer}  CERN: {cern}  WERN: {wern}", flush=True)
+        print(f"Validation loss: {sums['loss']:.5f}", flush=True)
+        print(f"CER: {sums['cer']}  WER: {sums['wer']}  CERN: {sums['cern']}  WERN: {sums['wern']}", flush=True)
 
-            return sum_loss
+        return sums['loss']
 
 
 def main(args):
@@ -456,16 +421,15 @@ def main(args):
     CHECKPOINT_filename = args.resume if args.resume else 'checkpoint.pth.tar'
 
     # Install signal handler
-    signal.signal(signal.SIGUSR1, lambda a, b: signal_handler(a, b, HALT_filename))
+    signal.signal(signal.SIGUSR1, lambda a, b: signal_handler(a, b))
     signal.signal(signal.SIGTERM, SIGTERM_handler)
     print('Signal handler installed', flush=True)
-
 
     audio_backend = "soundfile"
     torchaudio.set_audio_backend(audio_backend)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    num_devices = torch.cuda.device_count()
+    # num_devices = torch.cuda.device_count()
 
     data_loader_training_params = {
         "num_workers": args.workers,
@@ -504,13 +468,11 @@ def main(args):
     char_apostrophe = "'"
 
     labels = char_blank + char_space + char_apostrophe + string.ascii_lowercase
-    coder = LanguageModel(labels, char_blank)
-    encode = coder.encode
-    decode = coder.decode
-    vocab_size = coder.length
+    language_model = LanguageModel(labels, char_blank, char_space)
+    vocab_size = language_model.length
     print("vocab_size", vocab_size, flush=True)
 
-    training, validation, _ = datasets_librispeech(transforms, encode)
+    training, validation, _ = datasets_librispeech(transforms, language_model)
 
     num_features = n_bins if n_bins else 1
     model = Wav2Letter(num_features, vocab_size)
@@ -548,7 +510,7 @@ def main(args):
     scheduler = ExponentialLR(optimizer, gamma=args.gamma)
     # scheduler = ReduceLROnPlateau(optimizer, patience=2, threshold=1e-3)
 
-    criterion = torch.nn.CTCLoss(blank=coder.mapping[char_blank], zero_infinity=False)
+    criterion = torch.nn.CTCLoss(blank=language_model.mapping[char_blank], zero_infinity=False)
     # criterion = nn.MSELoss()
     # criterion = torch.nn.NLLLoss()
 
@@ -559,26 +521,18 @@ def main(args):
 
     print("Length of data loaders: ", len(loader_training), len(loader_validation), flush=True)
 
-    history_loader = defaultdict(list)
-    history_training = defaultdict(list)
-    history_validation = defaultdict(list)
-
     if args.resume and os.path.isfile(CHECKPOINT_filename):
         print("Checkpoint: loading '{}'".format(CHECKPOINT_filename))
         checkpoint = torch.load(CHECKPOINT_filename)
 
         args.start_epoch = checkpoint['epoch']
         best_loss = checkpoint['best_loss']
-        history_training = checkpoint['history_training']
-        history_validation = checkpoint['history_validation']
 
         model.load_state_dict(checkpoint['state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         scheduler.load_state_dict(checkpoint['scheduler'])
 
         print("Checkpoint: loaded '{}' at epoch {}".format(CHECKPOINT_filename, checkpoint['epoch']))
-        print(tabulate(history_training, headers="keys"), flush=True)
-        print(tabulate(history_validation, headers="keys"), flush=True)
     else:
         print("Checkpoint: not found")
 
@@ -588,28 +542,24 @@ def main(args):
             'best_loss': best_loss,
             'optimizer': optimizer.state_dict(),
             'scheduler': scheduler.state_dict(),
-            'history_training': history_training,
-            'history_validation': history_validation,
         }, False, CHECKPOINT_filename)
 
     with tqdm(total=args.epochs, unit_scale=1, disable=args.distributed) as pbar:
 
         for epoch in range(args.start_epoch, args.epochs):
 
-            train_one_epoch(
+            train_one_epoch(model, criterion, optimizer, scheduler, loader_training, device, pbar=pbar, non_blocking=non_blocking)
             if SIGNAL_RECEIVED:
-                    save_checkpoint({
-                        'epoch': epoch,
-                        'state_dict': model.state_dict(),
-                        'best_loss': best_loss,
-                        'optimizer': optimizer.state_dict(),
-                        'scheduler': scheduler.state_dict(),
-                        'history_training': history_training,
-                        'history_validation': history_validation,
-                    }, False, CHECKPOINT_filename)
+                save_checkpoint({
+                    'epoch': epoch,
+                    'state_dict': model.state_dict(),
+                    'best_loss': best_loss,
+                    'optimizer': optimizer.state_dict(),
+                    'scheduler': scheduler.state_dict(),
+                }, False, CHECKPOINT_filename)
             if not epoch % args.print_freq or epoch == args.epochs - 1:
 
-                sum_loss = evaluate_one_epoch
+                sum_loss = evaluate(model, criterion, loader_validation, greedy_decode, language_model, device, non_blocking=non_blocking)
 
                 is_best = sum_loss < best_loss
                 best_loss = min(sum_loss, best_loss)
@@ -619,8 +569,6 @@ def main(args):
                     'best_loss': best_loss,
                     'optimizer': optimizer.state_dict(),
                     'scheduler': scheduler.state_dict(),
-                    'history_training': history_training,
-                    'history_validation': history_validation,
                 }, is_best, CHECKPOINT_filename)
 
 
