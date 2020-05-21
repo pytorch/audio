@@ -27,31 +27,31 @@ from tqdm.notebook import tqdm as tqdm
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--workers', default=0, type=int, metavar='N', help='number of data loading workers')
-    parser.add_argument('--resume', default='', type=str, metavar='PATH', help='path to latest checkpoint')
+    parser.add_argument("--workers", default=0, type=int, metavar="N", help="number of data loading workers")
+    parser.add_argument("--resume", default="", type=str, metavar="PATH", help="path to latest checkpoint")
 
-    parser.add_argument('--epochs', default=200, type=int, metavar='N', help='number of total epochs to run')
-    parser.add_argument('--start-epoch', default=0, type=int, metavar='N', help='manual epoch number')
-    parser.add_argument('--print-freq', default=10, type=int, metavar='N', help='print frequency in epochs')
+    parser.add_argument("--epochs", default=200, type=int, metavar="N", help="number of total epochs to run")
+    parser.add_argument("--start-epoch", default=0, type=int, metavar="N", help="manual epoch number")
+    parser.add_argument("--print-freq", default=10, type=int, metavar="N", help="print frequency in epochs")
 
-    parser.add_argument('--arch', metavar='ARCH', default='wav2letter', choices=["wav2letter"], help='model architecture')
-    parser.add_argument('--batch-size', default=64, type=int, metavar='N', help='mini-batch size')
+    parser.add_argument("--arch", metavar="ARCH", default="wav2letter", choices=["wav2letter"], help="model architecture")
+    parser.add_argument("--batch-size", default=64, type=int, metavar="N", help="mini-batch size")
 
-    parser.add_argument('--n-bins', default=13, type=int, metavar='N', help='number of bins in transforms')
-    parser.add_argument('--learning-rate', default=1., type=float, metavar='LR', help='initial learning rate')
-    parser.add_argument('--gamma', default=.96, type=float, metavar='GAMMA', help='learning rate exponential decay constant')
+    parser.add_argument("--n-bins", default=13, type=int, metavar="N", help="number of bins in transforms")
+    parser.add_argument("--learning-rate", default=1.0, type=float, metavar="LR", help="initial learning rate")
+    parser.add_argument("--gamma", default=0.96, type=float, metavar="GAMMA", help="learning rate exponential decay constant")
     # parser.add_argument('--momentum', default=0.9, type=float, metavar='M', help='momentum')
-    parser.add_argument('--weight-decay', default=1e-5, type=float, metavar='W', help='weight decay')
-    parser.add_argument("--eps", metavar='EPS', type=float, default=1e-8)
-    parser.add_argument("--rho", metavar='RHO', type=float, default=.95)
+    parser.add_argument("--weight-decay", default=1e-5, type=float, metavar="W", help="weight decay")
+    parser.add_argument("--eps", metavar="EPS", type=float, default=1e-8)
+    parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
 
-    parser.add_argument('--dataset', default='librispeech', type=str)
-    parser.add_argument('--distributed', action="store_true")
-    parser.add_argument('--jit', action="store_true")
+    parser.add_argument("--dataset", default="librispeech", type=str)
+    parser.add_argument("--distributed", action="store_true")
+    parser.add_argument("--jit", action="store_true")
 
     args = parser.parse_args()
 
-    args.clip_norm = 0.
+    args.clip_norm = 0.0
 
     print(pprint.pformat(vars(args)), flush=True)
 
@@ -59,13 +59,13 @@ def parse_args():
 
 
 def SIGTERM_handler(a, b):
-    print('received sigterm')
+    print("received sigterm")
     pass
 
 
 def signal_handler(a, b):
     global SIGNAL_RECEIVED
-    print('Signal received', a, datetime.now().strftime("%y%m%d.%H%M%S"), flush=True)
+    print("Signal received", a, datetime.now().strftime("%y%m%d.%H%M%S"), flush=True)
     SIGNAL_RECEIVED = True
 
 
@@ -75,7 +75,7 @@ def save_checkpoint(state, is_best, filename):
     then copy it to filename, in case the signal interrupts
     the torch.save() process.
     """
-    CHECKPOINT_tempfile = filename + '.temp'
+    CHECKPOINT_tempfile = filename + ".temp"
 
     # Remove CHECKPOINT_tempfile, in case the signal arrives in the
     # middle of copying from CHECKPOINT_tempfile to CHECKPOINT_filename
@@ -86,7 +86,7 @@ def save_checkpoint(state, is_best, filename):
     if os.path.isfile(CHECKPOINT_tempfile):
         os.rename(CHECKPOINT_tempfile, filename)
     if is_best:
-        shutil.copyfile(filename, 'model_best.pth.tar')
+        shutil.copyfile(filename, "model_best.pth.tar")
     print("Checkpoint: saved")
 
 
@@ -116,7 +116,7 @@ class LanguageModel:
         else:
             # not idempotent, since clean string
             x = (self.mapping[i] for i in tensor)
-            x = ''.join(i for i, _ in itertools.groupby(x))
+            x = "".join(i for i, _ in itertools.groupby(x))
             x = x.replace(self.char_blank, "")
             # x = x.strip()
             return x
@@ -127,7 +127,6 @@ def model_length_function(tensor):
 
 
 class IterableMemoryCache:
-
     def __init__(self, iterable):
         self.iterable = iterable
         self._iter = iter(iterable)
@@ -172,7 +171,6 @@ class MapMemoryCache(torch.utils.data.Dataset):
 
 
 class Processed(torch.utils.data.Dataset):
-
     def __init__(self, process_datapoint, dataset):
         self.process_datapoint = process_datapoint
         self.dataset = dataset
@@ -207,7 +205,6 @@ def process_datapoint(item, transforms, encode):
 
 
 def datasets_librispeech(transforms, language_model, root="/datasets01/", folder_in_archive="librispeech/062419/"):
-
     def create(tag):
 
         if isinstance(tag, str):
@@ -266,17 +263,13 @@ def collate_fn(batch):
 
     tensors = [b[0] for b in batch if b]
 
-    tensors_lengths = torch.tensor(
-        [model_length_function(t) for t in tensors], dtype=torch.long, device=tensors[0].device
-    )
+    tensors_lengths = torch.tensor([model_length_function(t) for t in tensors], dtype=torch.long, device=tensors[0].device)
 
     tensors = torch.nn.utils.rnn.pad_sequence(tensors, batch_first=True)
     tensors = tensors.transpose(1, -1)
 
     targets = [b[1] for b in batch if b]
-    target_lengths = torch.tensor(
-        [target.shape[0] for target in targets], dtype=torch.long, device=tensors.device
-    )
+    target_lengths = torch.tensor([target.shape[0] for target in targets], dtype=torch.long, device=tensors.device)
     targets = torch.nn.utils.rnn.pad_sequence(targets, batch_first=True)
 
     return tensors, targets, tensors_lengths, target_lengths
@@ -290,7 +283,7 @@ def train_one_epoch(model, criterion, optimizer, scheduler, data_loader, device,
 
     model.train()
 
-    sum_loss = 0.
+    sum_loss = 0.0
     for inputs, targets, tensors_lengths, target_lengths in bg_iterator(data_loader, maxsize=2):
 
         inputs = inputs.to(device, non_blocking=non_blocking)
@@ -332,7 +325,7 @@ def evaluate(model, criterion, data_loader, decoder, language_model, device, non
 
         model.eval()
 
-        sums = defaultdict(lambda: 0.)
+        sums = defaultdict(lambda: 0.0)
 
         for inputs, targets, tensors_lengths, target_lengths in bg_iterator(data_loader, maxsize=2):
 
@@ -385,7 +378,7 @@ def evaluate(model, criterion, data_loader, decoder, language_model, device, non
         print(f"Validation loss: {sums['loss']:.5f}", flush=True)
         print(f"CER: {sums['cer']}  WER: {sums['wer']}  CERN: {sums['cern']}  WERN: {sums['wern']}", flush=True)
 
-        return sums['loss']
+        return sums["loss"]
 
 
 def main(args):
@@ -395,12 +388,12 @@ def main(args):
     # Empty CUDA cache
     torch.cuda.empty_cache()
 
-    CHECKPOINT_filename = args.resume if args.resume else 'checkpoint.pth.tar'
+    CHECKPOINT_filename = args.resume if args.resume else "checkpoint.pth.tar"
 
     # Install signal handler
     signal.signal(signal.SIGUSR1, lambda a, b: signal_handler(a, b))
     signal.signal(signal.SIGTERM, SIGTERM_handler)
-    print('Signal handler installed', flush=True)
+    print("Signal handler installed", flush=True)
 
     audio_backend = "soundfile"
     torchaudio.set_audio_backend(audio_backend)
@@ -423,9 +416,9 @@ def main(args):
 
     n_bins = args.n_bins  # 13, 128
     melkwargs = {
-        'n_fft': 512,
-        'n_mels': 20,
-        'hop_length': 80,  # (160, 80)
+        "n_fft": 512,
+        "n_mels": 20,
+        "hop_length": 80,  # (160, 80)
     }
 
     sample_rate_original = 16000
@@ -491,7 +484,7 @@ def main(args):
     # criterion = nn.MSELoss()
     # criterion = torch.nn.NLLLoss()
 
-    best_loss = 1.
+    best_loss = 1.0
 
     loader_training = DataLoader(training, batch_size=args.batch_size, collate_fn=collate_fn, **loader_training_params)
     loader_validation = DataLoader(validation, batch_size=args.batch_size, collate_fn=collate_fn, **loader_validation_params)
@@ -502,24 +495,28 @@ def main(args):
         print("Checkpoint: loading '{}'".format(CHECKPOINT_filename))
         checkpoint = torch.load(CHECKPOINT_filename)
 
-        args.start_epoch = checkpoint['epoch']
-        best_loss = checkpoint['best_loss']
+        args.start_epoch = checkpoint["epoch"]
+        best_loss = checkpoint["best_loss"]
 
-        model.load_state_dict(checkpoint['state_dict'])
-        optimizer.load_state_dict(checkpoint['optimizer'])
-        scheduler.load_state_dict(checkpoint['scheduler'])
+        model.load_state_dict(checkpoint["state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer"])
+        scheduler.load_state_dict(checkpoint["scheduler"])
 
-        print("Checkpoint: loaded '{}' at epoch {}".format(CHECKPOINT_filename, checkpoint['epoch']))
+        print("Checkpoint: loaded '{}' at epoch {}".format(CHECKPOINT_filename, checkpoint["epoch"]))
     else:
         print("Checkpoint: not found")
 
-        save_checkpoint({
-            'epoch': args.start_epoch,
-            'state_dict': model.state_dict(),
-            'best_loss': best_loss,
-            'optimizer': optimizer.state_dict(),
-            'scheduler': scheduler.state_dict(),
-        }, False, CHECKPOINT_filename)
+        save_checkpoint(
+            {
+                "epoch": args.start_epoch,
+                "state_dict": model.state_dict(),
+                "best_loss": best_loss,
+                "optimizer": optimizer.state_dict(),
+                "scheduler": scheduler.state_dict(),
+            },
+            False,
+            CHECKPOINT_filename,
+        )
 
     with tqdm(total=args.epochs, unit_scale=1, disable=args.distributed) as pbar:
 
@@ -528,26 +525,34 @@ def main(args):
             train_one_epoch(model, criterion, optimizer, scheduler, loader_training, device, pbar=pbar, non_blocking=non_blocking)
 
             if SIGNAL_RECEIVED:
-                save_checkpoint({
-                    'epoch': epoch,
-                    'state_dict': model.state_dict(),
-                    'best_loss': best_loss,
-                    'optimizer': optimizer.state_dict(),
-                    'scheduler': scheduler.state_dict(),
-                }, False, CHECKPOINT_filename)
+                save_checkpoint(
+                    {
+                        "epoch": epoch,
+                        "state_dict": model.state_dict(),
+                        "best_loss": best_loss,
+                        "optimizer": optimizer.state_dict(),
+                        "scheduler": scheduler.state_dict(),
+                    },
+                    False,
+                    CHECKPOINT_filename,
+                )
             if not epoch % args.print_freq or epoch == args.epochs - 1:
 
                 sum_loss = evaluate(model, criterion, loader_validation, greedy_decode, language_model, device, non_blocking=non_blocking)
 
                 is_best = sum_loss < best_loss
                 best_loss = min(sum_loss, best_loss)
-                save_checkpoint({
-                    'epoch': epoch + 1,
-                    'state_dict': model.state_dict(),
-                    'best_loss': best_loss,
-                    'optimizer': optimizer.state_dict(),
-                    'scheduler': scheduler.state_dict(),
-                }, is_best, CHECKPOINT_filename)
+                save_checkpoint(
+                    {
+                        "epoch": epoch + 1,
+                        "state_dict": model.state_dict(),
+                        "best_loss": best_loss,
+                        "optimizer": optimizer.state_dict(),
+                        "scheduler": scheduler.state_dict(),
+                    },
+                    is_best,
+                    CHECKPOINT_filename,
+                )
 
 
 if __name__ == "__main__":
