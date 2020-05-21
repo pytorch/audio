@@ -243,11 +243,11 @@ class ProcessedLIBRISPEECH(LIBRISPEECH):
 
     def __getitem__(self, key):
         item = super().__getitem__(key)
-        return self.process_datapoint(item, self.transforms, self.encode)
+        return self.process_datapoint(item)
 
     def __next__(self):
         item = super().__next__()
-        return self.process_datapoint(item, self.transforms, self.encode)
+        return self.process_datapoint(item)
 
     def process_datapoint(self, item):
         transformed = item[0]  # .to(device, non_blocking=non_blocking)
