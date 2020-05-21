@@ -24,6 +24,9 @@ from torchaudio.transforms import MFCC, Resample
 from tqdm.notebook import tqdm as tqdm
 
 
+SIGNAL_RECEIVED = False
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
 
@@ -113,7 +116,7 @@ def parse_args():
 
 
 def SIGTERM_handler(a, b):
-    print("received sigterm")
+    print("Received sigterm")
     pass
 
 
@@ -148,6 +151,7 @@ class LanguageModel:
     def __init__(self, labels, char_blank, char_space):
 
         self.char_space = char_space
+        self.char_blank = char_blank
 
         labels = [l for l in labels]
         self.length = len(labels)
@@ -360,7 +364,6 @@ def train_one_epoch(
     scheduler,
     data_loader,
     device,
-    epoch,
     pbar=None,
     non_blocking=False,
 ):
@@ -376,7 +379,7 @@ def train_one_epoch(
         targets = targets.to(device, non_blocking=non_blocking)
 
         # keep batch first for data parallel
-        outputs = model(inputs).transpose(0, 1)
+        outputs = model(inputs).transpose(-1, -2).transpose(0, 1)
 
         # CTC
         # outputs: input length, batch size, number of classes (including blank)
@@ -509,10 +512,9 @@ def main(args):
 
     # audio
 
-    n_bins = args.n_bins  # 13, 128
     melkwargs = {
         "n_fft": 512,
-        "n_mels": 20,
+        "n_mels": args.n_bins,  # 13, 20, 128
         "hop_length": 80,  # (160, 80)
     }
 
@@ -520,11 +522,11 @@ def main(args):
 
     transforms = nn.Sequential(
         # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
-        # torchaudio.transforms.MFCC(sample_rate=sample_rate_original, n_mfcc=n_bins, melkwargs=melkwargs),
+        # torchaudio.transforms.MFCC(sample_rate=sample_rate_original, n_mfcc=args.n_bins, melkwargs=melkwargs),
         torchaudio.transforms.MelSpectrogram(
             sample_rate=sample_rate_original, **melkwargs
         ),
-        # torchaudio.transforms.FrequencyMasking(freq_mask_param=n_bins),
+        # torchaudio.transforms.FrequencyMasking(freq_mask_param=args.n_bins),
         # torchaudio.transforms.TimeMasking(time_mask_param=35)
     )
 
@@ -541,8 +543,8 @@ def main(args):
 
     training, validation, _ = datasets_librispeech(transforms, language_model)
 
-    num_features = n_bins if n_bins else 1
-    model = Wav2Letter(num_features, vocab_size)
+    num_features = args.n_bins
+    model = Wav2Letter(num_classes=vocab_size, input_type="mfcc", num_features=num_features)
 
     if args.jit:
         model = torch.jit.script(model)
