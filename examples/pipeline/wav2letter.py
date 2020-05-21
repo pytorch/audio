@@ -235,7 +235,7 @@ class MapMemoryCache(torch.utils.data.Dataset):
         return len(self.dataset)
 
 
-class Processed(LIBRISPEECH):
+class ProcessedLIBRISPEECH(LIBRISPEECH):
     def __init__(self, transforms, encode, *args, **kwargs):
         self.transforms = transforms
         self.encode = encode
@@ -276,8 +276,8 @@ def datasets_librispeech(
         if isinstance(tag, str):
             tag = [tag]
 
-        data = sum(
-            Processed(
+        data = torch.utils.data.ConcatDataset([
+            ProcessedLIBRISPEECH(
                 transforms,
                 language_model.encode,
                 root,
@@ -286,7 +286,7 @@ def datasets_librispeech(
                 download=False,
             )
             for t in tag
-        )
+        ])
 
         # data = diskcache_iterator(data)
         data = MapMemoryCache(data)
