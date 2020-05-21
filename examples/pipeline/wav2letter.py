@@ -110,8 +110,6 @@ def parse_args():
 
     args.clip_norm = 0.0
 
-    print(pprint.pformat(vars(args)), flush=True)
-
     return args
 
 
@@ -481,7 +479,7 @@ def evaluate(
 
 def main(args):
 
-    print("start time: {}".format(str(datetime.now())), flush=True)
+    print("Start time: {}".format(str(datetime.now())), flush=True)
 
     # Empty CUDA cache
     torch.cuda.empty_cache()
@@ -491,8 +489,6 @@ def main(args):
     # Install signal handler
     signal.signal(signal.SIGUSR1, lambda a, b: signal_handler(a, b))
     signal.signal(signal.SIGTERM, SIGTERM_handler)
-    print("Signal handler installed", flush=True)
-
     audio_backend = "soundfile"
     torchaudio.set_audio_backend(audio_backend)
 
@@ -539,8 +535,6 @@ def main(args):
     labels = char_blank + char_space + char_apostrophe + string.ascii_lowercase
     language_model = LanguageModel(labels, char_blank, char_space)
     vocab_size = language_model.length
-    print("vocab_size", vocab_size, flush=True)
-
     training, validation, _ = datasets_librispeech(transforms, language_model)
 
     num_features = args.n_bins
@@ -560,8 +554,6 @@ def main(args):
 
     n = count_parameters(model)
     print(f"Number of parameters: {n}", flush=True)
-
-    print(torch.cuda.memory_summary(), flush=True)
 
     # Optimizer
 
@@ -598,13 +590,6 @@ def main(args):
         batch_size=args.batch_size,
         collate_fn=collate_fn,
         **loader_validation_params,
-    )
-
-    print(
-        "Length of data loaders: ",
-        len(loader_training),
-        len(loader_validation),
-        flush=True,
     )
 
     if args.resume and os.path.isfile(CHECKPOINT_filename):
