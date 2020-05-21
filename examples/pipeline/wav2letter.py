@@ -62,6 +62,9 @@ def parse_args():
         metavar="N",
         help="print frequency in epochs",
     )
+    parser.add_argument(
+        "--progress-bar", action="store_true", help="use progress bar while training"
+    )
 
     parser.add_argument(
         "--arch",
@@ -102,9 +105,16 @@ def parse_args():
     parser.add_argument("--eps", metavar="EPS", type=float, default=1e-8)
     parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
 
-    parser.add_argument("--dataset", default="librispeech", type=str)
-    parser.add_argument("--distributed", action="store_true")
-    parser.add_argument("--jit", action="store_true")
+    parser.add_argument(
+        "--dataset",
+        default="librispeech",
+        type=str,
+        help="select dataset to train with",
+    )
+    parser.add_argument(
+        "--distributed", action="store_true", help="enable DistributedDataParallel"
+    )
+    parser.add_argument("--jit", action="store_true", help="if used, model is jitted")
 
     args = parser.parse_args()
 
@@ -538,7 +548,9 @@ def main(args):
     training, validation, _ = datasets_librispeech(transforms, language_model)
 
     num_features = args.n_bins
-    model = Wav2Letter(num_classes=vocab_size, input_type="mfcc", num_features=num_features)
+    model = Wav2Letter(
+        num_classes=vocab_size, input_type="mfcc", num_features=num_features
+    )
 
     if args.jit:
         model = torch.jit.script(model)
@@ -623,7 +635,7 @@ def main(args):
             CHECKPOINT_filename,
         )
 
-    with tqdm(total=args.epochs, unit_scale=1, disable=args.distributed) as pbar:
+    with tqdm(total=args.epochs, unit_scale=1, disable=args.progress_bar) as pbar:
 
         for epoch in range(args.start_epoch, args.epochs):
 
