@@ -17,7 +17,7 @@ from torch import nn, topk
 from torch.optim import SGD, Adadelta, Adam
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
-from torchaudio.datasets import LIBRISPEECH, SPEECHCOMMANDS
+from torchaudio.datasets import LIBRISPEECH
 from torchaudio.datasets.utils import bg_iterator, diskcache_iterator
 from torchaudio.models.wav2letter import Wav2Letter
 from torchaudio.transforms import MFCC, Resample
@@ -27,50 +27,27 @@ from tqdm.notebook import tqdm as tqdm
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--workers', default=0, type=int,
-                        metavar='N', help='number of data loading workers')
-    parser.add_argument('--resume', default='', type=str,
-                        metavar='PATH', help='path to latest checkpoint')
-    parser.add_argument('--figures', default='', type=str,
-                        metavar='PATH', help='folder path to save figures')
+    parser.add_argument('--workers', default=0, type=int, metavar='N', help='number of data loading workers')
+    parser.add_argument('--resume', default='', type=str, metavar='PATH', help='path to latest checkpoint')
 
-    parser.add_argument('--epochs', default=200, type=int,
-                        metavar='N', help='number of total epochs to run')
-    parser.add_argument('--start-epoch', default=0, type=int,
-                        metavar='N', help='manual epoch number')
-    parser.add_argument('--print-freq', default=10, type=int,
-                        metavar='N', help='print frequency in epochs')
+    parser.add_argument('--epochs', default=200, type=int, metavar='N', help='number of total epochs to run')
+    parser.add_argument('--start-epoch', default=0, type=int, metavar='N', help='manual epoch number')
+    parser.add_argument('--print-freq', default=10, type=int, metavar='N', help='print frequency in epochs')
 
-    parser.add_argument('--arch', metavar='ARCH', default='wav2letter',
-                        choices=["wav2letter", "lstm"], help='model architecture')
-    parser.add_argument('--batch-size', default=64, type=int,
-                        metavar='N', help='mini-batch size')
+    parser.add_argument('--arch', metavar='ARCH', default='wav2letter', choices=["wav2letter"], help='model architecture')
+    parser.add_argument('--batch-size', default=64, type=int, metavar='N', help='mini-batch size')
 
-    parser.add_argument('--learning-rate', default=1., type=float,
-                        metavar='LR', help='initial learning rate')
-    parser.add_argument('--gamma', default=.96, type=float,
-                        metavar='GAMMA', help='learning rate exponential decay constant')
+    parser.add_argument('--n-bins', default=13, type=int, metavar='N', help='number of bins in transforms')
+    parser.add_argument('--learning-rate', default=1., type=float, metavar='LR', help='initial learning rate')
+    parser.add_argument('--gamma', default=.96, type=float, metavar='GAMMA', help='learning rate exponential decay constant')
     # parser.add_argument('--momentum', default=0.9, type=float, metavar='M', help='momentum')
-    parser.add_argument('--weight-decay', default=1e-5,
-                        type=float, metavar='W', help='weight decay')
+    parser.add_argument('--weight-decay', default=1e-5, type=float, metavar='W', help='weight decay')
     parser.add_argument("--eps", metavar='EPS', type=float, default=1e-8)
     parser.add_argument("--rho", metavar='RHO', type=float, default=.95)
 
-    parser.add_argument('--n-bins', default=13, type=int,
-                        metavar='N', help='number of bins in transforms')
-
-    parser.add_argument('--world-size', default=1, type=int,
-                        help='number of distributed processes')
-    parser.add_argument('--dist-url', default='tcp://224.66.41.62:23456',
-                        type=str, help='url used to set up distributed training')
-    parser.add_argument('--dist-backend', default='nccl',
-                        type=str, help='distributed backend')
-    parser.add_argument('--distributed', action="store_true")
-
     parser.add_argument('--dataset', default='librispeech', type=str)
-    parser.add_argument('--gradient', action="store_true")
+    parser.add_argument('--distributed', action="store_true")
     parser.add_argument('--jit', action="store_true")
-    parser.add_argument('--viterbi-decoder', action="store_true")
 
     args = parser.parse_args()
 
@@ -431,14 +408,14 @@ def main(args):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     # num_devices = torch.cuda.device_count()
 
-    data_loader_training_params = {
+    loader_training_params = {
         "num_workers": args.workers,
         "pin_memory": True,
         "shuffle": True,
         "drop_last": True,
     }
-    data_loader_validation_params = data_loader_training_params.copy()
-    data_loader_validation_params["shuffle"] = False
+    loader_validation_params = loader_training_params.copy()
+    loader_validation_params["shuffle"] = False
 
     non_blocking = True
 
@@ -456,7 +433,7 @@ def main(args):
     transforms = nn.Sequential(
         # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
         # torchaudio.transforms.MFCC(sample_rate=sample_rate_original, n_mfcc=n_bins, melkwargs=melkwargs),
-        torchaudio.transforms.MelSpectrogram(sample_rate=sample_rate_original, n_mels=n_bins),
+        torchaudio.transforms.MelSpectrogram(sample_rate=sample_rate_original, **melkwargs),
         # torchaudio.transforms.FrequencyMasking(freq_mask_param=n_bins),
         # torchaudio.transforms.TimeMasking(time_mask_param=35)
     )
@@ -516,8 +493,8 @@ def main(args):
 
     best_loss = 1.
 
-    loader_training = DataLoader(training, batch_size=args.batch_size, collate_fn=collate_fn, **data_loader_training_params)
-    loader_validation = DataLoader(validation, batch_size=args.batch_size, collate_fn=collate_fn, **data_loader_validation_params)
+    loader_training = DataLoader(training, batch_size=args.batch_size, collate_fn=collate_fn, **loader_training_params)
+    loader_validation = DataLoader(validation, batch_size=args.batch_size, collate_fn=collate_fn, **loader_validation_params)
 
     print("Length of data loaders: ", len(loader_training), len(loader_validation), flush=True)
 
@@ -549,6 +526,7 @@ def main(args):
         for epoch in range(args.start_epoch, args.epochs):
 
             train_one_epoch(model, criterion, optimizer, scheduler, loader_training, device, pbar=pbar, non_blocking=non_blocking)
+
             if SIGNAL_RECEIVED:
                 save_checkpoint({
                     'epoch': epoch,
