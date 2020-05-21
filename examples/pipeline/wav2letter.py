@@ -630,7 +630,7 @@ def main(args):
             CHECKPOINT_filename,
         )
 
-    with tqdm(total=args.epochs, unit_scale=1, disable=args.progress_bar) as pbar:
+    with tqdm(total=args.epochs, unit_scale=1, disable=not args.progress_bar) as pbar:
 
         for epoch in range(args.start_epoch, args.epochs):
 
