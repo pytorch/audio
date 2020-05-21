@@ -27,21 +27,75 @@ from tqdm.notebook import tqdm as tqdm
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--workers", default=0, type=int, metavar="N", help="number of data loading workers")
-    parser.add_argument("--resume", default="", type=str, metavar="PATH", help="path to latest checkpoint")
+    parser.add_argument(
+        "--workers",
+        default=0,
+        type=int,
+        metavar="N",
+        help="number of data loading workers",
+    )
+    parser.add_argument(
+        "--resume",
+        default="",
+        type=str,
+        metavar="PATH",
+        help="path to latest checkpoint",
+    )
 
-    parser.add_argument("--epochs", default=200, type=int, metavar="N", help="number of total epochs to run")
-    parser.add_argument("--start-epoch", default=0, type=int, metavar="N", help="manual epoch number")
-    parser.add_argument("--print-freq", default=10, type=int, metavar="N", help="print frequency in epochs")
+    parser.add_argument(
+        "--epochs",
+        default=200,
+        type=int,
+        metavar="N",
+        help="number of total epochs to run",
+    )
+    parser.add_argument(
+        "--start-epoch", default=0, type=int, metavar="N", help="manual epoch number"
+    )
+    parser.add_argument(
+        "--print-freq",
+        default=10,
+        type=int,
+        metavar="N",
+        help="print frequency in epochs",
+    )
 
-    parser.add_argument("--arch", metavar="ARCH", default="wav2letter", choices=["wav2letter"], help="model architecture")
-    parser.add_argument("--batch-size", default=64, type=int, metavar="N", help="mini-batch size")
+    parser.add_argument(
+        "--arch",
+        metavar="ARCH",
+        default="wav2letter",
+        choices=["wav2letter"],
+        help="model architecture",
+    )
+    parser.add_argument(
+        "--batch-size", default=64, type=int, metavar="N", help="mini-batch size"
+    )
 
-    parser.add_argument("--n-bins", default=13, type=int, metavar="N", help="number of bins in transforms")
-    parser.add_argument("--learning-rate", default=1.0, type=float, metavar="LR", help="initial learning rate")
-    parser.add_argument("--gamma", default=0.96, type=float, metavar="GAMMA", help="learning rate exponential decay constant")
+    parser.add_argument(
+        "--n-bins",
+        default=13,
+        type=int,
+        metavar="N",
+        help="number of bins in transforms",
+    )
+    parser.add_argument(
+        "--learning-rate",
+        default=1.0,
+        type=float,
+        metavar="LR",
+        help="initial learning rate",
+    )
+    parser.add_argument(
+        "--gamma",
+        default=0.96,
+        type=float,
+        metavar="GAMMA",
+        help="learning rate exponential decay constant",
+    )
     # parser.add_argument('--momentum', default=0.9, type=float, metavar='M', help='momentum')
-    parser.add_argument("--weight-decay", default=1e-5, type=float, metavar="W", help="weight decay")
+    parser.add_argument(
+        "--weight-decay", default=1e-5, type=float, metavar="W", help="weight decay"
+    )
     parser.add_argument("--eps", metavar="EPS", type=float, default=1e-8)
     parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
 
@@ -204,15 +258,29 @@ def process_datapoint(item, transforms, encode):
     return transformed, target
 
 
-def datasets_librispeech(transforms, language_model, root="/datasets01/", folder_in_archive="librispeech/062419/"):
+def datasets_librispeech(
+    transforms,
+    language_model,
+    root="/datasets01/",
+    folder_in_archive="librispeech/062419/",
+):
     def create(tag):
 
         if isinstance(tag, str):
-            data = LIBRISPEECH(root, tag, folder_in_archive=folder_in_archive, download=False)
+            data = LIBRISPEECH(
+                root, tag, folder_in_archive=folder_in_archive, download=False
+            )
         else:
-            data = sum(LIBRISPEECH(root, t, folder_in_archive=folder_in_archive, download=False) for t in tag)
+            data = sum(
+                LIBRISPEECH(
+                    root, t, folder_in_archive=folder_in_archive, download=False
+                )
+                for t in tag
+            )
 
-        data = Processed(lambda x: process_datapoint(x, transforms, language_model.encode), data)
+        data = Processed(
+            lambda x: process_datapoint(x, transforms, language_model.encode), data
+        )
         # data = diskcache_iterator(data)
         data = MapMemoryCache(data)
         return data
@@ -263,13 +331,19 @@ def collate_fn(batch):
 
     tensors = [b[0] for b in batch if b]
 
-    tensors_lengths = torch.tensor([model_length_function(t) for t in tensors], dtype=torch.long, device=tensors[0].device)
+    tensors_lengths = torch.tensor(
+        [model_length_function(t) for t in tensors],
+        dtype=torch.long,
+        device=tensors[0].device,
+    )
 
     tensors = torch.nn.utils.rnn.pad_sequence(tensors, batch_first=True)
     tensors = tensors.transpose(1, -1)
 
     targets = [b[1] for b in batch if b]
-    target_lengths = torch.tensor([target.shape[0] for target in targets], dtype=torch.long, device=tensors.device)
+    target_lengths = torch.tensor(
+        [target.shape[0] for target in targets], dtype=torch.long, device=tensors.device
+    )
     targets = torch.nn.utils.rnn.pad_sequence(targets, batch_first=True)
 
     return tensors, targets, tensors_lengths, target_lengths
@@ -279,12 +353,24 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-def train_one_epoch(model, criterion, optimizer, scheduler, data_loader, device, epoch, pbar=None, non_blocking=False):
+def train_one_epoch(
+    model,
+    criterion,
+    optimizer,
+    scheduler,
+    data_loader,
+    device,
+    epoch,
+    pbar=None,
+    non_blocking=False,
+):
 
     model.train()
 
     sum_loss = 0.0
-    for inputs, targets, tensors_lengths, target_lengths in bg_iterator(data_loader, maxsize=2):
+    for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
+        data_loader, maxsize=2
+    ):
 
         inputs = inputs.to(device, non_blocking=non_blocking)
         targets = targets.to(device, non_blocking=non_blocking)
@@ -319,7 +405,9 @@ def train_one_epoch(model, criterion, optimizer, scheduler, data_loader, device,
     scheduler.step()
 
 
-def evaluate(model, criterion, data_loader, decoder, language_model, device, non_blocking=False):
+def evaluate(
+    model, criterion, data_loader, decoder, language_model, device, non_blocking=False
+):
 
     with torch.no_grad():
 
@@ -327,7 +415,9 @@ def evaluate(model, criterion, data_loader, decoder, language_model, device, non
 
         sums = defaultdict(lambda: 0.0)
 
-        for inputs, targets, tensors_lengths, target_lengths in bg_iterator(data_loader, maxsize=2):
+        for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
+            data_loader, maxsize=2
+        ):
 
             inputs = inputs.to(device, non_blocking=non_blocking)
             targets = targets.to(device, non_blocking=non_blocking)
@@ -341,7 +431,9 @@ def evaluate(model, criterion, data_loader, decoder, language_model, device, non
             # input_lengths: batch size
             # target_lengths: batch size
 
-            sums["loss"] += criterion(outputs, targets, tensors_lengths, target_lengths).item()
+            sums["loss"] += criterion(
+                outputs, targets, tensors_lengths, target_lengths
+            ).item()
 
             output = outputs.transpose(0, 1).to("cpu")
             output = decoder(output)
@@ -376,7 +468,10 @@ def evaluate(model, criterion, data_loader, decoder, language_model, device, non
             sums[k] /= len(data_loader)
 
         print(f"Validation loss: {sums['loss']:.5f}", flush=True)
-        print(f"CER: {sums['cer']}  WER: {sums['wer']}  CERN: {sums['cern']}  WERN: {sums['wern']}", flush=True)
+        print(
+            f"CER: {sums['cer']}  WER: {sums['wer']}  CERN: {sums['cern']}  WERN: {sums['wern']}",
+            flush=True,
+        )
 
         return sums["loss"]
 
@@ -426,7 +521,9 @@ def main(args):
     transforms = nn.Sequential(
         # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
         # torchaudio.transforms.MFCC(sample_rate=sample_rate_original, n_mfcc=n_bins, melkwargs=melkwargs),
-        torchaudio.transforms.MelSpectrogram(sample_rate=sample_rate_original, **melkwargs),
+        torchaudio.transforms.MelSpectrogram(
+            sample_rate=sample_rate_original, **melkwargs
+        ),
         # torchaudio.transforms.FrequencyMasking(freq_mask_param=n_bins),
         # torchaudio.transforms.TimeMasking(time_mask_param=35)
     )
@@ -480,16 +577,33 @@ def main(args):
     scheduler = ExponentialLR(optimizer, gamma=args.gamma)
     # scheduler = ReduceLROnPlateau(optimizer, patience=2, threshold=1e-3)
 
-    criterion = torch.nn.CTCLoss(blank=language_model.mapping[char_blank], zero_infinity=False)
+    criterion = torch.nn.CTCLoss(
+        blank=language_model.mapping[char_blank], zero_infinity=False
+    )
     # criterion = nn.MSELoss()
     # criterion = torch.nn.NLLLoss()
 
     best_loss = 1.0
 
-    loader_training = DataLoader(training, batch_size=args.batch_size, collate_fn=collate_fn, **loader_training_params)
-    loader_validation = DataLoader(validation, batch_size=args.batch_size, collate_fn=collate_fn, **loader_validation_params)
+    loader_training = DataLoader(
+        training,
+        batch_size=args.batch_size,
+        collate_fn=collate_fn,
+        **loader_training_params,
+    )
+    loader_validation = DataLoader(
+        validation,
+        batch_size=args.batch_size,
+        collate_fn=collate_fn,
+        **loader_validation_params,
+    )
 
-    print("Length of data loaders: ", len(loader_training), len(loader_validation), flush=True)
+    print(
+        "Length of data loaders: ",
+        len(loader_training),
+        len(loader_validation),
+        flush=True,
+    )
 
     if args.resume and os.path.isfile(CHECKPOINT_filename):
         print("Checkpoint: loading '{}'".format(CHECKPOINT_filename))
@@ -502,7 +616,11 @@ def main(args):
         optimizer.load_state_dict(checkpoint["optimizer"])
         scheduler.load_state_dict(checkpoint["scheduler"])
 
-        print("Checkpoint: loaded '{}' at epoch {}".format(CHECKPOINT_filename, checkpoint["epoch"]))
+        print(
+            "Checkpoint: loaded '{}' at epoch {}".format(
+                CHECKPOINT_filename, checkpoint["epoch"]
+            )
+        )
     else:
         print("Checkpoint: not found")
 
@@ -522,7 +640,16 @@ def main(args):
 
         for epoch in range(args.start_epoch, args.epochs):
 
-            train_one_epoch(model, criterion, optimizer, scheduler, loader_training, device, pbar=pbar, non_blocking=non_blocking)
+            train_one_epoch(
+                model,
+                criterion,
+                optimizer,
+                scheduler,
+                loader_training,
+                device,
+                pbar=pbar,
+                non_blocking=non_blocking,
+            )
 
             if SIGNAL_RECEIVED:
                 save_checkpoint(
@@ -538,7 +665,15 @@ def main(args):
                 )
             if not epoch % args.print_freq or epoch == args.epochs - 1:
 
-                sum_loss = evaluate(model, criterion, loader_validation, greedy_decode, language_model, device, non_blocking=non_blocking)
+                sum_loss = evaluate(
+                    model,
+                    criterion,
+                    loader_validation,
+                    greedy_decode,
+                    language_model,
+                    device,
+                    non_blocking=non_blocking,
+                )
 
                 is_best = sum_loss < best_loss
                 best_loss = min(sum_loss, best_loss)
