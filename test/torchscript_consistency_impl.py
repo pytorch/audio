@@ -2,6 +2,7 @@
 import unittest
 
 import torch
+import torchaudio
 import torchaudio.functional as F
 import torchaudio.transforms as T
 
@@ -64,7 +65,7 @@ class Functional(common_utils.TestBaseMixin):
         self._assert_consistency(func, tensor)
 
     def test_detect_pitch_frequency(self):
-        waveform = common_utils.get_whitenoise(sample_rate=44100)
+        waveform = common_utils.get_sinusoid(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -582,6 +583,6 @@ class Transforms(common_utils.TestBaseMixin):
         self._assert_consistency(T.SlidingWindowCmn(), tensor)
 
     def test_Vad(self):
-        sr = 16000
-        waveform = common_utils.get_whitenoise(sample_rate=sr)
-        self._assert_consistency(T.Vad(sample_rate=sr), waveform)
+        filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
+        waveform, sample_rate = torchaudio.load(filepath)
+        self._assert_consistency(T.Vad(sample_rate=sample_rate), waveform)
