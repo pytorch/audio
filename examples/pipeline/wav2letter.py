@@ -21,7 +21,7 @@ from torchaudio.datasets import LIBRISPEECH
 from torchaudio.datasets.utils import bg_iterator, diskcache_iterator
 from torchaudio.models.wav2letter import Wav2Letter
 from torchaudio.transforms import MFCC, Resample
-from tqdm.notebook import tqdm as tqdm
+from tqdm import tqdm
 
 SIGNAL_RECEIVED = False
 
@@ -276,17 +276,19 @@ def datasets_librispeech(
         if isinstance(tag, str):
             tag = [tag]
 
-        data = torch.utils.data.ConcatDataset([
-            ProcessedLIBRISPEECH(
-                transforms,
-                language_model.encode,
-                root,
-                t,
-                folder_in_archive=folder_in_archive,
-                download=False,
-            )
-            for t in tag
-        ])
+        data = torch.utils.data.ConcatDataset(
+            [
+                ProcessedLIBRISPEECH(
+                    transforms,
+                    language_model.encode,
+                    root,
+                    t,
+                    folder_in_archive=folder_in_archive,
+                    download=False,
+                )
+                for t in tag
+            ]
+        )
 
         # data = diskcache_iterator(data)
         data = MapMemoryCache(data)
