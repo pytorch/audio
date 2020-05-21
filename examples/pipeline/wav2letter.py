@@ -23,7 +23,6 @@ from torchaudio.models.wav2letter import Wav2Letter
 from torchaudio.transforms import MFCC, Resample
 from tqdm.notebook import tqdm as tqdm
 
-
 SIGNAL_RECEIVED = False
 
 
@@ -236,38 +235,34 @@ class MapMemoryCache(torch.utils.data.Dataset):
         return len(self.dataset)
 
 
-class Processed(torch.utils.data.Dataset):
-    def __init__(self, process_datapoint, dataset):
-        self.process_datapoint = process_datapoint
-        self.dataset = dataset
+class Processed(LIBRISPEECH):
+    def __init__(self, transforms, encode, *args, **kwargs):
+        self.transforms = transforms
+        self.encode = encode
+        super().__init__(*args, **kwargs)
 
-    def __getitem__(self, n):
-        item = self.dataset[n]
-        return self.process_datapoint(item)
+    def __getitem__(self, key):
+        item = super().__getitem__(key)
+        return self.process_datapoint(item, self.transforms, self.encode)
 
     def __next__(self):
-        item = next(self.dataset)
-        return self.process_datapoint(item)
+        item = super().__next__()
+        return self.process_datapoint(item, self.transforms, self.encode)
 
-    def __len__(self):
-        return len(self.dataset)
+    def process_datapoint(self, item):
+        transformed = item[0]  # .to(device, non_blocking=non_blocking)
+        target = item[2].lower()
 
+        transformed = self.transforms(transformed)
+        transformed = transformed[0, ...].transpose(0, -1)
 
-def process_datapoint(item, transforms, encode):
-    transformed = item[0]  # .to(device, non_blocking=non_blocking)
-    target = item[2].lower()
+        target = " " + target + " "
+        target = self.encode(target)
+        target = torch.tensor(target, dtype=torch.long, device=transformed.device)
 
-    transformed = transforms(transformed)
-
-    transformed = transformed[0, ...].transpose(0, -1)
-
-    target = " " + target + " "
-    target = encode(target)
-    target = torch.tensor(target, dtype=torch.long, device=transformed.device)
-
-    transformed = transformed  # .to("cpu")
-    target = target  # .to("cpu")
-    return transformed, target
+        transformed = transformed  # .to("cpu")
+        target = target  # .to("cpu")
+        return transformed, target
 
 
 def datasets_librispeech(
@@ -279,20 +274,20 @@ def datasets_librispeech(
     def create(tag):
 
         if isinstance(tag, str):
-            data = LIBRISPEECH(
-                root, tag, folder_in_archive=folder_in_archive, download=False
-            )
-        else:
-            data = sum(
-                LIBRISPEECH(
-                    root, t, folder_in_archive=folder_in_archive, download=False
-                )
-                for t in tag
-            )
+            tag = [tag]
 
-        data = Processed(
-            lambda x: process_datapoint(x, transforms, language_model.encode), data
+        data = sum(
+            Processed(
+                transforms,
+                language_model.encode,
+                root,
+                t,
+                folder_in_archive=folder_in_archive,
+                download=False,
+            )
+            for t in tag
         )
+
         # data = diskcache_iterator(data)
         data = MapMemoryCache(data)
         return data
