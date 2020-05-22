@@ -2,7 +2,6 @@ import argparse
 import collections
 import itertools
 import os
-import pprint
 import shutil
 import signal
 import statistics
@@ -37,8 +36,8 @@ def parse_args():
         help="number of data loading workers",
     )
     parser.add_argument(
-        "--resume",
-        default="",
+        "--checkpoint",
+        default="checkpoint.pth.tar",
         type=str,
         metavar="PATH",
         help="path to latest checkpoint",
@@ -139,16 +138,16 @@ def save_checkpoint(state, is_best, filename):
     then copy it to filename, in case the signal interrupts
     the torch.save() process.
     """
-    CHECKPOINT_tempfile = filename + ".temp"
+    tempfile = filename + ".temp"
 
-    # Remove CHECKPOINT_tempfile, in case the signal arrives in the
-    # middle of copying from CHECKPOINT_tempfile to CHECKPOINT_filename
-    if os.path.isfile(CHECKPOINT_tempfile):
-        os.remove(CHECKPOINT_tempfile)
+    # Remove tempfile, in case the signal arrives in the
+    # middle of copying from tempfile to filename
+    if os.path.isfile(tempfile):
+        os.remove(tempfile)
 
-    torch.save(state, CHECKPOINT_tempfile)
-    if os.path.isfile(CHECKPOINT_tempfile):
-        os.rename(CHECKPOINT_tempfile, filename)
+    torch.save(state, tempfile)
+    if os.path.isfile(tempfile):
+        os.rename(tempfile, filename)
     if is_best:
         shutil.copyfile(filename, "model_best.pth.tar")
     print("Checkpoint: saved")
@@ -491,8 +490,6 @@ def main(args):
     # Empty CUDA cache
     torch.cuda.empty_cache()
 
-    CHECKPOINT_filename = args.resume if args.resume else "checkpoint.pth.tar"
-
     # Install signal handler
     signal.signal(signal.SIGUSR1, lambda a, b: signal_handler(a, b))
     signal.signal(signal.SIGTERM, SIGTERM_handler)
@@ -538,15 +535,13 @@ def main(args):
     char_blank = "*"
     char_space = " "
     char_apostrophe = "'"
-
     labels = char_blank + char_space + char_apostrophe + string.ascii_lowercase
     language_model = LanguageModel(labels, char_blank, char_space)
-    vocab_size = language_model.length
+
     training, validation, _ = datasets_librispeech(transforms, language_model)
 
-    num_features = args.n_bins
     model = Wav2Letter(
-        num_classes=vocab_size, input_type="mfcc", num_features=num_features
+        num_classes=language_model.length, input_type="mfcc", num_features=args.n_bins
     )
 
     if args.jit:
@@ -573,10 +568,7 @@ def main(args):
         "weight_decay": args.weight_decay,
     }
 
-    Optimizer = SGD
-    optimizer_params = optimizer_params
-
-    optimizer = Optimizer(model.parameters(), **optimizer_params)
+    optimizer = SGD(model.parameters(), **optimizer_params)
     scheduler = ExponentialLR(optimizer, gamma=args.gamma)
     # scheduler = ReduceLROnPlateau(optimizer, patience=2, threshold=1e-3)
 
@@ -585,8 +577,6 @@ def main(args):
     )
     # criterion = nn.MSELoss()
     # criterion = torch.nn.NLLLoss()
-
-    best_loss = 1.0
 
     loader_training = DataLoader(
         training,
@@ -601,9 +591,11 @@ def main(args):
         **loader_validation_params,
     )
 
-    if args.resume and os.path.isfile(CHECKPOINT_filename):
-        print("Checkpoint: loading '{}'".format(CHECKPOINT_filename))
-        checkpoint = torch.load(CHECKPOINT_filename)
+    best_loss = 1.0
+
+    if args.checkpoint and os.path.isfile(args.checkpoint):
+        print("Checkpoint: loading '{}'".format(args.checkpoint))
+        checkpoint = torch.load(args.checkpoint)
 
         args.start_epoch = checkpoint["epoch"]
         best_loss = checkpoint["best_loss"]
@@ -614,7 +606,7 @@ def main(args):
 
         print(
             "Checkpoint: loaded '{}' at epoch {}".format(
-                CHECKPOINT_filename, checkpoint["epoch"]
+                args.checkpoint, checkpoint["epoch"]
             )
         )
     else:
@@ -629,7 +621,7 @@ def main(args):
                 "scheduler": scheduler.state_dict(),
             },
             False,
-            CHECKPOINT_filename,
+            args.checkpoint,
         )
 
     with tqdm(total=args.epochs, unit_scale=1, disable=not args.progress_bar) as pbar:
@@ -657,7 +649,7 @@ def main(args):
                         "scheduler": scheduler.state_dict(),
                     },
                     False,
-                    CHECKPOINT_filename,
+                    args.checkpoint,
                 )
             if not epoch % args.print_freq or epoch == args.epochs - 1:
 
@@ -682,7 +674,7 @@ def main(args):
                         "scheduler": scheduler.state_dict(),
                     },
                     is_best,
-                    CHECKPOINT_filename,
+                    args.checkpoint,
                 )
 
 
