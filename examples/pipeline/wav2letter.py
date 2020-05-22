@@ -431,7 +431,7 @@ def evaluate(
             targets = targets.to(device, non_blocking=non_blocking)
 
             # keep batch first for data parallel
-            outputs = model(inputs).transpose(0, 1)
+            outputs = model(inputs).transpose(-1, -2).transpose(0, 1)
 
             # CTC
             # outputs: input length, batch size, number of classes (including blank)
