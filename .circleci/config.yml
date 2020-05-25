@@ -241,6 +241,53 @@ jobs:
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
             python -c "import torchaudio"
 
+  smoke_test_windows_conda:
+    <<: *binary_common
+    executor:
+      name: windows-cpu
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: install binaries
+          command: |
+            set -x
+            eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
+            conda env remove -n python${PYTHON_VERSION} || true
+            conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
+            conda activate python${PYTHON_VERSION}
+            conda install -v -y -c pytorch-nightly pytorch
+            conda install -v -y $(ls ~/workspace/torchaudio*.tar.bz2)
+      - run:
+          name: smoke test
+          command: |
+            eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
+            conda activate python${PYTHON_VERSION}
+            python -c "import torchaudio"
+
+  smoke_test_windows_pip:
+    <<: *binary_common
+    executor:
+      name: windows-cpu
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: install binaries
+          command: |
+            set -x
+            eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
+            conda env remove -n python${PYTHON_VERSION} || true
+            conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
+            conda activate python${PYTHON_VERSION}
+            pip install $(ls ~/workspace/torchaudio*.whl) -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+      - run:
+          name: smoke test
+          command: |
+            eval "$('/C/tools/miniconda3/Scripts/conda.exe' 'shell.bash' 'hook')"
+            conda activate python${PYTHON_VERSION}
+            python -c "import torchaudio"
+
   smoke_test_docker_image_build:
     machine:
       image: ubuntu-1604:201903-01
@@ -538,10 +585,6 @@ workflows:
           python_version: '3.8'
   nightly:
     jobs:
-      - circleci_consistency:
-          filters:
-            branches:
-              only: nightly
       - binary_linux_wheel:
           filters:
             branches:
@@ -651,9 +694,6 @@ workflows:
           requires:
           - nightly_binary_macos_wheel_py3.8
       - binary_windows_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_windows_wheel_py3.6
           python_version: '3.6'
       - binary_wheel_upload:
@@ -664,10 +704,12 @@ workflows:
           name: nightly_binary_windows_wheel_py3.6_upload
           requires:
           - nightly_binary_windows_wheel_py3.6
+      - smoke_test_windows_pip:
+          name: nightly_binary_windows_wheel_py3.6_smoke_test_pip
+          python_version: '3.6'
+          requires:
+          - nightly_binary_windows_wheel_py3.6
       - binary_windows_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_windows_wheel_py3.7
           python_version: '3.7'
       - binary_wheel_upload:
@@ -678,10 +720,12 @@ workflows:
           name: nightly_binary_windows_wheel_py3.7_upload
           requires:
           - nightly_binary_windows_wheel_py3.7
+      - smoke_test_windows_pip:
+          name: nightly_binary_windows_wheel_py3.7_smoke_test_pip
+          python_version: '3.7'
+          requires:
+          - nightly_binary_windows_wheel_py3.7
       - binary_windows_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_windows_wheel_py3.8
           python_version: '3.8'
       - binary_wheel_upload:
@@ -690,6 +734,11 @@ workflows:
             branches:
               only: nightly
           name: nightly_binary_windows_wheel_py3.8_upload
+          requires:
+          - nightly_binary_windows_wheel_py3.8
+      - smoke_test_windows_pip:
+          name: nightly_binary_windows_wheel_py3.8_smoke_test_pip
+          python_version: '3.8'
           requires:
           - nightly_binary_windows_wheel_py3.8
       - binary_linux_conda:
@@ -801,9 +850,6 @@ workflows:
           requires:
           - nightly_binary_macos_conda_py3.8
       - binary_windows_conda:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_windows_conda_py3.6
           python_version: '3.6'
       - binary_conda_upload:
@@ -814,10 +860,12 @@ workflows:
           name: nightly_binary_windows_conda_py3.6_upload
           requires:
           - nightly_binary_windows_conda_py3.6
+      - smoke_test_windows_conda:
+          name: nightly_binary_windows_conda_py3.6_smoke_test_conda
+          python_version: '3.6'
+          requires:
+          - nightly_binary_windows_conda_py3.6
       - binary_windows_conda:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_windows_conda_py3.7
           python_version: '3.7'
       - binary_conda_upload:
@@ -828,10 +876,12 @@ workflows:
           name: nightly_binary_windows_conda_py3.7_upload
           requires:
           - nightly_binary_windows_conda_py3.7
+      - smoke_test_windows_conda:
+          name: nightly_binary_windows_conda_py3.7_smoke_test_conda
+          python_version: '3.7'
+          requires:
+          - nightly_binary_windows_conda_py3.7
       - binary_windows_conda:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_windows_conda_py3.8
           python_version: '3.8'
       - binary_conda_upload:
@@ -840,6 +890,11 @@ workflows:
             branches:
               only: nightly
           name: nightly_binary_windows_conda_py3.8_upload
+          requires:
+          - nightly_binary_windows_conda_py3.8
+      - smoke_test_windows_conda:
+          name: nightly_binary_windows_conda_py3.8_smoke_test_conda
+          python_version: '3.8'
           requires:
           - nightly_binary_windows_conda_py3.8
   docker_build:
