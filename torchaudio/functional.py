@@ -1453,12 +1453,13 @@ def flanger(
 
     delay_buf_pos = 0
     lfo_pos = 0
+    channel_idxs = torch.arange(0, n_channels)
 
     for i in range(waveform.shape[-1]):
 
         delay_buf_pos = (delay_buf_pos + delay_buf_length - 1) % delay_buf_length
 
-        cur_channel_phase = (torch.arange(0, n_channels) * lfo_length * channel_phase + .5).to(torch.int64)
+        cur_channel_phase = (channel_idxs * lfo_length * channel_phase + .5).to(torch.int64)
         delay_tensor = lfo[(lfo_pos + cur_channel_phase) % lfo_length]
         frac_delay = torch.frac(delay_tensor)
         delay_tensor = torch.floor(delay_tensor)
@@ -1469,18 +1470,18 @@ def flanger(
 
         delay_bufs[:, :, delay_buf_pos] = temp + delay_last * feedback_gain
 
-        delayed_0 = delay_bufs[:, :, (delay_buf_pos + int_delay) % delay_buf_length].squeeze(-1)
+        delayed_0 = delay_bufs[:, channel_idxs, (delay_buf_pos + int_delay) % delay_buf_length]
 
         int_delay = int_delay + 1
 
-        delayed_1 = delay_bufs[:, :, (delay_buf_pos + int_delay) % delay_buf_length].squeeze(-1)
+        delayed_1 = delay_bufs[:, channel_idxs, (delay_buf_pos + int_delay) % delay_buf_length]
 
         int_delay = int_delay + 1
 
         if linear_interpolation:
             delayed = delayed_0 + (delayed_1 - delayed_0) * frac_delay
         else:
-            delayed_2 = delay_bufs[:, :, (delay_buf_pos + int_delay) % delay_buf_length].squeeze(-1)
+            delayed_2 = delay_bufs[:, channel_idxs, (delay_buf_pos + int_delay) % delay_buf_length]
 
             int_delay = int_delay + 1
 
