@@ -46,13 +46,13 @@ def build_workflow_pair(btype, os_type, python_version, filter_branch, prefix=''
 
     if upload:
 
-        is_py3_linux = os_type == 'linux' and not python_version.startswith("2.")
+        is_py3_linux = os_type in ['linux', "windows"] and not python_version.startswith("2.")
 
         w.append(generate_upload_workflow(base_workflow_name, filter_branch, btype))
 
         if filter_branch == 'nightly' and is_py3_linux:
             pydistro = 'pip' if btype == 'wheel' else 'conda'
-            w.append(generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, python_version))
+            w.append(generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, python_version, os_type))
 
     return w
 
@@ -87,7 +87,7 @@ def generate_upload_workflow(base_workflow_name, filter_branch, btype):
     return {"binary_{btype}_upload".format(btype=btype): d}
 
 
-def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, python_version):
+def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, python_version, os_type):
 
     required_build_suffix = "_upload"
     required_build_name = base_workflow_name + required_build_suffix
@@ -103,7 +103,7 @@ def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, pyt
     if filter_branch:
         d["filters"] = gen_filter_branch_tree(filter_branch)
 
-    return {"smoke_test_linux_{pydistro}".format(pydistro=pydistro): d}
+    return {"smoke_test_{os_type}_{pydistro}".format(os_type=os_type, pydistro=pydistro): d}
 
 
 def indent(indentation, data_list):
