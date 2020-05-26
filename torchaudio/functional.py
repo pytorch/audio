@@ -1270,21 +1270,23 @@ def phaser(
 
     # TODO: Autograd support?
     output_waveform_pre_gain_list = [] #torch.zeros_like(waveform.transpose(0, 1), dtype=dtype, device=device)
-    waveform_list = [waveform[:, i] for i in range(waveform.size(1))]
-    waveform_list_gain = [x * gain_in for x in waveform_list]
+    waveform_list = [waveform[:, i] * gain_in for i in range(waveform.size(1))]
     delay_buf_list = [delay_buf[:, i] for i in range(delay_buf.size(1))]
     mod_buf_list = [mod_buf[i] for i in range(mod_buf.size(0))]
 
     for i in range(waveform.shape[-1]):
         idx = int((delay_pos + mod_buf_list[mod_pos]) % delay_buf_len)
-        temp = (waveform_list_gain[i]) + (delay_buf_list[idx] * decay)
         mod_pos = (mod_pos + 1) % mod_buf_len
         delay_pos = (delay_pos + 1) % delay_buf_len
-        delay_buf_list[delay_pos] = temp
-        output_waveform_pre_gain_list.append(temp)
+        delay_buf_list[delay_pos] = (waveform_list[i]) + (delay_buf_list[idx] * decay)
+        output_waveform_pre_gain_list.append(delay_buf_list[delay_pos])
 
     # TODO: Test that output dtype and device are as expected
-    output_waveform = torch.tensor(output_waveform_pre_gain_list, dtype=dtype, device=device)
+    output_waveform = torch.zeros_like(waveform.transpose(0, 1), dtype=dtype, device=device)
+    for i in range(waveform.shape[-1]):
+        output_waveform[i] = output_waveform_pre_gain_list[i]
+    # TODO: This is much more efficient
+    # output_waveform = torch.tensor(output_waveform_pre_gain_list, dtype=dtype, device=device)
     # TODO: Autograd support?
     output_waveform.mul_(gain_out)
 
