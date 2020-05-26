@@ -1269,7 +1269,7 @@ def phaser(
     mod_pos = 0
 
     # TODO: Autograd support?
-    output_waveform_pre_gain_list = [] #torch.zeros_like(waveform.transpose(0, 1), dtype=dtype, device=device)
+    output_waveform_pre_gain_list = []
     waveform = waveform * gain_in
     delay_buf = delay_buf * decay
     waveform_list = [waveform[:, i] for i in range(waveform.size(1))]
