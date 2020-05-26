@@ -1285,7 +1285,7 @@ def phaser(
         output_waveform_pre_gain_list.append(temp)
 
     # TODO: Modify test to check that dtype and device are as expected
-    output_waveform = torch.stack(output_waveform_pre_gain_list).to(dtype=dtype, device=device)
+    output_waveform = torch.stack(output_waveform_pre_gain_list, dim=1).to(dtype=dtype, device=device)
     # TODO: Autograd support?
     output_waveform.mul_(gain_out)
 
