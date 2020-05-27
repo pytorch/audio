@@ -3,7 +3,7 @@ import unittest
 import torch
 import torchaudio.kaldi_io as kio
 
-import common_utils
+from . import common_utils
 
 
 class Test_KaldiIO(unittest.TestCase):

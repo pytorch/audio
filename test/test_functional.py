@@ -6,7 +6,7 @@ import torchaudio
 import torchaudio.functional as F
 import pytest
 
-import common_utils
+from . import common_utils
 
 
 class Lfilter(common_utils.TestBaseMixin):

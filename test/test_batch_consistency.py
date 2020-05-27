@@ -6,7 +6,7 @@ from torch.testing._internal.common_utils import TestCase
 import torchaudio
 import torchaudio.functional as F
 
-import common_utils
+from . import common_utils
 
 
 class TestFunctional(TestCase):

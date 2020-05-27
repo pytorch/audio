@@ -1,6 +1,7 @@
 """Test suites for numerical compatibility with librosa"""
 import os
 import unittest
+from distutils.version import StrictVersion
 
 import torch
 from torch.testing._internal.common_utils import TestCase
@@ -15,7 +16,7 @@ if IMPORT_LIBROSA:
 
 import pytest
 
-import common_utils
+from . import common_utils
 
 
 @unittest.skipIf(not IMPORT_LIBROSA, "Librosa not available")
@@ -74,6 +75,8 @@ class TestFunctional(TestCase):
         self._test_create_fb(n_mels=56, fmin=800.0, fmax=900.0)
         self._test_create_fb(n_mels=56, fmin=1900.0, fmax=900.0)
         self._test_create_fb(n_mels=10, fmin=1900.0, fmax=900.0)
+        if StrictVersion(librosa.__version__) < StrictVersion("0.7.2"):
+            return
         self._test_create_fb(n_mels=128, sample_rate=44100, norm="slaney")
         self._test_create_fb(n_mels=128, fmin=2000.0, fmax=5000.0, norm="slaney")
         self._test_create_fb(n_mels=56, fmin=100.0, fmax=9000.0, norm="slaney")

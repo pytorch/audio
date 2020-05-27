@@ -3,7 +3,7 @@ import torch
 import torchaudio
 import math
 import os
-from common_utils import AudioBackendScope, BACKENDS, BACKENDS_MP3, create_temp_assets_dir
+from .common_utils import AudioBackendScope, BACKENDS, BACKENDS_MP3, create_temp_assets_dir
 
 
 class Test_LoadSave(unittest.TestCase):
