@@ -54,7 +54,6 @@ def _get_include_dirs():
     ]
     if _BUILD_DEPS:
         dirs.append(str(_TP_INSTALL_DIR / 'include'))
-    print(dirs)
     return dirs
 
 
@@ -62,7 +61,6 @@ def _get_library_dirs():
     dirs = []
     if _BUILD_DEPS:
         dirs.append(str(_TP_INSTALL_DIR / 'lib'))
-    print(dirs)
     return dirs
 
 
