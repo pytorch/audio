@@ -18,6 +18,10 @@ _CSRC_DIR = _ROOT_DIR / 'torchaudio' / 'csrc'
 _TP_BASE_DIR = _ROOT_DIR / 'third_party'
 _TP_INSTALL_DIR = _TP_BASE_DIR / 'build'
 
+# Temporary fix for building in fbcode
+# at the moment, we have to use external sox in fbcode
+_BUILD_DEPS = not (_ROOT_DIR / '.use_external_sox').exists()
+
 
 def _get_eca(debug):
     eca = []
@@ -45,29 +49,38 @@ def _get_srcs():
 
 
 def _get_include_dirs():
-    return [
+    dirs = [
         str(_ROOT_DIR),
-        str(_TP_INSTALL_DIR / 'include'),
     ]
+    if _BUILD_DEPS:
+        dirs.append(str(_TP_INSTALL_DIR / 'include'))
+    print(dirs)
+    return dirs
 
 
 def _get_library_dirs():
-    return [
-        str(_TP_INSTALL_DIR / 'lib'),
-    ]
+    dirs = []
+    if _BUILD_DEPS:
+        dirs.append(str(_TP_INSTALL_DIR / 'lib'))
+    print(dirs)
+    return dirs
+
+
+def _get_extra_objects():
+    objs = []
+    if _BUILD_DEPS:
+        # NOTE: The order of the library listed bellow matters.
+        #
+        # (the most important thing is that dependencies come after a library
+        # e.g., sox comes first)
+        libs = ['libsox.a', 'libmad.a', 'libFLAC.a', 'libmp3lame.a']
+        for lib in libs:
+            objs.append(str(_TP_INSTALL_DIR / 'lib' / lib))
+    return objs
 
 
 def _get_libraries():
-    # NOTE: The order of the library listed bellow matters.
-    #
-    # (the most important thing is that dependencies come after a library
-    # e.g., sox comes first)
-    return [
-        'sox',
-        'mad',
-        'FLAC',
-        'mp3lame',
-    ]
+    return [] if _BUILD_DEPS else ['sox']
 
 
 def _build_codecs():
@@ -95,6 +108,7 @@ def get_ext_modules(debug=False):
             include_dirs=_get_include_dirs(),
             library_dirs=_get_library_dirs(),
             extra_compile_args=_get_eca(debug),
+            extra_objects=_get_extra_objects(),
             extra_link_args=_get_ela(debug),
         ),
     ]
@@ -102,6 +116,6 @@ def get_ext_modules(debug=False):
 
 class BuildExtension(TorchBuildExtension):
     def build_extension(self, ext):
-        if ext.name == _EXT_NAME:
+        if ext.name == _EXT_NAME and _BUILD_DEPS:
             _configure_third_party()
         super().build_extension(ext)
