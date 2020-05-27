@@ -32,3 +32,6 @@ conda activate "${env_dir}"
 # 3. Install Conda dependencies
 printf "* Installing dependencies (except PyTorch)\n"
 conda env update --file "${this_dir}/environment.yml" --prune
+
+# 4. Build codecs
+build_tools/setup_helpers/build_third_party.sh
