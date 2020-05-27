@@ -6,8 +6,8 @@ import torchaudio
 import torchaudio.functional as F
 import torchaudio.transforms as T
 
-import common_utils
-from common_utils import AudioBackendScope, BACKENDS
+from . import common_utils
+from .common_utils import AudioBackendScope, BACKENDS
 
 
 class TestFunctionalFiltering(TestCase):

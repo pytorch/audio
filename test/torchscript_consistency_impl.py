@@ -6,7 +6,7 @@ import torchaudio
 import torchaudio.functional as F
 import torchaudio.transforms as T
 
-import common_utils
+from . import common_utils
 
 
 class Functional(common_utils.TestBaseMixin):

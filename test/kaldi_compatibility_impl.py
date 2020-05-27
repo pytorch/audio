@@ -8,7 +8,7 @@ import torch
 import torchaudio.functional as F
 import torchaudio.compliance.kaldi
 
-import common_utils
+from . import common_utils
 
 
 def _not_available(cmd):

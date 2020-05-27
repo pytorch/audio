@@ -7,7 +7,7 @@ import torchaudio
 import torchaudio.transforms as transforms
 import torchaudio.functional as F
 
-import common_utils
+from . import common_utils
 
 
 class Tester(TestCase):

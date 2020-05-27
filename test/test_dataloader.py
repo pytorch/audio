@@ -3,8 +3,8 @@ import unittest
 import torchaudio
 from torch.utils.data import Dataset, DataLoader
 
-import common_utils
-from common_utils import AudioBackendScope, BACKENDS
+from . import common_utils
+from .common_utils import AudioBackendScope, BACKENDS
 
 
 class TORCHAUDIODS(Dataset):
