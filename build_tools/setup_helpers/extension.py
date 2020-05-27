@@ -57,13 +57,6 @@ def _get_include_dirs():
     return dirs
 
 
-def _get_library_dirs():
-    dirs = []
-    if _BUILD_DEPS:
-        dirs.append(str(_TP_INSTALL_DIR / 'lib'))
-    return dirs
-
-
 def _get_extra_objects():
     objs = []
     if _BUILD_DEPS:
@@ -104,7 +97,6 @@ def get_ext_modules(debug=False):
             _get_srcs(),
             libraries=_get_libraries(),
             include_dirs=_get_include_dirs(),
-            library_dirs=_get_library_dirs(),
             extra_compile_args=_get_eca(debug),
             extra_objects=_get_extra_objects(),
             extra_link_args=_get_ela(debug),
