@@ -8,7 +8,7 @@ from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.yesno import YESNO
 from torchaudio.datasets.ljspeech import LJSPEECH
 
-import common_utils
+from . import common_utils
 
 
 class TestDatasets(unittest.TestCase):
@@ -26,10 +26,12 @@ class TestDatasets(unittest.TestCase):
         data = LIBRISPEECH(self.path, "dev-clean")
         data[0]
 
+    @unittest.skipIf("sox" not in common_utils.BACKENDS, "sox not available")
     def test_commonvoice(self):
         data = COMMONVOICE(self.path, url="tatar")
         data[0]
 
+    @unittest.skipIf("sox" not in common_utils.BACKENDS, "sox not available")
     def test_commonvoice_diskcache(self):
         data = COMMONVOICE(self.path, url="tatar")
         data = diskcache_iterator(data)
@@ -38,6 +40,7 @@ class TestDatasets(unittest.TestCase):
         # Load
         data[0]
 
+    @unittest.skipIf("sox" not in common_utils.BACKENDS, "sox not available")
     def test_commonvoice_bg(self):
         data = COMMONVOICE(self.path, url="tatar")
         data = bg_iterator(data, 5)

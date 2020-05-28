@@ -2,6 +2,7 @@
 
 import math
 from typing import Optional, Tuple
+import warnings
 
 import torch
 from torch import Tensor
@@ -34,6 +35,7 @@ __all__ = [
     "contrast",
     "dcshift",
     "overdrive",
+    "phaser",
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
@@ -48,7 +50,7 @@ def istft(
         win_length: Optional[int] = None,
         window: Optional[Tensor] = None,
         center: bool = True,
-        pad_mode: str = "reflect",
+        pad_mode: Optional[str] = None,
         normalized: bool = False,
         onesided: bool = True,
         length: Optional[int] = None,
@@ -93,8 +95,7 @@ def istft(
         center (bool, optional): Whether ``input`` was padded on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
             (Default: ``True``)
-        pad_mode (str, optional): Controls the padding method used when ``center`` is True. (Default:
-            ``"reflect"``)
+        pad_mode: This argument was ignored and to be removed.
         normalized (bool, optional): Whether the STFT was normalized. (Default: ``False``)
         onesided (bool, optional): Whether the STFT is onesided. (Default: ``True``)
         length (int or None, optional): The amount to trim the signal by (i.e. the
@@ -103,105 +104,16 @@ def istft(
     Returns:
         Tensor: Least squares estimation of the original signal of size (..., signal_length)
     """
-    stft_matrix_dim = stft_matrix.dim()
-    assert 3 <= stft_matrix_dim, "Incorrect stft dimension: %d" % (stft_matrix_dim)
-    assert stft_matrix.numel() > 0
-
-    if stft_matrix_dim == 3:
-        # add a channel dimension
-        stft_matrix = stft_matrix.unsqueeze(0)
-
-    # pack batch
-    shape = stft_matrix.size()
-    stft_matrix = stft_matrix.view(-1, shape[-3], shape[-2], shape[-1])
-
-    dtype = stft_matrix.dtype
-    device = stft_matrix.device
-    fft_size = stft_matrix.size(1)
-    assert (onesided and n_fft // 2 + 1 == fft_size) or (
-        not onesided and n_fft == fft_size
-    ), (
-        "one_sided implies that n_fft // 2 + 1 == fft_size and not one_sided implies n_fft == fft_size. "
-        + "Given values were onesided: %s, n_fft: %d, fft_size: %d"
-        % ("True" if onesided else False, n_fft, fft_size)
-    )
-
-    # use stft defaults for Optionals
-    if win_length is None:
-        win_length = n_fft
-
-    if hop_length is None:
-        hop_length = int(win_length // 4)
-
-    # There must be overlap
-    assert 0 < hop_length <= win_length
-    assert 0 < win_length <= n_fft
-
-    if window is None:
-        window = torch.ones(win_length, device=device, dtype=dtype)
-
-    assert window.dim() == 1 and window.size(0) == win_length
-
-    if win_length != n_fft:
-        # center window with pad left and right zeros
-        left = (n_fft - win_length) // 2
-        window = torch.nn.functional.pad(window, (left, n_fft - win_length - left))
-        assert window.size(0) == n_fft
-    # win_length and n_fft are synonymous from here on
-
-    stft_matrix = stft_matrix.transpose(1, 2)  # size (channel, n_frame, fft_size, 2)
-    stft_matrix = torch.irfft(
-        stft_matrix, 1, normalized, onesided, signal_sizes=(n_fft,)
-    )  # size (channel, n_frame, n_fft)
-
-    assert stft_matrix.size(2) == n_fft
-    n_frame = stft_matrix.size(1)
-
-    ytmp = stft_matrix * window.view(1, 1, n_fft)  # size (channel, n_frame, n_fft)
-    # each column of a channel is a frame which needs to be overlap added at the right place
-    ytmp = ytmp.transpose(1, 2)  # size (channel, n_fft, n_frame)
-
-    # this does overlap add where the frames of ytmp are added such that the i'th frame of
-    # ytmp is added starting at i*hop_length in the output
-    y = torch.nn.functional.fold(
-        ytmp, (1, (n_frame - 1) * hop_length + n_fft), (1, n_fft), stride=(1, hop_length)
-    ).squeeze(2)
-
-    # do the same for the window function
-    window_sq = (
-        window.pow(2).view(n_fft, 1).repeat((1, n_frame)).unsqueeze(0)
-    )  # size (1, n_fft, n_frame)
-    window_envelop = torch.nn.functional.fold(
-        window_sq, (1, (n_frame - 1) * hop_length + n_fft), (1, n_fft), stride=(1, hop_length)
-    ).squeeze(2)  # size (1, 1, expected_signal_len)
-
-    expected_signal_len = n_fft + hop_length * (n_frame - 1)
-    assert y.size(2) == expected_signal_len
-    assert window_envelop.size(2) == expected_signal_len
-
-    half_n_fft = n_fft // 2
-    # we need to trim the front padding away if center
-    start = half_n_fft if center else 0
-    end = -half_n_fft if length is None else start + length
-
-    y = y[:, :, start:end]
-    window_envelop = window_envelop[:, :, start:end]
-
-    # check NOLA non-zero overlap condition
-    window_envelop_lowest = window_envelop.abs().min()
-    assert window_envelop_lowest > 1e-11, "window overlap add min: %f" % (
-        window_envelop_lowest
-    )
-
-    y = (y / window_envelop).squeeze(1)  # size (channel, expected_signal_len)
-
-    # unpack batch
-    y = y.view(shape[:-3] + y.shape[-1:])
-
-    if stft_matrix_dim == 3:  # remove the channel dimension
-        y = y.squeeze(0)
-
-    return y
+    warnings.warn(
+        'istft has been moved to PyTorch and will be removed from torchaudio, '
+        'please use torch.istft instead.')
+    if pad_mode is not None:
+        warnings.warn(
+            'The parameter `pad_mode` was ignored in isftft, and is thus being deprecated. '
+            'Please set `pad_mode` to None to suppress this warning.')
+    return torch.istft(
+        input=stft_matrix, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=window,
+        center=center, normalized=normalized, onesided=onesided, length=length)
 
 
 def spectrogram(
@@ -241,7 +153,7 @@ def spectrogram(
 
     # pack batch
     shape = waveform.size()
-    waveform = waveform.view(-1, shape[-1])
+    waveform = waveform.reshape(-1, shape[-1])
 
     # default values are consistent with librosa.core.spectrum._spectrogram
     spec_f = torch.stft(
@@ -249,7 +161,7 @@ def spectrogram(
     )
 
     # unpack batch
-    spec_f = spec_f.view(shape[:-1] + spec_f.shape[-3:])
+    spec_f = spec_f.reshape(shape[:-1] + spec_f.shape[-3:])
 
     if normalized:
         spec_f /= window.pow(2.).sum().sqrt()
@@ -310,11 +222,11 @@ def griffinlim(
         torch.Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.
     """
     assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
-    assert momentum > 0, 'momentum=%s < 0' % momentum
+    assert momentum >= 0, 'momentum=%s < 0' % momentum
 
     # pack batch
     shape = specgram.size()
-    specgram = specgram.view([-1] + list(shape[-2:]))
+    specgram = specgram.reshape([-1] + list(shape[-2:]))
 
     specgram = specgram.pow(1 / power)
 
@@ -348,7 +260,9 @@ def griffinlim(
                              True, 'reflect', False, True)
 
         # Update our phase estimates
-        angles = rebuilt - tprev.mul_(momentum / (1 + momentum))
+        angles = rebuilt
+        if momentum:
+            angles = angles - tprev.mul_(momentum / (1 + momentum))
         angles = angles.div_(complex_norm(angles).add_(1e-16).unsqueeze(-1).expand_as(angles))
 
     # Return the final phase estimates
@@ -360,7 +274,7 @@ def griffinlim(
                      length=length)
 
     # unpack batch
-    waveform = waveform.view(shape[:-2] + waveform.shape[-1:])
+    waveform = waveform.reshape(shape[:-2] + waveform.shape[-1:])
 
     return waveform
 
@@ -421,7 +335,8 @@ def create_fb_matrix(
         f_min: float,
         f_max: float,
         n_mels: int,
-        sample_rate: int
+        sample_rate: int,
+        norm: Optional[str] = None
 ) -> Tensor:
     r"""Create a frequency bin conversion matrix.
 
@@ -431,6 +346,8 @@ def create_fb_matrix(
         f_max (float): Maximum frequency (Hz)
         n_mels (int): Number of mel filterbanks
         sample_rate (int): Sample rate of the audio waveform
+        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
+        (area normalization). (Default: ``None``)
 
     Returns:
         Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)
@@ -439,6 +356,10 @@ def create_fb_matrix(
         size (..., ``n_freqs``), the applied result would be
         ``A * create_fb_matrix(A.size(-1), ...)``.
     """
+
+    if norm is not None and norm != "slaney":
+        raise ValueError("norm must be one of None or 'slaney'")
+
     # freq bins
     # Equivalent filterbank construction by Librosa
     all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
@@ -458,6 +379,12 @@ def create_fb_matrix(
     down_slopes = (-1.0 * slopes[:, :-2]) / f_diff[:-1]  # (n_freqs, n_mels)
     up_slopes = slopes[:, 2:] / f_diff[1:]  # (n_freqs, n_mels)
     fb = torch.max(zero, torch.min(down_slopes, up_slopes))
+
+    if norm is not None and norm == "slaney":
+        # Slaney-style mel is scaled to be approx constant energy per channel
+        enorm = 2.0 / (f_pts[2:n_mels + 2] - f_pts[:n_mels])
+        fb *= enorm.unsqueeze(0)
+
     return fb
 
 
@@ -623,7 +550,7 @@ def phase_vocoder(
 
     # pack batch
     shape = complex_specgrams.size()
-    complex_specgrams = complex_specgrams.view([-1] + list(shape[-3:]))
+    complex_specgrams = complex_specgrams.reshape([-1] + list(shape[-3:]))
 
     time_steps = torch.arange(0,
                               complex_specgrams.size(-2),
@@ -663,7 +590,7 @@ def phase_vocoder(
     complex_specgrams_stretch = torch.stack([real_stretch, imag_stretch], dim=-1)
 
     # unpack batch
-    complex_specgrams_stretch = complex_specgrams_stretch.view(shape[:-3] + complex_specgrams_stretch.shape[1:])
+    complex_specgrams_stretch = complex_specgrams_stretch.reshape(shape[:-3] + complex_specgrams_stretch.shape[1:])
 
     return complex_specgrams_stretch
 
@@ -671,25 +598,27 @@ def phase_vocoder(
 def lfilter(
         waveform: Tensor,
         a_coeffs: Tensor,
-        b_coeffs: Tensor
+        b_coeffs: Tensor,
+        clamp: bool = True,
 ) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation.
 
     Args:
-        waveform (Tensor): audio waveform of dimension of `(..., time)`.  Must be normalized to -1 to 1.
-        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of `(n_order + 1)`.
-                                Lower delays coefficients are first, e.g. `[a0, a1, a2, ...]`.
+        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
+        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(n_order + 1)``.
+                                Lower delays coefficients are first, e.g. ``[a0, a1, a2, ...]``.
                                 Must be same size as b_coeffs (pad with 0's as necessary).
-        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of `(n_order + 1)`.
-                                 Lower delays coefficients are first, e.g. `[b0, b1, b2, ...]`.
+        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of ``(n_order + 1)``.
+                                 Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.
                                  Must be same size as a_coeffs (pad with 0's as necessary).
+        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
 
     Returns:
-        Tensor: Waveform with dimension of `(..., time)`.  Output will be clipped to -1 to 1.
+        Tensor: Waveform with dimension of ``(..., time)``.
     """
     # pack batch
     shape = waveform.size()
-    waveform = waveform.view(-1, shape[-1])
+    waveform = waveform.reshape(-1, shape[-1])
 
     assert (a_coeffs.size(0) == b_coeffs.size(0))
     assert (len(waveform.size()) == 2)
@@ -729,10 +658,13 @@ def lfilter(
         o0.addmv_(windowed_output_signal, a_coeffs_flipped, alpha=-1)
         padded_output_waveform[:, i_sample + n_order - 1] = o0
 
-    output = torch.clamp(padded_output_waveform[:, (n_order - 1):], min=-1., max=1.)
+    output = padded_output_waveform[:, (n_order - 1):]
+
+    if clamp:
+        output = torch.clamp(output, min=-1., max=1.)
 
     # unpack batch
-    output = output.view(shape[:-1] + output.shape[-1:])
+    output = output.reshape(shape[:-1] + output.shape[-1:])
 
     return output
 
@@ -1296,6 +1228,135 @@ def overdrive(
     return output_waveform.clamp(min=-1, max=1).view(actual_shape)
 
 
+def phaser(
+        waveform: Tensor,
+        sample_rate: int,
+        gain_in: float = 0.4,
+        gain_out: float = 0.74,
+        delay_ms: float = 3.0,
+        decay: float = 0.4,
+        mod_speed: float = 0.5,
+        sinusoidal: bool = True
+) -> Tensor:
+    r"""Apply a phasing effect to the audio. Similar to SoX implementation.
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
+        gain_in (float): desired input gain at the boost (or attenuation) in dB
+            Allowed range of values are 0 to 1
+        gain_out (float): desired output gain at the boost (or attenuation) in dB
+            Allowed range of values are 0 to 1e9
+        delay_ms (float): desired delay in milli seconds
+            Allowed range of values are 0 to 5.0
+        decay (float):  desired decay relative to gain-in
+            Allowed range of values are 0 to 0.99
+        mod_speed (float):  modulation speed in Hz
+            Allowed range of values are 0.1 to 2
+        sinusoidal (bool):  If ``True``, uses sinusoidal modulation (preferable for multiple instruments)
+            If ``False``, uses triangular modulation (gives single instruments a sharper phasing effect)
+            (Default: ``True``)
+
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+        Scott Lehman, Effects Explained, http://harmony-central.com/Effects/effects-explained.html
+    """
+    actual_shape = waveform.shape
+    device, dtype = waveform.device, waveform.dtype
+
+    # convert to 2D (channels,time)
+    waveform = waveform.view(-1, actual_shape[-1])
+
+    delay_buf_len = int((delay_ms * .001 * sample_rate) + .5)
+    delay_buf = torch.zeros(waveform.shape[0], delay_buf_len, dtype=dtype, device=device)
+
+    mod_buf_len = int(sample_rate / mod_speed + .5)
+    mod_buf = torch.zeros(mod_buf_len, dtype=dtype, device=device)
+
+    if sinusoidal:
+        wave_type = 'SINE'
+    else:
+        wave_type = 'TRIANGLE'
+
+    mod_buf = _generate_wave_table(wave_type=wave_type,
+                                   data_type='INT',
+                                   table_size=mod_buf_len,
+                                   min=1.,
+                                   max=float(delay_buf_len),
+                                   phase=math.pi / 2)
+
+    delay_pos = 0
+    mod_pos = 0
+
+    output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
+
+    for i in range(waveform.shape[-1]):
+        idx = int((delay_pos + mod_buf[mod_pos]) % delay_buf_len)
+        temp = (waveform[:, i] * gain_in) + (delay_buf[:, idx] * decay)
+        mod_pos = (mod_pos + 1) % mod_buf_len
+        delay_pos = (delay_pos + 1) % delay_buf_len
+        delay_buf[:, delay_pos] = temp
+        output_waveform[:, i] = temp * gain_out
+
+    return output_waveform.clamp(min=-1, max=1).view(actual_shape)
+
+
+def _generate_wave_table(
+        wave_type: str,
+        data_type: str,
+        table_size: int,
+        min: float,
+        max: float,
+        phase: float
+) -> Tensor:
+    r"""A helper fucntion for phaser. Generates a table with given parameters
+
+    Args:
+        wave_type (str): SINE or TRIANGULAR
+        data_type (str): desired data_type ( `INT` or `FLOAT` )
+        table_size (int): desired table size
+        min (float): desired min value
+        max (float): desired max value
+        phase (float): desired phase
+
+    Returns:
+        Tensor: A 1D tensor with wave table values
+    """
+
+    phase_offset = int(phase / math.pi / 2 * table_size + 0.5)
+
+    t = torch.arange(table_size).to(torch.int32)
+
+    point = (t + phase_offset) % table_size
+
+    d = torch.zeros_like(point).to(torch.float64)
+
+    if wave_type == 'SINE':
+        d = (torch.sin(point.to(torch.float64) / table_size * 2 * math.pi) + 1) / 2
+    elif wave_type == 'TRIANGLE':
+        d = point.to(torch.float64) * 2 / table_size
+        value = 4 * point / table_size
+        d[value == 0] = d[value == 0] + 0.5
+        d[value == 1] = 1.5 - d[value == 1]
+        d[value == 2] = 1.5 - d[value == 2]
+        d[value == 3] = d[value == 3] - 1.5
+
+    d = d * (max - min) + min
+
+    if data_type == 'INT':
+        mask = d < 0
+        d[mask] = d[mask] - 0.5
+        d[~mask] = d[~mask] + 0.5
+        d = d.to(torch.int32)
+    elif data_type == 'FLOAT':
+        d = d.to(torch.float32)
+
+    return d
+
+
 def mask_along_axis_iid(
         specgrams: Tensor,
         mask_param: int,
@@ -1305,7 +1366,6 @@ def mask_along_axis_iid(
     r"""
     Apply a mask along ``axis``. Mask will be applied from indices ``[v_0, v_0 + v)``, where
     ``v`` is sampled from ``uniform(0, mask_param)``, and ``v_0`` from ``uniform(0, max_v - v)``.
-    All examples will have the same mask interval.
 
     Args:
         specgrams (Tensor): Real spectrograms (batch, channel, freq, time)
@@ -1362,7 +1422,7 @@ def mask_along_axis(
 
     # pack batch
     shape = specgram.size()
-    specgram = specgram.view([-1] + list(shape[-2:]))
+    specgram = specgram.reshape([-1] + list(shape[-2:]))
 
     value = torch.rand(1) * mask_param
     min_value = torch.rand(1) * (specgram.size(axis) - value)
@@ -1379,7 +1439,7 @@ def mask_along_axis(
         raise ValueError('Only Frequency and Time masking are supported')
 
     # unpack batch
-    specgram = specgram.view(shape[:-2] + specgram.shape[-2:])
+    specgram = specgram.reshape(shape[:-2] + specgram.shape[-2:])
 
     return specgram
 
@@ -1416,7 +1476,7 @@ def compute_deltas(
 
     # pack batch
     shape = specgram.size()
-    specgram = specgram.view(1, -1, shape[-1])
+    specgram = specgram.reshape(1, -1, shape[-1])
 
     assert win_length >= 3
 
@@ -1432,7 +1492,7 @@ def compute_deltas(
     output = torch.nn.functional.conv1d(specgram, kernel, groups=specgram.shape[1]) / denom
 
     # unpack batch
-    output = output.view(shape)
+    output = output.reshape(shape)
 
     return output
 
@@ -1466,10 +1526,11 @@ def _add_noise_shaping(
     error[n] = dithered[n] - original[n]
     noise_shaped_waveform[n] = dithered[n] + error[n-1]
     """
-    waveform = waveform.view(-1, waveform.size()[-1])
+    wf_shape = waveform.size()
+    waveform = waveform.reshape(-1, wf_shape[-1])
 
     dithered_shape = dithered_waveform.size()
-    dithered_waveform = dithered_waveform.view(-1, dithered_shape[-1])
+    dithered_waveform = dithered_waveform.reshape(-1, dithered_shape[-1])
 
     error = dithered_waveform - waveform
 
@@ -1480,7 +1541,7 @@ def _add_noise_shaping(
         error[index] = error_offset[:waveform.size()[1]]
 
     noise_shaped = dithered_waveform + error
-    return noise_shaped.view(dithered_shape[:-1] + noise_shaped.shape[-1:])
+    return noise_shaped.reshape(dithered_shape[:-1] + noise_shaped.shape[-1:])
 
 
 def _apply_probability_distribution(
@@ -1513,7 +1574,7 @@ def _apply_probability_distribution(
 
     # pack batch
     shape = waveform.size()
-    waveform = waveform.view(-1, shape[-1])
+    waveform = waveform.reshape(-1, shape[-1])
 
     channel_size = waveform.size()[0] - 1
     time_size = waveform.size()[-1] - 1
@@ -1554,7 +1615,7 @@ def _apply_probability_distribution(
     quantised_signal = quantised_signal_scaled / down_scaling
 
     # unpack batch
-    return quantised_signal.view(shape[:-1] + quantised_signal.shape[-1:])
+    return quantised_signal.reshape(shape[:-1] + quantised_signal.shape[-1:])
 
 
 def dither(
@@ -1732,7 +1793,7 @@ def detect_pitch_frequency(
     """
     # pack batch
     shape = list(waveform.size())
-    waveform = waveform.view([-1] + shape[-1:])
+    waveform = waveform.reshape([-1] + shape[-1:])
 
     nccf = _compute_nccf(waveform, sample_rate, frame_time, freq_low)
     indices = _find_max_per_frame(nccf, sample_rate, freq_high)
@@ -1743,7 +1804,7 @@ def detect_pitch_frequency(
     freq = sample_rate / (EPSILON + indices.to(torch.float))
 
     # unpack batch
-    freq = freq.view(shape[:-1] + list(freq.shape[-1:]))
+    freq = freq.reshape(shape[:-1] + list(freq.shape[-1:]))
 
     return freq
 

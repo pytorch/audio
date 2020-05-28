@@ -247,7 +247,7 @@ class MelScale(torch.nn.Module):
 
         # pack batch
         shape = specgram.size()
-        specgram = specgram.view(-1, shape[-2], shape[-1])
+        specgram = specgram.reshape(-1, shape[-2], shape[-1])
 
         if self.fb.numel() == 0:
             tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max, self.n_mels, self.sample_rate)
@@ -260,7 +260,7 @@ class MelScale(torch.nn.Module):
         mel_specgram = torch.matmul(specgram.transpose(1, 2), self.fb).transpose(1, 2)
 
         # unpack batch
-        mel_specgram = mel_specgram.view(shape[:-2] + mel_specgram.shape[-2:])
+        mel_specgram = mel_specgram.reshape(shape[:-2] + mel_specgram.shape[-2:])
 
         return mel_specgram
 
@@ -395,6 +395,8 @@ class MelSpectrogram(torch.nn.Module):
                  pad: int = 0,
                  n_mels: int = 128,
                  window_fn: Callable[..., Tensor] = torch.hann_window,
+                 power: Optional[float] = 2.,
+                 normalized: bool = False,
                  wkwargs: Optional[dict] = None) -> None:
         super(MelSpectrogram, self).__init__()
         self.sample_rate = sample_rate
@@ -402,13 +404,15 @@ class MelSpectrogram(torch.nn.Module):
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         self.pad = pad
+        self.power = power
+        self.normalized = normalized
         self.n_mels = n_mels  # number of mel frequency bins
         self.f_max = f_max
         self.f_min = f_min
         self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
                                        hop_length=self.hop_length,
-                                       pad=self.pad, window_fn=window_fn, power=2.,
-                                       normalized=False, wkwargs=wkwargs)
+                                       pad=self.pad, window_fn=window_fn, power=self.power,
+                                       normalized=self.normalized, wkwargs=wkwargs)
         self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1)
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -485,7 +489,7 @@ class MFCC(torch.nn.Module):
 
         # pack batch
         shape = waveform.size()
-        waveform = waveform.view(-1, shape[-1])
+        waveform = waveform.reshape(-1, shape[-1])
 
         mel_specgram = self.MelSpectrogram(waveform)
         if self.log_mels:
@@ -498,7 +502,7 @@ class MFCC(torch.nn.Module):
         mfcc = torch.matmul(mel_specgram.transpose(1, 2), self.dct_mat).transpose(1, 2)
 
         # unpack batch
-        mfcc = mfcc.view(shape[:-1] + mfcc.shape[-2:])
+        mfcc = mfcc.reshape(shape[:-1] + mfcc.shape[-2:])
 
         return mfcc
 
@@ -779,6 +783,7 @@ class _AxisMasking(torch.nn.Module):
         mask_param (int): Maximum possible length of the mask.
         axis (int): What dimension the mask is applied on.
         iid_masks (bool): Applies iid masks to each of the examples in the batch dimension.
+            This option is applicable only when the input tensor is 4D.
     """
     __constants__ = ['mask_param', 'axis', 'iid_masks']
 
@@ -798,7 +803,6 @@ class _AxisMasking(torch.nn.Module):
         Returns:
             Tensor: Masked spectrogram of dimensions (..., freq, time).
         """
-
         # if iid_masks flag marked and specgram has a batch dimension
         if self.iid_masks and specgram.dim() == 4:
             return F.mask_along_axis_iid(specgram, self.mask_param, mask_value, self.axis + 1)
@@ -812,10 +816,10 @@ class FrequencyMasking(_AxisMasking):
     Args:
         freq_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, freq_mask_param).
-        iid_masks (bool, optional): whether to apply the same mask to all
-            the examples/channels in the batch. (Default: ``False``)
+        iid_masks (bool, optional): whether to apply different masks to each
+            example/channel in the batch. (Default: ``False``)
+            This option is applicable only when the input tensor is 4D.
     """
-
     def __init__(self, freq_mask_param: int, iid_masks: bool = False) -> None:
         super(FrequencyMasking, self).__init__(freq_mask_param, 1, iid_masks)
 
@@ -826,10 +830,10 @@ class TimeMasking(_AxisMasking):
     Args:
         time_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, time_mask_param).
-        iid_masks (bool, optional): whether to apply the same mask to all
-            the examples/channels in the batch. (Default: ``False``)
+        iid_masks (bool, optional): whether to apply different masks to each
+            example/channel in the batch. (Default: ``False``)
+            This option is applicable only when the input tensor is 4D.
     """
-
     def __init__(self, time_mask_param: int, iid_masks: bool = False) -> None:
         super(TimeMasking, self).__init__(time_mask_param, 2, iid_masks)
 

@@ -1,6 +1,4 @@
-#include <torch/extension.h>
-
-#include <sox.h>
+#include <torchaudio/csrc/sox.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -69,12 +67,6 @@ void read_audio(
   });
 }
 } // namespace
-
-struct SoxEffect {
-  SoxEffect() : ename(""), eopts({""})  { }
-  std::string ename;
-  std::vector<std::string> eopts;
-};
 
 std::tuple<sox_signalinfo_t, sox_encodinginfo_t> get_info(
     const std::string& file_name
@@ -195,7 +187,7 @@ void write_audio_file(
 }
 
 int initialize_sox() {
-  /* Initializion for sox effects.  Only initialize once  */
+  /* Initialization for sox effects.  Only initialize once  */
   return sox_init();
 }
 
@@ -389,7 +381,7 @@ int build_flow_effects(const std::string& file_name,
 } // namespace audio
 } // namespace torch
 
-PYBIND11_MODULE(_torch_sox, m) {
+PYBIND11_MODULE(_torchaudio, m) {
   py::class_<torch::audio::SoxEffect>(m, "SoxEffect")
        .def(py::init<>())
        .def("__repr__", [](const torch::audio::SoxEffect &self) {

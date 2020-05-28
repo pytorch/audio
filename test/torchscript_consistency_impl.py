@@ -6,36 +6,21 @@ import torchaudio
 import torchaudio.functional as F
 import torchaudio.transforms as T
 
-import common_utils
+from . import common_utils
 
 
-def _assert_functional_consistency(func, tensor, device, shape_only=False):
-    tensor = tensor.to(device)
-    ts_func = torch.jit.script(func)
-    output = func(tensor)
-    ts_output = ts_func(tensor)
-
-    if shape_only:
-        assert ts_output.shape == output.shape, (ts_output.shape, output.shape)
-    else:
-        torch.testing.assert_allclose(ts_output, output)
-
-
-def _assert_transforms_consistency(transform, tensor, device):
-    tensor = tensor.to(device)
-    transform = transform.to(device)
-    ts_transform = torch.jit.script(transform)
-    output = transform(tensor)
-    ts_output = ts_transform(tensor)
-    torch.testing.assert_allclose(ts_output, output)
-
-
-class _FunctionalTestMixin:
+class Functional(common_utils.TestBaseMixin):
     """Implements test for `functinoal` modul that are performed for different devices"""
-    device = None
-
     def _assert_consistency(self, func, tensor, shape_only=False):
-        return _assert_functional_consistency(func, tensor, self.device, shape_only=shape_only)
+        tensor = tensor.to(device=self.device, dtype=self.dtype)
+
+        ts_func = torch.jit.script(func)
+        output = func(tensor)
+        ts_output = ts_func(tensor)
+        if shape_only:
+            ts_output = ts_output.shape
+            output = output.shape
+        self.assertEqual(ts_output, output)
 
     def test_spectrogram(self):
         def func(tensor):
@@ -48,7 +33,7 @@ class _FunctionalTestMixin:
             normalize = False
             return F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
 
-        tensor = torch.rand((1, 1000))
+        tensor = common_utils.get_whitenoise()
         self._assert_consistency(func, tensor)
 
     def test_griffinlim(self):
@@ -80,8 +65,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, tensor)
 
     def test_detect_pitch_frequency(self):
-        filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.mp3')
-        waveform, _ = torchaudio.load(filepath)
+        waveform = common_utils.get_sinusoid(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -99,7 +83,8 @@ class _FunctionalTestMixin:
             f_max = 20.0
             n_mels = 10
             sample_rate = 16000
-            return F.create_fb_matrix(n_stft, f_min, f_max, n_mels, sample_rate)
+            norm = "slaney"
+            return F.create_fb_matrix(n_stft, f_min, f_max, n_mels, sample_rate, norm)
 
         dummy = torch.zeros(1, 1)
         self._assert_consistency(func, dummy)
@@ -142,8 +127,8 @@ class _FunctionalTestMixin:
             qc = 256
             return F.mu_law_encoding(tensor, qc)
 
-        tensor = torch.rand((1, 10))
-        self._assert_consistency(func, tensor)
+        waveform = common_utils.get_whitenoise()
+        self._assert_consistency(func, waveform)
 
     def test_mu_law_decoding(self):
         def func(tensor):
@@ -159,7 +144,7 @@ class _FunctionalTestMixin:
             return F.complex_norm(tensor, power)
 
         tensor = torch.randn(1, 2, 1025, 400, 2)
-        _assert_functional_consistency(func, tensor, self.device)
+        self._assert_consistency(func, tensor)
 
     def test_mask_along_axis(self):
         def func(tensor):
@@ -193,26 +178,28 @@ class _FunctionalTestMixin:
         def func(tensor):
             return F.dither(tensor, 'TPDF')
 
-        tensor = torch.rand((2, 1000))
+        tensor = common_utils.get_whitenoise(n_channels=2)
         self._assert_consistency(func, tensor, shape_only=True)
 
     def test_dither_RPDF(self):
         def func(tensor):
             return F.dither(tensor, 'RPDF')
 
-        tensor = torch.rand((2, 1000))
+        tensor = common_utils.get_whitenoise(n_channels=2)
         self._assert_consistency(func, tensor, shape_only=True)
 
     def test_dither_GPDF(self):
         def func(tensor):
             return F.dither(tensor, 'GPDF')
 
-        tensor = torch.rand((2, 1000))
+        tensor = common_utils.get_whitenoise(n_channels=2)
         self._assert_consistency(func, tensor, shape_only=True)
 
     def test_lfilter(self):
-        filepath = common_utils.get_asset_path('whitenoise.wav')
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise()
 
         def func(tensor):
             # Design an IIR lowpass filter using scipy.signal filter design
@@ -252,8 +239,10 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_lowpass(self):
-        filepath = common_utils.get_asset_path('whitenoise.wav')
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -263,8 +252,10 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_highpass(self):
-        filepath = common_utils.get_asset_path('whitenoise.wav')
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -274,8 +265,10 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_allpass(self):
-        filepath = common_utils.get_asset_path('whitenoise.wav')
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -286,8 +279,10 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_bandpass_with_csg(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -298,9 +293,11 @@ class _FunctionalTestMixin:
 
         self._assert_consistency(func, waveform)
 
-    def test_bandpass_withou_csg(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+    def test_bandpass_without_csg(self):
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -312,8 +309,10 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_bandreject(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -324,8 +323,10 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_band_with_noise(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -337,8 +338,10 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_band_without_noise(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -350,8 +353,10 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_treble(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -363,8 +368,10 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_deemph(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -373,8 +380,10 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_riaa(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -383,8 +392,10 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_equalizer(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
         def func(tensor):
             sample_rate = 44100
@@ -396,8 +407,10 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_perf_biquad_filtering(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise()
 
         def func(tensor):
             a = torch.tensor([0.7, 0.2, 0.6], device=tensor.device, dtype=tensor.dtype)
@@ -442,8 +455,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, b)
 
     def test_contrast(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        waveform = common_utils.get_whitenoise()
 
         def func(tensor):
             enhancement_amount = 80.
@@ -452,8 +464,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_dcshift(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        waveform = common_utils.get_whitenoise()
 
         def func(tensor):
             shift = 0.5
@@ -463,8 +474,7 @@ class _FunctionalTestMixin:
         self._assert_consistency(func, waveform)
 
     def test_overdrive(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, _ = torchaudio.load(filepath, normalization=True)
+        waveform = common_utils.get_whitenoise()
 
         def func(tensor):
             gain = 30.
@@ -473,13 +483,31 @@ class _FunctionalTestMixin:
 
         self._assert_consistency(func, waveform)
 
+    def test_phaser(self):
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
 
-class _TransformsTestMixin:
+        def func(tensor):
+            gain_in = 0.5
+            gain_out = 0.8
+            delay_ms = 2.0
+            decay = 0.4
+            speed = 0.5
+            sample_rate = 44100
+            return F.phaser(tensor, sample_rate, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=True)
+
+        self._assert_consistency(func, waveform)
+
+
+class Transforms(common_utils.TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
-    device = None
-
     def _assert_consistency(self, transform, tensor):
-        _assert_transforms_consistency(transform, tensor, self.device)
+        tensor = tensor.to(device=self.device, dtype=self.dtype)
+        transform = transform.to(device=self.device, dtype=self.dtype)
+
+        ts_transform = torch.jit.script(transform)
+        output = transform(tensor)
+        ts_output = ts_transform(tensor)
+        self.assertEqual(ts_output, output)
 
     def test_Spectrogram(self):
         tensor = torch.rand((1, 1000))
@@ -506,17 +534,16 @@ class _TransformsTestMixin:
         self._assert_consistency(T.MFCC(), tensor)
 
     def test_Resample(self):
-        tensor = torch.rand((2, 1000))
-        sample_rate = 100.
-        sample_rate_2 = 50.
-        self._assert_consistency(T.Resample(sample_rate, sample_rate_2), tensor)
+        sr1, sr2 = 16000, 8000
+        tensor = common_utils.get_whitenoise(sample_rate=sr1)
+        self._assert_consistency(T.Resample(float(sr1), float(sr2)), tensor)
 
     def test_ComplexNorm(self):
         tensor = torch.rand((1, 2, 201, 2))
         self._assert_consistency(T.ComplexNorm(), tensor)
 
     def test_MuLawEncoding(self):
-        tensor = torch.rand((1, 10))
+        tensor = common_utils.get_whitenoise()
         self._assert_consistency(T.MuLawEncoding(), tensor)
 
     def test_MuLawDecoding(self):
@@ -534,8 +561,7 @@ class _TransformsTestMixin:
         )
 
     def test_Fade(self):
-        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, _ = torchaudio.load(test_filepath)
+        waveform = common_utils.get_whitenoise()
         fade_in_len = 3000
         fade_out_len = 3000
         self._assert_consistency(T.Fade(fade_in_len, fade_out_len), waveform)
@@ -549,8 +575,7 @@ class _TransformsTestMixin:
         self._assert_consistency(T.TimeMasking(time_mask_param=30, iid_masks=False), tensor)
 
     def test_Vol(self):
-        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, _ = torchaudio.load(test_filepath)
+        waveform = common_utils.get_whitenoise()
         self._assert_consistency(T.Vol(1.1), waveform)
 
     def test_SlidingWindowCmn(self):
@@ -558,32 +583,6 @@ class _TransformsTestMixin:
         self._assert_consistency(T.SlidingWindowCmn(), tensor)
 
     def test_Vad(self):
-        filepath = common_utils.get_asset_path("vad-hello-mono-32000.wav")
+        filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
         waveform, sample_rate = torchaudio.load(filepath)
         self._assert_consistency(T.Vad(sample_rate=sample_rate), waveform)
-
-
-class TestFunctionalCPU(_FunctionalTestMixin, unittest.TestCase):
-    """Test suite for Functional module on CPU"""
-    device = torch.device('cpu')
-
-
-@unittest.skipIf(not torch.cuda.is_available(), 'CUDA not available')
-class TestFunctionalCUDA(_FunctionalTestMixin, unittest.TestCase):
-    """Test suite for Functional module on GPU"""
-    device = torch.device('cuda')
-
-
-class TestTransformsCPU(_TransformsTestMixin, unittest.TestCase):
-    """Test suite for Transforms module on CPU"""
-    device = torch.device('cpu')
-
-
-@unittest.skipIf(not torch.cuda.is_available(), 'CUDA not available')
-class TestTransformsCUDA(_TransformsTestMixin, unittest.TestCase):
-    """Test suite for Transforms module on GPU"""
-    device = torch.device('cuda')
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -6,13 +6,10 @@ import torchaudio
 import torchaudio.functional as F
 import pytest
 
-import common_utils
+from . import common_utils
 
 
-class _LfilterMixin:
-    device = None
-    dtype = None
-
+class Lfilter(common_utils.TestBaseMixin):
     def test_simple(self):
         """
         Create a very basic signal,
@@ -26,23 +23,19 @@ class _LfilterMixin:
         a_coeffs = torch.tensor([1, 0, 0, 0], dtype=self.dtype, device=self.device)
         output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
 
-        torch.testing.assert_allclose(output_waveform[:, 3:], waveform[:, 0:-3], atol=1e-5, rtol=1e-5)
+        self.assertEqual(output_waveform[:, 3:], waveform[:, 0:-3], atol=1e-5, rtol=1e-5)
+
+    def test_clamp(self):
+        input_signal = torch.ones(1, 44100 * 1, dtype=self.dtype, device=self.device)
+        b_coeffs = torch.tensor([1, 0], dtype=self.dtype, device=self.device)
+        a_coeffs = torch.tensor([1, -0.95], dtype=self.dtype, device=self.device)
+        output_signal = F.lfilter(input_signal, a_coeffs, b_coeffs, clamp=True)
+        assert output_signal.max() <= 1
+        output_signal = F.lfilter(input_signal, a_coeffs, b_coeffs, clamp=False)
+        assert output_signal.max() > 1
 
 
-class TestLfilterFloat32CPU(_LfilterMixin, unittest.TestCase):
-    device = torch.device('cpu')
-    dtype = torch.float32
-
-
-class TestLfilterFloat64CPU(_LfilterMixin, unittest.TestCase):
-    device = torch.device('cpu')
-    dtype = torch.float64
-
-
-@unittest.skipIf(not torch.cuda.is_available(), "CUDA not available")
-class TestLfilterFloat32CUDA(_LfilterMixin, unittest.TestCase):
-    device = torch.device('cuda')
-    dtype = torch.float32
+common_utils.define_test_suites(globals(), [Lfilter])
 
 
 class TestComputeDeltas(unittest.TestCase):
@@ -179,7 +172,7 @@ class TestIstft(unittest.TestCase):
     def test_istft_requires_overlap_windows(self):
         # the window is size 1 but it hops 20 so there is a gap which throw an error
         stft = torch.zeros((3, 5, 2))
-        self.assertRaises(AssertionError, torchaudio.functional.istft, stft, n_fft=4,
+        self.assertRaises(RuntimeError, torchaudio.functional.istft, stft, n_fft=4,
                           hop_length=20, win_length=1, window=torch.ones(1))
 
     def test_istft_requires_nola(self):
@@ -199,11 +192,11 @@ class TestIstft(unittest.TestCase):
         # A window of ones meets NOLA but a window of zeros does not. This should
         # throw an error.
         torchaudio.functional.istft(stft, **kwargs_ok)
-        self.assertRaises(AssertionError, torchaudio.functional.istft, stft, **kwargs_not_ok)
+        self.assertRaises(RuntimeError, torchaudio.functional.istft, stft, **kwargs_not_ok)
 
     def test_istft_requires_non_empty(self):
-        self.assertRaises(AssertionError, torchaudio.functional.istft, torch.zeros((3, 0, 2)), 2)
-        self.assertRaises(AssertionError, torchaudio.functional.istft, torch.zeros((0, 3, 2)), 2)
+        self.assertRaises(RuntimeError, torchaudio.functional.istft, torch.zeros((3, 0, 2)), 2)
+        self.assertRaises(RuntimeError, torchaudio.functional.istft, torch.zeros((0, 3, 2)), 2)
 
     def _test_istft_of_sine(self, amplitude, L, n):
         # stft of amplitude*sin(2*pi/L*n*x) with the hop length and window size equaling L
