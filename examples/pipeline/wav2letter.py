@@ -366,6 +366,7 @@ def train_one_epoch(
     model.train()
 
     sums = defaultdict(lambda: 0.0)
+
     for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
         data_loader, maxsize=2
     ):
@@ -570,6 +571,8 @@ def main(args):
     )
     # criterion = nn.MSELoss()
     # criterion = torch.nn.NLLLoss()
+
+    torch.autograd.set_detect_anomaly(False)
 
     loader_training = DataLoader(
         training,
