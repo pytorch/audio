@@ -492,8 +492,9 @@ def main(args):
 
     # Install signal handler
     signal.signal(signal.SIGUSR1, lambda a, b: signal_handler(a, b))
-    audio_backend = "soundfile"
-    torchaudio.set_audio_backend(audio_backend)
+
+    # Change backend
+    torchaudio.set_audio_backend("soundfile")
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     # num_devices = torch.cuda.device_count()
