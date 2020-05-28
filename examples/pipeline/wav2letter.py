@@ -456,7 +456,7 @@ def evaluate(
 
             cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
             # cers_normalized = [d / len(a) for a, d in zip(target, cers)]
-            cers = statistics.mean(cers)
+            cers = sum(cers)
             sums["cer"] += cers
 
             output = [o.split(language_model.char_space) for o in output]
@@ -464,7 +464,7 @@ def evaluate(
 
             wers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
             # wers_normalized = [d / len(a) for a, d in zip(target, wers)]
-            wers = statistics.mean(wers)
+            wers = sum(wers)
             sums["wer"] += wers
 
             if SIGNAL_RECEIVED:
@@ -475,10 +475,7 @@ def evaluate(
             sums[k] /= len(data_loader)
 
         print(f"Validation loss: {sums['loss']:.5f}", flush=True)
-        print(
-            f"CER: {sums['cer']}  WER: {sums['wer']}  CERN: {sums['cern']}  WERN: {sums['wern']}",
-            flush=True,
-        )
+        print(f"CER: {sums['cer']}  WER: {sums['wer']}", flush=True)
 
         return sums["loss"]
 
