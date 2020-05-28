@@ -556,12 +556,12 @@ def main(args):
 
     optimizer_params = {
         "lr": args.learning_rate,
-        # "eps": args.eps,
-        # "rho": args.rho,
+        "eps": args.eps,
+        "rho": args.rho,
         "weight_decay": args.weight_decay,
     }
 
-    optimizer = SGD(model.parameters(), **optimizer_params)
+    optimizer = Adadelta(model.parameters(), **optimizer_params)
     scheduler = ExponentialLR(optimizer, gamma=args.gamma)
     # scheduler = ReduceLROnPlateau(optimizer, patience=2, threshold=1e-3)
 
