@@ -8,7 +8,7 @@ from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.yesno import YESNO
 from torchaudio.datasets.ljspeech import LJSPEECH
 
-import common_utils
+from . import common_utils
 
 
 class TestDatasets(unittest.TestCase):

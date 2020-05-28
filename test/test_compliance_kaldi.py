@@ -1,13 +1,13 @@
 import math
 import os
-import compliance.utils
 import torch
 import torchaudio
 import torchaudio.compliance.kaldi as kaldi
 import unittest
 
-import common_utils
-from common_utils import AudioBackendScope, BACKENDS
+from . import common_utils
+from .compliance import utils as compliance_utils
+from .common_utils import AudioBackendScope, BACKENDS
 
 
 def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
@@ -50,7 +50,7 @@ class Test_Kaldi(unittest.TestCase):
     test_filepath = common_utils.get_asset_path('kaldi_file.wav')
     test_8000_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
     kaldi_output_dir = common_utils.get_asset_path('kaldi')
-    test_filepaths = {prefix: [] for prefix in compliance.utils.TEST_PREFIX}
+    test_filepaths = {prefix: [] for prefix in compliance_utils.TEST_PREFIX}
 
     # separating test files by their types (e.g 'spec', 'fbank', etc.)
     for f in os.listdir(kaldi_output_dir):
@@ -151,7 +151,7 @@ class Test_Kaldi(unittest.TestCase):
             args = f.split('-')
             args[-1] = os.path.splitext(args[-1])[0]
             assert len(args) == expected_num_args, 'invalid test kaldi file name'
-            args = [compliance.utils.parse(arg) for arg in args]
+            args = [compliance_utils.parse(arg) for arg in args]
 
             output = get_output_fn(sound, args)
 

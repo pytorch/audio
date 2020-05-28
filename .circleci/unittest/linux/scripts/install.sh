@@ -20,6 +20,4 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 conda install -y -c pytorch-nightly pytorch "${cudatoolkit}"
 
 printf "* Installing torchaudio\n"
-# Link codecs present at /third_party. See Dockerfile for how this is built
-ln -fs /third_party ./third_party
-IS_CONDA=true python setup.py develop
+python setup.py develop

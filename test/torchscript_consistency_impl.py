@@ -6,7 +6,7 @@ import torchaudio
 import torchaudio.functional as F
 import torchaudio.transforms as T
 
-import common_utils
+from . import common_utils
 
 
 class Functional(common_utils.TestBaseMixin):
@@ -83,7 +83,7 @@ class Functional(common_utils.TestBaseMixin):
             f_max = 20.0
             n_mels = 10
             sample_rate = 16000
-            norm = ""
+            norm = "slaney"
             return F.create_fb_matrix(n_stft, f_min, f_max, n_mels, sample_rate, norm)
 
         dummy = torch.zeros(1, 1)
