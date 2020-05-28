@@ -102,6 +102,7 @@ def parse_args():
     )
     parser.add_argument("--eps", metavar="EPS", type=float, default=1e-8)
     parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
+    parser.add_argument("--clip-norm", metavar="NORM", type=float, default=0.0)
 
     parser.add_argument(
         "--dataset",
@@ -115,8 +116,6 @@ def parse_args():
     parser.add_argument("--jit", action="store_true", help="if used, model is jitted")
 
     args = parser.parse_args()
-
-    args.clip_norm = 0.0
 
     return args
 
@@ -374,7 +373,7 @@ def train_one_epoch(
 
     model.train()
 
-    sum_loss = 0.0
+    sums = defaultdict(lambda: 0.0)
     for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
         data_loader, maxsize=2
     ):
@@ -392,10 +391,15 @@ def train_one_epoch(
         # target_lengths: batch size
 
         loss = criterion(outputs, targets, tensors_lengths, target_lengths)
-        sum_loss += loss.item()
+        sums["loss"] += loss.item()
 
         optimizer.zero_grad()
         loss.backward()
+
+        if args.clip_norm > 0:
+            sums["gradient"] += torch.nn.utils.clip_grad_norm_(
+                model.parameters(), args.clip_norm
+            )
 
         optimizer.step()
 
@@ -405,9 +409,13 @@ def train_one_epoch(
         if pbar is not None:
             pbar.update(1 / len(data_loader))
 
-    # Average loss
-    sum_loss = sum_loss / len(data_loader)
-    print(f"Training loss: {sum_loss:4.5f}", flush=True)
+    # Average
+    for k in sums.keys():
+        sums[k] /= len(data_loader)
+
+    print(f"Training loss: {sums['loss']:4.5f}", flush=True)
+    if "gradient" in sums:
+        print(f"Average gradient norm: {sums['gradient']:4.5f}", flush=True)
 
     scheduler.step()
 
@@ -470,7 +478,7 @@ def evaluate(
             if SIGNAL_RECEIVED:
                 break
 
-        # Average loss
+        # Average
         for k in sums.keys():
             sums[k] /= len(data_loader)
 
