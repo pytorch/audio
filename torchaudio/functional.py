@@ -1369,7 +1369,7 @@ def flanger(
     r"""Apply a flanger effect to the audio. Similar to SoX implementation.
 
     Args:
-        waveform (Tensor): audio waveform of dimension of `(...,channels, time)` .
+        waveform (Tensor): audio waveform of dimension of `(..., channel, time)` .
             Max 4 channels allowed
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
         delay (float): desired delay in milliseconds(ms)
@@ -1392,7 +1392,7 @@ def flanger(
             (Default: ``True``)
 
     Returns:
-        Tensor: Waveform of dimension of `(...,channels,time)`
+        Tensor: Waveform of dimension of `(..., channel, time)`
 
     References:
         http://sox.sourceforge.net/sox.html
