@@ -120,11 +120,6 @@ def parse_args():
     return args
 
 
-def SIGTERM_handler(a, b):
-    print("Received sigterm")
-    pass
-
-
 def signal_handler(a, b):
     global SIGNAL_RECEIVED
     print("Signal received", a, datetime.now().strftime("%y%m%d.%H%M%S"), flush=True)
@@ -497,7 +492,6 @@ def main(args):
 
     # Install signal handler
     signal.signal(signal.SIGUSR1, lambda a, b: signal_handler(a, b))
-    signal.signal(signal.SIGTERM, SIGTERM_handler)
     audio_backend = "soundfile"
     torchaudio.set_audio_backend(audio_backend)
 
