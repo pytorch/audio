@@ -37,7 +37,7 @@ def parse_args():
     )
     parser.add_argument(
         "--checkpoint",
-        default="checkpoint.pth.tar",
+        default="",
         type=str,
         metavar="PATH",
         help="path to latest checkpoint",
@@ -132,6 +132,10 @@ def save_checkpoint(state, is_best, filename):
     then copy it to filename, in case the signal interrupts
     the torch.save() process.
     """
+
+    if filename == "":
+        return
+
     tempfile = filename + ".temp"
 
     # Remove tempfile, in case the signal arrives in the
