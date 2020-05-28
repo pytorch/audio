@@ -77,7 +77,7 @@ build_lame() {
         if [ ! -f Makefile ]; then
             ./configure ${CONFIG_OPTS} \
                         --disable-shared --enable-static --prefix="${install_dir}" CFLAGS=-fPIC CXXFLAGS=-fPIC \
-                        --with-pic --disable-debug --disable-dependency-tracking --enable-nasm
+                        LIBS=-ltinfo --with-pic --disable-debug --disable-dependency-tracking --enable-nasm
         fi
         make ${MAKE_OPTS} > make.log 2>&1
         make ${MAKE_OPTS} install
