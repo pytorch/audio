@@ -247,18 +247,18 @@ class ProcessedLIBRISPEECH(LIBRISPEECH):
         return self.process_datapoint(item)
 
     def process_datapoint(self, item):
-        transformed = item[0]  # .to(device, non_blocking=non_blocking)
+        transformed = item[0]  # .to(device)
         target = item[2].lower()
 
         transformed = self.transforms(transformed)
         transformed = transformed[0, ...].transpose(0, -1)
 
-        target = " " + target + " "
+        # target = " " + target + " "
         target = self.encode(target)
         target = torch.tensor(target, dtype=torch.long, device=transformed.device)
 
-        transformed = transformed  # .to("cpu")
-        target = target  # .to("cpu")
+        # transformed = transformed.to("cpu")
+        # target = target.to("cpu")
         return transformed, target
 
 
@@ -360,14 +360,7 @@ def count_parameters(model):
 
 
 def train_one_epoch(
-    model,
-    criterion,
-    optimizer,
-    scheduler,
-    data_loader,
-    device,
-    pbar=None,
-    non_blocking=False,
+    model, criterion, optimizer, scheduler, data_loader, device, pbar=None,
 ):
 
     model.train()
@@ -377,8 +370,8 @@ def train_one_epoch(
         data_loader, maxsize=2
     ):
 
-        inputs = inputs.to(device, non_blocking=non_blocking)
-        targets = targets.to(device, non_blocking=non_blocking)
+        inputs = inputs.to(device, non_blocking=True)
+        targets = targets.to(device, non_blocking=True)
 
         # keep batch first for data parallel
         outputs = model(inputs).transpose(-1, -2).transpose(0, 1)
@@ -419,9 +412,7 @@ def train_one_epoch(
     scheduler.step()
 
 
-def evaluate(
-    model, criterion, data_loader, decoder, language_model, device, non_blocking=False
-):
+def evaluate(model, criterion, data_loader, decoder, language_model, device):
 
     with torch.no_grad():
 
@@ -433,8 +424,8 @@ def evaluate(
             data_loader, maxsize=2
         ):
 
-            inputs = inputs.to(device, non_blocking=non_blocking)
-            targets = targets.to(device, non_blocking=non_blocking)
+            inputs = inputs.to(device, non_blocking=True)
+            targets = targets.to(device, non_blocking=True)
 
             # keep batch first for data parallel
             outputs = model(inputs).transpose(-1, -2).transpose(0, 1)
@@ -512,8 +503,6 @@ def main(args):
     loader_validation_params = loader_training_params.copy()
     loader_validation_params["shuffle"] = False
 
-    non_blocking = True
-
     # audio
 
     melkwargs = {
@@ -558,7 +547,7 @@ def main(args):
         model = torch.nn.parallel.DistributedDataParallel(model)
         # model = torch.nn.parallel.DistributedDataParallel(model, find_unused_parameters=True)
 
-    model = model.to(device, non_blocking=non_blocking)
+    model = model.to(device, non_blocking=True)
 
     n = count_parameters(model)
     print(f"Number of parameters: {n}", flush=True)
@@ -640,7 +629,6 @@ def main(args):
                 loader_training,
                 device,
                 pbar=pbar,
-                non_blocking=non_blocking,
             )
 
             if SIGNAL_RECEIVED:
@@ -664,7 +652,6 @@ def main(args):
                     greedy_decode,
                     language_model,
                     device,
-                    non_blocking=non_blocking,
                 )
 
                 is_best = sum_loss < best_loss
