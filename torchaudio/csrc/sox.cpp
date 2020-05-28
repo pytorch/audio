@@ -6,7 +6,10 @@
 #include <vector>
 
 namespace torch {
-namespace audio {
+
+
+
+  namespace audio {
 namespace {
 /// Helper struct to safely close the sox_format_t descriptor.
 struct SoxDescriptor {
