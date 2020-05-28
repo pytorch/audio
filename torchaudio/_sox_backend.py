@@ -4,7 +4,8 @@ from typing import Optional, Tuple
 import torch
 from torch import Tensor
 import torchaudio
-from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
+
+from .backend_common import SignalInfo, EncodingInfo
 
 
 def load(filepath: str,

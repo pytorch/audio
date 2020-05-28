@@ -19,7 +19,8 @@ from torchaudio._backend import (
     get_audio_backend,
     set_audio_backend,
 )
-from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
+from torchaudio.backend_common import SignalInfo, EncodingInfo
+
 
 try:
     from .version import __version__, git_version  # noqa: F401
