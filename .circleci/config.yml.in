@@ -471,6 +471,37 @@ jobs:
       - store_test_results:
           path: test-results
 
+  stylecheck:
+    <<: *binary_common
+    docker:
+      - image: "pytorch/torchaudio_unittest_base:manylinux"
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: Generate cache key
+          # This will refresh cache on Sundays, nightly build should generate new cache.
+          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - restore_cache:
+          {% raw %}
+          keys:
+            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          {% endraw %}
+      - run:
+          name: Setup
+          command: .circleci/unittest/linux/scripts/setup_env.sh
+      - save_cache:
+          {% raw %}
+          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          {% endraw %}
+          paths:
+            - conda
+            - env
+            - third_party/build
+      - run:
+          name: Run style check
+          command: .circleci/unittest/linux/scripts/run_style_checks.sh
+
 workflows:
   build:
     jobs:

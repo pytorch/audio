@@ -114,7 +114,7 @@ def unittest_workflows(indentation=6):
     jobs = []
     for os_type in ["linux", "windows"]:
         for device_type in ["cpu", "gpu"]:
-            for python_version in PYTHON_VERSIONS:
+            for i, python_version in enumerate(PYTHON_VERSIONS):
                 job = {
                     "name": f"unittest_{os_type}_{device_type}_py{python_version}",
                     "python_version": python_version,
@@ -123,6 +123,14 @@ def unittest_workflows(indentation=6):
                 if device_type == 'gpu':
                     job['filters'] = gen_filter_branch_tree('master')
                 jobs.append({f"unittest_{os_type}_{device_type}": job})
+
+                if i == 0 and os_type == "linux" and device_type == "cpu":
+                    jobs.append({
+                        f"stylecheck": {
+                            "name": f"stylecheck_py{python_version}",
+                            "python_version": python_version,
+                        }
+                    })
     return indent(indentation, jobs)
 
 
