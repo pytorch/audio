@@ -60,6 +60,34 @@ jobs:
             python .circleci/regenerate.py
             git diff --exit-code || (echo ".circleci/config.yml not in sync with config.yml.in! Run .circleci/regenerate.py to update config"; exit 1)
 
+  download_third_parties_nix:
+    docker:
+      - image: "centos:8"
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Generate cache key
+          # This will refresh cache on daily
+          command: echo "$(date +"%Y-%U-%d")" > .circleci-daily
+      - restore_cache:
+
+          keys:
+            - tp-nix-{{ checksum ".circleci-daily" }}-{{ checksum "./build_tools/setup_helpers/build_third_party.sh" }}-{{ checksum "./build_tools/setup_helpers/build_third_party_helper.sh" }}
+
+      - run:
+          command: ./build_tools/setup_helpers/build_third_party.sh $PWD --download-only
+      - save_cache:
+
+          key: tp-nix-{{ checksum ".circleci-daily" }}-{{ checksum "./build_tools/setup_helpers/build_third_party.sh" }}-{{ checksum "./build_tools/setup_helpers/build_third_party_helper.sh" }}
+
+          paths:
+            - third_party/tmp
+      - persist_to_workspace:
+          root: third_party
+          paths:
+            - tmp
+
   binary_linux_wheel:
     <<: *binary_common
     docker:
@@ -67,6 +95,8 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run: packaging/build_wheel.sh
       - store_artifacts:
           path: dist
@@ -82,6 +112,8 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run: packaging/build_conda.sh
       - store_artifacts:
           path: /opt/conda/conda-bld/linux-64
@@ -96,6 +128,8 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run:
           # Cannot easily deduplicate this as source'ing activate
           # will set environment variables which we need to propagate
@@ -118,6 +152,8 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run:
           command: |
             curl -o conda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
@@ -506,24 +542,38 @@ workflows:
   build:
     jobs:
       - circleci_consistency
+      - download_third_parties_nix:
+          name: download_third_parties_nix
       - binary_linux_wheel:
           name: binary_linux_wheel_py3.6
           python_version: '3.6'
+          requires:
+          - download_third_parties_nix
       - binary_linux_wheel:
           name: binary_linux_wheel_py3.7
           python_version: '3.7'
+          requires:
+          - download_third_parties_nix
       - binary_linux_wheel:
           name: binary_linux_wheel_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
       - binary_macos_wheel:
           name: binary_macos_wheel_py3.6
           python_version: '3.6'
+          requires:
+          - download_third_parties_nix
       - binary_macos_wheel:
           name: binary_macos_wheel_py3.7
           python_version: '3.7'
+          requires:
+          - download_third_parties_nix
       - binary_macos_wheel:
           name: binary_macos_wheel_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
       - binary_windows_wheel:
           name: binary_windows_wheel_py3.6
           python_version: '3.6'
@@ -536,21 +586,33 @@ workflows:
       - binary_linux_conda:
           name: binary_linux_conda_py3.6
           python_version: '3.6'
+          requires:
+          - download_third_parties_nix
       - binary_linux_conda:
           name: binary_linux_conda_py3.7
           python_version: '3.7'
+          requires:
+          - download_third_parties_nix
       - binary_linux_conda:
           name: binary_linux_conda_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
       - binary_macos_conda:
           name: binary_macos_conda_py3.6
           python_version: '3.6'
+          requires:
+          - download_third_parties_nix
       - binary_macos_conda:
           name: binary_macos_conda_py3.7
           python_version: '3.7'
+          requires:
+          - download_third_parties_nix
       - binary_macos_conda:
           name: binary_macos_conda_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
       - binary_windows_conda:
           name: binary_windows_conda_py3.6
           python_version: '3.6'
@@ -625,12 +687,19 @@ workflows:
           filters:
             branches:
               only: nightly
+      - download_third_parties_nix:
+          filters:
+            branches:
+              only: nightly
+          name: download_third_parties_nix
       - binary_linux_wheel:
           filters:
             branches:
               only: nightly
           name: nightly_binary_linux_wheel_py3.6
           python_version: '3.6'
+          requires:
+          - download_third_parties_nix
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -653,6 +722,8 @@ workflows:
               only: nightly
           name: nightly_binary_linux_wheel_py3.7
           python_version: '3.7'
+          requires:
+          - download_third_parties_nix
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -675,6 +746,8 @@ workflows:
               only: nightly
           name: nightly_binary_linux_wheel_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -697,6 +770,8 @@ workflows:
               only: nightly
           name: nightly_binary_macos_wheel_py3.6
           python_version: '3.6'
+          requires:
+          - download_third_parties_nix
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -711,6 +786,8 @@ workflows:
               only: nightly
           name: nightly_binary_macos_wheel_py3.7
           python_version: '3.7'
+          requires:
+          - download_third_parties_nix
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -725,6 +802,8 @@ workflows:
               only: nightly
           name: nightly_binary_macos_wheel_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
       - binary_wheel_upload:
           context: org-member
           filters:
@@ -805,6 +884,8 @@ workflows:
               only: nightly
           name: nightly_binary_linux_conda_py3.6
           python_version: '3.6'
+          requires:
+          - download_third_parties_nix
       - binary_conda_upload:
           context: org-member
           filters:
@@ -827,6 +908,8 @@ workflows:
               only: nightly
           name: nightly_binary_linux_conda_py3.7
           python_version: '3.7'
+          requires:
+          - download_third_parties_nix
       - binary_conda_upload:
           context: org-member
           filters:
@@ -849,6 +932,8 @@ workflows:
               only: nightly
           name: nightly_binary_linux_conda_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
       - binary_conda_upload:
           context: org-member
           filters:
@@ -871,6 +956,8 @@ workflows:
               only: nightly
           name: nightly_binary_macos_conda_py3.6
           python_version: '3.6'
+          requires:
+          - download_third_parties_nix
       - binary_conda_upload:
           context: org-member
           filters:
@@ -885,6 +972,8 @@ workflows:
               only: nightly
           name: nightly_binary_macos_conda_py3.7
           python_version: '3.7'
+          requires:
+          - download_third_parties_nix
       - binary_conda_upload:
           context: org-member
           filters:
@@ -899,6 +988,8 @@ workflows:
               only: nightly
           name: nightly_binary_macos_conda_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
       - binary_conda_upload:
           context: org-member
           filters:
