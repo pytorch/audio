@@ -27,7 +27,7 @@ to use and feel like a natural extension.
 Dependencies
 ------------
 * pytorch (nightly version needed for development)
-* libsox v14.3.2 or above (only when building from source. not required for binary installation)
+* libsox v14.3.2 or above (only required when building from source)
 * [optional] vesis84/kaldi-io-for-python commit cb46cb1f44318a5d04d4941cf39084c5b021241e or above
 
 Installation
@@ -113,10 +113,10 @@ BUILD_SOX= python setup.py install
 BUILD_SOX= MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
 ```
 
-This is known to work on a few major Linux distributions such as Ubuntu and CentOS 7 and macOS.
+This is known to work on linux and unix distributions such as Ubuntu and CentOS 7 and macOS.
 If you try this on a new system and found a solution to make it work, feel free to share it by opening and issue.
 
-#### Troubleshooting:
+#### Troubleshooting
 
 <Details><Summary>checking build system type... ./config.guess: unable to guess system type</Summary>
 
@@ -140,8 +140,6 @@ Install `ncurses` from `conda-forge` before running `python setup.py install`:
 # Install ncurses from conda-forge
 conda install -c conda-forge ncurses
 ```
-
-See also: [#666](https://github.com/pytorch/audio/issues/666)
 
 </Details>
 
