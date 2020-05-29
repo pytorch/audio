@@ -93,6 +93,21 @@ python setup.py install
 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
 ```
 
+If while building from within an anaconda environment you come across errors similar to the following:
+
+
+```
+../bin/ld: console.c:(.text+0xc1): undefined reference to `tgetnum'
+```
+
+Install `ncurses` from `conda-forge` before running `python setup.py install`:
+
+```
+# Install ncurses from conda-forge
+conda install -c conda-forge ncurses
+```
+
+
 Quick Usage
 -----------
 
