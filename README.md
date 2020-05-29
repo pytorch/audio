@@ -27,29 +27,16 @@ to use and feel like a natural extension.
 Dependencies
 ------------
 * pytorch (nightly version needed for development)
-* libsox v14.3.2 or above
+* libsox v14.3.2 or above (only when building from source. not required for binary installation)
 * [optional] vesis84/kaldi-io-for-python commit cb46cb1f44318a5d04d4941cf39084c5b021241e or above
-
-Quick install on
-OSX (Homebrew):
-```bash
-brew install sox
-```
-Linux (Ubuntu):
-```bash
-sudo apt-get install sox libsox-dev libsox-fmt-all
-```
-Anaconda
-```bash
-conda install -c conda-forge sox
-```
 
 Installation
 ------------
 
-### Binaries
+### Binary Distibutions
 
 To install the latest version using anaconda, run:
+
 ```
 conda install -c pytorch torchaudio
 ```
@@ -64,26 +51,48 @@ pip install torchaudio -f https://download.pytorch.org/whl/torch_stable.html
 torch from PyPI. If you need a different torch configuration, preinstall torch
 before running this command.)
 
-At the moment, there is no automated nightly build process, but we occasionally
-build nightlies based on PyTorch nightlies by hand following the instructions in
-[packaging](packaging).  To install the latest nightly via pip, run:
+### Nightly build
+
+Note that nightly build is build on PyTorch's nightly build. Therefore, you need to install the latest PyTorch when you use nightly build of torchaudio.
+
+**pip**
 
 ```
 pip install numpy
 pip install --pre torchaudio -f https://download.pytorch.org/whl/nightly/torch_nightly.html
 ```
 
-To install the latest nightly via conda, run:
+**conda**
 
 ```
 conda install -y -c pytorch-nightly torchaudio
 ```
 
-
 ### From Source
 
 If your system configuration is not among the supported configurations
-above, you can build from source.
+above, you can build torchaudio from source.
+
+This will require libsox v14.3.2 or above.
+
+<Details><Summary>Click here for the examples on how to install SoX</Summary>
+
+OSX (Homebrew):
+```bash
+brew install sox
+```
+
+Linux (Ubuntu):
+```bash
+sudo apt-get install sox libsox-dev libsox-fmt-all
+```
+
+Anaconda
+```bash
+conda install -c conda-forge sox
+```
+
+</Details>
 
 ```bash
 # Linux
@@ -93,8 +102,22 @@ python setup.py install
 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
 ```
 
-If while building from within an anaconda environment you come across errors similar to the following:
+Alternatively, the build process can build SoX (and codecs such as libmad, lame and flac) statically and torchaudio can link them, by defining `BUILD_SOX` environment variable.
+The build process will fetch and build SoX, liblame, libmad, flac before building extension.
 
+```bash
+# Linux
+BUILD_SOX= python setup.py install
+
+# OSX
+BUILD_SOX= MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
+```
+
+#### Troubleshooting:
+
+<Details><Summary>Undefined reference to `tgetnum' when using `BUILD_SOX`</Summary>
+
+If while building from within an anaconda environment you come across errors similar to the following:
 
 ```
 ../bin/ld: console.c:(.text+0xc1): undefined reference to `tgetnum'
@@ -106,6 +129,7 @@ Install `ncurses` from `conda-forge` before running `python setup.py install`:
 # Install ncurses from conda-forge
 conda install -c conda-forge ncurses
 ```
+</Details>
 
 
 Quick Usage
