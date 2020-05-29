@@ -113,7 +113,18 @@ BUILD_SOX= python setup.py install
 BUILD_SOX= MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
 ```
 
+This is known to work on a few major Linux distributions such as Ubuntu and CentOS 7 and macOS.
+If you try this on a new system and found a solution to make it work, feel free to share it by opening and issue.
+
 #### Troubleshooting:
+
+<Details><Summary>checking build system type... ./config.guess: unable to guess system type</Summary>
+
+Since the configuration file for codecs are old, they cannot correctly detect the new environments, such as Jetson Aarch. You need to replace the `config.guess` file in `./third_party/tmp/lame-3.99.5/config.guess` and/or `./third_party/tmp/libmad-0.15.1b/config.guess` with [the latest one](https://github.com/gcc-mirror/gcc/blob/master/config.guess).
+
+See also: [#658](https://github.com/pytorch/audio/issues/658)
+
+</Details>
 
 <Details><Summary>Undefined reference to `tgetnum' when using `BUILD_SOX`</Summary>
 
@@ -129,6 +140,9 @@ Install `ncurses` from `conda-forge` before running `python setup.py install`:
 # Install ncurses from conda-forge
 conda install -c conda-forge ncurses
 ```
+
+See also: [#666](https://github.com/pytorch/audio/issues/666)
+
 </Details>
 
 
