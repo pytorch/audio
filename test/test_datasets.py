@@ -7,6 +7,7 @@ from torchaudio.datasets.utils import diskcache_iterator, bg_iterator
 from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.yesno import YESNO
 from torchaudio.datasets.ljspeech import LJSPEECH
+from torchaudio.datasets.gtzan import GTZAN
 
 from . import common_utils
 
@@ -54,6 +55,11 @@ class TestDatasets(unittest.TestCase):
     def test_speechcommands(self):
         data = SPEECHCOMMANDS(self.path)
         data[0]
+
+    def test_gtzan(self):
+        data = GTZAN(self.path)
+        data[0]
+
 
 
 if __name__ == "__main__":
