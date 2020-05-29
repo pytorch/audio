@@ -1,4 +1,5 @@
 import os
+import warnings
 from typing import Any, Tuple
 
 import torchaudio
@@ -961,15 +962,15 @@ filtered_valid = [
 ]
 
 
-URL = "http://opihi.cs.uvic.genres.tar.gz"
+URL = "http://opihi.cs.uvic.ca/sound/genres.tar.gz"
 FOLDER_IN_ARCHIVE = "genres"
-_CHECKSUMS = {"http://opihi.cs.uvic.genres.tar.gz": "5b3d6dddb579ab49814ab86dba69e7c7"}
+_CHECKSUMS = {"http://opihi.cs.uvic.ca/sound/genres.tar.gz": "5b3d6dddb579ab49814ab86dba69e7c7"}
 
 
 def load_gtzan_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, str]:
     """
     Loads a file from the dataset and returns the raw waveform
-    as a Torch Tensor, its sample rate as an integer, and its 
+    as a Torch Tensor, its sample rate as an integer, and its
     genre as a string.
     """
     # Filenames are of the form label.id, e.g. blues.00078
@@ -985,8 +986,8 @@ def load_gtzan_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, str
 class GTZAN(Dataset):
     """
     Create a Dataset for GTZAN. Each item is a tuple of the form:
-    (waveform, sample_rate, label). Additionally, can provide a
-    custom split that fixes some of GTZAN's duplication issues.
+    waveform, sample_rate, label. Please see http://marsyas.info/downloads/datasets.html
+    if you are planning to use this dataset to publish results.
     """
 
     _ext_audio = ".wav"
@@ -997,27 +998,23 @@ class GTZAN(Dataset):
         url: str = URL,
         folder_in_archive: str = FOLDER_IN_ARCHIVE,
         download: bool = False,
-        filtered: bool = False,
-        subset: str = "",
-        transform: Any = None,
-        target_transform: Any = None,
+        subset: Any = None,
     ) -> None:
 
-        super(GTZAN, self).__init__()
+        # super(GTZAN, self).__init__()
         self.root = root
         self.url = url
         self.folder_in_archive = folder_in_archive
         self.download = download
-        self.filtered = filtered
         self.subset = subset
-        self.transform = transform
-        self.target_transform = target_transform
 
-        assert (
-            not filtered or subset in ["training", "validation", "testing"] and filtered
-        ), (
-            "When `filtered` is True, subset must take a value from "
-            + "{'training', 'validation', 'testing'}, otherwise `filtered` must be False."
+        warnings.warn("Please see http://marsyas.info/downloads/datasets.html "
+                      "if you are planning to use this dataset to publish experimental "
+                      "results using this dataset.")
+
+        assert subset is None or subset in ["training", "validation", "testing"], (
+            "When `subset` not None, it must take a value from "
+            + "{'training', 'validation', 'testing'}."
         )
 
         archive = os.path.basename(url)
@@ -1036,7 +1033,7 @@ class GTZAN(Dataset):
                 "Dataset not found. Please use `download=True` to download it."
             )
 
-        if not filtered:
+        if self.subset is None:
             walker = walk_files(
                 self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
             )
@@ -1052,12 +1049,7 @@ class GTZAN(Dataset):
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str]:
         fileid = self._walker[n]
         item = load_gtzan_item(fileid, self._path, self._ext_audio)
-
         waveform, sample_rate, label = item
-        if self.transform is not None:
-            waveform = self.transform(waveform)
-        if self.target_transform is not None:
-            labels = self.target_transform(labels)
         return waveform, sample_rate, label
 
     def __len__(self) -> int:
