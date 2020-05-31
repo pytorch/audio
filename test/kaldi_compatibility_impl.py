@@ -195,9 +195,9 @@ class Kaldi(common_utils.TestBaseMixin):
             kaldi_result = _run_kaldi(command, 'scp', wave_file)
             self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
 
-    @unittest.skipIf(_not_available('compute-spec-feats'), '`compute-spec-feats` not available')
+    @unittest.skipIf(_not_available('compute-spectrogram-feats'), '`compute-spectrogram-feats` not available')
     def test_spectrogram(self):
-        """spectrogram should be numerically compatible with compute-spec-feats"""
+        """spectrogram should be numerically compatible with compute-spectrogram-feats"""
 
         wave_file = common_utils.get_asset_path('kaldi_file.wav')
         waveform = torchaudio.load_wav(wave_file)[0].to(dtype=self.dtype, device=self.device)
@@ -223,13 +223,34 @@ class Kaldi(common_utils.TestBaseMixin):
         for args_string in spec_args_list:
             kwargs = _get_func_args('spec', spec_keys, args_string)
             result = torchaudio.compliance.kaldi.spectrogram(waveform, **kwargs)
-            command = ['compute-spec-feats'] + _convert_args(**kwargs) + ['scp:-', 'ark:-']
+            command = ['compute-spectrogram-feats'] + _convert_args(**kwargs) + ['scp:-', 'ark:-']
             kaldi_result = _run_kaldi(command, 'scp', wave_file)
             self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
 
     def test_mfcc_empty(self):
         # Passing in an empty tensor should result in an error
         self.assertRaises(AssertionError, kaldi.mfcc, torch.empty(0))
+
+    def test_resample(self):
+        wave_file = self.test_8000_filepath
+        waveform = torchaudio.load_wav(wave_file)[0].to(dtype=self.dtype, device=self.device)
+
+        kaldi_arg_file = common_utils.get_asset_path('kaldi_test_args.txt')
+        args_list = [line.strip() for line in open(kaldi_arg_file, "r")]
+        spec_args_list = [args for args in args_list if 'resample' in args]
+
+        resample_keys = ['orig_freq',
+                         'new_freq',
+                         ]
+
+        for args_string in spec_args_list:
+            kwargs = _get_func_args('resample', resample_keys, args_string)
+            result = torchaudio.compliance.kaldi.spectrogram(waveform, **kwargs)
+            # TODO: kaldi command for resample ??
+            # command = ['compute-spectrogram-feats'] + _convert_args(**kwargs) + ['scp:-', 'ark:-']
+            # kaldi_result = _run_kaldi(command, 'scp', wave_file)
+            kaldi_result = None
+            self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
 
     def test_resample_waveform_upsample_size(self):
         sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)
