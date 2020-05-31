@@ -24,6 +24,45 @@ def _convert_args(**kwargs):
     return args
 
 
+def _get_func_args(test_name, keys, args_str):
+    """Return the python dict of arguments for a input arg string , based on test_name
+
+    Arguments:
+        test_name: Name of the test ( Ex: 'fbank' , 'mfcc' )
+        keys : Arugument keys corresponding to the test
+        args_str : string of arguments joined by `-`
+    """
+    args_dict = {}
+    args = args_str.split('-')
+
+    for i in range(len(args) - 1):
+        args_dict[keys[i]] = _parse(args[i + 1])
+
+    if test_name in ('fbank', 'mfcc'):
+        args_dict['dither'] = 0.0
+
+    return args_dict
+
+TEST_PREFIX = ['spec', 'fbank', 'mfcc', 'resample']
+
+
+def _parse(token):
+    """converts an string argument(token) to its corresponding python type
+
+    Arguments:
+        token: string
+    """
+    if token == 'true':
+        return True
+    if token == 'false':
+        return False
+    if token in torchaudio.compliance.kaldi.WINDOWS or token in [TEST_PREFIX]:
+        return token
+    if '.' in token:
+        return float(token)
+    return int(token)
+
+
 def _run_kaldi(command, input_type, input_value):
     """Run provided Kaldi command, pass a tensor and get the resulting tensor
 
@@ -71,34 +110,41 @@ class Kaldi(common_utils.TestBaseMixin):
     @unittest.skipIf(_not_available('compute-fbank-feats'), '`compute-fbank-feats` not available')
     def test_fbank(self):
         """fbank should be numerically compatible with compute-fbank-feats"""
-        kwargs = {
-            'blackman_coeff': 4.3926,
-            'dither': 0.0,
-            'energy_floor': 2.0617,
-            'frame_length': 0.5625,
-            'frame_shift': 0.0625,
-            'high_freq': 4253,
-            'htk_compat': True,
-            'low_freq': 1367,
-            'num_mel_bins': 5,
-            'preemphasis_coefficient': 0.84,
-            'raw_energy': False,
-            'remove_dc_offset': True,
-            'round_to_power_of_two': True,
-            'snip_edges': True,
-            'subtract_mean': False,
-            'use_energy': True,
-            'use_log_fbank': True,
-            'use_power': False,
-            'vtln_high': 2112,
-            'vtln_low': 1445,
-            'vtln_warp': 1.0000,
-            'window_type': 'hamming',
 
-        }
         wave_file = common_utils.get_asset_path('kaldi_file.wav')
         waveform = torchaudio.load_wav(wave_file)[0].to(dtype=self.dtype, device=self.device)
-        result = torchaudio.compliance.kaldi.fbank(waveform, **kwargs)
-        command = ['compute-fbank-feats'] + _convert_args(**kwargs) + ['scp:-', 'ark:-']
-        kaldi_result = _run_kaldi(command, 'scp', wave_file)
-        self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
+
+        kaldi_arg_file = common_utils.get_asset_path('kaldi_test_args.txt')
+        args_list = [line.strip() for line in open(kaldi_arg_file, "r")]
+        fbank_args_list = [args for args in args_list if 'fbank' in args]
+
+        fbank_keys = ['blackman_coeff',
+                      'energy_floor',
+                      'frame_length',
+                      'frame_shift',
+                      'high_freq',
+                      'htk_compat',
+                      'low_freq',
+                      'num_mel_bins',
+                      'preemphasis_coefficient',
+                      'raw_energy',
+                      'remove_dc_offset',
+                      'round_to_power_of_two',
+                      'snip_edges',
+                      'subtract_mean',
+                      'use_energy',
+                      'use_log_fbank',
+                      'use_power',
+                      'vtln_high',
+                      'vtln_low',
+                      'vtln_warp',
+                      'window_type',
+                      'dither',
+                      ]
+
+        for args_string in fbank_args_list:
+            kwargs = _get_func_args('fbank', fbank_keys, args_string)
+            result = torchaudio.compliance.kaldi.fbank(waveform, **kwargs)
+            command = ['compute-fbank-feats'] + _convert_args(**kwargs) + ['scp:-', 'ark:-']
+            kaldi_result = _run_kaldi(command, 'scp', wave_file)
+            self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
