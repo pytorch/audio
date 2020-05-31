@@ -1363,8 +1363,8 @@ def flanger(
         width: float = 71.,
         speed: float = 0.5,
         phase: float = 25.,
-        sinusoidal: bool = True,
-        linear_interpolation: bool = True
+        modulation: str = 'sinusoidal',
+        interpolation: str = 'linear'
 ) -> Tensor:
     r"""Apply a flanger effect to the audio. Similar to SoX implementation.
 
@@ -1384,20 +1384,24 @@ def flanger(
             Allowed range of values are 0.1 to 10
         phase (float):  percentage phase-shift for multi-channel
             Allowed range of values are 0 to 100
-        sinusoidal (bool):  If ``True``, uses sinusoidal modulation
-            If ``False``, uses triangular modulation
-            (Default: ``True``)
-        linear_interpolation (bool):  If ``True``, uses linear interpolation for delay-line interpolation
-            If ``False``, uses Quadratic interpolation
-            (Default: ``True``)
+        modulation (str):  Use either "sinusoidal" or "triangular" modulation. (Default: ``sinusoidal``)
+        interpolation (str): Use either "linear" or "quadratic" for delay-line interpolation. (Default: ``linear``)
 
     Returns:
         Tensor: Waveform of dimension of `(..., channel, time)`
 
     References:
         http://sox.sourceforge.net/sox.html
-        Scott Lehman, Effects Explained, http://harmony-central.com/Effects/effects-explained.html
+
+        Scott Lehman, Effects Explained,
+        https://web.archive.org/web/20051125072557/http://www.harmony-central.com/Effects/effects-explained.html
     """
+
+    if modulation not in ('sinusoidal', 'triangular'):
+        raise ValueError("Only 'sinusoidal' or 'triangular' modulation allowed")
+
+    if interpolation not in ('linear', 'quadratic'):
+        raise ValueError("Only 'linear' or 'quadratic' interpolation allowed")
 
     actual_shape = waveform.shape
     device, dtype = waveform.device, waveform.dtype
@@ -1417,7 +1421,7 @@ def flanger(
 
     n_channels = waveform.shape[-2]
 
-    if sinusoidal:
+    if modulation == 'sinusoidal':
         wave_type = 'SINE'
     else:
         wave_type = 'TRIANGLE'
@@ -1478,7 +1482,7 @@ def flanger(
 
         int_delay = int_delay + 1
 
-        if linear_interpolation:
+        if interpolation == 'linear':
             delayed = delayed_0 + (delayed_1 - delayed_0) * frac_delay
         else:
             delayed_2 = delay_bufs[:, channel_idxs, (delay_buf_pos + int_delay) % delay_buf_length]
