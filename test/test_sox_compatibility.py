@@ -439,7 +439,7 @@ class TestFunctionalFiltering(TestCase):
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
         output_waveform = F.flanger(waveform, sample_rate, delay, depth, regen, width, speed, phase,
-                                    sinusoidal=False, linear_interpolation=True)
+                                    modulation='triangular', interpolation='linear')
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -463,7 +463,7 @@ class TestFunctionalFiltering(TestCase):
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
         output_waveform = F.flanger(waveform, sample_rate, delay, depth, regen, width, speed, phase,
-                                    sinusoidal=False, linear_interpolation=False)
+                                    modulation='triangular', interpolation='quadratic')
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -487,7 +487,7 @@ class TestFunctionalFiltering(TestCase):
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
         output_waveform = F.flanger(waveform, sample_rate, delay, depth, regen, width, speed, phase,
-                                    sinusoidal=True, linear_interpolation=True)
+                                    modulation='sinusoidal', interpolation='linear')
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -511,7 +511,7 @@ class TestFunctionalFiltering(TestCase):
 
         waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
         output_waveform = F.flanger(waveform, sample_rate, delay, depth, regen, width, speed, phase,
-                                    sinusoidal=True, linear_interpolation=False)
+                                    modulation='sinusoidal', interpolation='quadratic')
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
