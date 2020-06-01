@@ -22,10 +22,14 @@ _TP_INSTALL_DIR = _TP_BASE_DIR / 'build'
 
 def _get_build_sox():
     val = os.environ.get('BUILD_SOX', '0')
-    if val in ['1', 'true', 'TRUE', 'on', 'ON', 'yes', 'YES']:
+    trues = ['1', 'true', 'TRUE', 'on', 'ON', 'yes', 'YES']
+    falses = ['0', 'false', 'FALSE', 'off', 'OFF', 'no', 'NO']
+    if val in trues:
         return True
-    if val not in ['0', 'false', 'FALSE', 'off', 'OFF', 'no', 'NO']:
-        print(f'Unexpected value environment variable `BUILD_SOX={val}`.')
+    if val not in falses:
+        print(
+            f'WARNING: Unexpected environment variable value `BUILD_SOX={val}`. '
+            f'Expected one of {trues + falses}')
     return False
 
 
