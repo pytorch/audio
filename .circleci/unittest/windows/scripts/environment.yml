@@ -14,3 +14,4 @@ dependencies:
     - PySoundFile
     - librosa
     - future
+    - parameterized
