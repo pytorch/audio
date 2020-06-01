@@ -57,23 +57,34 @@ found_sox() {
     all_found "$1" 'include/sox.h' 'lib/libsox.a'
 }
 
+LAME="lame-3.99.5"
+LAME_ARCHIVE="${LAME}.tar.gz"
+
+get_lame() {
+    work_dir="$1"
+    url="https://downloads.sourceforge.net/project/lame/lame/3.99/${LAME_ARCHIVE}"
+    (
+        cd "${work_dir}"
+        if [ ! -d "${LAME}" ]; then
+            if [ ! -f "${LAME_ARCHIVE}" ]; then
+                printf "Fetching liblame from %s\n" "${url}"
+                curl $CURL_OPTS -O "${url}"
+            fi
+        fi
+    )
+}
+
 build_lame() {
     work_dir="$1"
     install_dir="$2"
-    package="lame-3.99.5"
-    url="https://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz"
     (
         cd "${work_dir}"
-        if [ ! -d "${package}" ]; then
-            if [ ! -f "${package}.tar.gz" ]; then
-                printf "Fetching liblame from %s\n" "${url}"
-                curl $CURL_OPTS -o "${package}.tar.gz" "${url}"
-            fi
-            tar xfp "${package}.tar.gz"
+        if [ ! -d "${LAME}" ]; then
+            tar xfp "${LAME_ARCHIVE}"
         fi
+        cd "${LAME}"
         # build statically
         printf "Building liblame\n"
-        cd "${package}"
         if [ ! -f Makefile ]; then
             ./configure ${CONFIG_OPTS} \
                         --disable-shared --enable-static --prefix="${install_dir}" CFLAGS=-fPIC CXXFLAGS=-fPIC \
@@ -84,23 +95,34 @@ build_lame() {
     )
 }
 
+FLAC="flac-1.3.2"
+FLAC_ARCHIVE="${FLAC}.tar.xz"
+
+get_flac() {
+    work_dir="$1"
+    url="https://downloads.sourceforge.net/project/flac/flac-src/${FLAC_ARCHIVE}"
+    (
+        cd "${work_dir}"
+        if [ ! -d "${FLAC}" ]; then
+            if [ ! -f "${FLAC_ARCHIVE}" ]; then
+                printf "Fetching flac from %s\n" "${url}"
+                curl $CURL_OPTS -O "${url}"
+            fi
+        fi
+    )
+}
+
 build_flac() {
     work_dir="$1"
     install_dir="$2"
-    package="flac-1.3.2"
-    url="https://downloads.sourceforge.net/project/flac/flac-src/flac-1.3.2.tar.xz"
     (
         cd "${work_dir}"
-        if [ ! -d "${package}" ]; then
-            if [ ! -f "${package}.tar.xz" ]; then
-                printf "Fetching flac from %s\n" "${url}"
-                curl $CURL_OPTS -o "${package}.tar.xz" "${url}"
-            fi
-            tar xfp "${package}.tar.xz"
+        if [ ! -d "${FLAC}" ]; then
+            tar xfp "${FLAC_ARCHIVE}"
         fi
+        cd "${FLAC}"
         # build statically
         printf "Building flac\n"
-        cd "${package}"
         if [ ! -f Makefile ]; then
             ./configure ${CONFIG_OPTS} \
                         --disable-shared --enable-static --prefix="${install_dir}" CFLAGS=-fPIC CXXFLAGS=-fPIC \
@@ -111,23 +133,34 @@ build_flac() {
     )
 }
 
+LIBMAD="libmad-0.15.1b"
+LIBMAD_ARCHIVE="${LIBMAD}.tar.gz"
+
+get_mad() {
+    work_dir="$1"
+    url="https://downloads.sourceforge.net/project/mad/libmad/0.15.1b/${LIBMAD_ARCHIVE}"
+    (
+        cd "${work_dir}"
+        if [ ! -d "${LIBMAD}" ]; then
+            if [ ! -f "${LIBMAD_ARCHIVE}" ]; then
+                printf "Fetching mad from %s\n" "${url}"
+                curl $CURL_OPTS -O "${url}"
+            fi
+        fi
+    )
+}
+
 build_mad() {
     work_dir="$1"
     install_dir="$2"
-    package="libmad-0.15.1b"
-    url="https://downloads.sourceforge.net/project/mad/libmad/0.15.1b/libmad-0.15.1b.tar.gz"
     (
         cd "${work_dir}"
-        if [ ! -d "${package}" ]; then
-            if [ ! -f "${package}.tar.gz" ]; then
-                printf "Fetching mad from %s\n" "${url}"
-                curl $CURL_OPTS -o "${package}.tar.gz" "${url}"
-            fi
-            tar xfp "${package}.tar.gz"
+        if [ ! -d "${LIBMAD}" ]; then
+            tar xfp "${LIBMAD_ARCHIVE}"
         fi
+        cd "${LIBMAD}"
         # build statically
         printf "Building mad\n"
-        cd "${package}"
         if [ ! -f Makefile ]; then
             # See https://stackoverflow.com/a/12864879/23845
             sed -i.bak 's/-march=i486//' configure
@@ -140,23 +173,34 @@ build_mad() {
     )
 }
 
+SOX="sox-14.4.2"
+SOX_ARCHIVE="${SOX}.tar.bz2"
+
+get_sox() {
+    work_dir="$1"
+    url="https://downloads.sourceforge.net/project/sox/sox/14.4.2/${SOX_ARCHIVE}"
+    (
+        cd "${work_dir}"
+        if [ ! -d "${SOX}" ]; then
+            if [ ! -f "${SOX_ARCHIVE}" ]; then
+                printf "Fetching SoX from %s\n" "${url}"
+                curl $CURL_OPTS -O "${url}"
+            fi
+        fi
+    )
+}
+
 build_sox() {
     work_dir="$1"
     install_dir="$2"
-    package="sox-14.4.2"
-    url="https://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2"
     (
         cd "${work_dir}"
-        if [ ! -d "${package}" ]; then
-            if [ ! -f "${package}.tar.bz2" ]; then
-                printf "Fetching SoX from %s\n" "${url}"
-                curl $CURL_OPTS -o "${package}.tar.bz2" "${url}"
-            fi
-            tar xfp "${package}.tar.bz2"
+        if [ ! -d "${SOX}" ]; then
+            tar xfp "${SOX_ARCHIVE}"
         fi
+        cd "${SOX}"
         # build statically
-        printf "Building sox\n"
-        cd "${package}"
+        printf "Building SoX\n"
         if [ ! -f Makefile ]; then
             # --without-png makes OS X build less hazardous; somehow the build
             # finds png and enables it.  We don't want it; we'd need to package

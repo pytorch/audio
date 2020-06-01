@@ -60,6 +60,34 @@ jobs:
             python .circleci/regenerate.py
             git diff --exit-code || (echo ".circleci/config.yml not in sync with config.yml.in! Run .circleci/regenerate.py to update config"; exit 1)
 
+  download_third_parties_nix:
+    docker:
+      - image: "centos:8"
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Generate cache key
+          # This will refresh cache on daily
+          command: echo "$(date +"%Y-%U-%d")" > .circleci-daily
+      - restore_cache:
+          {% raw %}
+          keys:
+            - tp-nix-{{ checksum ".circleci-daily" }}-{{ checksum "./build_tools/setup_helpers/build_third_party.sh" }}-{{ checksum "./build_tools/setup_helpers/build_third_party_helper.sh" }}
+          {% endraw %}
+      - run:
+          command: ./build_tools/setup_helpers/build_third_party.sh $PWD --download-only
+      - save_cache:
+          {% raw %}
+          key: tp-nix-{{ checksum ".circleci-daily" }}-{{ checksum "./build_tools/setup_helpers/build_third_party.sh" }}-{{ checksum "./build_tools/setup_helpers/build_third_party_helper.sh" }}
+          {% endraw %}
+          paths:
+            - third_party/tmp
+      - persist_to_workspace:
+          root: third_party
+          paths:
+            - tmp
+
   binary_linux_wheel:
     <<: *binary_common
     docker:
@@ -67,6 +95,8 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run: packaging/build_wheel.sh
       - store_artifacts:
           path: dist
@@ -82,6 +112,8 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run: packaging/build_conda.sh
       - store_artifacts:
           path: /opt/conda/conda-bld/linux-64
@@ -96,6 +128,8 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run:
           # Cannot easily deduplicate this as source'ing activate
           # will set environment variables which we need to propagate
@@ -118,6 +152,8 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run:
           command: |
             curl -o conda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
@@ -322,6 +358,8 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run:
           name: Generate cache key
           # This will refresh cache on Sundays, nightly build should generate new cache.
@@ -363,6 +401,8 @@ jobs:
       image_name: "pytorch/torchaudio_unittest_base:manylinux-cuda10.1"
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run:
           name: Generate cache key
           # This will refresh cache on Sundays, nightly build should generate new cache.
