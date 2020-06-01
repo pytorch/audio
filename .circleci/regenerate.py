@@ -126,6 +126,7 @@ def indent(indentation, data_list):
 
 def unittest_workflows(indentation=6):
     jobs = []
+    jobs += build_download_job(None)
     for os_type in ["linux", "windows"]:
         for device_type in ["cpu", "gpu"]:
             for i, python_version in enumerate(PYTHON_VERSIONS):
@@ -136,6 +137,10 @@ def unittest_workflows(indentation=6):
 
                 if device_type == 'gpu':
                     job['filters'] = gen_filter_branch_tree('master')
+
+                if os_type != "windows":
+                    job['requires'] = ['download_third_parties_nix']
+
                 jobs.append({f"unittest_{os_type}_{device_type}": job})
 
                 if i == 0 and os_type == "linux" and device_type == "cpu":

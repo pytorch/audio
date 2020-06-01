@@ -358,6 +358,8 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run:
           name: Generate cache key
           # This will refresh cache on Sundays, nightly build should generate new cache.
@@ -399,6 +401,8 @@ jobs:
       image_name: "pytorch/torchaudio_unittest_base:manylinux-cuda10.1"
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run:
           name: Generate cache key
           # This will refresh cache on Sundays, nightly build should generate new cache.

@@ -358,6 +358,8 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run:
           name: Generate cache key
           # This will refresh cache on Sundays, nightly build should generate new cache.
@@ -399,6 +401,8 @@ jobs:
       image_name: "pytorch/torchaudio_unittest_base:manylinux-cuda10.1"
     steps:
       - checkout
+      - attach_workspace:
+          at: third_party
       - run:
           name: Generate cache key
           # This will refresh cache on Sundays, nightly build should generate new cache.
@@ -624,36 +628,50 @@ workflows:
           python_version: '3.8'
   unittest:
     jobs:
+      - download_third_parties_nix:
+          name: download_third_parties_nix
       - unittest_linux_cpu:
           name: unittest_linux_cpu_py3.6
           python_version: '3.6'
+          requires:
+          - download_third_parties_nix
       - stylecheck:
           name: stylecheck_py3.6
           python_version: '3.6'
       - unittest_linux_cpu:
           name: unittest_linux_cpu_py3.7
           python_version: '3.7'
+          requires:
+          - download_third_parties_nix
       - unittest_linux_cpu:
           name: unittest_linux_cpu_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
       - unittest_linux_gpu:
           filters:
             branches:
               only: master
           name: unittest_linux_gpu_py3.6
           python_version: '3.6'
+          requires:
+          - download_third_parties_nix
       - unittest_linux_gpu:
           filters:
             branches:
               only: master
           name: unittest_linux_gpu_py3.7
           python_version: '3.7'
+          requires:
+          - download_third_parties_nix
       - unittest_linux_gpu:
           filters:
             branches:
               only: master
           name: unittest_linux_gpu_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
       - unittest_windows_cpu:
           name: unittest_windows_cpu_py3.6
           python_version: '3.6'
