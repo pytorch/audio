@@ -102,15 +102,15 @@ python setup.py install
 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
 ```
 
-Alternatively, the build process can build SoX (and codecs such as libmad, lame and flac) statically and torchaudio can link them, by defining `BUILD_SOX` environment variable.
+Alternatively, the build process can build SoX (and codecs such as libmad, lame and flac) statically and torchaudio can link them, by setting environment variable `BUILD_SOX=1`.
 The build process will fetch and build SoX, liblame, libmad, flac before building extension.
 
 ```bash
 # Linux
-BUILD_SOX= python setup.py install
+BUILD_SOX=1 python setup.py install
 
 # OSX
-BUILD_SOX= MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
+BUILD_SOX=1 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
 ```
 
 This is known to work on linux and unix distributions such as Ubuntu and CentOS 7 and macOS.

@@ -19,7 +19,17 @@ _CSRC_DIR = _ROOT_DIR / 'torchaudio' / 'csrc'
 _TP_BASE_DIR = _ROOT_DIR / 'third_party'
 _TP_INSTALL_DIR = _TP_BASE_DIR / 'build'
 
-_BUILD_SOX = 'BUILD_SOX' in os.environ
+
+def _get_build_sox():
+    val = os.environ.get('BUILD_SOX', '0')
+    if val in ['1', 'true', 'TRUE', 'on', 'ON', 'yes', 'YES']:
+        return True
+    if val not in ['0', 'false', 'FALSE', 'off', 'OFF', 'no', 'NO']:
+        print(f'Unexpected value environment variable `BUILD_SOX={val}`.')
+    return False
+
+
+_BUILD_SOX = _get_build_sox()
 
 
 def _get_eca(debug):
