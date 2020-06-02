@@ -84,8 +84,8 @@ def generate_base_workflow(base_workflow_name, python_version, filter_branch, os
     return {"binary_{os_type}_{btype}".format(os_type=os_type, btype=btype): d}
 
 
-def gen_filter_branch_tree(branch_name):
-    return {"branches": {"only": branch_name}}
+def gen_filter_branch_tree(*branches):
+    return {"branches": {"only": [ b for b in branches]}}
 
 
 def generate_upload_workflow(base_workflow_name, filter_branch, btype):
@@ -136,7 +136,7 @@ def unittest_workflows(indentation=6):
                 }
 
                 if device_type == 'gpu':
-                    job['filters'] = gen_filter_branch_tree('master')
+                    job['filters'] = gen_filter_branch_tree('master', 'nightly')
 
                 if os_type != "windows":
                     job['requires'] = ['download_third_parties_nix']
