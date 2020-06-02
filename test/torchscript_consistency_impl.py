@@ -366,6 +366,21 @@ class Functional(common_utils.TestBaseMixin):
             return F.treble_biquad(tensor, sample_rate, gain, central_freq, q)
 
         self._assert_consistency(func, waveform)
+        
+    def test_bass(self):
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
+
+        def func(tensor):
+            sample_rate = 44100
+            gain = 40.
+            central_freq = 1000.
+            q = 0.707
+            return F.bass_biquad(tensor, sample_rate, gain, central_freq, q)
+
+        self._assert_consistency(func, waveform)
 
     def test_deemph(self):
         if self.dtype == torch.float64:
