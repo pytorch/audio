@@ -24,12 +24,23 @@ PYTHON_VERSIONS = ["3.6", "3.7", "3.8"]
 
 def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
     w = []
+    w += build_download_job(filter_branch)
     for btype in ["wheel", "conda"]:
         for os_type in ["linux", "macos", "windows"]:
             for python_version in PYTHON_VERSIONS:
                 w += build_workflow_pair(btype, os_type, python_version, filter_branch, prefix, upload)
 
     return indent(indentation, w)
+
+
+def build_download_job(filter_branch):
+    job = {
+        "name": "download_third_parties_nix",
+    }
+
+    if filter_branch:
+        job["filters"] = gen_filter_branch_tree(filter_branch)
+    return [{"download_third_parties_nix": job}]
 
 
 def build_workflow_pair(btype, os_type, python_version, filter_branch, prefix='', upload=False):
@@ -63,6 +74,9 @@ def generate_base_workflow(base_workflow_name, python_version, filter_branch, os
         "name": base_workflow_name,
         "python_version": python_version,
     }
+
+    if os_type in ['linux', 'macos']:
+        d['requires'] = ['download_third_parties_nix']
 
     if filter_branch:
         d["filters"] = gen_filter_branch_tree(filter_branch)
@@ -112,6 +126,7 @@ def indent(indentation, data_list):
 
 def unittest_workflows(indentation=6):
     jobs = []
+    jobs += build_download_job(None)
     for os_type in ["linux", "windows"]:
         for device_type in ["cpu", "gpu"]:
             for i, python_version in enumerate(PYTHON_VERSIONS):
@@ -122,6 +137,10 @@ def unittest_workflows(indentation=6):
 
                 if device_type == 'gpu':
                     job['filters'] = gen_filter_branch_tree('master')
+
+                if os_type != "windows":
+                    job['requires'] = ['download_third_parties_nix']
+
                 jobs.append({f"unittest_{os_type}_{device_type}": job})
 
                 if i == 0 and os_type == "linux" and device_type == "cpu":
