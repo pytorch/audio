@@ -987,7 +987,7 @@ class GTZAN(Dataset):
     """
     Create a Dataset for GTZAN. Each item is a tuple of the form:
     waveform, sample_rate, label.
-    
+
     Please see http://marsyas.info/downloads/datasets.html
     if you are planning to use this dataset to publish results.
     """
