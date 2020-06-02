@@ -1022,7 +1022,7 @@ def bass_biquad(
     a1 = -2 * ((A - 1) + temp3)
     a2 = (A + 1) + temp2 - temp1
 
-    return biquad(waveform, b0/a0, b1/a0, b2/a0, a0/a0, a1/a0, a2/a0)
+    return biquad(waveform, b0 / a0, b1 / a0, b2 / a0, a0 / a0, a1 / a0, a2 / a0)
 
 
 def deemph_biquad(

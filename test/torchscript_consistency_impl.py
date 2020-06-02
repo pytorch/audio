@@ -366,7 +366,7 @@ class Functional(common_utils.TestBaseMixin):
             return F.treble_biquad(tensor, sample_rate, gain, central_freq, q)
 
         self._assert_consistency(func, waveform)
-        
+
     def test_bass(self):
         if self.dtype == torch.float64:
             raise unittest.SkipTest("This test is known to fail for float64")
