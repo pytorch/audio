@@ -13,3 +13,4 @@ dependencies:
     - clang-format
     - kaldi-io
     - scipy
+    - parameterized
