@@ -3,6 +3,7 @@ from .librispeech import LIBRISPEECH
 from .speechcommands import SPEECHCOMMANDS
 from .utils import bg_iterator, diskcache_iterator
 from .vctk import VCTK
+from .gtzan import GTZAN
 from .yesno import YESNO
 from .ljspeech import LJSPEECH
 
