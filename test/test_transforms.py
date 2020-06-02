@@ -34,7 +34,7 @@ class Tester(TestCase):
         if not waveform.is_floating_point():
             waveform = waveform.to(torch.get_default_dtype())
         waveform /= torch.abs(waveform).max()
-        
+
         self.assertTrue(waveform.min() >= -1. and waveform.max() <= 1.)
 
         waveform_mu = transforms.MuLawEncoding(quantization_channels)(waveform)
