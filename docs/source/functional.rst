@@ -143,6 +143,11 @@ Functions to perform common audio operations.
 
 .. autofunction:: phaser
 
+:hidden:`flanger`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: flanger
+
 :hidden:`mask_along_axis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
