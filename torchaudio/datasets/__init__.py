@@ -13,6 +13,7 @@ __all__ = (
     "VCTK",
     "YESNO",
     "LJSPEECH",
+    "GTZAN",
     "diskcache_iterator",
     "bg_iterator",
 )
