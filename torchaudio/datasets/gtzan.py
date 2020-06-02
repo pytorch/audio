@@ -986,7 +986,9 @@ def load_gtzan_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, str
 class GTZAN(Dataset):
     """
     Create a Dataset for GTZAN. Each item is a tuple of the form:
-    waveform, sample_rate, label. Please see http://marsyas.info/downloads/datasets.html
+    waveform, sample_rate, label.
+    
+    Please see http://marsyas.info/downloads/datasets.html
     if you are planning to use this dataset to publish results.
     """
 
@@ -1007,10 +1009,6 @@ class GTZAN(Dataset):
         self.folder_in_archive = folder_in_archive
         self.download = download
         self.subset = subset
-
-        warnings.warn("Please see http://marsyas.info/downloads/datasets.html "
-                      "if you are planning to use this dataset to publish experimental "
-                      "results using this dataset.")
 
         assert subset is None or subset in ["training", "validation", "testing"], (
             "When `subset` not None, it must take a value from "
