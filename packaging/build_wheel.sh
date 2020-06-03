@@ -15,5 +15,5 @@ if [[ "$OSTYPE" == "msys" ]]; then
     python_tag="$(echo "cp$PYTHON_VERSION" | tr -d '.')"
     python setup.py bdist_wheel --plat-name win_amd64 --python-tag $python_tag
 else
-    python setup.py bdist_wheel
+    BUILD_SOX=1 python setup.py bdist_wheel
 fi

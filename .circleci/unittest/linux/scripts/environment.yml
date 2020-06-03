@@ -10,5 +10,6 @@ dependencies:
   - librosa
   - pip
   - pip:
+    - clang-format
     - kaldi-io
     - scipy
