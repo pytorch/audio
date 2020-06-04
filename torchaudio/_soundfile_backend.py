@@ -1,10 +1,16 @@
 import os
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Tuple
 
 import torch
 from torch import Tensor
 
-from torchaudio._internal import misc_ops as _misc_ops
+from torchaudio._internal import (
+    module_utils as _mod_utils,
+    misc_ops as _misc_ops,
+)
+
+if _mod_utils.is_module_available('soundfile'):
+    import soundfile
 
 
 _subtype_to_precision = {
@@ -46,6 +52,7 @@ class EncodingInfo:
         self.opposite_endian = opposite_endian
 
 
+@_mod_utils.requires_module('soundfile')
 def load(filepath: str,
          out: Optional[Tensor] = None,
          normalization: Optional[bool] = True,
@@ -76,8 +83,6 @@ def load(filepath: str,
     if offset < 0:
         raise ValueError("Expected positive offset value")
 
-    import soundfile
-
     # initialize output tensor
     # TODO call libsoundfile directly to avoid numpy
     out, sample_rate = soundfile.read(
@@ -94,6 +99,7 @@ def load(filepath: str,
     return out, sample_rate
 
 
+@_mod_utils.requires_module('soundfile')
 def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, channels_first: bool = True) -> None:
     r"""See torchaudio.save"""
 
@@ -123,14 +129,13 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
 
     precision = "PCM_S8" if precision == 8 else "PCM_" + str(precision)
 
-    import soundfile
     return soundfile.write(filepath, src, sample_rate, precision)
 
 
+@_mod_utils.requires_module('soundfile')
 def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
     r"""See torchaudio.info"""
 
-    import soundfile
     sfi = soundfile.info(filepath)
 
     precision = _subtype_to_precision[sfi.subtype]
