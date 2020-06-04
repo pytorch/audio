@@ -272,6 +272,9 @@ def spectrogram(waveform: Tensor,
         Tensor: A spectrogram identical to what Kaldi would output. The shape is
         (m, ``padded_window_size // 2 + 1``) where m is calculated in _get_strided
     """
+    device, dtype = waveform.device, waveform.dtype
+    epsilon = _get_epsilon(device, dtype)
+
     waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
         waveform, channel, sample_frequency, frame_shift, frame_length, round_to_power_of_two, preemphasis_coefficient)
 
@@ -284,10 +287,10 @@ def spectrogram(waveform: Tensor,
         snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient)
 
     # size (m, padded_window_size // 2 + 1, 2)
-    fft = torch.rfft(strided_input, 1, normalized=False, onesided=True)
+    fft = torch.rfft(strided_input, 1, normalized=False, onesided=True).to(dtype=dtype, device=device)
 
     # Convert the FFT into a power spectrum
-    power_spectrum = torch.max(fft.pow(2).sum(2), EPSILON).log()  # size (m, padded_window_size // 2 + 1)
+    power_spectrum = torch.max(fft.pow(2).sum(2), epsilon).log()  # size (m, padded_window_size // 2 + 1)
     power_spectrum[:, 0] = signal_log_energy
 
     power_spectrum = _subtract_column_mean(power_spectrum, subtract_mean)
