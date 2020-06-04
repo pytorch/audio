@@ -19,6 +19,7 @@ from torchaudio._backend import (
     get_audio_backend,
     set_audio_backend,
 )
+from torchaudio.common_utils import requires_module
 from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
 
 try:
@@ -124,7 +125,7 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
     )
 
 
-@_audio_backend_guard("sox")
+@requires_module('torchaudio._torchaudio')
 def save_encinfo(filepath: str,
                  src: Tensor,
                  channels_first: bool = True,

@@ -3,10 +3,16 @@ from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
+
 import torchaudio
+from torchaudio.common_utils import is_module_available, requires_module
 from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
 
+if is_module_available('torchaudio._torchaudio'):
+    from . import _torchaudio
 
+
+@requires_module('torchaudio._torchaudio')
 def load(filepath: str,
          out: Optional[Tensor] = None,
          normalization: bool = True,
@@ -35,7 +41,6 @@ def load(filepath: str,
     if offset < 0:
         raise ValueError("Expected positive offset value")
 
-    from . import _torchaudio
     sample_rate = _torchaudio.read_audio_file(
         filepath,
         out,
@@ -53,6 +58,7 @@ def load(filepath: str,
     return out, sample_rate
 
 
+@requires_module('torchaudio._torchaudio')
 def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, channels_first: bool = True) -> None:
     r"""See torchaudio.save"""
 
@@ -65,8 +71,7 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
     return torchaudio.save_encinfo(filepath, src, channels_first, si)
 
 
+@requires_module('torchaudio._torchaudio')
 def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
     r"""See torchaudio.info"""
-
-    from . import _torchaudio
     return _torchaudio.get_info(filepath)
