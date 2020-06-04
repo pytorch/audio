@@ -651,7 +651,9 @@ workflows:
       - unittest_linux_gpu:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - nightly
           name: unittest_linux_gpu_py3.6
           python_version: '3.6'
           requires:
@@ -659,7 +661,9 @@ workflows:
       - unittest_linux_gpu:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - nightly
           name: unittest_linux_gpu_py3.7
           python_version: '3.7'
           requires:
@@ -667,7 +671,9 @@ workflows:
       - unittest_linux_gpu:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - nightly
           name: unittest_linux_gpu_py3.8
           python_version: '3.8'
           requires:
@@ -684,19 +690,25 @@ workflows:
       - unittest_windows_gpu:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - nightly
           name: unittest_windows_gpu_py3.6
           python_version: '3.6'
       - unittest_windows_gpu:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - nightly
           name: unittest_windows_gpu_py3.7
           python_version: '3.7'
       - unittest_windows_gpu:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - nightly
           name: unittest_windows_gpu_py3.8
           python_version: '3.8'
   nightly:
@@ -708,12 +720,14 @@ workflows:
       - download_third_parties_nix:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: download_third_parties_nix
       - binary_linux_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_wheel_py3.6
           python_version: '3.6'
           requires:
@@ -722,14 +736,16 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_wheel_py3.6_upload
           requires:
           - nightly_binary_linux_wheel_py3.6
       - smoke_test_linux_pip:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_wheel_py3.6_smoke_test_pip
           python_version: '3.6'
           requires:
@@ -737,7 +753,8 @@ workflows:
       - binary_linux_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_wheel_py3.7
           python_version: '3.7'
           requires:
@@ -746,14 +763,16 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_wheel_py3.7_upload
           requires:
           - nightly_binary_linux_wheel_py3.7
       - smoke_test_linux_pip:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_wheel_py3.7_smoke_test_pip
           python_version: '3.7'
           requires:
@@ -761,7 +780,8 @@ workflows:
       - binary_linux_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_wheel_py3.8
           python_version: '3.8'
           requires:
@@ -770,14 +790,16 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_wheel_py3.8_upload
           requires:
           - nightly_binary_linux_wheel_py3.8
       - smoke_test_linux_pip:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_wheel_py3.8_smoke_test_pip
           python_version: '3.8'
           requires:
@@ -785,7 +807,8 @@ workflows:
       - binary_macos_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_macos_wheel_py3.6
           python_version: '3.6'
           requires:
@@ -794,14 +817,16 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_macos_wheel_py3.6_upload
           requires:
           - nightly_binary_macos_wheel_py3.6
       - binary_macos_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_macos_wheel_py3.7
           python_version: '3.7'
           requires:
@@ -810,14 +835,16 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_macos_wheel_py3.7_upload
           requires:
           - nightly_binary_macos_wheel_py3.7
       - binary_macos_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_macos_wheel_py3.8
           python_version: '3.8'
           requires:
@@ -826,28 +853,32 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_macos_wheel_py3.8_upload
           requires:
           - nightly_binary_macos_wheel_py3.8
       - binary_windows_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_wheel_py3.6
           python_version: '3.6'
       - binary_wheel_upload:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_wheel_py3.6_upload
           requires:
           - nightly_binary_windows_wheel_py3.6
       - smoke_test_windows_pip:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_wheel_py3.6_smoke_test_pip
           python_version: '3.6'
           requires:
@@ -855,21 +886,24 @@ workflows:
       - binary_windows_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_wheel_py3.7
           python_version: '3.7'
       - binary_wheel_upload:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_wheel_py3.7_upload
           requires:
           - nightly_binary_windows_wheel_py3.7
       - smoke_test_windows_pip:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_wheel_py3.7_smoke_test_pip
           python_version: '3.7'
           requires:
@@ -877,21 +911,24 @@ workflows:
       - binary_windows_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_wheel_py3.8
           python_version: '3.8'
       - binary_wheel_upload:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_wheel_py3.8_upload
           requires:
           - nightly_binary_windows_wheel_py3.8
       - smoke_test_windows_pip:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_wheel_py3.8_smoke_test_pip
           python_version: '3.8'
           requires:
@@ -899,7 +936,8 @@ workflows:
       - binary_linux_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_conda_py3.6
           python_version: '3.6'
           requires:
@@ -908,14 +946,16 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_conda_py3.6_upload
           requires:
           - nightly_binary_linux_conda_py3.6
       - smoke_test_linux_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_conda_py3.6_smoke_test_conda
           python_version: '3.6'
           requires:
@@ -923,7 +963,8 @@ workflows:
       - binary_linux_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_conda_py3.7
           python_version: '3.7'
           requires:
@@ -932,14 +973,16 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_conda_py3.7_upload
           requires:
           - nightly_binary_linux_conda_py3.7
       - smoke_test_linux_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_conda_py3.7_smoke_test_conda
           python_version: '3.7'
           requires:
@@ -947,7 +990,8 @@ workflows:
       - binary_linux_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_conda_py3.8
           python_version: '3.8'
           requires:
@@ -956,14 +1000,16 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_conda_py3.8_upload
           requires:
           - nightly_binary_linux_conda_py3.8
       - smoke_test_linux_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_linux_conda_py3.8_smoke_test_conda
           python_version: '3.8'
           requires:
@@ -971,7 +1017,8 @@ workflows:
       - binary_macos_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_macos_conda_py3.6
           python_version: '3.6'
           requires:
@@ -980,14 +1027,16 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_macos_conda_py3.6_upload
           requires:
           - nightly_binary_macos_conda_py3.6
       - binary_macos_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_macos_conda_py3.7
           python_version: '3.7'
           requires:
@@ -996,14 +1045,16 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_macos_conda_py3.7_upload
           requires:
           - nightly_binary_macos_conda_py3.7
       - binary_macos_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_macos_conda_py3.8
           python_version: '3.8'
           requires:
@@ -1012,28 +1063,32 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_macos_conda_py3.8_upload
           requires:
           - nightly_binary_macos_conda_py3.8
       - binary_windows_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_conda_py3.6
           python_version: '3.6'
       - binary_conda_upload:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_conda_py3.6_upload
           requires:
           - nightly_binary_windows_conda_py3.6
       - smoke_test_windows_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_conda_py3.6_smoke_test_conda
           python_version: '3.6'
           requires:
@@ -1041,21 +1096,24 @@ workflows:
       - binary_windows_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_conda_py3.7
           python_version: '3.7'
       - binary_conda_upload:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_conda_py3.7_upload
           requires:
           - nightly_binary_windows_conda_py3.7
       - smoke_test_windows_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_conda_py3.7_smoke_test_conda
           python_version: '3.7'
           requires:
@@ -1063,21 +1121,24 @@ workflows:
       - binary_windows_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_conda_py3.8
           python_version: '3.8'
       - binary_conda_upload:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_conda_py3.8_upload
           requires:
           - nightly_binary_windows_conda_py3.8
       - smoke_test_windows_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
           name: nightly_binary_windows_conda_py3.8_smoke_test_conda
           python_version: '3.8'
           requires:

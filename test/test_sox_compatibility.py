@@ -267,6 +267,28 @@ class TestFunctionalFiltering(TestCase):
 
     @unittest.skipIf("sox" not in BACKENDS, "sox not available")
     @AudioBackendScope("sox")
+    def test_bass(self):
+        """
+        Test biquad bass filter, compare to SoX implementation
+        """
+
+        central_freq = 1000
+        q = 0.707
+        gain = 40
+
+        noise_filepath = common_utils.get_asset_path('whitenoise.wav')
+        E = torchaudio.sox_effects.SoxEffectsChain()
+        E.set_input_file(noise_filepath)
+        E.append_effect_to_chain("bass", [gain, central_freq, str(q) + 'q'])
+        sox_output_waveform, sr = E.sox_build_flow_effects()
+
+        waveform, sample_rate = torchaudio.load(noise_filepath, normalization=True)
+        output_waveform = F.bass_biquad(waveform, sample_rate, gain, central_freq, q)
+
+        self.assertEqual(output_waveform, sox_output_waveform, atol=1.5e-4, rtol=1e-5)
+
+    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
+    @AudioBackendScope("sox")
     def test_deemph(self):
         """
         Test biquad deemph filter, compare to SoX implementation
