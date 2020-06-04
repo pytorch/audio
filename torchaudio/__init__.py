@@ -360,7 +360,6 @@ def initialize_sox() -> int:
     if _SOX_INITIALIZED is None:
         raise RuntimeError('SoX effects chain has been already shut down. Can not initialize again.')
     if not _SOX_INITIALIZED:
-        from . import _torchaudio
         code = _torchaudio.initialize_sox()
         if code == _SOX_SUCCESS_CODE:
             _SOX_INITIALIZED = True
@@ -384,7 +383,6 @@ def shutdown_sox() -> int:
     """
     global _SOX_INITIALIZED
     if _SOX_INITIALIZED:
-        from . import _torchaudio
         code = _torchaudio.shutdown_sox()
         if code == _SOX_INITIALIZED:
             _SOX_INITIALIZED = None
