@@ -45,22 +45,6 @@ def _get_audio_backend_module() -> Any:
     return _audio_backends[backend]
 
 
-def _audio_backend_guard(backends: Union[str, List[str]]) -> Any:
-
-    if isinstance(backends, str):
-        backends = [backends]
-
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            if get_audio_backend() not in backends:
-                raise RuntimeError("Function {} requires backend to be one of {}.".format(func.__name__, backends))
-            return func(*args, **kwargs)
-        return wrapper
-
-    return decorator
-
-
 def check_input(src: Tensor) -> None:
     if not torch.is_tensor(src):
         raise TypeError('Expected a tensor, got %s' % type(src))
