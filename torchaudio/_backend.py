@@ -1,9 +1,7 @@
-from functools import wraps
-from typing import Any, List, Union
+from typing import Any
 
 import platform
-import torch
-from torch import Tensor
+
 
 from . import _soundfile_backend, _sox_backend
 
@@ -43,10 +41,3 @@ def _get_audio_backend_module() -> Any:
     """
     backend = get_audio_backend()
     return _audio_backends[backend]
-
-
-def check_input(src: Tensor) -> None:
-    if not torch.is_tensor(src):
-        raise TypeError('Expected a tensor, got %s' % type(src))
-    if src.is_cuda:
-        raise TypeError('Expected a CPU based tensor, got %s' % type(src))

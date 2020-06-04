@@ -4,6 +4,9 @@ from typing import Any, Optional, Tuple, Union
 import torch
 from torch import Tensor
 
+from torchaudio._internal import misc_ops as _misc_ops
+
+
 _subtype_to_precision = {
     'PCM_S8': 8,
     'PCM_16': 16,
@@ -41,13 +44,6 @@ class EncodingInfo:
         self.reverse_nibbles = reverse_nibbles
         self.reverse_bits = reverse_bits
         self.opposite_endian = opposite_endian
-
-
-def check_input(src: Tensor) -> None:
-    if not torch.is_tensor(src):
-        raise TypeError("Expected a tensor, got %s" % type(src))
-    if src.is_cuda:
-        raise TypeError("Expected a CPU based tensor, got %s" % type(src))
 
 
 def load(filepath: str,
@@ -108,7 +104,7 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
     if not os.path.isdir(abs_dirpath):
         raise OSError("Directory does not exist: {}".format(abs_dirpath))
     # check that src is a CPU tensor
-    check_input(src)
+    _misc_ops.check_input(src)
     # Check/Fix shape of source data
     if src.dim() == 1:
         # 1d tensors as assumed to be mono signals
