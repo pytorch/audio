@@ -287,7 +287,7 @@ def spectrogram(waveform: Tensor,
         snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient)
 
     # size (m, padded_window_size // 2 + 1, 2)
-    fft = torch.rfft(strided_input, 1, normalized=False, onesided=True).to(dtype=dtype, device=device)
+    fft = torch.rfft(strided_input, 1, normalized=False, onesided=True)
 
     # Convert the FFT into a power spectrum
     power_spectrum = torch.max(fft.pow(2).sum(2), epsilon).log()  # size (m, padded_window_size // 2 + 1)
