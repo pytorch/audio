@@ -696,6 +696,8 @@ def mfcc(
     """
     assert num_ceps <= num_mel_bins, 'num_ceps cannot be larger than num_mel_bins: %d vs %d' % (num_ceps, num_mel_bins)
 
+    device, dtype = waveform.device, waveform.dtype
+
     # The mel_energies should not be squared (use_power=True), not have mean subtracted
     # (subtract_mean=False), and use log (use_log_fbank=True).
     # size (m, num_mel_bins + use_energy)
@@ -717,7 +719,7 @@ def mfcc(
         feature = feature[:, mel_offset:(num_mel_bins + mel_offset)]
 
     # size (num_mel_bins, num_ceps)
-    dct_matrix = _get_dct_matrix(num_ceps, num_mel_bins)
+    dct_matrix = _get_dct_matrix(num_ceps, num_mel_bins).to(dtype=dtype, device=device)
 
     # size (m, num_ceps)
     feature = feature.matmul(dct_matrix)
@@ -725,7 +727,7 @@ def mfcc(
     if cepstral_lifter != 0.0:
         # size (1, num_ceps)
         lifter_coeffs = _get_lifter_coeffs(num_ceps, cepstral_lifter).unsqueeze(0)
-        feature *= lifter_coeffs
+        feature *= lifter_coeffs.to(device=device, dtype=dtype)
 
     # if use_energy then replace the last column for htk_compat == true else first column
     if use_energy:
