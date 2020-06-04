@@ -86,6 +86,17 @@ class Kaldi(common_utils.TestBaseMixin):
         kaldi_result = _run_kaldi(command, 'scp', wave_file)
         self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
 
+    @parameterized.expand(_load_params(common_utils.get_asset_path('kaldi_test_spectrogram_args.json')))
+    @unittest.skipIf(_not_available('compute-spectrogram-feats'), '`compute-spectrogram-feats` not available')
+    def test_spectrogram(self, kwargs):
+        """spectrogram should be numerically compatible with compute-spectrogram-feats"""
+        wave_file = common_utils.get_asset_path('kaldi_file.wav')
+        waveform = torchaudio.load_wav(wave_file)[0].to(dtype=self.dtype, device=self.device)
+        result = torchaudio.compliance.kaldi.spectrogram(waveform, **kwargs)
+        command = ['compute-spectrogram-feats'] + _convert_args(**kwargs) + ['scp:-', 'ark:-']
+        kaldi_result = _run_kaldi(command, 'scp', wave_file)
+        self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
+
     @parameterized.expand(_load_params(common_utils.get_asset_path('kaldi_test_mfcc_args.json')))
     @unittest.skipIf(_not_available('compute-mfcc-feats'), '`compute-mfcc-feats` not available')
     def test_mfcc(self, kwargs):
