@@ -157,7 +157,7 @@ class Kaldi(common_utils.TestBaseMixin):
         ground_truth = ground_truth[..., n_to_trim:-n_to_trim]
         estimate = estimate[..., n_to_trim:-n_to_trim]
 
-        torch.assert_equal(estimate, ground_truth, atol=atol, rtol=rtol)
+        self.assert_equal(estimate, expected=ground_truth, atol=atol, rtol=rtol)
 
     def test_resample_waveform_downsample_accuracy(self):
         for i in range(1, 20):
@@ -185,4 +185,4 @@ class Kaldi(common_utils.TestBaseMixin):
             single_channel_sampled = torchaudio.compliance.kaldi.resample_waveform(single_channel,
                                                                                    sample_rate,
                                                                                    sample_rate // 2)
-            self.assert_equal(multi_sound_sampled[i, :], single_channel_sampled[0], rtol=1e-4, atol=1e-8)
+            self.assert_equal(multi_sound_sampled[i, :], expected=single_channel_sampled[0], rtol=1e-4, atol=1e-8)
