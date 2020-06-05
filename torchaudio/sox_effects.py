@@ -3,10 +3,14 @@ from typing import Any, Callable, List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
-from torchaudio._backend import _audio_backend_guard
+
+from torchaudio._internal import module_utils as _mod_utils
+
+if _mod_utils.is_module_available('torchaudio._torchaudio'):
+    from . import _torchaudio
 
 
-@_audio_backend_guard("sox")
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def effect_names() -> List[str]:
     """Gets list of valid sox effect names
 
@@ -15,12 +19,10 @@ def effect_names() -> List[str]:
     Example
         >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
     """
-
-    from . import _torchaudio
     return _torchaudio.get_effect_names()
 
 
-@_audio_backend_guard("sox")
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def SoxEffect():
     r"""Create an object for passing sox effect information between python and c++
 
@@ -28,8 +30,6 @@ def SoxEffect():
         SoxEffect: An object with the following attributes: ename (str) which is the
         name of effect, and eopts (List[str]) which is a list of effect options.
     """
-
-    from . import _torchaudio
     return _torchaudio.SoxEffect()
 
 
@@ -123,7 +123,7 @@ class SoxEffectsChain(object):
         e.eopts = eargs
         self.chain.append(e)
 
-    @_audio_backend_guard("sox")
+    @_mod_utils.requires_module('torchaudio._torchaudio')
     def sox_build_flow_effects(self,
                                out: Optional[Tensor] = None) -> Tuple[Tensor, int]:
         r"""Build effects chain and flow effects from input file to output tensor
@@ -150,7 +150,6 @@ class SoxEffectsChain(object):
         # print("effect options:", [x.eopts for x in self.chain])
 
         torchaudio.initialize_sox()
-        from . import _torchaudio
         sr = _torchaudio.build_flow_effects(self.input_file,
                                             out,
                                             self.channels_first,

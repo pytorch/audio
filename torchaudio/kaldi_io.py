@@ -5,11 +5,9 @@ from typing import Any, Callable, Iterable, Tuple
 
 import torch
 from torch import Tensor
-from torchaudio.common_utils import _check_module_exists
+from torchaudio._internal import module_utils as _mod_utils
 
-_KALDI_IO_AVAILABLE = _check_module_exists('kaldi_io', 'numpy')
-
-if _KALDI_IO_AVAILABLE:
+if _mod_utils.is_module_available('kaldi_io', 'numpy'):
     import numpy as np
     import kaldi_io
 
@@ -38,15 +36,13 @@ def _convert_method_output_to_tensor(file_or_fd: Any,
     Returns:
         Iterable[Tuple[str, Tensor]]: The string is the key and the tensor is vec/mat
     """
-    if not _KALDI_IO_AVAILABLE:
-        raise ImportError('Could not import kaldi_io. Did you install it?')
-
     for key, np_arr in fn(file_or_fd):
         if convert_contiguous:
             np_arr = np.ascontiguousarray(np_arr)
         yield key, torch.from_numpy(np_arr)
 
 
+@_mod_utils.requires_module('kaldi_io', 'numpy')
 def read_vec_int_ark(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
     r"""Create generator of (key,vector<int>) tuples, which reads from the ark file/stream.
 
@@ -66,6 +62,7 @@ def read_vec_int_ark(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
     return _convert_method_output_to_tensor(file_or_fd, kaldi_io.read_vec_int_ark, convert_contiguous=True)
 
 
+@_mod_utils.requires_module('kaldi_io', 'numpy')
 def read_vec_flt_scp(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
     r"""Create generator of (key,vector<float32/float64>) tuples, read according to Kaldi scp.
 
@@ -82,6 +79,7 @@ def read_vec_flt_scp(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
     return _convert_method_output_to_tensor(file_or_fd, kaldi_io.read_vec_flt_scp)
 
 
+@_mod_utils.requires_module('kaldi_io', 'numpy')
 def read_vec_flt_ark(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
     r"""Create generator of (key,vector<float32/float64>) tuples, which reads from the ark file/stream.
 
@@ -98,6 +96,7 @@ def read_vec_flt_ark(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
     return _convert_method_output_to_tensor(file_or_fd, kaldi_io.read_vec_flt_ark)
 
 
+@_mod_utils.requires_module('kaldi_io', 'numpy')
 def read_mat_scp(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
     r"""Create generator of (key,matrix<float32/float64>) tuples, read according to Kaldi scp.
 
@@ -114,6 +113,7 @@ def read_mat_scp(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
     return _convert_method_output_to_tensor(file_or_fd, kaldi_io.read_mat_scp)
 
 
+@_mod_utils.requires_module('kaldi_io', 'numpy')
 def read_mat_ark(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
     r"""Create generator of (key,matrix<float32/float64>) tuples, which reads from the ark file/stream.
 

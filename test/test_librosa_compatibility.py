@@ -7,9 +7,9 @@ import torch
 from torch.testing._internal.common_utils import TestCase
 import torchaudio
 import torchaudio.functional as F
-from torchaudio.common_utils import _check_module_exists
+from torchaudio._internal.module_utils import is_module_available
 
-LIBROSA_AVAILABLE = _check_module_exists('librosa')
+LIBROSA_AVAILABLE = is_module_available('librosa')
 
 if LIBROSA_AVAILABLE:
     import numpy as np

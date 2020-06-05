@@ -14,17 +14,21 @@ from torchaudio import (
 )
 from torchaudio._backend import (
     check_input,
-    _audio_backend_guard,
     _get_audio_backend_module,
     get_audio_backend,
     set_audio_backend,
 )
 from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
+from torchaudio._internal import module_utils as _mod_utils
 
 try:
     from .version import __version__, git_version  # noqa: F401
 except ImportError:
     pass
+
+
+if _mod_utils.is_module_available('torchaudio._torchaudio'):
+    from . import _torchaudio
 
 
 def load(filepath: Union[str, Path],
@@ -75,7 +79,6 @@ def load(filepath: Union[str, Path],
         1.
 
     """
-
     return _get_audio_backend_module().load(
         filepath,
         out=out,
@@ -124,7 +127,7 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
     )
 
 
-@_audio_backend_guard("sox")
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def save_encinfo(filepath: str,
                  src: Tensor,
                  channels_first: bool = True,
@@ -192,8 +195,6 @@ def save_encinfo(filepath: str,
         src = src.transpose(1, 0)
     # save data to file
     src = src.contiguous()
-
-    from . import _torchaudio
     _torchaudio.write_audio_file(filepath, src, signalinfo, encodinginfo, filetype)
 
 
@@ -210,12 +211,11 @@ def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
      Example
          >>> si, ei = torchaudio.info('foo.wav')
          >>> rate, channels, encoding = si.rate, si.channels, ei.encoding
-     """
-
+    """
     return _get_audio_backend_module().info(filepath)
 
 
-@_audio_backend_guard("sox")
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def sox_signalinfo_t() -> SignalInfo:
     r"""Create a sox_signalinfo_t object. This object can be used to set the sample
     rate, number of channels, length, bit precision and headroom multiplier
@@ -235,12 +235,10 @@ def sox_signalinfo_t() -> SignalInfo:
         >>> si.precision = 16
         >>> si.length = 0
     """
-
-    from . import _torchaudio
     return _torchaudio.sox_signalinfo_t()
 
 
-@_audio_backend_guard("sox")
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def sox_encodinginfo_t() -> EncodingInfo:
     r"""Create a sox_encodinginfo_t object.  This object can be used to set the encoding
     type, bit precision, compression factor, reverse bytes, reverse nibbles,
@@ -270,8 +268,6 @@ def sox_encodinginfo_t() -> EncodingInfo:
         >>> ei.opposite_endian = torchaudio.get_sox_bool(0)
 
     """
-
-    from . import _torchaudio
     ei = _torchaudio.sox_encodinginfo_t()
     sdo = get_sox_option_t(2)  # sox_default_option
     ei.reverse_bytes = sdo
@@ -280,7 +276,7 @@ def sox_encodinginfo_t() -> EncodingInfo:
     return ei
 
 
-@_audio_backend_guard("sox")
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def get_sox_encoding_t(i: int = None) -> EncodingInfo:
     r"""Get enum of sox_encoding_t for sox encodings.
 
@@ -291,8 +287,6 @@ def get_sox_encoding_t(i: int = None) -> EncodingInfo:
     Returns:
         sox_encoding_t: A sox_encoding_t type for output encoding
     """
-
-    from . import _torchaudio
     if i is None:
         # one can see all possible values using the .__members__ attribute
         return _torchaudio.sox_encoding_t
@@ -300,7 +294,7 @@ def get_sox_encoding_t(i: int = None) -> EncodingInfo:
         return _torchaudio.sox_encoding_t(i)
 
 
-@_audio_backend_guard("sox")
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def get_sox_option_t(i: int = 2) -> Any:
     r"""Get enum of sox_option_t for sox encodinginfo options.
 
@@ -311,15 +305,13 @@ def get_sox_option_t(i: int = 2) -> Any:
     Returns:
         sox_option_t: A sox_option_t type
     """
-
-    from . import _torchaudio
     if i is None:
         return _torchaudio.sox_option_t
     else:
         return _torchaudio.sox_option_t(i)
 
 
-@_audio_backend_guard("sox")
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def get_sox_bool(i: int = 0) -> Any:
     r"""Get enum of sox_bool for sox encodinginfo options.
 
@@ -331,8 +323,6 @@ def get_sox_bool(i: int = 0) -> Any:
     Returns:
         sox_bool: A sox_bool type
     """
-
-    from . import _torchaudio
     if i is None:
         return _torchaudio.sox_bool
     else:
@@ -350,7 +340,7 @@ _SOX_SUCCESS_CODE = 0
 # https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93a9ef2b87ec303edfe40751d9a85fadeeb
 
 
-@_audio_backend_guard("sox")
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def initialize_sox() -> int:
     """Initialize sox for use with effects chains.
 
@@ -370,7 +360,6 @@ def initialize_sox() -> int:
     if _SOX_INITIALIZED is None:
         raise RuntimeError('SoX effects chain has been already shut down. Can not initialize again.')
     if not _SOX_INITIALIZED:
-        from . import _torchaudio
         code = _torchaudio.initialize_sox()
         if code == _SOX_SUCCESS_CODE:
             _SOX_INITIALIZED = True
@@ -379,7 +368,7 @@ def initialize_sox() -> int:
     return _SOX_SUCCESS_CODE
 
 
-@_audio_backend_guard("sox")
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def shutdown_sox() -> int:
     """Showdown sox for effects chain.
 
@@ -394,7 +383,6 @@ def shutdown_sox() -> int:
     """
     global _SOX_INITIALIZED
     if _SOX_INITIALIZED:
-        from . import _torchaudio
         code = _torchaudio.shutdown_sox()
         if code == _SOX_INITIALIZED:
             _SOX_INITIALIZED = None
