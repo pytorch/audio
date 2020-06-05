@@ -4,13 +4,13 @@ import torch
 import torchaudio
 from torch import Tensor
 
-from torchaudio.common_utils import is_module_available, requires_module
+from torchaudio._internal import module_utils as _mod_utils
 
-if is_module_available('torchaudio._torchaudio'):
+if _mod_utils.is_module_available('torchaudio._torchaudio'):
     from . import _torchaudio
 
 
-@requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def effect_names() -> List[str]:
     """Gets list of valid sox effect names
 
@@ -22,7 +22,7 @@ def effect_names() -> List[str]:
     return _torchaudio.get_effect_names()
 
 
-@requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def SoxEffect():
     r"""Create an object for passing sox effect information between python and c++
 
@@ -123,7 +123,7 @@ class SoxEffectsChain(object):
         e.eopts = eargs
         self.chain.append(e)
 
-    @requires_module('torchaudio._torchaudio')
+    @_mod_utils.requires_module('torchaudio._torchaudio')
     def sox_build_flow_effects(self,
                                out: Optional[Tensor] = None) -> Tuple[Tensor, int]:
         r"""Build effects chain and flow effects from input file to output tensor

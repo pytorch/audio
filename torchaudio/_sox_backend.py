@@ -5,14 +5,14 @@ import torch
 from torch import Tensor
 
 import torchaudio
-from torchaudio.common_utils import is_module_available, requires_module
+from torchaudio._internal import module_utils as _mod_utils
 from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
 
-if is_module_available('torchaudio._torchaudio'):
+if _mod_utils.is_module_available('torchaudio._torchaudio'):
     from . import _torchaudio
 
 
-@requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def load(filepath: str,
          out: Optional[Tensor] = None,
          normalization: bool = True,
@@ -58,7 +58,7 @@ def load(filepath: str,
     return out, sample_rate
 
 
-@requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, channels_first: bool = True) -> None:
     r"""See torchaudio.save"""
 
@@ -71,7 +71,7 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
     return torchaudio.save_encinfo(filepath, src, channels_first, si)
 
 
-@requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
     r"""See torchaudio.info"""
     return _torchaudio.get_info(filepath)
