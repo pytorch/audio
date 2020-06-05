@@ -53,7 +53,6 @@ class ViterbiDecoder:
         ).unsqueeze(1)
 
         self.transitions = transitions
-        return transitions
 
     def _viterbi_decode(self, tag_sequence: torch.Tensor):
         """

@@ -33,3 +33,6 @@ class LanguageModel:
             x = x.replace(self.char_blank, "")
             # x = x.strip()
             return x
+
+    def __len__(self):
+        return self.length
