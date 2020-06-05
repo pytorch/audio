@@ -1,3 +1,4 @@
+import atexit
 from typing import Any, Callable, List, Optional, Tuple, Union
 
 import torch
@@ -8,6 +9,67 @@ from torchaudio._internal import module_utils as _mod_utils
 
 if _mod_utils.is_module_available('torchaudio._torchaudio'):
     from . import _torchaudio
+
+
+_SOX_INITIALIZED: Optional[bool] = False
+# This variable has a micro lifecycle. (False -> True -> None)
+# False: Not initialized
+# True: Initialized
+# None: Already shut down (should not be initialized again.)
+
+_SOX_SUCCESS_CODE = 0
+# defined at
+# https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93a9ef2b87ec303edfe40751d9a85fadeeb
+
+
+@_mod_utils.requires_module('torchaudio._torchaudio')
+def initialize_sox() -> int:
+    """Initialize sox for use with effects chains.
+
+    You only need to call this function once to use SoX effects chains multiple times.
+    It is safe to call this function multiple times as long as ``shutdown_sox`` is not yet called.
+    Once ``shutdown_sox`` is called, you can no longer use SoX effects and calling this function
+    results in `RuntimeError`.
+
+    Note:
+        This function is not required for simple loading.
+
+    Returns:
+        int: Code corresponding to sox_error_t enum. See
+        https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93
+    """
+    global _SOX_INITIALIZED
+    if _SOX_INITIALIZED is None:
+        raise RuntimeError('SoX effects chain has been already shut down. Can not initialize again.')
+    if not _SOX_INITIALIZED:
+        code = _torchaudio.initialize_sox()
+        if code == _SOX_SUCCESS_CODE:
+            _SOX_INITIALIZED = True
+            atexit.register(shutdown_sox)
+        return code
+    return _SOX_SUCCESS_CODE
+
+
+@_mod_utils.requires_module("torchaudio._torchaudio")
+def shutdown_sox() -> int:
+    """Showdown sox for effects chain.
+
+    You do not need to call this function as it will be called automatically
+    at the end of program execution, if ``initialize_sox`` was called.
+
+    It is safe to call this function multiple times.
+
+    Returns:
+        int: Code corresponding to sox_error_t enum. See
+        https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93
+    """
+    global _SOX_INITIALIZED
+    if _SOX_INITIALIZED:
+        code = _torchaudio.shutdown_sox()
+        if code == _SOX_INITIALIZED:
+            _SOX_INITIALIZED = None
+        return code
+    return _SOX_SUCCESS_CODE
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -149,7 +211,6 @@ class SoxEffectsChain(object):
 
         # print("effect options:", [x.eopts for x in self.chain])
 
-        torchaudio.initialize_sox()
         sr = _torchaudio.build_flow_effects(self.input_file,
                                             out,
                                             self.channels_first,
