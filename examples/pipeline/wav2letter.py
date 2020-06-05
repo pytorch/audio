@@ -147,7 +147,7 @@ def save_checkpoint(state, is_best, filename):
         os.rename(tempfile, filename)
     if is_best:
         shutil.copyfile(filename, "model_best.pth.tar")
-    print("Checkpoint: saved")
+    print("Checkpoint: saved", flush=True)
 
 
 def model_length_function(tensor):
