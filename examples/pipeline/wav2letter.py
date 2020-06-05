@@ -4,7 +4,6 @@ import itertools
 import os
 import shutil
 import signal
-import statistics
 import string
 from collections import defaultdict
 from datetime import datetime
@@ -567,5 +566,6 @@ def main(args):
 
 
 if __name__ == "__main__":
+
     args = parse_args()
     main(args)
