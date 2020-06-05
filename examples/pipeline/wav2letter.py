@@ -411,7 +411,7 @@ def main(args):
     best_loss = 1.0
 
     if args.checkpoint and os.path.isfile(args.checkpoint):
-        print("Checkpoint: loading '{}'".format(args.checkpoint))
+        print("Checkpoint: loading '{}'".format(args.checkpoint), flush=True)
         checkpoint = torch.load(args.checkpoint)
 
         args.start_epoch = checkpoint["epoch"]
@@ -424,10 +424,11 @@ def main(args):
         print(
             "Checkpoint: loaded '{}' at epoch {}".format(
                 args.checkpoint, checkpoint["epoch"]
-            )
+            ),
+            flush=True,
         )
     else:
-        print("Checkpoint: not found")
+        print("Checkpoint: not found", flush=True)
 
         save_checkpoint(
             {
