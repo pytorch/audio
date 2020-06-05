@@ -16,10 +16,10 @@ from torchaudio.models.wav2letter import Wav2Letter
 from torchaudio.transforms import MFCC, Resample
 from tqdm import tqdm
 
-from .ctc_decoders import GreedyDecoder, ViterbiDecoder
-from .datasets import datasets_librispeech
-from .languagemodels import LanguageModel
-from .metrics import levenshtein_distance
+from ctc_decoders import GreedyDecoder, ViterbiDecoder
+from datasets import datasets_librispeech
+from languagemodels import LanguageModel
+from metrics import levenshtein_distance
 
 SIGNAL_RECEIVED = False
 

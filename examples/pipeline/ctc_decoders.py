@@ -1,3 +1,4 @@
+from tqdm import tqdm
 from collections import Counter
 
 import torch
@@ -19,11 +20,13 @@ class GreedyDecoder:
 
 
 class ViterbiDecoder:
-    def __init__(self, data_loader, vocab_size, n=2):
+    def __init__(self, data_loader, vocab_size, n=2, progress_bar=False):
         self.vocab_size = vocab_size
         self.n = n
-        self._build_transitions(data_loader)
         self.top_k = 1
+        self.progress_bar = progress_bar
+
+        self._build_transitions(data_loader)
 
     def _build_transitions(self, data_loader):
 
@@ -31,7 +34,7 @@ class ViterbiDecoder:
 
         c = Counter()
 
-        for _, label in data_loader:
+        for _, label in tqdm(data_loader, disable=not self.progress_bar):
             count = zip([label[i:].item() for i in range(self.n)])
             count = Counter(*count)
             c += count
