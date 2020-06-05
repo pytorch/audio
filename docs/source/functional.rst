@@ -113,6 +113,11 @@ Functions to perform common audio operations.
 
 .. autofunction:: treble_biquad
 
+:hidden:`bass_biquad`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: bass_biquad
+
 :hidden:`deemph_biquad`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -142,6 +147,11 @@ Functions to perform common audio operations.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: phaser
+
+:hidden:`flanger`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: flanger
 
 :hidden:`mask_along_axis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~

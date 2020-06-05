@@ -367,6 +367,21 @@ class Functional(common_utils.TestBaseMixin):
 
         self._assert_consistency(func, waveform)
 
+    def test_bass(self):
+        if self.dtype == torch.float64:
+            raise unittest.SkipTest("This test is known to fail for float64")
+
+        waveform = common_utils.get_whitenoise(sample_rate=44100)
+
+        def func(tensor):
+            sample_rate = 44100
+            gain = 40.
+            central_freq = 1000.
+            q = 0.707
+            return F.bass_biquad(tensor, sample_rate, gain, central_freq, q)
+
+        self._assert_consistency(func, waveform)
+
     def test_deemph(self):
         if self.dtype == torch.float64:
             raise unittest.SkipTest("This test is known to fail for float64")
@@ -494,6 +509,23 @@ class Functional(common_utils.TestBaseMixin):
             speed = 0.5
             sample_rate = 44100
             return F.phaser(tensor, sample_rate, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=True)
+
+        self._assert_consistency(func, waveform)
+
+    def test_flanger(self):
+        torch.random.manual_seed(40)
+        waveform = torch.rand(2, 100) - 0.5
+
+        def func(tensor):
+            delay = 0.8
+            depth = 0.88
+            regen = 3.0
+            width = 0.23
+            speed = 1.3
+            phase = 60.
+            sample_rate = 44100
+            return F.flanger(tensor, sample_rate, delay, depth, regen, width, speed,
+                             phase, modulation='sinusoidal', interpolation='linear')
 
         self._assert_consistency(func, waveform)
 

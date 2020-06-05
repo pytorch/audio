@@ -33,6 +33,14 @@ COMMONVOICE
   :special-members:
 
 
+GTZAN
+~~~~~
+
+.. autoclass:: GTZAN
+  :members: __getitem__
+  :special-members:
+
+
 LIBRISPEECH
 ~~~~~~~~~~~
 

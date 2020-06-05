@@ -1,3 +1,4 @@
+import os
 import platform
 import subprocess
 from pathlib import Path
@@ -18,9 +19,21 @@ _CSRC_DIR = _ROOT_DIR / 'torchaudio' / 'csrc'
 _TP_BASE_DIR = _ROOT_DIR / 'third_party'
 _TP_INSTALL_DIR = _TP_BASE_DIR / 'build'
 
-# Temporary fix for building in fbcode
-# at the moment, we have to use external sox in fbcode
-_BUILD_DEPS = not (_ROOT_DIR / '.use_external_sox').exists()
+
+def _get_build_sox():
+    val = os.environ.get('BUILD_SOX', '0')
+    trues = ['1', 'true', 'TRUE', 'on', 'ON', 'yes', 'YES']
+    falses = ['0', 'false', 'FALSE', 'off', 'OFF', 'no', 'NO']
+    if val in trues:
+        return True
+    if val not in falses:
+        print(
+            f'WARNING: Unexpected environment variable value `BUILD_SOX={val}`. '
+            f'Expected one of {trues + falses}')
+    return False
+
+
+_BUILD_SOX = _get_build_sox()
 
 
 def _get_eca(debug):
@@ -52,14 +65,14 @@ def _get_include_dirs():
     dirs = [
         str(_ROOT_DIR),
     ]
-    if _BUILD_DEPS:
+    if _BUILD_SOX:
         dirs.append(str(_TP_INSTALL_DIR / 'include'))
     return dirs
 
 
 def _get_extra_objects():
     objs = []
-    if _BUILD_DEPS:
+    if _BUILD_SOX:
         # NOTE: The order of the library listed bellow matters.
         #
         # (the most important thing is that dependencies come after a library
@@ -71,7 +84,7 @@ def _get_extra_objects():
 
 
 def _get_libraries():
-    return [] if _BUILD_DEPS else ['sox']
+    return [] if _BUILD_SOX else ['sox']
 
 
 def _build_codecs():
@@ -106,6 +119,6 @@ def get_ext_modules(debug=False):
 
 class BuildExtension(TorchBuildExtension):
     def build_extension(self, ext):
-        if ext.name == _EXT_NAME and _BUILD_DEPS:
+        if ext.name == _EXT_NAME and _BUILD_SOX:
             _configure_third_party()
         super().build_extension(ext)
