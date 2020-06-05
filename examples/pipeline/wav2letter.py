@@ -17,7 +17,7 @@ from torchaudio.transforms import MFCC, Resample
 from tqdm import tqdm
 
 from .datasets import datasets_librispeech
-from .decoders import greedy_decode
+from .decoders import GreedyDecoder
 from .languagemodels import LanguageModel
 from .metrics import levenshtein_distance
 
@@ -355,6 +355,8 @@ def main(args):
 
     training, validation, _ = datasets_librispeech(transforms, language_model)
 
+    decoder = GreedyDecoder()
+
     model = Wav2Letter(
         num_classes=language_model.length, input_type="mfcc", num_features=args.n_bins
     )
@@ -474,7 +476,7 @@ def main(args):
                     model,
                     criterion,
                     loader_validation,
-                    greedy_decode,
+                    decoder,
                     language_model,
                     device,
                 )
