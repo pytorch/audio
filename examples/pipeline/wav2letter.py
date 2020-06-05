@@ -1,17 +1,13 @@
 import argparse
-import collections
-import itertools
 import os
 import shutil
 import signal
 import string
 from collections import defaultdict
 from datetime import datetime
-from typing import Optional
 
 import torch
 import torchaudio
-from torch import nn, topk
 from torch.optim import SGD, Adadelta, Adam
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
@@ -21,6 +17,9 @@ from torchaudio.transforms import MFCC, Resample
 from tqdm import tqdm
 
 from .datasets import datasets_librispeech
+from .decoders import greedy_decode
+from .languagemodels import LanguageModel
+from .metrics import levenshtein_distance
 
 SIGNAL_RECEIVED = False
 
@@ -151,79 +150,8 @@ def save_checkpoint(state, is_best, filename):
     print("Checkpoint: saved")
 
 
-class LanguageModel:
-    def __init__(self, labels, char_blank, char_space):
-
-        self.char_space = char_space
-        self.char_blank = char_blank
-
-        labels = [l for l in labels]
-        self.length = len(labels)
-        enumerated = list(enumerate(labels))
-        flipped = [(sub[1], sub[0]) for sub in enumerated]
-
-        d1 = collections.OrderedDict(enumerated)
-        d2 = collections.OrderedDict(flipped)
-        self.mapping = {**d1, **d2}
-
-    def encode(self, iterable):
-        if isinstance(iterable, list):
-            return [self.encode(i) for i in iterable]
-        else:
-            return [self.mapping[i] + self.mapping[self.char_blank] for i in iterable]
-
-    def decode(self, tensor):
-        if isinstance(tensor[0], list):
-            return [self.decode(t) for t in tensor]
-        else:
-            # not idempotent, since clean string
-            x = (self.mapping[i] for i in tensor)
-            x = "".join(i for i, _ in itertools.groupby(x))
-            x = x.replace(self.char_blank, "")
-            # x = x.strip()
-            return x
-
-
 def model_length_function(tensor):
     return int(tensor.shape[0]) // 2 + 1
-
-
-def greedy_decode(outputs):
-    """Greedy Decoder. Returns highest probability of class labels for each timestep
-
-    Args:
-        outputs (torch.Tensor): shape (input length, batch size, number of classes (including blank))
-
-    Returns:
-        torch.Tensor: class labels per time step.
-    """
-    _, indices = topk(outputs, k=1, dim=-1)
-    return indices[..., 0]
-
-
-def levenshtein_distance(r: str, h: str, device: Optional[str] = None):
-
-    # initialisation
-    d = torch.zeros((2, len(h) + 1), dtype=torch.long)  # , device=device)
-    dold = 0
-    dnew = 1
-
-    # computation
-    for i in range(1, len(r) + 1):
-        d[dnew, 0] = 0
-        for j in range(1, len(h) + 1):
-
-            if r[i - 1] == h[j - 1]:
-                d[dnew, j] = d[dnew - 1, j - 1]
-            else:
-                substitution = d[dnew - 1, j - 1] + 1
-                insertion = d[dnew, j - 1] + 1
-                deletion = d[dnew - 1, j] + 1
-                d[dnew, j] = min(substitution, insertion, deletion)
-
-        dnew, dold = dold, dnew
-
-    return d[dnew, -1].item()
 
 
 def collate_fn(batch):
@@ -407,7 +335,7 @@ def main(args):
 
     sample_rate_original = 16000
 
-    transforms = nn.Sequential(
+    transforms = torch.nn.Sequential(
         # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
         # torchaudio.transforms.MFCC(sample_rate=sample_rate_original, n_mfcc=args.n_bins, melkwargs=melkwargs),
         torchaudio.transforms.MelSpectrogram(
@@ -462,7 +390,7 @@ def main(args):
     criterion = torch.nn.CTCLoss(
         blank=language_model.mapping[char_blank], zero_infinity=False
     )
-    # criterion = nn.MSELoss()
+    # criterion = torch.nn.MSELoss()
     # criterion = torch.nn.NLLLoss()
 
     torch.autograd.set_detect_anomaly(False)
