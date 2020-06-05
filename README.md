@@ -1,7 +1,9 @@
 torchaudio: an audio library for PyTorch
 ========================================
 
-[![Build Status](https://travis-ci.org/pytorch/audio.svg?branch=master)](https://travis-ci.org/pytorch/audio)
+[![Build Status](https://circleci.com/gh/pytorch/audio.svg?style=svg)](https://app.circleci.com/pipelines/github/pytorch/audio)
+[![Coverage](https://codecov.io/gh/pytorch/audio/branch/master/graph/badge.svg)](https://codecov.io/gh/pytorch/audio)
+[![Documentation](https://img.shields.io/badge/dynamic/json.svg?label=docs&url=https%3A%2F%2Fpypi.org%2Fpypi%2Ftorchaudio%2Fjson&query=%24.info.version&colorB=brightgreen&prefix=v)](https://pytorch.org/audio/)
 
 The aim of torchaudio is to apply [PyTorch](https://github.com/pytorch/pytorch) to
 the audio domain. By supporting PyTorch, torchaudio follows the same philosophy
@@ -26,9 +28,18 @@ to use and feel like a natural extension.
 
 Dependencies
 ------------
-* pytorch (nightly version needed for development)
+* PyTorch (See below for the compatible versions)
 * libsox v14.3.2 or above (only required when building from source)
 * [optional] vesis84/kaldi-io-for-python commit cb46cb1f44318a5d04d4941cf39084c5b021241e or above
+
+The following is the corresponding ``torchaudio`` versions and supported Python versions.
+
+| ``torch``                | ``torchaudio``           | ``python``                      |
+| ------------------------ | ------------------------ | ------------------------------- |
+| ``master`` / ``nightly`` | ``master`` / ``nightly`` | ``>=3.6``                       |
+| ``1.5.0``                | ``0.5.0``                | ``>=3.5``                       |
+| ``1.4.0``                | ``0.4.0``                | ``==2.7``, ``>=3.5``, ``<=3.8`` |
+
 
 Installation
 ------------

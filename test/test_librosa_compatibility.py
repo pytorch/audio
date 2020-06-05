@@ -7,9 +7,11 @@ import torch
 from torch.testing._internal.common_utils import TestCase
 import torchaudio
 import torchaudio.functional as F
-from torchaudio.common_utils import IMPORT_LIBROSA
+from torchaudio.common_utils import _check_module_exists
 
-if IMPORT_LIBROSA:
+LIBROSA_AVAILABLE = _check_module_exists('librosa')
+
+if LIBROSA_AVAILABLE:
     import numpy as np
     import librosa
     import scipy
@@ -19,7 +21,7 @@ import pytest
 from . import common_utils
 
 
-@unittest.skipIf(not IMPORT_LIBROSA, "Librosa not available")
+@unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
 class TestFunctional(TestCase):
     """Test suite for functions in `functional` module."""
     def test_griffinlim(self):
@@ -115,12 +117,8 @@ class TestFunctional(TestCase):
 ])
 @pytest.mark.parametrize('rate', [0.5, 1.01, 1.3])
 @pytest.mark.parametrize('hop_length', [256])
+@unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
 def test_phase_vocoder(complex_specgrams, rate, hop_length):
-
-    # Using a decorator here causes parametrize to fail on Python 2
-    if not IMPORT_LIBROSA:
-        raise unittest.SkipTest('Librosa is not available')
-
     # Due to cummulative sum, numerical error in using torch.float32 will
     # result in bottom right values of the stretched sectrogram to not
     # match with librosa.
@@ -158,7 +156,7 @@ def _load_audio_asset(*asset_paths, **kwargs):
     return sound, sample_rate
 
 
-@unittest.skipIf(not IMPORT_LIBROSA, "Librosa not available")
+@unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
 class TestTransforms(TestCase):
     """Test suite for functions in `transforms` module."""
     def assert_compatibilities(self, n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):

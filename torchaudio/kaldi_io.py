@@ -1,16 +1,16 @@
 # To use this file, the dependency (https://github.com/vesis84/kaldi-io-for-python)
 # needs to be installed. This is a light wrapper around kaldi_io that returns
 # torch.Tensors.
-from typing import Any, Callable, Iterable, Tuple, Union
+from typing import Any, Callable, Iterable, Tuple
 
 import torch
 from torch import Tensor
-from torchaudio.common_utils import IMPORT_KALDI_IO, IMPORT_NUMPY
+from torchaudio.common_utils import _check_module_exists
 
-if IMPORT_NUMPY:
+_KALDI_IO_AVAILABLE = _check_module_exists('kaldi_io', 'numpy')
+
+if _KALDI_IO_AVAILABLE:
     import numpy as np
-
-if IMPORT_KALDI_IO:
     import kaldi_io
 
 
@@ -38,7 +38,7 @@ def _convert_method_output_to_tensor(file_or_fd: Any,
     Returns:
         Iterable[Tuple[str, Tensor]]: The string is the key and the tensor is vec/mat
     """
-    if not IMPORT_KALDI_IO:
+    if not _KALDI_IO_AVAILABLE:
         raise ImportError('Could not import kaldi_io. Did you install it?')
 
     for key, np_arr in fn(file_or_fd):
