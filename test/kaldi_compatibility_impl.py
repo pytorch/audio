@@ -111,23 +111,27 @@ class Kaldi(common_utils.TestBaseMixin):
 
     def test_mfcc_empty(self):
         # Passing in an empty tensor should result in an error
-        self.assertRaises(AssertionError, torchaudio.compliance.kaldi.mfcc, torch.empty(0))
+        input = torch.empty(0).to(dtype=self.dtype, device=self.device)
+        self.assertRaises(AssertionError, torchaudio.compliance.kaldi.mfcc, input)
 
     def test_resample_waveform_upsample_size(self):
         test_8000_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
         sound, sample_rate = torchaudio.load_wav(test_8000_filepath)
+        sound = sound.to(dtype=self.dtype, device=self.device)
         upsample_sound = torchaudio.compliance.kaldi.resample_waveform(sound, sample_rate, sample_rate * 2)
         self.assertTrue(upsample_sound.size(-1) == sound.size(-1) * 2)
 
     def test_resample_waveform_downsample_size(self):
         test_8000_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
         sound, sample_rate = torchaudio.load_wav(test_8000_filepath)
+        sound = sound.to(dtype=self.dtype, device=self.device)
         downsample_sound = torchaudio.compliance.kaldi.resample_waveform(sound, sample_rate, sample_rate // 2)
         self.assertTrue(downsample_sound.size(-1) == sound.size(-1) // 2)
 
     def test_resample_waveform_identity_size(self):
         test_8000_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
         sound, sample_rate = torchaudio.load_wav(test_8000_filepath)
+        sound = sound.to(dtype=self.dtype, device=self.device)
         downsample_sound = torchaudio.compliance.kaldi.resample_waveform(sound, sample_rate, sample_rate)
         self.assertTrue(downsample_sound.size(-1) == sound.size(-1))
 
@@ -146,11 +150,13 @@ class Kaldi(common_utils.TestBaseMixin):
 
         duration = 5  # seconds
         original_timestamps = torch.arange(0, duration, 1.0 / sample_rate)
+        original_timestamps = original_timestamps.to(dtype=self.dtype, device=self.device)
 
         sound = 123 * torch.cos(2 * math.pi * 3 * original_timestamps).unsqueeze(0)
         estimate = torchaudio.compliance.kaldi.resample_waveform(sound, sample_rate, new_sample_rate).squeeze()
 
         new_timestamps = torch.arange(0, duration, 1.0 / new_sample_rate)[:estimate.size(0)]
+        new_timestamps = new_timestamps.to(dtype=self.dtype, device=self.device)
         ground_truth = 123 * torch.cos(2 * math.pi * 3 * new_timestamps)
 
         # trim the first/last n samples as these points have boundary effects
@@ -171,7 +177,9 @@ class Kaldi(common_utils.TestBaseMixin):
         num_channels = 3
 
         test_8000_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
-        sound, sample_rate = torchaudio.load_wav(test_8000_filepath)  # (1, 8000)
+        # (1, 8000)
+        sound, sample_rate = torchaudio.load_wav(test_8000_filepath)
+        sound = sound.to(dtype=self.dtype, device=self.device)
         multi_sound = sound.repeat(num_channels, 1)  # (num_channels, 8000)
 
         for i in range(num_channels):
