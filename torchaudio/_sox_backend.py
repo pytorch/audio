@@ -5,7 +5,10 @@ import torch
 from torch import Tensor
 
 import torchaudio
-from torchaudio._internal import module_utils as _mod_utils
+from torchaudio._internal import (
+    module_utils as _mod_utils,
+    misc_ops as _misc_ops,
+)
 from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
 
 if _mod_utils.is_module_available('torchaudio._torchaudio'):
@@ -32,7 +35,7 @@ def load(filepath: str,
 
     # initialize output tensor
     if out is not None:
-        torchaudio.check_input(out)
+        _misc_ops.check_input(out)
     else:
         out = torch.FloatTensor()
 
@@ -53,7 +56,7 @@ def load(filepath: str,
     )
 
     # normalize if needed
-    torchaudio._audio_normalization(out, normalization)
+    _misc_ops.normalize_audio(out, normalization)
 
     return out, sample_rate
 

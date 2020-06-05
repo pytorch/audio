@@ -5,7 +5,10 @@ import torch
 import torchaudio
 from torch import Tensor
 
-from torchaudio._internal import module_utils as _mod_utils
+from torchaudio._internal import (
+    module_utils as _mod_utils,
+    misc_ops as _misc_ops,
+)
 
 if _mod_utils.is_module_available('torchaudio._torchaudio'):
     from . import _torchaudio
@@ -200,7 +203,7 @@ class SoxEffectsChain(object):
         """
         # initialize output tensor
         if out is not None:
-            torchaudio.check_input(out)
+            _misc_ops.check_input(out)
         else:
             out = torch.FloatTensor()
         if not len(self.chain):
@@ -220,7 +223,7 @@ class SoxEffectsChain(object):
                                             self.chain,
                                             self.MAX_EFFECT_OPTS)
 
-        torchaudio._audio_normalization(out, self.normalization)
+        _misc_ops.normalize_audio(out, self.normalization)
 
         return out, sr
 

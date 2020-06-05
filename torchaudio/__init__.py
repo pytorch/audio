@@ -12,13 +12,15 @@ from torchaudio import (
     transforms
 )
 from torchaudio._backend import (
-    check_input,
     _get_audio_backend_module,
     get_audio_backend,
     set_audio_backend,
 )
 from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
-from torchaudio._internal import module_utils as _mod_utils
+from torchaudio._internal import (
+    module_utils as _mod_utils,
+    misc_ops as _misc_ops,
+)
 from torchaudio.sox_effects import initialize_sox, shutdown_sox
 
 try:
@@ -161,7 +163,7 @@ def save_encinfo(filepath: str,
     if not os.path.isdir(abs_dirpath):
         raise OSError("Directory does not exist: {}".format(abs_dirpath))
     # check that src is a CPU tensor
-    check_input(src)
+    _misc_ops.check_input(src)
     # Check/Fix shape of source data
     if src.dim() == 1:
         # 1d tensors as assumed to be mono signals
@@ -328,24 +330,3 @@ def get_sox_bool(i: int = 0) -> Any:
         return _torchaudio.sox_bool
     else:
         return _torchaudio.sox_bool(i)
-
-
-def _audio_normalization(signal: Tensor, normalization: Union[bool, float, Callable]) -> None:
-    """Audio normalization of a tensor in-place.  The normalization can be a bool,
-    a number, or a callable that takes the audio tensor as an input. SoX uses
-    32-bit signed integers internally, thus bool normalizes based on that assumption.
-    """
-
-    if not normalization:
-        return
-
-    if isinstance(normalization, bool):
-        normalization = 1 << 31
-
-    if isinstance(normalization, (float, int)):
-        # normalize with custom value
-        a = normalization
-        signal /= a
-    elif callable(normalization):
-        a = normalization(signal)
-        signal /= a
