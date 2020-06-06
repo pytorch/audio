@@ -1,12 +1,81 @@
+import atexit
 from typing import Any, Callable, List, Optional, Tuple, Union
 
 import torch
 import torchaudio
 from torch import Tensor
-from torchaudio._backend import _audio_backend_guard
+
+from torchaudio._internal import (
+    module_utils as _mod_utils,
+    misc_ops as _misc_ops,
+)
+
+if _mod_utils.is_module_available('torchaudio._torchaudio'):
+    from . import _torchaudio
 
 
-@_audio_backend_guard("sox")
+_SOX_INITIALIZED: Optional[bool] = False
+# This variable has a micro lifecycle. (False -> True -> None)
+# False: Not initialized
+# True: Initialized
+# None: Already shut down (should not be initialized again.)
+
+_SOX_SUCCESS_CODE = 0
+# defined at
+# https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93a9ef2b87ec303edfe40751d9a85fadeeb
+
+
+@_mod_utils.requires_module('torchaudio._torchaudio')
+def initialize_sox() -> int:
+    """Initialize sox for use with effects chains.
+
+    You only need to call this function once to use SoX effects chains multiple times.
+    It is safe to call this function multiple times as long as ``shutdown_sox`` is not yet called.
+    Once ``shutdown_sox`` is called, you can no longer use SoX effects and calling this function
+    results in `RuntimeError`.
+
+    Note:
+        This function is not required for simple loading.
+
+    Returns:
+        int: Code corresponding to sox_error_t enum. See
+        https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93
+    """
+    global _SOX_INITIALIZED
+    if _SOX_INITIALIZED is None:
+        raise RuntimeError('SoX effects chain has been already shut down. Can not initialize again.')
+    if not _SOX_INITIALIZED:
+        code = _torchaudio.initialize_sox()
+        if code == _SOX_SUCCESS_CODE:
+            _SOX_INITIALIZED = True
+            atexit.register(shutdown_sox)
+        return code
+    return _SOX_SUCCESS_CODE
+
+
+@_mod_utils.requires_module("torchaudio._torchaudio")
+def shutdown_sox() -> int:
+    """Showdown sox for effects chain.
+
+    You do not need to call this function as it will be called automatically
+    at the end of program execution, if ``initialize_sox`` was called.
+
+    It is safe to call this function multiple times.
+
+    Returns:
+        int: Code corresponding to sox_error_t enum. See
+        https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93
+    """
+    global _SOX_INITIALIZED
+    if _SOX_INITIALIZED:
+        code = _torchaudio.shutdown_sox()
+        if code == _SOX_INITIALIZED:
+            _SOX_INITIALIZED = None
+        return code
+    return _SOX_SUCCESS_CODE
+
+
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def effect_names() -> List[str]:
     """Gets list of valid sox effect names
 
@@ -15,12 +84,10 @@ def effect_names() -> List[str]:
     Example
         >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
     """
-
-    from . import _torchaudio
     return _torchaudio.get_effect_names()
 
 
-@_audio_backend_guard("sox")
+@_mod_utils.requires_module('torchaudio._torchaudio')
 def SoxEffect():
     r"""Create an object for passing sox effect information between python and c++
 
@@ -28,8 +95,6 @@ def SoxEffect():
         SoxEffect: An object with the following attributes: ename (str) which is the
         name of effect, and eopts (List[str]) which is a list of effect options.
     """
-
-    from . import _torchaudio
     return _torchaudio.SoxEffect()
 
 
@@ -123,7 +188,7 @@ class SoxEffectsChain(object):
         e.eopts = eargs
         self.chain.append(e)
 
-    @_audio_backend_guard("sox")
+    @_mod_utils.requires_module('torchaudio._torchaudio')
     def sox_build_flow_effects(self,
                                out: Optional[Tensor] = None) -> Tuple[Tensor, int]:
         r"""Build effects chain and flow effects from input file to output tensor
@@ -138,7 +203,7 @@ class SoxEffectsChain(object):
         """
         # initialize output tensor
         if out is not None:
-            torchaudio.check_input(out)
+            _misc_ops.check_input(out)
         else:
             out = torch.FloatTensor()
         if not len(self.chain):
@@ -149,8 +214,6 @@ class SoxEffectsChain(object):
 
         # print("effect options:", [x.eopts for x in self.chain])
 
-        torchaudio.initialize_sox()
-        from . import _torchaudio
         sr = _torchaudio.build_flow_effects(self.input_file,
                                             out,
                                             self.channels_first,
@@ -160,7 +223,7 @@ class SoxEffectsChain(object):
                                             self.chain,
                                             self.MAX_EFFECT_OPTS)
 
-        torchaudio._audio_normalization(out, self.normalization)
+        _misc_ops.normalize_audio(out, self.normalization)
 
         return out, sr
 
