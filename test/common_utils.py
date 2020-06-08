@@ -10,7 +10,7 @@ from torch.testing._internal.common_utils import TestCase
 import torchaudio
 
 _TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-BACKENDS = torchaudio._backend._BACKENDS
+BACKENDS = torchaudio.list_audio_backends()
 
 
 def get_asset_path(*paths):

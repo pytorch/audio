@@ -9,20 +9,20 @@ from torchaudio import (
     sox_effects,
     transforms
 )
-from torchaudio._backend import (
+from torchaudio.backend import (
     _get_audio_backend_module,
+    list_audio_backends,
     get_audio_backend,
     set_audio_backend,
-)
-from torchaudio._sox_backend import (
     save_encinfo,
     sox_signalinfo_t,
     sox_encodinginfo_t,
     get_sox_option_t,
     get_sox_encoding_t,
     get_sox_bool,
+    SignalInfo,
+    EncodingInfo,
 )
-from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
 from torchaudio._internal import (
     module_utils as _mod_utils,
     misc_ops as _misc_ops,

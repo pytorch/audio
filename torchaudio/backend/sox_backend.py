@@ -8,10 +8,10 @@ from torchaudio._internal import (
     module_utils as _mod_utils,
     misc_ops as _misc_ops,
 )
-from torchaudio._soundfile_backend import SignalInfo, EncodingInfo
+from .soundfile_backend import SignalInfo, EncodingInfo
 
 if _mod_utils.is_module_available('torchaudio._torchaudio'):
-    from . import _torchaudio
+    from torchaudio import _torchaudio
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
