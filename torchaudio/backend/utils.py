@@ -1,3 +1,4 @@
+import warnings
 from typing import Any, Optional
 
 from torchaudio._internal import module_utils as _mod_utils
@@ -5,16 +6,6 @@ from . import soundfile_backend, sox_backend
 
 _BACKEND = None
 _BACKENDS = {}
-
-if _mod_utils.is_module_available('soundfile'):
-    _BACKENDS['soundfile'] = soundfile_backend
-if _mod_utils.is_module_available('torchaudio._torchaudio'):
-    _BACKENDS['sox'] = sox_backend
-
-if 'sox' in _BACKENDS:
-    _BACKEND = 'sox'
-elif 'soundfile' in _BACKENDS:
-    _BACKEND = 'soundfile'
 
 
 def list_audio_backends():
@@ -50,3 +41,22 @@ def _get_audio_backend_module() -> Any:
     if _BACKEND is None:
         raise RuntimeError('Backend is not initialized.')
     return _BACKENDS[_BACKEND]
+
+
+def _init_audio_backend():
+    global _BACKEND
+    global _BACKENDS
+
+    _BACKENDS = {}
+    if _mod_utils.is_module_available('soundfile'):
+        _BACKENDS['soundfile'] = soundfile_backend
+    if _mod_utils.is_module_available('torchaudio._torchaudio'):
+        _BACKENDS['sox'] = sox_backend
+
+    if 'sox' in _BACKENDS:
+        _BACKEND = 'sox'
+    elif 'soundfile' in _BACKENDS:
+        _BACKEND = 'soundfile'
+    else:
+        warnings.warn('No audio backend is available.')
+        _BACKEND = None

@@ -1,3 +1,4 @@
+from . import utils
 from .utils import (
     _get_audio_backend_module,
     list_audio_backends,
@@ -16,3 +17,6 @@ from .common import (
     SignalInfo,
     EncodingInfo,
 )
+
+
+utils._init_audio_backend()
