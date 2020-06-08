@@ -1,5 +1,5 @@
 import os
-from typing import Any, Optional, Tuple
+from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
@@ -8,6 +8,7 @@ from torchaudio._internal import (
     module_utils as _mod_utils,
     misc_ops as _misc_ops,
 )
+from .common import SignalInfo, EncodingInfo
 
 if _mod_utils.is_module_available('soundfile'):
     import soundfile
@@ -20,36 +21,6 @@ _subtype_to_precision = {
     'PCM_32': 32,
     'PCM_U8': 8
 }
-
-
-class SignalInfo:
-    def __init__(self,
-                 channels: Optional[int] = None,
-                 rate: Optional[float] = None,
-                 precision: Optional[int] = None,
-                 length: Optional[int] = None) -> None:
-        self.channels = channels
-        self.rate = rate
-        self.precision = precision
-        self.length = length
-
-
-class EncodingInfo:
-    def __init__(self,
-                 encoding: Any = None,
-                 bits_per_sample: Optional[int] = None,
-                 compression: Optional[float] = None,
-                 reverse_bytes: Any = None,
-                 reverse_nibbles: Any = None,
-                 reverse_bits: Any = None,
-                 opposite_endian: Optional[bool] = None) -> None:
-        self.encoding = encoding
-        self.bits_per_sample = bits_per_sample
-        self.compression = compression
-        self.reverse_bytes = reverse_bytes
-        self.reverse_nibbles = reverse_nibbles
-        self.reverse_bits = reverse_bits
-        self.opposite_endian = opposite_endian
 
 
 @_mod_utils.requires_module('soundfile')
