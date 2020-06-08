@@ -8,10 +8,13 @@ _BACKENDS = {}
 
 if _mod_utils.is_module_available('soundfile'):
     _BACKENDS['soundfile'] = _soundfile_backend
-    _BACKEND = 'soundfile'
 if _mod_utils.is_module_available('torchaudio._torchaudio'):
     _BACKENDS['sox'] = _sox_backend
+
+if 'sox' in _BACKENDS:
     _BACKEND = 'sox'
+elif 'soundfile' in _BACKENDS:
+    _BACKEND = 'soundfile'
 
 
 def list_audio_backends():
