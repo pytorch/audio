@@ -1,15 +1,15 @@
 from typing import Any, Optional
 
 from torchaudio._internal import module_utils as _mod_utils
-from . import _soundfile_backend, _sox_backend
+from . import soundfile_backend, sox_backend
 
 _BACKEND = None
 _BACKENDS = {}
 
 if _mod_utils.is_module_available('soundfile'):
-    _BACKENDS['soundfile'] = _soundfile_backend
+    _BACKENDS['soundfile'] = soundfile_backend
 if _mod_utils.is_module_available('torchaudio._torchaudio'):
-    _BACKENDS['sox'] = _sox_backend
+    _BACKENDS['sox'] = sox_backend
 
 if 'sox' in _BACKENDS:
     _BACKEND = 'sox'
