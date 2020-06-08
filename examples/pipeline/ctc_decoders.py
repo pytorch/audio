@@ -42,7 +42,7 @@ class ViterbiDecoder:
 
         # Encode as transition matrix
 
-        ind = torch.tensor(list(a for (a, _) in c.items())).t()
+        ind = torch.tensor([a for (a, _) in c.items()]).t()
         val = torch.tensor([b for (_, b) in c.items()], dtype=torch.float)
 
         transitions = (

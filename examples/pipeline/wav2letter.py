@@ -64,12 +64,13 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--arch",
-        metavar="ARCH",
-        default="wav2letter",
-        choices=["wav2letter"],
-        help="model architecture",
+        "--decoder",
+        metavar="D",
+        default="greedy",
+        choices=["greedy", "viterbi"],
+        help="decoder to use",
     )
+
     parser.add_argument(
         "--batch-size", default=64, type=int, metavar="N", help="mini-batch size"
     )
@@ -355,8 +356,12 @@ def main(args):
 
     training, validation, _ = datasets_librispeech(transforms, language_model)
 
-    decoder = GreedyDecoder()
-    # decoder = ViterbiDecoder(training, len(language_model), progress_bar=args.progress_bar)
+    if args.decoder == "greedy":
+        decoder = GreedyDecoder()
+    elif args.decoder == "viterbi":
+        decoder = ViterbiDecoder(
+            training, len(language_model), progress_bar=args.progress_bar
+        )
 
     model = Wav2Letter(
         num_classes=language_model.length, input_type="mfcc", num_features=args.n_bins
