@@ -1,5 +1,5 @@
 import torch
-from torchaudio.models import Wav2Letter
+from torchaudio.models import Wav2Letter, MelResNet
 
 
 class TestWav2Letter:
@@ -29,3 +29,17 @@ class TestWav2Letter:
         out = model(x)
 
         assert out.size() == (batch_size, num_classes, 2)
+
+
+class TestMelResNet:
+    @pytest.mark.parametrize('batch_size', [2])
+    @pytest.mark.parametrize('num_features', [200])
+    @pytest.mark.parametrize('input_dims', [100])
+    @pytest.mark.parametrize('output_dims', [128])
+    def test_waveform(self, batch_size, num_features, input_dims, output_dims):
+        model = MelResNet()
+
+        x = torch.rand(batch_size, input_dims, num_features)
+        out = model(x)
+
+        assert out.size() == (batch_size, output_dims, num_features - 4)
