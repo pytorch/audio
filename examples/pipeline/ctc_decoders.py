@@ -1,8 +1,8 @@
-from tqdm import tqdm
 from collections import Counter
 
 import torch
 from torch import topk
+from tqdm import tqdm
 
 
 class GreedyDecoder:
@@ -33,16 +33,17 @@ class ViterbiDecoder:
         # Count n-grams
 
         c = Counter()
-
         for _, label in tqdm(data_loader, disable=not self.progress_bar):
-            count = zip([label[i:].item() for i in range(self.n)])
-            count = Counter(*count)
+            count = Counter(
+                tuple(b.item() for b in a)
+                for a in zip(*(label[i:] for i in range(self.n)))
+            )
             c += count
 
         # Encode as transition matrix
 
-        ind = torch.tensor(list(zip(*(a for (a, _) in c.items()))))
-        val = torch.tensor((b for (_, b) in c.items()), dtype=torch.float)
+        ind = torch.tensor(list(a for (a, _) in c.items())).t()
+        val = torch.tensor([b for (_, b) in c.items()], dtype=torch.float)
 
         transitions = (
             torch.sparse_coo_tensor(

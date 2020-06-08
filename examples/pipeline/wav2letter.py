@@ -356,7 +356,7 @@ def main(args):
     training, validation, _ = datasets_librispeech(transforms, language_model)
 
     decoder = GreedyDecoder()
-    # decoder = ViterbiDecoder(training, len(language_model))
+    # decoder = ViterbiDecoder(training, len(language_model), progress_bar=args.progress_bar)
 
     model = Wav2Letter(
         num_classes=language_model.length, input_type="mfcc", num_features=args.n_bins
