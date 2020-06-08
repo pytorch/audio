@@ -1372,11 +1372,11 @@ def _generate_wave_table(
 
     phase_offset = int(phase / math.pi / 2 * table_size + 0.5)
 
-    t = torch.arange(table_size, device=device).to(torch.int32)
+    t = torch.arange(table_size, device=device, dtype=torch.int32)
 
     point = (t + phase_offset) % table_size
 
-    d = torch.zeros_like(point, device=device).to(torch.float64)
+    d = torch.zeros_like(point, device=device, dtype=torch.float64)
 
     if wave_type == 'SINE':
         d = (torch.sin(point.to(torch.float64) / table_size * 2 * math.pi) + 1) / 2
@@ -1503,7 +1503,7 @@ def flanger(
 
     delay_buf_pos = 0
     lfo_pos = 0
-    channel_idxs = torch.arange(0, n_channels).to(device=device)
+    channel_idxs = torch.arange(0, n_channels, device=device)
 
     for i in range(waveform.shape[-1]):
 
