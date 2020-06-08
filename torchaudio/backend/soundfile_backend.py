@@ -8,6 +8,7 @@ from torchaudio._internal import (
     module_utils as _mod_utils,
     misc_ops as _misc_ops,
 )
+from . import common
 from .common import SignalInfo, EncodingInfo
 
 if _mod_utils.is_module_available('soundfile'):
@@ -24,6 +25,7 @@ _subtype_to_precision = {
 
 
 @_mod_utils.requires_module('soundfile')
+@common._impl_load
 def load(filepath: str,
          out: Optional[Tensor] = None,
          normalization: Optional[bool] = True,
@@ -71,6 +73,14 @@ def load(filepath: str,
 
 
 @_mod_utils.requires_module('soundfile')
+@common._impl_load_wav
+def load_wav(filepath, **kwargs):
+    # kwargs['normalization'] = 1 << 16
+    return load(filepath, **kwargs)
+
+
+@_mod_utils.requires_module('soundfile')
+@common._impl_save
 def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, channels_first: bool = True) -> None:
     r"""See torchaudio.save"""
 
@@ -104,6 +114,7 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
 
 
 @_mod_utils.requires_module('soundfile')
+@common._impl_info
 def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
     r"""See torchaudio.info"""
 
