@@ -78,3 +78,10 @@ YESNO
 .. autoclass:: YESNO
   :members: __getitem__
   :special-members:
+
+CMU_ARCTIC
+~~~~~
+
+.. autoclass:: CMU_ARCTIC
+  :members: __getitem__
+  :special-members:

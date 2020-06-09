@@ -6,6 +6,7 @@ from .vctk import VCTK
 from .gtzan import GTZAN
 from .yesno import YESNO
 from .ljspeech import LJSPEECH
+from .cmu_arctic import CMU_ARCTIC
 
 __all__ = (
     "COMMONVOICE",
