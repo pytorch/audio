@@ -1,3 +1,4 @@
+import warnings
 import importlib.util
 from functools import wraps
 
@@ -32,4 +33,15 @@ def requires_module(*modules: str):
             def wrapped(*args, **kwargs):
                 raise RuntimeError(f'{func.__module__}.{func.__name__} requires {req}')
             return wrapped
+    return decorator
+
+
+def depricate(direction: str):
+    """Decorator to add depciration message"""
+    def decorator(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            warnings.warn(f'{func.__module__}.{func.__name__} has been deprecated. f{direction}')
+            return func(*args, **kwargs)
+        return wrapped
     return decorator
