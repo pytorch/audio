@@ -12,7 +12,7 @@ from .sox_backend import (
     get_sox_encoding_t,
     get_sox_bool,
 )
-from .soundfile_backend import (
+from .common import (
     SignalInfo,
     EncodingInfo,
 )
