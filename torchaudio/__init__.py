@@ -23,21 +23,15 @@ from torchaudio.backend import (
     SignalInfo,
     EncodingInfo,
 )
-from torchaudio._internal import (
-    module_utils as _mod_utils,
-    misc_ops as _misc_ops,
+from torchaudio.sox_effects import (
+    init_sox_effects as initialize_sox,
+    shutdown_sox_effects as shutdown_sox,
 )
-from torchaudio.sox_effects import initialize_sox, shutdown_sox
 
 try:
     from .version import __version__, git_version  # noqa: F401
 except ImportError:
     pass
-
-
-if _mod_utils.is_module_available('torchaudio._torchaudio'):
-    from . import _torchaudio
-    initialize_sox()
 
 
 def load(filepath: Union[str, Path],
