@@ -16,6 +16,7 @@ __all__ = (
     "YESNO",
     "LJSPEECH",
     "GTZAN",
+    "CMU_ARCTIC",
     "diskcache_iterator",
     "bg_iterator",
 )
