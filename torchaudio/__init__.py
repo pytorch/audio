@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any, Callable, Optional, Tuple, Union
 
 from torch import Tensor
+from torchaudio._internal import module_utils as _mod_utils
 from torchaudio import (
     compliance,
     datasets,
@@ -24,14 +25,24 @@ from torchaudio.backend import (
     EncodingInfo,
 )
 from torchaudio.sox_effects import (
-    init_sox_effects as initialize_sox,
-    shutdown_sox_effects as shutdown_sox,
+    init_sox_effects,
+    shutdown_sox_effects,
 )
 
 try:
     from .version import __version__, git_version  # noqa: F401
 except ImportError:
     pass
+
+
+@_mod_utils.depricate("Use `torchaudio.sox_effects.init_sox_effects`.")
+def initialize_sox():
+    init_sox_effects()
+
+
+@_mod_utils.depricate("Use `torchaudio.sox_effects.shutdown_sox`.")
+def shutdown_sox():
+    shutdown_sox_effects()
 
 
 def load(filepath: Union[str, Path],
