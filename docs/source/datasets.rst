@@ -26,7 +26,7 @@ All the datasets have almost similar API. They all have two common arguments:
 
 
 CMUARCTIC
-~~~~~
+~~~~~~~~~
 
 .. autoclass:: CMUARCTIC
   :members: __getitem__
