@@ -25,6 +25,14 @@ All the datasets have almost similar API. They all have two common arguments:
 .. currentmodule:: torchaudio.datasets 
 
 
+CMUARCTIC
+~~~~~
+
+.. autoclass:: CMUARCTIC
+  :members: __getitem__
+  :special-members:
+
+
 COMMONVOICE
 ~~~~~~~~~~~
 
@@ -76,12 +84,5 @@ YESNO
 ~~~~~
 
 .. autoclass:: YESNO
-  :members: __getitem__
-  :special-members:
-
-CMUARCTIC
-~~~~~
-
-.. autoclass:: CMUARCTIC
   :members: __getitem__
   :special-members:
