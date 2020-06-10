@@ -17,7 +17,7 @@ from torchaudio.transforms import MFCC, Resample
 from tqdm import tqdm
 
 from ctc_decoders import GreedyDecoder, ViterbiDecoder
-from datasets import datasets_librispeech
+from datasets import collate_factory, datasets_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
 
@@ -153,28 +153,6 @@ def save_checkpoint(state, is_best, filename):
 
 def model_length_function(tensor):
     return int(tensor.shape[0]) // 2 + 1
-
-
-def collate_fn(batch):
-
-    tensors = [b[0] for b in batch if b]
-
-    tensors_lengths = torch.tensor(
-        [model_length_function(t) for t in tensors],
-        dtype=torch.long,
-        device=tensors[0].device,
-    )
-
-    tensors = torch.nn.utils.rnn.pad_sequence(tensors, batch_first=True)
-    tensors = tensors.transpose(1, -1)
-
-    targets = [b[1] for b in batch if b]
-    target_lengths = torch.tensor(
-        [target.shape[0] for target in targets], dtype=torch.long, device=tensors.device
-    )
-    targets = torch.nn.utils.rnn.pad_sequence(targets, batch_first=True)
-
-    return tensors, targets, tensors_lengths, target_lengths
 
 
 def count_parameters(model):
@@ -402,6 +380,8 @@ def main(args):
     # criterion = torch.nn.NLLLoss()
 
     torch.autograd.set_detect_anomaly(False)
+
+    collate_fn = collate_factory(model_length_function)
 
     loader_training = DataLoader(
         training,

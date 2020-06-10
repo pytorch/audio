@@ -109,3 +109,30 @@ def datasets_librispeech(
 
     return create("train-clean-100"), create("dev-clean"), None
     # return create(["train-clean-100", "train-clean-360", "train-other-500"]), create(["dev-clean", "dev-other"]), None
+
+
+def collate_factory(model_length_function):
+    def collate_fn(batch):
+
+        tensors = [b[0] for b in batch if b]
+
+        tensors_lengths = torch.tensor(
+            [model_length_function(t) for t in tensors],
+            dtype=torch.long,
+            device=tensors[0].device,
+        )
+
+        tensors = torch.nn.utils.rnn.pad_sequence(tensors, batch_first=True)
+        tensors = tensors.transpose(1, -1)
+
+        targets = [b[1] for b in batch if b]
+        target_lengths = torch.tensor(
+            [target.shape[0] for target in targets],
+            dtype=torch.long,
+            device=tensors.device,
+        )
+        targets = torch.nn.utils.rnn.pad_sequence(targets, batch_first=True)
+
+        return tensors, targets, tensors_lengths, target_lengths
+
+    return collate_fn
