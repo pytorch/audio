@@ -39,7 +39,11 @@ except ImportError:
     "Use `torchaudio.sox_effects.init_sox_effects`, or simply remove the call. "
     "It is automatically handled."
 )
-def initialize_sox():
+def initialize_sox() -> int:
+    """Initialize sox effects.
+
+    This function is deprecated. See ``torchaudio.sox_effects.init_sox_effects``
+    """
     init_sox_effects()
 
 
@@ -48,6 +52,10 @@ def initialize_sox():
     "It is automatically handled."
 )
 def shutdown_sox():
+    """Shutdown sox effects.
+
+    This function is deprecated. See ``torchaudio.sox_effects.shutdown_sox_effects``
+    """
     shutdown_sox_effects()
 
 
