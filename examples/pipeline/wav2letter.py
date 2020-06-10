@@ -21,8 +21,6 @@ from datasets import collate_factory, datasets_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
 
-SIGNAL_RECEIVED = False
-
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -120,12 +118,6 @@ def parse_args():
     return args
 
 
-def signal_handler(a, b):
-    global SIGNAL_RECEIVED
-    print("Signal received", a, datetime.now().strftime("%y%m%d.%H%M%S"), flush=True)
-    SIGNAL_RECEIVED = True
-
-
 def save_checkpoint(state, is_best, filename):
     """
     Save the model to a temporary file first,
@@ -196,9 +188,6 @@ def train_one_epoch(
 
         optimizer.step()
 
-        if SIGNAL_RECEIVED:
-            return
-
         if pbar is not None:
             pbar.update(1 / len(data_loader))
 
@@ -266,9 +255,6 @@ def evaluate(model, criterion, data_loader, decoder, language_model, device):
             wers = sum(wers)
             sums["wer"] += wers
 
-            if SIGNAL_RECEIVED:
-                break
-
         # Average
         for k in sums.keys():
             sums[k] /= len(data_loader)
@@ -285,9 +271,6 @@ def main(args):
 
     # Empty CUDA cache
     torch.cuda.empty_cache()
-
-    # Install signal handler
-    signal.signal(signal.SIGUSR1, lambda a, b: signal_handler(a, b))
 
     # Change backend
     torchaudio.set_audio_backend("soundfile")
@@ -444,18 +427,6 @@ def main(args):
                 pbar=pbar,
             )
 
-            if SIGNAL_RECEIVED:
-                save_checkpoint(
-                    {
-                        "epoch": epoch,
-                        "state_dict": model.state_dict(),
-                        "best_loss": best_loss,
-                        "optimizer": optimizer.state_dict(),
-                        "scheduler": scheduler.state_dict(),
-                    },
-                    False,
-                    args.checkpoint,
-                )
             if not epoch % args.print_freq or epoch == args.epochs - 1:
 
                 sum_loss = evaluate(
