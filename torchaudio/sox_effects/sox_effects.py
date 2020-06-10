@@ -2,7 +2,6 @@ import atexit
 from typing import Any, Callable, List, Optional, Tuple, Union
 
 import torch
-import torchaudio
 from torch import Tensor
 
 from torchaudio._internal import (
@@ -11,7 +10,7 @@ from torchaudio._internal import (
 )
 
 if _mod_utils.is_module_available('torchaudio._torchaudio'):
-    from . import _torchaudio
+    from torchaudio import _torchaudio
 
 
 _SOX_INITIALIZED: Optional[bool] = False
@@ -26,7 +25,7 @@ _SOX_SUCCESS_CODE = 0
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
-def initialize_sox() -> int:
+def init_sox_effects() -> int:
     """Initialize sox for use with effects chains.
 
     You only need to call this function once to use SoX effects chains multiple times.
@@ -48,13 +47,13 @@ def initialize_sox() -> int:
         code = _torchaudio.initialize_sox()
         if code == _SOX_SUCCESS_CODE:
             _SOX_INITIALIZED = True
-            atexit.register(shutdown_sox)
+            atexit.register(shutdown_sox_effects)
         return code
     return _SOX_SUCCESS_CODE
 
 
 @_mod_utils.requires_module("torchaudio._torchaudio")
-def shutdown_sox() -> int:
+def shutdown_sox_effects() -> int:
     """Showdown sox for effects chain.
 
     You do not need to call this function as it will be called automatically
