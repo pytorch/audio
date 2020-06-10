@@ -35,12 +35,18 @@ except ImportError:
     pass
 
 
-@_mod_utils.depricate("Use `torchaudio.sox_effects.init_sox_effects`.")
+@_mod_utils.deprecated(
+    "Use `torchaudio.sox_effects.init_sox_effects`, or simply remove the call. "
+    "It is automatically handled."
+)
 def initialize_sox():
     init_sox_effects()
 
 
-@_mod_utils.depricate("Use `torchaudio.sox_effects.shutdown_sox`.")
+@_mod_utils.deprecated(
+    "Use `torchaudio.sox_effects.shutdown_sox`, or remove the call. "
+    "It is automatically handled."
+)
 def shutdown_sox():
     shutdown_sox_effects()
 
