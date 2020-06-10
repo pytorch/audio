@@ -111,6 +111,11 @@ def parse_args():
     parser.add_argument(
         "--distributed", action="store_true", help="enable DistributedDataParallel"
     )
+    parser.add_argument("--seed", type=int, default=0, help="random seed")
+    parser.add_argument(
+        "--world-size", type=int, default=8, help="the world size to initiate DPP"
+    )
+
     parser.add_argument("--jit", action="store_true", help="if used, model is jitted")
 
     args = parser.parse_args()
@@ -118,20 +123,30 @@ def parse_args():
     return args
 
 
-def save_checkpoint(state, is_best, filename):
+def setup(rank, world_size):
+    os.environ["MASTER_ADDR"] = "localhost"
+    os.environ["MASTER_PORT"] = "12355"
+
+    # initialize the process group
+    torch.distributed.init_process_group("nccl", rank=rank, world_size=world_size)
+
+
+def save_checkpoint(state, is_best, filename, rank):
     """
     Save the model to a temporary file first,
     then copy it to filename, in case the signal interrupts
     the torch.save() process.
     """
 
+    if rank != 0:
+        return
+
     if filename == "":
         return
 
     tempfile = filename + ".temp"
 
-    # Remove tempfile, in case the signal arrives in the
-    # middle of copying from tempfile to filename
+    # Remove tempfile in case interuption during the copying from tempfile to filename
     if os.path.isfile(tempfile):
         os.remove(tempfile)
 
@@ -265,9 +280,15 @@ def evaluate(model, criterion, data_loader, decoder, language_model, device):
         return sums["loss"]
 
 
-def main(args):
+def main(args, rank=0):
+
+    if args.distributed:
+        setup(rank, args.world_size)
 
     print("Start time: {}".format(str(datetime.now())), flush=True)
+    # Explicitly setting seed to make sure that models created in two processes
+    # start from same random weights and biases.
+    torch.manual_seed(args.seed)
 
     # Empty CUDA cache
     torch.cuda.empty_cache()
@@ -275,8 +296,11 @@ def main(args):
     # Change backend
     torchaudio.set_audio_backend("soundfile")
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    # num_devices = torch.cuda.device_count()
+    if args.distributed:
+        n = torch.cuda.device_count() // args.world_size
+        devices = list(range(rank * n, (rank + 1) * n))
+    else:
+        devices = ["cuda" if torch.cuda.is_available() else "cpu"]
 
     loader_training_params = {
         "num_workers": args.workers,
@@ -335,10 +359,10 @@ def main(args):
         model = torch.nn.DataParallel(model)
     else:
         model.cuda()
-        model = torch.nn.parallel.DistributedDataParallel(model)
+        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=devices)
         # model = torch.nn.parallel.DistributedDataParallel(model, find_unused_parameters=True)
 
-    model = model.to(device, non_blocking=True)
+    model = model.to(devices[0], non_blocking=True)
 
     n = count_parameters(model)
     print(f"Number of parameters: {n}", flush=True)
@@ -381,7 +405,12 @@ def main(args):
 
     best_loss = 1.0
 
-    if args.checkpoint and os.path.isfile(args.checkpoint):
+    load_checkpoint = args.checkpoint and os.path.isfile(args.checkpoint)
+
+    if args.distributed:
+        torch.distributed.barrier()
+
+    if load_checkpoint:
         print("Checkpoint: loading '{}'".format(args.checkpoint), flush=True)
         checkpoint = torch.load(args.checkpoint)
 
@@ -411,7 +440,11 @@ def main(args):
             },
             False,
             args.checkpoint,
+            rank,
         )
+
+    if args.distributed:
+        torch.distributed.barrier()
 
     with tqdm(total=args.epochs, unit_scale=1, disable=not args.progress_bar) as pbar:
 
@@ -423,7 +456,7 @@ def main(args):
                 optimizer,
                 scheduler,
                 loader_training,
-                device,
+                devices[0],
                 pbar=pbar,
             )
 
@@ -435,7 +468,7 @@ def main(args):
                     loader_validation,
                     decoder,
                     language_model,
-                    device,
+                    devices[0],
                 )
 
                 is_best = sum_loss < best_loss
@@ -450,10 +483,17 @@ def main(args):
                     },
                     is_best,
                     args.checkpoint,
+                    rank,
                 )
+
+    if args.distributed:
+        torch.distributed.destroy_process_group()
 
 
 if __name__ == "__main__":
 
     args = parse_args()
-    main(args)
+    if args.distributed:
+        torch.multiprocessing.spawn(lambda x: main(args, x), nprocs=args.world_size, join=True)
+    else:
+        main(args)
