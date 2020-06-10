@@ -119,6 +119,15 @@ def define_test_suites(
                 scope[t.__name__] = t
 
 
+def common_test_class_parameters(
+    dtypes: Iterable[str] = ("float32", "float64"),
+    devices: Iterable[str] = ("cpu", "cuda"),
+):
+    for device in devices:
+        for dtype in dtypes:
+            yield {"device": torch.device(device), "dtype": getattr(torch, dtype)}
+
+
 def get_whitenoise(
     *,
     sample_rate: int = 16000,
