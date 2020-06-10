@@ -11,7 +11,7 @@ class ResBlock(nn.Module):
     Args:
         num_dims (int, optional): Number of compute dimensions in ResBlock. (Default: ``128``)
     """
-    def __init__(self, num_dims: int) -> None:
+    def __init__(self, num_dims: int = 128) -> None:
         super().__init__()
 
         self.conv1 = nn.Conv1d(num_dims, num_dims, kernel_size=1, bias=False)
@@ -33,7 +33,7 @@ class ResBlock(nn.Module):
 class MelResNet(nn.Module):
     r"""
     Args:
-        res_blocks (int, optional): Number of ResBlocks. (Default: ``40``).
+        res_blocks (int, optional): Number of ResBlocks. (Default: ``10``).
         input_dims (int, optional): Number of input dimensions (Default: ``100``).
         hidden_dims (int, optional): Number of hidden dimensions (Default: ``128``).
         output_dims (int, optional): Number of ouput dimensions (Default: ``128``).
