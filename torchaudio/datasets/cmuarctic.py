@@ -57,9 +57,9 @@ def load_cmuarctic_item(line: str,
                         folder_audio: str,
                         ext_audio: str) -> Tuple[Tensor, int, str, str]:
 
-    utterance_id, utterance = line.strip().split(" ", 2)[1:]
+    utterance_id, utterance = line[0].strip().split(" ", 2)[1:]
 
-    # clean "utterance" ) to utterance
+    # Remove space, double quote, and single parenthesis from utterance
     utterance = utterance[1:-3]
 
     file_audio = os.path.join(path, folder_audio, utterance_id + ext_audio)
@@ -143,7 +143,7 @@ class CMUARCTIC(Dataset):
             self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
-        line = self._walker[n][0]
+        line = self._walker[n]
         return load_cmuarctic_item(line, self._path, self._folder_audio, self._ext_audio)
 
     def __len__(self) -> int:
