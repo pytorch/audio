@@ -6,7 +6,7 @@ from .vctk import VCTK
 from .gtzan import GTZAN
 from .yesno import YESNO
 from .ljspeech import LJSPEECH
-from .cmu_arctic import CMU_ARCTIC
+from .cmuarctic import CMUARCTIC
 
 __all__ = (
     "COMMONVOICE",
@@ -16,7 +16,7 @@ __all__ = (
     "YESNO",
     "LJSPEECH",
     "GTZAN",
-    "CMU_ARCTIC",
+    "CMUARCTIC",
     "diskcache_iterator",
     "bg_iterator",
 )

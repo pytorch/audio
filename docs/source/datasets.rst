@@ -79,9 +79,9 @@ YESNO
   :members: __getitem__
   :special-members:
 
-CMU_ARCTIC
+CMUARCTIC
 ~~~~~
 
-.. autoclass:: CMU_ARCTIC
+.. autoclass:: CMUARCTIC
   :members: __getitem__
   :special-members:

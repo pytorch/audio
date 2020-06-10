@@ -7,10 +7,10 @@ from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    walk_files,
+    unicode_csv_reader,
 )
 
-URL = "cmu_us_aew_arctic"
+URL = "aew"
 FOLDER_IN_ARCHIVE = "ARCTIC"
 _CHECKSUMS = {
     "http://festvox.org/cmu_arctic/packed/cmu_us_aew_arctic.tar.bz2":
@@ -52,29 +52,20 @@ _CHECKSUMS = {
 }
 
 
-def load_cmu_arctic_item(fileid: str,
-                         path: str,
-                         ext_audio: str,
-                         ext_txt: str) -> Tuple[Tensor, int, str, str]:
-    utterance_id = fileid
+def load_cmuarctic_item(line: str,
+                        path: str,
+                        folder_audio: str,
+                        ext_audio: str) -> Tuple[Tensor, int, str, str]:
 
-    file_text = os.path.join(path, "etc", ext_txt)
+    utterance_id, utterance = line.strip().split(" ", 2)[1:]
 
-    file_audio = os.path.join(path, "wav", utterance_id + ext_audio)
+    # clean "utterance" ) to utterance
+    utterance = utterance[1:-3]
+
+    file_audio = os.path.join(path, folder_audio, utterance_id + ext_audio)
 
     # Load audio
     waveform, sample_rate = torchaudio.load(file_audio)
-
-    # Load text
-    with open(file_text) as ft:
-        for line in ft:
-            file_id, utterance = line.strip().split(" ", 2)[1:]
-            if fileid == file_id:
-                utterance = utterance[1:-3]
-                break
-        else:
-            # Translation not found
-            raise FileNotFoundError("Translation not found for " + fileid)
 
     return (
         waveform,
@@ -84,14 +75,16 @@ def load_cmu_arctic_item(fileid: str,
     )
 
 
-class CMU_ARCTIC(Dataset):
+class CMUARCTIC(Dataset):
     """
-    Create a Dataset for CMU_Arctic. Each item is a tuple of the form:
+    Create a Dataset for CMU_arctic. Each item is a tuple of the form:
     waveform, sample_rate, utterance, utterance_id
     """
 
-    _ext_txt = "txt.done.data"
+    _file_text = "txt.done.data"
+    _folder_text = "etc"
     _ext_audio = ".wav"
+    _folder_audio = "wav"
 
     def __init__(self,
                  root: str,
@@ -100,26 +93,27 @@ class CMU_ARCTIC(Dataset):
                  download: bool = False) -> None:
 
         if url in [
-            "cmu_us_aew_arctic",
-            "cmu_us_ahw_arctic",
-            "cmu_us_aup_arctic",
-            "cmu_us_awb_arctic",
-            "cmu_us_axb_arctic",
-            "cmu_us_bdl_arctic",
-            "cmu_us_clb_arctic",
-            "cmu_us_eey_arctic",
-            "cmu_us_fem_arctic",
-            "cmu_us_gka_arctic",
-            "cmu_us_jmk_arctic",
-            "cmu_us_ksp_arctic",
-            "cmu_us_ljm_arctic",
-            "cmu_us_lnh_arctic",
-            "cmu_us_rms_arctic",
-            "cmu_us_rxr_arctic",
-            "cmu_us_slp_arctic",
-            "cmu_us_slt_arctic"
+            "aew",
+            "ahw",
+            "aup",
+            "awb",
+            "axb",
+            "bdl",
+            "clb",
+            "eey",
+            "fem",
+            "gka",
+            "jmk",
+            "ksp",
+            "ljm",
+            "lnh",
+            "rms",
+            "rxr",
+            "slp",
+            "slt"
         ]:
 
+            url = "cmu_us_" + url + "_arctic"
             ext_archive = ".tar.bz2"
             base_url = "http://www.festvox.org/cmu_arctic/packed/"
 
@@ -139,17 +133,18 @@ class CMU_ARCTIC(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _CHECKSUMS.get(url, None)
-                    download_url(url, root, hash_value=checksum)
+                    download_url(url, root, hash_value=checksum, hash_type="md5")
                 extract_archive(archive)
 
-        walker = walk_files(
-            self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
-        )
-        self._walker = list(walker)
+        self._text = os.path.join(self._path, self._folder_text, self._file_text)
+
+        with open(self._text, "r") as text:
+            walker = unicode_csv_reader(text, delimiter="\n")
+            self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
-        fileid = self._walker[n]
-        return load_cmu_arctic_item(fileid, self._path, self._ext_audio, self._ext_txt)
+        line = self._walker[n][0]
+        return load_cmuarctic_item(line, self._path, self._folder_audio, self._ext_audio)
 
     def __len__(self) -> int:
         return len(self._walker)

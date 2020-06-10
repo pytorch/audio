@@ -8,7 +8,7 @@ from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.yesno import YESNO
 from torchaudio.datasets.ljspeech import LJSPEECH
 from torchaudio.datasets.gtzan import GTZAN
-from torchaudio.datasets.cmu_arctic import CMU_ARCTIC
+from torchaudio.datasets.cmuarctic import CMUARCTIC
 
 from . import common_utils
 
@@ -61,8 +61,8 @@ class TestDatasets(unittest.TestCase):
         data = GTZAN(self.path)
         data[0]
 
-    def test_cmu_arctic(self):
-        data = CMU_ARCTIC(self.path)
+    def test_cmuarctic(self):
+        data = CMUARCTIC(self.path)
         data[0]
 
 if __name__ == "__main__":
