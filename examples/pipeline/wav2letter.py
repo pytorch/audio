@@ -205,13 +205,12 @@ def train_one_epoch(
         if pbar is not None:
             pbar.update(1 / len(data_loader))
 
-    # Average
-    for k in sums.keys():
-        sums[k] /= len(data_loader)
+    avg_loss = sums["loss"] / len(data_loader)
+    print(f"Training loss: {avg_loss:4.5f}", flush=True)
 
-    print(f"Training loss: {sums['loss']:4.5f}", flush=True)
     if "gradient" in sums:
-        print(f"Average gradient norm: {sums['gradient']:4.5f}", flush=True)
+        avg_gradient = sums["gradient"] / len(data_loader)
+        print(f"Average gradient norm: {avg_gradient:4.5f}", flush=True)
 
     scheduler.step()
 
@@ -233,6 +232,8 @@ def evaluate(model, criterion, data_loader, decoder, language_model, device):
 
             # keep batch first for data parallel
             outputs = model(inputs).transpose(-1, -2).transpose(0, 1)
+
+            sums["length_dataset"] += len(inputs)
 
             # CTC
             # outputs: input length, batch size, number of classes (including blank)
@@ -260,6 +261,7 @@ def evaluate(model, criterion, data_loader, decoder, language_model, device):
             # cers_normalized = [d / len(a) for a, d in zip(target, cers)]
             cers = sum(cers)
             sums["cer"] += cers
+            sums["total_chars"] += sum(len(t) for t in target)
 
             output = [o.split(language_model.char_space) for o in output]
             target = [o.split(language_model.char_space) for o in target]
@@ -268,15 +270,26 @@ def evaluate(model, criterion, data_loader, decoder, language_model, device):
             # wers_normalized = [d / len(a) for a, d in zip(target, wers)]
             wers = sum(wers)
             sums["wer"] += wers
+            sums["total_words"] += len(target)
 
-        # Average
-        for k in sums.keys():
-            sums[k] /= len(data_loader)
+        avg_loss = sums["loss"] / len(data_loader)
+        print(f"Validation loss: {avg_loss:.5f}", flush=True)
 
-        print(f"Validation loss: {sums['loss']:.5f}", flush=True)
         print(f"CER: {sums['cer']}  WER: {sums['wer']}", flush=True)
+        print(
+            f"CER: {sums['cer']/sums['length_dataset']}  "
+            f"WER: {sums['wer']/sums['length_dataset']}  "
+            f"(over dataset length)",
+            flush=True,
+        )
+        print(
+            f"CER: {sums['cer']/sums['total_chars']}  "
+            f"WER: {sums['wer']/sums['total_words']}  "
+            f"(over total target length)",
+            flush=True,
+        )
 
-        return sums["loss"]
+        return avg_loss
 
 
 def main(args, rank=0):
