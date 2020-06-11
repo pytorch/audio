@@ -381,7 +381,7 @@ def test_mask_along_axis(specgram, mask_param, mask_value, axis):
 
     masked_columns = (mask_specgram == mask_value).sum(other_axis)
     num_masked_columns = (masked_columns == mask_specgram.size(other_axis)).sum()
-    num_masked_columns /= mask_specgram.size(0)
+    num_masked_columns //= mask_specgram.size(0)
 
     assert mask_specgram.size() == specgram.size()
     assert num_masked_columns < mask_param
