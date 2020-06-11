@@ -25,7 +25,7 @@ _SOX_SUCCESS_CODE = 0
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
-def init_sox_effects() -> int:
+def _init_sox_effects() -> int:
     """Initialize resources required to use ``SoxEffectsChain``
 
     You do not need to call this function manually. It is called automatically.
@@ -50,13 +50,13 @@ def init_sox_effects() -> int:
         code = _torchaudio.initialize_sox()
         if code == _SOX_SUCCESS_CODE:
             _SOX_INITIALIZED = True
-            atexit.register(shutdown_sox_effects)
+            atexit.register(_shutdown_sox_effects)
         return code
     return _SOX_SUCCESS_CODE
 
 
 @_mod_utils.requires_module("torchaudio._torchaudio")
-def shutdown_sox_effects() -> int:
+def _shutdown_sox_effects() -> int:
     """Clean up resources required to use ``SoxEffectsChain``
 
     You do not need to call this function manually. It is called automatically.
