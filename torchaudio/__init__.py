@@ -36,9 +36,7 @@ except ImportError:
 
 
 @_mod_utils.deprecated(
-    "Use `torchaudio.sox_effects.init_sox_effects`, or simply remove the call. "
-    "It is automatically handled."
-)
+    "Please remove the function call. Resource initialization is automatically handled")
 def initialize_sox() -> int:
     """Initialize sox effects.
 
@@ -48,9 +46,7 @@ def initialize_sox() -> int:
 
 
 @_mod_utils.deprecated(
-    "Use `torchaudio.sox_effects.shutdown_sox`, or remove the call. "
-    "It is automatically handled."
-)
+    "Please remove the function call. Resource clean up is automatically handled")
 def shutdown_sox():
     """Shutdown sox effects.
 
