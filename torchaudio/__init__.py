@@ -25,8 +25,8 @@ from torchaudio.backend import (
     EncodingInfo,
 )
 from torchaudio.sox_effects import (
-    _init_sox_effects,
-    _shutdown_sox_effects,
+    init_sox_effects as _init_sox_effects,
+    shutdown_sox_effects as _shutdown_sox_effects,
 )
 
 try:
