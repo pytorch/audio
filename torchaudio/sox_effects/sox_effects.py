@@ -26,12 +26,15 @@ _SOX_SUCCESS_CODE = 0
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def init_sox_effects() -> int:
-    """Initialize sox for use with effects chains.
+    """Initialize resources required to use ``SoxEffectsChain``
 
-    You only need to call this function once to use SoX effects chains multiple times.
-    It is safe to call this function multiple times as long as ``shutdown_sox`` is not yet called.
-    Once ``shutdown_sox`` is called, you can no longer use SoX effects and calling this function
-    results in `RuntimeError`.
+    You do not need to call this function manually. It is called automatically.
+
+    Once initialized, you do not need to call this function again across the multiple call of
+    ``SoxEffectsChain.sox_build_flow_effects``, though it is safe to do so as long as
+    ``shutdown_sox_effects`` is not called yet.
+    Once ``shutdown_sox_effects`` is called, you can no longer use SoX effects and calling
+    this function results in `RuntimeError`.
 
     Note:
         This function is not required for simple loading.
@@ -54,12 +57,14 @@ def init_sox_effects() -> int:
 
 @_mod_utils.requires_module("torchaudio._torchaudio")
 def shutdown_sox_effects() -> int:
-    """Showdown sox for effects chain.
+    """Clean up resources required to use ``SoxEffectsChain``
 
-    You do not need to call this function as it will be called automatically
-    at the end of program execution, if ``initialize_sox`` was called.
+    You do not need to call this function manually. It is called automatically.
 
     It is safe to call this function multiple times.
+    Once ``shutdown_sox_effects`` is called, you can no longer use SoX effects and calling
+    this function results in `RuntimeError`.
+
 
     Returns:
         int: Code corresponding to sox_error_t enum. See
