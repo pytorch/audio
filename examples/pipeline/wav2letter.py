@@ -1,7 +1,6 @@
 import argparse
 import os
 import shutil
-import signal
 import string
 from collections import defaultdict
 from datetime import datetime
@@ -494,6 +493,8 @@ if __name__ == "__main__":
 
     args = parse_args()
     if args.distributed:
-        torch.multiprocessing.spawn(lambda x: main(args, x), nprocs=args.world_size, join=True)
+        torch.multiprocessing.spawn(
+            lambda x: main(args, x), nprocs=args.world_size, join=True
+        )
     else:
         main(args)
