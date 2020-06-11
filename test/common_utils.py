@@ -1,7 +1,7 @@
 import os
 import tempfile
 import unittest
-from typing import Type, Iterable, Union
+from typing import Iterable, Union
 from contextlib import contextmanager
 from shutil import copytree
 
@@ -88,35 +88,7 @@ class TestBaseMixin:
     device = None
 
 
-_SKIP_IF_NO_CUDA = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
-
-
-def define_test_suite(testbase: Type[TestBaseMixin], dtype: str, device: str):
-    if dtype not in ['float32', 'float64']:
-        raise NotImplementedError(f'Unexpected dtype: {dtype}')
-    if device not in ['cpu', 'cuda']:
-        raise NotImplementedError(f'Unexpected device: {device}')
-
-    name = f'Test{testbase.__name__}_{device.upper()}_{dtype.capitalize()}'
-    attrs = {'dtype': getattr(torch, dtype), 'device': torch.device(device)}
-    testsuite = type(name, (testbase, TestCase), attrs)
-
-    if device == 'cuda':
-        testsuite = _SKIP_IF_NO_CUDA(testsuite)
-    return testsuite
-
-
-def define_test_suites(
-        scope: dict,
-        testbases: Iterable[Type[TestBaseMixin]],
-        dtypes: Iterable[str] = ('float32', 'float64'),
-        devices: Iterable[str] = ('cpu', 'cuda'),
-):
-    for suite in testbases:
-        for device in devices:
-            for dtype in dtypes:
-                t = define_test_suite(suite, dtype, device)
-                scope[t.__name__] = t
+skipIfNoCuda = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
 
 
 def common_test_class_parameters(
