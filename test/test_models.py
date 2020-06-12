@@ -32,12 +32,17 @@ class TestWav2Letter:
 
 
 class TestMelResNet:
-    @pytest.mark.parametrize('batch_size', [2])
-    @pytest.mark.parametrize('num_features', [200])
-    @pytest.mark.parametrize('input_dims', [100])
-    @pytest.mark.parametrize('output_dims', [128])
-    def test_waveform(self, batch_size, num_features, input_dims, output_dims):
-        model = MelResNet()
+
+    def test_waveform(self):
+
+        batch_size = 2
+        num_features = 200
+        input_dims = 100
+        output_dims = 128
+        res_blocks = 10
+        hidden_dims = 128
+
+        model = MelResNet(res_blocks, input_dims, hidden_dims, output_dims)
 
         x = torch.rand(batch_size, input_dims, num_features)
         out = model(x)

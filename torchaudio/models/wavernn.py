@@ -7,64 +7,97 @@ __all__ = ["ResBlock", "MelResNet"]
 
 
 class ResBlock(nn.Module):
-    r"""
+    r"""This is a ResNet block layer. This layer is based on the paper "Deep Residual Learning
+    for Image Recognition". Kaiming He,  Xiangyu Zhang, Shaoqing Ren, Jian Sun. CVPR, 2016.
+    Users may modify or implement in a different way during application. It is a block used in WaveRNN
+    (https://github.com/G-Wang/WaveRNN-Pytorch)
+
     Args:
-        num_dims (int, optional): Number of compute dimensions in ResBlock. (Default: ``128``)
+        num_dims: the number of compute dimensions in the input (default=128).
+
+    Examples::
+        >>> resblock = ResBlock(num_dims=128)
+        >>> input = torch.rand(10, 128, 512)
+        >>> output = resblock(input)
     """
+
     def __init__(self, num_dims: int = 128) -> None:
         super().__init__()
 
-        self.conv1 = nn.Conv1d(num_dims, num_dims, kernel_size=1, bias=False)
-        self.conv2 = nn.Conv1d(num_dims, num_dims, kernel_size=1, bias=False)
-        self.batch_norm1 = nn.BatchNorm1d(num_dims)
-        self.relu = nn.ReLU(inplace=True)
-        self.batch_norm2 = nn.BatchNorm1d(num_dims)
+        self.resblock_model = nn.Sequential(
+            nn.Conv1d(in_channels=num_dims, out_channels=num_dims, kernel_size=1, bias=False),
+            nn.BatchNorm1d(num_dims),
+            nn.ReLU(inplace=True),
+            nn.Conv1d(in_channels=num_dims, out_channels=num_dims, kernel_size=1, bias=False),
+            nn.BatchNorm1d(num_dims)
+        )
 
     def forward(self, x: Tensor) -> Tensor:
+        r"""Pass the input through the ResBlock layer.
+
+        Args:
+            x: the input sequence to the ResBlock layer (required).
+
+        Shape:
+            - x: :math:`(N, S, T)`.
+            - output: :math:`(N, S, T)`.
+        where N is the batch size, S is the number of input sequence,
+        T is the length of input sequence.
+        """
+
         residual = x
-        x = self.conv1(x)
-        x = self.batch_norm1(x)
-        x = self.relu(x)
-        x = self.conv2(x)
-        x = self.batch_norm2(x)
+        x = self.resblock_model(x)
         return x + residual
 
 
 class MelResNet(nn.Module):
-    r"""
+    r"""This is a MelResNet layer based on a stack of ResBlocks. It is a block used in WaveRNN
+    (https://github.com/G-Wang/WaveRNN-Pytorch)
+
     Args:
-        res_blocks (int, optional): Number of ResBlocks. (Default: ``10``).
-        input_dims (int, optional): Number of input dimensions (Default: ``100``).
-        hidden_dims (int, optional): Number of hidden dimensions (Default: ``128``).
-        output_dims (int, optional): Number of ouput dimensions (Default: ``128``).
+        res_blocks: the number of ResBlock in stack (default=10).
+        input_dims: the number of input sequence (default=100).
+        hidden_dims: the number of compute dimensions (default=128).
+        output_dims: the number of output sequence (default=128).
+
+    Examples::
+        >>> melresnet = MelResNet(res_blocks=10, input_dims=100,
+                                hidden_dims=128, output_dims=128)
+        >>> input = torch.rand(10, 100, 512)
+        >>> output = melresnet(input)
     """
+
     def __init__(self, res_blocks: int = 10,
                  input_dims: int = 100,
                  hidden_dims: int = 128,
                  output_dims: int = 128) -> None:
         super().__init__()
 
-        self.conv_in = nn.Conv1d(input_dims, hidden_dims, kernel_size=5, bias=False)
-        self.batch_norm = nn.BatchNorm1d(hidden_dims)
-        self.layers = nn.ModuleList()
+        ResBlocks = []
+
         for i in range(res_blocks):
-            self.layers.append(ResBlock(hidden_dims))
-        self.relu = nn.ReLU(inplace=True)
-        self.conv_out = nn.Conv1d(hidden_dims, output_dims, kernel_size=1)
+            ResBlocks.append(ResBlock(hidden_dims))
+
+        self.melresnet_model = nn.Sequential(
+            nn.Conv1d(in_channels=input_dims, out_channels=hidden_dims, kernel_size=5, bias=False),
+            nn.BatchNorm1d(hidden_dims),
+            nn.ReLU(inplace=True),
+            *ResBlocks,
+            nn.Conv1d(in_channels=hidden_dims, out_channels=output_dims, kernel_size=1)
+        )
 
     def forward(self, x: Tensor) -> Tensor:
-        r"""
-        Args:
-            x (Tensor): Tensor of dimension (batch_size, input_dims, input_length).
+        r"""Pass the input through the MelResNet layer.
 
-        Returns:
-            Tensor: Predictor tensor of dimension (batch_size, output_dims, input_length-4).
+        Args:
+            x: the input sequence to the MelResNet layer (required).
+
+        Shape:
+            - x: :math:`(N, S, T)`.
+            - output: :math:`(N, P, T-4)`.
+        where N is the batch size, S is the number of input sequence,
+        P is the number of ouput sequence, T is the length of input sequence.
         """
 
-        x = self.conv_in(x)
-        x = self.batch_norm(x)
-        x = self.relu(x)
-        for f in self.layers:
-            x = f(x)
-        x = self.conv_out(x)
+        x = self.melresnet_model(x)
         return x
