@@ -47,7 +47,7 @@ The following test modules are defined for corresponding `torchaudio` module/fun
 The following is the current practice of torchaudio test suite.
 
 1. Unless the tests are related to I/O, use synthetic data. [`common_utils`](./common_utils.py) has some data generator functions.
-1. When you add a new test case, use `common_utils.TorchaudioTestCase` as base class unless your are writing tests that are common to CPU / CUDA.
+1. When you add a new test case, use `common_utils.TorchaudioTestCase` as base class unless you are writing tests that are common to CPU / CUDA.
   - Set class memeber `dtype`, `device` and `backend` for the desired behavior.
   - If you do not set `backend` value in your test suite, then I/O functions will be unassigned and attempt to load/save file will fail.
   - For `backend` value, in addition to available backends, you can also provide the value "default" and backend will be picked automatically based on availability.

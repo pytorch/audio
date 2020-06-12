@@ -159,6 +159,7 @@ def _load_audio_asset(*asset_paths, **kwargs):
 class TestTransforms(common_utils.TorchaudioTestCase):
     """Test suite for functions in `transforms` module."""
     def assert_compatibilities(self, n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
+        common_utils.set_audio_backend('default')
         sound, sample_rate = _load_audio_asset('sinewave.wav')
         sound_librosa = sound.cpu().numpy().squeeze()  # (64000)
 
@@ -268,6 +269,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         }
         self.assert_compatibilities(**kwargs)
 
+    @unittest.skipIf(not common_utils.BACKENDS_MP3, 'no backend to read mp3')
     def test_MelScale(self):
         """MelScale transform is comparable to that of librosa"""
         n_fft = 2048
@@ -275,6 +277,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         hop_length = n_fft // 4
 
         # Prepare spectrogram input. We use torchaudio to compute one.
+        common_utils.set_audio_backend('default')
         sound, sample_rate = _load_audio_asset('whitenoise_1min.mp3')
         sound = sound.mean(dim=0, keepdim=True)
         spec_ta = F.spectrogram(
@@ -297,6 +300,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         hop_length = n_fft // 4
 
         # Prepare mel spectrogram input. We use torchaudio to compute one.
+        common_utils.set_audio_backend('default')
         sound, sample_rate = _load_audio_asset(
             'steam-train-whistle-daniel_simon.wav', offset=2**10, num_frames=2**14)
         sound = sound.mean(dim=0, keepdim=True)
