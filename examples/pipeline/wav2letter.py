@@ -260,8 +260,10 @@ def evaluate(model, criterion, data_loader, decoder, language_model, device):
             cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
             # cers_normalized = [d / len(a) for a, d in zip(target, cers)]
             cers = sum(cers)
+            n = sum(len(t) for t in target)
             sums["cer"] += cers
-            sums["total_chars"] += sum(len(t) for t in target)
+            sums["cer_relative"] += cers / n
+            sums["total_chars"] += n
 
             output = [o.split(language_model.char_space) for o in output]
             target = [o.split(language_model.char_space) for o in target]
@@ -269,8 +271,10 @@ def evaluate(model, criterion, data_loader, decoder, language_model, device):
             wers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
             # wers_normalized = [d / len(a) for a, d in zip(target, wers)]
             wers = sum(wers)
+            n = len(target)
             sums["wer"] += wers
-            sums["total_words"] += len(target)
+            sums["wer_relative"] += wers / n
+            sums["total_words"] += n
 
         avg_loss = sums["loss"] / len(data_loader)
         print(f"Validation loss: {avg_loss:.5f}", flush=True)
