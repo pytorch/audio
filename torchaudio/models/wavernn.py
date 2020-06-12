@@ -9,8 +9,7 @@ __all__ = ["ResBlock", "MelResNet"]
 class ResBlock(nn.Module):
     r"""This is a ResNet block layer. This layer is based on the paper "Deep Residual Learning
     for Image Recognition". Kaiming He,  Xiangyu Zhang, Shaoqing Ren, Jian Sun. CVPR, 2016.
-    Users may modify or implement in a different way during application. It is a block used in WaveRNN
-    (https://github.com/G-Wang/WaveRNN-Pytorch)
+    It is a block used in WaveRNN(https://github.com/G-Wang/WaveRNN-Pytorch).
 
     Args:
         num_dims: the number of compute dimensions in the input (default=128).
@@ -46,13 +45,12 @@ class ResBlock(nn.Module):
         """
 
         residual = x
-        x = self.resblock_model(x)
-        return x + residual
+        return self.resblock_model(x) + residual
 
 
 class MelResNet(nn.Module):
     r"""This is a MelResNet layer based on a stack of ResBlocks. It is a block used in WaveRNN
-    (https://github.com/G-Wang/WaveRNN-Pytorch)
+    (https://github.com/G-Wang/WaveRNN-Pytorch).
 
     Args:
         res_blocks: the number of ResBlock in stack (default=10).
@@ -62,7 +60,7 @@ class MelResNet(nn.Module):
 
     Examples::
         >>> melresnet = MelResNet(res_blocks=10, input_dims=100,
-                                hidden_dims=128, output_dims=128)
+                                  hidden_dims=128, output_dims=128)
         >>> input = torch.rand(10, 100, 512)
         >>> output = melresnet(input)
     """
@@ -99,5 +97,4 @@ class MelResNet(nn.Module):
         P is the number of ouput sequence, T is the length of input sequence.
         """
 
-        x = self.melresnet_model(x)
-        return x
+        return self.melresnet_model(x)
