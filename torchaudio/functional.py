@@ -1382,7 +1382,7 @@ def _generate_wave_table(
         d = (torch.sin(point.to(torch.float64) / table_size * 2 * math.pi) + 1) / 2
     elif wave_type == 'TRIANGLE':
         d = point.to(torch.float64) * 2 / table_size
-        value = 4 * point / table_size
+        value = 4 * point // table_size
         d[value == 0] = d[value == 0] + 0.5
         d[value == 1] = 1.5 - d[value == 1]
         d[value == 2] = 1.5 - d[value == 2]
