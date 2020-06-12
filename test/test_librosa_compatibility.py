@@ -4,7 +4,6 @@ import unittest
 from distutils.version import StrictVersion
 
 import torch
-from torch.testing._internal.common_utils import TestCase
 import torchaudio
 import torchaudio.functional as F
 from torchaudio._internal.module_utils import is_module_available
@@ -22,7 +21,7 @@ from . import common_utils
 
 
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
-class TestFunctional(TestCase):
+class TestFunctional(common_utils.TorchaudioTestCase):
     """Test suite for functions in `functional` module."""
     def test_griffinlim(self):
         # NOTE: This test is flaky without a fixed random seed
@@ -157,7 +156,7 @@ def _load_audio_asset(*asset_paths, **kwargs):
 
 
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
-class TestTransforms(TestCase):
+class TestTransforms(common_utils.TorchaudioTestCase):
     """Test suite for functions in `transforms` module."""
     def assert_compatibilities(self, n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
         sound, sample_rate = _load_audio_asset('sinewave.wav')
@@ -269,8 +268,6 @@ class TestTransforms(TestCase):
         }
         self.assert_compatibilities(**kwargs)
 
-    @unittest.skipIf("sox" not in common_utils.BACKENDS, "sox not available")
-    @common_utils.AudioBackendScope("sox")
     def test_MelScale(self):
         """MelScale transform is comparable to that of librosa"""
         n_fft = 2048

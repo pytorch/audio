@@ -10,17 +10,17 @@ from . import common_utils
 from .functional_impl import Lfilter
 
 
-class TestLFilterFloat32(Lfilter, common_utils.TestCase):
+class TestLFilterFloat32(Lfilter, common_utils.PytorchTestCase):
     dtype = torch.float32
     device = torch.device('cpu')
 
 
-class TestLFilterFloat64(Lfilter, common_utils.TestCase):
+class TestLFilterFloat64(Lfilter, common_utils.PytorchTestCase):
     dtype = torch.float64
     device = torch.device('cpu')
 
 
-class TestComputeDeltas(unittest.TestCase):
+class TestComputeDeltas(common_utils.TorchaudioTestCase):
     """Test suite for correctness of compute_deltas"""
     def test_one_channel(self):
         specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0]]])
@@ -57,7 +57,7 @@ def _test_istft_is_inverse_of_stft(kwargs):
             _compare_estimate(sound, estimate)
 
 
-class TestIstft(unittest.TestCase):
+class TestIstft(common_utils.TorchaudioTestCase):
     """Test suite for correctness of istft with various input"""
     number_of_trials = 100
 
@@ -273,7 +273,9 @@ class TestIstft(unittest.TestCase):
         self._test_linearity_of_istft(data_size, kwargs4, atol=1e-5, rtol=1e-8)
 
 
-class TestDetectPitchFrequency(unittest.TestCase):
+class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
+    backend = 'default'
+
     def test_pitch(self):
         test_filepath_100 = common_utils.get_asset_path("100Hz_44100Hz_16bit_05sec.wav")
         test_filepath_440 = common_utils.get_asset_path("440Hz_44100Hz_16bit_05sec.wav")
@@ -294,7 +296,7 @@ class TestDetectPitchFrequency(unittest.TestCase):
             self.assertFalse(s)
 
 
-class TestDB_to_amplitude(unittest.TestCase):
+class TestDB_to_amplitude(common_utils.TorchaudioTestCase):
     def test_DB_to_amplitude(self):
         # Make some noise
         x = torch.rand(1000)

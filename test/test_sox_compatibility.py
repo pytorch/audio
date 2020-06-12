@@ -1,18 +1,17 @@
 import unittest
 
 import torch
-from torch.testing._internal.common_utils import TestCase
 import torchaudio
 import torchaudio.functional as F
 import torchaudio.transforms as T
 
 from . import common_utils
-from .common_utils import AudioBackendScope, BACKENDS
 
 
-class TestFunctionalFiltering(TestCase):
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
+@common_utils.skipIfNoSoxBackend
+class TestFunctionalFiltering(common_utils.TorchaudioTestCase):
+    backend = 'sox'
+
     def test_gain(self):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)
@@ -27,8 +26,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(waveform_gain, sox_gain_waveform, atol=1e-04, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_dither(self):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)
@@ -49,8 +46,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(waveform_dithered_noiseshaped, sox_dither_waveform_ns, atol=1e-02, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_vctk_transform_pipeline(self):
         test_filepath_vctk = common_utils.get_asset_path('VCTK-Corpus', 'wav48', 'p224', 'p224_002.wav')
         wf_vctk, sr_vctk = torchaudio.load(test_filepath_vctk)
@@ -72,8 +67,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(wf_vctk, wf_vctk_sox, rtol=1e-03, atol=1e-03)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_lowpass(self):
         """
         Test biquad lowpass filter, compare to SoX implementation
@@ -92,8 +85,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_highpass(self):
         """
         Test biquad highpass filter, compare to SoX implementation
@@ -113,8 +104,6 @@ class TestFunctionalFiltering(TestCase):
         # TBD - this fails at the 1e-4 level, debug why
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-3, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_allpass(self):
         """
         Test biquad allpass filter, compare to SoX implementation
@@ -134,8 +123,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_bandpass_with_csg(self):
         """
         Test biquad bandpass filter, compare to SoX implementation
@@ -156,8 +143,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_bandpass_without_csg(self):
         """
         Test biquad bandpass filter, compare to SoX implementation
@@ -178,8 +163,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_bandreject(self):
         """
         Test biquad bandreject filter, compare to SoX implementation
@@ -199,8 +182,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_band_with_noise(self):
         """
         Test biquad band filter with noise mode, compare to SoX implementation
@@ -221,8 +202,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_band_without_noise(self):
         """
         Test biquad band filter without noise mode, compare to SoX implementation
@@ -243,8 +222,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_treble(self):
         """
         Test biquad treble filter, compare to SoX implementation
@@ -265,8 +242,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_bass(self):
         """
         Test biquad bass filter, compare to SoX implementation
@@ -287,8 +262,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1.5e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_deemph(self):
         """
         Test biquad deemph filter, compare to SoX implementation
@@ -305,8 +278,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_riaa(self):
         """
         Test biquad riaa filter, compare to SoX implementation
@@ -323,8 +294,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_contrast(self):
         """
         Test contrast effect, compare to SoX implementation
@@ -341,8 +310,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_dcshift_with_limiter(self):
         """
         Test dcshift effect, compare to SoX implementation
@@ -360,8 +327,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_dcshift_without_limiter(self):
         """
         Test dcshift effect, compare to SoX implementation
@@ -378,8 +343,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_overdrive(self):
         """
         Test overdrive effect, compare to SoX implementation
@@ -397,8 +360,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_phaser_sine(self):
         """
         Test phaser effect with sine moduldation, compare to SoX implementation
@@ -419,8 +380,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_phaser_triangle(self):
         """
         Test phaser effect with triangle modulation, compare to SoX implementation
@@ -441,8 +400,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_flanger_triangle_linear(self):
         """
         Test flanger effect with triangle modulation and linear interpolation, compare to SoX implementation
@@ -465,8 +422,6 @@ class TestFunctionalFiltering(TestCase):
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_flanger_triangle_quad(self):
         """
         Test flanger effect with triangle modulation and quadratic interpolation, compare to SoX implementation
@@ -489,8 +444,6 @@ class TestFunctionalFiltering(TestCase):
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_flanger_sine_linear(self):
         """
         Test flanger effect with sine modulation and linear interpolation, compare to SoX implementation
@@ -513,8 +466,6 @@ class TestFunctionalFiltering(TestCase):
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_flanger_sine_quad(self):
         """
         Test flanger effect with sine modulation and quadratic interpolation, compare to SoX implementation
@@ -537,8 +488,6 @@ class TestFunctionalFiltering(TestCase):
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_equalizer(self):
         """
         Test biquad peaking equalizer filter, compare to SoX implementation
@@ -559,8 +508,6 @@ class TestFunctionalFiltering(TestCase):
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_perf_biquad_filtering(self):
 
         fn_sine = common_utils.get_asset_path('whitenoise.wav')

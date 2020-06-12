@@ -13,7 +13,8 @@ from torchaudio.datasets.cmuarctic import CMUARCTIC
 from . import common_utils
 
 
-class TestDatasets(unittest.TestCase):
+class TestDatasets(common_utils.TorchaudioTestCase):
+    backend = 'default'
     path = common_utils.get_asset_path()
 
     def test_yesno(self):
@@ -27,30 +28,6 @@ class TestDatasets(unittest.TestCase):
     def test_librispeech(self):
         data = LIBRISPEECH(self.path, "dev-clean")
         data[0]
-
-    @unittest.skipIf("sox" not in common_utils.BACKENDS, "sox not available")
-    @common_utils.AudioBackendScope('sox')
-    def test_commonvoice(self):
-        data = COMMONVOICE(self.path, url="tatar")
-        data[0]
-
-    @unittest.skipIf("sox" not in common_utils.BACKENDS, "sox not available")
-    @common_utils.AudioBackendScope('sox')
-    def test_commonvoice_diskcache(self):
-        data = COMMONVOICE(self.path, url="tatar")
-        data = diskcache_iterator(data)
-        # Save
-        data[0]
-        # Load
-        data[0]
-
-    @unittest.skipIf("sox" not in common_utils.BACKENDS, "sox not available")
-    @common_utils.AudioBackendScope('sox')
-    def test_commonvoice_bg(self):
-        data = COMMONVOICE(self.path, url="tatar")
-        data = bg_iterator(data, 5)
-        for _ in data:
-            pass
 
     def test_ljspeech(self):
         data = LJSPEECH(self.path)
@@ -67,6 +44,31 @@ class TestDatasets(unittest.TestCase):
     def test_cmuarctic(self):
         data = CMUARCTIC(self.path)
         data[0]
+
+
+@common_utils.skipIfNoSoxBackend
+class TestCommonVoise(common_utils.TorchaudioTestCase):
+    backend = 'sox'
+    path = common_utils.get_asset_path()
+
+    def test_commonvoice(self):
+        data = COMMONVOICE(self.path, url="tatar")
+        data[0]
+
+    def test_commonvoice_diskcache(self):
+        data = COMMONVOICE(self.path, url="tatar")
+        data = diskcache_iterator(data)
+        # Save
+        data[0]
+        # Load
+        data[0]
+
+    def test_commonvoice_bg(self):
+        data = COMMONVOICE(self.path, url="tatar")
+        data = bg_iterator(data, 5)
+        for _ in data:
+            pass
+
 
 if __name__ == "__main__":
     unittest.main()

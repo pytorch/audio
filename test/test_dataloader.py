@@ -4,7 +4,6 @@ import torchaudio
 from torch.utils.data import Dataset, DataLoader
 
 from . import common_utils
-from .common_utils import AudioBackendScope, BACKENDS
 
 
 class TORCHAUDIODS(Dataset):
@@ -28,9 +27,10 @@ class TORCHAUDIODS(Dataset):
         return len(self.data)
 
 
-class Test_DataLoader(unittest.TestCase):
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
+class Test_DataLoader(common_utils.TorchaudioTestCase):
+    backend = 'sox'
+
+    @common_utils.skipIfNoSoxBackend
     def test_1(self):
         expected_size = (2, 1, 16000)
         ds = TORCHAUDIODS()

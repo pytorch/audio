@@ -2,7 +2,6 @@ import math
 import unittest
 
 import torch
-from torch.testing._internal.common_utils import TestCase
 import torchaudio
 import torchaudio.transforms as transforms
 import torchaudio.functional as F
@@ -10,7 +9,8 @@ import torchaudio.functional as F
 from . import common_utils
 
 
-class Tester(TestCase):
+class Tester(common_utils.TorchaudioTestCase):
+    backend = 'default'
 
     # create a sinewave signal for testing
     sample_rate = 16000

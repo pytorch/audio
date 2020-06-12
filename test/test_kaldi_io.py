@@ -6,7 +6,7 @@ import torchaudio.kaldi_io as kio
 from . import common_utils
 
 
-class Test_KaldiIO(unittest.TestCase):
+class Test_KaldiIO(common_utils.TorchaudioTestCase):
     data1 = [[1, 2, 3], [11, 12, 13], [21, 22, 23]]
     data2 = [[31, 32, 33], [41, 42, 43], [51, 52, 53]]
 
