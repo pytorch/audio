@@ -68,16 +68,18 @@ class MelResNet(nn.Module):
     def __init__(self, res_blocks: int = 10,
                  input_dims: int = 100,
                  hidden_dims: int = 128,
-                 output_dims: int = 128) -> None:
+                 output_dims: int = 128,
+                 pad: int = 2) -> None:
         super().__init__()
 
+        kernel_size = pad * 2 + 1
         ResBlocks = []
 
         for i in range(res_blocks):
             ResBlocks.append(ResBlock(hidden_dims))
 
         self.melresnet_model = nn.Sequential(
-            nn.Conv1d(in_channels=input_dims, out_channels=hidden_dims, kernel_size=5, bias=False),
+            nn.Conv1d(in_channels=input_dims, out_channels=hidden_dims, kernel_size=kernel_size, bias=False),
             nn.BatchNorm1d(hidden_dims),
             nn.ReLU(inplace=True),
             *ResBlocks,
