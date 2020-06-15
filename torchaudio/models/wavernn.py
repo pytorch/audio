@@ -57,10 +57,11 @@ class MelResNet(nn.Module):
         input_dims: the number of input sequence (default=100).
         hidden_dims: the number of compute dimensions (default=128).
         output_dims: the number of output sequence (default=128).
+        pad: the number of kernal size (pad * 2 + 1) in the first Conv1d layer (default=2).
 
     Examples::
         >>> melresnet = MelResNet(res_blocks=10, input_dims=100,
-                                  hidden_dims=128, output_dims=128)
+                                  hidden_dims=128, output_dims=128, pad=2)
         >>> input = torch.rand(10, 100, 512)
         >>> output = melresnet(input)
     """
@@ -94,7 +95,7 @@ class MelResNet(nn.Module):
 
         Shape:
             - x: :math:`(N, S, T)`.
-            - output: :math:`(N, P, T-4)`.
+            - output: :math:`(N, P, T-2*pad)`.
         where N is the batch size, S is the number of input sequence,
         P is the number of ouput sequence, T is the length of input sequence.
         """
