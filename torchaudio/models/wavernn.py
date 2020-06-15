@@ -9,7 +9,9 @@ __all__ = ["ResBlock", "MelResNet"]
 class ResBlock(nn.Module):
     r"""This is a ResNet block layer. This layer is based on the paper "Deep Residual Learning
     for Image Recognition". Kaiming He,  Xiangyu Zhang, Shaoqing Ren, Jian Sun. CVPR, 2016.
-    It is a block used in WaveRNN(https://github.com/G-Wang/WaveRNN-Pytorch).
+    It is a block used in WaveRNN. WaveRNN is based on the paper "Efficient Neural Audio Synthesis".
+    Nal Kalchbrenner, Erich Elsen, Karen Simonyan, Seb Noury, Norman Casagrande, Edward Lockhart,
+    Florian Stimberg, Aaron van den Oord, Sander Dieleman, Koray Kavukcuoglu. arXiv:1802.08435, 2018.
 
     Args:
         num_dims: the number of compute dimensions in the input (default=128).
@@ -49,8 +51,10 @@ class ResBlock(nn.Module):
 
 
 class MelResNet(nn.Module):
-    r"""This is a MelResNet layer based on a stack of ResBlocks. It is a block used in WaveRNN
-    (https://github.com/G-Wang/WaveRNN-Pytorch).
+    r"""This is a MelResNet layer based on a stack of ResBlocks. It is a block used in WaveRNN.
+    WaveRNN is based on the paper "Efficient Neural Audio Synthesis". Nal Kalchbrenner, Erich Elsen,
+    Karen Simonyan, Seb Noury, Norman Casagrande, Edward Lockhart, Florian Stimberg, Aaron van den Oord,
+    Sander Dieleman, Koray Kavukcuoglu. arXiv:1802.08435, 2018.
 
     Args:
         res_blocks: the number of ResBlock in stack (default=10).
