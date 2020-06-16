@@ -1,6 +1,5 @@
 from . import utils
 from .utils import (
-    _get_audio_backend_module,
     list_audio_backends,
     get_audio_backend,
     set_audio_backend,
