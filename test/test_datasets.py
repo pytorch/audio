@@ -29,11 +29,13 @@ class TestDatasets(unittest.TestCase):
         data[0]
 
     @unittest.skipIf("sox" not in common_utils.BACKENDS, "sox not available")
+    @common_utils.AudioBackendScope('sox')
     def test_commonvoice(self):
         data = COMMONVOICE(self.path, url="tatar")
         data[0]
 
     @unittest.skipIf("sox" not in common_utils.BACKENDS, "sox not available")
+    @common_utils.AudioBackendScope('sox')
     def test_commonvoice_diskcache(self):
         data = COMMONVOICE(self.path, url="tatar")
         data = diskcache_iterator(data)
@@ -43,6 +45,7 @@ class TestDatasets(unittest.TestCase):
         data[0]
 
     @unittest.skipIf("sox" not in common_utils.BACKENDS, "sox not available")
+    @common_utils.AudioBackendScope('sox')
     def test_commonvoice_bg(self):
         data = COMMONVOICE(self.path, url="tatar")
         data = bg_iterator(data, 5)
