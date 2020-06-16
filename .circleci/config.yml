@@ -155,7 +155,7 @@ jobs:
             # Prevent credential from leaking
             conda install -yq anaconda-client
             set -x
-            anaconda -t "${CONDA_PYTORCHBOT_TOKEN}" upload ~/workspace/*.tar.bz2 -u pytorch-nightly --label main --no-progress --force
+            anaconda -t "${CONDA_PYTORCHBOT_TOKEN}" upload ~/workspace/*.tar.bz2 -u pytorch-test --label main --no-progress --force
 
   # Requires org-member context
   binary_wheel_upload:
@@ -175,7 +175,7 @@ jobs:
             export AWS_SECRET_ACCESS_KEY="${PYTORCH_BINARY_AWS_SECRET_ACCESS_KEY}"
             set -x
             for pkg in ~/workspace/*.whl; do
-              aws s3 cp "$pkg" "s3://pytorch/whl/nightly/" --acl public-read
+              aws s3 cp "$pkg" "s3://pytorch/whl/test/" --acl public-read
             done
 
   smoke_test_linux_conda:
@@ -188,7 +188,7 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            conda install -v -y -c pytorch-nightly pytorch
+            conda install -v -y -c pytorch-test pytorch
             conda install -v -y $(ls ~/workspace/torchaudio*.tar.bz2)
       - run:
           name: smoke test
@@ -206,7 +206,7 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            pip install $(ls ~/workspace/torchaudio*.whl) -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+            pip install $(ls ~/workspace/torchaudio*.whl) -f https://download.pytorch.org/whl/test/torch_test.html
       - run:
           name: smoke test
           command: |
@@ -298,290 +298,130 @@ workflows:
     jobs:
       - circleci_consistency
       - binary_linux_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_wheel_py3.5
           python_version: '3.5'
       - binary_wheel_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_wheel_py3.5_upload
           requires:
           - nightly_binary_linux_wheel_py3.5
-      - smoke_test_linux_pip:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py3.5_smoke_test_pip
-          python_version: '3.5'
-          requires:
-          - nightly_binary_linux_wheel_py3.5_upload
       - binary_linux_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_wheel_py3.6
           python_version: '3.6'
       - binary_wheel_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_wheel_py3.6_upload
           requires:
           - nightly_binary_linux_wheel_py3.6
-      - smoke_test_linux_pip:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py3.6_smoke_test_pip
-          python_version: '3.6'
-          requires:
-          - nightly_binary_linux_wheel_py3.6_upload
       - binary_linux_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_wheel_py3.7
           python_version: '3.7'
       - binary_wheel_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_wheel_py3.7_upload
           requires:
           - nightly_binary_linux_wheel_py3.7
-      - smoke_test_linux_pip:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py3.7_smoke_test_pip
-          python_version: '3.7'
-          requires:
-          - nightly_binary_linux_wheel_py3.7_upload
       - binary_linux_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_wheel_py3.8
           python_version: '3.8'
       - binary_wheel_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_wheel_py3.8_upload
           requires:
           - nightly_binary_linux_wheel_py3.8
-      - smoke_test_linux_pip:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_wheel_py3.8_smoke_test_pip
-          python_version: '3.8'
-          requires:
-          - nightly_binary_linux_wheel_py3.8_upload
       - binary_macos_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_wheel_py3.5
           python_version: '3.5'
       - binary_wheel_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_wheel_py3.5_upload
           requires:
           - nightly_binary_macos_wheel_py3.5
       - binary_macos_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_wheel_py3.6
           python_version: '3.6'
       - binary_wheel_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_wheel_py3.6_upload
           requires:
           - nightly_binary_macos_wheel_py3.6
       - binary_macos_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_wheel_py3.7
           python_version: '3.7'
       - binary_wheel_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_wheel_py3.7_upload
           requires:
           - nightly_binary_macos_wheel_py3.7
       - binary_macos_wheel:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_wheel_py3.8
           python_version: '3.8'
       - binary_wheel_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_wheel_py3.8_upload
           requires:
           - nightly_binary_macos_wheel_py3.8
       - binary_linux_conda:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_conda_py3.5
           python_version: '3.5'
       - binary_conda_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_conda_py3.5_upload
           requires:
           - nightly_binary_linux_conda_py3.5
-      - smoke_test_linux_conda:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_conda_py3.5_smoke_test_conda
-          python_version: '3.5'
-          requires:
-          - nightly_binary_linux_conda_py3.5_upload
       - binary_linux_conda:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_conda_py3.6
           python_version: '3.6'
       - binary_conda_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_conda_py3.6_upload
           requires:
           - nightly_binary_linux_conda_py3.6
-      - smoke_test_linux_conda:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_conda_py3.6_smoke_test_conda
-          python_version: '3.6'
-          requires:
-          - nightly_binary_linux_conda_py3.6_upload
       - binary_linux_conda:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_conda_py3.7
           python_version: '3.7'
       - binary_conda_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_conda_py3.7_upload
           requires:
           - nightly_binary_linux_conda_py3.7
-      - smoke_test_linux_conda:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_conda_py3.7_smoke_test_conda
-          python_version: '3.7'
-          requires:
-          - nightly_binary_linux_conda_py3.7_upload
       - binary_linux_conda:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_conda_py3.8
           python_version: '3.8'
       - binary_conda_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_linux_conda_py3.8_upload
           requires:
           - nightly_binary_linux_conda_py3.8
-      - smoke_test_linux_conda:
-          filters:
-            branches:
-              only: nightly
-          name: nightly_binary_linux_conda_py3.8_smoke_test_conda
-          python_version: '3.8'
-          requires:
-          - nightly_binary_linux_conda_py3.8_upload
       - binary_macos_conda:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_conda_py3.5
           python_version: '3.5'
       - binary_conda_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_conda_py3.5_upload
           requires:
           - nightly_binary_macos_conda_py3.5
       - binary_macos_conda:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_conda_py3.6
           python_version: '3.6'
       - binary_conda_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_conda_py3.6_upload
           requires:
           - nightly_binary_macos_conda_py3.6
       - binary_macos_conda:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_conda_py3.7
           python_version: '3.7'
       - binary_conda_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_conda_py3.7_upload
           requires:
           - nightly_binary_macos_conda_py3.7
       - binary_macos_conda:
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_conda_py3.8
           python_version: '3.8'
       - binary_conda_upload:
           context: org-member
-          filters:
-            branches:
-              only: nightly
           name: nightly_binary_macos_conda_py3.8_upload
           requires:
           - nightly_binary_macos_conda_py3.8
