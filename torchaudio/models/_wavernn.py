@@ -3,10 +3,10 @@ from typing import Optional
 from torch import Tensor
 from torch import nn
 
-__all__ = ["ResBlock", "MelResNet"]
+__all__ = ["_ResBlock", "_MelResNet"]
 
 
-class ResBlock(nn.Module):
+class _ResBlock(nn.Module):
     r"""This is a ResNet block layer. This layer is based on the paper "Deep Residual Learning
     for Image Recognition". Kaiming He,  Xiangyu Zhang, Shaoqing Ren, Jian Sun. CVPR, 2016.
     It is a block used in WaveRNN. WaveRNN is based on the paper "Efficient Neural Audio Synthesis".
@@ -17,7 +17,7 @@ class ResBlock(nn.Module):
         num_dims: the number of compute dimensions in the input (default=128).
 
     Examples::
-        >>> resblock = ResBlock(num_dims=128)
+        >>> resblock = _ResBlock(num_dims=128)
         >>> input = torch.rand(10, 128, 512)
         >>> output = resblock(input)
     """
@@ -34,10 +34,10 @@ class ResBlock(nn.Module):
         )
 
     def forward(self, x: Tensor) -> Tensor:
-        r"""Pass the input through the ResBlock layer.
+        r"""Pass the input through the _ResBlock layer.
 
         Args:
-            x: the input sequence to the ResBlock layer (required).
+            x: the input sequence to the _ResBlock layer (required).
 
         Shape:
             - x: :math:`(N, S, T)`.
@@ -50,7 +50,7 @@ class ResBlock(nn.Module):
         return self.resblock_model(x) + residual
 
 
-class MelResNet(nn.Module):
+class _MelResNet(nn.Module):
     r"""This is a MelResNet layer based on a stack of ResBlocks. It is a block used in WaveRNN.
     WaveRNN is based on the paper "Efficient Neural Audio Synthesis". Nal Kalchbrenner, Erich Elsen,
     Karen Simonyan, Seb Noury, Norman Casagrande, Edward Lockhart, Florian Stimberg, Aaron van den Oord,
@@ -64,7 +64,7 @@ class MelResNet(nn.Module):
         pad: the number of kernal size (pad * 2 + 1) in the first Conv1d layer (default=2).
 
     Examples::
-        >>> melresnet = MelResNet(res_blocks=10, input_dims=100,
+        >>> melresnet = _MelResNet(res_blocks=10, input_dims=100,
                                   hidden_dims=128, output_dims=128, pad=2)
         >>> input = torch.rand(10, 100, 512)
         >>> output = melresnet(input)
@@ -81,7 +81,7 @@ class MelResNet(nn.Module):
         ResBlocks = []
 
         for i in range(res_blocks):
-            ResBlocks.append(ResBlock(hidden_dims))
+            ResBlocks.append(_ResBlock(hidden_dims))
 
         self.melresnet_model = nn.Sequential(
             nn.Conv1d(in_channels=input_dims, out_channels=hidden_dims, kernel_size=kernel_size, bias=False),
@@ -92,10 +92,10 @@ class MelResNet(nn.Module):
         )
 
     def forward(self, x: Tensor) -> Tensor:
-        r"""Pass the input through the MelResNet layer.
+        r"""Pass the input through the _MelResNet layer.
 
         Args:
-            x: the input sequence to the MelResNet layer (required).
+            x: the input sequence to the _MelResNet layer (required).
 
         Shape:
             - x: :math:`(N, S, T)`.

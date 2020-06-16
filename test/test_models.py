@@ -1,5 +1,5 @@
 import torch
-from torchaudio.models import Wav2Letter, MelResNet
+from torchaudio.models import Wav2Letter, _MelResNet
 
 
 class TestWav2Letter:
@@ -43,7 +43,7 @@ class TestMelResNet:
         hidden_dims = 128
         pad = 2
 
-        model = MelResNet(res_blocks, input_dims, hidden_dims, output_dims, pad)
+        model = _MelResNet(res_blocks, input_dims, hidden_dims, output_dims, pad)
 
         x = torch.rand(batch_size, input_dims, num_features)
         out = model(x)
