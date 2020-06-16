@@ -1,4 +1,5 @@
 import os
+import shutil
 import tempfile
 import unittest
 from typing import Union
@@ -7,6 +8,7 @@ from shutil import copytree
 import torch
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 import torchaudio
+from torchaudio._internal.module_utils import is_module_available
 
 _TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 BACKENDS = torchaudio.list_audio_backends()
@@ -87,6 +89,33 @@ def set_audio_backend(backend):
     torchaudio.set_audio_backend(be)
 
 
+class TempDirMixin:
+    """Mixin to provide easy access to temp dir"""
+    temp_dir_ = None
+    temp_dir = None
+
+    def setUp(self):
+        super().setUp()
+        self._init_temp_dir()
+
+    def tearDown(self):
+        super().tearDownClass()
+        self._clean_up_temp_dir()
+
+    def _init_temp_dir(self):
+        self.temp_dir_ = tempfile.TemporaryDirectory()
+        self.temp_dir = self.temp_dir_.name
+
+    def _clean_up_temp_dir(self):
+        if self.temp_dir_ is not None:
+            self.temp_dir_.cleanup()
+            self.temp_dir_ = None
+            self.temp_dir = None
+
+    def get_temp_path(self, *paths):
+        return os.path.join(self.temp_dir, *paths)
+
+
 class TestBaseMixin:
     """Mixin to provide consistent way to define device/dtype/backend aware TestCase"""
     dtype = None
@@ -102,8 +131,18 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
     pass
 
 
+def skipIfNoExec(cmd):
+    return unittest.skipIf(shutil.which(cmd) is None, f'`{cmd}` is not available')
+
+
+def skipIfNoModule(module, display_name=None):
+    display_name = display_name or module
+    return unittest.skipIf(not is_module_available(module), f'"{display_name}" is not available')
+
+
 skipIfNoSoxBackend = unittest.skipIf('sox' not in BACKENDS, 'Sox backend not available')
 skipIfNoCuda = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
+skipIfNoExtension = skipIfNoModule('torchaudio._torchaudio', 'torchaudio C++ extension')
 
 
 def get_whitenoise(
