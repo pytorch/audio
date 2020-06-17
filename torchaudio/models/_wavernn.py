@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List
 
 from torch import Tensor
 from torch import nn
@@ -65,7 +65,7 @@ class _MelResNet(nn.Module):
 
     Examples::
         >>> melresnet = _MelResNet(res_blocks=10, input_dims=100,
-                                  hidden_dims=128, output_dims=128, pad=2)
+                                   hidden_dims=128, output_dims=128, pad=2)
         >>> input = torch.rand(10, 100, 512)
         >>> output = melresnet(input)
     """
@@ -99,9 +99,9 @@ class _MelResNet(nn.Module):
 
         Shape:
             - x: :math:`(N, S, T)`.
-            - output: :math:`(N, P, T-2*pad)`.
+            - output: :math:`(N, P, T - 2 * pad)`.
         where N is the batch size, S is the number of input sequence,
-        P is the number of ouput sequence, T is the length of input sequence.
+        P is the number of output sequence, T is the length of input sequence.
         """
 
         return self.melresnet_model(x)
