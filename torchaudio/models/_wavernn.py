@@ -139,15 +139,74 @@ class _UpsampleNetwork(nn.Module):
         >>> upsamplenetwork = _UpsampleNetwork(upsample_scales=[4, 4, 16])
         >>> input = torch.rand(10, 128, 10)  # a random spectrogram
         >>> output = upsamplenetwork(input)  # shape: (10, 1536, 128), (10, 1536, 128)
+=======
+    r"""This is a two-dimensional stretch layer. It is a block used in WaveRNN. WaveRNN is based on the paper
+    "Efficient Neural Audio Synthesis". Nal Kalchbrenner, Erich Elsen, Karen Simonyan, Seb Noury,
+    Norman Casagrande, Edward Lockhart, Florian Stimberg, Aaron van den Oord, Sander Dieleman,
+    Koray Kavukcuoglu. arXiv:1802.08435, 2018.
+
+    Args:
+        x_scale: the scale factor in x axis (required).
+        y_scale: the scale factor in y axis (required).
+
+    Examples::
+        >>> stretch2d = _Stretch2d(x_scale=1, y_scale=1)
+
+        >>> input = torch.rand(10, 1, 100, 512)
+        >>> output = stretch2d(input)
     """
 
     def __init__(self,
-                 upsample_scales: List[int],
-                 n_res_block: int = 10,
-                 n_freq: int = 128,
-                 n_hidden: int = 128,
-                 n_output: int = 128,
-                 kernel_size: int = 5) -> None:
+                 x_scale: int,
+                 y_scale: int) -> None:
+        super().__init__()
+
+        self.x_scale = x_scale
+        self.y_scale = y_scale
+
+    def forward(self, x: Tensor) -> Tensor:
+        r"""Pass the input through the _Stretch2d layer.
+
+        Args:
+            x: the input sequence to the _Stretch2d layer (required).
+
+        Shape:
+            - x: :math:`(N, C, S, T)`.
+            - output: :math:`(N, C, S * y_scale, T * x_scale)`.
+        where N is the batch size, C is the channel size, S is the number of input sequence,
+        T is the length of input sequence.
+        """
+
+        n, c, s, t = x.size()
+        x = x.unsqueeze(-1).unsqueeze(3)
+        x = x.repeat(1, 1, 1, self.y_scale, 1, self.x_scale)
+        return x.view(n, c, s * self.y_scale, t * self.x_scale)
+
+
+class _UpsampleNetwork(nn.Module):
+    r"""This is an upsample block based on a stack of Conv2d and Strech2d layers.
+    It is a block used in WaveRNN. WaveRNN is based on the paper "Efficient Neural Audio Synthesis".
+    Nal Kalchbrenner, Erich Elsen, Karen Simonyan, Seb Noury, Norman Casagrande, Edward Lockhart,
+    Florian Stimberg, Aaron van den Oord, Sander Dieleman, Koray Kavukcuoglu. arXiv:1802.08435, 2018.
+
+    Args:
+        upsample_scales: the list of upsample scales (required).
+        res_blocks: the number of ResBlock in stack (default=10).
+        input_dims: the number of input sequence (default=100).
+        hidden_dims: the number of compute dimensions (default=128).
+        output_dims: the number of output sequence (default=128).
+        pad: the number of kernal size (pad * 2 + 1) in the first Conv1d layer (default=2).
+
+    Examples::
+        >>> upsamplenetwork = _UpsampleNetwork(upsample_scales=[4, 4, 16],
+                                               res_blocks=10,
+                                               input_dims=100,
+                                               hidden_dims=128,
+                                               output_dims=128,
+                                               pad=2)
+        >>> input = torch.rand(10, 100, 512)
+        >>> output = upsamplenetwork(input)
+
         super().__init__()
 
         total_scale = 1
@@ -156,6 +215,7 @@ class _UpsampleNetwork(nn.Module):
 
         self.indent = (kernel_size - 1) // 2 * total_scale
         self.resnet = _MelResNet(n_res_block, n_freq, n_hidden, n_output, kernel_size)
+
         self.resnet_stretch = _Stretch2d(total_scale, 1)
 
         up_layers = []
@@ -167,6 +227,7 @@ class _UpsampleNetwork(nn.Module):
                              padding=(0, scale),
                              bias=False)
             conv.weight.data.fill_(1. / (scale * 2 + 1))
+
             up_layers.append(stretch)
             up_layers.append(conv)
         self.upsample_layers = nn.Sequential(*up_layers)
@@ -192,3 +253,25 @@ class _UpsampleNetwork(nn.Module):
         upsampling_output = upsampling_output.squeeze(1)[:, :, self.indent:-self.indent]
 
         return upsampling_output, resnet_output
+
+    def forward(self, x: Tensor) -> Tensor:
+        r"""Pass the input through the _UpsampleNetwork layer.
+
+        Args:
+            x: the input sequence to the _UpsampleNetwork layer (required).
+
+        Shape:
+            - x: :math:`(N, S, T)`.
+            - output: :math:`(N, (T - 2 * pad) * Total_Scale, S)`, `(N, (T - 2 * pad) * total_scale, P)`.
+        where N is the batch size, S is the number of input sequence, T is the length of input sequence.
+        P is the number of output sequence. Total_Scale is the product of all elements in upsample_scales.
+        """
+
+        resnet_output = self.resnet(x).unsqueeze(1)
+        resnet_output = self.resnet_stretch(resnet_output)
+        resnet_output = resnet_output.squeeze(1)
+
+        upsampling_output = self.upsample_layers(x.unsqueeze(1))
+        upsampling_output = upsampling_output.squeeze(1)[:, :, self.indent:-self.indent]
+
+        return upsampling_output.transpose(1, 2), resnet_output.transpose(1, 2)
