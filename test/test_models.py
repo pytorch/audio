@@ -1,5 +1,5 @@
 import torch
-from torchaudio.models import Wav2Letter, _MelResNet
+from torchaudio.models import Wav2Letter, _MelResNet, _UpsampleNetwork
 
 from . import common_utils
 
@@ -53,3 +53,31 @@ class TestMelResNet(common_utils.TorchaudioTestCase):
         out = model(x)
 
         assert out.size() == (n_batch, n_output, n_time - kernel_size + 1)
+
+
+class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
+
+    def test_waveform(self):
+        """Validate the output dimensions of a _UpsampleNetwork block.
+        """
+
+        upsample_scales = [5, 5, 8]
+        n_batch = 2
+        n_time = 200
+        n_freq = 100
+        n_output = 256
+        n_res_block = 10
+        n_hidden = 128
+        kernel_size = 5
+
+        total_scale = 1
+        for upsample_scale in upsample_scales:
+            total_scale *= upsample_scale
+
+        model = _UpsampleNetwork(upsample_scales, n_res_block, n_freq, n_hidden, n_output, kernel_size)
+
+        x = torch.rand(n_batch, n_freq, n_time)
+        out1, out2 = model(x)
+
+        assert out1.size() == (n_batch, total_scale * (n_time - kernel_size + 1), n_freq)
+        assert out2.size() == (n_batch, total_scale * (n_time - kernel_size + 1), n_output)
