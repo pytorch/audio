@@ -260,7 +260,8 @@ class _UpsampleNetwork(nn.Module):
 
         Shape:
             - x: :math:`(batch_size, freq, time)`
-            - output: :math:`(batch_size, (time - 2 * pad) * total_scale, freq)`, `(batch_size, (time - 2 * pad) * total_scale, output_dims)`
+            - output: :math:`(batch_size, (time - 2 * pad) * total_scale, freq)`,
+                            `(batch_size, (time - 2 * pad) * total_scale, output_dims)`
         where total_scale is the product of all elements in upsample_scales.
         """
 
