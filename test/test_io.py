@@ -30,11 +30,15 @@ class Test_LoadSave(unittest.TestCase):
 
     def test_1_save(self):
         for backend in BACKENDS_MP3:
+            if backend == 'sox_io':
+                continue
             with self.subTest():
                 torchaudio.set_audio_backend(backend)
                 self._test_1_save(self.test_filepath, False)
 
         for backend in BACKENDS:
+            if backend == 'sox_io':
+                continue
             with self.subTest():
                 torchaudio.set_audio_backend(backend)
                 self._test_1_save(self.test_filepath_wav, True)
@@ -81,6 +85,8 @@ class Test_LoadSave(unittest.TestCase):
 
     def test_1_save_sine(self):
         for backend in BACKENDS:
+            if backend == 'sox_io':
+                continue
             with self.subTest():
                 torchaudio.set_audio_backend(backend)
                 self._test_1_save_sine()
@@ -114,11 +120,15 @@ class Test_LoadSave(unittest.TestCase):
 
     def test_2_load(self):
         for backend in BACKENDS_MP3:
+            if backend == 'sox_io':
+                continue
             with self.subTest():
                 torchaudio.set_audio_backend(backend)
                 self._test_2_load(self.test_filepath, 278756)
 
         for backend in BACKENDS:
+            if backend == 'sox_io':
+                continue
             with self.subTest():
                 torchaudio.set_audio_backend(backend)
                 self._test_2_load(self.test_filepath_wav, 276858)
@@ -155,6 +165,8 @@ class Test_LoadSave(unittest.TestCase):
 
     def test_2_load_nonormalization(self):
         for backend in BACKENDS_MP3:
+            if backend == 'sox_io':
+                continue
             with self.subTest():
                 torchaudio.set_audio_backend(backend)
                 self._test_2_load_nonormalization(self.test_filepath, 278756)
@@ -172,6 +184,8 @@ class Test_LoadSave(unittest.TestCase):
 
     def test_3_load_and_save_is_identity(self):
         for backend in BACKENDS:
+            if backend == 'sox_io':
+                continue
             with self.subTest():
                 torchaudio.set_audio_backend(backend)
                 self._test_3_load_and_save_is_identity()
@@ -210,6 +224,8 @@ class Test_LoadSave(unittest.TestCase):
 
     def test_4_load_partial(self):
         for backend in BACKENDS_MP3:
+            if backend == 'sox_io':
+                continue
             with self.subTest():
                 torchaudio.set_audio_backend(backend)
                 self._test_4_load_partial()
@@ -252,6 +268,8 @@ class Test_LoadSave(unittest.TestCase):
 
     def test_5_get_info(self):
         for backend in BACKENDS:
+            if backend == 'sox_io':
+                continue
             with self.subTest():
                 torchaudio.set_audio_backend(backend)
                 self._test_5_get_info()
