@@ -3,8 +3,10 @@ import unittest
 import torch
 from torchaudio.models import Wav2Letter, _MelResNet
 
+from . import common_utils
 
-class TestWav2Letter(unittest.TestCase):
+
+class TestWav2Letter(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
         batch_size = 2
@@ -33,7 +35,7 @@ class TestWav2Letter(unittest.TestCase):
         assert out.size() == (batch_size, num_classes, 2)
 
 
-class TestMelResNet(unittest.TestCase):
+class TestMelResNet(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
 
