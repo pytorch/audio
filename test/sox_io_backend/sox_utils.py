@@ -26,6 +26,9 @@ def gen_audio_file(
         *, encoding=None, bit_depth=None, compression=None, attenuation=None, duration=1,
 ):
     """Generate synthetic audio file with `sox` command."""
+    if path.endswith('.wav'):
+        raise RuntimeError(
+            'Use get_wav_data and save_wav to generate wav file for accurate result.')
     command = [
         'sox',
         '-V',  # verbose
@@ -51,4 +54,17 @@ def gen_audio_file(
         command += ['vol', f'-{attenuation}dB']
     print(' '.join(command))
     subprocess.run(command, check=True)
-    subprocess.run(['soxi', path], check=True)
+
+
+def convert_audio_file(
+        src_path, dst_path,
+        *, bit_depth=None, compression=None):
+    """Convert audio file with `sox` command."""
+    command = ['sox', '-V', str(src_path)]
+    if bit_depth is not None:
+        command += ['--bits', str(bit_depth)]
+    if compression is not None:
+        command += ['--compression', str(compression)]
+    command += [dst_path]
+    print(' '.join(command))
+    subprocess.run(command, check=True)

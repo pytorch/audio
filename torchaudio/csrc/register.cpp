@@ -3,11 +3,15 @@
 
 #include <torchaudio/csrc/sox_effects.h>
 #include <torchaudio/csrc/sox_io.h>
+#include <torchaudio/csrc/sox_utils.h>
 #include <torchaudio/csrc/typedefs.h>
 
 namespace torchaudio {
 namespace {
 
+////////////////////////////////////////////////////////////////////////////////
+// typedefs.h
+////////////////////////////////////////////////////////////////////////////////
 static auto registerSignalInfo =
     torch::class_<SignalInfo>("torchaudio", "SignalInfo")
         .def(torch::init<int64_t, int64_t, int64_t>())
@@ -15,11 +19,32 @@ static auto registerSignalInfo =
         .def("get_num_channels", &SignalInfo::getNumChannels)
         .def("get_num_frames", &SignalInfo::getNumFrames);
 
+////////////////////////////////////////////////////////////////////////////////
+// sox_utils.h
+////////////////////////////////////////////////////////////////////////////////
+static auto registerTensorSignal =
+    torch::class_<sox_utils::TensorSignal>("torchaudio", "TensorSignal")
+        .def(torch::init<torch::Tensor, int64_t, bool>())
+        .def("get_tensor", &sox_utils::TensorSignal::getTensor)
+        .def("get_sample_rate", &sox_utils::TensorSignal::getSampleRate)
+        .def("get_channels_first", &sox_utils::TensorSignal::getChannelsFirst);
+
+////////////////////////////////////////////////////////////////////////////////
+// sox_io.h
+////////////////////////////////////////////////////////////////////////////////
 static auto registerGetInfo = torch::RegisterOperators().op(
     torch::RegisterOperators::options()
         .schema(
             "torchaudio::sox_io_get_info(str path) -> __torch__.torch.classes.torchaudio.SignalInfo info")
         .catchAllKernel<decltype(sox_io::get_info), &sox_io::get_info>());
+
+static auto registerLoadAudioFile = torch::RegisterOperators().op(
+    torch::RegisterOperators::options()
+        .schema(
+            "torchaudio::sox_io_load_audio_file(str path, int frame_offset, int num_frames, bool normalize, bool channels_first) -> __torch__.torch.classes.torchaudio.TensorSignal signal")
+        .catchAllKernel<
+            decltype(sox_io::load_audio_file),
+            &sox_io::load_audio_file>());
 
 ////////////////////////////////////////////////////////////////////////////////
 // sox_effects.h

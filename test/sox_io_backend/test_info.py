@@ -10,7 +10,9 @@ from ..common_utils import (
     skipIfNoExtension,
 )
 from .common import (
-    get_test_name
+    get_test_name,
+    get_wav_data,
+    save_wav,
 )
 from . import sox_utils
 
@@ -27,12 +29,8 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         """`sox_io_backend.info` can check wav file correctly"""
         duration = 1
         path = self.get_temp_path(f'{dtype}_{sample_rate}_{num_channels}.wav')
-        sox_utils.gen_audio_file(
-            path, sample_rate, num_channels,
-            bit_depth=sox_utils.get_bit_depth(dtype),
-            encoding=sox_utils.get_encoding(dtype),
-            duration=duration,
-        )
+        data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
+        save_wav(path, data, sample_rate)
         info = sox_io_backend.info(path)
         assert info.get_sample_rate() == sample_rate
         assert info.get_num_frames() == sample_rate * duration
@@ -47,12 +45,8 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         """`sox_io_backend.info` can check wav file with channels more than 2 correctly"""
         duration = 1
         path = self.get_temp_path(f'{dtype}_{sample_rate}_{num_channels}.wav')
-        sox_utils.gen_audio_file(
-            path, sample_rate, num_channels,
-            bit_depth=sox_utils.get_bit_depth(dtype),
-            encoding=sox_utils.get_encoding(dtype),
-            duration=duration,
-        )
+        data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
+        save_wav(path, data, sample_rate)
         info = sox_io_backend.info(path)
         assert info.get_sample_rate() == sample_rate
         assert info.get_num_frames() == sample_rate * duration
