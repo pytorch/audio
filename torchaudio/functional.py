@@ -265,7 +265,7 @@ def griffinlim(
         angles = rebuilt
         if momentum:
             angles = angles - tprev.mul_(momentum / (1 + momentum))
-        angles = angles.div_(complex_norm(angles).add_(1e-16).unsqueeze(-1).expand_as(angles))
+        angles = angles.div(complex_norm(angles).add(1e-16).unsqueeze(-1).expand_as(angles))
 
     # Return the final phase estimates
     waveform = istft(specgram * angles,
