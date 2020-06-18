@@ -146,8 +146,8 @@ class _UpsampleNetwork(nn.Module):
     Koray Kavukcuoglu. arXiv:1802.08435, 2018.
 
     Args:
-        x_scale: the scale factor in x axis (required).
-        y_scale: the scale factor in y axis (required).
+        x_scale: the scale factor in x axis (required)
+        y_scale: the scale factor in y axis (required)
 
     Examples::
         >>> stretch2d = _Stretch2d(x_scale=1, y_scale=1)
@@ -168,19 +168,17 @@ class _UpsampleNetwork(nn.Module):
         r"""Pass the input through the _Stretch2d layer.
 
         Args:
-            x: the input sequence to the _Stretch2d layer (required).
+            x: the input sequence to the _Stretch2d layer (required)
 
         Shape:
-            - x: :math:`(N, C, S, T)`.
-            - output: :math:`(N, C, S * y_scale, T * x_scale)`.
-        where N is the batch size, C is the channel size, S is the number of input sequence,
-        T is the length of input sequence.
+            - x: :math:`(batch_size, channel, freq, time)`
+            - output: :math:`(batch_size, channel, freq * y_scale, time * x_scale)`
         """
 
-        n, c, s, t = x.size()
+        batch_size, channel, freq, time = x.size()
         x = x.unsqueeze(-1).unsqueeze(3)
         x = x.repeat(1, 1, 1, self.y_scale, 1, self.x_scale)
-        return x.view(n, c, s * self.y_scale, t * self.x_scale)
+        return x.view(batch_size, channel, freq * self.y_scale, time * self.x_scale)
 
 
 class _UpsampleNetwork(nn.Module):
@@ -190,12 +188,12 @@ class _UpsampleNetwork(nn.Module):
     Florian Stimberg, Aaron van den Oord, Sander Dieleman, Koray Kavukcuoglu. arXiv:1802.08435, 2018.
 
     Args:
-        upsample_scales: the list of upsample scales (required).
-        res_blocks: the number of ResBlock in stack (default=10).
-        input_dims: the number of input sequence (default=100).
-        hidden_dims: the number of compute dimensions (default=128).
-        output_dims: the number of output sequence (default=128).
-        pad: the number of kernal size (pad * 2 + 1) in the first Conv1d layer (default=2).
+        upsample_scales: the list of upsample scales (required)
+        res_blocks: the number of ResBlock in stack (default=10)
+        input_dims: the number of input sequence (default=100)
+        hidden_dims: the number of compute dimensions (default=128)
+        output_dims: the number of output sequence (default=128)
+        pad: the kernel size (kernel_size = pad * 2 + 1) in the first Conv1d layer (default=2)
 
     Examples::
         >>> upsamplenetwork = _UpsampleNetwork(upsample_scales=[4, 4, 16],
@@ -258,20 +256,20 @@ class _UpsampleNetwork(nn.Module):
         r"""Pass the input through the _UpsampleNetwork layer.
 
         Args:
-            x: the input sequence to the _UpsampleNetwork layer (required).
+            x: the input sequence to the _UpsampleNetwork layer (required)
 
         Shape:
-            - x: :math:`(N, S, T)`.
-            - output: :math:`(N, (T - 2 * pad) * Total_Scale, S)`, `(N, (T - 2 * pad) * total_scale, P)`.
-        where N is the batch size, S is the number of input sequence, T is the length of input sequence.
-        P is the number of output sequence. Total_Scale is the product of all elements in upsample_scales.
+            - x: :math:`(batch_size, freq, time)`
+            - output: :math:`(batch_size, (time - 2 * pad) * total_scale, freq)`, `(batch_size, (time - 2 * pad) * total_scale, output_dims)`
+        where total_scale is the product of all elements in upsample_scales.
         """
 
         resnet_output = self.resnet(x).unsqueeze(1)
         resnet_output = self.resnet_stretch(resnet_output)
         resnet_output = resnet_output.squeeze(1)
 
-        upsampling_output = self.upsample_layers(x.unsqueeze(1))
+        x = x.unsqueeze(1)
+        upsampling_output = self.upsample_layers(x)
         upsampling_output = upsampling_output.squeeze(1)[:, :, self.indent:-self.indent]
 
         return upsampling_output.transpose(1, 2), resnet_output.transpose(1, 2)
