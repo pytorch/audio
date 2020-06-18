@@ -2,14 +2,14 @@
 import unittest
 
 import torch
-from torch.testing._internal.common_utils import TestCase
 import torchaudio
 import torchaudio.functional as F
 
 from . import common_utils
 
 
-class TestFunctional(TestCase):
+class TestFunctional(common_utils.TorchaudioTestCase):
+    backend = 'default'
     """Test functions defined in `functional` module"""
     def assert_batch_consistency(
             self, functional, tensor, *args, batch_size=1, atol=1e-8, rtol=1e-5, seed=42, **kwargs):
@@ -98,12 +98,15 @@ class TestFunctional(TestCase):
         self.assert_batch_consistencies(F.sliding_window_cmn, waveform, center=False, norm_vars=False)
 
     def test_vad(self):
+        common_utils.set_audio_backend('default')
         filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
         waveform, sample_rate = torchaudio.load(filepath)
         self.assert_batch_consistencies(F.vad, waveform, sample_rate=sample_rate)
 
 
-class TestTransforms(TestCase):
+class TestTransforms(common_utils.TorchaudioTestCase):
+    backend = 'default'
+
     """Test suite for classes defined in `transforms` module"""
     def test_batch_AmplitudeToDB(self):
         spec = torch.rand((6, 201))

@@ -1,12 +1,11 @@
 import os
 import tempfile
 import unittest
-from typing import Iterable, Union
-from contextlib import contextmanager
+from typing import Union
 from shutil import copytree
 
 import torch
-from torch.testing._internal.common_utils import TestCase
+from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 import torchaudio
 
 _TEST_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -55,24 +54,14 @@ def random_float_tensor(seed, size, a=22695477, c=1, m=2 ** 32):
     return torch.tensor(arr).float().view(size) / m
 
 
-@contextmanager
-def AudioBackendScope(new_backend):
-    previous_backend = torchaudio.get_audio_backend()
-    try:
-        torchaudio.set_audio_backend(new_backend)
-        yield
-    finally:
-        torchaudio.set_audio_backend(previous_backend)
-
-
 def filter_backends_with_mp3(backends):
     # Filter out backends that do not support mp3
     test_filepath = get_asset_path('steam-train-whistle-daniel_simon.mp3')
 
     def supports_mp3(backend):
+        torchaudio.set_audio_backend(backend)
         try:
-            with AudioBackendScope(backend):
-                torchaudio.load(test_filepath)
+            torchaudio.load(test_filepath)
             return True
         except (RuntimeError, ImportError):
             return False
@@ -83,21 +72,38 @@ def filter_backends_with_mp3(backends):
 BACKENDS_MP3 = filter_backends_with_mp3(BACKENDS)
 
 
+def set_audio_backend(backend):
+    """Allow additional backend value, 'default'"""
+    if backend == 'default':
+        if 'sox' in BACKENDS:
+            be = 'sox'
+        elif 'soundfile' in BACKENDS:
+            be = 'soundfile'
+        else:
+            raise unittest.SkipTest('No default backend available')
+    else:
+        be = backend
+
+    torchaudio.set_audio_backend(be)
+
+
 class TestBaseMixin:
+    """Mixin to provide consistent way to define device/dtype/backend aware TestCase"""
     dtype = None
     device = None
+    backend = None
+
+    def setUp(self):
+        super().setUp()
+        set_audio_backend(self.backend)
 
 
+class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
+    pass
+
+
+skipIfNoSoxBackend = unittest.skipIf('sox' not in BACKENDS, 'Sox backend not available')
 skipIfNoCuda = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
-
-
-def common_test_class_parameters(
-    dtypes: Iterable[str] = ("float32", "float64"),
-    devices: Iterable[str] = ("cpu", "cuda"),
-):
-    for device in devices:
-        for dtype in dtypes:
-            yield {"device": torch.device(device), "dtype": getattr(torch, dtype)}
 
 
 def get_whitenoise(
