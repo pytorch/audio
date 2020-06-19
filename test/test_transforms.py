@@ -45,7 +45,7 @@ class Tester(common_utils.TorchaudioTestCase):
 
     def test_AmplitudeToDB(self):
         filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, sample_rate = torchaudio.load(filepath)
+        waveform = common_utils.load_wav(filepath)[0]
 
         mag_to_db_transform = transforms.AmplitudeToDB('magnitude', 80.)
         power_to_db_transform = transforms.AmplitudeToDB('power', 80.)
@@ -115,7 +115,7 @@ class Tester(common_utils.TorchaudioTestCase):
         self.assertTrue(mel_transform2.mel_scale.fb.sum(1).ge(0.).all())
         # check on multi-channel audio
         filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        x_stereo, sr_stereo = torchaudio.load(filepath)  # (2, 278756), 44100
+        x_stereo = common_utils.load_wav(filepath)[0]  # (2, 278756), 44100
         spectrogram_stereo = s2db(mel_transform(x_stereo))  # (2, 128, 1394)
         self.assertTrue(spectrogram_stereo.dim() == 3)
         self.assertTrue(spectrogram_stereo.size(0) == 2)
@@ -166,7 +166,7 @@ class Tester(common_utils.TorchaudioTestCase):
 
     def test_resample_size(self):
         input_path = common_utils.get_asset_path('sinewave.wav')
-        waveform, sample_rate = torchaudio.load(input_path)
+        waveform, sample_rate = common_utils.load_wav(input_path)
 
         upsample_rate = sample_rate * 2
         downsample_rate = sample_rate // 2
