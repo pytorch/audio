@@ -4,10 +4,11 @@ import torch
 from torchaudio.backend import sox_io_backend
 from parameterized import parameterized
 
-from .. import common_utils
 from ..common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
+    skipIfNoExec,
+    skipIfNoExtension,
 )
 from .common import (
     get_test_name,
@@ -19,8 +20,8 @@ def py_info_func(filepath: str) -> torch.classes.torchaudio.SignalInfo:
     return sox_io_backend.info(filepath)
 
 
-@common_utils.skipIfNoExec('sox')
-@common_utils.skipIfNoExtension
+@skipIfNoExec('sox')
+@skipIfNoExtension
 class SoxIO(TempDirMixin, TorchaudioTestCase):
     @parameterized.expand(list(itertools.product(
         ['float32', 'int32', 'int16', 'uint8'],
