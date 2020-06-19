@@ -1,13 +1,13 @@
-import math
 import os
+import math
+import unittest
+
 import torch
 import torchaudio
 import torchaudio.compliance.kaldi as kaldi
-import unittest
 
 from . import common_utils
 from .compliance import utils as compliance_utils
-from .common_utils import AudioBackendScope, BACKENDS
 
 
 def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
@@ -46,7 +46,10 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
             window[f, s] = wave[s_in_wave]
 
 
-class Test_Kaldi(unittest.TestCase):
+@common_utils.skipIfNoSoxBackend
+class Test_Kaldi(common_utils.TorchaudioTestCase):
+    backend = 'sox'
+
     test_filepath = common_utils.get_asset_path('kaldi_file.wav')
     test_8000_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
     kaldi_output_dir = common_utils.get_asset_path('kaldi')
@@ -162,8 +165,6 @@ class Test_Kaldi(unittest.TestCase):
         # Passing in an empty tensor should result in an error
         self.assertRaises(AssertionError, kaldi.mfcc, torch.empty(0))
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_resample_waveform(self):
         def get_output_fn(sound, args):
             output = kaldi.resample_waveform(sound, args[1], args[2])

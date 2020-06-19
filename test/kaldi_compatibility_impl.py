@@ -55,6 +55,8 @@ def _load_params(path):
 
 
 class Kaldi(common_utils.TestBaseMixin):
+    backend = 'sox'
+
     def assert_equal(self, output, *, expected, rtol=None, atol=None):
         expected = expected.to(dtype=self.dtype, device=self.device)
         self.assertEqual(output, expected, rtol=rtol, atol=atol)
