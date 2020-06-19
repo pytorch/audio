@@ -8,14 +8,14 @@ from ..common_utils import (
     PytorchTestCase,
     skipIfNoExec,
     skipIfNoExtension,
-)
-from .common import (
-    get_test_name,
     get_wav_data,
     load_wav,
     save_wav,
+    sox_utils,
 )
-from . import sox_utils
+from .common import (
+    name_func,
+)
 
 
 class SaveTestBase(TempDirMixin, PytorchTestCase):
@@ -176,7 +176,7 @@ class TestSave(SaveTestBase):
         ['float32', 'int32', 'int16', 'uint8'],
         [8000, 16000],
         [1, 2],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_wav(self, dtype, sample_rate, num_channels):
         """`sox_io_backend.save` can save wav format."""
         self.assert_wav(dtype, sample_rate, num_channels, num_frames=None)
@@ -185,7 +185,7 @@ class TestSave(SaveTestBase):
         ['float32'],
         [16000],
         [2],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_wav_large(self, dtype, sample_rate, num_channels):
         """`sox_io_backend.save` can save large wav file."""
         two_hours = 2 * 60 * 60 * sample_rate
@@ -194,7 +194,7 @@ class TestSave(SaveTestBase):
     @parameterized.expand(list(itertools.product(
         ['float32', 'int32', 'int16', 'uint8'],
         [4, 8, 16, 32],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_multiple_channels(self, dtype, num_channels):
         """`sox_io_backend.save` can save wav with more than 2 channels."""
         sample_rate = 8000
@@ -213,7 +213,7 @@ class TestSave(SaveTestBase):
         [16000],
         [2],
         [128],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_mp3_large(self, sample_rate, num_channels, bit_rate):
         """`sox_io_backend.save` can save large mp3 file."""
         two_hours = 2 * 60 * 60
@@ -223,7 +223,7 @@ class TestSave(SaveTestBase):
         [8000, 16000],
         [1, 2],
         list(range(9)),
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_flac(self, sample_rate, num_channels, compression_level):
         """`sox_io_backend.save` can save flac format."""
         self.assert_flac(sample_rate, num_channels, compression_level, duration=1)
@@ -232,7 +232,7 @@ class TestSave(SaveTestBase):
         [16000],
         [2],
         [0],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_flac_large(self, sample_rate, num_channels, compression_level):
         """`sox_io_backend.save` can save large flac file."""
         two_hours = 2 * 60 * 60
@@ -242,7 +242,7 @@ class TestSave(SaveTestBase):
         [8000, 16000],
         [1, 2],
         [-1, 0, 1, 2, 3, 3.6, 5, 10],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_vorbis(self, sample_rate, num_channels, quality_level):
         """`sox_io_backend.save` can save vorbis format."""
         self.assert_vorbis(sample_rate, num_channels, quality_level, duration=20)
@@ -255,7 +255,7 @@ class TestSave(SaveTestBase):
         [16000],
         [2],
         [10],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_vorbis_large(self, sample_rate, num_channels, quality_level):
         """`sox_io_backend.save` can save large vorbis file correctly."""
         two_hours = 2 * 60 * 60
@@ -267,7 +267,7 @@ class TestSave(SaveTestBase):
 @skipIfNoExtension
 class TestSaveParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of optional parameters of `sox_io_backend.save`"""
-    @parameterized.expand([(True, ), (False, )], name_func=get_test_name)
+    @parameterized.expand([(True, ), (False, )], name_func=name_func)
     def test_channels_first(self, channels_first):
         """channels_first swaps axes"""
         path = self.get_temp_path('data.wav')
@@ -280,7 +280,7 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
 
     @parameterized.expand([
         'float32', 'int32', 'int16', 'uint8'
-    ], name_func=get_test_name)
+    ], name_func=name_func)
     def test_noncontiguous(self, dtype):
         """Noncontiguous tensors are saved correctly"""
         path = self.get_temp_path('data.wav')

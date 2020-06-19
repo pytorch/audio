@@ -1,5 +1,4 @@
 """Test suites for checking numerical compatibility against Kaldi"""
-import json
 import subprocess
 
 import kaldi_io
@@ -8,7 +7,8 @@ import torchaudio.functional as F
 import torchaudio.compliance.kaldi
 
 from . import common_utils
-from parameterized import parameterized, param
+from .common_utils import load_params
+from parameterized import parameterized
 
 
 def _convert_args(**kwargs):
@@ -43,11 +43,6 @@ def _run_kaldi(command, input_type, input_value):
     return torch.from_numpy(result.copy())  # copy supresses some torch warning
 
 
-def _load_params(path):
-    with open(path, 'r') as file:
-        return [param(json.loads(line)) for line in file]
-
-
 class Kaldi(common_utils.TestBaseMixin):
     backend = 'sox'
 
@@ -71,7 +66,7 @@ class Kaldi(common_utils.TestBaseMixin):
         kaldi_result = _run_kaldi(command, 'ark', tensor)
         self.assert_equal(result, expected=kaldi_result)
 
-    @parameterized.expand(_load_params(common_utils.get_asset_path('kaldi_test_fbank_args.json')))
+    @parameterized.expand(load_params('kaldi_test_fbank_args.json'))
     @common_utils.skipIfNoExec('compute-fbank-feats')
     def test_fbank(self, kwargs):
         """fbank should be numerically compatible with compute-fbank-feats"""
@@ -82,7 +77,7 @@ class Kaldi(common_utils.TestBaseMixin):
         kaldi_result = _run_kaldi(command, 'scp', wave_file)
         self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
 
-    @parameterized.expand(_load_params(common_utils.get_asset_path('kaldi_test_spectrogram_args.json')))
+    @parameterized.expand(load_params('kaldi_test_spectrogram_args.json'))
     @common_utils.skipIfNoExec('compute-spectrogram-feats')
     def test_spectrogram(self, kwargs):
         """spectrogram should be numerically compatible with compute-spectrogram-feats"""
@@ -93,7 +88,7 @@ class Kaldi(common_utils.TestBaseMixin):
         kaldi_result = _run_kaldi(command, 'scp', wave_file)
         self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
 
-    @parameterized.expand(_load_params(common_utils.get_asset_path('kaldi_test_mfcc_args.json')))
+    @parameterized.expand(load_params('kaldi_test_mfcc_args.json'))
     @common_utils.skipIfNoExec('compute-mfcc-feats')
     def test_mfcc(self, kwargs):
         """mfcc should be numerically compatible with compute-mfcc-feats"""

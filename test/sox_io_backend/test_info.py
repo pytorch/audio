@@ -8,13 +8,13 @@ from ..common_utils import (
     PytorchTestCase,
     skipIfNoExec,
     skipIfNoExtension,
-)
-from .common import (
-    get_test_name,
+    sox_utils,
     get_wav_data,
     save_wav,
 )
-from . import sox_utils
+from .common import (
+    name_func,
+)
 
 
 @skipIfNoExec('sox')
@@ -24,7 +24,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         ['float32', 'int32', 'int16', 'uint8'],
         [8000, 16000],
         [1, 2],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_wav(self, dtype, sample_rate, num_channels):
         """`sox_io_backend.info` can check wav file correctly"""
         duration = 1
@@ -40,7 +40,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         ['float32', 'int32', 'int16', 'uint8'],
         [8000, 16000],
         [4, 8, 16, 32],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_wav_multiple_channels(self, dtype, sample_rate, num_channels):
         """`sox_io_backend.info` can check wav file with channels more than 2 correctly"""
         duration = 1
@@ -56,7 +56,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         [8000, 16000],
         [1, 2],
         [96, 128, 160, 192, 224, 256, 320],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_mp3(self, sample_rate, num_channels, bit_rate):
         """`sox_io_backend.info` can check mp3 file correctly"""
         duration = 1
@@ -75,7 +75,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         [8000, 16000],
         [1, 2],
         list(range(9)),
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_flac(self, sample_rate, num_channels, compression_level):
         """`sox_io_backend.info` can check flac file correctly"""
         duration = 1
@@ -93,7 +93,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         [8000, 16000],
         [1, 2],
         [-1, 0, 1, 2, 3, 3.6, 5, 10],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_vorbis(self, sample_rate, num_channels, quality_level):
         """`sox_io_backend.info` can check vorbis file correctly"""
         duration = 1
