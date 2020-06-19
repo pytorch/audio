@@ -23,7 +23,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         [8000, 16000],
         [1, 2],
     )), name_func=get_test_name)
-    def test_info_wav(self, dtype, sample_rate, num_channels):
+    def test_wav(self, dtype, sample_rate, num_channels):
         duration = 1
         path = self.get_temp_path(f'{dtype}_{sample_rate}_{num_channels}.wav')
         sox_utils.gen_audio_file(
@@ -42,7 +42,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         [8000, 16000],
         [4, 8, 16, 32],
     )), name_func=get_test_name)
-    def test_info_wav_multiple_channels(self, dtype, sample_rate, num_channels):
+    def test_wav_multiple_channels(self, dtype, sample_rate, num_channels):
         """`sox_io_backend.save` can save wav with more than 2 channels."""
         duration = 1
         path = self.get_temp_path(f'{dtype}_{sample_rate}_{num_channels}.wav')
@@ -62,7 +62,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         [1, 2],
         [96, 128, 160, 192, 224, 256, 320],
     )), name_func=get_test_name)
-    def test_info_mp3(self, sample_rate, num_channels, bit_rate):
+    def test_mp3(self, sample_rate, num_channels, bit_rate):
         duration = 1
         path = self.get_temp_path(f'{sample_rate}_{num_channels}_{bit_rate}k.mp3')
         sox_utils.gen_audio_file(
@@ -80,7 +80,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         [1, 2],
         list(range(9)),
     )), name_func=get_test_name)
-    def test_info_flac(self, sample_rate, num_channels, compression_level):
+    def test_flac(self, sample_rate, num_channels, compression_level):
         duration = 1
         path = self.get_temp_path(f'{sample_rate}_{num_channels}_{compression_level}.flac')
         sox_utils.gen_audio_file(
@@ -97,7 +97,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         [1, 2],
         [-1, 0, 1, 2, 3, 3.6, 5, 10],
     )), name_func=get_test_name)
-    def test_info_vorbis(self, sample_rate, num_channels, quality_level):
+    def test_vorbis(self, sample_rate, num_channels, quality_level):
         duration = 1
         path = self.get_temp_path(f'{sample_rate}_{num_channels}_{quality_level}.vorbis')
         sox_utils.gen_audio_file(
