@@ -24,6 +24,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         [1, 2],
     )), name_func=get_test_name)
     def test_wav(self, dtype, sample_rate, num_channels):
+        """`sox_io_backend.info` can check wav file correctly"""
         duration = 1
         path = self.get_temp_path(f'{dtype}_{sample_rate}_{num_channels}.wav')
         sox_utils.gen_audio_file(
@@ -43,7 +44,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         [4, 8, 16, 32],
     )), name_func=get_test_name)
     def test_wav_multiple_channels(self, dtype, sample_rate, num_channels):
-        """`sox_io_backend.save` can save wav with more than 2 channels."""
+        """`sox_io_backend.info` can check wav file with channels more than 2 correctly"""
         duration = 1
         path = self.get_temp_path(f'{dtype}_{sample_rate}_{num_channels}.wav')
         sox_utils.gen_audio_file(
@@ -63,6 +64,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         [96, 128, 160, 192, 224, 256, 320],
     )), name_func=get_test_name)
     def test_mp3(self, sample_rate, num_channels, bit_rate):
+        """`sox_io_backend.info` can check mp3 file correctly"""
         duration = 1
         path = self.get_temp_path(f'{sample_rate}_{num_channels}_{bit_rate}k.mp3')
         sox_utils.gen_audio_file(
@@ -81,6 +83,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         list(range(9)),
     )), name_func=get_test_name)
     def test_flac(self, sample_rate, num_channels, compression_level):
+        """`sox_io_backend.info` can check flac file correctly"""
         duration = 1
         path = self.get_temp_path(f'{sample_rate}_{num_channels}_{compression_level}.flac')
         sox_utils.gen_audio_file(
@@ -98,6 +101,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         [-1, 0, 1, 2, 3, 3.6, 5, 10],
     )), name_func=get_test_name)
     def test_vorbis(self, sample_rate, num_channels, quality_level):
+        """`sox_io_backend.info` can check vorbis file correctly"""
         duration = 1
         path = self.get_temp_path(f'{sample_rate}_{num_channels}_{quality_level}.vorbis')
         sox_utils.gen_audio_file(
