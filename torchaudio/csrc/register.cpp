@@ -12,7 +12,7 @@ static auto registerSignalInfo =
         .def(torch::init<int64_t, int64_t, int64_t>())
         .def("get_sample_rate", &SignalInfo::getSampleRate)
         .def("get_num_channels", &SignalInfo::getNumChannels)
-        .def("get_num_samples", &SignalInfo::getNumSamples);
+        .def("get_num_frames", &SignalInfo::getNumFrames);
 
 static auto registerGetInfo = torch::RegisterOperators().op(
     torch::RegisterOperators::options()
