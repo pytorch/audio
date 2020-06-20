@@ -70,5 +70,12 @@ TORCH_LIBRARY(torchaudio, m) {
   m.def(
       "torchaudio::sox_effects_apply_effects_file",
       &torchaudio::sox_effects::apply_effects_file);
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // functional.h
+  ////////////////////////////////////////////////////////////////////////////////
+  m.def(
+      "torchaudio::functional_lfilter",
+      &torchaudio::functional::lfilter);
 }
 #endif
