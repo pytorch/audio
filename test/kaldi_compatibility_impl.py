@@ -1,7 +1,5 @@
 """Test suites for checking numerical compatibility against Kaldi"""
 import json
-import shutil
-import unittest
 import subprocess
 
 import kaldi_io
@@ -11,10 +9,6 @@ import torchaudio.compliance.kaldi
 
 from . import common_utils
 from parameterized import parameterized, param
-
-
-def _not_available(cmd):
-    return shutil.which(cmd) is None
 
 
 def _convert_args(**kwargs):
@@ -61,7 +55,7 @@ class Kaldi(common_utils.TestBaseMixin):
         expected = expected.to(dtype=self.dtype, device=self.device)
         self.assertEqual(output, expected, rtol=rtol, atol=atol)
 
-    @unittest.skipIf(_not_available('apply-cmvn-sliding'), '`apply-cmvn-sliding` not available')
+    @common_utils.skipIfNoExec('apply-cmvn-sliding')
     def test_sliding_window_cmn(self):
         """sliding_window_cmn should be numerically compatible with apply-cmvn-sliding"""
         kwargs = {
@@ -78,7 +72,7 @@ class Kaldi(common_utils.TestBaseMixin):
         self.assert_equal(result, expected=kaldi_result)
 
     @parameterized.expand(_load_params(common_utils.get_asset_path('kaldi_test_fbank_args.json')))
-    @unittest.skipIf(_not_available('compute-fbank-feats'), '`compute-fbank-feats` not available')
+    @common_utils.skipIfNoExec('compute-fbank-feats')
     def test_fbank(self, kwargs):
         """fbank should be numerically compatible with compute-fbank-feats"""
         wave_file = common_utils.get_asset_path('kaldi_file.wav')
@@ -89,7 +83,7 @@ class Kaldi(common_utils.TestBaseMixin):
         self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
 
     @parameterized.expand(_load_params(common_utils.get_asset_path('kaldi_test_spectrogram_args.json')))
-    @unittest.skipIf(_not_available('compute-spectrogram-feats'), '`compute-spectrogram-feats` not available')
+    @common_utils.skipIfNoExec('compute-spectrogram-feats')
     def test_spectrogram(self, kwargs):
         """spectrogram should be numerically compatible with compute-spectrogram-feats"""
         wave_file = common_utils.get_asset_path('kaldi_file.wav')
@@ -100,7 +94,7 @@ class Kaldi(common_utils.TestBaseMixin):
         self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
 
     @parameterized.expand(_load_params(common_utils.get_asset_path('kaldi_test_mfcc_args.json')))
-    @unittest.skipIf(_not_available('compute-mfcc-feats'), '`compute-mfcc-feats` not available')
+    @common_utils.skipIfNoExec('compute-mfcc-feats')
     def test_mfcc(self, kwargs):
         """mfcc should be numerically compatible with compute-mfcc-feats"""
         wave_file = common_utils.get_asset_path('kaldi_file.wav')
