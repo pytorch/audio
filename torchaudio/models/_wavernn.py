@@ -1,9 +1,10 @@
 from typing import List
 
+import torch
 from torch import Tensor
 from torch import nn
 
-__all__ = ["_ResBlock", "_MelResNet", "_Stretch2d", "_UpsampleNetwork"]
+__all__ = ["_ResBlock", "_MelResNet", "_Stretch2d", "_UpsampleNetwork", "_WaveRNN"]
 
 
 class _ResBlock(nn.Module):
@@ -90,6 +91,7 @@ class _MelResNet(nn.Module):
 
 
 class _Stretch2d(nn.Module):
+<<<<<<< HEAD
     r"""Upscale the frequency and time dimensions of a spectrogram.
 
     Args:
@@ -144,13 +146,16 @@ class _UpsampleNetwork(nn.Module):
     "Efficient Neural Audio Synthesis". Nal Kalchbrenner, Erich Elsen, Karen Simonyan, Seb Noury,
     Norman Casagrande, Edward Lockhart, Florian Stimberg, Aaron van den Oord, Sander Dieleman,
     Koray Kavukcuoglu. arXiv:1802.08435, 2018.
+=======
+    r"""This is a two-dimensional stretch layer. It is a block used in WaveRNN.
+>>>>>>> add wavernn model
 
     Args:
-        x_scale: the scale factor in x axis (required)
-        y_scale: the scale factor in y axis (required)
+        x_scale: the scale factor in x axis
+        y_scale: the scale factor in y axis
 
     Examples::
-        >>> stretch2d = _Stretch2d(x_scale=1, y_scale=1)
+        >>> stretch2d = _Stretch2d(x_scale=10, y_scale=10)
 
         >>> input = torch.rand(10, 1, 100, 512)
         >>> output = stretch2d(input)
@@ -165,46 +170,50 @@ class _UpsampleNetwork(nn.Module):
         self.y_scale = y_scale
 
     def forward(self, x: Tensor) -> Tensor:
-        r"""Pass the input through the _Stretch2d layer.
-
+        r"""
         Args:
-            x: the input sequence to the _Stretch2d layer (required)
+            x: the input sequence to the _Stretch2d layer
 
         Shape:
-            - x: :math:`(batch_size, channel, freq, time)`
-            - output: :math:`(batch_size, channel, freq * y_scale, time * x_scale)`
+            - x: :math:`(..., freq, time)`
+            - output: :math:`(..., freq * y_scale, time * x_scale)`
         """
 
-        batch_size, channel, freq, time = x.size()
-        x = x.unsqueeze(-1).unsqueeze(3)
-        x = x.repeat(1, 1, 1, self.y_scale, 1, self.x_scale)
-        return x.view(batch_size, channel, freq * self.y_scale, time * self.x_scale)
+        return x.repeat_interleave(self.y_scale, 2).repeat_interleave(self.x_scale, 3)
 
 
 class _UpsampleNetwork(nn.Module):
     r"""This is an upsample block based on a stack of Conv2d and Strech2d layers.
-    It is a block used in WaveRNN. WaveRNN is based on the paper "Efficient Neural Audio Synthesis".
-    Nal Kalchbrenner, Erich Elsen, Karen Simonyan, Seb Noury, Norman Casagrande, Edward Lockhart,
-    Florian Stimberg, Aaron van den Oord, Sander Dieleman, Koray Kavukcuoglu. arXiv:1802.08435, 2018.
+    It is a block used in WaveRNN.
 
     Args:
-        upsample_scales: the list of upsample scales (required)
-        res_blocks: the number of ResBlock in stack (default=10)
-        input_dims: the number of input sequence (default=100)
-        hidden_dims: the number of compute dimensions (default=128)
-        output_dims: the number of output sequence (default=128)
-        pad: the kernel size (kernel_size = pad * 2 + 1) in the first Conv1d layer (default=2)
+        upsample_scales: the list of upsample scales
+        n_res_block: the number of ResBlock in stack (default=10)
+        n_freq: the number of bins in a spectrogram (default=128)
+        n_hidden: the number of hidden dimensions (default=128)
+        n_output: the number of output dimensions (default=128)
+        kernel_size: the number of kernel size in the first Conv1d layer (default=5)
 
     Examples::
         >>> upsamplenetwork = _UpsampleNetwork(upsample_scales=[4, 4, 16],
-                                               res_blocks=10,
-                                               input_dims=100,
-                                               hidden_dims=128,
-                                               output_dims=128,
-                                               pad=2)
-        >>> input = torch.rand(10, 100, 512)
+                                               n_res_block=10,
+                                               n_freq=128,
+                                               n_hidden=128,
+                                               n_output=128,
+                                               kernel_size=5)
+        >>> input = torch.rand(10, 128, 512)
         >>> output = upsamplenetwork(input)
 
+<<<<<<< HEAD
+=======
+    def __init__(self,
+                 upsample_scales: List[int],
+                 n_res_block: int = 10,
+                 n_freq: int = 128,
+                 n_hidden: int = 128,
+                 n_output: int = 128,
+                 kernel_size: int = 5) -> None:
+>>>>>>> add wavernn model
         super().__init__()
 
         total_scale = 1
@@ -213,7 +222,10 @@ class _UpsampleNetwork(nn.Module):
 
         self.indent = (kernel_size - 1) // 2 * total_scale
         self.resnet = _MelResNet(n_res_block, n_freq, n_hidden, n_output, kernel_size)
+<<<<<<< HEAD
 
+=======
+>>>>>>> add wavernn model
         self.resnet_stretch = _Stretch2d(total_scale, 1)
 
         up_layers = []
@@ -253,15 +265,14 @@ class _UpsampleNetwork(nn.Module):
         return upsampling_output, resnet_output
 
     def forward(self, x: Tensor) -> Tensor:
-        r"""Pass the input through the _UpsampleNetwork layer.
-
+        r"""
         Args:
-            x: the input sequence to the _UpsampleNetwork layer (required)
+            x: the input sequence to the _UpsampleNetwork layer
 
         Shape:
-            - x: :math:`(batch_size, freq, time)`
-            - output: :math:`(batch_size, (time - 2 * pad) * total_scale, freq)`,
-                            `(batch_size, (time - 2 * pad) * total_scale, output_dims)`
+            - x: :math:`(batch, freq, time)`.
+            - output: :math:`(batch, (time - kernel_size + 1) * total_scale, freq)`,
+                            `(batch, (time - kernel_size + 1) * total_scale, n_output)`
         where total_scale is the product of all elements in upsample_scales.
         """
 
@@ -274,3 +285,121 @@ class _UpsampleNetwork(nn.Module):
         upsampling_output = upsampling_output.squeeze(1)[:, :, self.indent:-self.indent]
 
         return upsampling_output.transpose(1, 2), resnet_output.transpose(1, 2)
+
+
+class _WaveRNN(nn.Module):
+    r"""
+    Args:
+        upsample_scales: the list of upsample scales
+        n_bits: the bits of output waveform
+        sample_rate: the rate of audio dimensions (samples per second)
+        hop_length: the number of samples between the starts of consecutive frames
+        n_res_block: the number of ResBlock in stack (default=10)
+        n_rnn: the dimension of RNN layer (default=512)
+        n_fc: the dimension of fully connected layer (default=512)
+        kernel_size: the number of kernel size in the first Conv1d layer (default=5)
+        n_freq: the number of bins in a spectrogram (default=128)
+        n_hidden: the number of hidden dimensions (default=128)
+        n_output: the number of output dimensions (default=128)
+        mode: the type of input waveform (default='RAW')
+
+    Examples::
+        >>> upsamplenetwork = _waveRNN(upsample_scales=[5,5,8],
+                                       n_bits=9,
+                                       sample_rate=24000,
+                                       hop_length=200,
+                                       n_res_block=10,
+                                       n_rnn=512,
+                                       n_fc=512,
+                                       kernel_size=5,
+                                       n_freq=128,
+                                       n_hidden=128,
+                                       n_output=128,
+                                       mode='RAW')
+        >>> x = torch.rand(10, 24800, 512)
+        >>> mels = torch.rand(10, 128, 512)
+        >>> output = upsamplenetwork(x, mels)
+    """
+
+    def __init__(self,
+                 upsample_scales: List[int],
+                 n_bits: int,
+                 sample_rate: int,
+                 hop_length: int,
+                 n_res_block: int = 10,
+                 n_rnn: int = 512,
+                 n_fc: int = 512,
+                 kernel_size: int = 5,
+                 n_freq: int = 128,
+                 n_hidden: int = 128,
+                 n_output: int = 128,
+                 mode: str = 'RAW') -> None:
+        super().__init__()
+
+        self.mode = mode
+        self.kernel_size = kernel_size
+
+        if self.mode == 'RAW':
+            self.n_classes = 2 ** n_bits
+        elif self.mode == 'MOL':
+            self.n_classes = 30
+
+        self.n_rnn = n_rnn
+        self.n_aux = n_output // 4
+        self.hop_length = hop_length
+        self.sample_rate = sample_rate
+
+        self.upsample = _UpsampleNetwork(upsample_scales, n_res_block, n_freq, n_hidden, n_output, kernel_size)
+        self.fc = nn.Linear(n_freq + self.n_aux + 1, n_rnn)
+
+        self.rnn1 = nn.GRU(n_rnn, n_rnn, batch_first=True)
+        self.rnn2 = nn.GRU(n_rnn + self.n_aux, n_rnn, batch_first=True)
+
+        self.relu1 = nn.ReLU(inplace=True)
+        self.relu2 = nn.ReLU(inplace=True)
+
+        self.fc1 = nn.Linear(n_rnn + self.n_aux, n_fc)
+        self.fc2 = nn.Linear(n_fc + self.n_aux, n_fc)
+        self.fc3 = nn.Linear(n_fc, self.n_classes)
+
+    def forward(self, x: Tensor, mels: Tensor) -> Tensor:
+        r"""
+        Args:
+            x: the input waveform to the _WaveRNN layer
+            mels: the input mel-spectrogram to the _WaveRNN layer
+
+        Shape:
+            - x: :math:`(batch, time)`
+            - mels: :math:`(batch, freq, time_mels)`
+            - output: :math:`(batch, time, 2 ** n_bits)`
+        """
+
+        batch_size = x.size(0)
+        h1 = torch.zeros(1, batch_size, self.n_rnn, device=x.device)
+        h2 = torch.zeros(1, batch_size, self.n_rnn, device=x.device)
+        mels, aux = self.upsample(mels)
+
+        aux_idx = [self.n_aux * i for i in range(5)]
+        a1 = aux[:, :, aux_idx[0]:aux_idx[1]]
+        a2 = aux[:, :, aux_idx[1]:aux_idx[2]]
+        a3 = aux[:, :, aux_idx[2]:aux_idx[3]]
+        a4 = aux[:, :, aux_idx[3]:aux_idx[4]]
+
+        x = torch.cat([x.unsqueeze(-1), mels, a1], dim=2)
+        x = self.fc(x)
+        res = x
+        x, _ = self.rnn1(x, h1)
+
+        x = x + res
+        res = x
+        x = torch.cat([x, a2], dim=2)
+        x, _ = self.rnn2(x, h2)
+
+        x = x + res
+        x = torch.cat([x, a3], dim=2)
+        x = self.relu1(self.fc1(x))
+
+        x = torch.cat([x, a4], dim=2)
+        x = self.relu2(self.fc2(x))
+
+        return self.fc3(x)
