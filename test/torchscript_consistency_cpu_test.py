@@ -1,14 +1,24 @@
-from parameterized import parameterized_class
+import torch
 
-from .common_utils import TestCase, common_test_class_parameters
+from . import common_utils
 from .torchscript_consistency_impl import Functional, Transforms
 
-parameters = list(common_test_class_parameters(devices=['cpu']))
-@parameterized_class(parameters)
-class TestFunctional(Functional, TestCase):
-    pass
+
+class TestFunctionalFloat32(Functional, common_utils.PytorchTestCase):
+    dtype = torch.float32
+    device = torch.device('cpu')
 
 
-@parameterized_class(parameters)
-class TestTransforms(Transforms, TestCase):
-    pass
+class TestFunctionalFloat64(Functional, common_utils.PytorchTestCase):
+    dtype = torch.float64
+    device = torch.device('cpu')
+
+
+class TestTransformsFloat32(Transforms, common_utils.PytorchTestCase):
+    dtype = torch.float32
+    device = torch.device('cpu')
+
+
+class TestTransformsFloat64(Transforms, common_utils.PytorchTestCase):
+    dtype = torch.float64
+    device = torch.device('cpu')
