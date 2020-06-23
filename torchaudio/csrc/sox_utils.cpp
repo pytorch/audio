@@ -32,12 +32,12 @@ SoxFormat::~SoxFormat() {
 sox_format_t* SoxFormat::operator->() const noexcept {
   return fd_;
 }
-sox_format_t* SoxFormat::get() const noexcept {
+SoxFormat::operator sox_format_t*() const noexcept {
   return fd_;
 }
 
 void validate_input_file(const SoxFormat& sf) {
-  if (sf.get() == nullptr) {
+  if (static_cast<sox_format_t*>(sf) == nullptr) {
     throw std::runtime_error("Error loading audio file: failed to open file.");
   }
   if (sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
@@ -45,6 +45,23 @@ void validate_input_file(const SoxFormat& sf) {
   }
   if (sf->signal.length == 0) {
     throw std::runtime_error("Error reading audio file: unkown length.");
+  }
+}
+
+void validate_input_tensor(const torch::Tensor tensor) {
+  if (!tensor.device().is_cpu()) {
+    throw std::runtime_error("Input tensor has to be on CPU.");
+  }
+
+  if (tensor.ndimension() != 2) {
+    throw std::runtime_error("Input tensor has to be 2D.");
+  }
+
+  const auto dtype = tensor.dtype();
+  if (!(dtype == torch::kFloat32 || dtype == torch::kInt32 ||
+        dtype == torch::kInt16 || dtype == torch::kUInt8)) {
+    throw std::runtime_error(
+        "Input tensor has to be one of float32, int32, int16 or uint8 type.");
   }
 }
 
@@ -107,6 +124,121 @@ torch::Tensor convert_to_tensor(
     t = t.transpose(1, 0);
   }
   return t.contiguous();
+}
+
+torch::Tensor unnormalize_wav(const torch::Tensor input_tensor) {
+  const auto dtype = input_tensor.dtype();
+  auto tensor = input_tensor;
+  if (dtype == torch::kFloat32) {
+    double multi_pos = 2147483647.;
+    double multi_neg = -2147483648.;
+    auto mult = (tensor > 0) * multi_pos - (tensor < 0) * multi_neg;
+    tensor = tensor.to(torch::dtype(torch::kFloat64));
+    tensor *= mult;
+    tensor.clamp_(multi_neg, multi_pos);
+    tensor = tensor.to(torch::dtype(torch::kInt32));
+  } else if (dtype == torch::kInt32) {
+    // already denormalized
+  } else if (dtype == torch::kInt16) {
+    tensor = tensor.to(torch::dtype(torch::kInt32));
+    tensor *= ((tensor != 0) * 65536);
+  } else if (dtype == torch::kUInt8) {
+    tensor = tensor.to(torch::dtype(torch::kInt32));
+    tensor -= 128;
+    tensor *= 16777216;
+  } else {
+    throw std::runtime_error("Unexpected dtype.");
+  }
+  return tensor;
+}
+
+const std::string get_filetype(const std::string path) {
+  std::string ext = path.substr(path.find_last_of(".") + 1);
+  std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+  return ext;
+}
+
+sox_encoding_t get_encoding(
+    const std::string filetype,
+    const caffe2::TypeMeta dtype) {
+  if (filetype == "mp3")
+    return SOX_ENCODING_MP3;
+  if (filetype == "flac")
+    return SOX_ENCODING_FLAC;
+  if (filetype == "ogg" || filetype == "vorbis")
+    return SOX_ENCODING_VORBIS;
+  if (filetype == "wav") {
+    if (dtype == torch::kUInt8)
+      return SOX_ENCODING_UNSIGNED;
+    if (dtype == torch::kInt16)
+      return SOX_ENCODING_SIGN2;
+    if (dtype == torch::kInt32)
+      return SOX_ENCODING_SIGN2;
+    if (dtype == torch::kFloat32)
+      return SOX_ENCODING_FLOAT;
+    throw std::runtime_error("Unsupported dtype.");
+  }
+  throw std::runtime_error("Unsupported file type.");
+}
+
+unsigned get_precision(
+    const std::string filetype,
+    const caffe2::TypeMeta dtype) {
+  if (filetype == "mp3")
+    return SOX_UNSPEC;
+  if (filetype == "flac")
+    return 24;
+  if (filetype == "ogg" || filetype == "vorbis")
+    return SOX_UNSPEC;
+  if (filetype == "wav") {
+    if (dtype == torch::kUInt8)
+      return 8;
+    if (dtype == torch::kInt16)
+      return 16;
+    if (dtype == torch::kInt32)
+      return 32;
+    if (dtype == torch::kFloat32)
+      return 32;
+    throw std::runtime_error("Unsupported dtype.");
+  }
+  throw std::runtime_error("Unsupported file type.");
+}
+
+sox_signalinfo_t get_signalinfo(
+    const torch::Tensor& tensor,
+    const int64_t sample_rate,
+    const bool channels_first,
+    const std::string filetype) {
+  return sox_signalinfo_t{
+      /*rate=*/static_cast<sox_rate_t>(sample_rate),
+      /*channels=*/static_cast<unsigned>(tensor.size(channels_first ? 0 : 1)),
+      /*precision=*/get_precision(filetype, tensor.dtype()),
+      /*length=*/static_cast<uint64_t>(tensor.numel())};
+}
+
+sox_encodinginfo_t get_encodinginfo(
+    const std::string filetype,
+    const caffe2::TypeMeta dtype,
+    const double compression) {
+  const double compression_ = [&]() {
+    if (filetype == "mp3")
+      return compression;
+    if (filetype == "flac")
+      return compression;
+    if (filetype == "ogg" || filetype == "vorbis")
+      return compression;
+    if (filetype == "wav")
+      return 0.;
+    throw std::runtime_error("Unsupported file type.");
+  }();
+
+  return sox_encodinginfo_t{/*encoding=*/get_encoding(filetype, dtype),
+                            /*bits_per_sample=*/get_precision(filetype, dtype),
+                            /*compression=*/compression_,
+                            /*reverse_bytes=*/sox_option_default,
+                            /*reverse_nibbles=*/sox_option_default,
+                            /*reverse_bits=*/sox_option_default,
+                            /*opposite_endian=*/sox_false};
 }
 
 } // namespace sox_utils

@@ -28,7 +28,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
     def test_wav(self, dtype, sample_rate, num_channels):
         """`sox_io_backend.info` can check wav file correctly"""
         duration = 1
-        path = self.get_temp_path(f'{dtype}_{sample_rate}_{num_channels}.wav')
+        path = self.get_temp_path('data.wav')
         data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
         save_wav(path, data, sample_rate)
         info = sox_io_backend.info(path)
@@ -44,7 +44,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
     def test_wav_multiple_channels(self, dtype, sample_rate, num_channels):
         """`sox_io_backend.info` can check wav file with channels more than 2 correctly"""
         duration = 1
-        path = self.get_temp_path(f'{dtype}_{sample_rate}_{num_channels}.wav')
+        path = self.get_temp_path('data.wav')
         data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
         save_wav(path, data, sample_rate)
         info = sox_io_backend.info(path)
@@ -60,7 +60,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
     def test_mp3(self, sample_rate, num_channels, bit_rate):
         """`sox_io_backend.info` can check mp3 file correctly"""
         duration = 1
-        path = self.get_temp_path(f'{sample_rate}_{num_channels}_{bit_rate}k.mp3')
+        path = self.get_temp_path('data.mp3')
         sox_utils.gen_audio_file(
             path, sample_rate, num_channels,
             compression=bit_rate, duration=duration,
@@ -79,7 +79,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
     def test_flac(self, sample_rate, num_channels, compression_level):
         """`sox_io_backend.info` can check flac file correctly"""
         duration = 1
-        path = self.get_temp_path(f'{sample_rate}_{num_channels}_{compression_level}.flac')
+        path = self.get_temp_path('data.flac')
         sox_utils.gen_audio_file(
             path, sample_rate, num_channels,
             compression=compression_level, duration=duration,
@@ -97,7 +97,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
     def test_vorbis(self, sample_rate, num_channels, quality_level):
         """`sox_io_backend.info` can check vorbis file correctly"""
         duration = 1
-        path = self.get_temp_path(f'{sample_rate}_{num_channels}_{quality_level}.vorbis')
+        path = self.get_temp_path('data.vorbis')
         sox_utils.gen_audio_file(
             path, sample_rate, num_channels,
             compression=quality_level, duration=duration,

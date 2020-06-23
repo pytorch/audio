@@ -46,6 +46,14 @@ static auto registerLoadAudioFile = torch::RegisterOperators().op(
             decltype(sox_io::load_audio_file),
             &sox_io::load_audio_file>());
 
+static auto registerSaveAudioFile = torch::RegisterOperators().op(
+    torch::RegisterOperators::options()
+        .schema(
+            "torchaudio::sox_io_save_audio_file(str path, __torch__.torch.classes.torchaudio.TensorSignal signal, float compression, int frames_per_chunk) -> ()")
+        .catchAllKernel<
+            decltype(sox_io::save_audio_file),
+            &sox_io::save_audio_file>());
+
 ////////////////////////////////////////////////////////////////////////////////
 // sox_effects.h
 ////////////////////////////////////////////////////////////////////////////////
