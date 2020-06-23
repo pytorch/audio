@@ -20,6 +20,12 @@ executors:
       shell: bash.exe
 
 commands:
+  generate_cache_key:
+    description: "Generates a cache key file that changes daily"
+    steps:
+      - run:
+          name: Generate cache key
+          command: echo "$(date +"%Y-%m-%d")" > .cachekey
   designate_upload_channel:
     description: "inserts the correct upload channel into ${BASH_ENV}"
     steps:
@@ -80,20 +86,17 @@ jobs:
     resource_class: small
     steps:
       - checkout
-      - run:
-          name: Generate cache key
-          # This will refresh cache on daily
-          command: echo "$(date +"%Y-%U-%d")" > .circleci-daily
+      - generate_cache_key
       - restore_cache:
           {% raw %}
           keys:
-            - tp-nix-{{ checksum ".circleci-daily" }}-{{ checksum "./build_tools/setup_helpers/build_third_party.sh" }}-{{ checksum "./build_tools/setup_helpers/build_third_party_helper.sh" }}
+            - tp-nix-{{ checksum ".cachekey" }}-{{ checksum "./build_tools/setup_helpers/build_third_party.sh" }}-{{ checksum "./build_tools/setup_helpers/build_third_party_helper.sh" }}
           {% endraw %}
       - run:
           command: ./build_tools/setup_helpers/build_third_party.sh $PWD --download-only
       - save_cache:
           {% raw %}
-          key: tp-nix-{{ checksum ".circleci-daily" }}-{{ checksum "./build_tools/setup_helpers/build_third_party.sh" }}-{{ checksum "./build_tools/setup_helpers/build_third_party_helper.sh" }}
+          key: tp-nix-{{ checksum ".cachekey" }}-{{ checksum "./build_tools/setup_helpers/build_third_party.sh" }}-{{ checksum "./build_tools/setup_helpers/build_third_party_helper.sh" }}
           {% endraw %}
           paths:
             - third_party/tmp
@@ -376,21 +379,18 @@ jobs:
       - checkout
       - attach_workspace:
           at: third_party
-      - run:
-          name: Generate cache key
-          # This will refresh cache on Sundays, nightly build should generate new cache.
-          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - generate_cache_key
       - restore_cache:
           {% raw %}
           keys:
-            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
@@ -419,21 +419,18 @@ jobs:
       - checkout
       - attach_workspace:
           at: third_party
-      - run:
-          name: Generate cache key
-          # This will refresh cache on Sundays, nightly build should generate new cache.
-          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - generate_cache_key
       - restore_cache:
           {% raw %}
           keys:
-            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Setup
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
@@ -457,21 +454,18 @@ jobs:
       name: windows-cpu
     steps:
       - checkout
-      - run:
-          name: Generate cache key
-          # This will refresh cache on Sundays, nightly build should generate new cache.
-          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - generate_cache_key
       - restore_cache:
           {% raw %}
           keys:
-            - env-v2-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+            - env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v2-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          key: env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
@@ -496,21 +490,18 @@ jobs:
       CUDA_VERSION: "10.1"
     steps:
       - checkout
-      - run:
-          name: Generate cache key
-          # This will refresh cache on Sundays, nightly build should generate new cache.
-          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - generate_cache_key
       - restore_cache:
           {% raw %}
           keys:
-            - env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+            - env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          key: env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
@@ -534,21 +525,18 @@ jobs:
     resource_class: medium
     steps:
       - checkout
-      - run:
-          name: Generate cache key
-          # This will refresh cache on Sundays, nightly build should generate new cache.
-          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - generate_cache_key
       - restore_cache:
           {% raw %}
           keys:
-            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
