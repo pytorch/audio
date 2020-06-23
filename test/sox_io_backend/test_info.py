@@ -35,7 +35,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         )
         info = sox_io_backend.info(path)
         assert info.get_sample_rate() == sample_rate
-        assert info.get_num_samples() == sample_rate * duration
+        assert info.get_num_frames() == sample_rate * duration
         assert info.get_num_channels() == num_channels
 
     @parameterized.expand(list(itertools.product(
@@ -55,7 +55,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         )
         info = sox_io_backend.info(path)
         assert info.get_sample_rate() == sample_rate
-        assert info.get_num_samples() == sample_rate * duration
+        assert info.get_num_frames() == sample_rate * duration
         assert info.get_num_channels() == num_channels
 
     @parameterized.expand(list(itertools.product(
@@ -74,7 +74,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         info = sox_io_backend.info(path)
         assert info.get_sample_rate() == sample_rate
         # mp3 does not preserve the number of samples
-        # assert info.get_num_samples() == sample_rate * duration
+        # assert info.get_num_frames() == sample_rate * duration
         assert info.get_num_channels() == num_channels
 
     @parameterized.expand(list(itertools.product(
@@ -92,7 +92,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         )
         info = sox_io_backend.info(path)
         assert info.get_sample_rate() == sample_rate
-        assert info.get_num_samples() == sample_rate * duration
+        assert info.get_num_frames() == sample_rate * duration
         assert info.get_num_channels() == num_channels
 
     @parameterized.expand(list(itertools.product(
@@ -110,5 +110,5 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         )
         info = sox_io_backend.info(path)
         assert info.get_sample_rate() == sample_rate
-        assert info.get_num_samples() == sample_rate * duration
+        assert info.get_num_frames() == sample_rate * duration
         assert info.get_num_channels() == num_channels

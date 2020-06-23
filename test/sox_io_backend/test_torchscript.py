@@ -44,5 +44,5 @@ class SoxIO(TempDirMixin, TorchaudioTestCase):
         ts_info = ts_info_func(audio_path)
 
         assert py_info.get_sample_rate() == ts_info.get_sample_rate()
-        assert py_info.get_num_samples() == ts_info.get_num_samples()
+        assert py_info.get_num_frames() == ts_info.get_num_frames()
         assert py_info.get_num_channels() == ts_info.get_num_channels()
