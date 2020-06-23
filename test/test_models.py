@@ -1,5 +1,3 @@
-import unittest
-
 import torch
 from torchaudio.models import Wav2Letter, _MelResNet
 
@@ -53,6 +51,3 @@ class TestMelResNet(common_utils.TorchaudioTestCase):
         out = model(x)
 
         assert out.size() == (batch_size, output_dims, num_features - pad * 2)
-
-if __name__ == '__main__':
-    unittest.main()
