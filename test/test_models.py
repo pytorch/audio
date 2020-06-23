@@ -1,5 +1,3 @@
-import unittest
-
 import torch
 from torchaudio.models import Wav2Letter, _MelResNet, _UpsampleNetwork, _WaveRNN
 
