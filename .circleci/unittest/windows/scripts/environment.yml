@@ -9,7 +9,7 @@ dependencies:
   - codecov
   - pip
   - pip:
-    - scipy
+    - scipy == 1.4.1
     - kaldi-io
     - PySoundFile
     - librosa
