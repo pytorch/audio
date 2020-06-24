@@ -271,7 +271,7 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            conda install -v -y -c pytorch-nightly -c pytorch-test pytorch
+            conda install -v -y -c pytorch-test -c pytorch-nightly pytorch
             conda install -v -y $(ls ~/workspace/torchaudio*.tar.bz2)
       - run:
           name: smoke test
@@ -311,7 +311,7 @@ jobs:
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
-            conda install -v -y -c pytorch-nightly -c pytorch-test pytorch
+            conda install -v -y -c pytorch-test -c pytorch-nightly pytorch
             conda install -v -y $(ls ~/workspace/torchaudio*.tar.bz2)
       - run:
           name: smoke test
