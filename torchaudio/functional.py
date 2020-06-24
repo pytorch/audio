@@ -168,7 +168,7 @@ def spectrogram(
     if normalized:
         spec_f /= window.pow(2.).sum().sqrt()
     if power is not None:
-        spec_f = complex_norm(spec_f, power=power)
+        # spec_f = complex_norm(spec_f, power=power)
         # Replace by torch.norm once issue is fixed
         # https://github.com/pytorch/pytorch/issues/34279
         spec_f = spec_f.pow(2.).sum(-1).pow(0.5 * power)
