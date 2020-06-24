@@ -73,13 +73,6 @@ def collate_factory(args):
         x_input = waves[:, :seq_len]
         y_coarse = waves[:, 1:]
 
-        bits = 16 if args.mode == 'MOL' else args.n_bits
-
-        x_input = 2 * x_input / (2**bits - 1.) - 1
-
-        if args.mode == 'MOL':
-            y_coarse = 2 * y_coarse.float() / (2**bits - 1.) - 1
-
         return x_input, mels, y_coarse
 
     return raw_collate
