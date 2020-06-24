@@ -35,6 +35,3 @@ conda env update --file "${this_dir}/environment.yml" --prune
 
 # 4. Build codecs
 # build_tools/setup_helpers/build_third_party.sh
-# 4. Install codecs
-apt update -q
-apt install -y -q sox libsox-dev libsox-fmt-all

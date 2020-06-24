@@ -30,10 +30,10 @@ def _init_dummy_module():
         without extension.
         This class has to implement the same interface as C++ equivalent.
         """
-        def __init__(self, sample_rate: int, num_channels: int, num_samples: int):
+        def __init__(self, sample_rate: int, num_channels: int, num_frames: int):
             self.sample_rate = sample_rate
             self.num_channels = num_channels
-            self.num_samples = num_samples
+            self.num_frames = num_frames
 
         def get_sample_rate(self):
             return self.sample_rate
@@ -41,8 +41,8 @@ def _init_dummy_module():
         def get_num_channels(self):
             return self.num_channels
 
-        def get_num_samples(self):
-            return self.num_samples
+        def get_num_frames(self):
+            return self.num_frames
 
     DummyModule = namedtuple('torchaudio', ['SignalInfo'])
     module = DummyModule(SignalInfo)

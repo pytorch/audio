@@ -7,15 +7,15 @@ namespace torchaudio {
 struct SignalInfo : torch::CustomClassHolder {
   int64_t sample_rate;
   int64_t num_channels;
-  int64_t num_samples;
+  int64_t num_frames;
 
   SignalInfo(
       const int64_t sample_rate_,
       const int64_t num_channels_,
-      const int64_t num_samples_);
+      const int64_t num_frames_);
   int64_t getSampleRate() const;
   int64_t getNumChannels() const;
-  int64_t getNumSamples() const;
+  int64_t getNumFrames() const;
 };
 
 } // namespace torchaudio

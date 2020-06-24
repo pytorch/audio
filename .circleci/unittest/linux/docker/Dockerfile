@@ -55,6 +55,9 @@ RUN apt update && apt install -y \
         curl \
         make \
         file \
+        sox \
+        libsox-dev \
+        libsox-fmt-all \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /kaldi /kaldi
 COPY --from=builder /third_party /third_party
