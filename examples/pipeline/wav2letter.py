@@ -387,14 +387,20 @@ def main(args, rank=0):
 
     # Optimizer
 
-    optimizer_params = {
-        "lr": args.learning_rate,
-        "eps": args.eps,
-        "rho": args.rho,
-        "weight_decay": args.weight_decay,
-    }
-
-    optimizer = Adadelta(model.parameters(), **optimizer_params)
+    # optimizer = Adadelta(
+    #     model.parameters(),
+    #     lr=args.learning_rate,
+    #     weight_decay=args.weight_decay,
+    #     momentum=args.momentum,
+    #     eps=args.eps,
+    #     rho=args.rho,
+    # )
+    optimizer = SGD(
+        model.parameters(),
+        lr=args.learning_rate,
+        weight_decay=args.weight_decay,
+        momentum=args.momentum,
+    )
     scheduler = ExponentialLR(optimizer, gamma=args.gamma)
     # scheduler = ReduceLROnPlateau(optimizer, patience=2, threshold=1e-3)
 
