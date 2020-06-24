@@ -93,13 +93,15 @@ def parse_args():
         metavar="GAMMA",
         help="learning rate exponential decay constant",
     )
-    # parser.add_argument('--momentum', default=0.9, type=float, metavar='M', help='momentum')
+    parser.add_argument(
+        "--momentum", default=0.0, type=float, metavar="M", help="momentum"
+    )
     parser.add_argument(
         "--weight-decay", default=1e-5, type=float, metavar="W", help="weight decay"
     )
     parser.add_argument("--eps", metavar="EPS", type=float, default=1e-8)
     parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
-    parser.add_argument("--clip-norm", metavar="NORM", type=float, default=0.0)
+    parser.add_argument("--clip-grad", metavar="NORM", type=float, default=0.0)
 
     parser.add_argument(
         "--dataset",
@@ -195,9 +197,9 @@ def train_one_epoch(
         optimizer.zero_grad()
         loss.backward()
 
-        if args.clip_norm > 0:
+        if args.clip_grad > 0:
             sums["gradient"] += torch.nn.utils.clip_grad_norm_(
-                model.parameters(), args.clip_norm
+                model.parameters(), args.clip_grad
             )
 
         optimizer.step()
