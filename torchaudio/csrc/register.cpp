@@ -1,6 +1,7 @@
 #ifndef TORCHAUDIO_REGISTER_H
 #define TORCHAUDIO_REGISTER_H
 
+#include <torchaudio/csrc/sox_effects.h>
 #include <torchaudio/csrc/sox_io.h>
 #include <torchaudio/csrc/typedefs.h>
 
@@ -19,6 +20,17 @@ static auto registerGetInfo = torch::RegisterOperators().op(
         .schema(
             "torchaudio::sox_io_get_info(str path) -> __torch__.torch.classes.torchaudio.SignalInfo info")
         .catchAllKernel<decltype(sox_io::get_info), &sox_io::get_info>());
+
+////////////////////////////////////////////////////////////////////////////////
+// sox_effects.h
+////////////////////////////////////////////////////////////////////////////////
+static auto registerSoxEffects =
+    torch::RegisterOperators(
+        "torchaudio::sox_effects_initialize_sox_effects",
+        &sox_effects::initialize_sox_effects)
+        .op("torchaudio::sox_effects_shutdown_sox_effects",
+            &sox_effects::shutdown_sox_effects)
+        .op("torchaudio::sox_effects_list_effects", &sox_effects::list_effects);
 
 } // namespace
 } // namespace torchaudio
