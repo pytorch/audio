@@ -38,7 +38,6 @@ def parse_args():
         metavar="PATH",
         help="path to latest checkpoint",
     )
-
     parser.add_argument(
         "--epochs",
         default=200,
@@ -59,7 +58,6 @@ def parse_args():
     parser.add_argument(
         "--progress-bar", action="store_true", help="use progress bar while training"
     )
-
     parser.add_argument(
         "--decoder",
         metavar="D",
@@ -67,17 +65,22 @@ def parse_args():
         choices=["greedy", "viterbi"],
         help="decoder to use",
     )
-
     parser.add_argument(
         "--batch-size", default=64, type=int, metavar="N", help="mini-batch size"
     )
-
     parser.add_argument(
         "--n-bins",
         default=13,
         type=int,
         metavar="N",
         help="number of bins in transforms",
+    )
+    parser.add_argument(
+        "--optimizer",
+        metavar="OPT",
+        default="sgd",
+        choices=["sgd", "adadelta", "adam"],
+        help="optimizer to use",
     )
     parser.add_argument(
         "--learning-rate",
@@ -102,7 +105,6 @@ def parse_args():
     parser.add_argument("--eps", metavar="EPS", type=float, default=1e-8)
     parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
     parser.add_argument("--clip-grad", metavar="NORM", type=float, default=0.0)
-
     parser.add_argument(
         "--dataset",
         default="librispeech",
@@ -116,7 +118,6 @@ def parse_args():
     parser.add_argument(
         "--world-size", type=int, default=8, help="the world size to initiate DPP"
     )
-
     parser.add_argument("--jit", action="store_true", help="if used, model is jitted")
 
     args = parser.parse_args()
@@ -387,20 +388,28 @@ def main(args, rank=0):
 
     # Optimizer
 
-    # optimizer = Adadelta(
-    #     model.parameters(),
-    #     lr=args.learning_rate,
-    #     weight_decay=args.weight_decay,
-    #     momentum=args.momentum,
-    #     eps=args.eps,
-    #     rho=args.rho,
-    # )
-    optimizer = SGD(
-        model.parameters(),
-        lr=args.learning_rate,
-        weight_decay=args.weight_decay,
-        momentum=args.momentum,
-    )
+    if args.optimizer == "adadelta":
+        optimizer = Adadelta(
+            model.parameters(),
+            lr=args.learning_rate,
+            weight_decay=args.weight_decay,
+            eps=args.eps,
+            rho=args.rho,
+        )
+    elif args.optimizer == "sgd":
+        optimizer = SGD(
+            model.parameters(),
+            lr=args.learning_rate,
+            momentum=args.momentum,
+            weight_decay=args.weight_decay,
+        )
+    elif args.optimizer == "adam":
+        optimizer = Adam(
+            model.parameters(),
+            lr=args.learning_rate,
+            momentum=args.momentum,
+            weight_decay=args.weight_decay,
+        )
     scheduler = ExponentialLR(optimizer, gamma=args.gamma)
     # scheduler = ReduceLROnPlateau(optimizer, patience=2, threshold=1e-3)
 
