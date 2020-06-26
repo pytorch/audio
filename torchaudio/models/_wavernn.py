@@ -7,15 +7,15 @@ __all__ = ["_ResBlock", "_MelResNet"]
 class _ResBlock(nn.Module):
     r"""ResNet block based on "Deep Residual Learning for Image Recognition"
 
-    The paper link is https://arxiv.org/pdf/1512.03385.pdf. The input signal is spectrogram.
+    The paper link is https://arxiv.org/pdf/1512.03385.pdf. The input signal is a spectrogram.
 
     Args:
         n_freq: the number of bins in a spectrogram (default=128)
 
     Examples
         >>> resblock = _ResBlock()
-        >>> input = torch.rand(10, 128, 512)
-        >>> output = resblock(input) # shape: (10, 128, 512)
+        >>> input = torch.rand(10, 128, 512)  # a random spectrogram
+        >>> output = resblock(input)  # shape: (10, 128, 512)
     """
 
     def __init__(self, n_freq: int = 128) -> None:
@@ -38,8 +38,7 @@ class _ResBlock(nn.Module):
             Tensor shape: (n_batch, n_freq, n_time)
         """
 
-        residual = specgram
-        return self.resblock_model(specgram) + residual
+        return self.resblock_model(specgram) + specgram
 
 
 class _MelResNet(nn.Module):
@@ -54,8 +53,8 @@ class _MelResNet(nn.Module):
 
     Examples
         >>> melresnet = _MelResNet()
-        >>> input = torch.rand(10, 128, 512)
-        >>> output = melresnet(input) # shape: (10, 128, 508)
+        >>> input = torch.rand(10, 128, 512)  # a random spectrogram
+        >>> output = melresnet(input)  # shape: (10, 128, 508)
     """
 
     def __init__(self,

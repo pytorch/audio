@@ -36,7 +36,7 @@ class TestWav2Letter(common_utils.TorchaudioTestCase):
 class TestMelResNet(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
-        """test the output dimensions after _MelResNet block.
+        """Validate the output dimensions of a _MelResNet block.
         """
 
         n_batch = 2
