@@ -86,7 +86,7 @@ class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
 class TestWaveRNN(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
-        """test the output dimensions of waveform input after _WaveRNN model.
+        """Validate the output dimensions of a _WaveRNN model with a waveform input.
         """
 
         upsample_scales = [5, 5, 8]
@@ -114,7 +114,7 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         assert out.size() == (n_batch, hop_length * (n_time - kernel_size + 1), 2 ** n_bits)
 
     def test_mol(self):
-        """test the output dimensions of mol input after _WaveRNN model.
+        """Validate the output dimensions of a _WaveRNN model with a mol input.
         """
 
         upsample_scales = [5, 5, 8]

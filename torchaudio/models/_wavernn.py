@@ -197,8 +197,8 @@ class _UpsampleNetwork(nn.Module):
 class _WaveRNN(nn.Module):
     r"""WaveRNN model based on "Efficient Neural Audio Synthesis".
 
-    The paper link is https://arxiv.org/pdf/1802.08435.pdf. The input signals are waveform
-    and spectrogram. The input channels of waveform and spectrogram have to be 1.
+    The paper link is https://arxiv.org/pdf/1802.08435.pdf. The input signals are a waveform
+    and a spectrogram. The input channels of waveform and spectrogram have to be 1.
 
     Args:
         upsample_scales: the list of upsample scales
@@ -216,10 +216,10 @@ class _WaveRNN(nn.Module):
 
     Examples
         >>> wavernn = _waveRNN(upsample_scales=[5,5,8], n_bits=9, sample_rate=24000, hop_length=200)
-        >>> waveform, sample_rate = torchaudio.load(file) # waveform shape:
+        >>> waveform, sample_rate = torchaudio.load(file)  # waveform shape:
         >>> (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length)
-        >>> specgram = MelSpectrogram(sample_rate)(waveform) # shape: (n_batch, n_channel, n_freq, n_time)
-        >>> output = wavernn(waveform.squeeze(1), specgram.squeeze(1)) # shape:
+        >>> specgram = MelSpectrogram(sample_rate)(waveform)  # shape: (n_batch, n_channel, n_freq, n_time)
+        >>> output = wavernn(waveform.squeeze(1), specgram.squeeze(1))  # shape:
         >>> (n_batch, (n_time - kernel_size + 1) * hop_length, 2 ** n_bits)
     """
 
