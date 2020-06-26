@@ -76,8 +76,18 @@ def _get_extra_objects():
         # NOTE: The order of the library listed bellow matters.
         #
         # (the most important thing is that dependencies come after a library
-        # e.g., sox comes first)
-        libs = ['libsox.a', 'libmad.a', 'libFLAC.a', 'libmp3lame.a']
+        # e.g., sox comes first, flac/vorbis comes before ogg, and
+        # vorbisenc/vorbisfile comes before vorbis
+        libs = [
+            'libsox.a',
+            'libmad.a',
+            'libFLAC.a',
+            'libmp3lame.a',
+            'libvorbisenc.a',
+            'libvorbisfile.a',
+            'libvorbis.a',
+            'libogg.a',
+        ]
         for lib in libs:
             objs.append(str(_TP_INSTALL_DIR / 'lib' / lib))
     return objs
