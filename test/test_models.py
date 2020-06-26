@@ -1,5 +1,3 @@
-import unittest
-
 import torch
 from torchaudio.models import Wav2Letter, _MelResNet, _UpsampleNetwork
 
@@ -38,7 +36,11 @@ class TestWav2Letter(common_utils.TorchaudioTestCase):
 class TestMelResNet(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
+<<<<<<< HEAD
         """Validate the output dimensions of a _MelResNet block.
+=======
+        """test the output dimensions after _MelResNet block.
+>>>>>>> update name and docstring
         """
 
         n_batch = 2
@@ -60,7 +62,11 @@ class TestMelResNet(common_utils.TorchaudioTestCase):
 class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
+<<<<<<< HEAD
         """Validate the output dimensions of a _UpsampleNetwork block.
+=======
+        """test the output dimensions after _UpsampleNetwork block.
+>>>>>>> update name and docstring
         """
 
         upsample_scales = [5, 5, 8]
