@@ -169,7 +169,6 @@ def spectrogram(
         spec_f /= window.pow(2.).sum().sqrt()
     if power is not None:
         spec_f = complex_norm(spec_f, power=power)
-        
 
     return spec_f
 
