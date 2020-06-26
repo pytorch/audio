@@ -7,7 +7,7 @@ __all__ = ["_ResBlock", "_MelResNet"]
 class _ResBlock(nn.Module):
     r"""ResNet block based on "Deep Residual Learning for Image Recognition"
 
-    The paper link is https://arxiv.org/pdf/1512.03385.pdf. The input signal is a spectrogram.
+    The paper link is https://arxiv.org/pdf/1512.03385.pdf.
 
     Args:
         n_freq: the number of bins in a spectrogram (default=128)

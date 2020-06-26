@@ -42,7 +42,7 @@ class TestMelResNet(common_utils.TorchaudioTestCase):
         n_batch = 2
         n_time = 200
         n_freq = 100
-        n_output = 256
+        n_output = 128
         n_res_block = 10
         n_hidden = 128
         kernel_size = 5
