@@ -83,6 +83,13 @@ def parse_args():
         help="optimizer to use",
     )
     parser.add_argument(
+        "--scheduler",
+        metavar="S",
+        default="exponential",
+        choices=["exponential", "reduceonplateau"],
+        help="optimizer to use",
+    )
+    parser.add_argument(
         "--learning-rate",
         default=1.0,
         type=float,
@@ -410,8 +417,11 @@ def main(args, rank=0):
             momentum=args.momentum,
             weight_decay=args.weight_decay,
         )
-    scheduler = ExponentialLR(optimizer, gamma=args.gamma)
-    # scheduler = ReduceLROnPlateau(optimizer, patience=2, threshold=1e-3)
+
+    if args.scheduler == "exponential":
+        scheduler = ExponentialLR(optimizer, gamma=args.gamma)
+    elif args.scheduler == "reduceonplateau":
+        scheduler = ReduceLROnPlateau(optimizer, patience=10, threshold=1e-3)
 
     criterion = torch.nn.CTCLoss(
         blank=language_model.mapping[char_blank], zero_infinity=False
