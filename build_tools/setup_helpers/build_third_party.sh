@@ -21,6 +21,20 @@ mkdir -p "${tmp_dir}" "${build_dir}"
 
 . "${this_dir}/build_third_party_helper.sh"
 
+if ! found_ogg "${build_dir}" ; then
+    get_ogg "${tmp_dir}"
+    if [ "${download_only}" = "false" ]; then
+        build_ogg "${tmp_dir}" "${build_dir}"
+    fi
+fi
+
+if ! found_vorbis "${build_dir}" ; then
+    get_vorbis "${tmp_dir}"
+    if [ "${download_only}" = "false" ]; then
+        build_vorbis "${tmp_dir}" "${build_dir}"
+    fi
+fi
+
 if ! found_lame "${build_dir}" ; then
     get_lame "${tmp_dir}"
     if [ "${download_only}" = "false" ]; then
