@@ -86,9 +86,7 @@ class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
 class TestWaveRNN(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
-        """
-        Create a tensor as the input of _WaveRNN model
-        and test if the output dimensions are correct.
+        """test the output dimensions of waveform input after _WaveRNN model.
         """
 
         upsample_scales = [5, 5, 8]
@@ -97,20 +95,48 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         n_bits = 9
         sample_rate = 24000
         hop_length = 200
-        batch_size = 2
+        n_batch = 2
         n_time = 200
         n_freq = 100
         n_output = 256
         n_res_block = 10
         n_hidden = 128
         kernel_size = 5
-        mode = 'RAW'
+        mode = 'waveform'
 
         model = _WaveRNN(upsample_scales, n_bits, sample_rate, hop_length, n_res_block,
                          n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output, mode)
 
-        x = torch.rand(batch_size, hop_length * (n_time - kernel_size + 1))
-        mels = torch.rand(batch_size, n_freq, n_time)
+        x = torch.rand(n_batch, hop_length * (n_time - kernel_size + 1))
+        mels = torch.rand(n_batch, n_freq, n_time)
         out = model(x, mels)
 
-        assert out.size() == (batch_size, hop_length * (n_time - kernel_size + 1), 2 ** n_bits)
+        assert out.size() == (n_batch, hop_length * (n_time - kernel_size + 1), 2 ** n_bits)
+
+    def test_mol(self):
+        """test the output dimensions of mol input after _WaveRNN model.
+        """
+
+        upsample_scales = [5, 5, 8]
+        n_rnn = 512
+        n_fc = 512
+        n_bits = 9
+        sample_rate = 24000
+        hop_length = 200
+        n_batch = 2
+        n_time = 200
+        n_freq = 100
+        n_output = 256
+        n_res_block = 10
+        n_hidden = 128
+        kernel_size = 5
+        mode = 'mol'
+
+        model = _WaveRNN(upsample_scales, n_bits, sample_rate, hop_length, n_res_block,
+                         n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output, mode)
+
+        x = torch.rand(n_batch, hop_length * (n_time - kernel_size + 1))
+        mels = torch.rand(n_batch, n_freq, n_time)
+        out = model(x, mels)
+
+        assert out.size() == (n_batch, hop_length * (n_time - kernel_size + 1), 30)

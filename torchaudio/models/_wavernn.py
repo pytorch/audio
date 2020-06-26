@@ -195,8 +195,10 @@ class _UpsampleNetwork(nn.Module):
 
 
 class _WaveRNN(nn.Module):
-    r"""WaveRNN model based on
-    `"Efficient Neural Audio Synthesis" <https://arxiv.org/pdf/1802.08435.pdf>`_
+    r"""WaveRNN model based on "Efficient Neural Audio Synthesis".
+
+    The paper link is https://arxiv.org/pdf/1802.08435.pdf. The input signals are waveform
+    and spectrogram. The input channels of waveform and spectrogram have to be 1.
 
     Args:
         upsample_scales: the list of upsample scales
@@ -210,24 +212,15 @@ class _WaveRNN(nn.Module):
         n_freq: the number of bins in a spectrogram (default=128)
         n_hidden: the number of hidden dimensions (default=128)
         n_output: the number of output dimensions (default=128)
-        mode: the type of input waveform in ['RAW', 'MOL'] (default='RAW')
+        mode: the type of input waveform in ['waveform', 'mol'] (default='waveform')
 
-    Examples::
-        >>> upsamplenetwork = _waveRNN(upsample_scales=[5,5,8],
-                                       n_bits=9,
-                                       sample_rate=24000,
-                                       hop_length=200,
-                                       n_res_block=10,
-                                       n_rnn=512,
-                                       n_fc=512,
-                                       kernel_size=5,
-                                       n_freq=128,
-                                       n_hidden=128,
-                                       n_output=128,
-                                       mode='RAW')
-        >>> x = torch.rand(10, 24800, 512)
-        >>> mels = torch.rand(10, 128, 512)
-        >>> output = upsamplenetwork(x, mels)
+    Examples
+        >>> wavernn = _waveRNN(upsample_scales=[5,5,8], n_bits=9, sample_rate=24000, hop_length=200)
+        >>> waveform, sample_rate = torchaudio.load(file) # waveform shape:
+        >>> (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length)
+        >>> specgram = MelSpectrogram(sample_rate)(waveform) # shape: (n_batch, n_channel, n_freq, n_time)
+        >>> output = wavernn(waveform.squeeze(1), specgram.squeeze(1)) # shape:
+        >>> (n_batch, (n_time - kernel_size + 1) * hop_length, 2 ** n_bits)
     """
 
     def __init__(self,
@@ -242,23 +235,29 @@ class _WaveRNN(nn.Module):
                  n_freq: int = 128,
                  n_hidden: int = 128,
                  n_output: int = 128,
-                 mode: str = 'RAW') -> None:
+                 mode: str = 'waveform') -> None:
         super().__init__()
 
         self.mode = mode
         self.kernel_size = kernel_size
 
-        if self.mode == 'RAW':
+        if self.mode == 'waveform':
             self.n_classes = 2 ** n_bits
-        elif self.mode == 'MOL':
+        elif self.mode == 'mol':
             self.n_classes = 30
         else:
-            raise ValueError("Unknown input mode - {}".format(self.mode))
+            raise ValueError(f"Expected mode: `waveform` or `mol`, but found {self.mode}")
 
         self.n_rnn = n_rnn
         self.n_aux = n_output // 4
         self.hop_length = hop_length
         self.sample_rate = sample_rate
+
+        total_scale = 1
+        for upsample_scale in upsample_scales:
+            total_scale *= upsample_scale
+        if total_scale != self.hop_length:
+            raise ValueError(f"Expected: total_scale == hop_length, but found {total_scale} != {hop_length}")
 
         self.upsample = _UpsampleNetwork(upsample_scales, n_res_block, n_freq, n_hidden, n_output, kernel_size)
         self.fc = nn.Linear(n_freq + self.n_aux + 1, n_rnn)
@@ -273,22 +272,20 @@ class _WaveRNN(nn.Module):
         self.fc2 = nn.Linear(n_fc + self.n_aux, n_fc)
         self.fc3 = nn.Linear(n_fc, self.n_classes)
 
-    def forward(self, x: Tensor, mels: Tensor) -> Tensor:
-        r"""
+    def forward(self, waveform: Tensor, specgram: Tensor) -> Tensor:
+        r"""Pass the input through the _WaveRNN model.
         Args:
-            x: the input waveform to the _WaveRNN layer
-            mels: the input mel-spectrogram to the _WaveRNN layer
+            waveform: the input waveform to the _WaveRNN layer (n_batch, (n_time - kernel_size + 1) * hop_length)
+            specgram: the input spectrogram to the _WaveRNN layer (n_batch, n_freq, n_time)
 
-        Shape:
-            - x: :math:`(batch, time)`
-            - mels: :math:`(batch, freq, time_mels)`
-            - output: :math:`(batch, time, 2 ** n_bits)`
+        Return:
+            Tensor shape: (n_batch, (n_time - kernel_size + 1) * hop_length, 2 ** n_bits)
         """
 
-        batch_size = x.size(0)
-        h1 = torch.zeros(1, batch_size, self.n_rnn, dtype=x.dtype, device=x.device)
-        h2 = torch.zeros(1, batch_size, self.n_rnn, dtype=x.dtype, device=x.device)
-        mels, aux = self.upsample(mels)
+        batch_size = waveform.size(0)
+        h1 = torch.zeros(1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device)
+        h2 = torch.zeros(1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device)
+        mels, aux = self.upsample(specgram)
 
         aux_idx = [self.n_aux * i for i in range(5)]
         a1 = aux[:, :, aux_idx[0]:aux_idx[1]]
@@ -296,7 +293,7 @@ class _WaveRNN(nn.Module):
         a3 = aux[:, :, aux_idx[2]:aux_idx[3]]
         a4 = aux[:, :, aux_idx[3]:aux_idx[4]]
 
-        x = torch.cat([x.unsqueeze(-1), mels, a1], dim=2)
+        x = torch.cat([waveform.unsqueeze(-1), mels, a1], dim=2)
         x = self.fc(x)
         res = x
         x, _ = self.rnn1(x, h1)
