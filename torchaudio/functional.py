@@ -168,10 +168,8 @@ def spectrogram(
     if normalized:
         spec_f /= window.pow(2.).sum().sqrt()
     if power is not None:
-        # spec_f = complex_norm(spec_f, power=power)
-        # Replace by torch.norm once issue is fixed
-        # https://github.com/pytorch/pytorch/issues/34279
-        spec_f = spec_f.pow(2.).sum(-1).pow(0.5 * power)
+        spec_f = complex_norm(spec_f, power=power)
+        
 
     return spec_f
 
@@ -488,9 +486,10 @@ def complex_norm(
     Returns:
         Tensor: Power of the normed input tensor. Shape of `(..., )`
     """
-    if power == 1.0:
-        return torch.norm(complex_tensor, 2, -1)
-    return torch.norm(complex_tensor, 2, -1).pow(power)
+
+    # Replace by torch.norm once issue is fixed
+    # https://github.com/pytorch/pytorch/issues/34279
+    return complex_tensor.pow(2.).sum(-1).pow(0.5 * power)
 
 
 def angle(
