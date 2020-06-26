@@ -36,18 +36,20 @@ class TestWav2Letter(common_utils.TorchaudioTestCase):
 class TestMelResNet(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
+        """test the output dimensions after _MelResNet block.
+        """
 
-        batch_size = 2
-        num_features = 200
-        input_dims = 100
-        output_dims = 128
-        res_blocks = 10
-        hidden_dims = 128
-        pad = 2
+        n_batch = 2
+        n_time = 200
+        n_freq = 100
+        n_output = 256
+        n_res_block = 10
+        n_hidden = 128
+        kernel_size = 5
 
-        model = _MelResNet(res_blocks, input_dims, hidden_dims, output_dims, pad)
+        model = _MelResNet(n_res_block, n_freq, n_hidden, n_output, kernel_size)
 
-        x = torch.rand(batch_size, input_dims, num_features)
+        x = torch.rand(n_batch, n_freq, n_time)
         out = model(x)
 
-        assert out.size() == (batch_size, output_dims, num_features - pad * 2)
+        assert out.size() == (n_batch, n_output, n_time - kernel_size + 1)
