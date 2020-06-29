@@ -1,6 +1,5 @@
 import argparse
 import os
-import shutil
 import string
 from collections import defaultdict
 from datetime import datetime
@@ -19,6 +18,7 @@ from ctc_decoders import GreedyDecoder, ViterbiDecoder
 from datasets import collate_factory, datasets_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
+from utils import count_parameters, save_checkpoint
 
 
 def parse_args():
@@ -140,39 +140,8 @@ def setup(rank, world_size):
     torch.distributed.init_process_group("nccl", rank=rank, world_size=world_size)
 
 
-def save_checkpoint(state, is_best, filename, rank):
-    """
-    Save the model to a temporary file first,
-    then copy it to filename, in case the signal interrupts
-    the torch.save() process.
-    """
-
-    if rank != 0:
-        return
-
-    if filename == "":
-        return
-
-    tempfile = filename + ".temp"
-
-    # Remove tempfile in case interuption during the copying from tempfile to filename
-    if os.path.isfile(tempfile):
-        os.remove(tempfile)
-
-    torch.save(state, tempfile)
-    if os.path.isfile(tempfile):
-        os.rename(tempfile, filename)
-    if is_best:
-        shutil.copyfile(filename, "model_best.pth.tar")
-    print("Checkpoint: saved", flush=True)
-
-
 def model_length_function(tensor):
     return int(tensor.shape[0]) // 2 + 1
-
-
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
 def train_one_epoch(
@@ -528,6 +497,8 @@ def main(args, rank=0):
                     args.checkpoint,
                     rank,
                 )
+
+    print("End time: {}".format(str(datetime.now())), flush=True)
 
     if args.distributed:
         torch.distributed.destroy_process_group()
