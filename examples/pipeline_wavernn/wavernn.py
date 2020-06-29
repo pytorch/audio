@@ -7,12 +7,14 @@ from datetime import datetime
 import torch
 import torch.nn as nn
 import torchaudio
+from transform import Transform
 from datasets import datasets_ljspeech, collate_factory
 from typing import List
 from torchaudio.models import _WaveRNN
 from torch.utils.data import DataLoader
 from torch.optim import Adam
 from tqdm import tqdm
+from loss_mol import LossFn_Mol
 
 
 def parse_args():
@@ -21,7 +23,7 @@ def parse_args():
     # training parameters
     parser.add_argument(
         "--workers",
-        default=2,
+        default=8,
         type=int,
         metavar="N",
         help="number of data loading workers",
@@ -30,12 +32,12 @@ def parse_args():
         "--checkpoint",
         default="checkpoint.pth.par",
         type=str,
-        metavar="PATH",
+        metavar="FILE",
         help="filename to latest checkpoint",
     )
     parser.add_argument(
         "--epochs",
-        default=10000,
+        default=2000,
         type=int,
         metavar="N",
         help="number of total epochs to run",
@@ -49,7 +51,7 @@ def parse_args():
     )
     parser.add_argument(
         "--print-freq",
-        default=2500,
+        default=100,
         type=int,
         metavar="N",
         help="print frequency in epochs",
@@ -102,18 +104,22 @@ def parse_args():
         default=4.0,
         help="clip norm value")
 
-    parser.add_argument("--progress-bar", action="store_true", help="use progress bar while training")
     parser.add_argument("--seed", type=int, default=1000, help="random seed")
-    # parser.add_argument("--jit", action="store_true", help="if used, model is jitted")
-    # parser.add_argument("--distributed", action="store_true", help="enable DistributedDataParallel")
+    parser.add_argument("--progress-bar", default=False, action="store_true", help="use progress bar while training")
+    parser.add_argument("--mulaw", default=True, action="store_true", help="if used, waveform is mulaw encoded")
+    parser.add_argument("--jit", default=False, action="store_true", help="if used, model is jitted")
+    # parser.add_argument("--distributed", default=False, action="store_true", help="enable DistributedDataParallel")
 
     # model parameters
+
+    # the product of upsample_scales must equal hop_length
     parser.add_argument(
         "--upsample-scales",
         default=[5, 5, 11],
         type=List[int],
         help="the list of upsample scales",
     )
+    # output waveform bits
     parser.add_argument(
         "--n-bits",
         default=9,
@@ -136,13 +142,19 @@ def parse_args():
         "--win-length",
         default=1100,
         type=int,
-        help="the length of the STFT window",
+        help="the number of samples between the starts of consecutive frames",
     )
     parser.add_argument(
         "--f-min",
         default=40.,
         type=float,
-        help="the lowest frequency of the lowest band in a spectrogram",
+        help="the number of samples between the starts of consecutive frames",
+    )
+    parser.add_argument(
+        "--min-level-db",
+        default=-100,
+        type=float,
+        help="the min db value for spectrogam normalization",
     )
     parser.add_argument(
         "--n-res-block",
@@ -186,24 +198,28 @@ def parse_args():
         type=int,
         help="the number of output dimensions",
     )
+    # mode = ['waveform', 'mol']
     parser.add_argument(
         "--mode",
-        default="RAW",
+        default="mol",
         type=str,
-        help="the type of input waveform in ['RAW', 'MOL']",
+        help="the mode of waveform",
     )
+    # the length of input waveform and spectrogram
     parser.add_argument(
         "--seq-len-factor",
         default=5,
         type=int,
-        help="seq_length = hop_length * seq_len_factor, the length of sequence for training",
+        help="seq_length = hop_length * seq_len_factor",
     )
+    # the number of waveforms for testing
     parser.add_argument(
         "--test-samples",
         default=50,
         type=float,
-        help="the number of files for test",
+        help="the number of test waveforms",
     )
+    # the path to store audio files
     parser.add_argument(
         "--file-path",
         default="/private/home/jimchen90/datasets/LJSpeech-1.1/wavs/",
@@ -215,6 +231,8 @@ def parse_args():
     return args
 
 
+# From wav2letter pipeline:
+# https://github.com/vincentqb/audio/blob/wav2letter/examples/pipeline/wav2letter.py
 def save_checkpoint(state, is_best, filename):
 
     if filename == "":
@@ -235,35 +253,37 @@ def save_checkpoint(state, is_best, filename):
     print("Checkpoint: saved", flush=True)
 
 
-# count total parameters in the model
+# count parameter numbers in model
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-def train_one_epoch(model, criterion, optimizer, data_loader, device, pbar=None):
-
+# train one epoch
+def train_one_epoch(model, mode, bits, mulaw, criterion, optimizer, data_loader, device, pbar=None):
     model.train()
 
     sums = defaultdict(lambda: 0.0)
 
-    for i, (x, m, y) in enumerate(data_loader):
-        x = x.to(device, non_blocking=True)
-        m = m.to(device, non_blocking=True)
-        y = y.to(device, non_blocking=True)
+    for i, (waveform, specgram, target) in enumerate(data_loader, 1):
+        waveform = waveform.to(device, non_blocking=True)
+        specgram = specgram.to(device, non_blocking=True)
+        target = target.to(device, non_blocking=True)
 
-        y_hat = model(x, m)
+        output = model(waveform, specgram)
 
-        if model.mode == 'RAW':
-            y_hat = y_hat.transpose(1, 2)
+        if mode == 'waveform':
+            # (n_batch, 2 ** n_bits, n_time)
+            output = output.transpose(1, 2)
+            target = target.long()
 
-        elif model.mode == 'MOL':
-            y = y.float().unsqueeze(-1)
+        elif mode == 'mol':
+            # (n_batch, n_time, 1)
+            target = target.unsqueeze(-1)
 
         else:
-            raise ValueError('This input mode is not valid.')
+            raise ValueError(f"Expected mode: `waveform` or `mol`, but found {mode}")
 
-        loss = criterion(y_hat, y)
-
+        loss = criterion(output, target)
         sums["loss"] += loss.item()
 
         optimizer.zero_grad()
@@ -287,7 +307,7 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, pbar=None)
         print(f"Average gradient norm: {avg_gradient:4.8f}", flush=True)
 
 
-def evaluate(model, criterion, data_loader, device):
+def evaluate(model, mode, bits, mulaw, criterion, data_loader, device):
 
     with torch.no_grad():
 
@@ -295,58 +315,74 @@ def evaluate(model, criterion, data_loader, device):
 
         sums = defaultdict(lambda: 0.0)
 
-        for i, (x, m, y) in enumerate(data_loader):
+        for i, (waveform, specgram, target) in enumerate(data_loader, 1):
+            waveform = waveform.to(device, non_blocking=True)
+            specgram = specgram.to(device, non_blocking=True)
+            target = target.to(device, non_blocking=True)
 
-            x = x.to(device, non_blocking=True)
-            m = m.to(device, non_blocking=True)
-            y = y.to(device, non_blocking=True)
+            output = model(waveform, specgram)
 
-            y_hat = model(x, m)
+            if mode == 'waveform':
+                # (batch, 2 ** bits, seq_len)
+                output = output.transpose(1, 2)
+                target = target.long()
 
-            if model.mode == 'RAW':
-                y_hat = y_hat.transpose(1, 2)
-
-            elif model.mode == 'MOL':
-                y = y.float().unsqueeze(-1)
+            elif mode == 'mol':
+                # (batch, seq_len, 1)
+                target = target.unsqueeze(-1)
 
             else:
-                raise ValueError('This input mode is not valid.')
+                raise ValueError(f"Expected mode: `waveform` or `mol`, but found {mode}")
 
-            loss = criterion(y_hat, y)
+            loss = criterion(output, target)
             sums["loss"] += loss.item()
 
         avg_loss = sums["loss"] / len(data_loader)
-        print(f"Validation loss: {avg_loss:.5f}", flush=True)
+        print(f"Validation loss: {avg_loss:.8f}", flush=True)
 
         return avg_loss
 
 
 def main(args):
 
-    devices = ["cuda:0" if torch.cuda.is_available() else "cpu"]
+    devices = ["cuda" if torch.cuda.is_available() else "cpu"]
 
     print("Start time: {}".format(str(datetime.now())), flush=True)
 
     # Empty CUDA cache
     torch.cuda.empty_cache()
 
-    # parameters for melspectrogram
+    # use torchaudio transform to get waveform and specgram
+
+#    melkwargs = {
+#        "n_fft": 2048,
+#        "n_mels": args.n_freq,
+#        "hop_length": args.hop_length,
+#        "f_min": args.f_min,
+#        "win_length": args.win_length
+#    }
+
+#    transforms = torch.nn.Sequential(
+#        torchaudio.transforms.MelSpectrogram(
+#            sample_rate=args.sample_rate, **melkwargs
+#        ),
+#        torchaudio.transforms.MuLawEncoding(2**args.n_bits)
+#    )
+
+    # use librosa transform to get waveform and specgram
+
     melkwargs = {
         "n_fft": 2048,
-        "n_mels": args.n_freq,
+        "num_mels": args.n_freq,
         "hop_length": args.hop_length,
-        "f_min": args.f_min,
-        "win_length": args.win_length
+        "fmin": args.f_min,
+        "win_length": args.win_length,
+        "sample_rate": args.sample_rate,
+        "min_level_db": args.min_level_db
     }
+    transforms = Transform(**melkwargs)
 
-    transforms = torch.nn.Sequential(
-        # torchaudio.transforms.Resample(sample_rate_original, sample_rate_input),
-        torchaudio.transforms.MelSpectrogram(
-            sample_rate=args.sample_rate, **melkwargs
-        ),
-    )
-
-    # Dataloader
+    # dataset
     train_dataset, test_dataset = datasets_ljspeech(args, transforms)
 
     loader_training_params = {
@@ -396,19 +432,14 @@ def main(args):
 #    else:
 #        model.cuda()
 #        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=devices)
-
+    model = torch.nn.DataParallel(model)
     model = model.to(devices[0], non_blocking=True)
 
     n = count_parameters(model)
     print(f"Number of parameters: {n}", flush=True)
 
-    # Check the hop length is correctly factorised
-    total_scale = 1
-    for upsample_scale in args.upsample_scales:
-        total_scale *= upsample_scale
-    assert total_scale == args.hop_length
-
     # Optimizer
+
     optimizer_params = {
         "lr": args.learning_rate,
         "betas": (args.adam_beta1, args.adam_beta2),
@@ -418,8 +449,7 @@ def main(args):
 
     optimizer = Adam(model.parameters(), **optimizer_params)
 
-    # This is for 'RAW' input, I need to add loss function for 'MOL' input here.
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss() if args.mode == 'waveform' else LossFn_Mol
 
     best_loss = 1.0
 
@@ -459,6 +489,9 @@ def main(args):
 
             train_one_epoch(
                 model,
+                args.mode,
+                args.n_bits,
+                args.mulaw,
                 criterion,
                 optimizer,
                 loader_training,
@@ -468,7 +501,15 @@ def main(args):
 
             if not (epoch + 1) % args.print_freq or epoch + 1 == args.epochs:
 
-                sum_loss = evaluate(model, criterion, loader_test, devices[0])
+                sum_loss = evaluate(
+                    model,
+                    args.mode,
+                    args.n_bits,
+                    args.mulaw,
+                    criterion,
+                    loader_test,
+                    devices[0],
+                )
 
                 is_best = sum_loss < best_loss
                 best_loss = min(sum_loss, best_loss)
