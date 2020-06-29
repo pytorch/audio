@@ -24,6 +24,18 @@ all_found() {
     done
 }
 
+found_ogg() {
+    all_found "$1" 'include/ogg/ogg.h' 'lib/libogg.a'
+}
+
+found_vorbis() {
+    all_found "$1" \
+              'include/vorbis/vorbisenc.h' \
+              'include/vorbis/vorbisfile.h' \
+              'lib/libvorbis.a' \
+              'lib/libvorbisenc.a' \
+              'lib/libvorbisfile.a'
+}
 
 found_lame() {
     all_found "$1" 'include/lame/lame.h' 'lib/libmp3lame.a'
@@ -55,6 +67,82 @@ found_mad() {
 
 found_sox() {
     all_found "$1" 'include/sox.h' 'lib/libsox.a'
+}
+
+# libogg 1.3.4 has bug on mac OS.
+# https://trac.macports.org/ticket/58924
+OGG="libogg-1.3.3"
+OGG_ARCHIVE="${OGG}.tar.gz"
+
+get_ogg() {
+    work_dir="$1"
+    url="https://ftp.osuosl.org/pub/xiph/releases/ogg/${OGG_ARCHIVE}"
+    (
+        cd "${work_dir}"
+        if [ ! -d "${OGG}" ]; then
+            if [ ! -f "${OGG_ARCHIVE}" ]; then
+                printf "Fetching libogg from %s\n" "${url}"
+                curl $CURL_OPTS -O "${url}"
+            fi
+        fi
+    )
+}
+
+build_ogg() {
+    work_dir="$1"
+    install_dir="$2"
+    (
+        cd "${work_dir}"
+        if [ ! -d "${OGG}" ]; then
+            tar xfp "${OGG_ARCHIVE}"
+        fi
+        cd "${OGG}"
+        printf "Building libogg\n"
+        if [ ! -f Makefile ]; then
+            ./configure ${CONFIG_OPTS} \
+                        --disable-shared --enable-static --prefix="${install_dir}" CFLAGS=-fPIC CXXFLAGS=-fPIC \
+                        --with-pic --disable-dependency-tracking
+        fi
+        make ${MAKE_OPTS} > make.log 2>&1
+        make install
+    )
+}
+
+VORBIS="libvorbis-1.3.6"
+VORBIS_ARCHIVE="${VORBIS}.tar.gz"
+
+get_vorbis() {
+    work_dir="$1"
+    url="https://ftp.osuosl.org/pub/xiph/releases/vorbis/${VORBIS_ARCHIVE}"
+    (
+        cd "${work_dir}"
+        if [ ! -d "${VORBIS}" ]; then
+            if [ ! -f "${VORBIS_ARCHIVE}" ]; then
+                printf "Fetching libvorbis from %s\n" "${url}"
+                curl $CURL_OPTS -O "${url}"
+            fi
+        fi
+    )
+}
+
+build_vorbis() {
+    work_dir="$1"
+    install_dir="$2"
+    (
+        cd "${work_dir}"
+        if [ ! -d "${VORBIS}" ]; then
+            tar xfp "${VORBIS_ARCHIVE}"
+        fi
+        cd "${VORBIS}"
+        printf "Building libvorbis\n"
+        if [ ! -f Makefile ]; then
+            ./configure ${CONFIG_OPTS} \
+                        --disable-shared --enable-static --prefix="${install_dir}" CFLAGS=-fPIC CXXFLAGS=-fPIC \
+                        --with-pic --disable-dependency-tracking
+        fi
+        make ${MAKE_OPTS} > make.log 2>&1
+        make install
+    )
 }
 
 LAME="lame-3.99.5"
@@ -126,7 +214,7 @@ build_flac() {
         if [ ! -f Makefile ]; then
             ./configure ${CONFIG_OPTS} \
                         --disable-shared --enable-static --prefix="${install_dir}" CFLAGS=-fPIC CXXFLAGS=-fPIC \
-                        --with-pic --disable-debug --disable-dependency-tracking
+                        --with-pic --with-ogg="${install_dir}" --disable-debug --disable-dependency-tracking
         fi
         make ${MAKE_OPTS} > make.log 2>&1
         make ${MAKE_OPTS} install
@@ -207,8 +295,8 @@ build_sox() {
             # it statically if we do.
             ./configure ${CONFIG_OPTS} --disable-shared --enable-static --prefix="${install_dir}" \
                         LDFLAGS="-L${install_dir}/lib" CPPFLAGS="-I${install_dir}/include" \
-                        --with-lame --with-flac --with-mad --without-alsa --without-coreaudio \
-                        --without-png --without-oggvorbis --without-oss --without-sndfile \
+                        --with-lame --with-flac --with-mad --with-oggvorbis --without-alsa --without-coreaudio \
+                        --without-png --without-oss --without-sndfile \
                         CFLAGS=-fPIC CXXFLAGS=-fPIC --with-pic --disable-debug --disable-dependency-tracking
         fi
         make ${MAKE_OPTS} > make.log 2>&1

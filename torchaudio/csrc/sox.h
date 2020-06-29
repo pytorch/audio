@@ -48,7 +48,8 @@ std::tuple<sox_signalinfo_t, sox_encodinginfo_t> get_info(
 // get names of all sox effects
 std::vector<std::string> get_effect_names();
 
-// Initialize and Shutdown SoX effects chain.  These functions should only be run once.
+// Initialize and Shutdown SoX effects chain.  These functions should only be
+// run once.
 int initialize_sox();
 int shutdown_sox();
 

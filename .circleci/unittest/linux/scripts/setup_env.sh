@@ -34,4 +34,4 @@ printf "* Installing dependencies (except PyTorch)\n"
 conda env update --file "${this_dir}/environment.yml" --prune
 
 # 4. Build codecs
-# build_tools/setup_helpers/build_third_party.sh
+build_tools/setup_helpers/build_third_party.sh

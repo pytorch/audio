@@ -83,11 +83,11 @@ std::tuple<sox_signalinfo_t, sox_encodinginfo_t> get_info(
 }
 
 std::vector<std::string> get_effect_names() {
-  sox_effect_fn_t const * fns = sox_get_effect_fns();
+  sox_effect_fn_t const* fns = sox_get_effect_fns();
   std::vector<std::string> sv;
-  for(int i = 0; fns[i]; ++i) {
-    const sox_effect_handler_t *eh = fns[i] ();
-    if(eh && eh->name)
+  for (int i = 0; fns[i]; ++i) {
+    const sox_effect_handler_t* eh = fns[i]();
+    if (eh && eh->name)
       sv.push_back(eh->name);
   }
   return sv;
@@ -502,7 +502,5 @@ PYBIND11_MODULE(_torchaudio, m) {
       &torch::audio::initialize_sox,
       "initialize sox for effects");
   m.def(
-      "shutdown_sox",
-      &torch::audio::shutdown_sox,
-      "shutdown sox for effects");
+      "shutdown_sox", &torch::audio::shutdown_sox, "shutdown sox for effects");
 }
