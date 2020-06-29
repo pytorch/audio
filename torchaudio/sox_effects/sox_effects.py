@@ -179,8 +179,13 @@ def apply_effects_file(
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.deprecated('Please migrate to `apply_effects_file` or `apply_effects_tensor`.')
 def SoxEffect():
     r"""Create an object for passing sox effect information between python and c++
+
+    Note:
+        This function is deprecated.
+        Please migrate to :func:`apply_effects_file` or :func:`apply_effects_tensor`.
 
     Returns:
         SoxEffect: An object with the following attributes: ename (str) which is the
@@ -189,8 +194,13 @@ def SoxEffect():
     return _torchaudio.SoxEffect()
 
 
+@_mod_utils.deprecated('Please migrate to `apply_effects_file` or `apply_effects_tensor`.')
 class SoxEffectsChain(object):
     r"""SoX effects chain class.
+
+    Note:
+        This class is deprecated.
+        Please migrate to :func:`apply_effects_file` or :func:`apply_effects_tensor`.
 
     Args:
         normalization (bool, number, or callable, optional): If boolean `True`, then output is divided by `1 << 31`
