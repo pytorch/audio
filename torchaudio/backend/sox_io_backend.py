@@ -25,12 +25,7 @@ def load(
     This function can handle all the codecs that underlying libsox can handle, however note the
     followings.
 
-    Note 1:
-        Current torchaudio's binary release only contains codecs for MP3, FLAC and OGG/VORBIS.
-        If you need other formats, you need to build torchaudio from source with libsox and
-        the corresponding codecs. Refer to README for this.
-
-    Note 2:
+    Note:
         This function is tested on the following formats;
          - WAV
             - 32-bit floating-point
@@ -98,37 +93,28 @@ def save(
      - FLAC
      - OGG/VORBIS
 
-    Note:
-        Currently torchaudio's binary release does not include codecs library required to handle
-        OGG/VORBIS and OPUS. To use these formats, you need to build torchaudio from source.
-        Refer to README for this.
-
     Args:
         filepath: Path to save file.
         tensor: Audio data to save. must be 2D tensor.
         sample_rate: sampling rate
         channels_first: If True, the given tensor is interpreted as ``[channel, time]``.
-        frame_offset: Number of frames to skip before start reading data.
-        num_frames: Maximum number of frames to read. If there is not enough frames in
-            the given audio, this function does NOT raise an error.
-        normalize: When True and input file is integer WAV, the resulting Tensor type
-            becomes ``float32`` and values are normalized to ``[-1.0, 1.0]``.
-            This argument has no effect for other formats.
-        channels_first: When True, the returned Tensor has dimension [channel, time].
         compression: Used for formats other than WAV. This corresponds to ``-C`` option
             of ``sox`` command.
             See the detail at http://sox.sourceforge.net/soxformat.html.
-            - MP3: bitrate [kbps].
-            - FLAC: compression level. Whole number from 0 to 8. 8 is default and highest
-                compression.
+            - MP3: Either bitrate [kbps] with quality factor, such as ``128.2`` or
+                VBR encoding with quality factor such as ``-4.2``. Default: ``-4.5``
+            - FLAC: compression level. Whole number from ``0`` to ``8``.
+                ``8`` is default and highest compression.
             - OGG/VORBIS: number from -1 to 10; -1 is the highest compression and lowest
-                quality. Default value is 3.
+                quality. Default: ``3``.
+        frames_per_chunk: The number of frames to process (convert to ``int32`` internally
+            then write to file) at a time.
     """
     if compression is None:
         compression = 0.
         ext = str(filepath)[-3:].lower()
         if ext == 'mp3':
-            compression = 128.2
+            compression = -4.5
         elif ext == 'flac':
             compression = 8.
         elif ext in ['ogg', 'vorbis']:
