@@ -111,14 +111,17 @@ def save(
             then write to file) at a time.
     """
     if compression is None:
-        compression = 0.
         ext = str(filepath)[-3:].lower()
-        if ext == 'mp3':
+        if ext == 'wav':
+            compression = 0.
+        elif ext == 'mp3':
             compression = -4.5
         elif ext == 'flac':
             compression = 8.
         elif ext in ['ogg', 'vorbis']:
             compression = 3.
+        else:
+            raise RuntimeError(f'Unsupported file type: "{ext}"')
     signal = torch.classes.torchaudio.TensorSignal(tensor, sample_rate, channels_first)
     torch.ops.torchaudio.sox_io_save_audio_file(filepath, signal, compression, frames_per_chunk)
 
