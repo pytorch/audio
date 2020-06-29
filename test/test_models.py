@@ -58,15 +58,7 @@ class TestMelResNet(common_utils.TorchaudioTestCase):
 class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
-<<<<<<< HEAD
-<<<<<<< HEAD
         """Validate the output dimensions of a _UpsampleNetwork block.
-=======
-        """test the output dimensions after _UpsampleNetwork block.
->>>>>>> update name and docstring
-=======
-        """Validate the output dimensions of a _UpsampleNetwork block.
->>>>>>> update format
         """
 
         upsample_scales = [5, 5, 8]
