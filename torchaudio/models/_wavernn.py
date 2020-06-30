@@ -90,7 +90,7 @@ class _MelResNet(nn.Module):
 
 
 class _Stretch2d(nn.Module):
-    r"""Stretch layer upscales the frequency and time dimensions of a spectrogram.
+    r"""Upscale the frequency and time dimensions of a spectrogram.
 
     Args:
         time_scale: the scale factor in time dimension
