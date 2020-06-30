@@ -18,7 +18,7 @@ from ctc_decoders import GreedyDecoder, ViterbiDecoder
 from datasets import collate_factory, datasets_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
-from utils import MetricLog, count_parameters, save_checkpoint
+from utils import MetricLogger, count_parameters, save_checkpoint
 
 
 def parse_args():
@@ -145,7 +145,14 @@ def model_length_function(tensor):
 
 
 def train_one_epoch(
-    model, criterion, optimizer, scheduler, data_loader, device, metric_log, pbar=None
+    model,
+    criterion,
+    optimizer,
+    scheduler,
+    data_loader,
+    device,
+    metric_logger,
+    pbar=None,
 ):
 
     model.train()
@@ -171,7 +178,7 @@ def train_one_epoch(
         loss = criterion(outputs, targets, tensors_lengths, target_lengths)
         loss_item = loss.item()
         sums["loss"] += loss_item
-        metric_log.record("train_iteration", "loss", loss_item)
+        metric_logger.record("train_iteration", "loss", loss_item)
 
         optimizer.zero_grad()
         loss.backward()
@@ -181,28 +188,28 @@ def train_one_epoch(
                 model.parameters(), args.clip_grad
             )
             sums["gradient"] += gradient
-            metric_log.record("train_iteration", "gradient", gradient)
+            metric_logger.record("train_iteration", "gradient", gradient)
 
         optimizer.step()
 
         if pbar is not None:
             pbar.update(1 / len(data_loader))
-            metric_log.record("train_iteration", "n", pbar.n)
+            metric_logger.record("train_iteration", "n", pbar.n)
 
     avg_loss = sums["loss"] / len(data_loader)
     print(f"Training loss: {avg_loss:4.5f}", flush=True)
-    metric_log.record("train_epoch", "loss", avg_loss, "Training loss: ")
+    metric_logger.record("train_epoch", "loss", avg_loss, "Training loss: ")
 
     if "gradient" in sums:
         avg_gradient = sums["gradient"] / len(data_loader)
         print(f"Average gradient norm: {avg_gradient:4.5f}", flush=True)
-        metric_log.record(
+        metric_logger.record(
             "train_epoch", "gradient", avg_gradient, "Average gradient norm: "
         )
 
     scheduler.step()
 
-    metric_log.record("train_epoch", "n", pbar.n)
+    metric_logger.record("train_epoch", "n", pbar.n)
 
 
 def evaluate(
@@ -212,7 +219,7 @@ def evaluate(
     decoder,
     language_model,
     device,
-    metric_log,
+    metric_logger,
     pbar=None,
 ):
 
@@ -293,19 +300,23 @@ def evaluate(
             flush=True,
         )
 
-        metric_log("validation", "loss", avg_loss)
-        metric_log("validation", "cer", sums["cer"])
-        metric_log("validation", "wer", sums["wer"])
-        metric_log(
+        metric_logger("validation", "loss", avg_loss)
+        metric_logger("validation", "cer", sums["cer"])
+        metric_logger("validation", "wer", sums["wer"])
+        metric_logger(
             "validation", "cer_over_dataset", sums["cer"] / sums["length_dataset"]
         )
-        metric_log(
+        metric_logger(
             "validation", "wer_over_dataset", sums["wer"] / sums["length_dataset"]
         )
-        metric_log("validation", "cer_over_length", sums["cer"] / sums["total_chars"])
-        metric_log("validation", "wer_over_length", sums["wer"] / sums["total_words"])
+        metric_logger(
+            "validation", "cer_over_length", sums["cer"] / sums["total_chars"]
+        )
+        metric_logger(
+            "validation", "wer_over_length", sums["wer"] / sums["total_words"]
+        )
         if pbar is not None:
-            metric_log("validation", "n", pbar.n)
+            metric_logger("validation", "n", pbar.n)
 
         return avg_loss
 
@@ -451,7 +462,7 @@ def main(args, rank=0):
     )
 
     best_loss = 1.0
-    metric_log = MetricLog()
+    metric_logger = MetricLogger()
 
     load_checkpoint = args.checkpoint and os.path.isfile(args.checkpoint)
 
@@ -505,7 +516,7 @@ def main(args, rank=0):
                 scheduler,
                 loader_training,
                 devices[0],
-                metric_log=metric_log,
+                metric_logger=metric_logger,
                 pbar=pbar,
             )
 
@@ -518,7 +529,7 @@ def main(args, rank=0):
                     decoder,
                     language_model,
                     devices[0],
-                    metric_log=metric_log,
+                    metric_logger=metric_logger,
                     pbar=pbar,
                 )
 
@@ -537,11 +548,11 @@ def main(args, rank=0):
                     rank,
                 )
 
-            metric_log.print_last_row()
+            metric_logger.print_last_row()
 
-            prefix = args.checkpoint or "metric_log"
-            metric_log.write_csv(prefix + ".csv")
-            metric_log.write_json(prefix + ".json")
+            prefix = args.checkpoint or "metric_logger"
+            metric_logger.write_csv(prefix + ".csv")
+            metric_logger.write_json(prefix + ".json")
 
     print("End time: {}".format(str(datetime.now())), flush=True)
 

@@ -8,15 +8,15 @@ import torch
 from tabulate import tabulate
 
 
-class MetricLog:
-    def __init__(self, d=None, disable=False):
+class MetricLogger:
+    def __init__(self, log=None, disable=False):
         self.disable = disable
-        self.d = defaultdict(lambda: defaultdict(list)) if d is None else d
+        self.log = defaultdict(lambda: defaultdict(list)) if log is None else log
 
     def record(self, group, metric, value, msg=None):
         if not self.disable:
 
-            self.d[group][metric].append(value)
+            self.log[group][metric].append(value)
             if msg is not None:
                 print(msg, "{: >10}".format(round(value, 5)), flush=True)
 
@@ -32,12 +32,19 @@ class MetricLog:
                 flush=True,
             )
 
+    def print_all_row(self, group=None):
+        if self.disable:
+            return
+        for group in group or self.log:
+            # print({k: v[-1] for k, v in group.items()})
+            print(tabulate(self.log[group], flush=True))
+
     def write_csv(self, prefix=""):
         if self.disable:
             return
-        for group in self.d:
+        for group in self.log:
             filename = prefix + group + ".csv"
-            content = tabulate(self.d[group])
+            content = tabulate(self.log[group])
             with open(filename, "w") as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(content)
@@ -46,7 +53,7 @@ class MetricLog:
         if self.disable:
             return
         with open(filename, "w") as outfile:
-            json.dump(self.d, outfile)
+            json.dump(self.log, outfile)
 
 
 def save_checkpoint(state, is_best, filename, rank):
