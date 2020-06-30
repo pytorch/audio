@@ -83,6 +83,8 @@ def _get_extra_objects():
             'libmad.a',
             'libFLAC.a',
             'libmp3lame.a',
+            'libopusfile.a',
+            'libopus.a',
             'libvorbisenc.a',
             'libvorbisfile.a',
             'libvorbis.a',
