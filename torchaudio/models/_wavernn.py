@@ -124,7 +124,7 @@ class _Stretch2d(nn.Module):
 
 
 class _UpsampleNetwork(nn.Module):
-    r"""Upsample block upscales the dimensions of a spectrogram to match waveform.
+    r"""Upscale the dimensions of a spectrogram to match waveform.
 
     Args:
         upsample_scales: the list of upsample scales
