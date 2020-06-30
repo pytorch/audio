@@ -5,7 +5,27 @@ include(ExternalProject)
 
 set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/install)
 set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/archives)
-set(COMMON_ARGS --quiet --disable-shared --enable-static --prefix=${INSTALL_DIR} CFLAGS=-fPIC CXXFLAGS=-fpic --with-pic --disable-dependency-tracking --disable-debug)
+set(COMMON_ARGS --quiet --disable-shared --enable-static --prefix=${INSTALL_DIR} --with-pic --disable-dependency-tracking --disable-debug --disable-examples --disable-doc)
+
+# See the followings for the origin of patch
+# http://www.linuxfromscratch.org/blfs/view/svn/multimedia/libmad.html
+# http://www.linuxfromscratch.org/patches/blfs/svn/libmad-0.15.1b-fixes-1.patch
+ExternalProject_Add(libmad
+  PREFIX ${CMAKE_CURRENT_SOURCE_DIR}
+  DOWNLOAD_DIR ${ARCHIVE_DIR}
+  URL https://downloads.sourceforge.net/project/mad/libmad/0.15.1b/libmad-0.15.1b.tar.gz
+  URL_HASH SHA256=bbfac3ed6bfbc2823d3775ebb931087371e142bb0e9bb1bee51a76a6e0078690
+  PATCH_COMMAND patch < ${CMAKE_CURRENT_SOURCE_DIR}/libmad.patch
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/src/libmad/configure ${COMMON_ARGS}
+)
+
+ExternalProject_Add(libmp3lame
+  PREFIX ${CMAKE_CURRENT_SOURCE_DIR}
+  DOWNLOAD_DIR ${ARCHIVE_DIR}
+  URL https://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
+  URL_HASH SHA256=24346b4158e4af3bd9f2e194bb23eb473c75fb7377011523353196b19b9a23ff
+  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/src/libmp3lame/configure ${COMMON_ARGS} --enable-nasm
+)
 
 ExternalProject_Add(libogg
   PREFIX ${CMAKE_CURRENT_SOURCE_DIR}
@@ -31,29 +51,6 @@ ExternalProject_Add(libvorbis
   URL https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.6.tar.gz
   URL_HASH SHA256=6ed40e0241089a42c48604dc00e362beee00036af2d8b3f46338031c9e0351cb
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/src/libvorbis/configure ${COMMON_ARGS} --with-ogg=${INSTALL_DIR}
-)
-
-ExternalProject_Add(libmp3lame
-  PREFIX ${CMAKE_CURRENT_SOURCE_DIR}
-  DOWNLOAD_DIR ${ARCHIVE_DIR}
-  URL https://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
-  URL_HASH SHA256=24346b4158e4af3bd9f2e194bb23eb473c75fb7377011523353196b19b9a23ff
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/src/libmp3lame/configure ${COMMON_ARGS} --enable-nasm
-)
-
-if (APPLE)
-  # https://stackoverflow.com/a/9499796
-  # without this clang tries to target -march=i486 which fails
-  set(LIBMAD_ARGS ${COMMON_ARGS} x86_64-apple-darwin10.9.0)
-else()
-  set(LIBMAD_ARGS ${COMMON_ARGS})
-endif()
-ExternalProject_Add(libmad
-  PREFIX ${CMAKE_CURRENT_SOURCE_DIR}
-  DOWNLOAD_DIR ${ARCHIVE_DIR}
-  URL https://downloads.sourceforge.net/project/mad/libmad/0.15.1b/libmad-0.15.1b.tar.gz
-  URL_HASH SHA256=bbfac3ed6bfbc2823d3775ebb931087371e142bb0e9bb1bee51a76a6e0078690
-  CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/src/libmad/configure ${LIBMAD_ARGS}
 )
 
 ExternalProject_Add(libsox
