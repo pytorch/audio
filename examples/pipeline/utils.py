@@ -1,59 +1,27 @@
-import csv
-import json
 import os
 import shutil
-from collections import defaultdict
+import sys
+from collections import defaultdict, deque
 
 import torch
-from tabulate import tabulate
 
 
 class MetricLogger:
-    def __init__(self, log=None, disable=False):
-        self.disable = disable
-        self.log = defaultdict(lambda: defaultdict(list)) if log is None else log
+    def __init__(self, group, print_freq=1):
+        self.print_freq = print_freq
+        self.data = defaultdict(lambda: deque(maxlen=self.print_freq))
+        self.data["group"].append(group)
+        self._iter = 0
 
-    def record(self, group, metric, value, msg=None):
-        if not self.disable:
+    def __call__(self, key, value):
+        self.data[key].append(value)
 
-            self.log[group][metric].append(value)
-            if msg is not None:
-                print(msg, "{: >10}".format(round(value, 5)), flush=True)
-
-        return value
-
-    def print_last_row(self, group=None):
-        if self.disable:
-            return
-        for group in group or self.log:
-            # print({k: v[-1] for k, v in group.items()})
-            print(
-                tabulate({k: v[-1] for k, v in group.items()}, headers="keys"),
-                flush=True,
-            )
-
-    def print_all_row(self, group=None):
-        if self.disable:
-            return
-        for group in group or self.log:
-            # print({k: v[-1] for k, v in group.items()})
-            print(tabulate(self.log[group], flush=True))
-
-    def write_csv(self, prefix=""):
-        if self.disable:
-            return
-        for group in self.log:
-            filename = prefix + group + ".csv"
-            content = tabulate(self.log[group])
-            with open(filename, "w") as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(content)
-
-    def write_json(self, filename):
-        if self.disable:
-            return
-        with open(filename, "w") as outfile:
-            json.dump(self.log, outfile)
+    def print(self):
+        self._iter += 1
+        if self._iter % self.print_freq:
+            # d = {k: statistics.mean(v) for k, v in self.data.items()}
+            d = {k: v[-1] for k, v in self.data.items()}
+            print(d, flush=True)
 
 
 def save_checkpoint(state, is_best, filename, rank):
@@ -80,7 +48,7 @@ def save_checkpoint(state, is_best, filename, rank):
         os.rename(tempfile, filename)
     if is_best:
         shutil.copyfile(filename, "model_best.pth.tar")
-    print("Checkpoint: saved", flush=True)
+    print("Checkpoint: saved", file=sys.stderr, flush=True)
 
 
 def count_parameters(model):

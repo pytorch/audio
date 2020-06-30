@@ -1,6 +1,7 @@
 import argparse
 import os
 import string
+import sys
 from collections import defaultdict
 from datetime import datetime
 
@@ -145,19 +146,14 @@ def model_length_function(tensor):
 
 
 def train_one_epoch(
-    model,
-    criterion,
-    optimizer,
-    scheduler,
-    data_loader,
-    device,
-    metric_logger,
-    pbar=None,
+    model, criterion, optimizer, scheduler, data_loader, device, pbar=None,
 ):
 
     model.train()
 
     sums = defaultdict(lambda: 0.0)
+
+    metric = MetricLogger("train_iteration")
 
     for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
         data_loader, maxsize=2
@@ -178,7 +174,7 @@ def train_one_epoch(
         loss = criterion(outputs, targets, tensors_lengths, target_lengths)
         loss_item = loss.item()
         sums["loss"] += loss_item
-        metric_logger.record("train_iteration", "loss", loss_item)
+        metric("loss", loss_item)
 
         optimizer.zero_grad()
         loss.backward()
@@ -188,39 +184,34 @@ def train_one_epoch(
                 model.parameters(), args.clip_grad
             )
             sums["gradient"] += gradient
-            metric_logger.record("train_iteration", "gradient", gradient)
+            metric("gradient", gradient)
 
         optimizer.step()
 
         if pbar is not None:
             pbar.update(1 / len(data_loader))
-            metric_logger.record("train_iteration", "n", pbar.n)
+            metric("n", pbar.n)
+
+        metric.print()
+
+    metric = MetricLogger("train_epoch")
+    metric("n", pbar.n)
 
     avg_loss = sums["loss"] / len(data_loader)
-    print(f"Training loss: {avg_loss:4.5f}", flush=True)
-    metric_logger.record("train_epoch", "loss", avg_loss, "Training loss: ")
+    metric("loss", avg_loss)
 
     if "gradient" in sums:
         avg_gradient = sums["gradient"] / len(data_loader)
-        print(f"Average gradient norm: {avg_gradient:4.5f}", flush=True)
-        metric_logger.record(
-            "train_epoch", "gradient", avg_gradient, "Average gradient norm: "
-        )
+        metric("gradient", avg_gradient)
+
+    metric("lr", scheduler.get_last_lr())
+    metric.print()
 
     scheduler.step()
 
-    metric_logger.record("train_epoch", "n", pbar.n)
-
 
 def evaluate(
-    model,
-    criterion,
-    data_loader,
-    decoder,
-    language_model,
-    device,
-    metric_logger,
-    pbar=None,
+    model, criterion, data_loader, decoder, language_model, device, pbar=None,
 ):
 
     with torch.no_grad():
@@ -262,7 +253,11 @@ def evaluate(
             for i in range(2):
                 output_print = output[i].ljust(print_length)[:print_length]
                 target_print = target[i].ljust(print_length)[:print_length]
-                print(f"Target: {target_print}   Output: {output_print}", flush=True)
+                print(
+                    f"Target: {target_print}   Output: {output_print}",
+                    file=sys.stderr,
+                    flush=True,
+                )
 
             cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
             # cers_normalized = [d / len(a) for a, d in zip(target, cers)]
@@ -284,39 +279,21 @@ def evaluate(
             sums["total_words"] += n
 
         avg_loss = sums["loss"] / len(data_loader)
-        print(f"Validation loss: {avg_loss:.5f}", flush=True)
 
-        print(f"CER: {sums['cer']}  WER: {sums['wer']}", flush=True)
-        print(
-            f"CER: {sums['cer']/sums['length_dataset']}  "
-            f"WER: {sums['wer']/sums['length_dataset']}  "
-            f"(over dataset length)",
-            flush=True,
-        )
-        print(
-            f"CER: {sums['cer']/sums['total_chars']}  "
-            f"WER: {sums['wer']/sums['total_words']}  "
-            f"(over total target length)",
-            flush=True,
-        )
-
-        metric_logger("validation", "loss", avg_loss)
-        metric_logger("validation", "cer", sums["cer"])
-        metric_logger("validation", "wer", sums["wer"])
-        metric_logger(
-            "validation", "cer_over_dataset", sums["cer"] / sums["length_dataset"]
-        )
-        metric_logger(
-            "validation", "wer_over_dataset", sums["wer"] / sums["length_dataset"]
-        )
-        metric_logger(
-            "validation", "cer_over_length", sums["cer"] / sums["total_chars"]
-        )
-        metric_logger(
-            "validation", "wer_over_length", sums["wer"] / sums["total_words"]
-        )
+        metric = MetricLogger("validation")
+        metric("loss", avg_loss)
+        metric("cer", sums["cer"])
+        metric("wer", sums["wer"])
+        metric("cer over dataset length", sums["cer"] / sums["length_dataset"])
+        metric("wer over dataset length", sums["wer"] / sums["length_dataset"])
+        metric("cer over target length", sums["cer"] / sums["total_chars"])
+        metric("wer over target length", sums["wer"] / sums["total_words"])
+        metric("target length", sums["total_chars"])
+        metric("target length", sums["total_words"])
+        metric("dataset length", sums["length_dataset"])
         if pbar is not None:
-            metric_logger("validation", "n", pbar.n)
+            metric("n", pbar.n)
+        metric.print()
 
         return avg_loss
 
@@ -326,7 +303,7 @@ def main(args, rank=0):
     if args.distributed:
         setup(rank, args.world_size)
 
-    print("Start time: {}".format(str(datetime.now())), flush=True)
+    print("Start time: {}".format(str(datetime.now())), file=sys.stderr, flush=True)
     # Explicitly setting seed to make sure that models created in two processes
     # start from same random weights and biases.
     torch.manual_seed(args.seed)
@@ -406,7 +383,7 @@ def main(args, rank=0):
     model = model.to(devices[0], non_blocking=True)
 
     n = count_parameters(model)
-    print(f"Number of parameters: {n}", flush=True)
+    print(f"Number of parameters: {n}", file=sys.stderr, flush=True)
 
     # Optimizer
 
@@ -462,7 +439,6 @@ def main(args, rank=0):
     )
 
     best_loss = 1.0
-    metric_logger = MetricLogger()
 
     load_checkpoint = args.checkpoint and os.path.isfile(args.checkpoint)
 
@@ -470,7 +446,11 @@ def main(args, rank=0):
         torch.distributed.barrier()
 
     if load_checkpoint:
-        print("Checkpoint: loading '{}'".format(args.checkpoint), flush=True)
+        print(
+            "Checkpoint: loading '{}'".format(args.checkpoint),
+            file=sys.stderr,
+            flush=True,
+        )
         checkpoint = torch.load(args.checkpoint)
 
         args.start_epoch = checkpoint["epoch"]
@@ -484,10 +464,11 @@ def main(args, rank=0):
             "Checkpoint: loaded '{}' at epoch {}".format(
                 args.checkpoint, checkpoint["epoch"]
             ),
+            file=sys.stderr,
             flush=True,
         )
     else:
-        print("Checkpoint: not found", flush=True)
+        print("Checkpoint: not found", file=sys.stderr, flush=True)
 
         save_checkpoint(
             {
@@ -516,7 +497,6 @@ def main(args, rank=0):
                 scheduler,
                 loader_training,
                 devices[0],
-                metric_logger=metric_logger,
                 pbar=pbar,
             )
 
@@ -529,7 +509,6 @@ def main(args, rank=0):
                     decoder,
                     language_model,
                     devices[0],
-                    metric_logger=metric_logger,
                     pbar=pbar,
                 )
 
@@ -548,13 +527,7 @@ def main(args, rank=0):
                     rank,
                 )
 
-            metric_logger.print_last_row()
-
-            prefix = args.checkpoint or "metric_logger"
-            metric_logger.write_csv(prefix + ".csv")
-            metric_logger.write_json(prefix + ".json")
-
-    print("End time: {}".format(str(datetime.now())), flush=True)
+    print("End time: {}".format(str(datetime.now())), file=sys.stderr, flush=True)
 
     if args.distributed:
         torch.distributed.destroy_process_group()
