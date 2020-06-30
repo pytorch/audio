@@ -1,6 +1,6 @@
+import logging
 import os
 import shutil
-import sys
 from collections import defaultdict, deque
 
 import torch
@@ -16,12 +16,13 @@ class MetricLogger:
     def __call__(self, key, value):
         self.data[key].append(value)
 
+    def __str__(self):
+        return str({k: v[-1] for k, v in self.data.items()})
+
     def print(self):
         self._iter += 1
-        if self._iter % self.print_freq:
-            # d = {k: statistics.mean(v) for k, v in self.data.items()}
-            d = {k: v[-1] for k, v in self.data.items()}
-            print(d, flush=True)
+        if not self._iter % self.print_freq:
+            print(self, flush=True)
 
 
 def save_checkpoint(state, is_best, filename, rank):
@@ -48,7 +49,7 @@ def save_checkpoint(state, is_best, filename, rank):
         os.rename(tempfile, filename)
     if is_best:
         shutil.copyfile(filename, "model_best.pth.tar")
-    print("Checkpoint: saved", file=sys.stderr, flush=True)
+    logging.info("Checkpoint: saved")
 
 
 def count_parameters(model):

@@ -1,7 +1,7 @@
 import argparse
+import logging
 import os
 import string
-import sys
 from collections import defaultdict
 from datetime import datetime
 
@@ -129,7 +129,7 @@ def parse_args():
     parser.add_argument("--jit", action="store_true", help="if used, model is jitted")
 
     args = parser.parse_args()
-
+    logging.info(args)
     return args
 
 
@@ -195,7 +195,8 @@ def train_one_epoch(
         metric.print()
 
     metric = MetricLogger("train_epoch")
-    metric("n", pbar.n)
+    if pbar is not None:
+        metric("n", pbar.n)
 
     avg_loss = sums["loss"] / len(data_loader)
     metric("loss", avg_loss)
@@ -253,11 +254,7 @@ def evaluate(
             for i in range(2):
                 output_print = output[i].ljust(print_length)[:print_length]
                 target_print = target[i].ljust(print_length)[:print_length]
-                print(
-                    f"Target: {target_print}   Output: {output_print}",
-                    file=sys.stderr,
-                    flush=True,
-                )
+                logging.info(f"Target: {target_print}   Output: {output_print}")
 
             cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
             # cers_normalized = [d / len(a) for a, d in zip(target, cers)]
@@ -303,7 +300,7 @@ def main(args, rank=0):
     if args.distributed:
         setup(rank, args.world_size)
 
-    print("Start time: {}".format(str(datetime.now())), file=sys.stderr, flush=True)
+    logging.info("Start time: {}".format(str(datetime.now())))
     # Explicitly setting seed to make sure that models created in two processes
     # start from same random weights and biases.
     torch.manual_seed(args.seed)
@@ -383,7 +380,7 @@ def main(args, rank=0):
     model = model.to(devices[0], non_blocking=True)
 
     n = count_parameters(model)
-    print(f"Number of parameters: {n}", file=sys.stderr, flush=True)
+    logging.info(f"Number of parameters: {n}")
 
     # Optimizer
 
@@ -446,11 +443,7 @@ def main(args, rank=0):
         torch.distributed.barrier()
 
     if load_checkpoint:
-        print(
-            "Checkpoint: loading '{}'".format(args.checkpoint),
-            file=sys.stderr,
-            flush=True,
-        )
+        logging.info(f"Checkpoint: loading '{args.checkpoint}'")
         checkpoint = torch.load(args.checkpoint)
 
         args.start_epoch = checkpoint["epoch"]
@@ -460,15 +453,11 @@ def main(args, rank=0):
         optimizer.load_state_dict(checkpoint["optimizer"])
         scheduler.load_state_dict(checkpoint["scheduler"])
 
-        print(
-            "Checkpoint: loaded '{}' at epoch {}".format(
-                args.checkpoint, checkpoint["epoch"]
-            ),
-            file=sys.stderr,
-            flush=True,
+        logging.info(
+            f"Checkpoint: loaded '{args.checkpoint}' at epoch {checkpoint['epoch']}"
         )
     else:
-        print("Checkpoint: not found", file=sys.stderr, flush=True)
+        logging.info("Checkpoint: not found")
 
         save_checkpoint(
             {
@@ -527,7 +516,7 @@ def main(args, rank=0):
                     rank,
                 )
 
-    print("End time: {}".format(str(datetime.now())), file=sys.stderr, flush=True)
+    logging.info(f"End time: {datetime.now()}")
 
     if args.distributed:
         torch.distributed.destroy_process_group()
@@ -535,7 +524,10 @@ def main(args, rank=0):
 
 if __name__ == "__main__":
 
+    logging.basicConfig(level=logging.INFO)
+
     args = parse_args()
+
     if args.distributed:
         torch.multiprocessing.spawn(
             lambda x: main(args, x), nprocs=args.world_size, join=True
