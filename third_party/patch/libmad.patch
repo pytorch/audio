@@ -1,3 +1,6 @@
+See the followings for the origin of this patch
+http://www.linuxfromscratch.org/blfs/view/svn/multimedia/libmad.html
+http://www.linuxfromscratch.org/patches/blfs/svn/libmad-0.15.1b-fixes-1.patch
 --- src/libmad/configure	2004-02-05 09:34:07.000000000 +0000
 +++ src/libmad/configure.new	2020-06-30 21:10:28.528018931 +0000
 @@ -19083,71 +19083,7 @@

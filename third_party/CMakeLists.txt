@@ -7,15 +7,12 @@ set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/install)
 set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/archives)
 set(COMMON_ARGS --quiet --disable-shared --enable-static --prefix=${INSTALL_DIR} --with-pic --disable-dependency-tracking --disable-debug --disable-examples --disable-doc)
 
-# See the followings for the origin of patch
-# http://www.linuxfromscratch.org/blfs/view/svn/multimedia/libmad.html
-# http://www.linuxfromscratch.org/patches/blfs/svn/libmad-0.15.1b-fixes-1.patch
 ExternalProject_Add(libmad
   PREFIX ${CMAKE_CURRENT_SOURCE_DIR}
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://downloads.sourceforge.net/project/mad/libmad/0.15.1b/libmad-0.15.1b.tar.gz
   URL_HASH SHA256=bbfac3ed6bfbc2823d3775ebb931087371e142bb0e9bb1bee51a76a6e0078690
-  PATCH_COMMAND patch < ${CMAKE_CURRENT_SOURCE_DIR}/libmad.patch
+  PATCH_COMMAND patch < ${CMAKE_CURRENT_SOURCE_DIR}/patch/libmad.patch
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/src/libmad/configure ${COMMON_ARGS}
 )
 
