@@ -69,12 +69,6 @@ Code:
 )
 ```
 
-Files:
-
-* `sinewave.wav`
-* `100Hz_44100Hz_16bit_05sec.wav`
-* `440Hz_44100Hz_16bit_05sec.wav`
-
 #### Noise
 
 Code:
@@ -89,7 +83,6 @@ Files:
 * `whitenoise.mp3`
 * `whitenoise_1min.mp3`
 * `steam-train-whistle-daniel_simon.wav`
-* `steam-train-whistle-daniel_simon.mp3`
 
 #### Voice
 
@@ -107,7 +100,6 @@ Files:
 #### Other
 
 * `kaldi_file.wav`
-* `test.wav`
 * `kaldi_file_8000.wav`
 
 ## Adding test
