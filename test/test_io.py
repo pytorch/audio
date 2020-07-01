@@ -1,11 +1,24 @@
 import os
 import math
+import shutil
+import tempfile
 import unittest
 
 import torch
 import torchaudio
 
-from .common_utils import BACKENDS, BACKENDS_MP3, create_temp_assets_dir
+from .common_utils import BACKENDS, BACKENDS_MP3, get_asset_path
+
+
+def create_temp_assets_dir():
+    """
+    Creates a temporary directory and moves all files from test/assets there.
+    Returns a Tuple[string, TemporaryDirectory] which is the folder path
+    and object.
+    """
+    tmp_dir = tempfile.TemporaryDirectory()
+    shutil.copytree(get_asset_path(), os.path.join(tmp_dir.name, "assets"))
+    return tmp_dir.name, tmp_dir
 
 
 class Test_LoadSave(unittest.TestCase):

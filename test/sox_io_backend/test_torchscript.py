@@ -10,14 +10,14 @@ from ..common_utils import (
     TorchaudioTestCase,
     skipIfNoExec,
     skipIfNoExtension,
-)
-from .common import (
-    get_test_name,
     get_wav_data,
     save_wav,
     load_wav,
+    sox_utils,
 )
-from . import sox_utils
+from .common import (
+    name_func,
+)
 
 
 def py_info_func(filepath: str) -> torch.classes.torchaudio.SignalInfo:
@@ -47,7 +47,7 @@ class SoxIO(TempDirMixin, TorchaudioTestCase):
         ['float32', 'int32', 'int16', 'uint8'],
         [8000, 16000],
         [1, 2],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_info_wav(self, dtype, sample_rate, num_channels):
         """`sox_io_backend.info` is torchscript-able and returns the same result"""
         audio_path = self.get_temp_path(f'{dtype}_{sample_rate}_{num_channels}.wav')
@@ -71,7 +71,7 @@ class SoxIO(TempDirMixin, TorchaudioTestCase):
         [1, 2],
         [False, True],
         [False, True],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_load_wav(self, dtype, sample_rate, num_channels, normalize, channels_first):
         """`sox_io_backend.load` is torchscript-able and returns the same result"""
         audio_path = self.get_temp_path(f'test_load_{dtype}_{sample_rate}_{num_channels}_{normalize}.wav')
@@ -94,7 +94,7 @@ class SoxIO(TempDirMixin, TorchaudioTestCase):
         ['float32', 'int32', 'int16', 'uint8'],
         [8000, 16000],
         [1, 2],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_save_wav(self, dtype, sample_rate, num_channels):
         script_path = self.get_temp_path('save_func.zip')
         torch.jit.script(py_save_func).save(script_path)
@@ -119,7 +119,7 @@ class SoxIO(TempDirMixin, TorchaudioTestCase):
         [8000, 16000],
         [1, 2],
         list(range(9)),
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_save_flac(self, sample_rate, num_channels, compression_level):
         script_path = self.get_temp_path('save_func.zip')
         torch.jit.script(py_save_func).save(script_path)
