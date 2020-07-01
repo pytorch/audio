@@ -736,7 +736,10 @@ class TimeStretch(torch.nn.Module):
         Returns:
             Tensor: Stretched complex spectrogram of dimension (..., freq, ceil(time/rate), complex=2).
         """
-        assert complex_specgrams.size(-1) == 2, "complex_specgrams should be a complex tensor, shape (..., complex=2)"
+        if not complex_specgrams.is_complex() and complex_specgrams.size(-1) != 2:
+            raise ValueError(
+                "complex_specgrams must be either complex dtype or "
+                "real dtype with the last dimension being 2, e.g. shape==(..., complex=2)")
 
         if overriding_rate is None:
             rate = self.fixed_rate
