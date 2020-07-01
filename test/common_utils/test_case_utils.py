@@ -36,6 +36,7 @@ class TempDirMixin:
             cls.temp_dir_.cleanup()
 
     def setUp(self):
+        super().setUp()
         self.temp_dir = os.path.join(self.base_temp_dir, self.id())
 
     def get_temp_path(self, *paths):
