@@ -2,7 +2,7 @@ import itertools
 from typing import Optional
 
 import torch
-from torchaudio.backend import sox_io_backend
+import torchaudio
 from parameterized import parameterized
 
 from ..common_utils import (
@@ -21,11 +21,11 @@ from .common import (
 
 
 def py_info_func(filepath: str) -> torch.classes.torchaudio.SignalInfo:
-    return sox_io_backend.info(filepath)
+    return torchaudio.info(filepath)
 
 
 def py_load_func(filepath: str, normalize: bool, channels_first: bool):
-    return sox_io_backend.load(
+    return torchaudio.load(
         filepath, normalize=normalize, channels_first=channels_first)
 
 
@@ -36,13 +36,15 @@ def py_save_func(
         channels_first: bool = True,
         compression: Optional[float] = None,
 ):
-    sox_io_backend.save(filepath, tensor, sample_rate, channels_first, compression)
+    torchaudio.save(filepath, tensor, sample_rate, channels_first, compression)
 
 
 @skipIfNoExec('sox')
 @skipIfNoExtension
 class SoxIO(TempDirMixin, TorchaudioTestCase):
     """TorchScript-ability Test suite for `sox_io_backend`"""
+    backend = 'sox_io'
+
     @parameterized.expand(list(itertools.product(
         ['float32', 'int32', 'int16', 'uint8'],
         [8000, 16000],
