@@ -1,4 +1,19 @@
-This is an example pipeline for speech recognition using a greedy or Viterbi CTC decoder, and the Wav2Letter model trained with LibriSpeech. Wav2Letter and LibriSpeech are available in torchaudio.
+This is an example pipeline for speech recognition using a greedy or Viterbi CTC decoder, along with the Wav2Letter model trained on LibriSpeech. Wav2Letter and LibriSpeech are available in torchaudio.
+
+### Usage
+
+More information about each command line parameters is available with the `--help` option. An example can be invoked as follows.
+```
+python main.py \
+    --batch-size 128 \
+    --learning-rate .6 \
+    --gamma .99 \
+    --n-bins 13 \
+    --momentum .8 \
+    --clip-grad 0. \
+    --optimizer "adadelta" \
+    --scheduler "exponential"
+```
 
 ### Output
 
@@ -20,19 +35,4 @@ def read_json(filename):
 
     data = [json.loads(l) for l in data.splitlines()]
     return pandas.DataFrame(data)
-```
-
-### Usage
-
-More information about each command line parameters is available with the `--help` option. An example can be invoked as follows.
-```
-python main.py \
-    --batch-size 128 \
-    --learning-rate .6 \
-    --gamma .99 \
-    --n-bins 13 \
-    --momentum .8 \
-    --clip-grad 0. \
-    --optimizer "adadelta" \
-    --scheduler "exponential"
 ```
