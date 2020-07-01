@@ -49,7 +49,7 @@ When testing transforms we often need waveforms of specific type (ex: pure tone,
 
 ```python
 filepath = common_utils.get_asset_path('filename.wav')
-waveform, sample_rate = scipy.io.wavfile.read(filepath)
+waveform, sample_rate = common_utils.load_wav(path)
 ```
 
 *Note: Should you choose to contribute an audio file, please leave a comment in the issue or pull request, mentioning content source and licensing information. WAV files are preferred. Other formats should be used only when there is no alternative. (i.e. dataset implementation comes with hardcoded non-wav extension).*
