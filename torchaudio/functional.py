@@ -448,6 +448,7 @@ def magphase(
     phase = angle(complex_tensor)
     return mag, phase
 
+
 def phase_vocoder(
         complex_specgrams: Tensor,
         rate: float,
@@ -520,6 +521,7 @@ def phase_vocoder(
     complex_specgrams_stretch = complex_specgrams_stretch.reshape(shape[:-2] + complex_specgrams_stretch.shape[1:])
 
     return complex_specgrams_stretch
+
 
 def lfilter(
         waveform: Tensor,
