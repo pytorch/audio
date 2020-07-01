@@ -197,8 +197,8 @@ class _UpsampleNetwork(nn.Module):
 class _WaveRNN(nn.Module):
     r"""WaveRNN model based on "Efficient Neural Audio Synthesis".
 
-    The paper link is https://arxiv.org/pdf/1802.08435.pdf. The input signals are a waveform
-    and a spectrogram. The input channels of waveform and spectrogram have to be 1.
+    The paper link is https://arxiv.org/pdf/1802.08435.pdf. The input channels of waveform
+    and spectrogram have to be 1. The product of upsample_scales must equal hop_length.
 
     Args:
         upsample_scales: the list of upsample scales
@@ -212,7 +212,7 @@ class _WaveRNN(nn.Module):
         n_freq: the number of bins in a spectrogram (default=128)
         n_hidden: the number of hidden dimensions (default=128)
         n_output: the number of output dimensions (default=128)
-        mode: the type of input waveform in ['waveform', 'mol'] (default='waveform')
+        mode: the mode of waveform in ['waveform', 'mol'] (default='waveform')
 
     Examples
         >>> wavernn = _waveRNN(upsample_scales=[5,5,8], n_bits=9, sample_rate=24000, hop_length=200)
@@ -274,6 +274,7 @@ class _WaveRNN(nn.Module):
 
     def forward(self, waveform: Tensor, specgram: Tensor) -> Tensor:
         r"""Pass the input through the _WaveRNN model.
+
         Args:
             waveform: the input waveform to the _WaveRNN layer (n_batch, (n_time - kernel_size + 1) * hop_length)
             specgram: the input spectrogram to the _WaveRNN layer (n_batch, n_freq, n_time)
@@ -286,6 +287,8 @@ class _WaveRNN(nn.Module):
         h1 = torch.zeros(1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device)
         h2 = torch.zeros(1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device)
         mels, aux = self.upsample(specgram)
+        mels = mels.transpose()
+        aux = aux.transpose()
 
         aux_idx = [self.n_aux * i for i in range(5)]
         a1 = aux[:, :, aux_idx[0]:aux_idx[1]]
