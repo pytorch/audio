@@ -132,7 +132,7 @@ def parse_args():
     return args
 
 
-def setup(rank, world_size):
+def setup_distributed(rank, world_size):
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "12355"
 
@@ -291,7 +291,7 @@ def evaluate(
 def main(args, rank=0):
 
     if args.distributed:
-        setup(rank, args.world_size)
+        setup_distributed(rank, args.world_size)
 
     logging.info("Start time: {}".format(str(datetime.now())))
     # Explicitly setting seed to make sure that models created in two processes
@@ -363,12 +363,12 @@ def main(args, rank=0):
     if args.jit:
         model = torch.jit.script(model)
 
-    if not args.distributed:
-        model = torch.nn.DataParallel(model)
-    else:
+    if args.distributed:
         model.cuda()
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=devices)
         # model = torch.nn.parallel.DistributedDataParallel(model, find_unused_parameters=True)
+    else:
+        model = torch.nn.DataParallel(model)
 
     model = model.to(devices[0], non_blocking=True)
 
@@ -507,15 +507,17 @@ def main(args, rank=0):
         torch.distributed.destroy_process_group()
 
 
-if __name__ == "__main__":
-
-    logging.basicConfig(level=logging.INFO)
-
-    args = parse_args()
-
+def spawn_main(args, main):
     if args.distributed:
         torch.multiprocessing.spawn(
             lambda x: main(args, x), nprocs=args.world_size, join=True
         )
     else:
         main(args)
+
+
+if __name__ == "__main__":
+
+    logging.basicConfig(level=logging.INFO)
+    args = parse_args()
+    spawn_main(args, main)
