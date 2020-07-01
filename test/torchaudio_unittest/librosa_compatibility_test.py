@@ -112,7 +112,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
 
 @pytest.mark.parametrize('complex_specgrams', [
-    torch.randn(2, 1025, 400, 2)
+    torch.randn(2, 1025, 400, dtype=torch.cdouble)
 ])
 @pytest.mark.parametrize('rate', [0.5, 1.01, 1.3])
 @pytest.mark.parametrize('hop_length', [256])
@@ -122,31 +122,24 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
     # result in bottom right values of the stretched sectrogram to not
     # match with librosa.
 
-    complex_specgrams = complex_specgrams.type(torch.float64)
-    phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-3], dtype=torch.float64)[..., None]
-
+    phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-2], dtype=torch.double)[..., None]
     complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
 
     # == Test shape
     expected_size = list(complex_specgrams.size())
-    expected_size[-2] = int(np.ceil(expected_size[-2] / rate))
+    expected_size[-1] = int(np.ceil(expected_size[-1] / rate))
 
     assert complex_specgrams.dim() == complex_specgrams_stretch.dim()
     assert complex_specgrams_stretch.size() == torch.Size(expected_size)
 
     # == Test values
-    index = [0] * (complex_specgrams.dim() - 3) + [slice(None)] * 3
+    index = [0] * (complex_specgrams.dim() - 2) + [slice(None)] * 2
     mono_complex_specgram = complex_specgrams[index].numpy()
-    mono_complex_specgram = mono_complex_specgram[..., 0] + \
-        mono_complex_specgram[..., 1] * 1j
     expected_complex_stretch = librosa.phase_vocoder(mono_complex_specgram,
                                                      rate=rate,
                                                      hop_length=hop_length)
 
-    complex_stretch = complex_specgrams_stretch[index].numpy()
-    complex_stretch = complex_stretch[..., 0] + 1j * complex_stretch[..., 1]
-
-    assert np.allclose(complex_stretch, expected_complex_stretch, atol=1e-5)
+    assert np.allclose(complex_specgrams_stretch[index].numpy(), expected_complex_stretch, atol=1e-5)
 
 
 def _load_audio_asset(*asset_paths, **kwargs):
