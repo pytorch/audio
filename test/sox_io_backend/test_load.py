@@ -8,6 +8,7 @@ from ..common_utils import (
     PytorchTestCase,
     skipIfNoExec,
     skipIfNoExtension,
+    get_asset_path,
     get_wav_data,
     load_wav,
     save_wav,
@@ -211,6 +212,23 @@ class TestLoad(LoadTestBase):
         """`sox_io_backend.load` can load large vorbis file correctly."""
         two_hours = 2 * 60 * 60
         self.assert_vorbis(sample_rate, num_channels, quality_level, two_hours)
+
+    @parameterized.expand(list(itertools.product(
+        ['96k'],
+        [1, 2],
+        [0, 5, 10],
+    )), name_func=name_func)
+    def test_opus(self, bitrate, num_channels, compression_level):
+        """`sox_io_backend.load` can load opus file correctly."""
+        ops_path = get_asset_path('io', f'{bitrate}_{compression_level}_{num_channels}ch.opus')
+        wav_path = self.get_temp_path(f'{bitrate}_{compression_level}_{num_channels}ch.opus.wav')
+        sox_utils.convert_audio_file(ops_path, wav_path)
+
+        expected, sample_rate = load_wav(wav_path)
+        found, sr = sox_io_backend.load(ops_path)
+
+        assert sample_rate == sr
+        self.assertEqual(expected, found)
 
 
 @skipIfNoExec('sox')
