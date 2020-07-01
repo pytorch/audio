@@ -247,7 +247,9 @@ def evaluate(
             for i in range(2):
                 output_print = output[i].ljust(print_length)[:print_length]
                 target_print = target[i].ljust(print_length)[:print_length]
-                logging.info(f"Epoch: {epoch}  Target: {target_print}   Output: {output_print}")
+                logging.info(
+                    f"Epoch: {epoch}  Target: {target_print}   Output: {output_print}"
+                )
 
             cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
             # cers_normalized = [d / len(a) for a, d in zip(target, cers)]
