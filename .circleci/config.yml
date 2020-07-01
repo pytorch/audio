@@ -38,17 +38,13 @@ commands:
               our_upload_channel=test
             fi
             echo "export UPLOAD_CHANNEL=${our_upload_channel}" >> ${BASH_ENV}
-  install_cmake_macos:
-    description: "installs cmake on macOS. Use binary distribution as brew is slow"
+  install_build_tools_macos:
+    description: "installs tools required to build torchaudio"
     steps:
       - run:
-          name: Install cmake
-          command: |
-            curl -L -o cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v3.16.5/cmake-3.16.5-Darwin-x86_64.tar.gz
-            mkdir cmake
-            tar -xf cmake.tar.gz --strip 3 -C cmake
-            rm cmake.tar.gz
-            echo 'export PATH='"${PWD}/cmake/bin"':${PATH}' >> ${BASH_ENV}
+          name: Install cmake and pkg-config
+          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install cmake pkg-config
+          # Disable brew auto update which is very slow
 
 binary_common: &binary_common
   parameters:
@@ -158,7 +154,7 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
-      - install_cmake_macos
+      - install_build_tools_macos
       - attach_workspace:
           at: third_party
       - run:
@@ -183,7 +179,7 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
-      - install_cmake_macos
+      - install_build_tools_macos
       - attach_workspace:
           at: third_party
       - run:
@@ -398,14 +394,14 @@ jobs:
       - restore_cache:
 
           keys:
-            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
@@ -440,14 +436,14 @@ jobs:
       - restore_cache:
 
           keys:
-            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda

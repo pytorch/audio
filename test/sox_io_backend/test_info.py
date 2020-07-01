@@ -8,6 +8,7 @@ from ..common_utils import (
     PytorchTestCase,
     skipIfNoExec,
     skipIfNoExtension,
+    get_asset_path,
 )
 from .common import (
     get_test_name
@@ -111,4 +112,20 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         info = sox_io_backend.info(path)
         assert info.get_sample_rate() == sample_rate
         assert info.get_num_frames() == sample_rate * duration
+        assert info.get_num_channels() == num_channels
+
+
+@skipIfNoExtension
+class TestInfoOpus(PytorchTestCase):
+    @parameterized.expand(list(itertools.product(
+        ['96k'],
+        [1, 2],
+        [0, 5, 10],
+    )), name_func=get_test_name)
+    def test_opus(self, bitrate, num_channels, compression_level):
+        """`sox_io_backend.info` can check opus file correcty"""
+        path = get_asset_path('io', f'{bitrate}_{compression_level}_{num_channels}ch.opus')
+        info = sox_io_backend.info(path)
+        assert info.get_sample_rate() == 48000
+        assert info.get_num_frames() == 32768
         assert info.get_num_channels() == num_channels
