@@ -58,6 +58,7 @@ RUN apt update && apt install -y \
         sox \
         libsox-dev \
         libsox-fmt-all \
+        cmake \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /kaldi /kaldi
 COPY --from=builder /third_party /third_party

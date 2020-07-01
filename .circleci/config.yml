@@ -38,6 +38,17 @@ commands:
               our_upload_channel=test
             fi
             echo "export UPLOAD_CHANNEL=${our_upload_channel}" >> ${BASH_ENV}
+  install_cmake_macos:
+    description: "installs cmake on macOS. Use binary distribution as brew is slow"
+    steps:
+      - run:
+          name: Install cmake
+          command: |
+            curl -L -o cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v3.16.5/cmake-3.16.5-Darwin-x86_64.tar.gz
+            mkdir cmake
+            tar -xf cmake.tar.gz --strip 3 -C cmake
+            rm cmake.tar.gz
+            echo 'export PATH='"${PWD}/cmake/bin"':${PATH}' >> ${BASH_ENV}
 
 binary_common: &binary_common
   parameters:
@@ -82,7 +93,7 @@ jobs:
 
   download_third_parties_nix:
     docker:
-      - image: "centos:8"
+      - image: "pytorch/torchaudio_unittest_base:manylinux"
     resource_class: small
     steps:
       - checkout
@@ -90,20 +101,22 @@ jobs:
       - restore_cache:
 
           keys:
-            - tp-nix-{{ checksum ".cachekey" }}-{{ checksum "./build_tools/setup_helpers/build_third_party.sh" }}-{{ checksum "./build_tools/setup_helpers/build_third_party_helper.sh" }}
+            - tp-nix-v2-{{ checksum ".cachekey" }}
 
       - run:
-          command: ./build_tools/setup_helpers/build_third_party.sh $PWD --download-only
+          command: |
+              mkdir -p third_party/archives/
+              wget --no-clobber --directory-prefix=third_party/archives/ $(awk '/URL /{print $2}' third_party/CMakeLists.txt)
       - save_cache:
 
-          key: tp-nix-{{ checksum ".cachekey" }}-{{ checksum "./build_tools/setup_helpers/build_third_party.sh" }}-{{ checksum "./build_tools/setup_helpers/build_third_party_helper.sh" }}
+          key: tp-nix-v2-{{ checksum ".cachekey" }}
 
           paths:
-            - third_party/tmp
+            - third_party/archives
       - persist_to_workspace:
           root: third_party
           paths:
-            - tmp
+            - archives
 
   binary_linux_wheel:
     <<: *binary_common
@@ -145,6 +158,7 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
+      - install_cmake_macos
       - attach_workspace:
           at: third_party
       - run:
@@ -169,6 +183,7 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
+      - install_cmake_macos
       - attach_workspace:
           at: third_party
       - run:
@@ -383,19 +398,21 @@ jobs:
       - restore_cache:
 
           keys:
-            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
             - env
             - third_party/build
+            - third_party/install
+            - third_party/src
       - run:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
@@ -423,19 +440,21 @@ jobs:
       - restore_cache:
 
           keys:
-            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
             - env
             - third_party/build
+            - third_party/install
+            - third_party/src
       - run:
           name: Install torchaudio
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
@@ -542,6 +561,8 @@ jobs:
             - conda
             - env
             - third_party/build
+            - third_party/install
+            - third_party/src
       - run:
           name: Run style check
           command: .circleci/unittest/linux/scripts/run_style_checks.sh
