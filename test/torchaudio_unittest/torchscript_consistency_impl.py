@@ -550,6 +550,7 @@ class TransformsWithComplexDtypes(common_utils.TestBaseMixin):
             tensor,
         )
 
+
 class Transforms(common_utils.TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
     def _assert_consistency(self, transform, tensor):
