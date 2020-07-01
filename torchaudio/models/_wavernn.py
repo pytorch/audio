@@ -1,9 +1,10 @@
 from typing import List
 
+import torch
 from torch import Tensor
 from torch import nn
 
-__all__ = ["_ResBlock", "_MelResNet", "_Stretch2d", "_UpsampleNetwork"]
+__all__ = ["_ResBlock", "_MelResNet", "_Stretch2d", "_UpsampleNetwork", "_WaveRNN"]
 
 
 class _ResBlock(nn.Module):
