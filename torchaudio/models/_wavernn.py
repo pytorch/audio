@@ -113,6 +113,7 @@ class _Stretch2d(nn.Module):
 
     def forward(self, specgram: Tensor) -> Tensor:
         r"""Pass the input through the _Stretch2d layer.
+
         Args:
             specgram (Tensor): the input sequence to the _Stretch2d layer (..., n_freq, n_time).
 
@@ -124,7 +125,7 @@ class _Stretch2d(nn.Module):
 
 
 class _UpsampleNetwork(nn.Module):
-    r"""Upscale the dimensions of a spectrogram to match waveform.
+    r"""Upscale the dimensions of a spectrogram.
 
     Args:
         upsample_scales: the list of upsample scales
@@ -172,12 +173,13 @@ class _UpsampleNetwork(nn.Module):
 
     def forward(self, specgram: Tensor) -> Tensor:
         r"""Pass the input through the _UpsampleNetwork layer.
+
         Args:
             specgram (Tensor): the input sequence to the _UpsampleNetwork layer (n_batch, n_freq, n_time)
 
         Return:
-            Tensor shape: (n_batch, (n_time - kernel_size + 1) * total_scale, n_freq),
-                          (n_batch, (n_time - kernel_size + 1) * total_scale, n_output)
+            Tensor shape: (n_batch, n_freq, (n_time - kernel_size + 1) * total_scale),
+                          (n_batch, n_output, (n_time - kernel_size + 1) * total_scale)
         where total_scale is the product of all elements in upsample_scales.
         """
 
@@ -189,4 +191,4 @@ class _UpsampleNetwork(nn.Module):
         upsampling_output = self.upsample_layers(specgram)
         upsampling_output = upsampling_output.squeeze(1)[:, :, self.indent:-self.indent]
 
-        return upsampling_output.transpose(1, 2), resnet_output.transpose(1, 2)
+        return upsampling_output, resnet_output

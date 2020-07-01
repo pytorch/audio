@@ -79,5 +79,5 @@ class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
         x = torch.rand(n_batch, n_freq, n_time)
         out1, out2 = model(x)
 
-        assert out1.size() == (n_batch, total_scale * (n_time - kernel_size + 1), n_freq)
-        assert out2.size() == (n_batch, total_scale * (n_time - kernel_size + 1), n_output)
+        assert out1.size() == (n_batch, n_freq, total_scale * (n_time - kernel_size + 1))
+        assert out2.size() == (n_batch, n_output, total_scale * (n_time - kernel_size + 1))
