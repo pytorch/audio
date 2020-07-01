@@ -26,3 +26,14 @@ class TestTransformsFloat32(Transforms, common_utils.PytorchTestCase):
 class TestTransformsFloat64(Transforms, common_utils.PytorchTestCase):
     dtype = torch.float64
     device = torch.device('cuda')
+
+@common_utils.skipIfNoCuda
+class TestTransformsCFloat(TransformsWithComplexDtypes, common_utils.PytorchTestCase):
+    dtype = torch.cfloat
+    device = torch.device('cuda')
+
+
+@common_utils.skipIfNoCuda
+class TestTransformsCDouble(TransformsWithComplexDtypes, common_utils.PytorchTestCase):
+    dtype = torch.cdouble
+    device = torch.device('cuda')
