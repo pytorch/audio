@@ -15,7 +15,7 @@ c10::intrusive_ptr<torchaudio::SignalInfo> get_info(const std::string& path) {
       /*encoding=*/nullptr,
       /*filetype=*/nullptr));
 
-  if (sf.get() == nullptr) {
+  if (static_cast<sox_format_t*>(sf) == nullptr) {
     throw std::runtime_error("Error opening audio file");
   }
 
@@ -52,7 +52,7 @@ c10::intrusive_ptr<TensorSignal> load_audio_file(
   const int64_t num_total_samples = sf->signal.length;
   const int64_t sample_start = sf->signal.channels * frame_offset;
 
-  if (sox_seek(sf.get(), sample_start, 0) == SOX_EOF) {
+  if (sox_seek(sf, sample_start, 0) == SOX_EOF) {
     throw std::runtime_error("Error reading audio file: offset past EOF.");
   }
 
@@ -79,7 +79,7 @@ c10::intrusive_ptr<TensorSignal> load_audio_file(
   // Read samples into buffer
   std::vector<sox_sample_t> buffer;
   buffer.reserve(max_samples);
-  const int64_t num_samples = sox_read(sf.get(), buffer.data(), max_samples);
+  const int64_t num_samples = sox_read(sf, buffer.data(), max_samples);
   if (num_samples == 0) {
     throw std::runtime_error(
         "Error reading audio file: empty file or read operation failed.");
@@ -98,6 +98,52 @@ c10::intrusive_ptr<TensorSignal> load_audio_file(
 
   return c10::make_intrusive<TensorSignal>(
       tensor, static_cast<int64_t>(sf->signal.rate), channels_first);
+}
+
+void save_audio_file(
+    const std::string& file_name,
+    const c10::intrusive_ptr<TensorSignal>& signal,
+    const double compression,
+    const int64_t frames_per_chunk) {
+  const auto tensor = signal->getTensor();
+  const auto sample_rate = signal->getSampleRate();
+  const auto channels_first = signal->getChannelsFirst();
+
+  validate_input_tensor(tensor);
+
+  const auto filetype = get_filetype(file_name);
+  const auto signal_info =
+      get_signalinfo(tensor, sample_rate, channels_first, filetype);
+  const auto encoding_info =
+      get_encodinginfo(filetype, tensor.dtype(), compression);
+
+  SoxFormat sf(sox_open_write(
+      file_name.c_str(),
+      &signal_info,
+      &encoding_info,
+      /*filetype=*/filetype.c_str(),
+      /*oob=*/nullptr,
+      /*overwrite_permitted=*/nullptr));
+
+  if (static_cast<sox_format_t*>(sf) == nullptr) {
+    throw std::runtime_error("Error saving audio file: failed to open file.");
+  }
+
+  auto tensor_ = tensor;
+  if (channels_first) {
+    tensor_ = tensor_.t();
+  }
+
+  for (int64_t i = 0; i < tensor_.size(0); i += frames_per_chunk) {
+    auto chunk = tensor_.index({Slice(i, i + frames_per_chunk), Slice()});
+    chunk = unnormalize_wav(chunk).contiguous();
+
+    const size_t numel = chunk.numel();
+    if (sox_write(sf, chunk.data_ptr<int32_t>(), numel) != numel) {
+      throw std::runtime_error(
+          "Error saving audio file: failed to write the entier buffer.");
+    }
+  }
 }
 
 } // namespace sox_io

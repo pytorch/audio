@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 import torch
 from torchaudio._internal import (
@@ -25,12 +25,7 @@ def load(
     This function can handle all the codecs that underlying libsox can handle, however note the
     followings.
 
-    Note 1:
-        Current torchaudio's binary release only contains codecs for MP3, FLAC and OGG/VORBIS.
-        If you need other formats, you need to build torchaudio from source with libsox and
-        the corresponding codecs. Refer to README for this.
-
-    Note 2:
+    Note:
         This function is tested on the following formats;
          - WAV
             - 32-bit floating-point
@@ -75,6 +70,60 @@ def load(
     signal = torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first)
     return signal.get_tensor(), signal.get_sample_rate()
+
+
+@_mod_utils.requires_module('torchaudio._torchaudio')
+def save(
+        filepath: str,
+        tensor: torch.Tensor,
+        sample_rate: int,
+        channels_first: bool = True,
+        compression: Optional[float] = None,
+        frames_per_chunk: int = 65536,
+):
+    """Save audio data to file.
+
+    Supported formats are;
+     - WAV
+        - 32-bit floating-point
+        - 32-bit signed integer
+        - 16-bit signed integer
+        -  8-bit unsigned integer
+     - MP3
+     - FLAC
+     - OGG/VORBIS
+
+    Args:
+        filepath: Path to save file.
+        tensor: Audio data to save. must be 2D tensor.
+        sample_rate: sampling rate
+        channels_first: If True, the given tensor is interpreted as ``[channel, time]``.
+        compression: Used for formats other than WAV. This corresponds to ``-C`` option
+            of ``sox`` command.
+            See the detail at http://sox.sourceforge.net/soxformat.html.
+            - MP3: Either bitrate [kbps] with quality factor, such as ``128.2`` or
+                VBR encoding with quality factor such as ``-4.2``. Default: ``-4.5``
+            - FLAC: compression level. Whole number from ``0`` to ``8``.
+                ``8`` is default and highest compression.
+            - OGG/VORBIS: number from -1 to 10; -1 is the highest compression and lowest
+                quality. Default: ``3``.
+        frames_per_chunk: The number of frames to process (convert to ``int32`` internally
+            then write to file) at a time.
+    """
+    if compression is None:
+        ext = str(filepath)[-3:].lower()
+        if ext == 'wav':
+            compression = 0.
+        elif ext == 'mp3':
+            compression = -4.5
+        elif ext == 'flac':
+            compression = 8.
+        elif ext in ['ogg', 'vorbis']:
+            compression = 3.
+        else:
+            raise RuntimeError(f'Unsupported file type: "{ext}"')
+    signal = torch.classes.torchaudio.TensorSignal(tensor, sample_rate, channels_first)
+    torch.ops.torchaudio.sox_io_save_audio_file(filepath, signal, compression, frames_per_chunk)
 
 
 load_wav = load

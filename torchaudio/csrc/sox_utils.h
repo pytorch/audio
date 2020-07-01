@@ -31,7 +31,7 @@ struct SoxFormat {
   SoxFormat& operator=(SoxFormat&& other) = delete;
   ~SoxFormat();
   sox_format_t* operator->() const noexcept;
-  sox_format_t* get() const noexcept;
+  operator sox_format_t*() const noexcept;
 
  private:
   sox_format_t* fd_;
@@ -40,6 +40,10 @@ struct SoxFormat {
 ///
 /// Verify that input file is found, has known encoding, and not empty
 void validate_input_file(const SoxFormat& sf);
+
+///
+/// Verify that input Tensor is 2D, CPU and either uin8, int16, int32 or float32
+void validate_input_tensor(const torch::Tensor);
 
 ///
 /// Get target dtype for the given encoding and precision.
@@ -69,6 +73,27 @@ torch::Tensor convert_to_tensor(
     const caffe2::TypeMeta dtype,
     const bool normalize,
     const bool channels_first);
+
+///
+/// Convert float32/int32/int16/uint8 Tensor to int32 for Torch -> Sox
+/// conversion.
+torch::Tensor unnormalize_wav(const torch::Tensor);
+
+/// Extract extension from file path
+const std::string get_filetype(const std::string path);
+
+/// Get sox_signalinfo_t for passing a torch::Tensor object.
+sox_signalinfo_t get_signalinfo(
+    const torch::Tensor& tensor,
+    const int64_t sample_rate,
+    const bool channels_first,
+    const std::string filetype);
+
+/// Get sox_encofinginfo_t for saving audoi file
+sox_encodinginfo_t get_encodinginfo(
+    const std::string filetype,
+    const caffe2::TypeMeta dtype,
+    const double compression);
 
 } // namespace sox_utils
 } // namespace torchaudio

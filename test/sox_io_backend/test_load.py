@@ -24,7 +24,7 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
 
         Wav data loaded with sox_io backend should match those with scipy
         """
-        path = self.get_temp_path(f'{dtype}_{sample_rate}_{num_channels}_{normalize}.wav')
+        path = self.get_temp_path('reference.wav')
         data = get_wav_data(dtype, num_channels, normalize=normalize, num_frames=duration * sample_rate)
         save_wav(path, data, sample_rate)
         expected = load_wav(path, normalize=normalize)[0]
@@ -58,8 +58,8 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
         By combining i & ii, step 2. and 4. allows to load reference mp3 data
         without using torchaudio
         """
-        path = self.get_temp_path(f'{sample_rate}_{num_channels}_{bit_rate}_{duration}.mp3')
-        ref_path = f'{path}.wav'
+        path = self.get_temp_path('1.original.mp3')
+        ref_path = self.get_temp_path('2.reference.wav')
 
         # 1. Generate mp3 with sox
         sox_utils.gen_audio_file(
@@ -80,8 +80,8 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
 
         This test takes the same strategy as mp3 to compare the result
         """
-        path = self.get_temp_path(f'{sample_rate}_{num_channels}_{compression_level}_{duration}.flac')
-        ref_path = f'{path}.wav'
+        path = self.get_temp_path('1.original.flac')
+        ref_path = self.get_temp_path('2.reference.wav')
 
         # 1. Generate flac with sox
         sox_utils.gen_audio_file(
@@ -102,8 +102,8 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
 
         This test takes the same strategy as mp3 to compare the result
         """
-        path = self.get_temp_path(f'{sample_rate}_{num_channels}_{quality_level}_{duration}.vorbis')
-        ref_path = f'{path}.wav'
+        path = self.get_temp_path('1.original.vorbis')
+        ref_path = self.get_temp_path('2.reference.wav')
 
         # 1. Generate vorbis with sox
         sox_utils.gen_audio_file(

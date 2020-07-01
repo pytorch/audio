@@ -31,7 +31,16 @@ def gen_audio_file(
             'Use get_wav_data and save_wav to generate wav file for accurate result.')
     command = [
         'sox',
-        '-V',  # verbose
+        '-V3',  # verbose
+        '-R',
+        # -R is supposed to be repeatable, though the implementation looks suspicious
+        # and not setting the seed to a fixed value.
+        # https://fossies.org/dox/sox-14.4.2/sox_8c_source.html
+        # search "sox_globals.repeatable"
+    ]
+    if bit_depth is not None:
+        command += ['--bits', str(bit_depth)]
+    command += [
         '--rate', str(sample_rate),
         '--null',  # no input
         '--channels', str(num_channels),
@@ -60,7 +69,7 @@ def convert_audio_file(
         src_path, dst_path,
         *, bit_depth=None, compression=None):
     """Convert audio file with `sox` command."""
-    command = ['sox', '-V', str(src_path)]
+    command = ['sox', '-V3', '-R', str(src_path)]
     if bit_depth is not None:
         command += ['--bits', str(bit_depth)]
     if compression is not None:
