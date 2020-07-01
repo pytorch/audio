@@ -585,7 +585,7 @@ class Transforms(common_utils.TestBaseMixin):
         n_freq = 400
         hop_length = 512
         fixed_rate = 1.3
-        tensor = torch.rand((10, 2, n_freq, 10, 2))
+        tensor = torch.rand((10, 2, n_freq, 10), dtype=torch.cdouble)
         self._assert_consistency(
             T.TimeStretch(n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate),
             tensor,
