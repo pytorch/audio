@@ -288,8 +288,8 @@ class _WaveRNN(nn.Module):
         h1 = torch.zeros(1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device)
         h2 = torch.zeros(1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device)
         mels, aux = self.upsample(specgram)
-        mels = mels.transpose()
-        aux = aux.transpose()
+        mels = mels.transpose(1, 2)
+        aux = aux.transpose(1, 2)
 
         aux_idx = [self.n_aux * i for i in range(5)]
         a1 = aux[:, :, aux_idx[0]:aux_idx[1]]
