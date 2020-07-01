@@ -484,7 +484,7 @@ def phase_vocoder(
                               complex_specgrams.size(-1),
                               rate,
                               device=complex_specgrams.device,
-                              dtype=complex_specgrams.real.dtype)
+                              dtype=torch.real(complex_specgrams).dtype)
 
     alphas = time_steps % 1.0
     phase_0 = complex_specgrams[..., :1].angle()
