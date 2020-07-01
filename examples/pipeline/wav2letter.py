@@ -13,7 +13,6 @@ from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator, diskcache_iterator
 from torchaudio.models.wav2letter import Wav2Letter
 from torchaudio.transforms import MFCC, Resample
-from tqdm import tqdm
 
 from ctc_decoders import GreedyDecoder, ViterbiDecoder
 from datasets import collate_factory, datasets_librispeech
@@ -146,14 +145,16 @@ def model_length_function(tensor):
 
 
 def train_one_epoch(
-    model, criterion, optimizer, scheduler, data_loader, device, pbar=None,
+    model, criterion, optimizer, scheduler, data_loader, device, epoch,
 ):
 
     model.train()
 
     sums = defaultdict(lambda: 0.0)
 
-    metric = MetricLogger("train_iteration")
+    metric_iteration = MetricLogger("train_iteration")
+    metric_iteration["epoch"] = epoch
+    metric_epoch = MetricLogger("train_epoch")
 
     for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
         data_loader, maxsize=2
@@ -174,7 +175,7 @@ def train_one_epoch(
         loss = criterion(outputs, targets, tensors_lengths, target_lengths)
         loss_item = loss.item()
         sums["loss"] += loss_item
-        metric("loss", loss_item)
+        metric_iteration("loss", loss_item)
 
         optimizer.zero_grad()
         loss.backward()
@@ -184,42 +185,35 @@ def train_one_epoch(
                 model.parameters(), args.clip_grad
             )
             sums["gradient"] += gradient
-            metric("gradient", gradient)
+            metric_iteration("gradient", gradient)
 
         optimizer.step()
 
-        if pbar is not None:
-            pbar.update(1 / len(data_loader))
-            metric("n", pbar.n)
-
-        metric.print()
-
-    metric = MetricLogger("train_epoch")
-    if pbar is not None:
-        metric("n", pbar.n)
+        metric_iteration("iteration", sums["iteration"])
+        metric_iteration.print()
+        sums["iteration"] += 1
 
     avg_loss = sums["loss"] / len(data_loader)
-    metric("loss", avg_loss)
 
+    metric_epoch("epoch", epoch)
+    metric_epoch("loss", avg_loss)
     if "gradient" in sums:
-        avg_gradient = sums["gradient"] / len(data_loader)
-        metric("gradient", avg_gradient)
-
-    metric("lr", scheduler.get_last_lr())
-    metric.print()
+        metric_epoch("gradient", sums["gradient"] / len(data_loader))
+    metric_epoch("lr", scheduler.get_last_lr()[0])
+    metric_epoch.print()
 
     scheduler.step()
 
 
 def evaluate(
-    model, criterion, data_loader, decoder, language_model, device, pbar=None,
+    model, criterion, data_loader, decoder, language_model, device, epoch,
 ):
 
     with torch.no_grad():
 
         model.eval()
-
         sums = defaultdict(lambda: 0.0)
+        metric = MetricLogger("validation")
 
         for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
             data_loader, maxsize=2
@@ -239,10 +233,9 @@ def evaluate(
             # input_lengths: batch size
             # target_lengths: batch size
 
-            loss_item = criterion(
+            sums["loss"] += criterion(
                 outputs, targets, tensors_lengths, target_lengths
             ).item()
-            sums["loss"] += loss_item
 
             output = outputs.transpose(0, 1).to("cpu")
             output = decoder(output)
@@ -254,7 +247,7 @@ def evaluate(
             for i in range(2):
                 output_print = output[i].ljust(print_length)[:print_length]
                 target_print = target[i].ljust(print_length)[:print_length]
-                logging.info(f"Target: {target_print}   Output: {output_print}")
+                logging.info(f"Epoch: {epoch}  Target: {target_print}   Output: {output_print}")
 
             cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
             # cers_normalized = [d / len(a) for a, d in zip(target, cers)]
@@ -277,7 +270,7 @@ def evaluate(
 
         avg_loss = sums["loss"] / len(data_loader)
 
-        metric = MetricLogger("validation")
+        metric("epoch", epoch)
         metric("loss", avg_loss)
         metric("cer", sums["cer"])
         metric("wer", sums["wer"])
@@ -288,8 +281,6 @@ def evaluate(
         metric("target length", sums["total_chars"])
         metric("target length", sums["total_words"])
         metric("dataset length", sums["length_dataset"])
-        if pbar is not None:
-            metric("n", pbar.n)
         metric.print()
 
         return avg_loss
@@ -475,46 +466,38 @@ def main(args, rank=0):
     if args.distributed:
         torch.distributed.barrier()
 
-    with tqdm(total=args.epochs, unit_scale=1, disable=not args.progress_bar) as pbar:
+    for epoch in range(args.start_epoch, args.epochs):
 
-        for epoch in range(args.start_epoch, args.epochs):
+        train_one_epoch(
+            model, criterion, optimizer, scheduler, loader_training, devices[0], epoch,
+        )
 
-            train_one_epoch(
+        if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
+
+            sum_loss = evaluate(
                 model,
                 criterion,
-                optimizer,
-                scheduler,
-                loader_training,
+                loader_validation,
+                decoder,
+                language_model,
                 devices[0],
-                pbar=pbar,
+                epoch,
             )
 
-            if not epoch % args.print_freq or epoch == args.epochs - 1:
-
-                sum_loss = evaluate(
-                    model,
-                    criterion,
-                    loader_validation,
-                    decoder,
-                    language_model,
-                    devices[0],
-                    pbar=pbar,
-                )
-
-                is_best = sum_loss < best_loss
-                best_loss = min(sum_loss, best_loss)
-                save_checkpoint(
-                    {
-                        "epoch": epoch + 1,
-                        "state_dict": model.state_dict(),
-                        "best_loss": best_loss,
-                        "optimizer": optimizer.state_dict(),
-                        "scheduler": scheduler.state_dict(),
-                    },
-                    is_best,
-                    args.checkpoint,
-                    rank,
-                )
+            is_best = sum_loss < best_loss
+            best_loss = min(sum_loss, best_loss)
+            save_checkpoint(
+                {
+                    "epoch": epoch + 1,
+                    "state_dict": model.state_dict(),
+                    "best_loss": best_loss,
+                    "optimizer": optimizer.state_dict(),
+                    "scheduler": scheduler.state_dict(),
+                },
+                is_best,
+                args.checkpoint,
+                rank,
+            )
 
     logging.info(f"End time: {datetime.now()}")
 
