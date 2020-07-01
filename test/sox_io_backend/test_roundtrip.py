@@ -8,10 +8,10 @@ from ..common_utils import (
     PytorchTestCase,
     skipIfNoExec,
     skipIfNoExtension,
+    get_wav_data,
 )
 from .common import (
-    get_test_name,
-    get_wav_data,
+    name_func,
 )
 
 
@@ -23,7 +23,7 @@ class TestRoundTripIO(TempDirMixin, PytorchTestCase):
         ['float32', 'int32', 'int16', 'uint8'],
         [8000, 16000],
         [1, 2],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_wav(self, dtype, sample_rate, num_channels):
         """save/load round trip should not degrade data for wav formats"""
         original = get_wav_data(dtype, num_channels, normalize=False)
@@ -39,7 +39,7 @@ class TestRoundTripIO(TempDirMixin, PytorchTestCase):
         [8000, 16000],
         [1, 2],
         list(range(9)),
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_flac(self, sample_rate, num_channels, compression_level):
         """save/load round trip should not degrade data for flac formats"""
         original = get_wav_data('float32', num_channels)

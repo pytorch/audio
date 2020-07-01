@@ -204,7 +204,7 @@ class TestSave(SaveTestBase):
         [8000, 16000],
         [1, 2],
         [-4.2, -0.2, 0, 0.2, 96, 128, 160, 192, 224, 256, 320],
-    )), name_func=get_test_name)
+    )), name_func=name_func)
     def test_mp3(self, sample_rate, num_channels, bit_rate):
         """`sox_io_backend.save` can save mp3 format."""
         self.assert_mp3(sample_rate, num_channels, bit_rate, duration=1)
