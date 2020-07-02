@@ -4,6 +4,7 @@ import os
 import string
 from collections import defaultdict
 from datetime import datetime
+from time import time
 
 import torch
 import torchaudio
@@ -151,15 +152,16 @@ def train_one_epoch(
     model.train()
 
     sums = defaultdict(lambda: 0.0)
+    start1 = time()
 
-    metric_iteration = MetricLogger("train_iteration")
-    metric_iteration["epoch"] = epoch
-    metric_epoch = MetricLogger("train_epoch")
+    metric = MetricLogger("train_iteration")
+    metric["epoch"] = epoch
 
     for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
         data_loader, maxsize=2
     ):
 
+        start2 = time()
         inputs = inputs.to(device, non_blocking=True)
         targets = targets.to(device, non_blocking=True)
 
@@ -175,7 +177,7 @@ def train_one_epoch(
         loss = criterion(outputs, targets, tensors_lengths, target_lengths)
         loss_item = loss.item()
         sums["loss"] += loss_item
-        metric_iteration("loss", loss_item)
+        metric("loss", loss_item)
 
         optimizer.zero_grad()
         loss.backward()
@@ -185,22 +187,25 @@ def train_one_epoch(
                 model.parameters(), args.clip_grad
             )
             sums["gradient"] += gradient
-            metric_iteration("gradient", gradient)
+            metric("gradient", gradient)
 
         optimizer.step()
 
-        metric_iteration("iteration", sums["iteration"])
-        metric_iteration.print()
+        metric("iteration", sums["iteration"])
+        metric("time", time() - start2)
+        metric.print()
         sums["iteration"] += 1
 
     avg_loss = sums["loss"] / len(data_loader)
 
-    metric_epoch("epoch", epoch)
-    metric_epoch("loss", avg_loss)
+    metric = MetricLogger("train_epoch")
+    metric("epoch", epoch)
+    metric("loss", avg_loss)
     if "gradient" in sums:
-        metric_epoch("gradient", sums["gradient"] / len(data_loader))
-    metric_epoch("lr", scheduler.get_last_lr()[0])
-    metric_epoch.print()
+        metric("gradient", sums["gradient"] / len(data_loader))
+    metric("lr", scheduler.get_last_lr()[0])
+    metric("time", time() - start1)
+    metric.print()
 
     scheduler.step()
 
@@ -213,7 +218,7 @@ def evaluate(
 
         model.eval()
         sums = defaultdict(lambda: 0.0)
-        metric = MetricLogger("validation")
+        start = time()
 
         for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
             data_loader, maxsize=2
@@ -272,6 +277,7 @@ def evaluate(
 
         avg_loss = sums["loss"] / len(data_loader)
 
+        metric = MetricLogger("validation")
         metric("epoch", epoch)
         metric("loss", avg_loss)
         metric("cer", sums["cer"])
@@ -283,6 +289,7 @@ def evaluate(
         metric("target length", sums["total_chars"])
         metric("target length", sums["total_words"])
         metric("dataset length", sums["length_dataset"])
+        metric("time", time() - start)
         metric.print()
 
         return avg_loss

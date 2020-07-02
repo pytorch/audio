@@ -1,29 +1,22 @@
 import logging
 import os
 import shutil
-import time
 from collections import defaultdict, deque
 
 import torch
 
 
 class MetricLogger:
-    def __init__(self, group, print_freq=1, time_key="_time"):
+    def __init__(self, group, print_freq=1):
         self.print_freq = print_freq
-        self.time_key = time_key
+        self._iter = 0
         self.data = defaultdict(lambda: deque(maxlen=self.print_freq))
         self.data["group"].append(group)
-        self._iter = 0
-        self._start = time.time()
 
     def __call__(self, key, value):
         self.data[key].append(value)
 
     def _get_last(self):
-        if self.time_key is not None:
-            stop = time.time()
-            self(self.time_key, stop - self._start)
-            self._start = stop
         return {k: v[-1] for k, v in self.data.items()}
 
     def __str__(self):
