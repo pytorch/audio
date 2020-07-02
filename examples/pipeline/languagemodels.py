@@ -24,7 +24,7 @@ class LanguageModel:
             return [self.mapping[i] + self.mapping[self.char_blank] for i in iterable]
 
     def decode(self, tensor):
-        if isinstance(tensor[0], list):
+        if len(tensor) > 0 and isinstance(tensor[0], list):
             return [self.decode(t) for t in tensor]
         else:
             # not idempotent, since clean string
