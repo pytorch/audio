@@ -155,7 +155,7 @@ def train_one_epoch(
     start1 = time()
 
     metric = MetricLogger("train_iteration")
-    metric["epoch"] = epoch
+    metric("epoch", epoch)
 
     for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
         data_loader, maxsize=2
