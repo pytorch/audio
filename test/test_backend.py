@@ -1,5 +1,3 @@
-import unittest
-
 import torchaudio
 
 from . import common_utils
@@ -31,6 +29,12 @@ class TestBackendSwitch_NoBackend(BackendSwitchMixin, common_utils.TorchaudioTes
 class TestBackendSwitch_SoX(BackendSwitchMixin, common_utils.TorchaudioTestCase):
     backend = 'sox'
     backend_module = torchaudio.backend.sox_backend
+
+
+@common_utils.skipIfNoExtension
+class TestBackendSwitch_SoXIO(BackendSwitchMixin, common_utils.TorchaudioTestCase):
+    backend = 'sox_io'
+    backend_module = torchaudio.backend.sox_io_backend
 
 
 @common_utils.skipIfNoModule('soundfile')
