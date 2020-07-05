@@ -198,8 +198,8 @@ class _UpsampleNetwork(nn.Module):
 class _WaveRNN(nn.Module):
     r"""WaveRNN model based on "Efficient Neural Audio Synthesis".
 
-    The paper link is https://arxiv.org/pdf/1802.08435.pdf. The input channels of waveform
-    and spectrogram have to be 1. The product of upsample_scales must equal hop_length.
+    The paper link is `<https://arxiv.org/pdf/1802.08435.pdf>`_. The input channels of waveform
+    and spectrogram have to be 1. The product of `upsample_scales` must equal `hop_length`.
 
     Args:
         upsample_scales: the list of upsample scales
@@ -217,11 +217,12 @@ class _WaveRNN(nn.Module):
 
     Examples
         >>> wavernn = _waveRNN(upsample_scales=[5,5,8], n_bits=9, sample_rate=24000, hop_length=200)
-        >>> waveform, sample_rate = torchaudio.load(file)  # waveform shape:
-        >>> (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length)
+        >>> waveform, sample_rate = torchaudio.load(file)
+        >>> # waveform shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length)
         >>> specgram = MelSpectrogram(sample_rate)(waveform)  # shape: (n_batch, n_channel, n_freq, n_time)
-        >>> output = wavernn(waveform.squeeze(1), specgram.squeeze(1))  # shape:
-        >>> (n_batch, (n_time - kernel_size + 1) * hop_length, 2 ** n_bits)
+        >>> output = wavernn(waveform.squeeze(1), specgram.squeeze(1))
+        >>> # output shape in 'waveform' mode: (n_batch, (n_time - kernel_size + 1) * hop_length, 2 ** n_bits)
+        >>> # output shape in 'mol' mode: (n_batch, (n_time - kernel_size + 1) * hop_length, 30)
     """
 
     def __init__(self,
@@ -287,8 +288,11 @@ class _WaveRNN(nn.Module):
         batch_size = waveform.size(0)
         h1 = torch.zeros(1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device)
         h2 = torch.zeros(1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device)
-        mels, aux = self.upsample(specgram)
-        mels = mels.transpose(1, 2)
+        # output of upsample:
+        # specgram: (n_batch, n_freq, (n_time - kernel_size + 1) * total_scale)
+        # aux: (n_batch, n_output, (n_time - kernel_size + 1) * total_scale)
+        specgram, aux = self.upsample(specgram)
+        specgram = specgram.transpose(1, 2)
         aux = aux.transpose(1, 2)
 
         aux_idx = [self.n_aux * i for i in range(5)]
@@ -297,21 +301,23 @@ class _WaveRNN(nn.Module):
         a3 = aux[:, :, aux_idx[2]:aux_idx[3]]
         a4 = aux[:, :, aux_idx[3]:aux_idx[4]]
 
-        x = torch.cat([waveform.unsqueeze(-1), mels, a1], dim=2)
+        x = torch.cat([waveform.unsqueeze(-1), specgram, a1], dim=-1)
         x = self.fc(x)
         res = x
         x, _ = self.rnn1(x, h1)
 
         x = x + res
         res = x
-        x = torch.cat([x, a2], dim=2)
+        x = torch.cat([x, a2], dim=-1)
         x, _ = self.rnn2(x, h2)
 
         x = x + res
-        x = torch.cat([x, a3], dim=2)
-        x = self.relu1(self.fc1(x))
+        x = torch.cat([x, a3], dim=-1)
+        x = self.fc1(x)
+        x = self.relu1(x)
 
-        x = torch.cat([x, a4], dim=2)
-        x = self.relu2(self.fc2(x))
+        x = torch.cat([x, a4], dim=-1)
+        x = self.fc2(x)
+        x = self.relu2(x)
 
         return self.fc3(x)
