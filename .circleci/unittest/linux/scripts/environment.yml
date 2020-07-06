@@ -14,4 +14,3 @@ dependencies:
     - kaldi-io
     - scipy
     - parameterized
-    - numba==0.48
