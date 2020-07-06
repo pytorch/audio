@@ -121,3 +121,9 @@ gen.yml
 examples/interactive_asr/data/*.txt
 examples/interactive_asr/data/*.model
 examples/interactive_asr/data/*.pt
+
+# third parties
+third_party/archives/
+third_party/install/
+third_party/src/
+third_party/tmp/
