@@ -12,7 +12,7 @@ import torchaudio
 from transform import Transform
 from datasets import datasets_ljspeech, collate_factory
 from typing import List
-from model import _WaveRNN
+from torchaudio.models import _WaveRNN
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
