@@ -59,13 +59,13 @@ waveform, sample_rate = common_utils.load_wav(filepath)
 Code:
 
 ```python
- waveform = common_utils.get_sinusoid(
-     frequency=300,
-     sample_rate=16000,
-     duration=1,  # seconds
-    n_channels=1,
-    dtype="float32",
-    device="cpu",
+waveform = common_utils.get_sinusoid(
+	frequency=300,
+	sample_rate=16000,
+	duration=1,  # seconds
+	n_channels=1,
+	dtype="float32",
+	device="cpu",
 )
 ```
 
@@ -96,11 +96,6 @@ Files:
 * `waves_yesno/0_1_0_1_0_1_1_0.wav`
 * `vad-go-stereo-44100.wav`
 * `vad-go-mono-32000.wav`
-
-#### Other
-
-* `kaldi_file.wav`
-* `kaldi_file_8000.wav`
 
 ## Adding test
 
