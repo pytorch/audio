@@ -299,8 +299,6 @@ class TestIstft(common_utils.TorchaudioTestCase):
 
 
 class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
-    backend = 'default'
-
     def test_pitch(self):
         test_filepath_100 = common_utils.get_asset_path("100Hz_44100Hz_16bit_05sec.wav")
         test_filepath_440 = common_utils.get_asset_path("440Hz_44100Hz_16bit_05sec.wav")
@@ -312,7 +310,7 @@ class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
         ]
 
         for filename, freq_ref in tests:
-            waveform, sample_rate = torchaudio.load(filename)
+            waveform, sample_rate = common_utils.load_wav(filename)
 
             freq = torchaudio.functional.detect_pitch_frequency(waveform, sample_rate)
 
