@@ -8,9 +8,11 @@ dependencies:
   - pytest-cov
   - codecov
   - librosa
+  - llvmlite==0.31
   - pip
   - pip:
     - clang-format
     - kaldi-io
     - scipy
     - parameterized
+    - numba==0.48
