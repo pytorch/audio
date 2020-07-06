@@ -28,8 +28,7 @@ class ProcessedLJSPEECH(LJSPEECH):
         waveform = self.transforms.load(file)
         specgram = self.transforms.melspectrogram(waveform)
 
-        # waveform: [0, 2**bits-1] in all cases.
-        # It is better than [-1, 1] in all cases because of mulaw-encode.
+        # waveform and spectrogram: [0, 2**bits-1].
         if self.mode == 'waveform':
             waveform = self.transforms.mulaw_encode(waveform, 2**self.n_bits) if self.mulaw \
                 else float_2_int(waveform, self.n_bits)

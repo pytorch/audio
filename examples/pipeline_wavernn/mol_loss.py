@@ -1,13 +1,6 @@
 import torch
 import torch.nn.functional as F
 
-# Adapted from wavenet vocoder:
-# https://github.com/r9y9/wavenet_vocoder/blob/master/wavenet_vocoder/mixture.py
-# Explain mol loss:
-# https://github.com/Rayhane-mamah/Tacotron-2/issues/155
-
-# Remove numpy dependency
-
 
 def log_sum_exp(x):
     """ numerically stable log_sum_exp implementation that prevents overflow """
@@ -18,12 +11,28 @@ def log_sum_exp(x):
     return m + torch.log(torch.sum(torch.exp(x - m2), dim=axis))
 
 
-def LossFn_Mol(y_hat, y, num_classes=65536, log_scale_min=None, reduce=True):
-    """ calculate the loss of mol mode"""
+def Mol_Loss(y_hat, y, num_classes=65536, log_scale_min=None, reduce=True):
+    """ Discretized mixture of logistic distributions loss
 
-    min_value = -32.23619130191664  # = float(np.log(1e-14))
+    Adapted from wavenet vocoder:
+    https://github.com/r9y9/wavenet_vocoder/blob/master/wavenet_vocoder/mixture.py
+    Explanation of `mol` loss:
+    https://github.com/Rayhane-mamah/Tacotron-2/issues/155
+    It is assumed that input is scaled to [-1, 1].
+
+    Args:
+        y_hat (Tensor): Predicted output (n_batch x n_time x n_channel)
+        y (Tensor): Target (n_batch x n_time x 1).
+        num_classes (int): Number of classes
+        log_scale_min (float): Log scale minimum value
+        reduce (bool): If True, the losses are averaged or summed for each minibatch.
+
+    Returns
+        Tensor: loss
+    """
+
     if log_scale_min is None:
-        log_scale_min = min_value
+        log_scale_min = torch.log(torch.as_tensor(1e-14)).item()
 
     assert y_hat.dim() == 3
     assert y_hat.size(-1) % 3 == 0
@@ -63,10 +72,9 @@ def LossFn_Mol(y_hat, y, num_classes=65536, log_scale_min=None, reduce=True):
 
     inner_inner_cond = (cdf_delta > 1e-5).float()
 
-    tmp = 10.397192449493701  # = np.log((num_classes - 1) / 2)
     inner_inner_out = inner_inner_cond * \
         torch.log(torch.clamp(cdf_delta, min=1e-12)) + \
-        (1. - inner_inner_cond) * (log_pdf_mid - tmp)
+        (1. - inner_inner_cond) * (log_pdf_mid - torch.log(torch.as_tensor((num_classes - 1) / 2)).item())
     inner_cond = (y > 0.999).float()
     inner_out = inner_cond * log_one_minus_cdf_min + (1. - inner_cond) * inner_inner_out
     cond = (y < -0.999).float()

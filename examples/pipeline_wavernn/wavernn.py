@@ -1,8 +1,10 @@
 import argparse
+import logging
 import os
-import shutil
+import signal
 from collections import defaultdict
 from datetime import datetime
+from time import time
 
 import torch
 import torch.nn as nn
@@ -10,34 +12,37 @@ import torchaudio
 from transform import Transform
 from datasets import datasets_ljspeech, collate_factory
 from typing import List
-from torchaudio.models import _WaveRNN
+from model import _WaveRNN
 from torch.utils.data import DataLoader
+from torchaudio.datasets.utils import bg_iterator
+from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.optim import Adam
-from tqdm import tqdm
-from loss_mol import LossFn_Mol
+from mol_loss import Mol_Loss
+from utils import MetricLogger, count_parameters, save_checkpoint
+
+SIGNAL_RECEIVED = False
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    # training parameters
     parser.add_argument(
         "--workers",
-        default=8,
+        default=4,
         type=int,
         metavar="N",
         help="number of data loading workers",
     )
     parser.add_argument(
         "--checkpoint",
-        default="checkpoint.pth.par",
+        default="checkpoint.pth.tar",
         type=str,
         metavar="FILE",
         help="filename to latest checkpoint",
     )
     parser.add_argument(
         "--epochs",
-        default=2000,
+        default=3000,
         type=int,
         metavar="N",
         help="number of total epochs to run",
@@ -58,7 +63,7 @@ def parse_args():
     )
     parser.add_argument(
         "--batch-size",
-        default=32,
+        default=256,
         type=int,
         metavar="N",
         help="mini-batch size"
@@ -81,45 +86,80 @@ def parse_args():
         "--adam-beta1",
         default=0.9,
         type=float,
-        metavar="BETA1",
+        metavar="AD1",
         help="adam_beta1"
     )
     parser.add_argument(
         "--adam-beta2",
         default=0.999,
         type=float,
-        metavar="BETA2",
+        metavar="AD2",
         help="adam_beta2"
     )
     parser.add_argument(
         "--eps",
-        default=1e-8,
-        type=float,
         metavar="EPS",
-        help="eps")
+        type=float,
+        default=1e-8
+    )
     parser.add_argument(
         "--clip-norm",
         metavar="NORM",
         type=float,
-        default=4.0,
-        help="clip norm value")
-
-    parser.add_argument("--seed", type=int, default=1000, help="random seed")
-    parser.add_argument("--progress-bar", default=False, action="store_true", help="use progress bar while training")
-    parser.add_argument("--mulaw", default=True, action="store_true", help="if used, waveform is mulaw encoded")
-    parser.add_argument("--jit", default=False, action="store_true", help="if used, model is jitted")
-    # parser.add_argument("--distributed", default=False, action="store_true", help="enable DistributedDataParallel")
-
-    # model parameters
-
-    # the product of upsample_scales must equal hop_length
+        default=4.0
+    )
+    parser.add_argument(
+        "--scheduler",
+        metavar="S",
+        default="exponential",
+        choices=["exponential", "reduceonplateau"],
+        help="optimizer to use",
+    )
+    parser.add_argument(
+        "--gamma",
+        default=0.999,
+        type=float,
+        metavar="GAMMA",
+        help="learning rate exponential decay constant",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=1000,
+        help="random seed"
+    )
+    parser.add_argument(
+        "--progress-bar",
+        default=False,
+        action="store_true",
+        help="use progress bar while training"
+    )
+    parser.add_argument(
+        "--mulaw",
+        default=True,
+        action="store_true",
+        help="if used, waveform is mulaw encoded"
+    )
+    parser.add_argument(
+        "--jit",
+        default=False,
+        action="store_true",
+        help="if used, model is jitted"
+    )
+    parser.add_argument(
+        '--resume',
+        default='',
+        type=str,
+        metavar='PATH',
+        help='path to latest checkpoint'
+    )
+    # the product of `upsample_scales` must equal `hop_length`
     parser.add_argument(
         "--upsample-scales",
         default=[5, 5, 11],
         type=List[int],
         help="the list of upsample scales",
     )
-    # output waveform bits
     parser.add_argument(
         "--n-bits",
         default=9,
@@ -172,7 +212,7 @@ def parse_args():
         "--n-fc",
         default=512,
         type=int,
-        help="the dimension of fully connected layer ",
+        help="the dimension of fully connected layer",
     )
     parser.add_argument(
         "--kernel-size",
@@ -198,28 +238,25 @@ def parse_args():
         type=int,
         help="the number of output dimensions",
     )
-    # mode = ['waveform', 'mol']
     parser.add_argument(
         "--mode",
-        default="mol",
+        default="waveform",
+        choices=["waveform", "mol"],
         type=str,
-        help="the mode of waveform",
+        help="the type of waveform",
     )
-    # the length of input waveform and spectrogram
     parser.add_argument(
         "--seq-len-factor",
         default=5,
         type=int,
         help="seq_length = hop_length * seq_len_factor",
     )
-    # the number of waveforms for testing
     parser.add_argument(
         "--test-samples",
         default=50,
         type=float,
-        help="the number of test waveforms",
+        help="the number of waveforms for testing",
     )
-    # the path to store audio files
     parser.add_argument(
         "--file-path",
         default="/private/home/jimchen90/datasets/LJSpeech-1.1/wavs/",
@@ -231,114 +268,126 @@ def parse_args():
     return args
 
 
-# From wav2letter pipeline:
-# https://github.com/vincentqb/audio/blob/wav2letter/examples/pipeline/wav2letter.py
-def save_checkpoint(state, is_best, filename):
-
-    if filename == "":
-        return
-
-    tempfile = filename + ".temp"
-
-    # Remove tempfile in case interuption during the copying from tempfile to filename
-    if os.path.isfile(tempfile):
-        os.remove(tempfile)
-
-    torch.save(state, tempfile)
-    if os.path.isfile(tempfile):
-        os.rename(tempfile, filename)
-    if is_best:
-        shutil.copyfile(filename, "model_best.pth.tar")
-
-    print("Checkpoint: saved", flush=True)
+def signal_handler(a, b):
+    global SIGNAL_RECEIVED
+    print("Signal received", a, datetime.now().strftime("%y%m%d.%H%M%S"), flush=True)
+    SIGNAL_RECEIVED = True
 
 
-# count parameter numbers in model
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+def train_one_epoch(
+    model, mode, criterion, optimizer, scheduler, data_loader, device, epoch
+):
 
-
-# train one epoch
-def train_one_epoch(model, mode, bits, mulaw, criterion, optimizer, data_loader, device, pbar=None):
     model.train()
 
     sums = defaultdict(lambda: 0.0)
+    start1 = time()
 
-    for i, (waveform, specgram, target) in enumerate(data_loader, 1):
-        waveform = waveform.to(device, non_blocking=True)
-        specgram = specgram.to(device, non_blocking=True)
-        target = target.to(device, non_blocking=True)
+    metric = MetricLogger("train_iteration")
+    metric("epoch", epoch)
+
+    for waveform, specgram, target in bg_iterator(data_loader, maxsize=2):
+
+        start2 = time()
+
+        waveform = waveform.to(device)
+        specgram = specgram.to(device)
+        target = target.to(device)
 
         output = model(waveform, specgram)
 
         if mode == 'waveform':
-            # (n_batch, 2 ** n_bits, n_time)
             output = output.transpose(1, 2)
             target = target.long()
 
         elif mode == 'mol':
-            # (n_batch, n_time, 1)
             target = target.unsqueeze(-1)
 
         else:
-            raise ValueError(f"Expected mode: `waveform` or `mol`, but found {mode}")
+            raise ValueError(
+                f"Expected mode: `waveform` or `mol`, but found {mode}"
+            )
 
         loss = criterion(output, target)
-        sums["loss"] += loss.item()
+        loss_item = loss.item()
+        sums["loss"] += loss_item
+        metric("loss", loss_item)
 
         optimizer.zero_grad()
         loss.backward()
 
         if args.clip_norm > 0:
-            sums["gradient"] += torch.nn.utils.clip_grad_norm_(
+            gradient = torch.nn.utils.clip_grad_norm_(
                 model.parameters(), args.clip_norm
             )
+            sums["gradient"] += gradient
+            metric("gradient", gradient.item())
 
         optimizer.step()
 
-        if pbar is not None:
-            pbar.update(1 / len(data_loader))
+        metric("iteration", sums["iteration"])
+        metric("time", time() - start2)
+        metric.print()
+        sums["iteration"] += 1
+
+        if SIGNAL_RECEIVED:
+            return
 
     avg_loss = sums["loss"] / len(data_loader)
-    print(f"Training loss: {avg_loss:4.5f}", flush=True)
 
+    metric = MetricLogger("train_epoch")
+    metric("epoch", epoch)
+    metric("loss", avg_loss)
     if "gradient" in sums:
-        avg_gradient = sums["gradient"] / len(data_loader)
-        print(f"Average gradient norm: {avg_gradient:4.8f}", flush=True)
+        metric("gradient", sums["gradient"] / len(data_loader))
+    metric("lr", scheduler.get_last_lr()[0])
+    metric("time", time() - start1)
+    metric.print()
+
+    scheduler.step()
 
 
-def evaluate(model, mode, bits, mulaw, criterion, data_loader, device):
+def evaluate(model, mode, criterion, data_loader, device, epoch):
 
     with torch.no_grad():
 
         model.eval()
-
         sums = defaultdict(lambda: 0.0)
+        start = time()
 
-        for i, (waveform, specgram, target) in enumerate(data_loader, 1):
-            waveform = waveform.to(device, non_blocking=True)
-            specgram = specgram.to(device, non_blocking=True)
-            target = target.to(device, non_blocking=True)
+        for waveform, specgram, target in bg_iterator(data_loader, maxsize=2):
+
+            waveform = waveform.to(device)
+            specgram = specgram.to(device)
+            target = target.to(device)
 
             output = model(waveform, specgram)
 
             if mode == 'waveform':
-                # (batch, 2 ** bits, seq_len)
                 output = output.transpose(1, 2)
                 target = target.long()
 
             elif mode == 'mol':
-                # (batch, seq_len, 1)
                 target = target.unsqueeze(-1)
 
             else:
-                raise ValueError(f"Expected mode: `waveform` or `mol`, but found {mode}")
+                raise ValueError(
+                    f"Expected mode: `waveform` or `mol`, but found {mode}"
+                )
 
             loss = criterion(output, target)
             sums["loss"] += loss.item()
 
+            if SIGNAL_RECEIVED:
+                break
+
         avg_loss = sums["loss"] / len(data_loader)
-        print(f"Validation loss: {avg_loss:.8f}", flush=True)
+
+        metric = MetricLogger("validation")
+        metric("epoch", epoch)
+        metric("loss", avg_loss)
+        metric("time", time() - start)
+        metric.print()
 
         return avg_loss
 
@@ -347,10 +396,13 @@ def main(args):
 
     devices = ["cuda" if torch.cuda.is_available() else "cpu"]
 
-    print("Start time: {}".format(str(datetime.now())), flush=True)
+    logging.info("Start time: {}".format(str(datetime.now())))
 
     # Empty CUDA cache
     torch.cuda.empty_cache()
+
+    # Install signal handler
+    signal.signal(signal.SIGUSR1, lambda a, b: signal_handler(a, b))
 
     # use torchaudio transform to get waveform and specgram
 
@@ -366,7 +418,6 @@ def main(args):
 #        torchaudio.transforms.MelSpectrogram(
 #            sample_rate=args.sample_rate, **melkwargs
 #        ),
-#        torchaudio.transforms.MuLawEncoding(2**args.n_bits)
 #    )
 
     # use librosa transform to get waveform and specgram
@@ -387,7 +438,7 @@ def main(args):
 
     loader_training_params = {
         "num_workers": args.workers,
-        "pin_memory": True,
+        "pin_memory": False,
         "shuffle": True,
         "drop_last": False,
     }
@@ -402,7 +453,6 @@ def main(args):
         collate_fn=collate_fn,
         **loader_training_params,
     )
-
     loader_test = DataLoader(
         test_dataset,
         batch_size=args.batch_size,
@@ -422,24 +472,19 @@ def main(args):
                      n_freq=args.n_freq,
                      n_hidden=args.n_hidden,
                      n_output=args.n_output,
-                     mode=args.mode)
+                     mode=args.mode,
+                     )
 
-#    if args.jit:
-#        model = torch.jit.script(model)
+    if args.jit:
+        model = torch.jit.script(model)
 
-#    if not args.distributed:
-#        model = torch.nn.DataParallel(model)
-#    else:
-#        model.cuda()
-#        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=devices)
     model = torch.nn.DataParallel(model)
     model = model.to(devices[0], non_blocking=True)
 
     n = count_parameters(model)
-    print(f"Number of parameters: {n}", flush=True)
+    logging.info(f"Number of parameters: {n}")
 
     # Optimizer
-
     optimizer_params = {
         "lr": args.learning_rate,
         "betas": (args.adam_beta1, args.adam_beta2),
@@ -449,14 +494,19 @@ def main(args):
 
     optimizer = Adam(model.parameters(), **optimizer_params)
 
-    criterion = nn.CrossEntropyLoss() if args.mode == 'waveform' else LossFn_Mol
+    if args.scheduler == "exponential":
+        scheduler = ExponentialLR(optimizer, gamma=args.gamma)
+    elif args.scheduler == "reduceonplateau":
+        scheduler = ReduceLROnPlateau(optimizer, patience=10, threshold=1e-3)
 
-    best_loss = 1.0
+    criterion = nn.CrossEntropyLoss() if args.mode == 'waveform' else Mol_Loss
+
+    best_loss = 10.
 
     load_checkpoint = args.checkpoint and os.path.isfile(args.checkpoint)
 
     if load_checkpoint:
-        print("Checkpoint: loading '{}'".format(args.checkpoint), flush=True)
+        logging.info(f"Checkpoint: loading '{args.checkpoint}'")
         checkpoint = torch.load(args.checkpoint)
 
         args.start_epoch = checkpoint["epoch"]
@@ -464,12 +514,13 @@ def main(args):
 
         model.load_state_dict(checkpoint["state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer"])
-        # scheduler.load_state_dict(checkpoint["scheduler"])
+        scheduler.load_state_dict(checkpoint["scheduler"])
 
-        print("Checkpoint: loaded '{}' at epoch {}".format(args.checkpoint, checkpoint["epoch"]), flush=True,)
-
+        logging.info(
+            f"Checkpoint: loaded '{args.checkpoint}' at epoch {checkpoint['epoch']}"
+        )
     else:
-        print("Checkpoint: not found", flush=True)
+        logging.info("Checkpoint: not found")
 
         save_checkpoint(
             {
@@ -477,54 +528,58 @@ def main(args):
                 "state_dict": model.state_dict(),
                 "best_loss": best_loss,
                 "optimizer": optimizer.state_dict(),
-                # "scheduler": scheduler.state_dict(),
+                "scheduler": scheduler.state_dict(),
             },
             False,
             args.checkpoint,
         )
 
-    with tqdm(total=args.epochs, unit_scale=1, disable=not args.progress_bar) as pbar:
+    for epoch in range(args.start_epoch, args.epochs):
 
-        for epoch in range(args.start_epoch, args.epochs):
+        train_one_epoch(
+            model, args.mode, criterion, optimizer, scheduler, loader_training, devices[0], epoch,
+        )
 
-            train_one_epoch(
+        if SIGNAL_RECEIVED:
+            save_checkpoint({
+                'epoch': epoch,
+                'state_dict': model.state_dict(),
+                'best_loss': best_loss,
+                'optimizer': optimizer.state_dict(),
+                'scheduler': scheduler.state_dict(),
+            }, False, args.checkpoint)
+
+        if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
+
+            sum_loss = evaluate(
                 model,
                 args.mode,
-                args.n_bits,
-                args.mulaw,
                 criterion,
-                optimizer,
-                loader_training,
+                loader_test,
                 devices[0],
-                pbar=pbar,
+                epoch,
             )
 
-            if not (epoch + 1) % args.print_freq or epoch + 1 == args.epochs:
+            is_best = sum_loss < best_loss
+            best_loss = min(sum_loss, best_loss)
+            save_checkpoint(
+                {
+                    "epoch": epoch + 1,
+                    "state_dict": model.state_dict(),
+                    "best_loss": best_loss,
+                    "optimizer": optimizer.state_dict(),
+                    "scheduler": scheduler.state_dict(),
+                },
+                is_best,
+                args.checkpoint,
+            )
 
-                sum_loss = evaluate(
-                    model,
-                    args.mode,
-                    args.n_bits,
-                    args.mulaw,
-                    criterion,
-                    loader_test,
-                    devices[0],
-                )
-
-                is_best = sum_loss < best_loss
-                best_loss = min(sum_loss, best_loss)
-                save_checkpoint(
-                    {
-                        "epoch": epoch + 1,
-                        "state_dict": model.state_dict(),
-                        "best_loss": best_loss,
-                        "optimizer": optimizer.state_dict(),
-                    },
-                    is_best,
-                    args.checkpoint,
-                )
+    logging.info(f"End time: {datetime.now()}")
 
 
 if __name__ == "__main__":
+
+    logging.basicConfig(level=logging.INFO)
+
     args = parse_args()
     main(args)
