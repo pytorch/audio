@@ -133,9 +133,7 @@ class ViterbiDecoder:
         outputs = []
         scores = []
         for i in range(tag_sequence.shape[1]):
-            paths, score = self._viterbi_decode(
-                tag_sequence[:, i, :], self.transitions
-            )
+            paths, score = self._viterbi_decode(tag_sequence[:, i, :])
             outputs.append(paths)
             scores.append(score)
 
