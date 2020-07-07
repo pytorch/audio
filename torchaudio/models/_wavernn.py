@@ -288,6 +288,7 @@ class _WaveRNN(nn.Module):
 
         assert waveform.size(1) == 1, 'Require the input channel of waveform is 1'
         assert specgram.size(1) == 1, 'Require the input channel of specgram is 1'
+        # remove channel dimension until the end
         waveform, specgram = waveform.squeeze(1), specgram.squeeze(1)
 
         batch_size = waveform.size(0)
@@ -324,6 +325,7 @@ class _WaveRNN(nn.Module):
         x = torch.cat([x, a4], dim=-1)
         x = self.fc2(x)
         x = self.relu2(x)
-        x = self.fc3(x).unsqueeze(1)
+        x = self.fc3(x)
 
-        return x
+        # bring back channel dimension
+        return x.unsqueeze(1)
