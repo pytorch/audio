@@ -223,7 +223,7 @@ class _WaveRNN(nn.Module):
         >>> # waveform shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length)
         >>> specgram = MelSpectrogram(sample_rate)(waveform)  # shape: (n_batch, n_channel, n_freq, n_time)
         >>> output = wavernn(waveform, specgram)
-        >>> # output shape in 'waveform' mode: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length, 2 ** n_bits)
+        >>> # output shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length, 2 ** n_bits)
     """
 
     def __init__(self,
