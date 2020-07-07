@@ -146,7 +146,15 @@ def model_length_function(tensor):
 
 
 def train_one_epoch(
-    model, criterion, optimizer, scheduler, data_loader, device, epoch,
+    model,
+    criterion,
+    optimizer,
+    scheduler,
+    data_loader,
+    decoder,
+    language_model,
+    device,
+    epoch,
 ):
 
     model.train()
@@ -191,10 +199,13 @@ def train_one_epoch(
 
         optimizer.step()
 
+        sums["length_dataset"] += len(inputs)
         metric("iteration", sums["iteration"])
         metric("time", time() - start2)
         metric.print()
         sums["iteration"] += 1
+
+        compute_error_rates(outputs, targets, decoder, language_model, sums, epoch)
 
     avg_loss = sums["loss"] / len(data_loader)
 
@@ -203,11 +214,59 @@ def train_one_epoch(
     metric("loss", avg_loss)
     if "gradient" in sums:
         metric("gradient", sums["gradient"] / len(data_loader))
-    metric("lr", scheduler.get_last_lr()[0])
+    try:
+        metric("lr", scheduler.get_last_lr()[0])
+    except AttributeError:
+        pass
+    metric("cer", sums["cer"])
+    metric("wer", sums["wer"])
+    metric("cer over dataset length", sums["cer"] / sums["length_dataset"])
+    metric("wer over dataset length", sums["wer"] / sums["length_dataset"])
+    metric("cer over target length", sums["cer"] / sums["total_chars"])
+    metric("wer over target length", sums["wer"] / sums["total_words"])
+    metric("target length", sums["total_chars"])
+    metric("target length", sums["total_words"])
+    metric("dataset length", sums["length_dataset"])
     metric("time", time() - start1)
     metric.print()
 
-    scheduler.step()
+    if isinstance(scheduler, ReduceLROnPlateau):
+        scheduler.step(avg_loss)
+    else:
+        scheduler.step()
+
+
+def compute_error_rates(outputs, targets, decoder, language_model, sums, epoch):
+    output = outputs.transpose(0, 1).to("cpu")
+    output = decoder(output)
+
+    output = language_model.decode(output.tolist())
+    target = language_model.decode(targets.tolist())
+
+    print_length = 20
+    for i in range(2):
+        output_print = output[i].ljust(print_length)[:print_length]
+        target_print = target[i].ljust(print_length)[:print_length]
+        logging.info(f"Epoch: {epoch}  Target: {target_print}   Output: {output_print}")
+
+    cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
+    # cers_normalized = [d / len(a) for a, d in zip(target, cers)]
+    cers = sum(cers)
+    n = sum(len(t) for t in target)
+    sums["cer"] += cers
+    # sums["cer_relative"] += cers / n
+    sums["total_chars"] += n
+
+    output = [o.split(language_model.char_space) for o in output]
+    target = [o.split(language_model.char_space) for o in target]
+
+    wers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
+    # wers_normalized = [d / len(a) for a, d in zip(target, wers)]
+    wers = sum(wers)
+    n = len(target)
+    sums["wer"] += wers
+    # sums["wer_relative"] += wers / n
+    sums["total_words"] += n
 
 
 def evaluate(
@@ -230,8 +289,6 @@ def evaluate(
             # keep batch first for data parallel
             outputs = model(inputs).transpose(-1, -2).transpose(0, 1)
 
-            sums["length_dataset"] += len(inputs)
-
             # CTC
             # outputs: input length, batch size, number of classes (including blank)
             # targets: batch size, max target length
@@ -242,38 +299,9 @@ def evaluate(
                 outputs, targets, tensors_lengths, target_lengths
             ).item()
 
-            output = outputs.transpose(0, 1).to("cpu")
-            output = decoder(output)
+            sums["length_dataset"] += len(inputs)
 
-            output = language_model.decode(output.tolist())
-            target = language_model.decode(targets.tolist())
-
-            print_length = 20
-            for i in range(2):
-                output_print = output[i].ljust(print_length)[:print_length]
-                target_print = target[i].ljust(print_length)[:print_length]
-                logging.info(
-                    f"Epoch: {epoch}  Target: {target_print}   Output: {output_print}"
-                )
-
-            cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
-            # cers_normalized = [d / len(a) for a, d in zip(target, cers)]
-            cers = sum(cers)
-            n = sum(len(t) for t in target)
-            sums["cer"] += cers
-            sums["cer_relative"] += cers / n
-            sums["total_chars"] += n
-
-            output = [o.split(language_model.char_space) for o in output]
-            target = [o.split(language_model.char_space) for o in target]
-
-            wers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
-            # wers_normalized = [d / len(a) for a, d in zip(target, wers)]
-            wers = sum(wers)
-            n = len(target)
-            sums["wer"] += wers
-            sums["wer_relative"] += wers / n
-            sums["total_words"] += n
+            compute_error_rates(outputs, targets, decoder, language_model, sums, epoch)
 
         avg_loss = sums["loss"] / len(data_loader)
 
@@ -478,7 +506,15 @@ def main(args, rank=0):
     for epoch in range(args.start_epoch, args.epochs):
 
         train_one_epoch(
-            model, criterion, optimizer, scheduler, loader_training, devices[0], epoch,
+            model,
+            criterion,
+            optimizer,
+            scheduler,
+            loader_training,
+            decoder,
+            language_model,
+            devices[0],
+            epoch,
         )
 
         if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
