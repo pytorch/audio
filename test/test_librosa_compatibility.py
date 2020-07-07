@@ -160,7 +160,8 @@ class TestTransforms(common_utils.TorchaudioTestCase):
     """Test suite for functions in `transforms` module."""
     def assert_compatibilities(self, n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
         common_utils.set_audio_backend('default')
-        sound, sample_rate = _load_audio_asset('sinewave.wav')
+        path = common_utils.get_asset_path('sinewave.wav')
+        sound, sample_rate = common_utils.load_wav(path)
         sound_librosa = sound.cpu().numpy().squeeze()  # (64000)
 
         # test core spectrogram
@@ -300,9 +301,9 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         hop_length = n_fft // 4
 
         # Prepare mel spectrogram input. We use torchaudio to compute one.
-        common_utils.set_audio_backend('default')
-        sound, sample_rate = _load_audio_asset(
-            'steam-train-whistle-daniel_simon.wav', offset=2**10, num_frames=2**14)
+        path = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
+        sound, sample_rate = common_utils.load_wav(path)
+        sound = sound[:, 2**10:2**10 + 2**14]
         sound = sound.mean(dim=0, keepdim=True)
         spec_orig = F.spectrogram(
             sound, pad=0, window=torch.hann_window(n_fft), n_fft=n_fft,
