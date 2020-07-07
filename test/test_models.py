@@ -107,11 +107,11 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         model = _WaveRNN(upsample_scales, n_bits, sample_rate, hop_length, n_res_block,
                          n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output, mode)
 
-        x = torch.rand(n_batch, hop_length * (n_time - kernel_size + 1))
-        mels = torch.rand(n_batch, n_freq, n_time)
+        x = torch.rand(n_batch, 1, hop_length * (n_time - kernel_size + 1))
+        mels = torch.rand(n_batch, 1, n_freq, n_time)
         out = model(x, mels)
 
-        assert out.size() == (n_batch, hop_length * (n_time - kernel_size + 1), 2 ** n_bits)
+        assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1), 2 ** n_bits)
 
     def test_mol(self):
         """Validate the output dimensions of a _WaveRNN model in mol mode.
@@ -135,8 +135,8 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         model = _WaveRNN(upsample_scales, n_bits, sample_rate, hop_length, n_res_block,
                          n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output, mode)
 
-        x = torch.rand(n_batch, hop_length * (n_time - kernel_size + 1))
-        mels = torch.rand(n_batch, n_freq, n_time)
+        x = torch.rand(n_batch, 1, hop_length * (n_time - kernel_size + 1))
+        mels = torch.rand(n_batch, 1, n_freq, n_time)
         out = model(x, mels)
 
-        assert out.size() == (n_batch, hop_length * (n_time - kernel_size + 1), 30)
+        assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1), 30)

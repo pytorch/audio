@@ -222,7 +222,7 @@ class _WaveRNN(nn.Module):
         >>> waveform, sample_rate = torchaudio.load(file)
         >>> # waveform shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length)
         >>> specgram = MelSpectrogram(sample_rate)(waveform)  # shape: (n_batch, n_channel, n_freq, n_time)
-        >>> output = wavernn(waveform.squeeze(1), specgram.squeeze(1))
+        >>> output = wavernn(waveform, specgram)
         >>> # output shape in 'waveform' mode: (n_batch, (n_time - kernel_size + 1) * hop_length, 2 ** n_bits)
     """
 
@@ -279,12 +279,16 @@ class _WaveRNN(nn.Module):
         r"""Pass the input through the _WaveRNN model.
 
         Args:
-            waveform: the input waveform to the _WaveRNN layer (n_batch, (n_time - kernel_size + 1) * hop_length)
-            specgram: the input spectrogram to the _WaveRNN layer (n_batch, n_freq, n_time)
+            waveform: the input waveform to the _WaveRNN layer (n_batch, 1, (n_time - kernel_size + 1) * hop_length)
+            specgram: the input spectrogram to the _WaveRNN layer (n_batch, 1, n_freq, n_time)
 
         Return:
-            Tensor shape: (n_batch, (n_time - kernel_size + 1) * hop_length, 2 ** n_bits)
+            Tensor shape: (n_batch, 1, (n_time - kernel_size + 1) * hop_length, 2 ** n_bits)
         """
+
+        assert waveform.size(1) == 1, 'Require the input channel of waveform is 1'
+        assert specgram.size(1) == 1, 'Require the input channel of specgram is 1'
+        waveform, specgram = waveform.squeeze(1), specgram.squeeze(1)
 
         batch_size = waveform.size(0)
         h1 = torch.zeros(1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device)
@@ -320,5 +324,6 @@ class _WaveRNN(nn.Module):
         x = torch.cat([x, a4], dim=-1)
         x = self.fc2(x)
         x = self.relu2(x)
+        x = self.fc3(x).unsqueeze(1)
 
-        return self.fc3(x)
+        return x
