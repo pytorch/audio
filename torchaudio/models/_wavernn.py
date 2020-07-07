@@ -196,10 +196,12 @@ class _UpsampleNetwork(nn.Module):
 
 
 class _WaveRNN(nn.Module):
-    r"""WaveRNN model based on "Efficient Neural Audio Synthesis".
+    r"""WaveRNN model based on the implementation from `fatchord <https://github.com/fatchord/WaveRNN>`_.
 
-    The paper link is `<https://arxiv.org/pdf/1802.08435.pdf>`_. The input channels of waveform
-    and spectrogram have to be 1. The product of `upsample_scales` must equal `hop_length`.
+    The original implementation was introduced in
+    `"Efficient Neural Audio Synthesis" <https://arxiv.org/pdf/1802.08435.pdf>`_.
+    The input channels of waveform and spectrogram have to be 1. The product of
+    `upsample_scales` must equal `hop_length`.
 
     Args:
         upsample_scales: the list of upsample scales
@@ -215,14 +217,13 @@ class _WaveRNN(nn.Module):
         n_output: the number of output dimensions (default=128)
         mode: the mode of waveform in ['waveform', 'mol'] (default='waveform')
 
-    Examples
+    Example
         >>> wavernn = _waveRNN(upsample_scales=[5,5,8], n_bits=9, sample_rate=24000, hop_length=200)
         >>> waveform, sample_rate = torchaudio.load(file)
         >>> # waveform shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length)
         >>> specgram = MelSpectrogram(sample_rate)(waveform)  # shape: (n_batch, n_channel, n_freq, n_time)
         >>> output = wavernn(waveform.squeeze(1), specgram.squeeze(1))
         >>> # output shape in 'waveform' mode: (n_batch, (n_time - kernel_size + 1) * hop_length, 2 ** n_bits)
-        >>> # output shape in 'mol' mode: (n_batch, (n_time - kernel_size + 1) * hop_length, 30)
     """
 
     def __init__(self,
