@@ -79,9 +79,6 @@ tensor = common_utils.get_whitenoise()
 
 Files:
 
-* `whitenoise.wav`
-* `whitenoise.mp3`
-* `whitenoise_1min.mp3`
 * `steam-train-whistle-daniel_simon.wav`
 
 #### Voice
