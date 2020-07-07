@@ -46,6 +46,7 @@ def set_audio_backend(backend: Optional[str]) -> None:
     elif backend == 'sox':
         module = sox_backend
     elif backend == 'sox_io':
+        warnings.warn('"sox_io" backend is currently beta. Function signatures might change.')
         module = sox_io_backend
     elif backend == 'soundfile':
         module = soundfile_backend
