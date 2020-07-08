@@ -4,20 +4,9 @@
 #include <torchaudio/csrc/sox_effects.h>
 #include <torchaudio/csrc/sox_io.h>
 #include <torchaudio/csrc/sox_utils.h>
-#include <torchaudio/csrc/typedefs.h>
 
 namespace torchaudio {
 namespace {
-
-////////////////////////////////////////////////////////////////////////////////
-// typedefs.h
-////////////////////////////////////////////////////////////////////////////////
-static auto registerSignalInfo =
-    torch::class_<SignalInfo>("torchaudio", "SignalInfo")
-        .def(torch::init<int64_t, int64_t, int64_t>())
-        .def("get_sample_rate", &SignalInfo::getSampleRate)
-        .def("get_num_channels", &SignalInfo::getNumChannels)
-        .def("get_num_frames", &SignalInfo::getNumFrames);
 
 ////////////////////////////////////////////////////////////////////////////////
 // sox_utils.h
@@ -32,6 +21,12 @@ static auto registerTensorSignal =
 ////////////////////////////////////////////////////////////////////////////////
 // sox_io.h
 ////////////////////////////////////////////////////////////////////////////////
+static auto registerSignalInfo =
+    torch::class_<sox_io::SignalInfo>("torchaudio", "SignalInfo")
+        .def("get_sample_rate", &sox_io::SignalInfo::getSampleRate)
+        .def("get_num_channels", &sox_io::SignalInfo::getNumChannels)
+        .def("get_num_frames", &sox_io::SignalInfo::getNumFrames);
+
 static auto registerGetInfo = torch::RegisterOperators().op(
     torch::RegisterOperators::options()
         .schema(

@@ -2,7 +2,6 @@
 #define TORCHAUDIO_SOX_EFFECTS_H
 
 #include <torch/script.h>
-#include <torchaudio/csrc/typedefs.h>
 
 namespace torchaudio {
 namespace sox_effects {
