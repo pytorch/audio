@@ -1,4 +1,5 @@
-This is an example pipeline for WaveRNN vocoder using the WaveRNN model trained with LJSPEECH. WaveRNN model is based on the implementation from https://github.com/fatchord/WaveRNN. The original implementation was introduced in "Efficient Neural Audio Synthesis". WaveRNN and LJSPEECH are available in torchaudio.
+This is an example pipeline for WaveRNN vocoder using the WaveRNN model trained with LJSpeech. WaveRNN model is based on the implementation from https://github.com/fatchord/WaveRNN. The original implementation was
+introduced in "Efficient Neural Audio Synthesis". WaveRNN and LJSpeech are available in torchaudio.
 
 ### Output
 
@@ -31,5 +32,5 @@ python main.py \
     --learning-rate 1e-4 \
     --n-freq 80 \
     --mode 'waveform' \
-    --n_bits 9 \
+    --n_bits 8 \
 ```

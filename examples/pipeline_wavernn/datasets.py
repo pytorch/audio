@@ -109,6 +109,6 @@ def collate_factory(args):
         if args.mode == 'mol':
             target = int_2_float(target.float(), bits)
 
-        return waveform, specgram, target
+        return waveform.unsqueeze(1), specgram.unsqueeze(1), target.unsqueeze(1)
 
     return raw_collate

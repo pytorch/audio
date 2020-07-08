@@ -162,7 +162,7 @@ def parse_args():
     )
     parser.add_argument(
         "--n-bits",
-        default=9,
+        default=8,
         type=int,
         help="the bits of output waveform",
     )
@@ -295,6 +295,7 @@ def train_one_epoch(
         target = target.to(device)
 
         output = model(waveform, specgram)
+        output, target = output.squeeze(1), target.squeeze(1)
 
         if mode == 'waveform':
             output = output.transpose(1, 2)
