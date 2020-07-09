@@ -6,10 +6,18 @@ from torchaudio._internal import (
 )
 
 
+class AudioMetaData:
+    def __init__(self, sample_rate: int, num_frames: int, num_channels: int):
+        self.sample_rate = sample_rate
+        self.num_frames = num_frames
+        self.num_channels = num_channels
+
+
 @_mod_utils.requires_module('torchaudio._torchaudio')
-def info(filepath: str) -> torch.classes.torchaudio.SignalInfo:
+def info(filepath: str) -> AudioMetaData:
     """Get signal information of an audio file."""
-    return torch.ops.torchaudio.sox_io_get_info(filepath)
+    sinfo = torch.ops.torchaudio.sox_io_get_info(filepath)
+    return AudioMetaData(sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels())
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')

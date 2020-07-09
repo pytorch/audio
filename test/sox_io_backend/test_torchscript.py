@@ -20,7 +20,7 @@ from .common import (
 )
 
 
-def py_info_func(filepath: str) -> torch.classes.torchaudio.SignalInfo:
+def py_info_func(filepath: str) -> torchaudio.backend.sox_io_backend.AudioMetaData:
     return torchaudio.info(filepath)
 
 
@@ -63,9 +63,9 @@ class SoxIO(TempDirMixin, TorchaudioTestCase):
         py_info = py_info_func(audio_path)
         ts_info = ts_info_func(audio_path)
 
-        assert py_info.get_sample_rate() == ts_info.get_sample_rate()
-        assert py_info.get_num_frames() == ts_info.get_num_frames()
-        assert py_info.get_num_channels() == ts_info.get_num_channels()
+        assert py_info.sample_rate == ts_info.sample_rate
+        assert py_info.num_frames == ts_info.num_frames
+        assert py_info.num_channels == ts_info.num_channels
 
     @parameterized.expand(list(itertools.product(
         ['float32', 'int32', 'int16', 'uint8'],

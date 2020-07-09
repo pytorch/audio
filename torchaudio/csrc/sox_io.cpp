@@ -8,7 +8,27 @@ using namespace torchaudio::sox_utils;
 namespace torchaudio {
 namespace sox_io {
 
-c10::intrusive_ptr<torchaudio::SignalInfo> get_info(const std::string& path) {
+SignalInfo::SignalInfo(
+    const int64_t sample_rate_,
+    const int64_t num_channels_,
+    const int64_t num_frames_)
+    : sample_rate(sample_rate_),
+      num_channels(num_channels_),
+      num_frames(num_frames_){};
+
+int64_t SignalInfo::getSampleRate() const {
+  return sample_rate;
+}
+
+int64_t SignalInfo::getNumChannels() const {
+  return num_channels;
+}
+
+int64_t SignalInfo::getNumFrames() const {
+  return num_frames;
+}
+
+c10::intrusive_ptr<SignalInfo> get_info(const std::string& path) {
   SoxFormat sf(sox_open_read(
       path.c_str(),
       /*signal=*/nullptr,
@@ -19,7 +39,7 @@ c10::intrusive_ptr<torchaudio::SignalInfo> get_info(const std::string& path) {
     throw std::runtime_error("Error opening audio file");
   }
 
-  return c10::make_intrusive<torchaudio::SignalInfo>(
+  return c10::make_intrusive<SignalInfo>(
       static_cast<int64_t>(sf->signal.rate),
       static_cast<int64_t>(sf->signal.channels),
       static_cast<int64_t>(sf->signal.length / sf->signal.channels));

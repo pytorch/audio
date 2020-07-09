@@ -33,9 +33,9 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
         save_wav(path, data, sample_rate)
         info = sox_io_backend.info(path)
-        assert info.get_sample_rate() == sample_rate
-        assert info.get_num_frames() == sample_rate * duration
-        assert info.get_num_channels() == num_channels
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
 
     @parameterized.expand(list(itertools.product(
         ['float32', 'int32', 'int16', 'uint8'],
@@ -49,9 +49,9 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
         save_wav(path, data, sample_rate)
         info = sox_io_backend.info(path)
-        assert info.get_sample_rate() == sample_rate
-        assert info.get_num_frames() == sample_rate * duration
-        assert info.get_num_channels() == num_channels
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
@@ -67,10 +67,10 @@ class TestInfo(TempDirMixin, PytorchTestCase):
             compression=bit_rate, duration=duration,
         )
         info = sox_io_backend.info(path)
-        assert info.get_sample_rate() == sample_rate
+        assert info.sample_rate == sample_rate
         # mp3 does not preserve the number of samples
-        # assert info.get_num_frames() == sample_rate * duration
-        assert info.get_num_channels() == num_channels
+        # assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
@@ -86,9 +86,9 @@ class TestInfo(TempDirMixin, PytorchTestCase):
             compression=compression_level, duration=duration,
         )
         info = sox_io_backend.info(path)
-        assert info.get_sample_rate() == sample_rate
-        assert info.get_num_frames() == sample_rate * duration
-        assert info.get_num_channels() == num_channels
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
@@ -104,9 +104,9 @@ class TestInfo(TempDirMixin, PytorchTestCase):
             compression=quality_level, duration=duration,
         )
         info = sox_io_backend.info(path)
-        assert info.get_sample_rate() == sample_rate
-        assert info.get_num_frames() == sample_rate * duration
-        assert info.get_num_channels() == num_channels
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
 
 
 @skipIfNoExtension
@@ -120,6 +120,6 @@ class TestInfoOpus(PytorchTestCase):
         """`sox_io_backend.info` can check opus file correcty"""
         path = get_asset_path('io', f'{bitrate}_{compression_level}_{num_channels}ch.opus')
         info = sox_io_backend.info(path)
-        assert info.get_sample_rate() == 48000
-        assert info.get_num_frames() == 32768
-        assert info.get_num_channels() == num_channels
+        assert info.sample_rate == 48000
+        assert info.num_frames == 32768
+        assert info.num_channels == num_channels
