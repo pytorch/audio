@@ -74,7 +74,10 @@ class TestFunctionalFiltering(common_utils.TorchaudioTestCase):
 
         cutoff_freq = 3000
 
-        noise_filepath = common_utils.get_asset_path('whitenoise.wav')
+        noise_waveform = common_utils.get_whitenoise(sample_rate=44100, duration=5)
+        noise_filepath = self.get_temp_path('whitenoise.wav')
+        common_utils.save_wav(noise_filepath, noise_waveform)
+    
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(noise_filepath)
         E.append_effect_to_chain("lowpass", [cutoff_freq])
