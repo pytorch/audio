@@ -11,7 +11,7 @@ from . import common_utils
 class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
     backend = 'sox'
 
-    test_filepath = common_utils.get_asset_path("steam-train-whistle-daniel_simon.mp3")
+    test_filepath = common_utils.get_asset_path("steam-train-whistle-daniel_simon.wav")
 
     def test_single_channel(self):
         fn_sine = common_utils.get_asset_path("sinewave.wav")
