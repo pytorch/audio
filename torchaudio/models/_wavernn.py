@@ -3,8 +3,15 @@ from typing import List
 import torch
 from torch import Tensor
 from torch import nn
+from .utils import load_state_dict_from_url
 
-__all__ = ["_ResBlock", "_MelResNet", "_Stretch2d", "_UpsampleNetwork", "_WaveRNN"]
+
+__all__ = ["_ResBlock", "_MelResNet", "_Stretch2d", "_UpsampleNetwork", "_WaveRNN", "_wavernn"]
+
+
+model_urls = {
+    '_wavernn': 'https://download.pytorch.org/models/_wavernn.pth',
+}
 
 
 class _ResBlock(nn.Module):
@@ -329,3 +336,19 @@ class _WaveRNN(nn.Module):
 
         # bring back channel dimension
         return x.unsqueeze(1)
+
+
+def _wavernn(pretrained=False, progress=True, **kwargs):
+    r"""WaveRNN model based on the implementation from
+    `fatchord <https://github.com/fatchord/WaveRNN>`_.
+
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on LJSpeech
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    model = _WaveRNN(**kwargs)
+    if pretrained:
+        state_dict = load_state_dict_from_url(model_urls['_wavernn'],
+                                              progress=progress)
+        model.load_state_dict(state_dict)
+    return model
