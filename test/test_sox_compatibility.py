@@ -14,8 +14,8 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
 
     def setUp(self):
         common_utils.TempDirMixin.setUp(self)
-        common_utils.TorchaudioTestCase.setUp(self)        
-        
+        common_utils.TorchaudioTestCase.setUp(self)
+
         NOISE_SAMPLE_RATE = 44100
         INT16_MAX = 32767
         noise_waveform = common_utils.get_whitenoise(
@@ -29,7 +29,6 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         common_utils.save_wav(
             self.noise_filepath, noise_waveform_as_int, NOISE_SAMPLE_RATE
         )
-
 
     def test_gain(self):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
