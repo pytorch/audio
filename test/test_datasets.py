@@ -46,9 +46,7 @@ class TestDatasets(common_utils.TorchaudioTestCase):
         data[0]
 
 
-@common_utils.skipIfNoSoxBackend
 class TestCommonVoice(common_utils.TorchaudioTestCase):
-    backend = 'sox'
     path = common_utils.get_asset_path()
 
     def test_commonvoice(self):
