@@ -261,7 +261,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
         output_waveform = F.bass_biquad(waveform, sample_rate, gain, central_freq, q)
 
-        self.assertEqual(output_waveform, sox_output_waveform, atol=1.5e-4, rtol=1e-5)
+        self.assertEqual(output_waveform, sox_output_waveform, atol=1e-3, rtol=1e-4)
 
     def test_deemph(self):
         """
