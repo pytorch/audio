@@ -85,7 +85,7 @@ Files:
 
 Files:
 
-* `CommonVoice/cv-corpus-4-2019-12-10/tt/clips/common_voice_tt_00000000.mp3`
+* `CommonVoice/cv-corpus-4-2019-12-10/tt/clips/common_voice_tt_00000000.wav`
 * `LibriSpeech/dev-clean/1272/128104/1272-128104-0000.flac`
 * `LJSpeech-1.1/wavs/LJ001-0001.wav`
 * `SpeechCommands/speech_commands_v0.02/go/0a9f9af7_nohash_0.wav`
