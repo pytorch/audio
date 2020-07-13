@@ -136,7 +136,7 @@ def parse_args():
     )
     parser.add_argument(
         "--mode",
-        default="mol",
+        default="waveform",
         choices=["waveform", "mol"],
         type=str,
         help="the mode of waveform",
@@ -155,7 +155,7 @@ def parse_args():
     )
     parser.add_argument(
         "--file-path",
-        default="/private/home/jimchen90/datasets/LJSpeech-1.1/wavs/",
+        default="",
         type=str,
         help="the path of audio files",
     )
