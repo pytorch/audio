@@ -47,6 +47,7 @@ class TestDatasets(common_utils.TorchaudioTestCase):
 
 
 class TestCommonVoice(common_utils.TorchaudioTestCase):
+    backend = 'default'
     path = common_utils.get_asset_path()
 
     def test_commonvoice(self):
