@@ -7,7 +7,7 @@ import torch
 
 
 class MetricLogger:
-    r"""Logger for metrics
+    r"""Logger for model metrics
     """
 
     def __init__(self, group, print_freq=1):
@@ -55,7 +55,7 @@ def save_checkpoint(state, is_best, filename):
 
 
 def count_parameters(model):
-    r"""Count the total parameters in the model
+    r"""Count the total number of parameters in the model
     """
 
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -70,7 +70,7 @@ def specgram_normalize(specgram, min_level_db):
 
 
 def mulaw_encode(waveform, mu):
-    r"""mulaw encode waveform
+    r"""Waveform mulaw encoding
     """
 
     mu = mu - 1

@@ -16,7 +16,7 @@ from torchaudio.datasets.utils import bg_iterator
 from torchaudio.models._wavernn import _WaveRNN
 
 from datasets import collate_factory, datasets_ljspeech
-from losses import Mol_Loss
+from losses import MoLLoss
 from utils import MetricLogger, count_parameters, save_checkpoint
 
 
@@ -190,6 +190,7 @@ def train_one_epoch(model, mode, criterion, optimizer, data_loader, device, epoc
             target = target.long()
 
         else:
+            # use mol mode
             target = target.unsqueeze(-1)
 
         loss = criterion(output, target)
@@ -245,6 +246,7 @@ def evaluate(model, mode, criterion, data_loader, device, epoch):
                 target = target.long()
 
             else:
+                # use mol mode
                 target = target.unsqueeze(-1)
 
             loss = criterion(output, target)
@@ -299,10 +301,7 @@ def main(args):
         **loader_training_params,
     )
     loader_test = DataLoader(
-        test_dataset,
-        batch_size=args.batch_size,
-        collate_fn=collate_fn,
-        **loader_validation_params,
+        test_dataset, batch_size=1, collate_fn=collate_fn, **loader_validation_params,
     )
 
     model = _WaveRNN(
@@ -336,7 +335,7 @@ def main(args):
 
     optimizer = Adam(model.parameters(), **optimizer_params)
 
-    criterion = nn.CrossEntropyLoss() if args.mode == "waveform" else Mol_Loss
+    criterion = nn.CrossEntropyLoss() if args.mode == "waveform" else MoLLoss
 
     best_loss = 10.0
 
