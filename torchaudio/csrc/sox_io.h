@@ -33,8 +33,8 @@ c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> load_audio_file(
 void save_audio_file(
     const std::string& file_name,
     const c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal>& signal,
-    const double compression = 0.,
-    const int64_t frames_per_chunk = 65536);
+    const double compression = 0.);
+
 } // namespace sox_io
 } // namespace torchaudio
 
