@@ -16,23 +16,22 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         common_utils.TempDirMixin.setUp(self)
         common_utils.TorchaudioTestCase.setUp(self)
 
-        NOISE_SAMPLE_RATE = 44100
-        INT16_MAX = 32767
-        noise_waveform = common_utils.get_whitenoise(
-            sample_rate=NOISE_SAMPLE_RATE, duration=5
+        SEED = 42
+        self.NOISE_SAMPLE_RATE = 44100
+        noise_waveform_as_int = common_utils.get_whitenoise(
+            sample_rate=self.NOISE_SAMPLE_RATE, duration=5, dtype=torch.int16, seed=SEED, scale_factor=0.9,
         )
-        # convert to int16, scipy wav writer automatically selects wav format based on tensor dtype
-        noise_waveform_as_int = torch.as_tensor(
-            INT16_MAX * noise_waveform, dtype=torch.int16
-        )
+        self.noise_waveform = common_utils.get_whitenoise(
+            sample_rate=self.NOISE_SAMPLE_RATE, duration=5, dtype=torch.float32, seed=SEED, scale_factor=0.9,
+        )        
         self.noise_filepath = self.get_temp_path("whitenoise.wav")
         common_utils.save_wav(
-            self.noise_filepath, noise_waveform_as_int, NOISE_SAMPLE_RATE
+            self.noise_filepath, noise_waveform_as_int, self.NOISE_SAMPLE_RATE
         )
 
     def test_gain(self):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, _ = torchaudio.load(test_filepath)
+        waveform, _ = common_utils.load_wav(test_filepath)
 
         waveform_gain = F.gain(waveform, 3)
         self.assertTrue(waveform_gain.abs().max().item(), 1.)
@@ -46,7 +45,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
 
     def test_dither(self):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, _ = torchaudio.load(test_filepath)
+        waveform, _ = common_utils.load_wav(test_filepath)
 
         waveform_dithered = F.dither(waveform)
         waveform_dithered_noiseshaped = F.dither(waveform, noise_shaping=True)
@@ -66,7 +65,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
 
     def test_vctk_transform_pipeline(self):
         test_filepath_vctk = common_utils.get_asset_path('VCTK-Corpus', 'wav48', 'p224', 'p224_002.wav')
-        wf_vctk, sr_vctk = torchaudio.load(test_filepath_vctk)
+        wf_vctk, sr_vctk = common_utils.load_wav(test_filepath_vctk)
 
         # rate
         sample = T.Resample(sr_vctk, 16000, resampling_method='sinc_interpolation')
@@ -96,8 +95,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("lowpass", [cutoff_freq])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.lowpass_biquad(waveform, sample_rate, cutoff_freq)
+        output_waveform = F.lowpass_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, cutoff_freq)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -112,11 +110,9 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("highpass", [cutoff_freq])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.highpass_biquad(waveform, sample_rate, cutoff_freq)
+        output_waveform = F.highpass_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, cutoff_freq)
 
-        # TBD - this fails at the 1e-4 level, debug why
-        self.assertEqual(output_waveform, sox_output_waveform, atol=1e-3, rtol=1e-5)
+        self.assertEqual(output_waveform, sox_output_waveform, atol=1.5e-3, rtol=1e-5)
 
     def test_allpass(self):
         """
@@ -130,8 +126,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("allpass", [central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.allpass_biquad(waveform, sample_rate, central_freq, q)
+        output_waveform = F.allpass_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, central_freq, q)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -148,8 +143,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("bandpass", ["-c", central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.bandpass_biquad(waveform, sample_rate, central_freq, q, const_skirt_gain)
+        output_waveform = F.bandpass_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, central_freq, q, const_skirt_gain)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -166,8 +160,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("bandpass", [central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.bandpass_biquad(waveform, sample_rate, central_freq, q, const_skirt_gain)
+        output_waveform = F.bandpass_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, central_freq, q, const_skirt_gain)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -183,8 +176,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("bandreject", [central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.bandreject_biquad(waveform, sample_rate, central_freq, q)
+        output_waveform = F.bandreject_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, central_freq, q)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -201,8 +193,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("band", ["-n", central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.band_biquad(waveform, sample_rate, central_freq, q, noise)
+        output_waveform = F.band_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, central_freq, q, noise)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -220,8 +211,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("band", [central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.band_biquad(waveform, sample_rate, central_freq, q, noise)
+        output_waveform = F.band_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, central_freq, q, noise)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -239,8 +229,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("treble", [gain, central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.treble_biquad(waveform, sample_rate, gain, central_freq, q)
+        output_waveform = F.treble_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, gain, central_freq, q)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -258,10 +247,9 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("bass", [gain, central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.bass_biquad(waveform, sample_rate, gain, central_freq, q)
+        output_waveform = F.bass_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, gain, central_freq, q)
 
-        self.assertEqual(output_waveform, sox_output_waveform, atol=1e-3, rtol=1e-4)
+        self.assertEqual(output_waveform, sox_output_waveform, atol=1.5e-3, rtol=1e-4)
 
     def test_deemph(self):
         """
@@ -272,8 +260,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("deemph")
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.deemph_biquad(waveform, sample_rate)
+        output_waveform = F.deemph_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -286,8 +273,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("riaa")
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.riaa_biquad(waveform, sample_rate)
+        output_waveform = F.riaa_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -302,8 +288,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("contrast", [enhancement_amount])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.contrast(waveform, enhancement_amount)
+        output_waveform = F.contrast(self.noise_waveform, enhancement_amount)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -319,8 +304,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("dcshift", [shift, limiter_gain])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, _ = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.dcshift(waveform, shift, limiter_gain)
+        output_waveform = F.dcshift(self.noise_waveform, shift, limiter_gain)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -335,8 +319,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("dcshift", [shift])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, _ = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.dcshift(waveform, shift)
+        output_waveform = F.dcshift(self.noise_waveform, shift)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -352,8 +335,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("overdrive", [gain, colour])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, _ = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.overdrive(waveform, gain, colour)
+        output_waveform = F.overdrive(self.noise_waveform, gain, colour)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -372,8 +354,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("phaser", [gain_in, gain_out, delay_ms, decay, speed, "-s"])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.phaser(waveform, sample_rate, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=True)
+        output_waveform = F.phaser(self.noise_waveform, self.NOISE_SAMPLE_RATE, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=True)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -392,8 +373,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("phaser", [gain_in, gain_out, delay_ms, decay, speed, "-t"])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.phaser(waveform, sample_rate, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=False)
+        output_waveform = F.phaser(self.noise_waveform, self.NOISE_SAMPLE_RATE, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=False)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -413,8 +393,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("flanger", [delay, depth, regen, width, speed, "triangle", phase, "linear"])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.flanger(waveform, sample_rate, delay, depth, regen, width, speed, phase,
+        output_waveform = F.flanger(self.noise_waveform, self.NOISE_SAMPLE_RATE, delay, depth, regen, width, speed, phase,
                                     modulation='triangular', interpolation='linear')
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
@@ -435,8 +414,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("flanger", [delay, depth, regen, width, speed, "triangle", phase, "quadratic"])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.flanger(waveform, sample_rate, delay, depth, regen, width, speed, phase,
+        output_waveform = F.flanger(self.noise_waveform, self.NOISE_SAMPLE_RATE, delay, depth, regen, width, speed, phase,
                                     modulation='triangular', interpolation='quadratic')
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
@@ -457,8 +435,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("flanger", [delay, depth, regen, width, speed, "sine", phase, "linear"])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.flanger(waveform, sample_rate, delay, depth, regen, width, speed, phase,
+        output_waveform = F.flanger(self.noise_waveform, self.NOISE_SAMPLE_RATE, delay, depth, regen, width, speed, phase,
                                     modulation='sinusoidal', interpolation='linear')
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
@@ -479,8 +456,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("flanger", [delay, depth, regen, width, speed, "sine", phase, "quadratic"])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.flanger(waveform, sample_rate, delay, depth, regen, width, speed, phase,
+        output_waveform = F.flanger(self.noise_waveform, self.NOISE_SAMPLE_RATE, delay, depth, regen, width, speed, phase,
                                     modulation='sinusoidal', interpolation='quadratic')
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
@@ -499,15 +475,11 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("equalizer", [center_freq, q, gain])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        waveform, sample_rate = torchaudio.load(self.noise_filepath, normalization=True)
-        output_waveform = F.equalizer_biquad(waveform, sample_rate, center_freq, gain, q)
+        output_waveform = F.equalizer_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, center_freq, gain, q)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
     def test_perf_biquad_filtering(self):
-
-        # FIXME - misnamed, fn_sine does not match asset path
-        fn_sine = common_utils.get_asset_path('whitenoise.wav')
 
         b0 = 0.4
         b1 = 0.2
@@ -518,13 +490,12 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
 
         # SoX method
         E = torchaudio.sox_effects.SoxEffectsChain()
-        E.set_input_file(fn_sine)
+        E.set_input_file(self.noise_filepath)
         E.append_effect_to_chain("biquad", [b0, b1, b2, a0, a1, a2])
         waveform_sox_out, _ = E.sox_build_flow_effects()
 
-        waveform, _ = torchaudio.load(fn_sine, normalization=True)
         waveform_lfilter_out = F.lfilter(
-            waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
+            self.noise_waveform, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2])
         )
 
         self.assertEqual(waveform_lfilter_out, waveform_sox_out, atol=1e-4, rtol=1e-5)
