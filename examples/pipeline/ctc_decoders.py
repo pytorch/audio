@@ -92,7 +92,7 @@ class ViterbiDecoder:
             # Add pairwise potentials to current scores.
             # assert path_scores[timestep - 1].size() == (n_permutations, num_tags)
             summed_potentials = (
-                path_scores[timestep - 1].unsqueeze(2) + self.transition_matrix
+                path_scores[timestep - 1].unsqueeze(2) + self.transitions
             )
             summed_potentials = summed_potentials.view(-1, num_tags)
 
