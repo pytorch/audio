@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import signal
 import string
 from collections import defaultdict
 from datetime import datetime
@@ -20,6 +21,10 @@ from datasets import collate_factory, datasets_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
 from utils import MetricLogger, count_parameters, save_checkpoint
+
+# TODO Remove before merge pull request
+MAIN_PID = os.getpid()
+SIGNAL_RECEIVED = False
 
 
 def parse_args():
@@ -133,6 +138,27 @@ def parse_args():
     return args
 
 
+# TODO Remove before merge pull request
+def signal_handler(a, b):
+    global SIGNAL_RECEIVED
+    logging.info(f"Signal received on {datetime.now()}")
+    SIGNAL_RECEIVED = True
+
+
+# TODO Remove before merge pull request
+def trigger_job_requeue():
+    # Submit a new job to resume from checkpoint.
+    if os.environ["SLURM_PROCID"] == "0" and os.getpid() == MAIN_PID:
+        logging.info(f"PID: {os.getpid()}. PPID: {os.getppid()}.")
+        logging.info("Resubmitting job")
+        command = "scontrol requeue " + os.environ["SLURM_JOB_ID"]
+        logging.info(command)
+        if os.system(command):
+            raise RuntimeError("Fail to resubmit")
+        logging.info("New job submitted to the queue")
+    exit(0)
+
+
 def setup_distributed(rank, world_size):
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "12355"
@@ -168,6 +194,10 @@ def train_one_epoch(
     for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
         data_loader, maxsize=2
     ):
+
+        # TODO Remove before merge pull request
+        if SIGNAL_RECEIVED:
+            return
 
         start2 = time()
         inputs = inputs.to(device, non_blocking=True)
@@ -282,6 +312,10 @@ def evaluate(
         for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
             data_loader, maxsize=2
         ):
+
+            # TODO Remove before merge pull request
+            if SIGNAL_RECEIVED:
+                return
 
             inputs = inputs.to(device, non_blocking=True)
             targets = targets.to(device, non_blocking=True)
@@ -517,7 +551,11 @@ def main(args, rank=0):
             epoch,
         )
 
-        if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
+        if (
+            SIGNAL_RECEIVED  # TODO Remove before merge pull request
+            or not (epoch + 1) % args.print_freq
+            or epoch == args.epochs - 1
+        ):
 
             sum_loss = evaluate(
                 model,
@@ -544,6 +582,10 @@ def main(args, rank=0):
                 rank,
             )
 
+        # TODO Remove before merge pull request
+        if SIGNAL_RECEIVED:
+            trigger_job_requeue()
+
     logging.info(f"End time: {datetime.now()}")
 
     if args.distributed:
@@ -562,5 +604,6 @@ def spawn_main(args, main):
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
+    signal.signal(signal.SIGUSR1, signal_handler)
     args = parse_args()
     spawn_main(args, main)
