@@ -52,7 +52,7 @@ class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase):
         path = get_asset_path('steam-train-whistle-daniel_simon.wav')
         data, _ = load_wav(path)
         result = F.dither(data, noise_shaping=True)
-        self.assert_sox_effect(result, path, ['dither', '-s'], atol=1e-3)
+        self.assert_sox_effect(result, path, ['dither', '-s'], atol=1.5e-4)
 
     def test_lowpass(self):
         cutoff_freq = 3000
@@ -60,7 +60,7 @@ class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase):
 
         data, path = self.get_whitenoise(sample_rate)
         result = F.lowpass_biquad(data, sample_rate, cutoff_freq)
-        self.assert_sox_effect(result, path, ['lowpass', cutoff_freq], atol=1e-3)
+        self.assert_sox_effect(result, path, ['lowpass', cutoff_freq], atol=1.5e-4)
 
     def test_highpass(self):
         cutoff_freq = 2000
@@ -68,7 +68,7 @@ class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase):
 
         data, path = self.get_whitenoise(sample_rate)
         result = F.highpass_biquad(data, sample_rate, cutoff_freq)
-        self.assert_sox_effect(result, path, ['highpass', cutoff_freq], atol=1e-3)
+        self.assert_sox_effect(result, path, ['highpass', cutoff_freq], atol=1.5e-4)
 
     def test_allpass(self):
         central_freq = 1000
@@ -146,7 +146,7 @@ class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase):
 
         data, path = self.get_whitenoise(sample_rate)
         result = F.bass_biquad(data, sample_rate, gain, central_freq, q)
-        self.assert_sox_effect(result, path, ['bass', gain, central_freq, f'{q}q'], atol=1.5e-4, rtol=1e-5)
+        self.assert_sox_effect(result, path, ['bass', gain, central_freq, f'{q}q'], atol=1.5e-4)
 
     def test_deemph(self):
         sample_rate = 44100
