@@ -2,7 +2,6 @@
 import unittest
 
 import torch
-import torchaudio
 import torchaudio.functional as F
 import torchaudio.transforms as T
 
@@ -616,6 +615,5 @@ class Transforms(common_utils.TestBaseMixin):
 
     def test_Vad(self):
         filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
-        common_utils.set_audio_backend('default')
-        waveform, sample_rate = torchaudio.load(filepath)
+        waveform, sample_rate = common_utils.load_wav(filepath)
         self._assert_consistency(T.Vad(sample_rate=sample_rate), waveform)
