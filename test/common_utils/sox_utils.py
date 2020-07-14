@@ -77,3 +77,24 @@ def convert_audio_file(
     command += [dst_path]
     print(' '.join(command))
     subprocess.run(command, check=True)
+
+
+def _flattern(effects):
+    if not effects:
+        return effects
+    if isinstance(effects[0], str):
+        return effects
+    return [item for sublist in effects for item in sublist]
+
+
+def run_sox_effect(input_file, output_file, effect, *, output_sample_rate=None, output_bitdepth=None):
+    """Run sox effects"""
+    effect = _flattern(effect)
+    command = ['sox', '-V', '--no-dither', input_file]
+    if output_bitdepth:
+        command += ['--bits', str(output_bitdepth)]
+    command += [output_file] + effect
+    if output_sample_rate:
+        command += ['rate', str(output_sample_rate)]
+    print(' '.join(command))
+    subprocess.run(command, check=True)
