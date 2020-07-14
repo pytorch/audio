@@ -25,3 +25,14 @@ def levenshtein_distance(r: Union[str, List[str]], h: Union[str, List[str]]):
         dnew, dold = dold, dnew
 
     return dold[-1]
+
+
+if __name__ == "__main__":
+    assert levenshtein_distance("abc", "abc") == 0
+    assert levenshtein_distance("aaa", "aba") == 1
+    assert levenshtein_distance("aba", "aaa") == 1
+    assert levenshtein_distance("aa", "aaa") == 1
+    assert levenshtein_distance("aaa", "aa") == 1
+    assert levenshtein_distance("abc", "bcd") == 2
+    assert levenshtein_distance(["hello", "world"], ["hello", "world", "!"]) == 1
+    assert levenshtein_distance(["hello", "world"], ["world", "hello", "!"]) == 2
