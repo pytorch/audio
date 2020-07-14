@@ -1,28 +1,27 @@
-from typing import Optional
-
-import torch
+from typing import List, Union
 
 
-def levenshtein_distance(r: str, h: str, device: Optional[str] = None):
+def levenshtein_distance(r: Union[str, List[str]], h: Union[str, List[str]]):
+    """
+    Calculate the Levenshtein distance between two lists or strings.
+    """
 
-    # initialisation
-    d = torch.zeros((2, len(h) + 1), dtype=torch.long)  # , device=device)
-    dold = 0
-    dnew = 1
+    # Initialisation
+    dold = list(range(len(h) + 1))
+    dnew = list(0 for _ in range(len(h) + 1))
 
-    # computation
+    # Computation
     for i in range(1, len(r) + 1):
-        d[dnew, 0] = 0
+        dnew[0] = i
         for j in range(1, len(h) + 1):
-
             if r[i - 1] == h[j - 1]:
-                d[dnew, j] = d[dnew - 1, j - 1]
+                dnew[j] = dold[j - 1]
             else:
-                substitution = d[dnew - 1, j - 1] + 1
-                insertion = d[dnew, j - 1] + 1
-                deletion = d[dnew - 1, j] + 1
-                d[dnew, j] = min(substitution, insertion, deletion)
+                substitution = dold[j - 1] + 1
+                insertion = dnew[j - 1] + 1
+                deletion = dold[j] + 1
+                dnew[j] = min(substitution, insertion, deletion)
 
         dnew, dold = dold, dnew
 
-    return d[dnew, -1].item()
+    return dold[-1]
