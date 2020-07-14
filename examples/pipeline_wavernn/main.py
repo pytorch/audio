@@ -154,10 +154,7 @@ def parse_args():
         help="the ratio of waveforms for validation",
     )
     parser.add_argument(
-        "--file-path",
-        default="",
-        type=str,
-        help="the path of audio files",
+        "--file-path", default="", type=str, help="the path of audio files",
     )
 
     args = parser.parse_args()
@@ -301,7 +298,10 @@ def main(args):
         **loader_training_params,
     )
     val_loader = DataLoader(
-        val_dataset, batch_size=args.batch_size, collate_fn=collate_fn, **loader_validation_params,
+        val_dataset,
+        batch_size=args.batch_size,
+        collate_fn=collate_fn,
+        **loader_validation_params,
     )
 
     model = _WaveRNN(

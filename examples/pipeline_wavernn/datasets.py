@@ -6,7 +6,12 @@ import torchaudio
 from torchaudio.datasets import LJSPEECH
 
 from transform import linear_to_mel
-from functional import label_to_waveform, mulaw_encode, specgram_normalize, waveform_to_label
+from functional import (
+    label_to_waveform,
+    mulaw_encode,
+    specgram_normalize,
+    waveform_to_label,
+)
 
 
 class MapMemoryCache(torch.utils.data.Dataset):
@@ -31,19 +36,20 @@ class MapMemoryCache(torch.utils.data.Dataset):
 
 
 class ProcessedLJSPEECH(LJSPEECH):
-    def __init__(self, files, transforms, args):
-        self.files = files
+    def __init__(self, dataset, transforms, args):
+        self.dataset = dataset
         self.transforms = transforms
         self.args = args
 
     def __getitem__(self, index):
-        filename = self.files[index][0]
-        file = os.path.join(self.args.file_path, filename + '.wav')
+        filename = self.dataset[index][0]
+        folder = "LJSpeech-1.1/wavs/"
+        file = os.path.join(self.args.file_path, folder, filename + ".wav")
 
         return self.process_datapoint(file)
 
     def __len__(self):
-        return len(self.files)
+        return len(self.dataset)
 
     def process_datapoint(self, file):
         args = self.args
@@ -65,23 +71,24 @@ class ProcessedLJSPEECH(LJSPEECH):
         return waveform, specgram
 
 
-def split_data(data, val_ratio):
-    files = data._walker
-    random.shuffle(files)
-    train_files = files[: -int(val_ratio * len(files))]
-    val_files = files[-int(val_ratio * len(files)):]
+def split_data(data, val_ratio, seed):
+    dataset = data._walker
 
-    return train_files, val_files
+    random.seed(seed)
+    random.shuffle(dataset)
+
+    train_dataset = dataset[: -int(val_ratio * len(dataset))]
+    val_dataset = dataset[-int(val_ratio * len(dataset)):]
+
+    return train_dataset, val_dataset
 
 
 def gen_datasets_ljspeech(
-    args,
-    transforms,
-    root="datasets/",
+    args, transforms,
 ):
-    data = LJSPEECH(root=root, download=False)
+    data = LJSPEECH(root=args.file_path, download=False)
 
-    train_dataset, val_dataset = split_data(data, args.val_ratio)
+    train_dataset, val_dataset = split_data(data, args.val_ratio, args.seed)
 
     train_dataset = ProcessedLJSPEECH(train_dataset, transforms, args)
     val_dataset = ProcessedLJSPEECH(val_dataset, transforms, args)
