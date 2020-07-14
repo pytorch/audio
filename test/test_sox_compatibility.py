@@ -144,7 +144,8 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("bandpass", ["-c", central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        output_waveform = F.bandpass_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, central_freq, q, const_skirt_gain)
+        output_waveform = F.bandpass_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE,
+                                            central_freq, q, const_skirt_gain)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -161,7 +162,8 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("bandpass", [central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        output_waveform = F.bandpass_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, central_freq, q, const_skirt_gain)
+        output_waveform = F.bandpass_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE,
+                                            central_freq, q, const_skirt_gain)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -177,7 +179,8 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("bandreject", [central_freq, str(q) + 'q'])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        output_waveform = F.bandreject_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, central_freq, q)
+        output_waveform = F.bandreject_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE,
+                                              central_freq, q)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -355,7 +358,8 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("phaser", [gain_in, gain_out, delay_ms, decay, speed, "-s"])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        output_waveform = F.phaser(self.noise_waveform, self.NOISE_SAMPLE_RATE, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=True)
+        output_waveform = F.phaser(self.noise_waveform, self.NOISE_SAMPLE_RATE,
+                                   gain_in, gain_out, delay_ms, decay, speed, sinusoidal=True)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -374,7 +378,8 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("phaser", [gain_in, gain_out, delay_ms, decay, speed, "-t"])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        output_waveform = F.phaser(self.noise_waveform, self.NOISE_SAMPLE_RATE, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=False)
+        output_waveform = F.phaser(self.noise_waveform, self.NOISE_SAMPLE_RATE,
+                                   gain_in, gain_out, delay_ms, decay, speed, sinusoidal=False)
 
         self.assertEqual(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -394,8 +399,8 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("flanger", [delay, depth, regen, width, speed, "triangle", phase, "linear"])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        output_waveform = F.flanger(self.noise_waveform, self.NOISE_SAMPLE_RATE, delay, depth, regen, width, speed, phase,
-                                    modulation='triangular', interpolation='linear')
+        output_waveform = F.flanger(self.noise_waveform, self.NOISE_SAMPLE_RATE, delay, depth, regen,
+                                    width, speed, phase, modulation='triangular', interpolation='linear')
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -415,8 +420,8 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("flanger", [delay, depth, regen, width, speed, "triangle", phase, "quadratic"])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        output_waveform = F.flanger(self.noise_waveform, self.NOISE_SAMPLE_RATE, delay, depth, regen, width, speed, phase,
-                                    modulation='triangular', interpolation='quadratic')
+        output_waveform = F.flanger(self.noise_waveform, self.NOISE_SAMPLE_RATE, delay, depth,
+                                    regen, width, speed, phase, modulation='triangular', interpolation='quadratic')
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -436,8 +441,8 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("flanger", [delay, depth, regen, width, speed, "sine", phase, "linear"])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        output_waveform = F.flanger(self.noise_waveform, self.NOISE_SAMPLE_RATE, delay, depth, regen, width, speed, phase,
-                                    modulation='sinusoidal', interpolation='linear')
+        output_waveform = F.flanger(self.noise_waveform, self.NOISE_SAMPLE_RATE, delay, depth,
+                                    regen, width, speed, phase, modulation='sinusoidal', interpolation='linear')
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
@@ -457,8 +462,8 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         E.append_effect_to_chain("flanger", [delay, depth, regen, width, speed, "sine", phase, "quadratic"])
         sox_output_waveform, sr = E.sox_build_flow_effects()
 
-        output_waveform = F.flanger(self.noise_waveform, self.NOISE_SAMPLE_RATE, delay, depth, regen, width, speed, phase,
-                                    modulation='sinusoidal', interpolation='quadratic')
+        output_waveform = F.flanger(self.noise_waveform, self.NOISE_SAMPLE_RATE, delay, depth,
+                                    regen, width, speed, phase, modulation='sinusoidal', interpolation='quadratic')
 
         torch.testing.assert_allclose(output_waveform, sox_output_waveform, atol=1e-4, rtol=1e-5)
 
