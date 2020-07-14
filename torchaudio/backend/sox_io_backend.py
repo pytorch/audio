@@ -87,7 +87,6 @@ def save(
         sample_rate: int,
         channels_first: bool = True,
         compression: Optional[float] = None,
-        frames_per_chunk: int = 65536,
 ):
     """Save audio data to file.
 
@@ -115,8 +114,6 @@ def save(
                 ``8`` is default and highest compression.
             - OGG/VORBIS: number from -1 to 10; -1 is the highest compression and lowest
                 quality. Default: ``3``.
-        frames_per_chunk: The number of frames to process (convert to ``int32`` internally
-            then write to file) at a time.
     """
     if compression is None:
         ext = str(filepath)[-3:].lower()
@@ -131,7 +128,7 @@ def save(
         else:
             raise RuntimeError(f'Unsupported file type: "{ext}"')
     signal = torch.classes.torchaudio.TensorSignal(tensor, sample_rate, channels_first)
-    torch.ops.torchaudio.sox_io_save_audio_file(filepath, signal, compression, frames_per_chunk)
+    torch.ops.torchaudio.sox_io_save_audio_file(filepath, signal, compression)
 
 
 load_wav = load

@@ -123,8 +123,7 @@ c10::intrusive_ptr<TensorSignal> load_audio_file(
 void save_audio_file(
     const std::string& file_name,
     const c10::intrusive_ptr<TensorSignal>& signal,
-    const double compression,
-    const int64_t frames_per_chunk) {
+    const double compression) {
   const auto tensor = signal->getTensor();
   const auto sample_rate = signal->getSampleRate();
   const auto channels_first = signal->getChannelsFirst();
@@ -154,6 +153,7 @@ void save_audio_file(
     tensor_ = tensor_.t();
   }
 
+  const int64_t frames_per_chunk = 65536;
   for (int64_t i = 0; i < tensor_.size(0); i += frames_per_chunk) {
     auto chunk = tensor_.index({Slice(i, i + frames_per_chunk), Slice()});
     chunk = unnormalize_wav(chunk).contiguous();
