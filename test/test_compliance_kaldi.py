@@ -51,13 +51,11 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
     backend = 'sox'
 
     kaldi_output_dir = common_utils.get_asset_path('kaldi')
+    test_filepath = common_utils.get_asset_path('kaldi_file.wav')
     test_filepaths = {prefix: [] for prefix in compliance_utils.TEST_PREFIX}
 
     def setUp(self):
         super().setUp()
-
-        # 0. temp filepath to test IO
-        self.test0_filepath = self.get_temp_path('kaldi_file.wav')
 
         # 1. test signal for testing resampling
         self.test1_signal_sr = 16000
@@ -65,7 +63,7 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
             sample_rate=self.test1_signal_sr, duration=0.5,
         )
 
-        # 2. test file and saved kaldi ark files
+        # 2. test audio file corresponding to saved kaldi ark files
         self.test2_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
 
     # separating test files by their types (e.g 'spec', 'fbank', etc.)
@@ -115,8 +113,8 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
         y = (y / 6 * (1 << 30)).long()
         # clear the last 16 bits because they aren't used anyways
         y = ((y >> 16) << 16).float()
-        torchaudio.save(self.test0_filepath, y, sr)
-        sound, sample_rate = torchaudio.load(self.test0_filepath, normalization=False)
+        torchaudio.save(self.test_filepath, y, sr)
+        sound, sample_rate = torchaudio.load(self.test_filepath, normalization=False)
         print(y >> 16)
         self.assertTrue(sample_rate == sr)
         torch.testing.assert_allclose(y, sound)
