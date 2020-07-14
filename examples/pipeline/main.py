@@ -229,34 +229,29 @@ def train_one_epoch(
 
         optimizer.step()
 
+        compute_error_rates(outputs, targets, decoder, language_model, sums)
+        record_error_rates(sums, metric)
+
         sums["length_dataset"] += len(inputs)
+
         metric("iteration", sums["iteration"])
         metric("time", time() - start2)
+        metric("epoch", epoch)
         metric.print()
-        sums["iteration"] += 1
 
-        compute_error_rates(outputs, targets, decoder, language_model, sums, epoch)
+        sums["iteration"] += 1
 
     avg_loss = sums["loss"] / len(data_loader)
 
     metric = MetricLogger("train_epoch")
+    record_error_rates(sums, metric)
     metric("epoch", epoch)
     metric("loss", avg_loss)
-    if "gradient" in sums:
-        metric("gradient", sums["gradient"] / len(data_loader))
+    metric("gradient", sums["gradient"] / len(data_loader))
     try:
         metric("lr", scheduler.get_last_lr()[0])
     except AttributeError:
         pass
-    metric("cer", sums["cer"])
-    metric("wer", sums["wer"])
-    metric("cer over dataset length", sums["cer"] / sums["length_dataset"])
-    metric("wer over dataset length", sums["wer"] / sums["length_dataset"])
-    metric("cer over target length", sums["cer"] / sums["total_chars"])
-    metric("wer over target length", sums["wer"] / sums["total_words"])
-    metric("target length", sums["total_chars"])
-    metric("target length", sums["total_words"])
-    metric("dataset length", sums["length_dataset"])
     metric("time", time() - start1)
     metric.print()
 
@@ -266,7 +261,20 @@ def train_one_epoch(
         scheduler.step()
 
 
-def compute_error_rates(outputs, targets, decoder, language_model, sums, epoch):
+def record_error_rates(sums, metric):
+
+    metric("cer", sums["cer"])
+    metric("wer", sums["wer"])
+    metric("cer over dataset length", sums["cer"] / sums["length_dataset"])
+    metric("wer over dataset length", sums["wer"] / sums["length_dataset"])
+    metric("cer over target length", sums["cer"] / sums["total_chars"])
+    metric("wer over target length", sums["wer"] / sums["total_words"])
+    metric("target length", sums["total_chars"])
+    metric("target length", sums["total_words"])
+    metric("dataset length", sums["length_dataset"])
+
+
+def compute_error_rates(outputs, targets, decoder, language_model, sums):
     output = outputs.transpose(0, 1).to("cpu")
     output = decoder(output)
 
@@ -277,7 +285,7 @@ def compute_error_rates(outputs, targets, decoder, language_model, sums, epoch):
     for i in range(2):
         output_print = output[i].ljust(print_length)[:print_length]
         target_print = target[i].ljust(print_length)[:print_length]
-        logging.info(f"Epoch: {epoch}  Target: {target_print}   Output: {output_print}")
+        logging.info(f"Target: {target_print}   Output: {output_print}")
 
     cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
     # cers_normalized = [d / len(a) for a, d in zip(target, cers)]
@@ -308,6 +316,7 @@ def evaluate(
         model.eval()
         sums = defaultdict(lambda: 0.0)
         start = time()
+        metric = MetricLogger("validation")
 
         for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
             data_loader, maxsize=2
@@ -335,23 +344,14 @@ def evaluate(
 
             sums["length_dataset"] += len(inputs)
 
-            compute_error_rates(outputs, targets, decoder, language_model, sums, epoch)
+            compute_error_rates(outputs, targets, decoder, language_model, sums)
 
         avg_loss = sums["loss"] / len(data_loader)
 
-        metric = MetricLogger("validation")
         metric("epoch", epoch)
         metric("loss", avg_loss)
-        metric("cer", sums["cer"])
-        metric("wer", sums["wer"])
-        metric("cer over dataset length", sums["cer"] / sums["length_dataset"])
-        metric("wer over dataset length", sums["wer"] / sums["length_dataset"])
-        metric("cer over target length", sums["cer"] / sums["total_chars"])
-        metric("wer over target length", sums["wer"] / sums["total_words"])
-        metric("target length", sums["total_chars"])
-        metric("target length", sums["total_words"])
-        metric("dataset length", sums["length_dataset"])
         metric("time", time() - start)
+        record_error_rates(sums, metric)
         metric.print()
 
         return avg_loss
@@ -538,6 +538,8 @@ def main(args, rank=0):
         torch.distributed.barrier()
 
     for epoch in range(args.start_epoch, args.epochs):
+
+        logging.info(f"Epoch: {epoch}")
 
         train_one_epoch(
             model,
