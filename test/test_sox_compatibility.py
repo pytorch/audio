@@ -13,21 +13,22 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
     backend = 'sox'
 
     def setUp(self):
-        common_utils.TempDirMixin.setUp(self)
-        common_utils.TorchaudioTestCase.setUp(self)
+        # 1. Create int16 signal to save as PCM wav
+        # 2. Write to temp file
+        # 3. Load temp file into tensor to reuse in downstream tests
+        #    Prefer to use common_utils.load_wav() but this implementation does
+        #    not match torchaudio.load and errors on downstream tests
+        super().setUp()
 
-        SEED = 42
-        self.NOISE_SAMPLE_RATE = 44100
+        self.NOISE_SAMPLE_RATE = 44100  # N.B. 44.1 kHz required by SoX riaa effect
         noise_waveform_as_int = common_utils.get_whitenoise(
-            sample_rate=self.NOISE_SAMPLE_RATE, duration=5, dtype=torch.int16, seed=SEED, scale_factor=0.9,
+            sample_rate=self.NOISE_SAMPLE_RATE, duration=5, dtype=torch.int16,
         )
-        self.noise_waveform = common_utils.get_whitenoise(
-            sample_rate=self.NOISE_SAMPLE_RATE, duration=5, dtype=torch.float32, seed=SEED, scale_factor=0.9,
-        )        
         self.noise_filepath = self.get_temp_path("whitenoise.wav")
         common_utils.save_wav(
             self.noise_filepath, noise_waveform_as_int, self.NOISE_SAMPLE_RATE
         )
+        self.noise_waveform, _ = torchaudio.load(self.noise_filepath, normalization=True)
 
     def test_gain(self):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
