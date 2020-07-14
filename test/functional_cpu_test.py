@@ -298,10 +298,23 @@ class TestIstft(common_utils.TorchaudioTestCase):
         self._test_linearity_of_istft(data_size, kwargs4, atol=1e-5, rtol=1e-8)
 
 
-class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
+class TestDetectPitchFrequency(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
     def test_pitch(self):
-        test_filepath_100 = common_utils.get_asset_path("100Hz_44100Hz_16bit_05sec.wav")
-        test_filepath_440 = common_utils.get_asset_path("440Hz_44100Hz_16bit_05sec.wav")
+        SAMPLE_RATE = 44100
+        test_100Hz = common_utils.get_sinusoid(
+            frequency=100, sample_rate=SAMPLE_RATE, duration=5, dtype=torch.int16,
+        )
+        test_filepath_100 = self.get_temp_path("100Hz_44100Hz_16bit_05sec.wav")
+        common_utils.save_wav(
+            test_filepath_100, test_100Hz, SAMPLE_RATE
+        )
+        test_440Hz = common_utils.get_sinusoid(
+            frequency=440, sample_rate=SAMPLE_RATE, duration=5, dtype=torch.int16,
+        )
+        test_filepath_440 = self.get_temp_path("440Hz_44100Hz_16bit_05sec.wav")
+        common_utils.save_wav(
+            test_filepath_440, test_440Hz, SAMPLE_RATE
+        )
 
         # Files from https://www.mediacollege.com/audio/tone/download/
         tests = [
