@@ -6,7 +6,7 @@ import torchaudio
 from torchaudio.datasets import LJSPEECH
 
 from transform import linear_to_mel
-from utils import label_to_waveform, mulaw_encode, specgram_normalize, waveform_to_label
+from functional import label_to_waveform, mulaw_encode, specgram_normalize, waveform_to_label
 
 
 class MapMemoryCache(torch.utils.data.Dataset):
@@ -32,19 +32,25 @@ class MapMemoryCache(torch.utils.data.Dataset):
 
 class ProcessedLJSPEECH(LJSPEECH):
     def __init__(self, files, transforms, args):
-
-        self.transforms = transforms
         self.files = files
+        self.transforms = transforms
         self.args = args
 
     def __getitem__(self, index):
+        filename = self.files[index][0]
+        file = os.path.join(self.args.file_path, filename + '.wav')
 
-        file = self.files[index]
+        return self.process_datapoint(file)
+
+    def __len__(self):
+        return len(self.files)
+
+    def process_datapoint(self, file):
         args = self.args
         n_fft = 2048
         waveform, sample_rate = torchaudio.load(file)
         specgram = self.transforms(waveform)
-        # Will be replaced by torchaudio as described in https://github.com/pytorch/audio/pull/593
+        # TODO Replace by torchaudio, once https://github.com/pytorch/audio/pull/593 is resolved
         specgram = linear_to_mel(specgram, sample_rate, n_fft, args.n_freq, args.f_min)
         specgram = specgram_normalize(specgram, args.min_level_db)
         waveform = waveform.squeeze(0)
@@ -58,28 +64,32 @@ class ProcessedLJSPEECH(LJSPEECH):
 
         return waveform, specgram
 
-    def __len__(self):
-        return len(self.files)
+
+def split_data(data, val_ratio):
+    files = data._walker
+    random.shuffle(files)
+    train_files = files[: -int(val_ratio * len(files))]
+    val_files = files[-int(val_ratio * len(files)):]
+
+    return train_files, val_files
 
 
-def datasets_ljspeech(args, transforms):
+def gen_datasets_ljspeech(
+    args,
+    transforms,
+    root="datasets/",
+):
+    data = LJSPEECH(root=root, download=False)
 
-    root = args.file_path
-    wavefiles = [os.path.join(root, file) for file in os.listdir(root)]
+    train_dataset, val_dataset = split_data(data, args.val_ratio)
 
-    random.seed(args.seed)
-    random.shuffle(wavefiles)
-
-    train_files = wavefiles[: -args.test_samples]
-    test_files = wavefiles[-args.test_samples:]
-
-    train_dataset = ProcessedLJSPEECH(train_files, transforms, args)
-    test_dataset = ProcessedLJSPEECH(test_files, transforms, args)
+    train_dataset = ProcessedLJSPEECH(train_dataset, transforms, args)
+    val_dataset = ProcessedLJSPEECH(val_dataset, transforms, args)
 
     train_dataset = MapMemoryCache(train_dataset)
-    test_dataset = MapMemoryCache(test_dataset)
+    val_dataset = MapMemoryCache(val_dataset)
 
-    return train_dataset, test_dataset
+    return train_dataset, val_dataset
 
 
 def collate_factory(args):

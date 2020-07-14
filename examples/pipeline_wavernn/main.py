@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
 from torchaudio.models._wavernn import _WaveRNN
 
-from datasets import collate_factory, datasets_ljspeech
+from datasets import collate_factory, gen_datasets_ljspeech
 from losses import MoLLoss
 from utils import MetricLogger, count_parameters, save_checkpoint
 
@@ -148,10 +148,10 @@ def parse_args():
         help="seq_length = hop_length * seq_len_factor",
     )
     parser.add_argument(
-        "--test-samples",
-        default=50,
+        "--val-ratio",
+        default=0.1,
         type=float,
-        help="the number of waveforms for testing",
+        help="the ratio of waveforms for validation",
     )
     parser.add_argument(
         "--file-path",
@@ -225,7 +225,7 @@ def train_one_epoch(model, mode, criterion, optimizer, data_loader, device, epoc
     metric.print()
 
 
-def evaluate(model, mode, criterion, data_loader, device, epoch):
+def validate(model, mode, criterion, data_loader, device, epoch):
 
     with torch.no_grad():
 
@@ -281,7 +281,7 @@ def main(args):
 
     transforms = torch.nn.Sequential(torchaudio.transforms.Spectrogram(**melkwargs))
 
-    train_dataset, test_dataset = datasets_ljspeech(args, transforms)
+    train_dataset, val_dataset = gen_datasets_ljspeech(args, transforms)
 
     loader_training_params = {
         "num_workers": args.workers,
@@ -294,14 +294,14 @@ def main(args):
 
     collate_fn = collate_factory(args)
 
-    loader_training = DataLoader(
+    train_loader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
         collate_fn=collate_fn,
         **loader_training_params,
     )
-    loader_test = DataLoader(
-        test_dataset, batch_size=1, collate_fn=collate_fn, **loader_validation_params,
+    val_loader = DataLoader(
+        val_dataset, batch_size=args.batch_size, collate_fn=collate_fn, **loader_validation_params,
     )
 
     model = _WaveRNN(
@@ -371,13 +371,13 @@ def main(args):
     for epoch in range(args.start_epoch, args.epochs):
 
         train_one_epoch(
-            model, args.mode, criterion, optimizer, loader_training, devices[0], epoch,
+            model, args.mode, criterion, optimizer, train_loader, devices[0], epoch,
         )
 
         if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
 
-            sum_loss = evaluate(
-                model, args.mode, criterion, loader_test, devices[0], epoch,
+            sum_loss = validate(
+                model, args.mode, criterion, val_loader, devices[0], epoch,
             )
 
             is_best = sum_loss < best_loss
