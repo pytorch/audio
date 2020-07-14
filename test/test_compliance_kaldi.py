@@ -47,13 +47,26 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
 
 
 @common_utils.skipIfNoSoxBackend
-class Test_Kaldi(common_utils.TorchaudioTestCase):
+class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
     backend = 'sox'
 
-    test_filepath = common_utils.get_asset_path('kaldi_file.wav')
-    test_8000_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
     kaldi_output_dir = common_utils.get_asset_path('kaldi')
     test_filepaths = {prefix: [] for prefix in compliance_utils.TEST_PREFIX}
+
+    def setUp(self):
+        super().setUp()
+
+        # 0. temp filepath to test IO
+        self.test0_filepath = self.get_temp_path('kaldi_file.wav')
+
+        # 1. test signal for testing resampling
+        self.test1_signal_sr = 16000
+        self.test1_signal = common_utils.get_whitenoise(
+            sample_rate=self.test1_signal_sr, duration=0.5,
+        )
+
+        #2. test file and saved kaldi ark files
+        self.test2_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
 
     # separating test files by their types (e.g 'spec', 'fbank', etc.)
     for f in os.listdir(kaldi_output_dir):
@@ -94,7 +107,6 @@ class Test_Kaldi(common_utils.TorchaudioTestCase):
 
     def _create_data_set(self):
         # used to generate the dataset to test on. this is not used in testing (offline procedure)
-        test_filepath = common_utils.get_asset_path('kaldi_file.wav')
         sr = 16000
         x = torch.arange(0, 20).float()
         # between [-6,6]
@@ -103,8 +115,8 @@ class Test_Kaldi(common_utils.TorchaudioTestCase):
         y = (y / 6 * (1 << 30)).long()
         # clear the last 16 bits because they aren't used anyways
         y = ((y >> 16) << 16).float()
-        torchaudio.save(test_filepath, y, sr)
-        sound, sample_rate = torchaudio.load(test_filepath, normalization=False)
+        torchaudio.save(self.test_filepath, y, sr)
+        sound, sample_rate = torchaudio.load(self.test_filepath, normalization=False)
         print(y >> 16)
         self.assertTrue(sample_rate == sr)
         torch.testing.assert_allclose(y, sound)
@@ -126,7 +138,7 @@ class Test_Kaldi(common_utils.TorchaudioTestCase):
                                 expected_num_args, get_output_fn, atol=1e-5, rtol=1e-8):
         """
         Inputs:
-            sound_filepath (str): The location of the sound file
+            sound_filepath (str): 
             filepath_key (str): A key to `test_filepaths` which matches which files to use
             expected_num_files (int): The expected number of kaldi files to read
             expected_num_args (int): The expected number of arguments used in a kaldi configuration
@@ -135,7 +147,7 @@ class Test_Kaldi(common_utils.TorchaudioTestCase):
             atol (float): absolute tolerance
             rtol (float): relative tolerance
         """
-        sound, sample_rate = torchaudio.load_wav(sound_filepath)
+        sound, sr = common_utils.load_wav(sound_filepath)
         files = self.test_filepaths[filepath_key]
 
         assert len(files) == expected_num_files, ('number of kaldi %s file changed to %d' % (filepath_key, len(files)))
@@ -170,22 +182,19 @@ class Test_Kaldi(common_utils.TorchaudioTestCase):
             output = kaldi.resample_waveform(sound, args[1], args[2])
             return output
 
-        self._compliance_test_helper(self.test_8000_filepath, 'resample', 32, 3, get_output_fn, atol=1e-2, rtol=1e-5)
+        self._compliance_test_helper(self.test2_filepath, 'resample', 32, 3, get_output_fn, atol=1e-2, rtol=1e-5)
 
     def test_resample_waveform_upsample_size(self):
-        sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)
-        upsample_sound = kaldi.resample_waveform(sound, sample_rate, sample_rate * 2)
-        self.assertTrue(upsample_sound.size(-1) == sound.size(-1) * 2)
+        upsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr * 2)
+        self.assertTrue(upsample_sound.size(-1) == self.test1_signal.size(-1) * 2)
 
     def test_resample_waveform_downsample_size(self):
-        sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)
-        downsample_sound = kaldi.resample_waveform(sound, sample_rate, sample_rate // 2)
-        self.assertTrue(downsample_sound.size(-1) == sound.size(-1) // 2)
+        downsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr // 2)
+        self.assertTrue(downsample_sound.size(-1) == self.test1_signal.size(-1) // 2)
 
     def test_resample_waveform_identity_size(self):
-        sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)
-        downsample_sound = kaldi.resample_waveform(sound, sample_rate, sample_rate)
-        self.assertTrue(downsample_sound.size(-1) == sound.size(-1))
+        downsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr)
+        self.assertTrue(downsample_sound.size(-1) == self.test1_signal.size(-1))
 
     def _test_resample_waveform_accuracy(self, up_scale_factor=None, down_scale_factor=None,
                                          atol=1e-1, rtol=1e-4):
@@ -226,18 +235,17 @@ class Test_Kaldi(common_utils.TorchaudioTestCase):
     def test_resample_waveform_multi_channel(self):
         num_channels = 3
 
-        sound, sample_rate = torchaudio.load_wav(self.test_8000_filepath)  # (1, 8000)
-        multi_sound = sound.repeat(num_channels, 1)  # (num_channels, 8000)
+        multi_sound = self.test1_signal.repeat(num_channels, 1)  # (num_channels, 8000 smp)
 
         for i in range(num_channels):
             multi_sound[i, :] *= (i + 1) * 1.5
 
-        multi_sound_sampled = kaldi.resample_waveform(multi_sound, sample_rate, sample_rate // 2)
+        multi_sound_sampled = kaldi.resample_waveform(multi_sound, self.test1_signal_sr, self.test1_signal_sr // 2)
 
         # check that sampling is same whether using separately or in a tensor of size (c, n)
         for i in range(num_channels):
-            single_channel = sound * (i + 1) * 1.5
-            single_channel_sampled = kaldi.resample_waveform(single_channel, sample_rate, sample_rate // 2)
+            single_channel = self.test1_signal * (i + 1) * 1.5
+            single_channel_sampled = kaldi.resample_waveform(single_channel, self.test1_signal_sr, self.test1_signal_sr // 2)
             torch.testing.assert_allclose(multi_sound_sampled[i, :], single_channel_sampled[0], rtol=1e-4, atol=1e-8)
 
 
