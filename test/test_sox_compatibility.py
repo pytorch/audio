@@ -20,7 +20,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
         #    not match torchaudio.load and errors on downstream tests
         super().setUp()
 
-        self.NOISE_SAMPLE_RATE = 44100  # N.B. 44.1 kHz required by SoX riaa effect
+        self.NOISE_SAMPLE_RATE = 44100  # N.B. 44.1 kHz required by SoX deemph effect
         noise_waveform_as_int = common_utils.get_whitenoise(
             sample_rate=self.NOISE_SAMPLE_RATE, duration=5, dtype=torch.int16,
         )
