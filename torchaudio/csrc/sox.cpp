@@ -82,17 +82,6 @@ std::tuple<sox_signalinfo_t, sox_encodinginfo_t> get_info(
   return std::make_tuple(fd->signal, fd->encoding);
 }
 
-std::vector<std::string> get_effect_names() {
-  sox_effect_fn_t const * fns = sox_get_effect_fns();
-  std::vector<std::string> sv;
-  for(int i = 0; fns[i]; ++i) {
-    const sox_effect_handler_t *eh = fns[i] ();
-    if(eh && eh->name)
-      sv.push_back(eh->name);
-  }
-  return sv;
-}
-
 int read_audio_file(
     const std::string& file_name,
     at::Tensor output,
@@ -184,16 +173,6 @@ void write_audio_file(
     throw std::runtime_error(
         "Error writing audio file: could not write entire buffer");
   }
-}
-
-int initialize_sox() {
-  /* Initialization for sox effects.  Only initialize once  */
-  return sox_init();
-}
-
-int shutdown_sox() {
-  /* Shutdown for sox effects.  Do not shutdown between multiple calls  */
-  return sox_quit();
 }
 
 int build_flow_effects(const std::string& file_name,
@@ -490,19 +469,7 @@ PYBIND11_MODULE(_torchaudio, m) {
       &torch::audio::get_info,
       "Gets information about an audio file");
   m.def(
-      "get_effect_names",
-      &torch::audio::get_effect_names,
-      "Gets the names of all available effects");
-  m.def(
       "build_flow_effects",
       &torch::audio::build_flow_effects,
       "build effects and flow chain into tensors");
-  m.def(
-      "initialize_sox",
-      &torch::audio::initialize_sox,
-      "initialize sox for effects");
-  m.def(
-      "shutdown_sox",
-      &torch::audio::shutdown_sox,
-      "shutdown sox for effects");
 }

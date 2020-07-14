@@ -7,6 +7,7 @@ from torchaudio._internal.module_utils import is_module_available
 from . import (
     no_backend,
     sox_backend,
+    sox_io_backend,
     soundfile_backend,
 )
 
@@ -24,6 +25,7 @@ def list_audio_backends() -> List[str]:
         backends.append('soundfile')
     if is_module_available('torchaudio._torchaudio'):
         backends.append('sox')
+        backends.append('sox_io')
     return backends
 
 
@@ -43,6 +45,8 @@ def set_audio_backend(backend: Optional[str]) -> None:
         module = no_backend
     elif backend == 'sox':
         module = sox_backend
+    elif backend == 'sox_io':
+        module = sox_io_backend
     elif backend == 'soundfile':
         module = soundfile_backend
     else:
@@ -69,6 +73,8 @@ def get_audio_backend() -> Optional[str]:
         return None
     if torchaudio.load == sox_backend.load:
         return 'sox'
+    if torchaudio.load == sox_io_backend.load:
+        return 'sox_io'
     if torchaudio.load == soundfile_backend.load:
         return 'soundfile'
     raise ValueError('Unknown backend.')

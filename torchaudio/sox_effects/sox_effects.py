@@ -1,4 +1,3 @@
-import atexit
 from typing import Any, Callable, List, Optional, Tuple, Union
 
 import torch
@@ -13,19 +12,8 @@ if _mod_utils.is_module_available('torchaudio._torchaudio'):
     from torchaudio import _torchaudio
 
 
-_SOX_INITIALIZED: Optional[bool] = False
-# This variable has a micro lifecycle. (False -> True -> None)
-# False: Not initialized
-# True: Initialized
-# None: Already shut down (should not be initialized again.)
-
-_SOX_SUCCESS_CODE = 0
-# defined at
-# https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93a9ef2b87ec303edfe40751d9a85fadeeb
-
-
 @_mod_utils.requires_module('torchaudio._torchaudio')
-def init_sox_effects() -> int:
+def init_sox_effects() -> None:
     """Initialize resources required to use ``SoxEffectsChain``
 
     You do not need to call this function manually. It is called automatically.
@@ -33,50 +21,26 @@ def init_sox_effects() -> int:
     Once initialized, you do not need to call this function again across the multiple call of
     ``SoxEffectsChain.sox_build_flow_effects``, though it is safe to do so as long as
     ``shutdown_sox_effects`` is not called yet.
-    Once ``shutdown_sox_effects`` is called, you can no longer use SoX effects and calling
-    this function results in `RuntimeError`.
+    Once ``shutdown_sox_effects`` is called, you can no longer use SoX effects and
+    initializing again will result in error.
 
     Note:
         This function is not required for simple loading.
-
-    Returns:
-        int: Code corresponding to sox_error_t enum. See
-        https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93
     """
-    global _SOX_INITIALIZED
-    if _SOX_INITIALIZED is None:
-        raise RuntimeError('SoX effects chain has been already shut down. Can not initialize again.')
-    if not _SOX_INITIALIZED:
-        code = _torchaudio.initialize_sox()
-        if code == _SOX_SUCCESS_CODE:
-            _SOX_INITIALIZED = True
-            atexit.register(shutdown_sox_effects)
-        return code
-    return _SOX_SUCCESS_CODE
+    torch.ops.torchaudio.sox_effects_initialize_sox_effects()
 
 
 @_mod_utils.requires_module("torchaudio._torchaudio")
-def shutdown_sox_effects() -> int:
+def shutdown_sox_effects() -> None:
     """Clean up resources required to use ``SoxEffectsChain``
 
     You do not need to call this function manually. It is called automatically.
 
     It is safe to call this function multiple times.
-    Once ``shutdown_sox_effects`` is called, you can no longer use SoX effects and calling
-    this function results in `RuntimeError`.
-
-
-    Returns:
-        int: Code corresponding to sox_error_t enum. See
-        https://fossies.org/dox/sox-14.4.2/sox_8h.html#a8e07e80cebeff3339265d89c387cea93
+    Once ``shutdown_sox_effects`` is called, you can no longer use SoX effects and
+    initializing again will result in error.
     """
-    global _SOX_INITIALIZED
-    if _SOX_INITIALIZED:
-        code = _torchaudio.shutdown_sox()
-        if code == _SOX_INITIALIZED:
-            _SOX_INITIALIZED = None
-        return code
-    return _SOX_SUCCESS_CODE
+    torch.ops.torchaudio.sox_effects_shutdown_sox_effects()
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -88,7 +52,7 @@ def effect_names() -> List[str]:
     Example
         >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
     """
-    return _torchaudio.get_effect_names()
+    return torch.ops.torchaudio.sox_effects_list_effects()
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
