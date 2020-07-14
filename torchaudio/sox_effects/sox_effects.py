@@ -7,6 +7,7 @@ from torchaudio._internal import (
     module_utils as _mod_utils,
     misc_ops as _misc_ops,
 )
+from torchaudio.utils.sox_utils import list_effects
 
 if _mod_utils.is_module_available('torchaudio._torchaudio'):
     from torchaudio import _torchaudio
@@ -52,7 +53,7 @@ def effect_names() -> List[str]:
     Example
         >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
     """
-    return torch.ops.torchaudio.sox_effects_list_effects()
+    return list(list_effects().keys())
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')

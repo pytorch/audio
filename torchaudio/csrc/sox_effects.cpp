@@ -39,16 +39,5 @@ void shutdown_sox_effects() {
   }
 }
 
-std::vector<std::string> list_effects() {
-  std::vector<std::string> names;
-  const sox_effect_fn_t* fns = sox_get_effect_fns();
-  for (int i = 0; fns[i]; ++i) {
-    const sox_effect_handler_t* handler = fns[i]();
-    if (handler && handler->name)
-      names.push_back(handler->name);
-  }
-  return names;
-}
-
 } // namespace sox_effects
 } // namespace torchaudio

@@ -10,8 +10,6 @@ void initialize_sox_effects();
 
 void shutdown_sox_effects();
 
-std::vector<std::string> list_effects();
-
 } // namespace sox_effects
 } // namespace torchaudio
 

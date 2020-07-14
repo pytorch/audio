@@ -18,6 +18,17 @@ static auto registerTensorSignal =
         .def("get_sample_rate", &sox_utils::TensorSignal::getSampleRate)
         .def("get_channels_first", &sox_utils::TensorSignal::getChannelsFirst);
 
+static auto registerSetSoxOptions =
+    torch::RegisterOperators()
+        .op("torchaudio::sox_utils_set_seed", &sox_utils::set_seed)
+        .op("torchaudio::sox_utils_set_verbosity", &sox_utils::set_verbosity)
+        .op("torchaudio::sox_utils_set_use_threads",
+            &sox_utils::set_use_threads)
+        .op("torchaudio::sox_utils_set_buffer_size",
+            &sox_utils::set_buffer_size)
+        .op("torchaudio::sox_utils_list_effects", &sox_utils::list_effects)
+        .op("torchaudio::sox_utils_list_formats", &sox_utils::list_formats);
+
 ////////////////////////////////////////////////////////////////////////////////
 // sox_io.h
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,12 +64,11 @@ static auto registerSaveAudioFile = torch::RegisterOperators().op(
 // sox_effects.h
 ////////////////////////////////////////////////////////////////////////////////
 static auto registerSoxEffects =
-    torch::RegisterOperators(
-        "torchaudio::sox_effects_initialize_sox_effects",
-        &sox_effects::initialize_sox_effects)
+    torch::RegisterOperators()
+        .op("torchaudio::sox_effects_initialize_sox_effects",
+            &sox_effects::initialize_sox_effects)
         .op("torchaudio::sox_effects_shutdown_sox_effects",
-            &sox_effects::shutdown_sox_effects)
-        .op("torchaudio::sox_effects_list_effects", &sox_effects::list_effects);
+            &sox_effects::shutdown_sox_effects);
 
 } // namespace
 } // namespace torchaudio
