@@ -115,8 +115,8 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
         y = (y / 6 * (1 << 30)).long()
         # clear the last 16 bits because they aren't used anyways
         y = ((y >> 16) << 16).float()
-        torchaudio.save(self.test_filepath, y, sr)
-        sound, sample_rate = torchaudio.load(self.test_filepath, normalization=False)
+        torchaudio.save(self.test0_filepath, y, sr)
+        sound, sample_rate = torchaudio.load(self.test0_filepath, normalization=False)
         print(y >> 16)
         self.assertTrue(sample_rate == sr)
         torch.testing.assert_allclose(y, sound)
