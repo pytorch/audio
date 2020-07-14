@@ -9,6 +9,7 @@ from torchaudio._internal import (
 )
 from torchaudio.utils.sox_utils import list_effects
 
+
 if _mod_utils.is_module_available('torchaudio._torchaudio'):
     from torchaudio import _torchaudio
 
@@ -54,6 +55,65 @@ def effect_names() -> List[str]:
         >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
     """
     return list(list_effects().keys())
+
+
+@_mod_utils.requires_module('torchaudio._torchaudio')
+def apply_effects_tensor(
+        tensor: torch.Tensor,
+        sample_rate: int,
+        effects: List[List[str]],
+        channels_first: bool = True,
+) -> Tuple[torch.Tensor, int]:
+    """Apply sox effects to given Tensor
+
+    Args:
+        tensor: Input 2D Tensor.
+        sample_rate: Sample rate
+        effects: List of effects.
+        channels_first: Indicates if the input Tensor's dimension is
+            ``[channels, time]`` or ``[time, channels]``
+
+    Notes:
+        This function works in the way very similar to ```sox``` command, however there are slight
+        differences. For example, ``sox`` commnad adds certain effects automatically (such as
+        ``rate`` effect after ``speed`` and ``pitch`` and other effects), but this function does
+        only applies the given effects. (Therefore, to actually apply ``speed`` effect, you also
+        need to give ``rate`` effect with desired sampling rate.)
+    """
+    in_signal = torch.classes.torchaudio.TensorSignal(tensor, sample_rate, channels_first)
+    out_signal = torch.ops.torchaudio.sox_effects_apply_effects_tensor(in_signal, effects)
+    return out_signal.get_tensor(), out_signal.get_sample_rate()
+
+
+@_mod_utils.requires_module('torchaudio._torchaudio')
+def apply_effects_file(
+        path: str,
+        effects: List[List[str]],
+        normalize: bool = True,
+        channels_first: bool = True,
+) -> Tuple[torch.Tensor, int]:
+    """Apply sox effects to the audio file and load Tensor
+
+    Args:
+        path: Path to the audio file.
+        effects: List of effects.
+        normalize: When ``True``, this function always return ``float32``, and sample values are
+            normalized to ``[-1.0, 1.0]``. If input file is integer WAV, giving ``False`` will change
+            the resulting Tensor type to integer type. This argument has no effect for formats other
+            than integer WAV type.
+        channels_first: When True, the returned Tensor has dimension ``[channel, time]``.
+            Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+
+    Notes:
+        This function works in the way very similar to ``sox`` command, however there are slight
+        differences. For example, ``sox`` commnad adds certain effects automatically (such as
+        ``rate`` effect after ``speed``, ``pitch`` etc), but this function only applies the given
+        effects. Therefore, to actually apply ``speed`` effect, you also need to give ``rate``
+        effect with desired sampling rate, because internally, ``speed`` effects only alter sampling
+        rate and leave samples untouched.
+    """
+    signal = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first)
+    return signal.get_tensor(), signal.get_sample_rate()
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')

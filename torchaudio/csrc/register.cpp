@@ -68,7 +68,19 @@ static auto registerSoxEffects =
         .op("torchaudio::sox_effects_initialize_sox_effects",
             &sox_effects::initialize_sox_effects)
         .op("torchaudio::sox_effects_shutdown_sox_effects",
-            &sox_effects::shutdown_sox_effects);
+            &sox_effects::shutdown_sox_effects)
+        .op(torch::RegisterOperators::options()
+                .schema(
+                    "torchaudio::sox_effects_apply_effects_tensor(__torch__.torch.classes.torchaudio.TensorSignal input_signal, str[][] effects) -> __torch__.torch.classes.torchaudio.TensorSignal output_signal")
+                .catchAllKernel<
+                    decltype(sox_effects::apply_effects_tensor),
+                    &sox_effects::apply_effects_tensor>())
+        .op(torch::RegisterOperators::options()
+                .schema(
+                    "torchaudio::sox_effects_apply_effects_file(str path, str[][] effects, bool normalize, bool channels_first) -> __torch__.torch.classes.torchaudio.TensorSignal output_signal")
+                .catchAllKernel<
+                    decltype(sox_effects::apply_effects_file),
+                    &sox_effects::apply_effects_file>());
 
 } // namespace
 } // namespace torchaudio

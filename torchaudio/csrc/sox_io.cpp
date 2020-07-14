@@ -125,6 +125,7 @@ void save_audio_file(
     const c10::intrusive_ptr<TensorSignal>& signal,
     const double compression) {
   const auto tensor = signal->getTensor();
+  const auto sample_rate = signal->getSampleRate();
   const auto channels_first = signal->getChannelsFirst();
 
   validate_input_tensor(tensor);
