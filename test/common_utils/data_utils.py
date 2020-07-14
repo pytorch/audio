@@ -12,6 +12,7 @@ def get_asset_path(*paths):
     """Return full path of a test asset"""
     return os.path.join(_TEST_DIR_PATH, 'assets', *paths)
 
+
 def get_whitenoise(
     *,
     sample_rate: int = 16000,
@@ -21,7 +22,7 @@ def get_whitenoise(
     dtype: Union[str, torch.dtype] = "float32",
     device: Union[str, torch.device] = "cpu",
     channels_first=True,
-    scale_factor : float = 1.0,
+    scale_factor: float = 1,
 ):
     """Generate pseudo audio data with whitenoise
     Args:
@@ -33,7 +34,7 @@ def get_whitenoise(
         dtype: Torch dtype
         device: device
         channels_first: whether first dimension is n_channels
-        scale_factor : enable down scaling to avoid edge effects
+        scale_factor: scale the Tensor before clamping and quantization
     Returns:
         Tensor: shape of (n_channels, sample_rate * duration)
     """
@@ -47,6 +48,7 @@ def get_whitenoise(
         torch.random.manual_seed(seed)
         tensor = torch.randn([sample_rate * duration], dtype=torch.float32, device='cpu')
     tensor /= 2.0
+    tensor *= scale_factor
     tensor.clamp_(-1.0, 1.0)
     if dtype == torch.int32:
         tensor *= (tensor > 0) * 2147483647 + (tensor < 0) * 2147483648
@@ -60,6 +62,7 @@ def get_whitenoise(
     if not channels_first:
         tensor = tensor.t()
     return tensor.to(device=device)
+
 
 def get_sinusoid(
     *,

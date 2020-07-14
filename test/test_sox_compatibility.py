@@ -22,7 +22,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
 
         self.NOISE_SAMPLE_RATE = 44100  # N.B. 44.1 kHz required by SoX deemph effect
         noise_waveform_as_int = common_utils.get_whitenoise(
-            sample_rate=self.NOISE_SAMPLE_RATE, duration=5, dtype=torch.int16,
+            sample_rate=self.NOISE_SAMPLE_RATE, duration=5, dtype=torch.int16, scale_factor=0.9,
         )
         self.noise_filepath = self.get_temp_path("whitenoise.wav")
         common_utils.save_wav(
@@ -250,7 +250,7 @@ class TestFunctionalFiltering(common_utils.TempDirMixin, common_utils.Torchaudio
 
         output_waveform = F.bass_biquad(self.noise_waveform, self.NOISE_SAMPLE_RATE, gain, central_freq, q)
 
-        self.assertEqual(output_waveform, sox_output_waveform, atol=1.5e-3, rtol=1e-4)
+        self.assertEqual(output_waveform, sox_output_waveform, atol=1.5e-4, rtol=1e-5)
 
     def test_deemph(self):
         """
