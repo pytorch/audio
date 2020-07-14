@@ -72,6 +72,7 @@ def get_sinusoid(
     n_channels: int = 1,
     dtype: Union[str, torch.dtype] = "float32",
     device: Union[str, torch.device] = "cpu",
+    channels_first: bool = True,
 ):
     """Generate pseudo audio data with sine wave.
 
@@ -91,4 +92,7 @@ def get_sinusoid(
     pie2 = 2 * 3.141592653589793
     end = pie2 * frequency * duration
     theta = torch.linspace(0, end, sample_rate * duration, dtype=dtype, device=device)
-    return torch.sin(theta, out=None).repeat([n_channels, 1])
+    sin = torch.sin(theta, out=None).repeat([n_channels, 1])
+    if not channels_first:
+        sin = sin.t()
+    return sin
