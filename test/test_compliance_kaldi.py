@@ -65,7 +65,7 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
             sample_rate=self.test1_signal_sr, duration=0.5,
         )
 
-        #2. test file and saved kaldi ark files
+        # 2. test file and saved kaldi ark files
         self.test2_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
 
     # separating test files by their types (e.g 'spec', 'fbank', etc.)
@@ -138,7 +138,7 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
                                 expected_num_args, get_output_fn, atol=1e-5, rtol=1e-8):
         """
         Inputs:
-            sound_filepath (str): 
+            sound_filepath (str): The location of the sound file
             filepath_key (str): A key to `test_filepaths` which matches which files to use
             expected_num_files (int): The expected number of kaldi files to read
             expected_num_args (int): The expected number of arguments used in a kaldi configuration
@@ -147,7 +147,7 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
             atol (float): absolute tolerance
             rtol (float): relative tolerance
         """
-        sound, sr = common_utils.load_wav(sound_filepath)
+        sound, sr = torchaudio.load_wav(sound_filepath)
         files = self.test_filepaths[filepath_key]
 
         assert len(files) == expected_num_files, ('number of kaldi %s file changed to %d' % (filepath_key, len(files)))
@@ -245,7 +245,8 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
         # check that sampling is same whether using separately or in a tensor of size (c, n)
         for i in range(num_channels):
             single_channel = self.test1_signal * (i + 1) * 1.5
-            single_channel_sampled = kaldi.resample_waveform(single_channel, self.test1_signal_sr, self.test1_signal_sr // 2)
+            single_channel_sampled = kaldi.resample_waveform(single_channel, self.test1_signal_sr,
+                                                             self.test1_signal_sr // 2)
             torch.testing.assert_allclose(multi_sound_sampled[i, :], single_channel_sampled[0], rtol=1e-4, atol=1e-8)
 
 
