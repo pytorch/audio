@@ -225,10 +225,10 @@ def train_one_epoch(
 
         optimizer.step()
 
+        sums["length_dataset"] += len(inputs)
+
         compute_error_rates(outputs, targets, decoder, language_model, sums)
         record_error_rates(sums, metric)
-
-        sums["length_dataset"] += len(inputs)
 
         metric["iteration"] = sums["iteration"]
         metric["time"] = time() - start2
