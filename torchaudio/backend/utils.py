@@ -19,7 +19,11 @@ __all__ = [
 
 
 def list_audio_backends() -> List[str]:
-    """List available backends"""
+    """List available backends
+
+    Returns:
+        List[str]: The list of available backends.
+    """
     backends = []
     if is_module_available('soundfile'):
         backends.append('soundfile')
@@ -29,12 +33,13 @@ def list_audio_backends() -> List[str]:
     return backends
 
 
-def set_audio_backend(backend: Optional[str]) -> None:
+def set_audio_backend(backend: Optional[str]):
     """Set the backend for I/O operation
 
     Args:
-        backend (str): Name of the backend. One of "sox" or "soundfile",
-            based on availability of the system.
+        backend (Optional[str]): Name of the backend.
+            One of ``"sox"``, ``"sox_io"`` or ``"soundfile"`` based on availability
+            of the system. If ``None`` is provided the  current backend is unassigned.
     """
     if backend is not None and backend not in list_audio_backends():
         raise RuntimeError(
@@ -68,7 +73,11 @@ def _init_audio_backend():
 
 
 def get_audio_backend() -> Optional[str]:
-    """Get the name of the current backend"""
+    """Get the name of the current backend
+
+    Returns:
+        Optional[str]: The name of the current backend or ``None`` if no backend is assigned.
+    """
     if torchaudio.load == no_backend.load:
         return None
     if torchaudio.load == sox_backend.load:
