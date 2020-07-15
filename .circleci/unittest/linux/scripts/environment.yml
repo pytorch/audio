@@ -11,7 +11,6 @@ dependencies:
   - llvmlite==0.31  # See https://github.com/pytorch/audio/pull/766
   - pip
   - pip:
-    - clang-format
     - kaldi-io
     - scipy
     - parameterized
