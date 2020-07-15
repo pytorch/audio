@@ -189,7 +189,7 @@ def train_one_epoch(
     start1 = time()
 
     metric = MetricLogger("train_iteration")
-    metric("epoch", epoch)
+    metric["epoch"] = epoch
 
     for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
         data_loader, maxsize=2
@@ -215,7 +215,7 @@ def train_one_epoch(
         loss = criterion(outputs, targets, tensors_lengths, target_lengths)
         loss_item = loss.item()
         sums["loss"] += loss_item
-        metric("loss", loss_item)
+        metric["loss"] = loss_item
 
         optimizer.zero_grad()
         loss.backward()
@@ -225,7 +225,7 @@ def train_one_epoch(
                 model.parameters(), args.clip_grad
             )
             sums["gradient"] += gradient
-            metric("gradient", gradient)
+            metric["gradient"] = gradient
 
         optimizer.step()
 
@@ -234,10 +234,10 @@ def train_one_epoch(
 
         sums["length_dataset"] += len(inputs)
 
-        metric("iteration", sums["iteration"])
-        metric("time", time() - start2)
-        metric("epoch", epoch)
-        metric.print()
+        metric["iteration"] = sums["iteration"]
+        metric["time"] = time() - start2
+        metric["epoch"] = epoch
+        metric()
 
         sums["iteration"] += 1
 
@@ -245,15 +245,15 @@ def train_one_epoch(
 
     metric = MetricLogger("train_epoch")
     record_error_rates(sums, metric)
-    metric("epoch", epoch)
-    metric("loss", avg_loss)
-    metric("gradient", sums["gradient"] / len(data_loader))
+    metric["epoch"] = epoch
+    metric["loss"] = avg_loss
+    metric["gradient"] = sums["gradient"] / len(data_loader)
     try:
-        metric("lr", scheduler.get_last_lr()[0])
+        metric["lr"] = scheduler.get_last_lr()[0]
     except AttributeError:
         pass
-    metric("time", time() - start1)
-    metric.print()
+    metric["time"] = time() - start1
+    metric()
 
     if isinstance(scheduler, ReduceLROnPlateau):
         scheduler.step(avg_loss)
@@ -263,15 +263,15 @@ def train_one_epoch(
 
 def record_error_rates(sums, metric):
 
-    metric("cer", sums["cer"])
-    metric("wer", sums["wer"])
-    metric("cer over dataset length", sums["cer"] / sums["length_dataset"])
-    metric("wer over dataset length", sums["wer"] / sums["length_dataset"])
-    metric("cer over target length", sums["cer"] / sums["total_chars"])
-    metric("wer over target length", sums["wer"] / sums["total_words"])
-    metric("target length", sums["total_chars"])
-    metric("target length", sums["total_words"])
-    metric("dataset length", sums["length_dataset"])
+    metric["cer"] = sums["cer"]
+    metric["wer"] = sums["wer"]
+    metric["cer over dataset length"] = sums["cer"] / sums["length_dataset"]
+    metric["wer over dataset length"] = sums["wer"] / sums["length_dataset"]
+    metric["cer over target length"] = sums["cer"] / sums["total_chars"]
+    metric["wer over target length"] = sums["wer"] / sums["total_words"]
+    metric["target length"] = sums["total_chars"]
+    metric["target length"] = sums["total_words"]
+    metric["dataset length"] = sums["length_dataset"]
 
 
 def compute_error_rates(outputs, targets, decoder, language_model, sums):
@@ -348,11 +348,11 @@ def evaluate(
 
         avg_loss = sums["loss"] / len(data_loader)
 
-        metric("epoch", epoch)
-        metric("loss", avg_loss)
-        metric("time", time() - start)
+        metric["epoch"] = epoch
+        metric["loss"] = avg_loss
+        metric["time"] = time() - start
         record_error_rates(sums, metric)
-        metric.print()
+        metric()
 
         return avg_loss
 
