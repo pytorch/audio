@@ -12,8 +12,6 @@ from ..common_utils import (
     load_wav,
     save_wav,
     sox_utils,
-)
-from .common import (
     name_func,
 )
 
