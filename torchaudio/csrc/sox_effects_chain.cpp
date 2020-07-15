@@ -198,21 +198,19 @@ void SoxEffectsChain::addEffect(const std::vector<std::string> effect) {
 
   SoxEffect e(sox_create_effect(sox_find_effect(name.c_str())));
   const auto num_options = num_args - 1;
-  if (num_options == 0) {
-    sox_effect_options(e, 0, nullptr);
-  } else {
-    std::vector<char*> opts;
-    for (size_t i = 1; i < num_args; ++i) {
-      opts.push_back((char*)effect[i].c_str());
+
+  std::vector<char*> opts;
+  for (size_t i = 1; i < num_args; ++i) {
+    opts.push_back((char*)effect[i].c_str());
+  }
+  if (sox_effect_options(e, num_options, num_options ? opts.data() : nullptr) !=
+      SOX_SUCCESS) {
+    std::ostringstream stream;
+    stream << "Invalid effect option:";
+    for (const auto& v : effect) {
+      stream << " " << v;
     }
-    if (sox_effect_options(e, num_options, opts.data()) != SOX_SUCCESS) {
-      std::ostringstream stream;
-      stream << "Invalid effect option:";
-      for (const auto& v : effect) {
-        stream << " " << v;
-      }
-      throw std::runtime_error(stream.str());
-    }
+    throw std::runtime_error(stream.str());
   }
 
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
