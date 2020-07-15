@@ -3,6 +3,7 @@ from typing import List
 import torch
 from torch import Tensor
 from torch import nn
+
 from .utils import load_state_dict_from_url
 
 
@@ -10,7 +11,7 @@ __all__ = ["_ResBlock", "_MelResNet", "_Stretch2d", "_UpsampleNetwork", "_WaveRN
 
 
 model_urls = {
-    '_wavernn': 'https://download.pytorch.org/models/_wavernn.pth',
+    '_wavernn': 'https://ossci-assets.s3.amazonaws.com/torchaudio/wavernn_8bits_waveform_ljspeech.pth',
 }
 
 
