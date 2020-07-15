@@ -195,10 +195,6 @@ def train_one_epoch(
         data_loader, maxsize=2
     ):
 
-        # TODO Remove before merge pull request
-        if SIGNAL_RECEIVED:
-            return
-
         start2 = time()
         inputs = inputs.to(device, non_blocking=True)
         targets = targets.to(device, non_blocking=True)
@@ -240,6 +236,10 @@ def train_one_epoch(
         metric()
 
         sums["iteration"] += 1
+
+        # TODO Remove before merge pull request
+        if SIGNAL_RECEIVED:
+            return loss_item
 
     avg_loss = sums["loss"] / len(data_loader)
 
@@ -322,10 +322,6 @@ def evaluate(
             data_loader, maxsize=2
         ):
 
-            # TODO Remove before merge pull request
-            if SIGNAL_RECEIVED:
-                return
-
             inputs = inputs.to(device, non_blocking=True)
             targets = targets.to(device, non_blocking=True)
 
@@ -346,6 +342,10 @@ def evaluate(
 
             compute_error_rates(outputs, targets, decoder, language_model, sums)
 
+            # TODO Remove before merge pull request
+            if SIGNAL_RECEIVED:
+                return sums["loss"] / len(data_loader)
+
         avg_loss = sums["loss"] / len(data_loader)
 
         metric["epoch"] = epoch
@@ -363,6 +363,10 @@ def main(args, rank=0):
         setup_distributed(rank, args.world_size)
 
     logging.info("Start time: {}".format(str(datetime.now())))
+
+    # Install signal handler
+    signal.signal(signal.SIGUSR1, signal_handler)
+
     # Explicitly setting seed to make sure that models created in two processes
     # start from same random weights and biases.
     torch.manual_seed(args.seed)
@@ -553,13 +557,9 @@ def main(args, rank=0):
             epoch,
         )
 
-        if (
-            SIGNAL_RECEIVED  # TODO Remove before merge pull request
-            or not (epoch + 1) % args.print_freq
-            or epoch == args.epochs - 1
-        ):
+        if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
 
-            sum_loss = evaluate(
+            loss = evaluate(
                 model,
                 criterion,
                 loader_validation,
@@ -569,8 +569,8 @@ def main(args, rank=0):
                 epoch,
             )
 
-            is_best = sum_loss < best_loss
-            best_loss = min(sum_loss, best_loss)
+            is_best = loss < best_loss
+            best_loss = min(loss, best_loss)
             save_checkpoint(
                 {
                     "epoch": epoch + 1,
@@ -586,6 +586,18 @@ def main(args, rank=0):
 
         # TODO Remove before merge pull request
         if SIGNAL_RECEIVED:
+            save_checkpoint(
+                {
+                    "epoch": epoch + 1,
+                    "state_dict": model.state_dict(),
+                    "best_loss": best_loss,
+                    "optimizer": optimizer.state_dict(),
+                    "scheduler": scheduler.state_dict(),
+                },
+                False,
+                args.checkpoint,
+                rank,
+            )
             trigger_job_requeue()
 
     logging.info(f"End time: {datetime.now()}")
@@ -606,6 +618,5 @@ def spawn_main(args, main):
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
-    signal.signal(signal.SIGUSR1, signal_handler)
     args = parse_args()
     spawn_main(args, main)
