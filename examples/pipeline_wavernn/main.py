@@ -15,9 +15,9 @@ from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
 from torchaudio.models._wavernn import _WaveRNN
 
-from datasets import collate_factory, gen_datasets_ljspeech
+from datasets import collate_factory, split_process_ljspeech
 from losses import MoLLoss
-from transform import linear_to_mel, specgram_normalize
+from transform import LinearToMel, NormalizeDB
 from utils import MetricLogger, count_parameters, save_checkpoint
 
 
@@ -158,7 +158,7 @@ def parse_args():
     )
     parser.add_argument(
         "--file-path",
-        default="",
+        default="/private/home/jimchen90/datasets",
         type=str,
         help="the path of audio files",
     )
@@ -273,9 +273,6 @@ def main(args):
 
     logging.info("Start time: {}".format(str(datetime.now())))
 
-    # Empty CUDA cache
-    torch.cuda.empty_cache()
-
     melkwargs = {
         "n_fft": args.n_fft,
         "power": 1,
@@ -285,17 +282,16 @@ def main(args):
 
     transforms = torch.nn.Sequential(
         torchaudio.transforms.Spectrogram(**melkwargs),
-        # TODO Replace by torchaudio, once https://github.com/pytorch/audio/pull/593 is resolved
-        linear_to_mel(
+        LinearToMel(
             sample_rate=args.sample_rate,
             n_fft=args.n_fft,
             n_mels=args.n_freq,
             fmin=args.f_min,
         ),
-        specgram_normalize(min_level_db=args.min_level_db),
+        NormalizeDB(min_level_db=args.min_level_db),
     )
 
-    train_dataset, val_dataset = gen_datasets_ljspeech(args, transforms)
+    train_dataset, val_dataset = split_process_ljspeech(args, transforms)
 
     loader_training_params = {
         "num_workers": args.workers,

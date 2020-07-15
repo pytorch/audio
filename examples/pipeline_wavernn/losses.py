@@ -12,7 +12,7 @@ def log_sum_exp(x):
     return m + torch.log(torch.sum(torch.exp(x - m2), dim=axis))
 
 
-def MoLLoss(y_hat, y, num_classes=65536, log_scale_min=None, reduce=True):
+def mol_loss(y_hat, y, num_classes=65536, log_scale_min=None, reduce=True):
     r""" Discretized mixture of logistic distributions loss
 
     Adapted from wavenet vocoder

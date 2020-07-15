@@ -3,7 +3,8 @@ import torch
 import torch.nn as nn
 
 
-class linear_to_mel(nn.Module):
+# TODO Replace by torchaudio, once https://github.com/pytorch/audio/pull/593 is resolved
+class LinearToMel(nn.Module):
     def __init__(self, sample_rate, n_fft, n_mels, fmin):
         super().__init__()
         self.sample_rate = sample_rate
@@ -22,7 +23,7 @@ class linear_to_mel(nn.Module):
         return torch.from_numpy(specgram)
 
 
-class specgram_normalize(nn.Module):
+class NormalizeDB(nn.Module):
     r"""Normalize the spectrogram with a minimum db value
     """
 
@@ -33,3 +34,19 @@ class specgram_normalize(nn.Module):
     def forward(self, specgram):
         specgram = 20 * torch.log10(torch.clamp(specgram, min=1e-5))
         return torch.clamp((self.min_level_db - specgram) / self.min_level_db, min=0, max=1)
+
+
+def waveform_to_label(waveform, bits):
+    r"""Transform waveform [-1, 1] to label [0, 2 ** bits - 1]
+    """
+
+    assert abs(waveform).max() <= 1.0
+    waveform = (waveform + 1.0) * (2 ** bits - 1) / 2
+    return torch.clamp(waveform, 0, 2 ** bits - 1).int()
+
+
+def label_to_waveform(label, bits):
+    r"""Transform label [0, 2 ** bits - 1] to waveform [-1, 1]
+    """
+
+    return 2 * label / (2 ** bits - 1.0) - 1.0

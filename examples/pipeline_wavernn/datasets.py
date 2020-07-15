@@ -5,8 +5,9 @@ import torch
 import torchaudio
 from torch.utils.data.dataset import random_split
 from torchaudio.datasets import LJSPEECH
+from torchaudio.transforms import MuLawEncoding
 
-from functional import label_to_waveform, mulaw_encode, waveform_to_label
+from functional import label_to_waveform, waveform_to_label
 
 
 class MapMemoryCache(torch.utils.data.Dataset):
@@ -36,18 +37,18 @@ class Processed(torch.utils.data.Dataset):
         self.transforms = transforms
 
     def __getitem__(self, key):
-        item = self.dataset[key][0]
+        item = self.dataset[key]
         return self.process_datapoint(item)
 
     def __len__(self):
         return len(self.dataset)
 
     def process_datapoint(self, waveform):
-        specgram = self.transforms(waveform)
-        return waveform.squeeze(0), specgram
+        specgram = self.transforms(waveform[0])
+        return waveform[0].squeeze(0), specgram
 
 
-def gen_datasets_ljspeech(args, transforms):
+def split_process_ljspeech(args, transforms):
     data = LJSPEECH(root=args.file_path, download=False)
 
     val_length = int(len(data) * args.val_ratio)
@@ -100,8 +101,9 @@ def collate_factory(args):
         if args.mode == "waveform":
 
             if args.mulaw:
-                waveform = mulaw_encode(waveform, 2 ** args.n_bits)
-                target = mulaw_encode(target, 2 ** args.n_bits)
+                mulaw_encode = MuLawEncoding(2 ** args.n_bits)
+                waveform = mulaw_encode(waveform)
+                target = mulaw_encode(waveform)
 
                 waveform = label_to_waveform(waveform, args.n_bits)
 
