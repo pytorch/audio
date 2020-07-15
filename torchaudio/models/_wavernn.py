@@ -11,7 +11,8 @@ __all__ = ["_ResBlock", "_MelResNet", "_Stretch2d", "_UpsampleNetwork", "_WaveRN
 
 
 model_urls = {
-    '_wavernn': 'https://ossci-assets.s3.amazonaws.com/torchaudio/wavernn_8bits_waveform_ljspeech.pth',
+    # FIXME Replace URL by final one once determined
+    '_wavernn': 'https://download.pytorch.org/models/_wavernn.pth',
 }
 
 
