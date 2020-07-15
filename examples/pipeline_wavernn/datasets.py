@@ -3,15 +3,10 @@ import random
 
 import torch
 import torchaudio
+from torch.utils.data.dataset import random_split
 from torchaudio.datasets import LJSPEECH
 
-from transform import linear_to_mel
-from functional import (
-    label_to_waveform,
-    mulaw_encode,
-    specgram_normalize,
-    waveform_to_label,
-)
+from functional import label_to_waveform, mulaw_encode, waveform_to_label
 
 
 class MapMemoryCache(torch.utils.data.Dataset):
@@ -35,63 +30,32 @@ class MapMemoryCache(torch.utils.data.Dataset):
         return len(self.dataset)
 
 
-class ProcessedLJSPEECH(LJSPEECH):
-    def __init__(self, dataset, transforms, args):
+class Processed(torch.utils.data.Dataset):
+    def __init__(self, dataset, transforms):
         self.dataset = dataset
         self.transforms = transforms
-        self.args = args
 
-    def __getitem__(self, index):
-        filename = self.dataset[index][0]
-        folder = "LJSpeech-1.1/wavs/"
-        file = os.path.join(self.args.file_path, folder, filename + ".wav")
-
-        return self.process_datapoint(file)
+    def __getitem__(self, key):
+        item = self.dataset[key][0]
+        return self.process_datapoint(item)
 
     def __len__(self):
         return len(self.dataset)
 
-    def process_datapoint(self, file):
-        args = self.args
-        n_fft = 2048
-        waveform, sample_rate = torchaudio.load(file)
+    def process_datapoint(self, waveform):
         specgram = self.transforms(waveform)
-        # TODO Replace by torchaudio, once https://github.com/pytorch/audio/pull/593 is resolved
-        specgram = linear_to_mel(specgram, sample_rate, n_fft, args.n_freq, args.f_min)
-        specgram = specgram_normalize(specgram, args.min_level_db)
-        waveform = waveform.squeeze(0)
-
-        if args.mode == "waveform":
-            waveform = (
-                mulaw_encode(waveform, 2 ** args.n_bits)
-                if args.mulaw
-                else waveform_to_label(waveform, args.n_bits)
-            )
-
-        return waveform, specgram
+        return waveform.squeeze(0), specgram
 
 
-def split_data(data, val_ratio, seed):
-    dataset = data._walker
-
-    random.seed(seed)
-    random.shuffle(dataset)
-
-    train_dataset = dataset[: -int(val_ratio * len(dataset))]
-    val_dataset = dataset[-int(val_ratio * len(dataset)):]
-
-    return train_dataset, val_dataset
-
-
-def gen_datasets_ljspeech(
-    args, transforms,
-):
+def gen_datasets_ljspeech(args, transforms):
     data = LJSPEECH(root=args.file_path, download=False)
 
-    train_dataset, val_dataset = split_data(data, args.val_ratio, args.seed)
+    val_length = int(len(data) * args.val_ratio)
+    lengths = [len(data) - val_length, val_length]
+    train_dataset, val_dataset = random_split(data, lengths)
 
-    train_dataset = ProcessedLJSPEECH(train_dataset, transforms, args)
-    val_dataset = ProcessedLJSPEECH(val_dataset, transforms, args)
+    train_dataset = Processed(train_dataset, transforms)
+    val_dataset = Processed(val_dataset, transforms)
 
     train_dataset = MapMemoryCache(train_dataset)
     val_dataset = MapMemoryCache(val_dataset)
@@ -133,9 +97,16 @@ def collate_factory(args):
         target = waveform_combine[:, 1:]
 
         # waveform: [-1, 1], target: [0, 2**bits-1] if mode = 'waveform'
-        # waveform: [-1, 1], target: [-1, 1] if mode = 'mol'
         if args.mode == "waveform":
-            waveform = label_to_waveform(waveform.float(), args.n_bits)
+
+            if args.mulaw:
+                waveform = mulaw_encode(waveform, 2 ** args.n_bits)
+                target = mulaw_encode(target, 2 ** args.n_bits)
+
+                waveform = label_to_waveform(waveform, args.n_bits)
+
+            else:
+                target = waveform_to_label(target, args.n_bits)
 
         return waveform.unsqueeze(1), specgram.unsqueeze(1), target.unsqueeze(1)
 

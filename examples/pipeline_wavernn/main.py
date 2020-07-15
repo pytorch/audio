@@ -17,6 +17,7 @@ from torchaudio.models._wavernn import _WaveRNN
 
 from datasets import collate_factory, gen_datasets_ljspeech
 from losses import MoLLoss
+from transform import linear_to_mel, specgram_normalize
 from utils import MetricLogger, count_parameters, save_checkpoint
 
 
@@ -61,7 +62,6 @@ def parse_args():
         "--learning-rate", default=1e-4, type=float, metavar="LR", help="learning rate",
     )
     parser.add_argument("--clip-grad", metavar="NORM", type=float, default=4.0)
-    parser.add_argument("--seed", type=int, default=1000, help="random seed")
     parser.add_argument(
         "--mulaw",
         default=True,
@@ -135,6 +135,9 @@ def parse_args():
         "--n-output", default=128, type=int, help="the number of output dimensions",
     )
     parser.add_argument(
+        "--n-fft", default=2048, type=int, help="the number of Fourier bins",
+    )
+    parser.add_argument(
         "--mode",
         default="waveform",
         choices=["waveform", "mol"],
@@ -154,7 +157,10 @@ def parse_args():
         help="the ratio of waveforms for validation",
     )
     parser.add_argument(
-        "--file-path", default="", type=str, help="the path of audio files",
+        "--file-path",
+        default="",
+        type=str,
+        help="the path of audio files",
     )
 
     args = parser.parse_args()
@@ -237,6 +243,7 @@ def validate(model, mode, criterion, data_loader, device, epoch):
             target = target.to(device)
 
             output = model(waveform, specgram)
+            output, target = output.squeeze(1), target.squeeze(1)
 
             if mode == "waveform":
                 output = output.transpose(1, 2)
@@ -270,13 +277,23 @@ def main(args):
     torch.cuda.empty_cache()
 
     melkwargs = {
-        "n_fft": 2048,
+        "n_fft": args.n_fft,
         "power": 1,
         "hop_length": args.hop_length,
         "win_length": args.win_length,
     }
 
-    transforms = torch.nn.Sequential(torchaudio.transforms.Spectrogram(**melkwargs))
+    transforms = torch.nn.Sequential(
+        torchaudio.transforms.Spectrogram(**melkwargs),
+        # TODO Replace by torchaudio, once https://github.com/pytorch/audio/pull/593 is resolved
+        linear_to_mel(
+            sample_rate=args.sample_rate,
+            n_fft=args.n_fft,
+            n_mels=args.n_freq,
+            fmin=args.f_min,
+        ),
+        specgram_normalize(min_level_db=args.min_level_db),
+    )
 
     train_dataset, val_dataset = gen_datasets_ljspeech(args, transforms)
 

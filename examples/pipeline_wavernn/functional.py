@@ -1,14 +1,6 @@
 import torch
 
 
-def specgram_normalize(specgram, min_level_db):
-    r"""Normalize the spectrogram with a minimum db value
-    """
-
-    specgram = 20 * torch.log10(torch.clamp(specgram, min=1e-5))
-    return torch.clamp((min_level_db - specgram) / min_level_db, min=0, max=1)
-
-
 def mulaw_encode(waveform, mu):
     r"""Waveform mulaw encoding
     """
