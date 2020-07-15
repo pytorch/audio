@@ -48,15 +48,12 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         )
 
     def test_detect_pitch_frequency(self):
-        filenames = [
-            'steam-train-whistle-daniel_simon.wav',  # 2ch 44100Hz
-            # Files from https://www.mediacollege.com/audio/tone/download/
-            '100Hz_44100Hz_16bit_05sec.wav',  # 1ch
-            '440Hz_44100Hz_16bit_05sec.wav',  # 1ch
+        waveform_and_sample_rates = [
+            torchaudio.load(common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')),  # 2ch 44100Hz
+            (common_utils.get_sinusoid(frequency=100, sample_rate=44100, duration=5), 44100,),  # generated
+            (common_utils.get_sinusoid(frequency=440, sample_rate=44100, duration=5), 44100,),  # generated
         ]
-        for filename in filenames:
-            filepath = common_utils.get_asset_path(filename)
-            waveform, sample_rate = torchaudio.load(filepath)
+        for waveform, sample_rate in waveform_and_sample_rates:
             self.assert_batch_consistencies(F.detect_pitch_frequency, waveform, sample_rate)
 
     def test_istft(self):

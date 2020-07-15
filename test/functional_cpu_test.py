@@ -4,6 +4,7 @@ import unittest
 import torch
 import torchaudio
 import torchaudio.functional as F
+from parameterized import parameterized
 import pytest
 
 from . import common_utils
@@ -299,28 +300,18 @@ class TestIstft(common_utils.TorchaudioTestCase):
 
 
 class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
-    def test_pitch(self):
-        SAMPLE_RATE = 44100
-        test_100Hz = common_utils.get_sinusoid(
-            frequency=100, sample_rate=SAMPLE_RATE, duration=5,
-        )
-        test_440Hz = common_utils.get_sinusoid(
-            frequency=440, sample_rate=SAMPLE_RATE, duration=5,
+    @parameterized.expand([(100,), (440,)])
+    def test_pitch(self, frequency):
+        sample_rate = 44100
+        test_sine_waveform = common_utils.get_sinusoid(
+            frequency=frequency, sample_rate=sample_rate, duration=5,
         )
 
-        # Files from https://www.mediacollege.com/audio/tone/download/
-        tests = [
-            (test_100Hz, 100),
-            (test_440Hz, 440),
-        ]
+        freq = torchaudio.functional.detect_pitch_frequency(test_sine_waveform, sample_rate)
 
-        for waveform, freq_ref in tests:
-
-            freq = torchaudio.functional.detect_pitch_frequency(waveform, SAMPLE_RATE)
-
-            threshold = 1
-            s = ((freq - freq_ref).abs() > threshold).sum()
-            self.assertFalse(s)
+        threshold = 1
+        s = ((freq - frequency).abs() > threshold).sum()
+        self.assertFalse(s)
 
 
 class TestDB_to_amplitude(common_utils.TorchaudioTestCase):

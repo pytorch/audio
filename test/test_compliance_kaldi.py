@@ -133,7 +133,7 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
         print('relative_mse:', relative_mse.item(), 'relative_max_error:', relative_max_error.item())
 
     def _compliance_test_helper(self, sound_filepath, filepath_key, expected_num_files,
-                                expected_num_args, get_output_fn, atol=1e-5, rtol=1e-8):
+                                expected_num_args, get_output_fn, atol=1e-5, rtol=1e-7):
         """
         Inputs:
             sound_filepath (str): The location of the sound file
