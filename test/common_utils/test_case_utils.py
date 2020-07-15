@@ -69,6 +69,9 @@ def skipIfNoModule(module, display_name=None):
     return unittest.skipIf(not is_module_available(module), f'"{display_name}" is not available')
 
 
+def name_func(func, _, params):
+    return f'{func.__name__}_{"_".join(str(arg) for arg in params.args)}'
+
 skipIfNoSoxBackend = unittest.skipIf(
     'sox' not in torchaudio.list_audio_backends(), 'Sox backend not available')
 skipIfNoCuda = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')

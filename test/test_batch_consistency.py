@@ -1,5 +1,7 @@
 """Test numerical consistency among single input and batched input."""
 import unittest
+import itertools
+from parameterized import parameterized
 
 import torch
 import torchaudio
@@ -47,14 +49,15 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             F.griffinlim, tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, 0, atol=5e-5
         )
 
-    def test_detect_pitch_frequency(self):
-        waveform_and_sample_rates = [
-            torchaudio.load(common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')),  # 2ch 44100Hz
-            (common_utils.get_sinusoid(frequency=100, sample_rate=44100, duration=5), 44100,),  # generated
-            (common_utils.get_sinusoid(frequency=440, sample_rate=44100, duration=5), 44100,),  # generated
-        ]
-        for waveform, sample_rate in waveform_and_sample_rates:
-            self.assert_batch_consistencies(F.detect_pitch_frequency, waveform, sample_rate)
+    @parameterized.expand(list(itertools.product(
+        [100, 440],
+        [8000, 16000, 44100],
+        [1, 2],
+    )), name_func=common_utils.name_func)
+    def test_detect_pitch_frequency(self, frequency, sample_rate, n_channels):
+        waveform = common_utils.get_sinusoid(frequency=frequency, sample_rate=sample_rate,
+                                             n_channels=n_channels, duration=5)
+        self.assert_batch_consistencies(F.detect_pitch_frequency, waveform, sample_rate)
 
     def test_istft(self):
         stft = torch.tensor([
