@@ -29,8 +29,8 @@ BACKENDS_MP3 = _filter_backends_with_mp3(BACKENDS)
 def set_audio_backend(backend):
     """Allow additional backend value, 'default'"""
     if backend == 'default':
-        if 'sox' in BACKENDS:
-            be = 'sox'
+        if 'sox_io' in BACKENDS:
+            be = 'sox_io'
         elif 'soundfile' in BACKENDS:
             be = 'soundfile'
         else:
