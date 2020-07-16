@@ -157,10 +157,7 @@ def parse_args():
         help="the ratio of waveforms for validation",
     )
     parser.add_argument(
-        "--file-path",
-        default="",
-        type=str,
-        help="the path of audio files",
+        "--file-path", default="", type=str, help="the path of audio files",
     )
 
     args = parser.parse_args()
