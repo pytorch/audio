@@ -7,7 +7,7 @@ torchaudio.backend
 To switch backend, use :py:func:`torchaudio.set_audio_backend`. To check the current backend use :py:func:`torchaudio.get_audio_backend`.
 
 .. warning::
-   Although ``sox`` backend is default for backward compatibility reason, it has a number of issues, therefore it is highly recommended to use ``sox_io`` backend instead. Note, however, that due to the interface refinement, functions defined in ``sox`` backend and those defined in ``sox_io`` backend do not have the signatures.
+   Although ``sox`` backend is default for backward compatibility reason, it has a number of issues, therefore it is highly recommended to use ``sox_io`` backend instead. Note, however, that due to the interface refinement, functions defined in ``sox`` backend and those defined in ``sox_io`` backend do not have the same signatures.
 
 .. note::
    Instead of calling functions in :mod:`torchaudio.backend` directly, please use ``torchaudio.info``, ``torhcaudio.load``, ``torchaudio.load_wav`` and ``torchaudio.save`` with proper backend set with :func:`torchaudio.get_audio_backend`.
