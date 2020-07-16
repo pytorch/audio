@@ -18,7 +18,6 @@ from .test_case_utils import (
     skipIfNoModule,
     skipIfNoExtension,
     skipIfNoSoxBackend,
-    name_func,
 )
 from .wav_utils import (
     get_wav_data,
