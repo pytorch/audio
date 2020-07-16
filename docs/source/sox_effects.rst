@@ -4,9 +4,15 @@
 torchaudio.sox_effects
 ======================
 
-Create SoX effects chain for preprocessing audio.
-
 .. currentmodule:: torchaudio.sox_effects
+
+Apply SoX effects chain on torch.Tensor or on file and load as torch.Tensor.
+
+.. autofunction:: apply_effects_tensor
+
+.. autofunction:: apply_effects_file
+
+Create SoX effects chain for preprocessing audio.
 
 :hidden:`SoxEffect`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

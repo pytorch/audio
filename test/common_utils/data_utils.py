@@ -72,12 +72,10 @@ def get_whitenoise(
     tensor /= 2.0
     tensor *= scale_factor
     tensor.clamp_(-1.0, 1.0)
-    tensor = convert_tensor_encoding(tensor, dtype)
-    tensor = tensor.to(dtype)
     tensor = tensor.repeat([n_channels, 1])
     if not channels_first:
         tensor = tensor.t()
-    return tensor.to(device=device)
+    return convert_tensor_encoding(tensor, dtype)
 
 
 def get_sinusoid(
@@ -88,6 +86,7 @@ def get_sinusoid(
     n_channels: int = 1,
     dtype: Union[str, torch.dtype] = "float32",
     device: Union[str, torch.device] = "cpu",
+    channels_first: bool = True,
 ):
     """Generate pseudo audio data with sine wave.
 
@@ -108,5 +107,6 @@ def get_sinusoid(
     end = pie2 * frequency * duration
     theta = torch.linspace(0, end, int(sample_rate * duration), dtype=torch.float32, device=device)
     tensor = torch.sin(theta, out=None).repeat([n_channels, 1])
-    tensor = convert_tensor_encoding(tensor, dtype)
-    return tensor
+    if not channels_first:
+        tensor = tensor.t()
+    return convert_tensor_encoding(tensor, dtype)

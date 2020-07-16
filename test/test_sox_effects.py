@@ -1,3 +1,4 @@
+import sys
 import math
 import unittest
 
@@ -34,6 +35,7 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         self.assertEqual(sr, target_rate)
         self.assertEqual(x.size(0), target_channels)
 
+    @unittest.skipIf(sys.platform == 'darwin', 'This test is known to fail on macOS')
     def test_lowpass_speed(self):
         speed = .8
         si, _ = torchaudio.info(self.test_filepath)

@@ -7,6 +7,8 @@ from torchaudio._internal import (
     module_utils as _mod_utils,
     misc_ops as _misc_ops,
 )
+from torchaudio.utils.sox_utils import list_effects
+
 
 if _mod_utils.is_module_available('torchaudio._torchaudio'):
     from torchaudio import _torchaudio
@@ -52,12 +54,138 @@ def effect_names() -> List[str]:
     Example
         >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
     """
-    return torch.ops.torchaudio.sox_effects_list_effects()
+    return list(list_effects().keys())
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
+def apply_effects_tensor(
+        tensor: torch.Tensor,
+        sample_rate: int,
+        effects: List[List[str]],
+        channels_first: bool = True,
+) -> Tuple[torch.Tensor, int]:
+    """Apply sox effects to given Tensor
+
+    Args:
+        tensor (torch.Tensor): Input 2D Tensor.
+        sample_rate (int): Sample rate
+        effects (List[List[str]]): List of effects.
+        channels_first (bool): Indicates if the input Tensor's dimension is
+            ``[channels, time]`` or ``[time, channels]``
+
+    Returns:
+        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
+        The resulting Tensor has the same ``dtype`` as the input Tensor, and
+        the same channels order. The shape of the Tensor can be different based on the
+        effects applied. Sample rate can also be different based on the effects applied.
+
+    Notes:
+        This function works in the way very similar to ``sox`` command, however there are slight
+        differences. For example, ``sox`` commnad adds certain effects automatically (such as
+        ``rate`` effect after ``speed`` and ``pitch`` and other effects), but this function does
+        only applies the given effects. (Therefore, to actually apply ``speed`` effect, you also
+        need to give ``rate`` effect with desired sampling rate.)
+
+    Examples:
+        >>> # Defines the effects to apply
+        >>> effects = [
+        ...     ['gain', '-n'],  # normalises to 0dB
+        ...     ['pitch', '5'],  # 5 cent pitch shift
+        ...     ['rate', '8000'],  # resample to 8000 Hz
+        ... ]
+        >>> # Generate pseudo wave:
+        >>> # normalized, channels first, 2ch, sampling rate 16000, 1 second
+        >>> sample_rate = 16000
+        >>> waveform = 2 * torch.rand([2, sample_rate * 1]) - 1
+        >>> waveform.shape
+        torch.Size([2, 16000])
+        >>> waveform
+        tensor([[ 0.3138,  0.7620, -0.9019,  ..., -0.7495, -0.4935,  0.5442],
+                [-0.0832,  0.0061,  0.8233,  ..., -0.5176, -0.9140, -0.2434]])
+        >>> # Apply effects
+        >>> waveform, sample_rate = apply_effects_tensor(
+        ...     wave_form, sample_rate, effects, channels_first=True)
+        >>> # The new waveform is sampling rate 8000, 1 second.
+        >>> # normalization and channel order are preserved
+        >>> waveform.shape
+        torch.Size([2, 8000])
+        >>> waveform
+        tensor([[ 0.5054, -0.5518, -0.4800,  ..., -0.0076,  0.0096, -0.0110],
+                [ 0.1331,  0.0436, -0.3783,  ..., -0.0035,  0.0012,  0.0008]])
+        >>> sample_rate
+        8000
+    """
+    in_signal = torch.classes.torchaudio.TensorSignal(tensor, sample_rate, channels_first)
+    out_signal = torch.ops.torchaudio.sox_effects_apply_effects_tensor(in_signal, effects)
+    return out_signal.get_tensor(), out_signal.get_sample_rate()
+
+
+@_mod_utils.requires_module('torchaudio._torchaudio')
+def apply_effects_file(
+        path: str,
+        effects: List[List[str]],
+        normalize: bool = True,
+        channels_first: bool = True,
+) -> Tuple[torch.Tensor, int]:
+    """Apply sox effects to the audio file and load the resulting data as Tensor
+
+    Args:
+        path (str): Path to the audio file.
+        effects (List[List[str]]): List of effects.
+        normalize (bool): When ``True``, this function always return ``float32``, and sample values are
+            normalized to ``[-1.0, 1.0]``. If input file is integer WAV, giving ``False`` will change
+            the resulting Tensor type to integer type. This argument has no effect for formats other
+            than integer WAV type.
+        channels_first (bool): When True, the returned Tensor has dimension ``[channel, time]``.
+            Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+
+    Returns:
+        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
+        If ``normalize=True``, the resulting Tensor is always ``float32`` type.
+        If ``normalize=False`` and the input audio file is of integer WAV file, then the
+        resulting Tensor has corresponding integer type. (Note 24 bit integer type is not supported)
+        If ``channels_first=True``, the resulting Tensor has dimension ``[channel, time]``,
+        otherwise ``[time, channel]``.
+
+    Notes:
+        This function works in the way very similar to ``sox`` command, however there are slight
+        differences. For example, ``sox`` commnad adds certain effects automatically (such as
+        ``rate`` effect after ``speed``, ``pitch`` etc), but this function only applies the given
+        effects. Therefore, to actually apply ``speed`` effect, you also need to give ``rate``
+        effect with desired sampling rate, because internally, ``speed`` effects only alter sampling
+        rate and leave samples untouched.
+
+    Examples:
+        >>> # Defines the effects to apply
+        >>> effects = [
+        ...     ['gain', '-n'],  # normalises to 0dB
+        ...     ['pitch', '5'],  # 5 cent pitch shift
+        ...     ['rate', '8000'],  # resample to 8000 Hz
+        ... ]
+        >>> # Apply effects and load data with channels_first=True
+        >>> waveform, sample_rate = apply_effects_file("data.wav", effects, channels_first=True)
+        >>> waveform.shape
+        torch.Size([2, 8000])
+        >>> waveform
+        tensor([[ 5.1151e-03,  1.8073e-02,  2.2188e-02,  ...,  1.0431e-07,
+                 -1.4761e-07,  1.8114e-07],
+                [-2.6924e-03,  2.1860e-03,  1.0650e-02,  ...,  6.4122e-07,
+                 -5.6159e-07,  4.8103e-07]])
+        >>> sample_rate
+        8000
+    """
+    signal = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first)
+    return signal.get_tensor(), signal.get_sample_rate()
+
+
+@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.deprecated('Please migrate to `apply_effects_file` or `apply_effects_tensor`.')
 def SoxEffect():
     r"""Create an object for passing sox effect information between python and c++
+
+    Note:
+        This function is deprecated.
+        Please migrate to :func:`apply_effects_file` or :func:`apply_effects_tensor`.
 
     Returns:
         SoxEffect: An object with the following attributes: ename (str) which is the
@@ -66,8 +194,13 @@ def SoxEffect():
     return _torchaudio.SoxEffect()
 
 
+@_mod_utils.deprecated('Please migrate to `apply_effects_file` or `apply_effects_tensor`.')
 class SoxEffectsChain(object):
     r"""SoX effects chain class.
+
+    Note:
+        This class is deprecated.
+        Please migrate to :func:`apply_effects_file` or :func:`apply_effects_tensor`.
 
     Args:
         normalization (bool, number, or callable, optional): If boolean `True`, then output is divided by `1 << 31`
