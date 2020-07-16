@@ -8,7 +8,6 @@ from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    walk_files,
 )
 
 # The following lists prefixed with `filtered_` provide a filtered split
@@ -1067,7 +1066,7 @@ class GTZAN(Dataset):
                 songs_in_genre = os.listdir(fulldir)
                 for fname in songs_in_genre:
                     name, ext = os.path.splitext(fname)
-                    if ext.lower() == "wav" and "." in name:
+                    if ext.lower() == ".wav" and "." in name:
                         # Check whether the file is of the form
                         # `gtzan_genre`.`5 digit number`.wav
                         genre, num = name.split(".")
