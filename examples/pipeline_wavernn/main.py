@@ -16,7 +16,7 @@ from torchaudio.datasets.utils import bg_iterator
 from torchaudio.models._wavernn import _WaveRNN
 
 from datasets import collate_factory, split_process_ljspeech
-from losses import mol_loss
+from losses import MoLLoss
 from processing import LinearToMel, NormalizeDB
 from utils import MetricLogger, count_parameters, save_checkpoint
 
@@ -345,7 +345,7 @@ def main(args):
 
     optimizer = Adam(model.parameters(), **optimizer_params)
 
-    criterion = nn.CrossEntropyLoss() if args.mode == "waveform" else mol_loss
+    criterion = nn.CrossEntropyLoss() if args.mode == "waveform" else MoLLoss()
 
     best_loss = 10.0
 

@@ -7,7 +7,7 @@ from torch.utils.data.dataset import random_split
 from torchaudio.datasets import LJSPEECH
 from torchaudio.transforms import MuLawEncoding
 
-from processing import label_to_waveform, waveform_to_label
+from processing import encode_waveform_into_bits, encode_bits_into_waveform
 
 
 class MapMemoryCache(torch.utils.data.Dataset):

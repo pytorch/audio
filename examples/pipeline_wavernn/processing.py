@@ -36,7 +36,7 @@ class NormalizeDB(nn.Module):
         return torch.clamp((self.min_level_db - specgram) / self.min_level_db, min=0, max=1)
 
 
-def waveform_to_label(waveform, bits):
+def encode_waveform_into_bits(waveform, bits):
     r"""Transform waveform [-1, 1] to label [0, 2 ** bits - 1]
     """
 
@@ -45,7 +45,7 @@ def waveform_to_label(waveform, bits):
     return torch.clamp(waveform, 0, 2 ** bits - 1).int()
 
 
-def label_to_waveform(label, bits):
+def encode_bits_into_waveform(label, bits):
     r"""Transform label [0, 2 ** bits - 1] to waveform [-1, 1]
     """
 
