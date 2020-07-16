@@ -53,7 +53,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         [100, 440],
         [8000, 16000, 44100],
         [1, 2],
-    )), name_func= lambda f, _, p: f'{f.__name__}_{"_".join(str(arg) for arg in p.args)}')
+    )), name_func=lambda f, _, p: f'{f.__name__}_{"_".join(str(arg) for arg in p.args)}')
     def test_detect_pitch_frequency(self, frequency, sample_rate, n_channels):
         waveform = common_utils.get_sinusoid(frequency=frequency, sample_rate=sample_rate,
                                              n_channels=n_channels, duration=5)
@@ -80,8 +80,10 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistencies(F.overdrive, waveform, gain=45, colour=30)
 
     def test_phaser(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, sample_rate = torchaudio.load(filepath)
+        sample_rate = 44100
+        waveform = common_utils.get_whitenoise(
+            sample_rate=sample_rate, duration=5,
+        )
         self.assert_batch_consistencies(F.phaser, waveform, sample_rate)
 
     def test_flanger(self):
