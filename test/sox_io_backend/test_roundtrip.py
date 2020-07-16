@@ -9,6 +9,8 @@ from ..common_utils import (
     skipIfNoExec,
     skipIfNoExtension,
     get_wav_data,
+)
+from .common import (
     name_func,
 )
 
