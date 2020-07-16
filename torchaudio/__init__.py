@@ -4,6 +4,7 @@ from torchaudio import (
     compliance,
     datasets,
     kaldi_io,
+    utils,
     sox_effects,
     transforms
 )
