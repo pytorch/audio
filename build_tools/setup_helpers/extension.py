@@ -17,7 +17,7 @@ _THIS_DIR = Path(__file__).parent.resolve()
 _ROOT_DIR = _THIS_DIR.parent.parent.resolve()
 _CSRC_DIR = _ROOT_DIR / 'torchaudio' / 'csrc'
 _TP_BASE_DIR = _ROOT_DIR / 'third_party'
-_TP_INSTALL_DIR = _TP_BASE_DIR / 'build'
+_TP_INSTALL_DIR = _TP_BASE_DIR / 'install'
 
 
 def _get_build_sox():
@@ -76,8 +76,20 @@ def _get_extra_objects():
         # NOTE: The order of the library listed bellow matters.
         #
         # (the most important thing is that dependencies come after a library
-        # e.g., sox comes first)
-        libs = ['libsox.a', 'libmad.a', 'libFLAC.a', 'libmp3lame.a']
+        # e.g., sox comes first, flac/vorbis comes before ogg, and
+        # vorbisenc/vorbisfile comes before vorbis
+        libs = [
+            'libsox.a',
+            'libmad.a',
+            'libFLAC.a',
+            'libmp3lame.a',
+            'libopusfile.a',
+            'libopus.a',
+            'libvorbisenc.a',
+            'libvorbisfile.a',
+            'libvorbis.a',
+            'libogg.a',
+        ]
         for lib in libs:
             objs.append(str(_TP_INSTALL_DIR / 'lib' / lib))
     return objs
@@ -87,15 +99,19 @@ def _get_libraries():
     return [] if _BUILD_SOX else ['sox']
 
 
-def _build_codecs():
+def _build_third_party():
+    build_dir = str(_TP_BASE_DIR / 'build')
+    os.makedirs(build_dir, exist_ok=True)
     subprocess.run(
-        args=[str(_THIS_DIR / 'build_third_party.sh')],
+        args=['cmake', '..'],
+        cwd=build_dir,
         check=True,
     )
-
-
-def _configure_third_party():
-    _build_codecs()
+    subprocess.run(
+        args=['cmake', '--build', '.'],
+        cwd=build_dir,
+        check=True,
+    )
 
 
 _EXT_NAME = 'torchaudio._torchaudio'
@@ -120,5 +136,5 @@ def get_ext_modules(debug=False):
 class BuildExtension(TorchBuildExtension):
     def build_extension(self, ext):
         if ext.name == _EXT_NAME and _BUILD_SOX:
-            _configure_third_party()
+            _build_third_party()
         super().build_extension(ext)

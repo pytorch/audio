@@ -272,6 +272,9 @@ def spectrogram(waveform: Tensor,
         Tensor: A spectrogram identical to what Kaldi would output. The shape is
         (m, ``padded_window_size // 2 + 1``) where m is calculated in _get_strided
     """
+    device, dtype = waveform.device, waveform.dtype
+    epsilon = _get_epsilon(device, dtype)
+
     waveform, window_shift, window_size, padded_window_size = _get_waveform_and_window_properties(
         waveform, channel, sample_frequency, frame_shift, frame_length, round_to_power_of_two, preemphasis_coefficient)
 
@@ -287,7 +290,7 @@ def spectrogram(waveform: Tensor,
     fft = torch.rfft(strided_input, 1, normalized=False, onesided=True)
 
     # Convert the FFT into a power spectrum
-    power_spectrum = torch.max(fft.pow(2).sum(2), EPSILON).log()  # size (m, padded_window_size // 2 + 1)
+    power_spectrum = torch.max(fft.pow(2).sum(2), epsilon).log()  # size (m, padded_window_size // 2 + 1)
     power_spectrum[:, 0] = signal_log_energy
 
     power_spectrum = _subtract_column_mean(power_spectrum, subtract_mean)
@@ -696,6 +699,8 @@ def mfcc(
     """
     assert num_ceps <= num_mel_bins, 'num_ceps cannot be larger than num_mel_bins: %d vs %d' % (num_ceps, num_mel_bins)
 
+    device, dtype = waveform.device, waveform.dtype
+
     # The mel_energies should not be squared (use_power=True), not have mean subtracted
     # (subtract_mean=False), and use log (use_log_fbank=True).
     # size (m, num_mel_bins + use_energy)
@@ -717,7 +722,7 @@ def mfcc(
         feature = feature[:, mel_offset:(num_mel_bins + mel_offset)]
 
     # size (num_mel_bins, num_ceps)
-    dct_matrix = _get_dct_matrix(num_ceps, num_mel_bins)
+    dct_matrix = _get_dct_matrix(num_ceps, num_mel_bins).to(dtype=dtype, device=device)
 
     # size (m, num_ceps)
     feature = feature.matmul(dct_matrix)
@@ -725,7 +730,7 @@ def mfcc(
     if cepstral_lifter != 0.0:
         # size (1, num_ceps)
         lifter_coeffs = _get_lifter_coeffs(num_ceps, cepstral_lifter).unsqueeze(0)
-        feature *= lifter_coeffs
+        feature *= lifter_coeffs.to(device=device, dtype=dtype)
 
     # if use_energy then replace the last column for htk_compat == true else first column
     if use_energy:

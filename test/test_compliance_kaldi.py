@@ -1,13 +1,13 @@
-import math
 import os
+import math
+import unittest
+
 import torch
 import torchaudio
 import torchaudio.compliance.kaldi as kaldi
-import unittest
 
 from . import common_utils
 from .compliance import utils as compliance_utils
-from .common_utils import AudioBackendScope, BACKENDS
 
 
 def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
@@ -46,7 +46,10 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
             window[f, s] = wave[s_in_wave]
 
 
-class Test_Kaldi(unittest.TestCase):
+@common_utils.skipIfNoSoxBackend
+class Test_Kaldi(common_utils.TorchaudioTestCase):
+    backend = 'sox'
+
     test_filepath = common_utils.get_asset_path('kaldi_file.wav')
     test_8000_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
     kaldi_output_dir = common_utils.get_asset_path('kaldi')
@@ -158,98 +161,10 @@ class Test_Kaldi(unittest.TestCase):
             self._print_diagnostic(output, kaldi_output)
             torch.testing.assert_allclose(output, kaldi_output, atol=atol, rtol=rtol)
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
-    def test_spectrogram(self):
-        def get_output_fn(sound, args):
-            output = kaldi.spectrogram(
-                sound,
-                blackman_coeff=args[1],
-                dither=args[2],
-                energy_floor=args[3],
-                frame_length=args[4],
-                frame_shift=args[5],
-                preemphasis_coefficient=args[6],
-                raw_energy=args[7],
-                remove_dc_offset=args[8],
-                round_to_power_of_two=args[9],
-                snip_edges=args[10],
-                subtract_mean=args[11],
-                window_type=args[12])
-            return output
-
-        self._compliance_test_helper(self.test_filepath, 'spec', 131, 13, get_output_fn, atol=1e-3, rtol=0)
-
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
-    def test_fbank(self):
-        def get_output_fn(sound, args):
-            output = kaldi.fbank(
-                sound,
-                blackman_coeff=args[1],
-                dither=0.0,
-                energy_floor=args[2],
-                frame_length=args[3],
-                frame_shift=args[4],
-                high_freq=args[5],
-                htk_compat=args[6],
-                low_freq=args[7],
-                num_mel_bins=args[8],
-                preemphasis_coefficient=args[9],
-                raw_energy=args[10],
-                remove_dc_offset=args[11],
-                round_to_power_of_two=args[12],
-                snip_edges=args[13],
-                subtract_mean=args[14],
-                use_energy=args[15],
-                use_log_fbank=args[16],
-                use_power=args[17],
-                vtln_high=args[18],
-                vtln_low=args[19],
-                vtln_warp=args[20],
-                window_type=args[21])
-            return output
-
-        self._compliance_test_helper(self.test_filepath, 'fbank', 97, 22, get_output_fn, atol=1e-3, rtol=1e-1)
-
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
-    def test_mfcc(self):
-        def get_output_fn(sound, args):
-            output = kaldi.mfcc(
-                sound,
-                blackman_coeff=args[1],
-                dither=0.0,
-                energy_floor=args[2],
-                frame_length=args[3],
-                frame_shift=args[4],
-                high_freq=args[5],
-                htk_compat=args[6],
-                low_freq=args[7],
-                num_mel_bins=args[8],
-                preemphasis_coefficient=args[9],
-                raw_energy=args[10],
-                remove_dc_offset=args[11],
-                round_to_power_of_two=args[12],
-                snip_edges=args[13],
-                subtract_mean=args[14],
-                use_energy=args[15],
-                num_ceps=args[16],
-                cepstral_lifter=args[17],
-                vtln_high=args[18],
-                vtln_low=args[19],
-                vtln_warp=args[20],
-                window_type=args[21])
-            return output
-
-        self._compliance_test_helper(self.test_filepath, 'mfcc', 145, 22, get_output_fn, atol=1e-3)
-
     def test_mfcc_empty(self):
         # Passing in an empty tensor should result in an error
         self.assertRaises(AssertionError, kaldi.mfcc, torch.empty(0))
 
-    @unittest.skipIf("sox" not in BACKENDS, "sox not available")
-    @AudioBackendScope("sox")
     def test_resample_waveform(self):
         def get_output_fn(sound, args):
             output = kaldi.resample_waveform(sound, args[1], args[2])

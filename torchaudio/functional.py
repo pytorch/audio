@@ -29,6 +29,7 @@ __all__ = [
     "equalizer_biquad",
     "band_biquad",
     "treble_biquad",
+    "bass_biquad",
     "deemph_biquad",
     "riaa_biquad",
     "biquad",
@@ -264,7 +265,7 @@ def griffinlim(
         angles = rebuilt
         if momentum:
             angles = angles - tprev.mul_(momentum / (1 + momentum))
-        angles = angles.div_(complex_norm(angles).add_(1e-16).unsqueeze(-1).expand_as(angles))
+        angles = angles.div(complex_norm(angles).add(1e-16).unsqueeze(-1).expand_as(angles))
 
     # Return the final phase estimates
     waveform = istft(specgram * angles,
@@ -484,9 +485,10 @@ def complex_norm(
     Returns:
         Tensor: Power of the normed input tensor. Shape of `(..., )`
     """
-    if power == 1.0:
-        return torch.norm(complex_tensor, 2, -1)
-    return torch.norm(complex_tensor, 2, -1).pow(power)
+
+    # Replace by torch.norm once issue is fixed
+    # https://github.com/pytorch/pytorch/issues/34279
+    return complex_tensor.pow(2.).sum(-1).pow(0.5 * power)
 
 
 def angle(
@@ -988,6 +990,47 @@ def treble_biquad(
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
+def bass_biquad(
+        waveform: Tensor,
+        sample_rate: int,
+        gain: float,
+        central_freq: float = 100,
+        Q: float = 0.707
+) -> Tensor:
+    r"""Design a bass tone-control effect.  Similar to SoX implementation.
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of `(..., time)`
+        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
+        gain (float): desired gain at the boost (or attenuation) in dB.
+        central_freq (float, optional): central frequency (in Hz). (Default: ``100``)
+        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).
+
+    Returns:
+        Tensor: Waveform of dimension of `(..., time)`
+
+    References:
+        http://sox.sourceforge.net/sox.html
+        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    """
+    w0 = 2 * math.pi * central_freq / sample_rate
+    alpha = math.sin(w0) / 2 / Q
+    A = math.exp(gain / 40 * math.log(10))
+
+    temp1 = 2 * math.sqrt(A) * alpha
+    temp2 = (A - 1) * math.cos(w0)
+    temp3 = (A + 1) * math.cos(w0)
+
+    b0 = A * ((A + 1) - temp2 + temp1)
+    b1 = 2 * A * ((A - 1) - temp3)
+    b2 = A * ((A + 1) - temp2 - temp1)
+    a0 = (A + 1) + temp2 + temp1
+    a1 = -2 * ((A - 1) + temp3)
+    a2 = (A + 1) + temp2 - temp1
+
+    return biquad(waveform, b0 / a0, b1 / a0, b2 / a0, a0 / a0, a1 / a0, a2 / a0)
+
+
 def deemph_biquad(
         waveform: Tensor,
         sample_rate: int
@@ -1275,7 +1318,6 @@ def phaser(
     delay_buf = torch.zeros(waveform.shape[0], delay_buf_len, dtype=dtype, device=device)
 
     mod_buf_len = int(sample_rate / mod_speed + .5)
-    mod_buf = torch.zeros(mod_buf_len, dtype=dtype, device=device)
 
     if sinusoidal:
         wave_type = 'SINE'
@@ -1287,7 +1329,8 @@ def phaser(
                                    table_size=mod_buf_len,
                                    min=1.,
                                    max=float(delay_buf_len),
-                                   phase=math.pi / 2)
+                                   phase=math.pi / 2,
+                                   device=device)
 
     delay_pos = 0
     mod_pos = 0
@@ -1311,7 +1354,8 @@ def _generate_wave_table(
         table_size: int,
         min: float,
         max: float,
-        phase: float
+        phase: float,
+        device: torch.device
 ) -> Tensor:
     r"""A helper fucntion for phaser. Generates a table with given parameters
 
@@ -1322,24 +1366,24 @@ def _generate_wave_table(
         min (float): desired min value
         max (float): desired max value
         phase (float): desired phase
-
+        device (torch.device): Torch device on which table must be generated
     Returns:
         Tensor: A 1D tensor with wave table values
     """
 
     phase_offset = int(phase / math.pi / 2 * table_size + 0.5)
 
-    t = torch.arange(table_size).to(torch.int32)
+    t = torch.arange(table_size, device=device, dtype=torch.int32)
 
     point = (t + phase_offset) % table_size
 
-    d = torch.zeros_like(point).to(torch.float64)
+    d = torch.zeros_like(point, device=device, dtype=torch.float64)
 
     if wave_type == 'SINE':
         d = (torch.sin(point.to(torch.float64) / table_size * 2 * math.pi) + 1) / 2
     elif wave_type == 'TRIANGLE':
         d = point.to(torch.float64) * 2 / table_size
-        value = 4 * point / table_size
+        value = 4 * point // table_size
         d[value == 0] = d[value == 0] + 0.5
         d[value == 1] = 1.5 - d[value == 1]
         d[value == 2] = 1.5 - d[value == 2]
@@ -1445,8 +1489,6 @@ def flanger(
 
     lfo_length = int(sample_rate / speed)
 
-    lfo = torch.zeros(lfo_length, dtype=dtype, device=device)
-
     table_min = math.floor(delay_min * sample_rate + 0.5)
     table_max = delay_buf_length - 2.
 
@@ -1455,13 +1497,14 @@ def flanger(
                                table_size=lfo_length,
                                min=float(table_min),
                                max=float(table_max),
-                               phase=3 * math.pi / 2)
+                               phase=3 * math.pi / 2,
+                               device=device)
 
     output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
 
     delay_buf_pos = 0
     lfo_pos = 0
-    channel_idxs = torch.arange(0, n_channels)
+    channel_idxs = torch.arange(0, n_channels, device=device)
 
     for i in range(waveform.shape[-1]):
 

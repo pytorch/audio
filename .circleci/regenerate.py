@@ -84,8 +84,17 @@ def generate_base_workflow(base_workflow_name, python_version, filter_branch, os
     return {"binary_{os_type}_{btype}".format(os_type=os_type, btype=btype): d}
 
 
-def gen_filter_branch_tree(branch_name):
-    return {"branches": {"only": branch_name}}
+def gen_filter_branch_tree(*branches):
+    return {
+        "branches": {
+            "only": list(branches),
+        },
+        "tags": {
+            # Using a raw string here to avoid having to escape
+            # anything
+            "only": r"/v[0-9]+(\.[0-9]+)*-rc[0-9]+/"
+        }
+    }
 
 
 def generate_upload_workflow(base_workflow_name, filter_branch, btype):
@@ -127,8 +136,11 @@ def indent(indentation, data_list):
 def unittest_workflows(indentation=6):
     jobs = []
     jobs += build_download_job(None)
-    for os_type in ["linux", "windows"]:
+    for os_type in ["linux", "windows", "macos"]:
         for device_type in ["cpu", "gpu"]:
+            if os_type == "macos" and device_type == "gpu":
+                continue
+
             for i, python_version in enumerate(PYTHON_VERSIONS):
                 job = {
                     "name": f"unittest_{os_type}_{device_type}_py{python_version}",
@@ -136,7 +148,7 @@ def unittest_workflows(indentation=6):
                 }
 
                 if device_type == 'gpu':
-                    job['filters'] = gen_filter_branch_tree('master')
+                    job['filters'] = gen_filter_branch_tree('master', 'nightly')
 
                 if os_type != "windows":
                     job['requires'] = ['download_third_parties_nix']

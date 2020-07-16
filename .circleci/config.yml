@@ -19,6 +19,33 @@ executors:
       image: windows-server-2019-nvidia:stable
       shell: bash.exe
 
+commands:
+  generate_cache_key:
+    description: "Generates a cache key file that changes daily"
+    steps:
+      - run:
+          name: Generate cache key
+          command: echo "$(date +"%Y-%m-%d")" > .cachekey
+  designate_upload_channel:
+    description: "inserts the correct upload channel into ${BASH_ENV}"
+    steps:
+      - run:
+          name: adding UPLOAD_CHANNEL to BASH_ENV
+          command: |
+            our_upload_channel=nightly
+            # On tags upload to test instead
+            if [[ -n "${CIRCLE_TAG}" ]]; then
+              our_upload_channel=test
+            fi
+            echo "export UPLOAD_CHANNEL=${our_upload_channel}" >> ${BASH_ENV}
+  install_build_tools_macos:
+    description: "installs tools required to build torchaudio"
+    steps:
+      - run:
+          name: Install cmake and pkg-config
+          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install cmake pkg-config wget
+          # Disable brew auto update which is very slow
+
 binary_common: &binary_common
   parameters:
     # Edit these defaults to do a release
@@ -62,31 +89,30 @@ jobs:
 
   download_third_parties_nix:
     docker:
-      - image: "centos:8"
+      - image: "pytorch/torchaudio_unittest_base:manylinux"
     resource_class: small
     steps:
       - checkout
-      - run:
-          name: Generate cache key
-          # This will refresh cache on daily
-          command: echo "$(date +"%Y-%U-%d")" > .circleci-daily
+      - generate_cache_key
       - restore_cache:
 
           keys:
-            - tp-nix-{{ checksum ".circleci-daily" }}-{{ checksum "./build_tools/setup_helpers/build_third_party.sh" }}-{{ checksum "./build_tools/setup_helpers/build_third_party_helper.sh" }}
+            - tp-nix-v2-{{ checksum ".cachekey" }}
 
       - run:
-          command: ./build_tools/setup_helpers/build_third_party.sh $PWD --download-only
+          command: |
+              mkdir -p third_party/archives/
+              wget --no-clobber --directory-prefix=third_party/archives/ $(awk '/URL /{print $2}' third_party/CMakeLists.txt)
       - save_cache:
 
-          key: tp-nix-{{ checksum ".circleci-daily" }}-{{ checksum "./build_tools/setup_helpers/build_third_party.sh" }}-{{ checksum "./build_tools/setup_helpers/build_third_party_helper.sh" }}
+          key: tp-nix-v2-{{ checksum ".cachekey" }}
 
           paths:
-            - third_party/tmp
+            - third_party/archives
       - persist_to_workspace:
           root: third_party
           paths:
-            - tmp
+            - archives
 
   binary_linux_wheel:
     <<: *binary_common
@@ -128,6 +154,7 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
+      - install_build_tools_macos
       - attach_workspace:
           at: third_party
       - run:
@@ -152,6 +179,7 @@ jobs:
       xcode: "9.0"
     steps:
       - checkout
+      - install_build_tools_macos
       - attach_workspace:
           at: third_party
       - run:
@@ -214,12 +242,13 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/workspace
+      - designate_upload_channel
       - run:
           command: |
             # Prevent credential from leaking
             conda install -yq anaconda-client
             set -x
-            anaconda -t "${CONDA_PYTORCHBOT_TOKEN}" upload ~/workspace/*.tar.bz2 -u pytorch-nightly --label main --no-progress --force
+            anaconda -t "${CONDA_PYTORCHBOT_TOKEN}" upload ~/workspace/*.tar.bz2 -u "pytorch-${UPLOAD_CHANNEL}" --label main --no-progress --force
 
   # Requires org-member context
   binary_wheel_upload:
@@ -229,6 +258,7 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - checkout
+      - designate_upload_channel
       - run:
           command: |
             pip install --user awscli
@@ -239,7 +269,7 @@ jobs:
             export AWS_SECRET_ACCESS_KEY="${PYTORCH_BINARY_AWS_SECRET_ACCESS_KEY}"
             set -x
             for pkg in ~/workspace/*.whl; do
-              aws s3 cp "$pkg" "s3://pytorch/whl/nightly/" --acl public-read
+              aws s3 cp "$pkg" "s3://pytorch/whl/${UPLOAD_CHANNEL}/" --acl public-read
             done
 
   smoke_test_linux_conda:
@@ -252,7 +282,7 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            conda install -v -y -c pytorch-nightly pytorch
+            conda install -v -y -c pytorch-test -c pytorch-nightly pytorch
             conda install -v -y $(ls ~/workspace/torchaudio*.tar.bz2)
       - run:
           name: smoke test
@@ -270,7 +300,7 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            pip install $(ls ~/workspace/torchaudio*.whl) -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+            pip install $(ls ~/workspace/torchaudio*.whl) -f https://download.pytorch.org/whl/nightly/torch_nightly.html -f https://download.pytorch.org/whl/test/torch_test.html
       - run:
           name: smoke test
           command: |
@@ -292,7 +322,7 @@ jobs:
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
-            conda install -v -y -c pytorch-nightly pytorch
+            conda install -v -y -c pytorch-test -c pytorch-nightly pytorch
             conda install -v -y $(ls ~/workspace/torchaudio*.tar.bz2)
       - run:
           name: smoke test
@@ -316,7 +346,7 @@ jobs:
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
-            pip install $(ls ~/workspace/torchaudio*.whl) -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+            pip install $(ls ~/workspace/torchaudio*.whl) -f https://download.pytorch.org/whl/nightly/torch_nightly.html -f https://download.pytorch.org/whl/test/torch_test.html
       - run:
           name: smoke test
           command: |
@@ -360,26 +390,25 @@ jobs:
       - checkout
       - attach_workspace:
           at: third_party
-      - run:
-          name: Generate cache key
-          # This will refresh cache on Sundays, nightly build should generate new cache.
-          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - generate_cache_key
       - restore_cache:
 
           keys:
-            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
             - env
             - third_party/build
+            - third_party/install
+            - third_party/src
       - run:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
@@ -403,26 +432,25 @@ jobs:
       - checkout
       - attach_workspace:
           at: third_party
-      - run:
-          name: Generate cache key
-          # This will refresh cache on Sundays, nightly build should generate new cache.
-          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - generate_cache_key
       - restore_cache:
 
           keys:
-            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
             - env
             - third_party/build
+            - third_party/install
+            - third_party/src
       - run:
           name: Install torchaudio
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
@@ -441,21 +469,18 @@ jobs:
       name: windows-cpu
     steps:
       - checkout
-      - run:
-          name: Generate cache key
-          # This will refresh cache on Sundays, nightly build should generate new cache.
-          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - generate_cache_key
       - restore_cache:
 
           keys:
-            - env-v2-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+            - env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v2-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          key: env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
@@ -480,21 +505,18 @@ jobs:
       CUDA_VERSION: "10.1"
     steps:
       - checkout
-      - run:
-          name: Generate cache key
-          # This will refresh cache on Sundays, nightly build should generate new cache.
-          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - generate_cache_key
       - restore_cache:
 
           keys:
-            - env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+            - env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          key: env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
@@ -511,6 +533,47 @@ jobs:
       - store_test_results:
           path: test-results
 
+  unittest_macos_cpu:
+    <<: *binary_common
+    macos:
+      xcode: "9.0"
+    resource_class: large
+    steps:
+      - checkout
+      - install_build_tools_macos
+      - attach_workspace:
+          at: third_party
+      - generate_cache_key
+      - restore_cache:
+
+          keys:
+            - env-v3-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+
+      - run:
+          name: Setup
+          command: .circleci/unittest/linux/scripts/setup_env.sh
+      - save_cache:
+
+          key: env-v3-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+
+          paths:
+            - conda
+            - env
+            - third_party/build
+            - third_party/install
+            - third_party/src
+      - run:
+          name: Install torchaudio
+          command: .circleci/unittest/linux/scripts/install.sh
+      - run:
+          name: Run tests
+          command: .circleci/unittest/linux/scripts/run_test.sh
+      - run:
+          name: Post process
+          command: .circleci/unittest/linux/scripts/post_process.sh
+      - store_test_results:
+          path: test-results
+
   stylecheck:
     <<: *binary_common
     docker:
@@ -518,26 +581,25 @@ jobs:
     resource_class: medium
     steps:
       - checkout
-      - run:
-          name: Generate cache key
-          # This will refresh cache on Sundays, nightly build should generate new cache.
-          command: echo "$(date +"%Y-%U")" > .circleci-weekly
+      - generate_cache_key
       - restore_cache:
 
           keys:
-            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".circleci-weekly" }}
+          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
             - env
             - third_party/build
+            - third_party/install
+            - third_party/src
       - run:
           name: Run style check
           command: .circleci/unittest/linux/scripts/run_style_checks.sh
@@ -651,7 +713,11 @@ workflows:
       - unittest_linux_gpu:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_linux_gpu_py3.6
           python_version: '3.6'
           requires:
@@ -659,7 +725,11 @@ workflows:
       - unittest_linux_gpu:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_linux_gpu_py3.7
           python_version: '3.7'
           requires:
@@ -667,7 +737,11 @@ workflows:
       - unittest_linux_gpu:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_linux_gpu_py3.8
           python_version: '3.8'
           requires:
@@ -684,21 +758,48 @@ workflows:
       - unittest_windows_gpu:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_windows_gpu_py3.6
           python_version: '3.6'
       - unittest_windows_gpu:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_windows_gpu_py3.7
           python_version: '3.7'
       - unittest_windows_gpu:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_windows_gpu_py3.8
           python_version: '3.8'
+      - unittest_macos_cpu:
+          name: unittest_macos_cpu_py3.6
+          python_version: '3.6'
+          requires:
+          - download_third_parties_nix
+      - unittest_macos_cpu:
+          name: unittest_macos_cpu_py3.7
+          python_version: '3.7'
+          requires:
+          - download_third_parties_nix
+      - unittest_macos_cpu:
+          name: unittest_macos_cpu_py3.8
+          python_version: '3.8'
+          requires:
+          - download_third_parties_nix
   nightly:
     jobs:
       - circleci_consistency:
@@ -708,12 +809,18 @@ workflows:
       - download_third_parties_nix:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: download_third_parties_nix
       - binary_linux_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_wheel_py3.6
           python_version: '3.6'
           requires:
@@ -722,14 +829,20 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_wheel_py3.6_upload
           requires:
           - nightly_binary_linux_wheel_py3.6
       - smoke_test_linux_pip:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_wheel_py3.6_smoke_test_pip
           python_version: '3.6'
           requires:
@@ -737,7 +850,10 @@ workflows:
       - binary_linux_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_wheel_py3.7
           python_version: '3.7'
           requires:
@@ -746,14 +862,20 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_wheel_py3.7_upload
           requires:
           - nightly_binary_linux_wheel_py3.7
       - smoke_test_linux_pip:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_wheel_py3.7_smoke_test_pip
           python_version: '3.7'
           requires:
@@ -761,7 +883,10 @@ workflows:
       - binary_linux_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_wheel_py3.8
           python_version: '3.8'
           requires:
@@ -770,14 +895,20 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_wheel_py3.8_upload
           requires:
           - nightly_binary_linux_wheel_py3.8
       - smoke_test_linux_pip:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_wheel_py3.8_smoke_test_pip
           python_version: '3.8'
           requires:
@@ -785,7 +916,10 @@ workflows:
       - binary_macos_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_macos_wheel_py3.6
           python_version: '3.6'
           requires:
@@ -794,14 +928,20 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_macos_wheel_py3.6_upload
           requires:
           - nightly_binary_macos_wheel_py3.6
       - binary_macos_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_macos_wheel_py3.7
           python_version: '3.7'
           requires:
@@ -810,14 +950,20 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_macos_wheel_py3.7_upload
           requires:
           - nightly_binary_macos_wheel_py3.7
       - binary_macos_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_macos_wheel_py3.8
           python_version: '3.8'
           requires:
@@ -826,28 +972,40 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_macos_wheel_py3.8_upload
           requires:
           - nightly_binary_macos_wheel_py3.8
       - binary_windows_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_wheel_py3.6
           python_version: '3.6'
       - binary_wheel_upload:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_wheel_py3.6_upload
           requires:
           - nightly_binary_windows_wheel_py3.6
       - smoke_test_windows_pip:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_wheel_py3.6_smoke_test_pip
           python_version: '3.6'
           requires:
@@ -855,21 +1013,30 @@ workflows:
       - binary_windows_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_wheel_py3.7
           python_version: '3.7'
       - binary_wheel_upload:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_wheel_py3.7_upload
           requires:
           - nightly_binary_windows_wheel_py3.7
       - smoke_test_windows_pip:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_wheel_py3.7_smoke_test_pip
           python_version: '3.7'
           requires:
@@ -877,21 +1044,30 @@ workflows:
       - binary_windows_wheel:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_wheel_py3.8
           python_version: '3.8'
       - binary_wheel_upload:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_wheel_py3.8_upload
           requires:
           - nightly_binary_windows_wheel_py3.8
       - smoke_test_windows_pip:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_wheel_py3.8_smoke_test_pip
           python_version: '3.8'
           requires:
@@ -899,7 +1075,10 @@ workflows:
       - binary_linux_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_conda_py3.6
           python_version: '3.6'
           requires:
@@ -908,14 +1087,20 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_conda_py3.6_upload
           requires:
           - nightly_binary_linux_conda_py3.6
       - smoke_test_linux_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_conda_py3.6_smoke_test_conda
           python_version: '3.6'
           requires:
@@ -923,7 +1108,10 @@ workflows:
       - binary_linux_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_conda_py3.7
           python_version: '3.7'
           requires:
@@ -932,14 +1120,20 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_conda_py3.7_upload
           requires:
           - nightly_binary_linux_conda_py3.7
       - smoke_test_linux_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_conda_py3.7_smoke_test_conda
           python_version: '3.7'
           requires:
@@ -947,7 +1141,10 @@ workflows:
       - binary_linux_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_conda_py3.8
           python_version: '3.8'
           requires:
@@ -956,14 +1153,20 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_conda_py3.8_upload
           requires:
           - nightly_binary_linux_conda_py3.8
       - smoke_test_linux_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_linux_conda_py3.8_smoke_test_conda
           python_version: '3.8'
           requires:
@@ -971,7 +1174,10 @@ workflows:
       - binary_macos_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_macos_conda_py3.6
           python_version: '3.6'
           requires:
@@ -980,14 +1186,20 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_macos_conda_py3.6_upload
           requires:
           - nightly_binary_macos_conda_py3.6
       - binary_macos_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_macos_conda_py3.7
           python_version: '3.7'
           requires:
@@ -996,14 +1208,20 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_macos_conda_py3.7_upload
           requires:
           - nightly_binary_macos_conda_py3.7
       - binary_macos_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_macos_conda_py3.8
           python_version: '3.8'
           requires:
@@ -1012,28 +1230,40 @@ workflows:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_macos_conda_py3.8_upload
           requires:
           - nightly_binary_macos_conda_py3.8
       - binary_windows_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_conda_py3.6
           python_version: '3.6'
       - binary_conda_upload:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_conda_py3.6_upload
           requires:
           - nightly_binary_windows_conda_py3.6
       - smoke_test_windows_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_conda_py3.6_smoke_test_conda
           python_version: '3.6'
           requires:
@@ -1041,21 +1271,30 @@ workflows:
       - binary_windows_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_conda_py3.7
           python_version: '3.7'
       - binary_conda_upload:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_conda_py3.7_upload
           requires:
           - nightly_binary_windows_conda_py3.7
       - smoke_test_windows_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_conda_py3.7_smoke_test_conda
           python_version: '3.7'
           requires:
@@ -1063,21 +1302,30 @@ workflows:
       - binary_windows_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_conda_py3.8
           python_version: '3.8'
       - binary_conda_upload:
           context: org-member
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_conda_py3.8_upload
           requires:
           - nightly_binary_windows_conda_py3.8
       - smoke_test_windows_conda:
           filters:
             branches:
-              only: nightly
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: nightly_binary_windows_conda_py3.8_smoke_test_conda
           python_version: '3.8'
           requires:

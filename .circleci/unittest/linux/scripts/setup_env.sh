@@ -14,10 +14,15 @@ env_dir="${root_dir}/env"
 
 cd "${root_dir}"
 
+case "$(uname -s)" in
+    Darwin*) os=MacOSX;;
+    *) os=Linux
+esac
+
 # 1. Install conda at ./conda
 if [ ! -d "${conda_dir}" ]; then
     printf "* Installing conda\n"
-    wget -O miniconda.sh http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    wget -O miniconda.sh "http://repo.continuum.io/miniconda/Miniconda3-latest-${os}-x86_64.sh"
     bash ./miniconda.sh -b -f -p "${conda_dir}"
 fi
 eval "$(${conda_dir}/bin/conda shell.bash hook)"
@@ -32,6 +37,14 @@ conda activate "${env_dir}"
 # 3. Install Conda dependencies
 printf "* Installing dependencies (except PyTorch)\n"
 conda env update --file "${this_dir}/environment.yml" --prune
+if [ "${os}" == Linux ] ; then
+    pip install clang-format
+fi
 
-# 4. Build codecs
-build_tools/setup_helpers/build_third_party.sh
+# 4. Buld codecs
+mkdir -p third_party/build
+(
+    cd third_party/build
+    cmake ..
+    cmake --build .
+)

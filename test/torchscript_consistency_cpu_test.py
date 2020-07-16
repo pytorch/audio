@@ -1,5 +1,24 @@
-from .common_utils import define_test_suites
+import torch
+
+from . import common_utils
 from .torchscript_consistency_impl import Functional, Transforms
 
 
-define_test_suites(globals(), [Functional, Transforms], devices=['cpu'])
+class TestFunctionalFloat32(Functional, common_utils.PytorchTestCase):
+    dtype = torch.float32
+    device = torch.device('cpu')
+
+
+class TestFunctionalFloat64(Functional, common_utils.PytorchTestCase):
+    dtype = torch.float64
+    device = torch.device('cpu')
+
+
+class TestTransformsFloat32(Transforms, common_utils.PytorchTestCase):
+    dtype = torch.float32
+    device = torch.device('cpu')
+
+
+class TestTransformsFloat64(Transforms, common_utils.PytorchTestCase):
+    dtype = torch.float64
+    device = torch.device('cpu')
