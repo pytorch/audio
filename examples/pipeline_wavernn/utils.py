@@ -16,8 +16,8 @@ class MetricLogger:
         self.data = defaultdict(lambda: deque(maxlen=self.print_freq))
         self.data["group"].append(group)
 
-    def __setitem__(self, key):
-        self.data[key][-1]
+    def __setitem__(self, key, value):
+        self.data[key].append(value)
 
     def _get_last(self):
         return {k: v[-1] for k, v in self.data.items()}
@@ -25,7 +25,7 @@ class MetricLogger:
     def __str__(self):
         return str(self._get_last())
 
-    def print(self):
+    def __call__(self):
         self._iter = (self._iter + 1) % self.print_freq
         if not self._iter:
             print(self, flush=True)

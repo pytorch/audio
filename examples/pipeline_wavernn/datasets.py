@@ -7,7 +7,7 @@ from torch.utils.data.dataset import random_split
 from torchaudio.datasets import LJSPEECH
 from torchaudio.transforms import MuLawEncoding
 
-from functional import label_to_waveform, waveform_to_label
+from processing import label_to_waveform, waveform_to_label
 
 
 class MapMemoryCache(torch.utils.data.Dataset):
@@ -103,7 +103,7 @@ def collate_factory(args):
             if args.mulaw:
                 mulaw_encode = MuLawEncoding(2 ** args.n_bits)
                 waveform = mulaw_encode(waveform)
-                target = mulaw_encode(waveform)
+                target = mulaw_encode(target)
 
                 waveform = label_to_waveform(waveform, args.n_bits)
 

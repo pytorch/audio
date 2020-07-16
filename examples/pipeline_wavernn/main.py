@@ -16,8 +16,8 @@ from torchaudio.datasets.utils import bg_iterator
 from torchaudio.models._wavernn import _WaveRNN
 
 from datasets import collate_factory, split_process_ljspeech
-from losses import MoLLoss
-from transform import LinearToMel, NormalizeDB
+from losses import mol_loss
+from processing import LinearToMel, NormalizeDB
 from utils import MetricLogger, count_parameters, save_checkpoint
 
 
@@ -158,7 +158,7 @@ def parse_args():
     )
     parser.add_argument(
         "--file-path",
-        default="/private/home/jimchen90/datasets",
+        default="",
         type=str,
         help="the path of audio files",
     )
@@ -175,7 +175,7 @@ def train_one_epoch(model, mode, criterion, optimizer, data_loader, device, epoc
     start1 = time()
 
     metric = MetricLogger("train_iteration")
-    metric("epoch", epoch)
+    metric["epoch"] = epoch
 
     for waveform, specgram, target in bg_iterator(data_loader, maxsize=2):
 
@@ -199,7 +199,7 @@ def train_one_epoch(model, mode, criterion, optimizer, data_loader, device, epoc
         loss = criterion(output, target)
         loss_item = loss.item()
         sums["loss"] += loss_item
-        metric("loss", loss_item)
+        metric["loss"] = loss_item
 
         optimizer.zero_grad()
         loss.backward()
@@ -208,24 +208,24 @@ def train_one_epoch(model, mode, criterion, optimizer, data_loader, device, epoc
             gradient = torch.nn.utils.clip_grad_norm_(
                 model.parameters(), args.clip_grad
             )
-            sums["gradient"] += gradient
-            metric("gradient", gradient.item())
+            sums["gradient"] += gradient.item()
+            metric["gradient"] = gradient.item()
 
         optimizer.step()
 
-        metric("iteration", sums["iteration"])
-        metric("time", time() - start2)
-        metric.print()
+        metric["iteration"] = sums["iteration"]
+        metric["time"] = time() - start2
+        metric()
         sums["iteration"] += 1
 
     avg_loss = sums["loss"] / len(data_loader)
 
     metric = MetricLogger("train_epoch")
-    metric("epoch", epoch)
-    metric("loss", avg_loss)
-    metric("gradient", sums["gradient"] / len(data_loader))
-    metric("time", time() - start1)
-    metric.print()
+    metric["epoch"] = epoch
+    metric["loss"] = avg_loss
+    metric["gradient"] = sums["gradient"] / len(data_loader)
+    metric["time"] = time() - start1
+    metric()
 
 
 def validate(model, mode, criterion, data_loader, device, epoch):
@@ -259,10 +259,10 @@ def validate(model, mode, criterion, data_loader, device, epoch):
         avg_loss = sums["loss"] / len(data_loader)
 
         metric = MetricLogger("validation")
-        metric("epoch", epoch)
-        metric("loss", avg_loss)
-        metric("time", time() - start)
-        metric.print()
+        metric["epoch"] = epoch
+        metric["loss"] = avg_loss
+        metric["time"] = time() - start
+        metric()
 
         return avg_loss
 
@@ -348,7 +348,7 @@ def main(args):
 
     optimizer = Adam(model.parameters(), **optimizer_params)
 
-    criterion = nn.CrossEntropyLoss() if args.mode == "waveform" else MoLLoss
+    criterion = nn.CrossEntropyLoss() if args.mode == "waveform" else mol_loss
 
     best_loss = 10.0
 
