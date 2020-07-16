@@ -4,8 +4,7 @@ from typing import Any, Optional
 class SignalInfo:
     """Data class returned ``info`` functions.
 
-    Used by :py:func:`torchaudio.backend.sox_backend.info` and
-    :py:func:`torchaudio.backend.soundfile_backend.info`
+    Used by :ref:`sox backend<sox_backend>` and :ref:`soundfile backend<soundfile_backend>`
 
     See https://fossies.org/dox/sox-14.4.2/structsox__signalinfo__t.html
 
@@ -29,8 +28,7 @@ class SignalInfo:
 class EncodingInfo:
     """Data class returned ``info`` functions.
 
-    Used by :py:func:`torchaudio.backend.sox_backend.info` and
-    :py:func:`torchaudio.backend.soundfile_backend.info`
+    Used by :ref:`sox backend<sox_backend>` and :ref:`soundfile backend<soundfile_backend>`
 
     See https://fossies.org/dox/sox-14.4.2/structsox__encodinginfo__t.html
 

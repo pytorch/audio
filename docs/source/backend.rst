@@ -3,7 +3,7 @@
 torchaudio.backend
 ==================
 
-:mod:`torchaudio.backend` module provides implemenrations for audio file I/O, using different backend libraries
+:mod:`torchaudio.backend` module provides implementations for audio file I/O, using different backend libraries.
 To switch backend, use :py:func:`torchaudio.set_audio_backend`. To check the current backend use :py:func:`torchaudio.get_audio_backend`.
 
 .. warning::
