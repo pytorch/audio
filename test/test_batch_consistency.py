@@ -1,5 +1,7 @@
 """Test numerical consistency among single input and batched input."""
 import unittest
+import itertools
+from parameterized import parameterized
 
 import torch
 import torchaudio
@@ -47,17 +49,15 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             F.griffinlim, tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, 0, atol=5e-5
         )
 
-    def test_detect_pitch_frequency(self):
-        filenames = [
-            'steam-train-whistle-daniel_simon.wav',  # 2ch 44100Hz
-            # Files from https://www.mediacollege.com/audio/tone/download/
-            '100Hz_44100Hz_16bit_05sec.wav',  # 1ch
-            '440Hz_44100Hz_16bit_05sec.wav',  # 1ch
-        ]
-        for filename in filenames:
-            filepath = common_utils.get_asset_path(filename)
-            waveform, sample_rate = torchaudio.load(filepath)
-            self.assert_batch_consistencies(F.detect_pitch_frequency, waveform, sample_rate)
+    @parameterized.expand(list(itertools.product(
+        [100, 440],
+        [8000, 16000, 44100],
+        [1, 2],
+    )), name_func=lambda f, _, p: f'{f.__name__}_{"_".join(str(arg) for arg in p.args)}')
+    def test_detect_pitch_frequency(self, frequency, sample_rate, n_channels):
+        waveform = common_utils.get_sinusoid(frequency=frequency, sample_rate=sample_rate,
+                                             n_channels=n_channels, duration=5)
+        self.assert_batch_consistencies(F.detect_pitch_frequency, waveform, sample_rate)
 
     def test_istft(self):
         stft = torch.tensor([
@@ -80,8 +80,10 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistencies(F.overdrive, waveform, gain=45, colour=30)
 
     def test_phaser(self):
-        filepath = common_utils.get_asset_path("whitenoise.wav")
-        waveform, sample_rate = torchaudio.load(filepath)
+        sample_rate = 44100
+        waveform = common_utils.get_whitenoise(
+            sample_rate=sample_rate, duration=5,
+        )
         self.assert_batch_consistencies(F.phaser, waveform, sample_rate)
 
     def test_flanger(self):

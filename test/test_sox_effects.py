@@ -45,8 +45,8 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         E.append_effect_to_chain("speed", speed)
         E.append_effect_to_chain("rate", si.rate)
         x, sr = E.sox_build_flow_effects()
-        # check if effects worked
-        self.assertEqual(x.size(1), int((si.length / si.channels) / speed))
+        # check if effects worked, add small tolerance for rounding effects
+        self.assertEqual(x.size(1), int((si.length / si.channels) / speed), atol=1, rtol=1e-8)
 
     def test_ulaw_and_siginfo(self):
         si_out = torchaudio.sox_signalinfo_t()
