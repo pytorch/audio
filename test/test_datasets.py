@@ -10,6 +10,7 @@ from torchaudio.datasets.yesno import YESNO
 from torchaudio.datasets.ljspeech import LJSPEECH
 from torchaudio.datasets.gtzan import GTZAN
 from torchaudio.datasets.cmuarctic import CMUARCTIC
+from torchaudio.datasets.libritts import LIBRITTS
 
 from .common_utils import (
     TempDirMixin,
@@ -47,6 +48,10 @@ class TestDatasets(TorchaudioTestCase):
 
     def test_cmuarctic(self):
         data = CMUARCTIC(self.path)
+        data[0]
+    
+    def test_libritts(self):
+        data = LIBRITTS(self.path)
         data[0]
 
 

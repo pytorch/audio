@@ -31,48 +31,52 @@ _CHECKSUMS = {
 
 
 def load_libritts_item(fileid: str,
-                          path: str,
-                          ext_audio: str,
-                          ext_txt: str) -> Tuple[Tensor, int, str, int, int, int]:
-    speaker_id, chapter_id, utterance_id = fileid.split("-")
+                       path: str,
+                       ext_audio: str,
+                       ext_original_txt: str,
+                       ext_normalized_txt: str) -> Tuple[Tensor, int, str, str, int, int, int, int]:
+    speaker_id, chapter_id, utterance_id1, utterance_id2 = fileid.split("_")
 
-    file_text = speaker_id + "-" + chapter_id + ext_txt
-    file_text = os.path.join(path, speaker_id, chapter_id, file_text)
-
-    fileid_audio = speaker_id + "-" + chapter_id + "-" + utterance_id
+    normalized_text = speaker_id + "_" + chapter_id + "_" + utterance_id1 + "_" + utterance_id2 + ext_normalized_txt
+    normalized_text = os.path.join(path, speaker_id, chapter_id, normalized_text)
+    
+    original_text = speaker_id + "_" + chapter_id + "_" + utterance_id1 + "_" + utterance_id2 + ext_original_txt
+    original_text = os.path.join(path, speaker_id, chapter_id, original_text)
+    
+    fileid_audio = speaker_id + "_" + chapter_id + "_" + utterance_id1 + "_" + utterance_id2
     file_audio = fileid_audio + ext_audio
     file_audio = os.path.join(path, speaker_id, chapter_id, file_audio)
 
     # Load audio
     waveform, sample_rate = torchaudio.load(file_audio)
 
-    # Load text
-    with open(file_text) as ft:
-        for line in ft:
-            fileid_text, utterance = line.strip().split(" ", 1)
-            if fileid_audio == fileid_text:
-                break
-        else:
-            # Translation not found
-            raise FileNotFoundError("Translation not found for " + fileid_audio)
+    # Load original text
+    with open(original_text) as ft:
+        original_utterance = ft.readline()  
+    # Load normalized text
+    with open(normalized_text, 'r') as ft:
+        normalized_utterance = ft.readline()
 
     return (
         waveform,
         sample_rate,
-        utterance,
+        original_utterance,
+        normalized_utterance,
         int(speaker_id),
         int(chapter_id),
-        int(utterance_id),
+        int(utterance_id1),
+        int(utterance_id2),
     )
 
 
-class LIBRISPEECH(Dataset):
+class LIBRITTS(Dataset):
     """
     Create a Dataset for LibriTTS. Each item is a tuple of the form:
     waveform, sample_rate, utterance, speaker_id, chapter_id, utterance_id
     """
 
-    _ext_txt = ".trans.txt"
+    _ext_original_txt = ".original.txt"
+    _ext_normalized_txt = ".normalized.txt"
     _ext_audio = ".wav"
 
     def __init__(self,
@@ -92,7 +96,7 @@ class LIBRISPEECH(Dataset):
         ]:
 
             ext_archive = ".tar.gz"
-            base_url = "http://www.openslr.org/60/"
+            base_url = "http://www.openslr.org/resources/60/"
 
             url = os.path.join(base_url, url + ext_archive)
 
@@ -116,9 +120,9 @@ class LIBRISPEECH(Dataset):
         )
         self._walker = list(walker)
 
-    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int, int, int, int]:
         fileid = self._walker[n]
-        return load_librispeech_item(fileid, self._path, self._ext_audio, self._ext_txt)
+        return load_libritts_item(fileid, self._path, self._ext_audio, self._ext_original_txt, self._ext_normalized_txt)
 
     def __len__(self) -> int:
         return len(self._walker)
