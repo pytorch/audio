@@ -49,7 +49,7 @@ class TestDatasets(TorchaudioTestCase):
     def test_cmuarctic(self):
         data = CMUARCTIC(self.path)
         data[0]
-    
+
     def test_libritts(self):
         data = LIBRITTS(self.path)
         data[0]

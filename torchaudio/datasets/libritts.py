@@ -26,7 +26,7 @@ _CHECKSUMS = {
     "http://www.openslr.org/60/train-clean-360.tar.gz":
     "a84ef10ddade5fd25df69596a2767b2d",
     "http://www.openslr.org/60/train-other-500.tar.gz":
-    "7b181dd5ace343a5f38427999684aa6f"
+    "7b181dd5ace343a5f38427999684aa6f",
 }
 
 
@@ -40,10 +40,10 @@ def load_libritts_item(fileid: str,
 
     normalized_text = utterance_id + ext_normalized_txt
     normalized_text = os.path.join(path, speaker_id, chapter_id, normalized_text)
-    
+
     original_text = utterance_id + ext_original_txt
     original_text = os.path.join(path, speaker_id, chapter_id, original_text)
-    
+
     file_audio = utterance_id + ext_audio
     file_audio = os.path.join(path, speaker_id, chapter_id, file_audio)
 
@@ -52,8 +52,8 @@ def load_libritts_item(fileid: str,
 
     # Load original text
     with open(original_text) as ft:
-        original_utterance = ft.readline() 
- 
+        original_utterance = ft.readline()
+
     # Load normalized text
     with open(normalized_text, 'r') as ft:
         normalized_utterance = ft.readline()
