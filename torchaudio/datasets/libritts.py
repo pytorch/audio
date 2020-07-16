@@ -34,17 +34,17 @@ def load_libritts_item(fileid: str,
                        path: str,
                        ext_audio: str,
                        ext_original_txt: str,
-                       ext_normalized_txt: str) -> Tuple[Tensor, int, str, str, int, int, int, int]:
-    speaker_id, chapter_id, utterance_id1, utterance_id2 = fileid.split("_")
+                       ext_normalized_txt: str) -> Tuple[Tensor, int, str, str, int, int, str]:
+    speaker_id, chapter_id, segment_id, utterance_id = fileid.split("_")
+    utterance_id = fileid
 
-    normalized_text = speaker_id + "_" + chapter_id + "_" + utterance_id1 + "_" + utterance_id2 + ext_normalized_txt
+    normalized_text = utterance_id + ext_normalized_txt
     normalized_text = os.path.join(path, speaker_id, chapter_id, normalized_text)
     
-    original_text = speaker_id + "_" + chapter_id + "_" + utterance_id1 + "_" + utterance_id2 + ext_original_txt
+    original_text = utterance_id + ext_original_txt
     original_text = os.path.join(path, speaker_id, chapter_id, original_text)
     
-    fileid_audio = speaker_id + "_" + chapter_id + "_" + utterance_id1 + "_" + utterance_id2
-    file_audio = fileid_audio + ext_audio
+    file_audio = utterance_id + ext_audio
     file_audio = os.path.join(path, speaker_id, chapter_id, file_audio)
 
     # Load audio
@@ -52,7 +52,8 @@ def load_libritts_item(fileid: str,
 
     # Load original text
     with open(original_text) as ft:
-        original_utterance = ft.readline()  
+        original_utterance = ft.readline() 
+ 
     # Load normalized text
     with open(normalized_text, 'r') as ft:
         normalized_utterance = ft.readline()
@@ -64,15 +65,14 @@ def load_libritts_item(fileid: str,
         normalized_utterance,
         int(speaker_id),
         int(chapter_id),
-        int(utterance_id1),
-        int(utterance_id2),
+        utterance_id,
     )
 
 
 class LIBRITTS(Dataset):
     """
     Create a Dataset for LibriTTS. Each item is a tuple of the form:
-    waveform, sample_rate, utterance, speaker_id, chapter_id, utterance_id
+    waveform, sample_rate, original_utterance, normalized_utterance, speaker_id, chapter_id, utterance_id
     """
 
     _ext_original_txt = ".original.txt"
@@ -120,7 +120,7 @@ class LIBRITTS(Dataset):
         )
         self._walker = list(walker)
 
-    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int, int, int, int]:
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int, int, str]:
         fileid = self._walker[n]
         return load_libritts_item(fileid, self._path, self._ext_audio, self._ext_original_txt, self._ext_normalized_txt)
 
