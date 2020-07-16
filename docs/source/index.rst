@@ -13,6 +13,7 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    kaldi_io
    transforms
    functional
+   utils
 
 .. automodule:: torchaudio
    :members:

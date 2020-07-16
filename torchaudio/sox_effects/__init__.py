@@ -3,6 +3,8 @@ from .sox_effects import (
     init_sox_effects,
     shutdown_sox_effects,
     effect_names,
+    apply_effects_tensor,
+    apply_effects_file,
     SoxEffect,
     SoxEffectsChain,
 )
