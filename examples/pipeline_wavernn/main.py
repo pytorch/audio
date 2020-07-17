@@ -90,22 +90,16 @@ def parse_args():
         help="the number of samples between the starts of consecutive frames",
     )
     parser.add_argument(
-        "--win-length",
-        default=1100,
-        type=int,
-        help="the number of samples between the starts of consecutive frames",
+        "--win-length", default=1100, type=int, help="the length of the STFT window",
     )
     parser.add_argument(
-        "--f-min",
-        default=40.0,
-        type=float,
-        help="the number of samples between the starts of consecutive frames",
+        "--f-min", default=40.0, type=float, help="the minimum frequency",
     )
     parser.add_argument(
         "--min-level-db",
         default=-100,
         type=float,
-        help="the min db value for spectrogam normalization",
+        help="the minimum db value for spectrogam normalization",
     )
     parser.add_argument(
         "--n-res-block", default=10, type=int, help="the number of ResBlock in stack",
@@ -157,10 +151,7 @@ def parse_args():
         help="the ratio of waveforms for validation",
     )
     parser.add_argument(
-        "--file-path",
-        default="",
-        type=str,
-        help="the path of audio files",
+        "--file-path", default="", type=str, help="the path of audio files",
     )
 
     args = parser.parse_args()
