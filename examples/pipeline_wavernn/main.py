@@ -120,23 +120,23 @@ def parse_args():
         "--n-freq", default=80, type=int, help="the number of spectrogram bins to use",
     )
     parser.add_argument(
-        "--n-hidden", default=128, type=int, help="the number of hidden dimensions",
+        "--n-hidden-resblock", default=128, type=int, help="the number of hidden dimensions of resblock",
     )
     parser.add_argument(
-        "--n-output",
+        "--n-output-melresnet",
         default=128,
         type=int,
-        help="the output dimension of upsample network in WaveRNN model",
+        help="the output dimension of melresnet block in WaveRNN model",
     )
     parser.add_argument(
         "--n-fft", default=2048, type=int, help="the number of Fourier bins",
     )
     parser.add_argument(
-        "--mode",
+        "--loss",
         default="waveform",
         choices=["waveform", "mol"],
         type=str,
-        help="the mode of waveform",
+        help="the type of loss",
     )
     parser.add_argument(
         "--seq-len-factor",
@@ -151,14 +151,14 @@ def parse_args():
         help="the ratio of waveforms for validation",
     )
     parser.add_argument(
-        "--file-path", default="", type=str, help="the path of audio files",
+        "--file-path", default="/private/home/jimchen90/datasets", type=str, help="the path of audio files",
     )
 
     args = parser.parse_args()
     return args
 
 
-def train_one_epoch(model, mode, criterion, optimizer, data_loader, device, epoch):
+def train_one_epoch(model, loss, criterion, optimizer, data_loader, device, epoch):
 
     model.train()
 
@@ -179,12 +179,12 @@ def train_one_epoch(model, mode, criterion, optimizer, data_loader, device, epoc
         output = model(waveform, specgram)
         output, target = output.squeeze(1), target.squeeze(1)
 
-        if mode == "waveform":
+        if loss == "waveform":
             output = output.transpose(1, 2)
             target = target.long()
 
         else:
-            # use mol mode
+            # use mol loss
             target = target.unsqueeze(-1)
 
         loss = criterion(output, target)
@@ -219,7 +219,7 @@ def train_one_epoch(model, mode, criterion, optimizer, data_loader, device, epoc
     metric()
 
 
-def validate(model, mode, criterion, data_loader, device, epoch):
+def validate(model, loss, criterion, data_loader, device, epoch):
 
     with torch.no_grad():
 
@@ -236,12 +236,12 @@ def validate(model, mode, criterion, data_loader, device, epoch):
             output = model(waveform, specgram)
             output, target = output.squeeze(1), target.squeeze(1)
 
-            if mode == "waveform":
+            if loss == "waveform":
                 output = output.transpose(1, 2)
                 target = target.long()
 
             else:
-                # use mol mode
+                # use mol loss
                 target = target.unsqueeze(-1)
 
             loss = criterion(output, target)
@@ -318,9 +318,9 @@ def main(args):
         n_fc=args.n_fc,
         kernel_size=args.kernel_size,
         n_freq=args.n_freq,
-        n_hidden=args.n_hidden,
-        n_output=args.n_output,
-        mode=args.mode,
+        n_hidden_resblock=args.n_hidden_resblock,
+        n_output_melresnet=args.n_output_melresnet,
+        loss=args.loss,
     )
 
     model = torch.nn.DataParallel(model)
@@ -336,7 +336,7 @@ def main(args):
 
     optimizer = Adam(model.parameters(), **optimizer_params)
 
-    criterion = nn.CrossEntropyLoss() if args.mode == "waveform" else MoLLoss()
+    criterion = nn.CrossEntropyLoss() if args.loss == "waveform" else MoLLoss()
 
     best_loss = 10.0
 
@@ -370,13 +370,13 @@ def main(args):
     for epoch in range(args.start_epoch, args.epochs):
 
         train_one_epoch(
-            model, args.mode, criterion, optimizer, train_loader, devices[0], epoch,
+            model, args.loss, criterion, optimizer, train_loader, devices[0], epoch,
         )
 
         if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
 
             sum_loss = validate(
-                model, args.mode, criterion, val_loader, devices[0], epoch,
+                model, args.loss, criterion, val_loader, devices[0], epoch,
             )
 
             is_best = sum_loss < best_loss

@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
+import math
+
 
 class MoLLoss(torch.nn.Module):
     r""" Discretized mixture of logistic distributions loss
@@ -30,7 +32,7 @@ class MoLLoss(torch.nn.Module):
     def forward(self, y_hat, y):
 
         if self.log_scale_min is None:
-            self.log_scale_min = torch.log(torch.as_tensor(1e-14)).item()
+            self.log_scale_min = math.log(1e-14)
 
         assert y_hat.dim() == 3
         assert y_hat.size(-1) % 3 == 0
@@ -74,7 +76,7 @@ class MoLLoss(torch.nn.Module):
         inner_inner_out = inner_inner_cond * torch.log(
             torch.clamp(cdf_delta, min=1e-12)
         ) + (1.0 - inner_inner_cond) * (
-            log_pdf_mid - torch.log(torch.as_tensor((self.num_classes - 1) / 2)).item()
+            log_pdf_mid - math.log((self.num_classes - 1) / 2)
         )
         inner_cond = (y > 0.999).float()
         inner_out = (

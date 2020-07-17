@@ -43,9 +43,9 @@ class Processed(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.dataset)
 
-    def process_datapoint(self, waveform):
-        specgram = self.transforms(waveform[0])
-        return waveform[0].squeeze(0), specgram
+    def process_datapoint(self, item):
+        specgram = self.transforms(item[0])
+        return item[0].squeeze(0), specgram
 
 
 def split_process_ljspeech(args, transforms):
@@ -97,8 +97,8 @@ def collate_factory(args):
         waveform = waveform_combine[:, :wave_length]
         target = waveform_combine[:, 1:]
 
-        # waveform: [-1, 1], target: [0, 2**bits-1] if mode = 'waveform'
-        if args.mode == "waveform":
+        # waveform: [-1, 1], target: [0, 2**bits-1] if loss = 'waveform'
+        if args.loss == "waveform":
 
             if args.mulaw:
                 mulaw_encode = MuLawEncoding(2 ** args.n_bits)
