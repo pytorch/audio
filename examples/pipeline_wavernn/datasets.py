@@ -7,7 +7,7 @@ from torch.utils.data.dataset import random_split
 from torchaudio.datasets import LJSPEECH
 from torchaudio.transforms import MuLawEncoding
 
-from processing import encode_waveform_into_bits, encode_bits_into_waveform
+from processing import bits_to_normalized_waveform, normalized_waveform_to_bits
 
 
 class MapMemoryCache(torch.utils.data.Dataset):
@@ -97,18 +97,18 @@ def collate_factory(args):
         waveform = waveform_combine[:, :wave_length]
         target = waveform_combine[:, 1:]
 
-        # waveform: [-1, 1], target: [0, 2**bits-1] if loss = 'waveform'
-        if args.loss == "waveform":
+        # waveform: [-1, 1], target: [0, 2**bits-1] if loss = 'crossentropy'
+        if args.loss == "crossentropy":
 
             if args.mulaw:
                 mulaw_encode = MuLawEncoding(2 ** args.n_bits)
                 waveform = mulaw_encode(waveform)
                 target = mulaw_encode(target)
 
-                waveform = encode_bits_into_waveform(waveform, args.n_bits)
+                waveform = bits_to_normalized_waveform(waveform, args.n_bits)
 
             else:
-                target = encode_waveform_into_bits(target, args.n_bits)
+                target = normalized_waveform_to_bits(target, args.n_bits)
 
         return waveform.unsqueeze(1), specgram.unsqueeze(1), target.unsqueeze(1)
 

@@ -16,7 +16,7 @@ from torchaudio.datasets.utils import bg_iterator
 from torchaudio.models._wavernn import _WaveRNN
 
 from datasets import collate_factory, split_process_ljspeech
-from losses import MoLLoss
+from losses import LongCrossEntropyLoss, MoLLoss
 from processing import LinearToMel, NormalizeDB
 from utils import MetricLogger, count_parameters, save_checkpoint
 
@@ -120,13 +120,13 @@ def parse_args():
         "--n-freq", default=80, type=int, help="the number of spectrogram bins to use",
     )
     parser.add_argument(
-        "--n-hidden-resblock",
+        "--n-hidden",
         default=128,
         type=int,
         help="the number of hidden dimensions of resblock",
     )
     parser.add_argument(
-        "--n-output-melresnet",
+        "--n-output",
         default=128,
         type=int,
         help="the output dimension of melresnet block in WaveRNN model",
@@ -135,11 +135,11 @@ def parse_args():
         "--n-fft", default=2048, type=int, help="the number of Fourier bins",
     )
     parser.add_argument(
-        "--loss-fn",
+        "--loss",
         default="crossentropy",
         choices=["crossentropy", "mol"],
         type=str,
-        help="the type of loss function",
+        help="the type of loss",
     )
     parser.add_argument(
         "--seq-len-factor",
@@ -161,7 +161,7 @@ def parse_args():
     return args
 
 
-def train_one_epoch(model, loss_fn, criterion, optimizer, data_loader, device, epoch):
+def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch):
 
     model.train()
 
@@ -181,14 +181,6 @@ def train_one_epoch(model, loss_fn, criterion, optimizer, data_loader, device, e
 
         output = model(waveform, specgram)
         output, target = output.squeeze(1), target.squeeze(1)
-
-        if loss_fn == "crossentropy":
-            output = output.transpose(1, 2)
-            target = target.long()
-
-        else:
-            # use mol loss
-            target = target.unsqueeze(-1)
 
         loss = criterion(output, target)
         loss_item = loss.item()
@@ -222,7 +214,7 @@ def train_one_epoch(model, loss_fn, criterion, optimizer, data_loader, device, e
     metric()
 
 
-def validate(model, loss_fn, criterion, data_loader, device, epoch):
+def validate(model, criterion, data_loader, device, epoch):
 
     with torch.no_grad():
 
@@ -238,14 +230,6 @@ def validate(model, loss_fn, criterion, data_loader, device, epoch):
 
             output = model(waveform, specgram)
             output, target = output.squeeze(1), target.squeeze(1)
-
-            if loss_fn == "crossentropy":
-                output = output.transpose(1, 2)
-                target = target.long()
-
-            else:
-                # use mol loss
-                target = target.unsqueeze(-1)
 
             loss = criterion(output, target)
             sums["loss"] += loss.item()
@@ -311,7 +295,7 @@ def main(args):
         **loader_validation_params,
     )
 
-    n_classes = 2 ** args.n_bits if args.loss_fn == "crossentropy" else 30
+    n_classes = 2 ** args.n_bits if args.loss == "crossentropy" else 30
 
     model = _WaveRNN(
         upsample_scales=args.upsample_scales,
@@ -339,7 +323,7 @@ def main(args):
 
     optimizer = Adam(model.parameters(), **optimizer_params)
 
-    criterion = nn.CrossEntropyLoss() if args.loss_fn == "crossentropy" else MoLLoss()
+    criterion = LongCrossEntropyLoss() if args.loss == "crossentropy" else MoLLoss()
 
     best_loss = 10.0
 
@@ -373,14 +357,12 @@ def main(args):
     for epoch in range(args.start_epoch, args.epochs):
 
         train_one_epoch(
-            model, args.loss_fn, criterion, optimizer, train_loader, devices[0], epoch,
+            model, criterion, optimizer, train_loader, devices[0], epoch,
         )
 
         if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
 
-            sum_loss = validate(
-                model, args.loss_fn, criterion, val_loader, devices[0], epoch,
-            )
+            sum_loss = validate(model, criterion, val_loader, devices[0], epoch)
 
             is_best = sum_loss < best_loss
             best_loss = min(sum_loss, best_loss)

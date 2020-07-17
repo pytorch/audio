@@ -1,8 +1,23 @@
+import math
+
 import torch
-import torch.nn as nn
+from torch import nn as nn
 from torch.nn import functional as F
 
-import math
+
+class LongCrossEntropyLoss(torch.nn.Module):
+    r""" CrossEntropy loss
+    """
+
+    def __init__(self):
+        super(LongCrossEntropyLoss, self).__init__()
+
+    def forward(self, output, target):
+        output = output.transpose(1, 2)
+        target = target.long()
+
+        criterion = nn.CrossEntropyLoss()
+        return criterion(output, target)
 
 
 class MoLLoss(torch.nn.Module):
@@ -30,6 +45,7 @@ class MoLLoss(torch.nn.Module):
         self.reduce = reduce
 
     def forward(self, y_hat, y):
+        y = y.unsqueeze(-1)
 
         if self.log_scale_min is None:
             self.log_scale_min = math.log(1e-14)
