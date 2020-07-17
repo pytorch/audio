@@ -1,7 +1,4 @@
-import unittest
-
 import torchaudio
-from torchaudio._internal.module_utils import is_module_available
 
 from . import common_utils
 
@@ -28,15 +25,19 @@ class TestBackendSwitch_NoBackend(BackendSwitchMixin, common_utils.TorchaudioTes
     backend_module = torchaudio.backend.no_backend
 
 
-@unittest.skipIf(
-    not is_module_available('torchaudio._torchaudio'),
-    'torchaudio C++ extension not available')
+@common_utils.skipIfNoExtension
 class TestBackendSwitch_SoX(BackendSwitchMixin, common_utils.TorchaudioTestCase):
     backend = 'sox'
     backend_module = torchaudio.backend.sox_backend
 
 
-@unittest.skipIf(not is_module_available('soundfile'), '"soundfile" not available')
+@common_utils.skipIfNoExtension
+class TestBackendSwitch_SoXIO(BackendSwitchMixin, common_utils.TorchaudioTestCase):
+    backend = 'sox_io'
+    backend_module = torchaudio.backend.sox_io_backend
+
+
+@common_utils.skipIfNoModule('soundfile')
 class TestBackendSwitch_soundfile(BackendSwitchMixin, common_utils.TorchaudioTestCase):
     backend = 'soundfile'
     backend_module = torchaudio.backend.soundfile_backend

@@ -41,6 +41,58 @@ The following test modules are defined for corresponding `torchaudio` module/fun
 - [assets/kaldi](./assets/kaldi): Contains Kaldi format matrix files used in [./test_compliance_kaldi.py](./test_compliance_kaldi.py).
 - [compliance](./compliance): Scripts used to generate above Kaldi matrix files.
 
+### Waveforms for Testing Purposes
+
+When testing transforms we often need waveforms of specific type (ex: pure tone, noise, or voice), with specific bitrate (ex. 8 or 16 kHz) and number of channels (ex. mono, stereo). Below are some tips on how to construct waveforms and guidance around existing audio files.
+
+#### Load a Waveform from a File
+
+```python
+filepath = common_utils.get_asset_path('filename.wav')
+waveform, sample_rate = common_utils.load_wav(filepath)
+```
+
+*Note: Should you choose to contribute an audio file, please leave a comment in the issue or pull request, mentioning content source and licensing information. WAV files are preferred. Other formats should be used only when there is no alternative. (i.e. dataset implementation comes with hardcoded non-wav extension).*
+
+#### Pure Tone
+
+Code:
+
+```python
+waveform = common_utils.get_sinusoid(
+	frequency=300,
+	sample_rate=16000,
+	duration=1,  # seconds
+	n_channels=1,
+	dtype="float32",
+	device="cpu",
+)
+```
+
+#### Noise
+
+Code:
+
+```python
+tensor = common_utils.get_whitenoise()
+```
+
+Files:
+
+* `steam-train-whistle-daniel_simon.wav`
+
+#### Voice
+
+Files:
+
+* `CommonVoice/cv-corpus-4-2019-12-10/tt/clips/common_voice_tt_00000000.wav`
+* `LibriSpeech/dev-clean/1272/128104/1272-128104-0000.flac`
+* `LJSpeech-1.1/wavs/LJ001-0001.wav`
+* `SpeechCommands/speech_commands_v0.02/go/0a9f9af7_nohash_0.wav`
+* `VCTK-Corpus/wav48/p224/p224_002.wav`
+* `waves_yesno/0_1_0_1_0_1_1_0.wav`
+* `vad-go-stereo-44100.wav`
+* `vad-go-mono-32000.wav`
 
 ## Adding test
 
