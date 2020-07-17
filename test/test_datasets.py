@@ -50,10 +50,6 @@ class TestDatasets(TorchaudioTestCase):
         data = CMUARCTIC(self.path)
         data[0]
 
-    def test_libritts(self):
-        data = LIBRITTS(self.path)
-        data[0]
-
 
 class TestCommonVoice(TorchaudioTestCase):
     backend = 'default'
@@ -89,7 +85,7 @@ class TestYesNo(TempDirMixin, TorchaudioTestCase):
         [0, 1, 0, 1, 0, 1, 1, 0],
         [1, 1, 1, 1, 0, 0, 0, 0],
         [1, 1, 1, 1, 1, 1, 1, 1],
-    ]
+
 
     @classmethod
     def setUpClass(cls):
@@ -99,6 +95,7 @@ class TestYesNo(TempDirMixin, TorchaudioTestCase):
         for label in cls.labels:
             filename = f'{"_".join(str(l) for l in label)}.wav'
             path = os.path.join(base_dir, filename)
+
             data = get_whitenoise(sample_rate=8000, duration=6, n_channels=1, dtype='int16')
             save_wav(path, data, 8000)
             cls.data.append(normalize_wav(data))
