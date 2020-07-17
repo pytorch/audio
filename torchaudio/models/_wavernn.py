@@ -50,8 +50,8 @@ class _MelResNet(nn.Module):
     Args:
         n_res_block: the number of ResBlock in stack (default=10)
         n_freq: the number of bins in a spectrogram (default=128)
-        n_hidden_resblock: the number of hidden dimensions of resblock (default=128)
-        n_output_melresnet: the number of output dimensions of melresnet (default=128)
+        n_hidden: the number of hidden dimensions of resblock (default=128)
+        n_output: the number of output dimensions of melresnet (default=128)
         kernel_size: the number of kernel size in the first Conv1d layer (default=5)
 
     Examples
@@ -63,19 +63,19 @@ class _MelResNet(nn.Module):
     def __init__(self,
                  n_res_block: int = 10,
                  n_freq: int = 128,
-                 n_hidden_resblock: int = 128,
-                 n_output_melresnet: int = 128,
+                 n_hidden: int = 128,
+                 n_output: int = 128,
                  kernel_size: int = 5) -> None:
         super().__init__()
 
-        ResBlocks = [_ResBlock(n_hidden_resblock) for _ in range(n_res_block)]
+        ResBlocks = [_ResBlock(n_hidden) for _ in range(n_res_block)]
 
         self.melresnet_model = nn.Sequential(
-            nn.Conv1d(in_channels=n_freq, out_channels=n_hidden_resblock, kernel_size=kernel_size, bias=False),
-            nn.BatchNorm1d(n_hidden_resblock),
+            nn.Conv1d(in_channels=n_freq, out_channels=n_hidden, kernel_size=kernel_size, bias=False),
+            nn.BatchNorm1d(n_hidden),
             nn.ReLU(inplace=True),
             *ResBlocks,
-            nn.Conv1d(in_channels=n_hidden_resblock, out_channels=n_output_melresnet, kernel_size=1)
+            nn.Conv1d(in_channels=n_hidden, out_channels=n_output, kernel_size=1)
         )
 
     def forward(self, specgram: Tensor) -> Tensor:
@@ -84,7 +84,7 @@ class _MelResNet(nn.Module):
             specgram (Tensor): the input sequence to the _MelResNet layer (n_batch, n_freq, n_time).
 
         Return:
-            Tensor shape: (n_batch, n_output_melresnet, n_time - kernel_size + 1)
+            Tensor shape: (n_batch, n_output, n_time - kernel_size + 1)
         """
 
         return self.melresnet_model(specgram)
@@ -132,8 +132,8 @@ class _UpsampleNetwork(nn.Module):
         upsample_scales: the list of upsample scales
         n_res_block: the number of ResBlock in stack (default=10)
         n_freq: the number of bins in a spectrogram (default=128)
-        n_hidden_resblock: the number of hidden dimensions of resblock (default=128)
-        n_output_melresnet: the number of output dimensions of melresnet (default=128)
+        n_hidden: the number of hidden dimensions of resblock (default=128)
+        n_output: the number of output dimensions of melresnet (default=128)
         kernel_size: the number of kernel size in the first Conv1d layer (default=5)
 
     Examples
@@ -146,8 +146,8 @@ class _UpsampleNetwork(nn.Module):
                  upsample_scales: List[int],
                  n_res_block: int = 10,
                  n_freq: int = 128,
-                 n_hidden_resblock: int = 128,
-                 n_output_melresnet: int = 128,
+                 n_hidden: int = 128,
+                 n_output: int = 128,
                  kernel_size: int = 5) -> None:
         super().__init__()
 
@@ -156,7 +156,7 @@ class _UpsampleNetwork(nn.Module):
             total_scale *= upsample_scale
 
         self.indent = (kernel_size - 1) // 2 * total_scale
-        self.resnet = _MelResNet(n_res_block, n_freq, n_hidden_resblock, n_output_melresnet, kernel_size)
+        self.resnet = _MelResNet(n_res_block, n_freq, n_hidden, n_output, kernel_size)
         self.resnet_stretch = _Stretch2d(total_scale, 1)
 
         up_layers = []
@@ -180,7 +180,7 @@ class _UpsampleNetwork(nn.Module):
 
         Return:
             Tensor shape: (n_batch, n_freq, (n_time - kernel_size + 1) * total_scale),
-                          (n_batch, n_output_melresnet, (n_time - kernel_size + 1) * total_scale)
+                          (n_batch, n_output, (n_time - kernel_size + 1) * total_scale)
         where total_scale is the product of all elements in upsample_scales.
         """
 
@@ -206,19 +206,17 @@ class _WaveRNN(nn.Module):
     Args:
         upsample_scales: the list of upsample scales
         n_classes: the number of output classes
-        sample_rate: the rate of audio dimensions (samples per second)
         hop_length: the number of samples between the starts of consecutive frames
         n_res_block: the number of ResBlock in stack (default=10)
         n_rnn: the dimension of RNN layer (default=512)
         n_fc: the dimension of fully connected layer (default=512)
         kernel_size: the number of kernel size in the first Conv1d layer (default=5)
         n_freq: the number of bins in a spectrogram (default=128)
-        n_hidden_resblock: the number of hidden dimensions of resblock (default=128)
-        n_output_melresnet: the number of output dimensions of melresnet (default=128)
-        loss: the type of loss in ['crossentropy', 'mol'] (default='crossentropy')
+        n_hidden: the number of hidden dimensions of resblock (default=128)
+        n_output: the number of output dimensions of melresnet (default=128)
 
     Example
-        >>> wavernn = _waveRNN(upsample_scales=[5,5,8], n_classes=512, sample_rate=24000, hop_length=200)
+        >>> wavernn = _waveRNN(upsample_scales=[5,5,8], n_classes=512, hop_length=200)
         >>> waveform, sample_rate = torchaudio.load(file)
         >>> # waveform shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length)
         >>> specgram = MelSpectrogram(sample_rate)(waveform)  # shape: (n_batch, n_channel, n_freq, n_time)
@@ -229,32 +227,21 @@ class _WaveRNN(nn.Module):
     def __init__(self,
                  upsample_scales: List[int],
                  n_classes: int,
-                 sample_rate: int,
                  hop_length: int,
                  n_res_block: int = 10,
                  n_rnn: int = 512,
                  n_fc: int = 512,
                  kernel_size: int = 5,
                  n_freq: int = 128,
-                 n_hidden_resblock: int = 128,
-                 n_output_melresnet: int = 128,
-                 loss: str = 'crossentropy') -> None:
+                 n_hidden: int = 128,
+                 n_output: int = 128) -> None:
         super().__init__()
 
-        self.loss = loss
         self.kernel_size = kernel_size
-
-        if self.loss == 'crossentropy':
-            self.n_classes = n_classes
-        elif self.loss == 'mol':
-            self.n_classes = 30
-        else:
-            raise ValueError(f"Expected loss: `crossentropy` or `mol`, but found {self.loss}")
-
         self.n_rnn = n_rnn
-        self.n_aux = n_output_melresnet // 4
+        self.n_aux = n_output // 4
         self.hop_length = hop_length
-        self.sample_rate = sample_rate
+        self.n_classes = n_classes
 
         total_scale = 1
         for upsample_scale in upsample_scales:
@@ -265,8 +252,8 @@ class _WaveRNN(nn.Module):
         self.upsample = _UpsampleNetwork(upsample_scales,
                                          n_res_block,
                                          n_freq,
-                                         n_hidden_resblock,
-                                         n_output_melresnet,
+                                         n_hidden,
+                                         n_output,
                                          kernel_size)
         self.fc = nn.Linear(n_freq + self.n_aux + 1, n_rnn)
 
@@ -301,7 +288,7 @@ class _WaveRNN(nn.Module):
         h2 = torch.zeros(1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device)
         # output of upsample:
         # specgram: (n_batch, n_freq, (n_time - kernel_size + 1) * total_scale)
-        # aux: (n_batch, n_output_melresnet, (n_time - kernel_size + 1) * total_scale)
+        # aux: (n_batch, n_output, (n_time - kernel_size + 1) * total_scale)
         specgram, aux = self.upsample(specgram)
         specgram = specgram.transpose(1, 2)
         aux = aux.transpose(1, 2)
