@@ -10,6 +10,31 @@ from . import common_utils
 from .functional_impl import Lfilter
 
 
+def random_float_tensor(seed, size, a=22695477, c=1, m=2 ** 32):
+    """ Generates random tensors given a seed and size
+    https://en.wikipedia.org/wiki/Linear_congruential_generator
+    X_{n + 1} = (a * X_n + c) % m
+    Using Borland C/C++ values
+
+    The tensor will have values between [0,1)
+    Inputs:
+        seed (int): an int
+        size (Tuple[int]): the size of the output tensor
+        a (int): the multiplier constant to the generator
+        c (int): the additive constant to the generator
+        m (int): the modulus constant to the generator
+    """
+    num_elements = 1
+    for s in size:
+        num_elements *= s
+
+    arr = [(a * seed + c) % m]
+    for i in range(num_elements - 1):
+        arr.append((a * arr[i] + c) % m)
+
+    return torch.tensor(arr).float().view(size) / m
+
+
 class TestLFilterFloat32(Lfilter, common_utils.PytorchTestCase):
     dtype = torch.float32
     device = torch.device('cpu')
@@ -49,7 +74,7 @@ def _test_istft_is_inverse_of_stft(kwargs):
     for data_size in [(2, 20), (3, 15), (4, 10)]:
         for i in range(100):
 
-            sound = common_utils.random_float_tensor(i, data_size)
+            sound = random_float_tensor(i, data_size)
 
             stft = torch.stft(sound, **kwargs)
             estimate = torchaudio.functional.istft(stft, length=sound.size(1), **kwargs)
@@ -211,8 +236,8 @@ class TestIstft(common_utils.TorchaudioTestCase):
 
     def _test_linearity_of_istft(self, data_size, kwargs, atol=1e-6, rtol=1e-8):
         for i in range(self.number_of_trials):
-            tensor1 = common_utils.random_float_tensor(i, data_size)
-            tensor2 = common_utils.random_float_tensor(i * 2, data_size)
+            tensor1 = random_float_tensor(i, data_size)
+            tensor2 = random_float_tensor(i * 2, data_size)
             a, b = torch.rand(2)
             istft1 = torchaudio.functional.istft(tensor1, **kwargs)
             istft2 = torchaudio.functional.istft(tensor2, **kwargs)
@@ -274,8 +299,6 @@ class TestIstft(common_utils.TorchaudioTestCase):
 
 
 class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
-    backend = 'default'
-
     def test_pitch(self):
         test_filepath_100 = common_utils.get_asset_path("100Hz_44100Hz_16bit_05sec.wav")
         test_filepath_440 = common_utils.get_asset_path("440Hz_44100Hz_16bit_05sec.wav")
@@ -287,7 +310,7 @@ class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
         ]
 
         for filename, freq_ref in tests:
-            waveform, sample_rate = torchaudio.load(filename)
+            waveform, sample_rate = common_utils.load_wav(filename)
 
             freq = torchaudio.functional.detect_pitch_frequency(waveform, sample_rate)
 
