@@ -13,28 +13,23 @@ from torchaudio.datasets.utils import (
 URL = "train-clean-100"
 FOLDER_IN_ARCHIVE = "LibriTTS"
 _CHECKSUMS = {
-    "http://www.openslr.org/60/dev-clean.tar.gz":
-    "0c3076c1e5245bb3f0af7d82087ee207",
-    "http://www.openslr.org/60/dev-other.tar.gz":
-    "815555d8d75995782ac3ccd7f047213d",
-    "http://www.openslr.org/60/test-clean.tar.gz":
-    "7bed3bdb047c4c197f1ad3bc412db59f",
-    "http://www.openslr.org/60/test-other.tar.gz":
-    "ae3258249472a13b5abef2a816f733e4",
-    "http://www.openslr.org/60/train-clean-100.tar.gz":
-    "4a8c202b78fe1bc0c47916a98f3a2ea8",
-    "http://www.openslr.org/60/train-clean-360.tar.gz":
-    "a84ef10ddade5fd25df69596a2767b2d",
-    "http://www.openslr.org/60/train-other-500.tar.gz":
-    "7b181dd5ace343a5f38427999684aa6f",
+    "http://www.openslr.org/60/dev-clean.tar.gz": "0c3076c1e5245bb3f0af7d82087ee207",
+    "http://www.openslr.org/60/dev-other.tar.gz": "815555d8d75995782ac3ccd7f047213d",
+    "http://www.openslr.org/60/test-clean.tar.gz": "7bed3bdb047c4c197f1ad3bc412db59f",
+    "http://www.openslr.org/60/test-other.tar.gz": "ae3258249472a13b5abef2a816f733e4",
+    "http://www.openslr.org/60/train-clean-100.tar.gz": "4a8c202b78fe1bc0c47916a98f3a2ea8",
+    "http://www.openslr.org/60/train-clean-360.tar.gz": "a84ef10ddade5fd25df69596a2767b2d",
+    "http://www.openslr.org/60/train-other-500.tar.gz": "7b181dd5ace343a5f38427999684aa6f",
 }
 
 
-def load_libritts_item(fileid: str,
-                       path: str,
-                       ext_audio: str,
-                       ext_original_txt: str,
-                       ext_normalized_txt: str) -> Tuple[Tensor, int, str, str, int, int, str]:
+def load_libritts_item(
+    fileid: str,
+    path: str,
+    ext_audio: str,
+    ext_original_txt: str,
+    ext_normalized_txt: str,
+) -> Tuple[Tensor, int, str, str, int, int, str]:
     speaker_id, chapter_id, segment_id, utterance_id = fileid.split("_")
     utterance_id = fileid
 
@@ -55,7 +50,7 @@ def load_libritts_item(fileid: str,
         original_utterance = ft.readline()
 
     # Load normalized text
-    with open(normalized_text, 'r') as ft:
+    with open(normalized_text, "r") as ft:
         normalized_utterance = ft.readline()
 
     return (
@@ -79,11 +74,13 @@ class LIBRITTS(Dataset):
     _ext_normalized_txt = ".normalized.txt"
     _ext_audio = ".wav"
 
-    def __init__(self,
-                 root: str,
-                 url: str = URL,
-                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False) -> None:
+    def __init__(
+        self,
+        root: str,
+        url: str = URL,
+        folder_in_archive: str = FOLDER_IN_ARCHIVE,
+        download: bool = False,
+    ) -> None:
 
         if url in [
             "dev-clean",
@@ -122,7 +119,13 @@ class LIBRITTS(Dataset):
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int, int, str]:
         fileid = self._walker[n]
-        return load_libritts_item(fileid, self._path, self._ext_audio, self._ext_original_txt, self._ext_normalized_txt)
+        return load_libritts_item(
+            fileid,
+            self._path,
+            self._ext_audio,
+            self._ext_original_txt,
+            self._ext_normalized_txt,
+        )
 
     def __len__(self) -> int:
         return len(self._walker)

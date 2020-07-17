@@ -95,7 +95,6 @@ class TestYesNo(TempDirMixin, TorchaudioTestCase):
         for label in cls.labels:
             filename = f'{"_".join(str(l) for l in label)}.wav'
             path = os.path.join(base_dir, filename)
-
             data = get_whitenoise(sample_rate=8000, duration=6, n_channels=1, dtype='int16')
             save_wav(path, data, 8000)
             cls.data.append(normalize_wav(data))
@@ -153,7 +152,7 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
     def test_libritts(self):
         dataset = LIBRITTS(self.root_dir)
         samples = list(dataset)
-        samples.sort(key=lambda s: s[2])
+        samples.sort(key=lambda s: s[4])
 
         for i, (waveform,
                 sample_rate,
