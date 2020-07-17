@@ -121,7 +121,7 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
         [19, 198, '000000', '000000'],
         [26, 495, '000004', '000000'],
     ]
-    original_text = 'this is the test text.'
+    original_text = 'this is the original text.'
     normalized_text = 'this is the normalized text.'
 
     @classmethod
@@ -155,7 +155,14 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
         samples = list(dataset)
         samples.sort(key=lambda s: s[2])
 
-        for i, (waveform, sample_rate, original_utterance, normalized_utterance, speaker_id, chapter_id, utterance_id) in enumerate(samples):
+        for i, (waveform,
+                sample_rate,
+                original_utterance,
+                normalized_utterance,
+                speaker_id,
+                chapter_id,
+                utterance_id) in enumerate(samples):
+
             expected_ids = self.utterance_ids[i]
             expected_data = self.data[i]
             self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
