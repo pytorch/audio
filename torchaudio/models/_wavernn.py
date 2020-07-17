@@ -215,7 +215,7 @@ class _WaveRNN(nn.Module):
         n_freq: the number of bins in a spectrogram (default=128)
         n_hidden_resblock: the number of hidden dimensions of resblock (default=128)
         n_output_melresnet: the number of output dimensions of melresnet (default=128)
-        loss: the type of loss in ['waveform', 'mol'] (default='waveform')
+        loss: the type of loss in ['crossentropy', 'mol'] (default='crossentropy')
 
     Example
         >>> wavernn = _waveRNN(upsample_scales=[5,5,8], n_classes=512, sample_rate=24000, hop_length=200)
@@ -238,18 +238,18 @@ class _WaveRNN(nn.Module):
                  n_freq: int = 128,
                  n_hidden_resblock: int = 128,
                  n_output_melresnet: int = 128,
-                 loss: str = 'waveform') -> None:
+                 loss: str = 'crossentropy') -> None:
         super().__init__()
 
         self.loss = loss
         self.kernel_size = kernel_size
 
-        if self.loss == 'waveform':
+        if self.loss == 'crossentropy':
             self.n_classes = n_classes
         elif self.loss == 'mol':
             self.n_classes = 30
         else:
-            raise ValueError(f"Expected loss: `waveform` or `mol`, but found {self.loss}")
+            raise ValueError(f"Expected loss: `crossentropy` or `mol`, but found {self.loss}")
 
         self.n_rnn = n_rnn
         self.n_aux = n_output_melresnet // 4

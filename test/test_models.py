@@ -91,7 +91,7 @@ class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
 class TestWaveRNN(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
-        """Validate the output dimensions of a _WaveRNN model in waveform mode.
+        """Validate the output dimensions of a _WaveRNN model in crossentropy loss.
         """
 
         upsample_scales = [5, 5, 8]
@@ -107,7 +107,7 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         n_res_block = 10
         n_hidden_resblock = 128
         kernel_size = 5
-        loss = 'waveform'
+        loss = 'crossentropy'
 
         model = _WaveRNN(upsample_scales, n_classes, sample_rate, hop_length, n_res_block,
                          n_rnn, n_fc, kernel_size, n_freq, n_hidden_resblock, n_output_melresnet, loss)
@@ -119,7 +119,7 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1), n_classes)
 
     def test_mol(self):
-        """Validate the output dimensions of a _WaveRNN model in mol mode.
+        """Validate the output dimensions of a _WaveRNN model in mol loss.
         """
 
         upsample_scales = [5, 5, 8]
