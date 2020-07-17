@@ -127,13 +127,13 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
     def setUpClass(cls):
         cls.root_dir = cls.get_base_temp_dir()
         base_dir = os.path.join(cls.root_dir, 'LibriTTS', 'train-clean-100')
-        for utterance_id in cls.utterance_ids:
+        for i, utterance_id in enumerate(cls.utterance_ids):
             filename = f'{"_".join(str(u) for u in utterance_id)}.wav'
             file_dir = os.path.join(base_dir, str(utterance_id[0]), str(utterance_id[1]))
             os.makedirs(file_dir, exist_ok=True)
             path = os.path.join(file_dir, filename)
 
-            data = get_whitenoise(sample_rate=8000, duration=6, n_channels=1, dtype='int16')
+            data = get_whitenoise(sample_rate=8000, duration=6, n_channels=1, dtype='int16', seed=i)
             save_wav(path, data, 8000)
             cls.data.append(normalize_wav(data))
 
