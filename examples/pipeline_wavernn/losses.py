@@ -109,7 +109,7 @@ class MoLLoss(torch.nn.Module):
             return -log_sum_exp(log_probs).unsqueeze(-1)
 
 
-def log_sum_exp(x):
+def _log_sum_exp(x):
     r""" Numerically stable log_sum_exp implementation that prevents overflow
     """
 

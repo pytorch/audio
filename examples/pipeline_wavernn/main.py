@@ -129,7 +129,7 @@ def parse_args():
         "--n-output",
         default=128,
         type=int,
-        help="the output dimension of melresnet block in WaveRNN model",
+        help="the output dimension of melresnet",
     )
     parser.add_argument(
         "--n-fft", default=2048, type=int, help="the number of Fourier bins",
