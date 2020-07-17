@@ -42,17 +42,17 @@ class TestMelResNet(common_utils.TorchaudioTestCase):
         n_batch = 2
         n_time = 200
         n_freq = 100
-        n_output = 128
+        n_output_melresnet = 128
         n_res_block = 10
-        n_hidden = 128
+        n_hidden_resblock = 128
         kernel_size = 5
 
-        model = _MelResNet(n_res_block, n_freq, n_hidden, n_output, kernel_size)
+        model = _MelResNet(n_res_block, n_freq, n_hidden_resblock, n_output_melresnet, kernel_size)
 
         x = torch.rand(n_batch, n_freq, n_time)
         out = model(x)
 
-        assert out.size() == (n_batch, n_output, n_time - kernel_size + 1)
+        assert out.size() == (n_batch, n_output_melresnet, n_time - kernel_size + 1)
 
 
 class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
@@ -65,22 +65,27 @@ class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
         n_batch = 2
         n_time = 200
         n_freq = 100
-        n_output = 256
+        n_output_melresnet = 256
         n_res_block = 10
-        n_hidden = 128
+        n_hidden_resblock = 128
         kernel_size = 5
 
         total_scale = 1
         for upsample_scale in upsample_scales:
             total_scale *= upsample_scale
 
-        model = _UpsampleNetwork(upsample_scales, n_res_block, n_freq, n_hidden, n_output, kernel_size)
+        model = _UpsampleNetwork(upsample_scales,
+                                 n_res_block,
+                                 n_freq,
+                                 n_hidden_resblock,
+                                 n_output_melresnet,
+                                 kernel_size)
 
         x = torch.rand(n_batch, n_freq, n_time)
         out1, out2 = model(x)
 
         assert out1.size() == (n_batch, n_freq, total_scale * (n_time - kernel_size + 1))
-        assert out2.size() == (n_batch, n_output, total_scale * (n_time - kernel_size + 1))
+        assert out2.size() == (n_batch, n_output_melresnet, total_scale * (n_time - kernel_size + 1))
 
 
 class TestWaveRNN(common_utils.TorchaudioTestCase):
@@ -92,26 +97,26 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         upsample_scales = [5, 5, 8]
         n_rnn = 512
         n_fc = 512
-        n_bits = 9
+        n_classes = 512
         sample_rate = 24000
         hop_length = 200
         n_batch = 2
         n_time = 200
         n_freq = 100
-        n_output = 256
+        n_output_melresnet = 256
         n_res_block = 10
-        n_hidden = 128
+        n_hidden_resblock = 128
         kernel_size = 5
-        mode = 'waveform'
+        loss = 'waveform'
 
-        model = _WaveRNN(upsample_scales, n_bits, sample_rate, hop_length, n_res_block,
-                         n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output, mode)
+        model = _WaveRNN(upsample_scales, n_classes, sample_rate, hop_length, n_res_block,
+                         n_rnn, n_fc, kernel_size, n_freq, n_hidden_resblock, n_output_melresnet, loss)
 
         x = torch.rand(n_batch, 1, hop_length * (n_time - kernel_size + 1))
         mels = torch.rand(n_batch, 1, n_freq, n_time)
         out = model(x, mels)
 
-        assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1), 2 ** n_bits)
+        assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1), n_classes)
 
     def test_mol(self):
         """Validate the output dimensions of a _WaveRNN model in mol mode.
@@ -120,20 +125,20 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         upsample_scales = [5, 5, 8]
         n_rnn = 512
         n_fc = 512
-        n_bits = 9
+        n_classes = 512
         sample_rate = 24000
         hop_length = 200
         n_batch = 2
         n_time = 200
         n_freq = 100
-        n_output = 256
+        n_output_melresnet = 256
         n_res_block = 10
-        n_hidden = 128
+        n_hidden_resblock = 128
         kernel_size = 5
-        mode = 'mol'
+        loss = 'mol'
 
-        model = _WaveRNN(upsample_scales, n_bits, sample_rate, hop_length, n_res_block,
-                         n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output, mode)
+        model = _WaveRNN(upsample_scales, n_classes, sample_rate, hop_length, n_res_block,
+                         n_rnn, n_fc, kernel_size, n_freq, n_hidden_resblock, n_output_melresnet, loss)
 
         x = torch.rand(n_batch, 1, hop_length * (n_time - kernel_size + 1))
         mels = torch.rand(n_batch, 1, n_freq, n_time)
