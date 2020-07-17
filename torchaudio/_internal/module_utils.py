@@ -48,7 +48,7 @@ def deprecated(direction: str, version: Optional[str] = None):
         def wrapped(*args, **kwargs):
             message = (
                 f'{func.__module__}.{func.__name__} has been deprecated '
-                f'and will be removed from {"future" if version is None else version} release.'
+                f'and will be removed from {"future" if version is None else version} release. '
                 f'{direction}')
             warnings.warn(message, stacklevel=2)
             return func(*args, **kwargs)

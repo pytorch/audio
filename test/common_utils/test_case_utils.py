@@ -15,16 +15,16 @@ class TempDirMixin:
     """Mixin to provide easy access to temp dir"""
     temp_dir_ = None
 
-    @property
-    def base_temp_dir(self):
+    @classmethod
+    def get_base_temp_dir(cls):
         # If TORCHAUDIO_TEST_TEMP_DIR is set, use it instead of temporary directory.
         # this is handy for debugging.
         key = 'TORCHAUDIO_TEST_TEMP_DIR'
         if key in os.environ:
             return os.environ[key]
-        if self.__class__.temp_dir_ is None:
-            self.__class__.temp_dir_ = tempfile.TemporaryDirectory()
-        return self.__class__.temp_dir_.name
+        if cls.temp_dir_ is None:
+            cls.temp_dir_ = tempfile.TemporaryDirectory()
+        return cls.temp_dir_.name
 
     @classmethod
     def tearDownClass(cls):
@@ -34,7 +34,7 @@ class TempDirMixin:
             cls.temp_dir_ = None
 
     def get_temp_path(self, *paths):
-        temp_dir = os.path.join(self.base_temp_dir, self.id())
+        temp_dir = os.path.join(self.get_base_temp_dir(), self.id())
         path = os.path.join(temp_dir, *paths)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         return path
