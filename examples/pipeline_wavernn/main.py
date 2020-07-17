@@ -69,9 +69,6 @@ def parse_args():
         help="if used, waveform is mulaw encoded",
     )
     parser.add_argument(
-        "--jit", default=False, action="store_true", help="if used, model is jitted"
-    )
-    parser.add_argument(
         "--upsample-scales",
         default=[5, 5, 11],
         type=List[int],
@@ -126,13 +123,16 @@ def parse_args():
         help="the number of kernel size in the first Conv1d layer",
     )
     parser.add_argument(
-        "--n-freq", default=80, type=int, help="the number of bins in a spectrogram",
+        "--n-freq", default=80, type=int, help="the number of spectrogram bins to use",
     )
     parser.add_argument(
         "--n-hidden", default=128, type=int, help="the number of hidden dimensions",
     )
     parser.add_argument(
-        "--n-output", default=128, type=int, help="the number of output dimensions",
+        "--n-output",
+        default=128,
+        type=int,
+        help="the output dimension of upsample network in WaveRNN model",
     )
     parser.add_argument(
         "--n-fft", default=2048, type=int, help="the number of Fourier bins",
@@ -148,7 +148,7 @@ def parse_args():
         "--seq-len-factor",
         default=5,
         type=int,
-        help="seq_length = hop_length * seq_len_factor",
+        help="the length factor of input waveform, the length of input waveform = hop_length * seq_len_factor",
     )
     parser.add_argument(
         "--val-ratio",
@@ -157,7 +157,10 @@ def parse_args():
         help="the ratio of waveforms for validation",
     )
     parser.add_argument(
-        "--file-path", default="", type=str, help="the path of audio files",
+        "--file-path",
+        default="",
+        type=str,
+        help="the path of audio files",
     )
 
     args = parser.parse_args()
@@ -219,8 +222,8 @@ def train_one_epoch(model, mode, criterion, optimizer, data_loader, device, epoc
 
     metric = MetricLogger("train_epoch")
     metric["epoch"] = epoch
-    metric["loss"] = avg_loss
-    metric["gradient"] = sums["gradient"] / len(data_loader)
+    metric["loss"] = sums["loss"] / len(data_loader)
+    metric["gradient"] = avg_loss
     metric["time"] = time() - start1
     metric()
 
@@ -328,9 +331,6 @@ def main(args):
         n_output=args.n_output,
         mode=args.mode,
     )
-
-    if args.jit:
-        model = torch.jit.script(model)
 
     model = torch.nn.DataParallel(model)
     model = model.to(devices[0], non_blocking=True)

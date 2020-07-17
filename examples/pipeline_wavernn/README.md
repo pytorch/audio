@@ -1,4 +1,4 @@
-This is an example pipeline for WaveRNN vocoder using the WaveRNN model trained on LJSpeech. WaveRNN model is based on the implementation from [this repository](https://github.com/fatchord/WaveRNN). The original implementation was
+This is an example vocoder pipeline using the WaveRNN model trained with LJSpeech. WaveRNN model is based on the implementation from [this repository](https://github.com/fatchord/WaveRNN). The original implementation was
 introduced in "Efficient Neural Audio Synthesis". WaveRNN and LJSpeech are available in torchaudio.
 
 ### Usage
@@ -15,7 +15,7 @@ python main.py \
 
 ### Output
 
-The information reported at each iteration and epoch (e.g. loss) is printed to standard output in the form of one json per line. Here is an example python function to parse the standard output.
+The information reported at each iteration and epoch (e.g. loss) is printed to standard output in the form of one json per line. Here is an example python function to parse the output if redirected to a file.
 ```python
 def read_json(filename):
 	"""

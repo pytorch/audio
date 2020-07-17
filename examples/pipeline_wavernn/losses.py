@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.nn import functional as F
 
 
-class MoLLoss(nn.Module):
+class MoLLoss(torch.nn.Module):
     r""" Discretized mixture of logistic distributions loss
 
     Adapted from wavenet vocoder
@@ -12,17 +12,17 @@ class MoLLoss(nn.Module):
 
     Args:
         y_hat (Tensor): Predicted output (n_batch x n_time x n_channel)
-        y (Tensor): Target (n_batch x n_time x 1).
+        y (Tensor): Target (n_batch x n_time x 1)
         num_classes (int): Number of classes
         log_scale_min (float): Log scale minimum value
-        reduce (bool): If True, the losses are averaged or summed for each minibatch.
+        reduce (bool): If True, the losses are averaged or summed for each minibatch
 
     Returns
         Tensor: loss
     """
 
     def __init__(self, num_classes=65536, log_scale_min=None, reduce=True):
-
+        super(MoLLoss, self).__init__()
         self.num_classes = num_classes
         self.log_scale_min = log_scale_min
         self.reduce = reduce
@@ -40,7 +40,9 @@ class MoLLoss(nn.Module):
         # unpack parameters (n_batch, n_time, num_mixtures) x 3
         logit_probs = y_hat[:, :, :nr_mix]
         means = y_hat[:, :, nr_mix: 2 * nr_mix]
-        log_scales = torch.clamp(y_hat[:, :, 2 * nr_mix: 3 * nr_mix], min=self.log_scale_min)
+        log_scales = torch.clamp(
+            y_hat[:, :, 2 * nr_mix: 3 * nr_mix], min=self.log_scale_min
+        )
 
         # (n_batch x n_time x 1) to (n_batch x n_time x num_mixtures)
         y = y.expand_as(means)
@@ -84,15 +86,16 @@ class MoLLoss(nn.Module):
         log_probs = log_probs + F.log_softmax(logit_probs, -1)
 
         if self.reduce:
-            return -torch.mean(self.log_sum_exp(log_probs))
+            return -torch.mean(log_sum_exp(log_probs))
         else:
-            return -self.log_sum_exp(log_probs).unsqueeze(-1)
+            return -log_sum_exp(log_probs).unsqueeze(-1)
 
-    def log_sum_exp(self, x):
-        r""" Numerically stable log_sum_exp implementation that prevents overflow
-        """
 
-        axis = len(x.size()) - 1
-        m, _ = torch.max(x, dim=axis)
-        m2, _ = torch.max(x, dim=axis, keepdim=True)
-        return m + torch.log(torch.sum(torch.exp(x - m2), dim=axis))
+def log_sum_exp(x):
+    r""" Numerically stable log_sum_exp implementation that prevents overflow
+    """
+
+    axis = len(x.size()) - 1
+    m, _ = torch.max(x, dim=axis)
+    m2, _ = torch.max(x, dim=axis, keepdim=True)
+    return m + torch.log(torch.sum(torch.exp(x - m2), dim=axis))

@@ -105,10 +105,10 @@ def collate_factory(args):
                 waveform = mulaw_encode(waveform)
                 target = mulaw_encode(target)
 
-                waveform = label_to_waveform(waveform, args.n_bits)
+                waveform = encode_bits_into_waveform(waveform, args.n_bits)
 
             else:
-                target = waveform_to_label(target, args.n_bits)
+                target = encode_waveform_into_bits(target, args.n_bits)
 
         return waveform.unsqueeze(1), specgram.unsqueeze(1), target.unsqueeze(1)
 
