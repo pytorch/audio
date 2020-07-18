@@ -156,8 +156,8 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
 
         for i, (waveform,
                 sample_rate,
-                original_utterance,
-                normalized_utterance,
+                original_text,
+                normalized_text,
                 speaker_id,
                 chapter_id,
                 utterance_id) in enumerate(samples):
@@ -168,8 +168,8 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
             assert sample_rate == 8000
             assert speaker_id == expected_ids[0]
             assert chapter_id == expected_ids[1]
-            assert original_utterance == self.original_text
-            assert normalized_utterance == self.normalized_text
+            assert original_text == self.original_text
+            assert normalized_text == self.normalized_text
             assert utterance_id == f'{"_".join(str(u) for u in expected_ids[-4:])}'
 
 

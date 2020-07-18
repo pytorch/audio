@@ -47,17 +47,17 @@ def load_libritts_item(
 
     # Load original text
     with open(original_text) as ft:
-        original_utterance = ft.readline()
+        original_text = ft.readline()
 
     # Load normalized text
     with open(normalized_text, "r") as ft:
-        normalized_utterance = ft.readline()
+        normalized_text = ft.readline()
 
     return (
         waveform,
         sample_rate,
-        original_utterance,
-        normalized_utterance,
+        original_text,
+        normalized_text,
         int(speaker_id),
         int(chapter_id),
         utterance_id,
@@ -67,7 +67,7 @@ def load_libritts_item(
 class LIBRITTS(Dataset):
     """
     Create a Dataset for LibriTTS. Each item is a tuple of the form:
-    waveform, sample_rate, original_utterance, normalized_utterance, speaker_id, chapter_id, utterance_id
+    waveform, sample_rate, original_text, normalized_text, speaker_id, chapter_id, utterance_id
     """
 
     _ext_original_txt = ".original.txt"
