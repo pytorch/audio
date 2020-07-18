@@ -5,7 +5,7 @@ from torch import nn as nn
 from torch.nn import functional as F
 
 
-class LongCrossEntropyLoss(torch.nn.Module):
+class LongCrossEntropyLoss(nn.Module):
     r""" CrossEntropy loss
     """
 
@@ -20,7 +20,7 @@ class LongCrossEntropyLoss(torch.nn.Module):
         return criterion(output, target)
 
 
-class MoLLoss(torch.nn.Module):
+class MoLLoss(nn.Module):
     r""" Discretized mixture of logistic distributions loss
 
     Adapted from wavenet vocoder
@@ -104,9 +104,9 @@ class MoLLoss(torch.nn.Module):
         log_probs = log_probs + F.log_softmax(logit_probs, -1)
 
         if self.reduce:
-            return -torch.mean(log_sum_exp(log_probs))
+            return -torch.mean(_log_sum_exp(log_probs))
         else:
-            return -log_sum_exp(log_probs).unsqueeze(-1)
+            return -_log_sum_exp(log_probs).unsqueeze(-1)
 
 
 def _log_sum_exp(x):

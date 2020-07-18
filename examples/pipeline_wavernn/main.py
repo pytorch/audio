@@ -69,6 +69,9 @@ def parse_args():
         help="if used, waveform is mulaw encoded",
     )
     parser.add_argument(
+        "--jit", default=False, action="store_true", help="if used, model is jitted"
+    )
+    parser.add_argument(
         "--upsample-scales",
         default=[5, 5, 11],
         type=List[int],
@@ -126,10 +129,7 @@ def parse_args():
         help="the number of hidden dimensions of resblock",
     )
     parser.add_argument(
-        "--n-output",
-        default=128,
-        type=int,
-        help="the output dimension of melresnet",
+        "--n-output", default=128, type=int, help="the output dimension of melresnet",
     )
     parser.add_argument(
         "--n-fft", default=2048, type=int, help="the number of Fourier bins",
@@ -309,6 +309,9 @@ def main(args):
         n_hidden=args.n_hidden,
         n_output=args.n_output,
     )
+
+    if args.jit:
+        model = torch.jit.script(model)
 
     model = torch.nn.DataParallel(model)
     model = model.to(devices[0], non_blocking=True)
