@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -184,12 +184,16 @@
             
               <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
 </ul>
 
             
@@ -263,12 +267,12 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.compliance.kaldi</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Tuple</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;get_mel_banks&#39;</span><span class="p">,</span>
@@ -298,6 +302,10 @@
 <span class="n">WINDOWS</span> <span class="o">=</span> <span class="p">[</span><span class="n">HAMMING</span><span class="p">,</span> <span class="n">HANNING</span><span class="p">,</span> <span class="n">POVEY</span><span class="p">,</span> <span class="n">RECTANGULAR</span><span class="p">,</span> <span class="n">BLACKMAN</span><span class="p">]</span>
 
 
+<span class="k">def</span> <span class="nf">_get_epsilon</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">EPSILON</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">_next_power_of_2</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the smallest power of 2 that is greater than x</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -325,7 +333,7 @@
 
     <span class="k">if</span> <span class="n">snip_edges</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">num_samples</span> <span class="o">&lt;</span> <span class="n">window_size</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">m</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">num_samples</span> <span class="o">-</span> <span class="n">window_size</span><span class="p">)</span> <span class="o">//</span> <span class="n">window_shift</span>
     <span class="k">else</span><span class="p">:</span>
@@ -348,24 +356,27 @@
 
 <span class="k">def</span> <span class="nf">_feature_window_function</span><span class="p">(</span><span class="n">window_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                              <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                             <span class="n">blackman_coeff</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+                             <span class="n">blackman_coeff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                             <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+                             <span class="n">dtype</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                             <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns a window function with the given type and size</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">window_type</span> <span class="o">==</span> <span class="n">HANNING</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">window_type</span> <span class="o">==</span> <span class="n">HAMMING</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">hamming_window</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.54</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.46</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">hamming_window</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.54</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.46</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">window_type</span> <span class="o">==</span> <span class="n">POVEY</span><span class="p">:</span>
         <span class="c1"># like hanning but goes to zero at edges</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">0.85</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">0.85</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">window_type</span> <span class="o">==</span> <span class="n">RECTANGULAR</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">window_type</span> <span class="o">==</span> <span class="n">BLACKMAN</span><span class="p">:</span>
         <span class="n">a</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="n">window_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">window_function</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
+        <span class="n">window_function</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
         <span class="c1"># can&#39;t use torch.blackman_window as they use different coefficients</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">blackman_coeff</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">window_function</span><span class="p">)</span> <span class="o">+</span>
-                <span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">blackman_coeff</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">window_function</span><span class="p">))</span>
+                <span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">blackman_coeff</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">window_function</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Invalid window type &#39;</span> <span class="o">+</span> <span class="n">window_type</span><span class="p">)</span>
 
@@ -375,12 +386,12 @@
                     <span class="n">energy_floor</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the log energy of size (m) for a strided_input (m,*)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">strided_input</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">strided_input</span><span class="o">.</span><span class="n">dtype</span>
     <span class="n">log_energy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">strided_input</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">epsilon</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>  <span class="c1"># size (m)</span>
     <span class="k">if</span> <span class="n">energy_floor</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">log_energy</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">log_energy</span><span class="p">,</span>
-                         <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">energy_floor</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
+        <span class="n">log_energy</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">energy_floor</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_get_waveform_and_window_properties</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -425,12 +436,15 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        (Tensor, Tensor): strided_input of size (m, ``padded_window_size``) and signal_log_energy of size (m)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">_get_epsilon</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+
     <span class="c1"># size (m, window_size)</span>
     <span class="n">strided_input</span> <span class="o">=</span> <span class="n">_get_strided</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">,</span> <span class="n">snip_edges</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">dither</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
         <span class="c1"># Returns a random number strictly between 0 and 1</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">EPSILON</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">strided_input</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">strided_input</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">))</span>
         <span class="n">rand_gauss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">log</span><span class="p">())</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
         <span class="n">strided_input</span> <span class="o">=</span> <span class="n">strided_input</span> <span class="o">+</span> <span class="n">rand_gauss</span> <span class="o">*</span> <span class="n">dither</span>
 
@@ -442,7 +456,7 @@
     <span class="k">if</span> <span class="n">raw_energy</span><span class="p">:</span>
         <span class="c1"># Compute the log energy of each row/frame before applying preemphasis and</span>
         <span class="c1"># window function</span>
-        <span class="n">signal_log_energy</span> <span class="o">=</span> <span class="n">_get_log_energy</span><span class="p">(</span><span class="n">strided_input</span><span class="p">,</span> <span class="n">EPSILON</span><span class="p">,</span> <span class="n">energy_floor</span><span class="p">)</span>  <span class="c1"># size (m)</span>
+        <span class="n">signal_log_energy</span> <span class="o">=</span> <span class="n">_get_log_energy</span><span class="p">(</span><span class="n">strided_input</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">energy_floor</span><span class="p">)</span>  <span class="c1"># size (m)</span>
 
     <span class="k">if</span> <span class="n">preemphasis_coefficient</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
         <span class="c1"># strided_input[i,j] -= preemphasis_coefficient * strided_input[i, max(0, j-1)] for all i,j</span>
@@ -452,7 +466,7 @@
 
     <span class="c1"># Apply window_function to each row/frame</span>
     <span class="n">window_function</span> <span class="o">=</span> <span class="n">_feature_window_function</span><span class="p">(</span>
-        <span class="n">window_type</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">blackman_coeff</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># size (1, window_size)</span>
+        <span class="n">window_type</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">blackman_coeff</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># size (1, window_size)</span>
     <span class="n">strided_input</span> <span class="o">=</span> <span class="n">strided_input</span> <span class="o">*</span> <span class="n">window_function</span>  <span class="c1"># size (m, window_size)</span>
 
     <span class="c1"># Pad columns with zero until we reach size (m, padded_window_size)</span>
@@ -463,7 +477,7 @@
 
     <span class="c1"># Compute energy after window function (not the raw one)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">raw_energy</span><span class="p">:</span>
-        <span class="n">signal_log_energy</span> <span class="o">=</span> <span class="n">_get_log_energy</span><span class="p">(</span><span class="n">strided_input</span><span class="p">,</span> <span class="n">EPSILON</span><span class="p">,</span> <span class="n">energy_floor</span><span class="p">)</span>  <span class="c1"># size (m)</span>
+        <span class="n">signal_log_energy</span> <span class="o">=</span> <span class="n">_get_log_energy</span><span class="p">(</span><span class="n">strided_input</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">energy_floor</span><span class="p">)</span>  <span class="c1"># size (m)</span>
 
     <span class="k">return</span> <span class="n">strided_input</span><span class="p">,</span> <span class="n">signal_log_energy</span>
 
@@ -527,6 +541,9 @@
 <span class="sd">        Tensor: A spectrogram identical to what Kaldi would output. The shape is</span>
 <span class="sd">        (m, ``padded_window_size // 2 + 1``) where m is calculated in _get_strided</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">_get_epsilon</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+
     <span class="n">waveform</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">padded_window_size</span> <span class="o">=</span> <span class="n">_get_waveform_and_window_properties</span><span class="p">(</span>
         <span class="n">waveform</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="p">,</span> <span class="n">frame_shift</span><span class="p">,</span> <span class="n">frame_length</span><span class="p">,</span> <span class="n">round_to_power_of_two</span><span class="p">,</span> <span class="n">preemphasis_coefficient</span><span class="p">)</span>
 
@@ -542,7 +559,7 @@
     <span class="n">fft</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">strided_input</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># Convert the FFT into a power spectrum</span>
-    <span class="n">power_spectrum</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fft</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">EPSILON</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>  <span class="c1"># size (m, padded_window_size // 2 + 1)</span>
+    <span class="n">power_spectrum</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fft</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">epsilon</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>  <span class="c1"># size (m, padded_window_size // 2 + 1)</span>
     <span class="n">power_spectrum</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">signal_log_energy</span>
 
     <span class="n">power_spectrum</span> <span class="o">=</span> <span class="n">_subtract_column_mean</span><span class="p">(</span><span class="n">power_spectrum</span><span class="p">,</span> <span class="n">subtract_mean</span><span class="p">)</span>
@@ -806,12 +823,14 @@
 <span class="sd">        Tensor: A fbank identical to what Kaldi would output. The shape is (m, ``num_mel_bins + use_energy``)</span>
 <span class="sd">        where m is calculated in _get_strided</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+
     <span class="n">waveform</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">padded_window_size</span> <span class="o">=</span> <span class="n">_get_waveform_and_window_properties</span><span class="p">(</span>
         <span class="n">waveform</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="p">,</span> <span class="n">frame_shift</span><span class="p">,</span> <span class="n">frame_length</span><span class="p">,</span> <span class="n">round_to_power_of_two</span><span class="p">,</span> <span class="n">preemphasis_coefficient</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_duration</span> <span class="o">*</span> <span class="n">sample_frequency</span><span class="p">:</span>
         <span class="c1"># signal is too short</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="c1"># strided_input, size (m, padded_window_size) and signal_log_energy, size (m)</span>
     <span class="n">strided_input</span><span class="p">,</span> <span class="n">signal_log_energy</span> <span class="o">=</span> <span class="n">_get_window</span><span class="p">(</span>
@@ -828,6 +847,7 @@
     <span class="c1"># size (num_mel_bins, padded_window_size // 2)</span>
     <span class="n">mel_energies</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_mel_banks</span><span class="p">(</span><span class="n">num_mel_bins</span><span class="p">,</span> <span class="n">padded_window_size</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="p">,</span>
                                     <span class="n">low_freq</span><span class="p">,</span> <span class="n">high_freq</span><span class="p">,</span> <span class="n">vtln_low</span><span class="p">,</span> <span class="n">vtln_high</span><span class="p">,</span> <span class="n">vtln_warp</span><span class="p">)</span>
+    <span class="n">mel_energies</span> <span class="o">=</span> <span class="n">mel_energies</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="c1"># pad right column with zeros and add dimension, size (1, num_mel_bins, padded_window_size // 2 + 1)</span>
     <span class="n">mel_energies</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">mel_energies</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -836,7 +856,7 @@
     <span class="n">mel_energies</span> <span class="o">=</span> <span class="p">(</span><span class="n">power_spectrum</span> <span class="o">*</span> <span class="n">mel_energies</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">use_log_fbank</span><span class="p">:</span>
         <span class="c1"># avoid log of zero (which should be prevented anyway by dithering)</span>
-        <span class="n">mel_energies</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">mel_energies</span><span class="p">,</span> <span class="n">EPSILON</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
+        <span class="n">mel_energies</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">mel_energies</span><span class="p">,</span> <span class="n">_get_epsilon</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="p">))</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
 
     <span class="c1"># if use_energy then add it as the last column for htk_compat == true else first column</span>
     <span class="k">if</span> <span class="n">use_energy</span><span class="p">:</span>
@@ -948,6 +968,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">num_ceps</span> <span class="o">&lt;=</span> <span class="n">num_mel_bins</span><span class="p">,</span> <span class="s1">&#39;num_ceps cannot be larger than num_mel_bins: </span><span class="si">%d</span><span class="s1"> vs </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num_ceps</span><span class="p">,</span> <span class="n">num_mel_bins</span><span class="p">)</span>
 
+    <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+
     <span class="c1"># The mel_energies should not be squared (use_power=True), not have mean subtracted</span>
     <span class="c1"># (subtract_mean=False), and use log (use_log_fbank=True).</span>
     <span class="c1"># size (m, num_mel_bins + use_energy)</span>
@@ -969,7 +991,7 @@
         <span class="n">feature</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[:,</span> <span class="n">mel_offset</span><span class="p">:(</span><span class="n">num_mel_bins</span> <span class="o">+</span> <span class="n">mel_offset</span><span class="p">)]</span>
 
     <span class="c1"># size (num_mel_bins, num_ceps)</span>
-    <span class="n">dct_matrix</span> <span class="o">=</span> <span class="n">_get_dct_matrix</span><span class="p">(</span><span class="n">num_ceps</span><span class="p">,</span> <span class="n">num_mel_bins</span><span class="p">)</span>
+    <span class="n">dct_matrix</span> <span class="o">=</span> <span class="n">_get_dct_matrix</span><span class="p">(</span><span class="n">num_ceps</span><span class="p">,</span> <span class="n">num_mel_bins</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
     <span class="c1"># size (m, num_ceps)</span>
     <span class="n">feature</span> <span class="o">=</span> <span class="n">feature</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">dct_matrix</span><span class="p">)</span>
@@ -977,7 +999,7 @@
     <span class="k">if</span> <span class="n">cepstral_lifter</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
         <span class="c1"># size (1, num_ceps)</span>
         <span class="n">lifter_coeffs</span> <span class="o">=</span> <span class="n">_get_lifter_coeffs</span><span class="p">(</span><span class="n">num_ceps</span><span class="p">,</span> <span class="n">cepstral_lifter</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">feature</span> <span class="o">*=</span> <span class="n">lifter_coeffs</span>
+        <span class="n">feature</span> <span class="o">*=</span> <span class="n">lifter_coeffs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="c1"># if use_energy then replace the last column for htk_compat == true else first column</span>
     <span class="k">if</span> <span class="n">use_energy</span><span class="p">:</span>
@@ -1002,7 +1024,9 @@
                                 <span class="n">output_samples_in_unit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                                 <span class="n">window_width</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
                                 <span class="n">lowpass_cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+                                <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                                <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+                                <span class="n">dtype</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Based on LinearResample::SetIndexesAndWeights where it retrieves the weights for</span>
 <span class="sd">    resampling as well as the indices in which they are valid. LinearResample (LR) means</span>
 <span class="sd">    that the output signal is at linearly spaced intervals (i.e the output signal has a</span>
@@ -1050,7 +1074,7 @@
 <span class="sd">        which correspond with min_input_index, size (``output_samples_in_unit``, ``max_weight_width``)).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">lowpass_cutoff</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
-    <span class="n">output_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">output_samples_in_unit</span><span class="p">)</span> <span class="o">/</span> <span class="n">new_freq</span>
+    <span class="n">output_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">output_samples_in_unit</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span> <span class="o">/</span> <span class="n">new_freq</span>
     <span class="n">min_t</span> <span class="o">=</span> <span class="n">output_t</span> <span class="o">-</span> <span class="n">window_width</span>
     <span class="n">max_t</span> <span class="o">=</span> <span class="n">output_t</span> <span class="o">+</span> <span class="n">window_width</span>
 
@@ -1060,7 +1084,7 @@
 
     <span class="n">max_weight_width</span> <span class="o">=</span> <span class="n">num_indices</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
     <span class="c1"># create a group of weights of size (output_samples_in_unit, max_weight_width)</span>
-    <span class="n">j</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">max_weight_width</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">max_weight_width</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">input_index</span> <span class="o">=</span> <span class="n">min_input_index</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">j</span>
     <span class="n">delta_t</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_index</span> <span class="o">/</span> <span class="n">orig_freq</span><span class="p">)</span> <span class="o">-</span> <span class="n">output_t</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
@@ -1155,6 +1179,8 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: The waveform at the new frequency</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+
     <span class="k">assert</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span>
     <span class="k">assert</span> <span class="n">orig_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">new_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
 
@@ -1168,9 +1194,9 @@
     <span class="n">output_samples_in_unit</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">base_freq</span>
 
     <span class="n">window_width</span> <span class="o">=</span> <span class="n">lowpass_filter_width</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">lowpass_cutoff</span><span class="p">)</span>
-    <span class="n">first_indices</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">_get_LR_indices_and_weights</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">output_samples_in_unit</span><span class="p">,</span>
-                                                         <span class="n">window_width</span><span class="p">,</span> <span class="n">lowpass_cutoff</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">)</span>
-    <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># TODO Create weights on device directly</span>
+    <span class="n">first_indices</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">_get_LR_indices_and_weights</span><span class="p">(</span>
+        <span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">output_samples_in_unit</span><span class="p">,</span>
+        <span class="n">window_width</span><span class="p">,</span> <span class="n">lowpass_cutoff</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
 
     <span class="k">assert</span> <span class="n">first_indices</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
     <span class="c1"># TODO figure a better way to do this. conv1d reaches every element i*stride + padding</span>
@@ -1183,9 +1209,9 @@
     <span class="n">window_size</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">tot_output_samp</span> <span class="o">=</span> <span class="n">_get_num_LR_output_samples</span><span class="p">(</span><span class="n">wave_len</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">)</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">tot_output_samp</span><span class="p">),</span>
-                         <span class="n">device</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                         <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="c1"># eye size: (num_channels, num_channels, 1)</span>
-    <span class="n">eye</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">eye</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">num_channels</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">first_indices</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
         <span class="n">wave_to_conv</span> <span class="o">=</span> <span class="n">waveform</span>
         <span class="n">first_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">first_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
@@ -1270,19 +1296,20 @@
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../../../_static/jquery.js"></script>
-         <script type="text/javascript" src="../../../_static/underscore.js"></script>
-         <script type="text/javascript" src="../../../_static/doctools.js"></script>
-         <script type="text/javascript" src="../../../_static/language_data.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js"></script>
-         <script type="text/javascript" src="../../../_static/katex_autorenderer.js"></script>
+         <script src="../../../_static/jquery.js"></script>
+         <script src="../../../_static/underscore.js"></script>
+         <script src="../../../_static/doctools.js"></script>
+         <script src="../../../_static/language_data.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script>
+         <script src="../../../_static/katex_autorenderer.js"></script>
      
 
   
 
   <script type="text/javascript" src="../../../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../../../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
   <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
@@ -1331,25 +1358,24 @@
             <li><a href="https://pytorch.org/features">Features</a></li>
             <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
             <li><a href="https://pytorch.org/blog/">Blog</a></li>
-            <li><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col">
           <ul>
-            <li class="list-title"><a href="https://pytorch.org/support">Support</a></li>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
             <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
             <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
             <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
             <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
-            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
-            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col follow-us-col">
           <ul>
-            <li class="list-title">Follow Us</li>
+            <li class="list-title">Stay Connected</li>
             <li>
               <div id="mc_embed_signup">
                 <form
@@ -1386,6 +1412,7 @@
           <div class="footer-social-icons">
             <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
             <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
           </div>
         </div>
       </div>
@@ -1473,6 +1500,7 @@
       scrollToAnchor.bind();
       highlightNavigation.bind();
       mainMenuDropdown.bind();
+      filterTags.bind();
 
       // Add class to links that have code blocks, since we cannot create links in code blocks
       $("article.pytorch-article a span.pre").each(function(e) {

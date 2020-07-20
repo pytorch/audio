@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.datasets.speechcommands &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.models.wav2letter &mdash; Torchaudio master documentation</title>
   
 
   
@@ -238,7 +238,7 @@
         
           <li><a href="../../torchaudio.html">torchaudio</a> &gt;</li>
         
-      <li>torchaudio.datasets.speechcommands</li>
+      <li>torchaudio.models.wav2letter</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -266,89 +266,80 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <h1>Source code for torchaudio.datasets.speechcommands</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+  <h1>Source code for torchaudio.models.wav2letter</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 
-<span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">download_url</span><span class="p">,</span>
-    <span class="n">extract_archive</span><span class="p">,</span>
-    <span class="n">walk_files</span>
-<span class="p">)</span>
-
-<span class="n">FOLDER_IN_ARCHIVE</span> <span class="o">=</span> <span class="s2">&quot;SpeechCommands&quot;</span>
-<span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;speech_commands_v0.02&quot;</span>
-<span class="n">HASH_DIVIDER</span> <span class="o">=</span> <span class="s2">&quot;_nohash_&quot;</span>
-<span class="n">EXCEPT_FOLDER</span> <span class="o">=</span> <span class="s2">&quot;_background_noise_&quot;</span>
-<span class="n">_CHECKSUMS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz&quot;</span><span class="p">:</span>
-    <span class="s2">&quot;3cd23799cb2bbdec517f1cc028f8d43c&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz&quot;</span><span class="p">:</span>
-    <span class="s2">&quot;6b74f3901214cb2c2934e98196829835&quot;</span><span class="p">,</span>
-<span class="p">}</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Wav2Letter&quot;</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">load_speechcommands_item</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-    <span class="n">relpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-    <span class="n">label</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">relpath</span><span class="p">)</span>
-    <span class="n">speaker</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<div class="viewcode-block" id="Wav2Letter"><a class="viewcode-back" href="../../../models.html#torchaudio.models.Wav2Letter">[docs]</a><span class="k">class</span> <span class="nc">Wav2Letter</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wav2Letter model architecture from the `Wav2Letter an End-to-End ConvNet-based Speech Recognition System`_.</span>
 
-    <span class="n">speaker_id</span><span class="p">,</span> <span class="n">utterance_number</span> <span class="o">=</span> <span class="n">speaker</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">HASH_DIVIDER</span><span class="p">)</span>
-    <span class="n">utterance_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">utterance_number</span><span class="p">)</span>
+<span class="sd">    .. _Wav2Letter an End-to-End ConvNet-based Speech Recognition System: https://arxiv.org/abs/1609.03193</span>
 
-    <span class="c1"># Load audio</span>
-    <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">utterance_number</span>
+<span class="sd">     :math:`\text{padding} = \frac{\text{ceil}(\text{kernel} - \text{stride})}{2}`</span>
 
-
-<div class="viewcode-block" id="SPEECHCOMMANDS"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.SPEECHCOMMANDS">[docs]</a><span class="k">class</span> <span class="nc">SPEECHCOMMANDS</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create a Dataset for Speech Commands. Each item is a tuple of the form:</span>
-<span class="sd">    waveform, sample_rate, label, speaker_id, utterance_number</span>
+<span class="sd">    Args:</span>
+<span class="sd">        num_classes (int, optional): Number of classes to be classified. (Default: ``40``)</span>
+<span class="sd">        input_type (str, optional): Wav2Letter can use as input: ``waveform``, ``power_spectrum``</span>
+<span class="sd">         or ``mfcc`` (Default: ``waveform``).</span>
+<span class="sd">        num_features (int, optional): Number of input features that the network will receive (Default: ``1``).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                 <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">URL</span><span class="p">,</span>
-                 <span class="n">folder_in_archive</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">FOLDER_IN_ARCHIVE</span><span class="p">,</span>
-                 <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">url</span> <span class="ow">in</span> <span class="p">[</span>
-            <span class="s2">&quot;speech_commands_v0.01&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;speech_commands_v0.02&quot;</span><span class="p">,</span>
-        <span class="p">]:</span>
-            <span class="n">base_url</span> <span class="o">=</span> <span class="s2">&quot;https://storage.googleapis.com/download.tensorflow.org/data/&quot;</span>
-            <span class="n">ext_archive</span> <span class="o">=</span> <span class="s2">&quot;.tar.gz&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
+                 <span class="n">input_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;waveform&quot;</span><span class="p">,</span>
+                 <span class="n">num_features</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Wav2Letter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-            <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">url</span> <span class="o">+</span> <span class="n">ext_archive</span><span class="p">)</span>
+        <span class="n">acoustic_num_features</span> <span class="o">=</span> <span class="mi">250</span> <span class="k">if</span> <span class="n">input_type</span> <span class="o">==</span> <span class="s2">&quot;waveform&quot;</span> <span class="k">else</span> <span class="n">num_features</span>
+        <span class="n">acoustic_model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">acoustic_num_features</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">23</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">16</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span>
 
-        <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">input_type</span> <span class="o">==</span> <span class="s2">&quot;waveform&quot;</span><span class="p">:</span>
+            <span class="n">waveform_model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">num_features</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">160</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">45</span><span class="p">),</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">acoustic_model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">waveform_model</span><span class="p">,</span> <span class="n">acoustic_model</span><span class="p">)</span>
 
-        <span class="n">basename</span> <span class="o">=</span> <span class="n">basename</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">folder_in_archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_in_archive</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">input_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;power_spectrum&quot;</span><span class="p">,</span> <span class="s2">&quot;mfcc&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">acoustic_model</span> <span class="o">=</span> <span class="n">acoustic_model</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">)</span>
+<div class="viewcode-block" id="Wav2Letter.forward"><a class="viewcode-back" href="../../../models.html#torchaudio.models.Wav2Letter.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            x (torch.Tensor): Tensor of dimension (batch_size, num_features, input_length).</span>
 
-        <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">archive</span><span class="p">):</span>
-                    <span class="n">checksum</span> <span class="o">=</span> <span class="n">_CHECKSUMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                    <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;md5&quot;</span><span class="p">)</span>
-                <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: Predictor tensor of dimension (batch_size, number_of_classes, input_length).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">walker</span> <span class="o">=</span> <span class="n">walk_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.wav&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">walker</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="n">HASH_DIVIDER</span> <span class="ow">in</span> <span class="n">w</span> <span class="ow">and</span> <span class="n">EXCEPT_FOLDER</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">w</span><span class="p">,</span> <span class="n">walker</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">walker</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-        <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">load_speechcommands_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">)</span></div>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">acoustic_model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span></div></div>
 </pre></div>
 
              </article>

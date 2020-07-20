@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.legacy &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.models &mdash; Torchaudio master documentation</title>
   
 
   
@@ -28,14 +28,35 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="torchaudio.functional" href="functional.html" /> 
+    <link rel="next" title="torchaudio.sox_effects" href="sox_effects.html" />
+    <link rel="prev" title="torchaudio.datasets" href="datasets.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 </head>
 
 <div class="container-fluid header-holder tutorials-header" id="header-holder">
@@ -50,11 +71,25 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/features">Features</a>
+            <div class="ecosystem-dropdown">
+              <a id="dropdownMenuButton" data-toggle="ecosystem-dropdown">
+                Ecosystem
+              </a>
+              <div class="ecosystem-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub"">
+                  <span class=dropdown-title>Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
+                  <span class=dropdown-title>Tools & Libraries</span>
+                  <p>Explore the ecosystem of tools and libraries</p>
+                </a>
+              </div>
+            </div>
           </li>
 
           <li>
-            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+            <a href="https://pytorch.org/mobile">Mobile</a>
           </li>
 
           <li>
@@ -70,7 +105,21 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/resources">Resources</a>
+            <div class="resources-dropdown">
+              <a id="resourcesDropdownButton" data-toggle="resources-dropdown">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources"">
+                  <span class=dropdown-title>Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class=dropdown-title>About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+              </div>
+            </div>
           </li>
 
           <li>
@@ -137,13 +186,16 @@
             
               <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.legacy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 </ul>
 
             
@@ -184,13 +236,13 @@
       </li>
 
         
-      <li>torchaudio.legacy</li>
+      <li>torchaudio.models</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="_sources/legacy.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+            <a href="_sources/models.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -216,79 +268,44 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchaudio-legacy">
-<h1>torchaudio.legacy<a class="headerlink" href="#torchaudio-legacy" title="Permalink to this headline">¶</a></h1>
-<p>Legacy loading and save functions.</p>
-<div class="section" id="load">
-<h2><span class="hidden-section">load</span><a class="headerlink" href="#load" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.legacy.load">
-<code class="sig-prename descclassname">torchaudio.legacy.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">out=None</em>, <em class="sig-param">normalization=None</em>, <em class="sig-param">num_frames=0</em>, <em class="sig-param">offset=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/legacy.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.legacy.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads an audio file from disk into a Tensor.  The default options have
-changed as of torchaudio 0.2 and this function maintains option defaults
-from version 0.1.</p>
+  <div class="section" id="torchaudio-models">
+<h1>torchaudio.models<a class="headerlink" href="#torchaudio-models" title="Permalink to this headline">¶</a></h1>
+<p>The models subpackage contains definitions of models for addressing common audio tasks.</p>
+<div class="section" id="wav2letter">
+<h2><span class="hidden-section">Wav2Letter</span><a class="headerlink" href="#wav2letter" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="torchaudio.models.Wav2Letter">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">Wav2Letter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_classes</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">40</span></em>, <em class="sig-param"><span class="n">input_type</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span> <span class="o">=</span> <span class="default_value">'waveform'</span></em>, <em class="sig-param"><span class="n">num_features</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wav2letter.html#Wav2Letter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Wav2Letter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wav2Letter model architecture from the <a class="reference external" href="https://arxiv.org/abs/1609.03193">Wav2Letter an End-to-End ConvNet-based Speech Recognition System</a>.</p>
+<blockquote>
+<div><p><span class="math">\(\text{padding} = \frac{\text{ceil}(\text{kernel} - \text{stride})}{2}\)</span></p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to audio file</p></li>
-<li><p><strong>out</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a><em>, </em><em>optional</em>) – An output Tensor to use instead of creating one. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>normalization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em> or </em><em>number</em><em>, </em><em>optional</em>) – If boolean <cite>True</cite>, then output is divided by <cite>1 &lt;&lt; 31</cite>
-(assumes 16-bit depth audio, and normalizes to <cite>[0, 1]</cite>. If <cite>number</cite>, then output is divided by that
-number. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of frames to load.  -1 to load everything after the
-offset. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
-<li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Number of frames from the start of the file to begin data
-loading. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
+<li><p><strong>num_classes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of classes to be classified. (Default: <code class="docutils literal notranslate"><span class="pre">40</span></code>)</p></li>
+<li><p><strong>input_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Wav2Letter can use as input: <code class="docutils literal notranslate"><span class="pre">waveform</span></code>, <code class="docutils literal notranslate"><span class="pre">power_spectrum</span></code>
+or <code class="docutils literal notranslate"><span class="pre">mfcc</span></code> (Default: <code class="docutils literal notranslate"><span class="pre">waveform</span></code>).</p></li>
+<li><p><strong>num_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of input features that the network will receive (Default: <code class="docutils literal notranslate"><span class="pre">1</span></code>).</p></li>
 </ul>
 </dd>
+</dl>
+<dl class="py method">
+<dt id="torchaudio.models.Wav2Letter.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.5.0a0+78c9009 ))">torch.Tensor</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.5.0a0+78c9009 ))">torch.Tensor</a><a class="reference internal" href="_modules/torchaudio/models/wav2letter.html#Wav2Letter.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Wav2Letter.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.5.0a0+78c9009 ))"><em>torch.Tensor</em></a>) – Tensor of dimension (batch_size, num_features, input_length).</p>
+</dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The output tensor is of size <cite>[L x C]</cite> where L is the number of audio frames,
-C is the number of channels. The integer is sample-rate of the audio (as listed in the metadata of
-the file)</p>
+<dd class="field-even"><p>Predictor tensor of dimension (batch_size, number_of_classes, input_length).</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>]</p>
-</dd>
-</dl>
-<dl>
-<dt>Example</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
-<span class="go">torch.Size([278756, 2])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)</span>
-<span class="go">44100</span>
-</pre></div>
-</div>
+<dd class="field-odd"><p>Tensor</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="save">
-<h2><span class="hidden-section">save</span><a class="headerlink" href="#save" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.legacy.save">
-<code class="sig-prename descclassname">torchaudio.legacy.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">src</em>, <em class="sig-param">sample_rate</em>, <em class="sig-param">precision=32</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/legacy.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.legacy.save" title="Permalink to this definition">¶</a></dt>
-<dd><p>Saves a Tensor with audio signal to disk as a standard format like mp3, wav, etc.
-The default options have changed as of torchaudio 0.2 and this function maintains
-option defaults from version 0.1.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to audio file</p></li>
-<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.1.0 ))"><em>torch.Tensor</em></a>) – An input 2D Tensor of shape <cite>[L x C]</cite> where L is
-the number of audio frames, C is the number of channels</p></li>
-<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The sample-rate of the audio to be saved</p></li>
-<li><p><strong>precision</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – The bit-precision of the audio to be saved. (Default: <code class="docutils literal notranslate"><span class="pre">32</span></code>)</p></li>
-</ul>
-</dd>
-</dl>
-<dl>
-<dt>Example</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">torchaudio</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;foo.wav&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd>
-</dl>
 </dd></dl>
 
 </div>
@@ -302,8 +319,10 @@ the number of audio frames, C is the number of channels</p></li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="sox_effects.html" class="btn btn-neutral float-right" title="torchaudio.sox_effects" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
-        <a href="functional.html" class="btn btn-neutral" title="torchaudio.functional" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+        <a href="datasets.html" class="btn btn-neutral" title="torchaudio.datasets" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -335,9 +354,8 @@ the number of audio frames, C is the number of channels</p></li>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">torchaudio.legacy</a><ul>
-<li><a class="reference internal" href="#load"><span class="hidden-section">load</span></a></li>
-<li><a class="reference internal" href="#save"><span class="hidden-section">save</span></a></li>
+<li><a class="reference internal" href="#">torchaudio.models</a><ul>
+<li><a class="reference internal" href="#wav2letter"><span class="hidden-section">Wav2Letter</span></a></li>
 </ul>
 </li>
 </ul>
@@ -355,19 +373,20 @@ the number of audio frames, C is the number of channels</p></li>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-         <script type="text/javascript" src="_static/jquery.js"></script>
-         <script type="text/javascript" src="_static/underscore.js"></script>
-         <script type="text/javascript" src="_static/doctools.js"></script>
-         <script type="text/javascript" src="_static/language_data.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js"></script>
-         <script type="text/javascript" src="_static/katex_autorenderer.js"></script>
+         <script src="_static/jquery.js"></script>
+         <script src="_static/underscore.js"></script>
+         <script src="_static/doctools.js"></script>
+         <script src="_static/language_data.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script>
+         <script src="_static/katex_autorenderer.js"></script>
      
 
   
 
   <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
   <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">
@@ -416,25 +435,24 @@ the number of audio frames, C is the number of channels</p></li>
             <li><a href="https://pytorch.org/features">Features</a></li>
             <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
             <li><a href="https://pytorch.org/blog/">Blog</a></li>
-            <li><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col">
           <ul>
-            <li class="list-title"><a href="https://pytorch.org/support">Support</a></li>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
             <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
             <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
             <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
             <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
-            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
-            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col follow-us-col">
           <ul>
-            <li class="list-title">Follow Us</li>
+            <li class="list-title">Stay Connected</li>
             <li>
               <div id="mc_embed_signup">
                 <form
@@ -471,6 +489,7 @@ the number of audio frames, C is the number of channels</p></li>
           <div class="footer-social-icons">
             <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
             <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
           </div>
         </div>
       </div>
@@ -502,15 +521,23 @@ the number of audio frames, C is the number of channels</p></li>
       <div class="main-menu">
         <ul>
           <li>
-            <a href="#">Get Started</a>
+            <a href="https://pytorch.org/get-started">Get Started</a>
           </li>
 
           <li>
-            <a href="#">Features</a>
+            <a href="https://pytorch.org/features">Features</a>
           </li>
 
           <li>
-            <a href="#">Ecosystem</a>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -549,6 +576,8 @@ the number of audio frames, C is the number of channels</p></li>
       sideMenus.bind();
       scrollToAnchor.bind();
       highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
 
       // Add class to links that have code blocks, since we cannot create links in code blocks
       $("article.pytorch-article a span.pre").each(function(e) {

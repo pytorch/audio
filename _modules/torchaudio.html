@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -184,12 +184,16 @@
             
               <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
 </ul>
 
             
@@ -261,383 +265,62 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os.path</span>
-
-<span class="kn">import</span> <span class="nn">torch</span>
-
-<span class="kn">from</span> <span class="nn">torchaudio</span> <span class="k">import</span> <span class="p">(</span>
+<span></span><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">extension</span>
+<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
+<span class="kn">from</span> <span class="nn">torchaudio</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">compliance</span><span class="p">,</span>
     <span class="n">datasets</span><span class="p">,</span>
     <span class="n">kaldi_io</span><span class="p">,</span>
+    <span class="n">utils</span><span class="p">,</span>
     <span class="n">sox_effects</span><span class="p">,</span>
-    <span class="n">transforms</span><span class="p">,</span>
+    <span class="n">transforms</span>
 <span class="p">)</span>
-
-<span class="kn">from</span> <span class="nn">torchaudio._backend</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">check_input</span><span class="p">,</span>
-    <span class="n">_audio_backend_guard</span><span class="p">,</span>
-    <span class="n">_get_audio_backend_module</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">torchaudio.backend</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">list_audio_backends</span><span class="p">,</span>
     <span class="n">get_audio_backend</span><span class="p">,</span>
     <span class="n">set_audio_backend</span><span class="p">,</span>
+    <span class="n">save_encinfo</span><span class="p">,</span>
+    <span class="n">sox_signalinfo_t</span><span class="p">,</span>
+    <span class="n">sox_encodinginfo_t</span><span class="p">,</span>
+    <span class="n">get_sox_option_t</span><span class="p">,</span>
+    <span class="n">get_sox_encoding_t</span><span class="p">,</span>
+    <span class="n">get_sox_bool</span><span class="p">,</span>
+    <span class="n">SignalInfo</span><span class="p">,</span>
+    <span class="n">EncodingInfo</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">torchaudio.sox_effects</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">init_sox_effects</span> <span class="k">as</span> <span class="n">_init_sox_effects</span><span class="p">,</span>
+    <span class="n">shutdown_sox_effects</span> <span class="k">as</span> <span class="n">_shutdown_sox_effects</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">.version</span> <span class="k">import</span> <span class="n">__version__</span><span class="p">,</span> <span class="n">git_version</span>  <span class="c1"># noqa: F401</span>
+    <span class="kn">from</span> <span class="nn">.version</span> <span class="kn">import</span> <span class="n">__version__</span><span class="p">,</span> <span class="n">git_version</span>  <span class="c1"># noqa: F401</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="k">pass</span>
 
 
-<div class="viewcode-block" id="load"><a class="viewcode-back" href="../index.html#torchaudio.load">[docs]</a><span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span>
-         <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-         <span class="n">normalization</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-         <span class="n">channels_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-         <span class="n">num_frames</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-         <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-         <span class="n">signalinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-         <span class="n">encodinginfo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-         <span class="n">filetype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loads an audio file from disk into a tensor</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        filepath (str or pathlib.Path): Path to audio file</span>
-<span class="sd">        out (torch.Tensor, optional): An output tensor to use instead of creating one. (Default: ``None``)</span>
-<span class="sd">        normalization (bool, number, or callable, optional): If boolean `True`, then output is divided by `1 &lt;&lt; 31`</span>
-<span class="sd">            (assumes signed 32-bit audio), and normalizes to `[-1, 1]`.</span>
-<span class="sd">            If `number`, then output is divided by that number</span>
-<span class="sd">            If `callable`, then the output is passed as a parameter</span>
-<span class="sd">            to the given function, then the output is divided by</span>
-<span class="sd">            the result. (Default: ``True``)</span>
-<span class="sd">        channels_first (bool): Set channels first or length first in result. (Default: ``True``)</span>
-<span class="sd">        num_frames (int, optional): Number of frames to load.  0 to load everything after the offset.</span>
-<span class="sd">            (Default: ``0``)</span>
-<span class="sd">        offset (int, optional): Number of frames from the start of the file to begin data loading.</span>
-<span class="sd">            (Default: ``0``)</span>
-<span class="sd">        signalinfo (sox_signalinfo_t, optional): A sox_signalinfo_t type, which could be helpful if the</span>
-<span class="sd">            audio type cannot be automatically determined. (Default: ``None``)</span>
-<span class="sd">        encodinginfo (sox_encodinginfo_t, optional): A sox_encodinginfo_t type, which could be set if the</span>
-<span class="sd">            audio type cannot be automatically determined. (Default: ``None``)</span>
-<span class="sd">        filetype (str, optional): A filetype or extension to be set if sox cannot determine it</span>
-<span class="sd">            automatically. (Default: ``None``)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Tuple[torch.Tensor, int]: An output tensor of size `[C x L]` or `[L x C]` where L is the number</span>
-<span class="sd">        of audio frames and C is the number of channels. An integer which is the sample rate of the</span>
-<span class="sd">        audio (as listed in the metadata of the file)</span>
-
-<span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; data, sample_rate = torchaudio.load(&#39;foo.mp3&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; print(data.size())</span>
-<span class="sd">        torch.Size([2, 278756])</span>
-<span class="sd">        &gt;&gt;&gt; print(sample_rate)</span>
-<span class="sd">        44100</span>
-<span class="sd">        &gt;&gt;&gt; data_vol_normalized, _ = torchaudio.load(&#39;foo.mp3&#39;, normalization=lambda x: torch.abs(x).max())</span>
-<span class="sd">        &gt;&gt;&gt; print(data_vol_normalized.abs().max())</span>
-<span class="sd">        1.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">return</span> <span class="n">_get_audio_backend_module</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">,</span>
-        <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
-        <span class="n">normalization</span><span class="o">=</span><span class="n">normalization</span><span class="p">,</span>
-        <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">,</span>
-        <span class="n">num_frames</span><span class="o">=</span><span class="n">num_frames</span><span class="p">,</span>
-        <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span>
-        <span class="n">signalinfo</span><span class="o">=</span><span class="n">signalinfo</span><span class="p">,</span>
-        <span class="n">encodinginfo</span><span class="o">=</span><span class="n">encodinginfo</span><span class="p">,</span>
-        <span class="n">filetype</span><span class="o">=</span><span class="n">filetype</span><span class="p">,</span>
-    <span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="load_wav"><a class="viewcode-back" href="../index.html#torchaudio.load_wav">[docs]</a><span class="k">def</span> <span class="nf">load_wav</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Loads a wave file. It assumes that the wav file uses 16 bit per sample that needs normalization by shifting</span>
-<span class="sd">    the input right by 16 bits.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        filepath (str or pathlib.Path): Path to audio file</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Tuple[torch.Tensor, int]: An output tensor of size `[C x L]` or `[L x C]` where L is the number</span>
-<span class="sd">        of audio frames and C is the number of channels. An integer which is the sample rate of the</span>
-<span class="sd">        audio (as listed in the metadata of the file)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;normalization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span>
-    <span class="k">return</span> <span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="save"><a class="viewcode-back" href="../index.html#torchaudio.save">[docs]</a><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convenience function for `save_encinfo`.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        filepath (str): Path to audio file</span>
-<span class="sd">        src (torch.Tensor): An input 2D tensor of shape `[C x L]` or `[L x C]` where L is</span>
-<span class="sd">            the number of audio frames, C is the number of channels</span>
-<span class="sd">        sample_rate (int): An integer which is the sample rate of the</span>
-<span class="sd">            audio (as listed in the metadata of the file)</span>
-<span class="sd">        precision (int): Bit precision (Default: ``16``)</span>
-<span class="sd">        channels_first (bool): Set channels first or length first in result. (</span>
-<span class="sd">            Default: ``True``)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">return</span> <span class="n">_get_audio_backend_module</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span>
-    <span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="save_encinfo"><a class="viewcode-back" href="../index.html#torchaudio.save_encinfo">[docs]</a><span class="nd">@_audio_backend_guard</span><span class="p">(</span><span class="s2">&quot;sox&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">save_encinfo</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span>
-                 <span class="n">src</span><span class="p">,</span>
-                 <span class="n">channels_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                 <span class="n">signalinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">encodinginfo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">filetype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Saves a tensor of an audio signal to disk as a standard format like mp3, wav, etc.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        filepath (str): Path to audio file</span>
-<span class="sd">        src (torch.Tensor): An input 2D tensor of shape `[C x L]` or `[L x C]` where L is</span>
-<span class="sd">            the number of audio frames, C is the number of channels</span>
-<span class="sd">        channels_first (bool): Set channels first or length first in result. (Default: ``True``)</span>
-<span class="sd">        signalinfo (sox_signalinfo_t): A sox_signalinfo_t type, which could be helpful if the</span>
-<span class="sd">            audio type cannot be automatically determined. (Default: ``None``)</span>
-<span class="sd">        encodinginfo (sox_encodinginfo_t, optional): A sox_encodinginfo_t type, which could be set if the</span>
-<span class="sd">            audio type cannot be automatically determined. (Default: ``None``)</span>
-<span class="sd">        filetype (str, optional): A filetype or extension to be set if sox cannot determine it</span>
-<span class="sd">            automatically. (Default: ``None``)</span>
-
-<span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; data, sample_rate = torchaudio.load(&#39;foo.mp3&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; torchaudio.save(&#39;foo.wav&#39;, data, sample_rate)</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ch_idx</span><span class="p">,</span> <span class="n">len_idx</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">channels_first</span> <span class="k">else</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-    <span class="c1"># check if save directory exists</span>
-    <span class="n">abs_dirpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">abs_dirpath</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;Directory does not exist: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">abs_dirpath</span><span class="p">))</span>
-    <span class="c1"># check that src is a CPU tensor</span>
-    <span class="n">check_input</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
-    <span class="c1"># Check/Fix shape of source data</span>
-    <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="c1"># 1d tensors as assumed to be mono signals</span>
-        <span class="n">src</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="n">ch_idx</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">src</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">src</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">ch_idx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">16</span><span class="p">:</span>
-        <span class="c1"># assumes num_channels &lt; 16</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Expected format where C &lt; 16, but found </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">size</span><span class="p">()))</span>
-    <span class="c1"># sox stores the sample rate as a float, though practically sample rates are almost always integers</span>
-    <span class="c1"># convert integers to floats</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">signalinfo</span><span class="o">.</span><span class="n">rate</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">signalinfo</span><span class="o">.</span><span class="n">rate</span><span class="p">)</span> <span class="o">==</span> <span class="n">signalinfo</span><span class="o">.</span><span class="n">rate</span><span class="p">:</span>
-            <span class="n">signalinfo</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">signalinfo</span><span class="o">.</span><span class="n">rate</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Sample rate should be a float or int&#39;</span><span class="p">)</span>
-    <span class="c1"># check if the bit precision (i.e. bits per sample) is an integer</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">signalinfo</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">signalinfo</span><span class="o">.</span><span class="n">precision</span><span class="p">)</span> <span class="o">==</span> <span class="n">signalinfo</span><span class="o">.</span><span class="n">precision</span><span class="p">:</span>
-            <span class="n">signalinfo</span><span class="o">.</span><span class="n">precision</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">signalinfo</span><span class="o">.</span><span class="n">precision</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Bit precision should be an integer&#39;</span><span class="p">)</span>
-    <span class="c1"># programs such as librosa normalize the signal, unnormalize if detected</span>
-    <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="ow">and</span> <span class="n">src</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span><span class="p">)</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
-    <span class="c1"># set filetype and allow for files with no extensions</span>
-    <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filepath</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">filetype</span> <span class="o">=</span> <span class="n">extension</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">filetype</span>
-    <span class="c1"># transpose from C x L -&gt; L x C</span>
-    <span class="k">if</span> <span class="n">channels_first</span><span class="p">:</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="c1"># save data to file</span>
-    <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
-
-    <span class="kn">import</span> <span class="nn">_torch_sox</span>
-    <span class="n">_torch_sox</span><span class="o">.</span><span class="n">write_audio_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">signalinfo</span><span class="p">,</span> <span class="n">encodinginfo</span><span class="p">,</span> <span class="n">filetype</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="info"><a class="viewcode-back" href="../index.html#torchaudio.info">[docs]</a><span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gets metadata from an audio file without loading the signal.</span>
-
-<span class="sd">     Args:</span>
-<span class="sd">        filepath (str): Path to audio file</span>
-
-<span class="sd">     Returns:</span>
-<span class="sd">        Tuple[sox_signalinfo_t, sox_encodinginfo_t]: A si (sox_signalinfo_t) signal</span>
-<span class="sd">        info as a python object. An ei (sox_encodinginfo_t) encoding info</span>
-
-<span class="sd">     Example</span>
-<span class="sd">         &gt;&gt;&gt; si, ei = torchaudio.info(&#39;foo.wav&#39;)</span>
-<span class="sd">         &gt;&gt;&gt; rate, channels, encoding = si.rate, si.channels, ei.encoding</span>
-<span class="sd">     &quot;&quot;&quot;</span>
-
-    <span class="k">return</span> <span class="n">_get_audio_backend_module</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="sox_signalinfo_t"><a class="viewcode-back" href="../index.html#torchaudio.sox_signalinfo_t">[docs]</a><span class="nd">@_audio_backend_guard</span><span class="p">(</span><span class="s2">&quot;sox&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">sox_signalinfo_t</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a sox_signalinfo_t object. This object can be used to set the sample</span>
-<span class="sd">    rate, number of channels, length, bit precision and headroom multiplier</span>
-<span class="sd">    primarily for effects</span>
-
-<span class="sd">    Returns: sox_signalinfo_t(object)</span>
-<span class="sd">        - rate (float), sample rate as a float, practically will likely be an integer float</span>
-<span class="sd">        - channel (int), number of audio channels</span>
-<span class="sd">        - precision (int), bit precision</span>
-<span class="sd">        - length (int), length of audio in samples * channels, 0 for unspecified and -1 for unknown</span>
-<span class="sd">        - mult (float, optional), headroom multiplier for effects and ``None`` for no multiplier</span>
-
-<span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; si = torchaudio.sox_signalinfo_t()</span>
-<span class="sd">        &gt;&gt;&gt; si.channels = 1</span>
-<span class="sd">        &gt;&gt;&gt; si.rate = 16000.</span>
-<span class="sd">        &gt;&gt;&gt; si.precision = 16</span>
-<span class="sd">        &gt;&gt;&gt; si.length = 0</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="kn">import</span> <span class="nn">_torch_sox</span>
-    <span class="k">return</span> <span class="n">_torch_sox</span><span class="o">.</span><span class="n">sox_signalinfo_t</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="sox_encodinginfo_t"><a class="viewcode-back" href="../index.html#torchaudio.sox_encodinginfo_t">[docs]</a><span class="nd">@_audio_backend_guard</span><span class="p">(</span><span class="s2">&quot;sox&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">sox_encodinginfo_t</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a sox_encodinginfo_t object.  This object can be used to set the encoding</span>
-<span class="sd">    type, bit precision, compression factor, reverse bytes, reverse nibbles,</span>
-<span class="sd">    reverse bits and endianness.  This can be used in an effects chain to encode the</span>
-<span class="sd">    final output or to save a file with a specific encoding.  For example, one could</span>
-<span class="sd">    use the sox ulaw encoding to do 8-bit ulaw encoding.  Note in a tensor output</span>
-<span class="sd">    the result will be a 32-bit number, but number of unique values will be determined by</span>
-<span class="sd">    the bit precision.</span>
-
-<span class="sd">    Returns: sox_encodinginfo_t(object)</span>
-<span class="sd">        - encoding (sox_encoding_t), output encoding</span>
-<span class="sd">        - bits_per_sample (int), bit precision, same as `precision` in sox_signalinfo_t</span>
-<span class="sd">        - compression (float), compression for lossy formats, 0.0 for default compression</span>
-<span class="sd">        - reverse_bytes (sox_option_t), reverse bytes, use sox_option_default</span>
-<span class="sd">        - reverse_nibbles (sox_option_t), reverse nibbles, use sox_option_default</span>
-<span class="sd">        - reverse_bits (sox_option_t), reverse bytes, use sox_option_default</span>
-<span class="sd">        - opposite_endian (sox_bool), change endianness, use sox_false</span>
-
-<span class="sd">    Example</span>
-<span class="sd">        &gt;&gt;&gt; ei = torchaudio.sox_encodinginfo_t()</span>
-<span class="sd">        &gt;&gt;&gt; ei.encoding = torchaudio.get_sox_encoding_t(1)</span>
-<span class="sd">        &gt;&gt;&gt; ei.bits_per_sample = 16</span>
-<span class="sd">        &gt;&gt;&gt; ei.compression = 0</span>
-<span class="sd">        &gt;&gt;&gt; ei.reverse_bytes = torchaudio.get_sox_option_t(2)</span>
-<span class="sd">        &gt;&gt;&gt; ei.reverse_nibbles = torchaudio.get_sox_option_t(2)</span>
-<span class="sd">        &gt;&gt;&gt; ei.reverse_bits = torchaudio.get_sox_option_t(2)</span>
-<span class="sd">        &gt;&gt;&gt; ei.opposite_endian = torchaudio.get_sox_bool(0)</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="kn">import</span> <span class="nn">_torch_sox</span>
-    <span class="n">ei</span> <span class="o">=</span> <span class="n">_torch_sox</span><span class="o">.</span><span class="n">sox_encodinginfo_t</span><span class="p">()</span>
-    <span class="n">sdo</span> <span class="o">=</span> <span class="n">get_sox_option_t</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># sox_default_option</span>
-    <span class="n">ei</span><span class="o">.</span><span class="n">reverse_bytes</span> <span class="o">=</span> <span class="n">sdo</span>
-    <span class="n">ei</span><span class="o">.</span><span class="n">reverse_nibbles</span> <span class="o">=</span> <span class="n">sdo</span>
-    <span class="n">ei</span><span class="o">.</span><span class="n">reverse_bits</span> <span class="o">=</span> <span class="n">sdo</span>
-    <span class="k">return</span> <span class="n">ei</span></div>
-
-
-<div class="viewcode-block" id="get_sox_encoding_t"><a class="viewcode-back" href="../index.html#torchaudio.get_sox_encoding_t">[docs]</a><span class="nd">@_audio_backend_guard</span><span class="p">(</span><span class="s2">&quot;sox&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_sox_encoding_t</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get enum of sox_encoding_t for sox encodings.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        i (int, optional): Choose type or get a dict with all possible options</span>
-<span class="sd">            use ``__members__`` to see all options when not specified. (Default: ``None``)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        sox_encoding_t: A sox_encoding_t type for output encoding</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="kn">import</span> <span class="nn">_torch_sox</span>
-    <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># one can see all possible values using the .__members__ attribute</span>
-        <span class="k">return</span> <span class="n">_torch_sox</span><span class="o">.</span><span class="n">sox_encoding_t</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_torch_sox</span><span class="o">.</span><span class="n">sox_encoding_t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="get_sox_option_t"><a class="viewcode-back" href="../index.html#torchaudio.get_sox_option_t">[docs]</a><span class="nd">@_audio_backend_guard</span><span class="p">(</span><span class="s2">&quot;sox&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_sox_option_t</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get enum of sox_option_t for sox encodinginfo options.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        i (int, optional): Choose type or get a dict with all possible options</span>
-<span class="sd">            use ``__members__`` to see all options when not specified.</span>
-<span class="sd">            (Default: ``sox_option_default`` or ``2``)</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        sox_option_t: A sox_option_t type</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="kn">import</span> <span class="nn">_torch_sox</span>
-    <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_torch_sox</span><span class="o">.</span><span class="n">sox_option_t</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_torch_sox</span><span class="o">.</span><span class="n">sox_option_t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="get_sox_bool"><a class="viewcode-back" href="../index.html#torchaudio.get_sox_bool">[docs]</a><span class="nd">@_audio_backend_guard</span><span class="p">(</span><span class="s2">&quot;sox&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_sox_bool</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get enum of sox_bool for sox encodinginfo options.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        i (int, optional): Choose type or get a dict with all possible options</span>
-<span class="sd">            use ``__members__`` to see all options when not specified. (Default:</span>
-<span class="sd">            ``sox_false`` or ``0``)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        sox_bool: A sox_bool type</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="kn">import</span> <span class="nn">_torch_sox</span>
-    <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_torch_sox</span><span class="o">.</span><span class="n">sox_bool</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_torch_sox</span><span class="o">.</span><span class="n">sox_bool</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="initialize_sox"><a class="viewcode-back" href="../index.html#torchaudio.initialize_sox">[docs]</a><span class="nd">@_audio_backend_guard</span><span class="p">(</span><span class="s2">&quot;sox&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="initialize_sox"><a class="viewcode-back" href="../torchaudio.html#torchaudio.initialize_sox">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span>
+    <span class="s2">&quot;Please remove the function call to initialize_sox. &quot;</span>
+    <span class="s2">&quot;Resource initialization is now automatically handled.&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">initialize_sox</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Initialize sox for use with effects chains.  This is not required for simple</span>
-<span class="sd">    loading.  Importantly, only run `initialize_sox` once and do not shutdown</span>
-<span class="sd">    after each effect chain, but rather once you are finished with all effects chains.</span>
+    <span class="sd">&quot;&quot;&quot;Initialize sox effects.</span>
+
+<span class="sd">    This function is deprecated. See :py:func:`torchaudio.sox_effects.init_sox_effects`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="kn">import</span> <span class="nn">_torch_sox</span>
-    <span class="k">return</span> <span class="n">_torch_sox</span><span class="o">.</span><span class="n">initialize_sox</span><span class="p">()</span></div>
+    <span class="n">_init_sox_effects</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="shutdown_sox"><a class="viewcode-back" href="../index.html#torchaudio.shutdown_sox">[docs]</a><span class="nd">@_audio_backend_guard</span><span class="p">(</span><span class="s2">&quot;sox&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="shutdown_sox"><a class="viewcode-back" href="../torchaudio.html#torchaudio.shutdown_sox">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span>
+    <span class="s2">&quot;Please remove the function call to torchaudio.shutdown_sox. &quot;</span>
+    <span class="s2">&quot;Resource clean up is now automatically handled. &quot;</span>
+    <span class="s2">&quot;In the unlikely event that you need to manually shutdown sox, &quot;</span>
+    <span class="s2">&quot;please use torchaudio.sox_effects.shutdown_sox_effects.&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">shutdown_sox</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Showdown sox for effects chain.  Not required for simple loading.  Importantly,</span>
-<span class="sd">    only call once.  Attempting to re-initialize sox will result in seg faults.</span>
+    <span class="sd">&quot;&quot;&quot;Shutdown sox effects.</span>
+
+<span class="sd">    This function is deprecated. See :py:func:`torchaudio.sox_effects.shutdown_sox_effects`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="kn">import</span> <span class="nn">_torch_sox</span>
-    <span class="k">return</span> <span class="n">_torch_sox</span><span class="o">.</span><span class="n">shutdown_sox</span><span class="p">()</span></div>
-
-
-<span class="k">def</span> <span class="nf">_audio_normalization</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">normalization</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Audio normalization of a tensor in-place.  The normalization can be a bool,</span>
-<span class="sd">    a number, or a callable that takes the audio tensor as an input. SoX uses</span>
-<span class="sd">    32-bit signed integers internally, thus bool normalizes based on that assumption.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">normalization</span><span class="p">:</span>
-        <span class="k">return</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">normalization</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-        <span class="n">normalization</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">normalization</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
-        <span class="c1"># normalize with custom value</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">normalization</span>
-        <span class="n">signal</span> <span class="o">/=</span> <span class="n">a</span>
-    <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">normalization</span><span class="p">):</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">normalization</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
-        <span class="n">signal</span> <span class="o">/=</span> <span class="n">a</span>
+    <span class="n">_shutdown_sox_effects</span><span class="p">()</span></div>
 </pre></div>
 
              </article>
@@ -686,19 +369,20 @@
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js"></script>
-         <script type="text/javascript" src="../_static/katex_autorenderer.js"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script src="../_static/language_data.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script>
+         <script src="../_static/katex_autorenderer.js"></script>
      
 
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
   <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">
@@ -747,25 +431,24 @@
             <li><a href="https://pytorch.org/features">Features</a></li>
             <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
             <li><a href="https://pytorch.org/blog/">Blog</a></li>
-            <li><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col">
           <ul>
-            <li class="list-title"><a href="https://pytorch.org/support">Support</a></li>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
             <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
             <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
             <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
             <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
-            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
-            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col follow-us-col">
           <ul>
-            <li class="list-title">Follow Us</li>
+            <li class="list-title">Stay Connected</li>
             <li>
               <div id="mc_embed_signup">
                 <form
@@ -802,6 +485,7 @@
           <div class="footer-social-icons">
             <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
             <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
           </div>
         </div>
       </div>
@@ -889,6 +573,7 @@
       scrollToAnchor.bind();
       highlightNavigation.bind();
       mainMenuDropdown.bind();
+      filterTags.bind();
 
       // Add class to links that have code blocks, since we cannot create links in code blocks
       $("article.pytorch-article a span.pre").each(function(e) {

@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -184,12 +184,16 @@
             
               <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../kaldi_io.html">torchaudio.kaldi_io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../transforms.html">torchaudio.transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">torchaudio.utils</a></li>
 </ul>
 
             
@@ -266,13 +270,13 @@
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torchaudio</span> <span class="k">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
-<span class="kn">from</span> <span class="nn">torchaudio.compliance</span> <span class="k">import</span> <span class="n">kaldi</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torchaudio</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+<span class="kn">from</span> <span class="nn">torchaudio.compliance</span> <span class="kn">import</span> <span class="n">kaldi</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
@@ -291,6 +295,8 @@
     <span class="s1">&#39;Fade&#39;</span><span class="p">,</span>
     <span class="s1">&#39;FrequencyMasking&#39;</span><span class="p">,</span>
     <span class="s1">&#39;TimeMasking&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;SlidingWindowCmn&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Vad&#39;</span><span class="p">,</span>
 <span class="p">]</span>
 
 
@@ -312,7 +318,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">,</span> <span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="s1">&#39;normalized&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
                  <span class="n">win_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">hop_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -349,20 +355,8 @@
 
 <div class="viewcode-block" id="GriffinLim"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.GriffinLim">[docs]</a><span class="k">class</span> <span class="nc">GriffinLim</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.</span>
-<span class="sd">        Implementation ported from `librosa`.</span>
 
-<span class="sd">    .. [1] McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto.</span>
-<span class="sd">        &quot;librosa: Audio and music signal analysis in python.&quot;</span>
-<span class="sd">        In Proceedings of the 14th python in science conference, pp. 18-25. 2015.</span>
-
-<span class="sd">    .. [2] Perraudin, N., Balazs, P., &amp; Søndergaard, P. L.</span>
-<span class="sd">        &quot;A fast Griffin-Lim algorithm,&quot;</span>
-<span class="sd">        IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (pp. 1-4),</span>
-<span class="sd">        Oct. 2013.</span>
-
-<span class="sd">    .. [3] D. W. Griffin and J. S. Lim,</span>
-<span class="sd">        &quot;Signal estimation from modified short-time Fourier transform,&quot;</span>
-<span class="sd">        IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.</span>
+<span class="sd">    Implementation ported from ``librosa`` [1]_, [2]_, [3]_.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)</span>
@@ -380,11 +374,29 @@
 <span class="sd">            Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: ``0.99``)</span>
 <span class="sd">        length (int, optional): Array length of the expected output. (Default: ``None``)</span>
 <span class="sd">        rand_init (bool, optional): Initializes phase randomly if True and to zero otherwise. (Default: ``True``)</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        .. [1]</span>
+<span class="sd">           | McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg,</span>
+<span class="sd">             and Oriol Nieto.</span>
+<span class="sd">           | &quot;librosa: Audio and music signal analysis in python.&quot;</span>
+<span class="sd">           | In Proceedings of the 14th python in science conference, pp. 18-25. 2015.</span>
+
+<span class="sd">        .. [2]</span>
+<span class="sd">           | Perraudin, N., Balazs, P., &amp; Søndergaard, P. L.</span>
+<span class="sd">           | &quot;A fast Griffin-Lim algorithm,&quot;</span>
+<span class="sd">           | IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (pp. 1-4),</span>
+<span class="sd">           | Oct. 2013.</span>
+
+<span class="sd">        .. [3]</span>
+<span class="sd">           | D. W. Griffin and J. S. Lim,</span>
+<span class="sd">           | &quot;Signal estimation from modified short-time Fourier transform,&quot;</span>
+<span class="sd">           | IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;n_iter&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">,</span> <span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="s1">&#39;normalized&#39;</span><span class="p">,</span>
                      <span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="s1">&#39;momentum&#39;</span><span class="p">,</span> <span class="s1">&#39;rand_init&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
                  <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
                  <span class="n">win_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -416,8 +428,9 @@
 <div class="viewcode-block" id="GriffinLim.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.GriffinLim.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            specgram (Tensor): A magnitude-only STFT spectrogram of dimension (..., freq, frames)</span>
-<span class="sd">            where freq is ``n_fft // 2 + 1``.</span>
+<span class="sd">            specgram (Tensor):</span>
+<span class="sd">                A magnitude-only STFT spectrogram of dimension (..., freq, frames)</span>
+<span class="sd">                where freq is ``n_fft // 2 + 1``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.</span>
@@ -441,7 +454,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;multiplier&#39;</span><span class="p">,</span> <span class="s1">&#39;amin&#39;</span><span class="p">,</span> <span class="s1">&#39;ref_value&#39;</span><span class="p">,</span> <span class="s1">&#39;db_multiplier&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="n">top_db</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="n">top_db</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AmplitudeToDB</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stype</span> <span class="o">=</span> <span class="n">stype</span>
         <span class="k">if</span> <span class="n">top_db</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">top_db</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -481,7 +494,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_mels&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;f_min&#39;</span><span class="p">,</span> <span class="s1">&#39;f_max&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">n_mels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
                  <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
                  <span class="n">f_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span>
@@ -510,7 +523,7 @@
 
         <span class="c1"># pack batch</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-        <span class="n">specgram</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">specgram</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">tmp_fb</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
@@ -523,7 +536,7 @@
         <span class="n">mel_specgram</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># unpack batch</span>
-        <span class="n">mel_specgram</span> <span class="o">=</span> <span class="n">mel_specgram</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">mel_specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+        <span class="n">mel_specgram</span> <span class="o">=</span> <span class="n">mel_specgram</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">mel_specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
 
         <span class="k">return</span> <span class="n">mel_specgram</span></div></div>
 
@@ -549,7 +562,7 @@
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_stft&#39;</span><span class="p">,</span> <span class="s1">&#39;n_mels&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;f_min&#39;</span><span class="p">,</span> <span class="s1">&#39;f_max&#39;</span><span class="p">,</span> <span class="s1">&#39;max_iter&#39;</span><span class="p">,</span> <span class="s1">&#39;tolerance_loss&#39;</span><span class="p">,</span>
                      <span class="s1">&#39;tolerance_change&#39;</span><span class="p">,</span> <span class="s1">&#39;sgdargs&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">n_stft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">n_mels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
                  <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
@@ -648,7 +661,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">,</span> <span class="s1">&#39;n_mels&#39;</span><span class="p">,</span> <span class="s1">&#39;f_min&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
                  <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
                  <span class="n">win_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -658,6 +671,8 @@
                  <span class="n">pad</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
                  <span class="n">n_mels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
                  <span class="n">window_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">,</span>
+                 <span class="n">power</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span><span class="p">,</span>
+                 <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="n">wkwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MelSpectrogram</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="n">sample_rate</span>
@@ -665,13 +680,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">win_length</span> <span class="o">=</span> <span class="n">win_length</span> <span class="k">if</span> <span class="n">win_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">n_fft</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hop_length</span> <span class="o">=</span> <span class="n">hop_length</span> <span class="k">if</span> <span class="n">hop_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">win_length</span> <span class="o">//</span> <span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">=</span> <span class="n">pad</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">power</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalized</span> <span class="o">=</span> <span class="n">normalized</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span> <span class="o">=</span> <span class="n">n_mels</span>  <span class="c1"># number of mel frequency bins</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span> <span class="o">=</span> <span class="n">f_max</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span> <span class="o">=</span> <span class="n">f_min</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spectrogram</span> <span class="o">=</span> <span class="n">Spectrogram</span><span class="p">(</span><span class="n">n_fft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">win_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">win_length</span><span class="p">,</span>
                                        <span class="n">hop_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hop_length</span><span class="p">,</span>
-                                       <span class="n">pad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span> <span class="n">window_fn</span><span class="o">=</span><span class="n">window_fn</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span>
-                                       <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">wkwargs</span><span class="o">=</span><span class="n">wkwargs</span><span class="p">)</span>
+                                       <span class="n">pad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span> <span class="n">window_fn</span><span class="o">=</span><span class="n">window_fn</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">,</span>
+                                       <span class="n">normalized</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">normalized</span><span class="p">,</span> <span class="n">wkwargs</span><span class="o">=</span><span class="n">wkwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mel_scale</span> <span class="o">=</span> <span class="n">MelScale</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MelSpectrogram.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.MelSpectrogram.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -708,7 +725,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;n_mfcc&#39;</span><span class="p">,</span> <span class="s1">&#39;dct_type&#39;</span><span class="p">,</span> <span class="s1">&#39;top_db&#39;</span><span class="p">,</span> <span class="s1">&#39;log_mels&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
                  <span class="n">n_mfcc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
                  <span class="n">dct_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
@@ -718,7 +735,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">MFCC</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">supported_dct_types</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">dct_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_dct_types</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;DCT type not supported&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dct_type</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;DCT type not supported: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dct_type</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="n">sample_rate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_mfcc</span> <span class="o">=</span> <span class="n">n_mfcc</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dct_type</span> <span class="o">=</span> <span class="n">dct_type</span>
@@ -748,7 +765,7 @@
 
         <span class="c1"># pack batch</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-        <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="n">mel_specgram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_mels</span><span class="p">:</span>
@@ -761,7 +778,7 @@
         <span class="n">mfcc</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">mel_specgram</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dct_mat</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># unpack batch</span>
-        <span class="n">mfcc</span> <span class="o">=</span> <span class="n">mfcc</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">mfcc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+        <span class="n">mfcc</span> <span class="o">=</span> <span class="n">mfcc</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">mfcc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
 
         <span class="k">return</span> <span class="n">mfcc</span></div></div>
 
@@ -778,7 +795,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;quantization_channels&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantization_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantization_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MuLawEncoding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quantization_channels</span> <span class="o">=</span> <span class="n">quantization_channels</span>
 
@@ -805,7 +822,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;quantization_channels&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantization_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantization_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MuLawDecoding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quantization_channels</span> <span class="o">=</span> <span class="n">quantization_channels</span>
 
@@ -829,7 +846,7 @@
 <span class="sd">        resampling_method (str, optional): The resampling method. (Default: ``&#39;sinc_interpolation&#39;``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
                  <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
                  <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;sinc_interpolation&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -870,7 +887,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">power</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">power</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ComplexNorm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">power</span>
 
@@ -896,7 +913,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;win_length&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;replicate&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;replicate&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ComputeDeltas</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">win_length</span> <span class="o">=</span> <span class="n">win_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
@@ -923,7 +940,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fixed_rate&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hop_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">n_freq</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">201</span><span class="p">,</span>
                  <span class="n">fixed_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -970,7 +987,7 @@
 <span class="sd">        fade_shape (str, optional): Shape of fade. Must be one of: &quot;quarter_sine&quot;,</span>
 <span class="sd">            &quot;half_sine&quot;, &quot;linear&quot;, &quot;logarithmic&quot;, &quot;exponential&quot;. (Default: ``&quot;linear&quot;``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">fade_in_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
                  <span class="n">fade_out_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
                  <span class="n">fade_shape</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1042,10 +1059,11 @@
 <span class="sd">        mask_param (int): Maximum possible length of the mask.</span>
 <span class="sd">        axis (int): What dimension the mask is applied on.</span>
 <span class="sd">        iid_masks (bool): Applies iid masks to each of the examples in the batch dimension.</span>
+<span class="sd">            This option is applicable only when the input tensor is 4D.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mask_param&#39;</span><span class="p">,</span> <span class="s1">&#39;axis&#39;</span><span class="p">,</span> <span class="s1">&#39;iid_masks&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_param</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iid_masks</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_param</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iid_masks</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">_AxisMasking</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask_param</span> <span class="o">=</span> <span class="n">mask_param</span>
@@ -1061,7 +1079,6 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: Masked spectrogram of dimensions (..., freq, time).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># if iid_masks flag marked and specgram has a batch dimension</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iid_masks</span> <span class="ow">and</span> <span class="n">specgram</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">mask_along_axis_iid</span><span class="p">(</span><span class="n">specgram</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_param</span><span class="p">,</span> <span class="n">mask_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -1075,11 +1092,11 @@
 <span class="sd">    Args:</span>
 <span class="sd">        freq_mask_param (int): maximum possible length of the mask.</span>
 <span class="sd">            Indices uniformly sampled from [0, freq_mask_param).</span>
-<span class="sd">        iid_masks (bool, optional): whether to apply the same mask to all</span>
-<span class="sd">            the examples/channels in the batch. (Default: ``False``)</span>
+<span class="sd">        iid_masks (bool, optional): whether to apply different masks to each</span>
+<span class="sd">            example/channel in the batch. (Default: ``False``)</span>
+<span class="sd">            This option is applicable only when the input tensor is 4D.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq_mask_param</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iid_masks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq_mask_param</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iid_masks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FrequencyMasking</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">freq_mask_param</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">iid_masks</span><span class="p">)</span></div>
 
 
@@ -1089,11 +1106,11 @@
 <span class="sd">    Args:</span>
 <span class="sd">        time_mask_param (int): maximum possible length of the mask.</span>
 <span class="sd">            Indices uniformly sampled from [0, time_mask_param).</span>
-<span class="sd">        iid_masks (bool, optional): whether to apply the same mask to all</span>
-<span class="sd">            the examples/channels in the batch. (Default: ``False``)</span>
+<span class="sd">        iid_masks (bool, optional): whether to apply different masks to each</span>
+<span class="sd">            example/channel in the batch. (Default: ``False``)</span>
+<span class="sd">            This option is applicable only when the input tensor is 4D.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_mask_param</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iid_masks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_mask_param</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iid_masks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TimeMasking</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">time_mask_param</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">iid_masks</span><span class="p">)</span></div>
 
 
@@ -1108,7 +1125,7 @@
 <span class="sd">        gain_type (str, optional): Type of gain. One of: ``amplitude``, ``power``, ``db`` (Default: ``amplitude``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gain</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">gain_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;amplitude&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gain</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">gain_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;amplitude&#39;</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Vol</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="n">gain</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gain_type</span> <span class="o">=</span> <span class="n">gain_type</span>
@@ -1134,6 +1151,160 @@
             <span class="n">waveform</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">gain</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gain</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SlidingWindowCmn"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.SlidingWindowCmn">[docs]</a><span class="k">class</span> <span class="nc">SlidingWindowCmn</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cmn_window (int, optional): Window in frames for running average CMN computation (int, default = 600)</span>
+<span class="sd">        min_cmn_window (int, optional):  Minimum CMN window used at start of decoding (adds latency only at start).</span>
+<span class="sd">            Only applicable if center == false, ignored if center==true (int, default = 100)</span>
+<span class="sd">        center (bool, optional): If true, use a window centered on the current frame</span>
+<span class="sd">            (to the extent possible, modulo end effects). If false, window is to the left. (bool, default = false)</span>
+<span class="sd">        norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">cmn_window</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
+                 <span class="n">min_cmn_window</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+                 <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">norm_vars</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmn_window</span> <span class="o">=</span> <span class="n">cmn_window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_cmn_window</span> <span class="o">=</span> <span class="n">min_cmn_window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm_vars</span> <span class="o">=</span> <span class="n">norm_vars</span>
+
+<div class="viewcode-block" id="SlidingWindowCmn.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.SlidingWindowCmn.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            waveform (Tensor): Tensor of audio of dimension (..., time).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: Tensor of audio of dimension (..., time).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cmn_waveform</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">sliding_window_cmn</span><span class="p">(</span>
+            <span class="n">waveform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmn_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_cmn_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm_vars</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cmn_waveform</span></div></div>
+
+
+<div class="viewcode-block" id="Vad"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Vad">[docs]</a><span class="k">class</span> <span class="nc">Vad</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Voice Activity Detector. Similar to SoX implementation.</span>
+<span class="sd">    Attempts to trim silence and quiet background sounds from the ends of recordings of speech.</span>
+<span class="sd">    The algorithm currently uses a simple cepstral power measurement to detect voice,</span>
+<span class="sd">    so may be fooled by other things, especially music.</span>
+
+<span class="sd">    The effect can trim only from the front of the audio,</span>
+<span class="sd">    so in order to trim from the back, the reverse effect must also be used.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sample_rate (int): Sample rate of audio signal.</span>
+<span class="sd">        trigger_level (float, optional): The measurement level used to trigger activity detection.</span>
+<span class="sd">            This may need to be cahnged depending on the noise level, signal level,</span>
+<span class="sd">            and other characteristics of the input audio. (Default: 7.0)</span>
+<span class="sd">        trigger_time (float, optional): The time constant (in seconds)</span>
+<span class="sd">            used to help ignore short bursts of sound. (Default: 0.25)</span>
+<span class="sd">        search_time (float, optional): The amount of audio (in seconds)</span>
+<span class="sd">            to search for quieter/shorter bursts of audio to include prior</span>
+<span class="sd">            to the detected trigger point. (Default: 1.0)</span>
+<span class="sd">        allowed_gap (float, optional): The allowed gap (in seconds) between</span>
+<span class="sd">            quiteter/shorter bursts of audio to include prior</span>
+<span class="sd">            to the detected trigger point. (Default: 0.25)</span>
+<span class="sd">        pre_trigger_time (float, optional): The amount of audio (in seconds) to preserve</span>
+<span class="sd">            before the trigger point and any found quieter/shorter bursts. (Default: 0.0)</span>
+<span class="sd">        boot_time (float, optional) The algorithm (internally) uses adaptive noise</span>
+<span class="sd">            estimation/reduction in order to detect the start of the wanted audio.</span>
+<span class="sd">            This option sets the time for the initial noise estimate. (Default: 0.35)</span>
+<span class="sd">        noise_up_time (float, optional) Time constant used by the adaptive noise estimator</span>
+<span class="sd">            for when the noise level is increasing. (Default: 0.1)</span>
+<span class="sd">        noise_down_time (float, optional) Time constant used by the adaptive noise estimator</span>
+<span class="sd">            for when the noise level is decreasing. (Default: 0.01)</span>
+<span class="sd">        noise_reduction_amount (float, optional) Amount of noise reduction to use in</span>
+<span class="sd">            the detection algorithm (e.g. 0, 0.5, ...). (Default: 1.35)</span>
+<span class="sd">        measure_freq (float, optional) Frequency of the algorithm’s</span>
+<span class="sd">            processing/measurements. (Default: 20.0)</span>
+<span class="sd">        measure_duration: (float, optional) Measurement duration.</span>
+<span class="sd">            (Default: Twice the measurement period; i.e. with overlap.)</span>
+<span class="sd">        measure_smooth_time (float, optional) Time constant used to smooth</span>
+<span class="sd">            spectral measurements. (Default: 0.4)</span>
+<span class="sd">        hp_filter_freq (float, optional) &quot;Brick-wall&quot; frequency of high-pass filter applied</span>
+<span class="sd">            at the input to the detector algorithm. (Default: 50.0)</span>
+<span class="sd">        lp_filter_freq (float, optional) &quot;Brick-wall&quot; frequency of low-pass filter applied</span>
+<span class="sd">            at the input to the detector algorithm. (Default: 6000.0)</span>
+<span class="sd">        hp_lifter_freq (float, optional) &quot;Brick-wall&quot; frequency of high-pass lifter used</span>
+<span class="sd">            in the detector algorithm. (Default: 150.0)</span>
+<span class="sd">        lp_lifter_freq (float, optional) &quot;Brick-wall&quot; frequency of low-pass lifter used</span>
+<span class="sd">            in the detector algorithm. (Default: 2000.0)</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        http://sox.sourceforge.net/sox.html</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">trigger_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.0</span><span class="p">,</span>
+                 <span class="n">trigger_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
+                 <span class="n">search_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+                 <span class="n">allowed_gap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
+                 <span class="n">pre_trigger_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">boot_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">35</span><span class="p">,</span>
+                 <span class="n">noise_up_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">noise_down_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">01</span><span class="p">,</span>
+                 <span class="n">noise_reduction_amount</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.35</span><span class="p">,</span>
+                 <span class="n">measure_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+                 <span class="n">measure_duration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">measure_smooth_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">4</span><span class="p">,</span>
+                 <span class="n">hp_filter_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">50.</span><span class="p">,</span>
+                 <span class="n">lp_filter_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">6000.</span><span class="p">,</span>
+                 <span class="n">hp_lifter_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">150.</span><span class="p">,</span>
+                 <span class="n">lp_lifter_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2000.</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="n">sample_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trigger_level</span> <span class="o">=</span> <span class="n">trigger_level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trigger_time</span> <span class="o">=</span> <span class="n">trigger_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_time</span> <span class="o">=</span> <span class="n">search_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowed_gap</span> <span class="o">=</span> <span class="n">allowed_gap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_trigger_time</span> <span class="o">=</span> <span class="n">pre_trigger_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boot_time</span> <span class="o">=</span> <span class="n">boot_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_up_time</span> <span class="o">=</span> <span class="n">noise_up_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_down_time</span> <span class="o">=</span> <span class="n">noise_up_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_reduction_amount</span> <span class="o">=</span> <span class="n">noise_reduction_amount</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measure_freq</span> <span class="o">=</span> <span class="n">measure_freq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measure_duration</span> <span class="o">=</span> <span class="n">measure_duration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measure_smooth_time</span> <span class="o">=</span> <span class="n">measure_smooth_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hp_filter_freq</span> <span class="o">=</span> <span class="n">hp_filter_freq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lp_filter_freq</span> <span class="o">=</span> <span class="n">lp_filter_freq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hp_lifter_freq</span> <span class="o">=</span> <span class="n">hp_lifter_freq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lp_lifter_freq</span> <span class="o">=</span> <span class="n">lp_lifter_freq</span>
+
+<div class="viewcode-block" id="Vad.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Vad.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            waveform (Tensor): Tensor of audio of dimension `(..., time)`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">vad</span><span class="p">(</span>
+            <span class="n">waveform</span><span class="o">=</span><span class="n">waveform</span><span class="p">,</span>
+            <span class="n">sample_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span>
+            <span class="n">trigger_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trigger_level</span><span class="p">,</span>
+            <span class="n">trigger_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trigger_time</span><span class="p">,</span>
+            <span class="n">search_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">search_time</span><span class="p">,</span>
+            <span class="n">allowed_gap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">allowed_gap</span><span class="p">,</span>
+            <span class="n">pre_trigger_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_trigger_time</span><span class="p">,</span>
+            <span class="n">boot_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">boot_time</span><span class="p">,</span>
+            <span class="n">noise_up_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">noise_up_time</span><span class="p">,</span>
+            <span class="n">noise_down_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">noise_up_time</span><span class="p">,</span>
+            <span class="n">noise_reduction_amount</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">noise_reduction_amount</span><span class="p">,</span>
+            <span class="n">measure_freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">measure_freq</span><span class="p">,</span>
+            <span class="n">measure_duration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">measure_duration</span><span class="p">,</span>
+            <span class="n">measure_smooth_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">measure_smooth_time</span><span class="p">,</span>
+            <span class="n">hp_filter_freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hp_filter_freq</span><span class="p">,</span>
+            <span class="n">lp_filter_freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lp_filter_freq</span><span class="p">,</span>
+            <span class="n">hp_lifter_freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hp_lifter_freq</span><span class="p">,</span>
+            <span class="n">lp_lifter_freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lp_lifter_freq</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
 </pre></div>
 
              </article>
@@ -1182,19 +1353,20 @@
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../../_static/jquery.js"></script>
-         <script type="text/javascript" src="../../_static/underscore.js"></script>
-         <script type="text/javascript" src="../../_static/doctools.js"></script>
-         <script type="text/javascript" src="../../_static/language_data.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js"></script>
-         <script type="text/javascript" src="../../_static/katex_autorenderer.js"></script>
+         <script src="../../_static/jquery.js"></script>
+         <script src="../../_static/underscore.js"></script>
+         <script src="../../_static/doctools.js"></script>
+         <script src="../../_static/language_data.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script>
+         <script src="../../_static/katex_autorenderer.js"></script>
      
 
   
 
   <script type="text/javascript" src="../../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
   <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
@@ -1243,25 +1415,24 @@
             <li><a href="https://pytorch.org/features">Features</a></li>
             <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
             <li><a href="https://pytorch.org/blog/">Blog</a></li>
-            <li><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col">
           <ul>
-            <li class="list-title"><a href="https://pytorch.org/support">Support</a></li>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
             <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
             <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
             <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
             <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
-            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
-            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col follow-us-col">
           <ul>
-            <li class="list-title">Follow Us</li>
+            <li class="list-title">Stay Connected</li>
             <li>
               <div id="mc_embed_signup">
                 <form
@@ -1298,6 +1469,7 @@
           <div class="footer-social-icons">
             <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
             <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
           </div>
         </div>
       </div>
@@ -1385,6 +1557,7 @@
       scrollToAnchor.bind();
       highlightNavigation.bind();
       mainMenuDropdown.bind();
+      filterTags.bind();
 
       // Add class to links that have code blocks, since we cannot create links in code blocks
       $("article.pytorch-article a span.pre").each(function(e) {

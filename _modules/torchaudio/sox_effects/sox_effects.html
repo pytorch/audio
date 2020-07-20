@@ -1,0 +1,976 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torchaudio.sox_effects.sox_effects &mdash; Torchaudio master documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <div class="ecosystem-dropdown">
+              <a id="dropdownMenuButton" data-toggle="ecosystem-dropdown">
+                Ecosystem
+              </a>
+              <div class="ecosystem-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub"">
+                  <span class=dropdown-title>Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
+                  <span class=dropdown-title>Tools & Libraries</span>
+                  <p>Explore the ecosystem of tools and libraries</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <div class="resources-dropdown">
+              <a id="resourcesDropdownButton" data-toggle="resources-dropdown">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources"">
+                  <span class=dropdown-title>Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class=dropdown-title>About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+
+  </div>
+</div>
+
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+                <div class="version">
+                  master 
+                </div>
+              
+            
+
+            
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../../../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+          <li><a href="../../index.html">Module code</a> &gt;</li>
+        
+          <li><a href="../../torchaudio.html">torchaudio</a> &gt;</li>
+        
+      <li>torchaudio.sox_effects.sox_effects</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <h1>Source code for torchaudio.sox_effects.sox_effects</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+
+<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span><span class="p">,</span>
+    <span class="n">misc_ops</span> <span class="k">as</span> <span class="n">_misc_ops</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">torchaudio.utils.sox_utils</span> <span class="kn">import</span> <span class="n">list_effects</span>
+
+
+<span class="k">if</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">is_module_available</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">torchaudio</span> <span class="kn">import</span> <span class="n">_torchaudio</span>
+
+
+<div class="viewcode-block" id="init_sox_effects"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.init_sox_effects">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">init_sox_effects</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Initialize resources required to use sox effects.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        You do not need to call this function manually. It is called automatically.</span>
+
+<span class="sd">    Once initialized, you do not need to call this function again across the multiple uses of</span>
+<span class="sd">    sox effects though it is safe to do so as long as :func:`shutdown_sox_effects` is not called yet.</span>
+<span class="sd">    Once :func:`shutdown_sox_effects` is called, you can no longer use SoX effects and initializing</span>
+<span class="sd">    again will result in error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_initialize_sox_effects</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="shutdown_sox_effects"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.shutdown_sox_effects">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;torchaudio._torchaudio&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">shutdown_sox_effects</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Clean up resources required to use sox effects.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        You do not need to call this function manually. It is called automatically.</span>
+
+<span class="sd">    It is safe to call this function multiple times.</span>
+<span class="sd">    Once :py:func:`shutdown_sox_effects` is called, you can no longer use SoX effects and</span>
+<span class="sd">    initializing again will result in error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_shutdown_sox_effects</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="effect_names"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.effect_names">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">effect_names</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Gets list of valid sox effect names</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[str]: list of available effect names.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; torchaudio.sox_effects.effect_names()</span>
+<span class="sd">        [&#39;allpass&#39;, &#39;band&#39;, &#39;bandpass&#39;, ... ]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">list_effects</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="apply_effects_tensor"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.apply_effects_tensor">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">apply_effects_tensor</span><span class="p">(</span>
+        <span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">effects</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Apply sox effects to given Tensor</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This function works in the way very similar to ``sox`` command, however there are slight</span>
+<span class="sd">        differences. For example, ``sox`` commnad adds certain effects automatically (such as</span>
+<span class="sd">        ``rate`` effect after ``speed`` and ``pitch`` and other effects), but this function does</span>
+<span class="sd">        only applies the given effects. (Therefore, to actually apply ``speed`` effect, you also</span>
+<span class="sd">        need to give ``rate`` effect with desired sampling rate.)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tensor (torch.Tensor): Input 2D Tensor.</span>
+<span class="sd">        sample_rate (int): Sample rate</span>
+<span class="sd">        effects (List[List[str]]): List of effects.</span>
+<span class="sd">        channels_first (bool): Indicates if the input Tensor&#39;s dimension is</span>
+<span class="sd">            ``[channels, time]`` or ``[time, channels]``</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.</span>
+<span class="sd">        The resulting Tensor has the same ``dtype`` as the input Tensor, and</span>
+<span class="sd">        the same channels order. The shape of the Tensor can be different based on the</span>
+<span class="sd">        effects applied. Sample rate can also be different based on the effects applied.</span>
+
+<span class="sd">    Example - Basic usage</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Defines the effects to apply</span>
+<span class="sd">        &gt;&gt;&gt; effects = [</span>
+<span class="sd">        ...     [&#39;gain&#39;, &#39;-n&#39;],  # normalises to 0dB</span>
+<span class="sd">        ...     [&#39;pitch&#39;, &#39;5&#39;],  # 5 cent pitch shift</span>
+<span class="sd">        ...     [&#39;rate&#39;, &#39;8000&#39;],  # resample to 8000 Hz</span>
+<span class="sd">        ... ]</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Generate pseudo wave:</span>
+<span class="sd">        &gt;&gt;&gt; # normalized, channels first, 2ch, sampling rate 16000, 1 second</span>
+<span class="sd">        &gt;&gt;&gt; sample_rate = 16000</span>
+<span class="sd">        &gt;&gt;&gt; waveform = 2 * torch.rand([2, sample_rate * 1]) - 1</span>
+<span class="sd">        &gt;&gt;&gt; waveform.shape</span>
+<span class="sd">        torch.Size([2, 16000])</span>
+<span class="sd">        &gt;&gt;&gt; waveform</span>
+<span class="sd">        tensor([[ 0.3138,  0.7620, -0.9019,  ..., -0.7495, -0.4935,  0.5442],</span>
+<span class="sd">                [-0.0832,  0.0061,  0.8233,  ..., -0.5176, -0.9140, -0.2434]])</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Apply effects</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = apply_effects_tensor(</span>
+<span class="sd">        ...     wave_form, sample_rate, effects, channels_first=True)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Check the result</span>
+<span class="sd">        &gt;&gt;&gt; # The new waveform is sampling rate 8000, 1 second.</span>
+<span class="sd">        &gt;&gt;&gt; # normalization and channel order are preserved</span>
+<span class="sd">        &gt;&gt;&gt; waveform.shape</span>
+<span class="sd">        torch.Size([2, 8000])</span>
+<span class="sd">        &gt;&gt;&gt; waveform</span>
+<span class="sd">        tensor([[ 0.5054, -0.5518, -0.4800,  ..., -0.0076,  0.0096, -0.0110],</span>
+<span class="sd">                [ 0.1331,  0.0436, -0.3783,  ..., -0.0035,  0.0012,  0.0008]])</span>
+<span class="sd">        &gt;&gt;&gt; sample_rate</span>
+<span class="sd">        8000</span>
+
+<span class="sd">    Example - Torchscript-able transform</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Use `apply_effects_tensor` in `torch.nn.Module` and dump it to file,</span>
+<span class="sd">        &gt;&gt;&gt; # then run sox effect via Torchscript runtime.</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; class SoxEffectTransform(torch.nn.Module):</span>
+<span class="sd">        ...     effects: List[List[str]]</span>
+<span class="sd">        ...</span>
+<span class="sd">        ...     def __init__(self, effects: List[List[str]]):</span>
+<span class="sd">        ...         super().__init__()</span>
+<span class="sd">        ...         self.effects = effects</span>
+<span class="sd">        ...</span>
+<span class="sd">        ...     def forward(self, tensor: torch.Tensor, sample_rate: int):</span>
+<span class="sd">        ...         return sox_effects.apply_effects_tensor(</span>
+<span class="sd">        ...             tensor, sample_rate, self.effects)</span>
+<span class="sd">        ...</span>
+<span class="sd">        ...</span>
+<span class="sd">        &gt;&gt;&gt; # Create transform object</span>
+<span class="sd">        &gt;&gt;&gt; effects = [</span>
+<span class="sd">        ...     [&quot;lowpass&quot;, &quot;-1&quot;, &quot;300&quot;],  # apply single-pole lowpass filter</span>
+<span class="sd">        ...     [&quot;rate&quot;, &quot;8000&quot;],  # change sample rate to 8000</span>
+<span class="sd">        ... ]</span>
+<span class="sd">        &gt;&gt;&gt; transform = SoxEffectTensorTransform(effects, input_sample_rate)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Dump it to file and load</span>
+<span class="sd">        &gt;&gt;&gt; path = &#39;sox_effect.zip&#39;</span>
+<span class="sd">        &gt;&gt;&gt; torch.jit.script(trans).save(path)</span>
+<span class="sd">        &gt;&gt;&gt; transform = torch.jit.load(path)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt;&gt; # Run transform</span>
+<span class="sd">        &gt;&gt;&gt; waveform, input_sample_rate = torchaudio.load(&quot;input.wav&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = transform(waveform, input_sample_rate)</span>
+<span class="sd">        &gt;&gt;&gt; assert sample_rate == 8000</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">in_signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">TensorSignal</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span>
+    <span class="n">out_signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_tensor</span><span class="p">(</span><span class="n">in_signal</span><span class="p">,</span> <span class="n">effects</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out_signal</span><span class="o">.</span><span class="n">get_tensor</span><span class="p">(),</span> <span class="n">out_signal</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="apply_effects_file"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.apply_effects_file">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">apply_effects_file</span><span class="p">(</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">effects</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Apply sox effects to the audio file and load the resulting data as Tensor</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This function works in the way very similar to ``sox`` command, however there are slight</span>
+<span class="sd">        differences. For example, ``sox`` commnad adds certain effects automatically (such as</span>
+<span class="sd">        ``rate`` effect after ``speed``, ``pitch`` etc), but this function only applies the given</span>
+<span class="sd">        effects. Therefore, to actually apply ``speed`` effect, you also need to give ``rate``</span>
+<span class="sd">        effect with desired sampling rate, because internally, ``speed`` effects only alter sampling</span>
+<span class="sd">        rate and leave samples untouched.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): Path to the audio file.</span>
+<span class="sd">        effects (List[List[str]]): List of effects.</span>
+<span class="sd">        normalize (bool):</span>
+<span class="sd">            When ``True``, this function always return ``float32``, and sample values are</span>
+<span class="sd">            normalized to ``[-1.0, 1.0]``.</span>
+<span class="sd">            If input file is integer WAV, giving ``False`` will change the resulting Tensor type to</span>
+<span class="sd">            integer type. This argument has no effect for formats other</span>
+<span class="sd">            than integer WAV type.</span>
+<span class="sd">        channels_first (bool): When True, the returned Tensor has dimension ``[channel, time]``.</span>
+<span class="sd">            Otherwise, the returned Tensor&#39;s dimension is ``[time, channel]``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.</span>
+<span class="sd">        If ``normalize=True``, the resulting Tensor is always ``float32`` type.</span>
+<span class="sd">        If ``normalize=False`` and the input audio file is of integer WAV file, then the</span>
+<span class="sd">        resulting Tensor has corresponding integer type. (Note 24 bit integer type is not supported)</span>
+<span class="sd">        If ``channels_first=True``, the resulting Tensor has dimension ``[channel, time]``,</span>
+<span class="sd">        otherwise ``[time, channel]``.</span>
+
+<span class="sd">    Example - Basic usage</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Defines the effects to apply</span>
+<span class="sd">        &gt;&gt;&gt; effects = [</span>
+<span class="sd">        ...     [&#39;gain&#39;, &#39;-n&#39;],  # normalises to 0dB</span>
+<span class="sd">        ...     [&#39;pitch&#39;, &#39;5&#39;],  # 5 cent pitch shift</span>
+<span class="sd">        ...     [&#39;rate&#39;, &#39;8000&#39;],  # resample to 8000 Hz</span>
+<span class="sd">        ... ]</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Apply effects and load data with channels_first=True</span>
+<span class="sd">        &gt;&gt;&gt; waveform, sample_rate = apply_effects_file(&quot;data.wav&quot;, effects, channels_first=True)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Check the result</span>
+<span class="sd">        &gt;&gt;&gt; waveform.shape</span>
+<span class="sd">        torch.Size([2, 8000])</span>
+<span class="sd">        &gt;&gt;&gt; waveform</span>
+<span class="sd">        tensor([[ 5.1151e-03,  1.8073e-02,  2.2188e-02,  ...,  1.0431e-07,</span>
+<span class="sd">                 -1.4761e-07,  1.8114e-07],</span>
+<span class="sd">                [-2.6924e-03,  2.1860e-03,  1.0650e-02,  ...,  6.4122e-07,</span>
+<span class="sd">                 -5.6159e-07,  4.8103e-07]])</span>
+<span class="sd">        &gt;&gt;&gt; sample_rate</span>
+<span class="sd">        8000</span>
+
+<span class="sd">    Example - Apply random speed perturbation to dataset</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Load data from file, apply random speed perturbation</span>
+<span class="sd">        &gt;&gt;&gt; class RandomPerturbationFile(torch.utils.data.Dataset):</span>
+<span class="sd">        ...     \&quot;\&quot;\&quot;Given flist, apply random speed perturbation</span>
+<span class="sd">        ...</span>
+<span class="sd">        ...     Suppose all the input files are at least one second long.</span>
+<span class="sd">        ...     \&quot;\&quot;\&quot;</span>
+<span class="sd">        ...     def __init__(self, flist: List[str], sample_rate: int):</span>
+<span class="sd">        ...         super().__init__()</span>
+<span class="sd">        ...         self.flist = flist</span>
+<span class="sd">        ...         self.sample_rate = sample_rate</span>
+<span class="sd">        ...         self.rng = None</span>
+<span class="sd">        ...</span>
+<span class="sd">        ...     def __getitem__(self, index):</span>
+<span class="sd">        ...         speed = self.rng.uniform(0.5, 2.0)</span>
+<span class="sd">        ...         effects = [</span>
+<span class="sd">        ...             [&#39;gain&#39;, &#39;-n&#39;, &#39;-10&#39;],  # apply 10 db attenuation</span>
+<span class="sd">        ...             [&#39;remix&#39;, &#39;-&#39;],  # merge all the channels</span>
+<span class="sd">        ...             [&#39;speed&#39;, f&#39;{speed:.5f}&#39;],  # duration is now 0.5 ~ 2.0 seconds.</span>
+<span class="sd">        ...             [&#39;rate&#39;, f&#39;{self.sample_rate}&#39;],</span>
+<span class="sd">        ...             [&#39;pad&#39;, &#39;0&#39;, &#39;1.5&#39;],  # add 1.5 seconds silence at the end</span>
+<span class="sd">        ...             [&#39;trim&#39;, &#39;0&#39;, &#39;2&#39;],  # get the first 2 seconds</span>
+<span class="sd">        ...         ]</span>
+<span class="sd">        ...         waveform, _ = torchaudio.sox_effects.apply_effects_file(</span>
+<span class="sd">        ...             self.flist[index], effects)</span>
+<span class="sd">        ...         return waveform</span>
+<span class="sd">        ...</span>
+<span class="sd">        ...     def __len__(self):</span>
+<span class="sd">        ...         return len(self.flist)</span>
+<span class="sd">        ...</span>
+<span class="sd">        &gt;&gt;&gt; dataset = RandomPerturbationFile(file_list, sample_rate=8000)</span>
+<span class="sd">        &gt;&gt;&gt; loader = torch.utils.data.DataLoader(dataset, batch_size=32)</span>
+<span class="sd">        &gt;&gt;&gt; for batch in loader:</span>
+<span class="sd">        &gt;&gt;&gt;     pass</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_tensor</span><span class="p">(),</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SoxEffect"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.SoxEffect">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="s1">&#39;Please migrate to `apply_effects_file` or `apply_effects_tensor`.&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">SoxEffect</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an object for passing sox effect information between python and c++</span>
+
+<span class="sd">    Warning:</span>
+<span class="sd">        This function is deprecated.</span>
+<span class="sd">        Please migrate to :func:`apply_effects_file` or :func:`apply_effects_tensor`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        SoxEffect: An object with the following attributes: ename (str) which is the</span>
+<span class="sd">        name of effect, and eopts (List[str]) which is a list of effect options.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_torchaudio</span><span class="o">.</span><span class="n">SoxEffect</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SoxEffectsChain"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="s1">&#39;Please migrate to `apply_effects_file` or `apply_effects_tensor`.&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">SoxEffectsChain</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;SoX effects chain class.</span>
+
+<span class="sd">    Warning:</span>
+<span class="sd">        This class is deprecated.</span>
+<span class="sd">        Please migrate to :func:`apply_effects_file` or :func:`apply_effects_tensor`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        normalization (bool, number, or callable, optional):</span>
+<span class="sd">            If boolean ``True``, then output is divided by ``1 &lt;&lt; 31``</span>
+<span class="sd">            (assumes signed 32-bit audio), and normalizes to ``[-1, 1]``.</span>
+<span class="sd">            If ``number``, then output is divided by that number.</span>
+<span class="sd">            If ``callable``, then the output is passed as a parameter to the given function, then</span>
+<span class="sd">            the output is divided by the result. (Default: ``True``)</span>
+<span class="sd">        channels_first (bool, optional):</span>
+<span class="sd">            Set channels first or length first in result.  (Default: ``True``)</span>
+<span class="sd">        out_siginfo (sox_signalinfo_t, optional):</span>
+<span class="sd">            a sox_signalinfo_t type, which could be helpful if the audio type cannot be</span>
+<span class="sd">            automatically determined. (Default: ``None``)</span>
+<span class="sd">        out_encinfo (sox_encodinginfo_t, optional):</span>
+<span class="sd">            a sox_encodinginfo_t type, which could be set if the audio type cannot be</span>
+<span class="sd">            automatically determined. (Default: ``None``)</span>
+<span class="sd">        filetype (str, optional):</span>
+<span class="sd">            a filetype or extension to be set if sox cannot determine it automatically.</span>
+<span class="sd">            (Default: ``&#39;raw&#39;``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[Tensor, int]:</span>
+<span class="sd">        An output Tensor of size ``[C x L]`` or ``[L x C]`` where L is the number</span>
+<span class="sd">        of audio frames and C is the number of channels. An integer which is the sample rate of the</span>
+<span class="sd">        audio (as listed in the metadata of the file)</span>
+
+<span class="sd">    Example</span>
+<span class="sd">        &gt;&gt;&gt; class MyDataset(Dataset):</span>
+<span class="sd">        ...     def __init__(self, audiodir_path):</span>
+<span class="sd">        ...         self.data = [</span>
+<span class="sd">        ...             os.path.join(audiodir_path, fn)</span>
+<span class="sd">        ...             for fn in os.listdir(audiodir_path)]</span>
+<span class="sd">        ...         self.E = torchaudio.sox_effects.SoxEffectsChain()</span>
+<span class="sd">        ...         self.E.append_effect_to_chain(&quot;rate&quot;, [16000])  # resample to 16000hz</span>
+<span class="sd">        ...         self.E.append_effect_to_chain(&quot;channels&quot;, [&quot;1&quot;])  # mono signal</span>
+<span class="sd">        ...     def __getitem__(self, index):</span>
+<span class="sd">        ...         fn = self.data[index]</span>
+<span class="sd">        ...         self.E.set_input_file(fn)</span>
+<span class="sd">        ...         x, sr = self.E.sox_build_flow_effects()</span>
+<span class="sd">        ...         return x, sr</span>
+<span class="sd">        ...</span>
+<span class="sd">        ...     def __len__(self):</span>
+<span class="sd">        ...         return len(self.data)</span>
+<span class="sd">        ...</span>
+<span class="sd">        &gt;&gt;&gt; ds = MyDataset(path_to_audio_files)</span>
+<span class="sd">        &gt;&gt;&gt; for sig, sr in ds:</span>
+<span class="sd">        ...    pass</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">EFFECTS_UNIMPLEMENTED</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;spectrogram&quot;</span><span class="p">,</span> <span class="s2">&quot;splice&quot;</span><span class="p">,</span> <span class="s2">&quot;noiseprof&quot;</span><span class="p">,</span> <span class="s2">&quot;fir&quot;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">normalization</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">out_siginfo</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">out_encinfo</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">filetype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;raw&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MAX_EFFECT_OPTS</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_siginfo</span> <span class="o">=</span> <span class="n">out_siginfo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_encinfo</span> <span class="o">=</span> <span class="n">out_encinfo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filetype</span> <span class="o">=</span> <span class="n">filetype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span> <span class="o">=</span> <span class="n">normalization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels_first</span> <span class="o">=</span> <span class="n">channels_first</span>
+
+        <span class="c1"># Define in __init__ to avoid calling at import time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">EFFECTS_AVAILABLE</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">effect_names</span><span class="p">())</span>
+
+<div class="viewcode-block" id="SoxEffectsChain.append_effect_to_chain"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.append_effect_to_chain">[docs]</a>    <span class="k">def</span> <span class="nf">append_effect_to_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                               <span class="n">ename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                               <span class="n">eargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append effect to a sox effects chain.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ename (str): which is the name of effect</span>
+<span class="sd">            eargs (List[str] or str, optional): which is a list of effect options. (Default: ``None``)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">SoxEffect</span><span class="p">()</span>
+        <span class="c1"># check if we have a valid effect</span>
+        <span class="n">ename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_effect</span><span class="p">(</span><span class="n">ename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">eargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">eargs</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="n">eargs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eargs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">eargs</span> <span class="o">=</span> <span class="p">[</span><span class="n">eargs</span><span class="p">]</span>
+        <span class="n">eargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flatten</span><span class="p">(</span><span class="n">eargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">eargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_EFFECT_OPTS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Number of effect options (</span><span class="si">{}</span><span class="s2">) is greater than max &quot;</span>
+                               <span class="s2">&quot;suggested number of options </span><span class="si">{}</span><span class="s2">.  Increase MAX_EFFECT_OPTS &quot;</span>
+                               <span class="s2">&quot;or lower the number of effect options&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">eargs</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_EFFECT_OPTS</span><span class="p">))</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">ename</span> <span class="o">=</span> <span class="n">ename</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">eopts</span> <span class="o">=</span> <span class="n">eargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SoxEffectsChain.sox_build_flow_effects"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.sox_build_flow_effects">[docs]</a>    <span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">sox_build_flow_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                               <span class="n">out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Build effects chain and flow effects from input file to output tensor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            out (Tensor, optional): Where the output will be written to. (Default: ``None``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where</span>
+<span class="sd">            L is the number of audio frames and C is the number of channels.</span>
+<span class="sd">            An integer which is the sample rate of the audio (as listed in the metadata of the file)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># initialize output tensor</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_misc_ops</span><span class="o">.</span><span class="n">check_input</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="p">):</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">SoxEffect</span><span class="p">()</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">ename</span> <span class="o">=</span> <span class="s2">&quot;no_effects&quot;</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">eopts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="c1"># print(&quot;effect options:&quot;, [x.eopts for x in self.chain])</span>
+
+        <span class="n">sr</span> <span class="o">=</span> <span class="n">_torchaudio</span><span class="o">.</span><span class="n">build_flow_effects</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="p">,</span>
+                                            <span class="n">out</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">channels_first</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">out_siginfo</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">out_encinfo</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">filetype</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">MAX_EFFECT_OPTS</span><span class="p">)</span>
+
+        <span class="n">_misc_ops</span><span class="o">.</span><span class="n">normalize_audio</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">sr</span></div>
+
+<div class="viewcode-block" id="SoxEffectsChain.clear_chain"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.clear_chain">[docs]</a>    <span class="k">def</span> <span class="nf">clear_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clear effects chain in python</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="SoxEffectsChain.set_input_file"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.set_input_file">[docs]</a>    <span class="k">def</span> <span class="nf">set_input_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set input file for input of chain</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_file (str): The path to the input file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="n">input_file</span></div>
+
+    <span class="k">def</span> <span class="nf">_check_effect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">EFFECTS_UNIMPLEMENTED</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This effect (</span><span class="si">{}</span><span class="s2">) is not implement in torchaudio&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">EFFECTS_AVAILABLE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s2">&quot;Effect name, </span><span class="si">{}</span><span class="s2">, not valid&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="c1"># https://stackoverflow.com/questions/12472338/flattening-a-list-recursively</span>
+    <span class="c1"># convenience function to flatten list recursively</span>
+    <span class="k">def</span> <span class="nf">_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flatten</span><span class="p">(</span><span class="n">x</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flatten</span><span class="p">(</span><span class="n">x</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[:</span><span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flatten</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span></div>
+</pre></div>
+
+             </article>
+             
+            </div>
+            <footer>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+         <script src="../../../_static/jquery.js"></script>
+         <script src="../../../_static/underscore.js"></script>
+         <script src="../../../_static/doctools.js"></script>
+         <script src="../../../_static/language_data.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script>
+         <script src="../../../_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Stay Connected</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../../../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/features">Features</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../../../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

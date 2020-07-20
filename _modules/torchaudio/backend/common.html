@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.datasets.speechcommands &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.backend.common &mdash; Torchaudio master documentation</title>
   
 
   
@@ -238,7 +238,7 @@
         
           <li><a href="../../torchaudio.html">torchaudio</a> &gt;</li>
         
-      <li>torchaudio.datasets.speechcommands</li>
+      <li>torchaudio.backend.common</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -266,89 +266,176 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <h1>Source code for torchaudio.datasets.speechcommands</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
-
-<span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">download_url</span><span class="p">,</span>
-    <span class="n">extract_archive</span><span class="p">,</span>
-    <span class="n">walk_files</span>
-<span class="p">)</span>
-
-<span class="n">FOLDER_IN_ARCHIVE</span> <span class="o">=</span> <span class="s2">&quot;SpeechCommands&quot;</span>
-<span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;speech_commands_v0.02&quot;</span>
-<span class="n">HASH_DIVIDER</span> <span class="o">=</span> <span class="s2">&quot;_nohash_&quot;</span>
-<span class="n">EXCEPT_FOLDER</span> <span class="o">=</span> <span class="s2">&quot;_background_noise_&quot;</span>
-<span class="n">_CHECKSUMS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz&quot;</span><span class="p">:</span>
-    <span class="s2">&quot;3cd23799cb2bbdec517f1cc028f8d43c&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz&quot;</span><span class="p">:</span>
-    <span class="s2">&quot;6b74f3901214cb2c2934e98196829835&quot;</span><span class="p">,</span>
-<span class="p">}</span>
+  <h1>Source code for torchaudio.backend.common</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
 
-<span class="k">def</span> <span class="nf">load_speechcommands_item</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-    <span class="n">relpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-    <span class="n">label</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">relpath</span><span class="p">)</span>
-    <span class="n">speaker</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<div class="viewcode-block" id="SignalInfo"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.common.SignalInfo">[docs]</a><span class="k">class</span> <span class="nc">SignalInfo</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Data class returned ``info`` functions.</span>
 
-    <span class="n">speaker_id</span><span class="p">,</span> <span class="n">utterance_number</span> <span class="o">=</span> <span class="n">speaker</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">HASH_DIVIDER</span><span class="p">)</span>
-    <span class="n">utterance_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">utterance_number</span><span class="p">)</span>
+<span class="sd">    Used by :ref:`sox backend&lt;sox_backend&gt;` and :ref:`soundfile backend&lt;soundfile_backend&gt;`</span>
 
-    <span class="c1"># Load audio</span>
-    <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">utterance_number</span>
+<span class="sd">    See https://fossies.org/dox/sox-14.4.2/structsox__signalinfo__t.html</span>
 
-
-<div class="viewcode-block" id="SPEECHCOMMANDS"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.SPEECHCOMMANDS">[docs]</a><span class="k">class</span> <span class="nc">SPEECHCOMMANDS</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create a Dataset for Speech Commands. Each item is a tuple of the form:</span>
-<span class="sd">    waveform, sample_rate, label, speaker_id, utterance_number</span>
+<span class="sd">    :ivar Optional[int] channels: The number of channels</span>
+<span class="sd">    :ivar Optional[float] rate: Sampleing rate</span>
+<span class="sd">    :ivar Optional[int] precision: Bit depth</span>
+<span class="sd">    :ivar Optional[int] length: For :ref:`sox backend&lt;sox_backend&gt;`, the number of samples.</span>
+<span class="sd">        (frames * channels). For :ref:`soundfile backend&lt;soundfile_backend&gt;`, the number of frames.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                 <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">URL</span><span class="p">,</span>
-                 <span class="n">folder_in_archive</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">FOLDER_IN_ARCHIVE</span><span class="p">,</span>
-                 <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">url</span> <span class="ow">in</span> <span class="p">[</span>
-            <span class="s2">&quot;speech_commands_v0.01&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;speech_commands_v0.02&quot;</span><span class="p">,</span>
-        <span class="p">]:</span>
-            <span class="n">base_url</span> <span class="o">=</span> <span class="s2">&quot;https://storage.googleapis.com/download.tensorflow.org/data/&quot;</span>
-            <span class="n">ext_archive</span> <span class="o">=</span> <span class="s2">&quot;.tar.gz&quot;</span>
+                 <span class="n">channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="n">channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="o">=</span> <span class="n">precision</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span></div>
 
-            <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">url</span> <span class="o">+</span> <span class="n">ext_archive</span><span class="p">)</span>
 
-        <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
+<div class="viewcode-block" id="EncodingInfo"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.common.EncodingInfo">[docs]</a><span class="k">class</span> <span class="nc">EncodingInfo</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Data class returned ``info`` functions.</span>
 
-        <span class="n">basename</span> <span class="o">=</span> <span class="n">basename</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">folder_in_archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_in_archive</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
+<span class="sd">    Used by :ref:`sox backend&lt;sox_backend&gt;` and :ref:`soundfile backend&lt;soundfile_backend&gt;`</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">)</span>
+<span class="sd">    See https://fossies.org/dox/sox-14.4.2/structsox__encodinginfo__t.html</span>
 
-        <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">archive</span><span class="p">):</span>
-                    <span class="n">checksum</span> <span class="o">=</span> <span class="n">_CHECKSUMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                    <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;md5&quot;</span><span class="p">)</span>
-                <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+<span class="sd">    :ivar Optional[int] encoding: sox_encoding_t</span>
+<span class="sd">    :ivar Optional[int] bits_per_sample: bit depth</span>
+<span class="sd">    :ivar Optional[float] compression: Compression option</span>
+<span class="sd">    :ivar Any reverse_bytes:</span>
+<span class="sd">    :ivar Any reverse_nibbles:</span>
+<span class="sd">    :ivar Any reverse_bits:</span>
+<span class="sd">    :ivar Optional[bool] opposite_endian:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">encoding</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">bits_per_sample</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">compression</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">reverse_bytes</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">reverse_nibbles</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">reverse_bits</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">opposite_endian</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">encoding</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bits_per_sample</span> <span class="o">=</span> <span class="n">bits_per_sample</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">=</span> <span class="n">compression</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reverse_bytes</span> <span class="o">=</span> <span class="n">reverse_bytes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reverse_nibbles</span> <span class="o">=</span> <span class="n">reverse_nibbles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reverse_bits</span> <span class="o">=</span> <span class="n">reverse_bits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opposite_endian</span> <span class="o">=</span> <span class="n">opposite_endian</span></div>
 
-        <span class="n">walker</span> <span class="o">=</span> <span class="n">walk_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.wav&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">walker</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="n">HASH_DIVIDER</span> <span class="ow">in</span> <span class="n">w</span> <span class="ow">and</span> <span class="n">EXCEPT_FOLDER</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">w</span><span class="p">,</span> <span class="n">walker</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">walker</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-        <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">load_speechcommands_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+<span class="n">_LOAD_DOCSTRING</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;Loads an audio file from disk into a tensor</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">)</span></div>
+<span class="s2">Args:</span>
+<span class="s2">    filepath: Path to audio file</span>
+
+<span class="s2">    out: An optional output tensor to use instead of creating one. (Default: ``None``)</span>
+
+<span class="s2">    normalization: Optional normalization.</span>
+<span class="s2">        If boolean `True`, then output is divided by `1 &lt;&lt; 31`.</span>
+<span class="s2">        Assuming the input is signed 32-bit audio, this normalizes to `[-1, 1]`.</span>
+<span class="s2">        If `float`, then output is divided by that number.</span>
+<span class="s2">        If `Callable`, then the output is passed as a paramete to the given function,</span>
+<span class="s2">        then the output is divided by the result. (Default: ``True``)</span>
+
+<span class="s2">    channels_first: Set channels first or length first in result. (Default: ``True``)</span>
+
+<span class="s2">    num_frames: Number of frames to load.  0 to load everything after the offset.</span>
+<span class="s2">        (Default: ``0``)</span>
+
+<span class="s2">    offset: Number of frames from the start of the file to begin data loading.</span>
+<span class="s2">        (Default: ``0``)</span>
+
+<span class="s2">    signalinfo: A sox_signalinfo_t type, which could be helpful if the</span>
+<span class="s2">        audio type cannot be automatically determined. (Default: ``None``)</span>
+
+<span class="s2">    encodinginfo: A sox_encodinginfo_t type, which could be set if the</span>
+<span class="s2">        audio type cannot be automatically determined. (Default: ``None``)</span>
+
+<span class="s2">    filetype: A filetype or extension to be set if sox cannot determine it</span>
+<span class="s2">        automatically. (Default: ``None``)</span>
+
+<span class="s2">Returns:</span>
+<span class="s2">    (Tensor, int): An output tensor of size `[C x L]` or `[L x C]` where</span>
+<span class="s2">        L is the number of audio frames and</span>
+<span class="s2">        C is the number of channels.</span>
+<span class="s2">        An integer which is the sample rate of the audio (as listed in the metadata of the file)</span>
+
+<span class="s2">Example</span>
+<span class="s2">    &gt;&gt;&gt; data, sample_rate = torchaudio.load(&#39;foo.mp3&#39;)</span>
+<span class="s2">    &gt;&gt;&gt; print(data.size())</span>
+<span class="s2">    torch.Size([2, 278756])</span>
+<span class="s2">    &gt;&gt;&gt; print(sample_rate)</span>
+<span class="s2">    44100</span>
+<span class="s2">    &gt;&gt;&gt; data_vol_normalized, _ = torchaudio.load(&#39;foo.mp3&#39;, normalization=lambda x: torch.abs(x).max())</span>
+<span class="s2">    &gt;&gt;&gt; print(data_vol_normalized.abs().max())</span>
+<span class="s2">    1.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+
+<span class="n">_LOAD_WAV_DOCSTRING</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot; Loads a wave file.</span>
+
+<span class="s2">It assumes that the wav file uses 16 bit per sample that needs normalization by</span>
+<span class="s2">shifting the input right by 16 bits.</span>
+
+<span class="s2">Args:</span>
+<span class="s2">    filepath: Path to audio file</span>
+
+<span class="s2">Returns:</span>
+<span class="s2">    (Tensor, int): An output tensor of size `[C x L]` or `[L x C]` where L is the number</span>
+<span class="s2">        of audio frames and C is the number of channels. An integer which is the sample rate of the</span>
+<span class="s2">        audio (as listed in the metadata of the file)</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">_SAVE_DOCSTRING</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;Saves a Tensor on file as an audio file</span>
+
+<span class="s2">Args:</span>
+<span class="s2">    filepath: Path to audio file</span>
+<span class="s2">    src: An input 2D tensor of shape `[C x L]` or `[L x C]` where L is</span>
+<span class="s2">        the number of audio frames, C is the number of channels</span>
+<span class="s2">    sample_rate: An integer which is the sample rate of the</span>
+<span class="s2">        audio (as listed in the metadata of the file)</span>
+<span class="s2">    precision Bit precision (Default: ``16``)</span>
+<span class="s2">    channels_first (bool, optional): Set channels first or length first in result. (</span>
+<span class="s2">        Default: ``True``)</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+
+<span class="n">_INFO_DOCSTRING</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;Gets metadata from an audio file without loading the signal.</span>
+
+<span class="s2">Args:</span>
+<span class="s2">    filepath: Path to audio file</span>
+
+<span class="s2">Returns:</span>
+<span class="s2">    (sox_signalinfo_t, sox_encodinginfo_t): A si (sox_signalinfo_t) signal</span>
+<span class="s2">        info as a python object. An ei (sox_encodinginfo_t) encoding info</span>
+
+<span class="s2">Example</span>
+<span class="s2">    &gt;&gt;&gt; si, ei = torchaudio.info(&#39;foo.wav&#39;)</span>
+<span class="s2">    &gt;&gt;&gt; rate, channels, encoding = si.rate, si.channels, ei.encoding</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_impl_load</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;__doc__&#39;</span><span class="p">,</span> <span class="n">_LOAD_DOCSTRING</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">func</span>
+
+
+<span class="k">def</span> <span class="nf">_impl_load_wav</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;__doc__&#39;</span><span class="p">,</span> <span class="n">_LOAD_WAV_DOCSTRING</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">func</span>
+
+
+<span class="k">def</span> <span class="nf">_impl_save</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;__doc__&#39;</span><span class="p">,</span> <span class="n">_SAVE_DOCSTRING</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">func</span>
+
+
+<span class="k">def</span> <span class="nf">_impl_info</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;__doc__&#39;</span><span class="p">,</span> <span class="n">_INFO_DOCSTRING</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">func</span>
 </pre></div>
 
              </article>
