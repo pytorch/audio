@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import torch
 from torch import Tensor
@@ -172,7 +172,7 @@ class _UpsampleNetwork(nn.Module):
             up_layers.append(conv)
         self.upsample_layers = nn.Sequential(*up_layers)
 
-    def forward(self, specgram: Tensor) -> Tensor:
+    def forward(self, specgram: Tensor) -> Tuple[Tensor, Tensor]:
         r"""Pass the input through the _UpsampleNetwork layer.
 
         Args:
