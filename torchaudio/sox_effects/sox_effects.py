@@ -142,16 +142,16 @@ def apply_effects_tensor(
         ...     ["lowpass", "-1", "300"],  # apply single-pole lowpass filter
         ...     ["rate", "8000"],  # change sample rate to 8000
         ... ]
-        >>> trans = SoxEffectTensorTransform(effects, input_sample_rate)
+        >>> transform = SoxEffectTensorTransform(effects, input_sample_rate)
         >>>
         >>> # Dump it to file and load
         >>> path = 'sox_effect.zip'
         >>> torch.jit.script(trans).save(path)
-        >>> trans = torch.jit.load(path)
+        >>> transform = torch.jit.load(path)
         >>>
         >>>> # Run transform
         >>> waveform, input_sample_rate = torchaudio.load("input.wav")
-        >>> waveform, sample_rate = trans(waveform, input_sample_rate)
+        >>> waveform, sample_rate = transform(waveform, input_sample_rate)
         >>> assert sample_rate == 8000
     """
     in_signal = torch.classes.torchaudio.TensorSignal(tensor, sample_rate, channels_first)

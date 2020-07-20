@@ -20,7 +20,7 @@ There are currently three implementations available.
 
 ``sox`` backend is the original backend which is built on ``libsox``. This module is currently default but is known to have number of issues, such as wrong handling of WAV files other than 16-bit signed integer. Users are encouraged to use ``sox_io`` backend. This backend requires C++ extension module and is not available on Windows system.
 
-``sox_io`` backend is the new backend which is built on ``libsox`` and bound to Python with ``Torchscript``. This module is thoroughly tested and addresses all the known issues ``sox`` backend has. Function calls to this backend can be Torchscriptable. This backend requires C++ extension module and is not available on Windows system.
+``sox_io`` backend is the new backend which is built on ``libsox`` and bound to Python with ``Torchscript``. This module addresses all the known issues ``sox`` backend has. Function calls to this backend can be Torchscriptable. This backend requires C++ extension module and is not available on Windows system.
 
 ``soundfile`` backend is built on ``PySoundFile``. You need to install ``PySoundFile`` separately.
 
