@@ -123,13 +123,13 @@ def parse_args():
         "--n-freq", default=80, type=int, help="the number of spectrogram bins to use",
     )
     parser.add_argument(
-        "--n-hidden",
+        "--n-hidden-melresnet",
         default=128,
         type=int,
-        help="the number of hidden dimensions of resblock",
+        help="the number of hidden dimensions of resblock in melresnet",
     )
     parser.add_argument(
-        "--n-output", default=128, type=int, help="the output dimension of melresnet",
+        "--n-output-melresnet", default=128, type=int, help="the output dimension of melresnet",
     )
     parser.add_argument(
         "--n-fft", default=2048, type=int, help="the number of Fourier bins",
@@ -306,8 +306,8 @@ def main(args):
         n_fc=args.n_fc,
         kernel_size=args.kernel_size,
         n_freq=args.n_freq,
-        n_hidden=args.n_hidden,
-        n_output=args.n_output,
+        n_hidden=args.n_hidden_melresnet,
+        n_output=args.n_output_melresnet,
     )
 
     if args.jit:

@@ -9,7 +9,7 @@ python main.py \
     --batch-size 256 \
     --learning-rate 1e-4 \
     --n-freq 80 \
-    --mode 'waveform' \
+    --loss 'crossentropy' \
     --n-bits 8 \
 ```
 
