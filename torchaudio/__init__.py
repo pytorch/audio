@@ -34,10 +34,10 @@ except ImportError:
 @_mod_utils.deprecated(
     "Please remove the function call to initialize_sox. "
     "Resource initialization is now automatically handled.")
-def initialize_sox() -> int:
+def initialize_sox():
     """Initialize sox effects.
 
-    This function is deprecated. See ``torchaudio.sox_effects.init_sox_effects``
+    This function is deprecated. See :py:func:`torchaudio.sox_effects.init_sox_effects`
     """
     _init_sox_effects()
 
@@ -50,6 +50,6 @@ def initialize_sox() -> int:
 def shutdown_sox():
     """Shutdown sox effects.
 
-    This function is deprecated. See ``torchaudio.sox_effects.shutdown_sox_effects``
+    This function is deprecated. See :py:func:`torchaudio.sox_effects.shutdown_sox_effects`
     """
     _shutdown_sox_effects()

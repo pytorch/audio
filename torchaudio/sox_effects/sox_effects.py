@@ -13,31 +13,29 @@ if _mod_utils.is_module_available('torchaudio._torchaudio'):
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
-def init_sox_effects() -> None:
-    """Initialize resources required to use ``SoxEffectsChain``
-
-    You do not need to call this function manually. It is called automatically.
-
-    Once initialized, you do not need to call this function again across the multiple call of
-    ``SoxEffectsChain.sox_build_flow_effects``, though it is safe to do so as long as
-    ``shutdown_sox_effects`` is not called yet.
-    Once ``shutdown_sox_effects`` is called, you can no longer use SoX effects and
-    initializing again will result in error.
+def init_sox_effects():
+    """Initialize resources required to use sox effects.
 
     Note:
-        This function is not required for simple loading.
+        You do not need to call this function manually. It is called automatically.
+
+    Once initialized, you do not need to call this function again across the multiple uses of
+    sox effects though it is safe to do so as long as :func:`shutdown_sox_effects` is not called yet.
+    Once :func:`shutdown_sox_effects` is called, you can no longer use SoX effects and initializing
+    again will result in error.
     """
     torch.ops.torchaudio.sox_effects_initialize_sox_effects()
 
 
 @_mod_utils.requires_module("torchaudio._torchaudio")
-def shutdown_sox_effects() -> None:
-    """Clean up resources required to use ``SoxEffectsChain``
+def shutdown_sox_effects():
+    """Clean up resources required to use sox effects.
 
-    You do not need to call this function manually. It is called automatically.
+    Note:
+        You do not need to call this function manually. It is called automatically.
 
     It is safe to call this function multiple times.
-    Once ``shutdown_sox_effects`` is called, you can no longer use SoX effects and
+    Once :py:func:`shutdown_sox_effects` is called, you can no longer use SoX effects and
     initializing again will result in error.
     """
     torch.ops.torchaudio.sox_effects_shutdown_sox_effects()
@@ -47,10 +45,12 @@ def shutdown_sox_effects() -> None:
 def effect_names() -> List[str]:
     """Gets list of valid sox effect names
 
-    Returns: list[str]
+    Returns:
+        List[str]: list of available effect names.
 
     Example
-        >>> EFFECT_NAMES = torchaudio.sox_effects.effect_names()
+        >>> torchaudio.sox_effects.effect_names()
+        ['allpass', 'band', 'bandpass', ... ]
     """
     return torch.ops.torchaudio.sox_effects_list_effects()
 
@@ -70,45 +70,51 @@ class SoxEffectsChain(object):
     r"""SoX effects chain class.
 
     Args:
-        normalization (bool, number, or callable, optional): If boolean `True`, then output is divided by `1 << 31`
-            (assumes signed 32-bit audio), and normalizes to `[-1, 1]`. If `number`, then output is divided by that
-            number. If `callable`, then the output is passed as a parameter to the given function, then the
-            output is divided by the result. (Default: ``True``)
-        channels_first (bool, optional): Set channels first or length first in result.  (Default: ``True``)
-        out_siginfo (sox_signalinfo_t, optional): a sox_signalinfo_t type, which could be helpful if the
-            audio type cannot be automatically determined. (Default: ``None``)
-        out_encinfo (sox_encodinginfo_t, optional): a sox_encodinginfo_t type, which could be set if the
-            audio type cannot be automatically determined. (Default: ``None``)
-        filetype (str, optional): a filetype or extension to be set if sox cannot determine it
-            automatically. . (Default: ``'raw'``)
+        normalization (bool, number, or callable, optional):
+            If boolean ``True``, then output is divided by ``1 << 31``
+            (assumes signed 32-bit audio), and normalizes to ``[-1, 1]``.
+            If ``number``, then output is divided by that number.
+            If ``callable``, then the output is passed as a parameter to the given function, then
+            the output is divided by the result. (Default: ``True``)
+        channels_first (bool, optional):
+            Set channels first or length first in result.  (Default: ``True``)
+        out_siginfo (sox_signalinfo_t, optional):
+            a sox_signalinfo_t type, which could be helpful if the audio type cannot be
+            automatically determined. (Default: ``None``)
+        out_encinfo (sox_encodinginfo_t, optional):
+            a sox_encodinginfo_t type, which could be set if the audio type cannot be
+            automatically determined. (Default: ``None``)
+        filetype (str, optional):
+            a filetype or extension to be set if sox cannot determine it automatically.
+            (Default: ``'raw'``)
 
     Returns:
-        Tuple[Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number
+        Tuple[Tensor, int]:
+        An output Tensor of size ``[C x L]`` or ``[L x C]`` where L is the number
         of audio frames and C is the number of channels. An integer which is the sample rate of the
         audio (as listed in the metadata of the file)
 
     Example
         >>> class MyDataset(Dataset):
-        >>>     def __init__(self, audiodir_path):
-        >>>         self.data = [os.path.join(audiodir_path, fn) for fn in os.listdir(audiodir_path)]
-        >>>         self.E = torchaudio.sox_effects.SoxEffectsChain()
-        >>>         self.E.append_effect_to_chain("rate", [16000])  # resample to 16000hz
-        >>>         self.E.append_effect_to_chain("channels", ["1"])  # mono signal
-        >>>     def __getitem__(self, index):
-        >>>         fn = self.data[index]
-        >>>         self.E.set_input_file(fn)
-        >>>         x, sr = self.E.sox_build_flow_effects()
-        >>>         return x, sr
-        >>>
-        >>>     def __len__(self):
-        >>>         return len(self.data)
-        >>>
-        >>> torchaudio.initialize_sox()
+        ...     def __init__(self, audiodir_path):
+        ...         self.data = [
+        ...             os.path.join(audiodir_path, fn)
+        ...             for fn in os.listdir(audiodir_path)]
+        ...         self.E = torchaudio.sox_effects.SoxEffectsChain()
+        ...         self.E.append_effect_to_chain("rate", [16000])  # resample to 16000hz
+        ...         self.E.append_effect_to_chain("channels", ["1"])  # mono signal
+        ...     def __getitem__(self, index):
+        ...         fn = self.data[index]
+        ...         self.E.set_input_file(fn)
+        ...         x, sr = self.E.sox_build_flow_effects()
+        ...         return x, sr
+        ...
+        ...     def __len__(self):
+        ...         return len(self.data)
+        ...
         >>> ds = MyDataset(path_to_audio_files)
         >>> for sig, sr in ds:
-        >>>   [do something here]
-        >>> torchaudio.shutdown_sox()
-
+        ...    pass
     """
 
     EFFECTS_UNIMPLEMENTED = {"spectrogram", "splice", "noiseprof", "fir"}
@@ -165,9 +171,9 @@ class SoxEffectsChain(object):
             out (Tensor, optional): Where the output will be written to. (Default: ``None``)
 
         Returns:
-            Tuple[Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where L is the number
-            of audio frames and C is the number of channels. An integer which is the sample rate of the
-            audio (as listed in the metadata of the file)
+            Tuple[Tensor, int]: An output Tensor of size `[C x L]` or `[L x C]` where
+            L is the number of audio frames and C is the number of channels.
+            An integer which is the sample rate of the audio (as listed in the metadata of the file)
         """
         # initialize output tensor
         if out is not None:

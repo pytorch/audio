@@ -1,5 +1,3 @@
-from typing import Optional
-
 from torch import Tensor
 from torch import nn
 
@@ -7,8 +5,9 @@ __all__ = ["Wav2Letter"]
 
 
 class Wav2Letter(nn.Module):
-    r"""Wav2Letter model architecture from the `"Wav2Letter: an End-to-End ConvNet-based Speech Recognition System"
-     <https://arxiv.org/abs/1609.03193>`_ paper.
+    r"""Wav2Letter model architecture from the `Wav2Letter an End-to-End ConvNet-based Speech Recognition System`_.
+
+    .. _Wav2Letter an End-to-End ConvNet-based Speech Recognition System: https://arxiv.org/abs/1609.03193
 
      :math:`\text{padding} = \frac{\text{ceil}(\text{kernel} - \text{stride})}{2}`
 
@@ -63,7 +62,7 @@ class Wav2Letter(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         r"""
         Args:
-            x (Tensor): Tensor of dimension (batch_size, num_features, input_length).
+            x (torch.Tensor): Tensor of dimension (batch_size, num_features, input_length).
 
         Returns:
             Tensor: Predictor tensor of dimension (batch_size, number_of_classes, input_length).
