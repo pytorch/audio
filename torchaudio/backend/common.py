@@ -2,6 +2,18 @@ from typing import Any, Optional
 
 
 class SignalInfo:
+    """Data class returned ``info`` functions.
+
+    Used by :ref:`sox backend<sox_backend>` and :ref:`soundfile backend<soundfile_backend>`
+
+    See https://fossies.org/dox/sox-14.4.2/structsox__signalinfo__t.html
+
+    :ivar Optional[int] channels: The number of channels
+    :ivar Optional[float] rate: Sampleing rate
+    :ivar Optional[int] precision: Bit depth
+    :ivar Optional[int] length: For :ref:`sox backend<sox_backend>`, the number of samples.
+        (frames * channels). For :ref:`soundfile backend<soundfile_backend>`, the number of frames.
+    """
     def __init__(self,
                  channels: Optional[int] = None,
                  rate: Optional[float] = None,
@@ -14,6 +26,20 @@ class SignalInfo:
 
 
 class EncodingInfo:
+    """Data class returned ``info`` functions.
+
+    Used by :ref:`sox backend<sox_backend>` and :ref:`soundfile backend<soundfile_backend>`
+
+    See https://fossies.org/dox/sox-14.4.2/structsox__encodinginfo__t.html
+
+    :ivar Optional[int] encoding: sox_encoding_t
+    :ivar Optional[int] bits_per_sample: bit depth
+    :ivar Optional[float] compression: Compression option
+    :ivar Any reverse_bytes:
+    :ivar Any reverse_nibbles:
+    :ivar Any reverse_bits:
+    :ivar Optional[bool] opposite_endian:
+    """
     def __init__(self,
                  encoding: Any = None,
                  bits_per_sample: Optional[int] = None,
