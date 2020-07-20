@@ -45,14 +45,6 @@ void write_audio_file(
 std::tuple<sox_signalinfo_t, sox_encodinginfo_t> get_info(
     const std::string& file_name);
 
-// get names of all sox effects
-std::vector<std::string> get_effect_names();
-
-// Initialize and Shutdown SoX effects chain.  These functions should only be
-// run once.
-int initialize_sox();
-int shutdown_sox();
-
 // Struct for build_flow_effects function
 struct SoxEffect {
   SoxEffect() : ename(""), eopts({""})  { }
