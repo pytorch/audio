@@ -5,7 +5,7 @@ import unittest
 import torch
 import torchaudio
 
-from . import common_utils
+from .. import common_utils
 
 
 @common_utils.skipIfNoSoxBackend
@@ -222,51 +222,3 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         E.append_effect_to_chain("compand", ["0.3", "1", "6:-70,-60,-20", "-5", "-90", "0.2"])
         with self.assertRaises(RuntimeError):
             E.sox_build_flow_effects()
-
-    def test_fade(self):
-        x_orig, _ = torchaudio.load(self.test_filepath)
-        fade_in_len = 44100
-        fade_out_len = 44100
-
-        for fade_shape_sox, fade_shape_torchaudio in (("q", "quarter_sine"), ("h", "half_sine"), ("t", "linear")):
-            E = torchaudio.sox_effects.SoxEffectsChain()
-            E.set_input_file(self.test_filepath)
-            E.append_effect_to_chain("fade", [fade_shape_sox, 1, "0", 1])
-            x, sr = E.sox_build_flow_effects()
-
-            fade = torchaudio.transforms.Fade(fade_in_len, fade_out_len, fade_shape_torchaudio)
-
-            # check if effect worked
-            self.assertTrue(x.allclose(fade(x_orig), rtol=1e-4, atol=1e-4))
-
-    def test_vol(self):
-        x_orig, _ = torchaudio.load(self.test_filepath)
-
-        for gain, gain_type in ((1.1, "amplitude"), (2, "db"), (2, "power")):
-            E = torchaudio.sox_effects.SoxEffectsChain()
-            E.set_input_file(self.test_filepath)
-            E.append_effect_to_chain("vol", [gain, gain_type])
-            x, sr = E.sox_build_flow_effects()
-
-            vol = torchaudio.transforms.Vol(gain, gain_type)
-            z = vol(x_orig)
-            # check if effect worked
-            self.assertTrue(x.allclose(z, rtol=1e-4, atol=1e-4))
-
-    def test_vad(self):
-        sample_files = [
-            common_utils.get_asset_path("vad-go-stereo-44100.wav"),
-            common_utils.get_asset_path("vad-go-mono-32000.wav")
-        ]
-
-        for sample_file in sample_files:
-            E = torchaudio.sox_effects.SoxEffectsChain()
-            E.set_input_file(sample_file)
-            E.append_effect_to_chain("vad")
-            x, _ = E.sox_build_flow_effects()
-
-            x_orig, sample_rate = torchaudio.load(sample_file)
-            vad = torchaudio.transforms.Vad(sample_rate)
-
-            y = vad(x_orig)
-            self.assertTrue(x.allclose(y, rtol=1e-4, atol=1e-4))
