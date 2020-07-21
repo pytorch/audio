@@ -1646,11 +1646,11 @@ def compute_deltas(
     r"""Compute delta coefficients of a tensor, usually a spectrogram:
 
     .. math::
-        d_t = \frac{\sum_{n=1}^{\text{N}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{N} n^2}
+       d_t = \frac{\sum_{n=1}^{\text{N}} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{\text{N}} n^2}
 
     where :math:`d_t` is the deltas at time :math:`t`,
     :math:`c_t` is the spectrogram coeffcients at time :math:`t`,
-    :math:`N` is (`win_length`-1)//2.
+    :math:`N` is ``(win_length-1)//2``.
 
     Args:
         specgram (Tensor): Tensor of audio of dimension (..., freq, time)

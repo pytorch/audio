@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import torch
 from torch import Tensor
@@ -13,7 +13,7 @@ class _ResBlock(nn.Module):
     The paper link is https://arxiv.org/pdf/1512.03385.pdf.
 
     Args:
-        n_freq: the number of bins in a spectrogram (default=128)
+        n_freq: the number of bins in a spectrogram. (Default: ``128``)
 
     Examples
         >>> resblock = _ResBlock()
@@ -48,11 +48,11 @@ class _MelResNet(nn.Module):
     r"""MelResNet layer uses a stack of ResBlocks on spectrogram.
 
     Args:
-        n_res_block: the number of ResBlock in stack (default=10)
-        n_freq: the number of bins in a spectrogram (default=128)
-        n_hidden: the number of hidden dimensions of resblock (default=128)
-        n_output: the number of output dimensions of melresnet (default=128)
-        kernel_size: the number of kernel size in the first Conv1d layer (default=5)
+        n_res_block: the number of ResBlock in stack. (Default: ``10``)
+        n_freq: the number of bins in a spectrogram. (Default: ``128``)
+        n_hidden: the number of hidden dimensions of resblock. (Default: ``128``)
+        n_output: the number of output dimensions of melresnet. (Default: ``128``)
+        kernel_size: the number of kernel size in the first Conv1d layer. (Default: ``5``)
 
     Examples
         >>> melresnet = _MelResNet()
@@ -129,12 +129,12 @@ class _UpsampleNetwork(nn.Module):
     r"""Upscale the dimensions of a spectrogram.
 
     Args:
-        upsample_scales: the list of upsample scales
-        n_res_block: the number of ResBlock in stack (default=10)
-        n_freq: the number of bins in a spectrogram (default=128)
-        n_hidden: the number of hidden dimensions of resblock (default=128)
-        n_output: the number of output dimensions of melresnet (default=128)
-        kernel_size: the number of kernel size in the first Conv1d layer (default=5)
+        upsample_scales: the list of upsample scales.
+        n_res_block: the number of ResBlock in stack. (Default: ``10``)
+        n_freq: the number of bins in a spectrogram. (Default: ``128``)
+        n_hidden: the number of hidden dimensions of resblock. (Default: ``128``)
+        n_output: the number of output dimensions of melresnet. (Default: ``128``)
+        kernel_size: the number of kernel size in the first Conv1d layer. (Default: ``5``)
 
     Examples
         >>> upsamplenetwork = _UpsampleNetwork(upsample_scales=[4, 4, 16])
@@ -172,7 +172,7 @@ class _UpsampleNetwork(nn.Module):
             up_layers.append(conv)
         self.upsample_layers = nn.Sequential(*up_layers)
 
-    def forward(self, specgram: Tensor) -> Tensor:
+    def forward(self, specgram: Tensor) -> Tuple[Tensor, Tensor]:
         r"""Pass the input through the _UpsampleNetwork layer.
 
         Args:
@@ -204,16 +204,16 @@ class _WaveRNN(nn.Module):
     `upsample_scales` must equal `hop_length`.
 
     Args:
-        upsample_scales: the list of upsample scales
-        n_classes: the number of output classes
-        hop_length: the number of samples between the starts of consecutive frames
-        n_res_block: the number of ResBlock in stack (default=10)
-        n_rnn: the dimension of RNN layer (default=512)
-        n_fc: the dimension of fully connected layer (default=512)
-        kernel_size: the number of kernel size in the first Conv1d layer (default=5)
-        n_freq: the number of bins in a spectrogram (default=128)
-        n_hidden: the number of hidden dimensions of resblock (default=128)
-        n_output: the number of output dimensions of melresnet (default=128)
+        upsample_scales: the list of upsample scales.
+        n_classes: the number of output classes.
+        hop_length: the number of samples between the starts of consecutive frames.
+        n_res_block: the number of ResBlock in stack. (Default: ``10``)
+        n_rnn: the dimension of RNN layer. (Default: ``512``)
+        n_fc: the dimension of fully connected layer. (Default: ``512``)
+        kernel_size: the number of kernel size in the first Conv1d layer. (Default: ``5``)
+        n_freq: the number of bins in a spectrogram. (Default: ``128``)
+        n_hidden: the number of hidden dimensions of resblock. (Default: ``128``)
+        n_output: the number of output dimensions of melresnet. (Default: ``128``)
 
     Example
         >>> wavernn = _waveRNN(upsample_scales=[5,5,8], n_classes=512, hop_length=200)

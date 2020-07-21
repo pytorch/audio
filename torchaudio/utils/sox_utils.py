@@ -55,8 +55,8 @@ def set_use_threads(use_threads: bool):
     """Set multithread option for sox effect chain
 
     Args:
-        use_threads (bool): When True, enables libsox's parallel effects channels processing.
-            To use mutlithread, the underlying libsox has to be compiled with OpenMP support.
+        use_threads (bool): When ``True``, enables ``libsox``'s parallel effects channels processing.
+            To use mutlithread, the underlying ``libsox`` has to be compiled with OpenMP support.
 
     See Also:
         http://sox.sourceforge.net/sox.html
@@ -69,7 +69,7 @@ def list_effects() -> Dict[str, str]:
     """List the available sox effect names
 
     Returns:
-        Dict[str, str]: Mapping from "effect name" to "usage"
+        Dict[str, str]: Mapping from ``effect name`` to ``usage``
     """
     return dict(torch.ops.torchaudio.sox_utils_list_effects())
 

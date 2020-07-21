@@ -1,5 +1,5 @@
 torchaudio
-===========
+==========
 
 The :mod:`torchaudio` package consists of I/O, popular datasets and common audio transformations.
 
@@ -7,13 +7,13 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    :maxdepth: 2
    :caption: Package Reference
 
-   sox_effects
+   torchaudio
+   backend
+   functional
+   transforms
    datasets
+   models
+   sox_effects
    compliance.kaldi
    kaldi_io
-   transforms
-   functional
    utils
-
-.. automodule:: torchaudio
-   :members:
