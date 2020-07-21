@@ -171,7 +171,3 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
             assert original_text == self.original_text
             assert normalized_text == self.normalized_text
             assert utterance_id == f'{"_".join(str(u) for u in expected_ids[-4:])}'
-
-
-if __name__ == "__main__":
-    unittest.main()

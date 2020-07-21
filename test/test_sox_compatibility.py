@@ -299,7 +299,3 @@ class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase):
         data, path = self.get_whitenoise()
         result = F.lfilter(data, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2]))
         self.assert_sox_effect(result, path, ['biquad', b0, b1, b2, a0, a1, a2])
-
-
-if __name__ == "__main__":
-    unittest.main()

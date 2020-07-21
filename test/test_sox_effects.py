@@ -270,7 +270,3 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
 
             y = vad(x_orig)
             self.assertTrue(x.allclose(y, rtol=1e-4, atol=1e-4))
-
-
-if __name__ == '__main__':
-    unittest.main()
