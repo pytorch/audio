@@ -219,7 +219,3 @@ class Tester(common_utils.TorchaudioTestCase):
         computed = transform(specgram)
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
         self.assertEqual(computed, expected, atol=1e-6, rtol=1e-8)
-
-
-if __name__ == '__main__':
-    unittest.main()
