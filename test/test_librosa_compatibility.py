@@ -270,16 +270,13 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         }
         self.assert_compatibilities(**kwargs)
 
-    @unittest.skipIf(not common_utils.BACKENDS_MP3, 'no backend to read mp3')
     def test_MelScale(self):
         """MelScale transform is comparable to that of librosa"""
         n_fft = 2048
         n_mels = 256
         hop_length = n_fft // 4
-
-        # Prepare spectrogram input. We use torchaudio to compute one.
-        common_utils.set_audio_backend('default')
-        sound, sample_rate = _load_audio_asset('whitenoise_1min.mp3')
+        sample_rate = 44100
+        sound = common_utils.get_whitenoise(sample_rate=sample_rate, duration=60)
         sound = sound.mean(dim=0, keepdim=True)
         spec_ta = F.spectrogram(
             sound, pad=0, window=torch.hann_window(n_fft), n_fft=n_fft,
