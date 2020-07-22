@@ -250,11 +250,11 @@ class WaveRNN(nn.Module):
             raise ValueError(f"Expected: total_scale == hop_length, but found {total_scale} != {hop_length}")
 
         self.upsample = UpsampleNetwork(upsample_scales,
-                                         n_res_block,
-                                         n_freq,
-                                         n_hidden,
-                                         n_output,
-                                         kernel_size)
+                                        n_res_block,
+                                        n_freq,
+                                        n_hidden,
+                                        n_output,
+                                        kernel_size)
         self.fc = nn.Linear(n_freq + self.n_aux + 1, n_rnn)
 
         self.rnn1 = nn.GRU(n_rnn, n_rnn, batch_first=True)
