@@ -9,8 +9,10 @@ from ..common_utils import (
     PytorchTestCase,
     skipIfNoExtension,
     get_sinusoid,
-    load_params,
     save_wav,
+)
+from .common import (
+    load_params,
 )
 
 
