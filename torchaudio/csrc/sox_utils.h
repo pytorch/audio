@@ -22,7 +22,9 @@ void set_buffer_size(const int64_t buffer_size);
 
 std::vector<std::vector<std::string>> list_effects();
 
-std::vector<std::string> list_formats();
+std::vector<std::string> list_read_formats();
+
+std::vector<std::string> list_write_formats();
 
 /// Class for exchanging signal infomation (tensor + meta data) between
 /// C++ and Python for read/write operation.

@@ -37,11 +37,24 @@ std::vector<std::vector<std::string>> list_effects() {
   return effects;
 }
 
-std::vector<std::string> list_formats() {
+std::vector<std::string> list_write_formats() {
   std::vector<std::string> formats;
   for (const sox_format_tab_t* fns = sox_get_format_fns(); fns->fn; ++fns) {
-    for (const char* const* names = fns->fn()->names; *names; ++names) {
-      if (!strchr(*names, '/'))
+    const sox_format_handler_t* handler = fns->fn();
+    for (const char* const* names = handler->names; *names; ++names) {
+      if (!strchr(*names, '/') && handler->write)
+        formats.emplace_back(*names);
+    }
+  }
+  return formats;
+}
+
+std::vector<std::string> list_read_formats() {
+  std::vector<std::string> formats;
+  for (const sox_format_tab_t* fns = sox_get_format_fns(); fns->fn; ++fns) {
+    const sox_format_handler_t* handler = fns->fn();
+    for (const char* const* names = handler->names; *names; ++names) {
+      if (!strchr(*names, '/') && handler->read)
         formats.emplace_back(*names);
     }
   }
