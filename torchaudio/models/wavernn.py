@@ -216,7 +216,7 @@ class WaveRNN(nn.Module):
         n_output: the number of output dimensions of melresnet. (Default: ``128``)
 
     Example
-        >>> wavernn = waveRNN(upsample_scales=[5,5,8], n_classes=512, hop_length=200)
+        >>> wavernn = WaveRNN(upsample_scales=[5,5,8], n_classes=512, hop_length=200)
         >>> waveform, sample_rate = torchaudio.load(file)
         >>> # waveform shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length)
         >>> specgram = MelSpectrogram(sample_rate)(waveform)  # shape: (n_batch, n_channel, n_freq, n_time)
