@@ -14,6 +14,7 @@ class SoxEffectsChain {
   const sox_encodinginfo_t out_enc_;
   sox_signalinfo_t in_sig_;
   sox_signalinfo_t interm_sig_;
+  sox_signalinfo_t out_sig_;
   sox_effects_chain_t* sec_;
 
  public:
@@ -29,6 +30,7 @@ class SoxEffectsChain {
   void addInputTensor(torchaudio::sox_utils::TensorSignal* signal);
   void addInputFile(sox_format_t* sf);
   void addOutputBuffer(std::vector<sox_sample_t>* output_buffer);
+  void addOutputFile(sox_format_t* sf);
   void addEffect(const std::vector<std::string> effect);
   int64_t getOutputNumChannels();
   int64_t getOutputSampleRate();

@@ -46,6 +46,9 @@ struct TensorInputPriv {
 struct TensorOutputPriv {
   std::vector<sox_sample_t>* buffer;
 };
+struct FileOutputPriv {
+  sox_format_t* sf;
+};
 
 /// Callback function to feed Tensor data to SoxEffectChain.
 int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
@@ -84,7 +87,7 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
 
 /// Callback function to fetch data from SoxEffectChain.
 int tensor_output_flow(
-    sox_effect_t* effp LSX_UNUSED,
+    sox_effect_t* effp,
     sox_sample_t const* ibuf,
     sox_sample_t* obuf LSX_UNUSED,
     size_t* isamp,
@@ -94,6 +97,28 @@ int tensor_output_flow(
   auto out_buffer = static_cast<TensorOutputPriv*>(effp->priv)->buffer;
   // Append at the end
   out_buffer->insert(out_buffer->end(), ibuf, ibuf + *isamp);
+  return SOX_SUCCESS;
+}
+
+int file_output_flow(
+    sox_effect_t* effp,
+    sox_sample_t const* ibuf,
+    sox_sample_t* obuf LSX_UNUSED,
+    size_t* isamp,
+    size_t* osamp) {
+  *osamp = 0;
+  if (*isamp) {
+    auto sf = static_cast<FileOutputPriv*>(effp->priv)->sf;
+    if (sox_write(sf, ibuf, *isamp) != *isamp) {
+      if (sf->sox_errno) {
+        std::ostringstream stream;
+        stream << sf->sox_errstr << " " << sox_strerror(sf->sox_errno) << " "
+               << sf->filename;
+        throw std::runtime_error(stream.str());
+      }
+      return SOX_EOF;
+    }
+  }
   return SOX_SUCCESS;
 }
 
@@ -125,6 +150,20 @@ sox_effect_handler_t* get_tensor_output_handler() {
   return &handler;
 }
 
+sox_effect_handler_t* get_file_output_handler() {
+  static sox_effect_handler_t handler{/*name=*/"output_file",
+                                      /*usage=*/NULL,
+                                      /*flags=*/SOX_EFF_MCHAN,
+                                      /*getopts=*/NULL,
+                                      /*start=*/NULL,
+                                      /*flow=*/file_output_flow,
+                                      /*drain=*/NULL,
+                                      /*stop=*/NULL,
+                                      /*kill=*/NULL,
+                                      /*priv_size=*/sizeof(FileOutputPriv)};
+  return &handler;
+}
+
 } // namespace
 
 SoxEffectsChain::SoxEffectsChain(
@@ -134,6 +173,7 @@ SoxEffectsChain::SoxEffectsChain(
       out_enc_(output_encoding),
       in_sig_(),
       interm_sig_(),
+      out_sig_(),
       sec_(sox_create_effects_chain(&in_enc_, &out_enc_)) {
   if (!sec_) {
     throw std::runtime_error("Failed to create effect chain.");
@@ -180,6 +220,17 @@ void SoxEffectsChain::addInputFile(sox_format_t* sf) {
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
     std::ostringstream stream;
     stream << "Failed to add effect: input " << sf->filename;
+    throw std::runtime_error(stream.str());
+  }
+}
+
+void SoxEffectsChain::addOutputFile(sox_format_t* sf) {
+  out_sig_ = sf->signal;
+  SoxEffect e(sox_create_effect(get_file_output_handler()));
+  static_cast<FileOutputPriv*>(e->priv)->sf = sf;
+  if (sox_add_effect(sec_, e, &interm_sig_, &out_sig_) != SOX_SUCCESS) {
+    std::ostringstream stream;
+    stream << "Failed to add effect: output " << sf->filename;
     throw std::runtime_error(stream.str());
   }
 }
