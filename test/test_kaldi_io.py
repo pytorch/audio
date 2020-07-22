@@ -33,7 +33,3 @@ class Test_KaldiIO(common_utils.TorchaudioTestCase):
 
     def test_read_mat_ark(self):
         self._test_helper("mat.ark", [self.data1, self.data2], kio.read_mat_ark, torch.float32)
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -405,7 +405,3 @@ def test_mask_along_axis_iid(mask_param, mask_value, axis):
 
     assert mask_specgrams.size() == specgrams.size()
     assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
-
-
-if __name__ == '__main__':
-    unittest.main()

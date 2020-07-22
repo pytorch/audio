@@ -246,7 +246,3 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
             single_channel_sampled = kaldi.resample_waveform(single_channel, self.test1_signal_sr,
                                                              self.test1_signal_sr // 2)
             torch.testing.assert_allclose(multi_sound_sampled[i, :], single_channel_sampled[0], rtol=1e-4, atol=1e-7)
-
-
-if __name__ == '__main__':
-    unittest.main()

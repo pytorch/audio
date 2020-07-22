@@ -288,7 +288,3 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         # Batch then transform
         computed = torchaudio.transforms.Vol(gain=1.1)(waveform.repeat(3, 1, 1))
         self.assertEqual(computed, expected)
-
-
-if __name__ == '__main__':
-    unittest.main()
