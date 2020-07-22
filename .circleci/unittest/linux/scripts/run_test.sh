@@ -7,4 +7,4 @@ conda activate ./env
 
 python -m torch.utils.collect_env
 export PATH="${PWD}/third_party/install/bin/:${PATH}"
-pytest --cov=torchaudio --junitxml=test-results/junit.xml -v --durations 20 test
+pytest -q -n auto --dist=loadscope --cov=torchaudio --junitxml=test-results/junit.xml --durations 20 test
