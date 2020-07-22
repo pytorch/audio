@@ -11,10 +11,10 @@ from ..common_utils import (
     get_wav_data,
     save_wav,
     load_wav,
-    load_params,
     sox_utils,
 )
 from .common import (
+    load_params,
     name_func,
 )
 

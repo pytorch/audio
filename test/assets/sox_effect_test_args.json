@@ -42,7 +42,7 @@
 {"effects": [["fade", "l", "3"]]}
 {"effects": [["fade", "p", "3"]]}
 {"effects": [["fir", "0.0195", "-0.082", "0.234", "0.891", "-0.145", "0.043"]]}
-{"effects": [["fir", "test/assets/sox_effect_test_fir_coeffs.txt"]]}
+{"effects": [["fir", "<ASSET_DIR>/sox_effect_test_fir_coeffs.txt"]]}
 {"effects": [["flanger"]]}
 {"effects": [["gain", "-n"]]}
 {"effects": [["gain", "-n", "-3"]]}
