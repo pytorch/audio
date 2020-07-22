@@ -75,11 +75,11 @@ class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
             total_scale *= upsample_scale
 
         model = UpsampleNetwork(upsample_scales,
-                                 n_res_block,
-                                 n_freq,
-                                 n_hidden,
-                                 n_output,
-                                 kernel_size)
+                                n_res_block,
+                                n_freq,
+                                n_hidden,
+                                n_output,
+                                kernel_size)
 
         x = torch.rand(n_batch, n_freq, n_time)
         out1, out2 = model(x)
@@ -108,7 +108,7 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         kernel_size = 5
 
         model = WaveRNN(upsample_scales, n_classes, hop_length, n_res_block,
-                         n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output)
+                        n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output)
 
         x = torch.rand(n_batch, 1, hop_length * (n_time - kernel_size + 1))
         mels = torch.rand(n_batch, 1, n_freq, n_time)
