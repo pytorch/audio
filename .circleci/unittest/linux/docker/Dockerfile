@@ -37,12 +37,6 @@ ADD ./scripts /scripts
 RUN bash /scripts/copy_kaldi_executables.sh /opt/kaldi /kaldi
 
 ################################################################################
-# Build third party dependencies
-################################################################################
-RUN apt install -q -y curl
-RUN bash /scripts/build_third_parties.sh /
-
-################################################################################
 # Build the final image
 ################################################################################
 FROM BASE_IMAGE
@@ -62,5 +56,4 @@ RUN apt update && apt install -y \
         pkg-config \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /kaldi /kaldi
-COPY --from=builder /third_party /third_party
 ENV PATH="${PATH}:/kaldi/bin" LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/kaldi/lib"
