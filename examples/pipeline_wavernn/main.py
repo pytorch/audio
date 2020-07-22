@@ -13,7 +13,7 @@ from torch import nn as nn
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
-from torchaudio.models._wavernn import _WaveRNN
+from torchaudio.models.wavernn import WaveRNN
 
 from datasets import collate_factory, split_process_ljspeech
 from losses import LongCrossEntropyLoss, MoLLoss
@@ -297,7 +297,7 @@ def main(args):
 
     n_classes = 2 ** args.n_bits if args.loss == "crossentropy" else 30
 
-    model = _WaveRNN(
+    model = WaveRNN(
         upsample_scales=args.upsample_scales,
         n_classes=n_classes,
         hop_length=args.hop_length,
