@@ -38,7 +38,12 @@ class TestSoxUtils(PytorchTestCase):
         assert 'phaser' in effects
         assert 'gain' in effects
 
-    def test_list_formats(self):
-        """`list_formats` returns the list of supported formats"""
-        formats = sox_utils.list_formats()
+    def test_list_read_formats(self):
+        """`list_read_formats` returns the list of supported formats"""
+        formats = sox_utils.list_read_formats()
         assert 'wav' in formats
+
+    def test_list_write_formats(self):
+        """`list_write_formats` returns the list of supported formats"""
+        formats = sox_utils.list_write_formats()
+        assert 'opus' not in formats
