@@ -27,7 +27,10 @@ static auto registerSetSoxOptions =
         .op("torchaudio::sox_utils_set_buffer_size",
             &sox_utils::set_buffer_size)
         .op("torchaudio::sox_utils_list_effects", &sox_utils::list_effects)
-        .op("torchaudio::sox_utils_list_formats", &sox_utils::list_formats);
+        .op("torchaudio::sox_utils_list_read_formats",
+            &sox_utils::list_read_formats)
+        .op("torchaudio::sox_utils_list_write_formats",
+            &sox_utils::list_write_formats);
 
 ////////////////////////////////////////////////////////////////////////////////
 // sox_io.h

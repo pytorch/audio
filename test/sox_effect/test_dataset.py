@@ -9,7 +9,6 @@ from ..common_utils import (
     PytorchTestCase,
     skipIfNoExtension,
     get_whitenoise,
-    load_wav,
     save_wav,
 )
 

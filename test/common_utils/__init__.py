@@ -8,7 +8,7 @@ from .backend_utils import (
     BACKENDS,
     BACKENDS_MP3,
 )
-from .test_case_utils import (
+from .case_utils import (
     TempDirMixin,
     TestBaseMixin,
     PytorchTestCase,

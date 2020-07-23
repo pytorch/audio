@@ -75,10 +75,20 @@ def list_effects() -> Dict[str, str]:
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
-def list_formats() -> List[str]:
-    """List the supported audio formats
+def list_read_formats() -> List[str]:
+    """List the supported audio formats for read
 
     Returns:
         List[str]: List of supported audio formats
     """
-    return torch.ops.torchaudio.sox_utils_list_formats()
+    return torch.ops.torchaudio.sox_utils_list_read_formats()
+
+
+@_mod_utils.requires_module('torchaudio._torchaudio')
+def list_write_formats() -> List[str]:
+    """List the supported audio formats for write
+
+    Returns:
+        List[str]: List of supported audio formats
+    """
+    return torch.ops.torchaudio.sox_utils_list_write_formats()
