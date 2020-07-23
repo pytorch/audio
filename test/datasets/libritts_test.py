@@ -49,16 +49,14 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
 
     def test_libritts(self):
         dataset = LIBRITTS(self.root_dir)
-        samples = list(dataset)
-        samples.sort(key=lambda s: s[4])
-
+        n_ites = 0
         for i, (waveform,
                 sample_rate,
                 original_text,
                 normalized_text,
                 speaker_id,
                 chapter_id,
-                utterance_id) in enumerate(samples):
+                utterance_id) in enumerate(dataset):
 
             expected_ids = self.utterance_ids[i]
             expected_data = self.data[i]
@@ -69,3 +67,5 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
             assert original_text == self.original_text
             assert normalized_text == self.normalized_text
             assert utterance_id == f'{"_".join(str(u) for u in expected_ids[-4:])}'
+            n_ites += 1
+        assert n_ites == len(self.utterance_ids)

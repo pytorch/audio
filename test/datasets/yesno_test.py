@@ -38,11 +38,12 @@ class TestYesNo(TempDirMixin, TorchaudioTestCase):
 
     def test_yesno(self):
         dataset = yesno.YESNO(self.root_dir)
-        samples = list(dataset)
-        samples.sort(key=lambda s: s[2])
-        for i, (waveform, sample_rate, label) in enumerate(samples):
+        n_ite = 0
+        for i, (waveform, sample_rate, label) in enumerate(dataset):
             expected_label = self.labels[i]
             expected_data = self.data[i]
             self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
             assert sample_rate == 8000
             assert label == expected_label
+            n_ite += 1
+        assert n_ite == len(self.data)
