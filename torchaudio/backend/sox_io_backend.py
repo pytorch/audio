@@ -40,6 +40,7 @@ def load(
         num_frames: int = -1,
         normalize: bool = True,
         channels_first: bool = True,
+        sample_rate: Optional[int] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Load audio data from file.
 
@@ -84,11 +85,13 @@ def load(
             Path to audio file
         frame_offset (int):
             Number of frames to skip before start reading data.
+            If ``sample_rate`` is given, frame counts start after the audio is resampled.
         num_frames (int):
             Maximum number of frames to read. ``-1`` reads all the remaining samples,
             starting from ``frame_offset``.
             This function may return the less number of frames if there is not enough
             frames in the given file.
+            If ``sample_rate`` is given, frame counts start after the audio is resampled.
         normalize (bool):
             When ``True``, this function always return ``float32``, and sample values are
             normalized to ``[-1.0, 1.0]``.
@@ -98,6 +101,8 @@ def load(
         channels_first (bool):
             When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+        sample_rate (int, optional):
+            Perform resampling.
 
     Returns:
         torch.Tensor:
@@ -105,8 +110,9 @@ def load(
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             ``[channel, time]`` else ``[time, channel]``.
     """
-    signal = torch.ops.torchaudio.sox_io_load_audio_file(
-        filepath, frame_offset, num_frames, normalize, channels_first)
+    sample_rate = -1 if sample_rate is None else sample_rate
+    signal = torch.ops.torchaudio.sox_io_load_audio_file_v1(
+        filepath, frame_offset, num_frames, normalize, channels_first, sample_rate)
     return signal.get_tensor(), signal.get_sample_rate()
 
 

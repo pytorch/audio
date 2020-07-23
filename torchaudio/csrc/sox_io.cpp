@@ -53,6 +53,16 @@ c10::intrusive_ptr<TensorSignal> load_audio_file(
     const int64_t num_frames,
     const bool normalize,
     const bool channels_first) {
+  return load_audio_file_v1(path, frame_offset, num_frames, channels_first, -1);
+}
+
+c10::intrusive_ptr<TensorSignal> load_audio_file_v1(
+    const std::string& path,
+    const int64_t frame_offset,
+    const int64_t num_frames,
+    const bool normalize,
+    const bool channels_first,
+    const int64_t sample_rate) {
   if (frame_offset < 0) {
     throw std::runtime_error(
         "Invalid argument: frame_offset must be non-negative.");
@@ -61,8 +71,16 @@ c10::intrusive_ptr<TensorSignal> load_audio_file(
     throw std::runtime_error(
         "Invalid argument: num_frames must be -1 or greater than 0.");
   }
+  if (sample_rate == 0 || sample_rate < -1) {
+    throw std::runtime_error(
+        "Invalid argument: sample_rate must be -1 or greater than 0.");
+  }
 
   std::vector<std::vector<std::string>> effects;
+  if (sample_rate != -1) {
+    effects.emplace_back(
+        std::vector<std::string>{"rate", std::to_string(sample_rate)});
+  }
   if (num_frames != -1) {
     std::ostringstream offset, frames;
     offset << frame_offset << "s";

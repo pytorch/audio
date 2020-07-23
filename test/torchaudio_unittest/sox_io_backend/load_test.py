@@ -291,3 +291,47 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
         found, _ = sox_io_backend.load(self.path, channels_first=channels_first)
         expected = self.original if channels_first else self.original.transpose(1, 0)
         self.assertEqual(found, expected)
+
+
+@skipIfNoExec('sox')
+@skipIfNoExtension
+class TestSampleRate(TempDirMixin, PytorchTestCase):
+    """Test the correctness of frame parameters of `sox_io_backend.load`"""
+    path = None
+
+    def setUp(self):
+        super().setUp()
+        sample_rate = 16000
+        original = get_wav_data('float32', num_channels=2)
+        self.path = self.get_temp_path('original.wave')
+        save_wav(self.path, original, sample_rate)
+
+    @parameterized.expand([(8000, ), (44100, )], name_func=name_func)
+    def test_sample_rate(self, sample_rate):
+        """sample_rate changes sample rate"""
+        found, rate = sox_io_backend.load(self.path, sample_rate=sample_rate)
+        ref_path = self.get_temp_path('reference.wav')
+        sox_utils.run_sox_effect(self.path, ref_path, ['rate', f'{sample_rate}'])
+        expected, expected_rate = load_wav(ref_path)
+
+        assert rate == expected_rate
+        self.assertEqual(found, expected)
+
+    @parameterized.expand(list(itertools.product(
+        [8000, 44100],
+        [0, 1, 10, 100, 1000],
+        [-1, 1, 10, 100, 1000],
+    )), name_func=name_func)
+    def test_frame(self, sample_rate, frame_offset, num_frames):
+        """frame_offset and num_frames applied after sample_rate"""
+        found, rate = sox_io_backend.load(
+            self.path, frame_offset=frame_offset, num_frames=num_frames, sample_rate=sample_rate)
+
+        ref_path = self.get_temp_path('reference.wav')
+        sox_utils.run_sox_effect(self.path, ref_path, ['rate', f'{sample_rate}'])
+        reference, expected_rate = load_wav(ref_path)
+        frame_end = None if num_frames == -1 else frame_offset + num_frames
+        expected = reference[:, frame_offset:frame_end]
+
+        assert rate == expected_rate
+        self.assertEqual(found, expected)
