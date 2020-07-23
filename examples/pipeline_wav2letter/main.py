@@ -12,12 +12,12 @@ import torchaudio
 from torch.optim import SGD, Adadelta, Adam
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
-from torchaudio.datasets.utils import bg_iterator, diskcache_iterator
+from torchaudio.datasets.utils import bg_iterator
 from torchaudio.models.wav2letter import Wav2Letter
 from torchaudio.transforms import MFCC, Resample
 
 from ctc_decoders import GreedyDecoder
-from datasets import collate_factory, datasets_librispeech
+from datasets import collate_factory, split_process_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
 from utils import MetricLogger, count_parameters, save_checkpoint
@@ -420,7 +420,7 @@ def main(args, rank=0):
     labels = char_blank + char_space + char_apostrophe + string.ascii_lowercase
     language_model = LanguageModel(labels, char_blank, char_space)
 
-    training, validation, _ = datasets_librispeech(transforms, language_model)
+    training, validation, _ = split_process_librispeech(transforms, language_model)
 
     if args.decoder == "greedy":
         decoder = GreedyDecoder()

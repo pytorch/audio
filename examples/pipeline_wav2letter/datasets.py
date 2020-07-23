@@ -26,19 +26,18 @@ class MapMemoryCache(torch.utils.data.Dataset):
         return len(self.dataset)
 
 
-class ProcessedLIBRISPEECH(LIBRISPEECH):
-    def __init__(self, transforms, encode, *args, **kwargs):
+class Processed(torch.utils.data.Dataset):
+    def __init__(self, dataset, transforms, encode):
+        self.dataset = dataset
         self.transforms = transforms
         self.encode = encode
-        super().__init__(*args, **kwargs)
 
     def __getitem__(self, key):
-        item = super().__getitem__(key)
+        item = self.dataset[key]
         return self.process_datapoint(item)
 
-    def __next__(self):
-        item = super().__next__()
-        return self.process_datapoint(item)
+    def __len__(self):
+        return len(self.dataset)
 
     def process_datapoint(self, item):
         transformed = item[0]  # .to(device)
@@ -56,7 +55,7 @@ class ProcessedLIBRISPEECH(LIBRISPEECH):
         return transformed, target
 
 
-def datasets_librispeech(
+def split_process_librispeech(
     transforms,
     language_model,
     root="/datasets01/",
@@ -69,13 +68,12 @@ def datasets_librispeech(
 
         data = torch.utils.data.ConcatDataset(
             [
-                ProcessedLIBRISPEECH(
+                Processed(
+                    LIBRISPEECH(
+                        root, t, folder_in_archive=folder_in_archive, download=False,
+                    ),
                     transforms,
                     language_model.encode,
-                    root,
-                    t,
-                    folder_in_archive=folder_in_archive,
-                    download=False,
                 )
                 for t in tag
             ]
