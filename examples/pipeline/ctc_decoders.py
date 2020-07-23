@@ -5,6 +5,28 @@ from torch import topk
 from tqdm import tqdm
 
 
+class GreedyIterableDecoder:
+    def __init__(self, blank_label=0, collapse_repeated=True):
+        self.blank_label = blank_label
+        self.collapse_repeated = collapse_repeated
+
+    def __call__(self, output):
+        arg_maxes = torch.argmax(output, dim=-1)
+        decodes = []
+        for args in arg_maxes:
+            decode = []
+            for j, index in enumerate(args):
+                if index != self.blank_label:
+                    if self.collapse_repeated and j != 0 and index == args[j - 1]:
+                        continue
+                    decode.append(index.item())
+            decode = torch.tensor(decode)
+            decodes.append(decode)
+        # decodes = torch.tensor(decodes)
+        decodes = torch.nn.utils.rnn.pad_sequence(decodes, batch_first=True)
+        return decodes
+
+
 class GreedyDecoder:
     def __call__(self, outputs):
         """Greedy Decoder. Returns highest probability of class labels for each timestep
@@ -17,6 +39,77 @@ class GreedyDecoder:
         """
         _, indices = topk(outputs, k=1, dim=-1)
         return indices[..., 0]
+
+
+def zeros_like(m):
+    return zeros(len(m), len(m[0]))
+
+
+def zeros(d1, d2):
+    return list(list(0 for _ in range(d2)) for _ in range(d1))
+
+
+def apply_transpose(f, m):
+    return list(map(f, zip(*m)))
+
+
+def argmax(l):
+    return max(range(len(l)), key=lambda i: l[i])
+
+
+def add1d2d(m1, m2):
+    return [[v2 + v1 for v2 in m2_row] for m2_row, v1 in zip(m2, m1)]
+
+
+def add1d1d(v1, v2):
+    return [e + s for e, s in zip(v1, v2)]
+
+
+class ListViterbiDecoder:
+    def __init__(self, data_loader, vocab_size, n=2, progress_bar=False):
+        self._transitions = self._build_transitions(
+            data_loader, vocab_size, n, progress_bar
+        )
+
+    def __call__(self, emissions):
+        return torch.tensor([self._decode(emissions[i].tolist(), self._transitions)[0] for i in range(len(emissions))])
+
+    @staticmethod
+    def _build_transitions(data_loader, vocab_size, n=2, progress_bar=False):
+
+        # Count n-grams
+        count = Counter()
+        for _, label in tqdm(data_loader, disable=not progress_bar):
+            count += Counter(a for a in zip(*(label[i:] for i in range(n))))
+
+        # Write as matrix
+        transitions = zeros(vocab_size, vocab_size)
+        for (k1, k2), v in count.items():
+            transitions[k1][k2] = v
+
+        return transitions
+
+    @staticmethod
+    def _decode(emissions, transitions):
+        scores = zeros_like(emissions)
+        back_pointers = zeros_like(emissions)
+        scores = emissions[0]
+
+        # Generate most likely scores and paths for each step in sequence
+        for i in range(1, len(emissions)):
+            score_with_transition = add1d2d(scores, transitions)
+            max_score_with_transition = apply_transpose(max, score_with_transition)
+            scores = add1d1d(emissions[i], max_score_with_transition)
+            back_pointers[i] = apply_transpose(argmax, score_with_transition)
+
+        # Generate the most likely path
+        viterbi = [argmax(scores)]
+        for bp in reversed(back_pointers[1:]):
+            viterbi.append(bp[viterbi[-1]])
+        viterbi.reverse()
+        viterbi_score = max(scores)
+
+        return viterbi, viterbi_score
 
 
 class ViterbiDecoder:

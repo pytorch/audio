@@ -16,7 +16,7 @@ from torchaudio.datasets.utils import bg_iterator, diskcache_iterator
 from torchaudio.models.wav2letter import Wav2Letter
 from torchaudio.transforms import MFCC, Resample
 
-from ctc_decoders import GreedyDecoder, ViterbiDecoder
+from ctc_decoders import GreedyDecoder, GreedyIterableDecoder, ViterbiDecoder, ListViterbiDecoder
 from datasets import collate_factory, datasets_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
@@ -68,7 +68,7 @@ def parse_args():
         "--decoder",
         metavar="D",
         default="greedy",
-        choices=["greedy", "viterbi"],
+        choices=["greedy", "greedyiter", "viterbi"],
         help="decoder to use",
     )
     parser.add_argument(
@@ -424,8 +424,10 @@ def main(args, rank=0):
 
     if args.decoder == "greedy":
         decoder = GreedyDecoder()
+    elif args.decoder == "greedyiter":
+        decoder = GreedyIterableDecoder()
     elif args.decoder == "viterbi":
-        decoder = ViterbiDecoder(
+        decoder = ListViterbiDecoder(
             training, len(language_model), progress_bar=args.progress_bar
         )
 
