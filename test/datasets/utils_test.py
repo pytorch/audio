@@ -39,6 +39,9 @@ class TestWalkFiles(TempDirMixin, TorchaudioTestCase):
 
     def test_walk_files(self):
         """walk_files should traverse files in alphabetical order"""
+        n_ites = 0
         for i, path in enumerate(dataset_utils.walk_files(self.root, '.txt', prefix=True)):
             found = os.path.join(self.root, path)
             assert found == self.expected[i]
+            n_ites += 1
+        assert n_ites == len(self.expected)
