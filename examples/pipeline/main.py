@@ -84,33 +84,33 @@ def parse_args():
     parser.add_argument(
         "--optimizer",
         metavar="OPT",
-        default="sgd",
+        default="adadelta",
         choices=["sgd", "adadelta", "adam"],
         help="optimizer to use",
     )
     parser.add_argument(
         "--scheduler",
         metavar="S",
-        default="exponential",
+        default="reduceonplateau",
         choices=["exponential", "reduceonplateau"],
         help="optimizer to use",
     )
     parser.add_argument(
         "--learning-rate",
-        default=1.0,
+        default=0.6,
         type=float,
         metavar="LR",
         help="initial learning rate",
     )
     parser.add_argument(
         "--gamma",
-        default=0.96,
+        default=0.99,
         type=float,
         metavar="GAMMA",
         help="learning rate exponential decay constant",
     )
     parser.add_argument(
-        "--momentum", default=0.0, type=float, metavar="M", help="momentum"
+        "--momentum", default=0.8, type=float, metavar="M", help="momentum"
     )
     parser.add_argument(
         "--weight-decay", default=1e-5, type=float, metavar="W", help="weight decay"
