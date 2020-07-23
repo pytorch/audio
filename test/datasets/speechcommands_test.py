@@ -25,7 +25,6 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
         )
         os.makedirs(dataset_dir, exist_ok=True)
         sample_rate = 16000  # 16kHz sample rate
-        seed = 0
         for i in range(30):
             label = "label_{:02d}".format(i)
             path = os.path.join(dataset_dir, label)
