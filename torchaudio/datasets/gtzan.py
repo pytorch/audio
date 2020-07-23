@@ -1064,6 +1064,7 @@ class GTZAN(Dataset):
                     continue
 
                 songs_in_genre = os.listdir(fulldir)
+                songs_in_genre.sort()
                 for fname in songs_in_genre:
                     name, ext = os.path.splitext(fname)
                     if ext.lower() == ".wav" and "." in name:
