@@ -56,7 +56,6 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
 
     def testSpeechCommands(self):
         dataset = speechcommands.SPEECHCOMMANDS(self.root_dir)
-        print(dataset._path)
 
         num_samples = 0
         for i, (data, sample_rate, label, speaker_id, utterance_number) in enumerate(
