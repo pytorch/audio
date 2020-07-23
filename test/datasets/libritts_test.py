@@ -49,16 +49,13 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
 
     def test_libritts(self):
         dataset = LIBRITTS(self.root_dir)
-        samples = list(dataset)
-        samples.sort(key=lambda s: s[4])
-
         for i, (waveform,
                 sample_rate,
                 original_text,
                 normalized_text,
                 speaker_id,
                 chapter_id,
-                utterance_id) in enumerate(samples):
+                utterance_id) in enumerate(dataset):
 
             expected_ids = self.utterance_ids[i]
             expected_data = self.data[i]
