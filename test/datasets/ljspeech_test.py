@@ -44,6 +44,7 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
         archive_dir = os.path.join(base_dir, "wavs")
         os.makedirs(archive_dir, exist_ok=True)
         metadata_path = os.path.join(base_dir, "metadata.csv")
+        sample_rate = 22050
 
         with open(metadata_path, mode="w", newline='') as metadata_file:
             metadata_writer = csv.writer(
@@ -57,9 +58,9 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
                 filename = fileid + ".wav"
                 path = os.path.join(archive_dir, filename)
                 data = get_whitenoise(
-                    sample_rate=8000, duration=12, n_channels=1, dtype="int16", seed=i
+                    sample_rate=sample_rate, duration=10, n_channels=1, dtype="int16", seed=i
                 )
-                save_wav(path, data, 8000)
+                save_wav(path, data, sample_rate)
                 cls.data.append(normalize_wav(data))
 
     def test_ljspeech(self):
@@ -72,7 +73,7 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
             expected_normalized_transcript = self.normalized_transcripts[i]
             expected_data = self.data[i]
             self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
-            assert sample_rate == 8000
+            assert sample_rate == sample_rate
             assert transcript == expected_transcript
             assert normalized_transcript == expected_normalized_transcript
             n_ite += 1
