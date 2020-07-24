@@ -16,6 +16,7 @@ _CHECKSUMS = {
 
 
 def load_ljspeech_item(line: List[str], path: str, ext_audio: str) -> Tuple[Tensor, int, str, str]:
+    print(line)
     assert len(line) == 3
     fileid, transcript, normalized_transcript = line
     fileid_audio = fileid + ext_audio
