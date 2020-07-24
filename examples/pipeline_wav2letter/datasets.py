@@ -1,5 +1,3 @@
-import itertools
-
 import torch
 from torchaudio.datasets import LIBRISPEECH
 
@@ -56,10 +54,7 @@ class Processed(torch.utils.data.Dataset):
 
 
 def split_process_librispeech(
-    transforms,
-    language_model,
-    root="/datasets01/",
-    folder_in_archive="librispeech/062419/",
+    datasets, transforms, language_model, root, folder_in_archive,
 ):
     def create(tag):
 
@@ -83,8 +78,7 @@ def split_process_librispeech(
         data = MapMemoryCache(data)
         return data
 
-    return create("train-clean-100"), create("dev-clean"), None
-    # return create(["train-clean-100", "train-clean-360", "train-other-500"]), create(["dev-clean", "dev-other"]), None
+    return tuple(create(dataset) for dataset in datasets)
 
 
 def collate_factory(model_length_function):

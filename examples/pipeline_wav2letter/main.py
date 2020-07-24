@@ -119,10 +119,18 @@ def parse_args():
     parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
     parser.add_argument("--clip-grad", metavar="NORM", type=float, default=0.0)
     parser.add_argument(
-        "--dataset",
-        default="librispeech",
+        "--dataset-train",
+        default=["train-100"],
+        nargs="+",
         type=str,
-        help="select dataset to train with",
+        help="select which part of librispeech to train with",
+    )
+    parser.add_argument(
+        "--dataset-valid",
+        default=["dev-clean"],
+        nargs="+",
+        type=str,
+        help="select which part of librispeech to validate with",
     )
     parser.add_argument(
         "--distributed", action="store_true", help="enable DistributedDataParallel"
@@ -420,7 +428,13 @@ def main(args, rank=0):
     labels = char_blank + char_space + char_apostrophe + string.ascii_lowercase
     language_model = LanguageModel(labels, char_blank, char_space)
 
-    training, validation, _ = split_process_librispeech(transforms, language_model)
+    training, validation = split_process_librispeech(
+        [args.datasets_train, args.datasets_valid],
+        transforms,
+        language_model,
+        root="/datasets01/",
+        folder_in_archive="librispeech/062419/",
+    )
 
     if args.decoder == "greedy":
         decoder = GreedyDecoder()
