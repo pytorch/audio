@@ -56,21 +56,25 @@ class Processed(torch.utils.data.Dataset):
 def split_process_librispeech(
     datasets, transforms, language_model, root, folder_in_archive,
 ):
-    def create(tag):
+    def create(tags, cache=True):
 
-        if isinstance(tag, str):
-            tag = [tag]
+        if isinstance(tags, str):
+            tags = [tags]
+        if isinstance(transforms, list):
+            transform_list = transforms
+        else:
+            transform_list = [transforms]
 
         data = torch.utils.data.ConcatDataset(
             [
                 Processed(
                     LIBRISPEECH(
-                        root, t, folder_in_archive=folder_in_archive, download=False,
+                        root, tag, folder_in_archive=folder_in_archive, download=False,
                     ),
-                    transforms,
+                    transform,
                     language_model.encode,
                 )
-                for t in tag
+                for tag, transform in zip(tags, transform_list)
             ]
         )
 
@@ -78,6 +82,9 @@ def split_process_librispeech(
         data = MapMemoryCache(data)
         return data
 
+    # FIXME For performance, we cache all datasets
+    # Do not cache first dataset
+    # return tuple(create(dataset, cache=i > 0) for i, dataset in enumerate(datasets))
     return tuple(create(dataset) for dataset in datasets)
 
 

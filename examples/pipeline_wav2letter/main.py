@@ -31,6 +31,20 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
+        "--freq-mask",
+        default=0,
+        type=int,
+        metavar="N",
+        help="maximal width of frequency mask",
+    )
+    parser.add_argument(
+        "--time-mask",
+        default=0,
+        type=int,
+        metavar="N",
+        help="maximal width of time mask",
+    )
+    parser.add_argument(
         "--workers",
         default=0,
         type=int,
@@ -410,15 +424,25 @@ def main(args, rank=0):
 
     sample_rate_original = 16000
 
-    transforms = torch.nn.Sequential(
+    transforms_valid = torch.nn.Sequential(
         # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
         # torchaudio.transforms.MFCC(sample_rate=sample_rate_original, n_mfcc=args.n_bins, melkwargs=melkwargs),
         torchaudio.transforms.MelSpectrogram(
             sample_rate=sample_rate_original, **melkwargs
         ),
-        # torchaudio.transforms.FrequencyMasking(freq_mask_param=args.n_bins),
-        # torchaudio.transforms.TimeMasking(time_mask_param=35)
     )
+
+    transforms_train = transforms_valid
+    if args.freq_mask:
+        transforms_train = torch.nn.Sequential(
+            transforms_train,
+            torchaudio.transforms.FrequencyMasking(freq_mask_param=args.freq_mask),
+        )
+    if args.time_mask:
+        transforms_train = torch.nn.Sequential(
+            transforms_train,
+            torchaudio.transforms.TimeMasking(time_mask_param=args.time_mask),
+        )
 
     # Text preprocessing
 
@@ -429,8 +453,8 @@ def main(args, rank=0):
     language_model = LanguageModel(labels, char_blank, char_space)
 
     training, validation = split_process_librispeech(
-        [args.datasets_train, args.datasets_valid],
-        transforms,
+        [args.dataset_train, args.dataset_valid],
+        [transforms_train, transforms_valid],
         language_model,
         root="/datasets01/",
         folder_in_archive="librispeech/062419/",
