@@ -38,6 +38,7 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
         archive_dir = os.path.join(base_dir, 'wavs')
         os.makedirs(archive_dir, exist_ok=True)
         metadata_path = os.path.join(base_dir, 'metadata.csv')
+
         with open(metadata_path, mode='w') as metadata_file:
             metadata_writer = csv.writer(metadata_file, delimiter='|', quoting=csv.QUOTE_NONE)
             for i, (transcript, normalized_transcript) in enumerate(zip(cls.transcripts, cls.normalized_transcripts)):
@@ -45,7 +46,7 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
                 metadata_writer.writerow([fileid, transcript, normalized_transcript])
                 filename = fileid + '.wav'
                 path = os.path.join(archive_dir, filename)
-                data = get_whitenoise(sample_rate=8000, duration=6, n_channels=1, dtype='int16')
+                data = get_whitenoise(sample_rate=8000, duration=12, n_channels=1, dtype='int16', seed=i)
                 save_wav(path, data, 8000)
                 cls.data.append(normalize_wav(data))
 
