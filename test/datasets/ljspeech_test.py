@@ -46,7 +46,7 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
             for i, (transcript, normalized_transcript) in enumerate(
                 zip(cls.transcripts, cls.normalized_transcripts)
             ):
-                fileid = "LJ00" + str(i)
+                fileid = "LJ001-000" + str(i)
                 metadata_writer.writerow([fileid, transcript, normalized_transcript])
                 filename = fileid + ".wav"
                 path = os.path.join(archive_dir, filename)
