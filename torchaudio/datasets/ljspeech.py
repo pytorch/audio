@@ -64,7 +64,7 @@ class LJSPEECH(Dataset):
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
-        with open(self._metadata_path, "r") as metadata:
+        with open(self._metadata_path, "r", newline='') as metadata:
             walker = unicode_csv_reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
             self._walker = list(walker)
 
