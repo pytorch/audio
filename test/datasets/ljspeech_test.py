@@ -45,7 +45,7 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
         os.makedirs(archive_dir, exist_ok=True)
         metadata_path = os.path.join(base_dir, "metadata.csv")
 
-        with open(metadata_path, mode="w") as metadata_file:
+        with open(metadata_path, mode="w", newline='') as metadata_file:
             metadata_writer = csv.writer(
                 metadata_file, delimiter="|", quoting=csv.QUOTE_NONE
             )
