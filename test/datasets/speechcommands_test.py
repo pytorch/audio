@@ -1,4 +1,5 @@
 import os
+import random
 
 from torchaudio.datasets import speechcommands
 
@@ -25,8 +26,8 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
         )
         os.makedirs(dataset_dir, exist_ok=True)
         sample_rate = 16000  # 16kHz sample rate
-        for i in range(30):
-            label = "label_{:02d}".format(i)
+        random.seed(0)
+        for label in speechcommands.LABELS:
             path = os.path.join(dataset_dir, label)
             os.makedirs(path, exist_ok=True)
             for j in range(100):
@@ -36,12 +37,13 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
                 for utterance in range(3):
                     filename = f"{speaker}{speechcommands.HASH_DIVIDER}{utterance}.wav"
                     file_path = os.path.join(path, filename)
+                    seed = random.randrange(100)
                     data = get_whitenoise(
                         sample_rate=sample_rate,
                         duration=0.01,
                         n_channels=1,
                         dtype="int16",
-                        seed=0,
+                        seed=seed,
                     )
                     save_wav(file_path, data, sample_rate)
                     sample = (
@@ -55,6 +57,7 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
 
     def testSpeechCommands(self):
         dataset = speechcommands.SPEECHCOMMANDS(self.root_dir)
+        print(dataset._path)
 
         num_samples = 0
         for i, (data, sample_rate, label, speaker_id, utterance_number) in enumerate(

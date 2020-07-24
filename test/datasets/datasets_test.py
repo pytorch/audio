@@ -1,19 +1,16 @@
+from torchaudio.datasets.cmuarctic import CMUARCTIC
 from torchaudio.datasets.commonvoice import COMMONVOICE
 from torchaudio.datasets.librispeech import LIBRISPEECH
-from torchaudio.datasets.speechcommands import SPEECHCOMMANDS
-from torchaudio.datasets.utils import diskcache_iterator, bg_iterator
-from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.ljspeech import LJSPEECH
-from torchaudio.datasets.cmuarctic import CMUARCTIC
+from torchaudio.datasets.speechcommands import SPEECHCOMMANDS
+from torchaudio.datasets.utils import bg_iterator, diskcache_iterator
+from torchaudio.datasets.vctk import VCTK
 
-from ..common_utils import (
-    TorchaudioTestCase,
-    get_asset_path,
-)
+from ..common_utils import TorchaudioTestCase, get_asset_path
 
 
 class TestDatasets(TorchaudioTestCase):
-    backend = 'default'
+    backend = "default"
     path = get_asset_path()
 
     def test_vctk(self):
@@ -28,17 +25,13 @@ class TestDatasets(TorchaudioTestCase):
         data = LJSPEECH(self.path)
         data[0]
 
-    def test_speechcommands(self):
-        data = SPEECHCOMMANDS(self.path)
-        data[0]
-
     def test_cmuarctic(self):
         data = CMUARCTIC(self.path)
         data[0]
 
 
 class TestCommonVoice(TorchaudioTestCase):
-    backend = 'default'
+    backend = "default"
     path = get_asset_path()
 
     def test_commonvoice(self):

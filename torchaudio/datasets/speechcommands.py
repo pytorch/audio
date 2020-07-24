@@ -20,6 +20,7 @@ _CHECKSUMS = {
     "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz":
     "6b74f3901214cb2c2934e98196829835",
 }
+LABELS = ['bed', 'bird', 'cat', 'dog', 'down', 'eight', 'five', 'follow', 'forward', 'four', 'go', 'happy', 'house', 'learn', 'left', 'marvin', 'nine', 'no', 'off', 'on', 'one', 'right', 'seven', 'sheila', 'six', 'stop', 'three', 'tree', 'two', 'up', 'visual', 'wow', 'yes', 'zero']
 
 
 def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str, str, int]:
