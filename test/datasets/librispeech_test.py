@@ -38,7 +38,7 @@ class TestLibriSpeech(TempDirMixin, TorchaudioTestCase):
             cls.root_dir, librispeech.FOLDER_IN_ARCHIVE, librispeech.URL
         )
         os.makedirs(dataset_dir, exist_ok=True)
-        sample_rate = 16000 # 16kHz
+        sample_rate = 16000  # 16kHz
         seed = 0
 
         for speaker_id in range(5):
