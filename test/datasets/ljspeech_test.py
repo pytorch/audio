@@ -21,14 +21,16 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
         "Test transcript 1",
         "Test transcript 2",
         "Test transcript 3",
-        "The examination and testimony of the experts enabled the Commission to conclude that 5 shots may have been fired,",
+        "The examination and testimony of the experts enabled the \
+        Commission to conclude that 5 shots may have been fired,",
     ]
 
     normalized_transcripts = [
         "Test transcript one",
         "Test transcript two",
         "Test transcript three",
-        "The examination and testimony of the experts enabled the Commission to conclude that five shots may have been fired,",
+        "The examination and testimony of the experts enabled the \
+        Commission to conclude that five shots may have been fired,",
     ]
 
     @classmethod
