@@ -2,28 +2,60 @@ import os
 from typing import Tuple
 
 import torchaudio
-from torch.utils.data import Dataset
 from torch import Tensor
-from torchaudio.datasets.utils import (
-    download_url,
-    extract_archive,
-    walk_files
-)
+from torch.utils.data import Dataset
+from torchaudio.datasets.utils import download_url, extract_archive, walk_files
+
 
 FOLDER_IN_ARCHIVE = "SpeechCommands"
 URL = "speech_commands_v0.02"
 HASH_DIVIDER = "_nohash_"
 EXCEPT_FOLDER = "_background_noise_"
 _CHECKSUMS = {
-    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz":
-    "3cd23799cb2bbdec517f1cc028f8d43c",
-    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz":
-    "6b74f3901214cb2c2934e98196829835",
+    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz": "3cd23799cb2bbdec517f1cc028f8d43c",
+    "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz": "6b74f3901214cb2c2934e98196829835",
 }
-LABELS = ['bed', 'bird', 'cat', 'dog', 'down', 'eight', 'five', 'follow', 'forward', 'four', 'go', 'happy', 'house', 'learn', 'left', 'marvin', 'nine', 'no', 'off', 'on', 'one', 'right', 'seven', 'sheila', 'six', 'stop', 'three', 'tree', 'two', 'up', 'visual', 'wow', 'yes', 'zero']
+LABELS = [
+    "bed",
+    "bird",
+    "cat",
+    "dog",
+    "down",
+    "eight",
+    "five",
+    "follow",
+    "forward",
+    "four",
+    "go",
+    "happy",
+    "house",
+    "learn",
+    "left",
+    "marvin",
+    "nine",
+    "no",
+    "off",
+    "on",
+    "one",
+    "right",
+    "seven",
+    "sheila",
+    "six",
+    "stop",
+    "three",
+    "tree",
+    "two",
+    "up",
+    "visual",
+    "wow",
+    "yes",
+    "zero",
+]
 
 
-def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str, str, int]:
+def load_speechcommands_item(
+    filepath: str, path: str
+) -> Tuple[Tensor, int, str, str, int]:
     relpath = os.path.relpath(filepath, path)
     label, filename = os.path.split(relpath)
     speaker, _ = os.path.splitext(filename)
@@ -42,15 +74,14 @@ class SPEECHCOMMANDS(Dataset):
     waveform, sample_rate, label, speaker_id, utterance_number
     """
 
-    def __init__(self,
-                 root: str,
-                 url: str = URL,
-                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False) -> None:
-        if url in [
-            "speech_commands_v0.01",
-            "speech_commands_v0.02",
-        ]:
+    def __init__(
+        self,
+        root: str,
+        url: str = URL,
+        folder_in_archive: str = FOLDER_IN_ARCHIVE,
+        download: bool = False,
+    ) -> None:
+        if url in ["speech_commands_v0.01", "speech_commands_v0.02"]:
             base_url = "https://storage.googleapis.com/download.tensorflow.org/data/"
             ext_archive = ".tar.gz"
 
