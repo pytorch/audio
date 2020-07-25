@@ -13,7 +13,8 @@ from torch.utils.data import Dataset
 # test.tsv
 # train.tsv
 # validated.tsv
-
+TSVS = ["dev.tsv", "invalidated.tsv", "other.tsv", "test.tsv", "train.tsv", "validated.tsv"]
+DEFAULT_TSV = "train.tsv"
 FOLDER_IN_ARCHIVE = "CommonVoice"
 URL = "english"
 VERSION = "cv-corpus-4-2019-12-10"
@@ -113,7 +114,7 @@ class COMMONVOICE(Dataset):
 
     def __init__(self,
                  root: str,
-                 tsv: str = TSV,
+                 tsv: str = DEFAULT_TSV,
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  version: str = VERSION,
