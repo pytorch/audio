@@ -3,7 +3,6 @@ import csv
 import random
 
 from torchaudio.datasets import commonvoice
-from torchaudio.datasets.utils import utf_8_encoder
 from ..common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -64,7 +63,7 @@ class TestCommonVoice(TempDirMixin, TorchaudioTestCase):
                 audio_path = os.path.join(audio_base_path, audio_filename)
                 data = get_whitenoise(sample_rate=cls.sample_rate, duration=6, n_channels=1, dtype='float32')
                 save_wav(audio_path, data, cls.sample_rate)
-                
+
                 # Append data entry
                 cls.data.append((normalize_wav(data), cls.sample_rate, dict(zip(cls._headers, text_data))))
 
