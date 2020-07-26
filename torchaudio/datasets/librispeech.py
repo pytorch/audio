@@ -73,13 +73,13 @@ class LIBRISPEECH(Dataset):
     """
 
     _ext_txt = ".trans.txt"
+    _ext_audio = ".flac"
 
     def __init__(self,
                  root: str,
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False,
-                 ext_audio: str = ".flac") -> None:
+                 download: bool = False) -> None:
 
         if url in [
             "dev-clean",
@@ -103,7 +103,6 @@ class LIBRISPEECH(Dataset):
         folder_in_archive = os.path.join(folder_in_archive, basename)
 
         self._path = os.path.join(root, folder_in_archive)
-        self._ext_audio = ext_audio
 
         if download:
             if not os.path.isdir(self._path):

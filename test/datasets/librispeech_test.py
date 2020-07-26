@@ -50,14 +50,12 @@ class TestLibriSpeech(TempDirMixin, TorchaudioTestCase):
                 os.makedirs(chapter_path, exist_ok=True)
                 trans_content = []
 
-                for utterance_id in range(20):
+                for utterance_id in range(10):
                     filename = f'{speaker_id}-{chapter_id}-{utterance_id:04d}.wav'
                     path = os.path.join(chapter_path, filename)
 
                     utterance = ' '.join(
-                        [NUMBERS[int(x)] for x in list(
-                            str(speaker_id) + str(chapter_id) + str(utterance_id)
-                        )]
+                        [NUMBERS[x] for x in [speaker_id, chapter_id, utterance_id]]
                     )
                     trans_content.append(
                         f'{speaker_id}-{chapter_id}-{utterance_id:04d} {utterance}'
@@ -88,8 +86,14 @@ class TestLibriSpeech(TempDirMixin, TorchaudioTestCase):
                 with open(trans_path, 'w') as f:
                     f.write('\n'.join(trans_content))
 
+    @classmethod
+    def tearDownClass(cls):
+        # In case of test failure
+        librispeech.LIBRISPEECH._ext_audio = '.flac'
+
     def test_librispeech(self):
-        dataset = librispeech.LIBRISPEECH(self.root_dir, ext_audio='.wav')
+        librispeech.LIBRISPEECH._ext_audio = '.wav'
+        dataset = librispeech.LIBRISPEECH(self.root_dir)
         print(dataset._path)
 
         num_samples = 0
@@ -105,3 +109,4 @@ class TestLibriSpeech(TempDirMixin, TorchaudioTestCase):
             num_samples += 1
 
         assert num_samples == len(self.samples)
+        librispeech.LIBRISPEECH._ext_audio = '.flac'
