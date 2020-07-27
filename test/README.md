@@ -29,7 +29,7 @@ The following test modules are defined for corresponding `torchaudio` module/fun
 - [`torchaudio.transforms`](./test_transforms.py)
 - [`torchaudio.compliance.kaldi`](./test_compliance_kaldi.py)
 - [`torchaudio.kaldi_io`](./test_kaldi_io.py)
-- [`torchaudio.sox_effects`](test/test_sox_effects.py)
+- [`torchaudio.sox_effects`](test/sox_effects)
 - [`torchaudio.save`, `torchaudio.load`, `torchaudio.info`](test/test_io.py)
 
 ### Test modules that do not fall into the above categories

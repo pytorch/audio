@@ -264,7 +264,13 @@ def walk_files(root: str,
 
     root = os.path.expanduser(root)
 
-    for dirpath, _, files in os.walk(root):
+    for dirpath, dirs, files in os.walk(root):
+        dirs.sort()
+        # `dirs` is the list used in os.walk function and by sorting it in-place here, we change the
+        # behavior of os.walk to traverse sub directory alphabetically
+        # see also
+        # https://stackoverflow.com/questions/6670029/can-i-force-python3s-os-walk-to-visit-directories-in-alphabetical-order-how#comment71993866_6670926
+        files.sort()
         for f in files:
             if f.endswith(suffix):
 

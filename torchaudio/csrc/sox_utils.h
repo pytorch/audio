@@ -7,6 +7,27 @@
 namespace torchaudio {
 namespace sox_utils {
 
+////////////////////////////////////////////////////////////////////////////////
+// APIs for Python interaction
+////////////////////////////////////////////////////////////////////////////////
+
+/// Set sox global options
+void set_seed(const int64_t seed);
+
+void set_verbosity(const int64_t verbosity);
+
+void set_use_threads(const bool use_threads);
+
+void set_buffer_size(const int64_t buffer_size);
+
+std::vector<std::vector<std::string>> list_effects();
+
+std::vector<std::string> list_read_formats();
+
+std::vector<std::string> list_write_formats();
+
+/// Class for exchanging signal infomation (tensor + meta data) between
+/// C++ and Python for read/write operation.
 struct TensorSignal : torch::CustomClassHolder {
   torch::Tensor tensor;
   int64_t sample_rate;
@@ -21,6 +42,13 @@ struct TensorSignal : torch::CustomClassHolder {
   int64_t getSampleRate() const;
   bool getChannelsFirst() const;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// Utilities for sox_io / sox_effects implementations
+////////////////////////////////////////////////////////////////////////////////
+
+const std::unordered_set<std::string> UNSUPPORTED_EFFECTS =
+    {"input", "output", "spectrogram", "noiseprof", "noisered", "splice"};
 
 /// helper class to automatically close sox_format_t*
 struct SoxFormat {
@@ -84,9 +112,7 @@ const std::string get_filetype(const std::string path);
 
 /// Get sox_signalinfo_t for passing a torch::Tensor object.
 sox_signalinfo_t get_signalinfo(
-    const torch::Tensor& tensor,
-    const int64_t sample_rate,
-    const bool channels_first,
+    const TensorSignal* signal,
     const std::string filetype);
 
 /// Get sox_encofinginfo_t for saving audoi file

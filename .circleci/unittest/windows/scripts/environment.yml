@@ -1,0 +1,18 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - flake8
+  - numpy
+  - pytest
+  - pytest-cov
+  - codecov
+  - pip
+  - pip:
+    - scipy == 1.4.1
+    - kaldi-io
+    - PySoundFile
+    - librosa
+    - future
+    - parameterized
+    - numba==0.48

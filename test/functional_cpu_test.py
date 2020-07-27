@@ -4,6 +4,7 @@ import unittest
 import torch
 import torchaudio
 import torchaudio.functional as F
+from parameterized import parameterized
 import pytest
 
 from . import common_utils
@@ -299,24 +300,18 @@ class TestIstft(common_utils.TorchaudioTestCase):
 
 
 class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
-    def test_pitch(self):
-        test_filepath_100 = common_utils.get_asset_path("100Hz_44100Hz_16bit_05sec.wav")
-        test_filepath_440 = common_utils.get_asset_path("440Hz_44100Hz_16bit_05sec.wav")
+    @parameterized.expand([(100,), (440,)])
+    def test_pitch(self, frequency):
+        sample_rate = 44100
+        test_sine_waveform = common_utils.get_sinusoid(
+            frequency=frequency, sample_rate=sample_rate, duration=5,
+        )
 
-        # Files from https://www.mediacollege.com/audio/tone/download/
-        tests = [
-            (test_filepath_100, 100),
-            (test_filepath_440, 440),
-        ]
+        freq = torchaudio.functional.detect_pitch_frequency(test_sine_waveform, sample_rate)
 
-        for filename, freq_ref in tests:
-            waveform, sample_rate = common_utils.load_wav(filename)
-
-            freq = torchaudio.functional.detect_pitch_frequency(waveform, sample_rate)
-
-            threshold = 1
-            s = ((freq - freq_ref).abs() > threshold).sum()
-            self.assertFalse(s)
+        threshold = 1
+        s = ((freq - frequency).abs() > threshold).sum()
+        self.assertFalse(s)
 
 
 class TestDB_to_amplitude(common_utils.TorchaudioTestCase):
@@ -410,7 +405,3 @@ def test_mask_along_axis_iid(mask_param, mask_value, axis):
 
     assert mask_specgrams.size() == specgrams.size()
     assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
-
-
-if __name__ == '__main__':
-    unittest.main()

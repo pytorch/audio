@@ -1,0 +1,32 @@
+# note dist: 'trusty' does not work here
+dist: xenial
+
+language: python
+
+# cache miniconda installer and similar files
+cache:
+  directories:
+  - /home/travis/download
+
+# This matrix tests that the code works on Python 3.5, 3.6, 3.7, passes
+# lint and example tests.
+matrix:
+  fast_finish: true
+  include:
+    - env: PYTHON_VERSION="3.6" RUN_EXAMPLE_TESTS="true" SKIP_TESTS="true"
+  allow_failures:
+    - env: PYTHON_VERSION="3.6" RUN_EXAMPLE_TESTS="true" SKIP_TESTS="true"
+
+addons:
+  apt:
+    packages:
+      sox
+      libsox-dev
+      libsox-fmt-all
+      portaudio19-dev
+
+notifications:
+  email: false
+
+install: source build_tools/travis/install.sh
+script: bash build_tools/travis/test_script.sh
