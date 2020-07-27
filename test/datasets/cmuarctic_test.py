@@ -43,7 +43,7 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
                     sample_rate=sample_rate,
                     duration=3,
                     n_channels=1,
-                    dtype="float32",
+                    dtype="int16",
                     seed=seed,
                 )
                 save_wav(path, data, sample_rate)
