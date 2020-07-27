@@ -16,11 +16,11 @@ class MetricLogger:
     def __setitem__(self, key, value):
         self.data[key].append(value)
 
-    def _get_last(self):
-        return {k: v[-1] for k, v in self.data.items()}
+    def __getitem__(self, key):
+        return self.data[key][-1]
 
     def __str__(self):
-        return str(self._get_last())
+        return str({k: self[k] for k in self.data})
 
     def __call__(self):
         self._iter = (self._iter + 1) % self.print_freq
