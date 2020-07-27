@@ -3,7 +3,6 @@ from torchaudio.datasets.speechcommands import SPEECHCOMMANDS
 from torchaudio.datasets.utils import diskcache_iterator, bg_iterator
 from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.ljspeech import LJSPEECH
-from torchaudio.datasets.cmuarctic import CMUARCTIC
 
 from ..common_utils import (
     TorchaudioTestCase,
@@ -25,10 +24,6 @@ class TestDatasets(TorchaudioTestCase):
 
     def test_speechcommands(self):
         data = SPEECHCOMMANDS(self.path)
-        data[0]
-
-    def test_cmuarctic(self):
-        data = CMUARCTIC(self.path)
         data[0]
 
 
