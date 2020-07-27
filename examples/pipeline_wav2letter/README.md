@@ -12,12 +12,12 @@ python main.py \
     --momentum .8 \
     --clip-grad 0. \
     --optimizer "adadelta" \
-    --scheduler "exponential"
+    --scheduler "reduceonplateau"
 ```
 
 ### Output
 
-The information reported at each iteration and epoch (e.g. loss, character error rate, word error rate) is printed to standard output in the form of one json per line. Further information is reported to standard error. Here is an example python function to parse the standard output.
+The information reported at each iteration and epoch (e.g. loss, character error rate, word error rate) is printed to standard output in the form of one json per line. Further information is reported to standard error. Here is an example python function to parse the standard output when saved to a file.
 ```python
 def read_json(filename):
 	"""
