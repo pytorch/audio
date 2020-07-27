@@ -1,20 +1,21 @@
+import json
 import logging
 import os
 import shutil
-from collections import defaultdict, deque
+from collections import defaultdict
 
 import torch
 
 
 class MetricLogger(defaultdict):
     def __init__(self, name, print_freq=1):
+        super().__init__(lambda: 0.0)
         self.print_freq = print_freq
         self._iter = 0
-        super().__init__(lambda: 0.)
         self["name"] = name
 
     def __str__(self):
-        return str(dict(self.data))
+        return json.dumps(self.data)
 
     def __call__(self):
         self._iter = (self._iter + 1) % self.print_freq
