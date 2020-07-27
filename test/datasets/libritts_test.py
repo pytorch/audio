@@ -33,8 +33,8 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
             os.makedirs(file_dir, exist_ok=True)
             path = os.path.join(file_dir, filename)
 
-            data = get_whitenoise(sample_rate=8000, duration=6, n_channels=1, dtype='int16', seed=i)
-            save_wav(path, data, 8000)
+            data = get_whitenoise(sample_rate=24000, duration=2, n_channels=1, dtype='int16', seed=i)
+            save_wav(path, data, 24000)
             cls.data.append(normalize_wav(data))
 
             original_text_filename = f'{"_".join(str(u) for u in utterance_id)}.original.txt'
@@ -61,7 +61,7 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
             expected_ids = self.utterance_ids[i]
             expected_data = self.data[i]
             self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
-            assert sample_rate == 8000
+            assert sample_rate == 24000
             assert speaker_id == expected_ids[0]
             assert chapter_id == expected_ids[1]
             assert original_text == self.original_text
