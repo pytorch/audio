@@ -247,7 +247,7 @@ def train_one_epoch(
 
         optimizer.step()
 
-        sums["length_dataset"] += len(inputs)
+        sums["dataset length"] += len(inputs)
 
         compute_error_rates(outputs, targets, decoder, language_model, sums)
         record_error_rates(sums, metric)
@@ -287,13 +287,13 @@ def record_error_rates(sums, metric):
 
     metric["cer"] = sums["cer"]
     metric["wer"] = sums["wer"]
-    metric["cer over dataset length"] = sums["cer"] / sums["length_dataset"]
-    metric["wer over dataset length"] = sums["wer"] / sums["length_dataset"]
-    metric["cer over target length"] = sums["cer"] / sums["total_chars"]
-    metric["wer over target length"] = sums["wer"] / sums["total_words"]
-    metric["target length"] = sums["total_chars"]
-    metric["target length"] = sums["total_words"]
-    metric["dataset length"] = sums["length_dataset"]
+    metric["cer over dataset length"] = sums["cer"] / sums["dataset length"]
+    metric["wer over dataset length"] = sums["wer"] / sums["dataset length"]
+    metric["cer over target length"] = sums["cer"] / sums["total chars"]
+    metric["wer over target length"] = sums["wer"] / sums["total words"]
+    metric["target chars"] = sums["total chars"]
+    metric["target words"] = sums["total words"]
+    metric["dataset length"] = sums[""]
 
 
 def compute_error_rates(outputs, targets, decoder, language_model, sums):
@@ -309,24 +309,20 @@ def compute_error_rates(outputs, targets, decoder, language_model, sums):
         target_print = target[i].ljust(print_length)[:print_length]
         logging.info(f"Target: {target_print}   Output: {output_print}")
 
-    cers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
-    # cers_normalized = [d / len(a) for a, d in zip(target, cers)]
+    cers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
     cers = sum(cers)
     n = sum(len(t) for t in target)
     sums["cer"] += cers
-    # sums["cer_relative"] += cers / n
-    sums["total_chars"] += n
+    sums["total chars"] += n
 
     output = [o.split(language_model.char_space) for o in output]
-    target = [o.split(language_model.char_space) for o in target]
+    target = [t.split(language_model.char_space) for t in target]
 
-    wers = [levenshtein_distance(a, b) for a, b in zip(target, output)]
-    # wers_normalized = [d / len(a) for a, d in zip(target, wers)]
+    wers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
     wers = sum(wers)
-    n = len(target)
+    n = sum(len(t) for t in target)
     sums["wer"] += wers
-    # sums["wer_relative"] += wers / n
-    sums["total_words"] += n
+    sums["total words"] += n
 
 
 def evaluate(
@@ -360,7 +356,7 @@ def evaluate(
                 outputs, targets, tensors_lengths, target_lengths
             ).item()
 
-            sums["length_dataset"] += len(inputs)
+            sums["dataset length"] += len(inputs)
 
             compute_error_rates(outputs, targets, decoder, language_model, sums)
 
