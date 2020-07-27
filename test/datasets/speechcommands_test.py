@@ -1,5 +1,4 @@
 import os
-import random
 
 from torchaudio.datasets import speechcommands
 
@@ -11,6 +10,42 @@ from ..common_utils import (
     save_wav,
 )
 
+LABELS = [
+    "bed",
+    "bird",
+    "cat",
+    "dog",
+    "down",
+    "eight",
+    "five",
+    "follow",
+    "forward",
+    "four",
+    "go",
+    "happy",
+    "house",
+    "learn",
+    "left",
+    "marvin",
+    "nine",
+    "no",
+    "off",
+    "on",
+    "one",
+    "right",
+    "seven",
+    "sheila",
+    "six",
+    "stop",
+    "three",
+    "tree",
+    "two",
+    "up",
+    "visual",
+    "wow",
+    "yes",
+    "zero",
+]
 
 class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
     backend = "default"
@@ -26,9 +61,8 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
         )
         os.makedirs(dataset_dir, exist_ok=True)
         sample_rate = 16000  # 16kHz sample rate
-        random.seed(0)
         seed = 0
-        for label in speechcommands.LABELS:
+        for label in LABELS:
             path = os.path.join(dataset_dir, label)
             os.makedirs(path, exist_ok=True)
             for j in range(2):
