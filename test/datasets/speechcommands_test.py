@@ -27,6 +27,7 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
         os.makedirs(dataset_dir, exist_ok=True)
         sample_rate = 16000  # 16kHz sample rate
         random.seed(0)
+        seed = 0
         for label in speechcommands.LABELS:
             path = os.path.join(dataset_dir, label)
             os.makedirs(path, exist_ok=True)
@@ -37,7 +38,7 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
                 for utterance in range(3):
                     filename = f"{speaker}{speechcommands.HASH_DIVIDER}{utterance}.wav"
                     file_path = os.path.join(path, filename)
-                    seed = random.randrange(100)
+                    seed += 1
                     data = get_whitenoise(
                         sample_rate=sample_rate,
                         duration=0.01,
