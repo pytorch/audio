@@ -2,9 +2,13 @@ import os
 from typing import Tuple
 
 import torchaudio
-from torch import Tensor
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import download_url, extract_archive, walk_files
+from torch import Tensor
+from torchaudio.datasets.utils import (
+    download_url,
+    extract_archive,
+    walk_files
+)
 
 
 FOLDER_IN_ARCHIVE = "SpeechCommands"
@@ -55,9 +59,7 @@ LABELS = [
 ]
 
 
-def load_speechcommands_item(
-    filepath: str, path: str
-) -> Tuple[Tensor, int, str, str, int]:
+def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str, str, int]:
     relpath = os.path.relpath(filepath, path)
     label, filename = os.path.split(relpath)
     speaker, _ = os.path.splitext(filename)
@@ -76,14 +78,15 @@ class SPEECHCOMMANDS(Dataset):
     waveform, sample_rate, label, speaker_id, utterance_number
     """
 
-    def __init__(
-        self,
-        root: str,
-        url: str = URL,
-        folder_in_archive: str = FOLDER_IN_ARCHIVE,
-        download: bool = False,
-    ) -> None:
-        if url in ["speech_commands_v0.01", "speech_commands_v0.02"]:
+    def __init__(self,
+                 root: str,
+                 url: str = URL,
+                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
+                 download: bool = False) -> None:
+        if url in [
+            "speech_commands_v0.01",
+            "speech_commands_v0.02"
+        ]:
             base_url = "https://storage.googleapis.com/download.tensorflow.org/data/"
             ext_archive = ".tar.gz"
 

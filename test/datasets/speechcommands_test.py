@@ -30,7 +30,7 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
         for label in speechcommands.LABELS:
             path = os.path.join(dataset_dir, label)
             os.makedirs(path, exist_ok=True)
-            for j in range(100):
+            for j in range(2):
                 # generate hash ID for speaker
                 speaker = "{:08x}".format(j)
 
