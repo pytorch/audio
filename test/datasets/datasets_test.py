@@ -32,10 +32,6 @@ class TestDatasets(TorchaudioTestCase):
         data = SPEECHCOMMANDS(self.path)
         data[0]
 
-    def test_cmuarctic(self):
-        data = CMUARCTIC(self.path)
-        data[0]
-
 
 class TestCommonVoice(TorchaudioTestCase):
     backend = 'default'
