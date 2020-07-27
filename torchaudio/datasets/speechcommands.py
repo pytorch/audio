@@ -10,7 +10,6 @@ from torchaudio.datasets.utils import (
     walk_files
 )
 
-
 FOLDER_IN_ARCHIVE = "SpeechCommands"
 URL = "speech_commands_v0.02"
 HASH_DIVIDER = "_nohash_"
@@ -85,7 +84,7 @@ class SPEECHCOMMANDS(Dataset):
                  download: bool = False) -> None:
         if url in [
             "speech_commands_v0.01",
-            "speech_commands_v0.02"
+            "speech_commands_v0.02",
         ]:
             base_url = "https://storage.googleapis.com/download.tensorflow.org/data/"
             ext_archive = ".tar.gz"
