@@ -65,4 +65,4 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
             assert utterance == expected_sample[2]
             assert utterance_id == expected_sample[3]
             self.assertEqual(expected_sample[0], waveform, atol=5e-5, rtol=1e-8)
-        assert (i + 1) == len(self.data)
+        assert (i + 1) == len(self.samples)
