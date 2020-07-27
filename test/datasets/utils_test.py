@@ -2,10 +2,12 @@ import os
 from pathlib import Path
 
 from torchaudio.datasets import utils as dataset_utils
+from torchaudio.datasets.commonvoice import COMMONVOICE
 
 from ..common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
+    get_asset_path,
 )
 
 
@@ -45,3 +47,26 @@ class TestWalkFiles(TempDirMixin, TorchaudioTestCase):
             assert found == self.expected[i]
             n_ites += 1
         assert n_ites == len(self.expected)
+
+
+class TestIterator(TorchaudioTestCase):
+    backend = 'default'
+    path = get_asset_path()
+
+    def test_commonvoice(self):
+        data = COMMONVOICE(self.path, url="tatar")
+        data[0]
+
+    def test_disckcache_iterator(self):
+        data = COMMONVOICE(self.path, url="tatar")
+        data = dataset_utils.diskcache_iterator(data)
+        # Save
+        data[0]
+        # Load
+        data[0]
+
+    def test_bg_iterator(self):
+        data = COMMONVOICE(self.path, url="tatar")
+        data = dataset_utils.bg_iterator(data, 5)
+        for _ in data:
+            pass
