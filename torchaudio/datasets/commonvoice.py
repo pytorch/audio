@@ -13,6 +13,7 @@ from torch.utils.data import Dataset
 # test.tsv
 # train.tsv
 # validated.tsv
+
 FOLDER_IN_ARCHIVE = "CommonVoice"
 URL = "english"
 VERSION = "cv-corpus-4-2019-12-10"
