@@ -47,6 +47,7 @@ LABELS = [
     "zero",
 ]
 
+
 class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
     backend = "default"
 
