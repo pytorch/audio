@@ -62,7 +62,7 @@ class SmokeTest(TempDirMixin, TorchaudioTestCase):
         [8000, 16000],
         [1, 2],
         [-4.2, -0.2, 0, 0.2, 96, 128, 160, 192, 224, 256, 320],
-    )), name_func=name_func)
+    )))
     @skipIfNoMP3
     def test_mp3(self, sample_rate, num_channels, bit_rate):
         """Run smoke test on mp3 format"""
@@ -72,7 +72,7 @@ class SmokeTest(TempDirMixin, TorchaudioTestCase):
         [8000, 16000],
         [1, 2],
         [-1, 0, 1, 2, 3, 3.6, 5, 10],
-    )), name_func=name_func)
+    )))
     def test_vorbis(self, sample_rate, num_channels, quality_level):
         """Run smoke test on vorbis format"""
         self.run_smoke_test('vorbis', sample_rate, num_channels, compression=quality_level)
