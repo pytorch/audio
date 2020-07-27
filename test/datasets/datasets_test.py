@@ -1,5 +1,4 @@
 from torchaudio.datasets.commonvoice import COMMONVOICE
-from torchaudio.datasets.speechcommands import SPEECHCOMMANDS
 from torchaudio.datasets.utils import diskcache_iterator, bg_iterator
 from torchaudio.datasets.vctk import VCTK
 
@@ -15,10 +14,6 @@ class TestDatasets(TorchaudioTestCase):
 
     def test_vctk(self):
         data = VCTK(self.path)
-        data[0]
-
-    def test_speechcommands(self):
-        data = SPEECHCOMMANDS(self.path)
         data[0]
 
 
