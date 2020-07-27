@@ -15,7 +15,7 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
     backend = 'default'
 
     root_dir = None
-    URL = "aew" # default url in CMUARCTIC
+    URL = "aew"  # default url in CMUARCTIC
     samples = []
 
     @classmethod
