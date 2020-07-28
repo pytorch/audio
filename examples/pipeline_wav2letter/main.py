@@ -193,6 +193,42 @@ def model_length_function(tensor):
     return int(tensor.shape[0]) // 2 + 1
 
 
+def compute_error_rates(outputs, targets, decoder, language_model, metric):
+    output = outputs.transpose(0, 1).to("cpu")
+    output = decoder(output)
+
+    # Compute CER
+
+    output = language_model.decode(output.tolist())
+    target = language_model.decode(targets.tolist())
+
+    print_length = 20
+    for i in range(2):
+        # Print a few examples
+        output_print = output[i].ljust(print_length)[:print_length]
+        target_print = target[i].ljust(print_length)[:print_length]
+        logging.info(f"Target: {target_print}   Output: {output_print}")
+
+    cers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
+    cers = sum(cers)
+    n = sum(len(t) for t in target)
+    metric["cer"] += cers
+    metric["total chars"] += n
+    metric["cer over target length"] = metric["cer"] / metric["total chars"]
+
+    # Compute WER
+
+    output = [o.split(language_model.char_space) for o in output]
+    target = [t.split(language_model.char_space) for t in target]
+
+    wers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
+    wers = sum(wers)
+    n = sum(len(t) for t in target)
+    metric["wer"] += wers
+    metric["total words"] += n
+    metric["wer over target length"] = metric["wer"] / metric["total words"]
+
+
 def train_one_epoch(
     model,
     criterion,
@@ -264,42 +300,6 @@ def train_one_epoch(
         scheduler.step(metric["average loss"])
     else:
         scheduler.step()
-
-
-def compute_error_rates(outputs, targets, decoder, language_model, metric):
-    output = outputs.transpose(0, 1).to("cpu")
-    output = decoder(output)
-
-    # Compute CER
-
-    output = language_model.decode(output.tolist())
-    target = language_model.decode(targets.tolist())
-
-    print_length = 20
-    for i in range(2):
-        # Print a few examples
-        output_print = output[i].ljust(print_length)[:print_length]
-        target_print = target[i].ljust(print_length)[:print_length]
-        logging.info(f"Target: {target_print}   Output: {output_print}")
-
-    cers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
-    cers = sum(cers)
-    n = sum(len(t) for t in target)
-    metric["cer"] += cers
-    metric["total chars"] += n
-    metric["cer over target length"] = metric["cer"] / metric["total chars"]
-
-    # Compute WER
-
-    output = [o.split(language_model.char_space) for o in output]
-    target = [t.split(language_model.char_space) for t in target]
-
-    wers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
-    wers = sum(wers)
-    n = sum(len(t) for t in target)
-    metric["wer"] += wers
-    metric["total words"] += n
-    metric["wer over target length"] = metric["wer"] / metric["total words"]
 
 
 def evaluate(
