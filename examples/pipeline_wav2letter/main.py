@@ -3,7 +3,6 @@ import logging
 import os
 import signal
 import string
-from collections import defaultdict
 from datetime import datetime
 from time import time
 
