@@ -1,9 +1,8 @@
-from torchaudio.datasets.commonvoice import COMMONVOICE
 from torchaudio.datasets.librispeech import LIBRISPEECH
 from torchaudio.datasets.speechcommands import SPEECHCOMMANDS
-from torchaudio.datasets.utils import diskcache_iterator, bg_iterator
 from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.ljspeech import LJSPEECH
+from torchaudio.datasets.cmuarctic import CMUARCTIC
 
 from ..common_utils import (
     TorchaudioTestCase,
@@ -53,3 +52,6 @@ class TestCommonVoice(TorchaudioTestCase):
         data = bg_iterator(data, 5)
         for _ in data:
             pass
+    def test_cmuarctic(self):
+        data = CMUARCTIC(self.path)
+        data[0]
