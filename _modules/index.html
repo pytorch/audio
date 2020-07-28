@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -184,12 +184,15 @@
             
               <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../backend.html">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
 </ul>
 
             
@@ -260,8 +263,15 @@
               
   <h1>All modules for which code is available</h1>
 <ul><li><a href="torchaudio.html">torchaudio</a></li>
-<ul><li><a href="torchaudio/compliance/kaldi.html">torchaudio.compliance.kaldi</a></li>
+<ul><li><a href="torchaudio/backend/common.html">torchaudio.backend.common</a></li>
+<li><a href="torchaudio/backend/soundfile_backend.html">torchaudio.backend.soundfile_backend</a></li>
+<li><a href="torchaudio/backend/sox_backend.html">torchaudio.backend.sox_backend</a></li>
+<li><a href="torchaudio/backend/sox_io_backend.html">torchaudio.backend.sox_io_backend</a></li>
+<li><a href="torchaudio/backend/utils.html">torchaudio.backend.utils</a></li>
+<li><a href="torchaudio/compliance/kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li><a href="torchaudio/datasets/cmuarctic.html">torchaudio.datasets.cmuarctic</a></li>
 <li><a href="torchaudio/datasets/commonvoice.html">torchaudio.datasets.commonvoice</a></li>
+<li><a href="torchaudio/datasets/gtzan.html">torchaudio.datasets.gtzan</a></li>
 <li><a href="torchaudio/datasets/librispeech.html">torchaudio.datasets.librispeech</a></li>
 <li><a href="torchaudio/datasets/ljspeech.html">torchaudio.datasets.ljspeech</a></li>
 <li><a href="torchaudio/datasets/speechcommands.html">torchaudio.datasets.speechcommands</a></li>
@@ -269,7 +279,8 @@
 <li><a href="torchaudio/datasets/yesno.html">torchaudio.datasets.yesno</a></li>
 <li><a href="torchaudio/functional.html">torchaudio.functional</a></li>
 <li><a href="torchaudio/kaldi_io.html">torchaudio.kaldi_io</a></li>
-<li><a href="torchaudio/sox_effects.html">torchaudio.sox_effects</a></li>
+<li><a href="torchaudio/models/wav2letter.html">torchaudio.models.wav2letter</a></li>
+<li><a href="torchaudio/sox_effects/sox_effects.html">torchaudio.sox_effects.sox_effects</a></li>
 <li><a href="torchaudio/transforms.html">torchaudio.transforms</a></li>
 </ul></ul>
 
@@ -319,19 +330,20 @@
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js"></script>
-         <script type="text/javascript" src="../_static/katex_autorenderer.js"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script src="../_static/language_data.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script>
+         <script src="../_static/katex_autorenderer.js"></script>
      
 
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
   <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">
@@ -380,25 +392,24 @@
             <li><a href="https://pytorch.org/features">Features</a></li>
             <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
             <li><a href="https://pytorch.org/blog/">Blog</a></li>
-            <li><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col">
           <ul>
-            <li class="list-title"><a href="https://pytorch.org/support">Support</a></li>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
             <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
             <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
             <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
             <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
-            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
-            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
           </ul>
         </div>
 
         <div class="footer-links-col follow-us-col">
           <ul>
-            <li class="list-title">Follow Us</li>
+            <li class="list-title">Stay Connected</li>
             <li>
               <div id="mc_embed_signup">
                 <form
@@ -435,6 +446,7 @@
           <div class="footer-social-icons">
             <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
             <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
           </div>
         </div>
       </div>
@@ -522,6 +534,7 @@
       scrollToAnchor.bind();
       highlightNavigation.bind();
       mainMenuDropdown.bind();
+      filterTags.bind();
 
       // Add class to links that have code blocks, since we cannot create links in code blocks
       $("article.pytorch-article a span.pre").each(function(e) {

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.datasets.librispeech &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.backend.sox_io_backend &mdash; Torchaudio master documentation</title>
   
 
   
@@ -237,7 +237,7 @@
         
           <li><a href="../../torchaudio.html">torchaudio</a> &gt;</li>
         
-      <li>torchaudio.datasets.librispeech</li>
+      <li>torchaudio.backend.sox_io_backend</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -265,131 +265,182 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <h1>Source code for torchaudio.datasets.librispeech</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+  <h1>Source code for torchaudio.backend.sox_io_backend</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">download_url</span><span class="p">,</span>
-    <span class="n">extract_archive</span><span class="p">,</span>
-    <span class="n">walk_files</span><span class="p">,</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;train-clean-100&quot;</span>
-<span class="n">FOLDER_IN_ARCHIVE</span> <span class="o">=</span> <span class="s2">&quot;LibriSpeech&quot;</span>
-<span class="n">_CHECKSUMS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/12/dev-clean.tar.gz&quot;</span><span class="p">:</span>
-    <span class="s2">&quot;76f87d090650617fca0cac8f88b9416e0ebf80350acb97b343a85fa903728ab3&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/12/dev-other.tar.gz&quot;</span><span class="p">:</span>
-    <span class="s2">&quot;12661c48e8c3fe1de2c1caa4c3e135193bfb1811584f11f569dd12645aa84365&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/12/test-clean.tar.gz&quot;</span><span class="p">:</span>
-    <span class="s2">&quot;39fde525e59672dc6d1551919b1478f724438a95aa55f874b576be21967e6c23&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/12/test-other.tar.gz&quot;</span><span class="p">:</span>
-    <span class="s2">&quot;d09c181bba5cf717b3dee7d4d592af11a3ee3a09e08ae025c5506f6ebe961c29&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/12/train-clean-100.tar.gz&quot;</span><span class="p">:</span>
-    <span class="s2">&quot;d4ddd1d5a6ab303066f14971d768ee43278a5f2a0aa43dc716b0e64ecbbbf6e2&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/12/train-clean-360.tar.gz&quot;</span><span class="p">:</span>
-    <span class="s2">&quot;146a56496217e96c14334a160df97fffedd6e0a04e66b9c5af0d40be3c792ecf&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/12/train-other-500.tar.gz&quot;</span><span class="p">:</span>
-    <span class="s2">&quot;ddb22f27f96ec163645d53215559df6aa36515f26e01dd70798188350adcb6d2&quot;</span>
-<span class="p">}</span>
 
+<div class="viewcode-block" id="AudioMetaData"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.AudioMetaData">[docs]</a><span class="k">class</span> <span class="nc">AudioMetaData</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Data class to be returned by :py:func:`~torchaudio.backend.sox_io_backend.info`.</span>
 
-<span class="k">def</span> <span class="nf">load_librispeech_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                          <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                          <span class="n">ext_audio</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                          <span class="n">ext_txt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-    <span class="n">speaker_id</span><span class="p">,</span> <span class="n">chapter_id</span><span class="p">,</span> <span class="n">utterance_id</span> <span class="o">=</span> <span class="n">fileid</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
-
-    <span class="n">file_text</span> <span class="o">=</span> <span class="n">speaker_id</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="n">chapter_id</span> <span class="o">+</span> <span class="n">ext_txt</span>
-    <span class="n">file_text</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">chapter_id</span><span class="p">,</span> <span class="n">file_text</span><span class="p">)</span>
-
-    <span class="n">fileid_audio</span> <span class="o">=</span> <span class="n">speaker_id</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="n">chapter_id</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="n">utterance_id</span>
-    <span class="n">file_audio</span> <span class="o">=</span> <span class="n">fileid_audio</span> <span class="o">+</span> <span class="n">ext_audio</span>
-    <span class="n">file_audio</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">chapter_id</span><span class="p">,</span> <span class="n">file_audio</span><span class="p">)</span>
-
-    <span class="c1"># Load audio</span>
-    <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_audio</span><span class="p">)</span>
-
-    <span class="c1"># Load text</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_text</span><span class="p">)</span> <span class="k">as</span> <span class="n">ft</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ft</span><span class="p">:</span>
-            <span class="n">fileid_text</span><span class="p">,</span> <span class="n">utterance</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">fileid_audio</span> <span class="o">==</span> <span class="n">fileid_text</span><span class="p">:</span>
-                <span class="k">break</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Translation not found</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Translation not found for &quot;</span> <span class="o">+</span> <span class="n">fileid_audio</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="n">waveform</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">,</span>
-        <span class="n">utterance</span><span class="p">,</span>
-        <span class="nb">int</span><span class="p">(</span><span class="n">speaker_id</span><span class="p">),</span>
-        <span class="nb">int</span><span class="p">(</span><span class="n">chapter_id</span><span class="p">),</span>
-        <span class="nb">int</span><span class="p">(</span><span class="n">utterance_id</span><span class="p">),</span>
-    <span class="p">)</span>
-
-
-<div class="viewcode-block" id="LIBRISPEECH"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.LIBRISPEECH">[docs]</a><span class="k">class</span> <span class="nc">LIBRISPEECH</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create a Dataset for LibriSpeech. Each item is a tuple of the form:</span>
-<span class="sd">    waveform, sample_rate, utterance, speaker_id, chapter_id, utterance_id</span>
+<span class="sd">    :ivar int sample_rate: Sample rate</span>
+<span class="sd">    :ivar int num_frames: The number of frames</span>
+<span class="sd">    :ivar int num_channels: The number of channels</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="n">sample_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_frames</span> <span class="o">=</span> <span class="n">num_frames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span> <span class="o">=</span> <span class="n">num_channels</span></div>
 
-    <span class="n">_ext_txt</span> <span class="o">=</span> <span class="s2">&quot;.trans.txt&quot;</span>
-    <span class="n">_ext_audio</span> <span class="o">=</span> <span class="s2">&quot;.flac&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                 <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">URL</span><span class="p">,</span>
-                 <span class="n">folder_in_archive</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">FOLDER_IN_ARCHIVE</span><span class="p">,</span>
-                 <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Get signal information of an audio file.</span>
 
-        <span class="k">if</span> <span class="n">url</span> <span class="ow">in</span> <span class="p">[</span>
-            <span class="s2">&quot;dev-clean&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;dev-other&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;test-clean&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;test-other&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;train-clean-100&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;train-clean-360&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;train-other-500&quot;</span><span class="p">,</span>
-        <span class="p">]:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        filepath (str): Path to audio file</span>
 
-            <span class="n">ext_archive</span> <span class="o">=</span> <span class="s2">&quot;.tar.gz&quot;</span>
-            <span class="n">base_url</span> <span class="o">=</span> <span class="s2">&quot;http://www.openslr.org/resources/12/&quot;</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        AudioMetaData: meta data of the given audio.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_get_info</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">(),</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">get_num_frames</span><span class="p">(),</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">get_num_channels</span><span class="p">())</span></div>
 
-            <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">url</span> <span class="o">+</span> <span class="n">ext_archive</span><span class="p">)</span>
 
-        <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.load">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">load</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">frame_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Load audio data from file.</span>
 
-        <span class="n">basename</span> <span class="o">=</span> <span class="n">basename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">folder_in_archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_in_archive</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
+<span class="sd">    Note:</span>
+<span class="sd">        This function can handle all the codecs that underlying libsox can handle,</span>
+<span class="sd">        however it is tested on the following formats;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">)</span>
+<span class="sd">        * WAV</span>
 
-        <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">archive</span><span class="p">):</span>
-                    <span class="n">checksum</span> <span class="o">=</span> <span class="n">_CHECKSUMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                    <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">)</span>
-                <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">)</span>
+<span class="sd">            * 32-bit floating-point</span>
+<span class="sd">            * 32-bit signed integer</span>
+<span class="sd">            * 16-bit signed integer</span>
+<span class="sd">            * 8-bit unsigned integer</span>
 
-        <span class="n">walker</span> <span class="o">=</span> <span class="n">walk_files</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_suffix</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">walker</span><span class="p">)</span>
+<span class="sd">        * MP3</span>
+<span class="sd">        * FLAC</span>
+<span class="sd">        * OGG/VORBIS</span>
+<span class="sd">        * OPUS</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-        <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">load_librispeech_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_txt</span><span class="p">)</span>
+<span class="sd">        To load ``MP3``, ``FLAC``, ``OGG/VORBIS``, ``OPUS`` and other codecs ``libsox`` does not</span>
+<span class="sd">        handle natively, your installation of ``torchaudio`` has to be linked to ``libsox``</span>
+<span class="sd">        and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">)</span></div>
+<span class="sd">    By default (``normalize=True``, ``channels_first=True``), this function returns Tensor with</span>
+<span class="sd">    ``float32`` dtype and the shape of ``[channel, time]``.</span>
+<span class="sd">    The samples are normalized to fit in the range of ``[-1.0, 1.0]``.</span>
+
+<span class="sd">    When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit</span>
+<span class="sd">    signed integer and 8-bit unsigned integer (24-bit signed integer is not supported),</span>
+<span class="sd">    by providing ``normalize=False``, this function can return integer Tensor, where the samples</span>
+<span class="sd">    are expressed within the whole range of the corresponding dtype, that is, ``int32`` tensor</span>
+<span class="sd">    for 32-bit signed PCM, ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM.</span>
+
+<span class="sd">    ``normalize`` parameter has no effect on 32-bit floating-point WAV and other formats, such as</span>
+<span class="sd">    ``flac`` and ``mp3``.</span>
+<span class="sd">    For these formats, this function always returns ``float32`` Tensor with values normalized to</span>
+<span class="sd">    ``[-1.0, 1.0]``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filepath (str):</span>
+<span class="sd">            Path to audio file</span>
+<span class="sd">        frame_offset (int):</span>
+<span class="sd">            Number of frames to skip before start reading data.</span>
+<span class="sd">        num_frames (int):</span>
+<span class="sd">            Maximum number of frames to read. ``-1`` reads all the remaining samples,</span>
+<span class="sd">            starting from ``frame_offset``.</span>
+<span class="sd">            This function may return the less number of frames if there is not enough</span>
+<span class="sd">            frames in the given file.</span>
+<span class="sd">        normalize (bool):</span>
+<span class="sd">            When ``True``, this function always return ``float32``, and sample values are</span>
+<span class="sd">            normalized to ``[-1.0, 1.0]``.</span>
+<span class="sd">            If input file is integer WAV, giving ``False`` will change the resulting Tensor type to</span>
+<span class="sd">            integer type.</span>
+<span class="sd">            This argument has no effect for formats other than integer WAV type.</span>
+<span class="sd">        channels_first (bool):</span>
+<span class="sd">            When True, the returned Tensor has dimension ``[channel, time]``.</span>
+<span class="sd">            Otherwise, the returned Tensor&#39;s dimension is ``[time, channel]``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor:</span>
+<span class="sd">            If the input file has integer wav format and normalization is off, then it has</span>
+<span class="sd">            integer type, else ``float32`` type. If ``channels_first=True``, it has</span>
+<span class="sd">            ``[channel, time]`` else ``[time, channel]``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_load_audio_file</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_tensor</span><span class="p">(),</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.save">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">save</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">compression</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save audio data to file.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Supported formats are;</span>
+
+<span class="sd">        * WAV</span>
+
+<span class="sd">            * 32-bit floating-point</span>
+<span class="sd">            * 32-bit signed integer</span>
+<span class="sd">            * 16-bit signed integer</span>
+<span class="sd">            * 8-bit unsigned integer</span>
+
+<span class="sd">        * MP3</span>
+<span class="sd">        * FLAC</span>
+<span class="sd">        * OGG/VORBIS</span>
+
+<span class="sd">        To save ``MP3``, ``FLAC``, ``OGG/VORBIS``, and other codecs ``libsox`` does not</span>
+<span class="sd">        handle natively, your installation of ``torchaudio`` has to be linked to ``libsox``</span>
+<span class="sd">        and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filepath (str): Path to save file.</span>
+<span class="sd">        tensor (torch.Tensor): Audio data to save. must be 2D tensor.</span>
+<span class="sd">        sample_rate (int): sampling rate</span>
+<span class="sd">        channels_first (bool):</span>
+<span class="sd">            If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
+<span class="sd">            otherwise ``[time, channel]``.</span>
+<span class="sd">        compression (Optional[float]):</span>
+<span class="sd">            Used for formats other than WAV. This corresponds to ``-C`` option of ``sox`` command.</span>
+
+<span class="sd">                * | ``MP3``: Either bitrate (in ``kbps``) with quality factor, such as ``128.2``, or</span>
+<span class="sd">                  | VBR encoding with quality factor such as ``-4.2``. Default: ``-4.5``.</span>
+<span class="sd">                * | ``FLAC``: compression level. Whole number from ``0`` to ``8``.</span>
+<span class="sd">                  | ``8`` is default and highest compression.</span>
+<span class="sd">                * | ``OGG/VORBIS``: number from ``-1`` to ``10``; ``-1`` is the highest compression</span>
+<span class="sd">                  | and lowest quality. Default: ``3``.</span>
+
+<span class="sd">            See the detail at http://sox.sourceforge.net/soxformat.html.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">compression</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;wav&#39;</span><span class="p">:</span>
+            <span class="n">compression</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;mp3&#39;</span><span class="p">:</span>
+            <span class="n">compression</span> <span class="o">=</span> <span class="o">-</span><span class="mf">4.5</span>
+        <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;flac&#39;</span><span class="p">:</span>
+            <span class="n">compression</span> <span class="o">=</span> <span class="mf">8.</span>
+        <span class="k">elif</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ogg&#39;</span><span class="p">,</span> <span class="s1">&#39;vorbis&#39;</span><span class="p">]:</span>
+            <span class="n">compression</span> <span class="o">=</span> <span class="mf">3.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported file type: &quot;</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">TensorSignal</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_save_audio_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">compression</span><span class="p">)</span></div>
+
+
+<span class="n">load_wav</span> <span class="o">=</span> <span class="n">load</span>
 </pre></div>
 
              </article>

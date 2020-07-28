@@ -1,0 +1,1321 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torchaudio.backend &mdash; Torchaudio master documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="torchaudio.functional" href="functional.html" />
+    <link rel="prev" title="torchaudio" href="torchaudio.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <div class="ecosystem-dropdown">
+              <a id="dropdownMenuButton" data-toggle="ecosystem-dropdown">
+                Ecosystem
+              </a>
+              <div class="ecosystem-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub"">
+                  <span class=dropdown-title>Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
+                  <span class=dropdown-title>Tools & Libraries</span>
+                  <p>Explore the ecosystem of tools and libraries</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <div class="resources-dropdown">
+              <a id="resourcesDropdownButton" data-toggle="resources-dropdown">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources"">
+                  <span class=dropdown-title>Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class=dropdown-title>About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+
+  </div>
+</div>
+
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+                <div class="version">
+                  master 
+                </div>
+              
+            
+
+            
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Package Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>torchaudio.backend</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="_sources/backend.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="section" id="torchaudio-backend">
+<span id="backend"></span><h1>torchaudio.backend<a class="headerlink" href="#torchaudio-backend" title="Permalink to this headline">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.backend</span></code> module provides implementations for audio file I/O, using different backend libraries.
+To switch backend, use <a class="reference internal" href="torchaudio.html#torchaudio.set_audio_backend" title="torchaudio.set_audio_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.set_audio_backend()</span></code></a>. To check the current backend use <a class="reference internal" href="torchaudio.html#torchaudio.get_audio_backend" title="torchaudio.get_audio_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.get_audio_backend()</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Although <code class="docutils literal notranslate"><span class="pre">sox</span></code> backend is default for backward compatibility reason, it has a number of issues, therefore it is highly recommended to use <code class="docutils literal notranslate"><span class="pre">sox_io</span></code> backend instead. Note, however, that due to the interface refinement, functions defined in <code class="docutils literal notranslate"><span class="pre">sox</span></code> backend and those defined in <code class="docutils literal notranslate"><span class="pre">sox_io</span></code> backend do not have the same signatures.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Instead of calling functions in <code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.backend</span></code> directly, please use <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torhcaudio.load</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load_wav</span></code> and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code> with proper backend set with <a class="reference internal" href="torchaudio.html#torchaudio.get_audio_backend" title="torchaudio.get_audio_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.get_audio_backend()</span></code></a>.</p>
+</div>
+<p>There are currently three implementations available.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="#sox-backend"><span class="std std-ref">sox</span></a></p></li>
+<li><p><a class="reference internal" href="#sox-io-backend"><span class="std std-ref">sox_io</span></a></p></li>
+<li><p><a class="reference internal" href="#soundfile-backend"><span class="std std-ref">soundfile</span></a></p></li>
+</ul>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">sox</span></code> backend is the original backend which is built on <code class="docutils literal notranslate"><span class="pre">libsox</span></code>. This module is currently default but is known to have number of issues, such as wrong handling of WAV files other than 16-bit signed integer. Users are encouraged to use <code class="docutils literal notranslate"><span class="pre">sox_io</span></code> backend. This backend requires C++ extension module and is not available on Windows system.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sox_io</span></code> backend is the new backend which is built on <code class="docutils literal notranslate"><span class="pre">libsox</span></code> and bound to Python with <code class="docutils literal notranslate"><span class="pre">Torchscript</span></code>. This module addresses all the known issues <code class="docutils literal notranslate"><span class="pre">sox</span></code> backend has. Function calls to this backend can be Torchscriptable. This backend requires C++ extension module and is not available on Windows system.</p>
+<p><code class="docutils literal notranslate"><span class="pre">soundfile</span></code> backend is built on <code class="docutils literal notranslate"><span class="pre">PySoundFile</span></code>. You need to install <code class="docutils literal notranslate"><span class="pre">PySoundFile</span></code> separately.</p>
+<div class="section" id="common-data-structure">
+<h2>Common Data Structure<a class="headerlink" href="#common-data-structure" title="Permalink to this headline">¶</a></h2>
+<p>Structures used to exchange data between Python interface and <code class="docutils literal notranslate"><span class="pre">libsox</span></code>. They are used by <a class="reference internal" href="#sox-backend"><span class="std std-ref">sox</span></a> and <a class="reference internal" href="#soundfile-backend"><span class="std std-ref">soundfile</span></a> but not by <a class="reference internal" href="#sox-io-backend"><span class="std std-ref">sox_io</span></a>.</p>
+<dl class="py class">
+<dt id="torchaudio.backend.common.SignalInfo">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.backend.common.</code><code class="sig-name descname">SignalInfo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">channels</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">rate</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">precision</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">length</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/common.html#SignalInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.common.SignalInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data class returned <code class="docutils literal notranslate"><span class="pre">info</span></code> functions.</p>
+<p>Used by <a class="reference internal" href="#sox-backend"><span class="std std-ref">sox backend</span></a> and <a class="reference internal" href="#soundfile-backend"><span class="std std-ref">soundfile backend</span></a></p>
+<p>See <a class="reference external" href="https://fossies.org/dox/sox-14.4.2/structsox__signalinfo__t.html">https://fossies.org/dox/sox-14.4.2/structsox__signalinfo__t.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>channels</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>]</em>) – The number of channels</p></li>
+<li><p><strong>rate</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – Sampleing rate</p></li>
+<li><p><strong>precision</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>]</em>) – Bit depth</p></li>
+<li><p><strong>length</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>]</em>) – For <a class="reference internal" href="#sox-backend"><span class="std std-ref">sox backend</span></a>, the number of samples.
+(frames * channels). For <a class="reference internal" href="#soundfile-backend"><span class="std std-ref">soundfile backend</span></a>, the number of frames.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="torchaudio.backend.common.EncodingInfo">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.backend.common.</code><code class="sig-name descname">EncodingInfo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">encoding</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bits_per_sample</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">compression</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reverse_bytes</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reverse_nibbles</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reverse_bits</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">opposite_endian</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/common.html#EncodingInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.common.EncodingInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data class returned <code class="docutils literal notranslate"><span class="pre">info</span></code> functions.</p>
+<p>Used by <a class="reference internal" href="#sox-backend"><span class="std std-ref">sox backend</span></a> and <a class="reference internal" href="#soundfile-backend"><span class="std std-ref">soundfile backend</span></a></p>
+<p>See <a class="reference external" href="https://fossies.org/dox/sox-14.4.2/structsox__encodinginfo__t.html">https://fossies.org/dox/sox-14.4.2/structsox__encodinginfo__t.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoding</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>]</em>) – sox_encoding_t</p></li>
+<li><p><strong>bits_per_sample</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>]</em>) – bit depth</p></li>
+<li><p><strong>compression</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – Compression option</p></li>
+<li><p><strong>reverse_bytes</strong> (<em>Any</em>) – </p></li>
+<li><p><strong>reverse_nibbles</strong> (<em>Any</em>) – </p></li>
+<li><p><strong>reverse_bits</strong> (<em>Any</em>) – </p></li>
+<li><p><strong>opposite_endian</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>]</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="sox-backend">
+<span id="id1"></span><h2>Sox Backend<a class="headerlink" href="#sox-backend" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">sox</span></code> backend is available on <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> installation with C++ extension. It is currently not available on Windows system.</p>
+<p>It is currently default backend when it’s available. You can switch from another backend to <code class="docutils literal notranslate"><span class="pre">sox</span></code> backend with the following;</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torchaudio</span><span class="o">.</span><span class="n">set_audio_backend</span><span class="p">(</span><span class="s2">&quot;sox&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="info">
+<h3>info<a class="headerlink" href="#info" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.sox_backend.info">
+<code class="sig-prename descclassname">torchaudio.backend.sox_backend.</code><code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference internal" href="#torchaudio.backend.common.SignalInfo" title="torchaudio.backend.common.SignalInfo">torchaudio.backend.common.SignalInfo</a><span class="p">, </span><a class="reference internal" href="#torchaudio.backend.common.EncodingInfo" title="torchaudio.backend.common.EncodingInfo">torchaudio.backend.common.EncodingInfo</a><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/backend/sox_backend.html#info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_backend.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets metadata from an audio file without loading the signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filepath</strong> – Path to audio file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A si (sox_signalinfo_t) signal</dt><dd><p>info as a python object. An ei (sox_encodinginfo_t) encoding info</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(sox_signalinfo_t, sox_encodinginfo_t)</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">si</span><span class="p">,</span> <span class="n">ei</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;foo.wav&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rate</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">rate</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span> <span class="n">ei</span><span class="o">.</span><span class="n">encoding</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="load">
+<h3>load<a class="headerlink" href="#load" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.sox_backend.load">
+<code class="sig-prename descclassname">torchaudio.backend.sox_backend.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>torch.Tensor<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">normalization</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">channels_first</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">num_frames</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">offset</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">signalinfo</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#torchaudio.backend.common.SignalInfo" title="torchaudio.backend.common.SignalInfo">torchaudio.backend.common.SignalInfo</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">encodinginfo</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#torchaudio.backend.common.EncodingInfo" title="torchaudio.backend.common.EncodingInfo">torchaudio.backend.common.EncodingInfo</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filetype</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>torch.Tensor<span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/backend/sox_backend.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_backend.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads an audio file from disk into a tensor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> – Path to audio file</p></li>
+<li><p><strong>out</strong> – An optional output tensor to use instead of creating one. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>normalization</strong> – Optional normalization.
+If boolean <cite>True</cite>, then output is divided by <cite>1 &lt;&lt; 31</cite>.
+Assuming the input is signed 32-bit audio, this normalizes to <cite>[-1, 1]</cite>.
+If <cite>float</cite>, then output is divided by that number.
+If <cite>Callable</cite>, then the output is passed as a paramete to the given function,
+then the output is divided by the result. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>channels_first</strong> – Set channels first or length first in result. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>num_frames</strong> – Number of frames to load.  0 to load everything after the offset.
+(Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
+<li><p><strong>offset</strong> – Number of frames from the start of the file to begin data loading.
+(Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
+<li><p><strong>signalinfo</strong> – A sox_signalinfo_t type, which could be helpful if the
+audio type cannot be automatically determined. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>encodinginfo</strong> – A sox_encodinginfo_t type, which could be set if the
+audio type cannot be automatically determined. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>filetype</strong> – A filetype or extension to be set if sox cannot determine it
+automatically. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>An output tensor of size <cite>[C x L]</cite> or <cite>[L x C]</cite> where</dt><dd><p>L is the number of audio frames and
+C is the number of channels.
+An integer which is the sample rate of the audio (as listed in the metadata of the file)</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(Tensor, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+<span class="go">torch.Size([2, 278756])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)</span>
+<span class="go">44100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_vol_normalized</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_vol_normalized</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+<span class="go">1.</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.backend.sox_backend.load_wav">
+<code class="sig-prename descclassname">torchaudio.backend.sox_backend.</code><code class="sig-name descname">load_wav</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/sox_backend.html#load_wav"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_backend.load_wav" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a wave file.</p>
+<p>It assumes that the wav file uses 16 bit per sample that needs normalization by
+shifting the input right by 16 bits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filepath</strong> – Path to audio file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>An output tensor of size <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is the number</dt><dd><p>of audio frames and C is the number of channels. An integer which is the sample rate of the
+audio (as listed in the metadata of the file)</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(Tensor, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="save">
+<h3>save<a class="headerlink" href="#save" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.sox_backend.save">
+<code class="sig-prename descclassname">torchaudio.backend.sox_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">src</span><span class="p">:</span> <span class="n">torch.Tensor</span></em>, <em class="sig-param"><span class="n">sample_rate</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span></em>, <em class="sig-param"><span class="n">precision</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">16</span></em>, <em class="sig-param"><span class="n">channels_first</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a><a class="reference internal" href="_modules/torchaudio/backend/sox_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_backend.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves a Tensor on file as an audio file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> – Path to audio file</p></li>
+<li><p><strong>src</strong> – An input 2D tensor of shape <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is
+the number of audio frames, C is the number of channels</p></li>
+<li><p><strong>sample_rate</strong> – An integer which is the sample rate of the
+audio (as listed in the metadata of the file)</p></li>
+<li><p><strong>Bit precision (Default</strong> (<em>precision</em>) – <code class="docutils literal notranslate"><span class="pre">16</span></code>)</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Set channels first or length first in result. (
+Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-torchaudio.backend.sox_backend">
+<span id="others"></span><h3>others<a class="headerlink" href="#module-torchaudio.backend.sox_backend" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.sox_backend.get_sox_bool">
+<code class="sig-prename descclassname">torchaudio.backend.sox_backend.</code><code class="sig-name descname">get_sox_bool</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">i</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/torchaudio/backend/sox_backend.html#get_sox_bool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_backend.get_sox_bool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get enum of sox_bool for sox encodinginfo options.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Choose type or get a dict with all possible options
+use <code class="docutils literal notranslate"><span class="pre">__members__</span></code> to see all options when not specified. (Default:
+<code class="docutils literal notranslate"><span class="pre">sox_false</span></code> or <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A sox_bool type</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>sox_bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.backend.sox_backend.get_sox_encoding_t">
+<code class="sig-prename descclassname">torchaudio.backend.sox_backend.</code><code class="sig-name descname">get_sox_encoding_t</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">i</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.backend.common.EncodingInfo" title="torchaudio.backend.common.EncodingInfo">torchaudio.backend.common.EncodingInfo</a><a class="reference internal" href="_modules/torchaudio/backend/sox_backend.html#get_sox_encoding_t"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_backend.get_sox_encoding_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get enum of sox_encoding_t for sox encodings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Choose type or get a dict with all possible options
+use <code class="docutils literal notranslate"><span class="pre">__members__</span></code> to see all options when not specified. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A sox_encoding_t type for output encoding</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>sox_encoding_t</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.backend.sox_backend.get_sox_option_t">
+<code class="sig-prename descclassname">torchaudio.backend.sox_backend.</code><code class="sig-name descname">get_sox_option_t</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">i</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">2</span></em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/torchaudio/backend/sox_backend.html#get_sox_option_t"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_backend.get_sox_option_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get enum of sox_option_t for sox encodinginfo options.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Choose type or get a dict with all possible options
+use <code class="docutils literal notranslate"><span class="pre">__members__</span></code> to see all options when not specified.
+(Default: <code class="docutils literal notranslate"><span class="pre">sox_option_default</span></code> or <code class="docutils literal notranslate"><span class="pre">2</span></code>)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A sox_option_t type</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>sox_option_t</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.backend.sox_backend.save_encinfo">
+<code class="sig-prename descclassname">torchaudio.backend.sox_backend.</code><code class="sig-name descname">save_encinfo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">src</span><span class="p">:</span> <span class="n">torch.Tensor</span></em>, <em class="sig-param"><span class="n">channels_first</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">signalinfo</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="#torchaudio.backend.common.SignalInfo" title="torchaudio.backend.common.SignalInfo">torchaudio.backend.common.SignalInfo</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">encodinginfo</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="#torchaudio.backend.common.EncodingInfo" title="torchaudio.backend.common.EncodingInfo">torchaudio.backend.common.EncodingInfo</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filetype</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a><a class="reference internal" href="_modules/torchaudio/backend/sox_backend.html#save_encinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_backend.save_encinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves a tensor of an audio signal to disk as a standard format like mp3, wav, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to audio file</p></li>
+<li><p><strong>src</strong> (<em>Tensor</em>) – An input 2D tensor of shape <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is
+the number of audio frames, C is the number of channels</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Set channels first or length first in result. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>signalinfo</strong> (<em>sox_signalinfo_t</em><em>, </em><em>optional</em>) – A sox_signalinfo_t type, which could be helpful if the
+audio type cannot be automatically determined (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>).</p></li>
+<li><p><strong>encodinginfo</strong> (<em>sox_encodinginfo_t</em><em>, </em><em>optional</em>) – A sox_encodinginfo_t type, which could be set if the
+audio type cannot be automatically determined (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>).</p></li>
+<li><p><strong>filetype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – A filetype or extension to be set if sox cannot determine it
+automatically. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;foo.wav&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.backend.sox_backend.sox_encodinginfo_t">
+<code class="sig-prename descclassname">torchaudio.backend.sox_backend.</code><code class="sig-name descname">sox_encodinginfo_t</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.backend.common.EncodingInfo" title="torchaudio.backend.common.EncodingInfo">torchaudio.backend.common.EncodingInfo</a><a class="reference internal" href="_modules/torchaudio/backend/sox_backend.html#sox_encodinginfo_t"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_backend.sox_encodinginfo_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a sox_encodinginfo_t object.  This object can be used to set the encoding
+type, bit precision, compression factor, reverse bytes, reverse nibbles,
+reverse bits and endianness.  This can be used in an effects chain to encode the
+final output or to save a file with a specific encoding.  For example, one could
+use the sox ulaw encoding to do 8-bit ulaw encoding.  Note in a tensor output
+the result will be a 32-bit number, but number of unique values will be determined by
+the bit precision.</p>
+<dl>
+<dt>Returns: sox_encodinginfo_t(object)</dt><dd><ul class="simple">
+<li><p>encoding (sox_encoding_t), output encoding</p></li>
+<li><p>bits_per_sample (int), bit precision, same as <cite>precision</cite> in sox_signalinfo_t</p></li>
+<li><p>compression (float), compression for lossy formats, 0.0 for default compression</p></li>
+<li><p>reverse_bytes (sox_option_t), reverse bytes, use sox_option_default</p></li>
+<li><p>reverse_nibbles (sox_option_t), reverse nibbles, use sox_option_default</p></li>
+<li><p>reverse_bits (sox_option_t), reverse bytes, use sox_option_default</p></li>
+<li><p>opposite_endian (sox_bool), change endianness, use sox_false</p></li>
+</ul>
+</dd>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ei</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_encodinginfo_t</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ei</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">get_sox_encoding_t</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ei</span><span class="o">.</span><span class="n">bits_per_sample</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ei</span><span class="o">.</span><span class="n">compression</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ei</span><span class="o">.</span><span class="n">reverse_bytes</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">get_sox_option_t</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ei</span><span class="o">.</span><span class="n">reverse_nibbles</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">get_sox_option_t</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ei</span><span class="o">.</span><span class="n">reverse_bits</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">get_sox_option_t</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ei</span><span class="o">.</span><span class="n">opposite_endian</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">get_sox_bool</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.backend.sox_backend.sox_signalinfo_t">
+<code class="sig-prename descclassname">torchaudio.backend.sox_backend.</code><code class="sig-name descname">sox_signalinfo_t</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.backend.common.SignalInfo" title="torchaudio.backend.common.SignalInfo">torchaudio.backend.common.SignalInfo</a><a class="reference internal" href="_modules/torchaudio/backend/sox_backend.html#sox_signalinfo_t"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_backend.sox_signalinfo_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a sox_signalinfo_t object. This object can be used to set the sample
+rate, number of channels, length, bit precision and headroom multiplier
+primarily for effects</p>
+<dl>
+<dt>Returns: sox_signalinfo_t(object)</dt><dd><ul class="simple">
+<li><p>rate (float), sample rate as a float, practically will likely be an integer float</p></li>
+<li><p>channel (int), number of audio channels</p></li>
+<li><p>precision (int), bit precision</p></li>
+<li><p>length (int), length of audio in samples * channels, 0 for unspecified and -1 for unknown</p></li>
+<li><p>mult (float, optional), headroom multiplier for effects and <code class="docutils literal notranslate"><span class="pre">None</span></code> for no multiplier</p></li>
+</ul>
+</dd>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">si</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_signalinfo_t</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">si</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">si</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="mf">16000.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">si</span><span class="o">.</span><span class="n">precision</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">si</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="sox-io-backend">
+<span id="id2"></span><h2>Sox IO Backend<a class="headerlink" href="#sox-io-backend" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">sox_io</span></code> backend is available on <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> installation with C++ extension. It is currently not available on Windows system.</p>
+<p>This new backend is recommended over <code class="docutils literal notranslate"><span class="pre">sox</span></code> backend. You can switch from another backend to <code class="docutils literal notranslate"><span class="pre">sox_io</span></code> backend with the following;</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torchaudio</span><span class="o">.</span><span class="n">set_audio_backend</span><span class="p">(</span><span class="s2">&quot;sox_io&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The function call to this backend can be Torchsript-able. You can apply <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.jit.script()</span></code> and dump the object to file, then call it from C++ application.</p>
+<div class="section" id="id3">
+<h3>info<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="torchaudio.backend.sox_io_backend.AudioMetaData">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.backend.sox_io_backend.</code><code class="sig-name descname">AudioMetaData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample_rate</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span></em>, <em class="sig-param"><span class="n">num_frames</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span></em>, <em class="sig-param"><span class="n">num_channels</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#AudioMetaData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.AudioMetaData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data class to be returned by <a class="reference internal" href="#torchaudio.backend.sox_io_backend.info" title="torchaudio.backend.sox_io_backend.info"><code class="xref py py-func docutils literal notranslate"><span class="pre">info()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Sample rate</p></li>
+<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of frames</p></li>
+<li><p><strong>num_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of channels</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.backend.sox_io_backend.info">
+<code class="sig-prename descclassname">torchaudio.backend.sox_io_backend.</code><code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#torchaudio.backend.sox_io_backend.AudioMetaData" title="torchaudio.backend.sox_io_backend.AudioMetaData">torchaudio.backend.sox_io_backend.AudioMetaData</a><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get signal information of an audio file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to audio file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>meta data of the given audio.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#torchaudio.backend.sox_io_backend.AudioMetaData" title="torchaudio.backend.sox_io_backend.AudioMetaData">AudioMetaData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>load<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.sox_io_backend.load">
+<code class="sig-prename descclassname">torchaudio.backend.sox_io_backend.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">frame_offset</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">num_frames</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">normalize</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">channels_first</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>torch.Tensor<span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load audio data from file.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function can handle all the codecs that underlying libsox can handle,
+however it is tested on the following formats;</p>
+<ul>
+<li><p>WAV</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>32-bit floating-point</p></li>
+<li><p>32-bit signed integer</p></li>
+<li><p>16-bit signed integer</p></li>
+<li><p>8-bit unsigned integer</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>MP3</p></li>
+<li><p>FLAC</p></li>
+<li><p>OGG/VORBIS</p></li>
+<li><p>OPUS</p></li>
+</ul>
+<p>To load <code class="docutils literal notranslate"><span class="pre">MP3</span></code>, <code class="docutils literal notranslate"><span class="pre">FLAC</span></code>, <code class="docutils literal notranslate"><span class="pre">OGG/VORBIS</span></code>, <code class="docutils literal notranslate"><span class="pre">OPUS</span></code> and other codecs <code class="docutils literal notranslate"><span class="pre">libsox</span></code> does not
+handle natively, your installation of <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> has to be linked to <code class="docutils literal notranslate"><span class="pre">libsox</span></code>
+and corresponding codec libraries such as <code class="docutils literal notranslate"><span class="pre">libmad</span></code> or <code class="docutils literal notranslate"><span class="pre">libmp3lame</span></code> etc.</p>
+</div>
+<p>By default (<code class="docutils literal notranslate"><span class="pre">normalize=True</span></code>, <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>), this function returns Tensor with
+<code class="docutils literal notranslate"><span class="pre">float32</span></code> dtype and the shape of <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
+The samples are normalized to fit in the range of <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.</p>
+<p>When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
+signed integer and 8-bit unsigned integer (24-bit signed integer is not supported),
+by providing <code class="docutils literal notranslate"><span class="pre">normalize=False</span></code>, this function can return integer Tensor, where the samples
+are expressed within the whole range of the corresponding dtype, that is, <code class="docutils literal notranslate"><span class="pre">int32</span></code> tensor
+for 32-bit signed PCM, <code class="docutils literal notranslate"><span class="pre">int16</span></code> for 16-bit signed PCM and <code class="docutils literal notranslate"><span class="pre">uint8</span></code> for 8-bit unsigned PCM.</p>
+<p><code class="docutils literal notranslate"><span class="pre">normalize</span></code> parameter has no effect on 32-bit floating-point WAV and other formats, such as
+<code class="docutils literal notranslate"><span class="pre">flac</span></code> and <code class="docutils literal notranslate"><span class="pre">mp3</span></code>.
+For these formats, this function always returns <code class="docutils literal notranslate"><span class="pre">float32</span></code> Tensor with values normalized to
+<code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to audio file</p></li>
+<li><p><strong>frame_offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of frames to skip before start reading data.</p></li>
+<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Maximum number of frames to read. <code class="docutils literal notranslate"><span class="pre">-1</span></code> reads all the remaining samples,
+starting from <code class="docutils literal notranslate"><span class="pre">frame_offset</span></code>.
+This function may return the less number of frames if there is not enough
+frames in the given file.</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function always return <code class="docutils literal notranslate"><span class="pre">float32</span></code>, and sample values are
+normalized to <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.
+If input file is integer WAV, giving <code class="docutils literal notranslate"><span class="pre">False</span></code> will change the resulting Tensor type to
+integer type.
+This argument has no effect for formats other than integer WAV type.</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – When True, the returned Tensor has dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
+Otherwise, the returned Tensor’s dimension is <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>If the input file has integer wav format and normalization is off, then it has
+integer type, else <code class="docutils literal notranslate"><span class="pre">float32</span></code> type. If <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>, it has
+<code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code> else <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.backend.sox_io_backend.load_wav">
+<code class="sig-prename descclassname">torchaudio.backend.sox_io_backend.</code><code class="sig-name descname">load_wav</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">frame_offset</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">num_frames</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">normalize</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">channels_first</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>torch.Tensor<span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a><span class="p">]</span><a class="headerlink" href="#torchaudio.backend.sox_io_backend.load_wav" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load audio data from file.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function can handle all the codecs that underlying libsox can handle,
+however it is tested on the following formats;</p>
+<ul>
+<li><p>WAV</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>32-bit floating-point</p></li>
+<li><p>32-bit signed integer</p></li>
+<li><p>16-bit signed integer</p></li>
+<li><p>8-bit unsigned integer</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>MP3</p></li>
+<li><p>FLAC</p></li>
+<li><p>OGG/VORBIS</p></li>
+<li><p>OPUS</p></li>
+</ul>
+<p>To load <code class="docutils literal notranslate"><span class="pre">MP3</span></code>, <code class="docutils literal notranslate"><span class="pre">FLAC</span></code>, <code class="docutils literal notranslate"><span class="pre">OGG/VORBIS</span></code>, <code class="docutils literal notranslate"><span class="pre">OPUS</span></code> and other codecs <code class="docutils literal notranslate"><span class="pre">libsox</span></code> does not
+handle natively, your installation of <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> has to be linked to <code class="docutils literal notranslate"><span class="pre">libsox</span></code>
+and corresponding codec libraries such as <code class="docutils literal notranslate"><span class="pre">libmad</span></code> or <code class="docutils literal notranslate"><span class="pre">libmp3lame</span></code> etc.</p>
+</div>
+<p>By default (<code class="docutils literal notranslate"><span class="pre">normalize=True</span></code>, <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>), this function returns Tensor with
+<code class="docutils literal notranslate"><span class="pre">float32</span></code> dtype and the shape of <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
+The samples are normalized to fit in the range of <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.</p>
+<p>When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
+signed integer and 8-bit unsigned integer (24-bit signed integer is not supported),
+by providing <code class="docutils literal notranslate"><span class="pre">normalize=False</span></code>, this function can return integer Tensor, where the samples
+are expressed within the whole range of the corresponding dtype, that is, <code class="docutils literal notranslate"><span class="pre">int32</span></code> tensor
+for 32-bit signed PCM, <code class="docutils literal notranslate"><span class="pre">int16</span></code> for 16-bit signed PCM and <code class="docutils literal notranslate"><span class="pre">uint8</span></code> for 8-bit unsigned PCM.</p>
+<p><code class="docutils literal notranslate"><span class="pre">normalize</span></code> parameter has no effect on 32-bit floating-point WAV and other formats, such as
+<code class="docutils literal notranslate"><span class="pre">flac</span></code> and <code class="docutils literal notranslate"><span class="pre">mp3</span></code>.
+For these formats, this function always returns <code class="docutils literal notranslate"><span class="pre">float32</span></code> Tensor with values normalized to
+<code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to audio file</p></li>
+<li><p><strong>frame_offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of frames to skip before start reading data.</p></li>
+<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Maximum number of frames to read. <code class="docutils literal notranslate"><span class="pre">-1</span></code> reads all the remaining samples,
+starting from <code class="docutils literal notranslate"><span class="pre">frame_offset</span></code>.
+This function may return the less number of frames if there is not enough
+frames in the given file.</p></li>
+<li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function always return <code class="docutils literal notranslate"><span class="pre">float32</span></code>, and sample values are
+normalized to <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.
+If input file is integer WAV, giving <code class="docutils literal notranslate"><span class="pre">False</span></code> will change the resulting Tensor type to
+integer type.
+This argument has no effect for formats other than integer WAV type.</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – When True, the returned Tensor has dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
+Otherwise, the returned Tensor’s dimension is <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>If the input file has integer wav format and normalization is off, then it has
+integer type, else <code class="docutils literal notranslate"><span class="pre">float32</span></code> type. If <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>, it has
+<code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code> else <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id5">
+<h3>save<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.sox_io_backend.save">
+<code class="sig-prename descclassname">torchaudio.backend.sox_io_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">tensor</span><span class="p">:</span> <span class="n">torch.Tensor</span></em>, <em class="sig-param"><span class="n">sample_rate</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span></em>, <em class="sig-param"><span class="n">channels_first</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">compression</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save audio data to file.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Supported formats are;</p>
+<ul>
+<li><p>WAV</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>32-bit floating-point</p></li>
+<li><p>32-bit signed integer</p></li>
+<li><p>16-bit signed integer</p></li>
+<li><p>8-bit unsigned integer</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>MP3</p></li>
+<li><p>FLAC</p></li>
+<li><p>OGG/VORBIS</p></li>
+</ul>
+<p>To save <code class="docutils literal notranslate"><span class="pre">MP3</span></code>, <code class="docutils literal notranslate"><span class="pre">FLAC</span></code>, <code class="docutils literal notranslate"><span class="pre">OGG/VORBIS</span></code>, and other codecs <code class="docutils literal notranslate"><span class="pre">libsox</span></code> does not
+handle natively, your installation of <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> has to be linked to <code class="docutils literal notranslate"><span class="pre">libsox</span></code>
+and corresponding codec libraries such as <code class="docutils literal notranslate"><span class="pre">libmad</span></code> or <code class="docutils literal notranslate"><span class="pre">libmp3lame</span></code> etc.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to save file.</p></li>
+<li><p><strong>tensor</strong> (<em>torch.Tensor</em>) – Audio data to save. must be 2D tensor.</p></li>
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – sampling rate</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>,
+otherwise <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
+<li><p><strong>compression</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>]</em>) – <p>Used for formats other than WAV. This corresponds to <code class="docutils literal notranslate"><span class="pre">-C</span></code> option of <code class="docutils literal notranslate"><span class="pre">sox</span></code> command.</p>
+<blockquote>
+<div><ul>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">MP3</span></code>: Either bitrate (in <code class="docutils literal notranslate"><span class="pre">kbps</span></code>) with quality factor, such as <code class="docutils literal notranslate"><span class="pre">128.2</span></code>, or</div>
+<div class="line">VBR encoding with quality factor such as <code class="docutils literal notranslate"><span class="pre">-4.2</span></code>. Default: <code class="docutils literal notranslate"><span class="pre">-4.5</span></code>.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">FLAC</span></code>: compression level. Whole number from <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">8</span></code>.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">8</span></code> is default and highest compression.</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">OGG/VORBIS</span></code>: number from <code class="docutils literal notranslate"><span class="pre">-1</span></code> to <code class="docutils literal notranslate"><span class="pre">10</span></code>; <code class="docutils literal notranslate"><span class="pre">-1</span></code> is the highest compression</div>
+<div class="line">and lowest quality. Default: <code class="docutils literal notranslate"><span class="pre">3</span></code>.</div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+<p>See the detail at <a class="reference external" href="http://sox.sourceforge.net/soxformat.html">http://sox.sourceforge.net/soxformat.html</a>.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="soundfile-backend">
+<span id="id6"></span><h2>Soundfile Backend<a class="headerlink" href="#soundfile-backend" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">soundfile</span></code> backend is available when <code class="docutils literal notranslate"><span class="pre">PySoundFile</span></code> is installed. This backend works on <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> installation without C++ extension. (i.e. Windows)</p>
+<p>You can switch from another backend to <code class="docutils literal notranslate"><span class="pre">soundfile</span></code> backend with the following;</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torchaudio</span><span class="o">.</span><span class="n">set_audio_backend</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="id7">
+<h3>info<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.soundfile_backend.info">
+<code class="sig-prename descclassname">torchaudio.backend.soundfile_backend.</code><code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference internal" href="#torchaudio.backend.common.SignalInfo" title="torchaudio.backend.common.SignalInfo">torchaudio.backend.common.SignalInfo</a><span class="p">, </span><a class="reference internal" href="#torchaudio.backend.common.EncodingInfo" title="torchaudio.backend.common.EncodingInfo">torchaudio.backend.common.EncodingInfo</a><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/backend/soundfile_backend.html#info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.soundfile_backend.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets metadata from an audio file without loading the signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filepath</strong> – Path to audio file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A si (sox_signalinfo_t) signal</dt><dd><p>info as a python object. An ei (sox_encodinginfo_t) encoding info</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(sox_signalinfo_t, sox_encodinginfo_t)</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">si</span><span class="p">,</span> <span class="n">ei</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;foo.wav&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rate</span><span class="p">,</span> <span class="n">channels</span><span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">rate</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span> <span class="n">ei</span><span class="o">.</span><span class="n">encoding</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id8">
+<h3>load<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.soundfile_backend.load">
+<code class="sig-prename descclassname">torchaudio.backend.soundfile_backend.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">out</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>torch.Tensor<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">normalization</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">channels_first</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">num_frames</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">offset</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">signalinfo</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#torchaudio.backend.common.SignalInfo" title="torchaudio.backend.common.SignalInfo">torchaudio.backend.common.SignalInfo</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">encodinginfo</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#torchaudio.backend.common.EncodingInfo" title="torchaudio.backend.common.EncodingInfo">torchaudio.backend.common.EncodingInfo</a></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filetype</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>torch.Tensor<span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/backend/soundfile_backend.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.soundfile_backend.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads an audio file from disk into a tensor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> – Path to audio file</p></li>
+<li><p><strong>out</strong> – An optional output tensor to use instead of creating one. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>normalization</strong> – Optional normalization.
+If boolean <cite>True</cite>, then output is divided by <cite>1 &lt;&lt; 31</cite>.
+Assuming the input is signed 32-bit audio, this normalizes to <cite>[-1, 1]</cite>.
+If <cite>float</cite>, then output is divided by that number.
+If <cite>Callable</cite>, then the output is passed as a paramete to the given function,
+then the output is divided by the result. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>channels_first</strong> – Set channels first or length first in result. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>num_frames</strong> – Number of frames to load.  0 to load everything after the offset.
+(Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
+<li><p><strong>offset</strong> – Number of frames from the start of the file to begin data loading.
+(Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
+<li><p><strong>signalinfo</strong> – A sox_signalinfo_t type, which could be helpful if the
+audio type cannot be automatically determined. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>encodinginfo</strong> – A sox_encodinginfo_t type, which could be set if the
+audio type cannot be automatically determined. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>filetype</strong> – A filetype or extension to be set if sox cannot determine it
+automatically. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>An output tensor of size <cite>[C x L]</cite> or <cite>[L x C]</cite> where</dt><dd><p>L is the number of audio frames and
+C is the number of channels.
+An integer which is the sample rate of the audio (as listed in the metadata of the file)</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(Tensor, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+<span class="go">torch.Size([2, 278756])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)</span>
+<span class="go">44100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_vol_normalized</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.mp3&#39;</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_vol_normalized</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+<span class="go">1.</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.backend.soundfile_backend.load_wav">
+<code class="sig-prename descclassname">torchaudio.backend.soundfile_backend.</code><code class="sig-name descname">load_wav</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/soundfile_backend.html#load_wav"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.soundfile_backend.load_wav" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a wave file.</p>
+<p>It assumes that the wav file uses 16 bit per sample that needs normalization by
+shifting the input right by 16 bits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filepath</strong> – Path to audio file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>An output tensor of size <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is the number</dt><dd><p>of audio frames and C is the number of channels. An integer which is the sample rate of the
+audio (as listed in the metadata of the file)</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(Tensor, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id9">
+<h3>save<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt id="torchaudio.backend.soundfile_backend.save">
+<code class="sig-prename descclassname">torchaudio.backend.soundfile_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">src</span><span class="p">:</span> <span class="n">torch.Tensor</span></em>, <em class="sig-param"><span class="n">sample_rate</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span></em>, <em class="sig-param"><span class="n">precision</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">16</span></em>, <em class="sig-param"><span class="n">channels_first</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a><a class="reference internal" href="_modules/torchaudio/backend/soundfile_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.soundfile_backend.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves a Tensor on file as an audio file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> – Path to audio file</p></li>
+<li><p><strong>src</strong> – An input 2D tensor of shape <cite>[C x L]</cite> or <cite>[L x C]</cite> where L is
+the number of audio frames, C is the number of channels</p></li>
+<li><p><strong>sample_rate</strong> – An integer which is the sample rate of the
+audio (as listed in the metadata of the file)</p></li>
+<li><p><strong>Bit precision (Default</strong> (<em>precision</em>) – <code class="docutils literal notranslate"><span class="pre">16</span></code>)</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Set channels first or length first in result. (
+Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="functional.html" class="btn btn-neutral float-right" title="torchaudio.functional" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="torchaudio.html" class="btn btn-neutral" title="torchaudio" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">torchaudio.backend</a><ul>
+<li><a class="reference internal" href="#common-data-structure">Common Data Structure</a></li>
+<li><a class="reference internal" href="#sox-backend">Sox Backend</a><ul>
+<li><a class="reference internal" href="#info">info</a></li>
+<li><a class="reference internal" href="#load">load</a></li>
+<li><a class="reference internal" href="#save">save</a></li>
+<li><a class="reference internal" href="#module-torchaudio.backend.sox_backend">others</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sox-io-backend">Sox IO Backend</a><ul>
+<li><a class="reference internal" href="#id3">info</a></li>
+<li><a class="reference internal" href="#id4">load</a></li>
+<li><a class="reference internal" href="#id5">save</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#soundfile-backend">Soundfile Backend</a><ul>
+<li><a class="reference internal" href="#id7">info</a></li>
+<li><a class="reference internal" href="#id8">load</a></li>
+<li><a class="reference internal" href="#id9">save</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+         <script src="_static/jquery.js"></script>
+         <script src="_static/underscore.js"></script>
+         <script src="_static/doctools.js"></script>
+         <script src="_static/language_data.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script>
+         <script src="_static/katex_autorenderer.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Stay Connected</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/features">Features</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

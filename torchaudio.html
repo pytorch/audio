@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.kaldi_io &mdash; Torchaudio master documentation</title>
+  <title>torchaudio &mdash; Torchaudio master documentation</title>
   
 
   
@@ -32,7 +32,8 @@
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="torchaudio.compliance.kaldi" href="compliance.kaldi.html" /> 
+    <link rel="next" title="torchaudio.backend" href="backend.html" />
+    <link rel="prev" title="torchaudio" href="index.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -185,7 +186,7 @@
             
               <p class="caption"><span class="caption-text">Package Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
@@ -193,7 +194,7 @@
 <li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 </ul>
 
             
@@ -234,13 +235,13 @@
       </li>
 
         
-      <li>torchaudio.kaldi_io</li>
+      <li>torchaudio</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="_sources/kaldi_io.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+            <a href="_sources/torchaudio.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -266,150 +267,97 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchaudio-kaldi-io">
-<h1>torchaudio.kaldi_io<a class="headerlink" href="#torchaudio-kaldi-io" title="Permalink to this headline">¶</a></h1>
-<p>To use this module, the dependency <a class="reference external" href="https://github.com/vesis84/kaldi-io-for-python">kaldi_io</a> needs to be installed.
-This is a light wrapper around <code class="docutils literal notranslate"><span class="pre">kaldi_io</span></code> that returns <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Tensor</span></code>.</p>
-<div class="section" id="vectors">
-<h2>Vectors<a class="headerlink" href="#vectors" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="read-vec-int-ark">
-<h3><span class="hidden-section">read_vec_int_ark</span><a class="headerlink" href="#read-vec-int-ark" title="Permalink to this headline">¶</a></h3>
+  <div class="section" id="torchaudio">
+<h1>torchaudio<a class="headerlink" href="#torchaudio" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="i-o-functionalities">
+<h2>I/O functionalities<a class="headerlink" href="#i-o-functionalities" title="Permalink to this headline">¶</a></h2>
+<p>Audio I/O functions are implemented in <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> module, but for the ease of use, the following functions are made available on <code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio</span></code> module. There are different backends available and you can switch backends with <code class="xref py py-func docutils literal notranslate"><span class="pre">set_audio_backend()</span></code>.</p>
+<p>Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
 <dl class="py function">
-<dt id="torchaudio.kaldi_io.read_vec_int_ark">
-<code class="sig-prename descclassname">torchaudio.kaldi_io.</code><code class="sig-name descname">read_vec_int_ark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_or_fd</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>torch.Tensor<span class="p">]</span><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/kaldi_io.html#read_vec_int_ark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_int_ark" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create generator of (key,vector&lt;int&gt;) tuples, which reads from the ark file/stream.</p>
+<dt id="torchaudio.info">
+<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">...</em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch meta data of an audio file. Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.load">
+<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">...</em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load audio file into torch.Tensor object. Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.load_wav">
+<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">load_wav</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">...</em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.load_wav" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load audio file into torch.Tensor, Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.save">
+<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">...</em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save torch.Tensor object into an audio format. Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="backend-utilities">
+<h2>Backend Utilities<a class="headerlink" href="#backend-utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="torchaudio.list_audio_backends">
+<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">list_audio_backends</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#list_audio_backends"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.list_audio_backends" title="Permalink to this definition">¶</a></dt>
+<dd><p>List available backends</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>str/FileDescriptor</em>) – ark, gzipped ark, pipe or opened file descriptor</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The list of available backends.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The string is the key and the tensor is the vector read from file</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Iterable[Tuple[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, Tensor]]</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>]</p>
 </dd>
 </dl>
-<dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read ark to a &#39;dictionary&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_int_ark</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
-</pre></div>
-</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.get_audio_backend">
+<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">get_audio_backend</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#get_audio_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.get_audio_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of the current backend</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The name of the current backend or <code class="docutils literal notranslate"><span class="pre">None</span></code> if no backend is assigned.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Optional[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="torchaudio.set_audio_backend">
+<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">set_audio_backend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">backend</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#set_audio_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.set_audio_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the backend for I/O operation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>backend</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>]</em>) – Name of the backend.
+One of <code class="docutils literal notranslate"><span class="pre">&quot;sox&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sox_io&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code> based on availability
+of the system. If <code class="docutils literal notranslate"><span class="pre">None</span></code> is provided the  current backend is unassigned.</p>
 </dd>
 </dl>
 </dd></dl>
 
 </div>
-<div class="section" id="read-vec-flt-scp">
-<h3><span class="hidden-section">read_vec_flt_scp</span><a class="headerlink" href="#read-vec-flt-scp" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="sox-effects-utilities">
+<h2>Sox Effects Utilities<a class="headerlink" href="#sox-effects-utilities" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="torchaudio.kaldi_io.read_vec_flt_scp">
-<code class="sig-prename descclassname">torchaudio.kaldi_io.</code><code class="sig-name descname">read_vec_flt_scp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_or_fd</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>torch.Tensor<span class="p">]</span><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/kaldi_io.html#read_vec_flt_scp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_flt_scp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create generator of (key,vector&lt;float32/float64&gt;) tuples, read according to Kaldi scp.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>str/FileDescriptor</em>) – scp, gzipped scp, pipe or opened file descriptor</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The string is the key and the tensor is the vector read from file</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Iterable[Tuple[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, Tensor]]</p>
-</dd>
-</dl>
-<dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read scp to a &#39;dictionary&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># d = { u:d for u,d in torchaudio.kaldi_io.read_vec_flt_scp(file) }</span>
-</pre></div>
-</div>
-</dd>
-</dl>
+<dt id="torchaudio.initialize_sox">
+<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">initialize_sox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio.html#initialize_sox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.initialize_sox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize sox effects.</p>
+<p>This function is deprecated. See <code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.init_sox_effects()</span></code></p>
 </dd></dl>
 
-</div>
-<div class="section" id="read-vec-flt-ark">
-<h3><span class="hidden-section">read_vec_flt_ark</span><a class="headerlink" href="#read-vec-flt-ark" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
-<dt id="torchaudio.kaldi_io.read_vec_flt_ark">
-<code class="sig-prename descclassname">torchaudio.kaldi_io.</code><code class="sig-name descname">read_vec_flt_ark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_or_fd</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>torch.Tensor<span class="p">]</span><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/kaldi_io.html#read_vec_flt_ark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.kaldi_io.read_vec_flt_ark" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create generator of (key,vector&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>str/FileDescriptor</em>) – ark, gzipped ark, pipe or opened file descriptor</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The string is the key and the tensor is the vector read from file</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Iterable[Tuple[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, Tensor]]</p>
-</dd>
-</dl>
-<dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read ark to a &#39;dictionary&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_flt_ark</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
-</pre></div>
-</div>
-</dd>
-</dl>
+<dt id="torchaudio.shutdown_sox">
+<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">shutdown_sox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio.html#shutdown_sox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.shutdown_sox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shutdown sox effects.</p>
+<p>This function is deprecated. See <code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.shutdown_sox_effects()</span></code></p>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="matrices">
-<h2>Matrices<a class="headerlink" href="#matrices" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="read-mat-scp">
-<h3><span class="hidden-section">read_mat_scp</span><a class="headerlink" href="#read-mat-scp" title="Permalink to this headline">¶</a></h3>
-<dl class="py function">
-<dt id="torchaudio.kaldi_io.read_mat_scp">
-<code class="sig-prename descclassname">torchaudio.kaldi_io.</code><code class="sig-name descname">read_mat_scp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_or_fd</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>torch.Tensor<span class="p">]</span><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/kaldi_io.html#read_mat_scp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.kaldi_io.read_mat_scp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create generator of (key,matrix&lt;float32/float64&gt;) tuples, read according to Kaldi scp.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>str/FileDescriptor</em>) – scp, gzipped scp, pipe or opened file descriptor</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The string is the key and the tensor is the matrix read from file</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Iterable[Tuple[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, Tensor]]</p>
-</dd>
-</dl>
-<dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read scp to a &#39;dictionary&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_scp</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="read-mat-ark">
-<h3><span class="hidden-section">read_mat_ark</span><a class="headerlink" href="#read-mat-ark" title="Permalink to this headline">¶</a></h3>
-<dl class="py function">
-<dt id="torchaudio.kaldi_io.read_mat_ark">
-<code class="sig-prename descclassname">torchaudio.kaldi_io.</code><code class="sig-name descname">read_mat_ark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_or_fd</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">, </span>torch.Tensor<span class="p">]</span><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/kaldi_io.html#read_mat_ark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.kaldi_io.read_mat_ark" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create generator of (key,matrix&lt;float32/float64&gt;) tuples, which reads from the ark file/stream.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>file_or_fd</strong> (<em>str/FileDescriptor</em>) – ark, gzipped ark, pipe or opened file descriptor</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The string is the key and the tensor is the matrix read from file</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Iterable[Tuple[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, Tensor]]</p>
-</dd>
-</dl>
-<dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read ark to a &#39;dictionary&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span> <span class="n">u</span><span class="p">:</span><span class="n">d</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_mat_ark</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="p">}</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
 </div>
 </div>
 
@@ -421,8 +369,10 @@ This is a light wrapper around <code class="docutils literal notranslate"><span 
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="backend.html" class="btn btn-neutral float-right" title="torchaudio.backend" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
-        <a href="compliance.kaldi.html" class="btn btn-neutral" title="torchaudio.compliance.kaldi" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+        <a href="index.html" class="btn btn-neutral" title="torchaudio" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -454,18 +404,10 @@ This is a light wrapper around <code class="docutils literal notranslate"><span 
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">torchaudio.kaldi_io</a><ul>
-<li><a class="reference internal" href="#vectors">Vectors</a><ul>
-<li><a class="reference internal" href="#read-vec-int-ark"><span class="hidden-section">read_vec_int_ark</span></a></li>
-<li><a class="reference internal" href="#read-vec-flt-scp"><span class="hidden-section">read_vec_flt_scp</span></a></li>
-<li><a class="reference internal" href="#read-vec-flt-ark"><span class="hidden-section">read_vec_flt_ark</span></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#matrices">Matrices</a><ul>
-<li><a class="reference internal" href="#read-mat-scp"><span class="hidden-section">read_mat_scp</span></a></li>
-<li><a class="reference internal" href="#read-mat-ark"><span class="hidden-section">read_mat_ark</span></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">torchaudio</a><ul>
+<li><a class="reference internal" href="#i-o-functionalities">I/O functionalities</a></li>
+<li><a class="reference internal" href="#backend-utilities">Backend Utilities</a></li>
+<li><a class="reference internal" href="#sox-effects-utilities">Sox Effects Utilities</a></li>
 </ul>
 </li>
 </ul>
