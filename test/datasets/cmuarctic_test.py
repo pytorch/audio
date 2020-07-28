@@ -34,7 +34,6 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
         with open(txt_file, "w") as txt:
             for c in ['a','b']:
                 for i in range(5):
-                    # Write audio file
                     utterance_id = f"arctic_{c}{i:04d}"
                     path = os.path.join(audio_dir, f"{utterance_id}.wav")
                     data = get_whitenoise(
@@ -52,7 +51,7 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
                         utterance_id.split("_")[1],
                     )
                     cls.samples.append(sample)
-                    # Write sentence prompt
+
                     txt.write(f'( {utterance_id} "{utterance}" )\n')
 
     def test_cmuarctic(self):
