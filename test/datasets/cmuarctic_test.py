@@ -21,7 +21,6 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
     def setUpClass(cls):
         cls.root_dir = cls.get_base_temp_dir()
         sample_rate = 16000
-        seed = 42
         utterance = "This is a test utterance."
 
         base_dir = os.path.join(cls.root_dir, "ARCTIC", "cmu_us_aew_arctic")
@@ -41,7 +40,7 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
                         duration=3,
                         n_channels=1,
                         dtype="int16",
-                        seed=seed,
+                        seed=i + ord(c),
                     )
                     save_wav(path, data, sample_rate)
                     sample = (
