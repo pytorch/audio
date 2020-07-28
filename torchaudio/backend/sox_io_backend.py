@@ -112,7 +112,7 @@ def load(
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def save(
         filepath: str,
-        src: torch.Tensor,
+        tensor: torch.Tensor,
         sample_rate: int,
         channels_first: bool = True,
         compression: Optional[float] = None,
@@ -168,22 +168,8 @@ def save(
             compression = 3.
         else:
             raise RuntimeError(f'Unsupported file type: "{ext}"')
-    signal = torch.classes.torchaudio.TensorSignal(src, sample_rate, channels_first)
+    signal = torch.classes.torchaudio.TensorSignal(tensor, sample_rate, channels_first)
     torch.ops.torchaudio.sox_io_save_audio_file(filepath, signal, compression)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
-def load_wav(
-        filepath: str,
-        frame_offset: int = 0,
-        num_frames: int = -1,
-        channels_first: bool = True,
-) -> Tuple[torch.Tensor, int]:
-    """Load wave file.
-
-
-    This function is defined only for the purpose of compatibility against other backend
-    for simple usecases, such as ``torchaudio.load_wav(filepath)``.
-    The implementation is same as :py:func:`load`.
-    """
-    return load(filepath, frame_offset, num_frames, normalize=False, channels_first=channels_first)
+load_wav = load
