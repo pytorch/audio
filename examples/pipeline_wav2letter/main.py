@@ -238,6 +238,7 @@ def train_one_epoch(
     language_model,
     device,
     epoch,
+    clip_grad,
 ):
 
     model.train()
@@ -267,9 +268,9 @@ def train_one_epoch(
         optimizer.zero_grad()
         loss.backward()
 
-        if args.clip_grad > 0:
+        if clip_grad > 0:
             metric["gradient"] = torch.nn.utils.clip_grad_norm_(
-                model.parameters(), args.clip_grad
+                model.parameters(), clip_grad
             )
 
         optimizer.step()
@@ -558,6 +559,7 @@ def main(args, rank=0):
             language_model,
             devices[0],
             epoch,
+            args.clip_grad,
         )
 
         if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
