@@ -36,3 +36,12 @@ def read_json(filename):
     data = [json.loads(l) for l in data.splitlines()]
     return pandas.DataFrame(data)
 ```
+
+## Structure of pipeline
+
+* `main.py` -- the entry point
+* `ctc_decoders.py` -- the greedy CTC decoder
+* `datasets.py` -- the function to split and process librispeech, a collate factory function
+* `languagemodels.py` -- a class to encode and decode strings
+* `metrics.py` -- the levenshtein edit distance
+* `utils.py` -- functions to log metrics, save checkpoint, and count parameters
