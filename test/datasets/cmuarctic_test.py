@@ -30,6 +30,7 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
         audio_dir = os.path.join(base_dir, "wav")
         os.makedirs(audio_dir, exist_ok=True)
 
+        seed = 42
         with open(txt_file, "w") as txt:
             for c in ["a", "b"]:
                 for i in range(5):
@@ -40,7 +41,7 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
                         duration=3,
                         n_channels=1,
                         dtype="int16",
-                        seed=i + ord(c),
+                        seed=seed,
                     )
                     save_wav(path, data, sample_rate)
                     sample = (
@@ -50,8 +51,8 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
                         utterance_id.split("_")[1],
                     )
                     cls.samples.append(sample)
-
                     txt.write(f'( {utterance_id} "{utterance}" )\n')
+                    seed += 1
 
     def test_cmuarctic(self):
         dataset = cmuarctic.CMUARCTIC(self.root_dir)
