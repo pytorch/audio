@@ -228,8 +228,6 @@ def train_one_epoch(
         # target_lengths: batch size
 
         loss = criterion(outputs, targets, tensors_lengths, target_lengths)
-        metric["loss"] = loss.item()
-        metric["cumulative loss"] += metric["loss"]
 
         optimizer.zero_grad()
         loss.backward()
@@ -251,6 +249,8 @@ def train_one_epoch(
         metric["batch size"] = len(inputs)
         metric["dataset length"] += metric["batch size"]
         metric["iteration"] += 1
+        metric["loss"] = loss.item()
+        metric["cumulative loss"] += metric["loss"]
         metric["average loss"] = metric["cumulative loss"] / metric["iteration"]
         metric["iteration time"] = time() - start
         metric["epoch time"] += metric["time"]

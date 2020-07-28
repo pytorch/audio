@@ -15,7 +15,7 @@ class MetricLogger(defaultdict):
         self["name"] = name
 
     def __str__(self):
-        return json.dumps(self.data)
+        return json.dumps(self)
 
     def __call__(self):
         self._iter = (self._iter + 1) % self.print_freq
