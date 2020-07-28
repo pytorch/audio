@@ -35,7 +35,7 @@ class TestCommonVoice(TempDirMixin, TorchaudioTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.root_dir = os.path.join(cls.get_base_temp_dir(), 'waves_commonvoice')
+        cls.root_dir = cls.get_base_temp_dir()
         # The path convention commonvoice uses
         base_dir = os.path.join(cls.root_dir, commonvoice.FOLDER_IN_ARCHIVE, commonvoice.VERSION, "en")
         os.makedirs(base_dir, exist_ok=True)

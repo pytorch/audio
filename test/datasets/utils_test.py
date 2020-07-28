@@ -53,10 +53,6 @@ class TestIterator(TorchaudioTestCase):
     backend = 'default'
     path = get_asset_path()
 
-    def test_commonvoice(self):
-        data = COMMONVOICE(self.path, url="tatar")
-        data[0]
-
     def test_disckcache_iterator(self):
         data = COMMONVOICE(self.path, url="tatar")
         data = dataset_utils.diskcache_iterator(data)
