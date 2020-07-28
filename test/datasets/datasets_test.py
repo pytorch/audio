@@ -4,7 +4,6 @@ from torchaudio.datasets.speechcommands import SPEECHCOMMANDS
 from torchaudio.datasets.utils import diskcache_iterator, bg_iterator
 from torchaudio.datasets.vctk import VCTK
 from torchaudio.datasets.ljspeech import LJSPEECH
-from torchaudio.datasets.cmuarctic import CMUARCTIC
 
 from ..common_utils import (
     TorchaudioTestCase,
