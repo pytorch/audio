@@ -32,7 +32,7 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
         os.makedirs(audio_dir, exist_ok=True)
 
         with open(txt_file, "w") as txt:
-            for c in ['a','b']:
+            for c in ["a", "b"]:
                 for i in range(5):
                     utterance_id = f"arctic_{c}{i:04d}"
                     path = os.path.join(audio_dir, f"{utterance_id}.wav")
