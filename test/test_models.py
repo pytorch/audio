@@ -1,5 +1,5 @@
 import torch
-from torchaudio.models import Wav2Letter, MelResNet, UpsampleNetwork, WaveRNN
+from torchaudio.models import Wav2Letter, MelResNet, UpsampleNetwork, WaveRNN, _Encoder
 
 from . import common_utils
 
@@ -135,4 +135,3 @@ class TestEncoder(common_utils.TorchaudioTestCase):
         out = model(x, input_length)
 
         assert out.size() == (n_batch, n_seq, n_encoder_embedding)
-    
