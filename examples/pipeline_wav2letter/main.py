@@ -132,6 +132,18 @@ def parse_args():
     parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
     parser.add_argument("--clip-grad", metavar="NORM", type=float, default=0.0)
     parser.add_argument(
+        "--dataset-root",
+        default="/datasets01/",
+        type=str,
+        help="specify dataset root folder",
+    )
+    parser.add_argument(
+        "--dataset-folder-in-archive",
+        default="librispeech/062419/",
+        type=str,
+        help="specify dataset folder in archive",
+    )
+    parser.add_argument(
         "--dataset-train",
         default=["train-clean-100"],
         nargs="+",
@@ -359,19 +371,21 @@ def evaluate(
 
 def main(rank, args):
 
+    # Distributed setup
+
     if args.distributed:
         setup_distributed(rank, args.world_size)
 
-    main_rank = rank == 0
-
-    logging.info("Start time: {}".format(str(datetime.now())))
+    main_rank = not args.distributed or rank == 0
 
     # Install signal handler
     # TODO Remove before merge pull request
     signal.signal(signal.SIGUSR1, signal_handler)
 
-    # Explicitly setting seed to make sure that models created in two processes
-    # start from same random weights and biases.
+    logging.info("Start time: {}".format(str(datetime.now())))
+
+    # Explicitly set seed to make sure models created in separate processes
+    # start from same random weights and biases
     torch.manual_seed(args.seed)
 
     # Empty CUDA cache
@@ -380,22 +394,7 @@ def main(rank, args):
     # Change backend for flac files
     torchaudio.set_audio_backend("soundfile")
 
-    if args.distributed:
-        n = torch.cuda.device_count() // args.world_size
-        devices = list(range(rank * n, (rank + 1) * n))
-    else:
-        devices = ["cuda" if torch.cuda.is_available() else "cpu"]
-
-    loader_training_params = {
-        "num_workers": args.workers,
-        "pin_memory": True,
-        "shuffle": True,
-        "drop_last": True,
-    }
-    loader_validation_params = loader_training_params.copy()
-    loader_validation_params["shuffle"] = False
-
-    # audio
+    # Transforms
 
     melkwargs = {
         "n_fft": 512,
@@ -433,16 +432,22 @@ def main(rank, args):
     labels = char_blank + char_space + char_apostrophe + string.ascii_lowercase
     language_model = LanguageModel(labels, char_blank, char_space)
 
+    # Dataset
+
     training, validation = split_process_librispeech(
         [args.dataset_train, args.dataset_valid],
         [transforms_train, transforms_valid],
         language_model,
-        root="/datasets01/",
-        folder_in_archive="librispeech/062419/",
+        root=args.dataset_root,
+        folder_in_archive=args.dataset_folder_in_archive,
     )
+
+    # Decoder
 
     if args.decoder == "greedy":
         decoder = GreedyDecoder()
+
+    # Model
 
     model = Wav2Letter(
         num_classes=language_model.length, input_type="mfcc", num_features=args.n_bins
@@ -452,10 +457,13 @@ def main(rank, args):
         model = torch.jit.script(model)
 
     if args.distributed:
+        n = torch.cuda.device_count() // args.world_size
+        devices = list(range(rank * n, (rank + 1) * n))
         model.cuda()
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=devices)
         # model = torch.nn.parallel.DistributedDataParallel(model, find_unused_parameters=True)
     else:
+        devices = ["cuda" if torch.cuda.is_available() else "cpu"]
         model = torch.nn.DataParallel(model)
 
     model = model.to(devices[0], non_blocking=True)
@@ -499,9 +507,18 @@ def main(rank, args):
     # criterion = torch.nn.MSELoss()
     # criterion = torch.nn.NLLLoss()
 
-    torch.autograd.set_detect_anomaly(False)
+    # Data Loader
 
     collate_fn = collate_factory(model_length_function)
+
+    loader_training_params = {
+        "num_workers": args.workers,
+        "pin_memory": True,
+        "shuffle": True,
+        "drop_last": True,
+    }
+    loader_validation_params = loader_training_params.copy()
+    loader_validation_params["shuffle"] = False
 
     loader_training = DataLoader(
         training,
@@ -515,6 +532,8 @@ def main(rank, args):
         collate_fn=collate_fn,
         **loader_validation_params,
     )
+
+    # Setup checkpoint
 
     best_loss = 1.0
 
@@ -555,6 +574,8 @@ def main(rank, args):
 
     if args.distributed:
         torch.distributed.barrier()
+
+    torch.autograd.set_detect_anomaly(False)
 
     for epoch in range(args.start_epoch, args.epochs):
 
