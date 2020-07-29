@@ -115,3 +115,24 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         out = model(x, mels)
 
         assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1), n_classes)
+
+
+class TestEncoder(common_utils.TorchaudioTestCase):
+    def test_output(self):
+        """Validate the output dimensions of a _Encoder block.
+        """
+
+        n_encoder_convolutions = 3
+        n_encoder_embedding = 512
+        n_encoder_kernel_size = 5
+        n_batch = 32
+        n_seq = 64
+
+        model = _Encoder(n_encoder_convolutions, n_encoder_embedding, n_encoder_kernel_size)
+
+        x = torch.rand(n_batch, n_encoder_embedding, n_seq)
+        input_length = [n_seq for i in range(n_batch)]
+        out = model(x, input_length)
+
+        assert out.size() == (n_batch, n_seq, n_encoder_embedding)
+    
