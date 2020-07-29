@@ -19,7 +19,6 @@ class MetricLogger(defaultdict):
         return json.dumps(self)
 
     def __call__(self):
-        logging.info(self.name, self.disable)
         self._iter = (self._iter + 1) % self.print_freq
         if not self.disable and not self._iter:
             print(self, flush=True)

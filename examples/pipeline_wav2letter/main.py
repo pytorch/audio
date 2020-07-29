@@ -461,14 +461,13 @@ def main(rank, args):
     if args.distributed:
         n = torch.cuda.device_count() // args.world_size
         devices = list(range(rank * n, (rank + 1) * n))
-        model.cuda()
+        model = model.to(devices[0])
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=devices)
         # model = torch.nn.parallel.DistributedDataParallel(model, find_unused_parameters=True)
     else:
         devices = ["cuda" if torch.cuda.is_available() else "cpu"]
+        model = model.to(devices[0], non_blocking=True)
         model = torch.nn.DataParallel(model)
-
-    model = model.to(devices[0], non_blocking=True)
 
     n = count_parameters(model)
     logging.info(f"Number of parameters: {n}")
