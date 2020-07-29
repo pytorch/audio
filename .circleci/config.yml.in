@@ -605,6 +605,41 @@ jobs:
           name: Run style check
           command: .circleci/unittest/linux/scripts/run_style_checks.sh
 
+  torchscript_bc_test:
+    docker:
+      - image: "pytorch/torchaudio_unittest_base:manylinux"
+    steps:
+      - checkout
+      - generate_cache_key
+      - restore_cache:
+          {% raw %}
+          keys:
+            - torchscript-bc-test-release-envs-v1-{{ arch }}-{{ checksum ".cachekey" }}
+          {% endraw %}
+      - run:
+          name: Generate Objects
+          command: |
+             .circleci/torchscript_bc_test/setup_release_envs.sh
+             .circleci/torchscript_bc_test/generate_objects.sh
+      - save_cache:
+          {% raw %}
+          key: torchscript-bc-test-release-envs-v1-{{ arch }}-{{ checksum ".cachekey" }}
+          {% endraw %}
+          paths:
+            - conda
+            - envs
+      - store_artifacts:
+          path: test/torchscript_bc_test/assets
+      - persist_to_workspace:
+          root: .
+          paths:
+            - test/torchscript_bc_test/assets
+      - run:
+          name: Run BC check test
+          command: |
+            .circleci/torchscript_bc_test/setup_master_envs.sh
+            .circleci/torchscript_bc_test/validate_objects.sh
+
 workflows:
   build:
     jobs:
@@ -612,6 +647,7 @@ workflows:
       {{ build_workflows() }}
   unittest:
     jobs:
+      - torchscript_bc_test
       {{ unittest_workflows() }}
   nightly:
     jobs:
