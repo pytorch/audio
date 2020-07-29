@@ -5,8 +5,6 @@ from .data_utils import (
 )
 from .backend_utils import (
     set_audio_backend,
-    BACKENDS,
-    BACKENDS_MP3,
 )
 from .case_utils import (
     TempDirMixin,
