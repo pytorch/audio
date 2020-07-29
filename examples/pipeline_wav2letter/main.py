@@ -133,7 +133,7 @@ def parse_args():
     parser.add_argument("--clip-grad", metavar="NORM", type=float, default=0.0)
     parser.add_argument(
         "--dataset-train",
-        default=["train-100"],
+        default=["train-clean-100"],
         nargs="+",
         type=str,
         help="select which part of librispeech to train with",
