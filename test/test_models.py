@@ -1,5 +1,5 @@
 import torch
-from torchaudio.models import Wav2Letter, _MelResNet, _UpsampleNetwork, _WaveRNN
+from torchaudio.models import Wav2Letter, MelResNet, UpsampleNetwork, WaveRNN
 
 from . import common_utils
 
@@ -36,7 +36,7 @@ class TestWav2Letter(common_utils.TorchaudioTestCase):
 class TestMelResNet(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
-        """Validate the output dimensions of a _MelResNet block.
+        """Validate the output dimensions of a MelResNet block.
         """
 
         n_batch = 2
@@ -47,7 +47,7 @@ class TestMelResNet(common_utils.TorchaudioTestCase):
         n_hidden = 128
         kernel_size = 5
 
-        model = _MelResNet(n_res_block, n_freq, n_hidden, n_output, kernel_size)
+        model = MelResNet(n_res_block, n_freq, n_hidden, n_output, kernel_size)
 
         x = torch.rand(n_batch, n_freq, n_time)
         out = model(x)
@@ -58,7 +58,7 @@ class TestMelResNet(common_utils.TorchaudioTestCase):
 class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
-        """Validate the output dimensions of a _UpsampleNetwork block.
+        """Validate the output dimensions of a UpsampleNetwork block.
         """
 
         upsample_scales = [5, 5, 8]
@@ -74,12 +74,12 @@ class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
         for upsample_scale in upsample_scales:
             total_scale *= upsample_scale
 
-        model = _UpsampleNetwork(upsample_scales,
-                                 n_res_block,
-                                 n_freq,
-                                 n_hidden,
-                                 n_output,
-                                 kernel_size)
+        model = UpsampleNetwork(upsample_scales,
+                                n_res_block,
+                                n_freq,
+                                n_hidden,
+                                n_output,
+                                kernel_size)
 
         x = torch.rand(n_batch, n_freq, n_time)
         out1, out2 = model(x)
@@ -91,7 +91,7 @@ class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
 class TestWaveRNN(common_utils.TorchaudioTestCase):
 
     def test_waveform(self):
-        """Validate the output dimensions of a _WaveRNN model.
+        """Validate the output dimensions of a WaveRNN model.
         """
 
         upsample_scales = [5, 5, 8]
@@ -107,8 +107,8 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         n_hidden = 128
         kernel_size = 5
 
-        model = _WaveRNN(upsample_scales, n_classes, hop_length, n_res_block,
-                         n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output)
+        model = WaveRNN(upsample_scales, n_classes, hop_length, n_res_block,
+                        n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output)
 
         x = torch.rand(n_batch, 1, hop_length * (n_time - kernel_size + 1))
         mels = torch.rand(n_batch, 1, n_freq, n_time)
