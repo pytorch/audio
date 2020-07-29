@@ -446,6 +446,8 @@ def main(rank, args):
 
     if args.decoder == "greedy":
         decoder = GreedyDecoder()
+    else:
+        raise ValueError("Selected decoder not supported")
 
     # Model
 
@@ -495,11 +497,15 @@ def main(rank, args):
             momentum=args.momentum,
             weight_decay=args.weight_decay,
         )
+    else:
+        raise ValueError("Selected optimizer not supported")
 
     if args.scheduler == "exponential":
         scheduler = ExponentialLR(optimizer, gamma=args.gamma)
     elif args.scheduler == "reduceonplateau":
         scheduler = ReduceLROnPlateau(optimizer, patience=10, threshold=1e-3)
+    else:
+        raise ValueError("Selected scheduler not supported")
 
     criterion = torch.nn.CTCLoss(
         blank=language_model.mapping[char_blank], zero_infinity=False
