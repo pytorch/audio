@@ -239,11 +239,12 @@ def train_one_epoch(
     device,
     epoch,
     clip_grad,
+    disable_logger=False,
 ):
 
     model.train()
 
-    metric = MetricLogger("train")
+    metric = MetricLogger("train", disable=disable_logger)
     metric["epoch"] = epoch
 
     for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
@@ -303,14 +304,21 @@ def train_one_epoch(
 
 
 def evaluate(
-    model, criterion, data_loader, decoder, language_model, device, epoch,
+    model,
+    criterion,
+    data_loader,
+    decoder,
+    language_model,
+    device,
+    epoch,
+    disable_logger=False,
 ):
 
     with torch.no_grad():
 
         model.eval()
         start = time()
-        metric = MetricLogger("validation")
+        metric = MetricLogger("validation", disable=disable_logger)
         metric["epoch"] = epoch
 
         for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
@@ -353,6 +361,8 @@ def main(args, rank=0):
 
     if args.distributed:
         setup_distributed(rank, args.world_size)
+
+    main_rank = rank == 0
 
     logging.info("Start time: {}".format(str(datetime.now())))
 
@@ -539,7 +549,7 @@ def main(args, rank=0):
             },
             False,
             args.checkpoint,
-            rank,
+            not main_rank,
         )
 
     if args.distributed:
@@ -560,6 +570,7 @@ def main(args, rank=0):
             devices[0],
             epoch,
             args.clip_grad,
+            not main_rank,
         )
 
         if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
@@ -572,6 +583,7 @@ def main(args, rank=0):
                 language_model,
                 devices[0],
                 epoch,
+                not main_rank,
             )
 
             is_best = loss < best_loss
@@ -586,7 +598,7 @@ def main(args, rank=0):
                 },
                 is_best,
                 args.checkpoint,
-                rank,
+                not main_rank,
             )
 
         # TODO Remove before merge pull request
@@ -601,7 +613,7 @@ def main(args, rank=0):
                 },
                 False,
                 args.checkpoint,
-                rank,
+                not main_rank,
             )
             trigger_job_requeue()
 

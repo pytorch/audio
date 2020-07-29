@@ -8,8 +8,9 @@ import torch
 
 
 class MetricLogger(defaultdict):
-    def __init__(self, name, print_freq=1):
+    def __init__(self, name, print_freq=1, disable=False):
         super().__init__(lambda: 0.0)
+        self.disable = disable
         self.print_freq = print_freq
         self._iter = 0
         self["name"] = name
@@ -19,18 +20,18 @@ class MetricLogger(defaultdict):
 
     def __call__(self):
         self._iter = (self._iter + 1) % self.print_freq
-        if not self._iter:
+        if not self.disable and not self._iter:
             print(self, flush=True)
 
 
-def save_checkpoint(state, is_best, filename, rank):
+def save_checkpoint(state, is_best, filename, disable):
     """
     Save the model to a temporary file first,
     then copy it to filename, in case the signal interrupts
     the torch.save() process.
     """
 
-    if rank != 0:
+    if disable:
         return
 
     if filename == "":
