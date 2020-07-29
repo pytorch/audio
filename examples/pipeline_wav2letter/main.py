@@ -367,6 +367,7 @@ def main(rank, args):
     logging.info("Start time: {}".format(str(datetime.now())))
 
     # Install signal handler
+    # TODO Remove before merge pull request
     signal.signal(signal.SIGUSR1, signal_handler)
 
     # Explicitly setting seed to make sure that models created in two processes
