@@ -376,7 +376,7 @@ def main(rank, args):
     if args.distributed:
         setup_distributed(rank, args.world_size)
 
-    main_rank = not args.distributed or rank == 0
+    not_main_rank = args.distributed and rank != 0
 
     # Install signal handler
     # TODO Remove before merge pull request
@@ -569,7 +569,7 @@ def main(rank, args):
             },
             False,
             args.checkpoint,
-            not main_rank,
+            not_main_rank,
         )
 
     if args.distributed:
@@ -592,7 +592,7 @@ def main(rank, args):
             devices[0],
             epoch,
             args.clip_grad,
-            not main_rank,
+            not_main_rank,
         )
 
         if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
@@ -605,7 +605,7 @@ def main(rank, args):
                 language_model,
                 devices[0],
                 epoch,
-                not main_rank,
+                not_main_rank,
             )
 
             is_best = loss < best_loss
@@ -620,7 +620,7 @@ def main(rank, args):
                 },
                 is_best,
                 args.checkpoint,
-                not main_rank,
+                not_main_rank,
             )
 
         # TODO Remove before merge pull request
@@ -635,7 +635,7 @@ def main(rank, args):
                 },
                 False,
                 args.checkpoint,
-                not main_rank,
+                not_main_rank,
             )
             trigger_job_requeue()
 
