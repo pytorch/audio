@@ -48,7 +48,7 @@ def save_checkpoint(state, is_best, filename, disable):
         os.rename(tempfile, filename)
     if is_best:
         shutil.copyfile(filename, "model_best.pth.tar")
-    logging.info("Checkpoint: saved")
+    logging.warning("Checkpoint: saved")
 
 
 def count_parameters(model):

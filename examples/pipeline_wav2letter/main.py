@@ -174,7 +174,7 @@ def parse_args():
 # TODO Remove before merge pull request
 def signal_handler(a, b):
     global SIGNAL_RECEIVED
-    logging.info(f"Signal received on {datetime.now()}")
+    logging.warning("Signal received on %s", datetime.now())
     SIGNAL_RECEIVED = True
 
 
@@ -182,13 +182,13 @@ def signal_handler(a, b):
 def trigger_job_requeue():
     # Submit a new job to resume from checkpoint.
     if os.environ["SLURM_PROCID"] == "0" and os.getpid() == MAIN_PID:
-        logging.info(f"PID: {os.getpid()}. PPID: {os.getppid()}.")
-        logging.info("Resubmitting job")
+        logging.warning("PID: %s. PPID: %s.", os.getpid(), os.getppid())
+        logging.warning("Resubmitting job")
         command = "scontrol requeue " + os.environ["SLURM_JOB_ID"]
-        logging.info(command)
+        logging.warning(command)
         if os.system(command):
             raise RuntimeError("Fail to resubmit")
-        logging.info("New job submitted to the queue")
+        logging.warning("New job submitted to the queue")
     exit(0)
 
 
@@ -218,7 +218,7 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
         # Print a few examples
         output_print = output[i].ljust(print_length)[:print_length]
         target_print = target[i].ljust(print_length)[:print_length]
-        logging.info(f"Target: {target_print}   Output: {output_print}")
+        logging.info("Target: %s    Output: %s", target_print, output_print)
 
     cers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
     cers = sum(cers)
@@ -382,7 +382,7 @@ def main(rank, args):
     # TODO Remove before merge pull request
     signal.signal(signal.SIGUSR1, signal_handler)
 
-    logging.info("Start time: {}".format(str(datetime.now())))
+    logging.info("Start time: %s", datetime.now())
 
     # Explicitly set seed to make sure models created in separate processes
     # start from same random weights and biases
@@ -470,7 +470,7 @@ def main(rank, args):
         model = torch.nn.DataParallel(model)
 
     n = count_parameters(model)
-    logging.info(f"Number of parameters: {n}")
+    logging.info("Number of parameters: %s", n)
 
     # Optimizer
 
@@ -548,7 +548,7 @@ def main(rank, args):
         torch.distributed.barrier()
 
     if load_checkpoint:
-        logging.info(f"Checkpoint: loading '{args.checkpoint}'")
+        logging.info("Checkpoint: loading %s", args.checkpoint)
         checkpoint = torch.load(args.checkpoint)
 
         args.start_epoch = checkpoint["epoch"]
@@ -559,7 +559,7 @@ def main(rank, args):
         scheduler.load_state_dict(checkpoint["scheduler"])
 
         logging.info(
-            f"Checkpoint: loaded '{args.checkpoint}' at epoch {checkpoint['epoch']}"
+            "Checkpoint: loaded '%s' at epoch %s", args.checkpoint, checkpoint["epoch"]
         )
     else:
         logging.info("Checkpoint: not found")
@@ -584,7 +584,7 @@ def main(rank, args):
 
     for epoch in range(args.start_epoch, args.epochs):
 
-        logging.info(f"Epoch: {epoch}")
+        logging.info("Epoch: %s", epoch)
 
         train_one_epoch(
             model,
@@ -644,7 +644,7 @@ def main(rank, args):
             )
             trigger_job_requeue()
 
-    logging.info(f"End time: {datetime.now()}")
+    logging.info("End time: %s", datetime.now())
 
     if args.distributed:
         torch.distributed.destroy_process_group()
