@@ -10,32 +10,6 @@ import pytest
 from . import common_utils
 from .functional_impl import Lfilter
 
-
-def random_float_tensor(seed, size, a=22695477, c=1, m=2 ** 32):
-    """ Generates random tensors given a seed and size
-    https://en.wikipedia.org/wiki/Linear_congruential_generator
-    X_{n + 1} = (a * X_n + c) % m
-    Using Borland C/C++ values
-
-    The tensor will have values between [0,1)
-    Inputs:
-        seed (int): an int
-        size (Tuple[int]): the size of the output tensor
-        a (int): the multiplier constant to the generator
-        c (int): the additive constant to the generator
-        m (int): the modulus constant to the generator
-    """
-    num_elements = 1
-    for s in size:
-        num_elements *= s
-
-    arr = [(a * seed + c) % m]
-    for i in range(num_elements - 1):
-        arr.append((a * arr[i] + c) % m)
-
-    return torch.tensor(arr).float().view(size) / m
-
-
 class TestLFilterFloat32(Lfilter, common_utils.PytorchTestCase):
     dtype = torch.float32
     device = torch.device('cpu')
