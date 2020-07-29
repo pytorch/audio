@@ -357,7 +357,7 @@ def evaluate(
         return metric["average loss"]
 
 
-def main(args, rank=0):
+def main(rank, args):
 
     if args.distributed:
         setup_distributed(rank, args.world_size)
@@ -376,7 +376,7 @@ def main(args, rank=0):
     # Empty CUDA cache
     torch.cuda.empty_cache()
 
-    # Change backend
+    # Change backend for flac files
     torchaudio.set_audio_backend("soundfile")
 
     if args.distributed:
@@ -623,17 +623,17 @@ def main(args, rank=0):
         torch.distributed.destroy_process_group()
 
 
-def spawn_main(args, main):
+def spawn_main(main, args):
     if args.distributed:
         torch.multiprocessing.spawn(
-            lambda x: main(args, x), nprocs=args.world_size, join=True
+            main, args=(args,), nprocs=args.world_size, join=True
         )
     else:
-        main(args)
+        main(0, args)
 
 
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
     args = parse_args()
-    spawn_main(args, main)
+    spawn_main(main, args)
