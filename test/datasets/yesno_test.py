@@ -29,10 +29,10 @@ class TestYesNo(TempDirMixin, TorchaudioTestCase):
         cls.root_dir = cls.get_base_temp_dir()
         base_dir = os.path.join(cls.root_dir, 'waves_yesno')
         os.makedirs(base_dir, exist_ok=True)
-        for label in cls.labels:
+        for i, label in enumerate(cls.labels):
             filename = f'{"_".join(str(l) for l in label)}.wav'
             path = os.path.join(base_dir, filename)
-            data = get_whitenoise(sample_rate=8000, duration=6, n_channels=1, dtype='int16')
+            data = get_whitenoise(sample_rate=8000, duration=6, n_channels=1, dtype='int16', seed=i)
             save_wav(path, data, 8000)
             cls.data.append(normalize_wav(data))
 

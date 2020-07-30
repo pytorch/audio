@@ -6,6 +6,7 @@ dependencies:
   - numpy
   - pytest
   - pytest-cov
+  - pytest-xdist
   - codecov
   - librosa
   - llvmlite==0.31  # See https://github.com/pytorch/audio/pull/766

@@ -15,3 +15,11 @@ The models subpackage contains definitions of models for addressing common audio
 .. autoclass:: Wav2Letter
 
   .. automethod:: forward
+
+
+:hidden:`WaveRNN`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: WaveRNN
+
+  .. automethod:: forward
