@@ -10,6 +10,7 @@ import pytest
 from . import common_utils
 from .functional_impl import Lfilter
 
+
 class TestLFilterFloat32(Lfilter, common_utils.PytorchTestCase):
     dtype = torch.float32
     device = torch.device('cpu')

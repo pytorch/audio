@@ -177,11 +177,11 @@ def griffinlim(
 
         # Invert with our current estimate of the phases
         inverse = torch.istft(specgram * angles,
-                        n_fft=n_fft,
-                        hop_length=hop_length,
-                        win_length=win_length,
-                        window=window,
-                        length=length).float()
+                              n_fft=n_fft,
+                              hop_length=hop_length,
+                              win_length=win_length,
+                              window=window,
+                              length=length).float()
 
         # Rebuild the spectrogram
         rebuilt = torch.stft(inverse, n_fft, hop_length, win_length, window,
@@ -195,11 +195,11 @@ def griffinlim(
 
     # Return the final phase estimates
     waveform = torch.istft(specgram * angles,
-                     n_fft=n_fft,
-                     hop_length=hop_length,
-                     win_length=win_length,
-                     window=window,
-                     length=length)
+                           n_fft=n_fft,
+                           hop_length=hop_length,
+                           win_length=win_length,
+                           window=window,
+                           length=length)
 
     # unpack batch
     waveform = waveform.reshape(shape[:-2] + waveform.shape[-1:])
