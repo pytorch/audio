@@ -59,14 +59,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
                                              n_channels=n_channels, duration=5)
         self.assert_batch_consistencies(F.detect_pitch_frequency, waveform, sample_rate)
 
-    def test_istft(self):
-        stft = torch.tensor([
-            [[4., 0.], [4., 0.], [4., 0.], [4., 0.], [4., 0.]],
-            [[0., 0.], [0., 0.], [0., 0.], [0., 0.], [0., 0.]],
-            [[0., 0.], [0., 0.], [0., 0.], [0., 0.], [0., 0.]]
-        ])
-        self.assert_batch_consistencies(F.istft, stft, n_fft=4, length=4)
-
     def test_contrast(self):
         waveform = torch.rand(2, 100) - 0.5
         self.assert_batch_consistencies(F.contrast, waveform, enhancement_amount=80.)

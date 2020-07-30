@@ -8,7 +8,6 @@ import torch
 from torch import Tensor
 
 __all__ = [
-    "istft",
     "spectrogram",
     "griffinlim",
     "amplitude_to_DB",
@@ -177,7 +176,7 @@ def griffinlim(
         tprev = rebuilt
 
         # Invert with our current estimate of the phases
-        inverse = istft(specgram * angles,
+        inverse = torch.istft(specgram * angles,
                         n_fft=n_fft,
                         hop_length=hop_length,
                         win_length=win_length,
@@ -195,7 +194,7 @@ def griffinlim(
         angles = angles.div(complex_norm(angles).add(1e-16).unsqueeze(-1).expand_as(angles))
 
     # Return the final phase estimates
-    waveform = istft(specgram * angles,
+    waveform = torch.istft(specgram * angles,
                      n_fft=n_fft,
                      hop_length=hop_length,
                      win_length=win_length,
