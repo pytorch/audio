@@ -20,8 +20,7 @@ pytest test/sox_io_backend -k load  # only runs tests where their names contain 
 ```
 
 **Note**
-Although we use `pytest` for running tests, we do not use `pytest` frameworks when writing tests, 
-for the reason we want to utilize `PyTorch`'s test utilities and avoid reinventing the wheel.
+We use PyTorch's test utilities instead of `pytest` frameworks when writing tests to avoid reinventing the wheel for Tensor comparison.
 
 ## Structure of tests
 
