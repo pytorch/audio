@@ -4,7 +4,7 @@ import random
 import torch
 import torchaudio
 from torch.utils.data.dataset import random_split
-from torchaudio.datasets import LJSPEECH
+from torchaudio.datasets import LJSPEECH, LIBRITTS
 from torchaudio.transforms import MuLawEncoding
 
 from processing import bits_to_normalized_waveform, normalized_waveform_to_bits
@@ -48,12 +48,20 @@ class Processed(torch.utils.data.Dataset):
         return item[0].squeeze(0), specgram
 
 
-def split_process_ljspeech(args, transforms):
-    data = LJSPEECH(root=args.file_path, download=False)
+def split_process_dataset(args, transforms):
+    if args.dataset == 'ljspeech':
+        data = LJSPEECH(root=args.file_path, download=False)
 
-    val_length = int(len(data) * args.val_ratio)
-    lengths = [len(data) - val_length, val_length]
-    train_dataset, val_dataset = random_split(data, lengths)
+        val_length = int(len(data) * args.val_ratio)
+        lengths = [len(data) - val_length, val_length]
+        train_dataset, val_dataset = random_split(data, lengths)
+
+    elif args.dataset == 'libritts':
+        train_dataset = LIBRITTS(root=args.file_path, url='train-clean-100', download=False)
+        val_dataset = LIBRITTS(root=args.file_path, url='dev-clean', download=False)
+
+    else:
+        raise ValueError(f"Expected dataset: `ljspeech` or `libritts`, but found {args.dataset}")
 
     train_dataset = Processed(train_dataset, transforms)
     val_dataset = Processed(val_dataset, transforms)
