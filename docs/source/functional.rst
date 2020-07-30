@@ -8,11 +8,6 @@ torchaudio.functional
 
 Functions to perform common audio operations.
 
-:hidden:`istft`
-~~~~~~~~~~~~~~~
-
-.. autofunction:: istft
-
 :hidden:`spectrogram`
 ~~~~~~~~~~~~~~~~~~~~~
 
