@@ -67,4 +67,12 @@ def skipIfNoModule(module, display_name=None):
 skipIfNoSoxBackend = unittest.skipIf(
     'sox' not in torchaudio.list_audio_backends(), 'Sox backend not available')
 skipIfNoCuda = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
-skipIfNoExtension = skipIfNoModule('torchaudio._torchaudio', 'torchaudio C++ extension')
+
+
+def skipIfNoExtension(test_item):
+    if (
+            not is_module_available('torchaudio._torchaudio')
+            and 'TORCHAUDIO_TEST_FAIL_IF_NO_EXTENSION' in os.environ
+    ):
+        raise RuntimeError('torchaudio C++ extension is not available.')
+    return unittest.skip('torchaudio C++ extension is not available')(test_item)
