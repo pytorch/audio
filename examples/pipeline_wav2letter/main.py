@@ -223,9 +223,10 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
     cers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
     cers = sum(cers)
     n = sum(len(t) for t in target)
-    metric["cer"] += cers
+    metric["cer over target length"] = cers / n
+    metric["cumulative cer"] += cers
     metric["total chars"] += n
-    metric["cer over target length"] = metric["cer"] / metric["total chars"]
+    metric["cumulative cer over target length"] = metric["cer"] / metric["total chars"]
 
     # Compute WER
 
@@ -235,9 +236,10 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
     wers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
     wers = sum(wers)
     n = sum(len(t) for t in target)
-    metric["wer"] += wers
+    metric["wer over target length"] = wers / n
+    metric["cumulative wer"] += wers
     metric["total words"] += n
-    metric["wer over target length"] = metric["wer"] / metric["total words"]
+    metric["cumulative wer over target length"] = metric["wer"] / metric["total words"]
 
 
 def train_one_epoch(
@@ -296,13 +298,15 @@ def train_one_epoch(
             pass
 
         metric["batch size"] = len(inputs)
+        metric["n_channel"] = inputs.shape[1]
+        metric["n_time"] = inputs.shape[-1]
         metric["dataset length"] += metric["batch size"]
         metric["iteration"] += 1
         metric["loss"] = loss.item()
         metric["cumulative loss"] += metric["loss"]
         metric["average loss"] = metric["cumulative loss"] / metric["iteration"]
         metric["iteration time"] = time() - start
-        metric["epoch time"] += metric["time"]
+        metric["epoch time"] += metric["iteration time"]
         metric()
 
         # TODO Remove before merge pull request
