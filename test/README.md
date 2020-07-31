@@ -1,5 +1,27 @@
 # Torchaudio Test Suite
 
+## How to run test
+
+You can use `pytest` to run `torchaudio`'s test suites. See https://docs.pytest.org/ for the detail of how to use `pytest` command.
+
+```
+# List up all the tests
+pytest test --collect-only
+# Run all the test suites
+pytest test
+# Run tests on sox_effects module
+pytest test/sox_effect
+# use -k to apply filter
+pytest test/sox_io_backend -k load  # only runs tests where their names contain load
+# Some other useful options;
+# Stop on the first failure -x
+# Run failure fast --ff
+# Only rerun the failure --lf
+```
+
+**Note**
+We use PyTorch's test utilities instead of `pytest` frameworks when writing tests to avoid reinventing the wheel for Tensor comparison.
+
 ## Structure of tests
 
 The following is an overview of the tests and related modules for `torchaudio`.
@@ -15,7 +37,7 @@ The following is an overview of the tests and related modules for `torchaudio`.
     Test suite for numerical compatibility against Kaldi.
 
 #### Result consistency with PyTorch framework
-- [TorchScript consistency test](./test_torchscript_consistency.py)
+- [TorchScript consistency test](torchscript_consistency_impl.py)
     Test suite to check 1. if an API is TorchScript-able, and 2. the results from Python and Torchscript match.
 - [Batch consistency test](./test_batch_consistency.py)
     Test suite to check if functionals/Transforms handle single sample input and batch input and return the same result.
@@ -24,8 +46,8 @@ The following is an overview of the tests and related modules for `torchaudio`.
 
 The following test modules are defined for corresponding `torchaudio` module/functions.
 
-- [`torchaudio.datasets`](./test_datasets.py)
-- [`torchaudio.functional`](./test_functional.py)
+- [`torchaudio.datasets`](./test_datasets)
+- `torchaudio.functional` [CPU](./functional_cpu_test.py), [CUDA](./functional_cuda_test.py), [common](./functional_impl.py)
 - [`torchaudio.transforms`](./test_transforms.py)
 - [`torchaudio.compliance.kaldi`](./test_compliance_kaldi.py)
 - [`torchaudio.kaldi_io`](./test_kaldi_io.py)
@@ -86,11 +108,7 @@ Files:
 Files:
 
 * `CommonVoice/cv-corpus-4-2019-12-10/tt/clips/common_voice_tt_00000000.wav`
-* `LibriSpeech/dev-clean/1272/128104/1272-128104-0000.flac`
-* `LJSpeech-1.1/wavs/LJ001-0001.wav`
-* `SpeechCommands/speech_commands_v0.02/go/0a9f9af7_nohash_0.wav`
 * `VCTK-Corpus/wav48/p224/p224_002.wav`
-* `waves_yesno/0_1_0_1_0_1_1_0.wav`
 * `vad-go-stereo-44100.wav`
 * `vad-go-mono-32000.wav`
 
