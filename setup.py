@@ -3,8 +3,8 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
-import distutils.command.clean
 from setuptools import setup, find_packages
+import distutils.command.clean
 
 from build_tools import setup_helpers
 
