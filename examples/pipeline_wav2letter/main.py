@@ -404,7 +404,7 @@ def main(rank, args):
 
     sample_rate_original = 16000
 
-    transforms_valid = torch.nn.Sequential(
+    transforms = torch.nn.Sequential(
         # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
         # torchaudio.transforms.MFCC(sample_rate=sample_rate_original, n_mfcc=args.n_bins, melkwargs=melkwargs),
         torchaudio.transforms.MelSpectrogram(
@@ -412,15 +412,15 @@ def main(rank, args):
         ),
     )
 
-    transforms_train = transforms_valid
+    augmentations = torch.nn.Sequential()
     if args.freq_mask:
-        transforms_train = torch.nn.Sequential(
-            transforms_train,
+        augmentations = torch.nn.Sequential(
+            augmentations,
             torchaudio.transforms.FrequencyMasking(freq_mask_param=args.freq_mask),
         )
     if args.time_mask:
-        transforms_train = torch.nn.Sequential(
-            transforms_train,
+        augmentations = torch.nn.Sequential(
+            augmentations,
             torchaudio.transforms.TimeMasking(time_mask_param=args.time_mask),
         )
 
@@ -436,7 +436,8 @@ def main(rank, args):
 
     training, validation = split_process_librispeech(
         [args.dataset_train, args.dataset_valid],
-        [transforms_train, transforms_valid],
+        # [transforms_train, transforms_valid],
+        [transforms, transforms],
         language_model,
         root=args.dataset_root,
         folder_in_archive=args.dataset_folder_in_archive,
@@ -514,7 +515,8 @@ def main(rank, args):
 
     # Data Loader
 
-    collate_fn = collate_factory(model_length_function)
+    collate_fn_train = collate_factory(model_length_function, augmentations)
+    collate_fn_valid = collate_factory(model_length_function)
 
     loader_training_params = {
         "num_workers": args.workers,
@@ -528,13 +530,13 @@ def main(rank, args):
     loader_training = DataLoader(
         training,
         batch_size=args.batch_size,
-        collate_fn=collate_fn,
+        collate_fn=collate_fn_train,
         **loader_training_params,
     )
     loader_validation = DataLoader(
         validation,
         batch_size=args.batch_size,
-        collate_fn=collate_fn,
+        collate_fn=collate_fn_valid,
         **loader_validation_params,
     )
 

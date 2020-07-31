@@ -88,10 +88,14 @@ def split_process_librispeech(
     return tuple(create(dataset) for dataset in datasets)
 
 
-def collate_factory(model_length_function):
+def collate_factory(model_length_function, transforms=None):
+
+    if transforms is None:
+        transforms = torch.nn.Sequential()
+
     def collate_fn(batch):
 
-        tensors = [b[0] for b in batch if b]
+        tensors = [transforms(b[0]) for b in batch if b]
 
         tensors_lengths = torch.tensor(
             [model_length_function(t) for t in tensors],
