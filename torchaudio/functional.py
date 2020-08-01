@@ -223,8 +223,8 @@ def griffinlim(
     Returns:
         torch.Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.
     """
-    assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
-    assert momentum >= 0, 'momentum=%s < 0' % momentum
+    assert momentum < 1, 'momentum={} > 1 can be unstable'.format(momentum)
+    assert momentum >= 0, 'momentum={} < 0'.format(momentum)
 
     # pack batch
     shape = specgram.size()

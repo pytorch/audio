@@ -607,7 +607,7 @@ class Resample(torch.nn.Module):
 
             return waveform
 
-        raise ValueError('Invalid resampling method: %s' % (self.resampling_method))
+        raise ValueError('Invalid resampling method: ' + str(self.resampling_method))
 
 
 class ComplexNorm(torch.nn.Module):
