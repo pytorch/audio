@@ -295,7 +295,7 @@ def train_one_epoch(
         try:
             metric["lr"] = scheduler.get_last_lr()[0]
         except AttributeError:
-            pass
+            metric["lr"] = optimizer.param_groups[0]["lr"]
 
         metric["batch size"] = len(inputs)
         metric["n_channel"] = inputs.shape[1]
