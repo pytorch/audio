@@ -888,7 +888,7 @@ def treble_biquad(
         waveform (Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
         gain (float): desired gain at the boost (or attenuation) in dB.
-        central_freq (float, optional): central frequency (in Hz). (Default: ``3000``)
+        central_freq (float, optional): central frequency (in Hz). (Default: ``3000``)whi
         Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).
 
     Returns:
@@ -2314,3 +2314,41 @@ def vad(
     res = waveform[:, pos - samplesLen_ns + flushedLen_ns:]
     # unpack batch
     return res.view(shape[:-1] + res.shape[-1:])
+
+
+def get_noisy_audio(
+    signal,
+    noise,
+    snr,
+    random_stating_point:bool = False,
+)-> Tuple[Tensor, Tensor]:
+    r"""
+    Augment noise to signal, with specified SNR value to generate degraded signal, or noisy signal.
+
+    Args:
+        signal (Tensor): Tensor of audio of dimension `(..., time)`
+        noise (Tensor): Tensor of audio of dimension `(..., time)`
+        snr (int): Desirable SNR value in generated noisy signal
+        random_starting_point (bool): Augment noise at a random starting point, if specified as True. (Default: False)
+
+    Returns:
+        Tensor: Tensor of freq of dimension (..., frame)
+    """
+    snr = 10 ** (snr/20)
+    _signal_length = len(signal)
+    _noise_length = len(noise)
+    # adjust length of background noise.
+    if _signal_length > _noise_length:
+        noise = torch.cat((noise, torch.zeros(_signal_length - _noise_length)))
+    # random stating point
+    if random_stating_point:
+        _random_start_point = torch.randint(_signal_length, (1,))
+        noise = torch.cat((torch.zeros([_random_start_point]), noise))
+    noise = noise[:_signal_length]
+    _signal_power = torch.mean(signal **2)
+    _noise_power = torch.mean(noise **2)
+    _noise_factor = torch.sqrt(_signal_power / torch.max((_noise_power *  snr), torch.Tensor([1e-12])))
+    scaled_noise = noise * _noise_factor
+    noisy_signal = signal + scaled_noise
+
+    return scaled_noise, noisy_signal
