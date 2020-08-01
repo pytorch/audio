@@ -2332,7 +2332,7 @@ def get_noisy_audio(
         random_starting_point (bool): Augment noise at a random starting point, if specified as True. (Default: False)
 
     Returns:
-        Tensor: Tensor of freq of dimension (..., frame)
+        Tensor: Noisy Signal, Tensor of audio dimension `(..., time)`
     """
     snr = 10 ** (snr/20)
     _signal_length = len(signal)
@@ -2351,4 +2351,4 @@ def get_noisy_audio(
     scaled_noise = noise * _noise_factor
     noisy_signal = signal + scaled_noise
 
-    return scaled_noise, noisy_signal
+    return noisy_signal
