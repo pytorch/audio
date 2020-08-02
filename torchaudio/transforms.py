@@ -28,6 +28,7 @@ __all__ = [
     'TimeMasking',
     'SlidingWindowCmn',
     'Vad',
+    'BackgroundNoise'
 ]
 
 
@@ -1036,3 +1037,41 @@ class Vad(torch.nn.Module):
             hp_lifter_freq=self.hp_lifter_freq,
             lp_lifter_freq=self.lp_lifter_freq,
         )
+
+
+class MixNoise(torch.nn.Module):
+    r""" Add noise to a waveform
+
+    Args:
+        snr (float, optional): Desirable SNR (in dB) value in generated noisy waveform. (Default: 30)
+        normalize (bool, optional): If True, normalizes the given waveform and noise. (Default: True)
+        noise_type (str, optional): Type of noise. One of: ``white``, ``red`` and ``custom``. (Default: ``white``)
+    """
+
+    def __init__(self,snr:float=30.0, normalize:bool=True, noise_type="white") -> None:
+        super(BackgroundNoise, self).__init__()
+        self.snr = snr
+        self.normalize = normalize
+        self.noise_type = noise_type
+
+
+    def forward(self, waveform: Tensor, noise:Tensor=None) -> Tensor:
+        r"""
+        Args:
+            waveform (Tensor): Tensor of audio of dimension (..., time).
+            noise (Tensor): Noise to be added to waveform. Tensor of audio of dimension (..., time).
+                If ``custom`` is provided as ``noise_type``, ``noise`` must be passed to forward method. (Default: ``None``)
+        """
+
+        if self.noise_type == "custom":
+            if noise is None:
+                raise ValueError("Please provide custom noise.")
+            F.add_background_noise(waveform, noise, self.snr, self.normalize)
+
+        if self.noise_type == "white":
+            F.add_white_noise(waveform, self.snr)
+
+
+        if self.noise_type == "red":
+            F.add_red_noise(waveform, self.snr)
+

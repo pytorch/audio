@@ -7,6 +7,10 @@ import warnings
 import torch
 from torch import Tensor
 
+from torchaudio._internal import (
+    misc_ops as _misc_ops,
+)
+
 __all__ = [
     "spectrogram",
     "griffinlim",
@@ -41,6 +45,8 @@ __all__ = [
     'mask_along_axis_iid',
     'sliding_window_cmn',
     'vad',
+    'add_background_noise',
+    'add_white_noise',
 ]
 
 
@@ -2316,39 +2322,90 @@ def vad(
     return res.view(shape[:-1] + res.shape[-1:])
 
 
-def get_noisy_audio(
-    signal,
-    noise,
-    snr,
-    random_stating_point:bool = False,
-)-> Tuple[Tensor, Tensor]:
+def add_background_noise(
+    waveform: Tensor,
+    noise: Tensor,
+    snr: float,
+    normalize: bool = True
+)-> Tensor:
     r"""
-    Augment noise to signal, with specified SNR value to generate degraded signal, or noisy signal.
+    Augment noise to waveform, with specified SNR value to generate degraded waveform.
 
     Args:
-        signal (Tensor): Tensor of audio of dimension `(..., time)`
-        noise (Tensor): Tensor of audio of dimension `(..., time)`
-        snr (int): Desirable SNR value in generated noisy signal
-        random_starting_point (bool): Augment noise at a random starting point, if specified as True. (Default: False)
+        waveform (Tensor): Tensor of audio of dimension `(..., time)`.
+        noise (Tensor): Tensor of audio of dimension `(..., time)`.
+        snr (float): Desirable SNR (in dB) value in generated noisy waveform.
+        normalize (bool, optional): If True, normalizes the given waveform and noise. (Default: True)
 
     Returns:
-        Tensor: Noisy Signal, Tensor of audio dimension `(..., time)`
+        Tensor: Noisy Waveform, Tensor of audio dimension `(..., time)`
     """
-    snr = 10 ** (snr/20)
-    _signal_length = len(signal)
-    _noise_length = len(noise)
-    # adjust length of background noise.
-    if _signal_length > _noise_length:
-        noise = torch.cat((noise, torch.zeros(_signal_length - _noise_length)))
-    # random stating point
-    if random_stating_point:
-        _random_start_point = torch.randint(_signal_length, (1,))
-        noise = torch.cat((torch.zeros([_random_start_point]), noise))
-    noise = noise[:_signal_length]
-    _signal_power = torch.mean(signal **2)
-    _noise_power = torch.mean(noise **2)
-    _noise_factor = torch.sqrt(_signal_power / torch.max((_noise_power *  snr), torch.Tensor([1e-12])))
-    scaled_noise = noise * _noise_factor
-    noisy_signal = signal + scaled_noise
 
-    return noisy_signal
+    # Inverse of dB
+    snr = 10 ** (snr/20)
+
+    if normalize:
+        # normalizes waveform and noise before combining them,
+        # to bring them to the same scale
+        _misc_ops.normalize_audio(waveform.to(torch.float32), 32768.0)
+        _misc_ops.normalize_audio(noise.to(torch.float32), 32768.0)
+
+
+    waveform_length = waveform.shape[0]
+    noise_length = noise.shape[0]
+
+    # adjust length of background noise
+    if waveform_length > noise_length:
+        noise = torch.cat((noise, torch.zeros(waveform_length - noise_length)))
+    noise = noise[:waveform_length]
+
+    # Average power of audio/ noise
+    waveform_power = torch.mean(waveform **2)
+    noise_power = torch.mean(noise **2)
+
+    # calculate noise factor by which the noise is scaled
+    factor = torch.sqrt(signal_power / torch.max((noise_power *  snr), torch.Tensor([1e-12])))
+    output_waveform = waveform + (noise * factor)
+
+    return output_waveform
+
+def add_white_noise(
+    waveform: Tensor,
+    snr: float,
+)-> Tensor:
+    r"""
+    Augment white noise to signal, with specified SNR value to generate degraded signal.
+
+    Args:
+        waveform (Tensor): Tensor of audio of dimension `(..., time)`
+        noise (Tensor): Tensor of audio of dimension `(..., time)`
+        snr (float): Desirable SNR (in dB) value in generated noisy signal
+
+    Returns:
+        Tensor: White noise added Waveform , Tensor of audio dimension `(..., time)`
+    """
+
+    white_noise = torch.normal(0.0, 1.0, (1, len(waveform)))
+    return add_background_noise(waveform, noise, snr, normalize=True)
+
+def add_red_noise(
+    waveform: Tensor,
+    snr: float,
+)-> Tensor:
+    r"""
+    Augment red noise to signal, with specified SNR value to generate degraded signal.
+
+    Args:
+        waveform (Tensor): Tensor of audio of dimension `(..., time)`
+        noise (Tensor): Tensor of audio of dimension `(..., time)`
+        snr (float): Desirable SNR (in dB) value in generated noisy signal
+
+    Returns:
+        Tensor: Red noise added Waveform, Tensor of audio dimension `(..., time)`
+    """
+
+    white_noise = torch.normal(0.0, 1.0, (1, len(waveform)))
+    red_noise = white_noise
+    for i in range(1, waveform.shape[0]):
+        red_noise[i] += red_noise[i-1]
+    return add_background_noise(red_noise, noise, snr, normalize=True)
