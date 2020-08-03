@@ -148,7 +148,9 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
         sound, sr = torchaudio.load_wav(sound_filepath)
         files = self.test_filepaths[filepath_key]
 
-        assert len(files) == expected_num_files, ('number of kaldi %s file changed to %d' % (filepath_key, len(files)))
+        assert len(files) == expected_num_files, \
+            ('number of kaldi {} file changed to {}'.format(
+                filepath_key, len(files)))
 
         for f in files:
             print(f)

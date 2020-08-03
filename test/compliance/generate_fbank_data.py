@@ -92,7 +92,7 @@ def decode(fn, sound_path, exe_path, scp_path, out_dir):
         'round_to_power_of_two', 'snip_edges', 'subtract_mean', 'use_energy', 'use_log_fbank',
         'use_power', 'vtln_high', 'vtln_low', 'vtln_warp', 'window_type']
     fn_split = fn.split('-')
-    assert len(fn_split) == len(arr), ('Len mismatch: %d and %d' % (len(fn_split), len(arr)))
+    assert len(fn_split) == len(arr), ('Len mismatch: {} and {}'.format(len(fn_split), len(arr)))
     inputs = {arr[i]: utils.parse(fn_split[i]) for i in range(len(arr))}
 
     # print flags for C++
