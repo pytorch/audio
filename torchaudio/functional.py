@@ -2351,8 +2351,8 @@ def add_background_noise(
         _misc_ops.normalize_audio(noise.to(torch.float32), 32768.0)
 
 
-    waveform_length = waveform.shape[0]
-    noise_length = noise.shape[0]
+    waveform_length = waveform.shape[-1]
+    noise_length = waveform.shape[-1]
 
     # adjust length of background noise
     if waveform_length > noise_length:
@@ -2364,7 +2364,7 @@ def add_background_noise(
     noise_power = torch.mean(noise **2)
 
     # calculate noise factor by which the noise is scaled
-    factor = torch.sqrt(signal_power / torch.max((noise_power *  snr), torch.Tensor([1e-12])))
+    factor = torch.sqrt(waveform_power / torch.max((noise_power *  snr), torch.Tensor([1e-12])))
     output_waveform = waveform + (noise * factor)
 
     return output_waveform
@@ -2385,7 +2385,7 @@ def add_white_noise(
         Tensor: White noise added Waveform , Tensor of audio dimension `(..., time)`
     """
 
-    white_noise = torch.normal(0.0, 1.0, (1, len(waveform)))
+    white_noise = torch.normal(0.0, 1.0, (1, waveform.shape[-1]))
     return add_background_noise(waveform, noise, snr, normalize=True)
 
 def add_red_noise(
@@ -2404,8 +2404,9 @@ def add_red_noise(
         Tensor: Red noise added Waveform, Tensor of audio dimension `(..., time)`
     """
 
-    white_noise = torch.normal(0.0, 1.0, (1, len(waveform)))
-    red_noise = white_noise
-    for i in range(1, waveform.shape[0]):
+    white_noise = torch.normal(0.0, 1.0, (1, waveform.shape[-1]))
+    red_noise = white_noise.T
+    # filter out high frequencies from white noise
+    for i in range(1, waveform.shape[-1]):
         red_noise[i] += red_noise[i-1]
-    return add_background_noise(red_noise, noise, snr, normalize=True)
+    return add_background_noise(waveform, red_noise.T, snr, normalize=True)

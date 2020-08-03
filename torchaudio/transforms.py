@@ -1066,12 +1066,12 @@ class MixNoise(torch.nn.Module):
         if self.noise_type == "custom":
             if noise is None:
                 raise ValueError("Please provide custom noise.")
-            F.add_background_noise(waveform, noise, self.snr, self.normalize)
+            return F.add_background_noise(waveform, noise, self.snr, self.normalize)
 
         if self.noise_type == "white":
-            F.add_white_noise(waveform, self.snr)
+            return F.add_white_noise(waveform, self.snr)
 
 
         if self.noise_type == "red":
-            F.add_red_noise(waveform, self.snr)
+            return F.add_red_noise(waveform, self.snr)
 
