@@ -47,6 +47,7 @@ __all__ = [
     'vad',
     'add_background_noise',
     'add_white_noise',
+    'add_red_noise',
 ]
 
 
