@@ -1,13 +1,6 @@
 from . import extension
 from torchaudio._internal import module_utils as _mod_utils
-from torchaudio import (
-    compliance,
-    datasets,
-    kaldi_io,
-    utils,
-    sox_effects,
-    transforms
-)
+from torchaudio import compliance, datasets, kaldi_io, utils, sox_effects, transforms
 from torchaudio.backend import (
     list_audio_backends,
     get_audio_backend,
@@ -34,7 +27,8 @@ except ImportError:
 
 @_mod_utils.deprecated(
     "Please remove the function call to initialize_sox. "
-    "Resource initialization is now automatically handled.")
+    "Resource initialization is now automatically handled."
+)
 def initialize_sox():
     """Initialize sox effects.
 
@@ -47,7 +41,8 @@ def initialize_sox():
     "Please remove the function call to torchaudio.shutdown_sox. "
     "Resource clean up is now automatically handled. "
     "In the unlikely event that you need to manually shutdown sox, "
-    "please use torchaudio.sox_effects.shutdown_sox_effects.")
+    "please use torchaudio.sox_effects.shutdown_sox_effects."
+)
 def shutdown_sox():
     """Shutdown sox effects.
 

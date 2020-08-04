@@ -13,49 +13,30 @@ from torchaudio.datasets.utils import (
 URL = "aew"
 FOLDER_IN_ARCHIVE = "ARCTIC"
 _CHECKSUMS = {
-    "http://festvox.org/cmu_arctic/packed/cmu_us_aew_arctic.tar.bz2":
-    "4382b116efcc8339c37e01253cb56295",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_ahw_arctic.tar.bz2":
-    "b072d6e961e3f36a2473042d097d6da9",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_aup_arctic.tar.bz2":
-    "5301c7aee8919d2abd632e2667adfa7f",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_awb_arctic.tar.bz2":
-    "280fdff1e9857119d9a2c57b50e12db7",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_axb_arctic.tar.bz2":
-    "5e21cb26c6529c533df1d02ccde5a186",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_bdl_arctic.tar.bz2":
-    "b2c3e558f656af2e0a65da0ac0c3377a",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_clb_arctic.tar.bz2":
-    "3957c503748e3ce17a3b73c1b9861fb0",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_eey_arctic.tar.bz2":
-    "59708e932d27664f9eda3e8e6859969b",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_fem_arctic.tar.bz2":
-    "dba4f992ff023347c07c304bf72f4c73",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_gka_arctic.tar.bz2":
-    "24a876ea7335c1b0ff21460e1241340f",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_jmk_arctic.tar.bz2":
-    "afb69d95f02350537e8a28df5ab6004b",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_ksp_arctic.tar.bz2":
-    "4ce5b3b91a0a54b6b685b1b05aa0b3be",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_ljm_arctic.tar.bz2":
-    "6f45a3b2c86a4ed0465b353be291f77d",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_lnh_arctic.tar.bz2":
-    "c6a15abad5c14d27f4ee856502f0232f",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_rms_arctic.tar.bz2":
-    "71072c983df1e590d9e9519e2a621f6e",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_rxr_arctic.tar.bz2":
-    "3771ff03a2f5b5c3b53aa0a68b9ad0d5",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_slp_arctic.tar.bz2":
-    "9cbf984a832ea01b5058ba9a96862850",
-    "http://festvox.org/cmu_arctic/packed/cmu_us_slt_arctic.tar.bz2":
-    "959eecb2cbbc4ac304c6b92269380c81",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_aew_arctic.tar.bz2": "4382b116efcc8339c37e01253cb56295",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_ahw_arctic.tar.bz2": "b072d6e961e3f36a2473042d097d6da9",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_aup_arctic.tar.bz2": "5301c7aee8919d2abd632e2667adfa7f",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_awb_arctic.tar.bz2": "280fdff1e9857119d9a2c57b50e12db7",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_axb_arctic.tar.bz2": "5e21cb26c6529c533df1d02ccde5a186",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_bdl_arctic.tar.bz2": "b2c3e558f656af2e0a65da0ac0c3377a",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_clb_arctic.tar.bz2": "3957c503748e3ce17a3b73c1b9861fb0",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_eey_arctic.tar.bz2": "59708e932d27664f9eda3e8e6859969b",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_fem_arctic.tar.bz2": "dba4f992ff023347c07c304bf72f4c73",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_gka_arctic.tar.bz2": "24a876ea7335c1b0ff21460e1241340f",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_jmk_arctic.tar.bz2": "afb69d95f02350537e8a28df5ab6004b",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_ksp_arctic.tar.bz2": "4ce5b3b91a0a54b6b685b1b05aa0b3be",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_ljm_arctic.tar.bz2": "6f45a3b2c86a4ed0465b353be291f77d",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_lnh_arctic.tar.bz2": "c6a15abad5c14d27f4ee856502f0232f",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_rms_arctic.tar.bz2": "71072c983df1e590d9e9519e2a621f6e",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_rxr_arctic.tar.bz2": "3771ff03a2f5b5c3b53aa0a68b9ad0d5",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_slp_arctic.tar.bz2": "9cbf984a832ea01b5058ba9a96862850",
+    "http://festvox.org/cmu_arctic/packed/cmu_us_slt_arctic.tar.bz2": "959eecb2cbbc4ac304c6b92269380c81",
 }
 
 
-def load_cmuarctic_item(line: str,
-                        path: str,
-                        folder_audio: str,
-                        ext_audio: str) -> Tuple[Tensor, int, str, str]:
+def load_cmuarctic_item(
+    line: str, path: str, folder_audio: str, ext_audio: str
+) -> Tuple[Tensor, int, str, str]:
 
     utterance_id, utterance = line[0].strip().split(" ", 2)[1:]
 
@@ -67,12 +48,7 @@ def load_cmuarctic_item(line: str,
     # Load audio
     waveform, sample_rate = torchaudio.load(file_audio)
 
-    return (
-        waveform,
-        sample_rate,
-        utterance,
-        utterance_id.split("_")[1]
-    )
+    return (waveform, sample_rate, utterance, utterance_id.split("_")[1])
 
 
 class CMUARCTIC(Dataset):
@@ -86,11 +62,13 @@ class CMUARCTIC(Dataset):
     _ext_audio = ".wav"
     _folder_audio = "wav"
 
-    def __init__(self,
-                 root: str,
-                 url: str = URL,
-                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False) -> None:
+    def __init__(
+        self,
+        root: str,
+        url: str = URL,
+        folder_in_archive: str = FOLDER_IN_ARCHIVE,
+        download: bool = False,
+    ) -> None:
 
         if url in [
             "aew",
@@ -110,7 +88,7 @@ class CMUARCTIC(Dataset):
             "rms",
             "rxr",
             "slp",
-            "slt"
+            "slt",
         ]:
 
             url = "cmu_us_" + url + "_arctic"
@@ -144,7 +122,9 @@ class CMUARCTIC(Dataset):
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
         line = self._walker[n]
-        return load_cmuarctic_item(line, self._path, self._folder_audio, self._ext_audio)
+        return load_cmuarctic_item(
+            line, self._path, self._folder_audio, self._ext_audio
+        )
 
     def __len__(self) -> int:
         return len(self._walker)

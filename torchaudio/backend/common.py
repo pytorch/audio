@@ -14,11 +14,14 @@ class SignalInfo:
     :ivar Optional[int] length: For :ref:`sox backend<sox_backend>`, the number of samples.
         (frames * channels). For :ref:`soundfile backend<soundfile_backend>`, the number of frames.
     """
-    def __init__(self,
-                 channels: Optional[int] = None,
-                 rate: Optional[float] = None,
-                 precision: Optional[int] = None,
-                 length: Optional[int] = None) -> None:
+
+    def __init__(
+        self,
+        channels: Optional[int] = None,
+        rate: Optional[float] = None,
+        precision: Optional[int] = None,
+        length: Optional[int] = None,
+    ) -> None:
         self.channels = channels
         self.rate = rate
         self.precision = precision
@@ -40,14 +43,17 @@ class EncodingInfo:
     :ivar Any reverse_bits:
     :ivar Optional[bool] opposite_endian:
     """
-    def __init__(self,
-                 encoding: Any = None,
-                 bits_per_sample: Optional[int] = None,
-                 compression: Optional[float] = None,
-                 reverse_bytes: Any = None,
-                 reverse_nibbles: Any = None,
-                 reverse_bits: Any = None,
-                 opposite_endian: Optional[bool] = None) -> None:
+
+    def __init__(
+        self,
+        encoding: Any = None,
+        bits_per_sample: Optional[int] = None,
+        compression: Optional[float] = None,
+        reverse_bytes: Any = None,
+        reverse_nibbles: Any = None,
+        reverse_bits: Any = None,
+        opposite_endian: Optional[bool] = None,
+    ) -> None:
         self.encoding = encoding
         self.bits_per_sample = bits_per_sample
         self.compression = compression
@@ -150,20 +156,20 @@ Example
 
 
 def _impl_load(func):
-    setattr(func, '__doc__', _LOAD_DOCSTRING)
+    setattr(func, "__doc__", _LOAD_DOCSTRING)
     return func
 
 
 def _impl_load_wav(func):
-    setattr(func, '__doc__', _LOAD_WAV_DOCSTRING)
+    setattr(func, "__doc__", _LOAD_WAV_DOCSTRING)
     return func
 
 
 def _impl_save(func):
-    setattr(func, '__doc__', _SAVE_DOCSTRING)
+    setattr(func, "__doc__", _SAVE_DOCSTRING)
     return func
 
 
 def _impl_info(func):
-    setattr(func, '__doc__', _INFO_DOCSTRING)
+    setattr(func, "__doc__", _INFO_DOCSTRING)
     return func

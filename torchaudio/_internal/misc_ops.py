@@ -4,7 +4,9 @@ import torch
 from torch import Tensor
 
 
-def normalize_audio(signal: Tensor, normalization: Union[bool, float, Callable]) -> None:
+def normalize_audio(
+    signal: Tensor, normalization: Union[bool, float, Callable]
+) -> None:
     """Audio normalization of a tensor in-place.  The normalization can be a bool,
     a number, or a callable that takes the audio tensor as an input. SoX uses
     32-bit signed integers internally, thus bool normalizes based on that assumption.
@@ -25,6 +27,6 @@ def normalize_audio(signal: Tensor, normalization: Union[bool, float, Callable])
 
 def check_input(src: Tensor) -> None:
     if not torch.is_tensor(src):
-        raise TypeError('Expected a tensor, got %s' % type(src))
+        raise TypeError("Expected a tensor, got %s" % type(src))
     if src.is_cuda:
-        raise TypeError('Expected a CPU based tensor, got %s' % type(src))
+        raise TypeError("Expected a CPU based tensor, got %s" % type(src))

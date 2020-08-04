@@ -10,12 +10,13 @@ from torch.utils.data import Dataset
 URL = "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"
 FOLDER_IN_ARCHIVE = "wavs"
 _CHECKSUMS = {
-    "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2":
-    "be1a30453f28eb8dd26af4101ae40cbf2c50413b1bb21936cbcdc6fae3de8aa5"
+    "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2": "be1a30453f28eb8dd26af4101ae40cbf2c50413b1bb21936cbcdc6fae3de8aa5"
 }
 
 
-def load_ljspeech_item(line: List[str], path: str, ext_audio: str) -> Tuple[Tensor, int, str, str]:
+def load_ljspeech_item(
+    line: List[str], path: str, ext_audio: str
+) -> Tuple[Tensor, int, str, str]:
     assert len(line) == 3
     fileid, transcript, normalized_transcript = line
     fileid_audio = fileid + ext_audio
@@ -39,13 +40,15 @@ class LJSPEECH(Dataset):
     """
 
     _ext_audio = ".wav"
-    _ext_archive = '.tar.bz2'
+    _ext_archive = ".tar.bz2"
 
-    def __init__(self,
-                 root: str,
-                 url: str = URL,
-                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False) -> None:
+    def __init__(
+        self,
+        root: str,
+        url: str = URL,
+        folder_in_archive: str = FOLDER_IN_ARCHIVE,
+        download: bool = False,
+    ) -> None:
 
         basename = os.path.basename(url)
         archive = os.path.join(root, basename)
@@ -54,7 +57,7 @@ class LJSPEECH(Dataset):
         folder_in_archive = os.path.join(basename, folder_in_archive)
 
         self._path = os.path.join(root, folder_in_archive)
-        self._metadata_path = os.path.join(root, basename, 'metadata.csv')
+        self._metadata_path = os.path.join(root, basename, "metadata.csv")
 
         if download:
             if not os.path.isdir(self._path):
@@ -63,7 +66,7 @@ class LJSPEECH(Dataset):
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
-        with open(self._metadata_path, "r", newline='') as metadata:
+        with open(self._metadata_path, "r", newline="") as metadata:
             walker = unicode_csv_reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
             self._walker = list(walker)
 

@@ -13,27 +13,19 @@ from torchaudio.datasets.utils import (
 URL = "train-clean-100"
 FOLDER_IN_ARCHIVE = "LibriSpeech"
 _CHECKSUMS = {
-    "http://www.openslr.org/resources/12/dev-clean.tar.gz":
-    "76f87d090650617fca0cac8f88b9416e0ebf80350acb97b343a85fa903728ab3",
-    "http://www.openslr.org/resources/12/dev-other.tar.gz":
-    "12661c48e8c3fe1de2c1caa4c3e135193bfb1811584f11f569dd12645aa84365",
-    "http://www.openslr.org/resources/12/test-clean.tar.gz":
-    "39fde525e59672dc6d1551919b1478f724438a95aa55f874b576be21967e6c23",
-    "http://www.openslr.org/resources/12/test-other.tar.gz":
-    "d09c181bba5cf717b3dee7d4d592af11a3ee3a09e08ae025c5506f6ebe961c29",
-    "http://www.openslr.org/resources/12/train-clean-100.tar.gz":
-    "d4ddd1d5a6ab303066f14971d768ee43278a5f2a0aa43dc716b0e64ecbbbf6e2",
-    "http://www.openslr.org/resources/12/train-clean-360.tar.gz":
-    "146a56496217e96c14334a160df97fffedd6e0a04e66b9c5af0d40be3c792ecf",
-    "http://www.openslr.org/resources/12/train-other-500.tar.gz":
-    "ddb22f27f96ec163645d53215559df6aa36515f26e01dd70798188350adcb6d2"
+    "http://www.openslr.org/resources/12/dev-clean.tar.gz": "76f87d090650617fca0cac8f88b9416e0ebf80350acb97b343a85fa903728ab3",
+    "http://www.openslr.org/resources/12/dev-other.tar.gz": "12661c48e8c3fe1de2c1caa4c3e135193bfb1811584f11f569dd12645aa84365",
+    "http://www.openslr.org/resources/12/test-clean.tar.gz": "39fde525e59672dc6d1551919b1478f724438a95aa55f874b576be21967e6c23",
+    "http://www.openslr.org/resources/12/test-other.tar.gz": "d09c181bba5cf717b3dee7d4d592af11a3ee3a09e08ae025c5506f6ebe961c29",
+    "http://www.openslr.org/resources/12/train-clean-100.tar.gz": "d4ddd1d5a6ab303066f14971d768ee43278a5f2a0aa43dc716b0e64ecbbbf6e2",
+    "http://www.openslr.org/resources/12/train-clean-360.tar.gz": "146a56496217e96c14334a160df97fffedd6e0a04e66b9c5af0d40be3c792ecf",
+    "http://www.openslr.org/resources/12/train-other-500.tar.gz": "ddb22f27f96ec163645d53215559df6aa36515f26e01dd70798188350adcb6d2",
 }
 
 
-def load_librispeech_item(fileid: str,
-                          path: str,
-                          ext_audio: str,
-                          ext_txt: str) -> Tuple[Tensor, int, str, int, int, int]:
+def load_librispeech_item(
+    fileid: str, path: str, ext_audio: str, ext_txt: str
+) -> Tuple[Tensor, int, str, int, int, int]:
     speaker_id, chapter_id, utterance_id = fileid.split("-")
 
     file_text = speaker_id + "-" + chapter_id + ext_txt
@@ -75,11 +67,13 @@ class LIBRISPEECH(Dataset):
     _ext_txt = ".trans.txt"
     _ext_audio = ".flac"
 
-    def __init__(self,
-                 root: str,
-                 url: str = URL,
-                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False) -> None:
+    def __init__(
+        self,
+        root: str,
+        url: str = URL,
+        folder_in_archive: str = FOLDER_IN_ARCHIVE,
+        download: bool = False,
+    ) -> None:
 
         if url in [
             "dev-clean",

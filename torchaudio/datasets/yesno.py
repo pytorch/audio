@@ -5,21 +5,18 @@ from typing import Any, List, Tuple
 import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import (
-    download_url,
-    extract_archive,
-    walk_files
-)
+from torchaudio.datasets.utils import download_url, extract_archive, walk_files
 
 URL = "http://www.openslr.org/resources/1/waves_yesno.tar.gz"
 FOLDER_IN_ARCHIVE = "waves_yesno"
 _CHECKSUMS = {
-    "http://www.openslr.org/resources/1/waves_yesno.tar.gz":
-    "962ff6e904d2df1126132ecec6978786"
+    "http://www.openslr.org/resources/1/waves_yesno.tar.gz": "962ff6e904d2df1126132ecec6978786"
 }
 
 
-def load_yesno_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, int, List[int]]:
+def load_yesno_item(
+    fileid: str, path: str, ext_audio: str
+) -> Tuple[Tensor, int, List[int]]:
     # Read label
     labels = [int(c) for c in fileid.split("_")]
 
@@ -38,13 +35,15 @@ class YESNO(Dataset):
 
     _ext_audio = ".wav"
 
-    def __init__(self,
-                 root: str,
-                 url: str = URL,
-                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False,
-                 transform: Any = None,
-                 target_transform: Any = None) -> None:
+    def __init__(
+        self,
+        root: str,
+        url: str = URL,
+        folder_in_archive: str = FOLDER_IN_ARCHIVE,
+        download: bool = False,
+        transform: Any = None,
+        target_transform: Any = None,
+    ) -> None:
 
         if transform is not None or target_transform is not None:
             warnings.warn(

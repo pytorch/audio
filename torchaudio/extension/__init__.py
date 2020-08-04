@@ -1,6 +1,4 @@
-from .extension import (
-    _init_extension,
-)
+from .extension import _init_extension
 
 _init_extension()
 

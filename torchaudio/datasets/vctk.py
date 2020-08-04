@@ -5,27 +5,24 @@ from typing import Any, Tuple
 import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
-from torchaudio.datasets.utils import (
-    download_url,
-    extract_archive,
-    walk_files
-)
+from torchaudio.datasets.utils import download_url, extract_archive, walk_files
 
 URL = "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz"
 FOLDER_IN_ARCHIVE = "VCTK-Corpus"
 _CHECKSUMS = {
-    "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz":
-    "45e8dede780278ef5541fde0b82ac292"
+    "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz": "45e8dede780278ef5541fde0b82ac292"
 }
 
 
-def load_vctk_item(fileid: str,
-                   path: str,
-                   ext_audio: str,
-                   ext_txt: str,
-                   folder_audio: str,
-                   folder_txt: str,
-                   downsample: bool = False) -> Tuple[Tensor, int, str, str, str]:
+def load_vctk_item(
+    fileid: str,
+    path: str,
+    ext_audio: str,
+    ext_txt: str,
+    folder_audio: str,
+    folder_txt: str,
+    downsample: bool = False,
+) -> Tuple[Tensor, int, str, str, str]:
     speaker_id, utterance_id = fileid.split("_")
 
     # Read text
@@ -41,7 +38,7 @@ def load_vctk_item(fileid: str,
         F = torchaudio.functional
         T = torchaudio.transforms
         # rate
-        sample = T.Resample(sample_rate, 16000, resampling_method='sinc_interpolation')
+        sample = T.Resample(sample_rate, 16000, resampling_method="sinc_interpolation")
         waveform = sample(waveform)
         # dither
         waveform = F.dither(waveform, noise_shaping=True)
@@ -64,14 +61,16 @@ class VCTK(Dataset):
     _ext_audio = ".wav"
     _except_folder = "p315"
 
-    def __init__(self,
-                 root: str,
-                 url: str = URL,
-                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False,
-                 downsample: bool = False,
-                 transform: Any = None,
-                 target_transform: Any = None) -> None:
+    def __init__(
+        self,
+        root: str,
+        url: str = URL,
+        folder_in_archive: str = FOLDER_IN_ARCHIVE,
+        download: bool = False,
+        downsample: bool = False,
+        transform: Any = None,
+        target_transform: Any = None,
+    ) -> None:
 
         if downsample:
             warnings.warn(

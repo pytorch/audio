@@ -11,21 +11,23 @@ from torchaudio._internal import (
 from . import common
 from .common import SignalInfo, EncodingInfo
 
-if _mod_utils.is_module_available('torchaudio._torchaudio'):
+if _mod_utils.is_module_available("torchaudio._torchaudio"):
     from torchaudio import _torchaudio
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 @common._impl_load
-def load(filepath: str,
-         out: Optional[Tensor] = None,
-         normalization: bool = True,
-         channels_first: bool = True,
-         num_frames: int = 0,
-         offset: int = 0,
-         signalinfo: SignalInfo = None,
-         encodinginfo: EncodingInfo = None,
-         filetype: Optional[str] = None) -> Tuple[Tensor, int]:
+def load(
+    filepath: str,
+    out: Optional[Tensor] = None,
+    normalization: bool = True,
+    channels_first: bool = True,
+    num_frames: int = 0,
+    offset: int = 0,
+    signalinfo: SignalInfo = None,
+    encodinginfo: EncodingInfo = None,
+    filetype: Optional[str] = None,
+) -> Tuple[Tensor, int]:
     r"""See torchaudio.load"""
 
     # stringify if `pathlib.Path` (noop if already `str`)
@@ -53,7 +55,7 @@ def load(filepath: str,
         offset,
         signalinfo,
         encodinginfo,
-        filetype
+        filetype,
     )
 
     # normalize if needed
@@ -62,16 +64,22 @@ def load(filepath: str,
     return out, sample_rate
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 @common._impl_load_wav
 def load_wav(filepath, **kwargs):
-    kwargs['normalization'] = 1 << 16
+    kwargs["normalization"] = 1 << 16
     return load(filepath, **kwargs)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 @common._impl_save
-def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, channels_first: bool = True) -> None:
+def save(
+    filepath: str,
+    src: Tensor,
+    sample_rate: int,
+    precision: int = 16,
+    channels_first: bool = True,
+) -> None:
     r"""See torchaudio.save"""
 
     si = sox_signalinfo_t()
@@ -83,20 +91,22 @@ def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, chan
     return save_encinfo(filepath, src, channels_first, si)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 @common._impl_info
 def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
     r"""See torchaudio.info"""
     return _torchaudio.get_info(filepath)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
-def save_encinfo(filepath: str,
-                 src: Tensor,
-                 channels_first: bool = True,
-                 signalinfo: Optional[SignalInfo] = None,
-                 encodinginfo: Optional[EncodingInfo] = None,
-                 filetype: Optional[str] = None) -> None:
+@_mod_utils.requires_module("torchaudio._torchaudio")
+def save_encinfo(
+    filepath: str,
+    src: Tensor,
+    channels_first: bool = True,
+    signalinfo: Optional[SignalInfo] = None,
+    encodinginfo: Optional[EncodingInfo] = None,
+    filetype: Optional[str] = None,
+) -> None:
     r"""Saves a tensor of an audio signal to disk as a standard format like mp3, wav, etc.
 
     Args:
@@ -131,7 +141,8 @@ def save_encinfo(filepath: str,
     elif src.dim() > 2 or src.size(ch_idx) > 16:
         # assumes num_channels < 16
         raise ValueError(
-            "Expected format where C < 16, but found {}".format(src.size()))
+            "Expected format where C < 16, but found {}".format(src.size())
+        )
     # sox stores the sample rate as a float, though practically sample rates are almost always integers
     # convert integers to floats
     if signalinfo:
@@ -139,13 +150,13 @@ def save_encinfo(filepath: str,
             if float(signalinfo.rate) == signalinfo.rate:
                 signalinfo.rate = float(signalinfo.rate)
             else:
-                raise TypeError('Sample rate should be a float or int')
+                raise TypeError("Sample rate should be a float or int")
         # check if the bit precision (i.e. bits per sample) is an integer
         if signalinfo.precision and not isinstance(signalinfo.precision, int):
             if int(signalinfo.precision) == signalinfo.precision:
                 signalinfo.precision = int(signalinfo.precision)
             else:
-                raise TypeError('Bit precision should be an integer')
+                raise TypeError("Bit precision should be an integer")
     # programs such as librosa normalize the signal, unnormalize if detected
     if src.min() >= -1.0 and src.max() <= 1.0:
         src = src * (1 << 31)
@@ -161,7 +172,7 @@ def save_encinfo(filepath: str,
     _torchaudio.write_audio_file(filepath, src, signalinfo, encodinginfo, filetype)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def sox_signalinfo_t() -> SignalInfo:
     r"""Create a sox_signalinfo_t object. This object can be used to set the sample
     rate, number of channels, length, bit precision and headroom multiplier
@@ -184,7 +195,7 @@ def sox_signalinfo_t() -> SignalInfo:
     return _torchaudio.sox_signalinfo_t()
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def sox_encodinginfo_t() -> EncodingInfo:
     r"""Create a sox_encodinginfo_t object.  This object can be used to set the encoding
     type, bit precision, compression factor, reverse bytes, reverse nibbles,
@@ -222,7 +233,7 @@ def sox_encodinginfo_t() -> EncodingInfo:
     return ei
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def get_sox_encoding_t(i: int = None) -> EncodingInfo:
     r"""Get enum of sox_encoding_t for sox encodings.
 
@@ -240,7 +251,7 @@ def get_sox_encoding_t(i: int = None) -> EncodingInfo:
         return _torchaudio.sox_encoding_t(i)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def get_sox_option_t(i: int = 2) -> Any:
     r"""Get enum of sox_option_t for sox encodinginfo options.
 
@@ -257,7 +268,7 @@ def get_sox_option_t(i: int = 2) -> Any:
         return _torchaudio.sox_option_t(i)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def get_sox_bool(i: int = 0) -> Any:
     r"""Get enum of sox_bool for sox encodinginfo options.
 

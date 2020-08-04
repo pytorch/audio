@@ -25,11 +25,15 @@ class ResBlock(nn.Module):
         super().__init__()
 
         self.resblock_model = nn.Sequential(
-            nn.Conv1d(in_channels=n_freq, out_channels=n_freq, kernel_size=1, bias=False),
+            nn.Conv1d(
+                in_channels=n_freq, out_channels=n_freq, kernel_size=1, bias=False
+            ),
             nn.BatchNorm1d(n_freq),
             nn.ReLU(inplace=True),
-            nn.Conv1d(in_channels=n_freq, out_channels=n_freq, kernel_size=1, bias=False),
-            nn.BatchNorm1d(n_freq)
+            nn.Conv1d(
+                in_channels=n_freq, out_channels=n_freq, kernel_size=1, bias=False
+            ),
+            nn.BatchNorm1d(n_freq),
         )
 
     def forward(self, specgram: Tensor) -> Tensor:
@@ -60,22 +64,29 @@ class MelResNet(nn.Module):
         >>> output = melresnet(input)  # shape: (10, 128, 508)
     """
 
-    def __init__(self,
-                 n_res_block: int = 10,
-                 n_freq: int = 128,
-                 n_hidden: int = 128,
-                 n_output: int = 128,
-                 kernel_size: int = 5) -> None:
+    def __init__(
+        self,
+        n_res_block: int = 10,
+        n_freq: int = 128,
+        n_hidden: int = 128,
+        n_output: int = 128,
+        kernel_size: int = 5,
+    ) -> None:
         super().__init__()
 
         ResBlocks = [ResBlock(n_hidden) for _ in range(n_res_block)]
 
         self.melresnet_model = nn.Sequential(
-            nn.Conv1d(in_channels=n_freq, out_channels=n_hidden, kernel_size=kernel_size, bias=False),
+            nn.Conv1d(
+                in_channels=n_freq,
+                out_channels=n_hidden,
+                kernel_size=kernel_size,
+                bias=False,
+            ),
             nn.BatchNorm1d(n_hidden),
             nn.ReLU(inplace=True),
             *ResBlocks,
-            nn.Conv1d(in_channels=n_hidden, out_channels=n_output, kernel_size=1)
+            nn.Conv1d(in_channels=n_hidden, out_channels=n_output, kernel_size=1),
         )
 
     def forward(self, specgram: Tensor) -> Tensor:
@@ -104,9 +115,7 @@ class Stretch2d(nn.Module):
         >>> output = stretch2d(input)  # shape: (10, 500, 5120)
     """
 
-    def __init__(self,
-                 time_scale: int,
-                 freq_scale: int) -> None:
+    def __init__(self, time_scale: int, freq_scale: int) -> None:
         super().__init__()
 
         self.freq_scale = freq_scale
@@ -122,7 +131,9 @@ class Stretch2d(nn.Module):
             Tensor shape: (..., n_freq * freq_scale, n_time * time_scale)
         """
 
-        return specgram.repeat_interleave(self.freq_scale, -2).repeat_interleave(self.time_scale, -1)
+        return specgram.repeat_interleave(self.freq_scale, -2).repeat_interleave(
+            self.time_scale, -1
+        )
 
 
 class UpsampleNetwork(nn.Module):
@@ -142,13 +153,15 @@ class UpsampleNetwork(nn.Module):
         >>> output = upsamplenetwork(input)  # shape: (10, 1536, 128), (10, 1536, 128)
     """
 
-    def __init__(self,
-                 upsample_scales: List[int],
-                 n_res_block: int = 10,
-                 n_freq: int = 128,
-                 n_hidden: int = 128,
-                 n_output: int = 128,
-                 kernel_size: int = 5) -> None:
+    def __init__(
+        self,
+        upsample_scales: List[int],
+        n_res_block: int = 10,
+        n_freq: int = 128,
+        n_hidden: int = 128,
+        n_output: int = 128,
+        kernel_size: int = 5,
+    ) -> None:
         super().__init__()
 
         total_scale = 1
@@ -162,12 +175,14 @@ class UpsampleNetwork(nn.Module):
         up_layers = []
         for scale in upsample_scales:
             stretch = Stretch2d(scale, 1)
-            conv = nn.Conv2d(in_channels=1,
-                             out_channels=1,
-                             kernel_size=(1, scale * 2 + 1),
-                             padding=(0, scale),
-                             bias=False)
-            conv.weight.data.fill_(1. / (scale * 2 + 1))
+            conv = nn.Conv2d(
+                in_channels=1,
+                out_channels=1,
+                kernel_size=(1, scale * 2 + 1),
+                padding=(0, scale),
+                bias=False,
+            )
+            conv.weight.data.fill_(1.0 / (scale * 2 + 1))
             up_layers.append(stretch)
             up_layers.append(conv)
         self.upsample_layers = nn.Sequential(*up_layers)
@@ -190,7 +205,9 @@ class UpsampleNetwork(nn.Module):
 
         specgram = specgram.unsqueeze(1)
         upsampling_output = self.upsample_layers(specgram)
-        upsampling_output = upsampling_output.squeeze(1)[:, :, self.indent:-self.indent]
+        upsampling_output = upsampling_output.squeeze(1)[
+            :, :, self.indent : -self.indent
+        ]
 
         return upsampling_output, resnet_output
 
@@ -224,17 +241,19 @@ class WaveRNN(nn.Module):
         >>> # output shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length, n_classes)
     """
 
-    def __init__(self,
-                 upsample_scales: List[int],
-                 n_classes: int,
-                 hop_length: int,
-                 n_res_block: int = 10,
-                 n_rnn: int = 512,
-                 n_fc: int = 512,
-                 kernel_size: int = 5,
-                 n_freq: int = 128,
-                 n_hidden: int = 128,
-                 n_output: int = 128) -> None:
+    def __init__(
+        self,
+        upsample_scales: List[int],
+        n_classes: int,
+        hop_length: int,
+        n_res_block: int = 10,
+        n_rnn: int = 512,
+        n_fc: int = 512,
+        kernel_size: int = 5,
+        n_freq: int = 128,
+        n_hidden: int = 128,
+        n_output: int = 128,
+    ) -> None:
         super().__init__()
 
         self.kernel_size = kernel_size
@@ -247,14 +266,13 @@ class WaveRNN(nn.Module):
         for upsample_scale in upsample_scales:
             total_scale *= upsample_scale
         if total_scale != self.hop_length:
-            raise ValueError(f"Expected: total_scale == hop_length, but found {total_scale} != {hop_length}")
+            raise ValueError(
+                f"Expected: total_scale == hop_length, but found {total_scale} != {hop_length}"
+            )
 
-        self.upsample = UpsampleNetwork(upsample_scales,
-                                        n_res_block,
-                                        n_freq,
-                                        n_hidden,
-                                        n_output,
-                                        kernel_size)
+        self.upsample = UpsampleNetwork(
+            upsample_scales, n_res_block, n_freq, n_hidden, n_output, kernel_size
+        )
         self.fc = nn.Linear(n_freq + self.n_aux + 1, n_rnn)
 
         self.rnn1 = nn.GRU(n_rnn, n_rnn, batch_first=True)
@@ -278,14 +296,18 @@ class WaveRNN(nn.Module):
             Tensor shape: (n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)
         """
 
-        assert waveform.size(1) == 1, 'Require the input channel of waveform is 1'
-        assert specgram.size(1) == 1, 'Require the input channel of specgram is 1'
+        assert waveform.size(1) == 1, "Require the input channel of waveform is 1"
+        assert specgram.size(1) == 1, "Require the input channel of specgram is 1"
         # remove channel dimension until the end
         waveform, specgram = waveform.squeeze(1), specgram.squeeze(1)
 
         batch_size = waveform.size(0)
-        h1 = torch.zeros(1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device)
-        h2 = torch.zeros(1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device)
+        h1 = torch.zeros(
+            1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device
+        )
+        h2 = torch.zeros(
+            1, batch_size, self.n_rnn, dtype=waveform.dtype, device=waveform.device
+        )
         # output of upsample:
         # specgram: (n_batch, n_freq, (n_time - kernel_size + 1) * total_scale)
         # aux: (n_batch, n_output, (n_time - kernel_size + 1) * total_scale)
@@ -294,10 +316,10 @@ class WaveRNN(nn.Module):
         aux = aux.transpose(1, 2)
 
         aux_idx = [self.n_aux * i for i in range(5)]
-        a1 = aux[:, :, aux_idx[0]:aux_idx[1]]
-        a2 = aux[:, :, aux_idx[1]:aux_idx[2]]
-        a3 = aux[:, :, aux_idx[2]:aux_idx[3]]
-        a4 = aux[:, :, aux_idx[3]:aux_idx[4]]
+        a1 = aux[:, :, aux_idx[0] : aux_idx[1]]
+        a2 = aux[:, :, aux_idx[1] : aux_idx[2]]
+        a3 = aux[:, :, aux_idx[2] : aux_idx[3]]
+        a4 = aux[:, :, aux_idx[3] : aux_idx[4]]
 
         x = torch.cat([waveform.unsqueeze(-1), specgram, a1], dim=-1)
         x = self.fc(x)

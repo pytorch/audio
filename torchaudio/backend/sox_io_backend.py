@@ -1,9 +1,7 @@
 from typing import Tuple, Optional
 
 import torch
-from torchaudio._internal import (
-    module_utils as _mod_utils,
-)
+from torchaudio._internal import module_utils as _mod_utils
 
 
 class AudioMetaData:
@@ -13,13 +11,14 @@ class AudioMetaData:
     :ivar int num_frames: The number of frames
     :ivar int num_channels: The number of channels
     """
+
     def __init__(self, sample_rate: int, num_frames: int, num_channels: int):
         self.sample_rate = sample_rate
         self.num_frames = num_frames
         self.num_channels = num_channels
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def info(filepath: str) -> AudioMetaData:
     """Get signal information of an audio file.
 
@@ -30,16 +29,18 @@ def info(filepath: str) -> AudioMetaData:
         AudioMetaData: meta data of the given audio.
     """
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath)
-    return AudioMetaData(sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels())
+    return AudioMetaData(
+        sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels()
+    )
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def load(
-        filepath: str,
-        frame_offset: int = 0,
-        num_frames: int = -1,
-        normalize: bool = True,
-        channels_first: bool = True,
+    filepath: str,
+    frame_offset: int = 0,
+    num_frames: int = -1,
+    normalize: bool = True,
+    channels_first: bool = True,
 ) -> Tuple[torch.Tensor, int]:
     """Load audio data from file.
 
@@ -106,17 +107,18 @@ def load(
             ``[channel, time]`` else ``[time, channel]``.
     """
     signal = torch.ops.torchaudio.sox_io_load_audio_file(
-        filepath, frame_offset, num_frames, normalize, channels_first)
+        filepath, frame_offset, num_frames, normalize, channels_first
+    )
     return signal.get_tensor(), signal.get_sample_rate()
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def save(
-        filepath: str,
-        src: torch.Tensor,
-        sample_rate: int,
-        channels_first: bool = True,
-        compression: Optional[float] = None,
+    filepath: str,
+    src: torch.Tensor,
+    sample_rate: int,
+    channels_first: bool = True,
+    compression: Optional[float] = None,
 ):
     """Save audio data to file.
 
@@ -160,26 +162,26 @@ def save(
     """
     if compression is None:
         ext = str(filepath)[-3:].lower()
-        if ext in ['wav', 'sph']:
-            compression = 0.
-        elif ext == 'mp3':
+        if ext in ["wav", "sph"]:
+            compression = 0.0
+        elif ext == "mp3":
             compression = -4.5
-        elif ext == 'flac':
-            compression = 8.
-        elif ext in ['ogg', 'vorbis']:
-            compression = 3.
+        elif ext == "flac":
+            compression = 8.0
+        elif ext in ["ogg", "vorbis"]:
+            compression = 3.0
         else:
             raise RuntimeError(f'Unsupported file type: "{ext}"')
     signal = torch.classes.torchaudio.TensorSignal(src, sample_rate, channels_first)
     torch.ops.torchaudio.sox_io_save_audio_file(filepath, signal, compression)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def load_wav(
-        filepath: str,
-        frame_offset: int = 0,
-        num_frames: int = -1,
-        channels_first: bool = True,
+    filepath: str,
+    frame_offset: int = 0,
+    num_frames: int = -1,
+    channels_first: bool = True,
 ) -> Tuple[torch.Tensor, int]:
     """Load wave file.
 
@@ -188,4 +190,10 @@ def load_wav(
     for simple usecases, such as ``torchaudio.load_wav(filepath)``.
     The implementation is same as :py:func:`load`.
     """
-    return load(filepath, frame_offset, num_frames, normalize=False, channels_first=channels_first)
+    return load(
+        filepath,
+        frame_offset,
+        num_frames,
+        normalize=False,
+        channels_first=channels_first,
+    )

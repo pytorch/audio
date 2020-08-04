@@ -26,14 +26,17 @@ def requires_module(*modules: str):
         # fall through. If all the modules are available, no need to decorate
         def decorator(func):
             return func
+
     else:
-        req = f'module: {missing[0]}' if len(missing) == 1 else f'modules: {missing}'
+        req = f"module: {missing[0]}" if len(missing) == 1 else f"modules: {missing}"
 
         def decorator(func):
             @wraps(func)
             def wrapped(*args, **kwargs):
-                raise RuntimeError(f'{func.__module__}.{func.__name__} requires {req}')
+                raise RuntimeError(f"{func.__module__}.{func.__name__} requires {req}")
+
             return wrapped
+
     return decorator
 
 
@@ -43,14 +46,18 @@ def deprecated(direction: str, version: Optional[str] = None):
     Args:
         direction: Migration steps to be given to users.
     """
+
     def decorator(func):
         @wraps(func)
         def wrapped(*args, **kwargs):
             message = (
-                f'{func.__module__}.{func.__name__} has been deprecated '
+                f"{func.__module__}.{func.__name__} has been deprecated "
                 f'and will be removed from {"future" if version is None else version} release. '
-                f'{direction}')
+                f"{direction}"
+            )
             warnings.warn(message, stacklevel=2)
             return func(*args, **kwargs)
+
         return wrapped
+
     return decorator

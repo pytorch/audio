@@ -10,11 +10,11 @@ from torchaudio._internal import (
 from torchaudio.utils.sox_utils import list_effects
 
 
-if _mod_utils.is_module_available('torchaudio._torchaudio'):
+if _mod_utils.is_module_available("torchaudio._torchaudio"):
     from torchaudio import _torchaudio
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def init_sox_effects():
     """Initialize resources required to use sox effects.
 
@@ -43,7 +43,7 @@ def shutdown_sox_effects():
     torch.ops.torchaudio.sox_effects_shutdown_sox_effects()
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def effect_names() -> List[str]:
     """Gets list of valid sox effect names
 
@@ -57,12 +57,12 @@ def effect_names() -> List[str]:
     return list(list_effects().keys())
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def apply_effects_tensor(
-        tensor: torch.Tensor,
-        sample_rate: int,
-        effects: List[List[str]],
-        channels_first: bool = True,
+    tensor: torch.Tensor,
+    sample_rate: int,
+    effects: List[List[str]],
+    channels_first: bool = True,
 ) -> Tuple[torch.Tensor, int]:
     """Apply sox effects to given Tensor
 
@@ -154,17 +154,21 @@ def apply_effects_tensor(
         >>> waveform, sample_rate = transform(waveform, input_sample_rate)
         >>> assert sample_rate == 8000
     """
-    in_signal = torch.classes.torchaudio.TensorSignal(tensor, sample_rate, channels_first)
-    out_signal = torch.ops.torchaudio.sox_effects_apply_effects_tensor(in_signal, effects)
+    in_signal = torch.classes.torchaudio.TensorSignal(
+        tensor, sample_rate, channels_first
+    )
+    out_signal = torch.ops.torchaudio.sox_effects_apply_effects_tensor(
+        in_signal, effects
+    )
     return out_signal.get_tensor(), out_signal.get_sample_rate()
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def apply_effects_file(
-        path: str,
-        effects: List[List[str]],
-        normalize: bool = True,
-        channels_first: bool = True,
+    path: str,
+    effects: List[List[str]],
+    normalize: bool = True,
+    channels_first: bool = True,
 ) -> Tuple[torch.Tensor, int]:
     """Apply sox effects to the audio file and load the resulting data as Tensor
 
@@ -255,12 +259,16 @@ def apply_effects_file(
         >>> for batch in loader:
         >>>     pass
     """
-    signal = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first)
+    signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
+        path, effects, normalize, channels_first
+    )
     return signal.get_tensor(), signal.get_sample_rate()
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
-@_mod_utils.deprecated('Please migrate to `apply_effects_file` or `apply_effects_tensor`.')
+@_mod_utils.requires_module("torchaudio._torchaudio")
+@_mod_utils.deprecated(
+    "Please migrate to `apply_effects_file` or `apply_effects_tensor`."
+)
 def SoxEffect():
     r"""Create an object for passing sox effect information between python and c++
 
@@ -275,7 +283,9 @@ def SoxEffect():
     return _torchaudio.SoxEffect()
 
 
-@_mod_utils.deprecated('Please migrate to `apply_effects_file` or `apply_effects_tensor`.')
+@_mod_utils.deprecated(
+    "Please migrate to `apply_effects_file` or `apply_effects_tensor`."
+)
 class SoxEffectsChain(object):
     r"""SoX effects chain class.
 
@@ -333,12 +343,14 @@ class SoxEffectsChain(object):
 
     EFFECTS_UNIMPLEMENTED = {"spectrogram", "splice", "noiseprof", "fir"}
 
-    def __init__(self,
-                 normalization: Union[bool, float, Callable] = True,
-                 channels_first: bool = True,
-                 out_siginfo: Any = None,
-                 out_encinfo: Any = None,
-                 filetype: str = "raw") -> None:
+    def __init__(
+        self,
+        normalization: Union[bool, float, Callable] = True,
+        channels_first: bool = True,
+        out_siginfo: Any = None,
+        out_encinfo: Any = None,
+        filetype: str = "raw",
+    ) -> None:
         self.input_file: Optional[str] = None
         self.chain: List[str] = []
         self.MAX_EFFECT_OPTS = 20
@@ -351,9 +363,9 @@ class SoxEffectsChain(object):
         # Define in __init__ to avoid calling at import time
         self.EFFECTS_AVAILABLE = set(effect_names())
 
-    def append_effect_to_chain(self,
-                               ename: str,
-                               eargs: Optional[Union[List[str], str]] = None) -> None:
+    def append_effect_to_chain(
+        self, ename: str, eargs: Optional[Union[List[str], str]] = None
+    ) -> None:
         r"""Append effect to a sox effects chain.
 
         Args:
@@ -369,16 +381,21 @@ class SoxEffectsChain(object):
             eargs = [eargs]
         eargs = self._flatten(eargs)
         if len(eargs) > self.MAX_EFFECT_OPTS:
-            raise RuntimeError("Number of effect options ({}) is greater than max "
-                               "suggested number of options {}.  Increase MAX_EFFECT_OPTS "
-                               "or lower the number of effect options".format(len(eargs), self.MAX_EFFECT_OPTS))
+            raise RuntimeError(
+                "Number of effect options ({}) is greater than max "
+                "suggested number of options {}.  Increase MAX_EFFECT_OPTS "
+                "or lower the number of effect options".format(
+                    len(eargs), self.MAX_EFFECT_OPTS
+                )
+            )
         e.ename = ename
         e.eopts = eargs
         self.chain.append(e)
 
-    @_mod_utils.requires_module('torchaudio._torchaudio')
-    def sox_build_flow_effects(self,
-                               out: Optional[Tensor] = None) -> Tuple[Tensor, int]:
+    @_mod_utils.requires_module("torchaudio._torchaudio")
+    def sox_build_flow_effects(
+        self, out: Optional[Tensor] = None
+    ) -> Tuple[Tensor, int]:
         r"""Build effects chain and flow effects from input file to output tensor
 
         Args:
@@ -402,14 +419,16 @@ class SoxEffectsChain(object):
 
         # print("effect options:", [x.eopts for x in self.chain])
 
-        sr = _torchaudio.build_flow_effects(self.input_file,
-                                            out,
-                                            self.channels_first,
-                                            self.out_siginfo,
-                                            self.out_encinfo,
-                                            self.filetype,
-                                            self.chain,
-                                            self.MAX_EFFECT_OPTS)
+        sr = _torchaudio.build_flow_effects(
+            self.input_file,
+            out,
+            self.channels_first,
+            self.out_siginfo,
+            self.out_encinfo,
+            self.filetype,
+            self.chain,
+            self.MAX_EFFECT_OPTS,
+        )
 
         _misc_ops.normalize_audio(out, self.normalization)
 
@@ -430,7 +449,9 @@ class SoxEffectsChain(object):
 
     def _check_effect(self, e: str) -> str:
         if e.lower() in self.EFFECTS_UNIMPLEMENTED:
-            raise NotImplementedError("This effect ({}) is not implement in torchaudio".format(e))
+            raise NotImplementedError(
+                "This effect ({}) is not implement in torchaudio".format(e)
+            )
         elif e.lower() not in self.EFFECTS_AVAILABLE:
             raise LookupError("Effect name, {}, not valid".format(e.lower()))
         return e.lower()

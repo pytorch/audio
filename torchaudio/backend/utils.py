@@ -12,9 +12,9 @@ from . import (
 )
 
 __all__ = [
-    'list_audio_backends',
-    'get_audio_backend',
-    'set_audio_backend',
+    "list_audio_backends",
+    "get_audio_backend",
+    "set_audio_backend",
 ]
 
 
@@ -25,11 +25,11 @@ def list_audio_backends() -> List[str]:
         List[str]: The list of available backends.
     """
     backends = []
-    if is_module_available('soundfile'):
-        backends.append('soundfile')
-    if is_module_available('torchaudio._torchaudio'):
-        backends.append('sox')
-        backends.append('sox_io')
+    if is_module_available("soundfile"):
+        backends.append("soundfile")
+    if is_module_available("torchaudio._torchaudio"):
+        backends.append("sox")
+        backends.append("sox_io")
     return backends
 
 
@@ -44,31 +44,32 @@ def set_audio_backend(backend: Optional[str]):
     if backend is not None and backend not in list_audio_backends():
         raise RuntimeError(
             f'Backend "{backend}" is not one of '
-            f'available backends: {list_audio_backends()}.')
+            f"available backends: {list_audio_backends()}."
+        )
 
     if backend is None:
         module = no_backend
-    elif backend == 'sox':
+    elif backend == "sox":
         module = sox_backend
-    elif backend == 'sox_io':
+    elif backend == "sox_io":
         module = sox_io_backend
-    elif backend == 'soundfile':
+    elif backend == "soundfile":
         module = soundfile_backend
     else:
         raise NotImplementedError(f'Unexpected backend "{backend}"')
 
-    for func in ['save', 'load', 'load_wav', 'info']:
+    for func in ["save", "load", "load_wav", "info"]:
         setattr(torchaudio, func, getattr(module, func))
 
 
 def _init_audio_backend():
     backends = list_audio_backends()
-    if 'sox' in backends:
-        set_audio_backend('sox')
-    elif 'soundfile' in backends:
-        set_audio_backend('soundfile')
+    if "sox" in backends:
+        set_audio_backend("sox")
+    elif "soundfile" in backends:
+        set_audio_backend("soundfile")
     else:
-        warnings.warn('No audio backend is available.')
+        warnings.warn("No audio backend is available.")
         set_audio_backend(None)
 
 
@@ -81,9 +82,9 @@ def get_audio_backend() -> Optional[str]:
     if torchaudio.load == no_backend.load:
         return None
     if torchaudio.load == sox_backend.load:
-        return 'sox'
+        return "sox"
     if torchaudio.load == sox_io_backend.load:
-        return 'sox_io'
+        return "sox_io"
     if torchaudio.load == soundfile_backend.load:
-        return 'soundfile'
-    raise ValueError('Unknown backend.')
+        return "soundfile"
+    raise ValueError("Unknown backend.")

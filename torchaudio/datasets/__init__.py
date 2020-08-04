@@ -18,7 +18,6 @@ __all__ = (
     "LJSPEECH",
     "GTZAN",
     "CMUARCTIC",
-    "LIBRITTS"
-    "diskcache_iterator",
+    "LIBRITTS" "diskcache_iterator",
     "bg_iterator",
 )
