@@ -5,31 +5,32 @@ from pathlib import Path
 
 from torch.utils.cpp_extension import (
     CppExtension,
-    BuildExtension as TorchBuildExtension
+    BuildExtension as TorchBuildExtension,
 )
 
 __all__ = [
-    'get_ext_modules',
-    'BuildExtension',
+    "get_ext_modules",
+    "BuildExtension",
 ]
 
 _THIS_DIR = Path(__file__).parent.resolve()
 _ROOT_DIR = _THIS_DIR.parent.parent.resolve()
-_CSRC_DIR = _ROOT_DIR / 'torchaudio' / 'csrc'
-_TP_BASE_DIR = _ROOT_DIR / 'third_party'
-_TP_INSTALL_DIR = _TP_BASE_DIR / 'install'
+_CSRC_DIR = _ROOT_DIR / "torchaudio" / "csrc"
+_TP_BASE_DIR = _ROOT_DIR / "third_party"
+_TP_INSTALL_DIR = _TP_BASE_DIR / "install"
 
 
 def _get_build_sox():
-    val = os.environ.get('BUILD_SOX', '0')
-    trues = ['1', 'true', 'TRUE', 'on', 'ON', 'yes', 'YES']
-    falses = ['0', 'false', 'FALSE', 'off', 'OFF', 'no', 'NO']
+    val = os.environ.get("BUILD_SOX", "0")
+    trues = ["1", "true", "TRUE", "on", "ON", "yes", "YES"]
+    falses = ["0", "false", "FALSE", "off", "OFF", "no", "NO"]
     if val in trues:
         return True
     if val not in falses:
         print(
-            f'WARNING: Unexpected environment variable value `BUILD_SOX={val}`. '
-            f'Expected one of {trues + falses}')
+            f"WARNING: Unexpected environment variable value `BUILD_SOX={val}`. "
+            f"Expected one of {trues + falses}"
+        )
     return False
 
 
@@ -58,7 +59,7 @@ def _get_ela(debug):
 
 
 def _get_srcs():
-    return [str(p) for p in _CSRC_DIR.glob('**/*.cpp')]
+    return [str(p) for p in _CSRC_DIR.glob("**/*.cpp")]
 
 
 def _get_include_dirs():
@@ -66,7 +67,7 @@ def _get_include_dirs():
         str(_ROOT_DIR),
     ]
     if _BUILD_SOX:
-        dirs.append(str(_TP_INSTALL_DIR / 'include'))
+        dirs.append(str(_TP_INSTALL_DIR / "include"))
     return dirs
 
 
@@ -79,46 +80,42 @@ def _get_extra_objects():
         # e.g., sox comes first, flac/vorbis comes before ogg, and
         # vorbisenc/vorbisfile comes before vorbis
         libs = [
-            'libsox.a',
-            'libmad.a',
-            'libFLAC.a',
-            'libmp3lame.a',
-            'libopusfile.a',
-            'libopus.a',
-            'libvorbisenc.a',
-            'libvorbisfile.a',
-            'libvorbis.a',
-            'libogg.a',
+            "libsox.a",
+            "libmad.a",
+            "libFLAC.a",
+            "libmp3lame.a",
+            "libopusfile.a",
+            "libopus.a",
+            "libvorbisenc.a",
+            "libvorbisfile.a",
+            "libvorbis.a",
+            "libogg.a",
         ]
         for lib in libs:
-            objs.append(str(_TP_INSTALL_DIR / 'lib' / lib))
+            objs.append(str(_TP_INSTALL_DIR / "lib" / lib))
     return objs
 
 
 def _get_libraries():
-    return [] if _BUILD_SOX else ['sox']
+    return [] if _BUILD_SOX else ["sox"]
 
 
 def _build_third_party():
-    build_dir = str(_TP_BASE_DIR / 'build')
+    build_dir = str(_TP_BASE_DIR / "build")
     os.makedirs(build_dir, exist_ok=True)
     subprocess.run(
-        args=['cmake', '..'],
-        cwd=build_dir,
-        check=True,
+        args=["cmake", ".."], cwd=build_dir, check=True,
     )
     subprocess.run(
-        args=['cmake', '--build', '.'],
-        cwd=build_dir,
-        check=True,
+        args=["cmake", "--build", "."], cwd=build_dir, check=True,
     )
 
 
-_EXT_NAME = 'torchaudio._torchaudio'
+_EXT_NAME = "torchaudio._torchaudio"
 
 
 def get_ext_modules(debug=False):
-    if platform.system() == 'Windows':
+    if platform.system() == "Windows":
         return None
     return [
         CppExtension(
