@@ -9,14 +9,14 @@ conda activate ./env
 
 exit_status=0
 
-printf "\x1b[34mRunning flake8: "
-flake8 --version
+printf "\x1b[34mRunning black: "
+black --version
 printf "\x1b[0m\n"
-flake8 torchaudio test build_tools/setup_helpers
+black --check torchaudio test examples setup.py build_tools
 status=$?
 exit_status="$((exit_status+status))"
 if [ "${status}" -ne 0 ]; then
-    printf "\x1b[31mflake8 failed. Check the format of Python files.\x1b[0m\n"
+    printf "\x1b[31mblack failed. Please run `black torchaudio test examples setup.py uild_tools`.\x1b[0m\n"
 fi
 
 printf "\x1b[34mRunning clang-format: "
