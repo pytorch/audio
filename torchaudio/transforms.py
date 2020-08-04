@@ -141,8 +141,8 @@ class GriffinLim(torch.nn.Module):
                  rand_init: bool = True) -> None:
         super(GriffinLim, self).__init__()
 
-        assert momentum < 1, 'momentum=%s > 1 can be unstable' % momentum
-        assert momentum > 0, 'momentum=%s < 0' % momentum
+        assert momentum < 1, 'momentum={} > 1 can be unstable'.format(momentum)
+        assert momentum > 0, 'momentum={} < 0'.format(momentum)
 
         self.n_fft = n_fft
         self.n_iter = n_iter
@@ -237,7 +237,7 @@ class MelScale(torch.nn.Module):
         self.f_max = f_max if f_max is not None else float(sample_rate // 2)
         self.f_min = f_min
 
-        assert f_min <= self.f_max, 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
+        assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
@@ -313,7 +313,7 @@ class InverseMelScale(torch.nn.Module):
         self.tolerance_change = tolerance_change
         self.sgdargs = sgdargs or {'lr': 0.1, 'momentum': 0.9}
 
-        assert f_min <= self.f_max, 'Require f_min: %f < f_max: %f' % (f_min, self.f_max)
+        assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
         fb = F.create_fb_matrix(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
         self.register_buffer('fb', fb)
@@ -607,7 +607,7 @@ class Resample(torch.nn.Module):
 
             return waveform
 
-        raise ValueError('Invalid resampling method: %s' % (self.resampling_method))
+        raise ValueError('Invalid resampling method: {}'.format(self.resampling_method))
 
 
 class ComplexNorm(torch.nn.Module):
