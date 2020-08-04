@@ -19,6 +19,7 @@ from ctc_decoders import GreedyDecoder
 from datasets import collate_factory, split_process_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
+from transforms import Normalize
 from utils import MetricLogger, count_parameters, save_checkpoint
 
 # TODO Remove before merge pull request
@@ -99,6 +100,9 @@ def parse_args():
         "--reduce-lr-valid",
         action="store_true",
         help="reduce learning rate based on validation loss",
+    )
+    parser.add_argument(
+        "--normalize", action="store_true", help="normalize model input"
     )
     parser.add_argument(
         "--progress-bar", action="store_true", help="use progress bar while training"
@@ -455,6 +459,9 @@ def main(rank, args):
         transforms = torch.nn.Sequential()
     else:
         raise ValueError("Model type not supported")
+
+    if args.normalize:
+        transforms = torch.nn.Sequential(transforms, Normalize())
 
     augmentations = torch.nn.Sequential()
     if args.freq_mask:
