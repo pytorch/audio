@@ -30,6 +30,13 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
+        "--type",
+        metavar="T",
+        default="mel",
+        choices=["waveform", "mfcc", "mel"],
+        help="input type for model",
+    )
+    parser.add_argument(
         "--freq-mask",
         default=0,
         type=int,
@@ -408,13 +415,26 @@ def main(rank, args):
 
     sample_rate_original = 16000
 
-    transforms = torch.nn.Sequential(
-        # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
-        # torchaudio.transforms.MFCC(sample_rate=sample_rate_original, n_mfcc=args.n_bins, melkwargs=melkwargs),
-        torchaudio.transforms.MelSpectrogram(
-            sample_rate=sample_rate_original, **melkwargs
-        ),
-    )
+    input_type = "mfcc" if args.type == "mel" else args.type
+    if args.type == "mel":
+        transforms = torch.nn.Sequential(
+            # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
+            torchaudio.transforms.MelSpectrogram(
+                sample_rate=sample_rate_original, **melkwargs
+            ),
+        )
+    elif args.type == "mfcc":
+        transforms = torch.nn.Sequential(
+            torchaudio.transforms.MFCC(
+                sample_rate=sample_rate_original,
+                n_mfcc=args.n_bins,
+                melkwargs=melkwargs,
+            ),
+        )
+    elif args.type == "waveform":
+        transforms = torch.nn.Sequential()
+    else:
+        raise ValueError("Model type not supported")
 
     augmentations = torch.nn.Sequential()
     if args.freq_mask:
@@ -456,8 +476,11 @@ def main(rank, args):
 
     # Model
 
+    input_type = "mfcc" if args.type == "mel" else args.type
     model = Wav2Letter(
-        num_classes=language_model.length, input_type="mfcc", num_features=args.n_bins
+        num_classes=language_model.length,
+        input_type=input_type,
+        num_features=args.n_bins,
     )
 
     if args.jit:
