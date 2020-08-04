@@ -1,5 +1,5 @@
 import torch
-from torchaudio.models import Wav2Letter, MelResNet, UpsampleNetwork, WaveRNN
+from torchaudio.models import Wav2Letter, MelResNet, UpsampleNetwork, WaveRNN, _Encoder, _Decoder
 
 from torchaudio_unittest import common_utils
 
@@ -115,3 +115,72 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         out = model(x, mels)
 
         assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1), n_classes)
+
+
+class TestEncoder(common_utils.TorchaudioTestCase):
+    def test_output(self):
+        """Validate the output dimensions of a _Encoder block.
+        """
+
+        n_encoder_convolutions = 3
+        n_encoder_embedding = 512
+        n_encoder_kernel_size = 5
+        n_batch = 32
+        n_seq = 64
+
+        model = _Encoder(n_encoder_convolutions, n_encoder_embedding, n_encoder_kernel_size)
+
+        x = torch.rand(n_batch, n_encoder_embedding, n_seq)
+        input_length = [n_seq for i in range(n_batch)]
+        out = model(x, input_length)
+
+        assert out.size() == (n_batch, n_seq, n_encoder_embedding)
+
+
+class TestDecoder(common_utils.TorchaudioTestCase):
+    def test_output(self):
+        """Validate the output dimensions of a _Decoder block.
+        """
+
+        n_mel_channels = 80
+        n_frames_per_step = 1
+        n_encoder_embedding = 512
+        n_attention = 128
+        attention_location_n_filters = 32
+        attention_location_kernel_size = 31
+        n_attention_rnn = 1024
+        n_decoder_rnn = 1024
+        n_prenet = 256
+        max_decoder_steps = 2000
+        gate_threshold = 0.5
+        p_attention_dropout = 0.1
+        p_decoder_dropout = 0.1
+        early_stopping = False
+        n_batch = 32
+        T_out = 200
+        n_seq = 300
+
+        model = _Decoder(n_mel_channels,
+                         n_frames_per_step,
+                         n_encoder_embedding,
+                         n_attention,
+                         attention_location_n_filters,
+                         attention_location_kernel_size,
+                         n_attention_rnn,
+                         n_decoder_rnn,
+                         n_prenet,
+                         max_decoder_steps,
+                         gate_threshold,
+                         p_attention_dropout,
+                         p_decoder_dropout,
+                         early_stopping)
+
+        memory = torch.rand(n_batch, n_seq, n_encoder_embedding)
+        decoder_inputs = torch.rand(n_batch, n_mel_channels, T_out)
+        memory_lengths = torch.ones(n_batch,)
+
+        mel_outputs, gate_outputs, alignments = model(memory, decoder_inputs, memory_lengths)
+
+        assert mel_outputs.size() == (n_batch, n_mel_channels, T_out)
+        assert gate_outputs.size() == (n_batch, T_out)
+        assert alignments.size() == (n_batch, T_out, n_seq)
