@@ -85,5 +85,6 @@ setup(
     cmdclass={
         'build_ext': setup_helpers.BuildExtension.with_options(no_python_abi_suffix=True)
     },
-    install_requires=[pytorch_package_dep]
+    install_requires=[pytorch_package_dep],
+    zip_safe=False,
 )
