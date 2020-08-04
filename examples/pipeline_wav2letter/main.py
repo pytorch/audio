@@ -82,6 +82,11 @@ def parse_args():
         help="print frequency in epochs",
     )
     parser.add_argument(
+        "--reduce-lr-valid",
+        action="store_true",
+        help="reduce learning rate based on validation loss",
+    )
+    parser.add_argument(
         "--progress-bar", action="store_true", help="use progress bar while training"
     )
     parser.add_argument(
@@ -261,6 +266,7 @@ def train_one_epoch(
     epoch,
     clip_grad,
     disable_logger=False,
+    reduce_lr_train=False,
 ):
 
     model.train()
@@ -320,7 +326,7 @@ def train_one_epoch(
         if SIGNAL_RECEIVED:
             break
 
-    if isinstance(scheduler, ReduceLROnPlateau):
+    if reduce_lr_train and isinstance(scheduler, ReduceLROnPlateau):
         scheduler.step(metric["average loss"])
     else:
         scheduler.step()
@@ -634,6 +640,7 @@ def main(rank, args):
             epoch,
             args.clip_grad,
             not_main_rank,
+            not args.reduce_lr_valid,
         )
 
         if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
@@ -663,6 +670,9 @@ def main(rank, args):
                 args.checkpoint,
                 not_main_rank,
             )
+
+        if args.reduce_lr_valid and isinstance(scheduler, ReduceLROnPlateau):
+            scheduler.step(loss)
 
         # TODO Remove before merge pull request
         if SIGNAL_RECEIVED:
