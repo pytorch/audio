@@ -8,7 +8,7 @@ from time import time
 
 import torch
 import torchaudio
-from torch.optim import SGD, Adadelta, Adam
+from torch.optim import SGD, Adadelta, Adam, AdamW
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
@@ -105,7 +105,7 @@ def parse_args():
         "--optimizer",
         metavar="OPT",
         default="adadelta",
-        choices=["sgd", "adadelta", "adam"],
+        choices=["sgd", "adadelta", "adam", "adamw"],
         help="optimizer to use",
     )
     parser.add_argument(
@@ -519,6 +519,13 @@ def main(rank, args):
         )
     elif args.optimizer == "adam":
         optimizer = Adam(
+            model.parameters(),
+            lr=args.learning_rate,
+            momentum=args.momentum,
+            weight_decay=args.weight_decay,
+        )
+    elif args.optimizer == "adamw":
+        optimizer = AdamW(
             model.parameters(),
             lr=args.learning_rate,
             momentum=args.momentum,
