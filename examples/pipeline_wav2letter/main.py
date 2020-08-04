@@ -44,6 +44,20 @@ def parse_args():
         help="maximal width of frequency mask",
     )
     parser.add_argument(
+        "--win-length",
+        default=512,
+        type=int,
+        metavar="N",
+        help="width of spectrogram window",
+    )
+    parser.add_argument(
+        "--hop-length",
+        default=80,
+        type=int,
+        metavar="N",
+        help="width of spectrogram window",
+    )
+    parser.add_argument(
         "--time-mask",
         default=0,
         type=int,
@@ -414,9 +428,9 @@ def main(rank, args):
     # Transforms
 
     melkwargs = {
-        "n_fft": 512,
-        "n_mels": args.n_bins,  # 13, 20, 128
-        "hop_length": 80,  # (160, 80)
+        "n_fft": args.win_length,
+        "n_mels": args.n_bins,
+        "hop_length": args.hop_length,
     }
 
     sample_rate_original = 16000
