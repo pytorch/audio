@@ -14,33 +14,28 @@ from .backend_utils import set_audio_backend
 class TempDirMixin:
     """Mixin to provide easy access to temp dir"""
     temp_dir_ = None
-    base_temp_dir = None
-    temp_dir = None
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def get_base_temp_dir(cls):
         # If TORCHAUDIO_TEST_TEMP_DIR is set, use it instead of temporary directory.
         # this is handy for debugging.
         key = 'TORCHAUDIO_TEST_TEMP_DIR'
         if key in os.environ:
-            cls.base_temp_dir = os.environ[key]
-        else:
+            return os.environ[key]
+        if cls.temp_dir_ is None:
             cls.temp_dir_ = tempfile.TemporaryDirectory()
-            cls.base_temp_dir = cls.temp_dir_.name
+        return cls.temp_dir_.name
 
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
-        if isinstance(cls.temp_dir_, tempfile.TemporaryDirectory):
+        if cls.temp_dir_ is not None:
             cls.temp_dir_.cleanup()
-
-    def setUp(self):
-        super().setUp()
-        self.temp_dir = os.path.join(self.base_temp_dir, self.id())
+            cls.temp_dir_ = None
 
     def get_temp_path(self, *paths):
-        path = os.path.join(self.temp_dir, *paths)
+        temp_dir = os.path.join(self.get_base_temp_dir(), self.id())
+        path = os.path.join(temp_dir, *paths)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         return path
 

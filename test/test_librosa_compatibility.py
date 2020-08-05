@@ -347,7 +347,3 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         # torch.dist(spec_lr, spec_ta, p=1)
         # >>> tensor(943.2759)
         assert torch.dist(spec_orig, spec_ta, p=1) < threshold
-
-
-if __name__ == '__main__':
-    unittest.main()

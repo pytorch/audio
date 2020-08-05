@@ -57,6 +57,14 @@ LIBRISPEECH
   :special-members:
 
 
+LIBRITTS
+~~~~~~~~
+
+.. autoclass:: LIBRITTS
+  :members: __getitem__
+  :special-members:
+
+
 LJSPEECH
 ~~~~~~~~
 

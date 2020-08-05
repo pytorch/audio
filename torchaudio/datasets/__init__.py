@@ -7,6 +7,7 @@ from .gtzan import GTZAN
 from .yesno import YESNO
 from .ljspeech import LJSPEECH
 from .cmuarctic import CMUARCTIC
+from .libritts import LIBRITTS
 
 __all__ = (
     "COMMONVOICE",
@@ -17,6 +18,7 @@ __all__ = (
     "LJSPEECH",
     "GTZAN",
     "CMUARCTIC",
+    "LIBRITTS"
     "diskcache_iterator",
     "bg_iterator",
 )

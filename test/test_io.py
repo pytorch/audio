@@ -282,6 +282,3 @@ class Test_LoadSave(unittest.TestCase):
         self.assertEqual(si.length, samples)
         self.assertEqual(si.rate, rate)
         self.assertEqual(ei.bits_per_sample, precision)
-
-if __name__ == '__main__':
-    unittest.main()
