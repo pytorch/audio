@@ -1,5 +1,27 @@
 # Torchaudio Test Suite
 
+## How to run test
+
+You can use `pytest` to run `torchaudio`'s test suites. See https://docs.pytest.org/ for the detail of how to use `pytest` command.
+
+```
+# List up all the tests
+pytest test --collect-only
+# Run all the test suites
+pytest test
+# Run tests on sox_effects module
+pytest test/sox_effect
+# use -k to apply filter
+pytest test/sox_io_backend -k load  # only runs tests where their names contain load
+# Some other useful options;
+# Stop on the first failure -x
+# Run failure fast --ff
+# Only rerun the failure --lf
+```
+
+**Note**
+We use PyTorch's test utilities instead of `pytest` frameworks when writing tests to avoid reinventing the wheel for Tensor comparison.
+
 ## Structure of tests
 
 The following is an overview of the tests and related modules for `torchaudio`.
@@ -7,39 +29,39 @@ The following is an overview of the tests and related modules for `torchaudio`.
 ### Purpose specific test suites
 
 #### Numerical compatibility agains existing software
-- [Librosa compatibility test](./test_librosa_compatibility.py)
+- [Librosa compatibility test](./torchaudio_unittest/librosa_compatibility_test.py)
     Test suite for numerical compatibility against librosa.
-- [SoX compatibility test](./test_sox_compatibility.py)
+- [SoX compatibility test](./torchaudio_unittest/sox_compatibility_test.py)
     Test suite for numerical compatibility against SoX.
-- [Kaldi compatibility test](./test_kaldi_compatibility.py)
+- [Kaldi compatibility test](./torchaudio_unittest/kaldi_compatibility_test.py)
     Test suite for numerical compatibility against Kaldi.
 
 #### Result consistency with PyTorch framework
-- [TorchScript consistency test](./test_torchscript_consistency.py)
+- [TorchScript consistency test](./torchaudio_unittest/torchscript_consistency_impl.py)
     Test suite to check 1. if an API is TorchScript-able, and 2. the results from Python and Torchscript match.
-- [Batch consistency test](./test_batch_consistency.py)
+- [Batch consistency test](./torchaudio_unittest/batch_consistency_test.py)
     Test suite to check if functionals/Transforms handle single sample input and batch input and return the same result.
 
 ### Module specific test suites
 
 The following test modules are defined for corresponding `torchaudio` module/functions.
 
-- [`torchaudio.datasets`](./test_datasets.py)
-- [`torchaudio.functional`](./test_functional.py)
-- [`torchaudio.transforms`](./test_transforms.py)
-- [`torchaudio.compliance.kaldi`](./test_compliance_kaldi.py)
-- [`torchaudio.kaldi_io`](./test_kaldi_io.py)
+- [`torchaudio.datasets`](./torchaudio_unittest/datasets)
+- [`torchaudio.functional`](./torchaudio_unittest/functional)
+- [`torchaudio.transforms`](./torchaudio_unittest/transforms_test.py)
+- [`torchaudio.compliance.kaldi`](./torchaudio_unittest/compliance_kaldi_test.py)
+- [`torchaudio.kaldi_io`](./torchaudio_unittest/kaldi_io_test.py)
 - [`torchaudio.sox_effects`](test/sox_effects)
-- [`torchaudio.save`, `torchaudio.load`, `torchaudio.info`](test/test_io.py)
+- [`torchaudio.save`, `torchaudio.load`, `torchaudio.info`](./torchaudio_unittest/io_test.py)
 
 ### Test modules that do not fall into the above categories
-- [test_dataloader.py](./test_dataloader.py)
+- [test_dataloader.py](./torchaudio_unittest/dataloader_test.py)
     Simple test for loading data and applying preprocessing.
 
 ### Support files
-- [assets](./assets): Contain sample audio files.
-- [assets/kaldi](./assets/kaldi): Contains Kaldi format matrix files used in [./test_compliance_kaldi.py](./test_compliance_kaldi.py).
-- [compliance](./compliance): Scripts used to generate above Kaldi matrix files.
+- [assets](./torchaudio_unittest/assets): Contain sample audio files.
+- [assets/kaldi](./torchaudio_unittest/assets/kaldi): Contains Kaldi format matrix files used in [./torchaudio_unittest/test_compliance_kaldi.py](./torchaudio_unittest/test_compliance_kaldi.py).
+- [compliance](./torchaudio_unittest/compliance): Scripts used to generate above Kaldi matrix files.
 
 ### Waveforms for Testing Purposes
 
@@ -86,11 +108,7 @@ Files:
 Files:
 
 * `CommonVoice/cv-corpus-4-2019-12-10/tt/clips/common_voice_tt_00000000.wav`
-* `LibriSpeech/dev-clean/1272/128104/1272-128104-0000.flac`
-* `LJSpeech-1.1/wavs/LJ001-0001.wav`
-* `SpeechCommands/speech_commands_v0.02/go/0a9f9af7_nohash_0.wav`
 * `VCTK-Corpus/wav48/p224/p224_002.wav`
-* `waves_yesno/0_1_0_1_0_1_1_0.wav`
 * `vad-go-stereo-44100.wav`
 * `vad-go-mono-32000.wav`
 
@@ -98,13 +116,13 @@ Files:
 
 The following is the current practice of torchaudio test suite.
 
-1. Unless the tests are related to I/O, use synthetic data. [`common_utils`](./common_utils.py) has some data generator functions.
+1. Unless the tests are related to I/O, use synthetic data. [`common_utils`](./torchaudio_unittest/common_utils) has some data generator functions.
 1. When you add a new test case, use `common_utils.TorchaudioTestCase` as base class unless you are writing tests that are common to CPU / CUDA.
   - Set class memeber `dtype`, `device` and `backend` for the desired behavior.
   - If you do not set `backend` value in your test suite, then I/O functions will be unassigned and attempt to load/save file will fail.
   - For `backend` value, in addition to available backends, you can also provide the value "default" and backend will be picked automatically based on availability.
-1. If you are writing tests that should pass on diffrent dtype/devices, write a common class inheriting `common_utils.TestBaseMixin`, then inherit `common_utils.PytorchTestCase` and define class attributes (`dtype` / `device` / `backend`) there. See [Torchscript consistency test implementation](./torchscript_consistency_impl.py) and test definitions for [CPU](./torchscript_consistency_cpu_test.py) and [CUDA](./torchscript_consistency_cuda_test.py) devices.
-1. For numerically comparing Tensors, use `assertEqual` method from `common_utils.PytorchTestCase` class. This method has a better support for a wide variety of Tensor types.
+1. If you are writing tests that should pass on diffrent dtype/devices, write a common class inheriting `common_utils.TestBaseMixin`, then inherit `common_utils.PytorchTestCase` and define class attributes (`dtype` / `device` / `backend`) there. See [Torchscript consistency test implementation](./torchaudio_unittest/torchscript_consistency_impl.py) and test definitions for [CPU](./torchaudio_unittest/torchscript_consistency_cpu_test.py) and [CUDA](./torchaudio_unittest/torchscript_consistency_cuda_test.py) devices.
+1. For numerically comparing Tensors, use `assertEqual` method from torchaudio_unittest.common_utils.PytorchTestCase` class. This method has a better support for a wide variety of Tensor types.
 
 When you add a new feature(functional/transform), consider the following
 

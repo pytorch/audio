@@ -3,8 +3,8 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
-import distutils.command.clean
 from setuptools import setup, find_packages
+import distutils.command.clean
 
 from build_tools import setup_helpers
 
@@ -85,5 +85,6 @@ setup(
     cmdclass={
         'build_ext': setup_helpers.BuildExtension.with_options(no_python_abi_suffix=True)
     },
-    install_requires=[pytorch_package_dep]
+    install_requires=[pytorch_package_dep],
+    zip_safe=False,
 )

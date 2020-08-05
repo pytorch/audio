@@ -8,7 +8,6 @@ import torch
 from torch import Tensor
 
 __all__ = [
-    "istft",
     "spectrogram",
     "griffinlim",
     "amplitude_to_DB",
@@ -43,79 +42,6 @@ __all__ = [
     'sliding_window_cmn',
     'vad',
 ]
-
-
-def istft(
-        stft_matrix: Tensor,
-        n_fft: int,
-        hop_length: Optional[int] = None,
-        win_length: Optional[int] = None,
-        window: Optional[Tensor] = None,
-        center: bool = True,
-        pad_mode: Optional[str] = None,
-        normalized: bool = False,
-        onesided: bool = True,
-        length: Optional[int] = None,
-) -> Tensor:
-    r"""Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.
-    It has the same parameters (+ additional optional parameter of ``length``) and it should return the
-    least squares estimation of the original signal. The algorithm will check using the NOLA condition (
-    nonzero overlap).
-
-    Important consideration in the parameters ``window`` and ``center`` so that the envelop
-    created by the summation of all the windows is never zero at certain point in time. Specifically,
-    :math:`\sum_{t=-\infty}^{\infty} w^2[n-t\times hop\_length] \cancel{=} 0`.
-
-    Since stft discards elements at the end of the signal if they do not fit in a frame, the
-    istft may return a shorter signal than the original signal (can occur if ``center`` is False
-    since the signal isn't padded).
-
-    If ``center`` is True, then there will be padding e.g. 'constant', 'reflect', etc. Left padding
-    can be trimmed off exactly because they can be calculated but right padding cannot be calculated
-    without additional information.
-
-    Example: Suppose the last window is:
-    [17, 18, 0, 0, 0] vs [18, 0, 0, 0, 0]
-
-    The n_frame, hop_length, win_length are all the same which prevents the calculation of right padding.
-    These additional values could be zeros or a reflection of the signal so providing ``length``
-    could be useful. If ``length`` is ``None`` then padding will be aggressively removed
-    (some loss of signal).
-
-    [1] D. W. Griffin and J. S. Lim, "Signal estimation from modified short-time Fourier transform,"
-    IEEE Trans. ASSP, vol.32, no.2, pp.236-243, Apr. 1984.
-
-    Args:
-        stft_matrix (Tensor): Output of stft where each row of a channel is a frequency and each
-            column is a window. It has a size of either (..., fft_size, n_frame, 2)
-        n_fft (int): Size of Fourier transform
-        hop_length (int or None, optional): The distance between neighboring sliding window frames.
-            (Default: ``win_length // 4``)
-        win_length (int or None, optional): The size of window frame and STFT filter. (Default: ``n_fft``)
-        window (Tensor or None, optional): The optional window function.
-            (Default: ``torch.ones(win_length)``)
-        center (bool, optional): Whether ``input`` was padded on both sides so
-            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
-            (Default: ``True``)
-        pad_mode: This argument was ignored and to be removed.
-        normalized (bool, optional): Whether the STFT was normalized. (Default: ``False``)
-        onesided (bool, optional): Whether the STFT is onesided. (Default: ``True``)
-        length (int or None, optional): The amount to trim the signal by (i.e. the
-            original signal length). (Default: whole signal)
-
-    Returns:
-        Tensor: Least squares estimation of the original signal of size (..., signal_length)
-    """
-    warnings.warn(
-        'istft has been moved to PyTorch and will be removed from torchaudio, '
-        'please use torch.istft instead.')
-    if pad_mode is not None:
-        warnings.warn(
-            'The parameter `pad_mode` was ignored in isftft, and is thus being deprecated. '
-            'Please set `pad_mode` to None to suppress this warning.')
-    return torch.istft(
-        input=stft_matrix, n_fft=n_fft, hop_length=hop_length, win_length=win_length, window=window,
-        center=center, normalized=normalized, onesided=onesided, length=length)
 
 
 def spectrogram(
@@ -250,12 +176,12 @@ def griffinlim(
         tprev = rebuilt
 
         # Invert with our current estimate of the phases
-        inverse = istft(specgram * angles,
-                        n_fft=n_fft,
-                        hop_length=hop_length,
-                        win_length=win_length,
-                        window=window,
-                        length=length).float()
+        inverse = torch.istft(specgram * angles,
+                              n_fft=n_fft,
+                              hop_length=hop_length,
+                              win_length=win_length,
+                              window=window,
+                              length=length).float()
 
         # Rebuild the spectrogram
         rebuilt = torch.stft(inverse, n_fft, hop_length, win_length, window,
@@ -268,12 +194,12 @@ def griffinlim(
         angles = angles.div(complex_norm(angles).add(1e-16).unsqueeze(-1).expand_as(angles))
 
     # Return the final phase estimates
-    waveform = istft(specgram * angles,
-                     n_fft=n_fft,
-                     hop_length=hop_length,
-                     win_length=win_length,
-                     window=window,
-                     length=length)
+    waveform = torch.istft(specgram * angles,
+                           n_fft=n_fft,
+                           hop_length=hop_length,
+                           win_length=win_length,
+                           window=window,
+                           length=length)
 
     # unpack batch
     waveform = waveform.reshape(shape[:-2] + waveform.shape[-1:])

@@ -13,9 +13,9 @@ from torch import nn as nn
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
-from torchaudio.models._wavernn import _WaveRNN
+from torchaudio.models.wavernn import WaveRNN
 
-from datasets import collate_factory, split_process_ljspeech
+from datasets import collate_factory, split_process_dataset
 from losses import LongCrossEntropyLoss, MoLLoss
 from processing import LinearToMel, NormalizeDB
 from utils import MetricLogger, count_parameters, save_checkpoint
@@ -54,6 +54,13 @@ def parse_args():
         type=int,
         metavar="N",
         help="print frequency in epochs",
+    )
+    parser.add_argument(
+        "--dataset",
+        default="ljspeech",
+        choices=["ljspeech", "libritts"],
+        type=str,
+        help="select dataset to train with",
     )
     parser.add_argument(
         "--batch-size", default=256, type=int, metavar="N", help="mini-batch size"
@@ -269,7 +276,7 @@ def main(args):
         NormalizeDB(min_level_db=args.min_level_db),
     )
 
-    train_dataset, val_dataset = split_process_ljspeech(args, transforms)
+    train_dataset, val_dataset = split_process_dataset(args, transforms)
 
     loader_training_params = {
         "num_workers": args.workers,
@@ -297,7 +304,7 @@ def main(args):
 
     n_classes = 2 ** args.n_bits if args.loss == "crossentropy" else 30
 
-    model = _WaveRNN(
+    model = WaveRNN(
         upsample_scales=args.upsample_scales,
         n_classes=n_classes,
         hop_length=args.hop_length,

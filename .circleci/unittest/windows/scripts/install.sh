@@ -20,4 +20,4 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 conda install -y -c pytorch-nightly pytorch "${cudatoolkit}"
 
 printf "* Installing torchaudio\n"
-python setup.py develop
+python setup.py install
