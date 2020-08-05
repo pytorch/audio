@@ -12,21 +12,21 @@ from torchaudio_unittest.common_utils import (
 
 # Used to generate a unique utterance for each dummy audio file
 NUMBERS = [
-    'ZERO',
-    'ONE',
-    'TWO',
-    'THREE',
-    'FOUR',
-    'FIVE',
-    'SIX',
-    'SEVEN',
-    'EIGHT',
-    'NINE'
+    "ZERO",
+    "ONE",
+    "TWO",
+    "THREE",
+    "FOUR",
+    "FIVE",
+    "SIX",
+    "SEVEN",
+    "EIGHT",
+    "NINE",
 ]
 
 
 class TestLibriSpeech(TempDirMixin, TorchaudioTestCase):
-    backend = 'default'
+    backend = "default"
 
     root_dir = None
     samples = []
@@ -51,22 +51,22 @@ class TestLibriSpeech(TempDirMixin, TorchaudioTestCase):
                 trans_content = []
 
                 for utterance_id in range(10):
-                    filename = f'{speaker_id}-{chapter_id}-{utterance_id:04d}.wav'
+                    filename = f"{speaker_id}-{chapter_id}-{utterance_id:04d}.wav"
                     path = os.path.join(chapter_path, filename)
 
-                    utterance = ' '.join(
+                    utterance = " ".join(
                         [NUMBERS[x] for x in [speaker_id, chapter_id, utterance_id]]
                     )
                     trans_content.append(
-                        f'{speaker_id}-{chapter_id}-{utterance_id:04d} {utterance}'
+                        f"{speaker_id}-{chapter_id}-{utterance_id:04d} {utterance}"
                     )
 
                     data = get_whitenoise(
                         sample_rate=sample_rate,
                         duration=0.01,
                         n_channels=1,
-                        dtype='float32',
-                        seed=seed
+                        dtype="float32",
+                        seed=seed,
                     )
                     save_wav(path, data, sample_rate)
                     sample = (
@@ -75,30 +75,31 @@ class TestLibriSpeech(TempDirMixin, TorchaudioTestCase):
                         utterance,
                         speaker_id,
                         chapter_id,
-                        utterance_id
+                        utterance_id,
                     )
                     cls.samples.append(sample)
 
                     seed += 1
 
-                trans_filename = f'{speaker_id}-{chapter_id}.trans.txt'
+                trans_filename = f"{speaker_id}-{chapter_id}.trans.txt"
                 trans_path = os.path.join(chapter_path, trans_filename)
-                with open(trans_path, 'w') as f:
-                    f.write('\n'.join(trans_content))
+                with open(trans_path, "w") as f:
+                    f.write("\n".join(trans_content))
 
     @classmethod
     def tearDownClass(cls):
         # In case of test failure
-        librispeech.LIBRISPEECH._ext_audio = '.flac'
+        librispeech.LIBRISPEECH._ext_audio = ".flac"
 
     def test_librispeech(self):
-        librispeech.LIBRISPEECH._ext_audio = '.wav'
+        librispeech.LIBRISPEECH._ext_audio = ".wav"
         dataset = librispeech.LIBRISPEECH(self.root_dir)
         print(dataset._path)
 
         num_samples = 0
-        for i, (
-            data, sample_rate, utterance, speaker_id, chapter_id, utterance_id
+        for (
+            i,
+            (data, sample_rate, utterance, speaker_id, chapter_id, utterance_id),
         ) in enumerate(dataset):
             self.assertEqual(data, self.samples[i][0], atol=5e-5, rtol=1e-8)
             assert sample_rate == self.samples[i][1]
@@ -109,4 +110,4 @@ class TestLibriSpeech(TempDirMixin, TorchaudioTestCase):
             num_samples += 1
 
         assert num_samples == len(self.samples)
-        librispeech.LIBRISPEECH._ext_audio = '.flac'
+        librispeech.LIBRISPEECH._ext_audio = ".flac"

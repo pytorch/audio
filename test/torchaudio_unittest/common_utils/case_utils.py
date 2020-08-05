@@ -13,13 +13,14 @@ from .backend_utils import set_audio_backend
 
 class TempDirMixin:
     """Mixin to provide easy access to temp dir"""
+
     temp_dir_ = None
 
     @classmethod
     def get_base_temp_dir(cls):
         # If TORCHAUDIO_TEST_TEMP_DIR is set, use it instead of temporary directory.
         # this is handy for debugging.
-        key = 'TORCHAUDIO_TEST_TEMP_DIR'
+        key = "TORCHAUDIO_TEST_TEMP_DIR"
         if key in os.environ:
             return os.environ[key]
         if cls.temp_dir_ is None:
@@ -42,6 +43,7 @@ class TempDirMixin:
 
 class TestBaseMixin:
     """Mixin to provide consistent way to define device/dtype/backend aware TestCase"""
+
     dtype = None
     device = None
     backend = None
@@ -56,22 +58,27 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
 
 
 def skipIfNoExec(cmd):
-    return unittest.skipIf(shutil.which(cmd) is None, f'`{cmd}` is not available')
+    return unittest.skipIf(shutil.which(cmd) is None, f"`{cmd}` is not available")
 
 
 def skipIfNoModule(module, display_name=None):
     display_name = display_name or module
-    return unittest.skipIf(not is_module_available(module), f'"{display_name}" is not available')
+    return unittest.skipIf(
+        not is_module_available(module), f'"{display_name}" is not available'
+    )
 
 
 skipIfNoSoxBackend = unittest.skipIf(
-    'sox' not in torchaudio.list_audio_backends(), 'Sox backend not available')
-skipIfNoCuda = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
+    "sox" not in torchaudio.list_audio_backends(), "Sox backend not available"
+)
+skipIfNoCuda = unittest.skipIf(
+    not torch.cuda.is_available(), reason="CUDA not available"
+)
 
 
 def skipIfNoExtension(test_item):
-    if is_module_available('torchaudio._torchaudio'):
+    if is_module_available("torchaudio._torchaudio"):
         return test_item
-    if 'TORCHAUDIO_TEST_FAIL_IF_NO_EXTENSION' in os.environ:
-        raise RuntimeError('torchaudio C++ extension is not available.')
-    return unittest.skip('torchaudio C++ extension is not available')(test_item)
+    if "TORCHAUDIO_TEST_FAIL_IF_NO_EXTENSION" in os.environ:
+        raise RuntimeError("torchaudio C++ extension is not available.")
+    return unittest.skip("torchaudio C++ extension is not available")(test_item)

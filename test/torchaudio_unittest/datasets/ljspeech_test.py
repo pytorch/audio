@@ -21,14 +21,14 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
         "Test transcript 1",
         "Test transcript 2",
         "Test transcript 3",
-        "In 1465 Sweynheim and Pannartz began printing in the monastery of Subiaco near Rome,"
+        "In 1465 Sweynheim and Pannartz began printing in the monastery of Subiaco near Rome,",
     ]
 
     normalized_transcripts = [
         "Test transcript one",
         "Test transcript two",
         "Test transcript three",
-        "In fourteen sixty-five Sweynheim and Pannartz began printing in the monastery of Subiaco near Rome,"
+        "In fourteen sixty-five Sweynheim and Pannartz began printing in the monastery of Subiaco near Rome,",
     ]
 
     @classmethod
@@ -40,19 +40,23 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
         metadata_path = os.path.join(base_dir, "metadata.csv")
         sample_rate = 22050
 
-        with open(metadata_path, mode="w", newline='') as metadata_file:
+        with open(metadata_path, mode="w", newline="") as metadata_file:
             metadata_writer = csv.writer(
                 metadata_file, delimiter="|", quoting=csv.QUOTE_NONE
             )
             for i, (transcript, normalized_transcript) in enumerate(
                 zip(cls.transcripts, cls.normalized_transcripts)
             ):
-                fileid = f'LJ001-{i:04d}'
+                fileid = f"LJ001-{i:04d}"
                 metadata_writer.writerow([fileid, transcript, normalized_transcript])
                 filename = fileid + ".wav"
                 path = os.path.join(archive_dir, filename)
                 data = get_whitenoise(
-                    sample_rate=sample_rate, duration=1, n_channels=1, dtype="int16", seed=i
+                    sample_rate=sample_rate,
+                    duration=1,
+                    n_channels=1,
+                    dtype="int16",
+                    seed=i,
                 )
                 save_wav(path, data, sample_rate)
                 cls.data.append(normalize_wav(data))

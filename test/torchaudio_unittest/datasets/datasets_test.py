@@ -9,7 +9,7 @@ from torchaudio_unittest.common_utils import (
 
 
 class TestDatasets(TorchaudioTestCase):
-    backend = 'default'
+    backend = "default"
     path = get_asset_path()
 
     def test_vctk(self):

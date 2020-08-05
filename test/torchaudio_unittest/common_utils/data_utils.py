@@ -4,18 +4,16 @@ from typing import Union
 import torch
 
 
-_TEST_DIR_PATH = os.path.realpath(
-    os.path.join(os.path.dirname(__file__), '..'))
+_TEST_DIR_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), ".."))
 
 
 def get_asset_path(*paths):
     """Return full path of a test asset"""
-    return os.path.join(_TEST_DIR_PATH, 'assets', *paths)
+    return os.path.join(_TEST_DIR_PATH, "assets", *paths)
 
 
 def convert_tensor_encoding(
-    tensor: torch.tensor,
-    dtype: torch.dtype,
+    tensor: torch.tensor, dtype: torch.dtype,
 ):
     """Convert input tensor with values between -1 and 1 to integer encoding
     Args:
@@ -63,12 +61,14 @@ def get_whitenoise(
     if isinstance(dtype, str):
         dtype = getattr(torch, dtype)
     if dtype not in [torch.float32, torch.int32, torch.int16, torch.uint8]:
-        raise NotImplementedError(f'dtype {dtype} is not supported.')
+        raise NotImplementedError(f"dtype {dtype} is not supported.")
     # According to the doc, folking rng on all CUDA devices is slow when there are many CUDA devices,
     # so we only fork on CPU, generate values and move the data to the given device
     with torch.random.fork_rng([]):
         torch.random.manual_seed(seed)
-        tensor = torch.randn([int(sample_rate * duration)], dtype=torch.float32, device='cpu')
+        tensor = torch.randn(
+            [int(sample_rate * duration)], dtype=torch.float32, device="cpu"
+        )
     tensor /= 2.0
     tensor *= scale_factor
     tensor.clamp_(-1.0, 1.0)
@@ -105,7 +105,9 @@ def get_sinusoid(
         dtype = getattr(torch, dtype)
     pie2 = 2 * 3.141592653589793
     end = pie2 * frequency * duration
-    theta = torch.linspace(0, end, int(sample_rate * duration), dtype=torch.float32, device=device)
+    theta = torch.linspace(
+        0, end, int(sample_rate * duration), dtype=torch.float32, device=device
+    )
     tensor = torch.sin(theta, out=None).repeat([n_channels, 1])
     if not channels_first:
         tensor = tensor.t()

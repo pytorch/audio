@@ -15,7 +15,9 @@ class TORCHAUDIODS(Dataset):
         self.E = torchaudio.sox_effects.SoxEffectsChain()
         self.E.append_effect_to_chain("rate", [self.si.rate])  # resample to 16000hz
         self.E.append_effect_to_chain("channels", [self.si.channels])  # mono signal
-        self.E.append_effect_to_chain("trim", [0, "16000s"])  # first 16000 samples of audio
+        self.E.append_effect_to_chain(
+            "trim", [0, "16000s"]
+        )  # first 16000 samples of audio
 
     def __getitem__(self, index):
         fn = self.data[index]
@@ -28,7 +30,7 @@ class TORCHAUDIODS(Dataset):
 
 
 class Test_DataLoader(common_utils.TorchaudioTestCase):
-    backend = 'sox'
+    backend = "sox"
 
     @common_utils.skipIfNoSoxBackend
     def test_1(self):

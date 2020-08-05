@@ -25,24 +25,26 @@ class TestWalkFiles(TempDirMixin, TorchaudioTestCase):
         self.expected = []
 
         # level 1
-        for filename in ['a.txt', 'b.txt', 'c.txt']:
+        for filename in ["a.txt", "b.txt", "c.txt"]:
             self._add_file(filename)
 
         # level 2
-        for dir1 in ['d1', 'd2', 'd3']:
-            for filename in ['d.txt', 'e.txt', 'f.txt']:
+        for dir1 in ["d1", "d2", "d3"]:
+            for filename in ["d.txt", "e.txt", "f.txt"]:
                 self._add_file(dir1, filename)
             # level 3
-            for dir2 in ['d1', 'd2', 'd3']:
-                for filename in ['g.txt', 'h.txt', 'i.txt']:
+            for dir2 in ["d1", "d2", "d3"]:
+                for filename in ["g.txt", "h.txt", "i.txt"]:
                     self._add_file(dir1, dir2, filename)
 
-        print('\n'.join(self.expected))
+        print("\n".join(self.expected))
 
     def test_walk_files(self):
         """walk_files should traverse files in alphabetical order"""
         n_ites = 0
-        for i, path in enumerate(dataset_utils.walk_files(self.root, '.txt', prefix=True)):
+        for i, path in enumerate(
+            dataset_utils.walk_files(self.root, ".txt", prefix=True)
+        ):
             found = os.path.join(self.root, path)
             assert found == self.expected[i]
             n_ites += 1
@@ -50,7 +52,7 @@ class TestWalkFiles(TempDirMixin, TorchaudioTestCase):
 
 
 class TestIterator(TorchaudioTestCase):
-    backend = 'default'
+    backend = "default"
     path = get_asset_path()
 
     def test_disckcache_iterator(self):

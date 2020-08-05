@@ -12,7 +12,7 @@ from torchaudio_unittest.common_utils import (
 
 
 class TestGTZAN(TempDirMixin, TorchaudioTestCase):
-    backend = 'default'
+    backend = "default"
 
     root_dir = None
     samples = []
@@ -26,12 +26,18 @@ class TestGTZAN(TempDirMixin, TorchaudioTestCase):
         sample_rate = 22050
         seed = 0
         for genre in gtzan.gtzan_genres:
-            base_dir = os.path.join(cls.root_dir, 'genres', genre)
+            base_dir = os.path.join(cls.root_dir, "genres", genre)
             os.makedirs(base_dir, exist_ok=True)
             for i in range(100):
-                filename = f'{genre}.{i:05d}'
-                path = os.path.join(base_dir, f'{filename}.wav')
-                data = get_whitenoise(sample_rate=sample_rate, duration=0.01, n_channels=1, dtype='int16', seed=seed)
+                filename = f"{genre}.{i:05d}"
+                path = os.path.join(base_dir, f"{filename}.wav")
+                data = get_whitenoise(
+                    sample_rate=sample_rate,
+                    duration=0.01,
+                    n_channels=1,
+                    dtype="int16",
+                    seed=seed,
+                )
                 save_wav(path, data, sample_rate)
                 sample = (normalize_wav(data), sample_rate, genre)
                 cls.samples.append(sample)
@@ -55,7 +61,7 @@ class TestGTZAN(TempDirMixin, TorchaudioTestCase):
         assert n_ite == len(self.samples)
 
     def test_training(self):
-        dataset = gtzan.GTZAN(self.root_dir, subset='training')
+        dataset = gtzan.GTZAN(self.root_dir, subset="training")
 
         n_ite = 0
         for i, (waveform, sample_rate, label) in enumerate(dataset):
@@ -66,7 +72,7 @@ class TestGTZAN(TempDirMixin, TorchaudioTestCase):
         assert n_ite == len(self.training)
 
     def test_validation(self):
-        dataset = gtzan.GTZAN(self.root_dir, subset='validation')
+        dataset = gtzan.GTZAN(self.root_dir, subset="validation")
 
         n_ite = 0
         for i, (waveform, sample_rate, label) in enumerate(dataset):
@@ -77,7 +83,7 @@ class TestGTZAN(TempDirMixin, TorchaudioTestCase):
         assert n_ite == len(self.validation)
 
     def test_testing(self):
-        dataset = gtzan.GTZAN(self.root_dir, subset='testing')
+        dataset = gtzan.GTZAN(self.root_dir, subset="testing")
 
         n_ite = 0
         for i, (waveform, sample_rate, label) in enumerate(dataset):

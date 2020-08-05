@@ -16,8 +16,10 @@ class Test_KaldiIO(common_utils.TorchaudioTestCase):
         will be used to check that the extracted data is of the right type.
         """
         test_filepath = common_utils.get_asset_path(file_name)
-        expected_output = {'key' + str(idx + 1): torch.tensor(val, dtype=expected_dtype)
-                           for idx, val in enumerate(expected_data)}
+        expected_output = {
+            "key" + str(idx + 1): torch.tensor(val, dtype=expected_dtype)
+            for idx, val in enumerate(expected_data)
+        }
 
         for key, vec in fn(test_filepath):
             self.assertTrue(key in expected_output)
@@ -29,7 +31,11 @@ class Test_KaldiIO(common_utils.TorchaudioTestCase):
         self._test_helper("vec_int.ark", self.data1, kio.read_vec_int_ark, torch.int32)
 
     def test_read_vec_flt_ark(self):
-        self._test_helper("vec_flt.ark", self.data1, kio.read_vec_flt_ark, torch.float32)
+        self._test_helper(
+            "vec_flt.ark", self.data1, kio.read_vec_flt_ark, torch.float32
+        )
 
     def test_read_mat_ark(self):
-        self._test_helper("mat.ark", [self.data1, self.data2], kio.read_mat_ark, torch.float32)
+        self._test_helper(
+            "mat.ark", [self.data1, self.data2], kio.read_mat_ark, torch.float32
+        )

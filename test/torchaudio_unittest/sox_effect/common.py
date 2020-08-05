@@ -10,15 +10,15 @@ def name_func(func, _, params):
         args = "_".join([str(arg) for arg in params.args])
     else:
         args = "_".join([str(arg) for arg in params.args[0]])
-    return f'{func.__name__}_{args}'
+    return f"{func.__name__}_{args}"
 
 
 def load_params(*paths):
     params = []
-    with open(get_asset_path(*paths), 'r') as file:
+    with open(get_asset_path(*paths), "r") as file:
         for line in file:
             data = json.loads(line)
-            for effect in data['effects']:
+            for effect in data["effects"]:
                 for i, arg in enumerate(effect):
                     if arg.startswith("<ASSET_DIR>"):
                         effect[i] = arg.replace("<ASSET_DIR>", get_asset_path())

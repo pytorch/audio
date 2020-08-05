@@ -14,17 +14,17 @@ from torchaudio_unittest.common_utils import get_asset_path
 BACKENDS = []
 BACKENDS_MP3 = []
 
-if is_module_available('soundfile'):
-    BACKENDS.append('soundfile')
+if is_module_available("soundfile"):
+    BACKENDS.append("soundfile")
 
-if is_module_available('torchaudio._torchaudio'):
-    BACKENDS.append('sox')
+if is_module_available("torchaudio._torchaudio"):
+    BACKENDS.append("sox")
 
     if (
-            'mp3' in sox_utils.list_read_formats() and
-            'mp3' in sox_utils.list_write_formats()
+        "mp3" in sox_utils.list_read_formats()
+        and "mp3" in sox_utils.list_write_formats()
     ):
-        BACKENDS_MP3 = ['sox']
+        BACKENDS_MP3 = ["sox"]
 
 
 def create_temp_assets_dir():
@@ -40,10 +40,12 @@ def create_temp_assets_dir():
 
 class Test_LoadSave(unittest.TestCase):
     test_dirpath, test_dir = create_temp_assets_dir()
-    test_filepath = os.path.join(test_dirpath, "assets",
-                                 "steam-train-whistle-daniel_simon.mp3")
-    test_filepath_wav = os.path.join(test_dirpath, "assets",
-                                     "steam-train-whistle-daniel_simon.wav")
+    test_filepath = os.path.join(
+        test_dirpath, "assets", "steam-train-whistle-daniel_simon.mp3"
+    )
+    test_filepath_wav = os.path.join(
+        test_dirpath, "assets", "steam-train-whistle-daniel_simon.wav"
+    )
 
     def test_1_save(self):
         for backend in BACKENDS_MP3:
@@ -92,8 +94,7 @@ class Test_LoadSave(unittest.TestCase):
 
         # don't save to folders that don't exist
         with self.assertRaises(OSError):
-            new_filepath = os.path.join(self.test_dirpath, "no-path",
-                                        "test.wav")
+            new_filepath = os.path.join(self.test_dirpath, "no-path", "test.wav")
             torchaudio.save(new_filepath, x, sr)
 
     def test_1_save_sine(self):
@@ -105,17 +106,15 @@ class Test_LoadSave(unittest.TestCase):
     def _test_1_save_sine(self):
 
         # save created file
-        sinewave_filepath = os.path.join(self.test_dirpath, "assets",
-                                         "sinewave.wav")
+        sinewave_filepath = os.path.join(self.test_dirpath, "assets", "sinewave.wav")
         sr = 16000
         freq = 440
         volume = 0.3
 
-        y = (torch.cos(
-            2 * math.pi * torch.arange(0, 4 * sr).float() * freq / sr))
+        y = torch.cos(2 * math.pi * torch.arange(0, 4 * sr).float() * freq / sr)
         y.unsqueeze_(0)
         # y is between -1 and 1, so must scale
-        y = (y * volume * (2**31)).long()
+        y = (y * volume * (2 ** 31)).long()
         torchaudio.save(sinewave_filepath, y, sr)
         self.assertTrue(os.path.isfile(sinewave_filepath))
 
@@ -166,13 +165,12 @@ class Test_LoadSave(unittest.TestCase):
             torchaudio.load("file-does-not-exist.mp3")
 
         with self.assertRaises(OSError):
-            tdir = os.path.join(
-                os.path.dirname(self.test_dirpath), "torchaudio")
+            tdir = os.path.join(os.path.dirname(self.test_dirpath), "torchaudio")
             torchaudio.load(tdir)
 
     def test_2_load_nonormalization(self):
         for backend in BACKENDS_MP3:
-            if backend == 'sox_io':
+            if backend == "sox_io":
                 continue
             with self.subTest():
                 torchaudio.set_audio_backend(backend)
@@ -191,23 +189,26 @@ class Test_LoadSave(unittest.TestCase):
 
     def test_3_load_and_save_is_identity(self):
         for backend in BACKENDS:
-            if backend == 'sox_io':
+            if backend == "sox_io":
                 continue
             with self.subTest():
                 torchaudio.set_audio_backend(backend)
                 self._test_3_load_and_save_is_identity()
 
     def _test_3_load_and_save_is_identity(self):
-        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        input_path = os.path.join(self.test_dirpath, "assets", "sinewave.wav")
         tensor, sample_rate = torchaudio.load(input_path)
-        output_path = os.path.join(self.test_dirpath, 'test.wav')
+        output_path = os.path.join(self.test_dirpath, "test.wav")
         torchaudio.save(output_path, tensor, sample_rate)
         tensor2, sample_rate2 = torchaudio.load(output_path)
         self.assertTrue(tensor.allclose(tensor2))
         self.assertEqual(sample_rate, sample_rate2)
         os.unlink(output_path)
 
-    @unittest.skipIf(any(be not in BACKENDS for be in ["sox", "soundfile"]), "sox and soundfile are not available")
+    @unittest.skipIf(
+        any(be not in BACKENDS for be in ["sox", "soundfile"]),
+        "sox and soundfile are not available",
+    )
     def test_3_load_and_save_is_identity_across_backend(self):
         with self.subTest():
             self._test_3_load_and_save_is_identity_across_backend("sox", "soundfile")
@@ -216,10 +217,10 @@ class Test_LoadSave(unittest.TestCase):
 
     def _test_3_load_and_save_is_identity_across_backend(self, backend1, backend2):
         torchaudio.set_audio_backend(backend1)
-        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        input_path = os.path.join(self.test_dirpath, "assets", "sinewave.wav")
         tensor1, sample_rate1 = torchaudio.load(input_path)
 
-        output_path = os.path.join(self.test_dirpath, 'test.wav')
+        output_path = os.path.join(self.test_dirpath, "test.wav")
         torchaudio.save(output_path, tensor1, sample_rate1)
 
         torchaudio.set_audio_backend(backend2)
@@ -239,28 +240,53 @@ class Test_LoadSave(unittest.TestCase):
         num_frames = 101
         offset = 201
         # load entire mono sinewave wav file, load a partial copy and then compare
-        input_sine_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        input_sine_path = os.path.join(self.test_dirpath, "assets", "sinewave.wav")
         x_sine_full, sr_sine = torchaudio.load(input_sine_path)
-        x_sine_part, _ = torchaudio.load(input_sine_path, num_frames=num_frames, offset=offset)
-        l1_error = x_sine_full[:, offset:(num_frames + offset)].sub(x_sine_part).abs().sum().item()
+        x_sine_part, _ = torchaudio.load(
+            input_sine_path, num_frames=num_frames, offset=offset
+        )
+        l1_error = (
+            x_sine_full[:, offset : (num_frames + offset)]
+            .sub(x_sine_part)
+            .abs()
+            .sum()
+            .item()
+        )
         # test for the correct number of samples and that the correct portion was loaded
         self.assertEqual(x_sine_part.size(1), num_frames)
-        self.assertEqual(l1_error, 0.)
+        self.assertEqual(l1_error, 0.0)
         # create a two channel version of this wavefile
         x_2ch_sine = x_sine_full.repeat(1, 2)
-        out_2ch_sine_path = os.path.join(self.test_dirpath, 'assets', '2ch_sinewave.wav')
+        out_2ch_sine_path = os.path.join(
+            self.test_dirpath, "assets", "2ch_sinewave.wav"
+        )
         torchaudio.save(out_2ch_sine_path, x_2ch_sine, sr_sine)
-        x_2ch_sine_load, _ = torchaudio.load(out_2ch_sine_path, num_frames=num_frames, offset=offset)
+        x_2ch_sine_load, _ = torchaudio.load(
+            out_2ch_sine_path, num_frames=num_frames, offset=offset
+        )
         os.unlink(out_2ch_sine_path)
-        l1_error = x_2ch_sine_load.sub(x_2ch_sine[:, offset:(offset + num_frames)]).abs().sum().item()
-        self.assertEqual(l1_error, 0.)
+        l1_error = (
+            x_2ch_sine_load.sub(x_2ch_sine[:, offset : (offset + num_frames)])
+            .abs()
+            .sum()
+            .item()
+        )
+        self.assertEqual(l1_error, 0.0)
 
         # test with two channel mp3
         x_2ch_full, sr_2ch = torchaudio.load(self.test_filepath, normalization=True)
-        x_2ch_part, _ = torchaudio.load(self.test_filepath, normalization=True, num_frames=num_frames, offset=offset)
-        l1_error = x_2ch_full[:, offset:(offset + num_frames)].sub(x_2ch_part).abs().sum().item()
+        x_2ch_part, _ = torchaudio.load(
+            self.test_filepath, normalization=True, num_frames=num_frames, offset=offset
+        )
+        l1_error = (
+            x_2ch_full[:, offset : (offset + num_frames)]
+            .sub(x_2ch_part)
+            .abs()
+            .sum()
+            .item()
+        )
         self.assertEqual(x_2ch_part.size(1), num_frames)
-        self.assertEqual(l1_error, 0.)
+        self.assertEqual(l1_error, 0.0)
 
         # check behavior if number of samples would exceed file length
         offset_ns = 300
@@ -278,7 +304,7 @@ class Test_LoadSave(unittest.TestCase):
                 self._test_5_get_info()
 
     def _test_5_get_info(self):
-        input_path = os.path.join(self.test_dirpath, 'assets', 'sinewave.wav')
+        input_path = os.path.join(self.test_dirpath, "assets", "sinewave.wav")
         channels, samples, rate, precision = (1, 64000, 16000, 16)
         si, ei = torchaudio.info(input_path)
         self.assertEqual(si.channels, channels)

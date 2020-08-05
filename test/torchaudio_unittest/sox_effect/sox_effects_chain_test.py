@@ -10,7 +10,7 @@ from .. import common_utils
 
 @common_utils.skipIfNoSoxBackend
 class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
-    backend = 'sox'
+    backend = "sox"
 
     test_filepath = common_utils.get_asset_path("steam-train-whistle-daniel_simon.wav")
 
@@ -35,9 +35,9 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         self.assertEqual(sr, target_rate)
         self.assertEqual(x.size(0), target_channels)
 
-    @unittest.skipIf(sys.platform == 'darwin', 'This test is known to fail on macOS')
+    @unittest.skipIf(sys.platform == "darwin", "This test is known to fail on macOS")
     def test_lowpass_speed(self):
-        speed = .8
+        speed = 0.8
         si, _ = torchaudio.info(self.test_filepath)
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(self.test_filepath)
@@ -46,7 +46,9 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         E.append_effect_to_chain("rate", si.rate)
         x, sr = E.sox_build_flow_effects()
         # check if effects worked, add small tolerance for rounding effects
-        self.assertEqual(x.size(1), int((si.length / si.channels) / speed), atol=1, rtol=1e-8)
+        self.assertEqual(
+            x.size(1), int((si.length / si.channels) / speed), atol=1, rtol=1e-8
+        )
 
     def test_ulaw_and_siginfo(self):
         si_out = torchaudio.sox_signalinfo_t()
@@ -57,12 +59,14 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         si_in, ei_in = torchaudio.info(self.test_filepath)
         si_out.rate = 44100
         si_out.channels = 2
-        E = torchaudio.sox_effects.SoxEffectsChain(out_siginfo=si_out, out_encinfo=ei_out)
+        E = torchaudio.sox_effects.SoxEffectsChain(
+            out_siginfo=si_out, out_encinfo=ei_out
+        )
         E.set_input_file(self.test_filepath)
         x, sr = E.sox_build_flow_effects()
         # Note: the output was encoded into ulaw because the
         #       number of unique values in the output is less than 256.
-        self.assertLess(x.unique().size(0), 2**8 + 1)
+        self.assertLess(x.unique().size(0), 2 ** 8 + 1)
         self.assertEqual(x.numel(), si_in.length)
 
     def test_band_chorus(self):
@@ -71,7 +75,7 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         E = torchaudio.sox_effects.SoxEffectsChain(out_encinfo=ei_in, out_siginfo=si_in)
         E.set_input_file(self.test_filepath)
         E.append_effect_to_chain("band", ["-n", "10k", "3.5k"])
-        E.append_effect_to_chain("chorus", [.5, .7, 55, 0.4, .25, 2, '-s'])
+        E.append_effect_to_chain("chorus", [0.5, 0.7, 55, 0.4, 0.25, 2, "-s"])
         E.append_effect_to_chain("rate", [si_in.rate])
         E.append_effect_to_chain("channels", [si_in.channels])
         x, sr = E.sox_build_flow_effects()
@@ -98,39 +102,43 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         E.append_effect_to_chain("gain", ["5"])
         x, sr = E.sox_build_flow_effects()
         E.clear_chain()
-        self.assertTrue(x.abs().max().item(), 1.)
+        self.assertTrue(x.abs().max().item(), 1.0)
         E.set_input_file(self.test_filepath)
         E.append_effect_to_chain("gain", ["-e", "-5"])
         x, sr = E.sox_build_flow_effects()
         E.clear_chain()
-        self.assertLess(x.abs().max().item(), 1.)
+        self.assertLess(x.abs().max().item(), 1.0)
         E.set_input_file(self.test_filepath)
         E.append_effect_to_chain("gain", ["-b", "8"])
         x, sr = E.sox_build_flow_effects()
         E.clear_chain()
-        self.assertTrue(x.abs().max().item(), 1.)
+        self.assertTrue(x.abs().max().item(), 1.0)
         E.set_input_file(self.test_filepath)
         E.append_effect_to_chain("gain", ["-n", "-10"])
         x, sr = E.sox_build_flow_effects()
         E.clear_chain()
-        self.assertLess(x.abs().max().item(), 1.)
+        self.assertLess(x.abs().max().item(), 1.0)
 
     def test_tempo_or_speed(self):
-        tempo = .8
+        tempo = 0.8
         si, _ = torchaudio.info(self.test_filepath)
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(self.test_filepath)
         E.append_effect_to_chain("tempo", ["-s", tempo])
         x, sr = E.sox_build_flow_effects()
         # check if effect worked
-        self.assertAlmostEqual(x.size(1), math.ceil((si.length / si.channels) / tempo), delta=1)
+        self.assertAlmostEqual(
+            x.size(1), math.ceil((si.length / si.channels) / tempo), delta=1
+        )
         # tempo > 1
         E.clear_chain()
         tempo = 1.2
         E.append_effect_to_chain("tempo", ["-s", tempo])
         x, sr = E.sox_build_flow_effects()
         # check if effect worked
-        self.assertAlmostEqual(x.size(1), math.ceil((si.length / si.channels) / tempo), delta=1)
+        self.assertAlmostEqual(
+            x.size(1), math.ceil((si.length / si.channels) / tempo), delta=1
+        )
         # tempo > 1
         E.clear_chain()
         speed = 1.2
@@ -138,7 +146,9 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         E.append_effect_to_chain("rate", [si.rate])
         x, sr = E.sox_build_flow_effects()
         # check if effect worked
-        self.assertAlmostEqual(x.size(1), math.ceil((si.length / si.channels) / speed), delta=1)
+        self.assertAlmostEqual(
+            x.size(1), math.ceil((si.length / si.channels) / speed), delta=1
+        )
         # speed < 1
         E.clear_chain()
         speed = 0.8
@@ -146,7 +156,9 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         E.append_effect_to_chain("rate", [si.rate])
         x, sr = E.sox_build_flow_effects()
         # check if effect worked
-        self.assertAlmostEqual(x.size(1), math.ceil((si.length / si.channels) / speed), delta=1)
+        self.assertAlmostEqual(
+            x.size(1), math.ceil((si.length / si.channels) / speed), delta=1
+        )
 
     def test_trim(self):
         x_orig, _ = torchaudio.load(self.test_filepath)
@@ -159,7 +171,13 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         E.append_effect_to_chain("trim", [offset, num_frames])
         x, sr = E.sox_build_flow_effects()
         # check if effect worked
-        self.assertTrue(x.allclose(x_orig[:, offset_int:(offset_int + num_frames_int)], rtol=1e-4, atol=1e-4))
+        self.assertTrue(
+            x.allclose(
+                x_orig[:, offset_int : (offset_int + num_frames_int)],
+                rtol=1e-4,
+                atol=1e-4,
+            )
+        )
 
     def test_silence_contrast(self):
         si, _ = torchaudio.info(self.test_filepath)
@@ -184,7 +202,9 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
     def test_compand_fade(self):
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(self.test_filepath)
-        E.append_effect_to_chain("compand", ["0.3,1", "6:-70,-60,-20", "-5", "-90", "0.2"])
+        E.append_effect_to_chain(
+            "compand", ["0.3,1", "6:-70,-60,-20", "-5", "-90", "0.2"]
+        )
         E.append_effect_to_chain("fade", ["q", "0.25", "0", "0.33"])
         x, _ = E.sox_build_flow_effects()
         # check if effect worked
@@ -194,8 +214,17 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         si, _ = torchaudio.info(self.test_filepath)
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(self.test_filepath)
-        E.append_effect_to_chain("biquad", ["0.25136437", "0.50272873", "0.25136437",
-                                            "1.0", "-0.17123075", "0.17668821"])
+        E.append_effect_to_chain(
+            "biquad",
+            [
+                "0.25136437",
+                "0.50272873",
+                "0.25136437",
+                "1.0",
+                "-0.17123075",
+                "0.17668821",
+            ],
+        )
         E.append_effect_to_chain("delay", ["15000s"])
         x, _ = E.sox_build_flow_effects()
         # check if effect worked
@@ -219,6 +248,8 @@ class Test_SoxEffectsChain(common_utils.TorchaudioTestCase):
         E = torchaudio.sox_effects.SoxEffectsChain()
         E.set_input_file(self.test_filepath)
         # first two options should be combined to "0.3,1"
-        E.append_effect_to_chain("compand", ["0.3", "1", "6:-70,-60,-20", "-5", "-90", "0.2"])
+        E.append_effect_to_chain(
+            "compand", ["0.3", "1", "6:-70,-60,-20", "-5", "-90", "0.2"]
+        )
         with self.assertRaises(RuntimeError):
             E.sox_build_flow_effects()

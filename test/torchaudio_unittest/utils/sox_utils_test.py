@@ -9,6 +9,7 @@ from torchaudio_unittest.common_utils import (
 @skipIfNoExtension
 class TestSoxUtils(PytorchTestCase):
     """Smoke tests for sox_util module"""
+
     def test_set_seed(self):
         """`set_seed` does not crush"""
         sox_utils.set_seed(0)
@@ -34,16 +35,16 @@ class TestSoxUtils(PytorchTestCase):
         """`list_effects` returns the list of available effects"""
         effects = sox_utils.list_effects()
         # We cannot infer what effects are available, so only check some of them.
-        assert 'highpass' in effects
-        assert 'phaser' in effects
-        assert 'gain' in effects
+        assert "highpass" in effects
+        assert "phaser" in effects
+        assert "gain" in effects
 
     def test_list_read_formats(self):
         """`list_read_formats` returns the list of supported formats"""
         formats = sox_utils.list_read_formats()
-        assert 'wav' in formats
+        assert "wav" in formats
 
     def test_list_write_formats(self):
         """`list_write_formats` returns the list of supported formats"""
         formats = sox_utils.list_write_formats()
-        assert 'opus' not in formats
+        assert "opus" not in formats

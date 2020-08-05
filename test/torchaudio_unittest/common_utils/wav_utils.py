@@ -9,26 +9,26 @@ def normalize_wav(tensor: torch.Tensor) -> torch.Tensor:
         pass
     elif tensor.dtype == torch.int32:
         tensor = tensor.to(torch.float32)
-        tensor[tensor > 0] /= 2147483647.
-        tensor[tensor < 0] /= 2147483648.
+        tensor[tensor > 0] /= 2147483647.0
+        tensor[tensor < 0] /= 2147483648.0
     elif tensor.dtype == torch.int16:
         tensor = tensor.to(torch.float32)
-        tensor[tensor > 0] /= 32767.
-        tensor[tensor < 0] /= 32768.
+        tensor[tensor > 0] /= 32767.0
+        tensor[tensor < 0] /= 32768.0
     elif tensor.dtype == torch.uint8:
         tensor = tensor.to(torch.float32) - 128
-        tensor[tensor > 0] /= 127.
-        tensor[tensor < 0] /= 128.
+        tensor[tensor > 0] /= 127.0
+        tensor[tensor < 0] /= 128.0
     return tensor
 
 
 def get_wav_data(
-        dtype: str,
-        num_channels: int,
-        *,
-        num_frames: Optional[int] = None,
-        normalize: bool = True,
-        channels_first: bool = True,
+    dtype: str,
+    num_channels: int,
+    *,
+    num_frames: Optional[int] = None,
+    normalize: bool = True,
+    channels_first: bool = True,
 ):
     """Generate linear signal of the given dtype and num_channels
 
@@ -45,18 +45,18 @@ def get_wav_data(
     dtype_ = getattr(torch, dtype)
 
     if num_frames is None:
-        if dtype == 'uint8':
+        if dtype == "uint8":
             num_frames = 256
         else:
             num_frames = 1 << 16
 
-    if dtype == 'uint8':
+    if dtype == "uint8":
         base = torch.linspace(0, 255, num_frames, dtype=dtype_)
-    if dtype == 'float32':
-        base = torch.linspace(-1., 1., num_frames, dtype=dtype_)
-    if dtype == 'int32':
+    if dtype == "float32":
+        base = torch.linspace(-1.0, 1.0, num_frames, dtype=dtype_)
+    if dtype == "int32":
         base = torch.linspace(-2147483648, 2147483647, num_frames, dtype=dtype_)
-    if dtype == 'int16':
+    if dtype == "int16":
         base = torch.linspace(-32768, 32767, num_frames, dtype=dtype_)
     data = base.repeat([num_channels, 1])
     if not channels_first:

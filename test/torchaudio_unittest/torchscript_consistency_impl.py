@@ -10,6 +10,7 @@ from torchaudio_unittest import common_utils
 
 class Functional(common_utils.TestBaseMixin):
     """Implements test for `functinoal` modul that are performed for different devices"""
+
     def _assert_consistency(self, func, tensor, shape_only=False):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
 
@@ -28,7 +29,7 @@ class Functional(common_utils.TestBaseMixin):
             hop = 200
             pad = 0
             window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
-            power = 2.
+            power = 2.0
             normalize = False
             return F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
 
@@ -41,13 +42,25 @@ class Functional(common_utils.TestBaseMixin):
             ws = 400
             hop = 200
             window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
-            power = 2.
+            power = 2.0
             normalize = False
             momentum = 0.99
             n_iter = 32
             length = 1000
             rand_int = False
-            return F.griffinlim(tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, rand_int)
+            return F.griffinlim(
+                tensor,
+                window,
+                n_fft,
+                hop,
+                ws,
+                power,
+                normalize,
+                n_iter,
+                momentum,
+                length,
+                rand_int,
+            )
 
         tensor = torch.rand((1, 201, 6))
         self._assert_consistency(func, tensor)
@@ -73,8 +86,8 @@ class Functional(common_utils.TestBaseMixin):
         self._assert_consistency(func, waveform)
 
     def test_create_fb_matrix(self):
-        if self.device != torch.device('cpu'):
-            raise unittest.SkipTest('No need to perform test on device other than CPU')
+        if self.device != torch.device("cpu"):
+            raise unittest.SkipTest("No need to perform test on device other than CPU")
 
         def func(_):
             n_stft = 100
@@ -101,16 +114,16 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_DB_to_amplitude(self):
         def func(tensor):
-            ref = 1.
-            power = 1.
+            ref = 1.0
+            power = 1.0
             return F.DB_to_amplitude(tensor, ref, power)
 
         tensor = torch.rand((1, 100))
         self._assert_consistency(func, tensor)
 
     def test_create_dct(self):
-        if self.device != torch.device('cpu'):
-            raise unittest.SkipTest('No need to perform test on device other than CPU')
+        if self.device != torch.device("cpu"):
+            raise unittest.SkipTest("No need to perform test on device other than CPU")
 
         def func(_):
             n_mfcc = 40
@@ -139,7 +152,7 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_complex_norm(self):
         def func(tensor):
-            power = 2.
+            power = 2.0
             return F.complex_norm(tensor, power)
 
         tensor = torch.randn(1, 2, 1025, 400, 2)
@@ -148,7 +161,7 @@ class Functional(common_utils.TestBaseMixin):
     def test_mask_along_axis(self):
         def func(tensor):
             mask_param = 100
-            mask_value = 30.
+            mask_value = 30.0
             axis = 2
             return F.mask_along_axis(tensor, mask_param, mask_value, axis)
 
@@ -158,7 +171,7 @@ class Functional(common_utils.TestBaseMixin):
     def test_mask_along_axis_iid(self):
         def func(tensor):
             mask_param = 100
-            mask_value = 30.
+            mask_value = 30.0
             axis = 2
             return F.mask_along_axis_iid(tensor, mask_param, mask_value, axis)
 
@@ -175,21 +188,21 @@ class Functional(common_utils.TestBaseMixin):
 
     def test_dither_TPDF(self):
         def func(tensor):
-            return F.dither(tensor, 'TPDF')
+            return F.dither(tensor, "TPDF")
 
         tensor = common_utils.get_whitenoise(n_channels=2)
         self._assert_consistency(func, tensor, shape_only=True)
 
     def test_dither_RPDF(self):
         def func(tensor):
-            return F.dither(tensor, 'RPDF')
+            return F.dither(tensor, "RPDF")
 
         tensor = common_utils.get_whitenoise(n_channels=2)
         self._assert_consistency(func, tensor, shape_only=True)
 
     def test_dither_GPDF(self):
         def func(tensor):
-            return F.dither(tensor, 'GPDF')
+            return F.dither(tensor, "GPDF")
 
         tensor = common_utils.get_whitenoise(n_channels=2)
         self._assert_consistency(func, tensor, shape_only=True)
@@ -252,7 +265,7 @@ class Functional(common_utils.TestBaseMixin):
 
         def func(tensor):
             sample_rate = 44100
-            cutoff_freq = 3000.
+            cutoff_freq = 3000.0
             return F.lowpass_biquad(tensor, sample_rate, cutoff_freq)
 
         self._assert_consistency(func, waveform)
@@ -265,7 +278,7 @@ class Functional(common_utils.TestBaseMixin):
 
         def func(tensor):
             sample_rate = 44100
-            cutoff_freq = 2000.
+            cutoff_freq = 2000.0
             return F.highpass_biquad(tensor, sample_rate, cutoff_freq)
 
         self._assert_consistency(func, waveform)
@@ -278,7 +291,7 @@ class Functional(common_utils.TestBaseMixin):
 
         def func(tensor):
             sample_rate = 44100
-            central_freq = 1000.
+            central_freq = 1000.0
             q = 0.707
             return F.allpass_biquad(tensor, sample_rate, central_freq, q)
 
@@ -292,10 +305,12 @@ class Functional(common_utils.TestBaseMixin):
 
         def func(tensor):
             sample_rate = 44100
-            central_freq = 1000.
+            central_freq = 1000.0
             q = 0.707
             const_skirt_gain = True
-            return F.bandpass_biquad(tensor, sample_rate, central_freq, q, const_skirt_gain)
+            return F.bandpass_biquad(
+                tensor, sample_rate, central_freq, q, const_skirt_gain
+            )
 
         self._assert_consistency(func, waveform)
 
@@ -307,10 +322,12 @@ class Functional(common_utils.TestBaseMixin):
 
         def func(tensor):
             sample_rate = 44100
-            central_freq = 1000.
+            central_freq = 1000.0
             q = 0.707
             const_skirt_gain = True
-            return F.bandpass_biquad(tensor, sample_rate, central_freq, q, const_skirt_gain)
+            return F.bandpass_biquad(
+                tensor, sample_rate, central_freq, q, const_skirt_gain
+            )
 
         self._assert_consistency(func, waveform)
 
@@ -322,7 +339,7 @@ class Functional(common_utils.TestBaseMixin):
 
         def func(tensor):
             sample_rate = 44100
-            central_freq = 1000.
+            central_freq = 1000.0
             q = 0.707
             return F.bandreject_biquad(tensor, sample_rate, central_freq, q)
 
@@ -336,7 +353,7 @@ class Functional(common_utils.TestBaseMixin):
 
         def func(tensor):
             sample_rate = 44100
-            central_freq = 1000.
+            central_freq = 1000.0
             q = 0.707
             noise = True
             return F.band_biquad(tensor, sample_rate, central_freq, q, noise)
@@ -351,7 +368,7 @@ class Functional(common_utils.TestBaseMixin):
 
         def func(tensor):
             sample_rate = 44100
-            central_freq = 1000.
+            central_freq = 1000.0
             q = 0.707
             noise = False
             return F.band_biquad(tensor, sample_rate, central_freq, q, noise)
@@ -366,8 +383,8 @@ class Functional(common_utils.TestBaseMixin):
 
         def func(tensor):
             sample_rate = 44100
-            gain = 40.
-            central_freq = 1000.
+            gain = 40.0
+            central_freq = 1000.0
             q = 0.707
             return F.treble_biquad(tensor, sample_rate, gain, central_freq, q)
 
@@ -381,8 +398,8 @@ class Functional(common_utils.TestBaseMixin):
 
         def func(tensor):
             sample_rate = 44100
-            gain = 40.
-            central_freq = 1000.
+            gain = 40.0
+            central_freq = 1000.0
             q = 0.707
             return F.bass_biquad(tensor, sample_rate, gain, central_freq, q)
 
@@ -420,8 +437,8 @@ class Functional(common_utils.TestBaseMixin):
 
         def func(tensor):
             sample_rate = 44100
-            center_freq = 300.
-            gain = 1.
+            center_freq = 300.0
+            gain = 1.0
             q = 0.707
             return F.equalizer_biquad(tensor, sample_rate, center_freq, gain, q)
 
@@ -448,38 +465,24 @@ class Functional(common_utils.TestBaseMixin):
             norm_vars = False
             a = torch.tensor(
                 [
-                    [
-                        -1.915875792503357,
-                        1.147700309753418
-                    ],
-                    [
-                        1.8242558240890503,
-                        1.3869990110397339
-                    ]
+                    [-1.915875792503357, 1.147700309753418],
+                    [1.8242558240890503, 1.3869990110397339],
                 ],
                 device=tensor.device,
-                dtype=tensor.dtype
+                dtype=tensor.dtype,
             )
-            return F.sliding_window_cmn(a, cmn_window, min_cmn_window, center, norm_vars)
-        b = torch.tensor(
-            [
-                [
-                    -1.8701,
-                    -0.1196
-                ],
-                [
-                    1.8701,
-                    0.1196
-                ]
-            ]
-        )
+            return F.sliding_window_cmn(
+                a, cmn_window, min_cmn_window, center, norm_vars
+            )
+
+        b = torch.tensor([[-1.8701, -0.1196], [1.8701, 0.1196]])
         self._assert_consistency(func, b)
 
     def test_contrast(self):
         waveform = common_utils.get_whitenoise()
 
         def func(tensor):
-            enhancement_amount = 80.
+            enhancement_amount = 80.0
             return F.contrast(tensor, enhancement_amount)
 
         self._assert_consistency(func, waveform)
@@ -498,8 +501,8 @@ class Functional(common_utils.TestBaseMixin):
         waveform = common_utils.get_whitenoise()
 
         def func(tensor):
-            gain = 30.
-            colour = 50.
+            gain = 30.0
+            colour = 50.0
             return F.overdrive(tensor, gain, colour)
 
         self._assert_consistency(func, waveform)
@@ -514,7 +517,16 @@ class Functional(common_utils.TestBaseMixin):
             decay = 0.4
             speed = 0.5
             sample_rate = 44100
-            return F.phaser(tensor, sample_rate, gain_in, gain_out, delay_ms, decay, speed, sinusoidal=True)
+            return F.phaser(
+                tensor,
+                sample_rate,
+                gain_in,
+                gain_out,
+                delay_ms,
+                decay,
+                speed,
+                sinusoidal=True,
+            )
 
         self._assert_consistency(func, waveform)
 
@@ -528,16 +540,27 @@ class Functional(common_utils.TestBaseMixin):
             regen = 3.0
             width = 0.23
             speed = 1.3
-            phase = 60.
+            phase = 60.0
             sample_rate = 44100
-            return F.flanger(tensor, sample_rate, delay, depth, regen, width, speed,
-                             phase, modulation='sinusoidal', interpolation='linear')
+            return F.flanger(
+                tensor,
+                sample_rate,
+                delay,
+                depth,
+                regen,
+                width,
+                speed,
+                phase,
+                modulation="sinusoidal",
+                interpolation="linear",
+            )
 
         self._assert_consistency(func, waveform)
 
 
 class Transforms(common_utils.TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
+
     def _assert_consistency(self, transform, tensor):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
@@ -606,11 +629,15 @@ class Transforms(common_utils.TestBaseMixin):
 
     def test_FrequencyMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
-        self._assert_consistency(T.FrequencyMasking(freq_mask_param=60, iid_masks=False), tensor)
+        self._assert_consistency(
+            T.FrequencyMasking(freq_mask_param=60, iid_masks=False), tensor
+        )
 
     def test_TimeMasking(self):
         tensor = torch.rand((10, 2, 50, 10, 2))
-        self._assert_consistency(T.TimeMasking(time_mask_param=30, iid_masks=False), tensor)
+        self._assert_consistency(
+            T.TimeMasking(time_mask_param=30, iid_masks=False), tensor
+        )
 
     def test_Vol(self):
         waveform = common_utils.get_whitenoise()

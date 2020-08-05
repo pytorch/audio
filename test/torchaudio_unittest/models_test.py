@@ -5,7 +5,6 @@ from torchaudio_unittest import common_utils
 
 
 class TestWav2Letter(common_utils.TorchaudioTestCase):
-
     def test_waveform(self):
         batch_size = 2
         num_features = 1
@@ -25,7 +24,9 @@ class TestWav2Letter(common_utils.TorchaudioTestCase):
         num_classes = 40
         input_length = 2
 
-        model = Wav2Letter(num_classes=num_classes, input_type="mfcc", num_features=num_features)
+        model = Wav2Letter(
+            num_classes=num_classes, input_type="mfcc", num_features=num_features
+        )
 
         x = torch.rand(batch_size, num_features, input_length)
         out = model(x)
@@ -34,7 +35,6 @@ class TestWav2Letter(common_utils.TorchaudioTestCase):
 
 
 class TestMelResNet(common_utils.TorchaudioTestCase):
-
     def test_waveform(self):
         """Validate the output dimensions of a MelResNet block.
         """
@@ -56,7 +56,6 @@ class TestMelResNet(common_utils.TorchaudioTestCase):
 
 
 class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
-
     def test_waveform(self):
         """Validate the output dimensions of a UpsampleNetwork block.
         """
@@ -74,22 +73,26 @@ class TestUpsampleNetwork(common_utils.TorchaudioTestCase):
         for upsample_scale in upsample_scales:
             total_scale *= upsample_scale
 
-        model = UpsampleNetwork(upsample_scales,
-                                n_res_block,
-                                n_freq,
-                                n_hidden,
-                                n_output,
-                                kernel_size)
+        model = UpsampleNetwork(
+            upsample_scales, n_res_block, n_freq, n_hidden, n_output, kernel_size
+        )
 
         x = torch.rand(n_batch, n_freq, n_time)
         out1, out2 = model(x)
 
-        assert out1.size() == (n_batch, n_freq, total_scale * (n_time - kernel_size + 1))
-        assert out2.size() == (n_batch, n_output, total_scale * (n_time - kernel_size + 1))
+        assert out1.size() == (
+            n_batch,
+            n_freq,
+            total_scale * (n_time - kernel_size + 1),
+        )
+        assert out2.size() == (
+            n_batch,
+            n_output,
+            total_scale * (n_time - kernel_size + 1),
+        )
 
 
 class TestWaveRNN(common_utils.TorchaudioTestCase):
-
     def test_waveform(self):
         """Validate the output dimensions of a WaveRNN model.
         """
@@ -107,11 +110,26 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         n_hidden = 128
         kernel_size = 5
 
-        model = WaveRNN(upsample_scales, n_classes, hop_length, n_res_block,
-                        n_rnn, n_fc, kernel_size, n_freq, n_hidden, n_output)
+        model = WaveRNN(
+            upsample_scales,
+            n_classes,
+            hop_length,
+            n_res_block,
+            n_rnn,
+            n_fc,
+            kernel_size,
+            n_freq,
+            n_hidden,
+            n_output,
+        )
 
         x = torch.rand(n_batch, 1, hop_length * (n_time - kernel_size + 1))
         mels = torch.rand(n_batch, 1, n_freq, n_time)
         out = model(x, mels)
 
-        assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1), n_classes)
+        assert out.size() == (
+            n_batch,
+            1,
+            hop_length * (n_time - kernel_size + 1),
+            n_classes,
+        )

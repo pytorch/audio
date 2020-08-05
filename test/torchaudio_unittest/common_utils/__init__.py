@@ -3,9 +3,7 @@ from .data_utils import (
     get_whitenoise,
     get_sinusoid,
 )
-from .backend_utils import (
-    set_audio_backend,
-)
+from .backend_utils import set_audio_backend
 from .case_utils import (
     TempDirMixin,
     TestBaseMixin,
@@ -23,7 +21,5 @@ from .wav_utils import (
     load_wav,
     save_wav,
 )
-from .parameterized_utils import (
-    load_params,
-)
+from .parameterized_utils import load_params
 from . import sox_utils

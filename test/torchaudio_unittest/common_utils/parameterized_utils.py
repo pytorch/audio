@@ -6,5 +6,5 @@ from .data_utils import get_asset_path
 
 
 def load_params(*paths):
-    with open(get_asset_path(*paths), 'r') as file:
+    with open(get_asset_path(*paths), "r") as file:
         return [param(json.loads(line)) for line in file]

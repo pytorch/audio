@@ -19,7 +19,9 @@ class Lfilter(common_utils.TestBaseMixin):
         a_coeffs = torch.tensor([1, 0, 0, 0], dtype=self.dtype, device=self.device)
         output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
 
-        self.assertEqual(output_waveform[:, 3:], waveform[:, 0:-3], atol=1e-5, rtol=1e-5)
+        self.assertEqual(
+            output_waveform[:, 3:], waveform[:, 0:-3], atol=1e-5, rtol=1e-5
+        )
 
     def test_clamp(self):
         input_signal = torch.ones(1, 44100 * 1, dtype=self.dtype, device=self.device)

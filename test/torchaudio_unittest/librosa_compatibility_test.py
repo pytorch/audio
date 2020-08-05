@@ -8,7 +8,7 @@ import torchaudio
 import torchaudio.functional as F
 from torchaudio._internal.module_utils import is_module_available
 
-LIBROSA_AVAILABLE = is_module_available('librosa')
+LIBROSA_AVAILABLE = is_module_available("librosa")
 
 if LIBROSA_AVAILABLE:
     import numpy as np
@@ -23,6 +23,7 @@ from torchaudio_unittest import common_utils
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
 class TestFunctional(common_utils.TorchaudioTestCase):
     """Test suite for functions in `functional` module."""
+
     def test_griffinlim(self):
         # NOTE: This test is flaky without a fixed random seed
         # See https://github.com/pytorch/audio/issues/382
@@ -38,35 +39,62 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         n_iter = 8
         length = 1000
         rand_init = False
-        init = 'random' if rand_init else None
+        init = "random" if rand_init else None
 
         specgram = F.spectrogram(tensor, 0, window, n_fft, hop, ws, 2, normalize).sqrt()
-        ta_out = F.griffinlim(specgram, window, n_fft, hop, ws, 1, normalize,
-                              n_iter, momentum, length, rand_init)
-        lr_out = librosa.griffinlim(specgram.squeeze(0).numpy(), n_iter=n_iter, hop_length=hop,
-                                    momentum=momentum, init=init, length=length)
+        ta_out = F.griffinlim(
+            specgram,
+            window,
+            n_fft,
+            hop,
+            ws,
+            1,
+            normalize,
+            n_iter,
+            momentum,
+            length,
+            rand_init,
+        )
+        lr_out = librosa.griffinlim(
+            specgram.squeeze(0).numpy(),
+            n_iter=n_iter,
+            hop_length=hop,
+            momentum=momentum,
+            init=init,
+            length=length,
+        )
         lr_out = torch.from_numpy(lr_out).unsqueeze(0)
 
         self.assertEqual(ta_out, lr_out, atol=5e-5, rtol=1e-5)
 
-    def _test_create_fb(self, n_mels=40, sample_rate=22050, n_fft=2048, fmin=0.0, fmax=8000.0, norm=None):
-        librosa_fb = librosa.filters.mel(sr=sample_rate,
-                                         n_fft=n_fft,
-                                         n_mels=n_mels,
-                                         fmax=fmax,
-                                         fmin=fmin,
-                                         htk=True,
-                                         norm=norm)
-        fb = F.create_fb_matrix(sample_rate=sample_rate,
-                                n_mels=n_mels,
-                                f_max=fmax,
-                                f_min=fmin,
-                                n_freqs=(n_fft // 2 + 1),
-                                norm=norm)
+    def _test_create_fb(
+        self, n_mels=40, sample_rate=22050, n_fft=2048, fmin=0.0, fmax=8000.0, norm=None
+    ):
+        librosa_fb = librosa.filters.mel(
+            sr=sample_rate,
+            n_fft=n_fft,
+            n_mels=n_mels,
+            fmax=fmax,
+            fmin=fmin,
+            htk=True,
+            norm=norm,
+        )
+        fb = F.create_fb_matrix(
+            sample_rate=sample_rate,
+            n_mels=n_mels,
+            f_max=fmax,
+            f_min=fmin,
+            n_freqs=(n_fft // 2 + 1),
+            norm=norm,
+        )
 
         for i_mel_bank in range(n_mels):
             self.assertEqual(
-                fb[:, i_mel_bank], torch.tensor(librosa_fb[i_mel_bank]), atol=1e-4, rtol=1e-5)
+                fb[:, i_mel_bank],
+                torch.tensor(librosa_fb[i_mel_bank]),
+                atol=1e-4,
+                rtol=1e-5,
+            )
 
     def test_create_fb(self):
         self._test_create_fb()
@@ -111,11 +139,9 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assertEqual(ta_out, lr_out, atol=5e-5, rtol=1e-5)
 
 
-@pytest.mark.parametrize('complex_specgrams', [
-    torch.randn(2, 1025, 400, 2)
-])
-@pytest.mark.parametrize('rate', [0.5, 1.01, 1.3])
-@pytest.mark.parametrize('hop_length', [256])
+@pytest.mark.parametrize("complex_specgrams", [torch.randn(2, 1025, 400, 2)])
+@pytest.mark.parametrize("rate", [0.5, 1.01, 1.3])
+@pytest.mark.parametrize("hop_length", [256])
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
 def test_phase_vocoder(complex_specgrams, rate, hop_length):
     # Due to cummulative sum, numerical error in using torch.float32 will
@@ -123,9 +149,13 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
     # match with librosa.
 
     complex_specgrams = complex_specgrams.type(torch.float64)
-    phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-3], dtype=torch.float64)[..., None]
+    phase_advance = torch.linspace(
+        0, np.pi * hop_length, complex_specgrams.shape[-3], dtype=torch.float64
+    )[..., None]
 
-    complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
+    complex_specgrams_stretch = F.phase_vocoder(
+        complex_specgrams, rate=rate, phase_advance=phase_advance
+    )
 
     # == Test shape
     expected_size = list(complex_specgrams.size())
@@ -137,11 +167,12 @@ def test_phase_vocoder(complex_specgrams, rate, hop_length):
     # == Test values
     index = [0] * (complex_specgrams.dim() - 3) + [slice(None)] * 3
     mono_complex_specgram = complex_specgrams[index].numpy()
-    mono_complex_specgram = mono_complex_specgram[..., 0] + \
-        mono_complex_specgram[..., 1] * 1j
-    expected_complex_stretch = librosa.phase_vocoder(mono_complex_specgram,
-                                                     rate=rate,
-                                                     hop_length=hop_length)
+    mono_complex_specgram = (
+        mono_complex_specgram[..., 0] + mono_complex_specgram[..., 1] * 1j
+    )
+    expected_complex_stretch = librosa.phase_vocoder(
+        mono_complex_specgram, rate=rate, hop_length=hop_length
+    )
 
     complex_stretch = complex_specgrams_stretch[index].numpy()
     complex_stretch = complex_stretch[..., 0] + 1j * complex_stretch[..., 1]
@@ -158,54 +189,89 @@ def _load_audio_asset(*asset_paths, **kwargs):
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
 class TestTransforms(common_utils.TorchaudioTestCase):
     """Test suite for functions in `transforms` module."""
-    def assert_compatibilities(self, n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
-        common_utils.set_audio_backend('default')
-        path = common_utils.get_asset_path('sinewave.wav')
+
+    def assert_compatibilities(
+        self, n_fft, hop_length, power, n_mels, n_mfcc, sample_rate
+    ):
+        common_utils.set_audio_backend("default")
+        path = common_utils.get_asset_path("sinewave.wav")
         sound, sample_rate = common_utils.load_wav(path)
         sound_librosa = sound.cpu().numpy().squeeze()  # (64000)
 
         # test core spectrogram
         spect_transform = torchaudio.transforms.Spectrogram(
-            n_fft=n_fft, hop_length=hop_length, power=power)
+            n_fft=n_fft, hop_length=hop_length, power=power
+        )
         out_librosa, _ = librosa.core.spectrum._spectrogram(
-            y=sound_librosa, n_fft=n_fft, hop_length=hop_length, power=power)
+            y=sound_librosa, n_fft=n_fft, hop_length=hop_length, power=power
+        )
 
         out_torch = spect_transform(sound).squeeze().cpu()
         self.assertEqual(out_torch, torch.from_numpy(out_librosa), atol=1e-5, rtol=1e-5)
 
         # test mel spectrogram
         melspect_transform = torchaudio.transforms.MelSpectrogram(
-            sample_rate=sample_rate, window_fn=torch.hann_window,
-            hop_length=hop_length, n_mels=n_mels, n_fft=n_fft)
+            sample_rate=sample_rate,
+            window_fn=torch.hann_window,
+            hop_length=hop_length,
+            n_mels=n_mels,
+            n_fft=n_fft,
+        )
         librosa_mel = librosa.feature.melspectrogram(
-            y=sound_librosa, sr=sample_rate, n_fft=n_fft,
-            hop_length=hop_length, n_mels=n_mels, htk=True, norm=None)
+            y=sound_librosa,
+            sr=sample_rate,
+            n_fft=n_fft,
+            hop_length=hop_length,
+            n_mels=n_mels,
+            htk=True,
+            norm=None,
+        )
         librosa_mel_tensor = torch.from_numpy(librosa_mel)
         torch_mel = melspect_transform(sound).squeeze().cpu()
         self.assertEqual(
-            torch_mel.type(librosa_mel_tensor.dtype), librosa_mel_tensor, atol=5e-3, rtol=1e-5)
+            torch_mel.type(librosa_mel_tensor.dtype),
+            librosa_mel_tensor,
+            atol=5e-3,
+            rtol=1e-5,
+        )
 
         # test s2db
-        power_to_db_transform = torchaudio.transforms.AmplitudeToDB('power', 80.)
-        power_to_db_torch = power_to_db_transform(spect_transform(sound)).squeeze().cpu()
+        power_to_db_transform = torchaudio.transforms.AmplitudeToDB("power", 80.0)
+        power_to_db_torch = (
+            power_to_db_transform(spect_transform(sound)).squeeze().cpu()
+        )
         power_to_db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
-        self.assertEqual(power_to_db_torch, torch.from_numpy(power_to_db_librosa), atol=5e-3, rtol=1e-5)
+        self.assertEqual(
+            power_to_db_torch,
+            torch.from_numpy(power_to_db_librosa),
+            atol=5e-3,
+            rtol=1e-5,
+        )
 
-        mag_to_db_transform = torchaudio.transforms.AmplitudeToDB('magnitude', 80.)
+        mag_to_db_transform = torchaudio.transforms.AmplitudeToDB("magnitude", 80.0)
         mag_to_db_torch = mag_to_db_transform(torch.abs(sound)).squeeze().cpu()
         mag_to_db_librosa = librosa.core.spectrum.amplitude_to_db(sound_librosa)
-        self.assertEqual(mag_to_db_torch, torch.from_numpy(mag_to_db_librosa), atol=5e-3, rtol=1e-5)
+        self.assertEqual(
+            mag_to_db_torch, torch.from_numpy(mag_to_db_librosa), atol=5e-3, rtol=1e-5
+        )
 
-        power_to_db_torch = power_to_db_transform(melspect_transform(sound)).squeeze().cpu()
+        power_to_db_torch = (
+            power_to_db_transform(melspect_transform(sound)).squeeze().cpu()
+        )
         db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
         db_librosa_tensor = torch.from_numpy(db_librosa)
         self.assertEqual(
-            power_to_db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3, rtol=1e-5)
+            power_to_db_torch.type(db_librosa_tensor.dtype),
+            db_librosa_tensor,
+            atol=5e-3,
+            rtol=1e-5,
+        )
 
         # test MFCC
-        melkwargs = {'hop_length': hop_length, 'n_fft': n_fft}
+        melkwargs = {"hop_length": hop_length, "n_fft": n_fft}
         mfcc_transform = torchaudio.transforms.MFCC(
-            sample_rate=sample_rate, n_mfcc=n_mfcc, norm='ortho', melkwargs=melkwargs)
+            sample_rate=sample_rate, n_mfcc=n_mfcc, norm="ortho", melkwargs=melkwargs
+        )
 
         # librosa.feature.mfcc doesn't pass kwargs properly since some of the
         # kwargs for melspectrogram and mfcc are the same. We just follow the
@@ -217,56 +283,62 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         #     y=sound_librosa, sr=sample_rate, n_mfcc = n_mfcc,
         #     hop_length=hop_length, n_fft=n_fft, htk=True, norm=None, n_mels=n_mels)
 
-        librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm='ortho')[:n_mfcc]
+        librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm="ortho")[
+            :n_mfcc
+        ]
         librosa_mfcc_tensor = torch.from_numpy(librosa_mfcc)
         torch_mfcc = mfcc_transform(sound).squeeze().cpu()
 
         self.assertEqual(
-            torch_mfcc.type(librosa_mfcc_tensor.dtype), librosa_mfcc_tensor, atol=5e-3, rtol=1e-5)
+            torch_mfcc.type(librosa_mfcc_tensor.dtype),
+            librosa_mfcc_tensor,
+            atol=5e-3,
+            rtol=1e-5,
+        )
 
     def test_basics1(self):
         kwargs = {
-            'n_fft': 400,
-            'hop_length': 200,
-            'power': 2.0,
-            'n_mels': 128,
-            'n_mfcc': 40,
-            'sample_rate': 16000
+            "n_fft": 400,
+            "hop_length": 200,
+            "power": 2.0,
+            "n_mels": 128,
+            "n_mfcc": 40,
+            "sample_rate": 16000,
         }
         self.assert_compatibilities(**kwargs)
 
     def test_basics2(self):
         kwargs = {
-            'n_fft': 600,
-            'hop_length': 100,
-            'power': 2.0,
-            'n_mels': 128,
-            'n_mfcc': 20,
-            'sample_rate': 16000
+            "n_fft": 600,
+            "hop_length": 100,
+            "power": 2.0,
+            "n_mels": 128,
+            "n_mfcc": 20,
+            "sample_rate": 16000,
         }
         self.assert_compatibilities(**kwargs)
 
     # NOTE: Test passes offline, but fails on TravisCI (and CircleCI), see #372.
-    @unittest.skipIf('CI' in os.environ, 'Test is known to fail on CI')
+    @unittest.skipIf("CI" in os.environ, "Test is known to fail on CI")
     def test_basics3(self):
         kwargs = {
-            'n_fft': 200,
-            'hop_length': 50,
-            'power': 2.0,
-            'n_mels': 128,
-            'n_mfcc': 50,
-            'sample_rate': 24000
+            "n_fft": 200,
+            "hop_length": 50,
+            "power": 2.0,
+            "n_mels": 128,
+            "n_mfcc": 50,
+            "sample_rate": 24000,
         }
         self.assert_compatibilities(**kwargs)
 
     def test_basics4(self):
         kwargs = {
-            'n_fft': 400,
-            'hop_length': 200,
-            'power': 3.0,
-            'n_mels': 128,
-            'n_mfcc': 40,
-            'sample_rate': 16000
+            "n_fft": 400,
+            "hop_length": 200,
+            "power": 3.0,
+            "n_mels": 128,
+            "n_mfcc": 40,
+            "sample_rate": 16000,
         }
         self.assert_compatibilities(**kwargs)
 
@@ -279,16 +351,36 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         sound = common_utils.get_whitenoise(sample_rate=sample_rate, duration=60)
         sound = sound.mean(dim=0, keepdim=True)
         spec_ta = F.spectrogram(
-            sound, pad=0, window=torch.hann_window(n_fft), n_fft=n_fft,
-            hop_length=hop_length, win_length=n_fft, power=2, normalized=False)
+            sound,
+            pad=0,
+            window=torch.hann_window(n_fft),
+            n_fft=n_fft,
+            hop_length=hop_length,
+            win_length=n_fft,
+            power=2,
+            normalized=False,
+        )
         spec_lr = spec_ta.cpu().numpy().squeeze()
         # Perform MelScale with torchaudio and librosa
-        melspec_ta = torchaudio.transforms.MelScale(n_mels=n_mels, sample_rate=sample_rate)(spec_ta)
+        melspec_ta = torchaudio.transforms.MelScale(
+            n_mels=n_mels, sample_rate=sample_rate
+        )(spec_ta)
         melspec_lr = librosa.feature.melspectrogram(
-            S=spec_lr, sr=sample_rate, n_fft=n_fft, hop_length=hop_length,
-            win_length=n_fft, center=True, window='hann', n_mels=n_mels, htk=True, norm=None)
+            S=spec_lr,
+            sr=sample_rate,
+            n_fft=n_fft,
+            hop_length=hop_length,
+            win_length=n_fft,
+            center=True,
+            window="hann",
+            n_mels=n_mels,
+            htk=True,
+            norm=None,
+        )
         # Note: Using relaxed rtol instead of atol
-        self.assertEqual(melspec_ta, torch.from_numpy(melspec_lr[None, ...]), atol=1e-8, rtol=1e-3)
+        self.assertEqual(
+            melspec_ta, torch.from_numpy(melspec_lr[None, ...]), atol=1e-8, rtol=1e-3
+        )
 
     def test_InverseMelScale(self):
         """InverseMelScale transform is comparable to that of librosa"""
@@ -298,20 +390,31 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         hop_length = n_fft // 4
 
         # Prepare mel spectrogram input. We use torchaudio to compute one.
-        path = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
+        path = common_utils.get_asset_path("steam-train-whistle-daniel_simon.wav")
         sound, sample_rate = common_utils.load_wav(path)
-        sound = sound[:, 2**10:2**10 + 2**14]
+        sound = sound[:, 2 ** 10 : 2 ** 10 + 2 ** 14]
         sound = sound.mean(dim=0, keepdim=True)
         spec_orig = F.spectrogram(
-            sound, pad=0, window=torch.hann_window(n_fft), n_fft=n_fft,
-            hop_length=hop_length, win_length=n_fft, power=2, normalized=False)
-        melspec_ta = torchaudio.transforms.MelScale(n_mels=n_mels, sample_rate=sample_rate)(spec_orig)
+            sound,
+            pad=0,
+            window=torch.hann_window(n_fft),
+            n_fft=n_fft,
+            hop_length=hop_length,
+            win_length=n_fft,
+            power=2,
+            normalized=False,
+        )
+        melspec_ta = torchaudio.transforms.MelScale(
+            n_mels=n_mels, sample_rate=sample_rate
+        )(spec_orig)
         melspec_lr = melspec_ta.cpu().numpy().squeeze()
         # Perform InverseMelScale with torch audio and librosa
         spec_ta = torchaudio.transforms.InverseMelScale(
-            n_stft, n_mels=n_mels, sample_rate=sample_rate)(melspec_ta)
+            n_stft, n_mels=n_mels, sample_rate=sample_rate
+        )(melspec_ta)
         spec_lr = librosa.feature.inverse.mel_to_stft(
-            melspec_lr, sr=sample_rate, n_fft=n_fft, power=2.0, htk=True, norm=None)
+            melspec_lr, sr=sample_rate, n_fft=n_fft, power=2.0, htk=True, norm=None
+        )
         spec_lr = torch.from_numpy(spec_lr[None, ...])
 
         # Align dimensions
