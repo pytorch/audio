@@ -1,5 +1,5 @@
 import torch
-from torchaudio.models import Wav2Letter, MelResNet, UpsampleNetwork, WaveRNN, _Encoder, _Decoder
+from torchaudio.models import Wav2Letter, MelResNet, UpsampleNetwork, WaveRNN, _Encoder, _Decoder, _Tacotron2
 
 from torchaudio_unittest import common_utils
 
@@ -184,3 +184,73 @@ class TestDecoder(common_utils.TorchaudioTestCase):
         assert mel_outputs.size() == (n_batch, n_mel_channels, T_out)
         assert gate_outputs.size() == (n_batch, T_out)
         assert alignments.size() == (n_batch, T_out, n_seq)
+
+
+class TestTacotron2(common_utils.TorchaudioTestCase):
+    def test_output(self):
+        """Validate the output dimensions of a _Tacotron2 block.
+        """
+
+        mask_padding = False
+        n_mel_channels = 80
+        n_symbols = 100
+        n_symbols_embedding = 512
+        encoder_kernel_size = 5
+        encoder_n_convolutions = 3
+        n_encoder_embedding = 512
+        n_attention = 128
+        attention_location_n_filters = 32
+        attention_location_kernel_size = 31
+        n_frames_per_step = 1
+        n_attention_rnn = 1024
+        n_decoder_rnn = 1024
+        n_prenet = 256
+        max_decoder_steps = 2000
+        gate_threshold = 0.5
+        p_attention_dropout = 0.1
+        p_decoder_dropout = 0.1
+        n_postnet_embedding = 512
+        postnet_kernel_size = 5
+        postnet_n_convolutions = 5
+        decoder_no_early_stopping = True
+
+        n_batch = 32
+        max_target_len = 500
+        n_seq = 100
+        max_len = 10
+
+        model = _Tacotron2(mask_padding,
+                           n_mel_channels,
+                           n_symbols,
+                           n_symbols_embedding,
+                           encoder_kernel_size,
+                           encoder_n_convolutions,
+                           n_encoder_embedding,
+                           n_attention_rnn,
+                           n_attention,
+                           attention_location_n_filters,
+                           attention_location_kernel_size,
+                           n_frames_per_step,
+                           n_decoder_rnn,
+                           n_prenet,
+                           max_decoder_steps,
+                           gate_threshold,
+                           p_attention_dropout,
+                           p_decoder_dropout,
+                           n_postnet_embedding,
+                           postnet_kernel_size,
+                           postnet_n_convolutions,
+                           decoder_no_early_stopping)
+
+        text_padded = torch.randint(0, 30, (n_batch, n_seq))
+        input_lengths = max_len * torch.ones([n_batch, ], dtype=torch.int32)
+        output_lengths = 20 * torch.ones([n_batch, ], dtype=torch.int32)
+        mel_padded = torch.rand(n_batch, n_mel_channels, max_target_len)
+
+        inputs = (text_padded, input_lengths, mel_padded, max_len, output_lengths)
+        mel_out, mel_out_postnet, gate_outputs, alignments = model(inputs)
+
+        assert mel_out.size() == (n_batch, n_mel_channels, max_target_len)
+        assert mel_out_postnet.size() == (n_batch, n_mel_channels, max_target_len)
+        assert gate_outputs.size() == (n_batch, max_target_len)
+        assert alignments.size() == (n_batch, max_target_len, max_len)
