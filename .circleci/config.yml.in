@@ -608,6 +608,7 @@ jobs:
   torchscript_bc_test:
     docker:
       - image: "pytorch/torchaudio_unittest_base:manylinux"
+    resource_class: medium
     steps:
       - checkout
       - generate_cache_key
