@@ -240,7 +240,6 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         rate = 2
 
         complex_specgrams = torch.stft(waveform, **kwargs)
-        complex_specgrams = torch.view_as_complex(complex_specgrams)
 
         # Single then transform then batch
         expected = torchaudio.transforms.TimeStretch(

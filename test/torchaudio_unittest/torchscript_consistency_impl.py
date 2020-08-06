@@ -603,15 +603,15 @@ class Transforms(common_utils.TestBaseMixin):
         tensor = torch.rand((1, 10))
         self._assert_consistency(T.MuLawDecoding(), tensor)
 
-    # def test_TimeStretch(self):
-    #     n_freq = 400
-    #     hop_length = 512
-    #     fixed_rate = 1.3
-    #     tensor = torch.rand((10, 2, n_freq, 10), dtype=torch.cdouble)
-    #     self._assert_consistency(
-    #         T.TimeStretch(n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate),
-    #         tensor,
-    #     )
+    def test_TimeStretch(self):
+        n_freq = 400
+        hop_length = 512
+        fixed_rate = 1.3
+        tensor = torch.rand((10, 2, n_freq, 10, 2), dtype=torch.double)
+        self._assert_consistency(
+            T.TimeStretch(n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate),
+            tensor,
+        )
 
     def test_Fade(self):
         waveform = common_utils.get_whitenoise()
