@@ -12,7 +12,6 @@ from torch.optim import SGD, Adadelta, Adam, AdamW
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
-from torchaudio.models.wav2letter import Wav2Letter
 from torchaudio.transforms import MFCC, Resample
 
 from ctc_decoders import GreedyDecoder
@@ -21,6 +20,9 @@ from languagemodels import LanguageModel
 from metrics import levenshtein_distance
 from transforms import Normalize
 from utils import MetricLogger, count_parameters, save_checkpoint
+
+# from torchaudio.models.wav2letter import Wav2Letter
+from wav2letter import Wav2Letter
 
 # TODO Remove before merge pull request
 MAIN_PID = os.getpid()
@@ -36,6 +38,13 @@ def parse_args():
         default="mel",
         choices=["waveform", "mfcc", "mel"],
         help="input type for model",
+    )
+    parser.add_argument(
+        "--n-hidden-channels",
+        default=2000,
+        type=int,
+        metavar="N",
+        help="number of hidden channels in wav2letter",
     )
     parser.add_argument(
         "--freq-mask",
@@ -123,6 +132,13 @@ def parse_args():
         type=int,
         metavar="N",
         help="number of bins in transforms",
+    )
+    parser.add_argument(
+        "--dropout",
+        default=0.0,
+        type=float,
+        metavar="D",
+        help="probability of an element to be zeroed",
     )
     parser.add_argument(
         "--optimizer",
@@ -508,6 +524,8 @@ def main(rank, args):
         num_classes=language_model.length,
         input_type=input_type,
         num_features=args.n_bins,
+        num_hidden_channels=args.n_hidden_channels,
+        dropout=args.dropout,
     )
 
     if args.jit:
