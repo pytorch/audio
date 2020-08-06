@@ -727,7 +727,9 @@ workflows:
           python_version: '3.8'
   unittest:
     jobs:
-      - torchscript_bc_test
+      - torchscript_bc_test:
+          requires:
+          - download_third_parties_nix
       - download_third_parties_nix:
           name: download_third_parties_nix
       - unittest_linux_cpu:
