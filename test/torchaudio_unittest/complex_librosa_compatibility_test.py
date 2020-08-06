@@ -19,6 +19,7 @@ import pytest
 
 from torchaudio_unittest import common_utils
 
+
 @pytest.mark.parametrize('complex_specgrams', [
     torch.randn(2, 1025, 400, dtype=torch.cdouble)
 ])
