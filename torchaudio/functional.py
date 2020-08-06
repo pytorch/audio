@@ -464,7 +464,8 @@ def phase_vocoder(
         phase_advance (Tensor): Expected phase advance in each bin. Dimension of (freq, 1)
 
     Returns:
-        Tensor: Complex Specgrams Stretch with either a real dtype and dimension of `(..., freq, ceil(time/rate), complex=2)` or
+        Tensor: Complex Specgrams Stretch with either a real dtype and dimension of
+                `(..., freq, ceil(time/rate), complex=2)` or
                 a complex dtype and dimension of `(..., freq, ceil(time/rate))`.
 
     (Old API) Example
@@ -495,10 +496,10 @@ def phase_vocoder(
         # pack batch
         complex_specgrams = complex_specgrams.reshape([-1] + list(shape[-2:]))
         time_steps = torch.arange(0,
-                              complex_specgrams.size(-1),
-                              rate,
-                              device=complex_specgrams.device,
-                              dtype=torch.real(complex_specgrams).dtype)
+                                  complex_specgrams.size(-1),
+                                  rate,
+                                  device=complex_specgrams.device,
+                                  dtype=torch.real(complex_specgrams).dtype)
         phase_0 = complex_specgrams[..., :1].angle()
         alphas = time_steps % 1.0
         # Time Padding
@@ -514,10 +515,10 @@ def phase_vocoder(
     else:
         complex_specgrams = complex_specgrams.reshape([-1] + list(shape[-3:]))
         time_steps = torch.arange(0,
-                              complex_specgrams.size(-2),
-                              rate,
-                              device=complex_specgrams.device,
-                              dtype=complex_specgrams.dtype)
+                                  complex_specgrams.size(-2),
+                                  rate,
+                                  device=complex_specgrams.device,
+                                  dtype=complex_specgrams.dtype)
         alphas = time_steps % 1.0
         phase_0 = angle(complex_specgrams[..., :1, :])
         # Time Padding
