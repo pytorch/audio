@@ -284,7 +284,7 @@ def train_one_epoch(
     epoch,
     clip_grad,
     disable_logger=False,
-    reduce_lr_train=False,
+    reduce_lr_on_plateau=False,
 ):
 
     model.train()
@@ -344,7 +344,7 @@ def train_one_epoch(
         if SIGNAL_RECEIVED:
             break
 
-    if reduce_lr_train and isinstance(scheduler, ReduceLROnPlateau):
+    if reduce_lr_on_plateau and isinstance(scheduler, ReduceLROnPlateau):
         scheduler.step(metric["average loss"])
     else:
         scheduler.step()
