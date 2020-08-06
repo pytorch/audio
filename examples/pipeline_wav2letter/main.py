@@ -362,7 +362,7 @@ def train_one_epoch(
 
     if reduce_lr_on_plateau and isinstance(scheduler, ReduceLROnPlateau):
         scheduler.step(metric["average loss"])
-    else:
+    elif not isinstance(scheduler, ReduceLROnPlateau):
         scheduler.step()
 
 
