@@ -18,7 +18,7 @@ from ctc_decoders import GreedyDecoder
 from datasets import collate_factory, split_process_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
-from transforms import Normalize
+from transforms import Normalize, UnsqueezeFirst
 from utils import MetricLogger, count_parameters, save_checkpoint
 
 # from torchaudio.models.wav2letter import Wav2Letter
@@ -247,6 +247,9 @@ def setup_distributed(rank, world_size):
 
 
 def model_length_function(tensor):
+    if tensor.shape[1] == 1:
+        # waveform mode
+        return int(tensor.shape[0]) // 160 // 2 + 1
     return int(tensor.shape[0]) // 2 + 1
 
 
@@ -475,7 +478,7 @@ def main(rank, args):
             ),
         )
     elif args.type == "waveform":
-        transforms = torch.nn.Sequential()
+        transforms = torch.nn.Sequential(UnsqueezeFirst())
         num_features = 1
     else:
         raise ValueError("Model type not supported")
