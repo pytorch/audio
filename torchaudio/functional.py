@@ -1655,9 +1655,10 @@ def _add_noise_shaping(
     error = dithered_waveform - waveform
 
     # add error[n-1] to dithered_waveform[n], so offset the error by 1 index
+    zeros = torch.zeros(1, dtype=error.dtype, device=error.device)
     for index in range(error.size()[0]):
         err = error[index]
-        error_offset = torch.cat((torch.zeros(1, dtype=err.dtype, device=err.device), err))
+        error_offset = torch.cat((zeros, err))
         error[index] = error_offset[:waveform.size()[1]]
 
     noise_shaped = dithered_waveform + error
