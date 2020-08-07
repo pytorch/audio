@@ -15,4 +15,3 @@ dependencies:
     - kaldi-io
     - scipy
     - parameterized
-    - numba==0.48  # See https://github.com/librosa/librosa/issues/1160

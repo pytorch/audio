@@ -15,4 +15,3 @@ dependencies:
     - librosa
     - future
     - parameterized
-    - numba==0.48
