@@ -490,9 +490,9 @@ def phase_vocoder(
         >>> x.shape # with 231 == ceil(300 / 1.3)
         torch.Size([2, 1025, 231])
     """
-    USE_COMPLEX = complex_specgrams.is_complex()
+    use_complex = complex_specgrams.is_complex()
     shape = complex_specgrams.size()
-    if USE_COMPLEX:
+    if use_complex:
         # pack batch
         complex_specgrams = complex_specgrams.reshape([-1] + list(shape[-2:]))
         time_steps = torch.arange(0,
@@ -546,7 +546,7 @@ def phase_vocoder(
     real_stretch = mag * torch.cos(phase_acc)
     imag_stretch = mag * torch.sin(phase_acc)
 
-    if USE_COMPLEX:
+    if use_complex:
         complex_specgrams_stretch = torch.view_as_complex(torch.stack([real_stretch, imag_stretch], dim=-1))
 
         # unpack batch

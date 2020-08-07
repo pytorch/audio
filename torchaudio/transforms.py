@@ -693,8 +693,8 @@ class TimeStretch(torch.nn.Module):
         Returns:
             Tensor: Stretched complex spectrogram of dimension (..., freq, ceil(time/rate), complex=2).
         """
-        USE_COMPLEX = complex_specgrams.is_complex()
-        if not USE_COMPLEX:
+        use_complex = complex_specgrams.is_complex()
+        if not use_complex:
             assert complex_specgrams.size(-1) == 2, "complex_specgrams \
             should be a complex tensor, shape (..., complex=2)"
 

@@ -17,8 +17,8 @@ if LIBROSA_AVAILABLE:
     import scipy
 
 import pytest
-
 from torchaudio_unittest import common_utils
+
 
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
 class TestFunctional(common_utils.TorchaudioTestCase):
@@ -35,7 +35,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         # result in bottom right values of the stretched sectrogram to not
         # match with librosa.
 
-        phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-2], dtype=torch.double)[..., None]
+        phase_advance = torch.linspace(0, np.pi * hop_length,
+                                       complex_specgrams.shape[-2], dtype=torch.double)[..., None]
 
         complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
 
@@ -50,7 +51,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         index = [0] + [slice(None)] * 2
         mono_complex_specgram = complex_specgrams[index].numpy()
         expected_complex_stretch = librosa.phase_vocoder(mono_complex_specgram,
-                                                        rate=rate,
-                                                        hop_length=hop_length)
+                                                         rate=rate,
+                                                         hop_length=hop_length)
 
         self.assertEqual(complex_specgrams_stretch[index], torch.from_numpy(expected_complex_stretch))
