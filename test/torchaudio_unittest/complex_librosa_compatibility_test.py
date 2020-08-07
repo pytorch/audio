@@ -2,6 +2,7 @@
 import os
 import unittest
 from distutils.version import StrictVersion
+from parameterized import parameterized
 
 import torch
 import torchaudio
@@ -19,34 +20,37 @@ import pytest
 
 from torchaudio_unittest import common_utils
 
-
-@pytest.mark.parametrize('complex_specgrams', [
-    torch.randn(2, 1025, 400, dtype=torch.cdouble)
-])
-@pytest.mark.parametrize('rate', [0.5, 1.01, 1.3])
-@pytest.mark.parametrize('hop_length', [256])
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
-def test_phase_vocoder(complex_specgrams, rate, hop_length):
-    # Due to cummulative sum, numerical error in using torch.float32 will
-    # result in bottom right values of the stretched sectrogram to not
-    # match with librosa.
+class TestFunctional(common_utils.TorchaudioTestCase):
+    """Test suite for functions in `functional` module."""
+    @parameterized.expand([
+        (0.5,), (1.01,), (1.3,)
+    ])
+    def test_phase_vocoder(self, rate):
+        torch.random.manual_seed(48)
+        complex_specgrams = torch.randn(2, 1025, 400, dtype=torch.cdouble)
+        hop_length = 256
 
-    phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-2], dtype=torch.double)[..., None]
+        # Due to cummulative sum, numerical error in using torch.float32 will
+        # result in bottom right values of the stretched sectrogram to not
+        # match with librosa.
 
-    complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
+        phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-2], dtype=torch.double)[..., None]
 
-    # == Test shape
-    expected_size = list(complex_specgrams.size())
-    expected_size[-1] = int(np.ceil(expected_size[-1] / rate))
+        complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
 
-    assert complex_specgrams.dim() == complex_specgrams_stretch.dim()
-    assert complex_specgrams_stretch.size() == torch.Size(expected_size)
+        # == Test shape
+        expected_size = list(complex_specgrams.size())
+        expected_size[-1] = int(np.ceil(expected_size[-1] / rate))
 
-    # == Test values
-    index = [0] * (complex_specgrams.dim() - 2) + [slice(None)] * 2
-    mono_complex_specgram = complex_specgrams[index].numpy()
-    expected_complex_stretch = librosa.phase_vocoder(mono_complex_specgram,
-                                                     rate=rate,
-                                                     hop_length=hop_length)
+        assert complex_specgrams.dim() == complex_specgrams_stretch.dim()
+        assert complex_specgrams_stretch.size() == torch.Size(expected_size)
 
-    assert np.allclose(complex_specgrams_stretch[index].numpy(), expected_complex_stretch, atol=1e-5)
+        # == Test values
+        index = [0] + [slice(None)] * 2
+        mono_complex_specgram = complex_specgrams[index].numpy()
+        expected_complex_stretch = librosa.phase_vocoder(mono_complex_specgram,
+                                                        rate=rate,
+                                                        hop_length=hop_length)
+
+        self.assertEqual(complex_specgrams_stretch[index], torch.from_numpy(expected_complex_stretch))

@@ -468,7 +468,7 @@ def phase_vocoder(
                 `(..., freq, ceil(time/rate), complex=2)` or
                 a complex dtype and dimension of `(..., freq, ceil(time/rate))`.
 
-    (Old API) Example
+    Example - old API
         >>> freq, hop_length = 1025, 512
         >>> # (channel, freq, time, complex=2)
         >>> complex_specgrams = torch.randn(2, freq, 300, 2)
@@ -479,7 +479,7 @@ def phase_vocoder(
         >>> x.shape # with 231 == ceil(300 / 1.3)
         torch.Size([2, 1025, 231, 2])
 
-    (New API) Example
+    Example - New API (using tensors with complex dtype)
         >>> freq, hop_length = 1025, 512
         >>> # (channel, freq, time)
         >>> complex_specgrams = torch.randn(2, freq, 300, dtype=torch.cfloat)

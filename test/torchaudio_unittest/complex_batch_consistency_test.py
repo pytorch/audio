@@ -15,7 +15,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
     def test_batch_TimeStretch(self):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
+        waveform, _ = common_utils.load_wav(test_filepath)  # (2, 278756), 44100
 
         kwargs = {
             'n_fft': 2048,
