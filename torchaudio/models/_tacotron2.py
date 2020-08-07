@@ -454,23 +454,6 @@ class _Encoder(nn.Module):
 
         return outputs
 
-    def infer(self, x: Tensor, input_lengths: Tensor) -> Tensor:
-        r"""Pass the input through the _Encoder layer for inference.
-        """
-
-        for conv in self.convolutions:
-            x = F.dropout(F.relu(conv(x)), 0.5, self.training)
-
-        x = x.transpose(1, 2)
-
-        x = nn.utils.rnn.pack_padded_sequence(x, input_lengths, batch_first=True)
-
-        outputs, _ = self.lstm(x)
-
-        outputs, _ = nn.utils.rnn.pad_packed_sequence(outputs, batch_first=True)
-
-        return outputs
-
 
 class _Decoder(nn.Module):
     r"""Decoder module
@@ -783,98 +766,6 @@ class _Decoder(nn.Module):
 
         return mel_outputs, gate_outputs, alignments
 
-    def infer(self, memory: Tensor, memory_lengths: Tensor) -> Tuple[Tensor]:
-        r""" Decoder forward pass for inference
-        """
-
-        decoder_input = self._get_go_frame(memory)
-
-        mask = _get_mask_from_lengths(memory_lengths)
-
-        (
-            attention_hidden,
-            attention_cell,
-            decoder_hidden,
-            decoder_cell,
-            attention_weights,
-            attention_weights_cum,
-            attention_context,
-            processed_memory,
-        ) = self._initialize_decoder_states(memory)
-
-        mel_lengths = torch.zeros(
-            [memory.size(0)], dtype=torch.int32, device=memory.device
-        )
-        not_finished = torch.ones(
-            [memory.size(0)], dtype=torch.int32, device=memory.device
-        )
-
-        mel_outputs, gate_outputs, alignments = (
-            torch.zeros(1),
-            torch.zeros(1),
-            torch.zeros(1),
-        )
-        first_iter = True
-        while True:
-            decoder_input = self._prenet(decoder_input)
-
-            (
-                mel_output,
-                gate_output,
-                attention_hidden,
-                attention_cell,
-                decoder_hidden,
-                decoder_cell,
-                attention_weights,
-                attention_weights_cum,
-                attention_context,
-            ) = self._decode(
-                decoder_input,
-                attention_hidden,
-                attention_cell,
-                decoder_hidden,
-                decoder_cell,
-                attention_weights,
-                attention_weights_cum,
-                attention_context,
-                memory,
-                processed_memory,
-                mask,
-            )
-
-            if first_iter:
-                mel_outputs = mel_output.unsqueeze(0)
-                gate_outputs = gate_output
-                alignments = attention_weights
-                first_iter = False
-            else:
-                mel_outputs = torch.cat((mel_outputs, mel_output.unsqueeze(0)), dim=0)
-                gate_outputs = torch.cat((gate_outputs, gate_output), dim=0)
-                alignments = torch.cat((alignments, attention_weights), dim=0)
-
-            dec = (
-                torch.le(torch.sigmoid(gate_output), self.gate_threshold)
-                .to(torch.int32)
-                .squeeze(1)
-            )
-
-            not_finished = not_finished * dec
-            mel_lengths += not_finished
-
-            if self.early_stopping and torch.sum(not_finished) == 0:
-                break
-            if len(mel_outputs) == self.max_decoder_steps:
-                print("Warning! Reached max decoder steps")
-                break
-
-            decoder_input = mel_output
-
-        mel_outputs, gate_outputs, alignments = self._parse_decoder_outputs(
-            mel_outputs, gate_outputs, alignments
-        )
-
-        return mel_outputs, gate_outputs, alignments, mel_lengths
-
 
 def _get_mask_from_lengths(lengths: Tensor) -> Tensor:
     max_len = torch.max(lengths).item()
@@ -1029,20 +920,3 @@ class _Tacotron2(nn.Module):
         return self.parse_output(
             [mel_outputs, mel_outputs_postnet, gate_outputs, alignments], output_lengths
         )
-
-    def infer(self, inputs: Tensor, input_lengths: Tensor) -> Tuple[Tensor]:
-
-        embedded_inputs = self.embedding(inputs).transpose(1, 2)
-        encoder_outputs = self.encoder.infer(embedded_inputs, input_lengths)
-
-        mel_outputs, gate_outputs, alignments, mel_lengths = self.decoder.infer(
-            encoder_outputs, input_lengths
-        )
-
-        mel_outputs_postnet = self.postnet(mel_outputs)
-        mel_outputs_postnet = mel_outputs + mel_outputs_postnet
-
-        n_batch = mel_outputs_postnet.size(0)
-        alignments = alignments.unfold(1, n_batch, n_batch).transpose(0, 2)
-
-        return mel_outputs_postnet, mel_lengths, alignments
