@@ -37,13 +37,12 @@ class NormalizeDB(nn.Module):
         self.normalization = normalization
 
     def forward(self, specgram):
+        specgram = torch.log10(torch.clamp(specgram, min=1e-5))
         if self.normalization:
-            specgram = 20 * torch.log10(torch.clamp(specgram, min=1e-5))
             return torch.clamp(
-                (self.min_level_db - specgram) / self.min_level_db, min=0, max=1
+                (self.min_level_db - 20 * specgram) / self.min_level_db, min=0, max=1
             )
-        else:
-            return torch.log10(torch.clamp(specgram, min=1e-5))
+        return specgram
 
 
 def normalized_waveform_to_bits(waveform, bits):
