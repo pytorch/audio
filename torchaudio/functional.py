@@ -2343,7 +2343,7 @@ def add_background_noise(
     """
 
     # Inverse of dB
-    snr = 10 ** (snr/20)
+    snr = 10 ** (snr/10)
 
     if normalize:
         # normalizes waveform and noise before combining them,
