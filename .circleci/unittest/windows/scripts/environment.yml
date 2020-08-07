@@ -12,6 +12,6 @@ dependencies:
     - scipy == 1.4.1
     - kaldi-io
     - PySoundFile
-    - librosa
+    - librosa >= 0.8.0
     - future
     - parameterized
