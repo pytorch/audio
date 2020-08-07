@@ -163,6 +163,9 @@ def parse_args():
     parser.add_argument(
         "--file-path", default="", type=str, help="the path of audio files",
     )
+    parser.add_argument(
+        "--normalization", default=True, action="store_true", help="if True, spectrogram is normalized",
+    )
 
     args = parser.parse_args()
     return args
@@ -273,7 +276,7 @@ def main(args):
             n_mels=args.n_freq,
             fmin=args.f_min,
         ),
-        NormalizeDB(min_level_db=args.min_level_db),
+        NormalizeDB(min_level_db=args.min_level_db, normalization=args.normalization),
     )
 
     train_dataset, val_dataset = split_process_dataset(args, transforms)
