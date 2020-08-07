@@ -455,7 +455,9 @@ def main(rank, args):
 
     sample_rate_original = 16000
 
-    input_type = "mfcc" if args.type == "mel" else args.type
+    input_type = args.type
+    num_features = args.n_bins
+
     if args.type == "mel":
         transforms = torch.nn.Sequential(
             # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
@@ -463,6 +465,7 @@ def main(rank, args):
                 sample_rate=sample_rate_original, **melkwargs
             ),
         )
+        input_type = "mfcc"
     elif args.type == "mfcc":
         transforms = torch.nn.Sequential(
             torchaudio.transforms.MFCC(
@@ -473,6 +476,7 @@ def main(rank, args):
         )
     elif args.type == "waveform":
         transforms = torch.nn.Sequential()
+        num_features = 1
     else:
         raise ValueError("Model type not supported")
 
@@ -519,11 +523,10 @@ def main(rank, args):
 
     # Model
 
-    input_type = "mfcc" if args.type == "mel" else args.type
     model = Wav2Letter(
         num_classes=language_model.length,
         input_type=input_type,
-        num_features=args.n_bins,
+        num_features=num_features,
         num_hidden_channels=args.n_hidden_channels,
         dropout=args.dropout,
     )
