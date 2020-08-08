@@ -31,15 +31,18 @@ class NormalizeDB(nn.Module):
     r"""Normalize the spectrogram with a minimum db value
     """
 
-    def __init__(self, min_level_db):
+    def __init__(self, min_level_db, normalization):
         super().__init__()
         self.min_level_db = min_level_db
+        self.normalization = normalization
 
     def forward(self, specgram):
-        specgram = 20 * torch.log10(torch.clamp(specgram, min=1e-5))
-        return torch.clamp(
-            (self.min_level_db - specgram) / self.min_level_db, min=0, max=1
-        )
+        specgram = torch.log10(torch.clamp(specgram, min=1e-5))
+        if self.normalization:
+            return torch.clamp(
+                (self.min_level_db - 20 * specgram) / self.min_level_db, min=0, max=1
+            )
+        return specgram
 
 
 def normalized_waveform_to_bits(waveform, bits):
