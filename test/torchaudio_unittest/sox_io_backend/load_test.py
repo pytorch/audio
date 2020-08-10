@@ -120,6 +120,28 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
         assert sr == sample_rate
         self.assertEqual(data, data_ref, atol=4e-05, rtol=1.3e-06)
 
+    def assert_sphere(self, sample_rate, num_channels, duration):
+        """`sox_io_backend.load` can load sph format.
+
+        This test takes the same strategy as mp3 to compare the result
+        """
+        path = self.get_temp_path('1.original.sph')
+        ref_path = self.get_temp_path('2.reference.wav')
+
+        # 1. Generate sph with sox
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels,
+            bit_depth=32, duration=duration)
+        # 2. Convert to wav with sox
+        sox_utils.convert_audio_file(path, ref_path)
+        # 3. Load sph with torchaudio
+        data, sr = sox_io_backend.load(path)
+        # 4. Load wav with scipy
+        data_ref = load_wav(ref_path)[0]
+        # 5. Compare
+        assert sr == sample_rate
+        self.assertEqual(data, data_ref, atol=4e-05, rtol=1.3e-06)
+
 
 @skipIfNoExec('sox')
 @skipIfNoExtension
@@ -229,6 +251,14 @@ class TestLoad(LoadTestBase):
 
         assert sample_rate == sr
         self.assertEqual(expected, found)
+
+    @parameterized.expand(list(itertools.product(
+        [8000, 16000],
+        [1, 2],
+    )), name_func=name_func)
+    def test_sphere(self, sample_rate, num_channels):
+        """`sox_io_backend.load` can load sph format correctly."""
+        self.assert_sphere(sample_rate, num_channels, duration=1)
 
 
 @skipIfNoExec('sox')
