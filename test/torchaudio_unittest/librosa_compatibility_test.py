@@ -2,7 +2,7 @@
 import os
 import unittest
 from distutils.version import StrictVersion
-import parameterized
+from parameterized import parameterized
 
 import torch
 import torchaudio
