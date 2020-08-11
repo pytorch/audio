@@ -529,7 +529,19 @@ class Functional(common_utils.TestBaseMixin):
         self._assert_consistency(func, waveform)
 
 
-class TransformsWithComplexDtypes(common_utils.TestBaseMixin):
+class TransformsMixin:
+    """Implements test for Transforms that are performed for different devices"""
+    def _assert_consistency(self, transform, tensor):
+        tensor = tensor.to(device=self.device, dtype=self.dtype)
+        transform = transform.to(device=self.device, dtype=self.dtype)
+
+        ts_transform = torch.jit.script(transform)
+        output = transform(tensor)
+        ts_output = ts_transform(tensor)
+        self.assertEqual(ts_output, output)
+
+
+class TransformsWithComplexDtypes(TransformsMixin, common_utils.TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
     def _assert_consistency(self, transform, tensor):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
@@ -544,24 +556,14 @@ class TransformsWithComplexDtypes(common_utils.TestBaseMixin):
         n_freq = 400
         hop_length = 512
         fixed_rate = 1.3
-        tensor = torch.rand((10, 2, n_freq, 10), dtype=torch.cdouble)
+        tensor = torch.rand((10, 2, n_freq, 10))
         self._assert_consistency(
             T.TimeStretch(n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate),
             tensor,
         )
 
 
-class Transforms(common_utils.TestBaseMixin):
-    """Implements test for Transforms that are performed for different devices"""
-    def _assert_consistency(self, transform, tensor):
-        tensor = tensor.to(device=self.device, dtype=self.dtype)
-        transform = transform.to(device=self.device, dtype=self.dtype)
-
-        ts_transform = torch.jit.script(transform)
-        output = transform(tensor)
-        ts_output = ts_transform(tensor)
-        self.assertEqual(ts_output, output)
-
+class Transforms(TransformsMixin, common_utils.TestBaseMixin):
     def test_Spectrogram(self):
         tensor = torch.rand((1, 1000))
         self._assert_consistency(T.Spectrogram(), tensor)
