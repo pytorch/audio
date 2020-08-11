@@ -164,14 +164,12 @@ def transcribe_file(args, task, generator, models, sp, tgt_dict):
         raise FileNotFoundError("Audio file not found: {}".format(path))
     waveform, sample_rate = torchaudio.load_wav(path)
     waveform = waveform.mean(0, True)
-    waveform = torchaudio.transforms.Resample(
-        orig_freq=sample_rate, new_freq=16000
-    )(waveform)
+    waveform = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=16000)(
+        waveform
+    )
 
     start = time.time()
-    transcription = transcribe(
-        waveform, args, task, generator, models, sp, tgt_dict
-    )
+    transcription = transcribe(waveform, args, task, generator, models, sp, tgt_dict)
     transcription_time = time.time() - start
     return transcription_time, transcription
 

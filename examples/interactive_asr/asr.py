@@ -14,7 +14,12 @@ import logging
 
 from fairseq import options
 
-from interactive_asr.utils import add_asr_eval_argument, setup_asr, get_microphone_transcription, transcribe_file
+from interactive_asr.utils import (
+    add_asr_eval_argument,
+    setup_asr,
+    get_microphone_transcription,
+    transcribe_file,
+)
 
 
 def main(args):
@@ -24,11 +29,15 @@ def main(args):
 
     print("READY!")
     if args.input_file:
-        transcription_time, transcription = transcribe_file(args, task, generator, models, sp, tgt_dict)
+        transcription_time, transcription = transcribe_file(
+            args, task, generator, models, sp, tgt_dict
+        )
         print("transcription:", transcription)
         print("transcription_time:", transcription_time)
     else:
-        for transcription in get_microphone_transcription(args, task, generator, models, sp, tgt_dict):
+        for transcription in get_microphone_transcription(
+            args, task, generator, models, sp, tgt_dict
+        ):
             print(
                 "{}: {}".format(
                     dt.datetime.now().strftime("%H:%M:%S"), transcription[0][0]

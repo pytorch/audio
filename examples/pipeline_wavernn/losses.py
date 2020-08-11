@@ -57,9 +57,9 @@ class MoLLoss(nn.Module):
 
         # unpack parameters (n_batch, n_time, num_mixtures) x 3
         logit_probs = y_hat[:, :, :nr_mix]
-        means = y_hat[:, :, nr_mix: 2 * nr_mix]
+        means = y_hat[:, :, nr_mix : 2 * nr_mix]
         log_scales = torch.clamp(
-            y_hat[:, :, 2 * nr_mix: 3 * nr_mix], min=self.log_scale_min
+            y_hat[:, :, 2 * nr_mix : 3 * nr_mix], min=self.log_scale_min
         )
 
         # (n_batch x n_time x 1) to (n_batch x n_time x num_mixtures)

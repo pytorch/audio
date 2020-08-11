@@ -136,7 +136,10 @@ def parse_args():
         help="the number of hidden dimensions of resblock in melresnet",
     )
     parser.add_argument(
-        "--n-output-melresnet", default=128, type=int, help="the output dimension of melresnet",
+        "--n-output-melresnet",
+        default=128,
+        type=int,
+        help="the output dimension of melresnet",
     )
     parser.add_argument(
         "--n-fft", default=2048, type=int, help="the number of Fourier bins",
@@ -164,7 +167,10 @@ def parse_args():
         "--file-path", default="", type=str, help="the path of audio files",
     )
     parser.add_argument(
-        "--normalization", default=True, action="store_true", help="if True, spectrogram is normalized",
+        "--normalization",
+        default=True,
+        action="store_true",
+        help="if True, spectrogram is normalized",
     )
 
     args = parser.parse_args()
