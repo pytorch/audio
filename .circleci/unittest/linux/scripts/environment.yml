@@ -3,7 +3,7 @@ channels:
   - defaults
 dependencies:
   - flake8
-  - numpy
+  - numpy >= 1.11
   - pytest
   - pytest-cov
   - pytest-xdist
