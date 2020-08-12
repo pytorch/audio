@@ -234,6 +234,8 @@ sox_encoding_t get_encoding(
       return SOX_ENCODING_FLOAT;
     throw std::runtime_error("Unsupported dtype.");
   }
+  if (filetype == "sph")
+    return SOX_ENCODING_SIGN2;
   throw std::runtime_error("Unsupported file type.");
 }
 
@@ -257,6 +259,8 @@ unsigned get_precision(
       return 32;
     throw std::runtime_error("Unsupported dtype.");
   }
+  if (filetype == "sph")
+    return 32;
   throw std::runtime_error("Unsupported file type.");
 }
 
@@ -284,6 +288,8 @@ sox_encodinginfo_t get_encodinginfo(
     if (filetype == "ogg" || filetype == "vorbis")
       return compression;
     if (filetype == "wav")
+      return 0.;
+    if (filetype == "sph")
       return 0.;
     throw std::runtime_error("Unsupported file type.");
   }();

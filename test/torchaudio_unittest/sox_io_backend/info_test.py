@@ -108,6 +108,20 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
 
+    @parameterized.expand(list(itertools.product(
+        [8000, 16000],
+        [1, 2],
+    )), name_func=name_func)
+    def test_sphere(self, sample_rate, num_channels):
+        """`sox_io_backend.info` can check sph file correctly"""
+        duration = 1
+        path = self.get_temp_path('data.sph')
+        sox_utils.gen_audio_file(path, sample_rate, num_channels, duration=duration)
+        info = sox_io_backend.info(path)
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
+
 
 @skipIfNoExtension
 class TestInfoOpus(PytorchTestCase):
