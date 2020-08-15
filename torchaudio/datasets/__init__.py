@@ -8,6 +8,7 @@ from .yesno import YESNO
 from .ljspeech import LJSPEECH
 from .cmuarctic import CMUARCTIC
 from .libritts import LIBRITTS
+from .tedlium import TEDLIUM
 
 __all__ = (
     "COMMONVOICE",
@@ -18,7 +19,8 @@ __all__ = (
     "LJSPEECH",
     "GTZAN",
     "CMUARCTIC",
-    "LIBRITTS"
+    "LIBRITTS",
     "diskcache_iterator",
     "bg_iterator",
+    "TEDLIUM",
 )
