@@ -105,7 +105,7 @@ class TEDLIUM(Dataset):
             identifier,
         )
 
-    def load_audio(self, path: str) -> Tensor:
+    def load_audio(self, path: str) -> [Tensor, int]:
         return torchaudio.load(path)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
