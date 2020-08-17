@@ -37,35 +37,6 @@ _RELEASE_CONFIGS = {
 }
 
 
-def load_tedlium_item(
-    fileid: str, line: int, path: str, ext_audio: str, ext_txt: str
-) -> Tuple[Tensor, int, str, int, int, int]:
-    transcript_path = os.path.join(path, "stm/", fileid)
-    with open(transcript_path + ext_txt) as f:
-        transcript = f.readlines()[line]
-        talk_id, _, speaker_id, start_time, end_time, identifier, transcript = transcript.split(
-            " ", 6
-        )
-
-    wave_path = os.path.join(path, "sph/", fileid)
-    waveform, sample_rate = torchaudio.load(wave_path + ext_audio)
-    print(wave_path + ext_audio)
-    # Calculate indexes for start time and endtime
-    start_time = int(float(start_time) * sample_rate)
-    end_time = int(float(end_time) * sample_rate)
-    print(start_time, end_time)
-    waveform = waveform[:, start_time:end_time]
-    return (
-        waveform,
-        sample_rate,
-        transcript,
-        talk_id,
-        speaker_id,
-        identifier,
-        transcript,
-    )
-
-
 class TEDLIUM(Dataset):
     """
     Create a Dataset for Tedlium. Each item is a tuple of the form:
@@ -74,17 +45,8 @@ class TEDLIUM(Dataset):
 
     _ext_txt = ".stm"
     _ext_audio = ".sph"
-    _folder_audio = "sph/"
-    _folder_txt = "stm/"
 
-    def __init__(
-        self,
-        root: str,
-        release: str = RELEASE,
-        subset: str = None,
-        folder_in_archive: str = _RELEASE_CONFIGS[RELEASE]["folder_in_archive"],
-        download: bool = False,
-    ) -> None:
+    def __init__(self, root: str, release: str = RELEASE, subset: str = None, download: bool = False) -> None:
 
         if release in _RELEASE_CONFIGS.keys():
             folder_in_archive = _RELEASE_CONFIGS[release]["folder_in_archive"]
@@ -94,7 +56,7 @@ class TEDLIUM(Dataset):
             # Raise warning
             raise RuntimeError(
                 "The release {} does not match any of the supported tedlium releases{} ".format(
-                    filepath, _RELEASE_CONFIGS.keys(),
+                    release, _RELEASE_CONFIGS.keys(),
                 )
             )
 
@@ -105,11 +67,11 @@ class TEDLIUM(Dataset):
 
         self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"])
         if subset in ["train", "dev", "test"]:
-            self._path = os.path.join(self._path, subset + "/")
+            self._path = os.path.join(self._path, subset)
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    checksum = _CHECKSUMS.get(url, None)
+                    checksum = _RELEASE_CONFIGS[release]["checksum"]
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
@@ -117,17 +79,38 @@ class TEDLIUM(Dataset):
         self._walker = list(walker)
         self._extended_walker = []
         for file in self._walker:
-            stm_path = os.path.join(self._path, self._folder_txt, file + self._ext_txt)
+            stm_path = os.path.join(self._path, "stm", file + self._ext_txt)
             with open(stm_path) as f:
                 l = len(f.readlines())
                 self._extended_walker += [(file, line) for line in range(l)]
 
+    def load_tedlium_item(self, fileid: str, line: int, path: str) -> Tuple[Tensor, int, str, int, int, int]:
+        transcript_path = os.path.join(path, "stm", fileid)
+        with open(transcript_path + self._ext_txt) as f:
+            transcript = f.readlines()[line]
+            talk_id, _, speaker_id, start_time, end_time, identifier, transcript = transcript.split(" ", 6)
+
+        wave_path = os.path.join(path, "sph", fileid)
+        waveform, sample_rate = self.load_audio(wave_path + self._ext_audio)
+        # Calculate indexes for start time and endtime
+        start_time = int(float(start_time) * sample_rate)
+        end_time = int(float(end_time) * sample_rate)
+        waveform = waveform[:, start_time:end_time]
+        return (
+            waveform,
+            sample_rate,
+            transcript,
+            talk_id,
+            speaker_id,
+            identifier,
+        )
+
+    def load_audio(self, path: str) -> [Tensor]:
+        return torchaudio.load(path)
+
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
         fileid, line = self._extended_walker[n]
-        return load_tedlium_item(fileid, line, self._path, self._ext_audio, self._ext_txt)
+        return self.load_tedlium_item(fileid, line, self._path)
 
     def __len__(self) -> int:
         return len(self._extended_walker)
-
-    def _getdict(self):
-        return 1
