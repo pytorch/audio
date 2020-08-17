@@ -57,7 +57,7 @@ class TEDLIUM(Dataset):
         Args:
             root (str): Path containing dataset or target path where its downloaded if needed
             release (str, optional): TEDLIUM identifier (release1,release2,release3). Defaults to RELEASE.
-            subset (str, optional): Subset of data(train,test,dev) supported for release 1 and 2. Defaults to Train/None.
+            subset (str, optional): Subset of data(train,test,dev) supported for release 1,2. Defaults to Train/None.
             download (bool, optional): Download dataset in case is not founded in root path. Defaults to False.
             audio_ext (str, optional): Overwrite audio extension when loading items. Defaults to ".sph".
 
