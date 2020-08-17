@@ -92,14 +92,12 @@ class TEDLIUM(Dataset):
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
-        walker = walk_files(self._path, suffix=".stm", prefix=False, remove_suffix=True)
-        self._walker = list(walker)
-        self._extended_walker = []
-        for file in self._walker:
+        self._walker = []
+        for file in walk_files(self._path, suffix=".stm", prefix=False, remove_suffix=True):
             stm_path = os.path.join(self._path, "stm", file + ".stm")
             with open(stm_path) as f:
                 l = len(f.readlines())
-                self._extended_walker += [(file, line) for line in range(l)]
+                self._walker.extend((file, line) for line in range(l))
 
     def load_tedlium_item(self, fileid: str, line: int, path: str) -> Tedlium_item:
         """Loads a TEDLIUM dataset sample given a file name and corresponding sentence name
@@ -118,23 +116,26 @@ class TEDLIUM(Dataset):
             talk_id, _, speaker_id, start_time, end_time, identifier, transcript = transcript.split(" ", 6)
 
         wave_path = os.path.join(path, "sph", fileid)
-        waveform, sample_rate = self.load_audio(wave_path + self._ext_audio)
         # Calculate indexes for start time and endtime
-        start_time = int(float(start_time) * sample_rate)
-        end_time = int(float(end_time) * sample_rate)
-        waveform = waveform[:, start_time:end_time]
+        start_time = int(float(start_time) * 16000)
+        end_time = int(float(end_time) * 16000)
+        waveform, sample_rate = self.load_audio(
+            wave_path + self._ext_audio, frame_offset=start_time, num_frames=end_time - start_time
+        )
         return Tedlium_item(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)
 
-    def load_audio(self, path: str) -> [Tensor, int]:
+    def load_audio(self, path: str, frame_offset: int = 0, num_frames: int = -1) -> [Tensor, int]:
         """Default load function used in TEDLIUM dataset, you can overwrite this function to customize functionality
 
         Args:
             path (str): Path to audio file
+            frame_offset (int, optional): Number of frames to use as offstet when loading audio. Defaults to 0
+            num_frames (int, optional): How many frames to load from the audio. Defaults to -1
 
         Returns:
             [Tensor, int]: Audio tensor representation and sample rate
         """
-        return torchaudio.load(path)
+        return torchaudio.load(path, frame_offset=frame_offset, num_frames=num_frames)
 
     def __getitem__(self, n: int) -> Tedlium_item:
         """TEDLIUM dataset custom function overwritting default loadbehaviour.
@@ -146,7 +147,7 @@ class TEDLIUM(Dataset):
         Returns:
             Tedlium_item: A namedTuple containing [waveform, sample_rate, transcript, talk_id, speaker_id, identifier]
         """
-        fileid, line = self._extended_walker[n]
+        fileid, line = self._walker[n]
         return self.load_tedlium_item(fileid, line, self._path)
 
     def __len__(self) -> int:
@@ -155,4 +156,4 @@ class TEDLIUM(Dataset):
         Returns:
             int: TEDLIUM dataset length
         """
-        return len(self._extended_walker)
+        return len(self._walker)
