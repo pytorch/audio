@@ -12,8 +12,6 @@ from torchaudio.datasets.utils import (
 from collections import namedtuple
 
 
-RELEASE = "release1"  # Default release
-
 _RELEASE_CONFIGS = {
     "release1": {
         "folder_in_archive": "TEDLIUM_release1",
@@ -21,6 +19,7 @@ _RELEASE_CONFIGS = {
         "checksum": "30301975fd8c5cac4040c261c0852f57cfa8adbbad2ce78e77e4986957445f27",
         "data_path": "",
         "subset": "train",
+        "dict": "TEDLIUM.150K.dic",
     },
     "release2": {
         "folder_in_archive": "TEDLIUM_release2",
@@ -28,6 +27,7 @@ _RELEASE_CONFIGS = {
         "checksum": "93281b5fcaaae5c88671c9d000b443cb3c7ea3499ad12010b3934ca41a7b9c58",
         "data_path": "",
         "subset": "train",
+        "dict": "TEDLIUM.152k.dic",
     },
     "release3": {
         "folder_in_archive": "TEDLIUM_release-3",
@@ -35,6 +35,7 @@ _RELEASE_CONFIGS = {
         "checksum": "ad1e454d14d1ad550bc2564c462d87c7a7ec83d4dc2b9210f22ab4973b9eccdb",
         "data_path": "data/",
         "subset": None,
+        "dict": "TEDLIUM.152k.dic",
     },
 }
 
@@ -50,7 +51,7 @@ class TEDLIUM(Dataset):
     """
 
     def __init__(
-        self, root: str, release: str = RELEASE, subset: str = None, download: bool = False, audio_ext=".sph"
+        self, root: str, release: str = "release1", subset: str = None, download: bool = False, audio_ext=".sph"
     ) -> None:
         """Constructor for TEDLIUM dataset
 
@@ -93,11 +94,24 @@ class TEDLIUM(Dataset):
                 extract_archive(archive)
 
         self._walker = []
+
+        # Create walker for all samples
         for file in walk_files(self._path, suffix=".stm", prefix=False, remove_suffix=True):
             stm_path = os.path.join(self._path, "stm", file + ".stm")
             with open(stm_path) as f:
                 l = len(f.readlines())
                 self._walker.extend((file, line) for line in range(l))
+        # Read phoneme dictionary
+        dict_path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["dict"])
+        self.phoneme_dict = {}
+        with open(dict_path, "rb") as f:
+            for line in f.readlines():
+                content = line.decode("utf-8").strip("\n").split(" ", 1)
+                if len(content) > 1:
+                    key, value = content[0], content[1]
+                    self.phoneme_dict[key] = value.strip()
+                    # # Some lines in release1 dont have a phoneme for a word so value will be out of index
+                    # # Need to find a better solution to read the dictionary
 
     def load_tedlium_item(self, fileid: str, line: int, path: str) -> Tedlium_item:
         """Loads a TEDLIUM dataset sample given a file name and corresponding sentence name
@@ -116,26 +130,27 @@ class TEDLIUM(Dataset):
             talk_id, _, speaker_id, start_time, end_time, identifier, transcript = transcript.split(" ", 6)
 
         wave_path = os.path.join(path, "sph", fileid)
-        # Calculate indexes for start time and endtime
-        start_time = int(float(start_time) * 16000)
-        end_time = int(float(end_time) * 16000)
-        waveform, sample_rate = self.load_audio(
-            wave_path + self._ext_audio, frame_offset=start_time, num_frames=end_time - start_time
+        waveform, sample_rate = self.__load_audio__(
+            wave_path + self._ext_audio, start_time=start_time, end_time=end_time
         )
+
         return Tedlium_item(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)
 
-    def load_audio(self, path: str, frame_offset: int = 0, num_frames: int = -1) -> [Tensor, int]:
+    def __load_audio__(self, path: str, start_time: float, end_time: float, sample_rate: int = 16000) -> [Tensor, int]:
         """Default load function used in TEDLIUM dataset, you can overwrite this function to customize functionality
+        and load individual sentnces from a full ted audio talk file
 
         Args:
             path (str): Path to audio file
-            frame_offset (int, optional): Number of frames to use as offstet when loading audio. Defaults to 0
-            num_frames (int, optional): How many frames to load from the audio. Defaults to -1
+            start_time (int, optional): Time in seconds where the sample sentence stars
+            end_time (int, optional): Time in seconds where the sample sentence finishes
 
         Returns:
             [Tensor, int]: Audio tensor representation and sample rate
         """
-        return torchaudio.load(path, frame_offset=frame_offset, num_frames=num_frames)
+        start_time = int(float(start_time) * 16000)
+        end_time = int(float(end_time) * 16000)
+        return torchaudio.load(path, frame_offset=start_time, num_frames=end_time - start_time)
 
     def __getitem__(self, n: int) -> Tedlium_item:
         """TEDLIUM dataset custom function overwritting default loadbehaviour.
@@ -157,3 +172,11 @@ class TEDLIUM(Dataset):
             int: TEDLIUM dataset length
         """
         return len(self._walker)
+
+    def get_phoneme_dict(self):
+        """Returns the phoneme dictionary of a TEDLIUM release
+
+        Returns:
+            dictionary: Phoneme dictionary for the current tedlium release
+        """
+        return self.phoneme_dict
