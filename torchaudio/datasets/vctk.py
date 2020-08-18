@@ -160,6 +160,7 @@ class VCTK_092(Dataset):
         self._path = os.path.join(root, 'VCTK-Corpus-0.92')
         self._txt_dir = os.path.join(self._path, 'txt')
         self._audio_dir = os.path.join(self._path, 'wav48_silence_trimmed')
+        self._mic_id = mic_id
 
         if download:
             if not os.path.isdir(self._path):
@@ -195,37 +196,32 @@ class VCTK_092(Dataset):
                                               f'{utterance_id}_{mic_id}.flac')
                 if speaker_id == 'p280' and mic_id == 'mic2':
                     break
-                elif speaker_id == 'p362':
-                    if os.path.isfile(audio_path_mic):
-                        self._sample_ids.append(f'{utterance_id}_{mic_id}')
-                else:
-                    self._sample_ids.append(f'{utterance_id}_{mic_id}')
+                if speaker_id == 'p362' and not os.path.isfile(audio_path_mic):
+                    continue
+                self._sample_ids.append(utterance_id.split('_'))
 
-    def load_text(self, file_path) -> str:
+    def _load_text(self, file_path) -> str:
         with open(file_path) as file_path:
             return file_path.readlines()[0]
 
-    def load_audio(self, file_path) -> Tuple[Tensor, int]:
+    def _load_audio(self, file_path) -> Tuple[Tensor, int]:
         return torchaudio.load(file_path)
 
-    def load_sample(self, sample_id: str) -> Sample:
-        # Slicing the speaker and utterance IDs
-        speaker_id, utterance_id, _ = sample_id.split("_")
-
+    def load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> Sample:
         utterance_path = os.path.join(self._txt_dir, speaker_id, f'{speaker_id}_{utterance_id}.txt')
-        audio_path = os.path.join(self._audio_dir, speaker_id, f'{sample_id}.flac')
+        audio_path = os.path.join(self._audio_dir, speaker_id, f'{speaker_id}_{utterance_id}_{mic_id}.flac')
 
         # Reading text
-        utterance = self.load_text(utterance_path)
+        utterance = self._load_text(utterance_path)
 
         # Reading FLAC
-        waveform, sample_rate = self.load_audio(audio_path)
+        waveform, sample_rate = self._load_audio(audio_path)
 
         return Sample(waveform, sample_rate, utterance, speaker_id, utterance_id)
 
     def __getitem__(self, n: int) -> Sample:
-        sample_id = self._sample_ids[n]
-        return self.load_sample(sample_id)
+        speaker_id, utterance_id = self._sample_ids[n]
+        return self.load_sample(speaker_id, utterance_id, self._mic_id)
 
     def __len__(self) -> int:
         return len(self._sample_ids)
