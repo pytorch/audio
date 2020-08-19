@@ -88,6 +88,15 @@ VCTK
   :members: __getitem__
   :special-members:
 
+
+VCTK_092
+~~~~~~~~
+
+.. autoclass:: VCTK_092
+  :members: __getitem__
+  :special-members:
+
+
 YESNO
 ~~~~~
 

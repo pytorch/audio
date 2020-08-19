@@ -1,6 +1,7 @@
 import os
 import warnings
 from typing import Any, Tuple
+from collections import namedtuple
 
 import torchaudio
 from torch import Tensor
@@ -11,12 +12,14 @@ from torchaudio.datasets.utils import (
     walk_files
 )
 
-URL = "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz"
+URL = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip"
 FOLDER_IN_ARCHIVE = "VCTK-Corpus"
 _CHECKSUMS = {
-    "http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz":
-    "45e8dede780278ef5541fde0b82ac292"
+    "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip":
+    "8a6ba2946b36fcbef0212cad601f4bfa"
 }
+
+Sample = namedtuple('Sample', ['waveform', 'sample_rate', 'utterance', 'speaker_id', 'utterance_id'])
 
 
 def load_vctk_item(fileid: str,
@@ -96,15 +99,15 @@ class VCTK(Dataset):
         self._path = os.path.join(root, folder_in_archive)
 
         if download:
-            if not os.path.isdir(self._path):
-                if not os.path.isfile(archive):
-                    checksum = _CHECKSUMS.get(url, None)
-                    download_url(url, root, hash_value=checksum, hash_type="md5")
-                extract_archive(archive)
+            raise RuntimeError(
+                "This Dataset is no longer available. "
+                "Please use `VCTK_092` class to download the latest version."
+            )
 
         if not os.path.isdir(self._path):
             raise RuntimeError(
-                "Dataset not found. Please use `download=True` to download it."
+                "Dataset not found. Please use `VCTK_092` class "
+                "with `download=True` to donwload the latest version."
             )
 
         walker = walk_files(
@@ -136,3 +139,94 @@ class VCTK(Dataset):
 
     def __len__(self) -> int:
         return len(self._walker)
+
+
+class VCTK_092(Dataset):
+    """
+    Create a Dataset for VCTK 0.92, the latest version of the VCTK dataset.
+    Each item is a tuple of the form: (waveform, sample_rate, utterance, speaker_id, utterance_id)
+    Folder `p315` will be ignored due to the non-existent corresponding text files.
+    For more information about the dataset visit: https://datashare.is.ed.ac.uk/handle/10283/3443
+    """
+
+    def __init__(
+        self, root: str, url: str = URL, download: bool = False, mic_id: str = "mic2"
+    ) -> None:
+
+        archive = os.path.join(root, os.path.basename("VCTK-Corpus-0.92.zip"))
+
+        self._path = os.path.join(root, "VCTK-Corpus-0.92")
+        self._txt_dir = os.path.join(self._path, "txt")
+        self._audio_dir = os.path.join(self._path, "wav48_silence_trimmed")
+        self._mic_id = mic_id
+
+        if download:
+            if not os.path.isdir(self._path):
+                if not os.path.isfile(archive):
+                    checksum = _CHECKSUMS.get(url, None)
+                    download_url(url, root, hash_value=checksum, hash_type="md5")
+                extract_archive(archive, self._path)
+
+        if not os.path.isdir(self._path):
+            raise RuntimeError(
+                "Dataset not found. Please use `download=True` to download it."
+            )
+
+        # Extracting speaker IDs from the folder structure
+        self._speaker_ids = sorted(os.listdir(self._txt_dir))
+        self._sample_ids = []
+
+        """
+        Due to some insufficient data complexity in the 0.92 version of this dataset,
+        we start traversing the audio folder structure in accordance with the text folder.
+        As some of the audio files are missing of either ``mic_1`` or ``mic_2`` but the
+        text is present for the same, we first check for the existence of the audio file
+        before adding it to the ``sample_ids`` list.
+
+        Once the ``audio_ids`` are loaded into memory we can quickly access the list for
+        different parameters required by the user.
+        """
+        for speaker_id in self._speaker_ids:
+            utterance_dir = os.path.join(self._txt_dir, speaker_id)
+            for utterance_file in sorted(
+                f for f in os.listdir(utterance_dir) if f.endswith(".txt")
+            ):
+                utterance_id = os.path.splitext(utterance_file)[0]
+                audio_path_mic = os.path.join(
+                    self._audio_dir, speaker_id, f"{utterance_id}_{mic_id}.flac"
+                )
+                if speaker_id == "p280" and mic_id == "mic2":
+                    break
+                if speaker_id == "p362" and not os.path.isfile(audio_path_mic):
+                    continue
+                self._sample_ids.append(utterance_id.split("_"))
+
+    def _load_text(self, file_path) -> str:
+        with open(file_path) as file_path:
+            return file_path.readlines()[0]
+
+    def _load_audio(self, file_path) -> Tuple[Tensor, int]:
+        return torchaudio.load(file_path)
+
+    def load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> Sample:
+        utterance_path = os.path.join(
+            self._txt_dir, speaker_id, f"{speaker_id}_{utterance_id}.txt"
+        )
+        audio_path = os.path.join(
+            self._audio_dir, speaker_id, f"{speaker_id}_{utterance_id}_{mic_id}.flac"
+        )
+
+        # Reading text
+        utterance = self._load_text(utterance_path)
+
+        # Reading FLAC
+        waveform, sample_rate = self._load_audio(audio_path)
+
+        return Sample(waveform, sample_rate, utterance, speaker_id, utterance_id)
+
+    def __getitem__(self, n: int) -> Sample:
+        speaker_id, utterance_id = self._sample_ids[n]
+        return self.load_sample(speaker_id, utterance_id, self._mic_id)
+
+    def __len__(self) -> int:
+        return len(self._sample_ids)
