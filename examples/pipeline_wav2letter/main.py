@@ -443,7 +443,6 @@ def main(rank, args):
 
     training, validation = split_process_librispeech(
         [args.dataset_train, args.dataset_valid],
-        # [transforms_train, transforms_valid],
         [transforms, transforms],
         language_model,
         root=args.dataset_root,
@@ -473,7 +472,6 @@ def main(rank, args):
         devices = list(range(rank * n, (rank + 1) * n))
         model = model.to(devices[0])
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=devices)
-        # model = torch.nn.parallel.DistributedDataParallel(model, find_unused_parameters=True)
     else:
         devices = ["cuda" if torch.cuda.is_available() else "cpu"]
         model = model.to(devices[0], non_blocking=True)
@@ -526,8 +524,6 @@ def main(rank, args):
     criterion = torch.nn.CTCLoss(
         blank=language_model.mapping[char_blank], zero_infinity=False
     )
-    # criterion = torch.nn.MSELoss()
-    # criterion = torch.nn.NLLLoss()
 
     # Data Loader
 

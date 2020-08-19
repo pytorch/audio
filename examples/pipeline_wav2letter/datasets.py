@@ -38,18 +38,15 @@ class Processed(torch.utils.data.Dataset):
         return len(self.dataset)
 
     def process_datapoint(self, item):
-        transformed = item[0]  # .to(device)
+        transformed = item[0]
         target = item[2].lower()
 
         transformed = self.transforms(transformed)
         transformed = transformed[0, ...].transpose(0, -1)
 
-        # target = " " + target + " "
         target = self.encode(target)
         target = torch.tensor(target, dtype=torch.long, device=transformed.device)
 
-        # transformed = transformed.to("cpu")
-        # target = target.to("cpu")
         return transformed, target
 
 
@@ -78,7 +75,6 @@ def split_process_librispeech(
             ]
         )
 
-        # data = diskcache_iterator(data)
         data = MapMemoryCache(data)
         return data
 
