@@ -82,9 +82,7 @@ def split_process_librispeech(
         data = MapMemoryCache(data)
         return data
 
-    # FIXME For performance, we cache all datasets
-    # Do not cache first dataset
-    # return tuple(create(dataset, cache=i > 0) for i, dataset in enumerate(datasets))
+    # For performance, we cache all datasets
     return tuple(create(dataset) for dataset in datasets)
 
 
