@@ -58,7 +58,7 @@ class TEDLIUM(Dataset):
         Args:
             root (str): Path containing dataset or target path where its downloaded if needed
             release (str, optional): TEDLIUM identifier (release1,release2,release3). Defaults to RELEASE.
-            subset (str, optional): Subset of data(train,test,dev) supported for release 1,2. Defaults to Train/None.
+            subset (str, optional): train/dev/test for releases 1&2, None for release3. Defaults to Train/None
             download (bool, optional): Download dataset in case is not founded in root path. Defaults to False.
             audio_ext (str, optional): Overwrite audio extension when loading items. Defaults to ".sph".
 
@@ -93,25 +93,24 @@ class TEDLIUM(Dataset):
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
-        self._walker = []
-
         # Create walker for all samples
-        for file in walk_files(self._path, suffix=".stm", prefix=False, remove_suffix=True):
-            stm_path = os.path.join(self._path, "stm", file + ".stm")
-            with open(stm_path) as f:
-                l = len(f.readlines())
-                self._walker.extend((file, line) for line in range(l))
+        self._walker = []
+        stm_path = os.path.join(self._path, "stm")
+        for file in os.listdir(stm_path):
+            if file.endswith(".stm"):
+                stm_path = os.path.join(self._path, "stm", file)
+                with open(stm_path) as f:
+                    l = len(f.readlines())
+                    file = file.replace(".stm", "")
+                    self._walker.extend((file, line) for line in range(l))
+
         # Read phoneme dictionary
         dict_path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["dict"])
         self.phoneme_dict = {}
-        with open(dict_path, "rb") as f:
+        with open(dict_path, "r", encoding="utf-8") as f:
             for line in f.readlines():
-                content = line.decode("utf-8").strip("\n").split(" ", 1)
-                if len(content) > 1:
-                    key, value = content[0], content[1]
-                    self.phoneme_dict[key] = value.strip()
-                    # # Some lines in release1 dont have a phoneme for a word so value will be out of index
-                    # # Need to find a better solution to read the dictionary
+                content = line.strip().split(maxsplit=1)
+                self.phoneme_dict[content[0]] = content[1:]  # content[1:] can be empty list
 
     def load_tedlium_item(self, fileid: str, line: int, path: str) -> Tedlium_item:
         """Loads a TEDLIUM dataset sample given a file name and corresponding sentence name
@@ -130,13 +129,11 @@ class TEDLIUM(Dataset):
             talk_id, _, speaker_id, start_time, end_time, identifier, transcript = transcript.split(" ", 6)
 
         wave_path = os.path.join(path, "sph", fileid)
-        waveform, sample_rate = self.__load_audio__(
-            wave_path + self._ext_audio, start_time=start_time, end_time=end_time
-        )
+        waveform, sample_rate = self._load_audio(wave_path + self._ext_audio, start_time=start_time, end_time=end_time)
 
         return Tedlium_item(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)
 
-    def __load_audio__(self, path: str, start_time: float, end_time: float, sample_rate: int = 16000) -> [Tensor, int]:
+    def _load_audio(self, path: str, start_time: float, end_time: float, sample_rate: int = 16000) -> [Tensor, int]:
         """Default load function used in TEDLIUM dataset, you can overwrite this function to customize functionality
         and load individual sentnces from a full ted audio talk file
 
