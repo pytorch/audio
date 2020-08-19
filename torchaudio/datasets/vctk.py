@@ -149,17 +149,15 @@ class VCTK_092(Dataset):
     For more information about the dataset visit: https://datashare.is.ed.ac.uk/handle/10283/3443
     """
 
-    def __init__(self,
-                 root: str,
-                 url: str = URL,
-                 download: bool = False,
-                 mic_id: str = 'mic2') -> None:
+    def __init__(
+        self, root: str, url: str = URL, download: bool = False, mic_id: str = "mic2"
+    ) -> None:
 
-        archive = os.path.join(root, os.path.basename('VCTK-Corpus-0.92.zip'))
+        archive = os.path.join(root, os.path.basename("VCTK-Corpus-0.92.zip"))
 
-        self._path = os.path.join(root, 'VCTK-Corpus-0.92')
-        self._txt_dir = os.path.join(self._path, 'txt')
-        self._audio_dir = os.path.join(self._path, 'wav48_silence_trimmed')
+        self._path = os.path.join(root, "VCTK-Corpus-0.92")
+        self._txt_dir = os.path.join(self._path, "txt")
+        self._audio_dir = os.path.join(self._path, "wav48_silence_trimmed")
         self._mic_id = mic_id
 
         if download:
@@ -190,15 +188,18 @@ class VCTK_092(Dataset):
         """
         for speaker_id in self._speaker_ids:
             utterance_dir = os.path.join(self._txt_dir, speaker_id)
-            for utterance_file in sorted(f for f in os.listdir(utterance_dir) if f.endswith('.txt')):
+            for utterance_file in sorted(
+                f for f in os.listdir(utterance_dir) if f.endswith(".txt")
+            ):
                 utterance_id = os.path.splitext(utterance_file)[0]
-                audio_path_mic = os.path.join(self._audio_dir, speaker_id,
-                                              f'{utterance_id}_{mic_id}.flac')
-                if speaker_id == 'p280' and mic_id == 'mic2':
+                audio_path_mic = os.path.join(
+                    self._audio_dir, speaker_id, f"{utterance_id}_{mic_id}.flac"
+                )
+                if speaker_id == "p280" and mic_id == "mic2":
                     break
-                if speaker_id == 'p362' and not os.path.isfile(audio_path_mic):
+                if speaker_id == "p362" and not os.path.isfile(audio_path_mic):
                     continue
-                self._sample_ids.append(utterance_id.split('_'))
+                self._sample_ids.append(utterance_id.split("_"))
 
     def _load_text(self, file_path) -> str:
         with open(file_path) as file_path:
@@ -208,8 +209,12 @@ class VCTK_092(Dataset):
         return torchaudio.load(file_path)
 
     def load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> Sample:
-        utterance_path = os.path.join(self._txt_dir, speaker_id, f'{speaker_id}_{utterance_id}.txt')
-        audio_path = os.path.join(self._audio_dir, speaker_id, f'{speaker_id}_{utterance_id}_{mic_id}.flac')
+        utterance_path = os.path.join(
+            self._txt_dir, speaker_id, f"{speaker_id}_{utterance_id}.txt"
+        )
+        audio_path = os.path.join(
+            self._audio_dir, speaker_id, f"{speaker_id}_{utterance_id}_{mic_id}.flac"
+        )
 
         # Reading text
         utterance = self._load_text(utterance_path)
