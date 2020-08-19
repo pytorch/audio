@@ -35,7 +35,7 @@ def parse_args():
     parser.add_argument(
         "--type",
         metavar="T",
-        default="mel",
+        default="mfcc",
         choices=["waveform", "mfcc", "mel"],
         help="input type for model",
     )
@@ -55,14 +55,14 @@ def parse_args():
     )
     parser.add_argument(
         "--win-length",
-        default=512,
+        default=400,
         type=int,
         metavar="N",
         help="width of spectrogram window",
     )
     parser.add_argument(
         "--hop-length",
-        default=80,
+        default=160,
         type=int,
         metavar="N",
         help="width of spectrogram window",
@@ -124,7 +124,7 @@ def parse_args():
         help="decoder to use",
     )
     parser.add_argument(
-        "--batch-size", default=64, type=int, metavar="N", help="mini-batch size"
+        "--batch-size", default=128, type=int, metavar="N", help="mini-batch size"
     )
     parser.add_argument(
         "--n-bins",
@@ -179,13 +179,11 @@ def parse_args():
     parser.add_argument("--clip-grad", metavar="NORM", type=float, default=0.0)
     parser.add_argument(
         "--dataset-root",
-        default="/datasets01/",
         type=str,
         help="specify dataset root folder",
     )
     parser.add_argument(
         "--dataset-folder-in-archive",
-        default="librispeech/062419/",
         type=str,
         help="specify dataset folder in archive",
     )
