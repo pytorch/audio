@@ -7,7 +7,6 @@ from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    walk_files,
 )
 from collections import namedtuple
 
@@ -19,6 +18,7 @@ _RELEASE_CONFIGS = {
         "checksum": "30301975fd8c5cac4040c261c0852f57cfa8adbbad2ce78e77e4986957445f27",
         "data_path": "",
         "subset": "train",
+        "supported_subsets": ["train", "test", "dev"],
         "dict": "TEDLIUM.150K.dic",
     },
     "release2": {
@@ -27,6 +27,7 @@ _RELEASE_CONFIGS = {
         "checksum": "93281b5fcaaae5c88671c9d000b443cb3c7ea3499ad12010b3934ca41a7b9c58",
         "data_path": "",
         "subset": "train",
+        "supported_subsets": ["train", "test", "dev"],
         "dict": "TEDLIUM.152k.dic",
     },
     "release3": {
@@ -35,6 +36,7 @@ _RELEASE_CONFIGS = {
         "checksum": "ad1e454d14d1ad550bc2564c462d87c7a7ec83d4dc2b9210f22ab4973b9eccdb",
         "data_path": "data/",
         "subset": None,
+        "supported_subsets": [None],
         "dict": "TEDLIUM.152k.dic",
     },
 }
@@ -46,8 +48,27 @@ Tedlium_item = namedtuple(
 
 class TEDLIUM(Dataset):
     """
-    Create a Dataset for Tedlium. Each item is a tuple of the form:
+    Create a Dataset for Tedlium. It supports releases 1,2 and 3, each item is a tuple of the form:
     [waveform, sample_rate, transcript, talk_id, speaker_id, identifier]
+
+    Constructor arguments:
+
+    Args:
+        root (str): Path containing dataset or target path where its downloaded if needed
+        release (str, optional): TEDLIUM identifier (release1,release2,release3). Defaults to RELEASE.
+        subset (str, optional): train/dev/test for releases 1&2, None for release3. Defaults to Train/None
+        download (bool, optional): Download dataset in case is not founded in root path. Defaults to False.
+        audio_ext (str, optional): Overwrite audio extension when loading items. Defaults to ".sph".
+
+    Special functions:
+
+    _load_tedlium_item: Loads a TEDLIUM dataset sample given a file name and corresponding sentence name
+
+    _load_audio: Default load function used in TEDLIUM dataset, you can overwrite this function to customize
+                 functionality and load individual sentences from a full ted audio talk file
+
+    get_phoneme_dict: Returns the phoneme dictionary of a TEDLIUM release
+
     """
 
     def __init__(
@@ -77,6 +98,13 @@ class TEDLIUM(Dataset):
                     release, _RELEASE_CONFIGS.keys(),
                 )
             )
+        if subset not in _RELEASE_CONFIGS[release]["supported_subsets"]:
+            # Raise warning
+            raise RuntimeError(
+                "The subset {} does not match any of the supported tedlium subsets{} ".format(
+                    subset, _RELEASE_CONFIGS[release]["supported_subsets"],
+                )
+            )
 
         basename = os.path.basename(url)
         archive = os.path.join(root, basename)
@@ -86,6 +114,7 @@ class TEDLIUM(Dataset):
         self._path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["data_path"])
         if subset in ["train", "dev", "test"]:
             self._path = os.path.join(self._path, subset)
+
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
@@ -96,7 +125,7 @@ class TEDLIUM(Dataset):
         # Create walker for all samples
         self._walker = []
         stm_path = os.path.join(self._path, "stm")
-        for file in os.listdir(stm_path):
+        for file in sorted(os.listdir(stm_path)):
             if file.endswith(".stm"):
                 stm_path = os.path.join(self._path, "stm", file)
                 with open(stm_path) as f:
@@ -112,7 +141,7 @@ class TEDLIUM(Dataset):
                 content = line.strip().split(maxsplit=1)
                 self.phoneme_dict[content[0]] = content[1:]  # content[1:] can be empty list
 
-    def load_tedlium_item(self, fileid: str, line: int, path: str) -> Tedlium_item:
+    def _load_tedlium_item(self, fileid: str, line: int, path: str) -> Tedlium_item:
         """Loads a TEDLIUM dataset sample given a file name and corresponding sentence name
 
         Args:
@@ -135,7 +164,7 @@ class TEDLIUM(Dataset):
 
     def _load_audio(self, path: str, start_time: float, end_time: float, sample_rate: int = 16000) -> [Tensor, int]:
         """Default load function used in TEDLIUM dataset, you can overwrite this function to customize functionality
-        and load individual sentnces from a full ted audio talk file
+        and load individual sentences from a full ted audio talk file
 
         Args:
             path (str): Path to audio file
@@ -160,7 +189,7 @@ class TEDLIUM(Dataset):
             Tedlium_item: A namedTuple containing [waveform, sample_rate, transcript, talk_id, speaker_id, identifier]
         """
         fileid, line = self._walker[n]
-        return self.load_tedlium_item(fileid, line, self._path)
+        return self._load_tedlium_item(fileid, line, self._path)
 
     def __len__(self) -> int:
         """DTEDLIUM dataset custom function overwritting len default behaviour.
