@@ -15,11 +15,12 @@ from torchaudio.datasets.utils import (
 URL = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip"
 FOLDER_IN_ARCHIVE = "VCTK-Corpus"
 _CHECKSUMS = {
-    "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip":
-    "8a6ba2946b36fcbef0212cad601f4bfa"
+    "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip": "8a6ba2946b36fcbef0212cad601f4bfa"
 }
 
-Sample = namedtuple('Sample', ['waveform', 'sample_rate', 'utterance', 'speaker_id', 'utterance_id'])
+Sample = namedtuple(
+    "Sample", ["waveform", "sample_rate", "utterance", "speaker_id", "utterance_id"]
+)
 
 
 def load_vctk_item(fileid: str,
@@ -142,23 +143,45 @@ class VCTK(Dataset):
 
 
 class VCTK_092(Dataset):
-    """
-    Create a Dataset for VCTK 0.92, the latest version of the VCTK dataset.
-    Each item is a tuple of the form: (waveform, sample_rate, utterance, speaker_id, utterance_id)
-    Folder `p315` will be ignored due to the non-existent corresponding text files.
-    For more information about the dataset visit: https://datashare.is.ed.ac.uk/handle/10283/3443
+    """Create VCTK 0.92 Dataset
+
+    An item is a ``namedtuple`` of (``waveform``, ``sample_rate``, ``utterance``,
+    ``speaker_id``, ``utterance_id``)
+
+    Args:
+        root (str): Root directory where the dataset's top level directory is found.
+        mic_id (str): Microphone ID. Either ``"mic1"`` or ``"mic2"``
+        download (bool, optional): Download the dataset if not found in the given directory.
+        url (str, optional): URL from which the dataset is downloaded.
+        audio_ext (str, optional): Custom audio extension if dataset is converted to non-default audio format.
+
+    Note:
+        * All the speeches from speaker ``p315`` will be skipped due to the lack of the corresponding text files.
+        * All the speeches from ``p280`` will be skipped for ``mic_id="mic2"`` due to the lack of the audio files.
+        * Some of the speeches from speaker ``p362`` will be skipped due to the lack of  the audio files.
+        * See Also: https://datashare.is.ed.ac.uk/handle/10283/3443
     """
 
     def __init__(
-        self, root: str, url: str = URL, download: bool = False, mic_id: str = "mic2"
-    ) -> None:
+        self,
+        root: str,
+        mic_id: str = "mic2",
+        download: bool = False,
+        url: str = URL,
+        audio_ext=".flac",
+    ):
+        if mic_id not in ["mic1", "mic2"]:
+            raise RuntimeError(
+                f'`mic_id` has to be either "mic1" or "mic2". Found: {mic_id}'
+            )
 
-        archive = os.path.join(root, os.path.basename("VCTK-Corpus-0.92.zip"))
+        archive = os.path.join(root, "VCTK-Corpus-0.92.zip")
 
         self._path = os.path.join(root, "VCTK-Corpus-0.92")
         self._txt_dir = os.path.join(self._path, "txt")
         self._audio_dir = os.path.join(self._path, "wav48_silence_trimmed")
         self._mic_id = mic_id
+        self._audio_ext = audio_ext
 
         if download:
             if not os.path.isdir(self._path):
@@ -187,16 +210,18 @@ class VCTK_092(Dataset):
         different parameters required by the user.
         """
         for speaker_id in self._speaker_ids:
+            if speaker_id == "p280" and mic_id == "mic2":
+                continue
             utterance_dir = os.path.join(self._txt_dir, speaker_id)
             for utterance_file in sorted(
                 f for f in os.listdir(utterance_dir) if f.endswith(".txt")
             ):
                 utterance_id = os.path.splitext(utterance_file)[0]
                 audio_path_mic = os.path.join(
-                    self._audio_dir, speaker_id, f"{utterance_id}_{mic_id}.flac"
+                    self._audio_dir,
+                    speaker_id,
+                    f"{utterance_id}_{mic_id}{self._audio_ext}",
                 )
-                if speaker_id == "p280" and mic_id == "mic2":
-                    break
                 if speaker_id == "p362" and not os.path.isfile(audio_path_mic):
                     continue
                 self._sample_ids.append(utterance_id.split("_"))
@@ -208,12 +233,14 @@ class VCTK_092(Dataset):
     def _load_audio(self, file_path) -> Tuple[Tensor, int]:
         return torchaudio.load(file_path)
 
-    def load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> Sample:
+    def _load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> Sample:
         utterance_path = os.path.join(
             self._txt_dir, speaker_id, f"{speaker_id}_{utterance_id}.txt"
         )
         audio_path = os.path.join(
-            self._audio_dir, speaker_id, f"{speaker_id}_{utterance_id}_{mic_id}.flac"
+            self._audio_dir,
+            speaker_id,
+            f"{speaker_id}_{utterance_id}_{mic_id}{self._audio_ext}",
         )
 
         # Reading text
@@ -226,7 +253,7 @@ class VCTK_092(Dataset):
 
     def __getitem__(self, n: int) -> Sample:
         speaker_id, utterance_id = self._sample_ids[n]
-        return self.load_sample(speaker_id, utterance_id, self._mic_id)
+        return self._load_sample(speaker_id, utterance_id, self._mic_id)
 
     def __len__(self) -> int:
         return len(self._sample_ids)
