@@ -159,7 +159,7 @@ def save(
             See the detail at http://sox.sourceforge.net/soxformat.html.
     """
     if compression is None:
-        ext = str(filepath)[-3:].lower()
+        ext = str(filepath).split('.')[-1].lower()
         if ext in ['wav', 'sph']:
             compression = 0.
         elif ext == 'mp3':
