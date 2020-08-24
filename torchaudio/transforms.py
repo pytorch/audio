@@ -567,8 +567,8 @@ class Resample(torch.nn.Module):
     """
 
     def __init__(self,
-                 orig_freq: int = 16000,
-                 new_freq: int = 16000,
+                 orig_freq: float = 16000,
+                 new_freq: float = 16000,
                  resampling_method: str = 'sinc_interpolation') -> None:
         super(Resample, self).__init__()
         self.orig_freq = orig_freq
