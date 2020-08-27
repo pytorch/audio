@@ -67,8 +67,7 @@ class Spectrogram(torch.nn.Module):
                  wkwargs: Optional[dict] = None,
                  center: bool = True,
                  pad_mode: str = "reflect",
-                 onesided: bool = True
-    ) -> None:
+                 onesided: bool = True) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -83,7 +82,6 @@ class Spectrogram(torch.nn.Module):
         self.center = center
         self.pad_mode = pad_mode
         self.onesided = onesided
-
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -104,8 +102,8 @@ class Spectrogram(torch.nn.Module):
             self.win_length,
             self.power,
             self.normalized,
-            self.center
-            self.pad_mode
+            self.center,
+            self.pad_mode,
             self.onesided
         )
 
