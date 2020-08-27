@@ -39,7 +39,10 @@ def spectrogram(
         hop_length: int,
         win_length: int,
         power: Optional[float],
-        normalized: bool
+        normalized: bool,
+        center: bool = True,
+        pad_mode: str = "reflect",
+        onesided: bool = True
 ) -> Tensor:
     r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
@@ -55,6 +58,13 @@ def spectrogram(
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
             If None, then the complex spectrum is returned instead.
         normalized (bool): Whether to normalize by magnitude after stft
+        center (bool, optional): whether to pad :attr:`waveform` on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            Default: ``True``
+        pad_mode (string, optional): controls the padding method used when
+            :attr:`center` is ``True``. Default: ``"reflect"``
+        onesided (bool, optional): controls whether to return half of results to
+            avoid redundancy Default: ``True``
 
     Returns:
         Tensor: Dimension (..., freq, time), freq is
@@ -72,7 +82,15 @@ def spectrogram(
 
     # default values are consistent with librosa.core.spectrum._spectrogram
     spec_f = torch.stft(
-        waveform, n_fft, hop_length, win_length, window, True, "reflect", False, True
+        input=waveform,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        win_length=win_length,
+        window=window,
+        center=center,
+        pad_mode=pad_mode,
+        normalized=False,
+        onesided=onesided
     )
 
     # unpack batch

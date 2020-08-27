@@ -46,6 +46,13 @@ class Spectrogram(torch.nn.Module):
             If None, then the complex spectrum is returned instead. (Default: ``2``)
         normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
+        center (bool, optional): whether to pad :attr:`waveform` on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            Default: ``True``
+        pad_mode (string, optional): controls the padding method used when
+            :attr:`center` is ``True``. Default: ``"reflect"``
+        onesided (bool, optional): controls whether to return half of results to
+            avoid redundancy Default: ``True``
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -57,7 +64,11 @@ class Spectrogram(torch.nn.Module):
                  window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: Optional[float] = 2.,
                  normalized: bool = False,
-                 wkwargs: Optional[dict] = None) -> None:
+                 wkwargs: Optional[dict] = None,
+                 center: bool = True,
+                 pad_mode: str = "reflect",
+                 onesided: bool = True
+    ) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -69,6 +80,10 @@ class Spectrogram(torch.nn.Module):
         self.pad = pad
         self.power = power
         self.normalized = normalized
+        self.center = center
+        self.pad_mode = pad_mode
+        self.onesided = onesided
+
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -80,8 +95,19 @@ class Spectrogram(torch.nn.Module):
             ``n_fft // 2 + 1`` where ``n_fft`` is the number of
             Fourier bins, and time is the number of window hops (n_frame).
         """
-        return F.spectrogram(waveform, self.pad, self.window, self.n_fft, self.hop_length,
-                             self.win_length, self.power, self.normalized)
+        return F.spectrogram(
+            waveform,
+            self.pad,
+            self.window,
+            self.n_fft,
+            self.hop_length,
+            self.win_length,
+            self.power,
+            self.normalized,
+            self.center
+            self.pad_mode
+            self.onesided
+        )
 
 
 class GriffinLim(torch.nn.Module):
