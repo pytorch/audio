@@ -52,6 +52,15 @@ c10::intrusive_ptr<TensorSignal> load_audio_file(
     const int64_t frame_offset,
     const int64_t num_frames,
     const bool normalize,
+    const bool channels_first) {
+  return load_audio_file_v1(path, frame_offset, num_frames, channels_first, -1);
+}
+
+c10::intrusive_ptr<TensorSignal> load_audio_file_v1(
+    const std::string& path,
+    const int64_t frame_offset,
+    const int64_t num_frames,
+    const bool normalize,
     const bool channels_first,
     const int64_t sample_rate) {
   if (frame_offset < 0) {
