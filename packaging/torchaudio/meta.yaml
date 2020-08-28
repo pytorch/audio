@@ -9,6 +9,8 @@ requirements:
   build:
     - {{ compiler('c') }} # [win]
     - {{ compiler('cxx') }} # [win]
+    - cmake >=3.18
+    - ninja
 
   host:
     - python
@@ -18,7 +20,6 @@ requirements:
 
   run:
     - python
-    - typing # [py2k]
     {{ environ.get('CONDA_PYTORCH_CONSTRAINT') }}
 
 build:

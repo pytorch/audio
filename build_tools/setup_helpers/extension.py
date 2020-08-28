@@ -1,23 +1,22 @@
 import os
+import sys
+from sysconfig import get_config_var
 import platform
 import subprocess
 from pathlib import Path
+from setuptools import Extension
+from setuptools.command.build_ext import build_ext
 
-from torch.utils.cpp_extension import (
-    CppExtension,
-    BuildExtension as TorchBuildExtension
-)
+import torch
 
 __all__ = [
     'get_ext_modules',
-    'BuildExtension',
+    'CMakeBuild',
 ]
 
 _THIS_DIR = Path(__file__).parent.resolve()
 _ROOT_DIR = _THIS_DIR.parent.parent.resolve()
-_CSRC_DIR = _ROOT_DIR / 'torchaudio' / 'csrc'
-_TP_BASE_DIR = _ROOT_DIR / 'third_party'
-_TP_INSTALL_DIR = _TP_BASE_DIR / 'install'
+_TORCHAUDIO_DIR = _ROOT_DIR / 'torchaudio'
 
 
 def _get_build_sox():
@@ -33,108 +32,76 @@ def _get_build_sox():
     return False
 
 
-_BUILD_SOX = _get_build_sox()
-
-
-def _get_eca(debug):
-    eca = []
-    if debug:
-        eca += ["-O0", "-g"]
-    else:
-        eca += ["-O3"]
-    return eca
-
-
-def _get_ela(debug):
-    ela = []
-    if debug:
-        if platform.system() == "Windows":
-            ela += ["/DEBUG:FULL"]
-        else:
-            ela += ["-O0", "-g"]
-    else:
-        ela += ["-O3"]
-    return ela
-
-
-def _get_srcs():
-    return [str(p) for p in _CSRC_DIR.glob('**/*.cpp')]
-
-
-def _get_include_dirs():
-    dirs = [
-        str(_ROOT_DIR),
-    ]
-    if _BUILD_SOX:
-        dirs.append(str(_TP_INSTALL_DIR / 'include'))
-    return dirs
-
-
-def _get_extra_objects():
-    objs = []
-    if _BUILD_SOX:
-        # NOTE: The order of the library listed bellow matters.
-        #
-        # (the most important thing is that dependencies come after a library
-        # e.g., sox comes first, flac/vorbis comes before ogg, and
-        # vorbisenc/vorbisfile comes before vorbis
-        libs = [
-            'libsox.a',
-            'libmad.a',
-            'libFLAC.a',
-            'libmp3lame.a',
-            'libopusfile.a',
-            'libopus.a',
-            'libvorbisenc.a',
-            'libvorbisfile.a',
-            'libvorbis.a',
-            'libogg.a',
-        ]
-        for lib in libs:
-            objs.append(str(_TP_INSTALL_DIR / 'lib' / lib))
-    return objs
-
-
-def _get_libraries():
-    return [] if _BUILD_SOX else ['sox']
-
-
-def _build_third_party():
-    build_dir = str(_TP_BASE_DIR / 'build')
-    os.makedirs(build_dir, exist_ok=True)
-    subprocess.run(
-        args=['cmake', '..'],
-        cwd=build_dir,
-        check=True,
-    )
-    subprocess.run(
-        args=['cmake', '--build', '.'],
-        cwd=build_dir,
-        check=True,
-    )
-
-
-_EXT_NAME = 'torchaudio._torchaudio'
-
-
-def get_ext_modules(debug=False):
+def get_ext_modules():
     if platform.system() == 'Windows':
         return None
-    return [
-        CppExtension(
-            _EXT_NAME,
-            _get_srcs(),
-            libraries=_get_libraries(),
-            include_dirs=_get_include_dirs(),
-            extra_compile_args=_get_eca(debug),
-            extra_objects=_get_extra_objects(),
-            extra_link_args=_get_ela(debug),
-        ),
-    ]
+    return [Extension(name='torchaudio._torchaudio', sources=[])]
 
 
-class BuildExtension(TorchBuildExtension):
+# Based off of
+# https://github.com/pybind/cmake_example/blob/580c5fd29d4651db99d8874714b07c0c49a53f8a/setup.py
+class CMakeBuild(build_ext):
+    def run(self):
+        try:
+            subprocess.check_output(['cmake', '--version'])
+        except OSError:
+            raise RuntimeError("CMake is not available.")
+        super().run()
+
     def build_extension(self, ext):
-        if ext.name == _EXT_NAME and _BUILD_SOX:
-            _build_third_party()
-        super().build_extension(ext)
+        extdir = os.path.abspath(
+            os.path.dirname(self.get_ext_fullpath(ext.name)))
+
+        # required for auto-detection of auxiliary "native" libs
+        if not extdir.endswith(os.path.sep):
+            extdir += os.path.sep
+
+        cfg = "Debug" if self.debug else "Release"
+
+        library_path = os.path.join(get_config_var('LIBDIR'), get_config_var('LDLIBRARY'))
+        cmake_args = [
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
+            f"-DCMAKE_BUILD_TYPE={cfg}",
+            f"-DCMAKE_PREFIX_PATH={torch.utils.cmake_prefix_path}",
+            f"-DPython_LIBRARIES={library_path}",
+            f"-DPython_INCLUDE_DIRS={get_config_var('INCLUDEPY')}",
+            f"-DBUILD_SOX:BOOL={_get_build_sox()}",
+            "-DBUILD_PYTHON_EXTENSION:BOOL=ON",
+            "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
+        ]
+        build_args = [
+            "--verbose",
+        ]
+
+        if 'CMAKE_CXX_FLAGS' in os.environ:
+            cmake_args += [f"-DCMAKE_CXX_FLAGS={os.environ['CMAKE_CXX_FLAGS']}"]
+
+        # Default to Ninja
+        if 'CMAKE_GENERATOR' not in os.environ:
+            cmake_args += ["-GNinja"]
+
+        # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
+        # across all generators.
+        if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
+            # self.parallel is a Python 3 only way to set parallel jobs by hand
+            # using -j in the build_ext call, not supported by pip or PyPA-build.
+            if hasattr(self, "parallel") and self.parallel:
+                # CMake 3.12+ only.
+                build_args += ["-j{}".format(self.parallel)]
+
+        if not os.path.exists(self.build_temp):
+            os.makedirs(self.build_temp)
+
+        subprocess.check_call(
+            ["cmake", str(_ROOT_DIR)] + cmake_args, cwd=self.build_temp
+        )
+        subprocess.check_call(
+            ["cmake", "--build", "."] + build_args, cwd=self.build_temp
+        )
+
+    def get_ext_filename(self, fullname):
+        ext_filename = super().get_ext_filename(fullname)
+        ext_filename_parts = ext_filename.split('.')
+        without_abi = ext_filename_parts[:-2] + ext_filename_parts[-1:]
+        ext_filename = '.'.join(without_abi)
+        return ext_filename
