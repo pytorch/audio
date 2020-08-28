@@ -207,3 +207,7 @@ ExternalProject_Add(sox
   LOG_MERGED_STDOUTERR ON
   LOG_OUTPUT_ON_FAILURE ON
 )
+
+add_dependencies(libsox sox)
+set(SOX_INCLUDE_DIR ${INSTALL_DIR}/include PARENT_SCOPE)
+set(SOX_LIBRARIES ${SOX_LIBRARIES} PARENT_SCOPE)
