@@ -23,16 +23,7 @@ struct SignalInfo : torch::CustomClassHolder {
 
 c10::intrusive_ptr<SignalInfo> get_info(const std::string& path);
 
-// ver. 0
 c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> load_audio_file(
-    const std::string& path,
-    const int64_t frame_offset = 0,
-    const int64_t num_frames = -1,
-    const bool normalize = true,
-    const bool channels_first = true);
-
-// ver. 1 sample_rate is added
-c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> load_audio_file_v1(
     const std::string& path,
     const int64_t frame_offset = 0,
     const int64_t num_frames = -1,

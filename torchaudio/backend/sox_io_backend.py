@@ -111,7 +111,7 @@ def load(
             ``[channel, time]`` else ``[time, channel]``.
     """
     sample_rate = -1 if sample_rate is None else sample_rate
-    signal = torch.ops.torchaudio.sox_io_load_audio_file_v1(
+    signal = torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, sample_rate)
     return signal.get_tensor(), signal.get_sample_rate()
 

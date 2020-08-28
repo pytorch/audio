@@ -52,9 +52,6 @@ TORCH_LIBRARY(torchaudio, m) {
       "torchaudio::sox_io_load_audio_file",
       &torchaudio::sox_io::load_audio_file);
   m.def(
-      "torchaudio::sox_io_load_audio_file_v1",
-      &torchaudio::sox_io::load_audio_file_v1);
-  m.def(
       "torchaudio::sox_io_save_audio_file",
       &torchaudio::sox_io::save_audio_file);
 
