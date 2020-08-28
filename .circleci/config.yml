@@ -42,8 +42,8 @@ commands:
     description: "installs tools required to build torchaudio"
     steps:
       - run:
-          name: Install cmake and pkg-config
-          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install cmake pkg-config wget
+          name: Install pkg-config
+          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pkg-config wget
           # Disable brew auto update which is very slow
 
 binary_common: &binary_common
@@ -433,7 +433,7 @@ jobs:
     resource_class: gpu.small
     environment:
       <<: *environment
-      image_name: "pytorch/torchaudio_unittest_base:manylinux-cuda10.1"
+      image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.1-cudnn7-20201203
     steps:
       - checkout
       - attach_workspace:

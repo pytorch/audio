@@ -14,11 +14,12 @@ requirements:
     - python
     - setuptools
     - cpuonly
+    - cmake
+    - ninja
     {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT') }}
 
   run:
     - python
-    - typing # [py2k]
     {{ environ.get('CONDA_PYTORCH_CONSTRAINT') }}
 
 build:

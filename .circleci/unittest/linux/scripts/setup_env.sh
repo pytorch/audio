@@ -5,7 +5,7 @@
 #
 # Do not install PyTorch and torchaudio here, otherwise they also get cached.
 
-set -e
+set -ex
 
 root_dir="$(git rev-parse --show-toplevel)"
 conda_dir="${root_dir}/conda"
@@ -41,11 +41,3 @@ conda activate "${env_dir}"
 
 # 3. Install minimal build tools
 pip --quiet install cmake ninja
-
-# 4. Buld codecs
-mkdir -p third_party/build
-(
-    cd third_party/build
-    cmake -GNinja ..
-    cmake --build .
-)

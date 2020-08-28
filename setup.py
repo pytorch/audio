@@ -82,9 +82,7 @@ setup(
     ],
     packages=find_packages(exclude=["build*", "test*", "torchaudio.csrc*", "third_party*", "build_tools*"]),
     ext_modules=setup_helpers.get_ext_modules(),
-    cmdclass={
-        'build_ext': setup_helpers.BuildExtension.with_options(no_python_abi_suffix=True)
-    },
+    cmdclass={'build_ext': setup_helpers.CMakeBuild},
     install_requires=[pytorch_package_dep],
     zip_safe=False,
 )
