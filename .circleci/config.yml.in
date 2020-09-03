@@ -151,7 +151,7 @@ jobs:
   binary_macos_wheel:
     <<: *binary_common
     macos:
-      xcode: "9.0"
+      xcode: "9.4.1"
     steps:
       - checkout
       - install_build_tools_macos
@@ -176,7 +176,7 @@ jobs:
   binary_macos_conda:
     <<: *binary_common
     macos:
-      xcode: "9.0"
+      xcode: "9.4.1"
     steps:
       - checkout
       - install_build_tools_macos
@@ -537,7 +537,7 @@ jobs:
   unittest_macos_cpu:
     <<: *binary_common
     macos:
-      xcode: "9.0"
+      xcode: "9.4.1"
     resource_class: large
     steps:
       - checkout
