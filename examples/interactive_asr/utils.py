@@ -151,7 +151,7 @@ def setup_asr(args, logger):
     optimize_models(args, use_cuda, models)
 
     # Initialize generator
-    generator = task.build_generator(args)
+    generator = task.build_generator(models, args)
 
     sp = spm.SentencePieceProcessor()
     sp.Load(os.path.join(args.data, "spm.model"))
