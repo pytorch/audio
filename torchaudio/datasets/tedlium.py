@@ -8,7 +8,6 @@ from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
 )
-from collections import namedtuple
 
 
 _RELEASE_CONFIGS = {
@@ -41,14 +40,10 @@ _RELEASE_CONFIGS = {
     },
 }
 
-Tedlium_item = namedtuple(
-    "Tedlium_item", ["waveform", "sample_rate", "transcript", "talk_id", "speaker_id", "identifier"]
-)
-
 
 class TEDLIUM(Dataset):
     """
-    Create a Dataset for Tedlium. It supports releases 1,2 and 3, each item is a tuple of the form:
+    Create a Dataset for Tedlium. It supports releases 1,2 and 3, each item is a list containings:
     [waveform, sample_rate, transcript, talk_id, speaker_id, identifier]
 
     Constructor arguments:
@@ -122,8 +117,8 @@ class TEDLIUM(Dataset):
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
-        # Create walker for all samples
-        self._walker = []
+        # Create list for all samples
+        self._filelist = []
         stm_path = os.path.join(self._path, "stm")
         for file in sorted(os.listdir(stm_path)):
             if file.endswith(".stm"):
@@ -131,17 +126,11 @@ class TEDLIUM(Dataset):
                 with open(stm_path) as f:
                     l = len(f.readlines())
                     file = file.replace(".stm", "")
-                    self._walker.extend((file, line) for line in range(l))
+                    self._filelist.extend((file, line) for line in range(l))
+        # Create dict path for later read
+        self.dict_path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["dict"])
 
-        # Read phoneme dictionary
-        dict_path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["dict"])
-        self.phoneme_dict = {}
-        with open(dict_path, "r", encoding="utf-8") as f:
-            for line in f.readlines():
-                content = line.strip().split(maxsplit=1)
-                self.phoneme_dict[content[0]] = content[1:]  # content[1:] can be empty list
-
-    def _load_tedlium_item(self, fileid: str, line: int, path: str) -> Tedlium_item:
+    def _load_tedlium_item(self, fileid: str, line: int, path: str) -> Tuple[Tensor, int, str, int, int, int]:
         """Loads a TEDLIUM dataset sample given a file name and corresponding sentence name
 
         Args:
@@ -160,7 +149,7 @@ class TEDLIUM(Dataset):
         wave_path = os.path.join(path, "sph", fileid)
         waveform, sample_rate = self._load_audio(wave_path + self._ext_audio, start_time=start_time, end_time=end_time)
 
-        return Tedlium_item(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)
+        return (waveform, sample_rate, transcript, talk_id, speaker_id, identifier)
 
     def _load_audio(self, path: str, start_time: float, end_time: float, sample_rate: int = 16000) -> [Tensor, int]:
         """Default load function used in TEDLIUM dataset, you can overwrite this function to customize functionality
@@ -176,9 +165,11 @@ class TEDLIUM(Dataset):
         """
         start_time = int(float(start_time) * 16000)
         end_time = int(float(end_time) * 16000)
-        return torchaudio.load(path, frame_offset=start_time, num_frames=end_time - start_time)
+        if torchaudio.get_audio_backend() == "sox_io":
+            return torchaudio.load(path, frame_offset=start_time, num_frames=end_time - start_time)
+        return torchaudio.load(path)[:, start_time:end_time]
 
-    def __getitem__(self, n: int) -> Tedlium_item:
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
         """TEDLIUM dataset custom function overwritting default loadbehaviour.
         Loads a TEDLIUM sample given a index N
 
@@ -188,7 +179,7 @@ class TEDLIUM(Dataset):
         Returns:
             Tedlium_item: A namedTuple containing [waveform, sample_rate, transcript, talk_id, speaker_id, identifier]
         """
-        fileid, line = self._walker[n]
+        fileid, line = self._filelist[n]
         return self._load_tedlium_item(fileid, line, self._path)
 
     def __len__(self) -> int:
@@ -197,7 +188,7 @@ class TEDLIUM(Dataset):
         Returns:
             int: TEDLIUM dataset length
         """
-        return len(self._walker)
+        return len(self._filelist)
 
     def get_phoneme_dict(self):
         """Returns the phoneme dictionary of a TEDLIUM release
@@ -205,4 +196,11 @@ class TEDLIUM(Dataset):
         Returns:
             dictionary: Phoneme dictionary for the current tedlium release
         """
+        # Read phoneme dictionary
+        if not hasattr(self, "phoneme_dict"):
+            self.phoneme_dict = {}
+            with open(self.dict_path, "r", encoding="utf-8") as f:
+                for line in f.readlines():
+                    content = line.strip().split(maxsplit=1)
+                    self.phoneme_dict[content[0]] = content[1:]  # content[1:] can be empty list
         return self.phoneme_dict
