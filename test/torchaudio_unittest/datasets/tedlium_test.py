@@ -24,7 +24,7 @@ class TestTedlium(TempDirMixin, TorchaudioTestCase):
     backend = "default"
 
     root_dir = None
-    samples = []
+    samples = {}
 
     @classmethod
     def setUpClass(cls):
@@ -33,8 +33,9 @@ class TestTedlium(TempDirMixin, TorchaudioTestCase):
         os.makedirs(dataset_dir, exist_ok=True)
         sample_rate = 16000  # 16kHz
         seed = 0
-        data = get_whitenoise(sample_rate=sample_rate, duration=10.00, n_channels=1, dtype="float32", seed=seed)
+
         for release in ["release1", "release2", "release3"]:
+            data = get_whitenoise(sample_rate=sample_rate, duration=10.00, n_channels=1, dtype="float32", seed=seed)
             if release in ["release1", "release2"]:
                 release_dir = os.path.join(
                     dataset_dir,
@@ -42,7 +43,11 @@ class TestTedlium(TempDirMixin, TorchaudioTestCase):
                     tedlium._RELEASE_CONFIGS[release]["subset"],
                 )
             else:
-                release_dir = os.path.join(dataset_dir, tedlium._RELEASE_CONFIGS[release]["folder_in_archive"])
+                release_dir = os.path.join(
+                    dataset_dir,
+                    tedlium._RELEASE_CONFIGS[release]["folder_in_archive"],
+                    tedlium._RELEASE_CONFIGS[release]["data_path"],
+                )
             os.makedirs(release_dir, exist_ok=True)
             os.makedirs(os.path.join(release_dir, "stm"), exist_ok=True)  # Subfolder for transcripts
             os.makedirs(os.path.join(release_dir, "sph"), exist_ok=True)  # Subfolder for audio files
@@ -55,39 +60,65 @@ class TestTedlium(TempDirMixin, TorchaudioTestCase):
             with open(trans_path, "w") as f:
                 f.write("".join(UTTERANCES))
 
-        # Create a samples list to compare with
-        for i, utterance in enumerate(UTTERANCES):
-            talk_id, _, speaker_id, start_time, end_time, identifier, transcript = utterance.split(" ", 6)
-            start_time = int(float(start_time)) * 16000
-            end_time = int(float(end_time)) * 16000
-            sample = (
-                data[:, start_time:end_time],
-                sample_rate,
-                transcript,
-                talk_id,
-                speaker_id,
-                identifier,
-            )
-            cls.samples.append(sample)
+            # Create a samples list to compare with
+            cls.samples[release] = []
+            for i, utterance in enumerate(UTTERANCES):
+                talk_id, _, speaker_id, start_time, end_time, identifier, transcript = utterance.split(" ", 6)
+                start_time = int(float(start_time)) * sample_rate
+                end_time = int(float(end_time)) * sample_rate
+                sample = (
+                    data[:, start_time:end_time],
+                    sample_rate,
+                    transcript,
+                    talk_id,
+                    speaker_id,
+                    identifier,
+                )
+                cls.samples[release].append(sample)
+            seed += 1
 
-    @classmethod
-    def tearDownClass(cls):
-        # In case of test failure
-        tedlium.TEDLIUM._ext_audio = ".flac"
-
-    def test_tedlium(self):
-        tedlium.TEDLIUM._ext_audio = ".wav"
-        dataset = tedlium.TEDLIUM(self.root_dir)
-        print(dataset._path)
+    def test_tedlium_release1(self):
+        release = "release1"
+        dataset = tedlium.TEDLIUM(self.root_dir, release=release)
         num_samples = 0
         for i, (data, sample_rate, transcript, talk_id, speaker_id, identifier) in enumerate(dataset):
-            self.assertEqual(data, self.samples[i][0], atol=5e-5, rtol=1e-8)
-            assert sample_rate == self.samples[i][1]
-            assert transcript == self.samples[i][2]
-            assert talk_id == self.samples[i][3]
-            assert speaker_id == self.samples[i][4]
-            assert identifier == self.samples[i][5]
+            self.assertEqual(data, self.samples[release][i][0], atol=5e-5, rtol=1e-8)
+            assert sample_rate == self.samples[release][i][1]
+            assert transcript == self.samples[release][i][2]
+            assert talk_id == self.samples[release][i][3]
+            assert speaker_id == self.samples[release][i][4]
+            assert identifier == self.samples[release][i][5]
             num_samples += 1
 
-        assert num_samples == len(self.samples)
-        tedlium.TEDLIUM._ext_audio = ".flac"
+        assert num_samples == len(self.samples[release])
+
+    def test_tedlium_release2(self):
+        release = "release2"
+        dataset = tedlium.TEDLIUM(self.root_dir, release=release)
+        num_samples = 0
+        for i, (data, sample_rate, transcript, talk_id, speaker_id, identifier) in enumerate(dataset):
+            self.assertEqual(data, self.samples[release][i][0], atol=5e-5, rtol=1e-8)
+            assert sample_rate == self.samples[release][i][1]
+            assert transcript == self.samples[release][i][2]
+            assert talk_id == self.samples[release][i][3]
+            assert speaker_id == self.samples[release][i][4]
+            assert identifier == self.samples[release][i][5]
+            num_samples += 1
+
+        assert num_samples == len(self.samples[release])
+
+    def test_tedlium_release3(self):
+        release = "release3"
+        dataset = tedlium.TEDLIUM(self.root_dir, release=release)
+        num_samples = 0
+        for i, (data, sample_rate, transcript, talk_id, speaker_id, identifier) in enumerate(dataset):
+            self.assertEqual(data, self.samples[release][i][0], atol=5e-5, rtol=1e-8)
+            assert sample_rate == self.samples[release][i][1]
+            assert transcript == self.samples[release][i][2]
+            assert talk_id == self.samples[release][i][3]
+            assert speaker_id == self.samples[release][i][4]
+            assert identifier == self.samples[release][i][5]
+            num_samples += 1
+
+        assert num_samples == len(self.samples[release])
+

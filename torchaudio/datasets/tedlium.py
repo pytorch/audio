@@ -128,7 +128,8 @@ class TEDLIUM(Dataset):
                     file = file.replace(".stm", "")
                     self._filelist.extend((file, line) for line in range(l))
         # Create dict path for later read
-        self.dict_path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["dict"])
+        self._dict_path = os.path.join(root, folder_in_archive, _RELEASE_CONFIGS[release]["dict"])
+        self._phoneme_dict = None
 
     def _load_tedlium_item(self, fileid: str, line: int, path: str) -> Tuple[Tensor, int, str, int, int, int]:
         """Loads a TEDLIUM dataset sample given a file name and corresponding sentence name
@@ -190,6 +191,7 @@ class TEDLIUM(Dataset):
         """
         return len(self._filelist)
 
+    @property
     def get_phoneme_dict(self):
         """Returns the phoneme dictionary of a TEDLIUM release
 
@@ -197,10 +199,10 @@ class TEDLIUM(Dataset):
             dictionary: Phoneme dictionary for the current tedlium release
         """
         # Read phoneme dictionary
-        if not hasattr(self, "phoneme_dict"):
-            self.phoneme_dict = {}
+        if not self._phoneme_dict:
+            self._phoneme_dict = {}
             with open(self.dict_path, "r", encoding="utf-8") as f:
                 for line in f.readlines():
                     content = line.strip().split(maxsplit=1)
-                    self.phoneme_dict[content[0]] = content[1:]  # content[1:] can be empty list
-        return self.phoneme_dict
+                    self._phoneme_dict[content[0]] = content[1:]  # content[1:] can be empty list
+        return self._phoneme_dict.copy()
