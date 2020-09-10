@@ -58,6 +58,9 @@ def set_audio_backend(backend: Optional[str]):
     elif backend == 'sox_io':
         module = sox_io_backend
     elif backend == 'soundfile':
+        warnings.warn(
+            '"soundfile" backend is planned to change the function signatures in 0.9.0. '
+            'Please refer to https://github.com/pytorch/audio/issues/903')
         module = soundfile_backend
     else:
         raise NotImplementedError(f'Unexpected backend "{backend}"')
