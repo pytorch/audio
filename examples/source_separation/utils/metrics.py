@@ -1,5 +1,4 @@
 import math
-from typing import Tuple
 from itertools import permutations
 
 import torch
@@ -133,10 +132,8 @@ def sdr_pit(estimate, reference):
     return _sdr_pit(estimate, reference)
 
 
-def si_sdr_improvement(
-    estimate: torch.Tensor, reference: torch.Tensor, mix: torch.Tensor
-) -> Tuple[torch.Tensor, torch.Tensor]:
-    """Compute the improvement of scale-invariant SDR. (SI-SNRi)
+def sdri(estimate: torch.Tensor, reference: torch.Tensor, mix: torch.Tensor) -> torch.Tensor:
+    """Compute the improvement of SDR (SDRi).
 
     This function compute how much SDR is improved if the estimation is changed from
     the original mixture signal to the actual estimated source signals. That is,
@@ -155,17 +152,13 @@ def si_sdr_improvement(
             Shape: [batch, speakers == 1, time frame]
 
     Returns:
-        torch.Tensor: Improved SI-SDR. Shape: [batch, ]
-        torch.Tensor: Absolute SI-SDR. Shape: [batch, ]
+        torch.Tensor: Improved SDR. Shape: [batch, ]
 
     References:
         - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
           Luo, Yi and Mesgarani, Nima
           https://arxiv.org/abs/1809.07454
     """
-    estimate = estimate - estimate.mean(axis=2, keepdim=True)
-    reference = reference - reference.mean(axis=2, keepdim=True)
-
-    sdr_ = sdr_pit(estimate, reference).unsqueeze(1)
+    sdr_ = sdr_pit(estimate, reference)  # [batch, ]
     base_sdr = sdr(mix, reference)  # [batch, speaker]
-    return (sdr_ - base_sdr).mean(dim=1), sdr_
+    return (sdr_.unsqueeze(1) - base_sdr).mean(dim=1)
