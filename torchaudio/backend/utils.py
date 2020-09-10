@@ -49,6 +49,10 @@ def set_audio_backend(backend: Optional[str]):
     if backend is None:
         module = no_backend
     elif backend == 'sox':
+        warnings.warn(
+            '"sox" backend is deprecated. '
+            'The default backend will be changeed to "sox_io" backend in 0.8.0 and '
+            '"sox" backend will be removed in 0.9.0. Please migrate to "sox_io" backend.')
         module = sox_backend
     elif backend == 'sox_io':
         module = sox_io_backend
