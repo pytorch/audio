@@ -44,7 +44,7 @@ _RELEASE_CONFIGS = {
 class TEDLIUM(Dataset):
     """
     Create a Dataset for Tedlium. It supports releases 1,2 and 3, each item is a list containings:
-    [waveform, sample_rate, transcript, talk_id, speaker_id, identifier]
+    [waveform, sample_rate, transcript, talk_id, speaker_id, identifier].
 
     Constructor arguments:
 
@@ -69,7 +69,7 @@ class TEDLIUM(Dataset):
     def __init__(
         self, root: str, release: str = "release1", subset: str = None, download: bool = False, audio_ext=".sph"
     ) -> None:
-        """Constructor for TEDLIUM dataset
+        """Constructor for TEDLIUM dataset.
 
         Args:
             root (str): Path containing dataset or target path where its downloaded if needed
@@ -132,7 +132,7 @@ class TEDLIUM(Dataset):
         self._phoneme_dict = None
 
     def _load_tedlium_item(self, fileid: str, line: int, path: str) -> Tuple[Tensor, int, str, int, int, int]:
-        """Loads a TEDLIUM dataset sample given a file name and corresponding sentence name
+        """Loads a TEDLIUM dataset sample given a file name and corresponding sentence name.
 
         Args:
             fileid (str): File id to identify both text and audio files corresponding to the sample
@@ -154,7 +154,7 @@ class TEDLIUM(Dataset):
 
     def _load_audio(self, path: str, start_time: float, end_time: float, sample_rate: int = 16000) -> [Tensor, int]:
         """Default load function used in TEDLIUM dataset, you can overwrite this function to customize functionality
-        and load individual sentences from a full ted audio talk file
+        and load individual sentences from a full ted audio talk file.
 
         Args:
             path (str): Path to audio file
@@ -171,8 +171,8 @@ class TEDLIUM(Dataset):
         return torchaudio.load(path)[:, start_time:end_time]
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
-        """TEDLIUM dataset custom function overwritting default loadbehaviour.
-        Loads a TEDLIUM sample given a index N
+        """TEDLIUM dataset custom function overwritting default loadbehaviour
+        Loads a TEDLIUM sample given a index N.
 
         Args:
             n (int): Index of sample to be loaded
@@ -184,7 +184,7 @@ class TEDLIUM(Dataset):
         return self._load_tedlium_item(fileid, line, self._path)
 
     def __len__(self) -> int:
-        """DTEDLIUM dataset custom function overwritting len default behaviour.
+        """TEDLIUM dataset custom function overwritting len default behaviour.
 
         Returns:
             int: TEDLIUM dataset length
@@ -192,8 +192,8 @@ class TEDLIUM(Dataset):
         return len(self._filelist)
 
     @property
-    def get_phoneme_dict(self):
-        """Returns the phoneme dictionary of a TEDLIUM release
+    def phoneme_dict(self):
+        """Returns the phoneme dictionary of a TEDLIUM release.
 
         Returns:
             dictionary: Phoneme dictionary for the current tedlium release
@@ -204,5 +204,5 @@ class TEDLIUM(Dataset):
             with open(self.dict_path, "r", encoding="utf-8") as f:
                 for line in f.readlines():
                     content = line.strip().split(maxsplit=1)
-                    self._phoneme_dict[content[0]] = content[1:]  # content[1:] can be empty list
+                    self._phoneme_dict[content[0]] = tuple(content[1:])  # content[1:] can be empty list
         return self._phoneme_dict.copy()

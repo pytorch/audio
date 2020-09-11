@@ -62,7 +62,7 @@ class TestTedlium(TempDirMixin, TorchaudioTestCase):
 
             # Create a samples list to compare with
             cls.samples[release] = []
-            for i, utterance in enumerate(UTTERANCES):
+            for utterance in UTTERANCES:
                 talk_id, _, speaker_id, start_time, end_time, identifier, transcript = utterance.split(" ", 6)
                 start_time = int(float(start_time)) * sample_rate
                 end_time = int(float(end_time)) * sample_rate
