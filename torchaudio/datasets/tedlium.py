@@ -164,8 +164,8 @@ class TEDLIUM(Dataset):
         Returns:
             [Tensor, int]: Audio tensor representation and sample rate
         """
-        start_time = int(float(start_time) * 16000)
-        end_time = int(float(end_time) * 16000)
+        start_time = int(float(start_time) * sample_rate)
+        end_time = int(float(end_time) * sample_rate)
         if torchaudio.get_audio_backend() == "sox_io":
             return torchaudio.load(path, frame_offset=start_time, num_frames=end_time - start_time)
         return torchaudio.load(path)[:, start_time:end_time]
@@ -201,8 +201,8 @@ class TEDLIUM(Dataset):
         # Read phoneme dictionary
         if not self._phoneme_dict:
             self._phoneme_dict = {}
-            with open(self.dict_path, "r", encoding="utf-8") as f:
+            with open(self._dict_path, "r", encoding="utf-8") as f:
                 for line in f.readlines():
-                    content = line.strip().split(maxsplit=1)
+                    content = line.strip().split()
                     self._phoneme_dict[content[0]] = tuple(content[1:])  # content[1:] can be empty list
         return self._phoneme_dict.copy()

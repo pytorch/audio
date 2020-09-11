@@ -19,6 +19,16 @@ UTTERANCES = [
     "AaronHuey_2010X 1 AaronHuey_2010X 8.0 10.0 <o,f0,female> script5\n",
 ]
 
+PHONEME = [
+    "a AH",
+    "a(2) EY",
+    "aachen AA K AH N",
+    "aad AE D",
+    "aaden EY D AH N",
+    "aadmi AE D M IY",
+    "aae EY EY",
+]
+
 
 class TestTedlium(TempDirMixin, TorchaudioTestCase):
     backend = "default"
@@ -60,6 +70,11 @@ class TestTedlium(TempDirMixin, TorchaudioTestCase):
             with open(trans_path, "w") as f:
                 f.write("".join(UTTERANCES))
 
+            dict_filename = f"{release}.dic"
+            dict_path = os.path.join(release_dir, dict_filename)
+            with open(dict_path, "w") as f:
+                f.write("\n".join(PHONEME))
+
             # Create a samples list to compare with
             cls.samples[release] = []
             for utterance in UTTERANCES:
@@ -92,6 +107,11 @@ class TestTedlium(TempDirMixin, TorchaudioTestCase):
 
         assert num_samples == len(self.samples[release])
 
+        dataset._dict_path = os.path.join(dataset._path, f"{release}.dic")
+        phoneme_dict = dataset.phoneme_dict
+        phoenemes = [f"{key} {' '.join(value)}" for key, value in phoneme_dict.items()]
+        assert phoenemes == PHONEME
+
     def test_tedlium_release2(self):
         release = "release2"
         dataset = tedlium.TEDLIUM(self.root_dir, release=release)
@@ -107,6 +127,11 @@ class TestTedlium(TempDirMixin, TorchaudioTestCase):
 
         assert num_samples == len(self.samples[release])
 
+        dataset._dict_path = os.path.join(dataset._path, f"{release}.dic")
+        phoneme_dict = dataset.phoneme_dict
+        phoenemes = [f"{key} {' '.join(value)}" for key, value in phoneme_dict.items()]
+        assert phoenemes == PHONEME
+
     def test_tedlium_release3(self):
         release = "release3"
         dataset = tedlium.TEDLIUM(self.root_dir, release=release)
@@ -121,4 +146,9 @@ class TestTedlium(TempDirMixin, TorchaudioTestCase):
             num_samples += 1
 
         assert num_samples == len(self.samples[release])
+
+        dataset._dict_path = os.path.join(dataset._path, f"{release}.dic")
+        phoneme_dict = dataset.phoneme_dict
+        phoenemes = [f"{key} {' '.join(value)}" for key, value in phoneme_dict.items()]
+        assert phoenemes == PHONEME
 
