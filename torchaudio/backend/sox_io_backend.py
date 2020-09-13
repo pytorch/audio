@@ -1,4 +1,5 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
+from pathlib import Path
 
 import torch
 from torchaudio._internal import (
@@ -20,22 +21,24 @@ class AudioMetaData:
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
-def info(filepath: str) -> AudioMetaData:
+def info(filepath: Union[str, Path]) -> AudioMetaData:
     """Get signal information of an audio file.
 
     Args:
-        filepath (str): Path to audio file
+        filepath (str/pathlib.Path): Path to audio file
 
     Returns:
         AudioMetaData: meta data of the given audio.
     """
+    # Cast to str in case type is `pathlib.Path`
+    filepath = str(filepath)
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath)
     return AudioMetaData(sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels())
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def load(
-        filepath: str,
+        filepath: Union[str, Path],
         frame_offset: int = 0,
         num_frames: int = -1,
         normalize: bool = True,
@@ -80,7 +83,7 @@ def load(
     ``[-1.0, 1.0]``.
 
     Args:
-        filepath (str):
+        filepath (str/pathlib.Path):
             Path to audio file
         frame_offset (int):
             Number of frames to skip before start reading data.
@@ -105,6 +108,8 @@ def load(
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             ``[channel, time]`` else ``[time, channel]``.
     """
+    # Cast to str in case type is `pathlib.Path`
+    filepath = str(filepath)
     signal = torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first)
     return signal.get_tensor(), signal.get_sample_rate()
@@ -112,7 +117,7 @@ def load(
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def save(
-        filepath: str,
+        filepath: Union[str, Path],
         src: torch.Tensor,
         sample_rate: int,
         channels_first: bool = True,
@@ -140,7 +145,7 @@ def save(
         and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.
 
     Args:
-        filepath (str): Path to save file.
+        filepath (str/pathlib.Path): Path to save file.
         tensor (torch.Tensor): Audio data to save. must be 2D tensor.
         sample_rate (int): sampling rate
         channels_first (bool):
@@ -158,6 +163,8 @@ def save(
 
             See the detail at http://sox.sourceforge.net/soxformat.html.
     """
+    # Cast to str in case type is `pathlib.Path`
+    filepath = str(filepath)
     if compression is None:
         ext = str(filepath).split('.')[-1].lower()
         if ext in ['wav', 'sph']:
@@ -176,7 +183,7 @@ def save(
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def load_wav(
-        filepath: str,
+        filepath: Union[str, Path],
         frame_offset: int = 0,
         num_frames: int = -1,
         channels_first: bool = True,
