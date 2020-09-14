@@ -151,4 +151,3 @@ class TestTedlium(TempDirMixin, TorchaudioTestCase):
         phoneme_dict = dataset.phoneme_dict
         phoenemes = [f"{key} {' '.join(value)}" for key, value in phoneme_dict.items()]
         assert phoenemes == PHONEME
-
