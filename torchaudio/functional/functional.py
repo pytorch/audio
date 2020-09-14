@@ -64,7 +64,7 @@ def spectrogram(
         pad_mode (string, optional): controls the padding method used when
             :attr:`center` is ``True``. Default: ``"reflect"``
         onesided (bool, optional): controls whether to return half of results to
-            avoid redundancy Default: ``True``
+            avoid redundancy. Default: ``True``
 
     Returns:
         Tensor: Dimension (..., freq, time), freq is
