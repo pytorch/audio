@@ -459,7 +459,7 @@ def main(rank, args):
     # Model
 
     model = Wav2Letter(
-        num_classes=language_model.length,
+        num_classes=len(language_model),
         input_type=args.type,
         num_features=num_features,
     )

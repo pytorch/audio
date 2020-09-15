@@ -12,13 +12,9 @@ class MapMemoryCache(torch.utils.data.Dataset):
         self._cache = [None] * len(dataset)
 
     def __getitem__(self, n):
-        if self._cache[n] is not None:
-            return self._cache[n]
-
-        item = self.dataset[n]
-        self._cache[n] = item
-
-        return item
+        if self._cache[n] is None:
+            self._cache[n] = self.dataset[n]
+        return self._cache[n]
 
     def __len__(self):
         return len(self.dataset)
