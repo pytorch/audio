@@ -60,7 +60,8 @@ class EncodingInfo:
 _LOAD_DOCSTRING = r"""Loads an audio file from disk into a tensor
 
 Args:
-    filepath: Path to audio file
+    filepath: Path to audio file. This function also handles `pathlib.Path` objects, but is annotated
+             as ``str`` for TorchScript compiler compatibility.
 
     out: An optional output tensor to use instead of creating one. (Default: ``None``)
 
@@ -112,7 +113,8 @@ It assumes that the wav file uses 16 bit per sample that needs normalization by
 shifting the input right by 16 bits.
 
 Args:
-    filepath: Path to audio file
+    filepath: Path to audio file. This function also handles `pathlib.Path` objects, but is annotated
+             as ``str`` for TorchScript compiler compatibility.
 
 Returns:
     (Tensor, int): An output tensor of size `[C x L]` or `[L x C]` where L is the number
@@ -123,7 +125,8 @@ Returns:
 _SAVE_DOCSTRING = r"""Saves a Tensor on file as an audio file
 
 Args:
-    filepath: Path to audio file
+    filepath: Path to audio file. This function also handles ``pathlib.Path`` objects, but is
+             annotated as ``str`` for TorchScript compiler compatibility.
     src: An input 2D tensor of shape `[C x L]` or `[L x C]` where L is
         the number of audio frames, C is the number of channels
     sample_rate: An integer which is the sample rate of the
@@ -137,7 +140,8 @@ Args:
 _INFO_DOCSTRING = r"""Gets metadata from an audio file without loading the signal.
 
 Args:
-    filepath: Path to audio file
+    filepath: Path to audio file. This function also handles `pathlib.Path` objects, but is annotated
+             as ``str`` for TorchScript compiler compatibility.
 
 Returns:
     (sox_signalinfo_t, sox_encodinginfo_t): A si (sox_signalinfo_t) signal

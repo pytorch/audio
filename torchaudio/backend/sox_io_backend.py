@@ -21,11 +21,13 @@ class AudioMetaData:
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
-def info(filepath: Union[str, Path]) -> AudioMetaData:
+def info(filepath: str) -> AudioMetaData:
     """Get signal information of an audio file.
 
     Args:
-        filepath (str/pathlib.Path): Path to audio file
+        filepath (str or pathlib.Path):
+        Path to audio file. This function also handles ``pathlib.Path`` objects, but is annotated as
+        ``str`` for TorchScript compiler compatibility.
 
     Returns:
         AudioMetaData: meta data of the given audio.
@@ -38,7 +40,7 @@ def info(filepath: Union[str, Path]) -> AudioMetaData:
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def load(
-        filepath: Union[str, Path],
+        filepath: str,
         frame_offset: int = 0,
         num_frames: int = -1,
         normalize: bool = True,
@@ -83,8 +85,9 @@ def load(
     ``[-1.0, 1.0]``.
 
     Args:
-        filepath (str/pathlib.Path):
-            Path to audio file
+        filepath (str or pathlib.Path):
+            Path to audio file. This function also handles ``pathlib.Path`` objects, but is
+            annotated as ``str`` for TorchScript compiler compatibility.
         frame_offset (int):
             Number of frames to skip before start reading data.
         num_frames (int):
@@ -117,7 +120,7 @@ def load(
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def save(
-        filepath: Union[str, Path],
+        filepath: str,
         src: torch.Tensor,
         sample_rate: int,
         channels_first: bool = True,
@@ -145,7 +148,9 @@ def save(
         and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.
 
     Args:
-        filepath (str/pathlib.Path): Path to save file.
+        filepath (str or pathlib.Path):
+            Path to save file. This function also handles ``pathlib.Path`` objects, but is annotated
+            as ``str`` for TorchScript compiler compatibility.
         tensor (torch.Tensor): Audio data to save. must be 2D tensor.
         sample_rate (int): sampling rate
         channels_first (bool):
@@ -183,7 +188,7 @@ def save(
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def load_wav(
-        filepath: Union[str, Path],
+        filepath: str,
         frame_offset: int = 0,
         num_frames: int = -1,
         channels_first: bool = True,
