@@ -1,5 +1,4 @@
-from typing import Tuple, Optional, Union
-from pathlib import Path
+from typing import Tuple, Optional
 
 import torch
 from torchaudio._internal import (

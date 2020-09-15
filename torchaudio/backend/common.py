@@ -125,8 +125,7 @@ Returns:
 _SAVE_DOCSTRING = r"""Saves a Tensor on file as an audio file
 
 Args:
-    filepath: Path to audio file. This function also handles ``pathlib.Path`` objects, but is
-             annotated as ``str`` for TorchScript compiler compatibility.
+    filepath: Path to audio file.
     src: An input 2D tensor of shape `[C x L]` or `[L x C]` where L is
         the number of audio frames, C is the number of channels
     sample_rate: An integer which is the sample rate of the
