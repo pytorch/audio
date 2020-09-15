@@ -1,5 +1,6 @@
 import logging
 import os
+import signal
 import string
 from datetime import datetime
 from time import time
@@ -11,6 +12,7 @@ from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
 from torchaudio.models.wav2letter import Wav2Letter
+from torchaudio.transforms import MFCC, Resample
 
 from ctc_decoders import GreedyDecoder
 from datasets import collate_factory, split_process_librispeech
@@ -18,6 +20,31 @@ from languagemodels import LanguageModel
 from metrics import levenshtein_distance
 from transforms import Normalize, UnsqueezeFirst
 from utils import MetricLogger, count_parameters, save_checkpoint
+
+# TODO Remove before merge pull request
+MAIN_PID = os.getpid()
+SIGNAL_RECEIVED = False
+
+
+# TODO Remove before merge pull request
+def signal_handler(a, b):
+    global SIGNAL_RECEIVED
+    logging.warning("Signal received on %s", datetime.now())
+    SIGNAL_RECEIVED = True
+
+
+# TODO Remove before merge pull request
+def trigger_job_requeue():
+    # Submit a new job to resume from checkpoint.
+    if os.environ["SLURM_PROCID"] == "0" and os.getpid() == MAIN_PID:
+        logging.warning("PID: %s. PPID: %s.", os.getpid(), os.getppid())
+        logging.warning("Resubmitting job")
+        command = "scontrol requeue " + os.environ["SLURM_JOB_ID"]
+        logging.warning(command)
+        if os.system(command):
+            raise RuntimeError("Fail to resubmit")
+        logging.warning("New job submitted to the queue")
+    exit(0)
 
 
 def setup_distributed(rank, world_size):
@@ -141,6 +168,10 @@ def train_one_epoch(
         metric["epoch time"] += metric["iteration time"]
         metric()
 
+        # TODO Remove before merge pull request
+        if SIGNAL_RECEIVED:
+            break
+
     if reduce_lr_on_plateau and isinstance(scheduler, ReduceLROnPlateau):
         scheduler.step(metric["average loss"])
     elif not isinstance(scheduler, ReduceLROnPlateau):
@@ -190,6 +221,10 @@ def evaluate(
 
             compute_error_rates(outputs, targets, decoder, language_model, metric)
 
+            # TODO Remove before merge pull request
+            if SIGNAL_RECEIVED:
+                break
+
         metric["average loss"] = metric["cumulative loss"] / metric["iteration"]
         metric["validation time"] = time() - start
         metric()
@@ -205,6 +240,10 @@ def main(rank, args):
         setup_distributed(rank, args.world_size)
 
     not_main_rank = args.distributed and rank != 0
+
+    # Install signal handler
+    # TODO Remove before merge pull request
+    signal.signal(signal.SIGUSR1, signal_handler)
 
     logging.info("Start time: %s", datetime.now())
 
@@ -228,7 +267,18 @@ def main(rank, args):
 
     sample_rate_original = 16000
 
-    if args.type == "mfcc":
+    input_type = args.type
+    num_features = args.n_bins
+
+    if args.type == "mel":
+        transforms = torch.nn.Sequential(
+            # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
+            torchaudio.transforms.MelSpectrogram(
+                sample_rate=sample_rate_original, **melkwargs
+            ),
+        )
+        input_type = "mfcc"
+    elif args.type == "mfcc":
         transforms = torch.nn.Sequential(
             torchaudio.transforms.MFCC(
                 sample_rate=sample_rate_original,
@@ -287,8 +337,10 @@ def main(rank, args):
 
     model = Wav2Letter(
         num_classes=len(language_model),
-        input_type=args.type,
+        input_type=input_type,
         num_features=num_features,
+        num_hidden_channels=args.n_hidden_channels,
+        dropout=args.dropout,
     )
 
     if args.jit:
@@ -472,6 +524,22 @@ def main(rank, args):
 
         if args.reduce_lr_valid and isinstance(scheduler, ReduceLROnPlateau):
             scheduler.step(loss)
+
+        # TODO Remove before merge pull request
+        if SIGNAL_RECEIVED:
+            save_checkpoint(
+                {
+                    "epoch": epoch + 1,
+                    "state_dict": model.state_dict(),
+                    "best_loss": best_loss,
+                    "optimizer": optimizer.state_dict(),
+                    "scheduler": scheduler.state_dict(),
+                },
+                False,
+                args.checkpoint,
+                not_main_rank,
+            )
+            trigger_job_requeue()
 
     logging.info("End time: %s", datetime.now())
 

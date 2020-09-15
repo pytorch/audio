@@ -11,8 +11,15 @@ def parse_args():
         "--type",
         metavar="T",
         default="mfcc",
-        choices=["waveform", "mfcc"],
+        choices=["waveform", "mfcc", "mel"],
         help="input type for model",
+    )
+    parser.add_argument(
+        "--n-hidden-channels",
+        default=2000,
+        type=int,
+        metavar="N",
+        help="number of hidden channels in wav2letter",
     )
     parser.add_argument(
         "--freq-mask",
@@ -100,6 +107,13 @@ def parse_args():
         type=int,
         metavar="N",
         help="number of bins in transforms",
+    )
+    parser.add_argument(
+        "--dropout",
+        default=0.0,
+        type=float,
+        metavar="D",
+        help="probability of an element to be zeroed",
     )
     parser.add_argument(
         "--optimizer",
