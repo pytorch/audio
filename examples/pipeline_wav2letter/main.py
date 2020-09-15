@@ -95,7 +95,7 @@ def parse_args():
         "--decoder",
         metavar="D",
         default="greedy",
-        choices=["greedy"],
+        choices=["greedy", "greedyiter", "viterbi"],
         help="decoder to use",
     )
     parser.add_argument(

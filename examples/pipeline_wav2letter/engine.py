@@ -14,7 +14,12 @@ from torchaudio.datasets.utils import bg_iterator
 from torchaudio.models.wav2letter import Wav2Letter
 from torchaudio.transforms import MFCC, Resample
 
-from ctc_decoders import GreedyDecoder
+from ctc_decoders import (
+    GreedyDecoder,
+    GreedyIterableDecoder,
+    ListViterbiDecoder,
+    ViterbiDecoder,
+)
 from datasets import collate_factory, split_process_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
@@ -286,7 +291,6 @@ def main(rank, args):
                 melkwargs=melkwargs,
             ),
         )
-        num_features = args.n_bins
     elif args.type == "waveform":
         transforms = torch.nn.Sequential(UnsqueezeFirst())
         num_features = 1
@@ -330,6 +334,12 @@ def main(rank, args):
 
     if args.decoder == "greedy":
         decoder = GreedyDecoder()
+    elif args.decoder == "greedyiter":
+        decoder = GreedyIterableDecoder()
+    elif args.decoder == "viterbi":
+        decoder = ListViterbiDecoder(
+            training, len(language_model), progress_bar=args.progress_bar
+        )
     else:
         raise ValueError("Selected decoder not supported")
 

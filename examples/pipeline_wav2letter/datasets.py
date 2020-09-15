@@ -2,6 +2,28 @@ import torch
 from torchaudio.datasets import LIBRISPEECH
 
 
+class IterableMemoryCache:
+    def __init__(self, iterable):
+        self.iterable = iterable
+        self._iter = iter(iterable)
+        self._done = False
+        self._values = []
+
+    def __iter__(self):
+        if self._done:
+            return iter(self._values)
+        return itertools.chain(self._values, self._gen_iter())
+
+    def _gen_iter(self):
+        for new_value in self._iter:
+            self._values.append(new_value)
+            yield new_value
+        self._done = True
+
+    def __len__(self):
+        return len(self._iterable)
+
+
 class MapMemoryCache(torch.utils.data.Dataset):
     """
     Wrap a dataset so that, whenever a new item is returned, it is saved to memory.
