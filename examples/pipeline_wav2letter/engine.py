@@ -417,73 +417,37 @@ def main(rank, args):
     logging.info("Number of parameters: %s", n)
 
     # Optimizer
+    optimizer = _get_optimizer(args, model)
+    scheduler = _get_scheduler(args, optimizer)
 
-    if args.optimizer == "adadelta":
-        optimizer = Adadelta(
-            model.parameters(),
-            lr=args.learning_rate,
-            weight_decay=args.weight_decay,
-            eps=args.eps,
-            rho=args.rho,
-        )
-    elif args.optimizer == "sgd":
-        optimizer = SGD(
-            model.parameters(),
-            lr=args.learning_rate,
-            momentum=args.momentum,
-            weight_decay=args.weight_decay,
-        )
-    elif args.optimizer == "adam":
-        optimizer = Adam(
-            model.parameters(),
-            lr=args.learning_rate,
-            momentum=args.momentum,
-            weight_decay=args.weight_decay,
-        )
-    elif args.optimizer == "adamw":
-        optimizer = AdamW(
-            model.parameters(),
-            lr=args.learning_rate,
-            momentum=args.momentum,
-            weight_decay=args.weight_decay,
-        )
-    else:
-        raise ValueError("Selected optimizer not supported")
-
-    if args.scheduler == "exponential":
-        scheduler = ExponentialLR(optimizer, gamma=args.gamma)
-    elif args.scheduler == "reduceonplateau":
-        scheduler = ReduceLROnPlateau(optimizer, patience=10, threshold=1e-3)
-    else:
-        raise ValueError("Selected scheduler not supported")
-
-    criterion = torch.nn.CTCLoss(blank=char_blank, zero_infinity=False)
+    # Loss
+    encoded_char_blank = language_model.encode(char_blank)[0]
+    criterion = torch.nn.CTCLoss(
+        blank=encoded_char_blank, zero_infinity=False, reduction="sum"
+    )
 
     # Data Loader
 
     collate_fn_train = collate_factory(model_length_function, augmentations)
     collate_fn_valid = collate_factory(model_length_function)
 
-    loader_training_params = {
-        "num_workers": args.workers,
-        "pin_memory": True,
-        "shuffle": True,
-        "drop_last": True,
-    }
-    loader_validation_params = loader_training_params.copy()
-    loader_validation_params["shuffle"] = False
-
     loader_training = DataLoader(
         training,
         batch_size=args.batch_size,
         collate_fn=collate_fn_train,
-        **loader_training_params,
+        num_workers=args.workers,
+        pin_memory=True,
+        shuffle=True,
+        drop_last=True,
     )
     loader_validation = DataLoader(
         validation,
         batch_size=args.batch_size,
         collate_fn=collate_fn_valid,
-        **loader_validation_params,
+        num_workers=args.workers,
+        pin_memory=True,
+        shuffle=False,
+        drop_last=False,
     )
 
     # Setup checkpoint
