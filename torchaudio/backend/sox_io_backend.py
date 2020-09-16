@@ -175,6 +175,7 @@ def save(
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.deprecated('Please use "torchaudio.load".', '0.9.0')
 def load_wav(
         filepath: str,
         frame_offset: int = 0,
