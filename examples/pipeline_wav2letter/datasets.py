@@ -1,3 +1,5 @@
+import itertools
+
 import torch
 from torchaudio.datasets import LIBRISPEECH
 
