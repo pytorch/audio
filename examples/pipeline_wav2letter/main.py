@@ -5,56 +5,34 @@ from engine import spawn_main
 
 
 def parse_args():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Train wav2letter for End-to-End ASR.")
 
     parser.add_argument(
-        "--type",
-        metavar="T",
+        "--feature-type",
         default="mfcc",
         choices=["waveform", "mfcc", "mel"],
         help="input type for model",
     )
     parser.add_argument(
-        "--n-hidden-channels",
+        "--hidden-channels",
         default=2000,
         type=int,
-        metavar="N",
         help="number of hidden channels in wav2letter",
     )
     parser.add_argument(
-        "--freq-mask",
-        default=0,
-        type=int,
-        metavar="N",
-        help="maximal width of frequency mask",
+        "--freq-mask", default=0, type=int, help="maximal width of frequency mask",
     )
     parser.add_argument(
-        "--win-length",
-        default=400,
-        type=int,
-        metavar="N",
-        help="width of spectrogram window",
+        "--time-mask", default=0, type=int, help="maximal width of time mask",
     )
     parser.add_argument(
-        "--hop-length",
-        default=160,
-        type=int,
-        metavar="N",
-        help="width of spectrogram window",
+        "--win-length", default=400, type=int, help="width of spectrogram window",
     )
     parser.add_argument(
-        "--time-mask",
-        default=0,
-        type=int,
-        metavar="N",
-        help="maximal width of time mask",
+        "--hop-length", default=160, type=int, help="hop length in for spectrogram",
     )
     parser.add_argument(
-        "--workers",
-        default=0,
-        type=int,
-        metavar="N",
-        help="number of data loading workers",
+        "--workers", default=0, type=int, help="number of data loading workers",
     )
     parser.add_argument(
         "--checkpoint",
@@ -64,21 +42,13 @@ def parse_args():
         help="path to latest checkpoint",
     )
     parser.add_argument(
-        "--epochs",
-        default=200,
-        type=int,
-        metavar="N",
-        help="number of total epochs to run",
+        "--epochs", default=200, type=int, help="number of total epochs to run",
     )
     parser.add_argument(
-        "--start-epoch", default=0, type=int, metavar="N", help="manual epoch number"
+        "--start-epoch", default=0, type=int, help="manual epoch number"
     )
     parser.add_argument(
-        "--print-freq",
-        default=10,
-        type=int,
-        metavar="N",
-        help="print frequency in epochs",
+        "--print-freq", default=10, type=int, help="print frequency in epochs",
     )
     parser.add_argument(
         "--reduce-lr-valid",
@@ -93,27 +63,19 @@ def parse_args():
     )
     parser.add_argument(
         "--decoder",
-        metavar="D",
         default="greedy",
         choices=["greedy", "greedyiter", "viterbi"],
-        help="decoder to use",
+        help="ctc decoder to use",
     )
+    parser.add_argument("--batch-size", default=128, type=int, help="mini-batch size")
     parser.add_argument(
-        "--batch-size", default=128, type=int, metavar="N", help="mini-batch size"
-    )
-    parser.add_argument(
-        "--n-bins",
-        default=13,
-        type=int,
-        metavar="N",
-        help="number of bins in transforms",
+        "--bins", default=13, type=int, help="number of bins in transforms",
     )
     parser.add_argument(
         "--dropout",
         default=0.0,
         type=float,
-        metavar="D",
-        help="probability of an element to be zeroed",
+        help="probability of given weights to be zeroed",
     )
     parser.add_argument(
         "--optimizer",
@@ -124,7 +86,6 @@ def parse_args():
     )
     parser.add_argument(
         "--scheduler",
-        metavar="S",
         default="reduceonplateau",
         choices=["exponential", "reduceonplateau"],
         help="optimizer to use",
@@ -149,9 +110,26 @@ def parse_args():
     parser.add_argument(
         "--weight-decay", default=1e-5, type=float, metavar="W", help="weight decay"
     )
-    parser.add_argument("--eps", metavar="EPS", type=float, default=1e-8)
-    parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
-    parser.add_argument("--clip-grad", metavar="NORM", type=float, default=0.0)
+    parser.add_argument(
+        "--eps",
+        metavar="EPS",
+        type=float,
+        default=1e-8,
+        help="epsilon parameter for Adadelta",
+    )
+    parser.add_argument(
+        "--rho",
+        metavar="RHO",
+        type=float,
+        default=0.95,
+        help="rho parameter for Adadelta",
+    )
+    parser.add_argument(
+        "--clip-grad",
+        metavar="NORM",
+        type=float,
+        help="value to clip gradient at",
+    )
     parser.add_argument(
         "--dataset-root", type=str, help="specify dataset root folder",
     )

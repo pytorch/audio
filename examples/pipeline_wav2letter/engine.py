@@ -23,7 +23,7 @@ from ctc_decoders import (
 from datasets import collate_factory, split_process_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
-from transforms import Normalize, UnsqueezeFirst
+from transforms import Normalize, UnsqueezeFirst, ToMono
 from utils import MetricLogger, count_parameters, save_checkpoint
 
 # TODO Remove before merge pull request
@@ -147,7 +147,7 @@ def train_one_epoch(
         optimizer.zero_grad()
         loss.backward()
 
-        if clip_grad > 0:
+        if clip_grad is not None:
             metric["gradient"] = torch.nn.utils.clip_grad_norm_(
                 model.parameters(), clip_grad
             )
@@ -266,18 +266,18 @@ def main(rank, args):
 
     melkwargs = {
         "n_fft": args.win_length,
-        "n_mels": args.n_bins,
+        "n_mels": args.bins,
         "hop_length": args.hop_length,
     }
 
     sample_rate_original = 16000
 
-    input_type = args.type
-    num_features = args.n_bins
+    input_type = args.feature_type
+    num_features = args.bins
 
     transforms = torch.nn.Sequential(ToMono())
 
-    if args.type == "mel":
+    if args.feature_type == "mel":
         transforms = torch.nn.Sequential(
             transforms,
             # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
@@ -286,16 +286,14 @@ def main(rank, args):
             ),
         )
         input_type = "mfcc"
-    elif args.type == "mfcc":
+    elif args.feature_type == "mfcc":
         transforms = torch.nn.Sequential(
             transforms,
             torchaudio.transforms.MFCC(
-                sample_rate=sample_rate_original,
-                n_mfcc=args.n_bins,
-                melkwargs=melkwargs,
+                sample_rate=sample_rate_original, n_mfcc=args.bins, melkwargs=melkwargs,
             ),
         )
-    elif args.type == "waveform":
+    elif args.feature_type == "waveform":
         transforms = torch.nn.Sequential(transforms, UnsqueezeFirst())
         num_features = 1
     else:
@@ -353,7 +351,7 @@ def main(rank, args):
         num_classes=len(language_model),
         input_type=input_type,
         num_features=num_features,
-        num_hidden_channels=args.n_hidden_channels,
+        num_hidden_channels=args.hidden_channels,
         dropout=args.dropout,
     )
 
