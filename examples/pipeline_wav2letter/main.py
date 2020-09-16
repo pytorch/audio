@@ -20,7 +20,6 @@ def parse_args():
         help="input type for model",
     )
     parser.add_argument(
-    parser.add_argument(
         "--freq-mask", default=0, type=int, help="maximal width of frequency mask",
     )
     parser.add_argument(

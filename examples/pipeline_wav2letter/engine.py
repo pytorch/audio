@@ -11,17 +11,8 @@ from torchaudio.datasets.utils import bg_iterator
 from torchaudio.transforms import MFCC
 from torchaudio.models.wav2letter import Wav2Letter
 
-from ctc_decoders import (
-    GreedyDecoder,
-    GreedyIterableDecoder,
-    ListViterbiDecoder,
-    ViterbiDecoder,
-)
-from datasets import (
-    collate_factory,
-    split_process_librispeech,
-    split_process_speechcommands,
-)
+from ctc_decoders import GreedyDecoder
+from datasets import collate_factory, split_process_librispeech, split_process_speechcommands
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
 from transforms import Normalize, ToMono, UnsqueezeFirst
@@ -255,10 +246,6 @@ def evaluate(
                 outputs, targets, decoder, language_model, loss.item(), metric
             )
 
-            # TODO Remove before merge pull request
-            if SIGNAL_RECEIVED:
-                break
-
         metric.flush()
 
         return avg_loss
@@ -358,12 +345,6 @@ def main(rank, args):
 
     if args.decoder == "greedy":
         decoder = GreedyDecoder()
-    elif args.decoder == "greedyiter":
-        decoder = GreedyIterableDecoder()
-    elif args.decoder == "viterbi":
-        decoder = ListViterbiDecoder(
-            training, len(language_model), progress_bar=args.progress_bar
-        )
     else:
         raise ValueError("Selected decoder not supported")
 
