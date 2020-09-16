@@ -11,7 +11,6 @@ from torch.optim import SGD, Adadelta, Adam, AdamW
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
-from torchaudio.models.wav2letter import Wav2Letter
 from torchaudio.transforms import MFCC, Resample
 
 from ctc_decoders import (
@@ -25,6 +24,9 @@ from languagemodels import LanguageModel
 from metrics import levenshtein_distance
 from transforms import Normalize, UnsqueezeFirst, ToMono
 from utils import MetricLogger, count_parameters, save_checkpoint
+
+# from torchaudio.models.wav2letter import Wav2Letter
+from wav2letter import Wav2Letter
 
 # TODO Remove before merge pull request
 MAIN_PID = os.getpid()
