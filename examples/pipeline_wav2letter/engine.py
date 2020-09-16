@@ -414,9 +414,7 @@ def main(rank, args):
     else:
         raise ValueError("Selected scheduler not supported")
 
-    criterion = torch.nn.CTCLoss(
-        blank=language_model.mapping[char_blank], zero_infinity=False
-    )
+    criterion = torch.nn.CTCLoss(blank=char_blank, zero_infinity=False)
 
     # Data Loader
 

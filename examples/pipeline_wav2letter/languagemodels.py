@@ -11,13 +11,13 @@ class LanguageModel:
         enumerated = list(enumerate(labels))
         flipped = [(sub[1], sub[0]) for sub in enumerated]
 
-        self._encode_map = dict(enumerated)
-        self._decode_map = dict(flipped)
+        self._decode_map = dict(enumerated)
+        self._encode_map = dict(flipped)
 
-    def encode(self, iterable):
-        if isinstance(iterable, Iterable):
-            return [self.encode(i) for i in iterable]
-        return [self._encode_map[i] + self._encode_map[self.char_blank] for i in iterable]
+    def encode(self, listlike):
+        if not isinstance(listlike, str):
+            return [self.encode(i) for i in listlike]
+        return [self._encode_map[i] + self._encode_map[self.char_blank] for i in listlike]
 
     def decode(self, tensor):
         if len(tensor) > 0 and isinstance(tensor[0], Iterable):
