@@ -22,8 +22,8 @@ from ctc_decoders import (
 from datasets import collate_factory, split_process_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
-from transforms import Normalize, UnsqueezeFirst, ToMono
-from utils import MetricLogger, count_parameters, save_checkpoint
+from transforms import Normalize, ToMono, UnsqueezeFirst
+from utils import Logger, count_parameters, save_checkpoint
 
 # from torchaudio.models.wav2letter import Wav2Letter
 from wav2letter import Wav2Letter
@@ -69,7 +69,19 @@ def model_length_function(tensor):
     return int(tensor.shape[-1]) // 2 + 1
 
 
-def compute_error_rates(outputs, targets, decoder, language_model, metric):
+def record_losses(outputs, targets, decoder, language_model, loss_value, metric):
+
+    metric["batch size"] = len(outputs)
+    metric["cumulative batch size"] += len(outputs)
+
+    # Record loss
+
+    metric["batch loss"] = loss_value
+    metric["cumulative loss"] += loss_value
+    metric["average loss"] = metric["cumulative loss"] / metric["cumulative batch size"]
+
+    # Decode output
+
     output = outputs.transpose(0, 1).to("cpu")
     output = decoder(output)
 
@@ -88,10 +100,11 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
     cers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
     cers = sum(cers)
     n = sum(len(t) for t in target)
-    metric["cer over target length"] = cers / n
-    metric["cumulative cer"] += cers
+
     metric["total chars"] += n
-    metric["cumulative cer over target length"] = metric["cer"] / metric["total chars"]
+    metric["cumulative char errors"] += cers
+    metric["batch cer"] = cers / n
+    metric["epoch cer"] = metric["cumulative char errors"] / metric["total chars"]
 
     # Compute WER
 
@@ -101,10 +114,56 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
     wers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
     wers = sum(wers)
     n = sum(len(t) for t in target)
-    metric["wer over target length"] = wers / n
-    metric["cumulative wer"] += wers
+
     metric["total words"] += n
-    metric["cumulative wer over target length"] = metric["wer"] / metric["total words"]
+    metric["cumulative word errors"] += wers
+    metric["batch wer"] = wers / n
+    metric["epoch wer"] = metric["cumulative word errors"] / metric["total words"]
+
+    return metric["average loss"]
+
+
+def _get_optimizer(args, model):
+    if args.optimizer == "adadelta":
+        return Adadelta(
+            model.parameters(),
+            lr=args.learning_rate,
+            weight_decay=args.weight_decay,
+            eps=args.eps,
+            rho=args.rho,
+        )
+    elif args.optimizer == "sgd":
+        return SGD(
+            model.parameters(),
+            lr=args.learning_rate,
+            momentum=args.momentum,
+            weight_decay=args.weight_decay,
+        )
+    elif args.optimizer == "adam":
+        return Adam(
+            model.parameters(),
+            lr=args.learning_rate,
+            momentum=args.momentum,
+            weight_decay=args.weight_decay,
+        )
+    elif args.optimizer == "adamw":
+        return AdamW(
+            model.parameters(),
+            lr=args.learning_rate,
+            momentum=args.momentum,
+            weight_decay=args.weight_decay,
+        )
+
+    raise NotImplementedError(f"Selected optimizer {args.optimizer} not supported")
+
+
+def _get_scheduler(args, optimizer):
+    if args.scheduler == "exponential":
+        return ExponentialLR(optimizer, gamma=args.gamma)
+    elif args.scheduler == "reduceonplateau":
+        return ReduceLROnPlateau(optimizer, patience=10, threshold=1e-3)
+
+    raise NotImplementedError(f"Selected scheduler {args.scheduler} not supported")
 
 
 def train_one_epoch(
@@ -124,14 +183,13 @@ def train_one_epoch(
 
     model.train()
 
-    metric = MetricLogger("train", disable=disable_logger)
+    metric = Logger("train", disable=disable_logger)
     metric["epoch"] = epoch
 
     for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
         data_loader, maxsize=2
     ):
 
-        start = time()
         inputs = inputs.to(device, non_blocking=True)
         targets = targets.to(device, non_blocking=True)
 
@@ -156,31 +214,22 @@ def train_one_epoch(
 
         optimizer.step()
 
-        compute_error_rates(outputs, targets, decoder, language_model, metric)
+        # FIXME reduced summed loss value in distributed case?
+        avg_loss = record_losses(
+            outputs, targets, decoder, language_model, loss.item(), metric
+        )
 
-        try:
-            metric["lr"] = scheduler.get_last_lr()[0]
-        except AttributeError:
-            metric["lr"] = optimizer.param_groups[0]["lr"]
-
-        metric["batch size"] = len(inputs)
+        metric["lr"] = optimizer.param_groups[0]["lr"]
         metric["n_channel"] = inputs.shape[1]
         metric["n_time"] = inputs.shape[-1]
-        metric["dataset length"] += metric["batch size"]
-        metric["iteration"] += 1
-        metric["loss"] = loss.item()
-        metric["cumulative loss"] += metric["loss"]
-        metric["average loss"] = metric["cumulative loss"] / metric["iteration"]
-        metric["iteration time"] = time() - start
-        metric["epoch time"] += metric["iteration time"]
-        metric()
+        metric.flush()
 
         # TODO Remove before merge pull request
         if SIGNAL_RECEIVED:
             break
 
     if reduce_lr_on_plateau and isinstance(scheduler, ReduceLROnPlateau):
-        scheduler.step(metric["average loss"])
+        scheduler.step(avg_loss)
     elif not isinstance(scheduler, ReduceLROnPlateau):
         scheduler.step()
 
@@ -199,8 +248,7 @@ def evaluate(
     with torch.no_grad():
 
         model.eval()
-        start = time()
-        metric = MetricLogger("validation", disable=disable_logger)
+        metric = Logger("validation", disable=disable_logger)
         metric["epoch"] = epoch
 
         for inputs, targets, tensors_lengths, target_lengths in bg_iterator(
@@ -219,24 +267,21 @@ def evaluate(
             # input_lengths: batch size
             # target_lengths: batch size
 
-            metric["cumulative loss"] += criterion(
+            loss_value = criterion(
                 outputs, targets, tensors_lengths, target_lengths
             ).item()
 
-            metric["dataset length"] += len(inputs)
-            metric["iteration"] += 1
-
-            compute_error_rates(outputs, targets, decoder, language_model, metric)
+            avg_loss = record_losses(
+                outputs, targets, decoder, language_model, loss_value, metric
+            )
 
             # TODO Remove before merge pull request
             if SIGNAL_RECEIVED:
                 break
 
-        metric["average loss"] = metric["cumulative loss"] / metric["iteration"]
-        metric["validation time"] = time() - start
-        metric()
+        metric.flush()
 
-        return metric["average loss"]
+        return avg_loss
 
 
 def main(rank, args):
