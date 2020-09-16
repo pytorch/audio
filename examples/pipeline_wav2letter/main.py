@@ -20,11 +20,6 @@ def parse_args():
         help="input type for model",
     )
     parser.add_argument(
-        "--hidden-channels",
-        default=2000,
-        type=int,
-        help="number of hidden channels in wav2letter",
-    )
     parser.add_argument(
         "--freq-mask", default=0, type=int, help="maximal width of frequency mask",
     )
@@ -83,12 +78,6 @@ def parse_args():
     parser.add_argument("--batch-size", default=128, type=int, help="mini-batch size")
     parser.add_argument(
         "--bins", default=13, type=int, help="number of bins in transforms",
-    )
-    parser.add_argument(
-        "--dropout",
-        default=0.0,
-        type=float,
-        help="probability of given weights to be zeroed",
     )
     parser.add_argument(
         "--optimizer",

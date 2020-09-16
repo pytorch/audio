@@ -1,6 +1,5 @@
 import logging
 import os
-import signal
 import string
 
 import torch
@@ -10,6 +9,7 @@ from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
 from torchaudio.transforms import MFCC
+from torchaudio.models.wav2letter import Wav2Letter
 
 from ctc_decoders import (
     GreedyDecoder,
@@ -26,34 +26,6 @@ from languagemodels import LanguageModel
 from metrics import levenshtein_distance
 from transforms import Normalize, ToMono, UnsqueezeFirst
 from utils import Logger, count_parameters, save_checkpoint
-
-# from torchaudio.models.wav2letter import Wav2Letter
-from wav2letter import Wav2Letter
-
-# TODO Remove before merge pull request
-MAIN_PID = os.getpid()
-SIGNAL_RECEIVED = False
-
-
-# TODO Remove before merge pull request
-def signal_handler(a, b):
-    global SIGNAL_RECEIVED
-    logging.warning("Signal received")
-    SIGNAL_RECEIVED = True
-
-
-# TODO Remove before merge pull request
-def trigger_job_requeue():
-    # Submit a new job to resume from checkpoint.
-    if os.environ["SLURM_PROCID"] == "0" and os.getpid() == MAIN_PID:
-        logging.warning("PID: %s. PPID: %s.", os.getpid(), os.getppid())
-        logging.warning("Resubmitting job")
-        command = "scontrol requeue " + os.environ["SLURM_JOB_ID"]
-        logging.warning(command)
-        if os.system(command):
-            raise RuntimeError("Fail to resubmit")
-        logging.warning("New job submitted to the queue")
-    exit(0)
 
 
 def setup_distributed(rank, world_size, master_addr, master_port):
@@ -238,10 +210,6 @@ def train_one_epoch(
         metric["time size"] = inputs.shape[-1]
         metric.flush()
 
-        # TODO Remove before merge pull request
-        if SIGNAL_RECEIVED:
-            break
-
     if reduce_lr_on_plateau and isinstance(scheduler, ReduceLROnPlateau):
         scheduler.step(avg_loss)
     elif not isinstance(scheduler, ReduceLROnPlateau):
@@ -304,10 +272,6 @@ def main(rank, args):
         setup_distributed(rank, args.world_size, args.distributed_master_addr, args.distributed_master_port)
 
     main_rank = rank == 0
-
-    # Install signal handler
-    # TODO Remove before merge pull request
-    signal.signal(signal.SIGUSR1, signal_handler)
 
     logging.info("Start")
 
@@ -409,8 +373,6 @@ def main(rank, args):
         num_classes=len(language_model),
         input_type=args.model_input_type,
         num_features=args.bins,
-        num_hidden_channels=args.hidden_channels,
-        dropout=args.dropout,
     )
 
     if args.distributed:
@@ -549,22 +511,6 @@ def main(rank, args):
                 is_best,
                 args.checkpoint,
             )
-
-        # TODO Remove before merge pull request
-        if SIGNAL_RECEIVED:
-            if main_rank and args.checkpoint:
-                save_checkpoint(
-                    {
-                        "epoch": epoch + 1,
-                        "state_dict": model.state_dict(),
-                        "best_loss": best_loss,
-                        "optimizer": optimizer.state_dict(),
-                        "scheduler": scheduler.state_dict(),
-                    },
-                    False,
-                    args.checkpoint,
-                )
-            trigger_job_requeue()
 
     logging.info("End")
 
