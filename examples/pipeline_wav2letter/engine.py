@@ -299,10 +299,6 @@ def main(rank, args):
 
     logging.info("Start time: %s", datetime.now())
 
-    # Explicitly set seed to make sure models created in separate processes
-    # start from same random weights and biases
-    torch.manual_seed(args.seed)
-
     # Empty CUDA cache
     torch.cuda.empty_cache()
 
@@ -344,7 +340,9 @@ def main(rank, args):
         transforms = torch.nn.Sequential(transforms, UnsqueezeFirst())
         num_features = 1
     else:
-        raise ValueError("Model type not supported")
+        raise NotImplementedError(
+            f"Selected feature type {args.feature_type} not supported"
+        )
 
     if args.normalize:
         transforms = torch.nn.Sequential(transforms, Normalize())
