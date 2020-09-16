@@ -9,7 +9,7 @@ import torch
 
 class MetricLogger(defaultdict):
     def __init__(self, name, print_freq=1, disable=False):
-        super().__init__(lambda: 0.0)
+        super().__init__(float)
         self.disable = disable
         self.print_freq = print_freq
         self._iter = 0
