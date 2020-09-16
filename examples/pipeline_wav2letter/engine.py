@@ -61,10 +61,10 @@ def setup_distributed(rank, world_size):
 
 
 def model_length_function(tensor):
-    if tensor.shape[1] == 1:
+    if tensor.shape[0] == 1:
         # waveform mode
-        return int(tensor.shape[0]) // 160 // 2 + 1
-    return int(tensor.shape[0]) // 2 + 1
+        return int(tensor.shape[-1]) // 160 // 2 + 1
+    return int(tensor.shape[-1]) // 2 + 1
 
 
 def compute_error_rates(outputs, targets, decoder, language_model, metric):
@@ -275,8 +275,11 @@ def main(rank, args):
     input_type = args.type
     num_features = args.n_bins
 
+    transforms = torch.nn.Sequential(ToMono())
+
     if args.type == "mel":
         transforms = torch.nn.Sequential(
+            transforms,
             # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
             torchaudio.transforms.MelSpectrogram(
                 sample_rate=sample_rate_original, **melkwargs
@@ -285,6 +288,7 @@ def main(rank, args):
         input_type = "mfcc"
     elif args.type == "mfcc":
         transforms = torch.nn.Sequential(
+            transforms,
             torchaudio.transforms.MFCC(
                 sample_rate=sample_rate_original,
                 n_mfcc=args.n_bins,
@@ -292,7 +296,7 @@ def main(rank, args):
             ),
         )
     elif args.type == "waveform":
-        transforms = torch.nn.Sequential(UnsqueezeFirst())
+        transforms = torch.nn.Sequential(transforms, UnsqueezeFirst())
         num_features = 1
     else:
         raise ValueError("Model type not supported")

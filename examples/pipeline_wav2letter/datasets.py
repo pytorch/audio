@@ -4,6 +4,56 @@ import torch
 from torchaudio.datasets import LIBRISPEECH
 
 
+def pad_sequence(sequences, padding_value=0.0):
+    # type: (List[Tensor], bool, float) -> Tensor
+    r"""Pad a list of variable length Tensors with ``padding_value``
+
+    ``pad_sequence`` stacks a list of Tensors along a new dimension,
+    and pads them to equal length. If the input is list of
+    sequences with size ``* x L`` then the output is and ``B x * x T``.
+
+    `B` is batch size. It is equal to the number of elements in ``sequences``.
+    `T` is length of the longest sequence.
+    `L` is length of the sequence.
+    `*` is any number of trailing dimensions, including none.
+
+    Example:
+        >>> from torch.nn.utils.rnn import pad_sequence
+        >>> a = torch.ones(300, 25)
+        >>> b = torch.ones(300, 22)
+        >>> c = torch.ones(300, 15)
+        >>> pad_sequence([a, b, c]).size()
+        torch.Size([300, 3, 25])
+
+    Note:
+        This function returns a Tensor of size ``B x * x T``
+        where `T` is the length of the longest sequence. This function assumes
+        trailing dimensions and type of all the Tensors in sequences are same.
+
+    Arguments:
+        sequences (list[Tensor]): list of variable length sequences.
+        padding_value (float, optional): value for padded elements. Default: 0.
+
+    Returns:
+        Tensor of size ``B x * x T``
+    """
+
+    # assuming trailing dimensions and type of all the Tensors
+    # in sequences are same and fetching those from sequences[0]
+    max_size = sequences[0].size()
+    trailing_dims = max_size[:-1]
+    max_len = max([s.size(-1) for s in sequences])
+    out_dims = (len(sequences),) + trailing_dims + (max_len,)
+
+    out_tensor = sequences[0].new_full(out_dims, padding_value)
+    for i, tensor in enumerate(sequences):
+        length = tensor.size(-1)
+        # use index notation to prevent duplicate references to the tensor
+        out_tensor[i, ..., :length] = tensor
+
+    return out_tensor
+
+
 class IterableMemoryCache:
     def __init__(self, iterable):
         self.iterable = iterable
@@ -58,11 +108,16 @@ class Processed(torch.utils.data.Dataset):
         return len(self.dataset)
 
     def process_datapoint(self, item):
+        """
+        Consume a LibriSpeech data point tuple:
+        (waveform, sample_rate, utterance, speaker_id, chapter_id, utterance_id).
+        - Transforms are applied to waveform. Output tensor shape (freq, time).
+        - target gets transformed into lower case, and encoded into a one dimensional long tensor.
+        """
         transformed = item[0]
         target = item[2].lower()
 
         transformed = self.transforms(transformed)
-        transformed = transformed[0, ...].transpose(0, -1)
 
         target = self.encode(target)
         target = torch.tensor(target, dtype=torch.long, device=transformed.device)
@@ -109,7 +164,7 @@ def collate_factory(model_length_function, transforms=None):
 
     def collate_fn(batch):
 
-        tensors = [transforms(b[0]) for b in batch if b]
+        tensors = [transforms(b[0]) for b in batch]  # apply transforms to waveforms
 
         tensors_lengths = torch.tensor(
             [model_length_function(t) for t in tensors],
@@ -117,16 +172,19 @@ def collate_factory(model_length_function, transforms=None):
             device=tensors[0].device,
         )
 
-        tensors = torch.nn.utils.rnn.pad_sequence(tensors, batch_first=True)
-        tensors = tensors.transpose(1, -1)
+        # tensors = [b.transpose(1, -1) for b in batch]
+        # tensors = torch.nn.utils.rnn.pad_sequence(tensors, batch_first=True)
+        # tensors = tensors.transpose(1, -1)
+        tensors = pad_sequence(tensors)
 
-        targets = [b[1] for b in batch if b]
+        targets = [b[1] for b in batch]  # extract target utterance
         target_lengths = torch.tensor(
             [target.shape[0] for target in targets],
             dtype=torch.long,
             device=tensors.device,
         )
-        targets = torch.nn.utils.rnn.pad_sequence(targets, batch_first=True)
+        # targets = torch.nn.utils.rnn.pad_sequence(targets, batch_first=True)
+        targets = pad_sequence(targets)
 
         return tensors, targets, tensors_lengths, target_lengths
 

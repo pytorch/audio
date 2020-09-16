@@ -9,3 +9,8 @@ class Normalize(torch.nn.Module):
 class UnsqueezeFirst(torch.nn.Module):
     def forward(self, tensor):
         return tensor.unsqueeze(0)
+
+
+class ToMono(torch.nn.Module):
+    def forward(self, tensor):
+        return tensor[0, ...]
