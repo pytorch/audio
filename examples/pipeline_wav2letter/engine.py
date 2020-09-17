@@ -453,8 +453,8 @@ def main(rank, args):
     if args.distributed:
         torch.distributed.barrier()
 
-    if args.checkpoint and args.resume and checkpoint_exists:
-        logging.info("Checkpoint: loading %s", args.checkpoint)
+    if args.checkpoint and checkpoint_exists and args.resume:
+        logging.info("Checkpoint loading %s", args.checkpoint)
         checkpoint = torch.load(args.checkpoint)
 
         args.start_epoch = checkpoint["epoch"]
@@ -465,10 +465,14 @@ def main(rank, args):
         scheduler.load_state_dict(checkpoint["scheduler"])
 
         logging.info(
-            "Checkpoint: loaded '%s' at epoch %s", args.checkpoint, checkpoint["epoch"]
+            "Checkpoint loaded '%s' at epoch %s", args.checkpoint, checkpoint["epoch"]
+        )
+    elif args.checkpoint and checkpoint_exists:
+        raise RuntimeError(
+            "Checkpoint already exists. Add --resume to resume, or manually delete existing file."
         )
     elif args.checkpoint and args.resume:
-        raise RuntimeError("Checkpoint: not found")
+        raise RuntimeError("Checkpoint not found")
     elif args.checkpoint and main_rank and args.checkpoint:
         save_checkpoint(
             {
@@ -482,7 +486,7 @@ def main(rank, args):
             args.checkpoint,
         )
     elif not args.checkpoint and args.resume:
-        raise RuntimeError("No checkpoint file specified to resume from.")
+        raise RuntimeError("Checkpoint not provided. Use --checkpoint to specify.")
 
     if args.distributed:
         torch.distributed.barrier()
