@@ -2,6 +2,7 @@ import os
 import time
 import torchaudio
 from torch import Tensor
+from torch.nn import Module
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import download_url, extract_archive, walk_files
 import pandas
@@ -47,12 +48,14 @@ class ESC50(Dataset):
     def __init__(self,
                 root: str,
                 folds: tuple = FOLDS,
-                download: bool = False) -> None:
+                download: bool = False,
+                transform: Module = None) -> None:
 
         super().__init__()
 
         self.root = root
         self.folds = folds
+        self.transform = transform
 
         self.url = URL["esc-50"]
         self.nb_class = 50
@@ -76,7 +79,13 @@ class ESC50(Dataset):
             tuple: (raw_audio, sr, target).
         """
         filename = self.metadata.iloc[index].name
-        return self.load_item(filename)
+        data, sampling_rate, target = self.load_item(filename)
+
+        if self.transform is not None:
+            data = self.transform(data)
+            data = data.squeeze()
+
+        return data, sampling_rate, target
 
     def __len__(self) -> int:
         return len(self.metadata)
@@ -90,7 +99,7 @@ class ESC50(Dataset):
         # Keep only the selected folds
         total = total.loc[total.fold.isin(self.folds)]
 
-        return total
+        return total 
 
     def download(self) -> None:
         """Download the dataset and extract the archive"""
@@ -98,11 +107,10 @@ class ESC50(Dataset):
             print("Dataset already downloaded and verified.")
             
         else:
-            archive_basename = os.path.basename(self.url)
             archive_path = os.path.join(self.root, FOLDER_IN_ARCHIVE + ".zip")
 
             download_url(self.url, self.root)
-            extract_archive(archive_path, self.target_directory)
+            extract_archive(archive_path, self.root)
 
     def check_integrity(self, path, checksum=None) -> bool:
         """Check if the dataset already exist and if yes, if it is not corrupted.
@@ -126,19 +134,27 @@ class ESC50(Dataset):
 
 
 class ESC10(ESC50):
+    TARGET_MAPPER = {0: 0, 1: 1, 38: 2, 40: 3, 41: 4, 10: 5, 11: 6, 12: 7, 20: 8, 21: 9}
+    
     def __init__(self, 
                 root: str,
                 folds: tuple = FOLDS,
-                download: bool = False) -> None:
-        super().__init__(root, folds, download)
+                download: bool = False,
+                transform: Module = None) -> None:
+        super().__init__(root, folds, download, transform)
 
         self.url = URL["esc-10"]
         self.nb_class = 10
+        self.mapper = None  # Map the ESC-50 target to range(0, 10)
 
     def _load_metadata(self) -> pandas.DataFrame:
         meta = super()._load_metadata()
 
         # Keep only the esc-10 relevant files
         meta = meta.loc[meta.esc10 == True]
-        
+
         return meta
+
+    def __getitem__(self, index: int) -> Tuple[Tensor, int]:
+        data, sampling_rate, target = super().__getitem__(index)
+        return data, sampling_rate, ESC10.TARGET_MAPPER[target]
