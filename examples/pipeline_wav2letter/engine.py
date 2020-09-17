@@ -93,13 +93,6 @@ def record_losses(outputs, targets, decoder, language_model, loss_value, metric)
     output = language_model.decode(output.tolist())
     target = language_model.decode(targets.tolist())
 
-    print_length = 20
-    for i in range(2):
-        # Print a few examples
-        output_print = output[i].ljust(print_length)[:print_length]
-        target_print = target[i].ljust(print_length)[:print_length]
-        logging.info("Target: %s    Output: %s", target_print, output_print)
-
     cers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
     cers = sum(cers)
     n = sum(len(t) for t in target)
@@ -108,6 +101,15 @@ def record_losses(outputs, targets, decoder, language_model, loss_value, metric)
     metric["cumulative char errors"] += cers
     metric["batch cer"] = cers / n
     metric["epoch cer"] = metric["cumulative char errors"] / metric["total chars"]
+
+    # Print a few output/target pairs
+
+    print_length = 20
+    for i in range(2):
+        # Print a few examples
+        output_print = output[i].ljust(print_length)[:print_length]
+        target_print = target[i].ljust(print_length)[:print_length]
+        logging.info("Target: %s    | Output: %s", target_print, output_print)
 
     # Compute WER
 
