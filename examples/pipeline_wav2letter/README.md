@@ -15,9 +15,9 @@ python main.py \
     --clip-grad 0. \
     --gamma .99 \
     --hop-length 160 \
-    --n-hidden-channels 2000 \
+    --hidden-channels 2000 \
     --win-length 400 \
-    --n-bins 13 \
+    --bins 13 \
     --normalize \
     --optimizer adadelta \
     --scheduler reduceonplateau \
@@ -37,9 +37,10 @@ One way to import the output in python with pandas is by saving the standard out
 
 ## Structure of pipeline
 
-* `main.py` -- the entry point
-* `ctc_decoders.py` -- the greedy CTC decoder
-* `datasets.py` -- the function to split and process librispeech, a collate factory function
-* `languagemodels.py` -- a class to encode and decode strings
-* `metrics.py` -- the levenshtein edit distance
+* `main.py` -- command line entry point
+* `engine.py` -- preprocessing, training, and validation, code
+* `ctc_decoders.py` -- greedy CTC decoder
+* `datasets.py` -- function to split and process librispeech, a collate factory function
+* `languagemodels.py` -- class to encode and decode strings
+* `metrics.py` -- levenshtein edit distance
 * `utils.py` -- functions to log metrics, save checkpoint, and count parameters
