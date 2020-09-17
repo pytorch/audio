@@ -294,7 +294,7 @@ def main(rank, args):
     if args.distributed:
         setup_distributed(rank, args.world_size)
 
-    not_main_rank = args.distributed and rank != 0
+    main_rank = rank == 0
 
     # Install signal handler
     # TODO Remove before merge pull request
@@ -446,12 +446,12 @@ def main(rank, args):
 
     best_loss = 1.0
 
-    load_checkpoint = args.checkpoint and os.path.isfile(args.checkpoint)
+    checkpoint_exists = os.path.isfile(args.checkpoint)
 
     if args.distributed:
         torch.distributed.barrier()
 
-    if load_checkpoint:
+    if args.checkpoint and args.resume and checkpoint_exists:
         logging.info("Checkpoint: loading %s", args.checkpoint)
         checkpoint = torch.load(args.checkpoint)
 
@@ -465,9 +465,9 @@ def main(rank, args):
         logging.info(
             "Checkpoint: loaded '%s' at epoch %s", args.checkpoint, checkpoint["epoch"]
         )
-    else:
-        logging.info("Checkpoint: not found")
-
+    elif args.checkpoint and args.resume:
+        raise RuntimeError("Checkpoint: not found")
+    elif args.checkpoint and main_rank and args.checkpoint:
         save_checkpoint(
             {
                 "epoch": args.start_epoch,
@@ -478,8 +478,9 @@ def main(rank, args):
             },
             False,
             args.checkpoint,
-            not_main_rank,
         )
+    elif not args.checkpoint and args.resume:
+        raise RuntimeError("No checkpoint file specified to resume from.")
 
     if args.distributed:
         torch.distributed.barrier()
@@ -501,7 +502,7 @@ def main(rank, args):
             devices[0],
             epoch,
             args.clip_grad,
-            not_main_rank,
+            not main_rank,
             not args.reduce_lr_valid,
         )
 
@@ -515,41 +516,41 @@ def main(rank, args):
                 language_model,
                 devices[0],
                 epoch,
-                not_main_rank,
+                not main_rank,
             )
 
             is_best = loss < best_loss
             best_loss = min(loss, best_loss)
-            save_checkpoint(
-                {
-                    "epoch": epoch + 1,
-                    "state_dict": model.state_dict(),
-                    "best_loss": best_loss,
-                    "optimizer": optimizer.state_dict(),
-                    "scheduler": scheduler.state_dict(),
-                },
-                is_best,
-                args.checkpoint,
-                not_main_rank,
-            )
+            if main_rank and args.checkpoint:
+                save_checkpoint(
+                    {
+                        "epoch": epoch + 1,
+                        "state_dict": model.state_dict(),
+                        "best_loss": best_loss,
+                        "optimizer": optimizer.state_dict(),
+                        "scheduler": scheduler.state_dict(),
+                    },
+                    is_best,
+                    args.checkpoint,
+                )
 
         if args.reduce_lr_valid and isinstance(scheduler, ReduceLROnPlateau):
             scheduler.step(loss)
 
         # TODO Remove before merge pull request
         if SIGNAL_RECEIVED:
-            save_checkpoint(
-                {
-                    "epoch": epoch + 1,
-                    "state_dict": model.state_dict(),
-                    "best_loss": best_loss,
-                    "optimizer": optimizer.state_dict(),
-                    "scheduler": scheduler.state_dict(),
-                },
-                False,
-                args.checkpoint,
-                not_main_rank,
-            )
+            if main_rank and args.checkpoint:
+                save_checkpoint(
+                    {
+                        "epoch": epoch + 1,
+                        "state_dict": model.state_dict(),
+                        "best_loss": best_loss,
+                        "optimizer": optimizer.state_dict(),
+                        "scheduler": scheduler.state_dict(),
+                    },
+                    False,
+                    args.checkpoint,
+                )
             trigger_job_requeue()
 
     logging.info("End time: %s", datetime.now())

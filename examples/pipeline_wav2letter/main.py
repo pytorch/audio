@@ -36,10 +36,14 @@ def parse_args():
     )
     parser.add_argument(
         "--checkpoint",
-        default="",
         type=str,
         metavar="PATH",
-        help="path to latest checkpoint",
+        help="path to checkpoint file",
+    )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="resume from checkpoint file provided by --checkpoint option",
     )
     parser.add_argument(
         "--epochs", default=200, type=int, help="number of total epochs to run",

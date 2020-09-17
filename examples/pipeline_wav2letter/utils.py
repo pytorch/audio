@@ -31,30 +31,18 @@ class Logger(defaultdict):
             print(self, flush=True)
 
 
-def save_checkpoint(state, is_best, filename, disable):
+def save_checkpoint(state, is_best, filename):
     """
     Save the model to a temporary file first,
     then copy it to filename, in case the signal interrupts
     the torch.save() process.
     """
 
-    if disable:
-        return
+    torch.save(state, filename)
 
-    if filename == "":
-        return
-
-    tempfile = filename + ".temp"
-
-    # Remove tempfile in case interuption during the copying from tempfile to filename
-    if os.path.isfile(tempfile):
-        os.remove(tempfile)
-
-    torch.save(state, tempfile)
-    if os.path.isfile(tempfile):
-        os.rename(tempfile, filename)
     if is_best:
         shutil.copyfile(filename, "model_best.pth.tar")
+
     logging.warning("Checkpoint: saved")
 
 
