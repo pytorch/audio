@@ -64,9 +64,9 @@ class ESC50(Dataset):
         # Dataset must exist to continue
         if download:
             self.download()
-        elif not self.check_integrity(self.target_directory):
-            raise RuntimeError("Dataset not found or corrupted. \n\
-                You can use download=True to download it.")
+        # elif not self.check_integrity(self.target_directory):
+        #     raise RuntimeError("Dataset not found or corrupted. \n\
+        #         You can use download=True to download it.")
 
         self.metadata = self._load_metadata()
 
@@ -93,13 +93,13 @@ class ESC50(Dataset):
     def _load_metadata(self) -> pandas.DataFrame:
         """Return the dataset medata into a pandas DataFrame."""
         path = os.path.join(self.target_directory, META_FOLDER, "esc50.csv")
-        total = pandas.read_csv(path)
+        total = pandas.read_csv(path, sep=",")
         total = total.set_index("filename")
 
         # Keep only the selected folds
         total = total.loc[total.fold.isin(self.folds)]
 
-        return total 
+        return total
 
     def download(self) -> None:
         """Download the dataset and extract the archive"""
