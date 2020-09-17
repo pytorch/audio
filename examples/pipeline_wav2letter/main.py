@@ -8,9 +8,9 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Train wav2letter for End-to-End ASR.")
 
     parser.add_argument(
-        "--feature-type",
+        "--model-input-type",
         default="mfcc",
-        choices=["waveform", "mfcc", "mel"],
+        choices=["waveform", "mfcc"],
         help="input type for model",
     )
     parser.add_argument(

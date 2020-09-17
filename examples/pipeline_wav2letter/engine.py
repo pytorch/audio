@@ -62,11 +62,14 @@ def setup_distributed(rank, world_size):
     torch.distributed.init_process_group("nccl", rank=rank, world_size=world_size)
 
 
-def model_length_function(tensor):
-    if tensor.shape[0] == 1:
-        # waveform mode
-        return int(tensor.shape[-1]) // 160 // 2 + 1
-    return int(tensor.shape[-1]) // 2 + 1
+def model_length_function_constructor(model_input_type):
+    if model_input_type == "waveform":
+        return lambda tensor: int(tensor.shape[-1]) // 160 // 2 + 1
+    elif model_input_type == "mfcc":
+        return lambda tensor: int(tensor.shape[-1]) // 2 + 1
+    raise NotImplementedError(
+        f"Selected model input type {model_input_type} not supported"
+    )
 
 
 def record_losses(outputs, targets, decoder, language_model, loss_value, metric):
@@ -315,33 +318,21 @@ def main(rank, args):
 
     sample_rate_original = 16000
 
-    input_type = args.feature_type
-    num_features = args.bins
-
     transforms = torch.nn.Sequential(ToMono())
 
-    if args.feature_type == "mel":
-        transforms = torch.nn.Sequential(
-            transforms,
-            # torchaudio.transforms.Resample(sample_rate_original, sample_rate_original//2),
-            torchaudio.transforms.MelSpectrogram(
-                sample_rate=sample_rate_original, **melkwargs
-            ),
-        )
-        input_type = "mfcc"
-    elif args.feature_type == "mfcc":
+    if args.model_input_type == "mfcc":
         transforms = torch.nn.Sequential(
             transforms,
             torchaudio.transforms.MFCC(
                 sample_rate=sample_rate_original, n_mfcc=args.bins, melkwargs=melkwargs,
             ),
         )
-    elif args.feature_type == "waveform":
+    elif args.model_input_type == "waveform":
         transforms = torch.nn.Sequential(transforms, UnsqueezeFirst())
-        num_features = 1
+        assert args.bins == 1, "waveform model input type only supports bins == 1"
     else:
         raise NotImplementedError(
-            f"Selected feature type {args.feature_type} not supported"
+            f"Selected model input type {args.model_input_type} not supported"
         )
 
     if args.normalize:
@@ -394,8 +385,8 @@ def main(rank, args):
 
     model = Wav2Letter(
         num_classes=len(language_model),
-        input_type=input_type,
-        num_features=num_features,
+        input_type=args.model_input_type,
+        num_features=args.bins,
         num_hidden_channels=args.hidden_channels,
         dropout=args.dropout,
     )
@@ -428,6 +419,7 @@ def main(rank, args):
 
     # Data Loader
 
+    model_length_function = model_length_function_constructor(args.model_input_type)
     collate_fn_train = collate_factory(model_length_function, augmentations)
     collate_fn_valid = collate_factory(model_length_function)
 
