@@ -2,7 +2,6 @@ import logging
 import os
 import signal
 import string
-from datetime import datetime
 
 import torch
 import torchaudio
@@ -35,7 +34,7 @@ SIGNAL_RECEIVED = False
 # TODO Remove before merge pull request
 def signal_handler(a, b):
     global SIGNAL_RECEIVED
-    logging.warning("Signal received on %s", datetime.now())
+    logging.warning("Signal received")
     SIGNAL_RECEIVED = True
 
 
@@ -302,7 +301,7 @@ def main(rank, args):
     # TODO Remove before merge pull request
     signal.signal(signal.SIGUSR1, signal_handler)
 
-    logging.info("Start time: %s", datetime.now())
+    logging.info("Star")
 
     # Empty CUDA cache
     torch.cuda.empty_cache()
@@ -556,7 +555,7 @@ def main(rank, args):
                 )
             trigger_job_requeue()
 
-    logging.info("End time: %s", datetime.now())
+    logging.info("End")
 
     if args.distributed:
         torch.distributed.destroy_process_group()

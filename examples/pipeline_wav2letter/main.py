@@ -35,10 +35,13 @@ def parse_args():
         "--workers", default=0, type=int, help="number of data loading workers",
     )
     parser.add_argument(
-        "--checkpoint",
+        "--output",
         type=str,
         metavar="PATH",
-        help="path to checkpoint file",
+        help="path to output file, standard output if not specified",
+    )
+    parser.add_argument(
+        "--checkpoint", type=str, metavar="PATH", help="path to checkpoint file",
     )
     parser.add_argument(
         "--resume",
@@ -129,10 +132,7 @@ def parse_args():
         help="rho parameter for Adadelta",
     )
     parser.add_argument(
-        "--clip-grad",
-        metavar="NORM",
-        type=float,
-        help="value to clip gradient at",
+        "--clip-grad", metavar="NORM", type=float, help="value to clip gradient at",
     )
     parser.add_argument(
         "--dataset-root", type=str, help="specify dataset root folder",
@@ -171,6 +171,11 @@ def parse_args():
 
 if __name__ == "__main__":
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(
+        format="%(asctime)s %(levelname)-8s %(message)s",
+        level=logging.INFO,
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
     args = parse_args()
     spawn_main(args)

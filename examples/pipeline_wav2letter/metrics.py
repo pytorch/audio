@@ -6,7 +6,7 @@ def levenshtein_distance(r: Union[str, List[str]], h: Union[str, List[str]]) -> 
     Calculate the Levenshtein distance between two lists or strings.
 
     The function computes an edit distance allowing deletion, insertion and substitution.
-    The result is an integer that is often normalize by the length of the reference.
+    The result is an integer. Users may want to normalize by the length of the reference.
 
     Args:
         r (str or List[str]): the reference list or string to compare.
