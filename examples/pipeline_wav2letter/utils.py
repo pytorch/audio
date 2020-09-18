@@ -1,8 +1,8 @@
 import json
 import logging
 import shutil
+import time
 from collections import defaultdict
-from time import time
 
 import torch
 
@@ -19,10 +19,10 @@ class Logger(defaultdict):
         self._iteration = "iteration"
 
         self[self._name] = name
-        self[self._start] = time()
+        self[self._start] = time.monotonic()
 
     def __str__(self):
-        self[self._time] = time()
+        self[self._time] = time.monotonic()
         return json.dumps(self)
 
     def flush(self):
