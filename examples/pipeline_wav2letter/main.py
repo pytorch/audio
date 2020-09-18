@@ -163,7 +163,6 @@ def parse_args():
     parser.add_argument(
         "--world-size", type=int, default=8, help="the world size to initiate DPP"
     )
-    parser.add_argument("--jit", action="store_true", help="if used, model is jitted")
 
     args = parser.parse_args()
     logging.info(args)

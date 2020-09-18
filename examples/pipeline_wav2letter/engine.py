@@ -393,9 +393,6 @@ def main(rank, args):
         dropout=args.dropout,
     )
 
-    if args.jit:
-        model = torch.jit.script(model)
-
     if args.distributed:
         n = torch.cuda.device_count() // args.world_size
         devices = list(range(rank * n, (rank + 1) * n))
