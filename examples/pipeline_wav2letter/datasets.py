@@ -1,11 +1,13 @@
 import itertools
+from typing import List
 
 import torch
+from torch import Tensor
 from torchaudio.datasets import LIBRISPEECH
 
 
 def pad_sequence(sequences, padding_value=0.0):
-    # type: (List[Tensor], bool, float) -> Tensor
+    # type: (List[Tensor], float) -> Tensor
     r"""Pad a list of variable length Tensors with ``padding_value``
 
     ``pad_sequence`` stacks a list of Tensors along a new dimension,

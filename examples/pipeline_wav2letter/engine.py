@@ -3,7 +3,6 @@ import os
 import signal
 import string
 from datetime import datetime
-from time import time
 
 import torch
 import torchaudio
@@ -11,7 +10,7 @@ from torch.optim import SGD, Adadelta, Adam, AdamW
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
-from torchaudio.transforms import MFCC, Resample
+from torchaudio.transforms import MFCC
 
 from ctc_decoders import (
     GreedyDecoder,
@@ -74,14 +73,15 @@ def model_length_function_constructor(model_input_type):
 
 def record_losses(outputs, targets, decoder, language_model, loss_value, metric):
 
-    metric["batch size"] = len(outputs)
-    metric["cumulative batch size"] += len(outputs)
+    # outputs: input length, batch size, number of classes (including blank)
+    metric["batch size"] = outputs.shape[1]
+    metric["cumulative batch size"] += metric["batch size"]
 
     # Record loss
 
-    metric["batch loss"] = loss_value
     metric["cumulative loss"] += loss_value
-    metric["average loss"] = metric["cumulative loss"] / metric["cumulative batch size"]
+    metric["epoch loss"] = metric["cumulative loss"] / metric["cumulative batch size"]
+    metric["batch loss"] = loss_value / metric["batch size"]
 
     # Decode output
 
@@ -325,7 +325,7 @@ def main(rank, args):
     if args.model_input_type == "mfcc":
         transforms = torch.nn.Sequential(
             transforms,
-            torchaudio.transforms.MFCC(
+            MFCC(
                 sample_rate=sample_rate_original, n_mfcc=args.bins, melkwargs=melkwargs,
             ),
         )
