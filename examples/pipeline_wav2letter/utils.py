@@ -49,7 +49,7 @@ def save_checkpoint(state, is_best, filename):
     torch.save(state, filename)
 
     if is_best:
-        shutil.copyfile(filename, "model_best.pth.tar")
+        shutil.copyfile(filename, "best_" + filename)
 
     logging.warning("Checkpoint: saved")
 
