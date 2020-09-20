@@ -124,7 +124,7 @@ def record_losses(outputs, targets, decoder, language_model, loss_value, metric)
     metric["batch wer"] = wers / n
     metric["epoch wer"] = metric["cumulative word errors"] / metric["total words"]
 
-    return metric["average loss"]
+    return metric["epoch loss"]
 
 
 def _get_optimizer(args, model):
