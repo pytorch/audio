@@ -313,6 +313,13 @@ def create_fb_matrix(
         enorm = 2.0 / (f_pts[2:n_mels + 2] - f_pts[:n_mels])
         fb *= enorm.unsqueeze(0)
 
+    if (fb.max(dim=0).values == 0.).any():
+        warnings.warn(
+            "At least one mel filterbank has all zero values. "
+            f"The value for `n_mels` ({n_mels}) may be set too high. "
+            f"Or, the value for `n_freqs` ({n_freqs}) may be set too low."
+        )
+
     return fb
 
 
