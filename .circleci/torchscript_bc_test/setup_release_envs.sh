@@ -2,8 +2,8 @@
 
 set -e
 
-cd "$( dirname "${BASH_SOURCE[0]}" )"
-. "common.sh"
+# shellcheck source=../../tools/conda_envs/utils.sh
+. "$(git rev-parse --show-toplevel)/tools/conda_envs/utils.sh"
 
 install_conda
 init_conda
