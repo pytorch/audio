@@ -6,6 +6,7 @@ set -u
 . "$(git rev-parse --show-toplevel)/tools/conda_envs/utils.sh"
 
 init_conda
+
 activate_env master "${PYTHON_VERSION}"
 
 
@@ -16,7 +17,7 @@ exit_status=0
 printf "\x1b[34mRunning flake8: "
 flake8 --version
 printf "\x1b[0m\n"
-flake8 torchaudio test build_tools/setup_helpers
+flake8 torchaudio test tools/setup_helpers
 status=$?
 exit_status="$((exit_status+status))"
 if [ "${status}" -ne 0 ]; then

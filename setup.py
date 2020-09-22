@@ -6,7 +6,7 @@ from pathlib import Path
 from setuptools import setup, find_packages
 import distutils.command.clean
 
-from build_tools import setup_helpers
+from tools import setup_helpers
 
 ROOT_DIR = Path(__file__).parent.resolve()
 
