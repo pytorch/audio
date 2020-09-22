@@ -168,6 +168,38 @@ class SaveTestBase(TempDirMixin, PytorchTestCase):
         else:
             raise error
 
+    def assert_sphere(self, sample_rate, num_channels, duration):
+        """`sox_io_backend.save` can save sph format.
+
+        This test takes the same strategy as mp3 to compare the result
+        """
+        src_path = self.get_temp_path('1.reference.wav')
+        flc_path = self.get_temp_path('2.1.torchaudio.sph')
+        wav_path = self.get_temp_path('2.2.torchaudio.wav')
+        flc_path_sox = self.get_temp_path('3.1.sox.sph')
+        wav_path_sox = self.get_temp_path('3.2.sox.wav')
+
+        # 1. Generate original wav
+        data = get_wav_data('float32', num_channels, normalize=True, num_frames=duration * sample_rate)
+        save_wav(src_path, data, sample_rate)
+        # 2.1. Convert the original wav to sph with torchaudio
+        sox_io_backend.save(flc_path, load_wav(src_path)[0], sample_rate)
+        # 2.2. Convert the sph to wav with Sox
+        # converting to 32 bit because sph file has 24 bit depth which scipy cannot handle.
+        sox_utils.convert_audio_file(flc_path, wav_path, bit_depth=32)
+        # 2.3. Load
+        found = load_wav(wav_path)[0]
+
+        # 3.1. Convert the original wav to sph with SoX
+        sox_utils.convert_audio_file(src_path, flc_path_sox)
+        # 3.2. Convert the sph to wav with Sox
+        # converting to 32 bit because sph file has 24 bit depth which scipy cannot handle.
+        sox_utils.convert_audio_file(flc_path_sox, wav_path_sox, bit_depth=32)
+        # 3.3. Load
+        expected = load_wav(wav_path_sox)[0]
+
+        self.assertEqual(found, expected)
+
 
 @skipIfNoExec('sox')
 @skipIfNoExtension
@@ -261,6 +293,14 @@ class TestSave(SaveTestBase):
         two_hours = 2 * 60 * 60
         self.assert_vorbis(sample_rate, num_channels, quality_level, two_hours)
     '''
+
+    @parameterized.expand(list(itertools.product(
+        [8000, 16000],
+        [1, 2],
+    )), name_func=name_func)
+    def test_sphere(self, sample_rate, num_channels):
+        """`sox_io_backend.save` can save sph format."""
+        self.assert_sphere(sample_rate, num_channels, duration=1)
 
 
 @skipIfNoExec('sox')

@@ -194,6 +194,13 @@ class Functional(common_utils.TestBaseMixin):
         tensor = common_utils.get_whitenoise(n_channels=2)
         self._assert_consistency(func, tensor, shape_only=True)
 
+    def test_dither_noise_shaping(self):
+        def func(tensor):
+            return F.dither(tensor, noise_shaping=True)
+
+        tensor = common_utils.get_whitenoise(n_channels=2)
+        self._assert_consistency(func, tensor)
+
     def test_lfilter(self):
         if self.dtype == torch.float64:
             raise unittest.SkipTest("This test is known to fail for float64")

@@ -58,6 +58,7 @@ def load(
         * FLAC
         * OGG/VORBIS
         * OPUS
+        * SPHERE
 
         To load ``MP3``, ``FLAC``, ``OGG/VORBIS``, ``OPUS`` and other codecs ``libsox`` does not
         handle natively, your installation of ``torchaudio`` has to be linked to ``libsox``
@@ -132,6 +133,7 @@ def save(
         * MP3
         * FLAC
         * OGG/VORBIS
+        * SPHERE
 
         To save ``MP3``, ``FLAC``, ``OGG/VORBIS``, and other codecs ``libsox`` does not
         handle natively, your installation of ``torchaudio`` has to be linked to ``libsox``
@@ -158,7 +160,7 @@ def save(
     """
     if compression is None:
         ext = str(filepath)[-3:].lower()
-        if ext == 'wav':
+        if ext in ['wav', 'sph']:
             compression = 0.
         elif ext == 'mp3':
             compression = -4.5
