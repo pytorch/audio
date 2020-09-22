@@ -7,17 +7,9 @@ unset PYTORCH_VERSION
 
 set -e
 
-eval "$(./conda/Scripts/conda.exe 'shell.bash' 'hook')"
-conda activate ./env
+# shellcheck source=../../../../tools/conda_envs/utils.sh
+. "$(git rev-parse --show-toplevel)/tools/conda_envs/utils.sh"
 
-if [ -z "${CUDA_VERSION:-}" ] ; then
-    cudatoolkit="cpuonly"
-else
-    version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
-    cudatoolkit="cudatoolkit=${version}"
-fi
-printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -y -c pytorch-nightly pytorch "${cudatoolkit}"
-
-printf "* Installing torchaudio\n"
-python setup.py install
+init_conda
+activate_env master "${PYTHON_VERSION}"
+build_master "${CUDA_VERSION:-}"
