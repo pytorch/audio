@@ -545,24 +545,24 @@ jobs:
       - attach_workspace:
           at: third_party
       - generate_cache_key
-      - restore_cache:
-
-          keys:
-            - env-v1-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum "tools/conda_envs/environment-MacOSX.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
-
+      # - restore_cache:
+      #     
+      #     keys:
+      #       - env-v1-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum "tools/conda_envs/environment-MacOSX.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+      #     
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
-      - save_cache:
-
-          key: env-v1-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum "tools/conda_envs/environment-MacOSX.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
-
-          paths:
-            - conda
-            - env
-            - third_party/build
-            - third_party/install
-            - third_party/src
+      # - save_cache:
+      #     
+      #     key: env-v1-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum "tools/conda_envs/environment-MacOSX.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+      #     
+      #     paths:
+      #       - conda
+      #       - env
+      #       - third_party/build
+      #       - third_party/install
+      #       - third_party/src
       - run:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
