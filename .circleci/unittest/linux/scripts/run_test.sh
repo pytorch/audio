@@ -2,8 +2,11 @@
 
 set -e
 
-eval "$(./conda/bin/conda shell.bash hook)"
-conda activate ./env
+# shellcheck source=../../../../tools/conda_envs/utils.sh
+. "$(git rev-parse --show-toplevel)/tools/conda_envs/utils.sh"
+
+init_conda
+activate_env master "${PYTHON_VERSION}"
 
 python -m torch.utils.collect_env
 export TORCHAUDIO_TEST_FAIL_IF_NO_EXTENSION=1

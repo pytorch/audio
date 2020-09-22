@@ -2,8 +2,12 @@
 
 set -u
 
-eval "$(./conda/bin/conda shell.bash hook)"
-conda activate ./env
+# shellcheck source=../../../../tools/conda_envs/utils.sh
+. "$(git rev-parse --show-toplevel)/tools/conda_envs/utils.sh"
+
+init_conda
+activate_env master "${PYTHON_VERSION}"
+
 
 # We want to run all the style checks even if one of them fail.
 
