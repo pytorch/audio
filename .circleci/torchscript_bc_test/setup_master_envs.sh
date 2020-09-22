@@ -2,8 +2,8 @@
 
 set -e
 
-cd "$( dirname "${BASH_SOURCE[0]}" )"
-. "common.sh"
+# shellcheck source=../../tools/conda_envs/utils.sh
+. "$(git rev-parse --show-toplevel)/tools/conda_envs/utils.sh"
 
 install_conda
 init_conda
@@ -12,6 +12,6 @@ init_conda
 for python in "${PYTHON_VERSIONS[@]}" ; do
     create_env master "${python}"
     activate_env master "${python}"
-    install_build_dependencies "${python}"
-    build_master "${python}"
+    install_build_dependencies
+    build_master
 done

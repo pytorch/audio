@@ -2,10 +2,8 @@
 
 set -e
 
-this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-pushd "${this_dir}"
-. "common.sh"
-popd
+# shellcheck source=../../tools/conda_envs/utils.sh
+. "$(git rev-parse --show-toplevel)/tools/conda_envs/utils.sh"
 
 init_conda
 

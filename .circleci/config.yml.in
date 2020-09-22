@@ -485,7 +485,7 @@ jobs:
           {% endraw %}
           paths:
             - conda
-            - env
+            - envs
       - run:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
@@ -615,7 +615,7 @@ jobs:
       - restore_cache:
           {% raw %}
           keys:
-            - torchscript-bc-test-release-envs-v1-{{ arch }}-{{ checksum ".cachekey" }}
+            - env-v1-linux-{{ arch }}-{{ checksum "tools/conda_envs/environment-Linux.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Generate Objects
@@ -624,7 +624,7 @@ jobs:
              .circleci/torchscript_bc_test/generate_objects.sh
       - save_cache:
           {% raw %}
-          key: torchscript-bc-test-release-envs-v1-{{ arch }}-{{ checksum ".cachekey" }}
+          key: env-v1-linux-{{ arch }}-{{ checksum "tools/conda_envs/environment-Linux.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
