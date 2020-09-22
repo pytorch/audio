@@ -21,6 +21,23 @@ class TestLFilterFloat64(Lfilter, common_utils.PytorchTestCase):
     device = torch.device('cpu')
 
 
+class TestCreateFBMatrix(common_utils.TorchaudioTestCase):
+    def test_no_warning_high_n_freq(self):
+        with pytest.warns(None) as w:
+            F.create_fb_matrix(288, 0, 8000, 128, 16000)
+        assert len(w) == 0
+
+    def test_no_warning_low_n_mels(self):
+        with pytest.warns(None) as w:
+            F.create_fb_matrix(201, 0, 8000, 89, 16000)
+        assert len(w) == 0
+
+    def test_warning(self):
+        with pytest.warns(None) as w:
+            F.create_fb_matrix(201, 0, 8000, 128, 16000)
+        assert len(w) == 1
+
+
 class TestComputeDeltas(common_utils.TorchaudioTestCase):
     """Test suite for correctness of compute_deltas"""
     def test_one_channel(self):
