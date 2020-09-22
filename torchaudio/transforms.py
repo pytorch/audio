@@ -9,9 +9,6 @@ from torch import Tensor
 from torchaudio import functional as F
 from torchaudio.compliance import kaldi
 
-import numpy as np
-from scipy import special
-
 
 __all__ = [
     'Spectrogram',
@@ -652,7 +649,9 @@ class Resampler(torch.nn.Module):
               quite a lot. The kernel size is 2*num_zeros + 1.
           cutoff_ratio: The filter rolloff point as a fraction of the
              Nyquist frequency.
-          filter: one of ['kaiser', 'kaiser_best', 'kaiser_fast', 'hann']
+          filter: one of [ 'hann'] 
+               ('kaiser', 'kaiser_best', 'kaiser_fast' can be options when 
+               pytorch includes scipy.special.i0)
           beta: parameter for 'kaiser' filter
 
         You can think of this algorithm as dividing up the signals
@@ -680,11 +679,11 @@ class Resampler(torch.nn.Module):
 
         assert dtype in [torch.float32, torch.float64]
         assert num_zeros > 3  # a reasonable bare minimum
-        np_dtype = np.float32 if dtype == torch.float32 else np.float64
 
-        assert filter in ['hann', 'kaiser', 'kaiser_best', 'kaiser_fast']
-
-        # settings from https://github.com/bmcfee/resampy/blob/master/resampy/filters.py#L41
+        assert filter in ['hann']
+        # ['kaiser', 'kaiser_best', 'kaiser_fast'] can be supported when pytorch
+        # includes scipy.special.io
+        # settings in https://github.com/bmcfee/resampy/blob/master/resampy/filters.py#L41
         if filter == 'kaiser_best':
             num_zeros = 64
             beta = 14.769656459379492
@@ -713,8 +712,7 @@ class Resampler(torch.nn.Module):
         #
         # Assuming the following division is not exact, adding 1
         # will have the same effect as rounding up.
-        # blocks_per_side = 1 + int(num_zeros / zeros_per_block)
-        blocks_per_side = int(np.ceil(num_zeros / zeros_per_block))
+        blocks_per_side = 1 + int(num_zeros / zeros_per_block)
 
         kernel_width = 2 * blocks_per_side + 1
 
@@ -735,9 +733,9 @@ class Resampler(torch.nn.Module):
         # which sign works.
 
         times = (
-            np.arange(output_sr, dtype=np_dtype).reshape((output_sr, 1, 1)) / output_sr -
-            np.arange(input_sr, dtype=np_dtype).reshape((1, input_sr, 1)) / input_sr -
-            (np.arange(kernel_width, dtype=np_dtype).reshape((1, 1, kernel_width)) - blocks_per_side))
+            torch.arange(output_sr, dtype=dtype).reshape((output_sr, 1, 1)) / output_sr -
+            torch.arange(input_sr, dtype=dtype).reshape((1, input_sr, 1)) / input_sr -
+            (torch.arange(kernel_width, dtype=dtype).reshape((1, 1, kernel_width)) - blocks_per_side))
 
         def hann_window(a):
             """
@@ -747,13 +745,22 @@ class Resampler(torch.nn.Module):
 
             The heaviside function returns (a > 0 ? 1 : 0).
             """
-            return np.heaviside(1 - np.abs(a), 0.0) * (0.5 + 0.5 * np.cos(a * np.pi))
+            #return np.heaviside(1 - np.abs(a), 0.0) * (0.5 + 0.5 * np.cos(a * np.pi))
+            pi = torch.acos(torch.zeros(1)).item() * 2
+            return torch.heaviside(1 - torch.abs(a), 0.0) * (0.5 + 0.5 * torch.cos(a * pi))
+
 
         def kaiser_window(a, beta):
-            w = special.i0(beta * np.sqrt(np.clip(1 - ((a - 0.0) / 1.0) ** 2.0, 0.0, 1.0))) / special.i0(beta)
-            return np.heaviside(1 - np.abs(a), 0.0) * w
+            #TODO: the kaiser window can be added once scipy.special.i0 has been implement in torch
+            #w = scipy.special.i0(beta * np.sqrt(np.clip(1 - ((a - 0.0) / 1.0) ** 2.0, 0.0, 1.0))) / special.i0(beta)
+            #return np.heaviside(1 - np.abs(a), 0.0) * w
+            return None
 
-        # The weights below are a sinc function times a Hann-window function.
+
+        def sinc(x):
+            return torch.exp(-torch.lgamma(1 + x) - torch.lgamma(1 - x))
+
+            # The weights below are a sinc function times a Hann-window function.
         #
         # Multiplication by zeros_per_block normalizes the sinc function
         # (to compensate for scaling on the x-axis), so that the integral is 1.
@@ -763,11 +770,11 @@ class Resampler(torch.nn.Module):
         # in order to have the same magnitude as the original input function,
         # we need to divide by the number of those deltas per unit time.
         if filter == 'hann':
-            weights = (np.sinc(times * zeros_per_block)
+            weights = (sinc(times * zeros_per_block)
                        * hann_window(times / window_radius_in_blocks)
                        * zeros_per_block / input_sr)
         else:
-            weights = (np.sinc(times * zeros_per_block)
+            weights = (sinc(times * zeros_per_block)
                        * kaiser_window(times / window_radius_in_blocks, beta)
                        * zeros_per_block / input_sr)
 
@@ -845,21 +852,38 @@ class Resampler(torch.nn.Module):
         else:
             assert self.resample_type == 'general'
             (minibatch_size, seq_len) = data.shape
-            num_blocks = seq_len // self.input_sr
-            if num_blocks == 0:
-                # TODO: pad with zeros.
-                raise RuntimeError("Signal is too short to resample")
+
+            pad = 0
+            if seq_len % self.input_sr != 0:
+                #pad the sequence with zeros so that the sequence is a whole number of blocks
+                pad = self.input_sr - (seq_len % self.input_sr)
+                zeros = torch.zeros(data.size()[0:-1] + (pad,), dtype=data.dtype)
+                data = torch.cat([data, zeros], dim=-1)
+
+            num_blocks = data.size(-1) // self.input_sr
+
+            # num_blocks = seq_len // self.input_sr
+            # if num_blocks == 0:
+            #     #if signal is shorter than the filter, then pad signal with zeros.
+            #     zeros = torch.zeros(data.size()[0:-1]+(self.input_sr - seq_len,), dtype=data.dtype)
+            #     data = torch.cat([data, zeros], dim=-1)
+            #     num_blocks = 1
+
             # data = data[:, 0:(num_blocks*self.input_sr)]  # Truncate input
             data = data[:, 0:(num_blocks * self.input_sr)].view(minibatch_size, num_blocks, self.input_sr)
 
-            # Torch's conv1d expects input data with shape (minibatch, in_channels, time_steps), so transpose
+            # conv1d expects input with shape (minibatch, in_channels, time_steps), so transpose
             data = data.transpose(1, 2)
 
             data = torch.nn.functional.conv1d(data, self.weights,
                                               padding=self.padding)
 
             assert data.shape == (minibatch_size, self.output_sr, num_blocks)
-            return data.transpose(1, 2).contiguous().view(minibatch_size, num_blocks * self.output_sr)
+
+            data = data.transpose(1, 2).contiguous().view(minibatch_size, num_blocks * self.output_sr)
+
+            # clip the signal to exclude where the zero-padding was added
+            return data[:, 0:(seq_len*self.output_sr)//self.input_sr]
 
 
 class ComplexNorm(torch.nn.Module):
