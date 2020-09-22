@@ -5,8 +5,6 @@ import torch
 from torch import Tensor
 from torchaudio.datasets import LIBRISPEECH
 
-from speechcommands import SPEECHCOMMANDS
-
 
 def pad_sequence(sequences, padding_value=0.0):
     # type: (List[Tensor], float) -> Tensor
@@ -147,36 +145,6 @@ def split_process_librispeech(
                     LIBRISPEECH(
                         root, tag, folder_in_archive=folder_in_archive, download=False,
                     ),
-                    transform,
-                    language_model.encode,
-                )
-                for tag, transform in zip(tags, transform_list)
-            ]
-        )
-
-        data = MapMemoryCache(data)
-        return data
-
-    # For performance, we cache all datasets
-    return tuple(create(dataset) for dataset in datasets)
-
-
-def split_process_speechcommands(
-    datasets, transforms, language_model, root,
-):
-    def create(tags, cache=True):
-
-        if isinstance(tags, str):
-            tags = [tags]
-        if isinstance(transforms, list):
-            transform_list = transforms
-        else:
-            transform_list = [transforms]
-
-        data = torch.utils.data.ConcatDataset(
-            [
-                Processed(
-                    SPEECHCOMMANDS(root, split=tag, download=False,),
                     transform,
                     language_model.encode,
                 )

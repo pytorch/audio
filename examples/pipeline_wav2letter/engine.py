@@ -12,7 +12,7 @@ from torchaudio.transforms import MFCC
 from torchaudio.models.wav2letter import Wav2Letter
 
 from ctc_decoders import GreedyDecoder
-from datasets import collate_factory, split_process_librispeech, split_process_speechcommands
+from datasets import collate_factory, split_process_librispeech
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
 from transforms import Normalize, ToMono, UnsqueezeFirst
@@ -289,10 +289,7 @@ def main(rank, args):
         )
     elif args.model_input_type == "waveform":
         transforms = torch.nn.Sequential(transforms, UnsqueezeFirst())
-        # assert args.bins == 1, "waveform model input type only supports bins == 1"
-        if args.bins != 1:
-            logging.warn("waveform model input type only supports bins == 1")
-            args.bins = 1
+        assert args.bins == 1, "waveform model input type only supports bins == 1"
     else:
         raise NotImplementedError(
             f"Selected model input type {args.model_input_type} not supported"
@@ -323,23 +320,13 @@ def main(rank, args):
 
     # Dataset
 
-    if args.speechcommands:
-        training, validation = split_process_speechcommands(
-            ["training", "validation"],
-            [transforms, transforms],
-            language_model,
-            root="/private/home/vincentqb/audio-pytorch/examples/pipeline_wav2letter/",
-            # root=args.dataset_root,
-            # folder_in_archive=args.dataset_folder_in_archive,
-        )
-    else:
-        training, validation = split_process_librispeech(
-            [args.dataset_train, args.dataset_valid],
-            [transforms, transforms],
-            language_model,
-            root=args.dataset_root,
-            folder_in_archive=args.dataset_folder_in_archive,
-        )
+    training, validation = split_process_librispeech(
+        [args.dataset_train, args.dataset_valid],
+        [transforms, transforms],
+        language_model,
+        root=args.dataset_root,
+        folder_in_archive=args.dataset_folder_in_archive,
+    )
 
     # Decoder
 
@@ -408,12 +395,12 @@ def main(rank, args):
 
     best_loss = 1.0
 
-    checkpoint_exists = args.checkpoint and os.path.isfile(args.checkpoint)
+    checkpoint_exists = os.path.isfile(args.checkpoint)
 
     if args.distributed:
         torch.distributed.barrier()
 
-    if args.checkpoint and checkpoint_exists:
+    if args.checkpoint and checkpoint_exists and args.resume:
         logging.info("Checkpoint loading %s", args.checkpoint)
         checkpoint = torch.load(args.checkpoint)
 
@@ -427,7 +414,13 @@ def main(rank, args):
         logging.info(
             "Checkpoint loaded '%s' at epoch %s", args.checkpoint, checkpoint["epoch"]
         )
-    elif args.checkpoint and main_rank:
+    elif args.checkpoint and checkpoint_exists:
+        raise RuntimeError(
+            "Checkpoint already exists. Add --resume to resume, or manually delete existing file."
+        )
+    elif args.checkpoint and args.resume:
+        raise RuntimeError("Checkpoint not found")
+    elif args.checkpoint and main_rank and args.checkpoint:
         save_checkpoint(
             {
                 "epoch": args.start_epoch,
@@ -439,6 +432,8 @@ def main(rank, args):
             False,
             args.checkpoint,
         )
+    elif not args.checkpoint and args.resume:
+        raise RuntimeError("Checkpoint not provided. Use --checkpoint to specify.")
 
     if args.distributed:
         torch.distributed.barrier()
@@ -464,16 +459,33 @@ def main(rank, args):
             not args.reduce_lr_valid,
         )
 
-        loss = evaluate(
-            model,
-            criterion,
-            loader_validation,
-            decoder,
-            language_model,
-            devices[0],
-            epoch,
-            not main_rank,
-        )
+        if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
+
+            loss = evaluate(
+                model,
+                criterion,
+                loader_validation,
+                decoder,
+                language_model,
+                devices[0],
+                epoch,
+                not main_rank,
+            )
+
+            is_best = loss < best_loss
+            best_loss = min(loss, best_loss)
+            if main_rank and args.checkpoint:
+                save_checkpoint(
+                    {
+                        "epoch": epoch + 1,
+                        "state_dict": model.state_dict(),
+                        "best_loss": best_loss,
+                        "optimizer": optimizer.state_dict(),
+                        "scheduler": scheduler.state_dict(),
+                    },
+                    is_best,
+                    args.checkpoint,
+                )
 
         if args.reduce_lr_valid and isinstance(scheduler, ReduceLROnPlateau):
             scheduler.step(loss)

@@ -163,11 +163,6 @@ def parse_args():
     parser.add_argument(
         "--world-size", type=int, default=8, help="the world size to initiate DPP"
     )
-    parser.add_argument(
-        "--speechcommands",
-        action="store_true",
-        help="select speechcommands instead of librispeech",
-    )
 
     args = parser.parse_args()
     logging.info(args)
