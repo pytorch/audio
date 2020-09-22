@@ -116,7 +116,6 @@ dependencies:
   - zlib=1.2.11
   - zstd=1.4.5
   - pip:
-    - dataclasses==0.7
     - kaldi-io==0.9.4
     - parameterized==0.7.4
     - scipy==1.5.2
