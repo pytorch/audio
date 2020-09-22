@@ -7,6 +7,7 @@ dependencies:
   - pytest
   - pytest-cov
   - codecov
+  - certifi
   - pip
   - pip:
     - scipy == 1.4.1
