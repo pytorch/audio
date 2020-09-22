@@ -14,8 +14,10 @@ class ConvBlock(torch.nn.Module):
         kernel_size (int): The convolution kernel size of the middle layer, <P>.
         padding (int): Padding value of the convolution in the middle layer.
         dilation (int): Dilation value of the convolution in the middle layer.
-        causal (bool): Switch causal/non-causal implementation.
         no_redisual (bool): Disable residual block/output.
+
+    Note:
+        This implementation corresponds to the "causal" setting in the paper.
 
     References:
         - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
@@ -30,13 +32,9 @@ class ConvBlock(torch.nn.Module):
         kernel_size: int,
         padding: int,
         dilation: int = 1,
-        causal: bool = False,
         no_residual: bool = False,
     ):
         super().__init__()
-
-        if causal:
-            raise NotImplementedError("causal=True is not implemented")
 
         self.conv_layers = torch.nn.Sequential(
             torch.nn.Conv1d(
@@ -92,7 +90,9 @@ class MaskGenerator(torch.nn.Module):
         num_hidden (int): Intermediate feature dimention of conv blocks, <H>
         num_layers (int): The number of conv blocks in one stack, <X>.
         num_stacks (int): The number of conv block stacks, <R>.
-        causal (bool): Switch causal/non-causal implementation.
+
+    Note:
+        This implementation corresponds to the "causal" setting in the paper.
 
     References:
         - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
@@ -109,11 +109,7 @@ class MaskGenerator(torch.nn.Module):
         num_hidden: int,
         num_layers: int,
         num_stacks: int,
-        causal: bool = False,
     ):
-        if causal:
-            raise NotImplementedError("causal=True is not implemented")
-
         super().__init__()
 
         self.input_dim = input_dim
@@ -137,7 +133,6 @@ class MaskGenerator(torch.nn.Module):
                         kernel_size=kernel_size,
                         dilation=multi,
                         padding=multi,
-                        causal=causal,
                         # The last ConvBlock does not need residual
                         no_residual=(l == (num_layers - 1) and s == (num_stacks - 1)),
                     )
@@ -188,7 +183,9 @@ class ConvTasNet(torch.nn.Module):
         msk_num_hidden_feats (int): The internal feature dimension of conv block of the mask generator, <H>.
         msk_num_layers (int): The number of layers in one conv block of the mask generator, <X>.
         msk_num_stacks (int): The numbr of conv blocks of the mask generator, <R>.
-        causal (bool): Switch causal/non-causal implementation.
+
+    Note:
+        This implementation corresponds to the "causal" setting in the paper.
 
     References:
         - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
@@ -208,12 +205,8 @@ class ConvTasNet(torch.nn.Module):
         msk_num_hidden_feats: int = 512,
         msk_num_layers: int = 8,
         msk_num_stacks: int = 3,
-        causal: bool = False,
     ):
         super().__init__()
-
-        if causal:
-            raise NotImplementedError("causal=True is not implemented")
 
         self.num_sources = num_sources
         self.enc_num_feats = enc_num_feats
