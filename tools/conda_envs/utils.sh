@@ -42,7 +42,7 @@ install_conda() {
             _install_conda
         fi
         init_conda
-        conda install -y -q python=3.7
+        conda update -y -q conda
     fi
 }
 
