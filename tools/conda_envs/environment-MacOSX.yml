@@ -3,10 +3,8 @@ channels:
   - defaults
 dependencies:
   - flake8
-  - numpy >= 1.11
   - pytest
   - pytest-cov
-  - pytest-xdist
   - codecov
   - librosa >= 0.8.0
   - pip
