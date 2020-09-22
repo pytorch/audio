@@ -15,7 +15,12 @@ init_conda
 
 create_env master "${PYTHON_VERSION}"
 activate_env master "${PYTHON_VERSION}"
+
+conda env export
+
 install_build_dependencies
+
+conda env export
 
 # Buld codecs
 mkdir -p third_party/build
