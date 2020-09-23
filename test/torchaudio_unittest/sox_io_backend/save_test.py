@@ -254,7 +254,7 @@ class TestSave(SaveTestBase):
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
         [1, 2],
-        list(range(9)),
+        [None] + list(range(9)),
     )), name_func=name_func)
     def test_flac(self, sample_rate, num_channels, compression_level):
         """`sox_io_backend.save` can save flac format."""
@@ -273,7 +273,7 @@ class TestSave(SaveTestBase):
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
         [1, 2],
-        [-1, 0, 1, 2, 3, 3.6, 5, 10],
+        [None, -1, 0, 1, 2, 3, 3.6, 5, 10],
     )), name_func=name_func)
     def test_vorbis(self, sample_rate, num_channels, quality_level):
         """`sox_io_backend.save` can save vorbis format."""
