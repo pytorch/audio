@@ -118,12 +118,11 @@ class MaskGenerator(torch.nn.Module):
         self.input_dim = input_dim
         self.num_sources = num_sources
 
-        self.norm_layers = torch.nn.Sequential(
-            torch.nn.GroupNorm(num_groups=1, num_channels=input_dim, eps=1e-8),
-            torch.nn.Conv1d(
-                in_channels=input_dim, out_channels=num_feats, kernel_size=1
-            ),
-        )
+        self.input_norm = torch.nn.GroupNorm(
+            num_groups=1, num_channels=input_dim, eps=1e-8)
+        self.input_conv = torch.nn.Conv1d(
+            in_channels=input_dim, out_channels=num_feats, kernel_size=1)
+
         self.receptive_field = 0
         self.conv_layers = torch.nn.ModuleList([])
         for s in range(num_stacks):
@@ -143,15 +142,12 @@ class MaskGenerator(torch.nn.Module):
                 self.receptive_field += (
                     kernel_size if s == 0 and l == 0 else (kernel_size - 1) * multi
                 )
-        self.output_layer = torch.nn.Sequential(
-            torch.nn.PReLU(),
-            torch.nn.Conv1d(
+        self.output_prelu = torch.nn.PReLU()
+        self.output_conv = torch.nn.Conv1d(
                 in_channels=num_feats,
                 out_channels=input_dim * num_sources,
                 kernel_size=1,
-            ),
-            torch.nn.Sigmoid(),
-        )
+            )
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         """Generate separation mask.
@@ -163,14 +159,17 @@ class MaskGenerator(torch.nn.Module):
             torch.Tensor: shape [batch, num_sources, features, frames]
         """
         batch_size = input.shape[0]
-        feats = self.norm_layers(input)
+        feats = self.input_norm(input)
+        feats = self.input_conv(feats)
         output = 0.0
         for layer in self.conv_layers:
             residual, skip = layer(feats)
             if residual is not None:  # the last conv layer does not produce residual
                 feats = feats + residual
             output = output + skip
-        output = self.output_layer(output)
+        output = self.output_prelu(output)
+        output = self.output_conv(output)
+        output = torch.sigmoid(output)
         return output.view(batch_size, self.num_sources, self.input_dim, -1)
 
 
