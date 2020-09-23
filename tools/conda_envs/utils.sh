@@ -41,8 +41,8 @@ install_conda() {
         else
             _install_conda
         fi
-        init_conda
-        conda update -y -q conda
+        # init_conda
+        # conda update -y -q conda
     fi
 }
 
