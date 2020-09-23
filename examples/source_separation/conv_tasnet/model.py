@@ -17,7 +17,7 @@ class ConvBlock(torch.nn.Module):
         no_redisual (bool): Disable residual block/output.
 
     Note:
-        This implementation corresponds to the "causal" setting in the paper.
+        This implementation corresponds to the "non-causal" setting in the paper.
 
     References:
         - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
@@ -92,7 +92,7 @@ class MaskGenerator(torch.nn.Module):
         num_stacks (int): The number of conv block stacks, <R>.
 
     Note:
-        This implementation corresponds to the "causal" setting in the paper.
+        This implementation corresponds to the "non-causal" setting in the paper.
 
     References:
         - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
@@ -185,7 +185,7 @@ class ConvTasNet(torch.nn.Module):
         msk_num_stacks (int): The numbr of conv blocks of the mask generator, <R>.
 
     Note:
-        This implementation corresponds to the "causal" setting in the paper.
+        This implementation corresponds to the "non-causal" setting in the paper.
 
     References:
         - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
