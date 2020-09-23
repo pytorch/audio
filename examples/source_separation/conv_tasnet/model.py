@@ -241,14 +241,15 @@ class ConvTasNet(torch.nn.Module):
             bias=False,
         )
 
-    def _pad_input(self, input: torch.Tensor) -> Tuple[torch.Tensor, int]:
+    def _align_num_frames_with_strides(self, input: torch.Tensor) -> Tuple[torch.Tensor, int]:
         """Pad input Tensor so that the end of the input tensor corresponds with
 
         1. (if kernel size is odd) the center of the last convolution kernel
         or 2. (if kernel size is even) the end of the first half of the last convolution kernel
 
-        Assuming that the resulting Tensor will be zero-padded with the size of stride
-        on the both ends in Conv1D
+        Assumption:
+            The resulting Tensor will be padded with the size of stride (== kernel_width // 2)
+            on the both ends in Conv1D
 
         |<--- k_1 --->|
         |      |            |<-- k_n-1 -->|
@@ -304,7 +305,7 @@ class ConvTasNet(torch.nn.Module):
         # M: feature frame length
         # S: number of sources
 
-        padded, num_pads = self._pad_input(input)  # B, 1, L'
+        padded, num_pads = self._align_num_frames_with_strides(input)  # B, 1, L'
         batch_size, num_padded_frames = padded.shape[0], padded.shape[2]
         feats = self.encoder(padded)  # B, F, M
         masked = self.mask_generator(feats) * feats.unsqueeze(1)  # B, S, F, M
