@@ -1,4 +1,5 @@
 import os
+import warnings
 from typing import Optional, Tuple
 
 import torch
@@ -34,8 +35,26 @@ def load(filepath: str,
          offset: int = 0,
          signalinfo: SignalInfo = None,
          encodinginfo: EncodingInfo = None,
-         filetype: Optional[str] = None) -> Tuple[Tensor, int]:
+         filetype: Optional[str] = None,
+         *,
+         normalize: bool = True,
+         frame_offset: int = 0) -> Tuple[Tensor, int]:
     r"""See torchaudio.load"""
+    warnings.warn(
+        'The return type of `load` function in "soundfile" backend is going to be changed in 0.8.0. '
+        'Please refer to https://github.com/pytorch/audio/issues/903 for the detail.'
+    )
+
+    if not normalization:
+        warnings.warn(
+            '"normalization" argument is deprecated and removed in 0.8.0. Please use "normalize".')
+    elif not normalize:
+        normalization = normalize
+    if offset != 0:
+        warnings.warn(
+            '"offset" argument is deprecated and removed in 0.8.0. Please use "frame_offset".')
+    elif frame_offset != 0:
+        offset = frame_offset
 
     assert out is None
     assert normalization
@@ -82,8 +101,28 @@ def load_wav(filepath, **kwargs):
 
 @_mod_utils.requires_module('soundfile')
 @common._impl_save
-def save(filepath: str, src: Tensor, sample_rate: int, precision: int = 16, channels_first: bool = True) -> None:
+def save(
+        filepath: str,
+        src: Tensor,
+        sample_rate: int,
+        precision: int = 16,
+        channels_first: bool = True,
+        *,
+        compression: Optional[float] = None,
+) -> None:
     r"""See torchaudio.save"""
+
+    if precision:
+        warnings.warn(
+            '"precision" argument is depricated and removed in 0.8.0. In 0.8.0, '
+            'convert the input Tensor to dtype of desired precision.'
+        )
+
+    if compression is not None:
+        warnings.warn(
+            '"soundfile" backend\'s `save` function  does not support changing compression level. '
+            '`compression` argument is silently ignore.'
+        )
 
     ch_idx, len_idx = (0, 1) if channels_first else (1, 0)
 
