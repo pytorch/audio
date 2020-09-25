@@ -12,7 +12,7 @@ class ConvBlock(torch.nn.Module):
     """1D Convolutional block.
 
     Args:
-        channels (int): The number of input/output channels, <B, Sc>
+        io_channels (int): The number of input/output channels, <B, Sc>
         hidden_channels (int): The number of channels in the internal layers, <H>.
         kernel_size (int): The convolution kernel size of the middle layer, <P>.
         padding (int): Padding value of the convolution in the middle layer.
