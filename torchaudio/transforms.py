@@ -649,17 +649,14 @@ class Resampler(torch.nn.Module):
               quite a lot. The kernel size is 2*num_zeros + 1.
           cutoff_ratio: The filter rolloff point as a fraction of the
              Nyquist frequency.
-          filter: one of [ 'hann'] 
-               ('kaiser', 'kaiser_best', 'kaiser_fast' can be options when 
-               pytorch includes scipy.special.i0)
+          filter: one of [ 'hann', 'kaiser', 'kaiser_best', 'kaiser_fast'] 
           beta: parameter for 'kaiser' filter
 
-        You can think of this algorithm as dividing up the signals
-        (input,output) into blocks where there are `input_sr` input
-        samples and `output_sr` output samples.  Then we treat it
-        using convolutional code, imagining there are `input_sr`
-        input channels and `output_sr` output channels per time step.
-
+        You can think of this algorithm as dividing up the signal
+        into blocks where there are `input_sr` input
+        samples and `output_sr` output samples.  Then we treat each
+        block of `input_sr` elements with a convolution which maps to `output_sr`
+        elements. 
         """
         assert isinstance(input_sr, int) and isinstance(output_sr, int)
         if input_sr == output_sr:
@@ -677,12 +674,12 @@ class Resampler(torch.nn.Module):
         d = gcd(input_sr, output_sr)
         input_sr, output_sr = input_sr // d, output_sr // d
 
+        #TODO: does  dtype need to be explicitly provided or can we just use float32?
         assert dtype in [torch.float32, torch.float64]
         assert num_zeros > 3  # a reasonable bare minimum
 
-        assert filter in ['hann']
-        # ['kaiser', 'kaiser_best', 'kaiser_fast'] can be supported when pytorch
-        # includes scipy.special.io
+        assert filter in ['hann', 'kaiser', 'kaiser_best', 'kaiser_fast']
+
         # settings in https://github.com/bmcfee/resampy/blob/master/resampy/filters.py#L41
         if filter == 'kaiser_best':
             num_zeros = 64
@@ -694,6 +691,9 @@ class Resampler(torch.nn.Module):
             beta = 8.555504641634386
             cutoff_ratio = 0.85
             filter = 'kaiser'
+
+        if not torch.is_tensor(beta):
+            beta = torch.tensor(beta)
 
         # Define one 'block' of samples `input_sr` input samples
         # and `output_sr` output samples.  We can divide up
@@ -746,18 +746,24 @@ class Resampler(torch.nn.Module):
             The heaviside function returns (a > 0 ? 1 : 0).
             """
             #return np.heaviside(1 - np.abs(a), 0.0) * (0.5 + 0.5 * np.cos(a * np.pi))
-            pi = torch.acos(torch.zeros(1)).item() * 2
-            return torch.heaviside(1 - torch.abs(a), 0.0) * (0.5 + 0.5 * torch.cos(a * pi))
+            pi = 2.0*torch.acos(torch.zeros(1)).item()
+            return torch.heaviside(1 - torch.abs(a), torch.tensor(0.0)) * (0.5 + 0.5 * torch.cos(a * pi))
 
+            #t = 0.5 - 0.5*(1 - torch.abs(a) <= 0.0).float() + 0.5*(1 - torch.abs(a) > 0.0).float()
+            #return t * (0.5 + 0.5 * torch.cos(a * pi))
 
         def kaiser_window(a, beta):
-            #TODO: the kaiser window can be added once scipy.special.i0 has been implement in torch
+            '''
+            kaiser_window returns the Kaiser window on [-1,1] and zero otherwise
+            '''
             #w = scipy.special.i0(beta * np.sqrt(np.clip(1 - ((a - 0.0) / 1.0) ** 2.0, 0.0, 1.0))) / special.i0(beta)
             #return np.heaviside(1 - np.abs(a), 0.0) * w
-            return None
+            w = torch.i0(beta * torch.sqrt(torch.clamp(1.0 - torch.pow(a, 2), 0.0, 1.0))) / torch.i0(beta)
+            return torch.heaviside(1 - torch.abs(a), torch.tensor(0.0)) * w
 
 
         def sinc(x):
+            #stop using this definition once torch.sinc is a supported function
             return torch.exp(-torch.lgamma(1 + x) - torch.lgamma(1 - x))
 
             # The weights below are a sinc function times a Hann-window function.
@@ -790,7 +796,6 @@ class Resampler(torch.nn.Module):
         if output_sr == 1:
             self.resample_type = 'integer_downsample'
             self.padding = input_sr * blocks_per_side
-            weights = torch.tensor(weights, dtype=dtype, requires_grad=False)
             self.weights = weights.transpose(1, 2).contiguous().view(1, 1, input_sr * kernel_width)
 
         elif input_sr == 1:
@@ -799,13 +804,12 @@ class Resampler(torch.nn.Module):
             # output_sr had been swapped.
             self.resample_type = 'integer_upsample'
             self.padding = output_sr * blocks_per_side
-            weights = torch.tensor(weights, dtype=dtype, requires_grad=False)
             self.weights = weights.flip(2).transpose(0, 2).contiguous().view(1, 1, output_sr * kernel_width)
         else:
             self.resample_type = 'general'
             self.reshaped = False
             self.padding = blocks_per_side
-            self.weights = torch.tensor(weights, dtype=dtype, requires_grad=False)
+            self.weights = weights #torch.tensor(weights, dtype=dtype, requires_grad=False)
 
         self.weights = torch.nn.Parameter(self.weights, requires_grad=False)
 
@@ -816,44 +820,52 @@ class Resampler(torch.nn.Module):
 
         Args:
          input: a torch.Tensor with the same dtype as was passed to the
-           constructor.
-         There must be 2 axes, interpreted as (minibatch_size, sequence_length)...
-         the minibatch_size may in practice be the number of channels.
+           constructor. dim = (batch_size, channels, seq_len) OR (batch_size, seq_len)
 
-         TODO: make default input dim (minibatch_size, channels, seq_len)?
+        Return:  Returns a torch.Tensor with the same dtype and number of channels
+           as the input:
+             (batch_size, (sequence_length*output_sr)//input_sr)
+           OR
+             (batch_size, n_channels, (sequence_length*output_sr)//input_sr)
 
-        Return:  Returns a torch.Tensor with the same dtype as the input, and
-         dimension (minibatch_size, (sequence_length//input_sr)*output_sr),
-         where input_sr and output_sr are the corresponding constructor args,
-         modified to remove any common factors.
+        input_sr and output_sr are the corresponding constructor args scaled to
+        remove any common factors.
         """
         if self.resample_type == 'trivial':
             return data
-        elif self.resample_type == 'integer_downsample':
-            (minibatch_size, seq_len) = data.shape
-            # will be shape (minibatch_size, in_channels, seq_len) with in_channels == 1
+
+        input_dim = len(data.size())
+        assert input_dim in [2, 3]
+
+        batch_size = data.size(0)
+        seq_len = data.size(-1)
+
+        #expand the channels dim for 2d data
+        if input_dim == 2:
             data = data.unsqueeze(1)
+
+        n_channels = data.size(1)
+
+        #if there is more than one channel, move the channels to the batch dimension
+        if n_channels != 1:
+            data = data.reshape(batch_size*n_channels, 1, seq_len)
+
+
+        if self.resample_type == 'integer_downsample':
             data = torch.nn.functional.conv1d(data,
                                               self.weights,
                                               stride=self.input_sr,
                                               padding=self.padding)
-            # shape will be (minibatch_size, out_channels = 1, seq_len);
-            # return as (minibatch_size, seq_len)
-            return data.squeeze(1)
 
         elif self.resample_type == 'integer_upsample':
-            data = data.unsqueeze(1)
             data = torch.nn.functional.conv_transpose1d(data,
                                                         self.weights,
                                                         stride=self.output_sr,
                                                         padding=self.padding)
 
-            return data.squeeze(1)
         else:
             assert self.resample_type == 'general'
-            (minibatch_size, seq_len) = data.shape
 
-            pad = 0
             if seq_len % self.input_sr != 0:
                 #pad the sequence with zeros so that the sequence is a whole number of blocks
                 pad = self.input_sr - (seq_len % self.input_sr)
@@ -862,28 +874,30 @@ class Resampler(torch.nn.Module):
 
             num_blocks = data.size(-1) // self.input_sr
 
-            # num_blocks = seq_len // self.input_sr
-            # if num_blocks == 0:
-            #     #if signal is shorter than the filter, then pad signal with zeros.
-            #     zeros = torch.zeros(data.size()[0:-1]+(self.input_sr - seq_len,), dtype=data.dtype)
-            #     data = torch.cat([data, zeros], dim=-1)
-            #     num_blocks = 1
+            #data now has shape (batch_size*n_channels, 1, num_blocks*self.input_sr)
+            data = data.view(batch_size*n_channels, num_blocks, self.input_sr)
 
-            # data = data[:, 0:(num_blocks*self.input_sr)]  # Truncate input
-            data = data[:, 0:(num_blocks * self.input_sr)].view(minibatch_size, num_blocks, self.input_sr)
-
-            # conv1d expects input with shape (minibatch, in_channels, time_steps), so transpose
+            # conv1d expects input with shape (minibatch, channels, time_steps), so transpose
+            # so that input_sr is on the channels axis
             data = data.transpose(1, 2)
 
             data = torch.nn.functional.conv1d(data, self.weights,
                                               padding=self.padding)
 
-            assert data.shape == (minibatch_size, self.output_sr, num_blocks)
+            assert data.shape == (batch_size*n_channels, self.output_sr, num_blocks)
 
-            data = data.transpose(1, 2).contiguous().view(minibatch_size, num_blocks * self.output_sr)
+            data = data.transpose(1, 2).contiguous().view(batch_size*n_channels, 1, num_blocks * self.output_sr)
 
             # clip the signal to exclude where the zero-padding was added
-            return data[:, 0:(seq_len*self.output_sr)//self.input_sr]
+            data = data[:, :, 0:(seq_len*self.output_sr)//self.input_sr]
+
+        # data shape is now (batch_size, n_channels, new_seq_len);
+        # return as (batch_size, new_seq_len) if input_dim==2
+        # return as (batch_size, n_channels, new_seq_len) otherwise
+        if input_dim == 2:
+            return data.squeeze(1)
+        else:
+            return data.reshape(batch_size, n_channels, -1)
 
 
 class ComplexNorm(torch.nn.Module):
