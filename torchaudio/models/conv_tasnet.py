@@ -119,9 +119,11 @@ class MaskGenerator(torch.nn.Module):
         self.num_sources = num_sources
 
         self.input_norm = torch.nn.GroupNorm(
-            num_groups=1, num_channels=input_dim, eps=1e-8)
+            num_groups=1, num_channels=input_dim, eps=1e-8
+        )
         self.input_conv = torch.nn.Conv1d(
-            in_channels=input_dim, out_channels=num_feats, kernel_size=1)
+            in_channels=input_dim, out_channels=num_feats, kernel_size=1
+        )
 
         self.receptive_field = 0
         self.conv_layers = torch.nn.ModuleList([])
@@ -144,10 +146,8 @@ class MaskGenerator(torch.nn.Module):
                 )
         self.output_prelu = torch.nn.PReLU()
         self.output_conv = torch.nn.Conv1d(
-                in_channels=num_feats,
-                out_channels=input_dim * num_sources,
-                kernel_size=1,
-            )
+            in_channels=num_feats, out_channels=input_dim * num_sources, kernel_size=1,
+        )
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         """Generate separation mask.
@@ -241,7 +241,9 @@ class ConvTasNet(torch.nn.Module):
             bias=False,
         )
 
-    def _align_num_frames_with_strides(self, input: torch.Tensor) -> Tuple[torch.Tensor, int]:
+    def _align_num_frames_with_strides(
+        self, input: torch.Tensor
+    ) -> Tuple[torch.Tensor, int]:
         """Pad input Tensor so that the end of the input tensor corresponds with
 
         1. (if kernel size is odd) the center of the last convolution kernel
