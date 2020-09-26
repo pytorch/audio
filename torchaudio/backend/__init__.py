@@ -3,6 +3,7 @@ from .utils import (
     list_audio_backends,
     get_audio_backend,
     set_audio_backend,
+    use_soundfile_legacy_interface,
 )
 from .sox_backend import (
     save_encinfo,
