@@ -16,7 +16,6 @@ __all__ = [
     'list_audio_backends',
     'get_audio_backend',
     'set_audio_backend',
-    'use_soundfile_legacy_interface',
 ]
 
 
@@ -33,16 +32,6 @@ def list_audio_backends() -> List[str]:
         backends.append('sox')
         backends.append('sox_io')
     return backends
-
-
-_USE_SOUNDFILE_LEGACY_INTERFACE = True
-
-
-def use_soundfile_legacy_interface(value: bool):
-    """Switch soundfile backend interface.
-    """
-    global _USE_SOUNDFILE_LEGACY_INTERFACE
-    _USE_SOUNDFILE_LEGACY_INTERFACE = value
 
 
 def set_audio_backend(backend: Optional[str]):
@@ -70,12 +59,12 @@ def set_audio_backend(backend: Optional[str]):
     elif backend == 'sox_io':
         module = sox_io_backend
     elif backend == 'soundfile':
-        if _USE_SOUNDFILE_LEGACY_INTERFACE:
+        if torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE:
             warnings.warn(
                 'The interface of "soundfile" backend is planned to change in 0.8.0 to '
                 'match that of "sox_io" backend and the current interface will be removed in 0.9.0. '
                 'To use the new interface, do '
-                '`torchaudio.backend.utils.use_soundfile_legacy_interface(False)` '
+                '`torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = False` '
                 'before setting the backend to "soundfile". '
                 'Please refer to https://github.com/pytorch/audio/issues/903 for the detail.'
             )

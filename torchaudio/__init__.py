@@ -8,6 +8,9 @@ from torchaudio import (
     sox_effects,
     transforms
 )
+
+USE_SOUNDFILE_LEGACY_INTERFACE = True
+
 from torchaudio.backend import (
     list_audio_backends,
     get_audio_backend,

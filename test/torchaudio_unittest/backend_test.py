@@ -48,6 +48,8 @@ class TestBackendSwitch_soundfile(BackendSwitchMixin, common_utils.TorchaudioTes
     backend = 'soundfile'
     backend_module = torchaudio.backend._soundfile_backend
 
-    def test_switch(self):
-        torchaudio.backend.utils.use_soundfile_legacy_interface(False)
-        super().test_switch()
+    def setUp(self):
+        torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = False
+
+    def tearDown(self):
+        torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = True
