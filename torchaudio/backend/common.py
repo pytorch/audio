@@ -1,6 +1,19 @@
 from typing import Any, Optional
 
 
+class AudioMetaData:
+    """Data class to be returned by :py:func:`~torchaudio.info`.
+
+    :ivar int sample_rate: Sample rate
+    :ivar int num_frames: The number of frames
+    :ivar int num_channels: The number of channels
+    """
+    def __init__(self, sample_rate: int, num_frames: int, num_channels: int):
+        self.sample_rate = sample_rate
+        self.num_frames = num_frames
+        self.num_channels = num_channels
+
+
 class SignalInfo:
     """Data class returned ``info`` functions.
 

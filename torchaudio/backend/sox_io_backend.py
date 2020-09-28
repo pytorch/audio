@@ -5,18 +5,7 @@ from torchaudio._internal import (
     module_utils as _mod_utils,
 )
 
-
-class AudioMetaData:
-    """Data class to be returned by :py:func:`~torchaudio.backend.sox_io_backend.info`.
-
-    :ivar int sample_rate: Sample rate
-    :ivar int num_frames: The number of frames
-    :ivar int num_channels: The number of channels
-    """
-    def __init__(self, sample_rate: int, num_frames: int, num_channels: int):
-        self.sample_rate = sample_rate
-        self.num_frames = num_frames
-        self.num_channels = num_channels
+from .common import AudioMetaData
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
