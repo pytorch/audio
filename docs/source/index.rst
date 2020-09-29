@@ -17,3 +17,15 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    compliance.kaldi
    kaldi_io
    utils
+   
+.. toctree::
+   :maxdepth: 1
+   :caption: PyTorch API and Libraries
+
+   PyTorch <https://pytorch.org/docs>
+   torchaudio <https://pytorch.org/audio>
+   torchtext <https://pytorch.org/text>
+   torchvision <https://pytorch.org/vision>
+   TorchElastic <https://pytorch.org/elastic/>
+   TorchServe <https://pytorch.org/serve>
+   PyTorch on XLA Devices <http://pytorch.org/xla/>
