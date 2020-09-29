@@ -578,7 +578,7 @@ class Functional(TempDirMixin, TestBaseMixin):
                              phase, modulation='sinusoidal', interpolation='linear')
 
         self._assert_consistency(func, waveform)
-
+    
     def test_spectral_centroid(self):
 
         def func(tensor):
@@ -592,6 +592,26 @@ class Functional(TempDirMixin, TestBaseMixin):
 
         tensor = common_utils.get_whitenoise(sample_rate=44100)
         self._assert_consistency(func, tensor)
+
+    def test_levenshtein_distance_str(self):
+
+        def func(tensor):
+            ref = "abc"
+            hyp = "bcd"
+            return F.levenshtein_distance_str(ref, hyp)
+
+        dummy = torch.zeros(1, 1)
+        self._assert_consistency(func, dummy)
+
+    def test_levenshtein_distance_list(self):
+
+        def func(tensor):
+            ref = ["hello", "world"]
+            hyp = ["hello", "planet"]
+            return F.levenshtein_distance_str(ref, hyp)
+
+        dummy = torch.zeros(1, 1)
+        self._assert_consistency(func, dummy)
 
     @common_utils.skipIfNoKaldi
     def test_compute_kaldi_pitch(self):
