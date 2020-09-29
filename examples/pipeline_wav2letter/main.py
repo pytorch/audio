@@ -11,12 +11,12 @@ from torch.optim import SGD, Adadelta, Adam, AdamW
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
+from torchaudio.metrics import levenshtein_distance
 from torchaudio.models.wav2letter import Wav2Letter
 
 from ctc_decoders import GreedyDecoder
 from datasets import collate_factory, split_process_librispeech
 from languagemodels import LanguageModel
-from metrics import levenshtein_distance
 from transforms import Normalize, UnsqueezeFirst
 from utils import MetricLogger, count_parameters, save_checkpoint
 
@@ -155,11 +155,7 @@ def parse_args():
     parser.add_argument("--eps", metavar="EPS", type=float, default=1e-8)
     parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
     parser.add_argument("--clip-grad", metavar="NORM", type=float, default=0.0)
-    parser.add_argument(
-        "--dataset-root",
-        type=str,
-        help="specify dataset root folder",
-    )
+    parser.add_argument("--dataset-root", type=str, help="specify dataset root folder")
     parser.add_argument(
         "--dataset-folder-in-archive",
         type=str,
@@ -407,7 +403,7 @@ def main(rank, args):
                 sample_rate=sample_rate_original,
                 n_mfcc=args.n_bins,
                 melkwargs=melkwargs,
-            ),
+            )
         )
         num_features = args.n_bins
     elif args.type == "waveform":

@@ -12,6 +12,7 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    functional
    transforms
    datasets
+   metrics
    models
    sox_effects
    compliance.kaldi
