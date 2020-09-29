@@ -1268,15 +1268,23 @@ def phaser(
     delay_pos = 0
     mod_pos = 0
 
-    output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
+    output_waveform_pre_gain_list = []
+    waveform = waveform * gain_in
+    delay_buf = delay_buf * decay
+    waveform_list = [waveform[:, i] for i in range(waveform.size(1))]
+    delay_buf_list = [delay_buf[:, i] for i in range(delay_buf.size(1))]
+    mod_buf_list = [mod_buf[i] for i in range(mod_buf.size(0))]
 
     for i in range(waveform.shape[-1]):
-        idx = int((delay_pos + mod_buf[mod_pos]) % delay_buf_len)
-        temp = (waveform[:, i] * gain_in) + (delay_buf[:, idx] * decay)
+        idx = int((delay_pos + mod_buf_list[mod_pos]) % delay_buf_len)
         mod_pos = (mod_pos + 1) % mod_buf_len
         delay_pos = (delay_pos + 1) % delay_buf_len
-        delay_buf[:, delay_pos] = temp
-        output_waveform[:, i] = temp * gain_out
+        temp = (waveform_list[i]) + (delay_buf_list[idx])
+        delay_buf_list[delay_pos] = temp * decay
+        output_waveform_pre_gain_list.append(temp)
+
+    output_waveform = torch.stack(output_waveform_pre_gain_list, dim=1).to(dtype=dtype, device=device)
+    output_waveform.mul_(gain_out)
 
     return output_waveform.clamp(min=-1, max=1).view(actual_shape)
 
