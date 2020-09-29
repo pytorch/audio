@@ -20,6 +20,8 @@ __all__ = [
     'MFCC',
     'MuLawEncoding',
     'MuLawDecoding',
+    'ALawEncoding',
+    'ALawDecoding',
     'Resample',
     'ComplexNorm',
     'TimeStretch',
@@ -567,6 +569,60 @@ class MuLawDecoding(torch.nn.Module):
             Tensor: The signal decoded.
         """
         return F.mu_law_decoding(x_mu, self.quantization_channels)
+
+class ALawEncoding(torch.nn.Module):
+    r"""Encode signal based on A-law companding.  For more info see the
+    `Wikipedia Entry <https://en.wikipedia.org/wiki/A-law_algorithm>`_
+
+    This algorithm assumes the signal has been scaled to between -1 and 1 and
+    returns a signal encoded with values from 0 to quantization_channels - 1
+
+    Args:
+        quantization_channels (int, optional): Number of channels. (Default: ``256``)
+    """
+    __constants__ = ['quantization_channels']
+
+    def __init__(self, quantization_channels: int = 256, factor: float = 83.7) -> None:
+        super(ALawEncoding, self).__init__()
+        self.quantization_channels = quantization_channels
+        self.factor = factor
+
+    def forward(self, x: Tensor) -> Tensor:
+        r"""
+        Args:
+            x (Tensor): A signal to be encoded.
+
+        Returns:
+            x_a (Tensor): An encoded signal.
+        """
+        return F.a_law_encoding(x, self.quantization_channels, self.factor)
+
+
+class ALawDecoding(torch.nn.Module):
+    r"""Decode A-law encoded signal.  For more info see the
+    `Wikipedia Entry <https://en.wikipedia.org/wiki/A-law_algorithm>`_
+
+    This expects an input with values between 0 and quantization_channels - 1
+    and returns a signal scaled between -1 and 1.
+
+    Args:
+        quantization_channels (int, optional): Number of channels. (Default: ``256``)
+    """
+    __constants__ = ['quantization_channels']
+
+    def __init__(self, quantization_channels: int = 256) -> None:
+        super(ALawDecoding, self).__init__()
+        self.quantization_channels = quantization_channels
+
+    def forward(self, x_a: Tensor) -> Tensor:
+        r"""
+        Args:
+            x_a (Tensor): An A-law encoded signal which needs to be decoded.
+
+        Returns:
+            Tensor: The signal decoded.
+        """
+        return F.a_law_decoding(x_a, self.quantization_channels)
 
 
 class Resample(torch.nn.Module):
