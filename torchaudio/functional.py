@@ -1268,7 +1268,6 @@ def phaser(
     delay_pos = 0
     mod_pos = 0
 
-    # TODO: Autograd support?
     output_waveform_pre_gain_list = []
     waveform = waveform * gain_in
     delay_buf = delay_buf * decay
@@ -1284,9 +1283,7 @@ def phaser(
         delay_buf_list[delay_pos] = temp * decay
         output_waveform_pre_gain_list.append(temp)
 
-    # TODO: Modify test to check that dtype and device are as expected
     output_waveform = torch.stack(output_waveform_pre_gain_list, dim=1).to(dtype=dtype, device=device)
-    # TODO: Autograd support?
     output_waveform.mul_(gain_out)
 
     return output_waveform.clamp(min=-1, max=1).view(actual_shape)
