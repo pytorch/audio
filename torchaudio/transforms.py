@@ -582,10 +582,10 @@ class ALawEncoding(torch.nn.Module):
     """
     __constants__ = ['quantization_channels']
 
-    def __init__(self, quantization_channels: int = 256, factor: float = 83.7) -> None:
+    def __init__(self, quantization_channels: int = 256, compression: float = 83.7) -> None:
         super(ALawEncoding, self).__init__()
         self.quantization_channels = quantization_channels
-        self.factor = factor
+        self.compression = compression
 
     def forward(self, x: Tensor) -> Tensor:
         r"""
@@ -595,7 +595,7 @@ class ALawEncoding(torch.nn.Module):
         Returns:
             x_a (Tensor): An encoded signal.
         """
-        return F.a_law_encoding(x, self.quantization_channels, self.factor)
+        return F.a_law_encoding(x, self.quantization_channels, self.compression)
 
 
 class ALawDecoding(torch.nn.Module):
@@ -610,9 +610,10 @@ class ALawDecoding(torch.nn.Module):
     """
     __constants__ = ['quantization_channels']
 
-    def __init__(self, quantization_channels: int = 256) -> None:
+    def __init__(self, quantization_channels: int = 256, compression: float = 83.7) -> None:
         super(ALawDecoding, self).__init__()
         self.quantization_channels = quantization_channels
+        self.compression = compression
 
     def forward(self, x_a: Tensor) -> Tensor:
         r"""
@@ -622,7 +623,7 @@ class ALawDecoding(torch.nn.Module):
         Returns:
             Tensor: The signal decoded.
         """
-        return F.a_law_decoding(x_a, self.quantization_channels)
+        return F.a_law_decoding(x_a, self.quantization_channels, self.compression)
 
 
 class Resample(torch.nn.Module):
