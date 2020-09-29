@@ -1,5 +1,15 @@
+import itertools
+from collections import namedtuple
+
 import torch
-from torchaudio.models import Wav2Letter, MelResNet, UpsampleNetwork, WaveRNN
+from torchaudio.models import (
+    Wav2Letter,
+    MelResNet,
+    UpsampleNetwork,
+    WaveRNN,
+    ConvTasNet,
+)
+from parameterized import parameterized
 
 from torchaudio_unittest import common_utils
 
@@ -115,3 +125,58 @@ class TestWaveRNN(common_utils.TorchaudioTestCase):
         out = model(x, mels)
 
         assert out.size() == (n_batch, 1, hop_length * (n_time - kernel_size + 1), n_classes)
+
+
+_ConvTasNetParams = namedtuple(
+    '_ConvTasNetParams',
+    [
+        'enc_num_feats',
+        'enc_kernel_size',
+        'msk_num_feats',
+        'msk_num_hidden_feats',
+        'msk_kernel_size',
+        'msk_num_layers',
+        'msk_num_stacks',
+    ]
+)
+
+
+class TestConvTasNet(common_utils.TorchaudioTestCase):
+    @parameterized.expand(list(itertools.product(
+        [2, 3],
+        [
+            _ConvTasNetParams(128, 40, 128, 256, 3, 7, 2),
+            _ConvTasNetParams(256, 40, 128, 256, 3, 7, 2),
+            _ConvTasNetParams(512, 40, 128, 256, 3, 7, 2),
+            _ConvTasNetParams(512, 40, 128, 256, 3, 7, 2),
+            _ConvTasNetParams(512, 40, 128, 512, 3, 7, 2),
+            _ConvTasNetParams(512, 40, 128, 512, 3, 7, 2),
+            _ConvTasNetParams(512, 40, 256, 256, 3, 7, 2),
+            _ConvTasNetParams(512, 40, 256, 512, 3, 7, 2),
+            _ConvTasNetParams(512, 40, 256, 512, 3, 7, 2),
+            _ConvTasNetParams(512, 40, 128, 512, 3, 6, 4),
+            _ConvTasNetParams(512, 40, 128, 512, 3, 4, 6),
+            _ConvTasNetParams(512, 40, 128, 512, 3, 8, 3),
+            _ConvTasNetParams(512, 32, 128, 512, 3, 8, 3),
+            _ConvTasNetParams(512, 16, 128, 512, 3, 8, 3),
+        ],
+    )))
+    def test_paper_configuration(self, num_sources, model_params):
+        """ConvTasNet model works on the valid configurations in the paper"""
+        batch_size = 32
+        num_frames = 8000
+
+        model = ConvTasNet(
+            num_sources=num_sources,
+            enc_kernel_size=model_params.enc_kernel_size,
+            enc_num_feats=model_params.enc_num_feats,
+            msk_kernel_size=model_params.msk_kernel_size,
+            msk_num_feats=model_params.msk_num_feats,
+            msk_num_hidden_feats=model_params.msk_num_hidden_feats,
+            msk_num_layers=model_params.msk_num_layers,
+            msk_num_stacks=model_params.msk_num_stacks,
+        )
+        tensor = torch.rand(batch_size, 1, num_frames)
+        output = model(tensor)
+
+        assert output.shape == (batch_size, num_sources, num_frames)

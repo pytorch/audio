@@ -45,6 +45,9 @@ class Test_LoadSave(unittest.TestCase):
     test_filepath_wav = os.path.join(test_dirpath, "assets",
                                      "steam-train-whistle-daniel_simon.wav")
 
+    def setUp(self):
+        torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = True
+
     def test_1_save(self):
         for backend in BACKENDS_MP3:
             with self.subTest():
