@@ -51,10 +51,10 @@ class Tester(common_utils.TorchaudioTestCase):
 
         self.assertTrue(waveform.min() >= -1. and waveform.max() <= 1.)
 
-        waveform_mu = transforms.ALawEncoding(quantization_channels)(waveform)
-        self.assertTrue(waveform_mu.min() >= 0. and waveform_mu.max() <= quantization_channels)
+        waveform_a = transforms.ALawEncoding(quantization_channels)(waveform)
+        self.assertTrue(waveform_a.min() >= 0. and waveform_a.max() <= quantization_channels)
 
-        waveform_exp = transforms.ALawDecoding(quantization_channels)(waveform_mu)
+        waveform_exp = transforms.ALawDecoding(quantization_channels)(waveform_a)
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
 
     def test_AmplitudeToDB(self):
