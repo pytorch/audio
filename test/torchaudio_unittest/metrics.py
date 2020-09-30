@@ -6,6 +6,8 @@ from torchaudio_unittest import common_utils
 class TestLevenshteinDistance(common_utils.TorchaudioTestCase):
     @parameterized.expand(
         [
+            ["abc", "", 3],
+            ["", "", 0],
             ["abc", "abc", 0],
             ["aaa", "aba", 1],
             ["aba", "aaa", 1],
@@ -14,6 +16,7 @@ class TestLevenshteinDistance(common_utils.TorchaudioTestCase):
             ["abc", "bcd", 2],
             [["hello", "world"], ["hello", "world", "!"], 1],
             [["hello", "world"], ["world", "hello", "!"], 2],
+            [["hello", "world"], "world", 5],
         ]
     )
     def test_simple_case(self, ref, hyp, distance):

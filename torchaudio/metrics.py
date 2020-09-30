@@ -1,15 +1,20 @@
-from typing import List, Union
+from collections.abc import Sequence
 
 
-def levenshtein_distance(r: Union[str, List[str]], h: Union[str, List[str]]) -> int:
+def levenshtein_distance(r: Sequence, h: Sequence) -> int:
     """
-    Calculate the Levenshtein distance between two lists or strings.
+    Calculate the Levenshtein distance between two sequences.
 
     The function computes an edit distance allowing deletion, insertion and substitution.
     The result is an integer. Users may want to normalize by the length of the reference.
+
+    This can be used to compute the edit distance for instance between two strings,
+    or two list of words. Note that, if a string and a list of words is provided, the distance
+    will be computed between the "string" sequence, and the "list of words" sequence.
+
     Args:
-        r (str or List[str]): the reference list or string to compare.
-        h (str or List[str]): the hypothesis, the predicted list or string, to compare.
+        r (Sequence): the reference sequence to compare.
+        h (Sequence): the hypothesis sequence (e.g. the predicted sequence) to compare.
     Returns:
         int: The distance between the reference and the hypothesis.
     """
