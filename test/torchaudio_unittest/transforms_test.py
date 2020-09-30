@@ -43,6 +43,20 @@ class Tester(common_utils.TorchaudioTestCase):
         waveform_exp = transforms.MuLawDecoding(quantization_channels)(waveform_mu)
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
 
+    def test_a_law_companding(self):
+        waveform = self.waveform.clone()
+        if not waveform.is_floating_point():
+            waveform = waveform.to(torch.get_default_dtype())
+        waveform /= torch.abs(waveform).max()
+
+        self.assertTrue(waveform.min() >= -1. and waveform.max() <= 1.)
+
+        waveform_mu = transforms.ALawEncoding(quantization_channels)(waveform)
+        self.assertTrue(waveform_mu.min() >= 0. and waveform_mu.max() <= quantization_channels)
+
+        waveform_exp = transforms.ALawDecoding(quantization_channels)(waveform_mu)
+        self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
+
     def test_AmplitudeToDB(self):
         filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform = common_utils.load_wav(filepath)[0]

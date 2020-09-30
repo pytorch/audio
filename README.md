@@ -216,6 +216,7 @@ dimension (channels, time)")
 
 Transforms expect and return the following dimensions.
 
+<<<<<<< HEAD
 * `Spectrogram`: (channels, time) -> (channels, freq, time)
 * `AmplitudeToDB`: (channels, freq, time) -> (channels, freq, time)
 * `MelScale`: (channels, freq, time) -> (channels, mel, time)
@@ -226,6 +227,20 @@ Transforms expect and return the following dimensions.
 * `Resample`: (channels, time) -> (channels, time)
 * `Fade`: (channels, time) -> (channels, time)
 * `Vol`: (channels, time) -> (channels, time)
+=======
+* `Spectrogram`: (channel, time) -> (channel, freq, time)
+* `AmplitudeToDB`: (channel, freq, time) -> (channel, freq, time)
+* `MelScale`: (channel, freq, time) -> (channel, mel, time)
+* `MelSpectrogram`: (channel, time) -> (channel, mel, time)
+* `MFCC`: (channel, time) -> (channel, mfcc, time)
+* `MuLawEncode`: (channel, time) -> (channel, time)
+* `MuLawDecode`: (channel, time) -> (channel, time)
+* `ALawEncode`: (channel, time) -> (channel, time)
+* `ALawDecode`: (channel, time) -> (channel, time)
+* `Resample`: (channel, time) -> (channel, time)
+* `Fade`: (channel, time) -> (channel, time)
+* `Vol`: (channel, time) -> (channel, time)
+>>>>>>> Cleanup
 
 Complex numbers are supported via tensors of dimension (..., 2), and torchaudio provides `complex_norm` and `angle` to convert such a tensor into its magnitude and phase. Here, and in the documentation, we use an ellipsis "..." as a placeholder for the rest of the dimensions of a tensor, e.g. optional batching and channel dimensions.
 
