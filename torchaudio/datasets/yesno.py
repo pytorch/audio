@@ -40,8 +40,8 @@ class YESNO(Dataset):
         folder_in_archive (str, optional):
             The top-level directory of the dataset. (default: ``"waves_yesno"``)
         download (bool, optional): Download dataset if it is not found at root path. (default: ``False``).
-        transform (callable, optional): Optional transform applied on waveform. (default: ``None``) 
-        target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``) 
+        transform (callable, optional): Optional transform applied on waveform. (default: ``None``)
+        target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``)
     """
 
     _ext_audio = ".wav"
@@ -52,7 +52,7 @@ class YESNO(Dataset):
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  download: bool = False,
                  transform: Any = None,
-                 target_transform: Any = None):
+                 target_transform: Any = None) -> None:
 
         if transform is not None or target_transform is not None:
             warnings.warn(

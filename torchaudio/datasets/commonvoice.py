@@ -123,7 +123,7 @@ class COMMONVOICE(Dataset):
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  version: str = VERSION,
-                 download: bool = False):
+                 download: bool = False) -> None:
 
         languages = {
             "tatar": "tt",

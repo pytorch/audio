@@ -56,7 +56,7 @@ class TEDLIUM(Dataset):
     """
     def __init__(
         self, root: str, release: str = "release1", subset: str = None, download: bool = False, audio_ext=".sph"
-    ):
+    ) -> None:
         self._ext_audio = audio_ext
         if release in _RELEASE_CONFIGS.keys():
             folder_in_archive = _RELEASE_CONFIGS[release]["folder_in_archive"]

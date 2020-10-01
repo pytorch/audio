@@ -86,7 +86,7 @@ class LIBRITTS(Dataset):
         url: str = URL,
         folder_in_archive: str = FOLDER_IN_ARCHIVE,
         download: bool = False,
-    ):
+    ) -> None:
 
         if url in [
             "dev-clean",

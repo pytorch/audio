@@ -1023,7 +1023,7 @@ class GTZAN(Dataset):
         folder_in_archive: str = FOLDER_IN_ARCHIVE,
         download: bool = False,
         subset: Any = None,
-    ):
+    ) -> None:
 
         # super(GTZAN, self).__init__()
         self.root = root

@@ -69,8 +69,8 @@ class VCTK(Dataset):
             The top-level directory of the dataset. (default: ``"VCTK-Corpus"``)
         download (bool, optional): Download dataset if it is not found at root path. (default: ``False``).
         downsample (bool, optional): Not used.
-        transform (callable, optional): Optional transform applied on waveform. (default: ``None``) 
-        target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``) 
+        transform (callable, optional): Optional transform applied on waveform. (default: ``None``)
+        target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``)
     """
 
     _folder_txt = "txt"
@@ -86,7 +86,7 @@ class VCTK(Dataset):
                  download: bool = False,
                  downsample: bool = False,
                  transform: Any = None,
-                 target_transform: Any = None):
+                 target_transform: Any = None) -> None:
 
         if downsample:
             warnings.warn(

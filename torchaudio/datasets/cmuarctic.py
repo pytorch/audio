@@ -96,7 +96,7 @@ class CMUARCTIC(Dataset):
                  root: str,
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False):
+                 download: bool = False) -> None:
 
         if url in [
             "aew",
