@@ -2,15 +2,9 @@ import itertools
 from collections import namedtuple
 
 import torch
-from torchaudio.models import (
-    Wav2Letter,
-    MelResNet,
-    UpsampleNetwork,
-    WaveRNN,
-    ConvTasNet,
-)
 from parameterized import parameterized
-
+from torchaudio.models import ConvTasNet, Wav2Letter, WaveRNN
+from torchaudio.models.wavernn import MelResNet, UpsampleNetwork
 from torchaudio_unittest import common_utils
 
 
