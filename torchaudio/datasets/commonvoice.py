@@ -106,8 +106,17 @@ class COMMONVOICE(Dataset):
         root (str): Path to the directory where the dataset is found or downloaded.
         tsv (str, optional): The name of the tsv file used to construct the metadata.
             (default: ``"train.tsv"``)
-        url (str, optional): The name of the language to select the URL when downloading the dataset.
-            This is **NOT** the actual URL. (default: ``"english"``)
+        url (str, optional): The language of the dataset to download.
+            This is **NOT** the actual URL. (default: ``"english"``).
+            Valid choices are ``"tatar"``, ``"english"``, ``"german"``, ``"french"``,
+            ``"welsh"``, ``"breton"``, ``"chuvash"``, ``"turkish"``, ``"kyrgyz"``,
+            ``"irish"``, ``"kabyle"``, ``"catalan"``, ``"taiwanese"``, ``"slovenian"``,
+            ``"italian"``, ``"dutch"``, ``"hakha chin"``, ``"esperanto"``, ``"estonian"``,
+            ``"persian"``, ``"portuguese"``, ``"basque"``, ``"spanish"``, ``"chinese"``,
+            ``"mongolian"``, ``"sakha"``, ``"dhivehi"``, ``"kinyarwanda"``, ``"swedish"``,
+            ``"russian"``, ``"indonesian"``, ``"arabic"``, ``"tamil"``, ``"interlingua"``,
+            ``"latvian"``, ``"japanese"``, ``"votic"``, ``"abkhaz"``, ``"cantonese"`` and
+            ``"romansh sursilvan"``.
         folder_in_archive (str, optional): The top-level directory of the dataset.
         version (str): Version string. (default: ``"cv-corpus-4-2019-12-10"``)
         download (bool, optional):
