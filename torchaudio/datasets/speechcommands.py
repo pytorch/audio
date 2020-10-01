@@ -44,7 +44,8 @@ class SPEECHCOMMANDS(Dataset):
             (default: ``"speech_commands_v0.02"``)
         folder_in_archive (str, optional):
             The top-level directory of the dataset. (default: ``"SpeechCommands"``)
-        download (bool, optional): Download dataset if it is not found at root path. (default: ``False``).
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
 
     def __init__(self,

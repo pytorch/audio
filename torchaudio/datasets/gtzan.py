@@ -1009,7 +1009,8 @@ class GTZAN(Dataset):
         url (str, optional): The URL to download the dataset from.
             (default: ``"http://opihi.cs.uvic.ca/sound/genres.tar.gz"``)
         folder_in_archive (str, optional): The top-level directory of the dataset.
-        download (bool, optional): Download dataset if it is not found at root path. (default: ``False``).
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
         subset (str, optional): Subset of the dataset. Either ``"training"``, ``"validation"`` or
             ``"testing"``. (default: ``None``).
     """

@@ -41,7 +41,8 @@ class LJSPEECH(Dataset):
             (default: ``"https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"``)
         folder_in_archive (str, optional):
             The top-level directory of the dataset. (default: ``"wavs"``)
-        download (bool, optional): Download dataset if it is not found at root path. (default: ``False``).
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
 
     _ext_audio = ".wav"

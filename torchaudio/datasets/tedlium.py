@@ -52,7 +52,8 @@ class TEDLIUM(Dataset):
             (default: ``"release1"``).
         subset (str, optional): The subset of dataset to use. Valid options are ``"train"``, ``"dev"``,
             and ``"test"`` for releases 1&2, ``None`` for release3. Defaults to ``"train"`` or ``None``.
-        download (bool, optional): Download dataset if it is not found at root path. (default: ``False``).
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
     def __init__(
         self, root: str, release: str = "release1", subset: str = None, download: bool = False, audio_ext=".sph"

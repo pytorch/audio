@@ -84,7 +84,8 @@ class CMUARCTIC(Dataset):
             Type of the dataset to dowload. This is **NOT** the actual URL. (default: ``"aew"``)
         folder_in_archive (str, optional):
             The top-level directory of the dataset. (default: ``"ARCTIC"``)
-        download (bool, optional): Download dataset if it is not found at root path. (default: ``False``).
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
 
     _file_text = "txt.done.data"

@@ -39,7 +39,8 @@ class YESNO(Dataset):
             (default: ``"http://www.openslr.org/resources/1/waves_yesno.tar.gz"``)
         folder_in_archive (str, optional):
             The top-level directory of the dataset. (default: ``"waves_yesno"``)
-        download (bool, optional): Download dataset if it is not found at root path. (default: ``False``).
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
         transform (callable, optional): Optional transform applied on waveform. (default: ``None``)
         target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``)
     """
