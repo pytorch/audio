@@ -1011,8 +1011,9 @@ class GTZAN(Dataset):
         folder_in_archive (str, optional): The top-level directory of the dataset.
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
-        subset (str, optional): Subset of the dataset. Either ``"training"``, ``"validation"`` or
-            ``"testing"``. (default: ``None``).
+        subset (str, optional): Which subset of the dataset to use.
+            One of ``"training"``, ``"validation"``, ``"testing"`` or ``None``.
+            If ``None``, the entire dataset is used. (default: ``None``).
     """
 
     _ext_audio = ".wav"
@@ -1023,7 +1024,7 @@ class GTZAN(Dataset):
         url: str = URL,
         folder_in_archive: str = FOLDER_IN_ARCHIVE,
         download: bool = False,
-        subset: Any = None,
+        subset: Optional[str] = None,
     ) -> None:
 
         # super(GTZAN, self).__init__()
