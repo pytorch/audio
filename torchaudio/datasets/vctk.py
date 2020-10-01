@@ -165,9 +165,6 @@ class VCTK(Dataset):
 class VCTK_092(Dataset):
     """Create VCTK 0.92 Dataset
 
-    An item is a ``namedtuple`` of (``waveform``, ``sample_rate``, ``utterance``,
-    ``speaker_id``, ``utterance_id``)
-
     Args:
         root (str): Root directory where the dataset's top level directory is found.
         mic_id (str): Microphone ID. Either ``"mic1"`` or ``"mic2"``. (default: ``"mic2"``)
