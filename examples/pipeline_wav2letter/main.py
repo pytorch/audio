@@ -8,6 +8,12 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Train wav2letter for End-to-End ASR.")
 
     parser.add_argument(
+        "--reduction",
+        default="mean",
+        choices=["none", "mean", "sum"],
+        help="reduction type for CTCLoss",
+    )
+    parser.add_argument(
         "--model-input-type",
         default="mfcc",
         choices=["waveform", "mfcc"],

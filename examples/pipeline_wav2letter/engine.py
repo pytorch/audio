@@ -224,8 +224,8 @@ def train_one_epoch(
         )
 
         metric["lr"] = optimizer.param_groups[0]["lr"]
-        metric["n_channel"] = inputs.shape[1]
-        metric["n_time"] = inputs.shape[-1]
+        metric["channel size"] = inputs.shape[1]
+        metric["time size"] = inputs.shape[-1]
         metric.flush()
 
         # TODO Remove before merge pull request
@@ -301,7 +301,7 @@ def main(rank, args):
     # TODO Remove before merge pull request
     signal.signal(signal.SIGUSR1, signal_handler)
 
-    logging.info("Star")
+    logging.info("Start")
 
     # Empty CUDA cache
     torch.cuda.empty_cache()
@@ -425,7 +425,7 @@ def main(rank, args):
     # Loss
     encoded_char_blank = language_model.encode(char_blank)[0]
     criterion = torch.nn.CTCLoss(
-        blank=encoded_char_blank, zero_infinity=False, reduction="sum"
+        blank=encoded_char_blank, zero_infinity=False, reduction=args.reduction
     )
 
     # Data Loader

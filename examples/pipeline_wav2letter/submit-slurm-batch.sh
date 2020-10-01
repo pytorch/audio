@@ -32,6 +32,16 @@ item=${choices[$j]}
 CMD="$CMD --$name $item"
 COUNT=$(($COUNT * $l))
 
+# choices=("sum" "mean")
+choices=("sum")
+name="reduction"
+l=${#choices[@]}
+j=$(($i % $l))
+i=$(($i / $l))
+item=${choices[$j]}
+CMD="$CMD --$name $item"
+COUNT=$(($COUNT * $l))
+
 # choices=("mel" "mfcc" "waveform")
 choices=("mfcc" "waveform")
 # choices=("waveform")
@@ -99,14 +109,14 @@ CMD="$CMD --$name $item"
 COUNT=$(($COUNT * $l))
 
 # grads=(0. .2)
-choices=(0.)
-name="clip-grad"
-l=${#choices[@]}
-j=$(($i % $l))
-i=$(($i / $l))
-item=${choices[$j]}
-CMD="$CMD --$name $item"
-COUNT=$(($COUNT * $l))
+# choices=(0.)
+# name="clip-grad"
+# l=${#choices[@]}
+# j=$(($i % $l))
+# i=$(($i / $l))
+# item=${choices[$j]}
+# CMD="$CMD --$name $item"
+# COUNT=$(($COUNT * $l))
 
 # gammas=(.98 .99)
 choices=(.99)

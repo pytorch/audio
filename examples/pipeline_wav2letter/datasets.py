@@ -176,9 +176,7 @@ def split_process_speechcommands(
         data = torch.utils.data.ConcatDataset(
             [
                 Processed(
-                    SPEECHCOMMANDS(
-                        root, split=tag, download=False,
-                    ),
+                    SPEECHCOMMANDS(root, split=tag, download=False,),
                     transform,
                     language_model.encode,
                 )
