@@ -9,6 +9,14 @@ torchaudio.models
 The models subpackage contains definitions of models for addressing common audio tasks.
 
 
+:hidden:`ConvTasNet`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ConvTasNet
+
+  .. automethod:: forward
+
+
 :hidden:`Wav2Letter`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
