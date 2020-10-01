@@ -33,9 +33,15 @@ def load_ljspeech_item(line: List[str], path: str, ext_audio: str) -> Tuple[Tens
 
 
 class LJSPEECH(Dataset):
-    """
-    Create a Dataset for LJSpeech-1.1. Each item is a tuple of the form:
-    waveform, sample_rate, transcript, normalized_transcript
+    """Create a Dataset for LJSpeech-1.1.
+
+    Args:
+        root (str): Path to the directory where the dataset is found or downloaded.
+        url (str, optional): The URL to download the dataset from.
+            (default: ``"https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"``)
+        folder_in_archive (str, optional):
+            The top-level directory of the dataset. (default: ``"wavs"``)
+        download (bool, optional): Download dataset if it is not found at root path. (default: ``False``).
     """
 
     _ext_audio = ".wav"
@@ -68,6 +74,14 @@ class LJSPEECH(Dataset):
             self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            tuple: ``(waveform, sample_rate, transcript, normalized_transcript)``
+        """
         line = self._walker[n]
         return load_ljspeech_item(line, self._path, self._ext_audio)
 

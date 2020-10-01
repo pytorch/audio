@@ -36,9 +36,15 @@ def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str
 
 
 class SPEECHCOMMANDS(Dataset):
-    """
-    Create a Dataset for Speech Commands. Each item is a tuple of the form:
-    waveform, sample_rate, label, speaker_id, utterance_number
+    """Create a Dataset for Speech Commands.
+
+    Args:
+        root (str): Path to the directory where the dataset is found or downloaded.
+        url (str, optional): Type of the dataset to dowload. This is **NOT** the actual URL.
+            (default: ``"speech_commands_v0.02"``)
+        folder_in_archive (str, optional):
+            The top-level directory of the dataset. (default: ``"SpeechCommands"``)
+        download (bool, optional): Download dataset if it is not found at root path. (default: ``False``).
     """
 
     def __init__(self,
@@ -75,6 +81,14 @@ class SPEECHCOMMANDS(Dataset):
         self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            tuple: ``(waveform, sample_rate, label, speaker_id, utterance_number)``
+        """
         fileid = self._walker[n]
         return load_speechcommands_item(fileid, self._path)
 
