@@ -63,12 +63,13 @@ class VCTK(Dataset):
 
     Args:
         root (str): Path to the directory where the dataset is found or downloaded.
-        url (str, optional): The URL to download the dataset from.
-            (default: ``"https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip"``)
+        url (str, optional): Not used as the dataset is no longer publicly available.
         folder_in_archive (str, optional):
             The top-level directory of the dataset. (default: ``"VCTK-Corpus"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
+            Giving ``download=True`` will result in error as the dataset is no longer
+            publicly available.
         downsample (bool, optional): Not used.
         transform (callable, optional): Optional transform applied on waveform. (default: ``None``)
         target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``)
