@@ -56,12 +56,18 @@ def trigger_job_requeue():
     exit(0)
 
 
-def setup_distributed(rank, world_size):
-    os.environ["MASTER_ADDR"] = "localhost"
-    os.environ["MASTER_PORT"] = "12355"
+def setup_distributed(rank, world_size, master_addr, master_port):
+    os.environ["MASTER_ADDR"] = str(master_addr)
+    os.environ["MASTER_PORT"] = str(master_port)
+
+    # See documentation for choice of backend
+    # https://pytorch.org/docs/stable/distributed.html
+    backend = "nccl" if torch.cuda.is_available() else "gloo"
 
     # initialize the process group
-    torch.distributed.init_process_group("nccl", rank=rank, world_size=world_size)
+    torch.distributed.init_process_group(
+        backend, rank=rank, world_size=world_size, init_method="env://"
+    )
 
 
 def model_length_function_constructor(model_input_type):
@@ -295,7 +301,7 @@ def main(rank, args):
     # Distributed setup
 
     if args.distributed:
-        setup_distributed(rank, args.world_size)
+        setup_distributed(rank, args.world_size, args.distributed_master_addr, args.distributed_master_port)
 
     main_rank = rank == 0
 

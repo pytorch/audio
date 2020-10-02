@@ -165,6 +165,12 @@ def parse_args():
     parser.add_argument(
         "--distributed", action="store_true", help="enable DistributedDataParallel"
     )
+    parser.add_argument(
+        "--distributed-master-addr", type=str, default="localhost", help="specify MASTER_ADDR for distributed"
+    )
+    parser.add_argument(
+        "--distributed-master-port", type=int, default=12355, help="specify MASTER_PORT for distributed"
+    )
     parser.add_argument("--seed", type=int, default=0, help="random seed")
     parser.add_argument(
         "--world-size", type=int, default=8, help="the world size to initiate DPP"
