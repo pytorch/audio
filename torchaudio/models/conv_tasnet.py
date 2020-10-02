@@ -22,9 +22,11 @@ class ConvBlock(torch.nn.Module):
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
 
-    References:
+    Reference:
         - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
+
           Luo, Yi and Mesgarani, Nima
+
           https://arxiv.org/abs/1809.07454
     """
 
@@ -189,9 +191,11 @@ class ConvTasNet(torch.nn.Module):
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
 
-    References:
+    Reference:
         - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
+
           Luo, Yi and Mesgarani, Nima
+
           https://arxiv.org/abs/1809.07454
     """
 
