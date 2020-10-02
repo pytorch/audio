@@ -1,8 +1,11 @@
 import os
+import platform
+import unittest
 
 from torchaudio.datasets import tedlium
 
 from torchaudio_unittest.common_utils import (
+    TestBaseMixin,
     TempDirMixin,
     TorchaudioTestCase,
     get_whitenoise,
@@ -30,9 +33,7 @@ PHONEME = [
 ]
 
 
-class TestTedlium(TempDirMixin, TorchaudioTestCase):
-    backend = "default"
-
+class Tedlium(TempDirMixin):
     root_dir = None
     samples = {}
 
@@ -151,3 +152,15 @@ class TestTedlium(TempDirMixin, TorchaudioTestCase):
         phoneme_dict = dataset.phoneme_dict
         phoenemes = [f"{key} {' '.join(value)}" for key, value in phoneme_dict.items()]
         assert phoenemes == PHONEME
+
+
+class TestTedliumDefault(Tedlium, TorchaudioTestCase):
+    backend = "default"
+
+
+@unittest.skipIf(
+    platform.system() == "Windows",
+    "Test already covered by 'default' backend on Windows.",
+)
+class TestTedliumSoundfile(Tedlium, TorchaudioTestCase):
+    backend = "soundfile"
