@@ -65,9 +65,19 @@ def load_libritts_item(
 
 
 class LIBRITTS(Dataset):
-    """
-    Create a Dataset for LibriTTS. Each item is a tuple of the form:
-    waveform, sample_rate, original_text, normalized_text, speaker_id, chapter_id, utterance_id
+    """Create a Dataset for LibriTTS.
+
+    Args:
+        root (str): Path to the directory where the dataset is found or downloaded.
+        url (str, optional): The URL to download the dataset from,
+            or the type of the dataset to dowload.
+            Allowed type values are ``"dev-clean"``, ``"dev-other"``, ``"test-clean"``,
+            ``"test-other"``, ``"train-clean-100"``, ``"train-clean-360"`` and
+            ``"train-other-500"``. (default: ``"train-clean-100"``)
+        folder_in_archive (str, optional):
+            The top-level directory of the dataset. (default: ``"LibriTTS"``)
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
 
     _ext_original_txt = ".original.txt"
@@ -118,6 +128,15 @@ class LIBRITTS(Dataset):
         self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int, int, str]:
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            tuple: ``(waveform, sample_rate, original_text, normalized_text, speaker_id,
+            chapter_id, utterance_id)``
+        """
         fileid = self._walker[n]
         return load_libritts_item(
             fileid,

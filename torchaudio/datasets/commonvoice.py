@@ -100,11 +100,28 @@ def load_commonvoice_item(line: List[str],
 
 
 class COMMONVOICE(Dataset):
-    """
-    Create a Dataset for CommonVoice. Each item is a tuple of the form:
-    (waveform, sample_rate, dictionary)
-    where dictionary is a dictionary built from the tsv file with the following keys:
-    client_id, path, sentence, up_votes, down_votes, age, gender, accent.
+    """Create a Dataset for CommonVoice.
+
+    Args:
+        root (str): Path to the directory where the dataset is found or downloaded.
+        tsv (str, optional): The name of the tsv file used to construct the metadata.
+            (default: ``"train.tsv"``)
+        url (str, optional): The URL to download the dataset from, or the language of
+            the dataset to download. (default: ``"english"``).
+            Allowed language values are ``"tatar"``, ``"english"``, ``"german"``,
+            ``"french"``, ``"welsh"``, ``"breton"``, ``"chuvash"``, ``"turkish"``, ``"kyrgyz"``,
+            ``"irish"``, ``"kabyle"``, ``"catalan"``, ``"taiwanese"``, ``"slovenian"``,
+            ``"italian"``, ``"dutch"``, ``"hakha chin"``, ``"esperanto"``, ``"estonian"``,
+            ``"persian"``, ``"portuguese"``, ``"basque"``, ``"spanish"``, ``"chinese"``,
+            ``"mongolian"``, ``"sakha"``, ``"dhivehi"``, ``"kinyarwanda"``, ``"swedish"``,
+            ``"russian"``, ``"indonesian"``, ``"arabic"``, ``"tamil"``, ``"interlingua"``,
+            ``"latvian"``, ``"japanese"``, ``"votic"``, ``"abkhaz"``, ``"cantonese"`` and
+            ``"romansh sursilvan"``.
+        folder_in_archive (str, optional): The top-level directory of the dataset.
+        version (str): Version string. (default: ``"cv-corpus-4-2019-12-10"``)
+            For the other allowed values, Please checkout https://commonvoice.mozilla.org/en/datasets.
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
 
     _ext_txt = ".txt"
@@ -192,6 +209,16 @@ class COMMONVOICE(Dataset):
             self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, Dict[str, str]]:
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            tuple: ``(waveform, sample_rate, dictionary)``,  where dictionary is built
+            from the TSV file with the following keys: ``client_id``, ``path``, ``sentence``,
+            ``up_votes``, ``down_votes``, ``age``, ``gender`` and ``accent``.
+        """
         line = self._walker[n]
         return load_commonvoice_item(line, self._header, self._path, self._folder_audio)
 

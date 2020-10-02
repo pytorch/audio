@@ -1,6 +1,6 @@
 import os
 import warnings
-from typing import Any, Tuple
+from typing import Any, Tuple, Optional
 
 import torchaudio
 from torch import Tensor
@@ -998,12 +998,22 @@ def load_gtzan_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, str
 
 
 class GTZAN(Dataset):
-    """
-    Create a Dataset for GTZAN. Each item is a tuple of the form:
-    waveform, sample_rate, label.
+    """Create a Dataset for GTZAN.
 
-    Please see http://marsyas.info/downloads/datasets.html
-    if you are planning to use this dataset to publish results.
+    Note:
+        Please see http://marsyas.info/downloads/datasets.html if you are planning to use
+        this dataset to publish results.
+
+    Args:
+        root (str): Path to the directory where the dataset is found or downloaded.
+        url (str, optional): The URL to download the dataset from.
+            (default: ``"http://opihi.cs.uvic.ca/sound/genres.tar.gz"``)
+        folder_in_archive (str, optional): The top-level directory of the dataset.
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
+        subset (str, optional): Which subset of the dataset to use.
+            One of ``"training"``, ``"validation"``, ``"testing"`` or ``None``.
+            If ``None``, the entire dataset is used. (default: ``None``).
     """
 
     _ext_audio = ".wav"
@@ -1014,7 +1024,7 @@ class GTZAN(Dataset):
         url: str = URL,
         folder_in_archive: str = FOLDER_IN_ARCHIVE,
         download: bool = False,
-        subset: Any = None,
+        subset: Optional[str] = None,
     ) -> None:
 
         # super(GTZAN, self).__init__()
@@ -1082,6 +1092,14 @@ class GTZAN(Dataset):
                 self._walker = filtered_test
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str]:
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            tuple: ``(waveform, sample_rate, label)``
+        """
         fileid = self._walker[n]
         item = load_gtzan_item(fileid, self._path, self._ext_audio)
         waveform, sample_rate, label = item

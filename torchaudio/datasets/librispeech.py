@@ -67,9 +67,19 @@ def load_librispeech_item(fileid: str,
 
 
 class LIBRISPEECH(Dataset):
-    """
-    Create a Dataset for LibriSpeech. Each item is a tuple of the form:
-    waveform, sample_rate, utterance, speaker_id, chapter_id, utterance_id
+    """Create a Dataset for LibriSpeech.
+
+    Args:
+        root (str): Path to the directory where the dataset is found or downloaded.
+        url (str, optional): The URL to download the dataset from,
+            or the type of the dataset to dowload.
+            Allowed type values are ``"dev-clean"``, ``"dev-other"``, ``"test-clean"``,
+            ``"test-other"``, ``"train-clean-100"``, ``"train-clean-360"`` and
+            ``"train-other-500"``. (default: ``"train-clean-100"``)
+        folder_in_archive (str, optional):
+            The top-level directory of the dataset. (default: ``"LibriSpeech"``)
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
 
     _ext_txt = ".trans.txt"
@@ -117,6 +127,14 @@ class LIBRISPEECH(Dataset):
         self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            tuple: ``(waveform, sample_rate, utterance, speaker_id, chapter_id, utterance_id)``
+        """
         fileid = self._walker[n]
         return load_librispeech_item(fileid, self._path, self._ext_audio, self._ext_txt)
 

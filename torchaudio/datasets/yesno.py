@@ -31,9 +31,18 @@ def load_yesno_item(fileid: str, path: str, ext_audio: str) -> Tuple[Tensor, int
 
 
 class YESNO(Dataset):
-    """
-    Create a Dataset for YesNo. Each item is a tuple of the form:
-    (waveform, sample_rate, labels)
+    """Create a Dataset for YesNo.
+
+    Args:
+        root (str): Path to the directory where the dataset is found or downloaded.
+        url (str, optional): The URL to download the dataset from.
+            (default: ``"http://www.openslr.org/resources/1/waves_yesno.tar.gz"``)
+        folder_in_archive (str, optional):
+            The top-level directory of the dataset. (default: ``"waves_yesno"``)
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
+        transform (callable, optional): Optional transform applied on waveform. (default: ``None``)
+        target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``)
     """
 
     _ext_audio = ".wav"
@@ -78,6 +87,14 @@ class YESNO(Dataset):
         self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, List[int]]:
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            tuple: ``(waveform, sample_rate, labels)``
+        """
         fileid = self._walker[n]
         item = load_yesno_item(fileid, self._path, self._ext_audio)
 
