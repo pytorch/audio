@@ -502,7 +502,7 @@ def main(rank, args):
 
     torch.autograd.set_detect_anomaly(False)
 
-    for epoch in range(args.start_epoch, args.epochs):
+    for epoch in range(args.start_epoch, args.max_epoch):
 
         logging.info("Epoch: %s", epoch)
 

@@ -55,7 +55,7 @@ def parse_args():
         help="resume from checkpoint file provided by --checkpoint option",
     )
     parser.add_argument(
-        "--epochs", default=200, type=int, help="number of total epochs to run",
+        "--max-epoch", default=200, type=int, help="max epoch to reach",
     )
     parser.add_argument(
         "--start-epoch", default=0, type=int, help="manual epoch number"
