@@ -17,7 +17,11 @@ from ctc_decoders import (
     ListViterbiDecoder,
     ViterbiDecoder,
 )
-from datasets import collate_factory, split_process_librispeech, split_process_speechcommands
+from datasets import (
+    collate_factory,
+    split_process_librispeech,
+    split_process_speechcommands,
+)
 from languagemodels import LanguageModel
 from metrics import levenshtein_distance
 from transforms import Normalize, ToMono, UnsqueezeFirst
@@ -271,12 +275,10 @@ def evaluate(
             # input_lengths: batch size
             # target_lengths: batch size
 
-            loss_value = criterion(
-                outputs, targets, tensors_lengths, target_lengths
-            ).item()
+            loss = criterion(outputs, targets, tensors_lengths, target_lengths)
 
             avg_loss = record_losses(
-                outputs, targets, decoder, language_model, loss_value, metric
+                outputs, targets, decoder, language_model, loss.item(), metric
             )
 
             # TODO Remove before merge pull request

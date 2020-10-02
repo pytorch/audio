@@ -23,14 +23,14 @@ CMD="$CMD python /private/home/vincentqb/audio-pytorch/examples/pipeline_wav2let
 # CMD="$CMD --distributed --world-size 8"
 CMD="$CMD --print-freq 1 --reduce-lr-valid --dataset-root /datasets01/librispeech/ --dataset-folder-in-archive 062419"
 
-choices=(0. 0.2)
-name="dropout"
-l=${#choices[@]}
-j=$(($i % $l))
-i=$(($i / $l))
-item=${choices[$j]}
-CMD="$CMD --$name $item"
-COUNT=$(($COUNT * $l))
+# choices=(0. 0.2)
+# name="dropout"
+# l=${#choices[@]}
+# j=$(($i % $l))
+# i=$(($i / $l))
+# item=${choices[$j]}
+# CMD="$CMD --$name $item"
+# COUNT=$(($COUNT * $l))
 
 # choices=("sum" "mean")
 choices=("sum")
@@ -43,7 +43,8 @@ CMD="$CMD --$name $item"
 COUNT=$(($COUNT * $l))
 
 # choices=("mel" "mfcc" "waveform")
-choices=("mfcc" "waveform")
+# choices=("mfcc" "waveform")
+choices=("mfcc")
 # choices=("waveform")
 name="model-input-type"
 l=${#choices[@]}
@@ -53,7 +54,8 @@ item=${choices[$j]}
 CMD="$CMD --$name $item"
 COUNT=$(($COUNT * $l))
 
-choices=("train-clean-100" "train-clean-100 train-clean-360 train-other-500")
+# choices=("train-clean-100" "train-clean-100 train-clean-360 train-other-500")
+choices=("train-clean-100")
 name="dataset-train"
 l=${#choices[@]}
 j=$(($i % $l))
@@ -138,14 +140,14 @@ item=${choices[$j]}
 CMD="$CMD --$name $item"
 COUNT=$(($COUNT * $l))
 
-choices=(2000 1000)
-name="hidden-channels"
-l=${#choices[@]}
-j=$(($i % $l))
-i=$(($i / $l))
-item=${choices[$j]}
-CMD="$CMD --$name $item"
-COUNT=$(($COUNT * $l))
+# choices=(2000 1000)
+# name="hidden-channels"
+# l=${#choices[@]}
+# j=$(($i % $l))
+# i=$(($i / $l))
+# item=${choices[$j]}
+# CMD="$CMD --$name $item"
+# COUNT=$(($COUNT * $l))
 
 # choices=(512 400)
 choices=(400)
@@ -206,7 +208,8 @@ COUNT=$(($COUNT * $l))
 # COUNT=$(($COUNT * $l))
 
 # choices=("sgd" "adadelta" "adamw")
-choices=("sgd" "adadelta")
+# choices=("sgd" "adadelta")
+choices=("adadelta")
 name="optimizer"
 l=${#choices[@]}
 j=$(($i % $l))
