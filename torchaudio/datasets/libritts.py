@@ -69,8 +69,9 @@ class LIBRITTS(Dataset):
 
     Args:
         root (str): Path to the directory where the dataset is found or downloaded.
-        url (str, optional): Type of the dataset to dowload. This is **NOT** the actual URL.
-            Allowed values are ``"dev-clean"``, ``"dev-other"``, ``"test-clean"``,
+        url (str, optional): The URL to download the dataset from,
+            or the type of the dataset to dowload.
+            Allowed type values are ``"dev-clean"``, ``"dev-other"``, ``"test-clean"``,
             ``"test-other"``, ``"train-clean-100"``, ``"train-clean-360"`` and
             ``"train-other-500"``. (default: ``"train-clean-100"``)
         folder_in_archive (str, optional):

@@ -81,8 +81,9 @@ class CMUARCTIC(Dataset):
     Args:
         root (str): Path to the directory where the dataset is found or downloaded.
         url (str, optional):
-            Type of the dataset to dowload. This is **NOT** the actual URL. (default: ``"aew"``)
-            Allowed values are ``"aew"``, ``"ahw"``, ``"aup"``, ``"awb"``, ``"axb"``, ``"bdl"``,
+            The URL to download the dataset from or the type of the dataset to dowload.
+            (default: ``"aew"``)
+            Allowed type values are ``"aew"``, ``"ahw"``, ``"aup"``, ``"awb"``, ``"axb"``, ``"bdl"``,
             ``"clb"``, ``"eey"``, ``"fem"``, ``"gka"``, ``"jmk"``, ``"ksp"``, ``"ljm"``, ``"lnh"``,
             ``"rms"``, ``"rxr"``, ``"slp"`` or ``"slt"``.
         folder_in_archive (str, optional):

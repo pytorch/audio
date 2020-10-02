@@ -106,10 +106,10 @@ class COMMONVOICE(Dataset):
         root (str): Path to the directory where the dataset is found or downloaded.
         tsv (str, optional): The name of the tsv file used to construct the metadata.
             (default: ``"train.tsv"``)
-        url (str, optional): The language of the dataset to download.
-            This is **NOT** the actual URL. (default: ``"english"``).
-            Valid choices are ``"tatar"``, ``"english"``, ``"german"``, ``"french"``,
-            ``"welsh"``, ``"breton"``, ``"chuvash"``, ``"turkish"``, ``"kyrgyz"``,
+        url (str, optional): The URL to download the dataset from, or the language of
+            the dataset to download. (default: ``"english"``).
+            Allowed language values are ``"tatar"``, ``"english"``, ``"german"``,
+            ``"french"``, ``"welsh"``, ``"breton"``, ``"chuvash"``, ``"turkish"``, ``"kyrgyz"``,
             ``"irish"``, ``"kabyle"``, ``"catalan"``, ``"taiwanese"``, ``"slovenian"``,
             ``"italian"``, ``"dutch"``, ``"hakha chin"``, ``"esperanto"``, ``"estonian"``,
             ``"persian"``, ``"portuguese"``, ``"basque"``, ``"spanish"``, ``"chinese"``,

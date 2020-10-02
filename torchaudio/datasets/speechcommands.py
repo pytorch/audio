@@ -40,8 +40,9 @@ class SPEECHCOMMANDS(Dataset):
 
     Args:
         root (str): Path to the directory where the dataset is found or downloaded.
-        url (str, optional): Type of the dataset to dowload. This is **NOT** the actual URL.
-            Allowed values are ``"speech_commands_v0.01"`` and ``"speech_commands_v0.02"``
+        url (str, optional): The URL to download the dataset from,
+            or the type of the dataset to dowload.
+            Allowed type values are ``"speech_commands_v0.01"`` and ``"speech_commands_v0.02"``
             (default: ``"speech_commands_v0.02"``)
         folder_in_archive (str, optional):
             The top-level directory of the dataset. (default: ``"SpeechCommands"``)
