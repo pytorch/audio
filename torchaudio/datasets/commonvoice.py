@@ -119,6 +119,7 @@ class COMMONVOICE(Dataset):
             ``"romansh sursilvan"``.
         folder_in_archive (str, optional): The top-level directory of the dataset.
         version (str): Version string. (default: ``"cv-corpus-4-2019-12-10"``)
+            For the other allowed values, Please checkout https://commonvoice.mozilla.org/en/datasets.
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
     """

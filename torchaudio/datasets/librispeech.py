@@ -72,7 +72,9 @@ class LIBRISPEECH(Dataset):
     Args:
         root (str): Path to the directory where the dataset is found or downloaded.
         url (str, optional): Type of the dataset to dowload. This is **NOT** the actual URL.
-            (default: ``"train-clean-100"``)
+            Allowed values are ``"dev-clean"``, ``"dev-other"``, ``"test-clean"``,
+            ``"test-other"``, ``"train-clean-100"``, ``"train-clean-360"`` and
+            ``"train-other-500"``. (default: ``"train-clean-100"``)
         folder_in_archive (str, optional):
             The top-level directory of the dataset. (default: ``"LibriSpeech"``)
         download (bool, optional):

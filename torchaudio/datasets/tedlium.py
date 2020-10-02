@@ -48,7 +48,7 @@ class TEDLIUM(Dataset):
     Args:
         root (str): Path to the directory where the dataset is found or downloaded.
         release (str, optional): Release version.
-            The valid choices are ``"release1"``, ``"release2"`` or ``"release3"``.
+            Allowed values are ``"release1"``, ``"release2"`` or ``"release3"``.
             (default: ``"release1"``).
         subset (str, optional): The subset of dataset to use. Valid options are ``"train"``, ``"dev"``,
             and ``"test"`` for releases 1&2, ``None`` for release3. Defaults to ``"train"`` or ``None``.

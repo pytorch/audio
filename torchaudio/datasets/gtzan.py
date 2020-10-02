@@ -1,6 +1,6 @@
 import os
 import warnings
-from typing import Any, Tuple
+from typing import Any, Tuple, Optional
 
 import torchaudio
 from torch import Tensor
