@@ -14,11 +14,11 @@ def info(filepath: str) -> AudioMetaData:
 
     Args:
         filepath (str or pathlib.Path):
-        Path to audio file. This function also handles ``pathlib.Path`` objects, but is annotated as
-        ``str`` for TorchScript compiler compatibility.
+            Path to audio file. This function also handles ``pathlib.Path`` objects,
+            but is annotated as ``str`` for TorchScript compiler compatibility.
 
     Returns:
-        AudioMetaData: meta data of the given audio.
+        AudioMetaData: Meta data of the given audio.
     """
     # Cast to str in case type is `pathlib.Path`
     filepath = str(filepath)
@@ -184,6 +184,9 @@ def load_wav(
 ) -> Tuple[torch.Tensor, int]:
     """Load wave file.
 
+    Warnings:
+        This functions is being deprecated and will be removed in ``0.9.0``.
+        Please use ``load(..., normalize=False)``
 
     This function is defined only for the purpose of compatibility against other backend
     for simple usecases, such as ``torchaudio.load_wav(filepath)``.
