@@ -29,82 +29,85 @@ CMUARCTIC
 ~~~~~~~~~
 
 .. autoclass:: CMUARCTIC
-  :members: __getitem__
-  :special-members:
+  :members:
+  :special-members: __getitem__
 
 
 COMMONVOICE
 ~~~~~~~~~~~
 
 .. autoclass:: COMMONVOICE
-  :members: __getitem__
-  :special-members:
+  :members:
+  :special-members: __getitem__
 
 
 GTZAN
 ~~~~~
 
 .. autoclass:: GTZAN
-  :members: __getitem__
-  :special-members:
+  :members:
+  :special-members: __getitem__
 
 
 LIBRISPEECH
 ~~~~~~~~~~~
 
 .. autoclass:: LIBRISPEECH
-  :members: __getitem__
-  :special-members:
+  :members:
+  :special-members: __getitem__
 
 
 LIBRITTS
 ~~~~~~~~
 
 .. autoclass:: LIBRITTS
-  :members: __getitem__
-  :special-members:
+  :members:
+  :special-members: __getitem__
 
 
 LJSPEECH
 ~~~~~~~~
 
 .. autoclass:: LJSPEECH
-  :members: __getitem__
-  :special-members:
+  :members:
+  :special-members: __getitem__
 
 
 SPEECHCOMMANDS
 ~~~~~~~~~~~~~~
 
 .. autoclass:: SPEECHCOMMANDS
-  :members: __getitem__
-  :special-members:
+  :members:
+  :special-members: __getitem__
 
 
 TEDLIUM
 ~~~~~~~~~~~~~~
 
 .. autoclass:: TEDLIUM
-  :members: __getitem__
-  :special-members: get_phoneme_dict
+  :members:
+  :special-members: __getitem__
+
 
 VCTK
 ~~~~
 
 .. autoclass:: VCTK
-  :members: __getitem__
-  :special-members:
+  :members:
+  :special-members: __getitem__
 
 
 VCTK_092
 ~~~~~~~~
 
 .. autoclass:: VCTK_092
+  :members:
+  :special-members: __getitem__
 
 
 YESNO
 ~~~~~
 
 .. autoclass:: YESNO
-  :members: __getitem__
-  :special-members:
+  :members:
+  :special-members: __getitem__

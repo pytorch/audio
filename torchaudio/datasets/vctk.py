@@ -54,12 +54,25 @@ def load_vctk_item(fileid: str,
 
 
 class VCTK(Dataset):
-    """
-    Create a Dataset for VCTK. Each item is a tuple of the form:
-    (waveform, sample_rate, utterance, speaker_id, utterance_id)
+    """Create a Dataset for VCTK.
 
-    Folder `p315` will be ignored due to the non-existent corresponding text files.
-    For more information about the dataset visit: https://datashare.is.ed.ac.uk/handle/10283/3443
+    Note:
+        * **This dataset is no longer publicly available.** Please use :py:class:`VCTK_092`
+        * Directory ``p315`` is ignored because there is no corresponding text files.
+          For more information about the dataset visit: https://datashare.is.ed.ac.uk/handle/10283/3443
+
+    Args:
+        root (str): Path to the directory where the dataset is found or downloaded.
+        url (str, optional): Not used as the dataset is no longer publicly available.
+        folder_in_archive (str, optional):
+            The top-level directory of the dataset. (default: ``"VCTK-Corpus"``)
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
+            Giving ``download=True`` will result in error as the dataset is no longer
+            publicly available.
+        downsample (bool, optional): Not used.
+        transform (callable, optional): Optional transform applied on waveform. (default: ``None``)
+        target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``)
     """
 
     _folder_txt = "txt"
@@ -118,6 +131,14 @@ class VCTK(Dataset):
         self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, str]:
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            tuple: ``(waveform, sample_rate, utterance, speaker_id, utterance_id)``
+        """
         fileid = self._walker[n]
         item = load_vctk_item(
             fileid,
@@ -145,14 +166,13 @@ class VCTK(Dataset):
 class VCTK_092(Dataset):
     """Create VCTK 0.92 Dataset
 
-    An item is a ``namedtuple`` of (``waveform``, ``sample_rate``, ``utterance``,
-    ``speaker_id``, ``utterance_id``)
-
     Args:
         root (str): Root directory where the dataset's top level directory is found.
-        mic_id (str): Microphone ID. Either ``"mic1"`` or ``"mic2"``
-        download (bool, optional): Download the dataset if not found in the given directory.
-        url (str, optional): URL from which the dataset is downloaded.
+        mic_id (str): Microphone ID. Either ``"mic1"`` or ``"mic2"``. (default: ``"mic2"``)
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
+        url (str, optional): The URL to download the dataset from.
+            (default: ``"https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip"``)
         audio_ext (str, optional): Custom audio extension if dataset is converted to non-default audio format.
 
     Note:
@@ -252,6 +272,14 @@ class VCTK_092(Dataset):
         return Sample(waveform, sample_rate, utterance, speaker_id, utterance_id)
 
     def __getitem__(self, n: int) -> Sample:
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            tuple: ``(waveform, sample_rate, utterance, speaker_id, utterance_id)``
+        """
         speaker_id, utterance_id = self._sample_ids[n]
         return self._load_sample(speaker_id, utterance_id, self._mic_id)
 
