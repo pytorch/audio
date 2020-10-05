@@ -5,7 +5,7 @@ from torch.testing._internal.common_utils import TestCase
 from parameterized import parameterized
 
 from . import sdr_reference
-from utils import metrics
+from source_separation.utils import metrics
 
 
 class TestSDR(TestCase):
