@@ -16,7 +16,7 @@ There are currently four implementations available.
 * :ref:`"soundfile" - new interface <soundfile_backend>` (default on Windows from the 0.8.0 release)
 
 .. note::
-   Instead of calling functions in ``torchaudio.backend`` directly, please use ``torchaudio.info``, ``torhcaudio.load``, ``torchaudio.load_wav`` and ``torchaudio.save`` with proper backend set with :func:`torchaudio.set_audio_backend`.
+   Instead of calling functions in ``torchaudio.backend`` directly, please use ``torchaudio.info``, ``torchaudio.load``, ``torchaudio.load_wav`` and ``torchaudio.save`` with proper backend set with :func:`torchaudio.set_audio_backend`.
 
 Availability
 ------------
