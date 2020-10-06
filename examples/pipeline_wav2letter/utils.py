@@ -17,18 +17,19 @@ class Logger(defaultdict):
 
         self._name = "name"
         self._time = "elapsed time"
+        self._iteration = "iteration"
 
         self[self._name] = name
         self[self._time] = time.monotonic()
-        self._iteration = 0
+        self[self._iteration] = 0
 
     def __str__(self):
         self[self._time] = time.monotonic() - self[self._time]
         return json.dumps(self)
 
     def flush(self):
-        self._iteration += 1
-        if not self.disable and not self._iteration % self.print_freq:
+        self[self._iteration] += 1
+        if not self.disable and not self[self._iteration] % self.print_freq:
             if self.filename:
                 self._append_to_file()
             else:
