@@ -4,7 +4,7 @@ from torchaudio._internal import module_utils as _mod_utils
 
 
 class AudioMetaData:
-    """Data class to be returned by ``torchaudio.info`` function.
+    """Return type of ``torchaudio.info`` function.
 
     This class is used by :ref:`"sox_io" backend<sox_io_backend>` and
     :ref:`"soundfile" backend with the new interface<soundfile_backend>`.
@@ -24,7 +24,7 @@ class SignalInfo:
     """Data class returned ``info`` functions.
 
     This class is used by :ref:`"sox" backend (deprecated)<sox_backend>` and
-    :ref:`"soundfile" backend with the legacy interface<soundfile_legacy_backend>`.
+    :ref:`"soundfile" backend with the legacy interface (deprecated)<soundfile_legacy_backend>`.
 
     Warnings:
         This class is used by deprecated backends, and will be removed in ``0.9.0``.
@@ -54,7 +54,7 @@ class EncodingInfo:
     """Data class returned ``info`` functions.
 
     This class is used by :ref:`"sox" backend (deprecated)<sox_backend>` and
-    :ref:`"soundfile" backend with the legacy interface<soundfile_legacy_backend>`.
+    :ref:`"soundfile" backend with the legacy interface (deprecated)<soundfile_legacy_backend>`.
 
     Warnings:
         This class is used by deprecated backends, and will be removed in ``0.9.0``.
@@ -90,7 +90,8 @@ class EncodingInfo:
 _LOAD_DOCSTRING = r"""Loads an audio file from disk into a tensor
 
 Warnings:
-    This function is deprecated. Please migrate to the new backend.
+    This function is deprecated.
+    Please migrate to the :ref:`"sox_io" backend<sox_io_backend>` or the :ref:`"soundfile" backed with the new interface<soundfile_backend>`.
 
 Args:
     filepath: Path to audio file
@@ -145,7 +146,9 @@ It assumes that the wav file uses 16 bit per sample that needs normalization by
 shifting the input right by 16 bits.
 
 Warnings:
-    This function is deprecated. Please migrate to the new backend and use ``load(.., normalize=False)``
+    This function is deprecated.
+    Please migrate to the :ref:`"sox_io" backend<sox_io_backend>` or the :ref:`"soundfile" backed with the new interface<soundfile_backend>`,
+    then use ``load(.., normalize=False)``
 
 Args:
     filepath: Path to audio file
@@ -159,7 +162,8 @@ Returns:
 _SAVE_DOCSTRING = r"""Saves a Tensor on file as an audio file
 
 Warnings:
-    This function is deprecated. Please migrate to the new backend.
+    This function is deprecated.
+    Please migrate to the :ref:`"sox_io" backend<sox_io_backend>` or the :ref:`"soundfile" backed with the new interface<soundfile_backend>`.
 
 Args:
     filepath: Path to audio file
@@ -176,7 +180,8 @@ Args:
 _INFO_DOCSTRING = r"""Gets metadata from an audio file without loading the signal.
 
 Warnings:
-    This function is deprecated. Please migrate to the new backend.
+    This function is deprecated.
+    Please migrate to the :ref:`"sox_io" backend<sox_io_backend>` or the :ref:`"soundfile" backed with the new interface<soundfile_backend>`.
 
 Args:
     filepath: Path to audio file

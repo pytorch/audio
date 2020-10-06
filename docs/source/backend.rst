@@ -6,52 +6,49 @@ torchaudio.backend
 Overview
 ~~~~~~~~
 
-:mod:`torchaudio.backend` module provides implementations for audio file I/O, using different backend libraries.
-To switch backend, use :py:func:`torchaudio.set_audio_backend`. To check the current backend use :py:func:`torchaudio.get_audio_backend`.
+:mod:`torchaudio.backend` module provides implementations for audio file I/O functionalities, which are ``torchaudio.info``, ``torchaudio.load``, ``torchaudio.load_wav`` and ``torchaudio.save``.
 
 There are currently four implementations available.
 
-    * ``"sox"`` (deprecated)
-    * ``"sox_io"``
-    * ``"soundfile"``, legacy interface (deprecated)
-    * ``"soundfile"``, new interface
-
-``"sox"`` backend is the original backend which is built on ``libsox``. This backend requires C++ extension module and is not available on Windows system. This backend is currently the default backend when available, but is being deprecated. Please use ``"sox_io"`` backend.
-
-``"sox_io"`` backend is the new backend which is built on ``libsox``, and bound with ``TorchScript``. This backend requires C++ extension module and is not available on Windows system. Function calls to this backend are TorchScript-able. This backend will become the default backend in ``"0.8.0"`` release.
-
-``"soundfile"`` backend is built on ``PySoundFile``. You need to install ``PySoundFile`` separately. The current interface of this backend (legacy interface) will be changed in ``0.8.0`` (new interface) to match the ``"sox_io"`` backend.
+* :ref:`"sox" <sox_backend>` (deprecated, default on Linux/macOS)
+* :ref:`"sox_io" <sox_io_backend>` (default on Linux/macOS from the 0.8.0 release)
+* :ref:`"soundfile" - legacy interface <soundfile_legacy_backend>` (deprecated, default on Windows)
+* :ref:`"soundfile" - new interface <soundfile_backend>` (default on Windows from the 0.8.0 release)
 
 .. note::
-   Instead of calling functions in :mod:`torchaudio.backend` directly, please use ``torchaudio.info``, ``torhcaudio.load``, ``torchaudio.load_wav`` and ``torchaudio.save`` with proper backend set with :func:`torchaudio.get_audio_backend`.
+   Instead of calling functions in ``torchaudio.backend`` directly, please use ``torchaudio.info``, ``torhcaudio.load``, ``torchaudio.load_wav`` and ``torchaudio.save`` with proper backend set with :func:`torchaudio.set_audio_backend`.
 
-Changes in default backend and Deprecation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Availability
+------------
 
-.. warning::
-   * The default backend for Linux/macOS will be changed from ``"sox"`` to ``"sox_io"`` in ``0.8.0`` release.
-   * ``"sox"``  backend will be removed in ``0.9.0`` release.
-   * The function signatures of ``"soundfile"`` backends are changed in ``0.8.0`` to match ``"sox_io"`` backend.
-   * To opt-in to the new signature of ``"soundfile"`` backend, do ``torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = False`` **before** switching to ``"soundfile"``.
+``"sox"`` and ``"sox_io"`` backends require C++ extension module. Linux and macOS binary distributions include this. These backends are not available on Windows.
 
-   The following table summarizes the timeline for the changes and deprecations.
+``"soundfile"`` backend requires ``SoundFile``. Please refer to `the SoundFile documentation <https://pysoundfile.readthedocs.io/en/latest/>`_ for the installation.
 
-   +--------------------+--------------------------+--------------------------+--------------------------+
-   | **Backend**        | **0.7.0**                | **0.8.0**                | **0.9.0**                |
-   +====================+==========================+==========================+==========================+
-   | ``"sox"``          | Default if C++ extension | Available                | Removed                  |
-   | (deprecated)       | is available             |                          |                          |
-   +--------------------+--------------------------+--------------------------+--------------------------+
-   | ``"sox_io"``       | Available                | Default if C++ extension | Default if C++ extension |
-   |                    |                          | is available             | is available             |
-   +--------------------+--------------------------+--------------------------+--------------------------+
-   | ``"soundfile"``    | Default if C++ extension | Available                | Removed                  |
-   | (legacy interface, | is not available         |                          |                          |
-   | deprecated)        |                          |                          |                          |
-   +--------------------+--------------------------+--------------------------+--------------------------+
-   | ``"soundfile"``    | Available                | Default if C++ extension | Default if C++ extension |
-   | (new interface)    |                          | is not available         | is not available         |
-   +--------------------+--------------------------+--------------------------+--------------------------+
+Changes in default backend and deprecation
+------------------------------------------
+
+Backend module is going through a major overhaul. The following table summarizes the timeline for the changes and deprecations.
+
+ +--------------------+--------------------------+-----------------------+------------------------+
+ | **Backend**        | **0.7.0**                | **0.8.0**             | **0.9.0**              |
+ +====================+==========================+=======================+========================+
+ | ``"sox"``          | Default on Linux/macOS   | Available             | Removed                |
+ | (deprecated)       |                          |                       |                        |
+ +--------------------+--------------------------+-----------------------+------------------------+
+ | ``"sox_io"``       | Available                | Default on Linx/macOS | Default on Linux/macOS |
+ +--------------------+--------------------------+-----------------------+------------------------+
+ | ``"soundfile"``    | Default on Windows       | Available             | Removed                |
+ | (legacy interface, |                          |                       |                        |
+ | deprecated)        |                          |                       |                        |
+ +--------------------+--------------------------+-----------------------+------------------------+
+ | ``"soundfile"``    | Available                | Default on Windows    | Default on Windows     |
+ | (new interface)    |                          |                       |                        |
+ +--------------------+--------------------------+-----------------------+------------------------+
+
+* The default backend for Linux/macOS will be changed from ``"sox"`` to ``"sox_io"`` in ``0.8.0`` release.
+* The ``"sox"`` backend will be removed in the ``0.9.0`` release.
+* Starting from the 0.8.0 release, ``"soundfile"`` backend will use the new interface, which has the same interface as ``"sox_io"`` backend. The legacy interface will be removed in the ``0.9.0`` release.
 
 Common Data Structure
 ~~~~~~~~~~~~~~~~~~~~~
@@ -78,11 +75,7 @@ EncodingInfo (Deprecated)
 Sox Backend (Deprecated)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-``"sox"`` backend is available on ``torchaudio`` installation with C++ extension. It is currently not available on Windows system.
-
-``"sox"`` backend is currently the default backend when C++ extension is available, however this backend is deprecated and will be removed in ``0.9.0`` release.
-
-In ``0.8.0`` release, :ref:`"sox_io" backend<sox_io_backend>` will become the default backend. Please migrate to :ref:`"sox_io" backend<sox_io_backend>`.
+The ``"sox"`` backend is available on Linux/macOS and not available on Windows. This backend is currently the default when available, but is deprecated and will be removed in ``0.9.0`` release.
 
 You can switch from another backend to ``sox`` backend with the following;
 
@@ -120,17 +113,15 @@ others
 Sox IO Backend
 ~~~~~~~~~~~~~~
 
-``sox_io`` backend is available on ``torchaudio`` installation with C++ extension. It is currently not available on Windows system.
+The ``"sox_io"`` backend is available on Linux/macOS and not available on Windows. This backend is recommended over the ``"sox"`` backend, and will become the default in the ``0.8.0`` release.
 
-This new backend is recommended over ``sox`` backend, and will become the default backend in ``0.8.0`` release when C++ extension is present.
+I/O functions of this backend support `TorchScript <https://pytorch.org/docs/stable/jit.html>`_.
 
-You can switch from another backend to ``sox_io`` backend with the following;
+You can switch from another backend to the ``sox_io`` backend with the following;
 
 .. code::
 
    torchaudio.set_audio_backend("sox_io")
-
-The function calls to this backend are TorchSript-able. You can apply :func:`torch.jit.script` and dump the object toa file, then call it from C++ application.
 
 info
 ----
@@ -155,13 +146,13 @@ save
 Soundfile Backend
 ~~~~~~~~~~~~~~~~~
 
-``soundfile`` backend is available when ``PySoundFile`` is installed. This backend works on ``torchaudio`` installation without C++ extension. (i.e. Windows)
+The ``"soundfile"`` backend is available when `SoundFile <https://pysoundfile.readthedocs.io/en/latest/>`_ is installed. This backend is the default on Windows.
 
-``"soundfile"`` backend has two interfaces, legacy and new.
+The ``"soundfile"`` backend has two interfaces, legacy and new.
 
-* In ``0.7.0`` release, the legacy interface is used by default when switching to ``"soundfile"`` backend.
-* In ``0.8.0`` release, the new interface will become the default.
-* In ``0.9.0`` release, the legacy interface will be removed.
+* In the ``0.7.0`` release, the legacy interface is used by default when switching to the ``"soundfile"`` backend.
+* In the ``0.8.0`` release, the new interface will become the default.
+* In the ``0.9.0`` release, the legacy interface will be removed.
 
 To change the interface, set ``torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE`` flag **before** switching the backend.
 
@@ -176,7 +167,7 @@ To change the interface, set ``torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE`` flag 
 Legacy Interface (Deprecated)
 -----------------------------
 
-``"soundfile"`` backend with legacy interface is currently the default backend if C++ is not available, however this interface is deprecated and will be removed in ``0.9.0`` release.
+``"soundfile"`` backend with legacy interface is currently the default on Windows, however this interface is deprecated and will be removed in the ``0.9.0`` release.
 
 To switch to this backend/interface, set ``torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE`` flag **before** switching the backend.
 
@@ -208,7 +199,7 @@ save
 New Interface
 -------------
 
-``"soundfile"`` backend with new interface will become the default interface in ``0.8.0``.
+The ``"soundfile"`` backend with new interface will become the default in the ``0.8.0`` release.
 
 To switch to this backend/interface, set ``torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE`` flag **before** switching the backend.
 

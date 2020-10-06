@@ -211,8 +211,8 @@ def load_wav(
     """Load wave file.
 
     Warnings:
-        This functions is being deprecated and will be removed in ``0.9.0``.
-        Please use ``load(..., normalize=False)``
+        This functions is deprecated and will be removed in ``0.9.0`` release.
+        Use ``load(..., normalize=False)``, instead.
 
     This function is defined only for the purpose of compatibility against other backend
     for simple usecases, such as ``torchaudio.load_wav(filepath)``.
