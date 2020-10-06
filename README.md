@@ -69,19 +69,19 @@ before running this command.)
 
 Note that nightly build is build on PyTorch's nightly build. Therefore, you need to install the latest PyTorch when you use nightly build of torchaudio.
 
+**conda**
+
+```
+conda install -c conda-forge pysoundfile  # only required for soundfile backend
+conda install -y -c pytorch-nightly torchaudio
+```
+
 **pip**
 
 ```
 pip install numpy
 pip install pysoundfile  # only required for soundfile backend
 pip install --pre torchaudio -f https://download.pytorch.org/whl/nightly/torch_nightly.html
-```
-
-**conda**
-
-```
-conda install -c conda-forge pysoundfile  # only required for soundfile backend
-conda install -y -c pytorch-nightly torchaudio
 ```
 
 ### From Source
