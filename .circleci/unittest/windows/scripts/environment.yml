@@ -15,3 +15,4 @@ dependencies:
     - librosa >= 0.8.0
     - future
     - parameterized
+    - dataclasses
