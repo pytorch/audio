@@ -50,12 +50,14 @@ Installation
 To install the latest version using anaconda, run:
 
 ```
+conda install -c conda-forge pysoundfile  # only required for soundfile backend
 conda install -c pytorch torchaudio
 ```
 
 To install the latest pip wheels, run:
 
 ```
+pip install pysoundfile  # only required for soundfile backend
 pip install torchaudio -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
@@ -71,12 +73,14 @@ Note that nightly build is build on PyTorch's nightly build. Therefore, you need
 
 ```
 pip install numpy
+pip install pysoundfile  # only required for soundfile backend
 pip install --pre torchaudio -f https://download.pytorch.org/whl/nightly/torch_nightly.html
 ```
 
 **conda**
 
 ```
+conda install -c conda-forge pysoundfile  # only required for soundfile backend
 conda install -y -c pytorch-nightly torchaudio
 ```
 
