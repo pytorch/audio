@@ -2353,8 +2353,8 @@ def levenshtein_distance(r: Sequence, h: Sequence) -> int:
     """
 
     # Initialisation
-    dold = list(range(len(h) + 1))
-    dnew = list(0 for _ in range(len(h) + 1))
+    dold = [range(len(h) + 1)]
+    dnew = [0 for _ in range(len(h) + 1)]
 
     # Computation
     for i in range(1, len(r) + 1):
