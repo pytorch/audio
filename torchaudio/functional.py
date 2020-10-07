@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import math
-from typing import Optional, Tuple
 from collections.abc import Sequence
+from typing import Optional, Tuple, List
 import warnings
 
 import torch
@@ -2334,7 +2334,7 @@ def vad(
     return res.view(shape[:-1] + res.shape[-1:])
 
 
-def levenshtein_distance(r: Sequence, h: Sequence) -> int:
+def levenshtein_distance(r, h) -> int:
     """
     Calculate the Levenshtein distance between two sequences.
 
@@ -2344,6 +2344,9 @@ def levenshtein_distance(r: Sequence, h: Sequence) -> int:
     This can be used to compute the edit distance for instance between two strings,
     or two list of words. Note that, if a string and a list of words is provided, the distance
     will be computed between the "string" sequence, and the "list of words" sequence.
+
+    This function is not type annotated. For annotated version use `levenshtein_distance_str`
+    or `levenshtein_distance_list`.
 
     Args:
         r (Sequence): the reference sequence to compare.
@@ -2371,3 +2374,11 @@ def levenshtein_distance(r: Sequence, h: Sequence) -> int:
         dnew, dold = dold, dnew
 
     return dold[-1]
+
+
+def levenshtein_distance_str(r: str, h: str) -> int:
+    return levenshtein_distance(r, h)
+
+
+def levenshtein_distance_list(r: List[str], h: List[str]) -> int:
+    return levenshtein_distance(r, h)

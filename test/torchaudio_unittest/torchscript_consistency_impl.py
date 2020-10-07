@@ -535,12 +535,22 @@ class Functional(common_utils.TestBaseMixin):
 
         self._assert_consistency(func, waveform)
 
-    def test_levenshtein_distance(self):
+    def test_levenshtein_distance_str(self):
 
         def func(tensor):
             ref = "abc"
             hyp = "bcd"
-            return F.levenshtein_distance(ref, hyp)
+            return F.levenshtein_distance_str(ref, hyp)
+
+        dummy = torch.zeros(1, 1)
+        self._assert_consistency(func, dummy)
+
+    def test_levenshtein_distance_list(self):
+
+        def func(tensor):
+            ref = ["hello", "world"]
+            hyp = ["hello", "planet"]
+            return F.levenshtein_distance_str(ref, hyp)
 
         dummy = torch.zeros(1, 1)
         self._assert_consistency(func, dummy)
