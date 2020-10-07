@@ -198,7 +198,8 @@ class AmplitudeToDB(torch.nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         r"""Numerically stable implementation from Librosa.
-        https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html
+
+        https://librosa.org/doc/latest/generated/librosa.amplitude_to_db.html
 
         Args:
             x (Tensor): Input tensor before being converted to decibel scale.
