@@ -154,13 +154,18 @@ class Tedlium(TempDirMixin):
         assert phoenemes == PHONEME
 
 
-class TestTedliumDefault(Tedlium, TorchaudioTestCase):
-    backend = "default"
-
-
-@unittest.skipIf(
-    platform.system() == "Windows",
-    "Test already covered by 'default' backend on Windows.",
-)
 class TestTedliumSoundfile(Tedlium, TorchaudioTestCase):
     backend = "soundfile"
+
+
+class TestTedliumSoundfileNew(Tedlium, TorchaudioTestCase):
+    backend = "soundfile-new"
+
+
+if platform.system() != "Windows":
+    class TestTedliumSox(Tedlium, TorchaudioTestCase):
+        backend = "sox"
+
+
+    class TestTedliumSoxIO(Tedlium, TorchaudioTestCase):
+        backend = "sox_io"
