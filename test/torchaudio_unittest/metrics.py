@@ -1,5 +1,5 @@
 from parameterized import parameterized
-from torchaudio.metrics import levenshtein_distance
+from torchaudio.functional import levenshtein_distance
 from torchaudio_unittest import common_utils
 
 
