@@ -535,6 +535,16 @@ class Functional(common_utils.TestBaseMixin):
 
         self._assert_consistency(func, waveform)
 
+    def test_levenshtein_distance(self):
+
+        def func(tensor):
+            ref = "abc"
+            hyp = "bcd"
+            return F.levenshtein_distance(ref, hyp)
+
+        dummy = torch.zeros(1, 1)
+        self._assert_consistency(func, dummy)
+
 
 class Transforms(common_utils.TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
