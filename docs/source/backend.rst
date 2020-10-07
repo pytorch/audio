@@ -16,7 +16,8 @@ There are currently four implementations available.
 * :ref:`"soundfile" - new interface <soundfile_backend>` (default on Windows from the 0.8.0 release)
 
 On Windows, only the ``"soundfile"`` backend (with both interfaces) are available. It is recommended to use the new interface as the legacy interface is deprecated.
-On Linux/macOS, please use "sox_io" backend. The use of ``"sox"`` backend is strongly discouraged as it cannot correctly handle formats other than 16-bit integer WAV. See `#726 <https://github.com/pytorch/audio/pull/726>`_ for the detail.
+
+On Linux/macOS, please use ``"sox_io"`` backend. The use of ``"sox"`` backend is strongly discouraged as it cannot correctly handle formats other than 16-bit integer WAV. See `#726 <https://github.com/pytorch/audio/pull/726>`_ for the detail.
 
 .. note::
    Instead of calling functions in ``torchaudio.backend`` directly, please use ``torchaudio.info``, ``torchaudio.load``, ``torchaudio.load_wav`` and ``torchaudio.save`` with proper backend set with :func:`torchaudio.set_audio_backend`.
@@ -24,7 +25,7 @@ On Linux/macOS, please use "sox_io" backend. The use of ``"sox"`` backend is str
 Availability
 ------------
 
-``"sox"`` and ``"sox_io"`` backends require C++ extension module. Linux and macOS binary distributions include this. These backends are not available on Windows.
+``"sox"`` and ``"sox_io"`` backends require C++ extension module, which is included in Linux/macOS binary distributions. These backends are not available on Windows.
 
 ``"soundfile"`` backend requires ``SoundFile``. Please refer to `the SoundFile documentation <https://pysoundfile.readthedocs.io/en/latest/>`_ for the installation.
 
