@@ -15,6 +15,9 @@ There are currently four implementations available.
 * :ref:`"soundfile" - legacy interface <soundfile_legacy_backend>` (deprecated, default on Windows)
 * :ref:`"soundfile" - new interface <soundfile_backend>` (default on Windows from the 0.8.0 release)
 
+On Windows, only `"soundfile"` backends are available. It is recommended to use the new interface as the legacy interface is deprecated.
+On Linux/macOS, please use "sox_io" backend. The use of `"sox"` backend is strongly discouraged as it cannot correctly handle formats other than 16-bit integer WAV. See `#726 <https://github.com/pytorch/audio/pull/726>`_ for the detail.
+
 .. note::
    Instead of calling functions in ``torchaudio.backend`` directly, please use ``torchaudio.info``, ``torchaudio.load``, ``torchaudio.load_wav`` and ``torchaudio.save`` with proper backend set with :func:`torchaudio.set_audio_backend`.
 
