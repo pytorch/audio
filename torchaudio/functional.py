@@ -6,6 +6,7 @@ import warnings
 
 import torch
 from torch import Tensor
+import torchaudio._internal.fft
 
 __all__ = [
     "spectrogram",
@@ -2073,7 +2074,7 @@ def _measure(
     dftBuf[measure_len_ws:dft_len_ws].zero_()
 
     # lsx_safe_rdft((int)p->dft_len_ws, 1, c->dftBuf);
-    _dftBuf = torch.rfft(dftBuf, 1)
+    _dftBuf = torchaudio._internal.fft.rfft(dftBuf)
 
     # memset(c->dftBuf, 0, p->spectrum_start * sizeof(*c->dftBuf));
     _dftBuf[:spectrum_start].zero_()
@@ -2082,7 +2083,7 @@ def _measure(
         if boot_count >= 0 \
         else measure_smooth_time_mult
 
-    _d = complex_norm(_dftBuf[spectrum_start:spectrum_end])
+    _d = _dftBuf[spectrum_start:spectrum_end].abs()
     spectrum[spectrum_start:spectrum_end].mul_(mult).add_(_d * (1 - mult))
     _d = spectrum[spectrum_start:spectrum_end] ** 2
 
@@ -2106,12 +2107,9 @@ def _measure(
     _cepstrum_Buf[spectrum_end:dft_len_ws >> 1].zero_()
 
     # lsx_safe_rdft((int)p->dft_len_ws >> 1, 1, c->dftBuf);
-    _cepstrum_Buf = torch.rfft(_cepstrum_Buf, 1)
+    _cepstrum_Buf = torchaudio._internal.fft.rfft(_cepstrum_Buf)
 
-    result: float = float(torch.sum(
-        complex_norm(
-            _cepstrum_Buf[cepstrum_start:cepstrum_end],
-            power=2.0)))
+    result: float = float(torch.sum(_cepstrum_Buf[cepstrum_start:cepstrum_end].abs().pow(2)))
     result = \
         math.log(result / (cepstrum_end - cepstrum_start)) \
         if result > 0 \
