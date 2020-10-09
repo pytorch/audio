@@ -1,8 +1,13 @@
 from typing import Any, Optional
 
+from torchaudio._internal import module_utils as _mod_utils
+
 
 class AudioMetaData:
-    """Data class to be returned by :py:func:`~torchaudio.info`.
+    """Return type of ``torchaudio.info`` function.
+
+    This class is used by :ref:`"sox_io" backend<sox_io_backend>` and
+    :ref:`"soundfile" backend with the new interface<soundfile_backend>`.
 
     :ivar int sample_rate: Sample rate
     :ivar int num_frames: The number of frames
@@ -14,10 +19,12 @@ class AudioMetaData:
         self.num_channels = num_channels
 
 
+@_mod_utils.deprecated('Please migrate to `AudioMetaData`.', '0.9.0')
 class SignalInfo:
-    """Data class returned ``info`` functions.
+    """One of return types of ``torchaudio.info`` functions.
 
-    Used by :ref:`sox backend<sox_backend>` and :ref:`soundfile backend<soundfile_backend>`
+    This class is used by :ref:`"sox" backend (deprecated)<sox_backend>` and
+    :ref:`"soundfile" backend with the legacy interface (deprecated)<soundfile_legacy_backend>`.
 
     See https://fossies.org/dox/sox-14.4.2/structsox__signalinfo__t.html
 
@@ -38,10 +45,12 @@ class SignalInfo:
         self.length = length
 
 
+@_mod_utils.deprecated('Please migrate to `AudioMetaData`.', '0.9.0')
 class EncodingInfo:
-    """Data class returned ``info`` functions.
+    """One of return types of ``torchaudio.info`` functions.
 
-    Used by :ref:`sox backend<sox_backend>` and :ref:`soundfile backend<soundfile_backend>`
+    This class is used by :ref:`"sox" backend (deprecated)<sox_backend>` and
+    :ref:`"soundfile" backend with the legacy interface (deprecated)<soundfile_legacy_backend>`.
 
     See https://fossies.org/dox/sox-14.4.2/structsox__encodinginfo__t.html
 
