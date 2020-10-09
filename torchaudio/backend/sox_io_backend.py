@@ -184,10 +184,6 @@ def load_wav(
 ) -> Tuple[torch.Tensor, int]:
     """Load wave file.
 
-    Warnings:
-        This functions is deprecated and will be removed in ``0.9.0``.
-        Please use ``load(..., normalize=False)``
-
     This function is defined only for the purpose of compatibility against other backend
     for simple usecases, such as ``torchaudio.load_wav(filepath)``.
     The implementation is same as :py:func:`load`.
