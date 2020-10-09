@@ -11,13 +11,16 @@ eval "$(./conda/bin/conda shell.bash hook)"
 conda activate ./env
 
 if [ -z "${CUDA_VERSION:-}" ] ; then
-    cudatoolkit="cpuonly"
+    case "$(uname -s)" in
+        Darwin*) cudatoolkit="";;
+        *) cudatoolkit="cpuonly"
+    esac
 else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
     cudatoolkit="cudatoolkit=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch "${cudatoolkit}"
+conda install -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch ${cudatoolkit}
 
 printf "* Installing torchaudio\n"
 BUILD_SOX=1 python setup.py install
