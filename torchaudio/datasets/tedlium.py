@@ -143,9 +143,14 @@ class TEDLIUM(Dataset):
         """
         start_time = int(float(start_time) * sample_rate)
         end_time = int(float(end_time) * sample_rate)
-        if torchaudio.get_audio_backend() == "sox_io":
-            return torchaudio.load(path, frame_offset=start_time, num_frames=end_time - start_time)
-        return torchaudio.load(path)[:, start_time:end_time]
+
+        backend = torchaudio.get_audio_backend()
+        if backend == "sox" or (backend == "soundfile" and torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE):
+            kwargs = {"offset": start_time, "num_frames": end_time - start_time}
+        else:
+            kwargs = {"frame_offset": start_time, "num_frames": end_time - start_time}
+
+        return torchaudio.load(path, **kwargs)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
         """Load the n-th sample from the dataset.
