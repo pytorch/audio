@@ -137,6 +137,22 @@ class Functional(common_utils.TestBaseMixin):
         tensor = torch.rand((1, 10))
         self._assert_consistency(func, tensor)
 
+    def test_a_law_encoding(self):
+        def func(tensor):
+            qc = 256
+            return F.a_law_encoding(tensor, qc)
+
+        waveform = common_utils.get_whitenoise()
+        self._assert_consistency(func, waveform)
+
+    def test_a_law_decoding(self):
+        def func(tensor):
+            qc = 256
+            return F.a_law_decoding(tensor, qc)
+
+        tensor = torch.rand((1, 10))
+        self._assert_consistency(func, tensor)
+
     def test_complex_norm(self):
         def func(tensor):
             power = 2.
