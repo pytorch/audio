@@ -44,33 +44,34 @@ def deprecated(direction: str, version: Optional[str] = None):
         direction: Migration steps to be given to users.
     """
     def decorator(obj):
+        message = (
+            f'{obj.__module__}.{obj.__name__} has been deprecated and will be '
+            f'removed from {"future" if version is None else version} release. '
+            f'{direction}')
         if isinstance(obj, type):
-            # Update the class to emit a warning when used
-            class Wrapper(obj):
-                def __init__(self, *args, **kwargs):
-                    message = (
-                        f'{obj.__module__}.{obj.__name__} has been deprecated '
-                        f'and will be removed from '
-                        f'{"future" if version is None else version} release. '
-                        f'{direction}')
-                    warnings.warn(message, stacklevel=1)
-                    self._wrapped = wrapped
-                    for attr in WRAPPER_ASSIGNMENTS:
-                        setattr(self, attr, getattr(wrapped, attr))
-                    super(self).__init__(*args, **kwargs)
+            return _decorate_class(obj, message)
+        else:
+            return _decorate_func(obj, message)
+    return decorator
 
-                def __repr__(self):
+def _decorate_class(obj, message):
+    # Update the class to emit a warning when used
+    class Wrapper(obj):
+        def __init__(self, *args, **kwargs):
+            warnings.warn(message, stacklevel=1)
+            self._wrapped = obj
+            for attr in WRAPPER_ASSIGNMENTS:
+                setattr(self, attr, getattr(wrapped, attr))
+            super(self).__init__(*args, **kwargs)
+
+        def __repr__(self):
                     return repr(self._wrapped)
 
-            return Wrapper
-        else:
-            @wraps(obj)
-            def wrapped(*args, **kwargs):
-                message = (
-                    f'{obj.__module__}.{obj.__name__} has been deprecated '
-                    f'and will be removed from {"future" if version is None else version} release. '
-                    f'{direction}')
-                warnings.warn(message, stacklevel=2)
-                return obj(*args, **kwargs)
-        return wrapped
-    return decorator
+    return Wrapper
+
+def _decorate_func(obj, message):
+    @wraps(obj)
+    def wrapped(*args, **kwargs):
+        warnings.warn(message, stacklevel=2)
+        return obj(*args, **kwargs)
+    return wrapped
