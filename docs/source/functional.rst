@@ -159,6 +159,17 @@ vad
 
 .. autofunction:: mu_law_decoding
 
+=======
+:hidden:`a_law_encoding`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: a_law_encoding
+
+:hidden:`a_law_decoding`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: a_law_decoding
+
 :hidden:`complex_norm`
 ~~~~~~~~~~~~~~~~~~~~~~
 

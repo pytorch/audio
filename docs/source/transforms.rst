@@ -73,6 +73,20 @@ Transforms are common audio transforms. They can be chained together using :clas
 
   .. automethod:: forward
 
+:hidden:`ALawEncoding`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ALawEncoding
+
+  .. automethod:: forward
+
+:hidden:`ALawDecoding`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ALawDecoding
+
+  .. automethod:: forward
+
 :hidden:`Resample`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
