@@ -1,3 +1,4 @@
 from . import (
+    dataset,
     metrics,
 )
