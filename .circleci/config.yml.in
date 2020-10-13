@@ -34,7 +34,7 @@ commands:
           command: |
             our_upload_channel=nightly
             # On tags upload to test instead
-            if [[ -n "${CIRCLE_TAG}" ]]; then
+            if [[ -n "${CIRCLE_TAG}" ]] || [[ ${CIRCLE_BRANCH} =~ release/* ]]; then
               our_upload_channel=test
             fi
             echo "export UPLOAD_CHANNEL=${our_upload_channel}" >> ${BASH_ENV}
@@ -301,7 +301,7 @@ jobs:
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            pip install $(ls ~/workspace/torchaudio*.whl) -f https://download.pytorch.org/whl/nightly/torch_nightly.html -f https://download.pytorch.org/whl/test/torch_test.html
+            pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
       - run:
           name: smoke test
           command: |
@@ -323,7 +323,7 @@ jobs:
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
-            conda install -v -y -c pytorch-test -c pytorch-nightly pytorch
+            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch
             conda install -v -y $(ls ~/workspace/torchaudio*.tar.bz2)
       - run:
           name: smoke test
@@ -347,7 +347,7 @@ jobs:
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
-            pip install $(ls ~/workspace/torchaudio*.whl) -f https://download.pytorch.org/whl/nightly/torch_nightly.html -f https://download.pytorch.org/whl/test/torch_test.html
+            pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
       - run:
           name: smoke test
           command: |
