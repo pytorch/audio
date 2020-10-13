@@ -17,7 +17,7 @@ else
     cudatoolkit="cudatoolkit=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -y -c pytorch-nightly pytorch "${cudatoolkit}"
+conda install -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch "${cudatoolkit}"
 
 printf "* Installing torchaudio\n"
 python setup.py install
