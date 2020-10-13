@@ -7,7 +7,7 @@
 #SBATCH --open-mode=append
 #SBATCH --time=1200
 #SBATCH --nodes=1
-#SBATCH --array=1-32
+#SBATCH --array=1-1
 # number of CPUs = 2x (number of data workers + number of GPUs requested)
 
 >&2 echo $SLURM_JOB_ID
