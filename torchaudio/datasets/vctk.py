@@ -17,6 +17,7 @@ _CHECKSUMS = {
     "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip": "8a6ba2946b36fcbef0212cad601f4bfa"
 }
 
+
 def load_vctk_item(fileid: str,
                    path: str,
                    ext_audio: str,
@@ -155,7 +156,6 @@ class VCTK(Dataset):
 
     def __len__(self) -> int:
         return len(self._walker)
-
 
 
 SampleType = Tuple[Tensor, int, str, str, str]
