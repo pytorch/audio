@@ -8,7 +8,7 @@ This directory contains reference implementations for source separations. For th
 
 ### Overview
 
-To traing a model, you can use [`train.py`](./train.py). This script takes the form of
+To training a model, you can use [`train.py`](./train.py). This script takes the form of
 `train.py [parameters for distributed training] -- [parameters for model/training]`
 
     ```
