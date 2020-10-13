@@ -55,7 +55,7 @@ CMD="$CMD --$name $item"
 COUNT=$(($COUNT * $l))
 
 # choices=("train-clean-100" "train-clean-100 train-clean-360 train-other-500")
-choices=("train-clean-100")
+choices=("train-clean-100 train-clean-360 train-other-500")
 name="dataset-train"
 l=${#choices[@]}
 j=$(($i % $l))
@@ -240,7 +240,7 @@ COUNT=$(($COUNT * $l))
 
 # decoders=("greedy" "greedyiter" "viterbi")
 choices=(1000)
-name="epochs"
+name="max-epoch"
 l=${#choices[@]}
 j=$(($i % $l))
 i=$(($i / $l))
