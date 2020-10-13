@@ -1,7 +1,6 @@
 import os
 import warnings
 from typing import Any, Tuple
-from collections import namedtuple
 
 import torchaudio
 from torch import Tensor
@@ -17,10 +16,6 @@ FOLDER_IN_ARCHIVE = "VCTK-Corpus"
 _CHECKSUMS = {
     "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip": "8a6ba2946b36fcbef0212cad601f4bfa"
 }
-
-Sample = namedtuple(
-    "Sample", ["waveform", "sample_rate", "utterance", "speaker_id", "utterance_id"]
-)
 
 
 def load_vctk_item(fileid: str,
@@ -163,6 +158,9 @@ class VCTK(Dataset):
         return len(self._walker)
 
 
+SampleType = Tuple[Tensor, int, str, str, str]
+
+
 class VCTK_092(Dataset):
     """Create VCTK 0.92 Dataset
 
@@ -253,7 +251,7 @@ class VCTK_092(Dataset):
     def _load_audio(self, file_path) -> Tuple[Tensor, int]:
         return torchaudio.load(file_path)
 
-    def _load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> Sample:
+    def _load_sample(self, speaker_id: str, utterance_id: str, mic_id: str) -> SampleType:
         utterance_path = os.path.join(
             self._txt_dir, speaker_id, f"{speaker_id}_{utterance_id}.txt"
         )
@@ -269,9 +267,9 @@ class VCTK_092(Dataset):
         # Reading FLAC
         waveform, sample_rate = self._load_audio(audio_path)
 
-        return Sample(waveform, sample_rate, utterance, speaker_id, utterance_id)
+        return (waveform, sample_rate, utterance, speaker_id, utterance_id)
 
-    def __getitem__(self, n: int) -> Sample:
+    def __getitem__(self, n: int) -> SampleType:
         """Load the n-th sample from the dataset.
 
         Args:
