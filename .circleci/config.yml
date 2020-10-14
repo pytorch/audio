@@ -756,6 +756,7 @@ workflows:
               only:
               - master
               - nightly
+              - release/*
             tags:
               only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_linux_gpu_py3.6
@@ -768,6 +769,7 @@ workflows:
               only:
               - master
               - nightly
+              - release/*
             tags:
               only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_linux_gpu_py3.7
@@ -780,6 +782,7 @@ workflows:
               only:
               - master
               - nightly
+              - release/*
             tags:
               only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_linux_gpu_py3.8
@@ -801,6 +804,7 @@ workflows:
               only:
               - master
               - nightly
+              - release/*
             tags:
               only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_windows_gpu_py3.6
@@ -811,6 +815,7 @@ workflows:
               only:
               - master
               - nightly
+              - release/*
             tags:
               only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_windows_gpu_py3.7
@@ -821,6 +826,7 @@ workflows:
               only:
               - master
               - nightly
+              - release/*
             tags:
               only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_windows_gpu_py3.8
