@@ -37,6 +37,7 @@ commands:
             if [[ -n "${CIRCLE_TAG}" ]] || [[ ${CIRCLE_BRANCH} =~ release/* ]]; then
               our_upload_channel=test
             fi
+            echo "UPLOAD_CHANNEL: ${our_upload_channel}"
             echo "export UPLOAD_CHANNEL=${our_upload_channel}" >> ${BASH_ENV}
   install_build_tools_macos:
     description: "installs tools required to build torchaudio"
