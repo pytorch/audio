@@ -170,8 +170,8 @@ setup_pip_pytorch_version() {
     fi
   else
     pip_install "torch==$PYTORCH_VERSION$PYTORCH_VERSION_SUFFIX" \
-      -f https://download.pytorch.org/whl/torch_stable.html \
-      -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
+      -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html" \
+      -f https://download.pytorch.org/whl/torch_stable.html
   fi
 }
 
