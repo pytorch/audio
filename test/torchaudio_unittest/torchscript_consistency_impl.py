@@ -140,15 +140,17 @@ class Functional(common_utils.TestBaseMixin):
     def test_a_law_encoding(self):
         def func(tensor):
             qc = 256
-            return F.a_law_encoding(tensor, qc)
+            compression = 83.7
+            return F.a_law_encoding(tensor, qc, compression)
 
         waveform = common_utils.get_whitenoise()
-        self._assert_consistency(func, waveform)
+        self._assert_consistency(func, waveform,)
 
     def test_a_law_decoding(self):
         def func(tensor):
             qc = 256
-            return F.a_law_decoding(tensor, qc)
+            compression = 83.7
+            return F.a_law_decoding(tensor, qc, compression)
 
         tensor = torch.rand((1, 10))
         self._assert_consistency(func, tensor)

@@ -44,6 +44,10 @@ class Tester(common_utils.TorchaudioTestCase):
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
 
     def test_a_law_companding(self):
+
+        quantization_channels = 256
+        compression_param = 83.7
+
         waveform = self.waveform.clone()
         if not waveform.is_floating_point():
             waveform = waveform.to(torch.get_default_dtype())
@@ -51,10 +55,10 @@ class Tester(common_utils.TorchaudioTestCase):
 
         self.assertTrue(waveform.min() >= -1. and waveform.max() <= 1.)
 
-        waveform_a = transforms.ALawEncoding(quantization_channels)(waveform)
+        waveform_a = transforms.ALawEncoding(quantization_channels, compression_param)(waveform)
         self.assertTrue(waveform_a.min() >= 0. and waveform_a.max() <= quantization_channels)
 
-        waveform_exp = transforms.ALawDecoding(quantization_channels)(waveform_a)
+        waveform_exp = transforms.ALawDecoding(quantization_channels, compression_param)(waveform_a)
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
 
     def test_AmplitudeToDB(self):
