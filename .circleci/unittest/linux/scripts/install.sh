@@ -9,6 +9,7 @@ set -e
 
 eval "$(./conda/bin/conda shell.bash hook)"
 conda activate ./env
+python --version
 
 if [ -z "${CUDA_VERSION:-}" ] ; then
     case "$(uname -s)" in
