@@ -160,7 +160,7 @@ setup_pip_pytorch_version() {
   if [[ -z "$PYTORCH_VERSION" ]]; then
     # Install latest prerelease version of torch, per our nightlies, consistent
     # with the requested cuda version
-    pip_install --pre torch -f "https://download.pytorch.org/whl/nightly/${WHEEL_DIR}torch_nightly.html"
+    pip_install --pre torch -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${WHEEL_DIR}torch_${UPLOAD_CHANNEL}.html"
     if [[ "$CUDA_VERSION" == "cpu" ]]; then
       # CUDA and CPU are ABI compatible on the CPU-only parts, so strip
       # in this case
@@ -171,8 +171,7 @@ setup_pip_pytorch_version() {
   else
     pip_install "torch==$PYTORCH_VERSION$PYTORCH_VERSION_SUFFIX" \
       -f https://download.pytorch.org/whl/torch_stable.html \
-      -f https://download.pytorch.org/whl/test/torch_test.html \
-      -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+      -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
   fi
 }
 
@@ -182,10 +181,10 @@ setup_pip_pytorch_version() {
 # You MUST have populated PYTORCH_VERSION_SUFFIX before hand.
 setup_conda_pytorch_constraint() {
   if [[ -z "$PYTORCH_VERSION" ]]; then
-    export CONDA_CHANNEL_FLAGS="-c pytorch-nightly"
-    export PYTORCH_VERSION="$(conda search --json 'pytorch[channel=pytorch-nightly]' | python -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version']))")"
+    export CONDA_CHANNEL_FLAGS="-c pytorch-${UPLOAD_CHANNEL}"
+    export PYTORCH_VERSION="$(conda search --json "pytorch[channel=pytorch-${UPLOAD_CHANNEL}]" | python -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version']))")"
   else
-    export CONDA_CHANNEL_FLAGS="-c pytorch -c pytorch-test -c pytorch-nightly"
+    export CONDA_CHANNEL_FLAGS="-c pytorch -c pytorch-test -c pytorch-${UPLOAD_CHANNEL}"
   fi
   if [[ "$CU_VERSION" == cpu ]]; then
     export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==$PYTORCH_VERSION${PYTORCH_VERSION_SUFFIX}"
