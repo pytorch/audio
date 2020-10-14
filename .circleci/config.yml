@@ -34,12 +34,10 @@ commands:
           command: |
             our_upload_channel=nightly
             # On tags upload to test instead
-            env
-            echo "CIRCLE_BRANCH: ${CIRCLE_BRANCH}"
             if [[ -n "${CIRCLE_TAG}" ]] || [[ ${CIRCLE_BRANCH} =~ release/* ]]; then
               our_upload_channel=test
             fi
-            echo "UPLOAD_CHANNEL: ${our_upload_channel}"
+            our_upload_channel=test
             echo "export UPLOAD_CHANNEL=${our_upload_channel}" >> ${BASH_ENV}
   install_build_tools_macos:
     description: "installs tools required to build torchaudio"
