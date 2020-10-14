@@ -34,6 +34,8 @@ commands:
           command: |
             our_upload_channel=nightly
             # On tags upload to test instead
+            env
+            echo "CIRCLE_BRANCH: ${CIRCLE_BRANCH}"
             if [[ -n "${CIRCLE_TAG}" ]] || [[ ${CIRCLE_BRANCH} =~ release/* ]]; then
               our_upload_channel=test
             fi
