@@ -37,17 +37,26 @@ def requires_module(*modules: str):
     return decorator
 
 
-def deprecated(direction: str, version: Optional[str] = None):
+def deprecated(direction: str,
+               version: Optional[str] = None,
+               name: Optional[str] = None,
+              ):
     """Decorator to add deprecation message
 
     Args:
         direction: Migration steps to be given to users.
+        version: Version deprecation will be completed
+        name: Object name to be deprected, defaults to func.__name__
     """
     def decorator(func):
+        if name:
+            func._warn_name = name
+        else:
+            func._warn_name = func.__name__
         @wraps(func)
         def wrapped(*args, **kwargs):
             message = (
-                f'{func.__module__}.{func.__name__} has been deprecated '
+                f'{func.__module__}.{func._warn_name} has been deprecated '
                 f'and will be removed from {"future" if version is None else version} release. '
                 f'{direction}')
             warnings.warn(message, stacklevel=2)

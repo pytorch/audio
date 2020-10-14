@@ -275,7 +275,6 @@ def SoxEffect():
     return _torchaudio.SoxEffect()
 
 
-@_mod_utils.deprecated('Please migrate to `apply_effects_file` or `apply_effects_tensor`.')
 class SoxEffectsChain(object):
     r"""SoX effects chain class.
 
@@ -333,6 +332,8 @@ class SoxEffectsChain(object):
 
     EFFECTS_UNIMPLEMENTED = {"spectrogram", "splice", "noiseprof", "fir"}
 
+    @_mod_utils.deprecated('Please migrate to `apply_effects_file` or '
+                           '`apply_effects_tensor`.', name='SoxEffectsChain')
     def __init__(self,
                  normalization: Union[bool, float, Callable] = True,
                  channels_first: bool = True,
