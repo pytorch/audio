@@ -1,10 +1,16 @@
 import math
+from typing import Optional
 from itertools import permutations
 
 import torch
 
 
-def sdr(estimate: torch.Tensor, reference: torch.Tensor, epsilon=1e-8) -> torch.Tensor:
+def sdr(
+        estimate: torch.Tensor,
+        reference: torch.Tensor,
+        mask: Optional[torch.Tensor] = None,
+        epsilon: float = 1e-8
+) -> torch.Tensor:
     """Computes source-to-distortion ratio.
 
     1. scale the reference signal with power(s_est * s_ref) / powr(s_ref * s_ref)
@@ -15,6 +21,8 @@ def sdr(estimate: torch.Tensor, reference: torch.Tensor, epsilon=1e-8) -> torch.
             Shape: [batch, speakers (can be 1), time frame]
         reference (torch.Tensor): Reference signal.
             Shape: [batch, speakers, time frame]
+        mask (Optional[torch.Tensor]): Binary mask to indicate padded value (0) or valid value (1).
+            Shape: [batch, 1, time frame]
         epsilon (float): constant value used to stabilize division.
 
     Returns:
@@ -39,8 +47,16 @@ def sdr(estimate: torch.Tensor, reference: torch.Tensor, epsilon=1e-8) -> torch.
     reference = scale * reference
     error = estimate - reference
 
-    reference_pow = reference.pow(2).mean(axis=2)
-    error_pow = error.pow(2).mean(axis=2)
+    reference_pow = reference.pow(2)
+    error_pow = error.pow(2)
+
+    if mask is None:
+        reference_pow = reference_pow.mean(axis=2)
+        error_pow = error_pow.mean(axis=2)
+    else:
+        denom = mask.sum(axis=2)
+        reference_pow = (mask * reference_pow).sum(axis=2) / denom
+        error_pow = (mask * error_pow).sum(axis=2) / denom
 
     return 10 * torch.log10(reference_pow) - 10 * torch.log10(error_pow)
 
@@ -69,7 +85,13 @@ class PIT(torch.nn.Module):
         super().__init__()
         self.utility_func = utility_func
 
-    def forward(self, estimate: torch.Tensor, reference: torch.Tensor) -> torch.Tensor:
+    def forward(
+            self,
+            estimate: torch.Tensor,
+            reference: torch.Tensor,
+            mask: Optional[torch.Tensor] = None,
+            epsilon: float = 1e-8
+    ) -> torch.Tensor:
         """Compute utterance-level PIT Loss
 
         Args:
@@ -77,6 +99,9 @@ class PIT(torch.nn.Module):
                 Shape: [bacth, speakers, time frame]
             reference (torch.Tensor): Reference (original) source signals.
                 Shape: [batch, speakers, time frame]
+            mask (Optional[torch.Tensor]): Binary mask to indicate padded value (0) or valid value (1).
+                Shape: [batch, 1, time frame]
+            epsilon (float): constant value used to stabilize division.
 
         Returns:
             torch.Tensor: Maximum criterion over the speaker permutation.
@@ -91,7 +116,7 @@ class PIT(torch.nn.Module):
             batch_size, num_permute, dtype=estimate.dtype, device=estimate.device
         )
         for i, idx in enumerate(permutations(range(num_speakers))):
-            util = self.utility_func(estimate, reference[:, idx, :])
+            util = self.utility_func(estimate, reference[:, idx, :], mask=mask, epsilon=epsilon)
             util_mat[:, i] = util.mean(dim=1)  # take the average over speaker dimension
         return util_mat.max(dim=1).values
 
@@ -99,7 +124,11 @@ class PIT(torch.nn.Module):
 _sdr_pit = PIT(utility_func=sdr)
 
 
-def sdr_pit(estimate, reference):
+def sdr_pit(
+        estimate: torch.Tensor,
+        reference: torch.Tensor,
+        mask: Optional[torch.Tensor] = None,
+        epsilon: float = 1e-8):
     """Computes scale-invariant source-to-distortion ratio.
 
     1. adjust both estimate and reference to have 0-mean
@@ -111,6 +140,8 @@ def sdr_pit(estimate, reference):
             Shape: [batch, speakers (can be 1), time frame]
         reference (torch.Tensor): Reference signal.
             Shape: [batch, speakers, time frame]
+        mask (Optional[torch.Tensor]): Binary mask to indicate padded value (0) or valid value (1).
+            Shape: [batch, 1, time frame]
         epsilon (float): constant value used to stabilize division.
 
     Returns:
@@ -129,10 +160,16 @@ def sdr_pit(estimate, reference):
         *when the inputs have 0-mean*
         https://github.com/naplab/Conv-TasNet/blob/e66d82a8f956a69749ec8a4ae382217faa097c5c/utility/sdr.py#L107-L153
     """
-    return _sdr_pit(estimate, reference)
+    return _sdr_pit(estimate, reference, mask, epsilon)
 
 
-def sdri(estimate: torch.Tensor, reference: torch.Tensor, mix: torch.Tensor) -> torch.Tensor:
+def sdri(
+        estimate: torch.Tensor,
+        reference: torch.Tensor,
+        mix: torch.Tensor,
+        mask: Optional[torch.Tensor] = None,
+        epsilon: float = 1e-8,
+) -> torch.Tensor:
     """Compute the improvement of SDR (SDRi).
 
     This function compute how much SDR is improved if the estimation is changed from
@@ -150,6 +187,9 @@ def sdri(estimate: torch.Tensor, reference: torch.Tensor, mix: torch.Tensor) -> 
             Shape: [batch, speakers, time frame]
         mix (torch.Tensor): Mixed souce signals, from which the setimated signals were generated.
             Shape: [batch, speakers == 1, time frame]
+        mask (Optional[torch.Tensor]): Binary mask to indicate padded value (0) or valid value (1).
+            Shape: [batch, 1, time frame]
+        epsilon (float): constant value used to stabilize division.
 
     Returns:
         torch.Tensor: Improved SDR. Shape: [batch, ]
@@ -159,6 +199,6 @@ def sdri(estimate: torch.Tensor, reference: torch.Tensor, mix: torch.Tensor) -> 
           Luo, Yi and Mesgarani, Nima
           https://arxiv.org/abs/1809.07454
     """
-    sdr_ = sdr_pit(estimate, reference)  # [batch, ]
-    base_sdr = sdr(mix, reference)  # [batch, speaker]
+    sdr_ = sdr_pit(estimate, reference, mask=mask, epsilon=epsilon)  # [batch, ]
+    base_sdr = sdr(mix, reference, mask=mask, epsilon=epsilon)  # [batch, speaker]
     return (sdr_.unsqueeze(1) - base_sdr).mean(dim=1)
