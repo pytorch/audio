@@ -1,5 +1,5 @@
 import os
-from typing import Tuple
+from typing import Tuple, Optional
 
 import torchaudio
 from torch.utils.data import Dataset
@@ -48,9 +48,9 @@ class SPEECHCOMMANDS(Dataset):
             The top-level directory of the dataset. (default: ``"SpeechCommands"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
-        split (str):
-            Select a subset of the dataset ["all", "training", "validation", "testing"].
-            (default: ``"all"``)
+        subset (Optional[str]):
+            Select a subset of the dataset [None, "training", "validation", "testing"].
+            (default: ``None``)
     """
 
     def __init__(self,
@@ -58,8 +58,14 @@ class SPEECHCOMMANDS(Dataset):
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  download: bool = False,
-                 split: str = "all",
+                 subset: str = None,
                  ) -> None:
+
+        assert subset is None or subset in ["training", "validation", "testing"], (
+            "When `subset` not None, it must take a value from "
+            + "{'training', 'validation', 'testing'}."
+        )
+
         if url in [
             "speech_commands_v0.01",
             "speech_commands_v0.02",
@@ -84,29 +90,24 @@ class SPEECHCOMMANDS(Dataset):
                     download_url(url, root, hash_value=checksum, hash_type="md5")
                 extract_archive(archive, self._path)
 
-        if split in ["training", "validation"]:
+        walker = walk_files(self._path, suffix=".wav", prefix=True)
+        walker = filter(lambda w: HASH_DIVIDER in w and EXCEPT_FOLDER not in w, walker)
+
+        if subset in ["training", "validation"]:
             filepath = os.path.join(self._path, "validation_list.txt")
             with open(filepath) as f:
-                validation_list = f.readline()
+                validation_list = [os.path.join(self._path, l.strip()) for l in f.readlines()]
 
-        if split in ["training", "testing"]:
+        if subset in ["training", "testing"]:
             filepath = os.path.join(self._path, "testing_list.txt")
             with open(filepath) as f:
-                testing_list = f.readline()
+                testing_list = [os.path.join(self._path, l.strip()) for l in f.readlines()]
 
-        if split == "validation":
+        if subset == "validation":
             walker = validation_list
-        elif split == "testing":
+        elif subset == "testing":
             walker = testing_list
-        elif split in ["training", "all"]:
-            walker = walk_files(self._path, suffix=".wav", prefix=True)
-            walker = filter(lambda w: HASH_DIVIDER in w and EXCEPT_FOLDER not in w, walker)
-        else:
-            raise ValueError(
-                f'Expected "split" to be one of "all, "training", "validation", "testing", but got "f{split}".'
-            )
-
-        if split == "training":
+        elif subset == "training":
             walker = filter(
                 lambda w: not (w in validation_list or w in testing_list), walker
             )

@@ -112,8 +112,8 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
 
         assert num_samples == len(self.samples)
 
-    def testSpeechCommandsSplit(self):
-        dataset = speechcommands.SPEECHCOMMANDS(self.root_dir, split="testing")
+    def testSpeechCommandsSubset(self):
+        dataset = speechcommands.SPEECHCOMMANDS(self.root_dir, subset="testing")
         print(dataset._path)
 
         num_samples = 0
