@@ -1,3 +1,4 @@
+import warnings
 from typing import Any, Callable, List, Optional, Tuple, Union
 
 import torch
@@ -260,7 +261,7 @@ def apply_effects_file(
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
-@_mod_utils.deprecated('Please migrate to `apply_effects_file` or `apply_effects_tensor`.')
+@_mod_utils.deprecated('Please migrate to `apply_effects_file` or `apply_effects_tensor`.', "0.8.0")
 def SoxEffect():
     r"""Create an object for passing sox effect information between python and c++
 
@@ -275,7 +276,6 @@ def SoxEffect():
     return _torchaudio.SoxEffect()
 
 
-@_mod_utils.deprecated('Please migrate to `apply_effects_file` or `apply_effects_tensor`.')
 class SoxEffectsChain(object):
     r"""SoX effects chain class.
 
@@ -339,6 +339,11 @@ class SoxEffectsChain(object):
                  out_siginfo: Any = None,
                  out_encinfo: Any = None,
                  filetype: str = "raw") -> None:
+        warnings.warn(
+            'torchaudio.sox_effects.SoxEffectsChain has been deprecated and '
+            'will be removed from 0.8.0 release. '
+            'Please migrate to `apply_effects_file` or `apply_effects_tensor`.'
+        )
         self.input_file: Optional[str] = None
         self.chain: List[str] = []
         self.MAX_EFFECT_OPTS = 20
