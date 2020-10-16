@@ -48,13 +48,18 @@ class SPEECHCOMMANDS(Dataset):
             The top-level directory of the dataset. (default: ``"SpeechCommands"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
+        split (str):
+            Select a subset of the dataset ["all", "training", "validation", "testing"].
+            (default: ``"all"``)
     """
 
     def __init__(self,
                  root: str,
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False) -> None:
+                 download: bool = False,
+                 split: str = "all",
+                 ) -> None:
         if url in [
             "speech_commands_v0.01",
             "speech_commands_v0.02",
@@ -79,8 +84,29 @@ class SPEECHCOMMANDS(Dataset):
                     download_url(url, root, hash_value=checksum, hash_type="md5")
                 extract_archive(archive, self._path)
 
-        walker = walk_files(self._path, suffix=".wav", prefix=True)
-        walker = filter(lambda w: HASH_DIVIDER in w and EXCEPT_FOLDER not in w, walker)
+        if split in ["training", "validation"]:
+            filepath = os.path.join(self._path, "validation_list.txt")
+            with open(filepath) as f:
+                validation_list = f.readline()
+
+        if split in ["training", "testing"]:
+            filepath = os.path.join(self._path, "testing_list.txt")
+            with open(filepath) as f:
+                testing_list = f.readline()
+
+        if split == "validation":
+            walker = validation_list
+        elif split == "testing":
+            walker = testing_list
+        else:
+            walker = walk_files(self._path, suffix=".wav", prefix=True)
+            walker = filter(lambda w: HASH_DIVIDER in w and EXCEPT_FOLDER not in w, walker)
+
+        if split == "training":
+            walker = filter(
+                lambda w: not (w in validation_list or w in testing_list), walker
+            )
+
         self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:
