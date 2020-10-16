@@ -98,9 +98,13 @@ class SPEECHCOMMANDS(Dataset):
             walker = validation_list
         elif split == "testing":
             walker = testing_list
-        else:
+        elif split in ["training", "all"]:
             walker = walk_files(self._path, suffix=".wav", prefix=True)
             walker = filter(lambda w: HASH_DIVIDER in w and EXCEPT_FOLDER not in w, walker)
+        else:
+            raise ValueError(
+                f'Expected "split" to be one of "all, "training", "validation", "testing", but got "f{split}".'
+            )
 
         if split == "training":
             walker = filter(
