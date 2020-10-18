@@ -63,6 +63,11 @@ Functions to perform common audio operations.
 
 .. autofunction:: lfilter
 
+:hidden:`filtfilt`
+~~~~~~~~~~~~~~~~~
+
+.. autofunction:: filtfilt
+
 :hidden:`biquad`
 ~~~~~~~~~~~~~~~~
 
