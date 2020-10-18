@@ -86,7 +86,6 @@ complex_norm
 
 .. autofunction:: complex_norm
 
-
 magphase
 --------
 
@@ -151,6 +150,11 @@ equalizer_biquad
 ----------------
 
 .. autofunction:: equalizer_biquad
+
+filtfilt
+----------------
+
+.. autofunction:: filtfilt
 
 flanger
 -------
