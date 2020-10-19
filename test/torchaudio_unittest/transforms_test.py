@@ -1,5 +1,6 @@
 import math
 import unittest
+import audioop
 
 import torch
 import torchaudio
@@ -60,6 +61,18 @@ class Tester(common_utils.TorchaudioTestCase):
 
         waveform_exp = transforms.ALawDecoding(quantization_channels, compression_param)(waveform_a)
         self.assertTrue(waveform_exp.min() >= -1. and waveform_exp.max() <= 1.)
+
+        segment_length = 1
+        small_int_waveform = waveform.to(torch.uint8)
+        waveform_bytes = bytearray(small_int_waveform[0, :])
+
+        encoded = audioop.lin2alaw(waveform_bytes, segment_length)
+        torch_encoded = transforms.ALawEncoding(quantization_channels, compression_param)(small_int_waveform)
+        self.assertEqual(torch.tensor(list(encoded)), torch_encoded[0])
+
+        decoded = audioop.alaw2lin(encoded, segment_length)
+        torch_decoded = transforms.ALawDecoding(quantization_channels, compression_param)(torch_encoded)
+        self.assertEqual(torch.tensor(list(decoded)), torch_decoded[0])
 
     def test_AmplitudeToDB(self):
         filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
