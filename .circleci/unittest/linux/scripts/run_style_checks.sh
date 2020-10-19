@@ -5,6 +5,8 @@ set -u
 eval "$(./conda/bin/conda shell.bash hook)"
 conda activate ./env
 
+pip install clang-format flake8
+
 # We want to run all the style checks even if one of them fail.
 
 exit_status=0
