@@ -821,6 +821,9 @@ class _AxisMasking(torch.nn.Module):
 class FrequencyMasking(_AxisMasking):
     r"""Apply masking to a spectrogram in the frequency domain.
 
+    In the image below, a frequency band has been masked on a spectrogram.
+    .. image:: _static/img/specaugment-freq.jpg
+
     Args:
         freq_mask_param (int): maximum possible length of the mask.
             Indices uniformly sampled from [0, freq_mask_param).
@@ -834,6 +837,9 @@ class FrequencyMasking(_AxisMasking):
 
 class TimeMasking(_AxisMasking):
     r"""Apply masking to a spectrogram in the time domain.
+
+    In the image below, a time band has been masked on a spectrogram.
+    .. image:: _static/img/specaugment-time.jpg
 
     Args:
         time_mask_param (int): maximum possible length of the mask.
