@@ -59,9 +59,6 @@ install_release() {
 install_build_dependencies() {
     printf "* Installing torchaudio dependencies except PyTorch - (Python: %s)\n" "$1"
     conda env update -q --file "${_this_dir}/environment.yml" --prune
-    if [ "${_os}" == Linux ]; then
-        pip install clang-format
-    fi
 }
 
 build_master() {
