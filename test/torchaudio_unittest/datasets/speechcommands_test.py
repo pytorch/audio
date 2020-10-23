@@ -53,6 +53,8 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
 
     root_dir = None
     samples = []
+    valid_samples = []
+    test_samples = []
 
     @classmethod
     def setUp(cls):
@@ -63,12 +65,13 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
         os.makedirs(dataset_dir, exist_ok=True)
         sample_rate = 16000  # 16kHz sample rate
         seed = 0
-        txt_file = os.path.join(dataset_dir, "testing_list.txt")
-        with open(txt_file, "w") as txt:
+        valid_file = os.path.join(dataset_dir, "validation_list.txt")
+        test_file = os.path.join(dataset_dir, "testing_list.txt")
+        with open(valid_file, "w") as valid, open(test_file, "w") as test:
             for label in LABELS:
                 path = os.path.join(dataset_dir, label)
                 os.makedirs(path, exist_ok=True)
-                for j in range(2):
+                for j in range(6):
                     # generate hash ID for speaker
                     speaker = "{:08x}".format(j)
 
@@ -93,7 +96,12 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
                         )
                         cls.samples.append(sample)
                         label_filename = os.path.join(label, filename)
-                        txt.write(f'{label_filename}\n')
+                        if 2 <= j < 4:
+                            valid.write(f'{label_filename}\n')
+                            cls.valid_samples.append(sample)
+                        elif 4 <= j < 6:
+                            test.write(f'{label_filename}\n')
+                            cls.test_samples.append(sample)
 
     def testSpeechCommands(self):
         dataset = speechcommands.SPEECHCOMMANDS(self.root_dir)
@@ -112,6 +120,23 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
 
         assert num_samples == len(self.samples)
 
+    def testSpeechCommandsSubsetValid(self):
+        dataset = speechcommands.SPEECHCOMMANDS(self.root_dir, subset="validation")
+        print(dataset._path)
+
+        num_samples = 0
+        for i, (data, sample_rate, label, speaker_id, utterance_number) in enumerate(
+            dataset
+        ):
+            self.assertEqual(data, self.valid_samples[i][0], atol=5e-5, rtol=1e-8)
+            assert sample_rate == self.valid_samples[i][1]
+            assert label == self.valid_samples[i][2]
+            assert speaker_id == self.valid_samples[i][3]
+            assert utterance_number == self.valid_samples[i][4]
+            num_samples += 1
+
+        assert num_samples == len(self.valid_samples)
+
     def testSpeechCommandsSubset(self):
         dataset = speechcommands.SPEECHCOMMANDS(self.root_dir, subset="testing")
         print(dataset._path)
@@ -120,11 +145,11 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
         for i, (data, sample_rate, label, speaker_id, utterance_number) in enumerate(
             dataset
         ):
-            self.assertEqual(data, self.samples[i][0], atol=5e-5, rtol=1e-8)
-            assert sample_rate == self.samples[i][1]
-            assert label == self.samples[i][2]
-            assert speaker_id == self.samples[i][3]
-            assert utterance_number == self.samples[i][4]
+            self.assertEqual(data, self.test_samples[i][0], atol=5e-5, rtol=1e-8)
+            assert sample_rate == self.test_samples[i][1]
+            assert label == self.test_samples[i][2]
+            assert speaker_id == self.test_samples[i][3]
+            assert utterance_number == self.test_samples[i][4]
             num_samples += 1
 
-        assert len(dataset) == len(self.samples)
+        assert num_samples == len(self.test_samples)
