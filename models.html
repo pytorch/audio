@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.models &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.models &mdash; Torchaudio 0.7.0 documentation</title>
   
 
   
@@ -156,7 +156,7 @@
               
               
                 <div class="version">
-                  master 
+                  0.7.0
                 </div>
               
             
@@ -195,6 +195,17 @@
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
 </ul>
 
             
@@ -270,11 +281,64 @@
   <div class="section" id="torchaudio-models">
 <h1>torchaudio.models<a class="headerlink" href="#torchaudio-models" title="Permalink to this headline">¶</a></h1>
 <p>The models subpackage contains definitions of models for addressing common audio tasks.</p>
+<div class="section" id="convtasnet">
+<h2><span class="hidden-section">ConvTasNet</span><a class="headerlink" href="#convtasnet" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.models.ConvTasNet">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">ConvTasNet</code><span class="sig-paren">(</span><em class="sig-param">num_sources: int = 2</em>, <em class="sig-param">enc_kernel_size: int = 16</em>, <em class="sig-param">enc_num_feats: int = 512</em>, <em class="sig-param">msk_kernel_size: int = 3</em>, <em class="sig-param">msk_num_feats: int = 128</em>, <em class="sig-param">msk_num_hidden_feats: int = 512</em>, <em class="sig-param">msk_num_layers: int = 8</em>, <em class="sig-param">msk_num_stacks: int = 3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/conv_tasnet.html#ConvTasNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.ConvTasNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conv-TasNet: a fully-convolutional time-domain audio separation network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_sources</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The number of sources to split.</p></li>
+<li><p><strong>enc_kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The convolution kernel size of the encoder/decoder, &lt;L&gt;.</p></li>
+<li><p><strong>enc_num_feats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The feature dimensions passed to mask generator, &lt;N&gt;.</p></li>
+<li><p><strong>msk_kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The convolution kernel size of the mask generator, &lt;P&gt;.</p></li>
+<li><p><strong>msk_num_feats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The input/output feature dimension of conv block in the mask generator, &lt;B, Sc&gt;.</p></li>
+<li><p><strong>msk_num_hidden_feats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The internal feature dimension of conv block of the mask generator, &lt;H&gt;.</p></li>
+<li><p><strong>msk_num_layers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The number of layers in one conv block of the mask generator, &lt;X&gt;.</p></li>
+<li><p><strong>msk_num_stacks</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The numbr of conv blocks of the mask generator, &lt;R&gt;.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This implementation corresponds to the “non-causal” setting in the paper.</p>
+</div>
+<dl>
+<dt>Reference:</dt><dd><ul>
+<li><p>Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation</p>
+<p>Luo, Yi and Mesgarani, Nima</p>
+<p><a class="reference external" href="https://arxiv.org/abs/1809.07454">https://arxiv.org/abs/1809.07454</a></p>
+</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.models.ConvTasNet.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">input: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/models/conv_tasnet.html#ConvTasNet.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.ConvTasNet.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform source separation. Generate audio source waveforms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.6.0a0+4392e52 ))"><em>torch.Tensor</em></a>) – 3D Tensor with shape [batch, channel==1, frames]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>3D Tensor with shape [batch, channel==num_sources, frames]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.6.0a0+4392e52 ))">torch.Tensor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="wav2letter">
 <h2><span class="hidden-section">Wav2Letter</span><a class="headerlink" href="#wav2letter" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
+<dl class="class">
 <dt id="torchaudio.models.Wav2Letter">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">Wav2Letter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_classes</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">40</span></em>, <em class="sig-param"><span class="n">input_type</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span> <span class="o">=</span> <span class="default_value">'waveform'</span></em>, <em class="sig-param"><span class="n">num_features</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wav2letter.html#Wav2Letter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Wav2Letter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">Wav2Letter</code><span class="sig-paren">(</span><em class="sig-param">num_classes: int = 40</em>, <em class="sig-param">input_type: str = 'waveform'</em>, <em class="sig-param">num_features: int = 1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wav2letter.html#Wav2Letter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Wav2Letter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wav2Letter model architecture from the <a class="reference external" href="https://arxiv.org/abs/1609.03193">Wav2Letter an End-to-End ConvNet-based Speech Recognition System</a>.</p>
 <blockquote>
 <div><p><span class="math">\(\text{padding} = \frac{\text{ceil}(\text{kernel} - \text{stride})}{2}\)</span></p>
@@ -282,25 +346,85 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>num_classes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of classes to be classified. (Default: <code class="docutils literal notranslate"><span class="pre">40</span></code>)</p></li>
-<li><p><strong>input_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Wav2Letter can use as input: <code class="docutils literal notranslate"><span class="pre">waveform</span></code>, <code class="docutils literal notranslate"><span class="pre">power_spectrum</span></code>
+<li><p><strong>num_classes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of classes to be classified. (Default: <code class="docutils literal notranslate"><span class="pre">40</span></code>)</p></li>
+<li><p><strong>input_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Wav2Letter can use as input: <code class="docutils literal notranslate"><span class="pre">waveform</span></code>, <code class="docutils literal notranslate"><span class="pre">power_spectrum</span></code>
 or <code class="docutils literal notranslate"><span class="pre">mfcc</span></code> (Default: <code class="docutils literal notranslate"><span class="pre">waveform</span></code>).</p></li>
-<li><p><strong>num_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of input features that the network will receive (Default: <code class="docutils literal notranslate"><span class="pre">1</span></code>).</p></li>
+<li><p><strong>num_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of input features that the network will receive (Default: <code class="docutils literal notranslate"><span class="pre">1</span></code>).</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
+<dl class="method">
 <dt id="torchaudio.models.Wav2Letter.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span><span class="p">:</span> <span class="n">torch.Tensor</span></em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/models/wav2letter.html#Wav2Letter.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Wav2Letter.forward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/models/wav2letter.html#Wav2Letter.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Wav2Letter.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<em>torch.Tensor</em>) – Tensor of dimension (batch_size, num_features, input_length).</p>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.6.0a0+4392e52 ))"><em>torch.Tensor</em></a>) – Tensor of dimension (batch_size, num_features, input_length).</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Predictor tensor of dimension (batch_size, number_of_classes, input_length).</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="wavernn">
+<h2><span class="hidden-section">WaveRNN</span><a class="headerlink" href="#wavernn" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.models.WaveRNN">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">WaveRNN</code><span class="sig-paren">(</span><em class="sig-param">upsample_scales: List[int], n_classes: int, hop_length: int, n_res_block: int = 10, n_rnn: int = 512, n_fc: int = 512, kernel_size: int = 5, n_freq: int = 128, n_hidden: int = 128, n_output: int = 128</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wavernn.html#WaveRNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.WaveRNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>WaveRNN model based on the implementation from <a class="reference external" href="https://github.com/fatchord/WaveRNN">fatchord</a>.</p>
+<p>The original implementation was introduced in
+<a class="reference external" href="https://arxiv.org/pdf/1802.08435.pdf">“Efficient Neural Audio Synthesis”</a>.
+The input channels of waveform and spectrogram have to be 1. The product of
+<cite>upsample_scales</cite> must equal <cite>hop_length</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>upsample_scales</strong> – the list of upsample scales.</p></li>
+<li><p><strong>n_classes</strong> – the number of output classes.</p></li>
+<li><p><strong>hop_length</strong> – the number of samples between the starts of consecutive frames.</p></li>
+<li><p><strong>n_res_block</strong> – the number of ResBlock in stack. (Default: <code class="docutils literal notranslate"><span class="pre">10</span></code>)</p></li>
+<li><p><strong>n_rnn</strong> – the dimension of RNN layer. (Default: <code class="docutils literal notranslate"><span class="pre">512</span></code>)</p></li>
+<li><p><strong>n_fc</strong> – the dimension of fully connected layer. (Default: <code class="docutils literal notranslate"><span class="pre">512</span></code>)</p></li>
+<li><p><strong>kernel_size</strong> – the number of kernel size in the first Conv1d layer. (Default: <code class="docutils literal notranslate"><span class="pre">5</span></code>)</p></li>
+<li><p><strong>n_freq</strong> – the number of bins in a spectrogram. (Default: <code class="docutils literal notranslate"><span class="pre">128</span></code>)</p></li>
+<li><p><strong>n_hidden</strong> – the number of hidden dimensions of resblock. (Default: <code class="docutils literal notranslate"><span class="pre">128</span></code>)</p></li>
+<li><p><strong>n_output</strong> – the number of output dimensions of melresnet. (Default: <code class="docutils literal notranslate"><span class="pre">128</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">wavernn</span> <span class="o">=</span> <span class="n">WaveRNN</span><span class="p">(</span><span class="n">upsample_scales</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">],</span> <span class="n">n_classes</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># waveform shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">specgram</span> <span class="o">=</span> <span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)(</span><span class="n">waveform</span><span class="p">)</span>  <span class="c1"># shape: (n_batch, n_channel, n_freq, n_time)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">wavernn</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">specgram</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># output shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length, n_classes)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.models.WaveRNN.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">specgram: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/models/wavernn.html#WaveRNN.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.WaveRNN.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pass the input through the WaveRNN model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>waveform</strong> – the input waveform to the WaveRNN layer (n_batch, 1, (n_time - kernel_size + 1) * hop_length)</p></li>
+<li><p><strong>specgram</strong> – the input spectrogram to the WaveRNN layer (n_batch, 1, n_freq, n_time)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(n_batch, 1, (n_time - kernel_size + 1) * hop_length, n_classes)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor shape</p>
 </dd>
 </dl>
 </dd></dl>
@@ -354,7 +478,9 @@ or <code class="docutils literal notranslate"><span class="pre">mfcc</span></cod
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">torchaudio.models</a><ul>
+<li><a class="reference internal" href="#convtasnet"><span class="hidden-section">ConvTasNet</span></a></li>
 <li><a class="reference internal" href="#wav2letter"><span class="hidden-section">Wav2Letter</span></a></li>
+<li><a class="reference internal" href="#wavernn"><span class="hidden-section">WaveRNN</span></a></li>
 </ul>
 </li>
 </ul>

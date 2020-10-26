@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.transforms &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.transforms &mdash; Torchaudio 0.7.0 documentation</title>
   
 
   
@@ -154,7 +154,7 @@
               
               
                 <div class="version">
-                  master 
+                  0.7.0
                 </div>
               
             
@@ -193,6 +193,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
 </ul>
 
             
@@ -409,8 +420,8 @@
                  <span class="n">rand_init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">GriffinLim</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-        <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">%s</span><span class="s1"> &gt; 1 can be unstable&#39;</span> <span class="o">%</span> <span class="n">momentum</span>
-        <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">%s</span><span class="s1"> &lt; 0&#39;</span> <span class="o">%</span> <span class="n">momentum</span>
+        <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">{}</span><span class="s1"> &gt; 1 can be unstable&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">{}</span><span class="s1"> &lt; 0&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span> <span class="o">=</span> <span class="n">n_fft</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_iter</span> <span class="o">=</span> <span class="n">n_iter</span>
@@ -466,7 +477,8 @@
 
 <div class="viewcode-block" id="AmplitudeToDB.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.AmplitudeToDB.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Numerically stable implementation from Librosa.</span>
-<span class="sd">        https://librosa.github.io/librosa/_modules/librosa/core/spectrum.html</span>
+
+<span class="sd">        https://librosa.org/doc/latest/generated/librosa.amplitude_to_db.html</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x (Tensor): Input tensor before being converted to decibel scale.</span>
@@ -505,7 +517,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span> <span class="o">=</span> <span class="n">f_max</span> <span class="k">if</span> <span class="n">f_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span> <span class="o">=</span> <span class="n">f_min</span>
 
-        <span class="k">assert</span> <span class="n">f_min</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="s1">&#39;Require f_min: </span><span class="si">%f</span><span class="s1"> &lt; f_max: </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">f_min</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="s1">&#39;Require f_min: </span><span class="si">{}</span><span class="s1"> &lt; f_max: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">)</span>
 
         <span class="n">fb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">n_stft</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span>
             <span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
@@ -581,7 +593,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tolerance_change</span> <span class="o">=</span> <span class="n">tolerance_change</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sgdargs</span> <span class="o">=</span> <span class="n">sgdargs</span> <span class="ow">or</span> <span class="p">{</span><span class="s1">&#39;lr&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;momentum&#39;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">}</span>
 
-        <span class="k">assert</span> <span class="n">f_min</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="s1">&#39;Require f_min: </span><span class="si">%f</span><span class="s1"> &lt; f_max: </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">f_min</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="s1">&#39;Require f_min: </span><span class="si">{}</span><span class="s1"> &lt; f_max: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">)</span>
 
         <span class="n">fb</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span><span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s1">&#39;fb&#39;</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span>
@@ -875,7 +887,7 @@
 
             <span class="k">return</span> <span class="n">waveform</span>
 
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid resampling method: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resampling_method</span><span class="p">))</span></div></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid resampling method: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resampling_method</span><span class="p">))</span></div></div>
 
 
 <div class="viewcode-block" id="ComplexNorm"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.ComplexNorm">[docs]</a><span class="k">class</span> <span class="nc">ComplexNorm</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>

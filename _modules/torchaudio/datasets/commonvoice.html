@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.datasets.commonvoice &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.datasets.commonvoice &mdash; Torchaudio 0.7.0 documentation</title>
   
 
   
@@ -154,7 +154,7 @@
               
               
                 <div class="version">
-                  master 
+                  0.7.0
                 </div>
               
             
@@ -193,6 +193,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
 </ul>
 
             
@@ -368,11 +379,28 @@
 
 
 <div class="viewcode-block" id="COMMONVOICE"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.COMMONVOICE">[docs]</a><span class="k">class</span> <span class="nc">COMMONVOICE</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create a Dataset for CommonVoice. Each item is a tuple of the form:</span>
-<span class="sd">    (waveform, sample_rate, dictionary)</span>
-<span class="sd">    where dictionary is a dictionary built from the tsv file with the following keys:</span>
-<span class="sd">    client_id, path, sentence, up_votes, down_votes, age, gender, accent.</span>
+    <span class="sd">&quot;&quot;&quot;Create a Dataset for CommonVoice.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        root (str): Path to the directory where the dataset is found or downloaded.</span>
+<span class="sd">        tsv (str, optional): The name of the tsv file used to construct the metadata.</span>
+<span class="sd">            (default: ``&quot;train.tsv&quot;``)</span>
+<span class="sd">        url (str, optional): The URL to download the dataset from, or the language of</span>
+<span class="sd">            the dataset to download. (default: ``&quot;english&quot;``).</span>
+<span class="sd">            Allowed language values are ``&quot;tatar&quot;``, ``&quot;english&quot;``, ``&quot;german&quot;``,</span>
+<span class="sd">            ``&quot;french&quot;``, ``&quot;welsh&quot;``, ``&quot;breton&quot;``, ``&quot;chuvash&quot;``, ``&quot;turkish&quot;``, ``&quot;kyrgyz&quot;``,</span>
+<span class="sd">            ``&quot;irish&quot;``, ``&quot;kabyle&quot;``, ``&quot;catalan&quot;``, ``&quot;taiwanese&quot;``, ``&quot;slovenian&quot;``,</span>
+<span class="sd">            ``&quot;italian&quot;``, ``&quot;dutch&quot;``, ``&quot;hakha chin&quot;``, ``&quot;esperanto&quot;``, ``&quot;estonian&quot;``,</span>
+<span class="sd">            ``&quot;persian&quot;``, ``&quot;portuguese&quot;``, ``&quot;basque&quot;``, ``&quot;spanish&quot;``, ``&quot;chinese&quot;``,</span>
+<span class="sd">            ``&quot;mongolian&quot;``, ``&quot;sakha&quot;``, ``&quot;dhivehi&quot;``, ``&quot;kinyarwanda&quot;``, ``&quot;swedish&quot;``,</span>
+<span class="sd">            ``&quot;russian&quot;``, ``&quot;indonesian&quot;``, ``&quot;arabic&quot;``, ``&quot;tamil&quot;``, ``&quot;interlingua&quot;``,</span>
+<span class="sd">            ``&quot;latvian&quot;``, ``&quot;japanese&quot;``, ``&quot;votic&quot;``, ``&quot;abkhaz&quot;``, ``&quot;cantonese&quot;`` and</span>
+<span class="sd">            ``&quot;romansh sursilvan&quot;``.</span>
+<span class="sd">        folder_in_archive (str, optional): The top-level directory of the dataset.</span>
+<span class="sd">        version (str): Version string. (default: ``&quot;cv-corpus-4-2019-12-10&quot;``)</span>
+<span class="sd">            For the other allowed values, Please checkout https://commonvoice.mozilla.org/en/datasets.</span>
+<span class="sd">        download (bool, optional):</span>
+<span class="sd">            Whether to download the dataset if it is not found at root path. (default: ``False``).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_ext_txt</span> <span class="o">=</span> <span class="s2">&quot;.txt&quot;</span>
@@ -459,9 +487,19 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">walker</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">walker</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<div class="viewcode-block" id="COMMONVOICE.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.COMMONVOICE.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (int): The index of the sample to be loaded</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: ``(waveform, sample_rate, dictionary)``,  where dictionary is built</span>
+<span class="sd">            from the TSV file with the following keys: ``client_id``, ``path``, ``sentence``,</span>
+<span class="sd">            ``up_votes``, ``down_votes``, ``age``, ``gender`` and ``accent``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">load_commonvoice_item</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_folder_audio</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">load_commonvoice_item</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_folder_audio</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">)</span></div>

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.datasets.vctk &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.datasets.vctk &mdash; Torchaudio 0.7.0 documentation</title>
   
 
   
@@ -154,7 +154,7 @@
               
               
                 <div class="version">
-                  master 
+                  0.7.0
                 </div>
               
             
@@ -193,6 +193,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
 </ul>
 
             
@@ -279,11 +290,10 @@
     <span class="n">walk_files</span>
 <span class="p">)</span>
 
-<span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz&quot;</span>
+<span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip&quot;</span>
 <span class="n">FOLDER_IN_ARCHIVE</span> <span class="o">=</span> <span class="s2">&quot;VCTK-Corpus&quot;</span>
 <span class="n">_CHECKSUMS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;http://homepages.inf.ed.ac.uk/jyamagis/release/VCTK-Corpus.tar.gz&quot;</span><span class="p">:</span>
-    <span class="s2">&quot;45e8dede780278ef5541fde0b82ac292&quot;</span>
+    <span class="s2">&quot;https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip&quot;</span><span class="p">:</span> <span class="s2">&quot;8a6ba2946b36fcbef0212cad601f4bfa&quot;</span>
 <span class="p">}</span>
 
 
@@ -318,12 +328,25 @@
 
 
 <div class="viewcode-block" id="VCTK"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VCTK">[docs]</a><span class="k">class</span> <span class="nc">VCTK</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create a Dataset for VCTK. Each item is a tuple of the form:</span>
-<span class="sd">    (waveform, sample_rate, utterance, speaker_id, utterance_id)</span>
+    <span class="sd">&quot;&quot;&quot;Create a Dataset for VCTK.</span>
 
-<span class="sd">    Folder `p315` will be ignored due to the non-existent corresponding text files.</span>
-<span class="sd">    For more information about the dataset visit: https://datashare.is.ed.ac.uk/handle/10283/3443</span>
+<span class="sd">    Note:</span>
+<span class="sd">        * **This dataset is no longer publicly available.** Please use :py:class:`VCTK_092`</span>
+<span class="sd">        * Directory ``p315`` is ignored because there is no corresponding text files.</span>
+<span class="sd">          For more information about the dataset visit: https://datashare.is.ed.ac.uk/handle/10283/3443</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        root (str): Path to the directory where the dataset is found or downloaded.</span>
+<span class="sd">        url (str, optional): Not used as the dataset is no longer publicly available.</span>
+<span class="sd">        folder_in_archive (str, optional):</span>
+<span class="sd">            The top-level directory of the dataset. (default: ``&quot;VCTK-Corpus&quot;``)</span>
+<span class="sd">        download (bool, optional):</span>
+<span class="sd">            Whether to download the dataset if it is not found at root path. (default: ``False``).</span>
+<span class="sd">            Giving ``download=True`` will result in error as the dataset is no longer</span>
+<span class="sd">            publicly available.</span>
+<span class="sd">        downsample (bool, optional): Not used.</span>
+<span class="sd">        transform (callable, optional): Optional transform applied on waveform. (default: ``None``)</span>
+<span class="sd">        target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_folder_txt</span> <span class="o">=</span> <span class="s2">&quot;txt&quot;</span>
@@ -364,15 +387,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">archive</span><span class="p">):</span>
-                    <span class="n">checksum</span> <span class="o">=</span> <span class="n">_CHECKSUMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                    <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;md5&quot;</span><span class="p">)</span>
-                <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;This Dataset is no longer available. &quot;</span>
+                <span class="s2">&quot;Please use `VCTK_092` class to download the latest version.&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;Dataset not found. Please use `download=True` to download it.&quot;</span>
+                <span class="s2">&quot;Dataset not found. Please use `VCTK_092` class &quot;</span>
+                <span class="s2">&quot;with `download=True` to donwload the latest version.&quot;</span>
             <span class="p">)</span>
 
         <span class="n">walker</span> <span class="o">=</span> <span class="n">walk_files</span><span class="p">(</span>
@@ -381,7 +404,15 @@
         <span class="n">walker</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_except_folder</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">w</span><span class="p">,</span> <span class="n">walker</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">walker</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="VCTK.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VCTK.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (int): The index of the sample to be loaded</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: ``(waveform, sample_rate, utterance, speaker_id, utterance_id)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="n">item</span> <span class="o">=</span> <span class="n">load_vctk_item</span><span class="p">(</span>
             <span class="n">fileid</span><span class="p">,</span>
@@ -400,10 +431,137 @@
             <span class="n">waveform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_transform</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">utterance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_transform</span><span class="p">(</span><span class="n">utterance</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">utterance</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">utterance_id</span>
+        <span class="k">return</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">utterance</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">utterance_id</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">)</span></div>
+
+
+<span class="n">SampleType</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="VCTK_092"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VCTK_092">[docs]</a><span class="k">class</span> <span class="nc">VCTK_092</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create VCTK 0.92 Dataset</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        root (str): Root directory where the dataset&#39;s top level directory is found.</span>
+<span class="sd">        mic_id (str): Microphone ID. Either ``&quot;mic1&quot;`` or ``&quot;mic2&quot;``. (default: ``&quot;mic2&quot;``)</span>
+<span class="sd">        download (bool, optional):</span>
+<span class="sd">            Whether to download the dataset if it is not found at root path. (default: ``False``).</span>
+<span class="sd">        url (str, optional): The URL to download the dataset from.</span>
+<span class="sd">            (default: ``&quot;https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip&quot;``)</span>
+<span class="sd">        audio_ext (str, optional): Custom audio extension if dataset is converted to non-default audio format.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        * All the speeches from speaker ``p315`` will be skipped due to the lack of the corresponding text files.</span>
+<span class="sd">        * All the speeches from ``p280`` will be skipped for ``mic_id=&quot;mic2&quot;`` due to the lack of the audio files.</span>
+<span class="sd">        * Some of the speeches from speaker ``p362`` will be skipped due to the lack of  the audio files.</span>
+<span class="sd">        * See Also: https://datashare.is.ed.ac.uk/handle/10283/3443</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">mic_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mic2&quot;</span><span class="p">,</span>
+        <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">URL</span><span class="p">,</span>
+        <span class="n">audio_ext</span><span class="o">=</span><span class="s2">&quot;.flac&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">mic_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;mic1&quot;</span><span class="p">,</span> <span class="s2">&quot;mic2&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;`mic_id` has to be either &quot;mic1&quot; or &quot;mic2&quot;. Found: </span><span class="si">{</span><span class="n">mic_id</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;VCTK-Corpus-0.92.zip&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;VCTK-Corpus-0.92&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_txt_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="s2">&quot;txt&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_audio_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="s2">&quot;wav48_silence_trimmed&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mic_id</span> <span class="o">=</span> <span class="n">mic_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_audio_ext</span> <span class="o">=</span> <span class="n">audio_ext</span>
+
+        <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">archive</span><span class="p">):</span>
+                    <span class="n">checksum</span> <span class="o">=</span> <span class="n">_CHECKSUMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;md5&quot;</span><span class="p">)</span>
+                <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Dataset not found. Please use `download=True` to download it.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Extracting speaker IDs from the folder structure</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_speaker_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_txt_dir</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_ids</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Due to some insufficient data complexity in the 0.92 version of this dataset,</span>
+<span class="sd">        we start traversing the audio folder structure in accordance with the text folder.</span>
+<span class="sd">        As some of the audio files are missing of either ``mic_1`` or ``mic_2`` but the</span>
+<span class="sd">        text is present for the same, we first check for the existence of the audio file</span>
+<span class="sd">        before adding it to the ``sample_ids`` list.</span>
+
+<span class="sd">        Once the ``audio_ids`` are loaded into memory we can quickly access the list for</span>
+<span class="sd">        different parameters required by the user.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">speaker_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_speaker_ids</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">speaker_id</span> <span class="o">==</span> <span class="s2">&quot;p280&quot;</span> <span class="ow">and</span> <span class="n">mic_id</span> <span class="o">==</span> <span class="s2">&quot;mic2&quot;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">utterance_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_txt_dir</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">utterance_file</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+                <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">utterance_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.txt&quot;</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">utterance_id</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">utterance_file</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">audio_path_mic</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_audio_dir</span><span class="p">,</span>
+                    <span class="n">speaker_id</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">utterance_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">mic_id</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">_audio_ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">speaker_id</span> <span class="o">==</span> <span class="s2">&quot;p362&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">audio_path_mic</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">utterance_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_load_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">file_path</span><span class="o">.</span><span class="n">readlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_load_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_load_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">utterance_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mic_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SampleType</span><span class="p">:</span>
+        <span class="n">utterance_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_txt_dir</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">speaker_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">utterance_id</span><span class="si">}</span><span class="s2">.txt&quot;</span>
+        <span class="p">)</span>
+        <span class="n">audio_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_audio_dir</span><span class="p">,</span>
+            <span class="n">speaker_id</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">speaker_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">utterance_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">mic_id</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">_audio_ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Reading text</span>
+        <span class="n">utterance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_text</span><span class="p">(</span><span class="n">utterance_path</span><span class="p">)</span>
+
+        <span class="c1"># Reading FLAC</span>
+        <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_audio</span><span class="p">(</span><span class="n">audio_path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">utterance</span><span class="p">,</span> <span class="n">speaker_id</span><span class="p">,</span> <span class="n">utterance_id</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VCTK_092.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.VCTK_092.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SampleType</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (int): The index of the sample to be loaded</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: ``(waveform, sample_rate, utterance, speaker_id, utterance_id)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">speaker_id</span><span class="p">,</span> <span class="n">utterance_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_ids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_sample</span><span class="p">(</span><span class="n">speaker_id</span><span class="p">,</span> <span class="n">utterance_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mic_id</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_ids</span><span class="p">)</span></div>
 </pre></div>
 
              </article>

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.backend.common &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.backend.common &mdash; Torchaudio 0.7.0 documentation</title>
   
 
   
@@ -154,7 +154,7 @@
               
               
                 <div class="version">
-                  master 
+                  0.7.0
                 </div>
               
             
@@ -193,6 +193,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
 </ul>
 
             
@@ -268,11 +279,31 @@
   <h1>Source code for torchaudio.backend.common</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
+<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
 
-<div class="viewcode-block" id="SignalInfo"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.common.SignalInfo">[docs]</a><span class="k">class</span> <span class="nc">SignalInfo</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Data class returned ``info`` functions.</span>
 
-<span class="sd">    Used by :ref:`sox backend&lt;sox_backend&gt;` and :ref:`soundfile backend&lt;soundfile_backend&gt;`</span>
+<div class="viewcode-block" id="AudioMetaData"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.common.AudioMetaData">[docs]</a><span class="k">class</span> <span class="nc">AudioMetaData</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return type of ``torchaudio.info`` function.</span>
+
+<span class="sd">    This class is used by :ref:`&quot;sox_io&quot; backend&lt;sox_io_backend&gt;` and</span>
+<span class="sd">    :ref:`&quot;soundfile&quot; backend with the new interface&lt;soundfile_backend&gt;`.</span>
+
+<span class="sd">    :ivar int sample_rate: Sample rate</span>
+<span class="sd">    :ivar int num_frames: The number of frames</span>
+<span class="sd">    :ivar int num_channels: The number of channels</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="n">sample_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_frames</span> <span class="o">=</span> <span class="n">num_frames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span> <span class="o">=</span> <span class="n">num_channels</span></div>
+
+
+<div class="viewcode-block" id="SignalInfo"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.common.SignalInfo">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="s1">&#39;Please migrate to `AudioMetaData`.&#39;</span><span class="p">,</span> <span class="s1">&#39;0.9.0&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">SignalInfo</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;One of return types of ``torchaudio.info`` functions.</span>
+
+<span class="sd">    This class is used by :ref:`&quot;sox&quot; backend (deprecated)&lt;sox_backend&gt;` and</span>
+<span class="sd">    :ref:`&quot;soundfile&quot; backend with the legacy interface (deprecated)&lt;soundfile_legacy_backend&gt;`.</span>
 
 <span class="sd">    See https://fossies.org/dox/sox-14.4.2/structsox__signalinfo__t.html</span>
 
@@ -293,10 +324,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span></div>
 
 
-<div class="viewcode-block" id="EncodingInfo"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.common.EncodingInfo">[docs]</a><span class="k">class</span> <span class="nc">EncodingInfo</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Data class returned ``info`` functions.</span>
+<div class="viewcode-block" id="EncodingInfo"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.common.EncodingInfo">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="s1">&#39;Please migrate to `AudioMetaData`.&#39;</span><span class="p">,</span> <span class="s1">&#39;0.9.0&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">EncodingInfo</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;One of return types of ``torchaudio.info`` functions.</span>
 
-<span class="sd">    Used by :ref:`sox backend&lt;sox_backend&gt;` and :ref:`soundfile backend&lt;soundfile_backend&gt;`</span>
+<span class="sd">    This class is used by :ref:`&quot;sox&quot; backend (deprecated)&lt;sox_backend&gt;` and</span>
+<span class="sd">    :ref:`&quot;soundfile&quot; backend with the legacy interface (deprecated)&lt;soundfile_legacy_backend&gt;`.</span>
 
 <span class="sd">    See https://fossies.org/dox/sox-14.4.2/structsox__encodinginfo__t.html</span>
 

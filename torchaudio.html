@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio &mdash; Torchaudio master documentation</title>
+  <title>torchaudio &mdash; Torchaudio 0.7.0 documentation</title>
   
 
   
@@ -156,7 +156,7 @@
               
               
                 <div class="version">
-                  master 
+                  0.7.0
                 </div>
               
             
@@ -195,6 +195,17 @@
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
 </ul>
 
             
@@ -273,25 +284,25 @@
 <h2>I/O functionalities<a class="headerlink" href="#i-o-functionalities" title="Permalink to this headline">¶</a></h2>
 <p>Audio I/O functions are implemented in <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> module, but for the ease of use, the following functions are made available on <code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio</span></code> module. There are different backends available and you can switch backends with <code class="xref py py-func docutils literal notranslate"><span class="pre">set_audio_backend()</span></code>.</p>
 <p>Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
-<dl class="py function">
+<dl class="function">
 <dt id="torchaudio.info">
 <code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">...</em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch meta data of an audio file. Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="torchaudio.load">
 <code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">...</em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load audio file into torch.Tensor object. Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="torchaudio.load_wav">
 <code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">load_wav</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">...</em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.load_wav" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load audio file into torch.Tensor, Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="torchaudio.save">
 <code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">...</em><span class="sig-paren">)</span><a class="headerlink" href="#torchaudio.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save torch.Tensor object into an audio format. Refer to <a class="reference internal" href="backend.html#backend"><span class="std std-ref">torchaudio.backend</span></a> for the detail.</p>
@@ -300,41 +311,41 @@
 </div>
 <div class="section" id="backend-utilities">
 <h2>Backend Utilities<a class="headerlink" href="#backend-utilities" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<dl class="function">
 <dt id="torchaudio.list_audio_backends">
-<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">list_audio_backends</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#list_audio_backends"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.list_audio_backends" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">list_audio_backends</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List[str]<a class="reference internal" href="_modules/torchaudio/backend/utils.html#list_audio_backends"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.list_audio_backends" title="Permalink to this definition">¶</a></dt>
 <dd><p>List available backends</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The list of available backends.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>]</p>
+<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>]</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="torchaudio.get_audio_backend">
-<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">get_audio_backend</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#get_audio_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.get_audio_backend" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">get_audio_backend</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Optional[str]<a class="reference internal" href="_modules/torchaudio/backend/utils.html#get_audio_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.get_audio_backend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the name of the current backend</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The name of the current backend or <code class="docutils literal notranslate"><span class="pre">None</span></code> if no backend is assigned.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Optional[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>]</p>
+<dd class="field-even"><p>Optional[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>]</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="torchaudio.set_audio_backend">
-<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">set_audio_backend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">backend</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#set_audio_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.set_audio_backend" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">set_audio_backend</code><span class="sig-paren">(</span><em class="sig-param">backend: Optional[str]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/utils.html#set_audio_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.set_audio_backend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the backend for I/O operation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>backend</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>]</em>) – Name of the backend.
+<dd class="field-odd"><p><strong>backend</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – Name of the backend.
 One of <code class="docutils literal notranslate"><span class="pre">&quot;sox&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sox_io&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code> based on availability
 of the system. If <code class="docutils literal notranslate"><span class="pre">None</span></code> is provided the  current backend is unassigned.</p>
 </dd>
@@ -344,18 +355,18 @@ of the system. If <code class="docutils literal notranslate"><span class="pre">N
 </div>
 <div class="section" id="sox-effects-utilities">
 <h2>Sox Effects Utilities<a class="headerlink" href="#sox-effects-utilities" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<dl class="function">
 <dt id="torchaudio.initialize_sox">
 <code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">initialize_sox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio.html#initialize_sox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.initialize_sox" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize sox effects.</p>
-<p>This function is deprecated. See <code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.init_sox_effects()</span></code></p>
+<p>This function is deprecated. See <a class="reference internal" href="sox_effects.html#torchaudio.sox_effects.init_sox_effects" title="torchaudio.sox_effects.init_sox_effects"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.init_sox_effects()</span></code></a></p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="torchaudio.shutdown_sox">
 <code class="sig-prename descclassname">torchaudio.</code><code class="sig-name descname">shutdown_sox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio.html#shutdown_sox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.shutdown_sox" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shutdown sox effects.</p>
-<p>This function is deprecated. See <code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.shutdown_sox_effects()</span></code></p>
+<p>This function is deprecated. See <a class="reference internal" href="sox_effects.html#torchaudio.sox_effects.shutdown_sox_effects" title="torchaudio.sox_effects.shutdown_sox_effects"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.shutdown_sox_effects()</span></code></a></p>
 </dd></dl>
 
 </div>

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.functional &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.functional &mdash; Torchaudio 0.7.0 documentation</title>
   
 
   
@@ -154,7 +154,7 @@
               
               
                 <div class="version">
-                  master 
+                  0.7.0
                 </div>
               
             
@@ -193,6 +193,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
 </ul>
 
             
@@ -276,7 +287,6 @@
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;istft&quot;</span><span class="p">,</span>
     <span class="s2">&quot;spectrogram&quot;</span><span class="p">,</span>
     <span class="s2">&quot;griffinlim&quot;</span><span class="p">,</span>
     <span class="s2">&quot;amplitude_to_DB&quot;</span><span class="p">,</span>
@@ -311,79 +321,6 @@
     <span class="s1">&#39;sliding_window_cmn&#39;</span><span class="p">,</span>
     <span class="s1">&#39;vad&#39;</span><span class="p">,</span>
 <span class="p">]</span>
-
-
-<div class="viewcode-block" id="istft"><a class="viewcode-back" href="../../functional.html#torchaudio.functional.istft">[docs]</a><span class="k">def</span> <span class="nf">istft</span><span class="p">(</span>
-        <span class="n">stft_matrix</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">hop_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">win_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">window</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">pad_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">onesided</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Inverse short time Fourier Transform. This is expected to be the inverse of torch.stft.</span>
-<span class="sd">    It has the same parameters (+ additional optional parameter of ``length``) and it should return the</span>
-<span class="sd">    least squares estimation of the original signal. The algorithm will check using the NOLA condition (</span>
-<span class="sd">    nonzero overlap).</span>
-
-<span class="sd">    Important consideration in the parameters ``window`` and ``center`` so that the envelop</span>
-<span class="sd">    created by the summation of all the windows is never zero at certain point in time. Specifically,</span>
-<span class="sd">    :math:`\sum_{t=-\infty}^{\infty} w^2[n-t\times hop\_length] \cancel{=} 0`.</span>
-
-<span class="sd">    Since stft discards elements at the end of the signal if they do not fit in a frame, the</span>
-<span class="sd">    istft may return a shorter signal than the original signal (can occur if ``center`` is False</span>
-<span class="sd">    since the signal isn&#39;t padded).</span>
-
-<span class="sd">    If ``center`` is True, then there will be padding e.g. &#39;constant&#39;, &#39;reflect&#39;, etc. Left padding</span>
-<span class="sd">    can be trimmed off exactly because they can be calculated but right padding cannot be calculated</span>
-<span class="sd">    without additional information.</span>
-
-<span class="sd">    Example: Suppose the last window is:</span>
-<span class="sd">    [17, 18, 0, 0, 0] vs [18, 0, 0, 0, 0]</span>
-
-<span class="sd">    The n_frame, hop_length, win_length are all the same which prevents the calculation of right padding.</span>
-<span class="sd">    These additional values could be zeros or a reflection of the signal so providing ``length``</span>
-<span class="sd">    could be useful. If ``length`` is ``None`` then padding will be aggressively removed</span>
-<span class="sd">    (some loss of signal).</span>
-
-<span class="sd">    [1] D. W. Griffin and J. S. Lim, &quot;Signal estimation from modified short-time Fourier transform,&quot;</span>
-<span class="sd">    IEEE Trans. ASSP, vol.32, no.2, pp.236-243, Apr. 1984.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        stft_matrix (Tensor): Output of stft where each row of a channel is a frequency and each</span>
-<span class="sd">            column is a window. It has a size of either (..., fft_size, n_frame, 2)</span>
-<span class="sd">        n_fft (int): Size of Fourier transform</span>
-<span class="sd">        hop_length (int or None, optional): The distance between neighboring sliding window frames.</span>
-<span class="sd">            (Default: ``win_length // 4``)</span>
-<span class="sd">        win_length (int or None, optional): The size of window frame and STFT filter. (Default: ``n_fft``)</span>
-<span class="sd">        window (Tensor or None, optional): The optional window function.</span>
-<span class="sd">            (Default: ``torch.ones(win_length)``)</span>
-<span class="sd">        center (bool, optional): Whether ``input`` was padded on both sides so</span>
-<span class="sd">            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.</span>
-<span class="sd">            (Default: ``True``)</span>
-<span class="sd">        pad_mode: This argument was ignored and to be removed.</span>
-<span class="sd">        normalized (bool, optional): Whether the STFT was normalized. (Default: ``False``)</span>
-<span class="sd">        onesided (bool, optional): Whether the STFT is onesided. (Default: ``True``)</span>
-<span class="sd">        length (int or None, optional): The amount to trim the signal by (i.e. the</span>
-<span class="sd">            original signal length). (Default: whole signal)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Tensor: Least squares estimation of the original signal of size (..., signal_length)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-        <span class="s1">&#39;istft has been moved to PyTorch and will be removed from torchaudio, &#39;</span>
-        <span class="s1">&#39;please use torch.istft instead.&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">pad_mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s1">&#39;The parameter `pad_mode` was ignored in isftft, and is thus being deprecated. &#39;</span>
-            <span class="s1">&#39;Please set `pad_mode` to None to suppress this warning.&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span>
-        <span class="nb">input</span><span class="o">=</span><span class="n">stft_matrix</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span> <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
-        <span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="n">normalized</span><span class="p">,</span> <span class="n">onesided</span><span class="o">=</span><span class="n">onesided</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="spectrogram"><a class="viewcode-back" href="../../functional.html#torchaudio.functional.spectrogram">[docs]</a><span class="k">def</span> <span class="nf">spectrogram</span><span class="p">(</span>
@@ -491,8 +428,8 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">%s</span><span class="s1"> &gt; 1 can be unstable&#39;</span> <span class="o">%</span> <span class="n">momentum</span>
-    <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">%s</span><span class="s1"> &lt; 0&#39;</span> <span class="o">%</span> <span class="n">momentum</span>
+    <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">{}</span><span class="s1"> &gt; 1 can be unstable&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">{}</span><span class="s1"> &lt; 0&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
 
     <span class="c1"># pack batch</span>
     <span class="n">shape</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
@@ -518,12 +455,12 @@
         <span class="n">tprev</span> <span class="o">=</span> <span class="n">rebuilt</span>
 
         <span class="c1"># Invert with our current estimate of the phases</span>
-        <span class="n">inverse</span> <span class="o">=</span> <span class="n">istft</span><span class="p">(</span><span class="n">specgram</span> <span class="o">*</span> <span class="n">angles</span><span class="p">,</span>
-                        <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
-                        <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
-                        <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
-                        <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
-                        <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">inverse</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span><span class="n">specgram</span> <span class="o">*</span> <span class="n">angles</span><span class="p">,</span>
+                              <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+                              <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
+                              <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
+                              <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+                              <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
 
         <span class="c1"># Rebuild the spectrogram</span>
         <span class="n">rebuilt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span><span class="n">inverse</span><span class="p">,</span> <span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="p">,</span> <span class="n">win_length</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span>
@@ -536,12 +473,12 @@
         <span class="n">angles</span> <span class="o">=</span> <span class="n">angles</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">complex_norm</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1e-16</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand_as</span><span class="p">(</span><span class="n">angles</span><span class="p">))</span>
 
     <span class="c1"># Return the final phase estimates</span>
-    <span class="n">waveform</span> <span class="o">=</span> <span class="n">istft</span><span class="p">(</span><span class="n">specgram</span> <span class="o">*</span> <span class="n">angles</span><span class="p">,</span>
-                     <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
-                     <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
-                     <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
-                     <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
-                     <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span><span class="n">specgram</span> <span class="o">*</span> <span class="n">angles</span><span class="p">,</span>
+                           <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+                           <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
+                           <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
+                           <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+                           <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span>
 
     <span class="c1"># unpack batch</span>
     <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
@@ -654,6 +591,13 @@
         <span class="c1"># Slaney-style mel is scaled to be approx constant energy per channel</span>
         <span class="n">enorm</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">f_pts</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="n">n_mels</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">f_pts</span><span class="p">[:</span><span class="n">n_mels</span><span class="p">])</span>
         <span class="n">fb</span> <span class="o">*=</span> <span class="n">enorm</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">fb</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="mf">0.</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;At least one mel filterbank has all zero values. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;The value for `n_mels` (</span><span class="si">{</span><span class="n">n_mels</span><span class="si">}</span><span class="s2">) may be set too high. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Or, the value for `n_freqs` (</span><span class="si">{</span><span class="n">n_freqs</span><span class="si">}</span><span class="s2">) may be set too low.&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fb</span></div>
 
@@ -1603,15 +1547,23 @@
     <span class="n">delay_pos</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">mod_pos</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="n">output_waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">output_waveform_pre_gain_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span> <span class="o">*</span> <span class="n">gain_in</span>
+    <span class="n">delay_buf</span> <span class="o">=</span> <span class="n">delay_buf</span> <span class="o">*</span> <span class="n">decay</span>
+    <span class="n">waveform_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">waveform</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">))]</span>
+    <span class="n">delay_buf_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">delay_buf</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">delay_buf</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">))]</span>
+    <span class="n">mod_buf_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">mod_buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mod_buf</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">))]</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">delay_pos</span> <span class="o">+</span> <span class="n">mod_buf</span><span class="p">[</span><span class="n">mod_pos</span><span class="p">])</span> <span class="o">%</span> <span class="n">delay_buf_len</span><span class="p">)</span>
-        <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="n">waveform</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">gain_in</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">delay_buf</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">decay</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">delay_pos</span> <span class="o">+</span> <span class="n">mod_buf_list</span><span class="p">[</span><span class="n">mod_pos</span><span class="p">])</span> <span class="o">%</span> <span class="n">delay_buf_len</span><span class="p">)</span>
         <span class="n">mod_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">mod_pos</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">mod_buf_len</span>
         <span class="n">delay_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">delay_pos</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">delay_buf_len</span>
-        <span class="n">delay_buf</span><span class="p">[:,</span> <span class="n">delay_pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>
-        <span class="n">output_waveform</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">*</span> <span class="n">gain_out</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="n">waveform_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">delay_buf_list</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="n">delay_buf_list</span><span class="p">[</span><span class="n">delay_pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">*</span> <span class="n">decay</span>
+        <span class="n">output_waveform_pre_gain_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+
+    <span class="n">output_waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">output_waveform_pre_gain_list</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">output_waveform</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">gain_out</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">output_waveform</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">actual_shape</span><span class="p">)</span></div>
 
@@ -1997,9 +1949,10 @@
     <span class="n">error</span> <span class="o">=</span> <span class="n">dithered_waveform</span> <span class="o">-</span> <span class="n">waveform</span>
 
     <span class="c1"># add error[n-1] to dithered_waveform[n], so offset the error by 1 index</span>
+    <span class="n">zeros</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">error</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">error</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]):</span>
         <span class="n">err</span> <span class="o">=</span> <span class="n">error</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-        <span class="n">error_offset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">err</span><span class="p">))</span>
+        <span class="n">error_offset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">zeros</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
         <span class="n">error</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">error_offset</span><span class="p">[:</span><span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">1</span><span class="p">]]</span>
 
     <span class="n">noise_shaped</span> <span class="o">=</span> <span class="n">dithered_waveform</span> <span class="o">+</span> <span class="n">error</span>

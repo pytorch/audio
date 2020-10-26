@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.datasets.librispeech &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.datasets.librispeech &mdash; Torchaudio 0.7.0 documentation</title>
   
 
   
@@ -154,7 +154,7 @@
               
               
                 <div class="version">
-                  master 
+                  0.7.0
                 </div>
               
             
@@ -193,6 +193,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
 </ul>
 
             
@@ -335,9 +346,19 @@
 
 
 <div class="viewcode-block" id="LIBRISPEECH"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.LIBRISPEECH">[docs]</a><span class="k">class</span> <span class="nc">LIBRISPEECH</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create a Dataset for LibriSpeech. Each item is a tuple of the form:</span>
-<span class="sd">    waveform, sample_rate, utterance, speaker_id, chapter_id, utterance_id</span>
+    <span class="sd">&quot;&quot;&quot;Create a Dataset for LibriSpeech.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        root (str): Path to the directory where the dataset is found or downloaded.</span>
+<span class="sd">        url (str, optional): The URL to download the dataset from,</span>
+<span class="sd">            or the type of the dataset to dowload.</span>
+<span class="sd">            Allowed type values are ``&quot;dev-clean&quot;``, ``&quot;dev-other&quot;``, ``&quot;test-clean&quot;``,</span>
+<span class="sd">            ``&quot;test-other&quot;``, ``&quot;train-clean-100&quot;``, ``&quot;train-clean-360&quot;`` and</span>
+<span class="sd">            ``&quot;train-other-500&quot;``. (default: ``&quot;train-clean-100&quot;``)</span>
+<span class="sd">        folder_in_archive (str, optional):</span>
+<span class="sd">            The top-level directory of the dataset. (default: ``&quot;LibriSpeech&quot;``)</span>
+<span class="sd">        download (bool, optional):</span>
+<span class="sd">            Whether to download the dataset if it is not found at root path. (default: ``False``).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_ext_txt</span> <span class="o">=</span> <span class="s2">&quot;.trans.txt&quot;</span>
@@ -384,9 +405,17 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">walker</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<div class="viewcode-block" id="LIBRISPEECH.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.LIBRISPEECH.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            n (int): The index of the sample to be loaded</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: ``(waveform, sample_rate, utterance, speaker_id, chapter_id, utterance_id)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">load_librispeech_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_txt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">load_librispeech_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_txt</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">)</span></div>

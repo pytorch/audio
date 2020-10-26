@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.backend.utils &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.backend.utils &mdash; Torchaudio 0.7.0 documentation</title>
   
 
   
@@ -154,7 +154,7 @@
               
               
                 <div class="version">
-                  master 
+                  0.7.0
                 </div>
               
             
@@ -193,6 +193,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
 </ul>
 
             
@@ -277,6 +288,7 @@
     <span class="n">sox_backend</span><span class="p">,</span>
     <span class="n">sox_io_backend</span><span class="p">,</span>
     <span class="n">soundfile_backend</span><span class="p">,</span>
+    <span class="n">_soundfile_backend</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
@@ -317,11 +329,27 @@
     <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">module</span> <span class="o">=</span> <span class="n">no_backend</span>
     <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;sox&#39;</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s1">&#39;&quot;sox&quot; backend is being deprecated. &#39;</span>
+            <span class="s1">&#39;The default backend will be changed to &quot;sox_io&quot; backend in 0.8.0 and &#39;</span>
+            <span class="s1">&#39;&quot;sox&quot; backend will be removed in 0.9.0. Please migrate to &quot;sox_io&quot; backend. &#39;</span>
+            <span class="s1">&#39;Please refer to https://github.com/pytorch/audio/issues/903 for the detail.&#39;</span><span class="p">)</span>
         <span class="n">module</span> <span class="o">=</span> <span class="n">sox_backend</span>
     <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;sox_io&#39;</span><span class="p">:</span>
         <span class="n">module</span> <span class="o">=</span> <span class="n">sox_io_backend</span>
     <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;soundfile&#39;</span><span class="p">:</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="n">soundfile_backend</span>
+        <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">USE_SOUNDFILE_LEGACY_INTERFACE</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s1">&#39;The interface of &quot;soundfile&quot; backend is planned to change in 0.8.0 to &#39;</span>
+                <span class="s1">&#39;match that of &quot;sox_io&quot; backend and the current interface will be removed in 0.9.0. &#39;</span>
+                <span class="s1">&#39;To use the new interface, do &#39;</span>
+                <span class="s1">&#39;`torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = False` &#39;</span>
+                <span class="s1">&#39;before setting the backend to &quot;soundfile&quot;. &#39;</span>
+                <span class="s1">&#39;Please refer to https://github.com/pytorch/audio/issues/903 for the detail.&#39;</span>
+            <span class="p">)</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">soundfile_backend</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">_soundfile_backend</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected backend &quot;</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
 
@@ -352,7 +380,7 @@
         <span class="k">return</span> <span class="s1">&#39;sox&#39;</span>
     <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="o">==</span> <span class="n">sox_io_backend</span><span class="o">.</span><span class="n">load</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;sox_io&#39;</span>
-    <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="o">==</span> <span class="n">soundfile_backend</span><span class="o">.</span><span class="n">load</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="ow">in</span> <span class="p">[</span><span class="n">soundfile_backend</span><span class="o">.</span><span class="n">load</span><span class="p">,</span> <span class="n">_soundfile_backend</span><span class="o">.</span><span class="n">load</span><span class="p">]:</span>
         <span class="k">return</span> <span class="s1">&#39;soundfile&#39;</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown backend.&#39;</span><span class="p">)</span></div>
 </pre></div>

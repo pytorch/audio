@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio &mdash; Torchaudio master documentation</title>
+  <title>torchaudio &mdash; Torchaudio 0.7.0 documentation</title>
   
 
   
@@ -155,7 +155,7 @@
               
               
                 <div class="version">
-                  master 
+                  0.7.0
                 </div>
               
             
@@ -194,6 +194,17 @@
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
 </ul>
 
             
@@ -268,6 +279,24 @@
               
   <div class="section" id="torchaudio">
 <h1>torchaudio<a class="headerlink" href="#torchaudio" title="Permalink to this headline">¶</a></h1>
+<p>This library is part of the <a class="reference external" href="http://pytorch.org/">PyTorch</a> project. PyTorch is an open source
+machine learning framework.</p>
+<p>Features described in this documentation are classified by release status:</p>
+<blockquote>
+<div><p><em>Stable:</em>  These features will be maintained long-term and there should generally
+be no major performance limitations or gaps in documentation.
+We also expect to maintain backwards compatibility (although
+breaking changes can happen and notice will be given one release ahead
+of time).</p>
+<p><em>Beta:</em>  Features are tagged as Beta because the API may change based on
+user feedback, because the performance needs to improve, or because
+coverage across operators is not yet complete. For Beta features, we are
+committing to seeing the feature through to the Stable classification.
+We are not, however, committing to backwards compatibility.</p>
+<p><em>Prototype:</em>  These features are typically not available as part of
+binary distributions like PyPI or Conda, except sometimes behind run-time
+flags, and are at an early stage for feedback and testing.</p>
+</div></blockquote>
 <p>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio</span></code> package consists of I/O, popular datasets and common audio transformations.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Package Reference</span></p>
@@ -279,14 +308,14 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="backend.html#common-data-structure">Common Data Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="backend.html#sox-backend">Sox Backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#sox-backend-deprecated">Sox Backend (Deprecated)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="backend.html#sox-io-backend">Sox IO Backend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="backend.html#soundfile-backend">Soundfile Backend</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="functional.html">torchaudio.functional</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="functional.html#istft"><span class="hidden-section">istft</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="functional.html#spectrogram"><span class="hidden-section">spectrogram</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="functional.html#amplitude-to-db"><span class="hidden-section">amplitude_to_DB</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="functional.html#create-fb-matrix"><span class="hidden-section">create_fb_matrix</span></a></li>
@@ -350,18 +379,26 @@
 <li class="toctree-l2"><a class="reference internal" href="datasets.html#commonvoice">COMMONVOICE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="datasets.html#gtzan">GTZAN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="datasets.html#librispeech">LIBRISPEECH</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#libritts">LIBRITTS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="datasets.html#ljspeech">LJSPEECH</a></li>
 <li class="toctree-l2"><a class="reference internal" href="datasets.html#speechcommands">SPEECHCOMMANDS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#tedlium">TEDLIUM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="datasets.html#vctk">VCTK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#vctk-092">VCTK_092</a></li>
 <li class="toctree-l2"><a class="reference internal" href="datasets.html#yesno">YESNO</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="models.html#convtasnet"><span class="hidden-section">ConvTasNet</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="models.html#wav2letter"><span class="hidden-section">Wav2Letter</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#wavernn"><span class="hidden-section">WaveRNN</span></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sox_effects.html#soxeffect"><span class="hidden-section">SoxEffect</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="sox_effects.html#resource-initialization-shutdown">Resource initialization / shutdown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sox_effects.html#listing-supported-effects">Listing supported effects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sox_effects.html#applying-effects">Applying effects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sox_effects.html#legacy">Legacy</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a><ul>
@@ -373,6 +410,22 @@
 <li class="toctree-l2"><a class="reference internal" href="kaldi_io.html#matrices">Matrices</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#torchaudio-utils-sox-utils">torchaudio.utils.sox_utils</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
 </ul>
 </div>
 </div>
@@ -418,7 +471,9 @@
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">torchaudio</a></li>
+<li><a class="reference internal" href="#">torchaudio</a><ul>
+</ul>
+</li>
 </ul>
 
             </div>

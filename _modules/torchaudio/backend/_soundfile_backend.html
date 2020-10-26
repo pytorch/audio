@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.backend.sox_io_backend &mdash; Torchaudio 0.7.0 documentation</title>
+  <title>torchaudio.backend._soundfile_backend &mdash; Torchaudio 0.7.0 documentation</title>
   
 
   
@@ -248,7 +248,7 @@
         
           <li><a href="../../torchaudio.html">torchaudio</a> &gt;</li>
         
-      <li>torchaudio.backend.sox_io_backend</li>
+      <li>torchaudio.backend._soundfile_backend</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -276,48 +276,60 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <h1>Source code for torchaudio.backend.sox_io_backend</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+  <h1>Source code for torchaudio.backend._soundfile_backend</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The new soundfile backend which will become default in 0.8.0 onward&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span><span class="p">,</span>
-<span class="p">)</span>
-
+<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
 <span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">AudioMetaData</span>
 
 
-<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">is_module_available</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">soundfile</span>
+
+
+<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend._soundfile_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Get signal information of an audio file.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filepath (str or pathlib.Path):</span>
-<span class="sd">            Path to audio file. This function also handles ``pathlib.Path`` objects,</span>
-<span class="sd">            but is annotated as ``str`` for TorchScript compatibility.</span>
+<span class="sd">        filepath (str or pathlib.Path): Path to audio file.</span>
+<span class="sd">            This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``</span>
+<span class="sd">            for the consistency with &quot;sox_io&quot; backend, which has a restriction on type annotation</span>
+<span class="sd">            for TorchScript compiler compatiblity.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        AudioMetaData: Metadata of the given audio.</span>
+<span class="sd">        AudioMetaData: meta data of the given audio.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Cast to str in case type is `pathlib.Path`</span>
-    <span class="n">filepath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-    <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_get_info</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">(),</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">get_num_frames</span><span class="p">(),</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">get_num_channels</span><span class="p">())</span></div>
+    <span class="n">sinfo</span> <span class="o">=</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">samplerate</span><span class="p">,</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">frames</span><span class="p">,</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">channels</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.load">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<span class="n">_SUBTYPE2DTYPE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;PCM_S8&quot;</span><span class="p">:</span> <span class="s2">&quot;int8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PCM_U8&quot;</span><span class="p">:</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PCM_16&quot;</span><span class="p">:</span> <span class="s2">&quot;int16&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PCM_32&quot;</span><span class="p">:</span> <span class="s2">&quot;int32&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FLOAT&quot;</span><span class="p">:</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DOUBLE&quot;</span><span class="p">:</span> <span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend._soundfile_backend.load">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">load</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">frame_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">frame_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Load audio data from file.</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        This function can handle all the codecs that underlying libsox can handle,</span>
-<span class="sd">        however it is tested on the following formats;</span>
+<span class="sd">        The formats this function can handle depend on the soundfile installation.</span>
+<span class="sd">        This function is tested on the following formats;</span>
 
 <span class="sd">        * WAV</span>
 
@@ -326,15 +338,9 @@
 <span class="sd">            * 16-bit signed integer</span>
 <span class="sd">            * 8-bit unsigned integer</span>
 
-<span class="sd">        * MP3</span>
 <span class="sd">        * FLAC</span>
 <span class="sd">        * OGG/VORBIS</span>
-<span class="sd">        * OPUS</span>
 <span class="sd">        * SPHERE</span>
-
-<span class="sd">        To load ``MP3``, ``FLAC``, ``OGG/VORBIS``, ``OPUS`` and other codecs ``libsox`` does not</span>
-<span class="sd">        handle natively, your installation of ``torchaudio`` has to be linked to ``libsox``</span>
-<span class="sd">        and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.</span>
 
 <span class="sd">    By default (``normalize=True``, ``channels_first=True``), this function returns Tensor with</span>
 <span class="sd">    ``float32`` dtype and the shape of ``[channel, time]``.</span>
@@ -352,9 +358,10 @@
 <span class="sd">    ``[-1.0, 1.0]``.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filepath (str or pathlib.Path):</span>
-<span class="sd">            Path to audio file. This function also handles ``pathlib.Path`` objects, but is</span>
-<span class="sd">            annotated as ``str`` for TorchScript compiler compatibility.</span>
+<span class="sd">        filepath (str or pathlib.Path): Path to audio file.</span>
+<span class="sd">            This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``</span>
+<span class="sd">            for the consistency with &quot;sox_io&quot; backend, which has a restriction on type annotation</span>
+<span class="sd">            for TorchScript compiler compatiblity.</span>
 <span class="sd">        frame_offset (int):</span>
 <span class="sd">            Number of frames to skip before start reading data.</span>
 <span class="sd">        num_frames (int):</span>
@@ -378,25 +385,37 @@
 <span class="sd">            integer type, else ``float32`` type. If ``channels_first=True``, it has</span>
 <span class="sd">            ``[channel, time]`` else ``[time, channel]``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Cast to str in case type is `pathlib.Path`</span>
-    <span class="n">filepath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-    <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_load_audio_file</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_tensor</span><span class="p">(),</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">()</span></div>
+    <span class="k">with</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">SoundFile</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">file_</span><span class="o">.</span><span class="n">format</span> <span class="o">!=</span> <span class="s2">&quot;WAV&quot;</span> <span class="ow">or</span> <span class="n">normalize</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="s2">&quot;float32&quot;</span>
+        <span class="k">elif</span> <span class="n">file_</span><span class="o">.</span><span class="n">subtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_SUBTYPE2DTYPE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported subtype: </span><span class="si">{</span><span class="n">file_</span><span class="o">.</span><span class="n">subtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">_SUBTYPE2DTYPE</span><span class="p">[</span><span class="n">file_</span><span class="o">.</span><span class="n">subtype</span><span class="p">]</span>
+
+        <span class="n">frames</span> <span class="o">=</span> <span class="n">file_</span><span class="o">.</span><span class="n">_prepare_read</span><span class="p">(</span><span class="n">frame_offset</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">)</span>
+        <span class="n">waveform</span> <span class="o">=</span> <span class="n">file_</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">always_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">file_</span><span class="o">.</span><span class="n">samplerate</span>
+
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">channels_first</span><span class="p">:</span>
+        <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span></div>
 
 
-<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.save">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend._soundfile_backend.save">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">save</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">src</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">compression</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">src</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">compression</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Save audio data to file.</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        Supported formats are;</span>
+<span class="sd">        The formats this function can handle depend on the soundfile installation.</span>
+<span class="sd">        This function is tested on the following formats;</span>
 
 <span class="sd">        * WAV</span>
 
@@ -405,61 +424,68 @@
 <span class="sd">            * 16-bit signed integer</span>
 <span class="sd">            * 8-bit unsigned integer</span>
 
-<span class="sd">        * MP3</span>
 <span class="sd">        * FLAC</span>
 <span class="sd">        * OGG/VORBIS</span>
 <span class="sd">        * SPHERE</span>
 
-<span class="sd">        To save ``MP3``, ``FLAC``, ``OGG/VORBIS``, and other codecs ``libsox`` does not</span>
-<span class="sd">        handle natively, your installation of ``torchaudio`` has to be linked to ``libsox``</span>
-<span class="sd">        and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.</span>
-
 <span class="sd">    Args:</span>
-<span class="sd">        filepath (str or pathlib.Path):</span>
-<span class="sd">            Path to save file. This function also handles ``pathlib.Path`` objects, but is annotated</span>
-<span class="sd">            as ``str`` for TorchScript compiler compatibility.</span>
+<span class="sd">        filepath (str or pathlib.Path): Path to audio file.</span>
+<span class="sd">            This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``</span>
+<span class="sd">            for the consistency with &quot;sox_io&quot; backend, which has a restriction on type annotation</span>
+<span class="sd">            for TorchScript compiler compatiblity.</span>
 <span class="sd">        tensor (torch.Tensor): Audio data to save. must be 2D tensor.</span>
 <span class="sd">        sample_rate (int): sampling rate</span>
 <span class="sd">        channels_first (bool):</span>
 <span class="sd">            If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
 <span class="sd">            otherwise ``[time, channel]``.</span>
 <span class="sd">        compression (Optional[float]):</span>
-<span class="sd">            Used for formats other than WAV. This corresponds to ``-C`` option of ``sox`` command.</span>
-
-<span class="sd">                * | ``MP3``: Either bitrate (in ``kbps``) with quality factor, such as ``128.2``, or</span>
-<span class="sd">                  | VBR encoding with quality factor such as ``-4.2``. Default: ``-4.5``.</span>
-<span class="sd">                * | ``FLAC``: compression level. Whole number from ``0`` to ``8``.</span>
-<span class="sd">                  | ``8`` is default and highest compression.</span>
-<span class="sd">                * | ``OGG/VORBIS``: number from ``-1`` to ``10``; ``-1`` is the highest compression</span>
-<span class="sd">                  | and lowest quality. Default: ``3``.</span>
-
-<span class="sd">            See the detail at http://sox.sourceforge.net/soxformat.html.</span>
+<span class="sd">            Not used. It is here only for interface compatibility reson with &quot;sox_io&quot; backend.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Cast to str in case type is `pathlib.Path`</span>
-    <span class="n">filepath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">compression</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">ext</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;wav&#39;</span><span class="p">,</span> <span class="s1">&#39;sph&#39;</span><span class="p">]:</span>
-            <span class="n">compression</span> <span class="o">=</span> <span class="mf">0.</span>
-        <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;mp3&#39;</span><span class="p">:</span>
-            <span class="n">compression</span> <span class="o">=</span> <span class="o">-</span><span class="mf">4.5</span>
-        <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;flac&#39;</span><span class="p">:</span>
-            <span class="n">compression</span> <span class="o">=</span> <span class="mf">8.</span>
-        <span class="k">elif</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ogg&#39;</span><span class="p">,</span> <span class="s1">&#39;vorbis&#39;</span><span class="p">]:</span>
-            <span class="n">compression</span> <span class="o">=</span> <span class="mf">3.</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported file type: &quot;</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
-    <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">TensorSignal</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_save_audio_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">compression</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected 2D Tensor, got </span><span class="si">{</span><span class="n">src</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">D.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">compression</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s1">&#39;`save` function of &quot;soundfile&quot; backend does not support &quot;compression&quot; parameter. &#39;</span>
+            <span class="s2">&quot;The argument is silently ignored.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">ext</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="o">!=</span> <span class="s2">&quot;wav&quot;</span><span class="p">:</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="n">src</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">:</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="s2">&quot;PCM_U8&quot;</span>
+    <span class="k">elif</span> <span class="n">src</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">int16</span><span class="p">:</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="s2">&quot;PCM_16&quot;</span>
+    <span class="k">elif</span> <span class="n">src</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">:</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="s2">&quot;PCM_32&quot;</span>
+    <span class="k">elif</span> <span class="n">src</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="s2">&quot;FLOAT&quot;</span>
+    <span class="k">elif</span> <span class="n">src</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="s2">&quot;DOUBLE&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported dtype for WAV: </span><span class="si">{</span><span class="n">src</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">format_</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># sph is a extension used in TED-LIUM but soundfile does not recognize it as NIST format,</span>
+    <span class="c1"># so we extend the extensions manually here</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;nis&quot;</span><span class="p">,</span> <span class="s2">&quot;nist&quot;</span><span class="p">,</span> <span class="s2">&quot;sph&quot;</span><span class="p">]:</span>
+        <span class="n">format_</span> <span class="o">=</span> <span class="s2">&quot;NIST&quot;</span>
+
+    <span class="k">if</span> <span class="n">channels_first</span><span class="p">:</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+
+    <span class="n">soundfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+        <span class="n">file</span><span class="o">=</span><span class="n">filepath</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="n">samplerate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">format_</span>
+    <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="load_wav"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.load_wav">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
-<span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="s1">&#39;Please use &quot;torchaudio.load&quot;.&#39;</span><span class="p">,</span> <span class="s1">&#39;0.9.0&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="load_wav"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend._soundfile_backend.load_wav">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
+<span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="s1">&#39;Please use &quot;torchaudio.load&quot;.&#39;</span><span class="p">,</span> <span class="s2">&quot;0.9.0&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">load_wav</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">frame_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">frame_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Load wave file.</span>
 
@@ -467,7 +493,13 @@
 <span class="sd">    for simple usecases, such as ``torchaudio.load_wav(filepath)``.</span>
 <span class="sd">    The implementation is same as :py:func:`load`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">load</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="p">,</span>
+        <span class="n">frame_offset</span><span class="p">,</span>
+        <span class="n">num_frames</span><span class="p">,</span>
+        <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">,</span>
+    <span class="p">)</span></div>
 </pre></div>
 
              </article>

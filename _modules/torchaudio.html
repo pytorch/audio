@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio &mdash; Torchaudio master documentation</title>
+  <title>torchaudio &mdash; Torchaudio 0.7.0 documentation</title>
   
 
   
@@ -154,7 +154,7 @@
               
               
                 <div class="version">
-                  master 
+                  0.7.0
                 </div>
               
             
@@ -193,6 +193,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
 </ul>
 
             
@@ -270,9 +281,13 @@
     <span class="n">compliance</span><span class="p">,</span>
     <span class="n">datasets</span><span class="p">,</span>
     <span class="n">kaldi_io</span><span class="p">,</span>
+    <span class="n">utils</span><span class="p">,</span>
     <span class="n">sox_effects</span><span class="p">,</span>
     <span class="n">transforms</span>
 <span class="p">)</span>
+
+<span class="n">USE_SOUNDFILE_LEGACY_INTERFACE</span> <span class="o">=</span> <span class="kc">True</span>
+
 <span class="kn">from</span> <span class="nn">torchaudio.backend</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">list_audio_backends</span><span class="p">,</span>
     <span class="n">get_audio_backend</span><span class="p">,</span>
@@ -299,7 +314,8 @@
 
 <div class="viewcode-block" id="initialize_sox"><a class="viewcode-back" href="../torchaudio.html#torchaudio.initialize_sox">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span>
     <span class="s2">&quot;Please remove the function call to initialize_sox. &quot;</span>
-    <span class="s2">&quot;Resource initialization is now automatically handled.&quot;</span><span class="p">)</span>
+    <span class="s2">&quot;Resource initialization is now automatically handled.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;0.8.0&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">initialize_sox</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Initialize sox effects.</span>
 
@@ -312,7 +328,8 @@
     <span class="s2">&quot;Please remove the function call to torchaudio.shutdown_sox. &quot;</span>
     <span class="s2">&quot;Resource clean up is now automatically handled. &quot;</span>
     <span class="s2">&quot;In the unlikely event that you need to manually shutdown sox, &quot;</span>
-    <span class="s2">&quot;please use torchaudio.sox_effects.shutdown_sox_effects.&quot;</span><span class="p">)</span>
+    <span class="s2">&quot;please use torchaudio.sox_effects.shutdown_sox_effects.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;0.8.0&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">shutdown_sox</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Shutdown sox effects.</span>
 
