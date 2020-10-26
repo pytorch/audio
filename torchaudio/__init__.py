@@ -9,7 +9,7 @@ from torchaudio import (
     transforms
 )
 
-USE_SOUNDFILE_LEGACY_INTERFACE = False
+USE_SOUNDFILE_LEGACY_INTERFACE = None
 
 from torchaudio.backend import (
     list_audio_backends,

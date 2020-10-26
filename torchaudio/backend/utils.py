@@ -42,6 +42,12 @@ def set_audio_backend(backend: Optional[str]):
             One of ``"sox"``, ``"sox_io"`` or ``"soundfile"`` based on availability
             of the system. If ``None`` is provided the  current backend is unassigned.
     """
+    if torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE is not None:
+        warnings.warn(
+            '"torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE" flag is depredated and will be removed in 0.9.0. '
+            'Please remove the use of flag.'
+        )
+
     if backend is not None and backend not in list_audio_backends():
         raise RuntimeError(
             f'Backend "{backend}" is not one of '
