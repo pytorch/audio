@@ -49,8 +49,8 @@ class SPEECHCOMMANDS(Dataset):
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
         subset (Optional[str]):
-            Select a subset of the dataset [None, "training", "validation", "testing"].
-            (default: ``None``)
+            Select a subset of the dataset [None, "training", "validation", "testing"]. None means
+            the whole dataset. (default: ``None``)
     """
 
     def __init__(self,
@@ -90,29 +90,25 @@ class SPEECHCOMMANDS(Dataset):
                     download_url(url, root, hash_value=checksum, hash_type="md5")
                 extract_archive(archive, self._path)
 
-        walker = walk_files(self._path, suffix=".wav", prefix=True)
-        walker = filter(lambda w: HASH_DIVIDER in w and EXCEPT_FOLDER not in w, walker)
-
-        if subset in ["training", "validation"]:
-            filepath = os.path.join(self._path, "validation_list.txt")
-            with open(filepath) as f:
-                validation_list = [os.path.join(self._path, l.strip()) for l in f.readlines()]
-
-        if subset in ["training", "testing"]:
-            filepath = os.path.join(self._path, "testing_list.txt")
-            with open(filepath) as f:
-                testing_list = [os.path.join(self._path, l.strip()) for l in f.readlines()]
+        def _load_list(*filenames):
+            output = []
+            for filename in filenames:
+                filepath = os.path.join(self._path, filename)
+                with open(filepath) as fileobj:
+                    output += [os.path.join(self._path, line.strip()) for line in fileobj]
+            return output
 
         if subset == "validation":
-            walker = validation_list
+            self._walker = _load_list("validation_list.txt")
         elif subset == "testing":
-            walker = testing_list
+            self._walker = _load_list("testing_list.txt")
         elif subset == "training":
-            walker = filter(
-                lambda w: not (w in validation_list or w in testing_list), walker
-            )
-
-        self._walker = list(walker)
+            excludes = set(_load_list("validation_list.txt", "testing_list.txt"))
+            walker = walk_files(self._path, suffix=".wav", prefix=True)
+            self._walker = [w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w and w not in excludes]
+        else:
+            walker = walk_files(self._path, suffix=".wav", prefix=True)
+            self._walker = [w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w]
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:
         """Load the n-th sample from the dataset.

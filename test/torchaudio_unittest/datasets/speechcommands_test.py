@@ -96,15 +96,14 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
                             utterance,
                         )
                         cls.samples.append(sample)
-                        label_filename = os.path.join(label, filename)
-                        if 2 <= j < 4:
-                            valid.write(f'{label_filename}\n')
-                            cls.valid_samples.append(sample)
-                        elif 4 <= j < 6:
-                            test.write(f'{label_filename}\n')
-                            cls.test_samples.append(sample)
-                        else:
+                        if j < 2:
                             cls.train_samples.append(sample)
+                        elif j < 4:
+                            valid.write(f'{label}/{filename}\n')
+                            cls.valid_samples.append(sample)
+                        elif j < 6:
+                            test.write(f'{label}/{filename}\n')
+                            cls.test_samples.append(sample)
 
     def testSpeechCommands(self):
         dataset = speechcommands.SPEECHCOMMANDS(self.root_dir)
@@ -141,7 +140,6 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
 
     def testSpeechCommandsSubsetValid(self):
         dataset = speechcommands.SPEECHCOMMANDS(self.root_dir, subset="validation")
-        print(dataset._path)
 
         num_samples = 0
         for i, (data, sample_rate, label, speaker_id, utterance_number) in enumerate(
@@ -156,9 +154,8 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
 
         assert num_samples == len(self.valid_samples)
 
-    def testSpeechCommandsSubset(self):
+    def testSpeechCommandsSubsetTest(self):
         dataset = speechcommands.SPEECHCOMMANDS(self.root_dir, subset="testing")
-        print(dataset._path)
 
         num_samples = 0
         for i, (data, sample_rate, label, speaker_id, utterance_number) in enumerate(
