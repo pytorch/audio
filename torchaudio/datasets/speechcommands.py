@@ -58,7 +58,7 @@ class SPEECHCOMMANDS(Dataset):
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  download: bool = False,
-                 subset: str = None,
+                 subset: Optional[str] = None,
                  ) -> None:
 
         assert subset is None or subset in ["training", "validation", "testing"], (
