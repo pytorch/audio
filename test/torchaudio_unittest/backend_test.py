@@ -46,7 +46,7 @@ class TestBackendSwitch_soundfile_legacy(BackendSwitchMixin, common_utils.Torcha
         torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = True
 
     def tearDown(self):
-        torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = False
+        torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = None
 
 
 @common_utils.skipIfNoModule('soundfile')
