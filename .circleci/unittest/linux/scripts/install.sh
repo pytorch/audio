@@ -41,10 +41,13 @@ printf "* Installing torchaudio\n"
 BUILD_SOX=1 python setup.py install
 
 # 3. Install Test tools
+printf "* Installing test tools\n"
 if [ "${os}" == Linux ] ; then
     # TODO: move this to docker
     apt install -y -q libsndfile1
+    conda install -y -c conda-forge codecov pytest pytest-cov
+    pip install kaldi-io 'librosa>=0.8.0' parameterized SoundFile scipy
+else
+    pip install kaldi-io SoundFile
+    conda install -y -c conda-forge codecov pytest pytest-cov 'librosa>=0.8.0' parameterized scipy
 fi
-printf "* Installing test tools\n"
-conda install -y -c conda-forge codecov pytest pytest-cov
-pip install kaldi-io 'librosa>=0.8.0' parameterized SoundFile scipy
