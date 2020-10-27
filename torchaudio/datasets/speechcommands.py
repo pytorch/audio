@@ -1,5 +1,5 @@
 import os
-from typing import Tuple
+from typing import Tuple, Optional
 
 import torchaudio
 from torch.utils.data import Dataset
@@ -20,6 +20,15 @@ _CHECKSUMS = {
     "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz":
     "6b74f3901214cb2c2934e98196829835",
 }
+
+
+def _load_list(root, *filenames):
+    output = []
+    for filename in filenames:
+        filepath = os.path.join(root, filename)
+        with open(filepath) as fileobj:
+            output += [os.path.normpath(os.path.join(root, line.strip())) for line in fileobj]
+    return output
 
 
 def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str, str, int]:
@@ -48,13 +57,25 @@ class SPEECHCOMMANDS(Dataset):
             The top-level directory of the dataset. (default: ``"SpeechCommands"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
+        subset (Optional[str]):
+            Select a subset of the dataset [None, "training", "validation", "testing"]. None means
+            the whole dataset. "validation" and "testing" are defined in "validation_list.txt" and
+            "testing_list.txt", respectively, and "training" is the rest. (default: ``None``)
     """
 
     def __init__(self,
                  root: str,
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False) -> None:
+                 download: bool = False,
+                 subset: Optional[str] = None,
+                 ) -> None:
+
+        assert subset is None or subset in ["training", "validation", "testing"], (
+            "When `subset` not None, it must take a value from "
+            + "{'training', 'validation', 'testing'}."
+        )
+
         if url in [
             "speech_commands_v0.01",
             "speech_commands_v0.02",
@@ -79,9 +100,22 @@ class SPEECHCOMMANDS(Dataset):
                     download_url(url, root, hash_value=checksum, hash_type="md5")
                 extract_archive(archive, self._path)
 
-        walker = walk_files(self._path, suffix=".wav", prefix=True)
-        walker = filter(lambda w: HASH_DIVIDER in w and EXCEPT_FOLDER not in w, walker)
-        self._walker = list(walker)
+        if subset == "validation":
+            self._walker = _load_list(self._path, "validation_list.txt")
+        elif subset == "testing":
+            self._walker = _load_list(self._path, "testing_list.txt")
+        elif subset == "training":
+            excludes = set(_load_list(self._path, "validation_list.txt", "testing_list.txt"))
+            walker = walk_files(self._path, suffix=".wav", prefix=True)
+            self._walker = [
+                w for w in walker
+                if HASH_DIVIDER in w
+                and EXCEPT_FOLDER not in w
+                and os.path.normpath(w) not in excludes
+            ]
+        else:
+            walker = walk_files(self._path, suffix=".wav", prefix=True)
+            self._walker = [w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w]
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:
         """Load the n-th sample from the dataset.
