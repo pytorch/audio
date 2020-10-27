@@ -22,6 +22,15 @@ _CHECKSUMS = {
 }
 
 
+def _load_list(root, *filenames):
+    output = []
+    for filename in filenames:
+        filepath = os.path.join(root, filename)
+        with open(filepath) as fileobj:
+            output += [os.path.normpath(os.path.join(root, line.strip())) for line in fileobj]
+    return output
+
+
 def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str, str, int]:
     relpath = os.path.relpath(filepath, path)
     label, filename = os.path.split(relpath)
@@ -90,20 +99,12 @@ class SPEECHCOMMANDS(Dataset):
                     download_url(url, root, hash_value=checksum, hash_type="md5")
                 extract_archive(archive, self._path)
 
-        def _load_list(*filenames):
-            output = []
-            for filename in filenames:
-                filepath = os.path.join(self._path, filename)
-                with open(filepath) as fileobj:
-                    output += [os.path.normpath(os.path.join(self._path, line.strip())) for line in fileobj]
-            return output
-
         if subset == "validation":
-            self._walker = _load_list("validation_list.txt")
+            self._walker = _load_list(self._path, "validation_list.txt")
         elif subset == "testing":
-            self._walker = _load_list("testing_list.txt")
+            self._walker = _load_list(self._path, "testing_list.txt")
         elif subset == "training":
-            excludes = set(_load_list("validation_list.txt", "testing_list.txt"))
+            excludes = set(_load_list(self._path, "validation_list.txt", "testing_list.txt"))
             walker = walk_files(self._path, suffix=".wav", prefix=True)
             self._walker = [
                 w for w in walker
