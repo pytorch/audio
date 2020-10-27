@@ -7,7 +7,6 @@
 
 set -e
 
-this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 root_dir="$(git rev-parse --show-toplevel)"
 conda_dir="${root_dir}/conda"
 env_dir="${root_dir}/env"
@@ -34,9 +33,7 @@ if [ ! -d "${env_dir}" ]; then
 fi
 conda activate "${env_dir}"
 
-# 3. Install Conda dependencies
-printf "* Installing dependencies (except PyTorch)\n"
-conda env update --file "${this_dir}/environment.yml" --prune
+# 3. Install clang-format
 if [ "${os}" == Linux ] ; then
     clangformat_path="${root_dir}/clang-format"
     curl https://oss-clang-format.s3.us-east-2.amazonaws.com/linux64/clang-format-linux64 -o "${clangformat_path}"
