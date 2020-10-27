@@ -59,7 +59,8 @@ class SPEECHCOMMANDS(Dataset):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
         subset (Optional[str]):
             Select a subset of the dataset [None, "training", "validation", "testing"]. None means
-            the whole dataset. (default: ``None``)
+            the whole dataset. "validation" and "testing" are defined in "validation_list.txt" and
+            "testing_list.txt", respectively, and "training" is the rest. (default: ``None``)
     """
 
     def __init__(self,
