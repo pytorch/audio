@@ -95,7 +95,7 @@ class SPEECHCOMMANDS(Dataset):
             for filename in filenames:
                 filepath = os.path.join(self._path, filename)
                 with open(filepath) as fileobj:
-                    output += [os.path.join(self._path, line.strip()) for line in fileobj]
+                    output += [os.path.normpath(os.path.join(self._path, line.strip())) for line in fileobj]
             return output
 
         if subset == "validation":
@@ -105,7 +105,12 @@ class SPEECHCOMMANDS(Dataset):
         elif subset == "training":
             excludes = set(_load_list("validation_list.txt", "testing_list.txt"))
             walker = walk_files(self._path, suffix=".wav", prefix=True)
-            self._walker = [w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w and w not in excludes]
+            self._walker = [
+                w for w in walker
+                if HASH_DIVIDER in w
+                and EXCEPT_FOLDER not in w
+                and os.path.normpath(w) not in excludes
+            ]
         else:
             walker = walk_files(self._path, suffix=".wav", prefix=True)
             self._walker = [w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w]

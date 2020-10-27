@@ -107,7 +107,22 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
 
     def testSpeechCommands(self):
         dataset = speechcommands.SPEECHCOMMANDS(self.root_dir)
-        print(dataset._path)
+
+        num_samples = 0
+        for i, (data, sample_rate, label, speaker_id, utterance_number) in enumerate(
+            dataset
+        ):
+            self.assertEqual(data, self.samples[i][0], atol=5e-5, rtol=1e-8)
+            assert sample_rate == self.samples[i][1]
+            assert label == self.samples[i][2]
+            assert speaker_id == self.samples[i][3]
+            assert utterance_number == self.samples[i][4]
+            num_samples += 1
+
+        assert num_samples == len(self.samples)
+
+    def testSpeechCommandsNone(self):
+        dataset = speechcommands.SPEECHCOMMANDS(self.root_dir, subset=None)
 
         num_samples = 0
         for i, (data, sample_rate, label, speaker_id, utterance_number) in enumerate(
@@ -169,3 +184,11 @@ class TestSpeechCommands(TempDirMixin, TorchaudioTestCase):
             num_samples += 1
 
         assert num_samples == len(self.test_samples)
+
+    def testSpeechCommandsSum(self):
+        dataset_all = speechcommands.SPEECHCOMMANDS(self.root_dir)
+        dataset_train = speechcommands.SPEECHCOMMANDS(self.root_dir, subset="training")
+        dataset_valid = speechcommands.SPEECHCOMMANDS(self.root_dir, subset="validation")
+        dataset_test = speechcommands.SPEECHCOMMANDS(self.root_dir, subset="testing")
+
+        assert len(dataset_train) + len(dataset_valid) + len(dataset_test) == len(dataset_all)
