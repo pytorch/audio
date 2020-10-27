@@ -5,8 +5,6 @@ from .sox_effects import (
     effect_names,
     apply_effects_tensor,
     apply_effects_file,
-    SoxEffect,
-    SoxEffectsChain,
 )
 
 
