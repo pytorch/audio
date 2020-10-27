@@ -34,7 +34,7 @@ fi
 conda activate "${env_dir}"
 
 # 3. Install minimal build tools
-pip install cmake
+pip install cmake ninja
 
 # 4. Buld codecs
 mkdir -p third_party/build
