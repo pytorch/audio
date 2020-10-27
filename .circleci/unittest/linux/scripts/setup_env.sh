@@ -33,17 +33,13 @@ if [ ! -d "${env_dir}" ]; then
 fi
 conda activate "${env_dir}"
 
-# 3. Install clang-format
-if [ "${os}" == Linux ] ; then
-    clangformat_path="${root_dir}/clang-format"
-    curl https://oss-clang-format.s3.us-east-2.amazonaws.com/linux64/clang-format-linux64 -o "${clangformat_path}"
-    chmod +x "${clangformat_path}"
-fi
+# 3. Install minimal build tools
+pip install cmake
 
 # 4. Buld codecs
 mkdir -p third_party/build
 (
     cd third_party/build
-    cmake ..
+    cmake -GNinja ..
     cmake --build .
 )
