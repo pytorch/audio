@@ -92,6 +92,9 @@ def info(filepath: str) -> Tuple[SignalInfo, EncodingInfo]:
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.deprecated(
+    'Please migrate to "sox_io" backend. See https://github.com/pytorch/audio/issues/903 for the detail',
+    '0.9.0')
 def save_encinfo(filepath: str,
                  src: Tensor,
                  channels_first: bool = True,
@@ -163,6 +166,9 @@ def save_encinfo(filepath: str,
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.deprecated(
+    'Please migrate to "sox_io" backend. See https://github.com/pytorch/audio/issues/903 for the detail',
+    '0.9.0')
 def sox_signalinfo_t() -> SignalInfo:
     r"""Create a sox_signalinfo_t object. This object can be used to set the sample
     rate, number of channels, length, bit precision and headroom multiplier
@@ -186,6 +192,9 @@ def sox_signalinfo_t() -> SignalInfo:
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.deprecated(
+    'Please migrate to "sox_io" backend. See https://github.com/pytorch/audio/issues/903 for the detail',
+    '0.9.0')
 def sox_encodinginfo_t() -> EncodingInfo:
     r"""Create a sox_encodinginfo_t object.  This object can be used to set the encoding
     type, bit precision, compression factor, reverse bytes, reverse nibbles,
@@ -224,6 +233,9 @@ def sox_encodinginfo_t() -> EncodingInfo:
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.deprecated(
+    'Please migrate to "sox_io" backend. See https://github.com/pytorch/audio/issues/903 for the detail',
+    '0.9.0')
 def get_sox_encoding_t(i: int = None) -> EncodingInfo:
     r"""Get enum of sox_encoding_t for sox encodings.
 
@@ -242,6 +254,9 @@ def get_sox_encoding_t(i: int = None) -> EncodingInfo:
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.deprecated(
+    'Please migrate to "sox_io" backend. See https://github.com/pytorch/audio/issues/903 for the detail',
+    '0.9.0')
 def get_sox_option_t(i: int = 2) -> Any:
     r"""Get enum of sox_option_t for sox encodinginfo options.
 
@@ -259,6 +274,9 @@ def get_sox_option_t(i: int = 2) -> Any:
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.deprecated(
+    'Please migrate to "sox_io" backend. See https://github.com/pytorch/audio/issues/903 for the detail',
+    '0.9.0')
 def get_sox_bool(i: int = 0) -> Any:
     r"""Get enum of sox_bool for sox encodinginfo options.
 
