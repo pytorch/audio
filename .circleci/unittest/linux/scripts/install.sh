@@ -42,5 +42,5 @@ BUILD_SOX=1 python setup.py install
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
-conda install -y -c conda-forge pytest pytest-cov codecov 'librosa>=0.8.0' scipy parameterized
-pip install kaldi-io soundfile
+conda install -y -c conda-forge codecov pytest pytest-cov
+pip install kaldi-io 'librosa>=0.8.0' parameterized PySoundFile scipy
