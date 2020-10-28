@@ -48,6 +48,6 @@ if [ "${os}" == Linux ] ; then
     conda install -y -c conda-forge codecov pytest pytest-cov
     pip install kaldi-io 'librosa>=0.8.0' parameterized SoundFile scipy
 else
-    pip install kaldi-io SoundFile
-    conda install -y -c conda-forge codecov pytest pytest-cov 'librosa>=0.8.0' parameterized scipy
+    conda install -y -c conda-forge codecov pytest pytest-cov parameterized scipy
+    pip install kaldi-io 'librosa>=0.8.0' SoundFile
 fi
