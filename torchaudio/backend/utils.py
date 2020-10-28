@@ -42,6 +42,12 @@ def set_audio_backend(backend: Optional[str]):
             One of ``"sox"``, ``"sox_io"`` or ``"soundfile"`` based on availability
             of the system. If ``None`` is provided the  current backend is unassigned.
     """
+    if torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE is not None:
+        warnings.warn(
+            '"torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE" flag is depredated and will be removed in 0.9.0. '
+            'Please remove the use of flag.'
+        )
+
     if backend is not None and backend not in list_audio_backends():
         raise RuntimeError(
             f'Backend "{backend}" is not one of '
@@ -51,22 +57,17 @@ def set_audio_backend(backend: Optional[str]):
         module = no_backend
     elif backend == 'sox':
         warnings.warn(
-            '"sox" backend is being deprecated. '
-            'The default backend will be changed to "sox_io" backend in 0.8.0 and '
-            '"sox" backend will be removed in 0.9.0. Please migrate to "sox_io" backend. '
-            'Please refer to https://github.com/pytorch/audio/issues/903 for the detail.')
+            '"sox" backend is depredated and will be removed in 0.9.0. '
+            'Please use "sox_io" backend.'
+        )
         module = sox_backend
     elif backend == 'sox_io':
         module = sox_io_backend
     elif backend == 'soundfile':
         if torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE:
             warnings.warn(
-                'The interface of "soundfile" backend is planned to change in 0.8.0 to '
-                'match that of "sox_io" backend and the current interface will be removed in 0.9.0. '
-                'To use the new interface, do '
-                '`torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = False` '
-                'before setting the backend to "soundfile". '
-                'Please refer to https://github.com/pytorch/audio/issues/903 for the detail.'
+                'The legacy interface of "soundfile" backend is depredated and will be removed in 0.9.0. '
+                'Please migrate to the new interface.'
             )
             module = soundfile_backend
         else:
@@ -81,7 +82,7 @@ def set_audio_backend(backend: Optional[str]):
 def _init_audio_backend():
     backends = list_audio_backends()
     if 'sox' in backends:
-        set_audio_backend('sox')
+        set_audio_backend('sox_io')
     elif 'soundfile' in backends:
         set_audio_backend('soundfile')
     else:
