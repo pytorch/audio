@@ -399,14 +399,14 @@ jobs:
       - restore_cache:
 
           keys:
-            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
@@ -442,14 +442,14 @@ jobs:
       - restore_cache:
 
           keys:
-            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
@@ -480,14 +480,14 @@ jobs:
       - restore_cache:
 
           keys:
-            - env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+            - env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+          key: env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
@@ -517,14 +517,14 @@ jobs:
       - restore_cache:
 
           keys:
-            - env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+            - env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+          key: env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
@@ -556,14 +556,14 @@ jobs:
       - restore_cache:
 
           keys:
-            - env-v3-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+            - env-v3-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v3-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+          key: env-v3-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda
@@ -595,14 +595,14 @@ jobs:
       - restore_cache:
 
           keys:
-            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
 
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
 
-          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
 
           paths:
             - conda

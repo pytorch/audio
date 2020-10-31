@@ -2,9 +2,20 @@
 
 set -u
 
-eval "$(./conda/bin/conda shell.bash hook)"
-conda activate ./env
+root_dir="$(git rev-parse --show-toplevel)"
+conda_dir="${root_dir}/conda"
+env_dir="${root_dir}/env"
 
+eval "$("${conda_dir}/bin/conda" shell.bash hook)"
+conda activate "${env_dir}"
+
+# 1. Install tools
+conda install flake8
+clangformat_path="${root_dir}/clang-format"
+curl https://oss-clang-format.s3.us-east-2.amazonaws.com/linux64/clang-format-linux64 -o "${clangformat_path}"
+chmod +x "${clangformat_path}"
+
+# 2. Run style checks
 # We want to run all the style checks even if one of them fail.
 
 exit_status=0
