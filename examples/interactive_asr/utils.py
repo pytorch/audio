@@ -124,7 +124,7 @@ def setup_asr(args, logger):
     check_args(args)
     import_user_module(args)
 
-    if args.max_tokens is None and args.max_sentences is None:
+    if args.max_tokens is None and args.batch_size is None:
         args.max_tokens = 30000
     logger.info(args)
 
