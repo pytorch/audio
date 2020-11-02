@@ -7,7 +7,6 @@
 
 set -e
 
-this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 root_dir="$(git rev-parse --show-toplevel)"
 conda_dir="${root_dir}/conda"
 env_dir="${root_dir}/env"
@@ -34,17 +33,13 @@ if [ ! -d "${env_dir}" ]; then
 fi
 conda activate "${env_dir}"
 
-# 3. Install Conda dependencies
-printf "* Installing dependencies (except PyTorch)\n"
-conda env update --file "${this_dir}/environment.yml" --prune
-if [ "${os}" == Linux ] ; then
-    pip install clang-format
-fi
+# 3. Install minimal build tools
+pip install cmake ninja
 
 # 4. Buld codecs
 mkdir -p third_party/build
 (
     cd third_party/build
-    cmake ..
+    cmake -GNinja ..
     cmake --build .
 )

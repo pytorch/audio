@@ -43,44 +43,21 @@ _RELEASE_CONFIGS = {
 
 class TEDLIUM(Dataset):
     """
-    Create a Dataset for Tedlium. It supports releases 1,2 and 3, each item is a list containings:
-    [waveform, sample_rate, transcript, talk_id, speaker_id, identifier].
-
-    Constructor arguments:
+    Create a Dataset for Tedlium. It supports releases 1,2 and 3.
 
     Args:
-        root (str): Path containing dataset or target path where its downloaded if needed
-        release (str, optional): TEDLIUM identifier (release1,release2,release3). Defaults to RELEASE.
-        subset (str, optional): train/dev/test for releases 1&2, None for release3. Defaults to Train/None
-        download (bool, optional): Download dataset in case is not founded in root path. Defaults to False.
-        audio_ext (str, optional): Overwrite audio extension when loading items. Defaults to ".sph".
-
-    Special functions:
-
-    _load_tedlium_item: Loads a TEDLIUM dataset sample given a file name and corresponding sentence name
-
-    _load_audio: Default load function used in TEDLIUM dataset, you can overwrite this function to customize
-                 functionality and load individual sentences from a full ted audio talk file
-
-    get_phoneme_dict: Returns the phoneme dictionary of a TEDLIUM release
-
+        root (str): Path to the directory where the dataset is found or downloaded.
+        release (str, optional): Release version.
+            Allowed values are ``"release1"``, ``"release2"`` or ``"release3"``.
+            (default: ``"release1"``).
+        subset (str, optional): The subset of dataset to use. Valid options are ``"train"``, ``"dev"``,
+            and ``"test"`` for releases 1&2, ``None`` for release3. Defaults to ``"train"`` or ``None``.
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
-
     def __init__(
         self, root: str, release: str = "release1", subset: str = None, download: bool = False, audio_ext=".sph"
     ) -> None:
-        """Constructor for TEDLIUM dataset.
-
-        Args:
-            root (str): Path containing dataset or target path where its downloaded if needed
-            release (str, optional): TEDLIUM identifier (release1,release2,release3). Defaults to RELEASE.
-            subset (str, optional): train/dev/test for releases 1&2, None for release3. Defaults to Train/None
-            download (bool, optional): Download dataset in case is not founded in root path. Defaults to False.
-            audio_ext (str, optional): Overwrite audio extension when loading items. Defaults to ".sph".
-
-        Raises:
-            RuntimeError: If release identifier does not match any supported release,
-        """
         self._ext_audio = audio_ext
         if release in _RELEASE_CONFIGS.keys():
             folder_in_archive = _RELEASE_CONFIGS[release]["folder_in_archive"]
@@ -140,7 +117,7 @@ class TEDLIUM(Dataset):
             path (str): Dataset root path
 
         Returns:
-            Tedlium_item: A namedTuple containing [waveform, sample_rate, transcript, talk_id, speaker_id, identifier]
+            tuple: ``(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)``
         """
         transcript_path = os.path.join(path, "stm", fileid)
         with open(transcript_path + ".stm") as f:
@@ -166,19 +143,23 @@ class TEDLIUM(Dataset):
         """
         start_time = int(float(start_time) * sample_rate)
         end_time = int(float(end_time) * sample_rate)
-        if torchaudio.get_audio_backend() == "sox_io":
-            return torchaudio.load(path, frame_offset=start_time, num_frames=end_time - start_time)
-        return torchaudio.load(path)[:, start_time:end_time]
+
+        backend = torchaudio.get_audio_backend()
+        if backend == "sox" or (backend == "soundfile" and torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE):
+            kwargs = {"offset": start_time, "num_frames": end_time - start_time}
+        else:
+            kwargs = {"frame_offset": start_time, "num_frames": end_time - start_time}
+
+        return torchaudio.load(path, **kwargs)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
-        """TEDLIUM dataset custom function overwritting default loadbehaviour
-        Loads a TEDLIUM sample given a index N.
+        """Load the n-th sample from the dataset.
 
         Args:
-            n (int): Index of sample to be loaded
+            n (int): The index of the sample to be loaded
 
         Returns:
-            Tedlium_item: A namedTuple containing [waveform, sample_rate, transcript, talk_id, speaker_id, identifier]
+            tuple: ``(waveform, sample_rate, transcript, talk_id, speaker_id, identifier)``
         """
         fileid, line = self._filelist[n]
         return self._load_tedlium_item(fileid, line, self._path)
@@ -193,10 +174,8 @@ class TEDLIUM(Dataset):
 
     @property
     def phoneme_dict(self):
-        """Returns the phoneme dictionary of a TEDLIUM release.
-
-        Returns:
-            dictionary: Phoneme dictionary for the current tedlium release
+        """dict[str, tuple[str]]: Phonemes. Mapping from word to tuple of phonemes.
+        Note that some words have empty phonemes.
         """
         # Read phoneme dictionary
         if not self._phoneme_dict:

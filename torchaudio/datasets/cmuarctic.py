@@ -76,9 +76,20 @@ def load_cmuarctic_item(line: str,
 
 
 class CMUARCTIC(Dataset):
-    """
-    Create a Dataset for CMU_arctic. Each item is a tuple of the form:
-    waveform, sample_rate, utterance, utterance_id
+    """Create a Dataset for CMU_ARCTIC.
+
+    Args:
+        root (str): Path to the directory where the dataset is found or downloaded.
+        url (str, optional):
+            The URL to download the dataset from or the type of the dataset to dowload.
+            (default: ``"aew"``)
+            Allowed type values are ``"aew"``, ``"ahw"``, ``"aup"``, ``"awb"``, ``"axb"``, ``"bdl"``,
+            ``"clb"``, ``"eey"``, ``"fem"``, ``"gka"``, ``"jmk"``, ``"ksp"``, ``"ljm"``, ``"lnh"``,
+            ``"rms"``, ``"rxr"``, ``"slp"`` or ``"slt"``.
+        folder_in_archive (str, optional):
+            The top-level directory of the dataset. (default: ``"ARCTIC"``)
+        download (bool, optional):
+            Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
 
     _file_text = "txt.done.data"
@@ -143,6 +154,14 @@ class CMUARCTIC(Dataset):
             self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            tuple: ``(waveform, sample_rate, utterance, utterance_id)``
+        """
         line = self._walker[n]
         return load_cmuarctic_item(line, self._path, self._folder_audio, self._ext_audio)
 

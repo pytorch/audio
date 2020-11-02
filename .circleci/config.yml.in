@@ -34,7 +34,7 @@ commands:
           command: |
             our_upload_channel=nightly
             # On tags upload to test instead
-            if [[ -n "${CIRCLE_TAG}" ]]; then
+            if [[ -n "${CIRCLE_TAG}" ]] || [[ ${CIRCLE_BRANCH} =~ release/* ]]; then
               our_upload_channel=test
             fi
             echo "export UPLOAD_CHANNEL=${our_upload_channel}" >> ${BASH_ENV}
@@ -296,12 +296,13 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/workspace
+      - designate_upload_channel
       - run:
           name: install binaries
           command: |
             set -x
             source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
-            pip install $(ls ~/workspace/torchaudio*.whl) -f https://download.pytorch.org/whl/nightly/torch_nightly.html -f https://download.pytorch.org/whl/test/torch_test.html
+            pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
       - run:
           name: smoke test
           command: |
@@ -315,6 +316,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/workspace
+      - designate_upload_channel
       - run:
           name: install binaries
           command: |
@@ -323,7 +325,7 @@ jobs:
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
-            conda install -v -y -c pytorch-test -c pytorch-nightly pytorch
+            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch
             conda install -v -y $(ls ~/workspace/torchaudio*.tar.bz2)
       - run:
           name: smoke test
@@ -339,6 +341,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/workspace
+      - designate_upload_channel
       - run:
           name: install binaries
           command: |
@@ -347,7 +350,7 @@ jobs:
             conda env remove -n python${PYTHON_VERSION} || true
             conda create -yn python${PYTHON_VERSION} python=${PYTHON_VERSION}
             conda activate python${PYTHON_VERSION}
-            pip install $(ls ~/workspace/torchaudio*.whl) -f https://download.pytorch.org/whl/nightly/torch_nightly.html -f https://download.pytorch.org/whl/test/torch_test.html
+            pip install $(ls ~/workspace/torchaudio*.whl) -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
       - run:
           name: smoke test
           command: |
@@ -391,18 +394,19 @@ jobs:
       - checkout
       - attach_workspace:
           at: third_party
+      - designate_upload_channel
       - generate_cache_key
       - restore_cache:
           {% raw %}
           keys:
-            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
@@ -433,18 +437,19 @@ jobs:
       - checkout
       - attach_workspace:
           at: third_party
+      - designate_upload_channel
       - generate_cache_key
       - restore_cache:
           {% raw %}
           keys:
-            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Setup
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
@@ -470,18 +475,19 @@ jobs:
       name: windows-cpu
     steps:
       - checkout
+      - designate_upload_channel
       - generate_cache_key
       - restore_cache:
           {% raw %}
           keys:
-            - env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+            - env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+          key: env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
@@ -506,18 +512,19 @@ jobs:
       CUDA_VERSION: "10.1"
     steps:
       - checkout
+      - designate_upload_channel
       - generate_cache_key
       - restore_cache:
           {% raw %}
           keys:
-            - env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+            - env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+          key: env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
@@ -544,18 +551,19 @@ jobs:
       - install_build_tools_macos
       - attach_workspace:
           at: third_party
+      - designate_upload_channel
       - generate_cache_key
       - restore_cache:
           {% raw %}
           keys:
-            - env-v3-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+            - env-v3-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v3-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+          key: env-v3-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
@@ -582,18 +590,19 @@ jobs:
     resource_class: medium
     steps:
       - checkout
+      - designate_upload_channel
       - generate_cache_key
       - restore_cache:
           {% raw %}
           keys:
-            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/environment.yml" }}-{{ checksum ".cachekey" }}
+          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
