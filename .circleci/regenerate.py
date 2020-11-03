@@ -147,8 +147,8 @@ def unittest_workflows(indentation=6):
                     "python_version": python_version,
                 }
 
-                if device_type == 'gpu':
-                    job['filters'] = gen_filter_branch_tree('master', 'nightly', 'release/*')
+                # if device_type == 'gpu':
+                #     job['filters'] = gen_filter_branch_tree('master', 'nightly', 'release/*')
 
                 if os_type != "windows":
                     job['requires'] = ['download_third_parties_nix']
