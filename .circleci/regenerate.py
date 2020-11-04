@@ -21,6 +21,8 @@ import os.path
 
 PYTHON_VERSIONS = ["3.6", "3.7", "3.8"]
 
+DOC_VERSION = ('linux', '3.8')
+
 
 def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
     w = []
@@ -30,6 +32,7 @@ def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
             for python_version in PYTHON_VERSIONS:
                 w += build_workflow_pair(btype, os_type, python_version, filter_branch, prefix, upload)
 
+    w += build_doc_job(filter_branch)
     return indent(indentation, w)
 
 
@@ -67,6 +70,16 @@ def build_workflow_pair(btype, os_type, python_version, filter_branch, prefix=''
 
     return w
 
+def build_doc_job(filter_branch):
+    job = {
+        "name": "build_docs",
+        "python_version": "3.8",
+    }
+
+    if filter_branch:
+        job["filters"] = gen_filter_branch_tree(filter_branch)
+    return [{"build_docs": job}]
+
 
 def generate_base_workflow(base_workflow_name, python_version, filter_branch, os_type, btype):
 
@@ -81,7 +94,7 @@ def generate_base_workflow(base_workflow_name, python_version, filter_branch, os
     if filter_branch:
         d["filters"] = gen_filter_branch_tree(filter_branch)
 
-    return {"binary_{os_type}_{btype}".format(os_type=os_type, btype=btype): d}
+    return {f"binary_{os_type}_{btype}": d}
 
 
 def gen_filter_branch_tree(*branches):
