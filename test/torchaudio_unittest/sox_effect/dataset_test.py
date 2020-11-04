@@ -1,3 +1,6 @@
+import sys
+import platform
+from unittest import skipIf
 from typing import List, Tuple
 
 import numpy as np
@@ -68,6 +71,13 @@ def init_random_seed(worker_id):
 
 
 @skipIfNoExtension
+@skipIf(
+    platform.system() == 'Darwin' and
+    sys.version_info.major == 3 and
+    sys.version_info.minor in [6, 7],
+    'This test is known to get stuck for macOS with Python < 3.8. '
+    'See https://github.com/pytorch/pytorch/issues/46409'
+)
 class TestSoxEffectsDataset(TempDirMixin, PytorchTestCase):
     """Test `apply_effects_file` in multi-process dataloader setting"""
 
