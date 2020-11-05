@@ -34,7 +34,15 @@ def _load_list(root, *filenames):
 def load_speechcommands_item(filepath: str, path: str) -> Tuple[Tensor, int, str, str, int]:
     relpath = os.path.relpath(filepath, path)
     label, filename = os.path.split(relpath)
+    # Besides the officially supported split method for datasets defined by "validation_list.txt"
+    # and "testing_list.txt" over "speech_commands_v0.0x.tar.gz" archives, an alternative split
+    # method referred to in paragraph 2-3 of Section 7.1, references 13 and 14 of the original
+    # paper, and the checksums file from the tensorflow_datasets package [1] is also supported.
+    # Some filenames in those "speech_commands_test_set_v0.0x.tar.gz" archives have the form
+    # "xxx.wav.wav", so file extensions twice needs to be stripped twice.
+    # [1] https://github.com/tensorflow/datasets/blob/master/tensorflow_datasets/url_checksums/speech_commands.txt
     speaker, _ = os.path.splitext(filename)
+    speaker, _ = os.path.splitext(speaker)
 
     speaker_id, utterance_number = speaker.split(HASH_DIVIDER)
     utterance_number = int(utterance_number)
@@ -60,7 +68,10 @@ class SPEECHCOMMANDS(Dataset):
         subset (Optional[str]):
             Select a subset of the dataset [None, "training", "validation", "testing"]. None means
             the whole dataset. "validation" and "testing" are defined in "validation_list.txt" and
-            "testing_list.txt", respectively, and "training" is the rest. (default: ``None``)
+            "testing_list.txt", respectively, and "training" is the rest. Details for the files
+            "validation_list.txt" and "testing_list.txt" are explained in the README of the dataset
+            and in the introduction of Section 7 of the original paper and its reference 12. The
+            original paper can be found here: https://arxiv.org/pdf/1804.03209.pdf (default: ``None``)
     """
 
     def __init__(self,
