@@ -42,7 +42,8 @@ def spectrogram(
         normalized: bool,
         center: bool = True,
         pad_mode: str = "reflect",
-        onesided: bool = True
+        onesided: bool = True,
+        return_complex: bool = False,
 ) -> Tensor:
     r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
@@ -65,12 +66,22 @@ def spectrogram(
             :attr:`center` is ``True``. Default: ``"reflect"``
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy. Default: ``True``
+        return_complex (bool, optional):
+            ``return_complex = True``, this function returns the resulting Tensor in
+            complex dtype, otherwise it returns the resulting Tensor in real dtype with extra
+            dimension for real and imaginary parts. (see ``torch.view_as_real``).
+            When ``power`` is provided, the value must be False, as the resulting
+            Tensor represents real-valued power.
 
     Returns:
         Tensor: Dimension (..., freq, time), freq is
         ``n_fft // 2 + 1`` and ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frame).
     """
+    if power is not None and return_complex:
+        raise ValueError(
+            'When `power` is provided, the return value is real-valued. '
+            'Therefore, `return_complex` must be False.')
 
     if pad > 0:
         # TODO add "with torch.no_grad():" back when JIT supports it
@@ -103,7 +114,9 @@ def spectrogram(
         if power == 1.0:
             return spec_f.abs()
         return spec_f.abs().pow(power)
-    return torch.view_as_real(spec_f)
+    if not return_complex:
+        return torch.view_as_real(spec_f)
+    return spec_f
 
 
 def griffinlim(

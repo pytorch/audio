@@ -54,6 +54,12 @@ class Spectrogram(torch.nn.Module):
             :attr:`center` is ``True``. Default: ``"reflect"``
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy Default: ``True``
+        return_complex (bool, optional):
+            ``return_complex = True``, this function returns the resulting Tensor in
+            complex dtype, otherwise it returns the resulting Tensor in real dtype with extra
+            dimension for real and imaginary parts. (see ``torch.view_as_real``).
+            When ``power`` is provided, the value must be False, as the resulting
+            Tensor represents real-valued power.
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -68,7 +74,8 @@ class Spectrogram(torch.nn.Module):
                  wkwargs: Optional[dict] = None,
                  center: bool = True,
                  pad_mode: str = "reflect",
-                 onesided: bool = True) -> None:
+                 onesided: bool = True,
+                 return_complex: bool = False) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -83,6 +90,7 @@ class Spectrogram(torch.nn.Module):
         self.center = center
         self.pad_mode = pad_mode
         self.onesided = onesided
+        self.return_complex = return_complex
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -105,7 +113,8 @@ class Spectrogram(torch.nn.Module):
             self.normalized,
             self.center,
             self.pad_mode,
-            self.onesided
+            self.onesided,
+            self.return_compex,
         )
 
 
@@ -430,7 +439,8 @@ class MelSpectrogram(torch.nn.Module):
                  window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: Optional[float] = 2.,
                  normalized: bool = False,
-                 wkwargs: Optional[dict] = None) -> None:
+                 wkwargs: Optional[dict] = None,
+                 return_complex: bool = False) -> None:
         super(MelSpectrogram, self).__init__()
         self.sample_rate = sample_rate
         self.n_fft = n_fft
@@ -442,10 +452,16 @@ class MelSpectrogram(torch.nn.Module):
         self.n_mels = n_mels  # number of mel frequency bins
         self.f_max = f_max
         self.f_min = f_min
-        self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
-                                       hop_length=self.hop_length,
-                                       pad=self.pad, window_fn=window_fn, power=self.power,
-                                       normalized=self.normalized, wkwargs=wkwargs)
+        self.spectrogram = Spectrogram(
+            n_fft=self.n_fft,
+            win_length=self.win_length,
+            hop_length=self.hop_length,
+            pad=self.pad,
+            window_fn=window_fn,
+            power=self.power,
+            normalized=self.normalized,
+            wkwargs=wkwargs,
+            return_complex=return_complex,)
         self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1)
 
     def forward(self, waveform: Tensor) -> Tensor:
