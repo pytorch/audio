@@ -32,7 +32,8 @@ def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
             for python_version in PYTHON_VERSIONS:
                 w += build_workflow_pair(btype, os_type, python_version, filter_branch, prefix, upload)
 
-    w += build_doc_job(filter_branch)
+    if filter_branch == 'nightly':
+        w += build_doc_job(filter_branch)
     return indent(indentation, w)
 
 
@@ -74,6 +75,7 @@ def build_doc_job(filter_branch):
     job = {
         "name": "build_docs",
         "python_version": "3.8",
+        "requires": ["nightly_binary_linux_conda_py3.8_upload",],
     }
 
     if filter_branch:

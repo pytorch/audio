@@ -650,59 +650,27 @@ jobs:
             .circleci/torchscript_bc_test/setup_master_envs.sh
             .circleci/torchscript_bc_test/validate_objects.sh
   build_docs:
-    <<: *binary_common
-    docker:
-      - image: "pytorch/torchaudio_unittest_base:manylinux"
-    resource_class: medium
+    <<: *smoke_test_common
     steps:
-    - checkout
-    - attach_workspace:
-        at: third_party
-    - designate_upload_channel
-    - generate_cache_key
-    - restore_cache:
-        {% raw %}
-        keys:
-          - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
-        {% endraw %}
-    - run:
-        name: Setup
-        command: .circleci/unittest/linux/scripts/setup_env.sh
-    - save_cache:
-        {% raw %}
-        key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
-        {% endraw %}
-        paths:
-          - conda
-          - env
-          - third_party/build
-          - third_party/install
-          - third_party/src
-    - run:
-        name: Install torchaudio
-        command: .circleci/unittest/linux/scripts/install.sh
-    - run:
-        name: Build docs
-        command: .circleci/unittest/linux/scripts/run_test.sh
-    - run:
-        name: Upload docs
-        command: |
-          tag=${CIRCLE_TAG:1:5}
-          target=${tag:-master}
-          echo "committing docs to ${target}"
-          git checkout gh-pages
-          rm -rf docs/$target/*
-          cp -r doc/build/html/* docs/$target
-          if [ $target == "master" ]; then
-              rm -rf docs/_static/*
-              cp -r doc/build/html/_static/* docs/_static
-          fi
-          git add docs || true
-          git config user.email "soumith+bot@pytorch.org"
-          git config user.name "pytorchbot"
-          # If there aren't changes, don't make a commit; push is no-op
-          git commit -m "auto-generating sphinx docs" || true
-          git push -u origin gh-pages
+      - attach_workspace:
+          at: ~/workspace
+      - designate_upload_channel
+      - run:
+          name: install binaries
+          command: |
+            set -x
+            source /usr/local/etc/profile.d/conda.sh && conda activate python${PYTHON_VERSION}
+            conda install -v -y -c pytorch-${UPLOAD_CHANNEL} pytorch
+            conda install -v -y -c file://$HOME/workspace/conda-bld torchaudio
+      - run:
+          name: Build docs
+          command: .circleci/build_docs/build_docs.sh
+      - run:
+          name: Upload docs
+          command: |
+            tag=${CIRCLE_TAG:1:5}
+            target=${tag:-master}
+            .circleci/build_docs/commit_docs.sh $target
 
 workflows:
   build:
