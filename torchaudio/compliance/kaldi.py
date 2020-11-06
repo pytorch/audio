@@ -2,8 +2,10 @@ from typing import Tuple
 
 import math
 import torch
-import torchaudio
 from torch import Tensor
+
+import torchaudio
+import torchaudio._internal.fft
 
 __all__ = [
     'get_mel_banks',
@@ -289,10 +291,10 @@ def spectrogram(waveform: Tensor,
         snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient)
 
     # size (m, padded_window_size // 2 + 1, 2)
-    fft = torch.rfft(strided_input, 1, normalized=False, onesided=True)
+    fft = torchaudio._internal.fft.rfft(strided_input)
 
     # Convert the FFT into a power spectrum
-    power_spectrum = torch.max(fft.pow(2).sum(2), epsilon).log()  # size (m, padded_window_size // 2 + 1)
+    power_spectrum = torch.max(fft.abs().pow(2.), epsilon).log()  # size (m, padded_window_size // 2 + 1)
     power_spectrum[:, 0] = signal_log_energy
 
     power_spectrum = _subtract_column_mean(power_spectrum, subtract_mean)
@@ -570,12 +572,10 @@ def fbank(waveform: Tensor,
         waveform, padded_window_size, window_size, window_shift, window_type, blackman_coeff,
         snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient)
 
-    # size (m, padded_window_size // 2 + 1, 2)
-    fft = torch.rfft(strided_input, 1, normalized=False, onesided=True)
-
-    power_spectrum = fft.pow(2).sum(2)  # size (m, padded_window_size // 2 + 1)
-    if not use_power:
-        power_spectrum = power_spectrum.pow(0.5)
+    # size (m, padded_window_size // 2 + 1)
+    spectrum = torchaudio._internal.fft.rfft(strided_input).abs()
+    if use_power:
+        spectrum = spectrum.pow(2.)
 
     # size (num_mel_bins, padded_window_size // 2)
     mel_energies, _ = get_mel_banks(num_mel_bins, padded_window_size, sample_frequency,
@@ -586,7 +586,7 @@ def fbank(waveform: Tensor,
     mel_energies = torch.nn.functional.pad(mel_energies, (0, 1), mode='constant', value=0)
 
     # sum with mel fiterbanks over the power spectrum, size (m, num_mel_bins)
-    mel_energies = torch.mm(power_spectrum, mel_energies.T)
+    mel_energies = torch.mm(spectrum, mel_energies.T)
     if use_log_fbank:
         # avoid log of zero (which should be prevented anyway by dithering)
         mel_energies = torch.max(mel_energies, _get_epsilon(device, dtype)).log()
