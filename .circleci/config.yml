@@ -61,7 +61,7 @@ binary_common: &binary_common
     python_version:
       description: "Python version to build against (e.g., 3.8)"
       type: string
-  environment:
+  environment: &environment
     PYTHON_VERSION: << parameters.python_version >>
     BUILD_VERSION: << parameters.build_version >>
     PYTORCH_VERSION: << parameters.pytorch_version >>
@@ -432,6 +432,7 @@ jobs:
       image: ubuntu-1604-cuda-10.1:201909-23
     resource_class: gpu.small
     environment:
+      <<: *environment
       image_name: "pytorch/torchaudio_unittest_base:manylinux-cuda10.1"
     steps:
       - checkout
@@ -445,8 +446,11 @@ jobs:
             - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
 
       - run:
+          name: Pull Docker image
+          command: docker pull --quiet "${image_name}"
+      - run:
           name: Setup
-          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
+          command: docker run -t --gpus all -e PYTHON_VERSION -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
 
           key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
@@ -509,6 +513,7 @@ jobs:
     executor:
       name: windows-gpu
     environment:
+      <<: *environment
       CUDA_VERSION: "10.1"
     steps:
       - checkout
