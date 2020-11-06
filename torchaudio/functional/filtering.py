@@ -849,7 +849,7 @@ def lfilter(
     padded_waveform = torch.zeros(
         n_channel, n_sample_padded, dtype=dtype, device=device
     )
-    padded_waveform[:, (n_order - 1) :] = waveform
+    padded_waveform[:, n_order - 1:] = waveform
     padded_output_waveform = torch.zeros(
         n_channel, n_sample_padded, dtype=dtype, device=device
     )
@@ -879,12 +879,12 @@ def lfilter(
     a_coeffs_flipped.div_(a_coeffs[0])
     for i_sample, o0 in enumerate(input_signal_windows.t()):
         windowed_output_signal = padded_output_waveform[
-            :, i_sample : (i_sample + n_order)
+            :, i_sample:i_sample + n_order
         ]
         o0.addmv_(windowed_output_signal, a_coeffs_flipped, alpha=-1)
         padded_output_waveform[:, i_sample + n_order - 1] = o0
 
-    output = padded_output_waveform[:, (n_order - 1) :]
+    output = padded_output_waveform[:, n_order - 1:]
 
     if clamp:
         output = torch.clamp(output, min=-1.0, max=1.0)
@@ -1232,7 +1232,7 @@ def _measure(
 
     _cepstrum_Buf: Tensor = torch.zeros(dft_len_ws >> 1)
     _cepstrum_Buf[spectrum_start:spectrum_end] = _d * cepstrum_window
-    _cepstrum_Buf[spectrum_end : dft_len_ws >> 1].zero_()
+    _cepstrum_Buf[spectrum_end:dft_len_ws >> 1].zero_()
 
     # lsx_safe_rdft((int)p->dft_len_ws >> 1, 1, c->dftBuf);
     _cepstrum_Buf = torchaudio._internal.fft.rfft(_cepstrum_Buf)
@@ -1464,6 +1464,6 @@ def vad(
             flushedLen_ns = (measures_len - num_measures_to_flush) * measure_period_ns
             samplesIndex_ns = (samplesIndex_ns + flushedLen_ns) % samplesLen_ns
 
-    res = waveform[:, pos - samplesLen_ns + flushedLen_ns :]
+    res = waveform[:, pos - samplesLen_ns + flushedLen_ns:]
     # unpack batch
     return res.view(shape[:-1] + res.shape[-1:])
