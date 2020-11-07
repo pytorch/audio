@@ -84,13 +84,6 @@ def parse_args():
         "--start-epoch", default=0, type=int, metavar="N", help="manual epoch number"
     )
     parser.add_argument(
-        "--print-freq",
-        default=10,
-        type=int,
-        metavar="N",
-        help="print frequency in epochs",
-    )
-    parser.add_argument(
         "--reduce-lr-valid",
         action="store_true",
         help="reduce learning rate based on validation loss",
@@ -615,36 +608,34 @@ def main(rank, args):
             not args.reduce_lr_valid,
         )
 
-        if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
-
-            loss = evaluate(
-                model,
-                criterion,
-                loader_validation,
-                decoder,
-                language_model,
-                devices[0],
-                epoch,
-                not_main_rank,
-            )
-
-            is_best = loss < best_loss
-            best_loss = min(loss, best_loss)
-            save_checkpoint(
-                {
-                    "epoch": epoch + 1,
-                    "state_dict": model.state_dict(),
-                    "best_loss": best_loss,
-                    "optimizer": optimizer.state_dict(),
-                    "scheduler": scheduler.state_dict(),
-                },
-                is_best,
-                args.checkpoint,
-                not_main_rank,
-            )
+        loss = evaluate(
+            model,
+            criterion,
+            loader_validation,
+            decoder,
+            language_model,
+            devices[0],
+            epoch,
+            not_main_rank,
+        )
 
         if args.reduce_lr_valid and isinstance(scheduler, ReduceLROnPlateau):
             scheduler.step(loss)
+
+        is_best = loss < best_loss
+        best_loss = min(loss, best_loss)
+        save_checkpoint(
+            {
+                "epoch": epoch + 1,
+                "state_dict": model.state_dict(),
+                "best_loss": best_loss,
+                "optimizer": optimizer.state_dict(),
+                "scheduler": scheduler.state_dict(),
+            },
+            is_best,
+            args.checkpoint,
+            not_main_rank,
+        )
 
     logging.info("End time: %s", datetime.now())
 
