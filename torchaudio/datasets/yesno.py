@@ -66,7 +66,7 @@ class YESNO(Dataset):
         self.transform = transform
         self.target_transform = target_transform
 
-        # Get string representation of 'root' incase Path object is passed
+        # Get string representation of 'root' in case Path object is passed
         root = os.fspath(root)
 
         archive = os.path.basename(url)
