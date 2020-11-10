@@ -1002,7 +1002,7 @@ class Vad(torch.nn.Module):
         self.pre_trigger_time = pre_trigger_time
         self.boot_time = boot_time
         self.noise_up_time = noise_up_time
-        self.noise_down_time = noise_up_time
+        self.noise_down_time = noise_down_time
         self.noise_reduction_amount = noise_reduction_amount
         self.measure_freq = measure_freq
         self.measure_duration = measure_duration
@@ -1027,7 +1027,7 @@ class Vad(torch.nn.Module):
             pre_trigger_time=self.pre_trigger_time,
             boot_time=self.boot_time,
             noise_up_time=self.noise_up_time,
-            noise_down_time=self.noise_up_time,
+            noise_down_time=self.noise_down_time,
             noise_reduction_amount=self.noise_reduction_amount,
             measure_freq=self.measure_freq,
             measure_duration=self.measure_duration,
