@@ -21,20 +21,26 @@ esac
 # 1. Install conda at ./conda
 if [ ! -d "${conda_dir}" ]; then
     printf "* Installing conda\n"
-    wget -O miniconda.sh "http://repo.continuum.io/miniconda/Miniconda3-latest-${os}-x86_64.sh"
+    wget --quiet -O miniconda.sh "http://repo.continuum.io/miniconda/Miniconda3-latest-${os}-x86_64.sh"
     bash ./miniconda.sh -b -f -p "${conda_dir}"
+    eval "$("${conda_dir}/bin/conda" shell.bash hook)"
+    conda update --quiet -y conda
+    printf "* Updating the base Python version to %s\n" "${PYTHON_VERSION}"
+    conda install --quiet -y python="${PYTHON_VERSION}"
+else
+    eval "$("${conda_dir}/bin/conda" shell.bash hook)"
 fi
-eval "$(${conda_dir}/bin/conda shell.bash hook)"
+
 
 # 2. Create test environment at ./env
 if [ ! -d "${env_dir}" ]; then
-    printf "* Creating a test environment\n"
-    conda create --prefix "${env_dir}" -y python="$PYTHON_VERSION"
+    printf "* Creating a test environment with PYTHON_VERSION=%s\n" "${PYTHON_VERSION}\n"
+    conda create --prefix "${env_dir}" -y python="${PYTHON_VERSION}"
 fi
 conda activate "${env_dir}"
 
 # 3. Install minimal build tools
-pip install cmake ninja
+pip --quiet install cmake ninja
 
 # 4. Buld codecs
 mkdir -p third_party/build
