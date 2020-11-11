@@ -3,20 +3,25 @@
 set -ex
 
 
-if [ "$1" == "" ]; then
-    echo call as $0 "<target branch>", where branch should be "master" or "1.7" or so
+if [ "$2" == "" ]; then
+    echo call as $0 "<src>" "<target branch>"
+    echo where src is the built documentation and
+    echo branch should be "master" or "1.7" or so
     exit 1
 fi
 
+scr=$1
+target=$2
+
 set -ex
-echo "committing docs to ${target}"
+echo "committing docs from ${stc} to ${target}"
 
 git checkout gh-pages
 rm -rf docs/$target/*
-cp -r doc/build/html/* docs/$target
+cp -r ${src}/build/html/* docs/$target
 if [ $target == "master" ]; then
     rm -rf docs/_static/*
-    cp -r doc/build/html/_static/* docs/_static
+    cp -r ${src}/build/html/_static/* docs/_static
 fi
 git add docs || true
 git config user.email "soumith+bot@pytorch.org"
