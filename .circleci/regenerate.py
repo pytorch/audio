@@ -32,8 +32,11 @@ def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
             for python_version in PYTHON_VERSIONS:
                 w += build_workflow_pair(btype, os_type, python_version, filter_branch, prefix, upload)
 
-    if filter_branch == 'nightly':
-        w += build_doc_job(filter_branch)
+    if not filter_branch:
+        # Build on every pull request, but upload only on nightly and tags
+        w += build_doc_job(None)
+        w += upload_doc_job('nightly')
+
     return indent(indentation, w)
 
 
@@ -75,12 +78,23 @@ def build_doc_job(filter_branch):
     job = {
         "name": "build_docs",
         "python_version": "3.8",
-        "requires": ["nightly_binary_linux_conda_py3.8_upload",],
+        "requires": ["binary_linux_wheel_py3.8",],
     }
 
     if filter_branch:
         job["filters"] = gen_filter_branch_tree(filter_branch)
     return [{"build_docs": job}]
+
+def upload_doc_job(filter_branch):
+    job = {
+        "name": "upload_docs",
+        "python_version": "3.8",
+        "requires": ["build_docs",],
+    }
+
+    if filter_branch:
+        job["filters"] = gen_filter_branch_tree(filter_branch)
+    return [{"upload_docs": job}]
 
 
 def generate_base_workflow(base_workflow_name, python_version, filter_branch, os_type, btype):
