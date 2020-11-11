@@ -34,10 +34,3 @@ Backend Utilities
 .. autofunction:: get_audio_backend
 
 .. autofunction:: set_audio_backend
-
-Sox Effects Utilities
-~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: initialize_sox
-
-.. autofunction:: shutdown_sox
