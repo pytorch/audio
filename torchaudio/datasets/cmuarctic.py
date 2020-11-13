@@ -1,5 +1,6 @@
 import os
-from typing import Tuple
+from pathlib import Path
+from typing import Tuple, Union
 
 import torchaudio
 from torch import Tensor
@@ -79,7 +80,7 @@ class CMUARCTIC(Dataset):
     """Create a Dataset for CMU_ARCTIC.
 
     Args:
-        root (str): Path to the directory where the dataset is found or downloaded.
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
         url (str, optional):
             The URL to download the dataset from or the type of the dataset to dowload.
             (default: ``"aew"``)
@@ -98,7 +99,7 @@ class CMUARCTIC(Dataset):
     _folder_audio = "wav"
 
     def __init__(self,
-                 root: str,
+                 root: Union[str, Path],
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  download: bool = False) -> None:
@@ -129,6 +130,9 @@ class CMUARCTIC(Dataset):
             base_url = "http://www.festvox.org/cmu_arctic/packed/"
 
             url = os.path.join(base_url, url + ext_archive)
+
+        # Get string representation of 'root' in case Path object is passed
+        root = os.fspath(root)
 
         basename = os.path.basename(url)
         root = os.path.join(root, folder_in_archive)
