@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from torchaudio.datasets import cmuarctic
 
@@ -54,8 +55,7 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
                     txt.write(f'( {utterance_id} "{utterance}" )\n')
                     seed += 1
 
-    def test_cmuarctic(self):
-        dataset = cmuarctic.CMUARCTIC(self.root_dir)
+    def _test_cmuarctic(self, dataset):
         n_ite = 0
         for i, (waveform, sample_rate, utterance, utterance_id) in enumerate(dataset):
             expected_sample = self.samples[i]
@@ -65,3 +65,11 @@ class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
             self.assertEqual(expected_sample[0], waveform, atol=5e-5, rtol=1e-8)
             n_ite += 1
         assert n_ite == len(self.samples)
+
+    def test_cmuarctic_str(self):
+        dataset = cmuarctic.CMUARCTIC(self.root_dir)
+        self._test_cmuarctic(dataset)
+
+    def test_cmuarctic_path(self):
+        dataset = cmuarctic.CMUARCTIC(Path(self.root_dir))
+        self._test_cmuarctic(dataset)
