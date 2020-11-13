@@ -71,13 +71,6 @@ def init_random_seed(worker_id):
 
 
 @skipIfNoExtension
-@skipIf(
-    platform.system() == 'Darwin' and
-    sys.version_info.major == 3 and
-    sys.version_info.minor in [6, 7],
-    'This test is known to get stuck for macOS with Python < 3.8. '
-    'See https://github.com/pytorch/pytorch/issues/46409'
-)
 class TestSoxEffectsDataset(TempDirMixin, PytorchTestCase):
     """Test `apply_effects_file` in multi-process dataloader setting"""
 
@@ -99,6 +92,7 @@ class TestSoxEffectsDataset(TempDirMixin, PytorchTestCase):
         loader = torch.utils.data.DataLoader(
             dataset, batch_size=32, num_workers=16,
             worker_init_fn=init_random_seed,
+            multiprocessing_context=torch.multiprocessing.get_context('spawn'),
         )
         for batch in loader:
             assert batch.shape == (32, 2, 2 * sample_rate)
@@ -119,6 +113,7 @@ class TestSoxEffectsDataset(TempDirMixin, PytorchTestCase):
         loader = torch.utils.data.DataLoader(
             dataset, batch_size=32, num_workers=16,
             worker_init_fn=init_random_seed,
+            multiprocessing_context=torch.multiprocessing.get_context('spawn'),
         )
         for batch in loader:
             assert batch.shape == (32, 2, 2 * sample_rate)
