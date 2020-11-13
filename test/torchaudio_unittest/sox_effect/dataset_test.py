@@ -126,9 +126,7 @@ class TestSoxEffectsDataset(TempDirMixin, PytorchTestCase):
 
 
 def speed(path):
-    sample_rate = 8000
-    wav = get_whitenoise(n_channels=1, sample_rate=sample_rate, duration=1, dtype='float')
-    # wav, sample_rate = torchaudio.load(path)
+    wav, sample_rate = torchaudio.load(path)
     effects = [
         ['speed', '1.03756523535464655'],
         ['rate', f'{sample_rate}'],
@@ -138,6 +136,8 @@ def speed(path):
 
 @skipIfNoExtension
 class TestProcessPoolExecutor(TempDirMixin, PytorchTestCase):
+    backend = "sox_io"
+
     def setUp(self):
         sample_rate = 16000
         self.flist = []
