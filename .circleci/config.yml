@@ -654,6 +654,46 @@ jobs:
           command: |
             .circleci/torchscript_bc_test/setup_master_envs.sh
             .circleci/torchscript_bc_test/validate_objects.sh
+  build_docs:
+    <<: *binary_common
+    docker:
+      - image: "pytorch/manylinux-cuda100"
+    resource_class: 2xlarge+
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - designate_upload_channel
+      - checkout
+      - run:
+          name: Install pytorch-audio
+          command: .circleci/build_docs/install_wheels.sh
+      - run:
+          name: Build docs
+          command: .circleci/build_docs/build_docs.sh
+      - persist_to_workspace:
+          root: docs
+          paths:
+            - "*"
+
+  upload_docs:
+    <<: *binary_common
+    docker:
+      - image: "pytorch/manylinux-cuda100"
+    resource_class: 2xlarge+
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - designate_upload_channel
+      - checkout
+      - run:
+          name: Upload docs
+          command: |
+            set -ex
+            echo $PWD
+            ls ~/workspace
+            tag=${CIRCLE_TAG:1:5}
+            target=${tag:-master}
+            .circleci/build_docs/commit_docs.sh ~/workspace $target
 
 workflows:
   build:
@@ -739,6 +779,22 @@ workflows:
       - binary_windows_conda:
           name: binary_windows_conda_py3.8
           python_version: '3.8'
+      - build_docs:
+          name: build_docs
+          python_version: '3.8'
+          requires:
+          - binary_linux_wheel_py3.8
+      - upload_docs:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: upload_docs
+          python_version: '3.8'
+          requires:
+          - build_docs
   unittest:
     jobs:
       - torchscript_bc_test:
