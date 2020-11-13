@@ -2,6 +2,7 @@ import sys
 import platform
 from unittest import skipIf
 from typing import List, Tuple
+from concurrent.futures import ProcessPoolExecutor
 
 import numpy as np
 import torch
@@ -122,3 +123,36 @@ class TestSoxEffectsDataset(TempDirMixin, PytorchTestCase):
         )
         for batch in loader:
             assert batch.shape == (32, 2, 2 * sample_rate)
+
+
+def speed(path):
+    sample_rate = 8000
+    wav = get_whitenoise(n_channels=1, sample_rate=sample_rate, duration=1, dtype='float')
+    # wav, sample_rate = torchaudio.load(path)
+    effects = [
+        ['speed', '1.03756523535464655'],
+        ['rate', f'{sample_rate}'],
+    ]
+    return torchaudio.sox_effects.apply_effects_tensor(wav, sample_rate, effects)[0]
+
+
+@skipIfNoExtension
+class TestProcessPoolExecutor(TempDirMixin, PytorchTestCase):
+    def setUp(self):
+        sample_rate = 16000
+        self.flist = []
+        for i in range(10):
+            path = self.get_temp_path(f'{i}.wav')
+            data = get_whitenoise(n_channels=1, sample_rate=sample_rate, duration=1, dtype='float')
+            save_wav(path, data, sample_rate)
+            self.flist.append(path)
+
+    def test_executor(self):
+        """Test that apply_effects_tensor with speed + rate does not crush
+
+        https://github.com/pytorch/audio/issues/1021
+        """
+        executor = ProcessPoolExecutor(1)
+        futures = [executor.submit(speed, path) for path in self.flist]
+        for future in futures:
+            future.result()
