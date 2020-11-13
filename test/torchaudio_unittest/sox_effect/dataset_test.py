@@ -126,7 +126,7 @@ class TestSoxEffectsDataset(TempDirMixin, PytorchTestCase):
 
 
 def speed(path):
-    wav, sample_rate = torchaudio.load(path)
+    wav, sample_rate = torchaudio.backend.sox_io_backend.load(path)
     effects = [
         ['speed', '1.03756523535464655'],
         ['rate', f'{sample_rate}'],
