@@ -124,10 +124,20 @@ vad
 
 .. autofunction:: spectrogram
 
+:hidden:`griffinlim`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: griffinlim
+
 :hidden:`amplitude_to_DB`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: amplitude_to_DB
+
+:hidden:`DB_to_amplitude`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: DB_to_amplitude
 
 :hidden:`create_fb_matrix`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -193,13 +203,3 @@ vad
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: sliding_window_cmn
-
-:hidden:`griffinlim`
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: griffinlim
-s
-:hidden:`DB_to_amplitude`
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: DB_to_amplitude
