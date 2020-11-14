@@ -1,6 +1,7 @@
 import os
 import csv
-from typing import List, Tuple
+from typing import List, Tuple, Union
+from pathlib import Path
 
 import torchaudio
 from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
@@ -49,10 +50,13 @@ class LJSPEECH(Dataset):
     _ext_archive = '.tar.bz2'
 
     def __init__(self,
-                 root: str,
+                 root: Union[str, Path],
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  download: bool = False) -> None:
+
+        # Get string representation of 'root' in case Path object is passed
+        root = os.fspath(root)
 
         basename = os.path.basename(url)
         archive = os.path.join(root, basename)

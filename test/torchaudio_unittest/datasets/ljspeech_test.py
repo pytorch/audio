@@ -1,5 +1,6 @@
 import csv
 import os
+from pathlib import Path
 
 from torchaudio.datasets import ljspeech
 
@@ -57,8 +58,7 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
                 save_wav(path, data, sample_rate)
                 cls.data.append(normalize_wav(data))
 
-    def test_ljspeech(self):
-        dataset = ljspeech.LJSPEECH(self.root_dir)
+    def _test_ljspeech(self, dataset):
         n_ite = 0
         for i, (waveform, sample_rate, transcript, normalized_transcript) in enumerate(
             dataset
@@ -72,3 +72,11 @@ class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
             assert normalized_transcript == expected_normalized_transcript
             n_ite += 1
         assert n_ite == len(self.data)
+
+    def test_ljspeech_str(self):
+        dataset = ljspeech.LJSPEECH(self.root_dir)
+        self._test_ljspeech(dataset)
+
+    def test_ljspeech_path(self):
+        dataset = ljspeech.LJSPEECH(Path(self.root_dir))
+        self._test_ljspeech(dataset)

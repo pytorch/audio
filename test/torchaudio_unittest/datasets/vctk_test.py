@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from torchaudio.datasets import vctk
 
@@ -77,8 +78,7 @@ class TestVCTK(TempDirMixin, TorchaudioTestCase):
 
                 seed += 1
 
-    def test_vctk(self):
-        dataset = vctk.VCTK_092(self.root_dir, audio_ext=".wav")
+    def _test_vctk(self, dataset):
         num_samples = 0
         for i, (data, sample_rate, utterance, speaker_id, utterance_id) in enumerate(dataset):
             self.assertEqual(data, self.samples[i][0], atol=5e-5, rtol=1e-8)
@@ -89,3 +89,11 @@ class TestVCTK(TempDirMixin, TorchaudioTestCase):
             num_samples += 1
 
         assert num_samples == len(self.samples)
+
+    def test_vctk_str(self):
+        dataset = vctk.VCTK_092(self.root_dir, audio_ext=".wav")
+        self._test_vctk(dataset)
+
+    def test_vctk_path(self):
+        dataset = vctk.VCTK_092(Path(self.root_dir), audio_ext=".wav")
+        self._test_vctk(dataset)
