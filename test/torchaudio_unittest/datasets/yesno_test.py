@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from torchaudio.datasets import yesno
 
@@ -36,8 +37,7 @@ class TestYesNo(TempDirMixin, TorchaudioTestCase):
             save_wav(path, data, 8000)
             cls.data.append(normalize_wav(data))
 
-    def test_yesno(self):
-        dataset = yesno.YESNO(self.root_dir)
+    def _test_yesno(self, dataset):
         n_ite = 0
         for i, (waveform, sample_rate, label) in enumerate(dataset):
             expected_label = self.labels[i]
@@ -47,3 +47,11 @@ class TestYesNo(TempDirMixin, TorchaudioTestCase):
             assert label == expected_label
             n_ite += 1
         assert n_ite == len(self.data)
+
+    def test_yesno_str(self):
+        dataset = yesno.YESNO(self.root_dir)
+        self._test_yesno(dataset)
+
+    def test_yesno_path(self):
+        dataset = yesno.YESNO(Path(self.root_dir))
+        self._test_yesno(dataset)

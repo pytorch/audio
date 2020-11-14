@@ -1,6 +1,7 @@
 import os
 import csv
 import random
+from pathlib import Path
 
 from torchaudio.datasets import commonvoice
 from torchaudio_unittest.common_utils import (
@@ -59,8 +60,7 @@ class TestCommonVoice(TempDirMixin, TorchaudioTestCase):
                 # Append data entry
                 cls.data.append((normalize_wav(data), cls.sample_rate, dict(zip(cls._headers, content))))
 
-    def test_commonvoice(self):
-        dataset = commonvoice.COMMONVOICE(self.root_dir)
+    def _test_commonvoice(self, dataset):
         n_ite = 0
         for i, (waveform, sample_rate, dictionary) in enumerate(dataset):
             expected_dictionary = self.data[i][2]
@@ -70,3 +70,11 @@ class TestCommonVoice(TempDirMixin, TorchaudioTestCase):
             assert dictionary == expected_dictionary
             n_ite += 1
         assert n_ite == len(self.data)
+
+    def test_commonvoice_str(self):
+        dataset = commonvoice.COMMONVOICE(self.root_dir)
+        self._test_commonvoice(dataset)
+
+    def test_commonvoice_path(self):
+        dataset = commonvoice.COMMONVOICE(Path(self.root_dir))
+        self._test_commonvoice(dataset)
