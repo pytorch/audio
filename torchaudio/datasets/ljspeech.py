@@ -37,7 +37,7 @@ class LJSPEECH(Dataset):
     """Create a Dataset for LJSpeech-1.1.
 
     Args:
-        root (str): Path to the directory where the dataset is found or downloaded.
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
         url (str, optional): The URL to download the dataset from.
             (default: ``"https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"``)
         folder_in_archive (str, optional):

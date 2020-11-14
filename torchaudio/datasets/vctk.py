@@ -58,7 +58,7 @@ class VCTK(Dataset):
           For more information about the dataset visit: https://datashare.is.ed.ac.uk/handle/10283/3443
 
     Args:
-        root (str): Path to the directory where the dataset is found or downloaded.
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
         url (str, optional): Not used as the dataset is no longer publicly available.
         folder_in_archive (str, optional):
             The top-level directory of the dataset. (default: ``"VCTK-Corpus"``)
