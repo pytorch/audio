@@ -10,8 +10,8 @@ the audio domain. By supporting PyTorch, torchaudio follows the same philosophy
 of providing strong GPU acceleration, having a focus on trainable features through
 the autograd system, and having consistent style (tensor names and dimension names).
 Therefore, it is primarily a machine learning library and not a general signal
-processing library. The benefits of Pytorch is be seen in torchaudio through
-having all the computations be through Pytorch operations which makes it easy
+processing library. The benefits of PyTorch is be seen in torchaudio through
+having all the computations be through PyTorch operations which makes it easy
 to use and feel like a natural extension.
 
 - [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/)
