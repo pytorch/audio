@@ -31,13 +31,15 @@ else
     eval "$("${conda_dir}/bin/conda" shell.bash hook)"
 fi
 
-
 # 2. Create test environment at ./env
 if [ ! -d "${env_dir}" ]; then
     printf "* Creating a test environment with PYTHON_VERSION=%s\n" "${PYTHON_VERSION}\n"
     conda create --prefix "${env_dir}" -y python="${PYTHON_VERSION}"
 fi
 conda activate "${env_dir}"
+
+export CMAKE_PREFIX_PATH="${env_dir}"
+printf "export CMAKE_PREFIX_PATH=%s\n" "${env_dir}"
 
 # 3. Install minimal build tools
 pip --quiet install cmake ninja
