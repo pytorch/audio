@@ -10,16 +10,16 @@ if [ "$2" == "" ]; then
     exit 1
 fi
 
-scr=$1
+src=$1
 target=$2
 
 set -ex
-echo "committing docs from ${stc} to ${target}"
+echo "committing docs from ${src} to ${target}"
 
 git checkout gh-pages
 rm -rf docs/$target/*
 cp -r ${src}/build/html/* docs/$target
-if [ $target == "master" ]; then
+if [ "$target" == "master" ]; then
     rm -rf docs/_static/*
     cp -r ${src}/build/html/_static/* docs/_static
 fi
