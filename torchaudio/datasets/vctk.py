@@ -1,6 +1,7 @@
 import os
 import warnings
-from typing import Any, Tuple
+from typing import Any, Tuple, Union
+from pathlib import Path
 
 import torchaudio
 from torch import Tensor
@@ -57,7 +58,7 @@ class VCTK(Dataset):
           For more information about the dataset visit: https://datashare.is.ed.ac.uk/handle/10283/3443
 
     Args:
-        root (str): Path to the directory where the dataset is found or downloaded.
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
         url (str, optional): Not used as the dataset is no longer publicly available.
         folder_in_archive (str, optional):
             The top-level directory of the dataset. (default: ``"VCTK-Corpus"``)
@@ -77,7 +78,7 @@ class VCTK(Dataset):
     _except_folder = "p315"
 
     def __init__(self,
-                 root: str,
+                 root: Union[str, Path],
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  download: bool = False,
@@ -102,6 +103,9 @@ class VCTK(Dataset):
         self.downsample = downsample
         self.transform = transform
         self.target_transform = target_transform
+
+        # Get string representation of 'root' in case Path object is passed
+        root = os.fspath(root)
 
         archive = os.path.basename(url)
         archive = os.path.join(root, archive)
