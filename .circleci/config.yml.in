@@ -61,7 +61,7 @@ binary_common: &binary_common
     python_version:
       description: "Python version to build against (e.g., 3.8)"
       type: string
-  environment:
+  environment: &environment
     PYTHON_VERSION: << parameters.python_version >>
     BUILD_VERSION: << parameters.build_version >>
     PYTORCH_VERSION: << parameters.pytorch_version >>
@@ -432,6 +432,7 @@ jobs:
       image: ubuntu-1604-cuda-10.1:201909-23
     resource_class: gpu.small
     environment:
+      <<: *environment
       image_name: "pytorch/torchaudio_unittest_base:manylinux-cuda10.1"
     steps:
       - checkout
@@ -445,8 +446,11 @@ jobs:
             - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
+          name: Pull Docker image
+          command: docker pull --quiet "${image_name}"
+      - run:
           name: Setup
-          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
+          command: docker run -t --gpus all -e PYTHON_VERSION -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
           {% raw %}
           key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
@@ -509,6 +513,7 @@ jobs:
     executor:
       name: windows-gpu
     environment:
+      <<: *environment
       CUDA_VERSION: "10.1"
     steps:
       - checkout
@@ -649,6 +654,46 @@ jobs:
           command: |
             .circleci/torchscript_bc_test/setup_master_envs.sh
             .circleci/torchscript_bc_test/validate_objects.sh
+  build_docs:
+    <<: *binary_common
+    docker:
+      - image: "pytorch/manylinux-cuda100"
+    resource_class: 2xlarge+
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - designate_upload_channel
+      - checkout
+      - run:
+          name: Install pytorch-audio
+          command: .circleci/build_docs/install_wheels.sh
+      - run:
+          name: Build docs
+          command: .circleci/build_docs/build_docs.sh
+      - persist_to_workspace:
+          root: docs
+          paths:
+            - "*"
+
+  upload_docs:
+    <<: *binary_common
+    docker:
+      - image: "pytorch/manylinux-cuda100"
+    resource_class: 2xlarge+
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - designate_upload_channel
+      - checkout
+      - run:
+          name: Upload docs
+          command: |
+            set -ex
+            echo $PWD
+            ls ~/workspace
+            tag=${CIRCLE_TAG:1:5}
+            target=${tag:-master}
+            .circleci/build_docs/commit_docs.sh ~/workspace $target
 
 workflows:
   build:

@@ -21,6 +21,8 @@ import os.path
 
 PYTHON_VERSIONS = ["3.6", "3.7", "3.8"]
 
+DOC_VERSION = ('linux', '3.8')
+
 
 def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
     w = []
@@ -29,6 +31,11 @@ def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
         for os_type in ["linux", "macos", "windows"]:
             for python_version in PYTHON_VERSIONS:
                 w += build_workflow_pair(btype, os_type, python_version, filter_branch, prefix, upload)
+
+    if not filter_branch:
+        # Build on every pull request, but upload only on nightly and tags
+        w += build_doc_job(None)
+        w += upload_doc_job('nightly')
 
     return indent(indentation, w)
 
@@ -68,6 +75,30 @@ def build_workflow_pair(btype, os_type, python_version, filter_branch, prefix=''
     return w
 
 
+def build_doc_job(filter_branch):
+    job = {
+        "name": "build_docs",
+        "python_version": "3.8",
+        "requires": ["binary_linux_wheel_py3.8"],
+    }
+
+    if filter_branch:
+        job["filters"] = gen_filter_branch_tree(filter_branch)
+    return [{"build_docs": job}]
+
+
+def upload_doc_job(filter_branch):
+    job = {
+        "name": "upload_docs",
+        "python_version": "3.8",
+        "requires": ["build_docs"],
+    }
+
+    if filter_branch:
+        job["filters"] = gen_filter_branch_tree(filter_branch)
+    return [{"upload_docs": job}]
+
+
 def generate_base_workflow(base_workflow_name, python_version, filter_branch, os_type, btype):
 
     d = {
@@ -81,7 +112,7 @@ def generate_base_workflow(base_workflow_name, python_version, filter_branch, os
     if filter_branch:
         d["filters"] = gen_filter_branch_tree(filter_branch)
 
-    return {"binary_{os_type}_{btype}".format(os_type=os_type, btype=btype): d}
+    return {f"binary_{os_type}_{btype}": d}
 
 
 def gen_filter_branch_tree(*branches):
@@ -147,9 +178,6 @@ def unittest_workflows(indentation=6):
                     "python_version": python_version,
                 }
 
-                if device_type == 'gpu':
-                    job['filters'] = gen_filter_branch_tree('master', 'nightly', 'release/*')
-
                 if os_type != "windows":
                     job['requires'] = ['download_third_parties_nix']
 
@@ -157,7 +185,7 @@ def unittest_workflows(indentation=6):
 
                 if i == 0 and os_type == "linux" and device_type == "cpu":
                     jobs.append({
-                        f"stylecheck": {
+                        "stylecheck": {
                             "name": f"stylecheck_py{python_version}",
                             "python_version": python_version,
                         }

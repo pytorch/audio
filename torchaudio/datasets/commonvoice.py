@@ -1,5 +1,6 @@
 import os
-from typing import List, Dict, Tuple
+from pathlib import Path
+from typing import List, Dict, Tuple, Union
 
 import torchaudio
 from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
@@ -103,7 +104,7 @@ class COMMONVOICE(Dataset):
     """Create a Dataset for CommonVoice.
 
     Args:
-        root (str): Path to the directory where the dataset is found or downloaded.
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
         tsv (str, optional): The name of the tsv file used to construct the metadata.
             (default: ``"train.tsv"``)
         url (str, optional): The URL to download the dataset from, or the language of
@@ -129,7 +130,7 @@ class COMMONVOICE(Dataset):
     _folder_audio = "clips"
 
     def __init__(self,
-                 root: str,
+                 root: Union[str, Path],
                  tsv: str = TSV,
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
@@ -185,6 +186,9 @@ class COMMONVOICE(Dataset):
 
             base_url = "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com"
             url = os.path.join(base_url, version, language + ext_archive)
+
+        # Get string representation of 'root' in case Path object is passed
+        root = os.fspath(root)
 
         basename = os.path.basename(url)
         archive = os.path.join(root, basename)

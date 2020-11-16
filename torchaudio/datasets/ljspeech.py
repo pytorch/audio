@@ -1,6 +1,7 @@
 import os
 import csv
-from typing import List, Tuple
+from typing import List, Tuple, Union
+from pathlib import Path
 
 import torchaudio
 from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
@@ -36,7 +37,7 @@ class LJSPEECH(Dataset):
     """Create a Dataset for LJSpeech-1.1.
 
     Args:
-        root (str): Path to the directory where the dataset is found or downloaded.
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
         url (str, optional): The URL to download the dataset from.
             (default: ``"https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"``)
         folder_in_archive (str, optional):
@@ -49,10 +50,13 @@ class LJSPEECH(Dataset):
     _ext_archive = '.tar.bz2'
 
     def __init__(self,
-                 root: str,
+                 root: Union[str, Path],
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  download: bool = False) -> None:
+
+        # Get string representation of 'root' in case Path object is passed
+        root = os.fspath(root)
 
         basename = os.path.basename(url)
         archive = os.path.join(root, basename)
