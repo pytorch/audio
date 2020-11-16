@@ -82,29 +82,29 @@ class TestGTZAN(TempDirMixin, TorchaudioTestCase):
             n_ite += 1
         assert n_ite == len(self.testing)
 
-    def test_gtzan_training_str(self):
+    def test_training_str(self):
         train_dataset = gtzan.GTZAN(self.root_dir, subset='training')
         self._test_training(train_dataset)
 
-    def test_gtzan_validation_str(self):
+    def test_validation_str(self):
         val_dataset = gtzan.GTZAN(self.root_dir, subset='validation')
         self._test_validation(val_dataset)
 
-    def test_gtzan_testing_str(self):
+    def test_testing_str(self):
         test_dataset = gtzan.GTZAN(self.root_dir, subset='testing')
         self._test_testing(test_dataset)
 
-    def test_gtzan_training_path(self):
+    def test_training_path(self):
         root_dir = Path(self.root_dir)
         train_dataset = gtzan.GTZAN(root_dir, subset='training')
         self._test_training(train_dataset)
 
-    def test_gtzan_validation_path(self):
+    def test_validation_path(self):
         root_dir = Path(self.root_dir)
         val_dataset = gtzan.GTZAN(root_dir, subset='validation')
         self._test_validation(val_dataset)
 
-    def test_gtzan_testing_path(self):
+    def test_testing_path(self):
         root_dir = Path(self.root_dir)
         test_dataset = gtzan.GTZAN(root_dir, subset='testing')
         self._test_testing(test_dataset)
