@@ -1,6 +1,6 @@
 import os
 import warnings
-from typing import Any, Tuple, Optional
+from typing import Any, Tuple, Optional, Union
 
 import torchaudio
 from torch import Tensor
@@ -1005,7 +1005,7 @@ class GTZAN(Dataset):
         this dataset to publish results.
 
     Args:
-        root (str): Path to the directory where the dataset is found or downloaded.
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
         url (str, optional): The URL to download the dataset from.
             (default: ``"http://opihi.cs.uvic.ca/sound/genres.tar.gz"``)
         folder_in_archive (str, optional): The top-level directory of the dataset.
@@ -1020,7 +1020,7 @@ class GTZAN(Dataset):
 
     def __init__(
         self,
-        root: str,
+        root: Union[str, Path],
         url: str = URL,
         folder_in_archive: str = FOLDER_IN_ARCHIVE,
         download: bool = False,
@@ -1028,6 +1028,10 @@ class GTZAN(Dataset):
     ) -> None:
 
         # super(GTZAN, self).__init__()
+
+        # Get string representation of 'root' in case Path object is passed
+        root = os.fspath(root)
+
         self.root = root
         self.url = url
         self.folder_in_archive = folder_in_archive
