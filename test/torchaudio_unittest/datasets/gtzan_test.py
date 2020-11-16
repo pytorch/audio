@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from torchaudio.datasets import gtzan
 
@@ -54,9 +55,7 @@ class TestGTZAN(TempDirMixin, TorchaudioTestCase):
             n_ite += 1
         assert n_ite == len(self.samples)
 
-    def test_training(self):
-        dataset = gtzan.GTZAN(self.root_dir, subset='training')
-
+    def test_training(self, dataset):
         n_ite = 0
         for i, (waveform, sample_rate, label) in enumerate(dataset):
             self.assertEqual(waveform, self.training[i][0], atol=5e-5, rtol=1e-8)
@@ -65,9 +64,7 @@ class TestGTZAN(TempDirMixin, TorchaudioTestCase):
             n_ite += 1
         assert n_ite == len(self.training)
 
-    def test_validation(self):
-        dataset = gtzan.GTZAN(self.root_dir, subset='validation')
-
+    def test_validation(self, dataset):
         n_ite = 0
         for i, (waveform, sample_rate, label) in enumerate(dataset):
             self.assertEqual(waveform, self.validation[i][0], atol=5e-5, rtol=1e-8)
@@ -76,9 +73,7 @@ class TestGTZAN(TempDirMixin, TorchaudioTestCase):
             n_ite += 1
         assert n_ite == len(self.validation)
 
-    def test_testing(self):
-        dataset = gtzan.GTZAN(self.root_dir, subset='testing')
-
+    def test_testing(self, dataset):
         n_ite = 0
         for i, (waveform, sample_rate, label) in enumerate(dataset):
             self.assertEqual(waveform, self.testing[i][0], atol=5e-5, rtol=1e-8)
@@ -86,3 +81,24 @@ class TestGTZAN(TempDirMixin, TorchaudioTestCase):
             assert label == self.testing[i][2]
             n_ite += 1
         assert n_ite == len(self.testing)
+
+    def test_gtzan_str(self):
+        train_dataset = gtzan.GTZAN(self.root_dir, subset='training')
+        self.test_training(train_dataset)
+
+        val_dataset = gtzan.GTZAN(self.root_dir, subset='validation')
+        self.test_validation(val_dataset)
+
+        test_dataset = gtzan.GTZAN(self.root_dir, subset='testing')
+        self.test_testing(test_dataset)
+
+    def test_gtzan_path(self):
+        root_dir = Path(self.root_dir)
+        train_dataset = gtzan.GTZAN(root_dir, subset='training')
+        self.test_training(train_dataset)
+
+        val_dataset = gtzan.GTZAN(root_dir, subset='validation')
+        self.test_validation(val_dataset)
+
+        test_dataset = gtzan.GTZAN(root_dir, subset='testing')
+        self.test_testing(test_dataset)
