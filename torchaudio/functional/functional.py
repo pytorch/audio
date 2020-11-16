@@ -190,10 +190,12 @@ def griffinlim(
 
     # unpack batch
     waveform = waveform.reshape(shape[:-2] + waveform.shape[-1:])
+
     if normalized:
         warnings.warn("The argument normalized is not used in Griffin-Lim, "
         "and will be removed in v0.9.0 release. To suppress this warning, "
         "please use `normalized=False`.")
+
     return waveform
 
 
