@@ -32,10 +32,9 @@ def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
             for python_version in PYTHON_VERSIONS:
                 w += build_workflow_pair(btype, os_type, python_version, filter_branch, prefix, upload)
 
-    if not filter_branch:
-        # Build on every pull request, but upload only on nightly and tags
-        w += build_doc_job(None)
-        w += upload_doc_job('nightly')
+    # Build on every pull request, but upload only on nightly and tags
+    w += build_doc_job(filter_branch)
+    w += upload_doc_job(filter_branch)
 
     return indent(indentation, w)
 
@@ -75,25 +74,41 @@ def build_workflow_pair(btype, os_type, python_version, filter_branch, prefix=''
     return w
 
 def build_doc_job(filter_branch):
-    job = {
-        "name": "build_docs",
-        "python_version": "3.8",
-        "requires": ["binary_linux_wheel_py3.8",],
-    }
-
     if filter_branch:
-        job["filters"] = gen_filter_branch_tree(filter_branch)
+        job = {
+            "name": "_".join((filter_branch, "build_docs")),
+            "python_version": "3.8",
+            "filters": {"branches": {"only": [filter_branch]}},
+            "requires": ["_".join((filter_branch, "binary_linux_wheel_py3.8"))],
+        } 
+    else:
+        job = {
+            "name": "always_build_docs",
+            "python_version": "3.8",
+            "requires": ["binary_linux_wheel_py3.8",],
+        }
     return [{"build_docs": job}]
 
 def upload_doc_job(filter_branch):
-    job = {
-        "name": "upload_docs",
-        "python_version": "3.8",
-        "requires": ["build_docs",],
-    }
-
     if filter_branch:
-        job["filters"] = gen_filter_branch_tree(filter_branch)
+        job = {
+            "name": "_".join((filter_branch, "upload_docs")),
+            "python_version": "3.8",
+            "filters": {"branches": {"only": [filter_branch]}},
+            "requires": ["_".join((filter_branch, "build_docs"))],
+        }
+    else:
+        job = {
+            "name": "upload_docs",
+            "python_version": "3.8",
+            "filters": {"tags": {
+                            # Using a raw string here to avoid having to escape
+                            # anything
+                            "only": r"/v[0-9]+(\.[0-9]+)*-rc[0-9]+/",
+                        }},
+            "requires": ["always_build_docs"],
+        }
+
     return [{"upload_docs": job}]
 
 

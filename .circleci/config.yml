@@ -780,21 +780,18 @@ workflows:
           name: binary_windows_conda_py3.8
           python_version: '3.8'
       - build_docs:
-          name: build_docs
+          name: always_build_docs
           python_version: '3.8'
           requires:
           - binary_linux_wheel_py3.8
       - upload_docs:
           filters:
-            branches:
-              only:
-              - nightly
             tags:
               only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: upload_docs
           python_version: '3.8'
           requires:
-          - build_docs
+          - always_build_docs
   unittest:
     jobs:
       - torchscript_bc_test:
@@ -1398,6 +1395,24 @@ workflows:
           python_version: '3.8'
           requires:
           - nightly_binary_windows_conda_py3.8_upload
+      - build_docs:
+          filters:
+            branches:
+              only:
+              - nightly
+          name: nightly_build_docs
+          python_version: '3.8'
+          requires:
+          - nightly_binary_linux_wheel_py3.8
+      - upload_docs:
+          filters:
+            branches:
+              only:
+              - nightly
+          name: nightly_upload_docs
+          python_version: '3.8'
+          requires:
+          - nightly_build_docs
   docker_build:
     triggers:
       - schedule:
