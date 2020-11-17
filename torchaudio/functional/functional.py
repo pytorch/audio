@@ -139,6 +139,12 @@ def griffinlim(
     assert momentum < 1, 'momentum={} > 1 can be unstable'.format(momentum)
     assert momentum >= 0, 'momentum={} < 0'.format(momentum)
 
+    if normalized:
+        warnings.warn(
+            "The argument normalized is not used in Griffin-Lim, "
+            "and will be removed in v0.9.0 release. To suppress this warning, "
+            "please use `normalized=False`.")
+
     # pack batch
     shape = specgram.size()
     specgram = specgram.reshape([-1] + list(shape[-2:]))
@@ -190,12 +196,6 @@ def griffinlim(
 
     # unpack batch
     waveform = waveform.reshape(shape[:-2] + waveform.shape[-1:])
-
-    if normalized:
-        warnings.warn(
-            "The argument normalized is not used in Griffin-Lim, "
-            "and will be removed in v0.9.0 release. To suppress this warning, "
-            "please use `normalized=False`.")
 
     return waveform
 
