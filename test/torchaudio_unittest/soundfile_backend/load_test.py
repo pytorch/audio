@@ -1,4 +1,4 @@
-import itertools
+import os
 from unittest.mock import patch
 
 import torch
@@ -263,3 +263,29 @@ class TestLoad(LoadTestBase):
     def test_flac(self, dtype, sample_rate, num_channels, channels_first):
         """`soundfile_backend.load` can load flac format correctly."""
         self.assert_flac(dtype, sample_rate, num_channels, channels_first)
+
+
+@skipIfNoModule("soundfile")
+class TestLoadFormat(TempDirMixin, PytorchTestCase):
+    """Given `format` parameter, `so.load` can load files without extension"""
+    original = None
+    path = None
+
+    def _make_file(self, format_):
+        sample_rate = 8000
+        path_with_ext = self.get_temp_path(f'test.{format_}')
+        data = get_wav_data('float32', num_channels=2).numpy().T
+        soundfile.write(path_with_ext, data, sample_rate)
+        expected = soundfile.read(path_with_ext, dtype='float32')[0].T
+        path = os.path.splitext(path_with_ext)[0]
+        os.rename(path_with_ext, path)
+        return path, expected
+
+    @parameterized.expand([
+        ('WAV', ), ('wav', ), ('FLAC', ), ('flac',),
+    ])
+    def test_format(self, format_):
+        """Providing format allows to read file without extension"""
+        path, expected = self._make_file(format_)
+        found, _ = soundfile_backend.load(path, format=format_)
+        self.assertEqual(found, expected)

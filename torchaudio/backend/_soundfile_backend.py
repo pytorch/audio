@@ -45,6 +45,7 @@ def load(
     num_frames: int = -1,
     normalize: bool = True,
     channels_first: bool = True,
+    format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Load audio data from file.
 
@@ -99,6 +100,8 @@ def load(
         channels_first (bool):
             When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+        format (optional, str):
+            Not used. Added only for the interface compatibility with "sox_io" backend
 
     Returns:
         torch.Tensor:
@@ -106,6 +109,10 @@ def load(
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             ``[channel, time]`` else ``[time, channel]``.
     """
+    if format is not None:
+        warnings.warn(
+            'Soundfile backaned does not support `format` option. It is silently ignored.')
+
     with soundfile.SoundFile(filepath, "r") as file_:
         if file_.format != "WAV" or normalize:
             dtype = "float32"
