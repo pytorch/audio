@@ -10,21 +10,21 @@ the audio domain. By supporting PyTorch, torchaudio follows the same philosophy
 of providing strong GPU acceleration, having a focus on trainable features through
 the autograd system, and having consistent style (tensor names and dimension names).
 Therefore, it is primarily a machine learning library and not a general signal
-processing library. The benefits of Pytorch is be seen in torchaudio through
-having all the computations be through Pytorch operations which makes it easy
+processing library. The benefits of PyTorch is be seen in torchaudio through
+having all the computations be through PyTorch operations which makes it easy
 to use and feel like a natural extension.
 
-- [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/)
+- [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/stable/)
   - Load the following formats into a torch Tensor using SoX
     - mp3, wav, aac, ogg, flac, avr, cdda, cvs/vms,
     - aiff, au, amr, mp2, mp4, ac3, avi, wmv,
     - mpeg, ircam and any other format supported by libsox.
-    - [Kaldi (ark/scp)](http://pytorch.org/audio/kaldi_io.html)
-- [Dataloaders for common audio datasets (VCTK, YesNo)](http://pytorch.org/audio/datasets.html)
+    - [Kaldi (ark/scp)](http://pytorch.org/audio/stable/kaldi_io.html)
+- [Dataloaders for common audio datasets (VCTK, YesNo)](http://pytorch.org/audio/stable/datasets.html)
 - Common audio transforms
-    - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/transforms.html)
+    - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/stable/transforms.html)
 - Compliance interfaces: Run code using PyTorch that align with other libraries
-    - [Kaldi: spectrogram, fbank, mfcc, resample_waveform](https://pytorch.org/audio/compliance.kaldi.html)
+    - [Kaldi: spectrogram, fbank, mfcc, resample_waveform](https://pytorch.org/audio/stable/compliance.kaldi.html)
 
 Dependencies
 ------------
