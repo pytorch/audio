@@ -17,13 +17,16 @@ set -ex
 echo "committing docs from ${src} to ${target}"
 
 git checkout gh-pages
-rm -rf docs/$target/*
-cp -r ${src}/build/html/* docs/$target
+mkdir -p ./$target
+rm -rf ./$target/*
+cp -r ${src}/build/html/* ./$target
 if [ "$target" == "master" ]; then
-    rm -rf docs/_static/*
-    cp -r ${src}/build/html/_static/* docs/_static
+    mkdir -p ./_static
+    rm -rf ./_static/*
+    cp -r ${src}/build/html/_static/* ./_static
+    git add ./_static || true
 fi
-git add docs || true
+git add ./$target || true
 git config user.email "soumith+bot@pytorch.org"
 git config user.name "pytorchbot"
 # If there aren't changes, don't make a commit; push is no-op
