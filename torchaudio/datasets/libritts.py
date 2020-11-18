@@ -1,5 +1,6 @@
 import os
-from typing import Tuple
+from typing import Tuple, Union
+from pathlib import Path
 
 import torchaudio
 from torch import Tensor
@@ -68,7 +69,7 @@ class LIBRITTS(Dataset):
     """Create a Dataset for LibriTTS.
 
     Args:
-        root (str): Path to the directory where the dataset is found or downloaded.
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
         url (str, optional): The URL to download the dataset from,
             or the type of the dataset to dowload.
             Allowed type values are ``"dev-clean"``, ``"dev-other"``, ``"test-clean"``,
@@ -86,7 +87,7 @@ class LIBRITTS(Dataset):
 
     def __init__(
         self,
-        root: str,
+        root: Union[str, Path],
         url: str = URL,
         folder_in_archive: str = FOLDER_IN_ARCHIVE,
         download: bool = False,
@@ -106,6 +107,9 @@ class LIBRITTS(Dataset):
             base_url = "http://www.openslr.org/resources/60/"
 
             url = os.path.join(base_url, url + ext_archive)
+
+        # Get string representation of 'root' in case Path object is passed
+        root = os.fspath(root)
 
         basename = os.path.basename(url)
         archive = os.path.join(root, basename)
