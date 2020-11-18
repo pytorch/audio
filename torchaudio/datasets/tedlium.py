@@ -1,5 +1,6 @@
 import os
 from typing import Tuple, Union
+from pathlib import Path
 
 import torchaudio
 from torch import Tensor
@@ -56,7 +57,7 @@ class TEDLIUM(Dataset):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
     def __init__(
-        self, root: str, release: str = "release1", subset: str = None, download: bool = False, audio_ext=".sph"
+        self, root: Union[str, Path], release: str = "release1", subset: str = None, download: bool = False, audio_ext=".sph"
     ) -> None:
         self._ext_audio = audio_ext
         if release in _RELEASE_CONFIGS.keys():
