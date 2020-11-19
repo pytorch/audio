@@ -684,6 +684,16 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - designate_upload_channel
+      - run:
+          name: Generate netrc
+          command: |
+            # set credentials for https pushing
+            # requires the org-member context
+            cat > ~/.netrc \<<DONE
+              machine github.com
+              login pytorchbot
+              password ${GITHUB_PYTORCHBOT_TOKEN}
+            DONE
       - checkout
       - run:
           name: Upload docs

@@ -88,6 +88,7 @@ def build_doc_job(filter_branch):
 def upload_doc_job(filter_branch):
     job = {
         "name": "upload_docs",
+        "context": "org-member",
         "python_version": "3.8",
         "requires": ["build_docs",],
     }
