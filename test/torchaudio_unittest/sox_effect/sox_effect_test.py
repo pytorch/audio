@@ -1,4 +1,5 @@
 import itertools
+from pathlib import Path
 
 from torchaudio import sox_effects
 from parameterized import parameterized
@@ -104,8 +105,8 @@ class TestSoxEffectsFile(TempDirMixin, PytorchTestCase):
         load_params("sox_effect_test_args.json"),
         name_func=lambda f, i, p: f'{f.__name__}_{i}_{p.args[0]["effects"][0][0]}',
     )
-    def test_apply_effects(self, args):
-        """`apply_effects_file` should return identical data as sox command"""
+    def test_apply_effects_str(self, args):
+        """`apply_effects_file` should return identical data as sox command when file path is given as a string"""
         dtype = 'int32'
         channels_first = True
         effects = args['effects']
@@ -123,6 +124,33 @@ class TestSoxEffectsFile(TempDirMixin, PytorchTestCase):
         expected, expected_sr = load_wav(reference_path)
         found, sr = sox_effects.apply_effects_file(
             input_path, effects, normalize=False, channels_first=channels_first)
+
+        assert sr == expected_sr
+        self.assertEqual(found, expected)
+
+    @parameterized.expand(
+        load_params("sox_effect_test_args.json"),
+        name_func=lambda f, i, p: f'{f.__name__}_{i}_{p.args[0]["effects"][0][0]}',
+    )
+    def test_apply_effects_path(self, args):
+        """`apply_effects_file` should return identical data as sox command when file path is given as a Path Object"""
+        dtype = 'int32'
+        channels_first = True
+        effects = args['effects']
+        num_channels = args.get("num_channels", 2)
+        input_sr = args.get("input_sample_rate", 8000)
+        output_sr = args.get("output_sample_rate")
+
+        input_path = self.get_temp_path('input.wav')
+        reference_path = self.get_temp_path('reference.wav')
+        data = get_wav_data(dtype, num_channels, channels_first=channels_first)
+        save_wav(input_path, data, input_sr, channels_first=channels_first)
+        sox_utils.run_sox_effect(
+            input_path, reference_path, effects, output_sample_rate=output_sr)
+
+        expected, expected_sr = load_wav(reference_path)
+        found, sr = sox_effects.apply_effects_file(
+            Path(input_path), effects, normalize=False, channels_first=channels_first)
 
         assert sr == expected_sr
         self.assertEqual(found, expected)

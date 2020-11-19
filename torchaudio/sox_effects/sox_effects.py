@@ -1,4 +1,6 @@
-from typing import List, Tuple
+import os
+from typing import List, Tuple, Union
+from pathlib import Path
 
 import torch
 
@@ -153,7 +155,7 @@ def apply_effects_tensor(
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def apply_effects_file(
-        path: str,
+        path: Union[str, Path],
         effects: List[List[str]],
         normalize: bool = True,
         channels_first: bool = True,
@@ -169,7 +171,7 @@ def apply_effects_file(
         rate and leave samples untouched.
 
     Args:
-        path (str): Path to the audio file.
+        path (str or Path): Path to the audio file.
         effects (List[List[str]]): List of effects.
         normalize (bool):
             When ``True``, this function always return ``float32``, and sample values are
@@ -247,5 +249,7 @@ def apply_effects_file(
         >>> for batch in loader:
         >>>     pass
     """
+    # Get string representation of 'path' in case Path object is passed
+    path = os.fspath(path)
     signal = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first)
     return signal.get_tensor(), signal.get_sample_rate()
