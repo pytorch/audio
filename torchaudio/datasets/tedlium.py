@@ -1,5 +1,6 @@
 import os
-from typing import Tuple
+from typing import Tuple, Union
+from pathlib import Path
 
 import torchaudio
 from torch import Tensor
@@ -46,7 +47,7 @@ class TEDLIUM(Dataset):
     Create a Dataset for Tedlium. It supports releases 1,2 and 3.
 
     Args:
-        root (str): Path to the directory where the dataset is found or downloaded.
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
         release (str, optional): Release version.
             Allowed values are ``"release1"``, ``"release2"`` or ``"release3"``.
             (default: ``"release1"``).
@@ -56,7 +57,12 @@ class TEDLIUM(Dataset):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
     def __init__(
-        self, root: str, release: str = "release1", subset: str = None, download: bool = False, audio_ext=".sph"
+        self,
+        root: Union[str, Path],
+        release: str = "release1",
+        subset: str = None,
+        download: bool = False,
+        audio_ext=".sph"
     ) -> None:
         self._ext_audio = audio_ext
         if release in _RELEASE_CONFIGS.keys():
@@ -77,6 +83,9 @@ class TEDLIUM(Dataset):
                     subset, _RELEASE_CONFIGS[release]["supported_subsets"],
                 )
             )
+
+        # Get string representation of 'root' in case Path object is passed
+        root = os.fspath(root)
 
         basename = os.path.basename(url)
         archive = os.path.join(root, basename)

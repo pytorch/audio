@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from torchaudio.datasets import librispeech
 
@@ -91,11 +92,7 @@ class TestLibriSpeech(TempDirMixin, TorchaudioTestCase):
         # In case of test failure
         librispeech.LIBRISPEECH._ext_audio = '.flac'
 
-    def test_librispeech(self):
-        librispeech.LIBRISPEECH._ext_audio = '.wav'
-        dataset = librispeech.LIBRISPEECH(self.root_dir)
-        print(dataset._path)
-
+    def _test_librispeech(self, dataset):
         num_samples = 0
         for i, (
             data, sample_rate, utterance, speaker_id, chapter_id, utterance_id
@@ -110,3 +107,13 @@ class TestLibriSpeech(TempDirMixin, TorchaudioTestCase):
 
         assert num_samples == len(self.samples)
         librispeech.LIBRISPEECH._ext_audio = '.flac'
+
+    def test_librispeech_str(self):
+        librispeech.LIBRISPEECH._ext_audio = '.wav'
+        dataset = librispeech.LIBRISPEECH(self.root_dir)
+        self._test_librispeech(dataset)
+
+    def test_librispeech_path(self):
+        librispeech.LIBRISPEECH._ext_audio = '.wav'
+        dataset = librispeech.LIBRISPEECH(Path(self.root_dir))
+        self._test_librispeech(dataset)
