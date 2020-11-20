@@ -1,4 +1,3 @@
-import os
 from typing import List, Tuple, Union
 from pathlib import Path
 
@@ -251,6 +250,6 @@ def apply_effects_file(
         >>>     pass
     """
     # Get string representation of 'path' in case Path object is passed
-    path = os.fspath(path)
+    path = str(path)
     signal = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first)
     return signal.get_tensor(), signal.get_sample_rate()

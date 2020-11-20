@@ -105,7 +105,7 @@ class TestSoxEffectsFile(TempDirMixin, PytorchTestCase):
         load_params("sox_effect_test_args.json"),
         name_func=lambda f, i, p: f'{f.__name__}_{i}_{p.args[0]["effects"][0][0]}',
     )
-    def test_apply_effects(self, args):
+    def test_apply_effects_str(self, args):
         """`apply_effects_file` should return identical data as sox command"""
         dtype = 'int32'
         channels_first = True
@@ -128,11 +128,11 @@ class TestSoxEffectsFile(TempDirMixin, PytorchTestCase):
         assert sr == expected_sr
         self.assertEqual(found, expected)
 
-    def test_apply_effects_path(self, args):
+    def test_apply_effects_path(self):
         """`apply_effects_file` should return identical data as sox command when file path is given as a Path Object"""
         dtype = 'int32'
         channels_first = True
-        effects = "hilbert"
+        effects = [["hilbert"]]
         num_channels = 2
         input_sr = 8000
         output_sr = 8000
