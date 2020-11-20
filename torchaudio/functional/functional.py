@@ -205,7 +205,7 @@ def amplitude_to_DB(
 
     This output depends on the maximum value in the input tensor, and so
     may return different values for an audio clip split into snippets vs. a
-    a full clip.
+    full clip.
 
     Args:
         x (Tensor): Input tensor before being converted to decibel scale
