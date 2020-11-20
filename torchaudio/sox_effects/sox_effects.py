@@ -155,7 +155,7 @@ def apply_effects_tensor(
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def apply_effects_file(
-        path: Union[str, Path],
+        path: str,
         effects: List[List[str]],
         normalize: bool = True,
         channels_first: bool = True,
@@ -171,7 +171,8 @@ def apply_effects_file(
         rate and leave samples untouched.
 
     Args:
-        path (str or Path): Path to the audio file.
+        path (str or pathlib.Path): Path to the audio file. This function also handles ``pathlib.Path`` objects, but is
+            annotated as ``str`` for TorchScript compiler compatibility.
         effects (List[List[str]]): List of effects.
         normalize (bool):
             When ``True``, this function always return ``float32``, and sample values are
