@@ -24,9 +24,9 @@ if [ "$target" == "master" ]; then
     mkdir -p ./_static
     rm -rf ./_static/*
     cp -r ${src}/build/html/_static/* ./_static
-    git add ./_static || true
+    git add --all ./_static || true
 fi
-git add ./$target || true
+git add --all ./$target || true
 git config user.email "soumith+bot@pytorch.org"
 git config user.name "pytorchbot"
 # If there aren't changes, don't make a commit; push is no-op
