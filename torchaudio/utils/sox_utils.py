@@ -26,6 +26,7 @@ def set_verbosity(verbosity: int):
 
     Args:
         verbosity (int): Set verbosity level of libsox.
+
             * ``1`` failure messages
             * ``2`` warnings
             * ``3`` details of processing
