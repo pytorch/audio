@@ -58,13 +58,13 @@ class CMakeBuild(build_ext):
 
         cfg = "Debug" if self.debug else "Release"
 
-        library_path = os.path.join(get_config_var('LIBDIR'), get_config_var('LDLIBRARY'))
+        # library_path = os.path.join(get_config_var('LIBDIR'), get_config_var('LDLIBRARY'))
         cmake_args = [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
             f"-DCMAKE_BUILD_TYPE={cfg}",
             f"-DCMAKE_PREFIX_PATH={torch.utils.cmake_prefix_path}",
-            f"-DPython_LIBRARIES={library_path}",
-            f"-DPython_INCLUDE_DIRS={get_config_var('INCLUDEPY')}",
+            f"-DPython_LIBRARY={get_config_var('LIBDIR')}",
+            f"-DPython_INCLUDE_DIR={get_config_var('INCLUDEPY')}",
             f"-DBUILD_SOX:BOOL={_get_build_sox()}",
             "-DBUILD_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",

@@ -75,12 +75,12 @@ if (BUILD_PYTHON_EXTENSION)
   # to be manually specified.
   # This approach does not require an extra step from a user, because we do so in
   # setup.py
-  # find_package(Python REQUIRED COMPONENTS Development)
+  find_package(Python3 REQUIRED COMPONENTS Development)
 
-  if (NOT Python_LIBRARIES)
+  if (NOT Python3_LIBRARIES)
     message(FATAL_ERROR "Python_LIBRARIES is not defined. Try with -DPython_LIBRARIES=...")
   endif()
-  if (NOT Python_INCLUDE_DIRS)
+  if (NOT Python3_INCLUDE_DIRS)
     message(FATAL_ERROR "Python_include_dirs is not defined. Try with -DPython_INCLUDE_DIR=...?")
   endif()
 
@@ -97,7 +97,7 @@ if (BUILD_PYTHON_EXTENSION)
     _torchaudio
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${Python_INCLUDE_DIRS}
+    ${Python3_INCLUDE_DIRS}
     )
 
   # See https://github.com/pytorch/pytorch/issues/38122
@@ -108,7 +108,7 @@ if (BUILD_PYTHON_EXTENSION)
     ${TORCHAUDIO_THIRD_PARTIES}
     ${TORCH_LIBRARIES}
     ${TORCH_PYTHON_LIBRARY}
-    ${Python_LIBRARIES}
+    ${Python3_LIBRARIES}
     )
 
   # We do not define install for _torchaudio.so
