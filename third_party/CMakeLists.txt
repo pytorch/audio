@@ -158,5 +158,9 @@ set(
 )
 
 else()
-  set(TORCHAUDIO_THIRD_PARTIES sox)
+  set(
+    TORCHAUDIO_THIRD_PARTIES
+    sox
+    PARENT_SCOPE
+    )
 endif()
