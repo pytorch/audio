@@ -17,7 +17,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 add_subdirectory(third_party)
 
 ################################################################################
-# Beggning of torchaudio extension configuration
+# Begining of torchaudio extension configuration
 ################################################################################
 
 set(TORCHAUDIO_CSRC "${CMAKE_CURRENT_SOURCE_DIR}/torchaudio/csrc")
@@ -29,7 +29,7 @@ set(
   "${TORCHAUDIO_CSRC}/sox_effects.cpp"
   "${TORCHAUDIO_CSRC}/sox_effects_chain.cpp"
   "${TORCHAUDIO_CSRC}/register.cpp"
-)
+  )
 
 ################################################################################
 # libtorchaudio.so
@@ -40,7 +40,6 @@ if(BUILD_LIBTORCHAUDIO)
     SHARED
     ${LIBTORCHAUDIO_SOURCES}
     )
-
   set_target_properties(libtorchaudio PROPERTIES PREFIX "")
 
   target_include_directories(
@@ -67,15 +66,14 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_PYTHON_EXTENSION)
-
   # Note:
-  # It seems that there is a bug in find_package and
+  # It seems that there is a bug in find_package(Python COMPONENTS Development) and
   # the resulting Python_LIBRARIES point a directory instead of the library
   # file, and it causes the link step to fail.
   # So, until find_package is fixed (and we change the cmake_minimum_required
   # to that specific version), we request Python_LIBRARIES and Python_INCLUDE_DIRS
   # to be manually specified.
-  # This is approach does not require extra step from a user, because we do so in
+  # This approach does not require an extra step from a user, because we do so in
   # setup.py
   # find_package(Python REQUIRED COMPONENTS Development)
 
