@@ -63,7 +63,7 @@ class CMakeBuild(build_ext):
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
             f"-DCMAKE_BUILD_TYPE={cfg}",
             f"-DCMAKE_PREFIX_PATH={torch.utils.cmake_prefix_path}",
-            f"-DPython3_EXECUTABLE={sys.executable}",
+            # f"-DPython3_EXECUTABLE={sys.executable}",
             # f"-DPython3_LIBRARY={get_config_var('LIBDIR')}",
             # f"-DPython3_INCLUDE_DIR={get_config_var('INCLUDEPY')}",
             f"-DBUILD_SOX:BOOL={_get_build_sox()}",
