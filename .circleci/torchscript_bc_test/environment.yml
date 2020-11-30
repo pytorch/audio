@@ -7,7 +7,7 @@ dependencies:
   - pytest
   - pytest-cov
   - codecov
-  - cmake>=3.14
+  - cmake>=3.18
   - librosa>=0.8.0
   - llvmlite==0.31  # See https://github.com/pytorch/audio/pull/766
   - pip

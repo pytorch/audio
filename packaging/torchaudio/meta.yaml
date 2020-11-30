@@ -14,7 +14,7 @@ requirements:
     - python
     - setuptools
     - cpuonly
-    - cmake
+    - cmake >=3.18
     - ninja
     {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT') }}
 

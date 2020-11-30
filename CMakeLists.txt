@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.18)
 
 project(torchaudio)
 
@@ -75,7 +75,7 @@ if (BUILD_PYTHON_EXTENSION)
   # to be manually specified.
   # This approach does not require an extra step from a user, because we do so in
   # setup.py
-  find_package(Python3 REQUIRED COMPONENTS Development)
+  find_package(Python3 REQUIRED COMPONENTS Development.Module)
 
   if (NOT Python3_LIBRARIES)
     message(FATAL_ERROR "Python_LIBRARIES is not defined. Try with -DPython_LIBRARIES=...")

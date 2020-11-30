@@ -40,12 +40,4 @@ fi
 conda activate "${env_dir}"
 
 # 3. Install minimal build tools
-pip --quiet install cmake ninja
-
-# 4. Buld codecs
-mkdir -p third_party/build
-(
-    cd third_party/build
-    cmake -GNinja ..
-    cmake --build .
-)
+pip --quiet install 'cmake>=3.18' ninja
