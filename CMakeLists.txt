@@ -67,10 +67,11 @@ endif()
 ################################################################################
 if (BUILD_PYTHON_EXTENSION)
 
-  find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+  cmake_policy(SET CMP0074 NEW)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
   message(STATUS ${Python3_FOUND})
   message(STATUS ${Python3_EXECUTABLE})
-  message(STATUS ${Python3_LIBRARY})
+  message(STATUS ${Python3_LIBRARIES})
   message(STATUS ${Python3_INCLUDE_DIRS})
   message(STATUS Python3::Module)
 
