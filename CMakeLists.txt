@@ -35,33 +35,32 @@ set(
 # libtorchaudio.so
 ################################################################################
 if(BUILD_LIBTORCHAUDIO)
-add_library(
-  libtorchaudio
-  SHARED
-  ${LIBTORCHAUDIO_SOURCES}
-)
+  add_library(
+    libtorchaudio
+    SHARED
+    ${LIBTORCHAUDIO_SOURCES}
+    )
 
-set_target_properties(libtorchaudio PROPERTIES PREFIX "")
+  set_target_properties(libtorchaudio PROPERTIES PREFIX "")
 
-target_include_directories(
-  libtorchaudio
-  PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}
-)
+  target_include_directories(
+    libtorchaudio
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    )
 
-target_link_libraries(
-  libtorchaudio
-  "${TORCHAUDIO_THIRD_PARTIES}"
-  "${TORCH_LIBRARIES}"
-)
+  target_link_libraries(
+    libtorchaudio
+    "${TORCHAUDIO_THIRD_PARTIES}"
+    "${TORCH_LIBRARIES}"
+    )
 
-install(
-  TARGETS
-  libtorchaudio
-  )
+  install(
+    TARGETS
+    libtorchaudio
+    )
 
-set(TORCHAUDIO_LIBRARY -Wl,--no-as-needed libtorchaudio -Wl,--as-needed CACHE INTERNAL "")
-
+  set(TORCHAUDIO_LIBRARY -Wl,--no-as-needed libtorchaudio -Wl,--as-needed CACHE INTERNAL "")
 endif()
 
 ################################################################################
