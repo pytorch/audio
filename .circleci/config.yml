@@ -655,6 +655,11 @@ workflows:
           python_version: '3.8'
           requires:
           - download_third_parties_nix
+      - binary_linux_wheel:
+          name: binary_linux_wheel_py3.9
+          python_version: '3.9'
+          requires:
+          - download_third_parties_nix
       - binary_macos_wheel:
           name: binary_macos_wheel_py3.6
           python_version: '3.6'
@@ -670,6 +675,11 @@ workflows:
           python_version: '3.8'
           requires:
           - download_third_parties_nix
+      - binary_macos_wheel:
+          name: binary_macos_wheel_py3.9
+          python_version: '3.9'
+          requires:
+          - download_third_parties_nix
       - binary_windows_wheel:
           name: binary_windows_wheel_py3.6
           python_version: '3.6'
@@ -679,6 +689,9 @@ workflows:
       - binary_windows_wheel:
           name: binary_windows_wheel_py3.8
           python_version: '3.8'
+      - binary_windows_wheel:
+          name: binary_windows_wheel_py3.9
+          python_version: '3.9'
       - binary_linux_conda:
           name: binary_linux_conda_py3.6
           python_version: '3.6'
@@ -692,6 +705,11 @@ workflows:
       - binary_linux_conda:
           name: binary_linux_conda_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
+      - binary_linux_conda:
+          name: binary_linux_conda_py3.9
+          python_version: '3.9'
           requires:
           - download_third_parties_nix
       - binary_macos_conda:
@@ -709,6 +727,11 @@ workflows:
           python_version: '3.8'
           requires:
           - download_third_parties_nix
+      - binary_macos_conda:
+          name: binary_macos_conda_py3.9
+          python_version: '3.9'
+          requires:
+          - download_third_parties_nix
       - binary_windows_conda:
           name: binary_windows_conda_py3.6
           python_version: '3.6'
@@ -718,6 +741,9 @@ workflows:
       - binary_windows_conda:
           name: binary_windows_conda_py3.8
           python_version: '3.8'
+      - binary_windows_conda:
+          name: binary_windows_conda_py3.9
+          python_version: '3.9'
   unittest:
     jobs:
       - torchscript_bc_test:
@@ -741,6 +767,11 @@ workflows:
       - unittest_linux_cpu:
           name: unittest_linux_cpu_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
+      - unittest_linux_cpu:
+          name: unittest_linux_cpu_py3.9
+          python_version: '3.9'
           requires:
           - download_third_parties_nix
       - unittest_linux_gpu:
@@ -779,6 +810,18 @@ workflows:
           python_version: '3.8'
           requires:
           - download_third_parties_nix
+      - unittest_linux_gpu:
+          filters:
+            branches:
+              only:
+              - master
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: unittest_linux_gpu_py3.9
+          python_version: '3.9'
+          requires:
+          - download_third_parties_nix
       - unittest_windows_cpu:
           name: unittest_windows_cpu_py3.6
           python_version: '3.6'
@@ -788,6 +831,9 @@ workflows:
       - unittest_windows_cpu:
           name: unittest_windows_cpu_py3.8
           python_version: '3.8'
+      - unittest_windows_cpu:
+          name: unittest_windows_cpu_py3.9
+          python_version: '3.9'
       - unittest_windows_gpu:
           filters:
             branches:
@@ -818,6 +864,16 @@ workflows:
               only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: unittest_windows_gpu_py3.8
           python_version: '3.8'
+      - unittest_windows_gpu:
+          filters:
+            branches:
+              only:
+              - master
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: unittest_windows_gpu_py3.9
+          python_version: '3.9'
       - unittest_macos_cpu:
           name: unittest_macos_cpu_py3.6
           python_version: '3.6'
@@ -831,6 +887,11 @@ workflows:
       - unittest_macos_cpu:
           name: unittest_macos_cpu_py3.8
           python_version: '3.8'
+          requires:
+          - download_third_parties_nix
+      - unittest_macos_cpu:
+          name: unittest_macos_cpu_py3.9
+          python_version: '3.9'
           requires:
           - download_third_parties_nix
   nightly:
@@ -946,6 +1007,39 @@ workflows:
           python_version: '3.8'
           requires:
           - nightly_binary_linux_wheel_py3.8_upload
+      - binary_linux_wheel:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.9
+          python_version: '3.9'
+          requires:
+          - download_third_parties_nix
+      - binary_wheel_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.9_upload
+          requires:
+          - nightly_binary_linux_wheel_py3.9
+      - smoke_test_linux_pip:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.9_smoke_test_pip
+          python_version: '3.9'
+          requires:
+          - nightly_binary_linux_wheel_py3.9_upload
       - binary_macos_wheel:
           filters:
             branches:
@@ -1012,6 +1106,28 @@ workflows:
           name: nightly_binary_macos_wheel_py3.8_upload
           requires:
           - nightly_binary_macos_wheel_py3.8
+      - binary_macos_wheel:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_macos_wheel_py3.9
+          python_version: '3.9'
+          requires:
+          - download_third_parties_nix
+      - binary_wheel_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_macos_wheel_py3.9_upload
+          requires:
+          - nightly_binary_macos_wheel_py3.9
       - binary_windows_wheel:
           filters:
             branches:
@@ -1105,6 +1221,37 @@ workflows:
           python_version: '3.8'
           requires:
           - nightly_binary_windows_wheel_py3.8_upload
+      - binary_windows_wheel:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_wheel_py3.9
+          python_version: '3.9'
+      - binary_wheel_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_wheel_py3.9_upload
+          requires:
+          - nightly_binary_windows_wheel_py3.9
+      - smoke_test_windows_pip:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_wheel_py3.9_smoke_test_pip
+          python_version: '3.9'
+          requires:
+          - nightly_binary_windows_wheel_py3.9_upload
       - binary_linux_conda:
           filters:
             branches:
@@ -1204,6 +1351,39 @@ workflows:
           python_version: '3.8'
           requires:
           - nightly_binary_linux_conda_py3.8_upload
+      - binary_linux_conda:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_conda_py3.9
+          python_version: '3.9'
+          requires:
+          - download_third_parties_nix
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_conda_py3.9_upload
+          requires:
+          - nightly_binary_linux_conda_py3.9
+      - smoke_test_linux_conda:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_conda_py3.9_smoke_test_conda
+          python_version: '3.9'
+          requires:
+          - nightly_binary_linux_conda_py3.9_upload
       - binary_macos_conda:
           filters:
             branches:
@@ -1270,6 +1450,28 @@ workflows:
           name: nightly_binary_macos_conda_py3.8_upload
           requires:
           - nightly_binary_macos_conda_py3.8
+      - binary_macos_conda:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_macos_conda_py3.9
+          python_version: '3.9'
+          requires:
+          - download_third_parties_nix
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_macos_conda_py3.9_upload
+          requires:
+          - nightly_binary_macos_conda_py3.9
       - binary_windows_conda:
           filters:
             branches:
@@ -1363,6 +1565,37 @@ workflows:
           python_version: '3.8'
           requires:
           - nightly_binary_windows_conda_py3.8_upload
+      - binary_windows_conda:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.9
+          python_version: '3.9'
+      - binary_conda_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.9_upload
+          requires:
+          - nightly_binary_windows_conda_py3.9
+      - smoke_test_windows_conda:
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_windows_conda_py3.9_smoke_test_conda
+          python_version: '3.9'
+          requires:
+          - nightly_binary_windows_conda_py3.9_upload
   docker_build:
     triggers:
       - schedule:
