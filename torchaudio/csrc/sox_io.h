@@ -25,10 +25,10 @@ c10::intrusive_ptr<SignalInfo> get_info(const std::string& path);
 
 c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> load_audio_file(
     const std::string& path,
-    const int64_t frame_offset = 0,
-    const int64_t num_frames = -1,
-    const bool normalize = true,
-    const bool channels_first = true);
+    c10::optional<int64_t>& frame_offset,
+    c10::optional<int64_t>& num_frames,
+    c10::optional<bool>& normalize,
+    c10::optional<bool>& channels_first);
 
 void save_audio_file(
     const std::string& file_name,
