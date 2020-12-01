@@ -20,7 +20,7 @@ else
     cudatoolkit="cudatoolkit=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch ${cudatoolkit}
+conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch ${cudatoolkit}
 
 printf "* Installing dependencies for test\n"
 conda install -y -c conda-forge pytest pytest-cov codecov 'librosa>=0.8.0' scipy parameterized
