@@ -399,14 +399,14 @@ jobs:
       - restore_cache:
           {% raw %}
           keys:
-            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-cpu-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-cpu-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda
@@ -443,7 +443,7 @@ jobs:
       - restore_cache:
           {% raw %}
           keys:
-            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-gpu-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
       - run:
           name: Pull Docker image
@@ -453,7 +453,7 @@ jobs:
           command: docker run -t --gpus all -e PYTHON_VERSION -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - save_cache:
           {% raw %}
-          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
+          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-gpu-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
             - conda

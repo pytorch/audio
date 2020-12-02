@@ -99,7 +99,7 @@ class CMakeBuild(build_ext):
         if 'CMAKE_GENERATOR' not in os.environ:
             cmake_args += ["-GNinja"]
 
-        print('setting CUDA_HOME: torch.utils.cpp_extension.CUDA_HOME')
+        print(f'setting CUDA_HOME: {torch.utils.cpp_extension.CUDA_HOME}')
         if torch.utils.cpp_extension.CUDA_HOME is not None:
             cmake_args += [f"-DCUDA_HOME={torch.utils.cpp_extension.CUDA_HOME}"]
 
