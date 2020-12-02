@@ -67,20 +67,13 @@ endif()
 ################################################################################
 if (BUILD_PYTHON_EXTENSION)
 
-  # cmake_policy(SET CMP0074 NEW)
-  # find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
-  # message(STATUS ${Python3_FOUND})
-  # message(STATUS ${Python3_EXECUTABLE})
-  # message(STATUS ${Python3_LIBRARIES})
-  # message(STATUS ${Python3_INCLUDE_DIRS})
-  # message(STATUS Python3::Module)
-
-  # if (NOT Python3_LIBRARIES)
-  #   message(FATAL_ERROR "Python_LIBRARIES is not defined. Try with -DPython_LIBRARIES=...")
-  # endif()
-  if (NOT Python3_INCLUDE_DIR)
-    message(FATAL_ERROR "Python3_INCLUDE_DIR is not defined. Try with -DPython3_INCLUDE_DIR=...")
-  endif()
+  # FindPythonLibs is deprecated and it is encouraged to use FindPython or
+  # FindPython3, but their behaviors are not consistent across platforms so we use
+  # FindPytonInterp and FindPythonLibs, like in PyTorch
+  # https://github.com/pytorch/pytorch/blob/7f869dca70606c42994d822ba11362a353411a1c/cmake/Dependencies.cmake#L936-L940
+  set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
+  find_package(PythonInterp 3.6 REQUIRED)
+  find_package(PythonLibs 3.6 REQUIRED)
 
   add_library(
     _torchaudio
@@ -95,7 +88,7 @@ if (BUILD_PYTHON_EXTENSION)
     _torchaudio
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${Python3_INCLUDE_DIR}
+    ${PYTHON_INCLUDE_DIRS}
     )
 
   # See https://github.com/pytorch/pytorch/issues/38122
@@ -106,6 +99,7 @@ if (BUILD_PYTHON_EXTENSION)
     ${TORCHAUDIO_THIRD_PARTIES}
     ${TORCH_LIBRARIES}
     ${TORCH_PYTHON_LIBRARY}
+    ${PYTHON_LIBRARIES}
     )
 
   # We do not define install for _torchaudio.so
