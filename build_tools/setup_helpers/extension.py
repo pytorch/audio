@@ -64,6 +64,8 @@ def _get_ela(debug):
 def _get_srcs():
     srcs = [_CSRC_DIR / 'pybind.cpp']
     srcs += list(_CSRC_DIR.glob('sox/**/*.cpp'))
+    srcs += list(_CSRC_DIR.glob('kaldi/**/*.cpp'))
+    srcs += list(_CSRC_DIR.glob('kaldi/**/*.cc'))
     if _BUILD_TRANSDUCER:
         srcs += [_CSRC_DIR / 'transducer.cpp']
     return [str(path) for path in srcs]
@@ -72,6 +74,7 @@ def _get_srcs():
 def _get_include_dirs():
     dirs = [
         str(_ROOT_DIR),
+        str(_CSRC_DIR / 'kaldi'),
     ]
     if _BUILD_SOX or _BUILD_TRANSDUCER:
         dirs.append(str(_TP_INSTALL_DIR / 'include'))

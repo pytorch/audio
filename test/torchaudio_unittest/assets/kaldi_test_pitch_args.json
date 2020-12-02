@@ -1,0 +1,5 @@
+{"sample_frequency": 8000}
+{"sample_frequency": 8000, "frames_per_chunk": 200}
+{"sample_frequency": 8000, "frames_per_chunk": 200, "simulate_first_pass_online": true}
+{"sample_frequency": 16000}
+{"sample_frequency": 44100}

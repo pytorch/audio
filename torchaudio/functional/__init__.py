@@ -3,6 +3,7 @@ from .functional import (
     angle,
     complex_norm,
     compute_deltas,
+    compute_kaldi_pitch,
     create_dct,
     create_fb_matrix,
     DB_to_amplitude,
