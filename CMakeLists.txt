@@ -16,6 +16,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 add_subdirectory(third_party)
 
+if (APPLE)
+  SET(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
+endif()
+
 ################################################################################
 # Begining of torchaudio extension configuration
 ################################################################################
