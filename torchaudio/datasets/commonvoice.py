@@ -125,7 +125,8 @@ class COMMONVOICE(Dataset):
         if url is not None:
             warnings.warn(
                 "The use of the url flag is deprecated, since the dataset "
-                "is no longer publicly accessible.", RuntimeWarning
+                "is no longer publicly accessible. To specify the language of the dataset, "
+                "please use the language parameter instead.", RuntimeWarning
             )
 
         languages = {

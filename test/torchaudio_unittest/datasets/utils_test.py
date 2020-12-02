@@ -54,7 +54,7 @@ class TestIterator(TorchaudioTestCase):
     path = get_asset_path()
 
     def test_disckcache_iterator(self):
-        data = COMMONVOICE(self.path, url="tatar")
+        data = COMMONVOICE(self.path, version="cv-corpus-4-2019-12-10", language="tatar")
         data = dataset_utils.diskcache_iterator(data)
         # Save
         data[0]
@@ -62,7 +62,7 @@ class TestIterator(TorchaudioTestCase):
         data[0]
 
     def test_bg_iterator(self):
-        data = COMMONVOICE(self.path, url="tatar")
+        data = COMMONVOICE(self.path, version="cv-corpus-4-2019-12-10", language="tatar")
         data = dataset_utils.bg_iterator(data, 5)
         for _ in data:
             pass
