@@ -21,7 +21,7 @@ if (APPLE)
 endif()
 
 ################################################################################
-# Begining of torchaudio extension configuration
+# Beginning of torchaudio extension configuration
 ################################################################################
 
 set(TORCHAUDIO_CSRC "${CMAKE_CURRENT_SOURCE_DIR}/torchaudio/csrc")
@@ -70,14 +70,16 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_PYTHON_EXTENSION)
-
-  # FindPythonLibs is deprecated and it is encouraged to use FindPython or
-  # FindPython3, but their behaviors are not consistent across platforms so we use
-  # FindPytonInterp and FindPythonLibs, like in PyTorch
-  # https://github.com/pytorch/pytorch/blob/7f869dca70606c42994d822ba11362a353411a1c/cmake/Dependencies.cmake#L936-L940
-  set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
-  find_package(PythonInterp 3.6 REQUIRED)
-  find_package(PythonLibs 3.6 REQUIRED)
+  # Since this part of code is expected to be called from setup.py, we expect
+  # that PYTHON_INCLUDE_DIR and PYTHON_LIBRARY are provided.
+  # If needed, we can add search here, like
+  # https://github.com/pytorch/pytorch/blob/7f869dca70606c42994d822ba11362a353411a1c/cmake/Dependencies.cmake#L904-L940
+  if (NOT PYTHON_INCLUDE_DIR)
+    message(FATAL_ERROR "PYTHON_INCLUDE_DIR is not provided.")
+  endif()
+  if (NOT PYTHON_LIBRARY)
+    message(FATAL_ERROR "PYTHON_LIBRARY is not provided.")
+  endif()
 
   add_library(
     _torchaudio
@@ -92,7 +94,7 @@ if (BUILD_PYTHON_EXTENSION)
     _torchaudio
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${PYTHON_INCLUDE_DIRS}
+    ${PYTHON_INCLUDE_DIR}
     )
 
   # See https://github.com/pytorch/pytorch/issues/38122
@@ -103,7 +105,7 @@ if (BUILD_PYTHON_EXTENSION)
     ${TORCHAUDIO_THIRD_PARTIES}
     ${TORCH_LIBRARIES}
     ${TORCH_PYTHON_LIBRARY}
-    ${PYTHON_LIBRARIES}
+    ${PYTHON_LIBRARY}
     )
 
   # We do not define install for _torchaudio.so

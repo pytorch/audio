@@ -1,13 +1,14 @@
 import os
-import sys
-from sysconfig import get_config_var
 import platform
 import subprocess
+import sysconfig
 from pathlib import Path
+
+import distutils.sysconfig
 from setuptools import Extension
 from setuptools.command.build_ext import build_ext
-
 import torch
+import torch.utils.cpp_extension
 
 __all__ = [
     'get_ext_modules',
@@ -38,6 +39,24 @@ def get_ext_modules():
     return [Extension(name='torchaudio._torchaudio', sources=[])]
 
 
+def _get_python_include_dir():
+    # https://github.com/pytorch/pytorch/blob/7f869dca70606c42994d822ba11362a353411a1c/cmake/Dependencies.cmake#L904-L940
+    dir_ = distutils.sysconfig.get_python_inc()
+    if os.path.exists(dir_):
+        return dir_
+    dir_ = sysconfig.get_paths()['include']
+    if os.path.exists(dir_):
+        return dir_
+    raise ValueError('Cannot find Python development include directory.')
+
+
+def _get_python_library():
+    lib = sysconfig.get_paths()['stdlib']
+    if os.path.exists(lib):
+        return lib
+    raise ValueError('Cannot find Python library.')
+
+
 # Based off of
 # https://github.com/pybind/cmake_example/blob/580c5fd29d4651db99d8874714b07c0c49a53f8a/setup.py
 class CMakeBuild(build_ext):
@@ -64,6 +83,8 @@ class CMakeBuild(build_ext):
             f"-DCMAKE_BUILD_TYPE={cfg}",
             f"-DCMAKE_PREFIX_PATH={torch.utils.cmake_prefix_path}",
             f"-DBUILD_SOX:BOOL={_get_build_sox()}",
+            f"-DPYTHON_INCLUDE_DIR={_get_python_include_dir()}",
+            f"-DPYTHON_LIBRARY={_get_python_library()}",
             "-DBUILD_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
         ]
@@ -77,6 +98,10 @@ class CMakeBuild(build_ext):
         # Default to Ninja
         if 'CMAKE_GENERATOR' not in os.environ:
             cmake_args += ["-GNinja"]
+
+        print('setting CUDA_HOME: torch.utils.cpp_extension.CUDA_HOME')
+        if torch.utils.cpp_extension.CUDA_HOME is not None:
+            cmake_args += [f"-DCUDA_HOME={torch.utils.cpp_extension.CUDA_HOME}"]
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.
