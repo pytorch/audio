@@ -463,7 +463,7 @@ jobs:
             - third_party/src
       - run:
           name: Install torchaudio
-          command: docker run -t --gpus all -e UPLOAD_CHANNEL -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
+          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CUDA_HOME -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
       - run:
           name: Run tests
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/run_test.sh

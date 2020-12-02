@@ -38,6 +38,8 @@ conda install -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch ${cudatoolkit}
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
+python -m torch.utils.collect_env
+echo "CUDA_HOME: ${CUDA_HOME}"
 BUILD_SOX=1 python setup.py install
 
 # 3. Install Test tools
