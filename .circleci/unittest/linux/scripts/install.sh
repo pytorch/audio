@@ -23,9 +23,15 @@ printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch ${cudatoolkit}
 
 printf "* Installing dependencies for test\n"
-conda install -y -c conda-forge pytest pytest-cov codecov scipy parameterized
-# librosa doesn't have conda packages for python 3.9+
-pip install kaldi-io 'librosa>=0.8.0'
+CONDA_PKGS="librosa>=0.8.0"
+PIP_PKGS=""
+if [[ $(python --version) = *3.9* ]]; then
+    CONDA_PKGS=""
+    # librosa doesn't have conda packages for python 3.9+
+    PIP_PKGS="librosa>=0.8.0"
+fi
+conda install -y -c conda-forge pytest pytest-cov codecov scipy parameterized ${CONDA_PKGS}
+pip install kaldi-io ${PIP_PKGS}
 
 printf "* Building codecs\n"
 mkdir -p third_party/build
