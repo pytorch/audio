@@ -11,12 +11,10 @@ datestr="$(date "+%Y%m%d")"
 if [ "$1" = "cpu" ]; then
     base_image="ubuntu:18.04"
     image="pytorch/torchaudio_unittest_base:manylinux-${datestr}"
-elif [[ "$1" =~ ^(9.2|10.1)$ ]]; then
-    base_image="nvidia/cuda:$1-devel-ubuntu18.04"
-    image="pytorch/torchaudio_unittest_base:manylinux-cuda$1-${datestr}"
 else
-    printf "Unexpected <CUDA_VERSION> string: %s" "$1"
-    exit 1;
+    base_image="nvidia/cuda:$1-devel-ubuntu18.04"
+    docker pull "${base_image}"
+    image="pytorch/torchaudio_unittest_base:manylinux-cuda$1-${datestr}"
 fi
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
