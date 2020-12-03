@@ -89,6 +89,8 @@ def _get_extra_objects():
             'libvorbisfile.a',
             'libvorbis.a',
             'libogg.a',
+            'libopencore-amrnb.a',
+            'libopencore-amrwb.a',
         ]
         for lib in libs:
             objs.append(str(_TP_INSTALL_DIR / 'lib' / lib))
