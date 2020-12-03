@@ -1,4 +1,5 @@
 import os
+import sys
 import platform
 import subprocess
 import sysconfig
@@ -47,14 +48,14 @@ def _get_python_include_dir():
     dir_ = sysconfig.get_paths()['include']
     if os.path.exists(dir_):
         return dir_
-    raise ValueError('Cannot find Python development include directory.')
+    raise RuntimeError('Cannot find Python development include directory.')
 
 
 def _get_python_library():
     lib = sysconfig.get_paths()['stdlib']
     if os.path.exists(lib):
         return lib
-    raise ValueError('Cannot find Python library.')
+    raise RuntimeError(f'Cannot find Python library. {lib}')
 
 
 # Based off of
@@ -81,10 +82,11 @@ class CMakeBuild(build_ext):
         cmake_args = [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
             f"-DCMAKE_BUILD_TYPE={cfg}",
-            f"-DCMAKE_PREFIX_PATH={torch.utils.cmake_prefix_path}",
+            f"-DCMAKE_PREFIX_PATH={torch.utils.cmake_prefix_path}:{}",
             f"-DBUILD_SOX:BOOL={_get_build_sox()}",
             f"-DPYTHON_INCLUDE_DIR={_get_python_include_dir()}",
             f"-DPYTHON_LIBRARY={_get_python_library()}",
+            f"-DPYTHON_VERSION={sys.version_info[0]}.{sys.version_info[1]}",
             "-DBUILD_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
         ]
