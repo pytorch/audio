@@ -107,9 +107,6 @@ if (BUILD_PYTHON_EXTENSION)
   # See https://github.com/pytorch/pytorch/issues/38122
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
 
-  target_link_directories(
-    _torchaudio
-    )
   target_link_libraries(
     _torchaudio
     ${TORCHAUDIO_THIRD_PARTIES}
