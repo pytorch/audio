@@ -27,7 +27,7 @@ CONDA_PKGS="librosa>=0.8.0"
 # TODO: Remove this after packages become available
 # Currently there's no librosa package available for Python 3.9, so lets just skip the dependency for now
 if [[ $(python --version) = *3.9* ]]; then
-    CONDA_PKGS=""
+    CONDA_PKGS="pysoundfile"
 fi
 conda install -y -c conda-forge pytest pytest-cov codecov scipy parameterized ${CONDA_PKGS}
 pip install kaldi-io
