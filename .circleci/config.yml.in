@@ -45,6 +45,16 @@ commands:
           name: Install cmake and pkg-config
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install cmake pkg-config wget
           # Disable brew auto update which is very slow
+  load_conda_channel_flags:
+    description: "Determines whether we need extra conda channels"
+    steps:
+      - run:
+          name: Adding CONDA_CHANNEL_FLAGS to BASH_ENV
+          command: |
+              CONDA_CHANNEL_FLAGS=""
+              if [[ "${PYTHON_VERSION}" = *3.9* ]]; then
+                echo "export CONDA_CHANNEL_FLAGS=-c=conda-forge" >> ${BASH_ENV}
+              fi
 
 binary_common: &binary_common
   parameters:
@@ -117,7 +127,7 @@ jobs:
   binary_linux_wheel:
     <<: *binary_common
     docker:
-      - image: "pytorch/manylinux-cuda100"
+      - image: "pytorch/manylinux-cuda102"
     resource_class: 2xlarge+
     steps:
       - checkout
@@ -138,6 +148,7 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - load_conda_channel_flags
       - attach_workspace:
           at: third_party
       - run: packaging/build_conda.sh
@@ -155,6 +166,7 @@ jobs:
     steps:
       - checkout
       - install_build_tools_macos
+      - load_conda_channel_flags
       - attach_workspace:
           at: third_party
       - run:
@@ -180,6 +192,7 @@ jobs:
     steps:
       - checkout
       - install_build_tools_macos
+      - load_conda_channel_flags
       - attach_workspace:
           at: third_party
       - run:
@@ -202,6 +215,7 @@ jobs:
       name: windows-cpu
     steps:
       - checkout
+      - load_conda_channel_flags
       - run:
           name: build
           command: |
@@ -221,6 +235,7 @@ jobs:
       name: windows-cpu
     steps:
       - checkout
+      - load_conda_channel_flags
       - run:
           name: build
           command: |
@@ -278,6 +293,7 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - designate_upload_channel
+      - load_conda_channel_flags
       - run:
           name: install binaries
           command: |
@@ -297,6 +313,7 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - designate_upload_channel
+      - load_conda_channel_flags
       - run:
           name: install binaries
           command: |
@@ -317,6 +334,7 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - designate_upload_channel
+      - load_conda_channel_flags
       - run:
           name: install binaries
           command: |
@@ -342,6 +360,7 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - designate_upload_channel
+      - load_conda_channel_flags
       - run:
           name: install binaries
           command: |
@@ -395,6 +414,7 @@ jobs:
       - attach_workspace:
           at: third_party
       - designate_upload_channel
+      - load_conda_channel_flags
       - generate_cache_key
       - restore_cache:
           {% raw %}
@@ -439,6 +459,7 @@ jobs:
       - attach_workspace:
           at: third_party
       - designate_upload_channel
+      - load_conda_channel_flags
       - generate_cache_key
       - restore_cache:
           {% raw %}
@@ -480,6 +501,7 @@ jobs:
     steps:
       - checkout
       - designate_upload_channel
+      - load_conda_channel_flags
       - generate_cache_key
       - restore_cache:
           {% raw %}
@@ -518,6 +540,7 @@ jobs:
     steps:
       - checkout
       - designate_upload_channel
+      - load_conda_channel_flags
       - generate_cache_key
       - restore_cache:
           {% raw %}
@@ -554,6 +577,7 @@ jobs:
     steps:
       - checkout
       - install_build_tools_macos
+      - load_conda_channel_flags
       - attach_workspace:
           at: third_party
       - designate_upload_channel
@@ -596,6 +620,7 @@ jobs:
     steps:
       - checkout
       - designate_upload_channel
+      - load_conda_channel_flags
       - generate_cache_key
       - restore_cache:
           {% raw %}
@@ -626,6 +651,7 @@ jobs:
     steps:
       - checkout
       - generate_cache_key
+      - load_conda_channel_flags
       - restore_cache:
           {% raw %}
           keys:

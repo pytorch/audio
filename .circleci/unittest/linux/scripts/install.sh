@@ -34,7 +34,25 @@ else
     cudatoolkit="cudatoolkit=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch ${cudatoolkit}
+conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch ${cudatoolkit}
+
+printf "* Installing dependencies for test\n"
+CONDA_PKGS="librosa>=0.8.0"
+# TODO: Remove this after packages become available
+# Currently there's no librosa package available for Python 3.9, so lets just skip the dependency for now
+if [[ $(python --version) = *3.9* ]]; then
+    CONDA_PKGS="pysoundfile"
+fi
+conda install -y -c conda-forge pytest pytest-cov codecov scipy parameterized ${CONDA_PKGS}
+pip install kaldi-io
+
+printf "* Building codecs\n"
+mkdir -p third_party/build
+(
+    cd third_party/build
+    cmake ..
+    cmake --build .
+)
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
