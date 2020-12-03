@@ -38,6 +38,12 @@ if [ ! -d "${env_dir}" ]; then
     conda create --prefix "${env_dir}" -y python="${PYTHON_VERSION}"
 fi
 conda activate "${env_dir}"
+NUMPY_PIN="1.11"
+if [[ "${PYTHON_VERSION}" = "3.9" ]]; then
+    NUMPY_PIN="1.20"
+fi
+printf "* Installing numpy>=%s\n" "${NUMPY_PIN}\n"
+conda install -y -c conda-forge "numpy>=${NUMPY_PIN}"
 
 # 3. Install minimal build tools
 pip --quiet install cmake ninja
