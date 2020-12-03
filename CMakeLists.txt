@@ -9,10 +9,10 @@ option(BUILD_PYTHON_EXTENSION "Build Python extension" OFF)
 set(CMAKE_CXX_STANDARD 14 CACHE STRING "The C++ standard whose features are requested to build this target.")
 
 find_package(Torch REQUIRED)
-# TORCH_CXX_FLAGS contains proper _GLIBCXX_USE_CXX11_ABI
-# We propagate it to CMAKE_CXX_FLAGS so that third party libraries are built
-# with the same flag
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+# Set -D_GLIBCXX_USE_CXX11_ABI for third party builds
+if (DEFINED _GLIBCXX_USE_CXX11_ABI)
+  set(CXXFLAGS "${CXXFLAGS} -D_GLIBCXX_USE_CXX11_ABI=${_GLIBCXX_USE_CXX11_ABI}")
+endif()
 
 add_subdirectory(third_party)
 

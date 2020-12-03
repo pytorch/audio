@@ -6,9 +6,11 @@ if (BUILD_SOX)
 
   set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/install)
   set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/archives)
-  set(COMMON_ARGS --quiet --disable-shared --enable-static --prefix=${INSTALL_DIR} --with-pic --disable-dependency-tracking --disable-debug --disable-examples --disable-doc)
-  set(envs "PKG_CONFIG_PATH=${INSTALL_DIR}/lib/pkgconfig" "LDFLAGS=-L${INSTALL_DIR}/lib $ENV{LDFLAGS}" "CPPFLAGS=-I${INSTALL_DIR}/include $ENV{CPPFLAGS}" "CXXFLAGS=${TORCH_CXX_FLAGS} $ENV{CXXFLAGS}")
+  set(COMMON_ARGS --quiet --disable-silent-rules --disable-shared --enable-static --prefix=${INSTALL_DIR} --with-pic --disable-dependency-tracking --disable-debug --disable-examples --disable-doc)
 
+  # We need to use `${CMAKE_COMMAND} -E env ${envs} <COMMANAD>` pattern, to propagate custom environment variables
+  # to ExternalProject_Add. We constrcut the custom environment variables here
+  set(envs "PKG_CONFIG_PATH=${INSTALL_DIR}/lib/pkgconfig" "LDFLAGS=-L${INSTALL_DIR}/lib $ENV{LDFLAGS}" "CPPFLAGS=-I${INSTALL_DIR}/include $ENV{CPPFLAGS}")
 
   ExternalProject_Add(mad_
     PREFIX ${CMAKE_CURRENT_SOURCE_DIR}
@@ -59,10 +61,9 @@ if (BUILD_SOX)
     DOWNLOAD_DIR ${ARCHIVE_DIR}
     URL https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.2.tar.xz
     URL_HASH SHA256=91cfc3ed61dc40f47f050a109b08610667d73477af6ef36dcad31c31a4a8d53f
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_SOURCE_DIR}/src/flac_/configure ${COMMON_ARGS} --with-ogg
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_SOURCE_DIR}/src/flac_/configure ${COMMON_ARGS} --with-ogg --disable-cpplibs
     BUILD_BYPRODUCTS
     ${INSTALL_DIR}/lib/libFLAC.a
-    ${INSTALL_DIR}/lib/libFLAC++.a
     )
 
   add_library(flac INTERFACE)
@@ -70,7 +71,6 @@ if (BUILD_SOX)
   target_link_libraries(
     flac INTERFACE
     ${INSTALL_DIR}/lib/libFLAC.a
-    ${INSTALL_DIR}/lib/libFLAC++.a
     )
   target_include_directories(flac INTERFACE ${INSTALL_DIR}/include)
 

@@ -9,7 +9,6 @@ import distutils.sysconfig
 from setuptools import Extension
 from setuptools.command.build_ext import build_ext
 import torch
-import torch.utils.cpp_extension
 
 __all__ = [
     'get_ext_modules',
@@ -32,6 +31,13 @@ def _get_build_sox():
             f'WARNING: Unexpected environment variable value `BUILD_SOX={val}`. '
             f'Expected one of {trues + falses}')
     return False
+
+
+def _get_cxx11_abi():
+    try:
+        return int(torch._C._GLIBCXX_USE_CXX11_ABI)
+    except ImportError:
+        return 0
 
 
 def get_ext_modules():
@@ -87,6 +93,7 @@ class CMakeBuild(build_ext):
             f"-DPYTHON_INCLUDE_DIR={_get_python_include_dir()}",
             f"-DPYTHON_LIBRARY={_get_python_library()}",
             f"-DPYTHON_VERSION={sys.version_info[0]}.{sys.version_info[1]}",
+            f"-D_GLIBCXX_USE_CXX11_ABI={_get_cxx11_abi()}",
             "-DBUILD_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
         ]
@@ -100,10 +107,6 @@ class CMakeBuild(build_ext):
         # Default to Ninja
         if 'CMAKE_GENERATOR' not in os.environ:
             cmake_args += ["-GNinja"]
-
-        print(f'setting CUDA_HOME: {torch.utils.cpp_extension.CUDA_HOME}')
-        if torch.utils.cpp_extension.CUDA_HOME is not None:
-            cmake_args += [f"-DCUDA_HOME={torch.utils.cpp_extension.CUDA_HOME}"]
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.
