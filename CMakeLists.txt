@@ -70,14 +70,7 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_PYTHON_EXTENSION)
-  if (APPLE)
-    # On Linux, build succeeds without these and fails with these.
-    # On macOS, build fails without these
-    message(STATUS "Python_ROOT_DIR: ${Python_ROOT_DIR}")
-    find_package(Python REQUIRED Interpreter Development)
-    message(STATUS "Python_INCLUDE_DIRS: ${Python_INCLUDE_DIRS}")
-    message(STATUS "Python_LIBRARIES: ${Python_LIBRARIES}")
-  endif()
+  find_package(Python REQUIRED Interpreter Development)
 
   add_library(
     _torchaudio
@@ -87,6 +80,12 @@ if (BUILD_PYTHON_EXTENSION)
     )
 
   set_target_properties(_torchaudio PROPERTIES PREFIX "")
+
+  if (APPLE)
+    # https://github.com/facebookarchive/caffe2/issues/854#issuecomment-364538485
+    # https://github.com/pytorch/pytorch/commit/73f6715f4725a0723d8171d3131e09ac7abf0666
+    set_target_properties(_torchaudio PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+  endif()
 
   target_include_directories(
     _torchaudio
@@ -103,7 +102,6 @@ if (BUILD_PYTHON_EXTENSION)
     ${TORCHAUDIO_THIRD_PARTIES}
     ${TORCH_LIBRARIES}
     ${TORCH_PYTHON_LIBRARY}
-    ${Python_LIBRARIES}
     )
 
   # We do not define install for _torchaudio.so

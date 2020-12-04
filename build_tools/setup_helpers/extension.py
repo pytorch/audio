@@ -83,15 +83,13 @@ class CMakeBuild(build_ext):
             extdir += os.path.sep
 
         cfg = "Debug" if self.debug else "Release"
-        root_dir = Path(sys.executable).parent.parent.resolve()
 
-        # library_path = os.path.join(get_config_var('LIBDIR'), get_config_var('LDLIBRARY'))
         cmake_args = [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
             f"-DCMAKE_BUILD_TYPE={cfg}",
             f"-DCMAKE_PREFIX_PATH={torch.utils.cmake_prefix_path}",
             f"-DBUILD_SOX:BOOL={_get_build_sox()}",
-            f"-DPython_ROOT_DIR={root_dir}",
+            f"-DPython_ROOT_DIR={Path(sys.executable).parent.parent.resolve()}",
             f"-D_GLIBCXX_USE_CXX11_ABI={_get_cxx11_abi()}",
             "-DBUILD_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
@@ -120,11 +118,9 @@ class CMakeBuild(build_ext):
             os.makedirs(self.build_temp)
 
         subprocess.check_call(
-            ["cmake", str(_ROOT_DIR)] + cmake_args, cwd=self.build_temp
-        )
+            ["cmake", str(_ROOT_DIR)] + cmake_args, cwd=self.build_temp)
         subprocess.check_call(
-            ["cmake", "--build", "."] + build_args, cwd=self.build_temp
-        )
+            ["cmake", "--build", "."] + build_args, cwd=self.build_temp)
 
     def get_ext_filename(self, fullname):
         ext_filename = super().get_ext_filename(fullname)
