@@ -200,6 +200,68 @@ class SaveTestBase(TempDirMixin, PytorchTestCase):
 
         self.assertEqual(found, expected)
 
+    def assert_amb(self, dtype, sample_rate, num_channels, duration):
+        """`sox_io_backend.save` can save amb format.
+
+        This test takes the same strategy as mp3 to compare the result
+        """
+        src_path = self.get_temp_path('1.reference.wav')
+        amb_path = self.get_temp_path('2.1.torchaudio.amb')
+        wav_path = self.get_temp_path('2.2.torchaudio.wav')
+        amb_path_sox = self.get_temp_path('3.1.sox.amb')
+        wav_path_sox = self.get_temp_path('3.2.sox.wav')
+
+        # 1. Generate original wav
+        data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
+        save_wav(src_path, data, sample_rate)
+        # 2.1. Convert the original wav to amb with torchaudio
+        sox_io_backend.save(amb_path, load_wav(src_path, normalize=False)[0], sample_rate)
+        # 2.2. Convert the amb to wav with Sox
+        sox_utils.convert_audio_file(amb_path, wav_path)
+        # 2.3. Load
+        found = load_wav(wav_path)[0]
+
+        # 3.1. Convert the original wav to amb with SoX
+        sox_utils.convert_audio_file(src_path, amb_path_sox)
+        # 3.2. Convert the amb to wav with Sox
+        sox_utils.convert_audio_file(amb_path_sox, wav_path_sox)
+        # 3.3. Load
+        expected = load_wav(wav_path_sox)[0]
+
+        self.assertEqual(found, expected)
+
+    def assert_amr_nb(self, duration):
+        """`sox_io_backend.save` can save amr_nb format.
+
+        This test takes the same strategy as mp3 to compare the result
+        """
+        sample_rate = 8000
+        num_channels = 1
+        src_path = self.get_temp_path('1.reference.wav')
+        amr_path = self.get_temp_path('2.1.torchaudio.amr-nb')
+        wav_path = self.get_temp_path('2.2.torchaudio.wav')
+        amr_path_sox = self.get_temp_path('3.1.sox.amr-nb')
+        wav_path_sox = self.get_temp_path('3.2.sox.wav')
+
+        # 1. Generate original wav
+        data = get_wav_data('int16', num_channels, normalize=False, num_frames=duration * sample_rate)
+        save_wav(src_path, data, sample_rate)
+        # 2.1. Convert the original wav to amr_nb with torchaudio
+        sox_io_backend.save(amr_path, load_wav(src_path, normalize=False)[0], sample_rate)
+        # 2.2. Convert the amr_nb to wav with Sox
+        sox_utils.convert_audio_file(amr_path, wav_path)
+        # 2.3. Load
+        found = load_wav(wav_path)[0]
+
+        # 3.1. Convert the original wav to amr_nb with SoX
+        sox_utils.convert_audio_file(src_path, amr_path_sox)
+        # 3.2. Convert the amr_nb to wav with Sox
+        sox_utils.convert_audio_file(amr_path_sox, wav_path_sox)
+        # 3.3. Load
+        expected = load_wav(wav_path_sox)[0]
+
+        self.assertEqual(found, expected)
+
 
 @skipIfNoExec('sox')
 @skipIfNoExtension
@@ -301,6 +363,19 @@ class TestSave(SaveTestBase):
     def test_sphere(self, sample_rate, num_channels):
         """`sox_io_backend.save` can save sph format."""
         self.assert_sphere(sample_rate, num_channels, duration=1)
+
+    @parameterized.expand(list(itertools.product(
+        ['float32', 'int32', 'int16', 'uint8'],
+        [8000, 16000],
+        [1, 2],
+    )), name_func=name_func)
+    def test_amb(self, dtype, sample_rate, num_channels):
+        """`sox_io_backend.save` can save amb format."""
+        self.assert_amb(dtype, sample_rate, num_channels, duration=1)
+
+    def test_amr_nb(self):
+        """`sox_io_backend.save` can save amr-nb format."""
+        self.assert_amr_nb(duration=1)
 
 
 @skipIfNoExec('sox')
