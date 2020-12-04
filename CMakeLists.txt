@@ -70,23 +70,9 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_PYTHON_EXTENSION)
-  # Since this part of code is expected to be called from setup.py, we expect
-  # that PYTHON_INCLUDE_DIR and PYTHON_LIBRARY are provided.
-  # If needed, we can add search here, like
-  # https://github.com/pytorch/pytorch/blob/7f869dca70606c42994d822ba11362a353411a1c/cmake/Dependencies.cmake#L904-L940
-  message(STATUS "PYTHON_INCLUDE_DIR: ${PYTHON_INCLUDE_DIR}")
-  message(STATUS "PYTHON_LIBRARY: ${PYTHON_LIBRARY}")
-  if (NOT PYTHON_INCLUDE_DIR)
-    message(FATAL_ERROR "PYTHON_INCLUDE_DIR is not provided.")
-  endif()
-  if (NOT PYTHON_LIBRARY)
-    message(FATAL_ERROR "PYTHON_LIBRARY is not provided.")
-  endif()
-  set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
-  find_package(PythonInterp 3.6)
-  find_package(PythonLibs 3.6 REQUIRED)
-  message(STATUS "PYTHON_INCLUDE_DIRS: ${PYTHON_INCLUDE_DIRS}")
-  message(STATUS "PYTHON_LIBRARIES: ${PYTHON_LIBRARIES}")
+  find_package(Python3 REQUIRED Interpreter Development)
+  message(STATUS "Python3_INCLUDE_DIRS: ${Python3_INCLUDE_DIRS}")
+  message(STATUS "Python3_LIBRARIES: ${Python3_LIBRARIES}")
 
   add_library(
     _torchaudio
@@ -101,7 +87,7 @@ if (BUILD_PYTHON_EXTENSION)
     _torchaudio
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${PYTHON_INCLUDE_DIRS}
+    ${Python3_INCLUDE_DIRS}
     )
 
   # See https://github.com/pytorch/pytorch/issues/38122
@@ -112,7 +98,7 @@ if (BUILD_PYTHON_EXTENSION)
     ${TORCHAUDIO_THIRD_PARTIES}
     ${TORCH_LIBRARIES}
     ${TORCH_PYTHON_LIBRARY}
-    ${PYTHON_LIBRARIES}
+    ${Python3_LIBRARIES}
     )
 
   # We do not define install for _torchaudio.so

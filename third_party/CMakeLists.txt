@@ -137,7 +137,7 @@ if (BUILD_SOX)
     URL_HASH SHA256=81a6956d4330e75b5827316e44ae381e6f1e8928003c6aa45896da9041ea149c
     # OpenMP is by default compiled against GNU OpenMP, which conflicts with the version of OpenMP that PyTorch uses.
     # See https://github.com/pytorch/audio/pull/1026
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_SOURCE_DIR}/src/sox_/configure ${COMMON_ARGS} --with-lame --with-flac --with-mad --with-oggvorbis --without-alsa --without-coreaudio --without-png --without-oss --without-sndfile --with-opus --disable-openmp
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_SOURCE_DIR}/src/sox_/configure ${COMMON_ARGS} --with-lame --with-flac --with-mad --with-oggvorbis --without-alsa --without-coreaudio --without-png --without-oss --without-sndfile --with-opus --without-amrnb --without-amrwb --disable-openmp
     BUILD_BYPRODUCTS ${INSTALL_DIR}/lib/libsox.a
     )
 
