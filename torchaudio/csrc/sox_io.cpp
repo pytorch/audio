@@ -85,11 +85,17 @@ void save_audio_file(
     const std::string& file_name,
     const c10::intrusive_ptr<TensorSignal>& signal,
     const double compression) {
-  const auto tensor = signal->getTensor();
+  auto tensor = signal->tensor;
 
   validate_input_tensor(tensor);
 
   const auto filetype = get_filetype(file_name);
+  if (filetype == "amr-nb") {
+    const auto num_channels = tensor.size(signal->channels_first ? 0 : 1);
+    TORCH_CHECK(
+        num_channels == 1, "amr-nb format only supports single channel audio.");
+    tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
+  }
   const auto signal_info = get_signalinfo(signal.get(), filetype);
   const auto encoding_info =
       get_encodinginfo(filetype, tensor.dtype(), compression);
