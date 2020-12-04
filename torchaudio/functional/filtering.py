@@ -1006,7 +1006,8 @@ def phaser(
 
     References:
         http://sox.sourceforge.net/sox.html
-        Scott Lehman, Effects Explained, http://harmony-central.com/Effects/effects-explained.html
+        Scott Lehman, Effects Explained,
+        https://web.archive.org/web/20051125072557/http://www.harmony-central.com/Effects/effects-explained.html
     """
     actual_shape = waveform.shape
     device, dtype = waveform.device, waveform.dtype
