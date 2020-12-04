@@ -70,9 +70,14 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_PYTHON_EXTENSION)
-  find_package(Python3 REQUIRED Interpreter Development)
-  message(STATUS "Python3_INCLUDE_DIRS: ${Python3_INCLUDE_DIRS}")
-  message(STATUS "Python3_LIBRARIES: ${Python3_LIBRARIES}")
+  if (APPLE)
+    # On Linux, build succeeds without these and fails with these.
+    # On macOS, build fails without these
+    message(STATUS "Python_ROOT_DIR: ${Python_ROOT_DIR}")
+    find_package(Python REQUIRED Interpreter Development)
+    message(STATUS "Python_INCLUDE_DIRS: ${Python_INCLUDE_DIRS}")
+    message(STATUS "Python_LIBRARIES: ${Python_LIBRARIES}")
+  endif()
 
   add_library(
     _torchaudio
@@ -87,7 +92,7 @@ if (BUILD_PYTHON_EXTENSION)
     _torchaudio
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${Python3_INCLUDE_DIRS}
+    ${Python_INCLUDE_DIRS}
     )
 
   # See https://github.com/pytorch/pytorch/issues/38122
@@ -98,7 +103,7 @@ if (BUILD_PYTHON_EXTENSION)
     ${TORCHAUDIO_THIRD_PARTIES}
     ${TORCH_LIBRARIES}
     ${TORCH_PYTHON_LIBRARY}
-    ${Python3_LIBRARIES}
+    ${Python_LIBRARIES}
     )
 
   # We do not define install for _torchaudio.so

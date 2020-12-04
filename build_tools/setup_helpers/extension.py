@@ -83,6 +83,7 @@ class CMakeBuild(build_ext):
             extdir += os.path.sep
 
         cfg = "Debug" if self.debug else "Release"
+        root_dir = Path(sys.executable).parent.parent.resolve()
 
         # library_path = os.path.join(get_config_var('LIBDIR'), get_config_var('LDLIBRARY'))
         cmake_args = [
@@ -90,7 +91,7 @@ class CMakeBuild(build_ext):
             f"-DCMAKE_BUILD_TYPE={cfg}",
             f"-DCMAKE_PREFIX_PATH={torch.utils.cmake_prefix_path}",
             f"-DBUILD_SOX:BOOL={_get_build_sox()}",
-            f"-DPYTHON_INCLUDE_DIR={sys.executable}",
+            f"-DPython_ROOT_DIR={root_dir}",
             f"-D_GLIBCXX_USE_CXX11_ABI={_get_cxx11_abi()}",
             "-DBUILD_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
