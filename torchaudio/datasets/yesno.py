@@ -8,7 +8,7 @@ from torch import Tensor
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
-    extract_archive
+    extract_archive,
 )
 
 URL = "http://www.openslr.org/resources/1/waves_yesno.tar.gz"
