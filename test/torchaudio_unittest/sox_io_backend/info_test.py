@@ -122,6 +122,36 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
 
+    @parameterized.expand(list(itertools.product(
+        ['float32', 'int32', 'int16', 'uint8'],
+        [8000, 16000],
+        [1, 2],
+    )), name_func=name_func)
+    def test_amb(self, dtype, sample_rate, num_channels):
+        """`sox_io_backend.info` can check amb file correctly"""
+        duration = 1
+        path = self.get_temp_path('data.amb')
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels,
+            bit_depth=sox_utils.get_bit_depth(dtype), duration=duration)
+        info = sox_io_backend.info(path)
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
+
+    def test_amr_nb(self):
+        """`sox_io_backend.info` can check amr-nb file correctly"""
+        duration = 1
+        num_channels = 1
+        sample_rate = 8000
+        path = self.get_temp_path('data.amr-nb')
+        sox_utils.gen_audio_file(
+            path, sample_rate=sample_rate, num_channels=num_channels, bit_depth=16, duration=duration)
+        info = sox_io_backend.info(path)
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
+
 
 @skipIfNoExtension
 class TestInfoOpus(PytorchTestCase):
