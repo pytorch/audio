@@ -123,8 +123,7 @@ class COMMONVOICE(Dataset):
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  version: str = VERSION,
                  download: Optional[bool] = None,
-                 language: Optional[str] = None,
-    ) -> None:
+                 language: Optional[str] = None) -> None:
 
         if download:
             raise RuntimeError(
