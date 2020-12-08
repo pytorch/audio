@@ -81,6 +81,7 @@ class COMMONVOICE(Dataset):
         url (str, optional): Deprecated.
         folder_in_archive (str, optional): The top-level directory of the dataset.
         version (str): Version string. (default: ``"cv-corpus-5.1-2020-06-22"``)
+        download (bool, optional): Deprecated.
         language (str, optional): Language of the dataset. (default: None)
             The following values are mapped to their corresponding shortened version:
             ``"tatar"``, ``"english"``, ``"german"``,
@@ -93,7 +94,6 @@ class COMMONVOICE(Dataset):
             ``"latvian"``, ``"japanese"``, ``"votic"``, ``"abkhaz"``, ``"cantonese"`` and
             ``"romansh sursilvan"``.
             For the other allowed values, Please checkout https://commonvoice.mozilla.org/en/datasets.
-        download (bool, optional): Deprecated.
     """
 
     _ext_txt = ".txt"
@@ -106,8 +106,8 @@ class COMMONVOICE(Dataset):
                  url: Optional[str] = None,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  version: str = VERSION,
-                 language: str = LANGUAGE,
-                 download: Optional[bool] = False) -> None:
+                 download: Optional[bool] = False,
+                 language: str = LANGUAGE) -> None:
 
         if download is True:
             raise RuntimeError(
@@ -177,15 +177,15 @@ class COMMONVOICE(Dataset):
             url = os.path.join(version, language + ext_archive)
         else:
             raise ValueError(
-                'Allowed language values are ``"tatar"``, ``"english"``, ``"german"``,'
-                '``"french"``, ``"welsh"``, ``"breton"``, ``"chuvash"``, ``"turkish"``, ``"kyrgyz"``,'
-                '``"irish"``, ``"kabyle"``, ``"catalan"``, ``"taiwanese"``, ``"slovenian"``,'
-                '``"italian"``, ``"dutch"``, ``"hakha chin"``, ``"esperanto"``, ``"estonian"``,'
-                '``"persian"``, ``"portuguese"``, ``"basque"``, ``"spanish"``, ``"chinese"``,'
-                '``"mongolian"``, ``"sakha"``, ``"dhivehi"``, ``"kinyarwanda"``, ``"swedish"``,'
-                '``"russian"``, ``"indonesian"``, ``"arabic"``, ``"tamil"``, ``"interlingua"``,'
-                '``"latvian"``, ``"japanese"``, ``"votic"``, ``"abkhaz"``, ``"cantonese"`` and'
-                '``"romansh sursilvan"``.'
+                'Allowed language values are "tatar", "english", "german",'
+                '"french", "welsh", "breton", "chuvash", "turkish", "kyrgyz",'
+                '"irish", "kabyle", "catalan", "taiwanese", "slovenian",'
+                '"italian", "dutch", "hakha chin", "esperanto", "estonian",'
+                '"persian", "portuguese", "basque", "spanish", "chinese",'
+                '"mongolian", "sakha", "dhivehi", "kinyarwanda", "swedish",'
+                '"russian", "indonesian", "arabic", "tamil", "interlingua",'
+                '"latvian", "japanese", "votic", "abkhaz", "cantonese" and'
+                '"romansh sursilvan".'
             )
 
         basename = os.path.basename(url)
