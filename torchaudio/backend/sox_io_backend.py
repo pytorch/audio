@@ -40,18 +40,19 @@ def load(
         This function can handle all the codecs that underlying libsox can handle,
         however it is tested on the following formats;
 
-        * WAV
+        * WAV, AMB
 
             * 32-bit floating-point
             * 32-bit signed integer
             * 16-bit signed integer
-            * 8-bit unsigned integer
+            * 8-bit unsigned integer (WAV only)
 
         * MP3
         * FLAC
         * OGG/VORBIS
         * OPUS
         * SPHERE
+        * AMR-NB
 
         To load ``MP3``, ``FLAC``, ``OGG/VORBIS``, ``OPUS`` and other codecs ``libsox`` does not
         handle natively, your installation of ``torchaudio`` has to be linked to ``libsox``
@@ -119,7 +120,7 @@ def save(
     Note:
         Supported formats are;
 
-        * WAV
+        * WAV, AMB
 
             * 32-bit floating-point
             * 32-bit signed integer
@@ -130,6 +131,7 @@ def save(
         * FLAC
         * OGG/VORBIS
         * SPHERE
+        * AMR-NB
 
         To save ``MP3``, ``FLAC``, ``OGG/VORBIS``, and other codecs ``libsox`` does not
         handle natively, your installation of ``torchaudio`` has to be linked to ``libsox``
@@ -160,7 +162,7 @@ def save(
     filepath = str(filepath)
     if compression is None:
         ext = str(filepath).split('.')[-1].lower()
-        if ext in ['wav', 'sph']:
+        if ext in ['wav', 'sph', 'amb', 'amr-nb']:
             compression = 0.
         elif ext == 'mp3':
             compression = -4.5

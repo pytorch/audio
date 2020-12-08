@@ -142,6 +142,53 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
         assert sr == sample_rate
         self.assertEqual(data, data_ref, atol=4e-05, rtol=1.3e-06)
 
+    def assert_amb(self, dtype, sample_rate, num_channels, normalize, duration):
+        """`sox_io_backend.load` can load amb format.
+
+        This test takes the same strategy as mp3 to compare the result
+        """
+        path = self.get_temp_path('1.original.amb')
+        ref_path = self.get_temp_path('2.reference.wav')
+
+        # 1. Generate amb with sox
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels,
+            encoding=sox_utils.get_encoding(dtype),
+            bit_depth=sox_utils.get_bit_depth(dtype), duration=duration)
+        # 2. Convert to wav with sox
+        sox_utils.convert_audio_file(path, ref_path)
+        # 3. Load amb with torchaudio
+        data, sr = sox_io_backend.load(path, normalize=normalize)
+        # 4. Load wav with scipy
+        data_ref = load_wav(ref_path, normalize=normalize)[0]
+        # 5. Compare
+        assert sr == sample_rate
+        self.assertEqual(data, data_ref, atol=4e-05, rtol=1.3e-06)
+
+    def assert_amr_nb(self, duration):
+        """`sox_io_backend.load` can load amr-nb format.
+
+        This test takes the same strategy as mp3 to compare the result
+        """
+        sample_rate = 8000
+        num_channels = 1
+        path = self.get_temp_path('1.original.amr-nb')
+        ref_path = self.get_temp_path('2.reference.wav')
+
+        # 1. Generate amr-nb with sox
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels,
+            bit_depth=32, duration=duration)
+        # 2. Convert to wav with sox
+        sox_utils.convert_audio_file(path, ref_path)
+        # 3. Load amr-nb with torchaudio
+        data, sr = sox_io_backend.load(path)
+        # 4. Load wav with scipy
+        data_ref = load_wav(ref_path)[0]
+        # 5. Compare
+        assert sr == sample_rate
+        self.assertEqual(data, data_ref, atol=4e-05, rtol=1.3e-06)
+
 
 @skipIfNoExec('sox')
 @skipIfNoExtension
@@ -259,6 +306,20 @@ class TestLoad(LoadTestBase):
     def test_sphere(self, sample_rate, num_channels):
         """`sox_io_backend.load` can load sph format correctly."""
         self.assert_sphere(sample_rate, num_channels, duration=1)
+
+    @parameterized.expand(list(itertools.product(
+        ['float32', 'int32', 'int16'],
+        [8000, 16000],
+        [1, 2],
+        [False, True],
+    )), name_func=name_func)
+    def test_amb(self, dtype, sample_rate, num_channels, normalize):
+        """`sox_io_backend.load` can load sph format correctly."""
+        self.assert_amb(dtype, sample_rate, num_channels, normalize, duration=1)
+
+    def test_amr_nb(self):
+        """`sox_io_backend.load` can load amr_nb format correctly."""
+        self.assert_amr_nb(duration=1)
 
 
 @skipIfNoExec('sox')

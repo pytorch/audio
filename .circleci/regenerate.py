@@ -79,7 +79,7 @@ def build_doc_job(filter_branch):
     job = {
         "name": "build_docs",
         "python_version": "3.8",
-        "requires": ["binary_linux_wheel_py3.8"],
+        "requires": ["binary_linux_wheel_py3.8", ],
     }
 
     if filter_branch:
@@ -90,8 +90,9 @@ def build_doc_job(filter_branch):
 def upload_doc_job(filter_branch):
     job = {
         "name": "upload_docs",
+        "context": "org-member",
         "python_version": "3.8",
-        "requires": ["build_docs"],
+        "requires": ["build_docs", ],
     }
 
     if filter_branch:

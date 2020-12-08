@@ -10,21 +10,21 @@ the audio domain. By supporting PyTorch, torchaudio follows the same philosophy
 of providing strong GPU acceleration, having a focus on trainable features through
 the autograd system, and having consistent style (tensor names and dimension names).
 Therefore, it is primarily a machine learning library and not a general signal
-processing library. The benefits of PyTorch is be seen in torchaudio through
+processing library. The benefits of PyTorch can be seen in torchaudio through
 having all the computations be through PyTorch operations which makes it easy
 to use and feel like a natural extension.
 
-- [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/)
+- [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/stable/)
   - Load the following formats into a torch Tensor using SoX
     - mp3, wav, aac, ogg, flac, avr, cdda, cvs/vms,
     - aiff, au, amr, mp2, mp4, ac3, avi, wmv,
     - mpeg, ircam and any other format supported by libsox.
-    - [Kaldi (ark/scp)](http://pytorch.org/audio/kaldi_io.html)
-- [Dataloaders for common audio datasets (VCTK, YesNo)](http://pytorch.org/audio/datasets.html)
+    - [Kaldi (ark/scp)](http://pytorch.org/audio/stable/kaldi_io.html)
+- [Dataloaders for common audio datasets (VCTK, YesNo)](http://pytorch.org/audio/stable/datasets.html)
 - Common audio transforms
-    - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/transforms.html)
+    - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/stable/transforms.html)
 - Compliance interfaces: Run code using PyTorch that align with other libraries
-    - [Kaldi: spectrogram, fbank, mfcc, resample_waveform](https://pytorch.org/audio/compliance.kaldi.html)
+    - [Kaldi: spectrogram, fbank, mfcc, resample_waveform](https://pytorch.org/audio/stable/compliance.kaldi.html)
 
 Dependencies
 ------------
@@ -32,7 +32,7 @@ Dependencies
 * libsox v14.3.2 or above (only required when building from source)
 * [optional] vesis84/kaldi-io-for-python commit cb46cb1f44318a5d04d4941cf39084c5b021241e or above
 
-The following is the corresponding ``torchaudio`` versions and supported Python versions.
+The following are the corresponding ``torchaudio`` versions and supported Python versions.
 
 | ``torch``                | ``torchaudio``           | ``python``                      |
 | ------------------------ | ------------------------ | ------------------------------- |
@@ -46,7 +46,7 @@ The following is the corresponding ``torchaudio`` versions and supported Python 
 Installation
 ------------
 
-### Binary Distibutions
+### Binary Distributions
 
 To install the latest version using anaconda, run:
 
@@ -127,7 +127,7 @@ BUILD_SOX=1 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py i
 ```
 
 This is known to work on linux and unix distributions such as Ubuntu and CentOS 7 and macOS.
-If you try this on a new system and found a solution to make it work, feel free to share it by opening and issue.
+If you try this on a new system and find a solution to make it work, feel free to share it by opening an issue.
 
 #### Troubleshooting
 
@@ -195,16 +195,16 @@ Conventions
 
 With torchaudio being a machine learning library and built on top of PyTorch,
 torchaudio is standardized around the following naming conventions. Tensors are
-assumed to have channel as the first dimension and time as the last
+assumed to have channels as the first dimension and time as the last
 dimension (when applicable). This makes it consistent with PyTorch's dimensions.
 For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`, `n_mel`)")
 whereas dimension names do not have this prefix (e.g. "a tensor of
-dimension (channel, time)")
+dimension (channels, time)")
 
-* `waveform`: a tensor of audio samples with dimensions (channel, time)
+* `waveform`: a tensor of audio samples with dimensions (channels, time)
 * `sample_rate`: the rate of audio dimensions (samples per second)
-* `specgram`: a tensor of spectrogram with dimensions (channel, freq, time)
-* `mel_specgram`: a mel spectrogram with dimensions (channel, mel, time)
+* `specgram`: a tensor of spectrogram with dimensions (channels, freq, time)
+* `mel_specgram`: a mel spectrogram with dimensions (channels, mel, time)
 * `hop_length`: the number of samples between the starts of consecutive frames
 * `n_fft`: the number of Fourier bins
 * `n_mel`, `n_mfcc`: the number of mel and MFCC bins
@@ -216,16 +216,16 @@ dimension (channel, time)")
 
 Transforms expect and return the following dimensions.
 
-* `Spectrogram`: (channel, time) -> (channel, freq, time)
-* `AmplitudeToDB`: (channel, freq, time) -> (channel, freq, time)
-* `MelScale`: (channel, freq, time) -> (channel, mel, time)
-* `MelSpectrogram`: (channel, time) -> (channel, mel, time)
-* `MFCC`: (channel, time) -> (channel, mfcc, time)
-* `MuLawEncode`: (channel, time) -> (channel, time)
-* `MuLawDecode`: (channel, time) -> (channel, time)
-* `Resample`: (channel, time) -> (channel, time)
-* `Fade`: (channel, time) -> (channel, time)
-* `Vol`: (channel, time) -> (channel, time)
+* `Spectrogram`: (channels, time) -> (channels, freq, time)
+* `AmplitudeToDB`: (channels, freq, time) -> (channels, freq, time)
+* `MelScale`: (channels, freq, time) -> (channels, mel, time)
+* `MelSpectrogram`: (channels, time) -> (channels, mel, time)
+* `MFCC`: (channels, time) -> (channel, mfcc, time)
+* `MuLawEncode`: (channels, time) -> (channels, time)
+* `MuLawDecode`: (channels, time) -> (channels, time)
+* `Resample`: (channels, time) -> (channels, time)
+* `Fade`: (channels, time) -> (channels, time)
+* `Vol`: (channels, time) -> (channels, time)
 
 Complex numbers are supported via tensors of dimension (..., 2), and torchaudio provides `complex_norm` and `angle` to convert such a tensor into its magnitude and phase. Here, and in the documentation, we use an ellipsis "..." as a placeholder for the rest of the dimensions of a tensor, e.g. optional batching and channel dimensions.
 

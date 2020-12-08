@@ -18,8 +18,8 @@ c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> apply_effects_tensor(
 c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> apply_effects_file(
     const std::string path,
     std::vector<std::vector<std::string>> effects,
-    const bool normalize = true,
-    const bool channels_first = true);
+    c10::optional<bool>& normalize,
+    c10::optional<bool>& channels_first);
 
 } // namespace sox_effects
 } // namespace torchaudio

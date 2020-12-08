@@ -169,7 +169,8 @@ def apply_effects_file(
         rate and leave samples untouched.
 
     Args:
-        path (str): Path to the audio file.
+        path (str or pathlib.Path): Path to the audio file. This function also handles ``pathlib.Path`` objects, but is
+            annotated as ``str`` for TorchScript compiler compatibility.
         effects (List[List[str]]): List of effects.
         normalize (bool):
             When ``True``, this function always return ``float32``, and sample values are
@@ -223,10 +224,9 @@ def apply_effects_file(
         ...         super().__init__()
         ...         self.flist = flist
         ...         self.sample_rate = sample_rate
-        ...         self.rng = None
         ...
         ...     def __getitem__(self, index):
-        ...         speed = self.rng.uniform(0.5, 2.0)
+        ...         speed = 0.5 + 1.5 * torch.rand()
         ...         effects = [
         ...             ['gain', '-n', '-10'],  # apply 10 db attenuation
         ...             ['remix', '-'],  # merge all the channels
@@ -247,5 +247,7 @@ def apply_effects_file(
         >>> for batch in loader:
         >>>     pass
     """
+    # Get string representation of 'path' in case Path object is passed
+    path = str(path)
     signal = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first)
     return signal.get_tensor(), signal.get_sample_rate()

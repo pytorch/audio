@@ -49,30 +49,32 @@ c10::intrusive_ptr<SignalInfo> get_info(const std::string& path) {
 
 c10::intrusive_ptr<TensorSignal> load_audio_file(
     const std::string& path,
-    const int64_t frame_offset,
-    const int64_t num_frames,
-    const bool normalize,
-    const bool channels_first) {
-  if (frame_offset < 0) {
+    c10::optional<int64_t>& frame_offset,
+    c10::optional<int64_t>& num_frames,
+    c10::optional<bool>& normalize,
+    c10::optional<bool>& channels_first) {
+  const auto offset = frame_offset.value_or(0);
+  if (offset < 0) {
     throw std::runtime_error(
         "Invalid argument: frame_offset must be non-negative.");
   }
-  if (num_frames == 0 || num_frames < -1) {
+  const auto frames = num_frames.value_or(-1);
+  if (frames == 0 || frames < -1) {
     throw std::runtime_error(
         "Invalid argument: num_frames must be -1 or greater than 0.");
   }
 
   std::vector<std::vector<std::string>> effects;
-  if (num_frames != -1) {
-    std::ostringstream offset, frames;
-    offset << frame_offset << "s";
-    frames << "+" << num_frames << "s";
+  if (frames != -1) {
+    std::ostringstream os_offset, os_frames;
+    os_offset << offset << "s";
+    os_frames << "+" << frames << "s";
     effects.emplace_back(
-        std::vector<std::string>{"trim", offset.str(), frames.str()});
-  } else if (frame_offset != 0) {
-    std::ostringstream offset;
-    offset << frame_offset << "s";
-    effects.emplace_back(std::vector<std::string>{"trim", offset.str()});
+        std::vector<std::string>{"trim", os_offset.str(), os_frames.str()});
+  } else if (offset != 0) {
+    std::ostringstream os_offset;
+    os_offset << offset << "s";
+    effects.emplace_back(std::vector<std::string>{"trim", os_offset.str()});
   }
 
   return torchaudio::sox_effects::apply_effects_file(
@@ -83,11 +85,17 @@ void save_audio_file(
     const std::string& file_name,
     const c10::intrusive_ptr<TensorSignal>& signal,
     const double compression) {
-  const auto tensor = signal->getTensor();
+  auto tensor = signal->tensor;
 
   validate_input_tensor(tensor);
 
   const auto filetype = get_filetype(file_name);
+  if (filetype == "amr-nb") {
+    const auto num_channels = tensor.size(signal->channels_first ? 0 : 1);
+    TORCH_CHECK(
+        num_channels == 1, "amr-nb format only supports single channel audio.");
+    tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
+  }
   const auto signal_info = get_signalinfo(signal.get(), filetype);
   const auto encoding_info =
       get_encodinginfo(filetype, tensor.dtype(), compression);

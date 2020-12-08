@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from torchaudio.datasets.libritts import LIBRITTS
 
@@ -47,8 +48,7 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
             with open(path_normalized, 'w') as file_:
                 file_.write(cls.normalized_text)
 
-    def test_libritts(self):
-        dataset = LIBRITTS(self.root_dir)
+    def _test_libritts(self, dataset):
         n_ites = 0
         for i, (waveform,
                 sample_rate,
@@ -69,3 +69,11 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
             assert utterance_id == f'{"_".join(str(u) for u in expected_ids[-4:])}'
             n_ites += 1
         assert n_ites == len(self.utterance_ids)
+
+    def test_libritts_str(self):
+        dataset = LIBRITTS(self.root_dir)
+        self._test_libritts(dataset)
+
+    def test_libritts_path(self):
+        dataset = LIBRITTS(Path(self.root_dir))
+        self._test_libritts(dataset)

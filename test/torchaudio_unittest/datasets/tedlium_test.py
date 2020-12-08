@@ -1,6 +1,7 @@
 import os
 import platform
 import unittest
+from pathlib import Path
 
 from torchaudio.datasets import tedlium
 
@@ -93,9 +94,7 @@ class Tedlium(TempDirMixin):
                 cls.samples[release].append(sample)
             seed += 1
 
-    def test_tedlium_release1(self):
-        release = "release1"
-        dataset = tedlium.TEDLIUM(self.root_dir, release=release)
+    def _test_tedlium(self, dataset, release):
         num_samples = 0
         for i, (data, sample_rate, transcript, talk_id, speaker_id, identifier) in enumerate(dataset):
             self.assertEqual(data, self.samples[release][i][0], atol=5e-5, rtol=1e-8)
@@ -112,46 +111,26 @@ class Tedlium(TempDirMixin):
         phoneme_dict = dataset.phoneme_dict
         phoenemes = [f"{key} {' '.join(value)}" for key, value in phoneme_dict.items()]
         assert phoenemes == PHONEME
+
+    def test_tedlium_release1_str(self):
+        release = "release1"
+        dataset = tedlium.TEDLIUM(self.root_dir, release=release)
+        self._test_tedlium(dataset, release)
+
+    def test_tedlium_release1_path(self):
+        release = "release1"
+        dataset = tedlium.TEDLIUM(Path(self.root_dir), release=release)
+        self._test_tedlium(dataset, release)
 
     def test_tedlium_release2(self):
         release = "release2"
         dataset = tedlium.TEDLIUM(self.root_dir, release=release)
-        num_samples = 0
-        for i, (data, sample_rate, transcript, talk_id, speaker_id, identifier) in enumerate(dataset):
-            self.assertEqual(data, self.samples[release][i][0], atol=5e-5, rtol=1e-8)
-            assert sample_rate == self.samples[release][i][1]
-            assert transcript == self.samples[release][i][2]
-            assert talk_id == self.samples[release][i][3]
-            assert speaker_id == self.samples[release][i][4]
-            assert identifier == self.samples[release][i][5]
-            num_samples += 1
-
-        assert num_samples == len(self.samples[release])
-
-        dataset._dict_path = os.path.join(dataset._path, f"{release}.dic")
-        phoneme_dict = dataset.phoneme_dict
-        phoenemes = [f"{key} {' '.join(value)}" for key, value in phoneme_dict.items()]
-        assert phoenemes == PHONEME
+        self._test_tedlium(dataset, release)
 
     def test_tedlium_release3(self):
         release = "release3"
         dataset = tedlium.TEDLIUM(self.root_dir, release=release)
-        num_samples = 0
-        for i, (data, sample_rate, transcript, talk_id, speaker_id, identifier) in enumerate(dataset):
-            self.assertEqual(data, self.samples[release][i][0], atol=5e-5, rtol=1e-8)
-            assert sample_rate == self.samples[release][i][1]
-            assert transcript == self.samples[release][i][2]
-            assert talk_id == self.samples[release][i][3]
-            assert speaker_id == self.samples[release][i][4]
-            assert identifier == self.samples[release][i][5]
-            num_samples += 1
-
-        assert num_samples == len(self.samples[release])
-
-        dataset._dict_path = os.path.join(dataset._path, f"{release}.dic")
-        phoneme_dict = dataset.phoneme_dict
-        phoenemes = [f"{key} {' '.join(value)}" for key, value in phoneme_dict.items()]
-        assert phoenemes == PHONEME
+        self._test_tedlium(dataset, release)
 
 
 class TestTedliumSoundfile(Tedlium, TorchaudioTestCase):
