@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Union
 
 import torchaudio
-from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
+from torchaudio.datasets.utils import unicode_csv_reader
 from torch import Tensor
 from torch.utils.data import Dataset
 
@@ -19,65 +19,48 @@ FOLDER_IN_ARCHIVE = "CommonVoice"
 URL = "english"
 VERSION = "cv-corpus-4-2019-12-10"
 TSV = "train.tsv"
-_CHECKSUMS = {
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/tt.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/en.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/de.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/fr.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/cy.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/br.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/cv.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/tr.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/ky.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/ga-IE.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/kab.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/ca.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/zh-TW.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/sl.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/it.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/nl.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/cnh.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/eo.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/et.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/fa.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/eu.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/es.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/zh-CN.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/mn.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/sah.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/dv.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/rw.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/sv-SE.tar.gz":
-    None,
-    "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/ru.tar.gz":
-    None
+
+_LANG_CODE = {
+    "tatar": "tt",
+    "english": "en",
+    "german": "de",
+    "french": "fr",
+    "welsh": "cy",
+    "breton": "br",
+    "chuvash": "cv",
+    "turkish": "tr",
+    "kyrgyz": "ky",
+    "irish": "ga-IE",
+    "kabyle": "kab",
+    "catalan": "ca",
+    "taiwanese": "zh-TW",
+    "slovenian": "sl",
+    "italian": "it",
+    "dutch": "nl",
+    "hakha chin": "cnh",
+    "esperanto": "eo",
+    "estonian": "et",
+    "persian": "fa",
+    "portuguese": "pt",
+    "basque": "eu",
+    "spanish": "es",
+    "chinese": "zh-CN",
+    "mongolian": "mn",
+    "sakha": "sah",
+    "dhivehi": "dv",
+    "kinyarwanda": "rw",
+    "swedish": "sv-SE",
+    "russian": "ru",
+    "indonesian": "id",
+    "arabic": "ar",
+    "tamil": "ta",
+    "interlingua": "ia",
+    "latvian": "lv",
+    "japanese": "ja",
+    "votic": "vot",
+    "abkhaz": "ab",
+    "cantonese": "zh-HK",
+    "romansh sursilvan": "rm-sursilv"
 }
 
 
@@ -136,84 +119,22 @@ class COMMONVOICE(Dataset):
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  version: str = VERSION,
                  download: bool = False) -> None:
-
-        languages = {
-            "tatar": "tt",
-            "english": "en",
-            "german": "de",
-            "french": "fr",
-            "welsh": "cy",
-            "breton": "br",
-            "chuvash": "cv",
-            "turkish": "tr",
-            "kyrgyz": "ky",
-            "irish": "ga-IE",
-            "kabyle": "kab",
-            "catalan": "ca",
-            "taiwanese": "zh-TW",
-            "slovenian": "sl",
-            "italian": "it",
-            "dutch": "nl",
-            "hakha chin": "cnh",
-            "esperanto": "eo",
-            "estonian": "et",
-            "persian": "fa",
-            "portuguese": "pt",
-            "basque": "eu",
-            "spanish": "es",
-            "chinese": "zh-CN",
-            "mongolian": "mn",
-            "sakha": "sah",
-            "dhivehi": "dv",
-            "kinyarwanda": "rw",
-            "swedish": "sv-SE",
-            "russian": "ru",
-            "indonesian": "id",
-            "arabic": "ar",
-            "tamil": "ta",
-            "interlingua": "ia",
-            "latvian": "lv",
-            "japanese": "ja",
-            "votic": "vot",
-            "abkhaz": "ab",
-            "cantonese": "zh-HK",
-            "romansh sursilvan": "rm-sursilv"
-        }
-
         if download:
             raise RuntimeError(
                 "Common Voice dataset requires user agreement on the usage term, "
                 "and torchaudio no longer provides the download feature. "
                 "Please download the dataset manually and extract it in the root directory, "
                 "then provide the target language to `url` argument.")
-        if url not in languages:
-            raise ValueError(f"`url` must be one of available languages: {languages.keys()}")
-
-        if url in languages:
-            ext_archive = ".tar.gz"
-            language = languages[url]
-
-            base_url = "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com"
-            url = os.path.join(base_url, version, language + ext_archive)
+        if url not in _LANG_CODE:
+            raise ValueError(f"`url` must be one of available languages: {_LANG_CODE.keys()}")
 
         # Get string representation of 'root' in case Path object is passed
         root = os.fspath(root)
 
-        basename = os.path.basename(url)
-        archive = os.path.join(root, basename)
-
-        basename = basename.rsplit(".", 2)[0]
-        folder_in_archive = os.path.join(folder_in_archive, version, basename)
+        lang_code = _LANG_CODE[url]
+        folder_in_archive = os.path.join(folder_in_archive, version, lang_code)
 
         self._path = os.path.join(root, folder_in_archive)
-
-        if download:
-            if not os.path.isdir(self._path):
-                if not os.path.isfile(archive):
-                    checksum = _CHECKSUMS.get(url, None)
-                    download_url(url, root, hash_value=checksum)
-                extract_archive(archive)
-
         self._tsv = os.path.join(root, folder_in_archive, tsv)
 
         with open(self._tsv, "r") as tsv:
