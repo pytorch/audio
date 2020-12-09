@@ -180,6 +180,15 @@ class COMMONVOICE(Dataset):
             "romansh sursilvan": "rm-sursilv"
         }
 
+        if download:
+            raise RuntimeError(
+                "Common Voice dataset requires user agreement on the usage term, "
+                "and torchaudio no longer provides the download feature. "
+                "Please download the dataset manually and extract it in the root directory, "
+                "then provide the target language to `url` argument.")
+        if url not in languages:
+            raise ValueError(f"`url` must be one of available languages: {languages.keys()}")
+
         if url in languages:
             ext_archive = ".tar.gz"
             language = languages[url]
