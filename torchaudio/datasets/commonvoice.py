@@ -178,15 +178,15 @@ class COMMONVOICE(Dataset):
             url = os.path.join(version, language + ext_archive)
         else:
             raise ValueError(
-                'Allowed language values are ``"tatar"``, ``"english"``, ``"german"``,'
-                '``"french"``, ``"welsh"``, ``"breton"``, ``"chuvash"``, ``"turkish"``, ``"kyrgyz"``,'
-                '``"irish"``, ``"kabyle"``, ``"catalan"``, ``"taiwanese"``, ``"slovenian"``,'
-                '``"italian"``, ``"dutch"``, ``"hakha chin"``, ``"esperanto"``, ``"estonian"``,'
-                '``"persian"``, ``"portuguese"``, ``"basque"``, ``"spanish"``, ``"chinese"``,'
-                '``"mongolian"``, ``"sakha"``, ``"dhivehi"``, ``"kinyarwanda"``, ``"swedish"``,'
-                '``"russian"``, ``"indonesian"``, ``"arabic"``, ``"tamil"``, ``"interlingua"``,'
-                '``"latvian"``, ``"japanese"``, ``"votic"``, ``"abkhaz"``, ``"cantonese"`` and'
-                '``"romansh sursilvan"``.'
+                'Allowed language values are "tatar", "english", "german",'
+                '"french", "welsh", "breton", "chuvash", "turkish", "kyrgyz",'
+                '"irish", "kabyle", "catalan", "taiwanese", "slovenian",'
+                '"italian", "dutch", "hakha chin", "esperanto", "estonian",'
+                '"persian", "portuguese", "basque", "spanish", "chinese",'
+                '"mongolian", "sakha", "dhivehi", "kinyarwanda", "swedish",'
+                '"russian", "indonesian", "arabic", "tamil", "interlingua",'
+                '"latvian", "japanese", "votic", "abkhaz", "cantonese" and'
+                '"romansh sursilvan".'
             )
 
         # Get string representation of 'root' in case Path object is passed

@@ -74,23 +74,25 @@ def build_workflow_pair(btype, os_type, python_version, filter_branch, prefix=''
 
     return w
 
+
 def build_doc_job(filter_branch):
     job = {
         "name": "build_docs",
         "python_version": "3.8",
-        "requires": ["binary_linux_wheel_py3.8",],
+        "requires": ["binary_linux_wheel_py3.8", ],
     }
 
     if filter_branch:
         job["filters"] = gen_filter_branch_tree(filter_branch)
     return [{"build_docs": job}]
 
+
 def upload_doc_job(filter_branch):
     job = {
         "name": "upload_docs",
         "context": "org-member",
         "python_version": "3.8",
-        "requires": ["build_docs",],
+        "requires": ["build_docs", ],
     }
 
     if filter_branch:
@@ -184,7 +186,7 @@ def unittest_workflows(indentation=6):
 
                 if i == 0 and os_type == "linux" and device_type == "cpu":
                     jobs.append({
-                        f"stylecheck": {
+                        "stylecheck": {
                             "name": f"stylecheck_py{python_version}",
                             "python_version": python_version,
                         }
