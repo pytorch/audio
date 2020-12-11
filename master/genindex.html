@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; Torchaudio 0.7.0 documentation</title>
+  <title>Index &mdash; Torchaudio master documentation</title>
   
 
   
@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -70,21 +70,7 @@
           </li>
 
           <li>
-            <div class="ecosystem-dropdown">
-              <a id="dropdownMenuButton" data-toggle="ecosystem-dropdown">
-                Ecosystem
-              </a>
-              <div class="ecosystem-dropdown-menu">
-                <a class="nav-dropdown-item" href="https://pytorch.org/hub"">
-                  <span class=dropdown-title>Models (Beta)</span>
-                  <p>Discover, publish, and reuse pre-trained models</p>
-                </a>
-                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
-                  <span class=dropdown-title>Tools & Libraries</span>
-                  <p>Explore the ecosystem of tools and libraries</p>
-                </a>
-              </div>
-            </div>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
           <li>
@@ -100,22 +86,67 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/torchvision/">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
+                  <span class="dropdown-title">TorchElastic</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
           </li>
 
           <li>
-            <div class="resources-dropdown">
-              <a id="resourcesDropdownButton" data-toggle="resources-dropdown">
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
                 Resources
               </a>
               <div class="resources-dropdown-menu">
-                <a class="nav-dropdown-item" href="https://pytorch.org/resources"">
-                  <span class=dropdown-title>Developer Resources</span>
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
                 </a>
-                <a class="nav-dropdown-item" href="https://pytorch.org/features">
-                  <span class=dropdown-title>About</span>
-                  <p>Learn about PyTorch’s features and capabilities</p>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
                 </a>
               </div>
             </div>
@@ -129,10 +160,8 @@
 
       <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
     </div>
-
   </div>
 </div>
-
 
 <body class="pytorch-body">
 
@@ -155,7 +184,7 @@
               
               
                 <div class="version">
-                  0.7.0
+                  master 
                 </div>
               
             
@@ -340,11 +369,9 @@
 </li>
       <li><a href="transforms.html#torchaudio.transforms.AmplitudeToDB">AmplitudeToDB (class in torchaudio.transforms)</a>
 </li>
-      <li><a href="functional.html#torchaudio.functional.angle">angle() (in module torchaudio.functional)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.append_effect_to_chain">append_effect_to_chain() (torchaudio.sox_effects.SoxEffectsChain method)</a>
+      <li><a href="functional.html#torchaudio.functional.angle">angle() (in module torchaudio.functional)</a>
 </li>
       <li><a href="sox_effects.html#torchaudio.sox_effects.apply_effects_file">apply_effects_file() (in module torchaudio.sox_effects)</a>
 </li>
@@ -376,8 +403,6 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.clear_chain">clear_chain() (torchaudio.sox_effects.SoxEffectsChain method)</a>
-</li>
       <li><a href="datasets.html#torchaudio.datasets.CMUARCTIC">CMUARCTIC (class in torchaudio.datasets)</a>
 </li>
       <li><a href="datasets.html#torchaudio.datasets.COMMONVOICE">COMMONVOICE (class in torchaudio.datasets)</a>
@@ -386,10 +411,10 @@
 </li>
       <li><a href="transforms.html#torchaudio.transforms.ComplexNorm">ComplexNorm (class in torchaudio.transforms)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="functional.html#torchaudio.functional.compute_deltas">compute_deltas() (in module torchaudio.functional)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="transforms.html#torchaudio.transforms.ComputeDeltas">ComputeDeltas (class in torchaudio.transforms)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.contrast">contrast() (in module torchaudio.functional)</a>
@@ -406,6 +431,8 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="functional.html#torchaudio.functional.DB_to_amplitude">DB_to_amplitude() (in module torchaudio.functional)</a>
+</li>
       <li><a href="functional.html#torchaudio.functional.dcshift">dcshift() (in module torchaudio.functional)</a>
 </li>
   </ul></td>
@@ -413,6 +440,8 @@
       <li><a href="functional.html#torchaudio.functional.deemph_biquad">deemph_biquad() (in module torchaudio.functional)</a>
 </li>
       <li><a href="functional.html#torchaudio.functional.detect_pitch_frequency">detect_pitch_frequency() (in module torchaudio.functional)</a>
+</li>
+      <li><a href="functional.html#torchaudio.functional.dither">dither() (in module torchaudio.functional)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -496,6 +525,8 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="functional.html#torchaudio.functional.gain">gain() (in module torchaudio.functional)</a>
+</li>
       <li><a href="torchaudio.html#torchaudio.get_audio_backend">get_audio_backend() (in module torchaudio)</a>
 </li>
       <li><a href="backend.html#torchaudio.backend.sox_backend.get_sox_bool">get_sox_bool() (in module torchaudio.backend.sox_backend)</a>
@@ -507,6 +538,8 @@
       <li><a href="backend.html#torchaudio.backend.sox_backend.get_sox_option_t">get_sox_option_t() (in module torchaudio.backend.sox_backend)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.GriffinLim">GriffinLim (class in torchaudio.transforms)</a>
+</li>
+      <li><a href="functional.html#torchaudio.functional.griffinlim">griffinlim() (in module torchaudio.functional)</a>
 </li>
       <li><a href="datasets.html#torchaudio.datasets.GTZAN">GTZAN (class in torchaudio.datasets)</a>
 </li>
@@ -537,8 +570,6 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="sox_effects.html#torchaudio.sox_effects.init_sox_effects">init_sox_effects() (in module torchaudio.sox_effects)</a>
-</li>
-      <li><a href="torchaudio.html#torchaudio.initialize_sox">initialize_sox() (in module torchaudio)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.InverseMelScale">InverseMelScale (class in torchaudio.transforms)</a>
 </li>
@@ -686,15 +717,11 @@
 </li>
       <li><a href="utils.html#torchaudio.utils.sox_utils.set_buffer_size">set_buffer_size() (in module torchaudio.utils.sox_utils)</a>
 </li>
-      <li><a href="sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.set_input_file">set_input_file() (torchaudio.sox_effects.SoxEffectsChain method)</a>
-</li>
       <li><a href="utils.html#torchaudio.utils.sox_utils.set_seed">set_seed() (in module torchaudio.utils.sox_utils)</a>
 </li>
       <li><a href="utils.html#torchaudio.utils.sox_utils.set_use_threads">set_use_threads() (in module torchaudio.utils.sox_utils)</a>
 </li>
       <li><a href="utils.html#torchaudio.utils.sox_utils.set_verbosity">set_verbosity() (in module torchaudio.utils.sox_utils)</a>
-</li>
-      <li><a href="torchaudio.html#torchaudio.shutdown_sox">shutdown_sox() (in module torchaudio)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -706,15 +733,9 @@
 </li>
       <li><a href="transforms.html#torchaudio.transforms.SlidingWindowCmn">SlidingWindowCmn (class in torchaudio.transforms)</a>
 </li>
-      <li><a href="sox_effects.html#torchaudio.sox_effects.SoxEffectsChain.sox_build_flow_effects">sox_build_flow_effects() (torchaudio.sox_effects.SoxEffectsChain method)</a>
-</li>
       <li><a href="backend.html#torchaudio.backend.sox_backend.sox_encodinginfo_t">sox_encodinginfo_t() (in module torchaudio.backend.sox_backend)</a>
 </li>
       <li><a href="backend.html#torchaudio.backend.sox_backend.sox_signalinfo_t">sox_signalinfo_t() (in module torchaudio.backend.sox_backend)</a>
-</li>
-      <li><a href="sox_effects.html#torchaudio.sox_effects.SoxEffect">SoxEffect (class in torchaudio.sox_effects)</a>
-</li>
-      <li><a href="sox_effects.html#torchaudio.sox_effects.SoxEffectsChain">SoxEffectsChain (class in torchaudio.sox_effects)</a>
 </li>
       <li><a href="transforms.html#torchaudio.transforms.Spectrogram">Spectrogram (class in torchaudio.transforms)</a>
 </li>
@@ -847,8 +868,8 @@
          <script src="_static/underscore.js"></script>
          <script src="_static/doctools.js"></script>
          <script src="_static/language_data.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
          <script src="_static/katex_autorenderer.js"></script>
      
 
@@ -995,10 +1016,6 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/features">Features</a>
-          </li>
-
-          <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
@@ -1018,13 +1035,65 @@
             <a href="https://pytorch.org/tutorials">Tutorials</a>
           </li>
 
-          <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          <li class="resources-mobile-menu-title">
+            Docs
           </li>
 
-          <li>
-            <a href="https://pytorch.org/resources">Resources</a>
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/docs/stable/torchvision/">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
           </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
 
           <li>
             <a href="https://github.com/pytorch/pytorch">Github</a>

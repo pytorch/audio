@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.backend.utils &mdash; Torchaudio 0.7.0 documentation</title>
+  <title>torchaudio.backend.utils &mdash; Torchaudio master documentation</title>
   
 
   
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -69,21 +69,7 @@
           </li>
 
           <li>
-            <div class="ecosystem-dropdown">
-              <a id="dropdownMenuButton" data-toggle="ecosystem-dropdown">
-                Ecosystem
-              </a>
-              <div class="ecosystem-dropdown-menu">
-                <a class="nav-dropdown-item" href="https://pytorch.org/hub"">
-                  <span class=dropdown-title>Models (Beta)</span>
-                  <p>Discover, publish, and reuse pre-trained models</p>
-                </a>
-                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
-                  <span class=dropdown-title>Tools & Libraries</span>
-                  <p>Explore the ecosystem of tools and libraries</p>
-                </a>
-              </div>
-            </div>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
           <li>
@@ -99,22 +85,67 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/torchvision/">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
+                  <span class="dropdown-title">TorchElastic</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
           </li>
 
           <li>
-            <div class="resources-dropdown">
-              <a id="resourcesDropdownButton" data-toggle="resources-dropdown">
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
                 Resources
               </a>
               <div class="resources-dropdown-menu">
-                <a class="nav-dropdown-item" href="https://pytorch.org/resources"">
-                  <span class=dropdown-title>Developer Resources</span>
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
                 </a>
-                <a class="nav-dropdown-item" href="https://pytorch.org/features">
-                  <span class=dropdown-title>About</span>
-                  <p>Learn about PyTorch’s features and capabilities</p>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
                 </a>
               </div>
             </div>
@@ -128,10 +159,8 @@
 
       <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
     </div>
-
   </div>
 </div>
-
 
 <body class="pytorch-body">
 
@@ -154,7 +183,7 @@
               
               
                 <div class="version">
-                  0.7.0
+                  master 
                 </div>
               
             
@@ -246,8 +275,6 @@
         
           <li><a href="../../index.html">Module code</a> &gt;</li>
         
-          <li><a href="../../torchaudio.html">torchaudio</a> &gt;</li>
-        
       <li>torchaudio.backend.utils</li>
     
     
@@ -321,6 +348,12 @@
 <span class="sd">            One of ``&quot;sox&quot;``, ``&quot;sox_io&quot;`` or ``&quot;soundfile&quot;`` based on availability</span>
 <span class="sd">            of the system. If ``None`` is provided the  current backend is unassigned.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">USE_SOUNDFILE_LEGACY_INTERFACE</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s1">&#39;&quot;torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE&quot; flag is depredated and will be removed in 0.9.0. &#39;</span>
+            <span class="s1">&#39;Please remove the use of flag.&#39;</span>
+        <span class="p">)</span>
+
     <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">list_audio_backends</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s1">&#39;Backend &quot;</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s1">&quot; is not one of &#39;</span>
@@ -330,22 +363,17 @@
         <span class="n">module</span> <span class="o">=</span> <span class="n">no_backend</span>
     <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;sox&#39;</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s1">&#39;&quot;sox&quot; backend is being deprecated. &#39;</span>
-            <span class="s1">&#39;The default backend will be changed to &quot;sox_io&quot; backend in 0.8.0 and &#39;</span>
-            <span class="s1">&#39;&quot;sox&quot; backend will be removed in 0.9.0. Please migrate to &quot;sox_io&quot; backend. &#39;</span>
-            <span class="s1">&#39;Please refer to https://github.com/pytorch/audio/issues/903 for the detail.&#39;</span><span class="p">)</span>
+            <span class="s1">&#39;&quot;sox&quot; backend is depredated and will be removed in 0.9.0. &#39;</span>
+            <span class="s1">&#39;Please use &quot;sox_io&quot; backend.&#39;</span>
+        <span class="p">)</span>
         <span class="n">module</span> <span class="o">=</span> <span class="n">sox_backend</span>
     <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;sox_io&#39;</span><span class="p">:</span>
         <span class="n">module</span> <span class="o">=</span> <span class="n">sox_io_backend</span>
     <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;soundfile&#39;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">USE_SOUNDFILE_LEGACY_INTERFACE</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s1">&#39;The interface of &quot;soundfile&quot; backend is planned to change in 0.8.0 to &#39;</span>
-                <span class="s1">&#39;match that of &quot;sox_io&quot; backend and the current interface will be removed in 0.9.0. &#39;</span>
-                <span class="s1">&#39;To use the new interface, do &#39;</span>
-                <span class="s1">&#39;`torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = False` &#39;</span>
-                <span class="s1">&#39;before setting the backend to &quot;soundfile&quot;. &#39;</span>
-                <span class="s1">&#39;Please refer to https://github.com/pytorch/audio/issues/903 for the detail.&#39;</span>
+                <span class="s1">&#39;The legacy interface of &quot;soundfile&quot; backend is depredated and will be removed in 0.9.0. &#39;</span>
+                <span class="s1">&#39;Please migrate to the new interface.&#39;</span>
             <span class="p">)</span>
             <span class="n">module</span> <span class="o">=</span> <span class="n">soundfile_backend</span>
         <span class="k">else</span><span class="p">:</span>
@@ -360,7 +388,7 @@
 <span class="k">def</span> <span class="nf">_init_audio_backend</span><span class="p">():</span>
     <span class="n">backends</span> <span class="o">=</span> <span class="n">list_audio_backends</span><span class="p">()</span>
     <span class="k">if</span> <span class="s1">&#39;sox&#39;</span> <span class="ow">in</span> <span class="n">backends</span><span class="p">:</span>
-        <span class="n">set_audio_backend</span><span class="p">(</span><span class="s1">&#39;sox&#39;</span><span class="p">)</span>
+        <span class="n">set_audio_backend</span><span class="p">(</span><span class="s1">&#39;sox_io&#39;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="s1">&#39;soundfile&#39;</span> <span class="ow">in</span> <span class="n">backends</span><span class="p">:</span>
         <span class="n">set_audio_backend</span><span class="p">(</span><span class="s1">&#39;soundfile&#39;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -435,8 +463,8 @@
          <script src="../../../_static/underscore.js"></script>
          <script src="../../../_static/doctools.js"></script>
          <script src="../../../_static/language_data.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
          <script src="../../../_static/katex_autorenderer.js"></script>
      
 
@@ -583,10 +611,6 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/features">Features</a>
-          </li>
-
-          <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
@@ -606,13 +630,65 @@
             <a href="https://pytorch.org/tutorials">Tutorials</a>
           </li>
 
-          <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          <li class="resources-mobile-menu-title">
+            Docs
           </li>
 
-          <li>
-            <a href="https://pytorch.org/resources">Resources</a>
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/docs/stable/torchvision/">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
           </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
 
           <li>
             <a href="https://github.com/pytorch/pytorch">Github</a>

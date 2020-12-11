@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.sox_effects &mdash; Torchaudio 0.7.0 documentation</title>
+  <title>torchaudio.sox_effects &mdash; Torchaudio master documentation</title>
   
 
   
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -71,21 +71,7 @@
           </li>
 
           <li>
-            <div class="ecosystem-dropdown">
-              <a id="dropdownMenuButton" data-toggle="ecosystem-dropdown">
-                Ecosystem
-              </a>
-              <div class="ecosystem-dropdown-menu">
-                <a class="nav-dropdown-item" href="https://pytorch.org/hub"">
-                  <span class=dropdown-title>Models (Beta)</span>
-                  <p>Discover, publish, and reuse pre-trained models</p>
-                </a>
-                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
-                  <span class=dropdown-title>Tools & Libraries</span>
-                  <p>Explore the ecosystem of tools and libraries</p>
-                </a>
-              </div>
-            </div>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
           <li>
@@ -101,22 +87,67 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/torchvision/">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
+                  <span class="dropdown-title">TorchElastic</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
           </li>
 
           <li>
-            <div class="resources-dropdown">
-              <a id="resourcesDropdownButton" data-toggle="resources-dropdown">
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
                 Resources
               </a>
               <div class="resources-dropdown-menu">
-                <a class="nav-dropdown-item" href="https://pytorch.org/resources"">
-                  <span class=dropdown-title>Developer Resources</span>
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
                 </a>
-                <a class="nav-dropdown-item" href="https://pytorch.org/features">
-                  <span class=dropdown-title>About</span>
-                  <p>Learn about PyTorch’s features and capabilities</p>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
                 </a>
               </div>
             </div>
@@ -130,10 +161,8 @@
 
       <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
     </div>
-
   </div>
 </div>
-
 
 <body class="pytorch-body">
 
@@ -156,7 +185,7 @@
               
               
                 <div class="version">
-                  0.7.0
+                  master 
                 </div>
               
             
@@ -280,10 +309,6 @@
               
   <div class="section" id="torchaudio-sox-effects">
 <span id="sox-effects"></span><h1>torchaudio.sox_effects<a class="headerlink" href="#torchaudio-sox-effects" title="Permalink to this headline">¶</a></h1>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The <a class="reference internal" href="#torchaudio.sox_effects.SoxEffect" title="torchaudio.sox_effects.SoxEffect"><code class="xref py py-class docutils literal notranslate"><span class="pre">SoxEffect</span></code></a> and <a class="reference internal" href="#torchaudio.sox_effects.SoxEffectsChain" title="torchaudio.sox_effects.SoxEffectsChain"><code class="xref py py-class docutils literal notranslate"><span class="pre">SoxEffectsChain</span></code></a> classes are deprecated. Please migrate to <a class="reference internal" href="#torchaudio.sox_effects.apply_effects_tensor" title="torchaudio.sox_effects.apply_effects_tensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_effects_tensor()</span></code></a> and <a class="reference internal" href="#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_effects_file()</span></code></a>.</p>
-</div>
 <div class="section" id="resource-initialization-shutdown">
 <h2>Resource initialization / shutdown<a class="headerlink" href="#resource-initialization-shutdown" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
@@ -358,7 +383,7 @@ need to give <code class="docutils literal notranslate"><span class="pre">rate</
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tensor</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.6.0a0+4392e52 ))"><em>torch.Tensor</em></a>) – Input 2D Tensor.</p></li>
+<li><p><strong>tensor</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))"><em>torch.Tensor</em></a>) – Input 2D Tensor.</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Sample rate</p></li>
 <li><p><strong>effects</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em><em>]</em>) – List of effects.</p></li>
 <li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Indicates if the input Tensor’s dimension is
@@ -372,7 +397,7 @@ the same channels order. The shape of the Tensor can be different based on the
 effects applied. Sample rate can also be different based on the effects applied.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.6.0a0+4392e52 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>]</p>
+<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>]</p>
 </dd>
 </dl>
 <dl>
@@ -468,7 +493,8 @@ rate and leave samples untouched.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the audio file.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><em>pathlib.Path</em></a>) – Path to the audio file. This function also handles <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> objects, but is
+annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> for TorchScript compiler compatibility.</p></li>
 <li><p><strong>effects</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em><em>]</em>) – List of effects.</p></li>
 <li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function always return <code class="docutils literal notranslate"><span class="pre">float32</span></code>, and sample values are
 normalized to <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.
@@ -488,7 +514,7 @@ If <code class="docutils literal notranslate"><span class="pre">channels_first=T
 otherwise <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.6.0a0+4392e52 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>]</p>
+<dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>]</p>
 </dd>
 </dl>
 <dl>
@@ -527,10 +553,9 @@ otherwise <code class="docutils literal notranslate"><span class="pre">[time,</s
 <span class="gp">... </span>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 <span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">flist</span> <span class="o">=</span> <span class="n">flist</span>
 <span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span> <span class="o">=</span> <span class="n">sample_rate</span>
-<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="gp">...</span>
 <span class="gp">... </span>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-<span class="gp">... </span>        <span class="n">speed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="n">speed</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span>
 <span class="gp">... </span>        <span class="n">effects</span> <span class="o">=</span> <span class="p">[</span>
 <span class="gp">... </span>            <span class="p">[</span><span class="s1">&#39;gain&#39;</span><span class="p">,</span> <span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="s1">&#39;-10&#39;</span><span class="p">],</span>  <span class="c1"># apply 10 db attenuation</span>
 <span class="gp">... </span>            <span class="p">[</span><span class="s1">&#39;remix&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">],</span>  <span class="c1"># merge all the channels</span>
@@ -554,147 +579,6 @@ otherwise <code class="docutils literal notranslate"><span class="pre">[time,</s
 </div>
 </dd>
 </dl>
-</dd></dl>
-
-</div>
-</div>
-<div class="section" id="legacy">
-<h2>Legacy<a class="headerlink" href="#legacy" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="soxeffect">
-<h3>SoxEffect<a class="headerlink" href="#soxeffect" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
-<dt id="torchaudio.sox_effects.SoxEffect">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.sox_effects.</code><code class="sig-name descname">SoxEffect</code><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#SoxEffect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create an object for passing sox effect information between python and c++</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This function is deprecated.
-Please migrate to <a class="reference internal" href="#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_effects_file()</span></code></a> or <a class="reference internal" href="#torchaudio.sox_effects.apply_effects_tensor" title="torchaudio.sox_effects.apply_effects_tensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_effects_tensor()</span></code></a>.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>An object with the following attributes: ename (str) which is the
-name of effect, and eopts (List[str]) which is a list of effect options.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#torchaudio.sox_effects.SoxEffect" title="torchaudio.sox_effects.SoxEffect">SoxEffect</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="soxeffectschain">
-<h3>SoxEffectsChain<a class="headerlink" href="#soxeffectschain" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
-<dt id="torchaudio.sox_effects.SoxEffectsChain">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.sox_effects.</code><code class="sig-name descname">SoxEffectsChain</code><span class="sig-paren">(</span><em class="sig-param">normalization: Union[bool</em>, <em class="sig-param">float</em>, <em class="sig-param">Callable] = True</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">out_siginfo: Any = None</em>, <em class="sig-param">out_encinfo: Any = None</em>, <em class="sig-param">filetype: str = 'raw'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#SoxEffectsChain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain" title="Permalink to this definition">¶</a></dt>
-<dd><p>SoX effects chain class.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This class is deprecated.
-Please migrate to <a class="reference internal" href="#torchaudio.sox_effects.apply_effects_file" title="torchaudio.sox_effects.apply_effects_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_effects_file()</span></code></a> or <a class="reference internal" href="#torchaudio.sox_effects.apply_effects_tensor" title="torchaudio.sox_effects.apply_effects_tensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_effects_tensor()</span></code></a>.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>normalization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>number</em><em>, or </em><em>callable</em><em>, </em><em>optional</em>) – If boolean <code class="docutils literal notranslate"><span class="pre">True</span></code>, then output is divided by <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;&lt;</span> <span class="pre">31</span></code>
-(assumes signed 32-bit audio), and normalizes to <code class="docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">1]</span></code>.
-If <code class="docutils literal notranslate"><span class="pre">number</span></code>, then output is divided by that number.
-If <code class="docutils literal notranslate"><span class="pre">callable</span></code>, then the output is passed as a parameter to the given function, then
-the output is divided by the result. (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Set channels first or length first in result.  (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>out_siginfo</strong> (<em>sox_signalinfo_t</em><em>, </em><em>optional</em>) – a sox_signalinfo_t type, which could be helpful if the audio type cannot be
-automatically determined. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>out_encinfo</strong> (<em>sox_encodinginfo_t</em><em>, </em><em>optional</em>) – a sox_encodinginfo_t type, which could be set if the audio type cannot be
-automatically determined. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>filetype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – a filetype or extension to be set if sox cannot determine it automatically.
-(Default: <code class="docutils literal notranslate"><span class="pre">'raw'</span></code>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>An output Tensor of size <code class="docutils literal notranslate"><span class="pre">[C</span> <span class="pre">x</span> <span class="pre">L]</span></code> or <code class="docutils literal notranslate"><span class="pre">[L</span> <span class="pre">x</span> <span class="pre">C]</span></code> where L is the number
-of audio frames and C is the number of channels. An integer which is the sample rate of the
-audio (as listed in the metadata of the file)</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tuple[Tensor, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>]</p>
-</dd>
-</dl>
-<dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audiodir_path</span><span class="p">):</span>
-<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
-<span class="gp">... </span>            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">audiodir_path</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span>
-<span class="gp">... </span>            <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">audiodir_path</span><span class="p">)]</span>
-<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">SoxEffectsChain</span><span class="p">()</span>
-<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">.</span><span class="n">append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">16000</span><span class="p">])</span>  <span class="c1"># resample to 16000hz</span>
-<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">.</span><span class="n">append_effect_to_chain</span><span class="p">(</span><span class="s2">&quot;channels&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">])</span>  <span class="c1"># mono signal</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-<span class="gp">... </span>        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">.</span><span class="n">set_input_file</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-<span class="gp">... </span>        <span class="n">x</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">.</span><span class="n">sox_build_flow_effects</span><span class="p">()</span>
-<span class="gp">... </span>        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">sr</span>
-<span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="gp">... </span>        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-<span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">(</span><span class="n">path_to_audio_files</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">sig</span><span class="p">,</span> <span class="n">sr</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
-<span class="gp">... </span>   <span class="k">pass</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-<dl class="method">
-<dt id="torchaudio.sox_effects.SoxEffectsChain.append_effect_to_chain">
-<code class="sig-name descname">append_effect_to_chain</code><span class="sig-paren">(</span><em class="sig-param">ename: str, eargs: Union[List[str], str, None] = None</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#SoxEffectsChain.append_effect_to_chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain.append_effect_to_chain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Append effect to a sox effects chain.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – which is the name of effect</p></li>
-<li><p><strong>eargs</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>] or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – which is a list of effect options. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="torchaudio.sox_effects.SoxEffectsChain.clear_chain">
-<code class="sig-name descname">clear_chain</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#SoxEffectsChain.clear_chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain.clear_chain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clear effects chain in python</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="torchaudio.sox_effects.SoxEffectsChain.set_input_file">
-<code class="sig-name descname">set_input_file</code><span class="sig-paren">(</span><em class="sig-param">input_file: str</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#SoxEffectsChain.set_input_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain.set_input_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set input file for input of chain</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>input_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The path to the input file.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="torchaudio.sox_effects.SoxEffectsChain.sox_build_flow_effects">
-<code class="sig-name descname">sox_build_flow_effects</code><span class="sig-paren">(</span><em class="sig-param">out: Optional[torch.Tensor] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int]<a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#SoxEffectsChain.sox_build_flow_effects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.SoxEffectsChain.sox_build_flow_effects" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build effects chain and flow effects from input file to output tensor</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>out</strong> (<em>Tensor</em><em>, </em><em>optional</em>) – Where the output will be written to. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>An output Tensor of size <cite>[C x L]</cite> or <cite>[L x C]</cite> where
-L is the number of audio frames and C is the number of channels.
-An integer which is the sample rate of the audio (as listed in the metadata of the file)</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tuple[Tensor, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -752,11 +636,6 @@ An integer which is the sample rate of the audio (as listed in the metadata of t
 <li><a class="reference internal" href="#applying-effects-on-file">Applying effects on file</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#legacy">Legacy</a><ul>
-<li><a class="reference internal" href="#soxeffect">SoxEffect</a></li>
-<li><a class="reference internal" href="#soxeffectschain">SoxEffectsChain</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -778,8 +657,8 @@ An integer which is the sample rate of the audio (as listed in the metadata of t
          <script src="_static/underscore.js"></script>
          <script src="_static/doctools.js"></script>
          <script src="_static/language_data.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
          <script src="_static/katex_autorenderer.js"></script>
      
 
@@ -926,10 +805,6 @@ An integer which is the sample rate of the audio (as listed in the metadata of t
           </li>
 
           <li>
-            <a href="https://pytorch.org/features">Features</a>
-          </li>
-
-          <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
@@ -949,13 +824,65 @@ An integer which is the sample rate of the audio (as listed in the metadata of t
             <a href="https://pytorch.org/tutorials">Tutorials</a>
           </li>
 
-          <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          <li class="resources-mobile-menu-title">
+            Docs
           </li>
 
-          <li>
-            <a href="https://pytorch.org/resources">Resources</a>
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/docs/stable/torchvision/">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
           </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
 
           <li>
             <a href="https://github.com/pytorch/pytorch">Github</a>

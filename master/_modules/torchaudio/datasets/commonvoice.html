@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.datasets.commonvoice &mdash; Torchaudio 0.7.0 documentation</title>
+  <title>torchaudio.datasets.commonvoice &mdash; Torchaudio master documentation</title>
   
 
   
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -69,21 +69,7 @@
           </li>
 
           <li>
-            <div class="ecosystem-dropdown">
-              <a id="dropdownMenuButton" data-toggle="ecosystem-dropdown">
-                Ecosystem
-              </a>
-              <div class="ecosystem-dropdown-menu">
-                <a class="nav-dropdown-item" href="https://pytorch.org/hub"">
-                  <span class=dropdown-title>Models (Beta)</span>
-                  <p>Discover, publish, and reuse pre-trained models</p>
-                </a>
-                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
-                  <span class=dropdown-title>Tools & Libraries</span>
-                  <p>Explore the ecosystem of tools and libraries</p>
-                </a>
-              </div>
-            </div>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
           <li>
@@ -99,22 +85,67 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/torchvision/">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
+                  <span class="dropdown-title">TorchElastic</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
           </li>
 
           <li>
-            <div class="resources-dropdown">
-              <a id="resourcesDropdownButton" data-toggle="resources-dropdown">
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
                 Resources
               </a>
               <div class="resources-dropdown-menu">
-                <a class="nav-dropdown-item" href="https://pytorch.org/resources"">
-                  <span class=dropdown-title>Developer Resources</span>
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
                 </a>
-                <a class="nav-dropdown-item" href="https://pytorch.org/features">
-                  <span class=dropdown-title>About</span>
-                  <p>Learn about PyTorch’s features and capabilities</p>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
                 </a>
               </div>
             </div>
@@ -128,10 +159,8 @@
 
       <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
     </div>
-
   </div>
 </div>
-
 
 <body class="pytorch-body">
 
@@ -154,7 +183,7 @@
               
               
                 <div class="version">
-                  0.7.0
+                  master 
                 </div>
               
             
@@ -246,8 +275,6 @@
         
           <li><a href="../../index.html">Module code</a> &gt;</li>
         
-          <li><a href="../../torchaudio.html">torchaudio</a> &gt;</li>
-        
       <li>torchaudio.datasets.commonvoice</li>
     
     
@@ -278,10 +305,12 @@
               
   <h1>Source code for torchaudio.datasets.commonvoice</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="n">download_url</span><span class="p">,</span> <span class="n">extract_archive</span><span class="p">,</span> <span class="n">unicode_csv_reader</span>
+<span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="n">extract_archive</span><span class="p">,</span> <span class="n">unicode_csv_reader</span><span class="p">,</span> <span class="n">validate_file</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
@@ -294,68 +323,39 @@
 <span class="c1"># validated.tsv</span>
 
 <span class="n">FOLDER_IN_ARCHIVE</span> <span class="o">=</span> <span class="s2">&quot;CommonVoice&quot;</span>
-<span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;english&quot;</span>
-<span class="n">VERSION</span> <span class="o">=</span> <span class="s2">&quot;cv-corpus-4-2019-12-10&quot;</span>
+<span class="n">LANGUAGE</span> <span class="o">=</span> <span class="s2">&quot;english&quot;</span>
+<span class="n">VERSION</span> <span class="o">=</span> <span class="s2">&quot;cv-corpus-5.1-2020-06-22&quot;</span>
 <span class="n">TSV</span> <span class="o">=</span> <span class="s2">&quot;train.tsv&quot;</span>
 <span class="n">_CHECKSUMS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/tt.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/en.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/de.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/fr.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/cy.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/br.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/cv.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/tr.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/ky.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/ga-IE.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/kab.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/ca.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/zh-TW.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/sl.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/it.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/nl.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/cnh.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/eo.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/et.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/fa.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/eu.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/es.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/zh-CN.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/mn.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/sah.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/dv.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/rw.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/sv-SE.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span><span class="p">,</span>
-    <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/ru.tar.gz&quot;</span><span class="p">:</span>
-    <span class="kc">None</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/tt.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/en.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/de.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/fr.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/cy.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/br.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/cv.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/tr.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/ky.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/ga-IE.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/kab.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/ca.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/zh-TW.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/sl.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/it.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/nl.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/cnh.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/eo.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/et.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/fa.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/eu.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/es.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/zh-CN.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/mn.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/sah.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/dv.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/rw.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/sv-SE.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;cv-corpus-5.1-2020-06-22/ru.tar.gz&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -379,15 +379,18 @@
 
 
 <div class="viewcode-block" id="COMMONVOICE"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.COMMONVOICE">[docs]</a><span class="k">class</span> <span class="nc">COMMONVOICE</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create a Dataset for CommonVoice.</span>
+    <span class="sd">&quot;&quot;&quot;Create a Dataset for `CommonVoice &lt;https://commonvoice.mozilla.org/&gt;`_.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        root (str): Path to the directory where the dataset is found or downloaded.</span>
+<span class="sd">        root (str or Path): Path to the directory where the dataset is found or downloaded.</span>
 <span class="sd">        tsv (str, optional): The name of the tsv file used to construct the metadata.</span>
 <span class="sd">            (default: ``&quot;train.tsv&quot;``)</span>
-<span class="sd">        url (str, optional): The URL to download the dataset from, or the language of</span>
-<span class="sd">            the dataset to download. (default: ``&quot;english&quot;``).</span>
-<span class="sd">            Allowed language values are ``&quot;tatar&quot;``, ``&quot;english&quot;``, ``&quot;german&quot;``,</span>
+<span class="sd">        url (str, optional): Deprecated.</span>
+<span class="sd">        folder_in_archive (str, optional): The top-level directory of the dataset.</span>
+<span class="sd">        version (str): Version string. (default: ``&quot;cv-corpus-5.1-2020-06-22&quot;``)</span>
+<span class="sd">        language (str, optional): Language of the dataset. (default: None)</span>
+<span class="sd">            The following values are mapped to their corresponding shortened version:</span>
+<span class="sd">            ``&quot;tatar&quot;``, ``&quot;english&quot;``, ``&quot;german&quot;``,</span>
 <span class="sd">            ``&quot;french&quot;``, ``&quot;welsh&quot;``, ``&quot;breton&quot;``, ``&quot;chuvash&quot;``, ``&quot;turkish&quot;``, ``&quot;kyrgyz&quot;``,</span>
 <span class="sd">            ``&quot;irish&quot;``, ``&quot;kabyle&quot;``, ``&quot;catalan&quot;``, ``&quot;taiwanese&quot;``, ``&quot;slovenian&quot;``,</span>
 <span class="sd">            ``&quot;italian&quot;``, ``&quot;dutch&quot;``, ``&quot;hakha chin&quot;``, ``&quot;esperanto&quot;``, ``&quot;estonian&quot;``,</span>
@@ -396,11 +399,8 @@
 <span class="sd">            ``&quot;russian&quot;``, ``&quot;indonesian&quot;``, ``&quot;arabic&quot;``, ``&quot;tamil&quot;``, ``&quot;interlingua&quot;``,</span>
 <span class="sd">            ``&quot;latvian&quot;``, ``&quot;japanese&quot;``, ``&quot;votic&quot;``, ``&quot;abkhaz&quot;``, ``&quot;cantonese&quot;`` and</span>
 <span class="sd">            ``&quot;romansh sursilvan&quot;``.</span>
-<span class="sd">        folder_in_archive (str, optional): The top-level directory of the dataset.</span>
-<span class="sd">        version (str): Version string. (default: ``&quot;cv-corpus-4-2019-12-10&quot;``)</span>
 <span class="sd">            For the other allowed values, Please checkout https://commonvoice.mozilla.org/en/datasets.</span>
-<span class="sd">        download (bool, optional):</span>
-<span class="sd">            Whether to download the dataset if it is not found at root path. (default: ``False``).</span>
+<span class="sd">        download (bool, optional): Deprecated.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_ext_txt</span> <span class="o">=</span> <span class="s2">&quot;.txt&quot;</span>
@@ -408,12 +408,32 @@
     <span class="n">_folder_audio</span> <span class="o">=</span> <span class="s2">&quot;clips&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
                  <span class="n">tsv</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">TSV</span><span class="p">,</span>
-                 <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">URL</span><span class="p">,</span>
+                 <span class="n">url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">folder_in_archive</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">FOLDER_IN_ARCHIVE</span><span class="p">,</span>
                  <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">VERSION</span><span class="p">,</span>
-                 <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                 <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">LANGUAGE</span><span class="p">,</span>
+                 <span class="n">download</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">download</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;The dataset is no longer publicly accessible. You need to &quot;</span>
+                <span class="s2">&quot;download the archives externally and place them in the root &quot;</span>
+                <span class="s2">&quot;directory.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">download</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The use of the download flag is deprecated, since the dataset &quot;</span>
+                <span class="s2">&quot;is no longer directly accessible.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The use of the url flag is deprecated, since the dataset &quot;</span>
+                <span class="s2">&quot;is no longer publicly accessible. To specify the language of the dataset, &quot;</span>
+                <span class="s2">&quot;please use the language parameter instead.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span>
+            <span class="p">)</span>
 
         <span class="n">languages</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;tatar&quot;</span><span class="p">:</span> <span class="s2">&quot;tt&quot;</span><span class="p">,</span>
@@ -458,12 +478,25 @@
             <span class="s2">&quot;romansh sursilvan&quot;</span><span class="p">:</span> <span class="s2">&quot;rm-sursilv&quot;</span>
         <span class="p">}</span>
 
-        <span class="k">if</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">language</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
             <span class="n">ext_archive</span> <span class="o">=</span> <span class="s2">&quot;.tar.gz&quot;</span>
-            <span class="n">language</span> <span class="o">=</span> <span class="n">languages</span><span class="p">[</span><span class="n">url</span><span class="p">]</span>
+            <span class="n">language</span> <span class="o">=</span> <span class="n">languages</span><span class="p">[</span><span class="n">language</span><span class="p">]</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="n">language</span> <span class="o">+</span> <span class="n">ext_archive</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Allowed language values are &quot;tatar&quot;, &quot;english&quot;, &quot;german&quot;,&#39;</span>
+                <span class="s1">&#39;&quot;french&quot;, &quot;welsh&quot;, &quot;breton&quot;, &quot;chuvash&quot;, &quot;turkish&quot;, &quot;kyrgyz&quot;,&#39;</span>
+                <span class="s1">&#39;&quot;irish&quot;, &quot;kabyle&quot;, &quot;catalan&quot;, &quot;taiwanese&quot;, &quot;slovenian&quot;,&#39;</span>
+                <span class="s1">&#39;&quot;italian&quot;, &quot;dutch&quot;, &quot;hakha chin&quot;, &quot;esperanto&quot;, &quot;estonian&quot;,&#39;</span>
+                <span class="s1">&#39;&quot;persian&quot;, &quot;portuguese&quot;, &quot;basque&quot;, &quot;spanish&quot;, &quot;chinese&quot;,&#39;</span>
+                <span class="s1">&#39;&quot;mongolian&quot;, &quot;sakha&quot;, &quot;dhivehi&quot;, &quot;kinyarwanda&quot;, &quot;swedish&quot;,&#39;</span>
+                <span class="s1">&#39;&quot;russian&quot;, &quot;indonesian&quot;, &quot;arabic&quot;, &quot;tamil&quot;, &quot;interlingua&quot;,&#39;</span>
+                <span class="s1">&#39;&quot;latvian&quot;, &quot;japanese&quot;, &quot;votic&quot;, &quot;abkhaz&quot;, &quot;cantonese&quot; and&#39;</span>
+                <span class="s1">&#39;&quot;romansh sursilvan&quot;.&#39;</span>
+            <span class="p">)</span>
 
-            <span class="n">base_url</span> <span class="o">=</span> <span class="s2">&quot;https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com&quot;</span>
-            <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">language</span> <span class="o">+</span> <span class="n">ext_archive</span><span class="p">)</span>
+        <span class="c1"># Get string representation of &#39;root&#39; in case Path object is passed</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
 
         <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="n">archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
@@ -473,12 +506,23 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">archive</span><span class="p">):</span>
-                    <span class="n">checksum</span> <span class="o">=</span> <span class="n">_CHECKSUMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                    <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">archive</span><span class="p">):</span>
+                <span class="n">checksum</span> <span class="o">=</span> <span class="n">_CHECKSUMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">checksum</span><span class="p">:</span>
+                    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_obj</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_file</span><span class="p">(</span><span class="n">file_obj</span><span class="p">,</span> <span class="n">checksum</span><span class="p">,</span> <span class="s2">&quot;sha256&quot;</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;The hash of </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> does not match. Delete the file manually and retry.&quot;</span>
+                            <span class="p">)</span>
                 <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;The dataset is no longer publicly accessible. You need to &quot;</span>
+                    <span class="s2">&quot;download the archives externally and place them in the root &quot;</span>
+                    <span class="s2">&quot;directory.&quot;</span>
+                <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_tsv</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">,</span> <span class="n">tsv</span><span class="p">)</span>
 
@@ -555,8 +599,8 @@
          <script src="../../../_static/underscore.js"></script>
          <script src="../../../_static/doctools.js"></script>
          <script src="../../../_static/language_data.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
          <script src="../../../_static/katex_autorenderer.js"></script>
      
 
@@ -703,10 +747,6 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/features">Features</a>
-          </li>
-
-          <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
@@ -726,13 +766,65 @@
             <a href="https://pytorch.org/tutorials">Tutorials</a>
           </li>
 
-          <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          <li class="resources-mobile-menu-title">
+            Docs
           </li>
 
-          <li>
-            <a href="https://pytorch.org/resources">Resources</a>
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/docs/stable/torchvision/">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
           </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
 
           <li>
             <a href="https://github.com/pytorch/pytorch">Github</a>

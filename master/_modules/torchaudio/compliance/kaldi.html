@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.compliance.kaldi &mdash; Torchaudio 0.7.0 documentation</title>
+  <title>torchaudio.compliance.kaldi &mdash; Torchaudio master documentation</title>
   
 
   
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -69,21 +69,7 @@
           </li>
 
           <li>
-            <div class="ecosystem-dropdown">
-              <a id="dropdownMenuButton" data-toggle="ecosystem-dropdown">
-                Ecosystem
-              </a>
-              <div class="ecosystem-dropdown-menu">
-                <a class="nav-dropdown-item" href="https://pytorch.org/hub"">
-                  <span class=dropdown-title>Models (Beta)</span>
-                  <p>Discover, publish, and reuse pre-trained models</p>
-                </a>
-                <a class="nav-dropdown-item" href="https://pytorch.org/ecosystem">
-                  <span class=dropdown-title>Tools & Libraries</span>
-                  <p>Explore the ecosystem of tools and libraries</p>
-                </a>
-              </div>
-            </div>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
           <li>
@@ -99,22 +85,67 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/torchvision/">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/elastic/">
+                  <span class="dropdown-title">TorchElastic</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
           </li>
 
           <li>
-            <div class="resources-dropdown">
-              <a id="resourcesDropdownButton" data-toggle="resources-dropdown">
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
                 Resources
               </a>
               <div class="resources-dropdown-menu">
-                <a class="nav-dropdown-item" href="https://pytorch.org/resources"">
-                  <span class=dropdown-title>Developer Resources</span>
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
                   <p>Find resources and get questions answered</p>
                 </a>
-                <a class="nav-dropdown-item" href="https://pytorch.org/features">
-                  <span class=dropdown-title>About</span>
-                  <p>Learn about PyTorch’s features and capabilities</p>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
                 </a>
               </div>
             </div>
@@ -128,10 +159,8 @@
 
       <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
     </div>
-
   </div>
 </div>
-
 
 <body class="pytorch-body">
 
@@ -154,7 +183,7 @@
               
               
                 <div class="version">
-                  0.7.0
+                  master 
                 </div>
               
             
@@ -246,8 +275,6 @@
         
           <li><a href="../../index.html">Module code</a> &gt;</li>
         
-          <li><a href="../../torchaudio.html">torchaudio</a> &gt;</li>
-        
       <li>torchaudio.compliance.kaldi</li>
     
     
@@ -281,8 +308,10 @@
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+
+<span class="kn">import</span> <span class="nn">torchaudio</span>
+<span class="kn">import</span> <span class="nn">torchaudio._internal.fft</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;get_mel_banks&#39;</span><span class="p">,</span>
@@ -568,10 +597,10 @@
         <span class="n">snip_edges</span><span class="p">,</span> <span class="n">raw_energy</span><span class="p">,</span> <span class="n">energy_floor</span><span class="p">,</span> <span class="n">dither</span><span class="p">,</span> <span class="n">remove_dc_offset</span><span class="p">,</span> <span class="n">preemphasis_coefficient</span><span class="p">)</span>
 
     <span class="c1"># size (m, padded_window_size // 2 + 1, 2)</span>
-    <span class="n">fft</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">strided_input</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">fft</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_internal</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">strided_input</span><span class="p">)</span>
 
     <span class="c1"># Convert the FFT into a power spectrum</span>
-    <span class="n">power_spectrum</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fft</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">epsilon</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>  <span class="c1"># size (m, padded_window_size // 2 + 1)</span>
+    <span class="n">power_spectrum</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fft</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">2.</span><span class="p">),</span> <span class="n">epsilon</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>  <span class="c1"># size (m, padded_window_size // 2 + 1)</span>
     <span class="n">power_spectrum</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">signal_log_energy</span>
 
     <span class="n">power_spectrum</span> <span class="o">=</span> <span class="n">_subtract_column_mean</span><span class="p">(</span><span class="n">power_spectrum</span><span class="p">,</span> <span class="n">subtract_mean</span><span class="p">)</span>
@@ -849,12 +878,10 @@
         <span class="n">waveform</span><span class="p">,</span> <span class="n">padded_window_size</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">window_shift</span><span class="p">,</span> <span class="n">window_type</span><span class="p">,</span> <span class="n">blackman_coeff</span><span class="p">,</span>
         <span class="n">snip_edges</span><span class="p">,</span> <span class="n">raw_energy</span><span class="p">,</span> <span class="n">energy_floor</span><span class="p">,</span> <span class="n">dither</span><span class="p">,</span> <span class="n">remove_dc_offset</span><span class="p">,</span> <span class="n">preemphasis_coefficient</span><span class="p">)</span>
 
-    <span class="c1"># size (m, padded_window_size // 2 + 1, 2)</span>
-    <span class="n">fft</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">strided_input</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="n">power_spectrum</span> <span class="o">=</span> <span class="n">fft</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># size (m, padded_window_size // 2 + 1)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">use_power</span><span class="p">:</span>
-        <span class="n">power_spectrum</span> <span class="o">=</span> <span class="n">power_spectrum</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="c1"># size (m, padded_window_size // 2 + 1)</span>
+    <span class="n">spectrum</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_internal</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">strided_input</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">use_power</span><span class="p">:</span>
+        <span class="n">spectrum</span> <span class="o">=</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span>
 
     <span class="c1"># size (num_mel_bins, padded_window_size // 2)</span>
     <span class="n">mel_energies</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_mel_banks</span><span class="p">(</span><span class="n">num_mel_bins</span><span class="p">,</span> <span class="n">padded_window_size</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="p">,</span>
@@ -865,7 +892,7 @@
     <span class="n">mel_energies</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">mel_energies</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="c1"># sum with mel fiterbanks over the power spectrum, size (m, num_mel_bins)</span>
-    <span class="n">mel_energies</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">power_spectrum</span><span class="p">,</span> <span class="n">mel_energies</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">mel_energies</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span> <span class="n">mel_energies</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">use_log_fbank</span><span class="p">:</span>
         <span class="c1"># avoid log of zero (which should be prevented anyway by dithering)</span>
         <span class="n">mel_energies</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">mel_energies</span><span class="p">,</span> <span class="n">_get_epsilon</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="p">))</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
@@ -1312,8 +1339,8 @@
          <script src="../../../_static/underscore.js"></script>
          <script src="../../../_static/doctools.js"></script>
          <script src="../../../_static/language_data.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
          <script src="../../../_static/katex_autorenderer.js"></script>
      
 
@@ -1460,10 +1487,6 @@
           </li>
 
           <li>
-            <a href="https://pytorch.org/features">Features</a>
-          </li>
-
-          <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
@@ -1483,13 +1506,65 @@
             <a href="https://pytorch.org/tutorials">Tutorials</a>
           </li>
 
-          <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          <li class="resources-mobile-menu-title">
+            Docs
           </li>
 
-          <li>
-            <a href="https://pytorch.org/resources">Resources</a>
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/docs/stable/torchvision/">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
           </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
 
           <li>
             <a href="https://github.com/pytorch/pytorch">Github</a>
