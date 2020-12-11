@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Union
 
 import torchaudio
-from torchaudio.datasets.utils import unicode_csv_reader
+from torchaudio.datasets.utils import unicode_csv_reader, extract_archive
 from torch import Tensor
 from torch.utils.data import Dataset
 
@@ -136,6 +136,19 @@ class COMMONVOICE(Dataset):
 
         self._path = os.path.join(root, folder_in_archive)
         self._tsv = os.path.join(root, folder_in_archive, tsv)
+
+        if not os.path.isdir(self._path):
+            archive = os.path.join(root, f'{lang_code}.tar')
+            if not os.path.isfile(archive):
+                raise RuntimeError(
+                    f'Neither the data set directory "{folder_in_archive}", '
+                    f'or the archive "{lang_code}.tar" is found.')
+            extract_archive(archive)
+            if not os.path.isdir(self._path):
+                raise RuntimeError(
+                    f'The data set directory "{folder_in_archive}" is not found after '
+                    f'extracting "{lang_code}.tar" is found. '
+                    'Is the `version` matching to the archive?')
 
         with open(self._tsv, "r") as tsv:
             walker = unicode_csv_reader(tsv, delimiter="\t")
