@@ -125,7 +125,7 @@ class LIBRISPEECH(Dataset):
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
-        walker = sorted([str(p.stem) for p in Path(self._path).glob('*/*/*'+self._ext_audio)])
+        walker = sorted([str(p.stem) for p in Path(self._path).glob('*/*/*' + self._ext_audio)])
         self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:

@@ -84,7 +84,7 @@ class YESNO(Dataset):
                 "Dataset not found. Please use `download=True` to download it."
             )
 
-        walker = sorted([str(p.stem) for p in Path(self._path).glob('*.wav')])
+        walker = sorted([str(p.stem) for p in Path(self._path).glob('*.' + self._ext_audio)])
         self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, List[int]]:
