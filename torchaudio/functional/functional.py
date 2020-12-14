@@ -24,7 +24,6 @@ __all__ = [
     "angle",
     "magphase",
     "phase_vocoder",
-    "detect_pitch_frequency",
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
