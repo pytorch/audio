@@ -772,16 +772,16 @@ def _get_sinc_resample_kernel(orig_freq: int, new_freq: int, lowpass_filter_widt
     #    y[j] = sum_i x[i] sinc(pi * orig_freq * (i / orig_freq - j / new_freq))
 
     # We see here that y[j] is the convolution of x[i] with a specific filter, for which
-    # we take an FIR approximation, stopping when we see at least `zeros` zeros crossing.
+    # we take an FIR approximation, stopping when we see at least `lowpass_filter_width` zeros crossing.
     # But y[j+1] is going to have a different set of weights and so on, until y[j + new_freq].
     # Indeed:
     # y[j + new_freq] = sum_i x[i] sinc(pi * orig_freq * ((i / orig_freq - (j + new_freq) / new_freq))
-    #               = sum_i x[i] sinc(pi * orig_freq * ((i - orig_freq) / orig_freq - j / new_freq))
-    #               = sum_i x[i + orig_freq] sinc(pi * orig_freq * (i / orig_freq - j / new_freq))
+    #                 = sum_i x[i] sinc(pi * orig_freq * ((i - orig_freq) / orig_freq - j / new_freq))
+    #                 = sum_i x[i + orig_freq] sinc(pi * orig_freq * (i / orig_freq - j / new_freq))
     # so y[j+new_freq] uses the same filter as y[j], but on a shifted version of x by `orig_freq`.
     # This will explain the F.conv1d after, with a stride of orig_freq.
     width = math.ceil(lowpass_filter_width * orig_freq / base_freq)
-    # If old_sr is still big after GCD reduction, most filters will be very unbalanced, i.e.,
+    # If orig_freq is still big after GCD reduction, most filters will be very unbalanced, i.e.,
     # they will have a lot of almost zero values to the left or to the right...
     # There is probably a way to evaluate those filters more efficiently, but this is kept for
     # future work.
