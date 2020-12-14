@@ -662,7 +662,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/workspace
-      - designate_upload_channel
       - checkout
       - run:
           name: Install pytorch-audio
@@ -671,7 +670,7 @@ jobs:
           name: Build docs
           command: .circleci/build_docs/build_docs.sh
       - persist_to_workspace:
-          root: docs
+          root: ./
           paths:
             - "*"
 
@@ -683,7 +682,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/workspace
-      - designate_upload_channel
       - run:
           name: Generate netrc
           command: |
@@ -694,13 +692,15 @@ jobs:
               login pytorchbot
               password ${GITHUB_PYTORCHBOT_TOKEN}
             DONE
-      - checkout
       - run:
           name: Upload docs
           command: |
+            # Don't use "checkout" step since it uses ssh, which cannot git push
+            # https://circleci.com/docs/2.0/configuration-reference/#checkout
             set -ex
             echo $PWD
             ls ~/workspace
+            ls ~/workspace/doc
             tag=${CIRCLE_TAG:1:5}
             target=${tag:-master}
             .circleci/build_docs/commit_docs.sh ~/workspace $target
