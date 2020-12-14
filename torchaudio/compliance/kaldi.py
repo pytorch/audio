@@ -794,8 +794,9 @@ def _get_sinc_resample_kernel(orig_freq: int, new_freq: int, lowpass_filter_widt
         # we do not use torch.hann_window here as we need to evaluate the window
         # at spectifics positions, not over a regular grid.
         window = torch.cos(t / lowpass_filter_width / 2)**2
-        sinc = torch.where(t == 0, torch.tensor(1.).to(t), torch.sin(t) / t)
-        kernels.append(sinc(t) * window)
+        kernel = torch.where(t == 0, torch.tensor(1.).to(t), torch.sin(t) / t)
+        kernel.mul_(window)
+        kernels.append(kernel)
 
     scale = base_freq / orig_freq
     return torch.stack(kernels).view(new_freq, 1, -1).mul_(scale), width
@@ -837,9 +838,6 @@ def resample_waveform(waveform: Tensor,
     if int(orig_freq) != orig_freq or int(new_freq) != new_freq:
         raise ValueError("orig_freq and new_freq should be integers")
     assert orig_freq > 0.0 and new_freq > 0.0
-
-    if orig_freq == new_freq:
-        return waveform
 
     orig_freq = int(orig_freq)
     new_freq = int(new_freq)
