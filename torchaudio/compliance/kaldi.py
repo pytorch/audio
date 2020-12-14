@@ -852,5 +852,5 @@ def resample_waveform(waveform: Tensor,
     waveform = F.pad(waveform, (width, width + orig_freq))
     resampled = F.conv1d(waveform[:, None], kernel, stride=orig_freq)
     resampled = resampled.transpose(1, 2).reshape(num_wavs, -1)
-    target_length = int(new_freq * length / orig_freq)
+    target_length = int(math.ceil(new_freq * length / orig_freq))
     return resampled[..., :target_length]
