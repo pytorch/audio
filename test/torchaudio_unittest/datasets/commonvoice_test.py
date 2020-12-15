@@ -1,9 +1,8 @@
 import os
 import csv
-import random
 from pathlib import Path
 
-from torchaudio.datasets import commonvoice
+from torchaudio.datasets import COMMONVOICE
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -31,29 +30,23 @@ class TestCommonVoice(TempDirMixin, TorchaudioTestCase):
             "common_voice_en_18607573.wav",
             "Caddy, show Miss Clare and Miss Summerson their rooms.", "2", "0", "twenties", "male", "canada"],
     ]
-    _folder_audio = "clips"
     sample_rate = 48000
 
     @classmethod
     def setUpClass(cls):
         cls.root_dir = cls.get_base_temp_dir()
-        # The path convention commonvoice uses
-        base_dir = os.path.join(cls.root_dir, commonvoice.FOLDER_IN_ARCHIVE, commonvoice.VERSION, "en")
-        os.makedirs(base_dir, exist_ok=True)
-
         # Tsv file name difference does not mean different subset, testing as a whole dataset here
-        tsv_filename = os.path.join(base_dir, commonvoice.TSV)
+        tsv_filename = os.path.join(cls.root_dir, "train.tsv")
+        audio_base_path = os.path.join(cls.root_dir, "clips")
+        os.makedirs(audio_base_path, exist_ok=True)
         with open(tsv_filename, "w", newline='') as tsv:
             writer = csv.writer(tsv, delimiter='\t')
             writer.writerow(cls._headers)
             for i, content in enumerate(cls._train_csv_contents):
-                audio_filename = audio_filename = content[1]
                 writer.writerow(content)
 
                 # Generate and store audio
-                audio_base_path = os.path.join(base_dir, cls._folder_audio)
-                os.makedirs(audio_base_path, exist_ok=True)
-                audio_path = os.path.join(audio_base_path, audio_filename)
+                audio_path = os.path.join(audio_base_path, content[1])
                 data = get_whitenoise(sample_rate=cls.sample_rate, duration=1, n_channels=1, seed=i, dtype='float32')
                 save_wav(audio_path, data, cls.sample_rate)
 
@@ -72,9 +65,9 @@ class TestCommonVoice(TempDirMixin, TorchaudioTestCase):
         assert n_ite == len(self.data)
 
     def test_commonvoice_str(self):
-        dataset = commonvoice.COMMONVOICE(self.root_dir)
+        dataset = COMMONVOICE(self.root_dir)
         self._test_commonvoice(dataset)
 
     def test_commonvoice_path(self):
-        dataset = commonvoice.COMMONVOICE(Path(self.root_dir))
+        dataset = COMMONVOICE(Path(self.root_dir))
         self._test_commonvoice(dataset)
