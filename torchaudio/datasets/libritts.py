@@ -126,7 +126,8 @@ class LIBRITTS(Dataset):
                 extract_archive(archive)
 
         walker = [str(p.stem) for p in Path(self._path).glob('*/*/*' + self._ext_audio)]
-        self._walker = walker.sort()
+        walker.sort()
+        self._walker = walker
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int, int, str]:
         """Load the n-th sample from the dataset.
