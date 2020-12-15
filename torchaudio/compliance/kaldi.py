@@ -760,9 +760,9 @@ def _get_sinc_resample_kernel(orig_freq: int, new_freq: int, lowpass_filter_widt
     assert 1 >= lowpass_cutoff_ratio > 0
     kernels = []
     base_freq = min(orig_freq, new_freq)
-    # rolloff will perform antialiasing filtering by removing the highest frequencies.
+    # `lowpass_cutoff_ratio` will perform antialiasing filtering by removing the highest frequencies.
     # At first I thought I only needed this when downsampling, but when upsampling
-    # you will get edge artifacts without this, the edge is equivalent to zero padding,
+    # you will get edge artifacts without this, as the edge is equivalent to zero padding,
     # which will add high freq artifacts.
     base_freq *= lowpass_cutoff_ratio
 
