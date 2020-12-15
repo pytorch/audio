@@ -754,14 +754,17 @@ def mfcc(
 
 
 def _get_sinc_resample_kernel(orig_freq: int, new_freq: int, lowpass_filter_width: int,
-                              rolloff: float, device: torch.device, dtype: torch.dtype):
+                              lowpass_cutoff_ratio: float,
+                              device: torch.device, dtype: torch.dtype):
+    assert lowpass_filter_width > 0
+    assert 1 >= lowpass_cutoff_ratio > 0
     kernels = []
     base_freq = min(orig_freq, new_freq)
     # rolloff will perform antialiasing filtering by removing the highest frequencies.
     # At first I thought I only needed this when downsampling, but when upsampling
     # you will get edge artifacts without this, the edge is equivalent to zero padding,
     # which will add high freq artifacts.
-    base_freq *= rolloff
+    base_freq *= lowpass_cutoff_ratio
 
     # The key idea of the algorithm is that x(t) can be exactly reconstructed from x[i] (tensor)
     # using the sinc interpolation formula:
@@ -803,10 +806,10 @@ def _get_sinc_resample_kernel(orig_freq: int, new_freq: int, lowpass_filter_widt
 
 
 def resample_waveform(waveform: Tensor,
-                      orig_freq: float,
-                      new_freq: float,
+                      orig_freq: int,
+                      new_freq: int,
                       lowpass_filter_width: int = 6,
-                      rolloff: float = 0.99) -> Tensor:
+                      lowpass_cutoff_ratio: float = 0.99) -> Tensor:
     r"""Resamples the waveform at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
     a signal). LinearResample (LR) means that the output signal is at linearly spaced intervals (i.e
@@ -822,10 +825,10 @@ def resample_waveform(waveform: Tensor,
         new_freq (int): The desired frequency
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
             but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
-        rolloff (float): use a lowpass filter that is `rolloff * new_freq / 2`,
-            to ensure sufficient margin due to the imperfection of the FIR filter used.
-            Lowering this value will reduce anti-aliasing, but will lose some of the high
-            frequency content.
+        lowpass_cutoff_ratio (float): Controls the cutoff frequency of the low pass filter.
+            Lower values will reduce aliasing, but also lose more of the high frequency content.
+            Typical values range from 0.9 to 1 (Default is ``0.9``).
+
 
     Returns:
         Tensor: The waveform at the new frequency
@@ -845,8 +848,9 @@ def resample_waveform(waveform: Tensor,
     orig_freq = orig_freq // gcd
     new_freq = new_freq // gcd
 
-    kernel, width = _get_sinc_resample_kernel(
-        orig_freq, new_freq, lowpass_filter_width, rolloff, waveform.device, waveform.dtype)
+    kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq,
+                                              lowpass_filter_width, lowpass_cutoff_ratio,
+                                              waveform.device, waveform.dtype)
 
     num_wavs, length = waveform.shape
     waveform = F.pad(waveform, (width, width + orig_freq))
