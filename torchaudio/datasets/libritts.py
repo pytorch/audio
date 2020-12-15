@@ -125,7 +125,7 @@ class LIBRITTS(Dataset):
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
-        walker = sorted([str(p.stem) for p in Path(self._path).glob('*/*/*' + self._ext_audio)])
+        walker = [str(p.stem) for p in Path(self._path).glob('*/*/*' + self._ext_audio)]
         self._walker = walker.sort()
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int, int, str]:
