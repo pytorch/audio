@@ -109,8 +109,7 @@ class SPEECHCOMMANDS(Dataset):
             self._walker = _load_list(self._path, "testing_list.txt")
         elif subset == "training":
             excludes = set(_load_list(self._path, "validation_list.txt", "testing_list.txt"))
-            walker = [str(p) for p in Path(self._path).glob('*/*.wav')]
-            walker.sort()
+            walker = sorted(str(p) for p in Path(self._path).glob('*/*.wav'))
             self._walker = [
                 w for w in walker
                 if HASH_DIVIDER in w
@@ -118,8 +117,7 @@ class SPEECHCOMMANDS(Dataset):
                 and os.path.normpath(w) not in excludes
             ]
         else:
-            walker = [str(p) for p in Path(self._path).glob('*/*.wav')]
-            walker.sort()
+            walker = sorted(str(p) for p in Path(self._path).glob('*/*.wav'))
             self._walker = [w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w]
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:

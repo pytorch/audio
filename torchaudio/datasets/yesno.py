@@ -84,9 +84,7 @@ class YESNO(Dataset):
                 "Dataset not found. Please use `download=True` to download it."
             )
 
-        walker = [str(p.stem) for p in Path(self._path).glob('*' + self._ext_audio)]
-        walker.sort()
-        self._walker = walker
+        self._walker = sorted(str(p.stem) for p in Path(self._path).glob('*' + self._ext_audio))
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, List[int]]:
         """Load the n-th sample from the dataset.

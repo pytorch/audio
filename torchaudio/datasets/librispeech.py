@@ -124,9 +124,7 @@ class LIBRISPEECH(Dataset):
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
-        walker = [str(p.stem) for p in Path(self._path).glob('*/*/*' + self._ext_audio)]
-        walker.sort()
-        self._walker = walker
+        self._walker = sorted(str(p.stem) for p in Path(self._path).glob('*/*/*' + self._ext_audio))
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, int, int, int]:
         """Load the n-th sample from the dataset.
