@@ -8,7 +8,6 @@ from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    walk_files,
 )
 
 URL = "train-clean-100"
