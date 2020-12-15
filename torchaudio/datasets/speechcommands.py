@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 from torch import Tensor
 from torchaudio.datasets.utils import (
     download_url,
-    extract_archive
+    extract_archive,
 )
 
 FOLDER_IN_ARCHIVE = "SpeechCommands"
