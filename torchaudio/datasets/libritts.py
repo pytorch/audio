@@ -8,7 +8,6 @@ from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    walk_files,
 )
 
 URL = "train-clean-100"
@@ -126,10 +125,7 @@ class LIBRITTS(Dataset):
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
-        walker = walk_files(
-            self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
-        )
-        self._walker = list(walker)
+        self._walker = sorted(str(p.stem) for p in Path(self._path).glob('*/*/*' + self._ext_audio))
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int, int, str]:
         """Load the n-th sample from the dataset.
