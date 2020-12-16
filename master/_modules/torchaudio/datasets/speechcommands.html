@@ -275,6 +275,8 @@
         
           <li><a href="../../index.html">Module code</a> &gt;</li>
         
+          <li><a href="../../torchaudio.html">torchaudio</a> &gt;</li>
+        
       <li>torchaudio.datasets.speechcommands</li>
     
     
@@ -314,7 +316,6 @@
 <span class="kn">from</span> <span class="nn">torchaudio.datasets.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">download_url</span><span class="p">,</span>
     <span class="n">extract_archive</span><span class="p">,</span>
-    <span class="n">walk_files</span>
 <span class="p">)</span>
 
 <span class="n">FOLDER_IN_ARCHIVE</span> <span class="o">=</span> <span class="s2">&quot;SpeechCommands&quot;</span>
@@ -416,7 +417,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="n">_load_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="s2">&quot;testing_list.txt&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">subset</span> <span class="o">==</span> <span class="s2">&quot;training&quot;</span><span class="p">:</span>
             <span class="n">excludes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">_load_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="s2">&quot;validation_list.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;testing_list.txt&quot;</span><span class="p">))</span>
-            <span class="n">walker</span> <span class="o">=</span> <span class="n">walk_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.wav&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">walker</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*/*.wav&#39;</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">walker</span>
                 <span class="k">if</span> <span class="n">HASH_DIVIDER</span> <span class="ow">in</span> <span class="n">w</span>
@@ -424,7 +425,7 @@
                 <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excludes</span>
             <span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">walker</span> <span class="o">=</span> <span class="n">walk_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.wav&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">walker</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*/*.wav&#39;</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">walker</span> <span class="k">if</span> <span class="n">HASH_DIVIDER</span> <span class="ow">in</span> <span class="n">w</span> <span class="ow">and</span> <span class="n">EXCEPT_FOLDER</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">w</span><span class="p">]</span>
 
 <div class="viewcode-block" id="SPEECHCOMMANDS.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.SPEECHCOMMANDS.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
