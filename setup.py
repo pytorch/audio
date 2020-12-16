@@ -40,6 +40,7 @@ if pytorch_package_version is not None:
 
 class clean(distutils.command.clean.clean):
     def run(self):
+        print("got here")
         # Run default behavior first
         distutils.command.clean.clean.run(self)
 
@@ -51,6 +52,7 @@ class clean(distutils.command.clean.clean):
         build_dirs = [
             ROOT_DIR / 'build',
             ROOT_DIR / 'third_party' / 'build',
+            ROOT_DIR / 'third_party' / 'warp_transducer' / 'build',
         ]
         for path in build_dirs:
             if path.exists():
@@ -83,7 +85,8 @@ setup(
     packages=find_packages(exclude=["build*", "test*", "torchaudio.csrc*", "third_party*", "build_tools*"]),
     ext_modules=setup_helpers.get_ext_modules(),
     cmdclass={
-        'build_ext': setup_helpers.BuildExtension.with_options(no_python_abi_suffix=True)
+        'build_ext': setup_helpers.BuildExtension.with_options(no_python_abi_suffix=True),
+        'clean': clean,
     },
     install_requires=[pytorch_package_dep],
     zip_safe=False,

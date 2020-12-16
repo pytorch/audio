@@ -1,0 +1,5 @@
+[submodule "third_party/warp_transducer"]
+    path = third_party/warp_transducer
+    # url = https://github.com/HawkAaron/warp-transducer
+    url = https://github.com/vincentqb/warp-transducer
+    branch = torchbind

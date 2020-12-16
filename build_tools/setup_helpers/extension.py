@@ -17,6 +17,7 @@ _THIS_DIR = Path(__file__).parent.resolve()
 _ROOT_DIR = _THIS_DIR.parent.parent.resolve()
 _CSRC_DIR = _ROOT_DIR / 'torchaudio' / 'csrc'
 _TP_BASE_DIR = _ROOT_DIR / 'third_party'
+_TP_TRANSDUCER_BASE_DIR = _ROOT_DIR / 'third_party' / 'warp_transducer'
 _TP_INSTALL_DIR = _TP_BASE_DIR / 'install'
 
 
@@ -101,8 +102,8 @@ def _get_libraries():
     return [] if _BUILD_SOX else ['sox']
 
 
-def _build_third_party():
-    build_dir = str(_TP_BASE_DIR / 'build')
+def _build_third_party(base_dir):
+    build_dir = str(base_dir / 'build')
     os.makedirs(build_dir, exist_ok=True)
     subprocess.run(
         args=['cmake', '..'],
@@ -115,6 +116,57 @@ def _build_third_party():
         check=True,
     )
 
+def _get_ext(debug):
+    return CppExtension(
+        _EXT_NAME,
+        _get_srcs(),
+        libraries=_get_libraries(),
+        include_dirs=_get_include_dirs(),
+        extra_compile_args=_get_eca(debug),
+        extra_objects=_get_extra_objects(),
+        extra_link_args=_get_ela(debug),
+    )
+
+
+def _get_ext_rnnt(debug):
+    import torch
+    # from torch.utils.cpp_extension import CppExtension
+
+    extra_compile_args = ['-fPIC']
+    extra_compile_args += ['-std=c++14']
+    base_path = _TP_TRANSDUCER_BASE_DIR
+    default_warp_rnnt_path = base_path / "build"
+
+    if torch.cuda.is_available():
+
+        if "CUDA_HOME" not in os.environ:
+            raise RuntimeError("Please specify the environment variable CUDA_HOME")
+
+        enable_gpu = True
+
+    else:
+        print("Torch was not built with CUDA support, not building GPU extensions.")
+        enable_gpu = False
+
+    if enable_gpu:
+        extra_compile_args += ['-DWARPRNNT_ENABLE_GPU']
+
+    if "WARP_RNNT_PATH" in os.environ:
+        warp_rnnt_path = os.environ["WARP_RNNT_PATH"]
+    else:
+        warp_rnnt_path = default_warp_rnnt_path
+    include_dirs = [os.path.realpath(os.path.join(base_path, 'include'))]
+
+    return CppExtension(
+        name='_warp_transducer',
+        sources=[os.path.realpath(base_path / 'pytorch_binding' / 'src' / 'binding.cpp')],
+        include_dirs=include_dirs,
+        library_dirs=[os.path.realpath(warp_rnnt_path)],
+        libraries=['warprnnt'],
+        extra_link_args=['-Wl,-rpath,' + os.path.realpath(warp_rnnt_path)],
+        extra_compile_args=extra_compile_args
+    )
+
 
 _EXT_NAME = 'torchaudio._torchaudio'
 
@@ -123,20 +175,15 @@ def get_ext_modules(debug=False):
     if platform.system() == 'Windows':
         return None
     return [
-        CppExtension(
-            _EXT_NAME,
-            _get_srcs(),
-            libraries=_get_libraries(),
-            include_dirs=_get_include_dirs(),
-            extra_compile_args=_get_eca(debug),
-            extra_objects=_get_extra_objects(),
-            extra_link_args=_get_ela(debug),
-        ),
+        _get_ext(debug),
+        _get_ext_rnnt(debug),
     ]
 
 
 class BuildExtension(TorchBuildExtension):
     def build_extension(self, ext):
         if ext.name == _EXT_NAME and _BUILD_SOX:
-            _build_third_party()
+            _build_third_party(_TP_BASE_DIR)
+        if ext.name == "_warp_transducer":
+            _build_third_party(_TP_TRANSDUCER_BASE_DIR)
         super().build_extension(ext)
