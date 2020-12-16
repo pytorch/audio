@@ -699,8 +699,6 @@ jobs:
             # https://circleci.com/docs/2.0/configuration-reference/#checkout
             set -ex
             echo $PWD
-            ls ~/workspace
-            ls ~/workspace/doc
             tag=${CIRCLE_TAG:1:5}
             target=${tag:-master}
             .circleci/build_docs/commit_docs.sh ~/workspace $target
