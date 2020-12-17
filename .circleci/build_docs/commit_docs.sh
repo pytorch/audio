@@ -31,4 +31,5 @@ git config user.email "soumith+bot@pytorch.org"
 git config user.name "pytorchbot"
 # If there aren't changes, don't make a commit; push is no-op
 git commit -m "auto-generating sphinx docs" || true
-git push -u origin gh-pages
+git remote add https https://github.com/pytorch/audio.git
+git push -u https gh-pages
