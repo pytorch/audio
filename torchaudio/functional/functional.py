@@ -187,7 +187,7 @@ def griffinlim(
             input=inverse,
             n_fft=n_fft,
             hop_length=hop_length,
-            win_lenght=win_length,
+            win_length=win_length,
             window=window,
             center=True,
             pad_mode='reflect',
