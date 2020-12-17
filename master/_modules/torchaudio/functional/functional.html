@@ -275,10 +275,6 @@
         
           <li><a href="../../index.html">Module code</a> &gt;</li>
         
-          <li><a href="../../torchaudio.html">torchaudio</a> &gt;</li>
-        
-          <li><a href="../functional.html">torchaudio.functional</a> &gt;</li>
-        
       <li>torchaudio.functional.functional</li>
     
     
@@ -380,8 +376,19 @@
     <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="c1"># default values are consistent with librosa.core.spectrum._spectrogram</span>
-    <span class="n">spec_f</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span>
-        <span class="n">waveform</span><span class="p">,</span> <span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="p">,</span> <span class="n">win_length</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span>
+    <span class="n">spec_f</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">view_as_real</span><span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span>
+            <span class="nb">input</span><span class="o">=</span><span class="n">waveform</span><span class="p">,</span>
+            <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+            <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
+            <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
+            <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+            <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">pad_mode</span><span class="o">=</span><span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
+            <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">return_complex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="p">)</span>
 
     <span class="c1"># unpack batch</span>
@@ -484,8 +491,20 @@
                               <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
 
         <span class="c1"># Rebuild the spectrogram</span>
-        <span class="n">rebuilt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span><span class="n">inverse</span><span class="p">,</span> <span class="n">n_fft</span><span class="p">,</span> <span class="n">hop_length</span><span class="p">,</span> <span class="n">win_length</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span>
-                             <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;reflect&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">rebuilt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">view_as_real</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span>
+                <span class="nb">input</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span>
+                <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+                <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
+                <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
+                <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+                <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">pad_mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">,</span>
+                <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">return_complex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="c1"># Update our phase estimates</span>
         <span class="n">angles</span> <span class="o">=</span> <span class="n">rebuilt</span>
