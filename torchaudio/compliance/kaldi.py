@@ -825,10 +825,6 @@ def resample_waveform(waveform: Tensor,
 
     Returns:
         Tensor: The waveform at the new frequency
-
-    .. caution::
-        After dividing `orig_freq` and `new_freq` by their GCD, both should be small
-        for this implementation to be fast.
     """
     assert waveform.dim() == 2
     assert orig_freq > 0.0 and new_freq > 0.0
