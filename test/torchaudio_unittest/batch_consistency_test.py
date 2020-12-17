@@ -236,6 +236,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
             'pad_mode': 'reflect',
             'normalized': True,
             'onesided': True,
+            'return_complex': False,
         }
         rate = 2
 

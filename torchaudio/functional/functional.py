@@ -71,7 +71,16 @@ def spectrogram(
 
     # default values are consistent with librosa.core.spectrum._spectrogram
     spec_f = torch.stft(
-        waveform, n_fft, hop_length, win_length, window, True, "reflect", False, True
+        input=waveform,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        win_length=win_length,
+        window=window,
+        center=True,
+        pad_mode="reflect",
+        normalized=False,
+        onesided=True,
+        return_complex=False
     )
 
     # unpack batch
@@ -174,8 +183,18 @@ def griffinlim(
                               length=length).float()
 
         # Rebuild the spectrogram
-        rebuilt = torch.stft(inverse, n_fft, hop_length, win_length, window,
-                             True, 'reflect', False, True)
+        rebuilt = torch.stft(
+            input=inverse,
+            n_fft=n_fft,
+            hop_length=hop_length,
+            win_lenght=win_length,
+            window=window,
+            center=True,
+            pad_mode='reflect',
+            normalized=False,
+            onesided=True,
+            return_complex=False,
+        )
 
         # Update our phase estimates
         angles = rebuilt
