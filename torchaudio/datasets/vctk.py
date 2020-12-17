@@ -9,7 +9,6 @@ from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    walk_files
 )
 
 URL = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip"
@@ -123,9 +122,7 @@ class VCTK(Dataset):
                 "with `download=True` to donwload the latest version."
             )
 
-        walker = walk_files(
-            self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
-        )
+        walker = sorted(str(p.stem) for p in Path(self._path).glob('*/*/*' + self._ext_audio))
         walker = filter(lambda w: self._except_folder not in w, walker)
         self._walker = list(walker)
 
