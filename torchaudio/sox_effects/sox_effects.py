@@ -1,7 +1,10 @@
+import os
+from pathlib import Path
 from typing import List, Tuple, Optional
 
 import torch
 
+import torchaudio
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.utils.sox_utils import list_effects
 
@@ -170,8 +173,15 @@ def apply_effects_file(
         rate and leave samples untouched.
 
     Args:
-        path (str or pathlib.Path): Path to the audio file. This function also handles ``pathlib.Path`` objects, but is
-            annotated as ``str`` for TorchScript compiler compatibility.
+        path (path-like object or file-like object):
+            Source of audio data. When the function is not compiled by TorchScript,
+            (e.g. ``torch.jit.script``), the following types are accepted;
+                  * ``path-like object``: file path
+                  * ``file-like object``: Any object with ``read`` method that returns ``bytes``.
+            When the function is compiled by TorchScript, only ``str`` type is allowed.
+            Note:
+                * This argument is intentionally annotated as ``str`` only for
+                  TorchScript compiler compatibility.
         effects (List[List[str]]): List of effects.
         normalize (bool):
             When ``True``, this function always return ``float32``, and sample values are
@@ -252,8 +262,13 @@ def apply_effects_file(
         >>> for batch in loader:
         >>>     pass
     """
-    # Get string representation of 'path' in case Path object is passed
-    path = str(path)
+    if not torch.jit.is_scripting():
+        if hasattr(path, 'read'):
+            return torchaudio._torchaudio.apply_effects_fileobj(
+                path, effects, normalize, channels_first, format)
+        signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
+            os.fspath(path), effects, normalize, channels_first, format)
+        return signal.get_tensor(), signal.get_sample_rate()
     signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
         path, effects, normalize, channels_first, format)
     return signal.get_tensor(), signal.get_sample_rate()

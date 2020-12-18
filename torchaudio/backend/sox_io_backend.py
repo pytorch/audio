@@ -1,3 +1,4 @@
+import os
 from typing import Tuple, Optional
 
 import torch
@@ -5,6 +6,7 @@ from torchaudio._internal import (
     module_utils as _mod_utils,
 )
 
+import torchaudio
 from .common import AudioMetaData
 
 
@@ -82,9 +84,16 @@ def load(
     ``[-1.0, 1.0]``.
 
     Args:
-        filepath (str or pathlib.Path):
-            Path to audio file. This function also handles ``pathlib.Path`` objects, but is
-            annotated as ``str`` for TorchScript compiler compatibility.
+        filepath (path-like object or file-like object):
+            Source of audio data. When the function is not compiled by TorchScript,
+            (e.g. ``torch.jit.script``), the following types are accepted;
+                  * ``path-like object``: file path
+                  * ``file-like object``: Any object with ``read`` method that returns ``bytes``.
+            When the function is compiled by TorchScript, only ``str`` type is allowed.
+
+            Note:
+                * This argument is intentionally annotated as ``str`` only due to
+                  TorchScript compiler compatibility.
         frame_offset (int):
             Number of frames to skip before start reading data.
         num_frames (int):
@@ -112,8 +121,13 @@ def load(
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             ``[channel, time]`` else ``[time, channel]``.
     """
-    # Cast to str in case type is `pathlib.Path`
-    filepath = str(filepath)
+    if not torch.jit.is_scripting():
+        if hasattr(filepath, 'read'):
+            return torchaudio._torchaudio.load_audio_fileobj(
+                filepath, frame_offset, num_frames, normalize, channels_first, format)
+        signal = torch.ops.torchaudio.sox_io_load_audio_file(
+            os.fspath(filepath), frame_offset, num_frames, normalize, channels_first, format)
+        return signal.get_tensor(), signal.get_sample_rate()
     signal = torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, format)
     return signal.get_tensor(), signal.get_sample_rate()

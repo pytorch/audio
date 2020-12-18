@@ -283,5 +283,131 @@ int64_t SoxEffectsChain::getOutputSampleRate() {
   return interm_sig_.rate;
 }
 
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+
+namespace {
+
+/// helper classes for passing file-like object to SoxEffectChain
+struct FileObjInputPriv {
+  sox_format_t* sf;
+  py::object* fileobj;
+  char* buffer;
+  uint64_t buffer_size;
+};
+
+/// Callback function to feed byte string
+int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
+  auto priv = static_cast<FileObjInputPriv *>(effp->priv);
+  auto sf = priv->sf;
+  auto fileobj = priv->fileobj;
+  auto buffer = priv->buffer;
+  auto buffer_size = priv->buffer_size;
+
+  // 1. Refresh the buffer
+  //
+  // NOTE:
+  //   Since the underlying FILE* was opened with `fmemopen`, the only way
+  //   libsox detect EOF is reaching the end of the buffer. (null byte won't help)
+  //   Therefore we need to align the content at the end of buffer, otherwise,
+  //   libsox will keep reading the content beyond intended length.
+  //
+  // Before:
+  //
+  //     |<--------consumed------->|<-remaining->|
+  //     |*************************|-------------|
+  //                               ^ ftell
+  //
+  // After:
+  //
+  //     |<-offset->|<-remaining->|<--new data-->|
+  //     |**********|-------------|++++++++++++++|
+  //                ^ ftell
+
+  const auto num_consumed = sf->tell_off;
+  const auto num_remain = buffer_size - num_consumed;
+
+  // 1.1. First, we fetch the data to see if there is data to fill the buffer
+  py::bytes chunk_ = fileobj->attr("read")(num_consumed);
+  const auto num_refill = py::len(chunk_);
+  const auto offset = buffer_size - (num_remain + num_refill);
+
+  if(num_refill > num_consumed) {
+    std::ostringstream message;
+    message << "Tried to read up to " << num_consumed << " bytes but, "
+            << "recieved " << num_refill << " bytes. "
+            << "The given object does not confirm to read protocol of file object.";
+    throw std::runtime_error(message.str());
+  }
+
+  // 1.2. Move the unconsumed data towards the beginning of buffer.
+  if (num_remain) {
+    auto src = static_cast<void*>(buffer + num_consumed);
+    auto dst = static_cast<void*>(buffer + offset);
+    memmove(dst, src, num_remain);
+  }
+
+  // 1.3. Refill the remaining buffer.
+  if (num_refill) {
+    auto chunk = static_cast<std::string>(chunk_);
+    auto src = static_cast<void*>(const_cast<char*>(chunk.c_str()));
+    auto dst = buffer + offset + num_remain;
+    memcpy(dst, src, num_refill);
+  }
+
+  // 1.4. Set the file pointer to the new offset
+  sf->tell_off = offset;
+  fseek ((FILE*)sf->fp, offset, SEEK_SET);
+
+  // 2. Perform decoding operation
+  // The following part is practically same as "input" effect
+  // https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/input.c#L30-L48
+
+  // Ensure that it's a multiple of the number of channels
+  *osamp -= *osamp % effp->out_signal.channels;
+
+  // Read up to *osamp samples into obuf;
+  // store the actual number read back to *osamp
+  *osamp = sox_read(sf, obuf, *osamp);
+
+  return *osamp? SOX_SUCCESS : SOX_EOF;
+}
+
+sox_effect_handler_t* get_fileobj_input_handler() {
+  static sox_effect_handler_t handler{/*name=*/"input_fileobj_object",
+                                      /*usage=*/NULL,
+                                      /*flags=*/SOX_EFF_MCHAN,
+                                      /*getopts=*/NULL,
+                                      /*start=*/NULL,
+                                      /*flow=*/NULL,
+                                      /*drain=*/fileobj_input_drain,
+                                      /*stop=*/NULL,
+                                      /*kill=*/NULL,
+                                      /*priv_size=*/sizeof(FileObjInputPriv)};
+  return &handler;
+}
+
+} // namespace
+
+void SoxEffectsChain::addInputFileObj(
+    sox_format_t* sf,
+    char* buffer,
+    uint64_t buffer_size,
+    py::object* fileobj) {
+  in_sig_ = sf->signal;
+  interm_sig_ = in_sig_;
+
+  SoxEffect e(sox_create_effect(get_fileobj_input_handler()));
+  auto priv = static_cast<FileObjInputPriv*>(e->priv);
+  priv->sf = sf;
+  priv->fileobj = fileobj;
+  priv->buffer = buffer;
+  priv->buffer_size = buffer_size;
+  if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
+    throw std::runtime_error("Failed to add effect: input fileobj");
+  }
+}
+
+#endif // TORCH_API_INCLUDE_EXTENSION_H
+
 } // namespace sox_effects_chain
 } // namespace torchaudio

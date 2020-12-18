@@ -1,13 +1,18 @@
+import io
 import itertools
+import tarfile
 
-from torchaudio.backend import sox_io_backend
 from parameterized import parameterized
+from torchaudio.backend import sox_io_backend
+from torchaudio._internal import module_utils as _mod_utils
 
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
+    HttpServerMixin,
     PytorchTestCase,
     skipIfNoExec,
     skipIfNoExtension,
+    skipIfNoModule,
     get_asset_path,
     get_wav_data,
     load_wav,
@@ -17,6 +22,10 @@ from torchaudio_unittest.common_utils import (
 from .common import (
     name_func,
 )
+
+
+if _mod_utils.is_module_available("requests"):
+    import requests
 
 
 class LoadTestBase(TempDirMixin, PytorchTestCase):
@@ -369,3 +378,156 @@ class TestLoadWithoutExtension(PytorchTestCase):
         path = get_asset_path("mp3_without_ext")
         _, sr = sox_io_backend.load(path, format="mp3")
         assert sr == 16000
+
+
+@skipIfNoExtension
+@skipIfNoExec('sox')
+class TestFileObject(TempDirMixin, PytorchTestCase):
+    """
+    In this test suite, the result of file-like object input is compared against file path input,
+    because `load` function is rigrously tested for file path inputs to match libsox's result,
+    """
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_fileobj(self, ext, compression):
+        """Loading audio via file object returns the same result as via file path."""
+        sample_rate = 16000
+        format_ = ext if ext in ['mp3'] else None
+        path = self.get_temp_path(f'test.{ext}')
+
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels=2,
+            compression=compression)
+        expected, _ = sox_io_backend.load(path)
+
+        with open(path, 'rb') as fileobj:
+            found, sr = sox_io_backend.load(fileobj, format=format_)
+
+        assert sr == sample_rate
+        self.assertEqual(expected, found)
+
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_bytesio(self, ext, compression):
+        """Loading audio via BytesIO object returns the same result as via file path."""
+        sample_rate = 16000
+        format_ = ext if ext in ['mp3'] else None
+        path = self.get_temp_path(f'test.{ext}')
+
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels=2,
+            compression=compression)
+        expected, _ = sox_io_backend.load(path)
+
+        with open(path, 'rb') as file_:
+            fileobj = io.BytesIO(file_.read())
+        found, sr = sox_io_backend.load(fileobj, format=format_)
+
+        assert sr == sample_rate
+        self.assertEqual(expected, found)
+
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_tarfile(self, ext, compression):
+        """Loading compressed audio via file-like object returns the same result as via file path."""
+        sample_rate = 16000
+        format_ = ext if ext in ['mp3'] else None
+        audio_file = f'test.{ext}'
+        audio_path = self.get_temp_path(audio_file)
+        archive_path = self.get_temp_path('archive.tar.gz')
+
+        sox_utils.gen_audio_file(
+            audio_path, sample_rate, num_channels=2,
+            compression=compression)
+        expected, _ = sox_io_backend.load(audio_path)
+
+        with tarfile.TarFile(archive_path, 'w') as tarobj:
+            tarobj.add(audio_path, arcname=audio_file)
+        with tarfile.TarFile(archive_path, 'r') as tarobj:
+            fileobj = tarobj.extractfile(audio_file)
+            found, sr = sox_io_backend.load(fileobj, format=format_)
+
+        assert sr == sample_rate
+        self.assertEqual(expected, found)
+
+
+@skipIfNoExtension
+@skipIfNoExec('sox')
+@skipIfNoModule("requests")
+class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_requests(self, ext, compression):
+        sample_rate = 16000
+        format_ = ext if ext in ['mp3'] else None
+        audio_file = f'test.{ext}'
+        audio_path = self.get_temp_path(audio_file)
+
+        sox_utils.gen_audio_file(
+            audio_path, sample_rate, num_channels=2, compression=compression)
+        expected, _ = sox_io_backend.load(audio_path)
+
+        url = self.get_url(audio_file)
+        with requests.get(url, stream=True) as resp:
+            found, sr = sox_io_backend.load(resp.raw, format=format_)
+
+        assert sr == sample_rate
+        self.assertEqual(expected, found)
+
+    @parameterized.expand(list(itertools.product(
+        [0, 1, 10, 100, 1000],
+        [-1, 1, 10, 100, 1000],
+    )), name_func=name_func)
+    def test_frame(self, frame_offset, num_frames):
+        """num_frames and frame_offset correctly specify the region of data"""
+        sample_rate = 8000
+        audio_file = 'test.wav'
+        audio_path = self.get_temp_path(audio_file)
+
+        original = get_wav_data('float32', num_channels=2)
+        save_wav(audio_path, original, sample_rate)
+        frame_end = None if num_frames == -1 else frame_offset + num_frames
+        expected = original[:, frame_offset:frame_end]
+
+        url = self.get_url(audio_file)
+        with requests.get(url, stream=True) as resp:
+            found, sr = sox_io_backend.load(resp.raw, frame_offset, num_frames)
+
+        assert sr == sample_rate
+        self.assertEqual(expected, found)

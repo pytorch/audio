@@ -82,10 +82,12 @@ def load(
     ``[-1.0, 1.0]``.
 
     Args:
-        filepath (str or pathlib.Path): Path to audio file.
-            This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``
-            for the consistency with "sox_io" backend, which has a restriction on type annotation
-            for TorchScript compiler compatiblity.
+        filepath (path-like object or file-like object):
+            Source of audio data.
+            Note:
+                  * This argument is intentionally annotated as ``str`` only,
+                    for the consistency with "sox_io" backend, which has a restriction
+                    on type annotation due to TorchScript compiler compatiblity.
         frame_offset (int):
             Number of frames to skip before start reading data.
         num_frames (int):

@@ -1,5 +1,7 @@
 #include <torch/extension.h>
+#include <torchaudio/csrc/sox/io.h>
 #include <torchaudio/csrc/sox/legacy.h>
+
 
 PYBIND11_MODULE(_torchaudio, m) {
   py::class_<sox_signalinfo_t>(m, "sox_signalinfo_t")
@@ -94,4 +96,8 @@ PYBIND11_MODULE(_torchaudio, m) {
       "get_info",
       &torch::audio::get_info,
       "Gets information about an audio file");
+  m.def(
+      "load_audio_fileobj",
+      &torchaudio::sox_io::load_audio_fileobj,
+      "Load audio from file object.");
 }
