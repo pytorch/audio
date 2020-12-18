@@ -68,4 +68,4 @@ def validate(input_dir):
 
         save_(temp_file, temp_data, sample_rate, channels_first, 0.)
         # info_(temp_file)
-        load_(temp_file, 0, -1, normalize, channels_first)
+        load_(temp_file, None, None, normalize, channels_first)

@@ -53,8 +53,8 @@ TORCH_LIBRARY(torchaudio, m) {
           "str path,"
           "int? frame_offset=None,"
           "int? num_frames=None,"
-          "bool? normalize=True,"
-          "bool? channels_first=False"
+          "bool normalize=True,"
+          "bool channels_first=False"
       ") -> __torch__.torch.classes.torchaudio.TensorSignal",
       &torchaudio::sox_io::load_audio_file);
   m.def(

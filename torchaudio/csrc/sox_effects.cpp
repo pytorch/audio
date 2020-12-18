@@ -52,7 +52,7 @@ void shutdown_sox_effects() {
 
 c10::intrusive_ptr<TensorSignal> apply_effects_tensor(
     const c10::intrusive_ptr<TensorSignal>& input_signal,
-    std::vector<std::vector<std::string>> effects) {
+    const std::vector<std::vector<std::string>>& effects) {
   auto in_tensor = input_signal->getTensor();
   validate_input_tensor(in_tensor);
 
@@ -89,10 +89,10 @@ c10::intrusive_ptr<TensorSignal> apply_effects_tensor(
 }
 
 c10::intrusive_ptr<TensorSignal> apply_effects_file(
-    const std::string path,
-    std::vector<std::vector<std::string>> effects,
-    c10::optional<bool>& normalize,
-    c10::optional<bool>& channels_first) {
+    const std::string& path,
+    const std::vector<std::vector<std::string>>& effects,
+    const bool normalize,
+    const bool channels_first) {
   // Open input file
   SoxFormat sf(sox_open_read(
       path.c_str(),
@@ -121,17 +121,16 @@ c10::intrusive_ptr<TensorSignal> apply_effects_file(
   chain.run();
 
   // Create tensor from buffer
-  bool channels_first_ = channels_first.value_or(true);
   auto tensor = convert_to_tensor(
       /*buffer=*/out_buffer.data(),
       /*num_samples=*/out_buffer.size(),
       /*num_channels=*/chain.getOutputNumChannels(),
       dtype,
-      normalize.value_or(true),
-      channels_first_);
+      normalize,
+      channels_first);
 
   return c10::make_intrusive<TensorSignal>(
-      tensor, chain.getOutputSampleRate(), channels_first_);
+      tensor, chain.getOutputSampleRate(), channels_first);
 }
 
 } // namespace sox_effects
