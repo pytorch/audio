@@ -99,9 +99,6 @@ void validate_input_file(const SoxFormat& sf) {
   if (sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
     throw std::runtime_error("Error loading audio file: unknown encoding.");
   }
-  if (sf->signal.length == 0) {
-    throw std::runtime_error("Error reading audio file: unkown length.");
-  }
 }
 
 void validate_input_tensor(const torch::Tensor tensor) {

@@ -299,3 +299,53 @@ class TestLoadFormat(TempDirMixin, PytorchTestCase):
     @skipIfFormatNotSupported("FLAC")
     def test_flac(self, format_):
         self._test_format(format_)
+
+
+@skipIfNoModule("soundfile")
+class TestFileLikeObject(TempDirMixin, PytorchTestCase):
+    def _test_fileobj(self, ext):
+        """Loading audio via file-like object works"""
+        sample_rate = 16000
+        path = self.get_temp_path(f'test.{ext}')
+
+        data = get_wav_data('float32', num_channels=2).numpy().T
+        soundfile.write(path, data, sample_rate)
+        expected = soundfile.read(path, dtype='float32')[0].T
+
+        with open(path, 'rb') as fileobj:
+            found, sr = soundfile_backend.load(fileobj)
+        assert sr == sample_rate
+        self.assertEqual(expected, found)
+
+    def test_fileobj_wav(self):
+        """Loading audio via file-like object works"""
+        self._test_fileobj('wav')
+
+    @skipIfFormatNotSupported("FLAC")
+    def test_fileobj_flac(self):
+        """Loading audio via file-like object works"""
+        self._test_fileobj('flac')
+
+    def _test_bytes(self, ext):
+        """Loading audio via bytes works"""
+        sample_rate = 16000
+        path = self.get_temp_path(f'test.{ext}')
+
+        data = get_wav_data('float32', num_channels=2).numpy().T
+        soundfile.write(path, data, sample_rate)
+        expected = soundfile.read(path, dtype='float32')[0].T
+
+        with open(path, 'rb') as fileobj:
+            data = fileobj.read()
+            found, sr = soundfile_backend.load(data)
+        assert sr == sample_rate
+        self.assertEqual(expected, found)
+
+    def _test_bytes_wav(self):
+        """Loading audio via bytes works"""
+        self._test_bytes('wav')
+
+    @skipIfFormatNotSupported("FLAC")
+    def _test_bytes_flac(self):
+        """Loading audio via bytes works"""
+        self._test_bytes('flac')

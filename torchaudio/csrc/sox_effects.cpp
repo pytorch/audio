@@ -88,18 +88,13 @@ c10::intrusive_ptr<TensorSignal> apply_effects_tensor(
       out_tensor, chain.getOutputSampleRate(), channels_first);
 }
 
-c10::intrusive_ptr<TensorSignal> apply_effects_file(
-    const std::string path,
+namespace {
+
+c10::intrusive_ptr<TensorSignal> apply_effects_impl(
+    const SoxFormat& sf,
     std::vector<std::vector<std::string>> effects,
     c10::optional<bool>& normalize,
-    c10::optional<bool>& channels_first,
-    c10::optional<std::string>& format) {
-  // Open input file
-  SoxFormat sf(sox_open_read(
-      path.c_str(),
-      /*signal=*/nullptr,
-      /*encoding=*/nullptr,
-      /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
+    c10::optional<bool>& channels_first) {
 
   validate_input_file(sf);
 
@@ -133,6 +128,38 @@ c10::intrusive_ptr<TensorSignal> apply_effects_file(
 
   return c10::make_intrusive<TensorSignal>(
       tensor, chain.getOutputSampleRate(), channels_first_);
+}
+
+} // namespace
+
+c10::intrusive_ptr<TensorSignal> apply_effects_file(
+    const std::string& path,
+    std::vector<std::vector<std::string>> effects,
+    c10::optional<bool>& normalize,
+    c10::optional<bool>& channels_first,
+    c10::optional<std::string>& format) {
+  // Open input file
+  SoxFormat sf(sox_open_read(
+      path.c_str(),
+      /*signal=*/nullptr,
+      /*encoding=*/nullptr,
+      /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
+  return apply_effects_impl(sf, effects, normalize, channels_first);
+}
+
+c10::intrusive_ptr<TensorSignal> apply_effects_bytes(
+    const std::string& bytes,
+    std::vector<std::vector<std::string>> effects,
+    c10::optional<bool>& normalize,
+    c10::optional<bool>& channels_first,
+        c10::optional<std::string>& format) {
+  SoxFormat sf(sox_open_mem_read(
+      static_cast<void*>(const_cast<char*>(bytes.c_str())),
+      bytes.length(),
+      /*signal=*/nullptr,
+      /*encoding=*/nullptr,
+      /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
+  return apply_effects_impl(sf, effects, normalize, channels_first);
 }
 
 } // namespace sox_effects

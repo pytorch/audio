@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Tuple, Optional
 
 import torch
@@ -5,6 +6,7 @@ from torchaudio._internal import (
     module_utils as _mod_utils,
 )
 
+import torchaudio
 from .common import AudioMetaData
 
 
@@ -82,9 +84,14 @@ def load(
     ``[-1.0, 1.0]``.
 
     Args:
-        filepath (str or pathlib.Path):
-            Path to audio file. This function also handles ``pathlib.Path`` objects, but is
-            annotated as ``str`` for TorchScript compiler compatibility.
+        filepath (str, pathlib.Path, file-like object or bytes):
+            Source of audio data. One of the following types;
+                  * ``str`` or ``pathlib.Path``: file path
+                  * ``bytes``: Audio data in bytes
+                  * ``file-like``: A file-like object with ``read`` method
+                    that returns ``bytes``.
+            This argument is intentionally annotated as only ``str`` for
+            TorchScript compiler compatibility.
         frame_offset (int):
             Number of frames to skip before start reading data.
         num_frames (int):
@@ -112,8 +119,18 @@ def load(
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             ``[channel, time]`` else ``[time, channel]``.
     """
-    # Cast to str in case type is `pathlib.Path`
-    filepath = str(filepath)
+    if not torch.jit.is_scripting():
+        if isinstance(filepath, (str, Path)):
+            signal = torch.ops.torchaudio.sox_io_load_audio_file(
+                str(filepath), frame_offset, num_frames, normalize, channels_first, format)
+            return signal.get_tensor(), signal.get_sample_rate()
+        if isinstance(filepath, bytes):
+            return torchaudio._torchaudio.load_audio_bytes(
+                filepath, frame_offset, num_frames, normalize, channels_first, format)
+        if hasattr(filepath, 'read'):
+            return torchaudio._torchaudio.load_audio_bytes(
+                filepath.read(), frame_offset, num_frames, normalize, channels_first, format)
+        raise RuntimeError('The `filepath` object must be one of str, Path, bytes, file-like object.')
     signal = torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, format)
     return signal.get_tensor(), signal.get_sample_rate()

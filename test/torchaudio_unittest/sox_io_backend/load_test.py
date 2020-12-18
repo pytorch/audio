@@ -369,3 +369,72 @@ class TestLoadWithoutExtension(PytorchTestCase):
         path = get_asset_path("mp3_without_ext")
         _, sr = sox_io_backend.load(path, format="mp3")
         assert sr == 16000
+
+
+@skipIfNoExtension
+@skipIfNoExec('sox')
+class TestFileLikeObject(TempDirMixin, PytorchTestCase):
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_fileobj(self, ext, compression):
+        """Loading audio via file-like object returns the same result as via file path.
+
+        We campare the result of file-like object input against file path input because
+        `load` function is rigrously tested for file path inputs to match libsox's result,
+        """
+        sample_rate = 16000
+        path = self.get_temp_path(f'test.{ext}')
+
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels=2,
+            compression=compression)
+
+        expected, _ = sox_io_backend.load(path)
+
+        format_ = ext if ext in ['mp3'] else None
+        with open(path, 'rb') as fileobj:
+            found, sr = sox_io_backend.load(fileobj, format=format_)
+        assert sr == sample_rate
+        self.assertEqual(expected, found)
+
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_bytes(self, ext, compression):
+        """Loading audio via bytes returns the same result as via file path.
+
+        We campare the result of file-like object input against file path input because
+        `load` function is rigrously tested for file path inputs to match libsox's result,
+        """
+        sample_rate = 16000
+        path = self.get_temp_path(f'test.{ext}')
+
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels=2,
+            compression=compression)
+
+        expected, _ = sox_io_backend.load(path)
+
+        format_ = ext if ext in ['mp3'] else None
+        with open(path, 'rb') as fileobj:
+            data = fileobj.read()
+            found, sr = sox_io_backend.load(data, format=format_)
+        assert sr == sample_rate
+        self.assertEqual(expected, found)

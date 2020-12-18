@@ -1,4 +1,5 @@
 #include <torchaudio/csrc/sox.h>
+#include <torchaudio/csrc/sox_io.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -178,6 +179,23 @@ void write_audio_file(
 } // namespace audio
 } // namespace torch
 
+namespace {
+
+std::tuple<torch::Tensor, int64_t> load_audio_bytes(
+    py::bytes src,
+    c10::optional<int64_t> frame_offset,
+    c10::optional<int64_t> num_frames,
+    c10::optional<bool> normalize,
+    c10::optional<bool> channels_first,
+    c10::optional<std::string>& format) {
+  auto bytes = static_cast<std::string>(src);
+  auto result = torchaudio::sox_io::load_audio_bytes(
+      bytes, frame_offset, num_frames, normalize, channels_first, format);
+  return std::make_tuple(result->getTensor(), result->getSampleRate());
+}
+
+} // namespace
+
 PYBIND11_MODULE(_torchaudio, m) {
   py::class_<sox_signalinfo_t>(m, "sox_signalinfo_t")
        .def(py::init<>())
@@ -271,4 +289,5 @@ PYBIND11_MODULE(_torchaudio, m) {
       "get_info",
       &torch::audio::get_info,
       "Gets information about an audio file");
+  m.def("load_audio_bytes", &load_audio_bytes, "Load audio from byte string.");
 }

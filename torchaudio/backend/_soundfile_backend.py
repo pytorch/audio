@@ -1,4 +1,5 @@
 """The new soundfile backend which will become default in 0.8.0 onward"""
+import io
 from typing import Tuple, Optional
 import warnings
 
@@ -80,8 +81,13 @@ def load(
     ``[-1.0, 1.0]``.
 
     Args:
-        filepath (str or pathlib.Path): Path to audio file.
-            This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``
+        filepath (str, pathlib.Path, or file-like object):
+            Source of audio data. One of the following types;
+                  * ``str`` or ``pathlib.Path``: file path
+                  * ``bytes``: Audio data in bytes
+                  * ``file-like``: A file-like object with ``read`` method
+                    that returns ``bytes``.
+            This argument is intentionally annotated as only ``str`` for
             for the consistency with "sox_io" backend, which has a restriction on type annotation
             for TorchScript compiler compatiblity.
         frame_offset (int):
@@ -109,6 +115,8 @@ def load(
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             ``[channel, time]`` else ``[time, channel]``.
     """
+    if isinstance(filepath, bytes):
+        filepath = io.BytesIO(filepath)
     with soundfile.SoundFile(filepath, "r") as file_:
         if file_.format != "WAV" or normalize:
             dtype = "float32"
