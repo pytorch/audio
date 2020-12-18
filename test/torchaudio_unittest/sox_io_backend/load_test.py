@@ -338,13 +338,13 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
         save_wav(self.path, self.original, sample_rate)
 
     @parameterized.expand(list(itertools.product(
-        [0, 1, 10, 100, 1000],
-        [-1, 1, 10, 100, 1000],
+        [None, 0, 1, 10, 100, 1000],
+        [None, 1, 10, 100, 1000],
     )), name_func=name_func)
     def test_frame(self, frame_offset, num_frames):
         """num_frames and frame_offset correctly specify the region of data"""
         found, _ = sox_io_backend.load(self.path, frame_offset, num_frames)
-        frame_end = None if num_frames == -1 else frame_offset + num_frames
+        frame_end = None if num_frames is None else (frame_offset or 0) + num_frames
         self.assertEqual(found, self.original[:, frame_offset:frame_end])
 
     @parameterized.expand([(True, ), (False, )], name_func=name_func)

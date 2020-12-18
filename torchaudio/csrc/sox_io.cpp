@@ -58,14 +58,14 @@ c10::intrusive_ptr<TensorSignal> load_audio_file(
     throw std::runtime_error(
         "Invalid argument: frame_offset must be non-negative.");
   }
-  const auto frames = num_frames.value_or(-1);
-  if (frames == 0 || frames < -1) {
-    throw std::runtime_error(
-        "Invalid argument: num_frames must be -1 or greater than 0.");
-  }
 
   std::vector<std::vector<std::string>> effects;
-  if (frames != -1) {
+  if (num_frames.has_value()) {
+    const auto frames = num_frames.value();
+    if (frames <= 0) {
+      throw std::runtime_error(
+          "Invalid argument: num_frames must be greater than 0.");
+    }
     std::ostringstream os_offset, os_frames;
     os_offset << offset << "s";
     os_frames << "+" << frames << "s";

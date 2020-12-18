@@ -41,8 +41,8 @@ _SUBTYPE2DTYPE = {
 @_mod_utils.requires_module("soundfile")
 def load(
     filepath: str,
-    frame_offset: int = 0,
-    num_frames: int = -1,
+    frame_offset: Optional[int] = None,
+    num_frames: Optional[int] = None,
     normalize: bool = True,
     channels_first: bool = True,
 ) -> Tuple[torch.Tensor, int]:
@@ -83,11 +83,10 @@ def load(
             This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``
             for the consistency with "sox_io" backend, which has a restriction on type annotation
             for TorchScript compiler compatiblity.
-        frame_offset (int):
-            Number of frames to skip before start reading data.
-        num_frames (int):
-            Maximum number of frames to read. ``-1`` reads all the remaining samples,
-            starting from ``frame_offset``.
+        frame_offset (int, optional):
+            If provided, skip the given number of frames before start reading data.
+        num_frames (int, optional):
+            Maximum number of frames to read. If not given, read the rest of all frames.
             This function may return the less number of frames if there is not enough
             frames in the given file.
         normalize (bool):
@@ -106,6 +105,8 @@ def load(
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             ``[channel, time]`` else ``[time, channel]``.
     """
+    frame_offset = 0 if frame_offset is None else frame_offset
+    num_frames = -1 if num_frames is None else num_frames
     with soundfile.SoundFile(filepath, "r") as file_:
         if file_.format != "WAV" or normalize:
             dtype = "float32"

@@ -49,7 +49,13 @@ TORCH_LIBRARY(torchaudio, m) {
 
   m.def("torchaudio::sox_io_get_info", &torchaudio::sox_io::get_info);
   m.def(
-      "torchaudio::sox_io_load_audio_file",
+      "torchaudio::sox_io_load_audio_file("
+          "str path,"
+          "int? frame_offset=None,"
+          "int? num_frames=None,"
+          "bool? normalize=True,"
+          "bool? channels_first=False"
+      ") -> __torch__.torch.classes.torchaudio.TensorSignal",
       &torchaudio::sox_io::load_audio_file);
   m.def(
       "torchaudio::sox_io_save_audio_file",

@@ -29,8 +29,8 @@ def info(filepath: str) -> AudioMetaData:
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def load(
         filepath: str,
-        frame_offset: int = 0,
-        num_frames: int = -1,
+        frame_offset: Optional[int] = None,
+        num_frames: Optional[int] = None,
         normalize: bool = True,
         channels_first: bool = True,
 ) -> Tuple[torch.Tensor, int]:
@@ -77,11 +77,10 @@ def load(
         filepath (str or pathlib.Path):
             Path to audio file. This function also handles ``pathlib.Path`` objects, but is
             annotated as ``str`` for TorchScript compiler compatibility.
-        frame_offset (int):
-            Number of frames to skip before start reading data.
-        num_frames (int):
-            Maximum number of frames to read. ``-1`` reads all the remaining samples,
-            starting from ``frame_offset``.
+        frame_offset (int, optional):
+            If provided, skip the given number of frames before start reading data.
+        num_frames (int, optional):
+            Maximum number of frames to read. If not given, read the rest of all frames.
             This function may return the less number of frames if there is not enough
             frames in the given file.
         normalize (bool):
