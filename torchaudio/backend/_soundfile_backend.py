@@ -45,6 +45,7 @@ def load(
     num_frames: int = -1,
     normalize: bool = True,
     channels_first: bool = True,
+    format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Load audio data from file.
 
@@ -99,6 +100,8 @@ def load(
         channels_first (bool):
             When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+        format (str, optional):
+            Not used. PySoundFile does not accept format hint.
 
     Returns:
         torch.Tensor:

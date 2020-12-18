@@ -9,20 +9,27 @@ from .common import AudioMetaData
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
-def info(filepath: str) -> AudioMetaData:
+def info(
+        filepath: str,
+        format: Optional[str] = None,
+) -> AudioMetaData:
     """Get signal information of an audio file.
 
     Args:
         filepath (str or pathlib.Path):
             Path to audio file. This function also handles ``pathlib.Path`` objects,
             but is annotated as ``str`` for TorchScript compatibility.
+        format (str, optional):
+            Hint libsox about the audio format. This argument helps libsox detect the audio
+            format when it cannot detect it via header or file extension.
+            (such as "mp3" file without extension)
 
     Returns:
         AudioMetaData: Metadata of the given audio.
     """
     # Cast to str in case type is `pathlib.Path`
     filepath = str(filepath)
-    sinfo = torch.ops.torchaudio.sox_io_get_info(filepath)
+    sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
     return AudioMetaData(sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels())
 
 
@@ -33,6 +40,7 @@ def load(
         num_frames: int = -1,
         normalize: bool = True,
         channels_first: bool = True,
+        format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Load audio data from file.
 
@@ -93,6 +101,10 @@ def load(
         channels_first (bool):
             When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+        format (str, optional):
+            Hint libsox about the audio format. This argument helps libsox detect the audio
+            format when it cannot detect it via header or file extension.
+            (such as "mp3" file without extension)
 
     Returns:
         torch.Tensor:
@@ -103,7 +115,7 @@ def load(
     # Cast to str in case type is `pathlib.Path`
     filepath = str(filepath)
     signal = torch.ops.torchaudio.sox_io_load_audio_file(
-        filepath, frame_offset, num_frames, normalize, channels_first)
+        filepath, frame_offset, num_frames, normalize, channels_first, format)
     return signal.get_tensor(), signal.get_sample_rate()
 
 

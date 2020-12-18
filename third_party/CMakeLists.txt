@@ -84,7 +84,6 @@ ExternalProject_Add(libsox
   DOWNLOAD_DIR ${ARCHIVE_DIR}
   URL https://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2
   URL_HASH SHA256=81a6956d4330e75b5827316e44ae381e6f1e8928003c6aa45896da9041ea149c
-  PATCH_COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/libsox.patch
   # OpenMP is by default compiled against GNU OpenMP, which conflicts with the version of OpenMP that PyTorch uses.
   # See https://github.com/pytorch/audio/pull/1026
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/build_codec_helper.sh ${CMAKE_CURRENT_SOURCE_DIR}/src/libsox/configure ${COMMON_ARGS} --with-lame --with-flac --with-mad --with-oggvorbis --without-alsa --without-coreaudio --without-png --without-oss --without-sndfile --with-opus --with-amrwb --with-amrnb --disable-openmp
