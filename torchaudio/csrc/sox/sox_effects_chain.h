@@ -3,7 +3,7 @@
 
 #include <sox.h>
 #include <torch/script.h>
-#include <torchaudio/csrc/sox_utils.h>
+#include <torchaudio/csrc/sox/sox_utils.h>
 
 namespace torchaudio {
 namespace sox_effects_chain {

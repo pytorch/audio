@@ -1,4 +1,4 @@
-#include <torchaudio/csrc/sox.h>
+#include <torchaudio/csrc/sox/sox.h>
 
 #include <algorithm>
 #include <cstdint>
