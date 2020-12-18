@@ -101,6 +101,10 @@ PYBIND11_MODULE(_torchaudio, m) {
       &torch::audio::get_info,
       "Gets information about an audio file");
   m.def(
+      "get_info_fileobj",
+      &torchaudio::sox_io::get_info_fileobj,
+      "Get metadata of audio in file object.");
+  m.def(
       "load_audio_fileobj",
       &torchaudio::sox_io::load_audio_fileobj,
       "Load audio from file object.");

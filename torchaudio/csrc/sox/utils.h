@@ -4,6 +4,10 @@
 #include <sox.h>
 #include <torch/script.h>
 
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+#include <torch/extension.h>
+#endif // TORCH_API_INCLUDE_EXTENSION_H
+
 namespace torchaudio {
 namespace sox_utils {
 
@@ -126,6 +130,12 @@ sox_encodinginfo_t get_encodinginfo(
     const std::string filetype,
     const caffe2::TypeMeta dtype,
     c10::optional<double>& compression);
+
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+
+uint64_t read_fileobj(py::object* fileobj, uint64_t size, char* buffer);
+
+#endif // TORCH_API_INCLUDE_EXTENSION_H
 
 } // namespace sox_utils
 } // namespace torchaudio

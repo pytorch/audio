@@ -28,7 +28,7 @@ struct SignalInfo : torch::CustomClassHolder {
   int64_t getBitsPerSample() const;
 };
 
-c10::intrusive_ptr<SignalInfo> get_info(
+c10::intrusive_ptr<SignalInfo> get_info_file(
     const std::string& path,
     c10::optional<std::string>& format);
 
@@ -49,6 +49,10 @@ void save_audio_file(
     c10::optional<std::string> format);
 
 #ifdef TORCH_API_INCLUDE_EXTENSION_H
+
+std::tuple<int64_t, int64_t, int64_t, int64_t> get_info_fileobj(
+    py::object fileobj,
+    c10::optional<std::string>& format);
 
 std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
     py::object fileobj,

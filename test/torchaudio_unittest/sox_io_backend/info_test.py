@@ -1,13 +1,18 @@
+import io
 import itertools
-from parameterized import parameterized
+import tarfile
 
+from parameterized import parameterized
 from torchaudio.backend import sox_io_backend
+from torchaudio._internal import module_utils as _mod_utils
 
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
+    HttpServerMixin,
     PytorchTestCase,
     skipIfNoExec,
     skipIfNoExtension,
+    skipIfNoModule,
     get_asset_path,
     get_wav_data,
     save_wav,
@@ -16,6 +21,10 @@ from torchaudio_unittest.common_utils import (
 from .common import (
     name_func,
 )
+
+
+if _mod_utils.is_module_available("requests"):
+    import requests
 
 
 @skipIfNoExec('sox')
@@ -197,3 +206,143 @@ class TestLoadWithoutExtension(PytorchTestCase):
         sinfo = sox_io_backend.info(path, format="mp3")
         assert sinfo.sample_rate == 16000
         assert sinfo.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats
+
+
+@skipIfNoExtension
+@skipIfNoExec('sox')
+class TestFileObject(TempDirMixin, PytorchTestCase):
+    @parameterized.expand([
+        ('wav', 32),
+        ('mp3', 0),
+        ('flac', 24),
+        ('vorbis', 0),
+        ('amb', 32),
+    ])
+    def test_fileobj(self, ext, bits_per_sample):
+        """Querying audio via file object works"""
+        sample_rate = 16000
+        num_channels = 2
+        duration = 3
+        format_ = ext if ext in ['mp3'] else None
+        path = self.get_temp_path(f'test.{ext}')
+
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels=2,
+            duration=duration)
+
+        with open(path, 'rb') as fileobj:
+            sinfo = sox_io_backend.info(fileobj, format_)
+
+        assert sinfo.sample_rate == sample_rate
+        assert sinfo.num_channels == num_channels
+        if ext not in ['mp3', 'vorbis']:  # these container formats do not have length info
+            assert sinfo.num_frames == sample_rate * duration
+        assert sinfo.bits_per_sample == bits_per_sample
+
+    def _test_bytesio(self, ext, bits_per_sample, duration):
+        sample_rate = 16000
+        num_channels = 2
+        format_ = ext if ext in ['mp3'] else None
+        path = self.get_temp_path(f'test.{ext}')
+
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels=2,
+            duration=duration)
+
+        with open(path, 'rb') as file_:
+            fileobj = io.BytesIO(file_.read())
+        sinfo = sox_io_backend.info(fileobj, format_)
+
+        assert sinfo.sample_rate == sample_rate
+        assert sinfo.num_channels == num_channels
+        if ext not in ['mp3', 'vorbis']:  # these container formats do not have length info
+            assert sinfo.num_frames == sample_rate * duration
+        assert sinfo.bits_per_sample == bits_per_sample
+
+    @parameterized.expand([
+        ('wav', 32),
+        ('mp3', 0),
+        ('flac', 24),
+        ('vorbis', 0),
+        ('amb', 32),
+    ])
+    def test_bytesio(self, ext, bits_per_sample):
+        """Querying audio via ByteIO object works"""
+        self._test_bytesio(ext, bits_per_sample, duration=3)
+
+    @parameterized.expand([
+        ('wav', 32),
+        ('mp3', 0),
+        ('flac', 24),
+        ('vorbis', 0),
+        ('amb', 32),
+    ])
+    def test_bytesio_tiny(self, ext, bits_per_sample):
+        """Querying audio via ByteIO object works for small data"""
+        self._test_bytesio(ext, bits_per_sample, duration=1 / 1600)
+
+    @parameterized.expand([
+        ('wav', 32),
+        ('mp3', 0),
+        ('flac', 24),
+        ('vorbis', 0),
+        ('amb', 32),
+    ])
+    def test_tarfile(self, ext, bits_per_sample):
+        """Querying compressed audio via file-like object works"""
+        sample_rate = 16000
+        num_channels = 2
+        duration = 3
+        format_ = ext if ext in ['mp3'] else None
+        audio_file = f'test.{ext}'
+        audio_path = self.get_temp_path(audio_file)
+        archive_path = self.get_temp_path('archive.tar.gz')
+
+        sox_utils.gen_audio_file(
+            audio_path, sample_rate, num_channels=num_channels, duration=duration)
+
+        with tarfile.TarFile(archive_path, 'w') as tarobj:
+            tarobj.add(audio_path, arcname=audio_file)
+        with tarfile.TarFile(archive_path, 'r') as tarobj:
+            fileobj = tarobj.extractfile(audio_file)
+            sinfo = sox_io_backend.info(fileobj, format=format_)
+
+        assert sinfo.sample_rate == sample_rate
+        assert sinfo.num_channels == num_channels
+        if ext not in ['mp3', 'vorbis']:  # these container formats do not have length info
+            assert sinfo.num_frames == sample_rate * duration
+        assert sinfo.bits_per_sample == bits_per_sample
+
+
+@skipIfNoExtension
+@skipIfNoExec('sox')
+@skipIfNoModule("requests")
+class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
+    @parameterized.expand([
+        ('wav', 32),
+        ('mp3', 0),
+        ('flac', 24),
+        ('vorbis', 0),
+        ('amb', 32),
+    ])
+    def test_requests(self, ext, bits_per_sample):
+        """Querying compressed audio via requests works"""
+        sample_rate = 16000
+        num_channels = 2
+        duration = 3
+        format_ = ext if ext in ['mp3'] else None
+        audio_file = f'test.{ext}'
+        audio_path = self.get_temp_path(audio_file)
+
+        sox_utils.gen_audio_file(
+            audio_path, sample_rate, num_channels=num_channels, duration=duration)
+
+        url = self.get_url(audio_file)
+        with requests.get(url, stream=True) as resp:
+            sinfo = sox_io_backend.info(resp.raw, format=format_)
+
+        assert sinfo.sample_rate == sample_rate
+        assert sinfo.num_channels == num_channels
+        if ext not in ['mp3', 'vorbis']:  # these container formats do not have length info
+            assert sinfo.num_frames == sample_rate * duration
+        assert sinfo.bits_per_sample == bits_per_sample
