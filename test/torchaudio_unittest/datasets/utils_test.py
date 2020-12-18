@@ -51,7 +51,7 @@ class TestWalkFiles(TempDirMixin, TorchaudioTestCase):
 
 class TestIterator(TorchaudioTestCase):
     backend = 'default'
-    path = get_asset_path()
+    path = get_asset_path('CommonVoice', 'cv-corpus-4-2019-12-10', 'tt')
 
     def test_disckcache_iterator(self):
         data = COMMONVOICE(self.path, url="tatar")
