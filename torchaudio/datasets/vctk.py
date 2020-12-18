@@ -122,7 +122,7 @@ class VCTK(Dataset):
                 "with `download=True` to donwload the latest version."
             )
 
-        walker = sorted(str(p.stem) for p in Path(self._path).glob('*/*/*' + self._ext_audio))
+        walker = sorted(str(p.stem) for p in Path(self._path).glob('**/*' + self._ext_audio))
         walker = filter(lambda w: self._except_folder not in w, walker)
         self._walker = list(walker)
 
