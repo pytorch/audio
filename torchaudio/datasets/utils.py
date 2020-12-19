@@ -1,4 +1,3 @@
-import csv
 import errno
 import hashlib
 import logging
@@ -16,50 +15,6 @@ import urllib
 import urllib.request
 from torch.utils.data import Dataset
 from torch.utils.model_zoo import tqdm
-
-
-def unicode_csv_reader(unicode_csv_data: TextIOWrapper, **kwargs: Any) -> Any:
-    r"""Since the standard csv library does not handle unicode in Python 2, we need a wrapper.
-    Borrowed and slightly modified from the Python docs:
-    https://docs.python.org/2/library/csv.html#csv-examples
-    Args:
-        unicode_csv_data (TextIOWrapper): unicode csv data (see example below)
-
-    Examples:
-        >>> from torchaudio.datasets.utils import unicode_csv_reader
-        >>> import io
-        >>> with io.open(data_path, encoding="utf8") as f:
-        >>>     reader = unicode_csv_reader(f)
-    """
-
-    # Fix field larger than field limit error
-    maxInt = sys.maxsize
-    while True:
-        # decrease the maxInt value by factor 10
-        # as long as the OverflowError occurs.
-        try:
-            csv.field_size_limit(maxInt)
-            break
-        except OverflowError:
-            maxInt = int(maxInt / 10)
-    csv.field_size_limit(maxInt)
-
-    for line in csv.reader(unicode_csv_data, **kwargs):
-        yield line
-
-
-def makedir_exist_ok(dirpath: str) -> None:
-    """
-    Python2 support for os.makedirs(.., exist_ok=True)
-    """
-    try:
-        os.makedirs(dirpath)
-    except OSError as e:
-        if e.errno == errno.EEXIST:
-            pass
-        else:
-            raise
-
 
 def stream_url(url: str,
                start_byte: Optional[int] = None,
@@ -305,7 +260,7 @@ class _DiskCache(Dataset):
         item = self.dataset[n]
 
         self._cache[n] = f
-        makedir_exist_ok(self.location)
+        os.makedirs(self.location, exist_ok=True)
         torch.save(item, f)
 
         return item

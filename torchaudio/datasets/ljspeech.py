@@ -4,7 +4,7 @@ from typing import List, Tuple, Union
 from pathlib import Path
 
 import torchaudio
-from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
+from torchaudio.datasets.utils import download_url, extract_archive
 from torch import Tensor
 from torch.utils.data import Dataset
 
@@ -75,7 +75,7 @@ class LJSPEECH(Dataset):
                 extract_archive(archive)
 
         with open(self._metadata_path, "r", newline='') as metadata:
-            walker = unicode_csv_reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
+            walker = csv.reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
             self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
