@@ -16,6 +16,7 @@ import urllib.request
 from torch.utils.data import Dataset
 from torch.utils.model_zoo import tqdm
 
+
 def stream_url(url: str,
                start_byte: Optional[int] = None,
                block_size: int = 32 * 1024,
