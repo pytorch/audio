@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Union, Optional
 
 import torchaudio
-from torchaudio.datasets.utils import unicode_csv_reader
 from torch import Tensor
 from torch.utils.data import Dataset
 
@@ -79,7 +78,7 @@ class COMMONVOICE(Dataset):
         self._tsv = os.path.join(self._path, tsv)
 
         with open(self._tsv, "r") as tsv_:
-            walker = unicode_csv_reader(tsv_, delimiter="\t")
+            walker = csv.reader(tsv_, delimiter="\t")
             self._header = next(walker)
             self._walker = list(walker)
 
