@@ -226,7 +226,7 @@ def apply_effects_file(
         ...         self.sample_rate = sample_rate
         ...
         ...     def __getitem__(self, index):
-        ...         speed = 0.5 + 1.5 * torch.rand()
+        ...         speed = 0.5 + 1.5 * random.randn()
         ...         effects = [
         ...             ['gain', '-n', '-10'],  # apply 10 db attenuation
         ...             ['remix', '-'],  # merge all the channels
