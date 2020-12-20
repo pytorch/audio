@@ -1,4 +1,5 @@
 import os
+import csv
 from pathlib import Path
 from typing import Tuple, Union
 
@@ -8,7 +9,6 @@ from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    unicode_csv_reader,
 )
 
 URL = "aew"
@@ -154,7 +154,7 @@ class CMUARCTIC(Dataset):
         self._text = os.path.join(self._path, self._folder_text, self._file_text)
 
         with open(self._text, "r") as text:
-            walker = unicode_csv_reader(text, delimiter="\n")
+            walker = csv.reader(text, delimiter="\n")
             self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:

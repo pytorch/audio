@@ -10,9 +10,9 @@ pytest test --collect-only
 # Run all the test suites
 pytest test
 # Run tests on sox_effects module
-pytest test/sox_effect
+pytest test/torchaudio_unittest/sox_effect
 # use -k to apply filter
-pytest test/sox_io_backend -k load  # only runs tests where their names contain load
+pytest test/torchaudio_unittest/sox_io_backend -k load  # only runs tests where their names contain load
 # Some other useful options;
 # Stop on the first failure -x
 # Run failure fast --ff
@@ -51,7 +51,7 @@ The following test modules are defined for corresponding `torchaudio` module/fun
 - [`torchaudio.transforms`](./transforms_test.py)
 - [`torchaudio.compliance.kaldi`](./compliance_kaldi_test.py)
 - [`torchaudio.kaldi_io`](./kaldi_io_test.py)
-- [`torchaudio.sox_effects`](test/sox_effects)
+- [`torchaudio.sox_effects`](./sox_effect)
 - [`torchaudio.save`, `torchaudio.load`, `torchaudio.info`](./io_test.py)
 
 ### Test modules that do not fall into the above categories
