@@ -532,7 +532,7 @@
 <span class="sd">        ...         self.sample_rate = sample_rate</span>
 <span class="sd">        ...</span>
 <span class="sd">        ...     def __getitem__(self, index):</span>
-<span class="sd">        ...         speed = 0.5 + 1.5 * torch.rand()</span>
+<span class="sd">        ...         speed = 0.5 + 1.5 * random.randn()</span>
 <span class="sd">        ...         effects = [</span>
 <span class="sd">        ...             [&#39;gain&#39;, &#39;-n&#39;, &#39;-10&#39;],  # apply 10 db attenuation</span>
 <span class="sd">        ...             [&#39;remix&#39;, &#39;-&#39;],  # merge all the channels</span>
