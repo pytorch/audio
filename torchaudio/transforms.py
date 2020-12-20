@@ -494,24 +494,16 @@ class MFCC(torch.nn.Module):
         Returns:
             Tensor: specgram_mel_db of size (..., ``n_mfcc``, time).
         """
-
-        # pack batch
-        shape = waveform.size()
-        waveform = waveform.reshape(-1, shape[-1])
-
         mel_specgram = self.MelSpectrogram(waveform)
         if self.log_mels:
             log_offset = 1e-6
             mel_specgram = torch.log(mel_specgram + log_offset)
         else:
             mel_specgram = self.amplitude_to_DB(mel_specgram)
-        # (channel, n_mels, time).tranpose(...) dot (n_mels, n_mfcc)
-        # -> (channel, time, n_mfcc).tranpose(...)
-        mfcc = torch.matmul(mel_specgram.transpose(1, 2), self.dct_mat).transpose(1, 2)
 
-        # unpack batch
-        mfcc = mfcc.reshape(shape[:-1] + mfcc.shape[-2:])
-
+        # (..., channel, n_mels, time).tranpose(...) dot (n_mels, n_mfcc)
+        # -> (..., channel, time, n_mfcc).tranpose(...)
+        mfcc = torch.matmul(mel_specgram.transpose(-2, -1), self.dct_mat).transpose(-2, -1)
         return mfcc
 
 
