@@ -17,7 +17,12 @@ def info(filepath: str) -> AudioMetaData:
     """Get signal information of an audio file.
 
     Args:
-        filepath (str or pathlib.Path): Path to audio file.
+        filepath (str, pathlib.Path, bytes or file-like object):
+            Source of audio data. One of the following types;
+                  * ``str`` or ``pathlib.Path``: file path
+                  * ``bytes``: Audio data in bytes.
+                  * ``file-like``: A file-like object with ``read`` method
+                    that returns ``bytes``.
             This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``
             for the consistency with "sox_io" backend, which has a restriction on type annotation
             for TorchScript compiler compatiblity.
@@ -25,6 +30,8 @@ def info(filepath: str) -> AudioMetaData:
     Returns:
         AudioMetaData: meta data of the given audio.
     """
+    if isinstance(filepath, bytes):
+        filepath = io.BytesIO(filepath)
     sinfo = soundfile.info(filepath)
     return AudioMetaData(sinfo.samplerate, sinfo.frames, sinfo.channels)
 

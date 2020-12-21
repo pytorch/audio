@@ -93,3 +93,58 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
+
+
+@skipIfNoModule("soundfile")
+class TestFileLikeObject(TempDirMixin, PytorchTestCase):
+    def _test_fileobj(self, ext):
+        """Query audio via file-like object should work"""
+        duration = 2
+        sample_rate = 16000
+        num_channels = 2
+        num_frames = sample_rate * duration
+        path = self.get_temp_path(f'test.{ext}')
+
+        data = torch.randn(num_frames, num_channels).numpy()
+        soundfile.write(path, data, sample_rate)
+
+        with open(path, 'rb') as fileobj:
+            info = soundfile_backend.info(fileobj)
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == num_frames
+        assert info.num_channels == num_channels
+
+    def test_fileobj_wav(self):
+        """Loading audio via file-like object works"""
+        self._test_fileobj('wav')
+
+    @skipIfFormatNotSupported("FLAC")
+    def test_fileobj_flac(self):
+        """Loading audio via file-like object works"""
+        self._test_fileobj('flac')
+
+    def _test_bytes(self, ext):
+        """Query audio via file-like object should work"""
+        duration = 2
+        sample_rate = 16000
+        num_channels = 2
+        num_frames = sample_rate * duration
+        path = self.get_temp_path(f'test.{ext}')
+
+        data = torch.randn(num_frames, num_channels).numpy()
+        soundfile.write(path, data, sample_rate)
+
+        with open(path, 'rb') as file_:
+            info = soundfile_backend.info(file_.read())
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == num_frames
+        assert info.num_channels == num_channels
+
+    def test_bytes_wav(self):
+        """Loading audio via file-like object works"""
+        self._test_bytes('wav')
+
+    @skipIfFormatNotSupported("FLAC")
+    def test_bytes_flac(self):
+        """Loading audio via file-like object works"""
+        self._test_bytes('flac')

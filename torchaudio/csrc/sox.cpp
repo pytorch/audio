@@ -181,6 +181,16 @@ void write_audio_file(
 
 namespace {
 
+using SignalInfo = std::tuple<int64_t, int64_t, int64_t>;
+SignalInfo get_info_bytes(
+    py::bytes src,
+    c10::optional<std::string>& format) {
+  auto bytes = static_cast<std::string>(src);
+  auto info = torchaudio::sox_io::get_info_bytes(bytes, format);
+  return std::make_tuple(
+      info->getSampleRate(), info->getNumFrames(), info->getNumChannels());
+}
+
 std::tuple<torch::Tensor, int64_t> load_audio_bytes(
     py::bytes src,
     c10::optional<int64_t> frame_offset,
@@ -289,5 +299,7 @@ PYBIND11_MODULE(_torchaudio, m) {
       "get_info",
       &torch::audio::get_info,
       "Gets information about an audio file");
+  m.def(
+      "get_info_bytes", &get_info_bytes, "Get information about an audio file");
   m.def("load_audio_bytes", &load_audio_bytes, "Load audio from byte string.");
 }

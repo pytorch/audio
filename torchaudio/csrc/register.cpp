@@ -47,7 +47,7 @@ TORCH_LIBRARY(torchaudio, m) {
       .def("get_num_channels", &torchaudio::sox_io::SignalInfo::getNumChannels)
       .def("get_num_frames", &torchaudio::sox_io::SignalInfo::getNumFrames);
 
-  m.def("torchaudio::sox_io_get_info", &torchaudio::sox_io::get_info);
+  m.def("torchaudio::sox_io_get_info", &torchaudio::sox_io::get_info_file);
   m.def(
       "torchaudio::sox_io_load_audio_file("
           "str path,"

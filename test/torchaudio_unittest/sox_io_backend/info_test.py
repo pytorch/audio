@@ -184,3 +184,60 @@ class TestLoadWithoutExtension(PytorchTestCase):
         path = get_asset_path("mp3_without_ext")
         sinfo = sox_io_backend.info(path, format="mp3")
         assert sinfo.sample_rate == 16000
+
+
+@skipIfNoExec('sox')
+class TestFileLikeObject(TempDirMixin, PytorchTestCase):
+    @parameterized.expand([
+        ('wav', ),
+        ('mp3', ),
+        ('flac', ),
+        ('vorbis', ),
+        ('amb', ),
+    ])
+    def test_fileobj(self, ext):
+        """Querying audio via file-like object works"""
+        sample_rate = 16000
+        num_channels = 2
+        duration = 3
+        path = self.get_temp_path(f'test.{ext}')
+
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels=2,
+            duration=duration)
+
+        format_ = ext if ext in ['mp3'] else None
+
+        with open(path, 'rb') as file_:
+            sinfo = sox_io_backend.info(file_, format_)
+        assert sinfo.sample_rate == sample_rate
+        assert sinfo.num_channels == num_channels
+        if ext not in ['mp3', 'vorbis']:  # these container formats do not have length info
+            assert sinfo.num_frames == sample_rate * duration
+
+    @parameterized.expand([
+        ('wav', ),
+        ('mp3', ),
+        ('flac', ),
+        ('vorbis', ),
+        ('amb', ),
+    ])
+    def test_bytes(self, ext):
+        """Querying audio via byte works"""
+        sample_rate = 16000
+        num_channels = 2
+        duration = 3
+        path = self.get_temp_path(f'test.{ext}')
+
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels=2,
+            duration=duration)
+
+        format_ = ext if ext in ['mp3'] else None
+
+        with open(path, 'rb') as file_:
+            sinfo = sox_io_backend.info(file_.read(), format_)
+        assert sinfo.sample_rate == sample_rate
+        assert sinfo.num_channels == num_channels
+        if ext not in ['mp3', 'vorbis']:  # these container formats do not have length info
+            assert sinfo.num_frames == sample_rate * duration

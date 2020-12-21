@@ -30,15 +30,10 @@ int64_t SignalInfo::getNumFrames() const {
   return num_frames;
 }
 
-c10::intrusive_ptr<SignalInfo> get_info(
-    const std::string& path,
-    c10::optional<std::string>& format) {
-  SoxFormat sf(sox_open_read(
-      path.c_str(),
-      /*signal=*/nullptr,
-      /*encoding=*/nullptr,
-      /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
+namespace {
+
+c10::intrusive_ptr<SignalInfo> get_info_impl(const SoxFormat& sf) {
   if (static_cast<sox_format_t*>(sf) == nullptr) {
     throw std::runtime_error("Error opening audio file");
   }
@@ -47,6 +42,31 @@ c10::intrusive_ptr<SignalInfo> get_info(
       static_cast<int64_t>(sf->signal.rate),
       static_cast<int64_t>(sf->signal.channels),
       static_cast<int64_t>(sf->signal.length / sf->signal.channels));
+}
+
+} // namespace
+
+c10::intrusive_ptr<SignalInfo> get_info_file(
+    const std::string& path,
+    c10::optional<std::string>& format) {
+  SoxFormat sf(sox_open_read(
+      path.c_str(),
+      /*signal=*/nullptr,
+      /*encoding=*/nullptr,
+      /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
+  return get_info_impl(sf);
+}
+
+c10::intrusive_ptr<SignalInfo> get_info_bytes(
+    const std::string& bytes,
+    c10::optional<std::string>& format) {
+  SoxFormat sf(sox_open_mem_read(
+      static_cast<void*>(const_cast<char*>(bytes.c_str())),
+      bytes.length(),
+      /*signal=*/nullptr,
+      /*encoding=*/nullptr,
+      /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
+  return get_info_impl(sf);
 }
 
 namespace {

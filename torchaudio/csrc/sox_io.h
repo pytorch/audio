@@ -21,8 +21,11 @@ struct SignalInfo : torch::CustomClassHolder {
   int64_t getNumFrames() const;
 };
 
-c10::intrusive_ptr<SignalInfo> get_info(
+c10::intrusive_ptr<SignalInfo> get_info_file(
     const std::string& path,
+    c10::optional<std::string>& format);
+c10::intrusive_ptr<SignalInfo> get_info_bytes(
+    const std::string& bytes,
     c10::optional<std::string>& format);
 
 c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> load_audio_file(

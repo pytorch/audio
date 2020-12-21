@@ -18,9 +18,16 @@ def info(
     """Get signal information of an audio file.
 
     Args:
-        filepath (str or pathlib.Path):
-            Path to audio file. This function also handles ``pathlib.Path`` objects,
-            but is annotated as ``str`` for TorchScript compatibility.
+        filepath (str, pathlib.Path, bytes or file-like object):
+            Source of audio data. One of the following types;
+                  * ``str`` or ``pathlib.Path``: file path
+                  * ``bytes``: Audio data in bytes.
+                  * ``file-like``: A file-like object with ``read`` method
+                    that returns ``bytes``.
+            Note that when the input type is bytes or file-like object, this function cannot
+            get the length (`num_samples`) for certain formats, such as ``mp3`` and ``vorbis``.
+            This argument is intentionally annotated as only ``str`` for
+            TorchScript compiler compatibility.
         format (str, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
@@ -29,8 +36,19 @@ def info(
     Returns:
         AudioMetaData: Metadata of the given audio.
     """
-    # Cast to str in case type is `pathlib.Path`
-    filepath = str(filepath)
+    if not torch.jit.is_scripting():
+        if isinstance(filepath, (str, Path)):
+            sinfo = torch.ops.torchaudio.sox_io_get_info(str(filepath), format)
+            return AudioMetaData(sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels())
+        if isinstance(filepath, bytes):
+            sinfo = torchaudio._torchaudio.get_info_bytes(filepath, format)
+            return AudioMetaData(*sinfo)
+        if hasattr(filepath, 'read'):
+            # https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/formats.c#L40-L46
+            # 4096 is fixed minimum buffer size
+            sinfo = torchaudio._torchaudio.get_info_bytes(filepath.read(4096), format)
+            return AudioMetaData(*sinfo)
+        raise RuntimeError('The `filepath` object must be one of str, Path, bytes, file-like object.')
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
     return AudioMetaData(sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels())
 
