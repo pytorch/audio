@@ -1,7 +1,9 @@
+import pathlib
 from typing import List, Tuple, Optional
 
 import torch
 
+import torchaudio
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.utils.sox_utils import list_effects
 
@@ -252,8 +254,18 @@ def apply_effects_file(
         >>> for batch in loader:
         >>>     pass
     """
-    # Get string representation of 'path' in case Path object is passed
-    path = str(path)
+    if not torch.jit.is_scripting():
+        if isinstance(path, (str, pathlib.Path)):
+            signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
+                str(path), effects, normalize, channels_first, format)
+            return signal.get_tensor(), signal.get_sample_rate()
+        if isinstance(path, bytes):
+            return torchaudio._torchaudio.apply_effects_bytes(
+                path, effects, normalize, channels_first, format)
+        if hasattr(path, 'read'):
+            return torchaudio._torchaudio.apply_effects_bytes(
+                path.read(), effects, normalize, channels_first, format)
+        raise RuntimeError('The `path` must be str, Path, bytes, or file-like object.')
     signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
         path, effects, normalize, channels_first, format)
     return signal.get_tensor(), signal.get_sample_rate()

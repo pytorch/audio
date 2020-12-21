@@ -9,6 +9,7 @@ from torchaudio_unittest.common_utils import (
     PytorchTestCase,
     skipIfNoExtension,
     get_asset_path,
+    skipIfNoExec,
     get_sinusoid,
     get_wav_data,
     save_wav,
@@ -262,3 +263,81 @@ class TestApplyEffectFileWithoutExtension(PytorchTestCase):
         path = get_asset_path("mp3_without_ext")
         _, sr = sox_effects.apply_effects_file(path, effects, format="mp3")
         assert sr == 16000
+
+
+@skipIfNoExec('sox')
+@skipIfNoExtension
+class TestFileLikeObject(TempDirMixin, PytorchTestCase):
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_fileobj(self, ext, compression):
+        """Loading audio via file-like object returns the same result as via file path.
+
+        We campare the result of file-like object input against file path input because
+        `load` function is rigrously tested for file path inputs to match libsox's result,
+        """
+        channels_first = True
+        effects = [['band', '300', '10']]
+        sample_rate = 16000
+        input_path = self.get_temp_path(f'test.{ext}')
+        reference_path = self.get_temp_path('reference.wav')
+        sox_utils.gen_audio_file(
+            input_path, sample_rate, num_channels=2,
+            compression=compression)
+        sox_utils.run_sox_effect(input_path, reference_path, effects, output_bitdepth=32)
+
+        expected, expected_sr = load_wav(reference_path)
+        with open(input_path, 'rb') as fileobj:
+            found, sr = sox_effects.apply_effects_file(
+                fileobj,
+                effects,
+                channels_first=channels_first,
+                format=ext if ext in ['mp3'] else None)
+        assert sr == expected_sr
+        self.assertEqual(found, expected)
+
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_bytes(self, ext, compression):
+        """Loading audio via bytes returns the same result as via file path.
+
+        We campare the result of file-like object input against file path input because
+        `load` function is rigrously tested for file path inputs to match libsox's result,
+        """
+        channels_first = True
+        effects = [['band', '300', '10']]
+        sample_rate = 16000
+        input_path = self.get_temp_path(f'test.{ext}')
+        reference_path = self.get_temp_path('reference.wav')
+        sox_utils.gen_audio_file(
+            input_path, sample_rate, num_channels=2,
+            compression=compression)
+        sox_utils.run_sox_effect(input_path, reference_path, effects, output_bitdepth=32)
+
+        expected, expected_sr = load_wav(reference_path)
+        with open(input_path, 'rb') as fileobj:
+            found, sr = sox_effects.apply_effects_file(
+                fileobj.read(),
+                effects,
+                channels_first=channels_first,
+                format=ext if ext in ['mp3'] else None)
+        assert sr == expected_sr
+        self.assertEqual(found, expected)
