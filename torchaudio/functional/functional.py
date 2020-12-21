@@ -253,7 +253,7 @@ def amplitude_to_DB(
     if top_db is not None:
         dims = x_db.dim()
         if dims > 3:
-            db_floors = torch.amax(x_db, dim=tuple(range(1, dims))) - top_db
+            db_floors = x_db.reshape(x_db.size(0), -1).amax(dim=1) - top_db
             broadcast_shape = (...,) + (None,)*(dims-1)
             x_db = torch.max(x_db, db_floors[broadcast_shape])
         else:
