@@ -75,3 +75,21 @@ def skipIfNoExtension(test_item):
     if 'TORCHAUDIO_TEST_FAIL_IF_NO_EXTENSION' in os.environ:
         raise RuntimeError('torchaudio C++ extension is not available.')
     return unittest.skip('torchaudio C++ extension is not available')(test_item)
+
+
+skipIfNoTransducer = unittest.skipIf(
+    not is_module_available('_warp_transducer'),
+    '"_warp_transducer" is not available',
+)
+
+try:
+    torch.ops.warprnnt_pytorch_warp_rnnt.gpu_rnnt
+    _CUDA_TRANSDUCER = True
+except RuntimeError:
+    _CUDA_TRANSDUCER = False
+
+
+skipIfNoCudaTransducer = unittest.skipIf(
+    not _CUDA_TRANSDUCER,
+    '"_warp_transducer" not built with GPU support',
+)
