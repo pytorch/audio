@@ -132,6 +132,7 @@ def get_ext_modules(debug=False):
             extra_objects=_get_extra_objects(),
             extra_link_args=_get_ela(debug),
         ),
+        _get_transducer_module(),
     ]
 
 
@@ -139,4 +140,52 @@ class BuildExtension(TorchBuildExtension):
     def build_extension(self, ext):
         if ext.name == _EXT_NAME and _BUILD_SOX:
             _build_third_party()
+        if ext.name == _TRANSDUCER_NAME:
+            _build_transducer()
         super().build_extension(ext)
+
+
+_TRANSDUCER_NAME = '_warp_transducer'
+_TP_TRANSDUCER_BASE_DIR = _ROOT_DIR / 'third_party' / 'warp_transducer'
+
+
+def _build_transducer():
+    build_dir = str(_TP_TRANSDUCER_BASE_DIR / 'submodule' / 'build')
+    os.makedirs(build_dir, exist_ok=True)
+    subprocess.run(
+        args=['cmake', str(_TP_TRANSDUCER_BASE_DIR), '-DWITH_OMP=OFF'],
+        cwd=build_dir,
+        check=True,
+    )
+    subprocess.run(
+        args=['cmake', '--build', '.'],
+        cwd=build_dir,
+        check=True,
+    )
+
+
+def _get_transducer_module():
+    extra_compile_args = [
+        '-fPIC',
+        '-std=c++14',
+    ]
+
+    librairies = ['warprnnt']
+
+    source_paths = [
+        _TP_TRANSDUCER_BASE_DIR / 'binding.cpp',
+        _TP_TRANSDUCER_BASE_DIR / 'submodule' / 'pytorch_binding' / 'src' / 'binding.cpp',
+    ]
+    build_path = _TP_TRANSDUCER_BASE_DIR / 'submodule' / 'build'
+    include_path = _TP_TRANSDUCER_BASE_DIR / 'submodule' / 'include'
+
+    return CppExtension(
+        name=_TRANSDUCER_NAME,
+        sources=[os.path.realpath(path) for path in source_paths],
+        libraries=librairies,
+        include_dirs=[os.path.realpath(include_path)],
+        library_dirs=[os.path.realpath(build_path)],
+        extra_compile_args=extra_compile_args,
+        extra_objects=[str(build_path / f'lib{lib}.a') for lib in librairies],
+        extra_link_args=['-Wl,-rpath,' + os.path.realpath(build_path)],
+    )

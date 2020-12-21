@@ -1,4 +1,6 @@
 from . import extension
+from . import prototype
+
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio import (
     compliance,
