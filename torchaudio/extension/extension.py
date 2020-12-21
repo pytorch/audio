@@ -14,6 +14,14 @@ def _init_extension():
         warnings.warn('torchaudio C++ extension is not available.')
 
 
+def _init_transducer_extension():
+    ext = '_warp_transducer'
+    if _mod_utils.is_module_available(ext):
+        _init_script_module(ext)
+    else:
+        warnings.warn('{ext} extension is not available.')
+
+
 def _init_script_module(module):
     path = importlib.util.find_spec(module).origin
     torch.classes.load_library(path)
