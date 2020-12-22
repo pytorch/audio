@@ -1,3 +1,4 @@
+import os
 import itertools
 
 from torchaudio.backend import sox_io_backend
@@ -333,7 +334,7 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
         super().setUp()
         sample_rate = 8000
         self.original = get_wav_data('float32', num_channels=2)
-        self.path = self.get_temp_path('test.wave')
+        self.path = self.get_temp_path('test.wav')
         save_wav(self.path, self.original, sample_rate)
 
     @parameterized.expand(list(itertools.product(
@@ -352,3 +353,28 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
         found, _ = sox_io_backend.load(self.path, channels_first=channels_first)
         expected = self.original if channels_first else self.original.transpose(1, 0)
         self.assertEqual(found, expected)
+
+
+@skipIfNoExec('sox')
+@skipIfNoExtension
+class TestLoadExtensionLess(TempDirMixin, PytorchTestCase):
+    """Given `format` parameter, `sox_io_backend.load` can load files without extension"""
+    original = None
+    path = None
+
+    def _make_file(self, format_):
+        sample_rate = 8000
+        path = self.get_temp_path(f'test.{format_}')
+        sox_utils.gen_audio_file(f'{path}', sample_rate, num_channels=2)
+        self.original = sox_io_backend.load(path)[0]
+        self.path = os.path.splitext(path)[0]
+        os.rename(path, self.path)
+
+    @parameterized.expand([
+        ('WAV', ), ('wav', ), ('MP3', ), ('mp3', ), ('FLAC', ), ('flac',),
+    ], name_func=name_func)
+    def test_format(self, format_):
+        """Providing format allows to read file without extension"""
+        self._make_file(format_)
+        found, _ = sox_io_backend.load(self.path)
+        self.assertEqual(found, self.original)

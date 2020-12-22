@@ -1,4 +1,5 @@
 import subprocess
+import warnings
 
 
 def get_encoding(dtype):
@@ -27,8 +28,7 @@ def gen_audio_file(
 ):
     """Generate synthetic audio file with `sox` command."""
     if path.endswith('.wav'):
-        raise RuntimeError(
-            'Use get_wav_data and save_wav to generate wav file for accurate result.')
+        warnings.warn('Use get_wav_data and save_wav to generate wav file for accurate result.')
     command = [
         'sox',
         '-V3',  # verbose

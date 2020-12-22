@@ -1,0 +1,24 @@
+--- src/formats.c	2014-10-27 02:55:50.000000000 +0000
++++ src/formats_new.c	2020-11-18 19:14:17.398689371 +0000
+@@ -91,6 +91,21 @@
+ 
+   if (ext && !strcasecmp(ext, "snd"))
+   CHECK(sndr  , 7, 1, ""     , 0,  2, "\0")
++
++#if defined HAVE_MP3 && (defined STATIC_MP3 || !defined HAVE_LIBLTDL)
++  // http://www.mp3-tech.org/programmer/frame_header.html
++  // Check the first two bytes are
++  // expected             1111_1111 111X_X01X
++  // mask         \xEEE6 (1111_1111 1110_0110)
++  // masked value \xEEE2 (1111_1111 1110_0010)
++  if (len >= 2 && !memcmp(data, "\xFF", 1)) {
++    unsigned char second_byte = data[1];
++    unsigned char mask = 0xE6;
++    unsigned char expected = 0xE2;
++    if ((second_byte & mask) == expected)
++      return "mp3";
++  }
++#endif
+   #undef CHECK
+ 
+ #if HAVE_MAGIC

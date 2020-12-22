@@ -9,7 +9,6 @@ from torch.utils.data import Dataset
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    walk_files
 )
 
 URL = "http://www.openslr.org/resources/1/waves_yesno.tar.gz"
@@ -85,10 +84,7 @@ class YESNO(Dataset):
                 "Dataset not found. Please use `download=True` to download it."
             )
 
-        walker = walk_files(
-            self._path, suffix=self._ext_audio, prefix=False, remove_suffix=True
-        )
-        self._walker = list(walker)
+        self._walker = sorted(str(p.stem) for p in Path(self._path).glob('*' + self._ext_audio))
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, List[int]]:
         """Load the n-th sample from the dataset.

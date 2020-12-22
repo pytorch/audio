@@ -24,7 +24,6 @@ __all__ = [
     "angle",
     "magphase",
     "phase_vocoder",
-    "detect_pitch_frequency",
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
@@ -71,8 +70,19 @@ def spectrogram(
     waveform = waveform.reshape(-1, shape[-1])
 
     # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = torch.stft(
-        waveform, n_fft, hop_length, win_length, window, True, "reflect", False, True
+    spec_f = torch.view_as_real(
+        torch.stft(
+            input=waveform,
+            n_fft=n_fft,
+            hop_length=hop_length,
+            win_length=win_length,
+            window=window,
+            center=True,
+            pad_mode="reflect",
+            normalized=False,
+            onesided=True,
+            return_complex=True,
+        )
     )
 
     # unpack batch
@@ -175,8 +185,20 @@ def griffinlim(
                               length=length).float()
 
         # Rebuild the spectrogram
-        rebuilt = torch.stft(inverse, n_fft, hop_length, win_length, window,
-                             True, 'reflect', False, True)
+        rebuilt = torch.view_as_real(
+            torch.stft(
+                input=inverse,
+                n_fft=n_fft,
+                hop_length=hop_length,
+                win_length=win_length,
+                window=window,
+                center=True,
+                pad_mode='reflect',
+                normalized=False,
+                onesided=True,
+                return_complex=True,
+            )
+        )
 
         # Update our phase estimates
         angles = rebuilt
