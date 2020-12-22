@@ -167,3 +167,20 @@ class TestInfoOpus(PytorchTestCase):
         assert info.sample_rate == 48000
         assert info.num_frames == 32768
         assert info.num_channels == num_channels
+
+
+@skipIfNoExtension
+class TestLoadWithoutExtension(PytorchTestCase):
+    def test_mp3(self):
+        """Providing `format` allows to read mp3 without extension
+
+        libsox does not check header for mp3
+
+        https://github.com/pytorch/audio/issues/1040
+
+        The file was generated with the following command
+            ffmpeg -f lavfi -i "sine=frequency=1000:duration=5" -ar 16000 -f mp3 test_noext
+        """
+        path = get_asset_path("mp3_without_ext")
+        sinfo = sox_io_backend.info(path, format="mp3")
+        assert sinfo.sample_rate == 16000

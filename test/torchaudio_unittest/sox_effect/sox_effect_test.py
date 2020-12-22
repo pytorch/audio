@@ -8,6 +8,7 @@ from torchaudio_unittest.common_utils import (
     TempDirMixin,
     PytorchTestCase,
     skipIfNoExtension,
+    get_asset_path,
     get_sinusoid,
     get_wav_data,
     save_wav,
@@ -243,3 +244,21 @@ class TestFileFormats(TempDirMixin, PytorchTestCase):
 
         assert sr == expected_sr
         self.assertEqual(found, expected)
+
+
+@skipIfNoExtension
+class TestApplyEffectFileWithoutExtension(PytorchTestCase):
+    def test_mp3(self):
+        """Providing format allows to read mp3 without extension
+
+        libsox does not check header for mp3
+
+        https://github.com/pytorch/audio/issues/1040
+
+        The file was generated with the following command
+            ffmpeg -f lavfi -i "sine=frequency=1000:duration=5" -ar 16000 -f mp3 test_noext
+        """
+        effects = [['band', '300', '10']]
+        path = get_asset_path("mp3_without_ext")
+        _, sr = sox_effects.apply_effects_file(path, effects, format="mp3")
+        assert sr == 16000
