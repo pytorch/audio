@@ -182,9 +182,9 @@ def apply_effects_file(
         channels_first (bool): When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
         format (str, optional):
-            Hint libsox about the audio format. This argument helps libsox detect the audio
-            format when it cannot detect it via header or file extension.
-            (such as "mp3" file without extension)
+            Override the format detection with the given format.
+            Providing the argument might help when libsox can not infer the format
+            from header or extension,
 
     Returns:
         Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.

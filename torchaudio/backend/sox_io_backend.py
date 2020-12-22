@@ -20,9 +20,9 @@ def info(
             Path to audio file. This function also handles ``pathlib.Path`` objects,
             but is annotated as ``str`` for TorchScript compatibility.
         format (str, optional):
-            Hint libsox about the audio format. This argument helps libsox detect the audio
-            format when it cannot detect it via header or file extension.
-            (such as "mp3" file without extension)
+            Override the format detection with the given format.
+            Providing the argument might help when libsox can not infer the format
+            from header or extension,
 
     Returns:
         AudioMetaData: Metadata of the given audio.
@@ -102,9 +102,9 @@ def load(
             When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
         format (str, optional):
-            Hint libsox about the audio format. This argument helps libsox detect the audio
-            format when it cannot detect it via header or file extension.
-            (such as "mp3" file without extension)
+            Override the format detection with the given format.
+            Providing the argument might help when libsox can not infer the format
+            from header or extension,
 
     Returns:
         torch.Tensor:
