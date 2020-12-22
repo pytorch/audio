@@ -1,18 +1,15 @@
-import errno
 import hashlib
 import logging
 import os
-import sys
 import tarfile
 import threading
-import zipfile
-from _io import TextIOWrapper
-from queue import Queue
-from typing import Any, Iterable, List, Optional, Tuple, Union
-
-import torch
 import urllib
 import urllib.request
+import zipfile
+from queue import Queue
+from typing import Any, Iterable, List, Optional
+
+import torch
 from torch.utils.data import Dataset
 from torch.utils.model_zoo import tqdm
 
@@ -41,11 +38,11 @@ def stream_url(url: str,
         req.headers["Range"] = "bytes={}-".format(start_byte)
 
     with urllib.request.urlopen(req) as upointer, tqdm(
-        unit="B",
-        unit_scale=True,
-        unit_divisor=1024,
-        total=url_size,
-        disable=not progress_bar,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            total=url_size,
+            disable=not progress_bar,
     ) as pbar:
 
         num_bytes = 0
@@ -201,42 +198,6 @@ def extract_archive(from_path: str, to_path: Optional[str] = None, overwrite: bo
         pass
 
     raise NotImplementedError("We currently only support tar.gz, tgz, and zip achives.")
-
-
-def walk_files(root: str,
-               suffix: Union[str, Tuple[str]],
-               prefix: bool = False,
-               remove_suffix: bool = False) -> Iterable[str]:
-    """List recursively all files ending with a suffix at a given root
-    Args:
-        root (str): Path to directory whose folders need to be listed
-        suffix (str or tuple): Suffix of the files to match, e.g. '.png' or ('.jpg', '.png').
-            It uses the Python "str.endswith" method and is passed directly
-        prefix (bool, optional): If true, prepends the full path to each result, otherwise
-            only returns the name of the files found (Default: ``False``)
-        remove_suffix (bool, optional): If true, removes the suffix to each result defined in suffix,
-            otherwise will return the result as found (Default: ``False``).
-    """
-
-    root = os.path.expanduser(root)
-
-    for dirpath, dirs, files in os.walk(root):
-        dirs.sort()
-        # `dirs` is the list used in os.walk function and by sorting it in-place here, we change the
-        # behavior of os.walk to traverse sub directory alphabetically
-        # see also
-        # https://stackoverflow.com/questions/6670029/can-i-force-python3s-os-walk-to-visit-directories-in-alphabetical-order-how#comment71993866_6670926
-        files.sort()
-        for f in files:
-            if f.endswith(suffix):
-
-                if remove_suffix:
-                    f = f[: -len(suffix)]
-
-                if prefix:
-                    f = os.path.join(dirpath, f)
-
-                yield f
 
 
 class _DiskCache(Dataset):
