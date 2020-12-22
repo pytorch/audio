@@ -85,11 +85,14 @@ def load(
 
     Args:
         filepath (str, pathlib.Path, file-like object or bytes):
-            Source of audio data. One of the following types;
+            Source of audio data. When the function is not compiled by TorchScript,
+            (e.g. ``torch.jit.script``), the following types are accepted;
                   * ``str`` or ``pathlib.Path``: file path
                   * ``bytes``: Audio data in bytes
                   * ``file-like``: A file-like object with ``read`` method
                     that returns ``bytes``.
+            When the function is compiled by TorchScript (such as ``torch.jit.script``), then only
+            ``str`` type is allowed.
             This argument is intentionally annotated as only ``str`` for
             TorchScript compiler compatibility.
         frame_offset (int):
