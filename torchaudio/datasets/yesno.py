@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Any, List, Tuple, Union
+from typing import List, Tuple, Union
 
 from torch import Tensor
 from torch.utils.data import Dataset
@@ -41,7 +41,6 @@ class YESNO(Dataset):
             The top-level directory of the dataset. (default: ``"waves_yesno"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
-        target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``)
     """
 
     _ext_audio = ".wav"
@@ -50,10 +49,7 @@ class YESNO(Dataset):
                  root: Union[str, Path],
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
-                 download: bool = False,
-                 target_transform: Any = None) -> None:
-
-        self.target_transform = target_transform
+                 download: bool = False) -> None:
 
         # Get string representation of 'root' in case Path object is passed
         root = os.fspath(root)
@@ -92,8 +88,6 @@ class YESNO(Dataset):
         # return item
 
         waveform, sample_rate, labels = item
-        if self.target_transform is not None:
-            labels = self.target_transform(labels)
         return waveform, sample_rate, labels
 
     def __len__(self) -> int:

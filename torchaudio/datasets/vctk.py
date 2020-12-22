@@ -1,7 +1,7 @@
 import os
 import warnings
 from pathlib import Path
-from typing import Any, Tuple, Union
+from typing import Tuple, Union
 
 from torch import Tensor
 from torch.utils.data import Dataset
@@ -67,7 +67,6 @@ class VCTK(Dataset):
             Giving ``download=True`` will result in error as the dataset is no longer
             publicly available.
         downsample (bool, optional): Not used.
-        target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``)
     """
 
     _folder_txt = "txt"
@@ -81,8 +80,7 @@ class VCTK(Dataset):
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  download: bool = False,
-                 downsample: bool = False,
-                 target_transform: Any = None) -> None:
+                 downsample: bool = False) -> None:
 
         if downsample:
             warnings.warn(
@@ -92,8 +90,6 @@ class VCTK(Dataset):
             )
 
         self.downsample = downsample
-        self.target_transform = target_transform
-
         # Get string representation of 'root' in case Path object is passed
         root = os.fspath(root)
 
@@ -140,8 +136,6 @@ class VCTK(Dataset):
         # return item
 
         waveform, sample_rate, utterance, speaker_id, utterance_id = item
-        if self.target_transform is not None:
-            utterance = self.target_transform(utterance)
         return waveform, sample_rate, utterance, speaker_id, utterance_id
 
     def __len__(self) -> int:
