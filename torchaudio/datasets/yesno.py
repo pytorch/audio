@@ -1,11 +1,11 @@
 import os
-import warnings
-from typing import Any, List, Tuple, Union
 from pathlib import Path
+from typing import Any, List, Tuple, Union
 
-import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
+
+import torchaudio
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
@@ -15,7 +15,7 @@ URL = "http://www.openslr.org/resources/1/waves_yesno.tar.gz"
 FOLDER_IN_ARCHIVE = "waves_yesno"
 _CHECKSUMS = {
     "http://www.openslr.org/resources/1/waves_yesno.tar.gz":
-    "962ff6e904d2df1126132ecec6978786"
+        "962ff6e904d2df1126132ecec6978786"
 }
 
 
@@ -41,7 +41,6 @@ class YESNO(Dataset):
             The top-level directory of the dataset. (default: ``"waves_yesno"``)
         download (bool, optional):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
-        transform (callable, optional): Optional transform applied on waveform. (default: ``None``)
         target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``)
     """
 
@@ -52,17 +51,8 @@ class YESNO(Dataset):
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  download: bool = False,
-                 transform: Any = None,
                  target_transform: Any = None) -> None:
 
-        if transform is not None or target_transform is not None:
-            warnings.warn(
-                "In the next version, transforms will not be part of the dataset. "
-                "Please remove the option `transform=True` and "
-                "`target_transform=True` to suppress this warning."
-            )
-
-        self.transform = transform
         self.target_transform = target_transform
 
         # Get string representation of 'root' in case Path object is passed
@@ -102,8 +92,6 @@ class YESNO(Dataset):
         # return item
 
         waveform, sample_rate, labels = item
-        if self.transform is not None:
-            waveform = self.transform(waveform)
         if self.target_transform is not None:
             labels = self.target_transform(labels)
         return waveform, sample_rate, labels
