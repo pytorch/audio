@@ -1,4 +1,3 @@
-import os
 import itertools
 
 from torchaudio.backend import sox_io_backend
@@ -355,26 +354,18 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
         self.assertEqual(found, expected)
 
 
-@skipIfNoExec('sox')
 @skipIfNoExtension
-class TestLoadExtensionLess(TempDirMixin, PytorchTestCase):
-    """Given `format` parameter, `sox_io_backend.load` can load files without extension"""
-    original = None
-    path = None
+class TestLoadWithoutExtension(PytorchTestCase):
+    def test_mp3(self):
+        """Providing format allows to read mp3 without extension
 
-    def _make_file(self, format_):
-        sample_rate = 8000
-        path = self.get_temp_path(f'test.{format_}')
-        sox_utils.gen_audio_file(f'{path}', sample_rate, num_channels=2)
-        self.original = sox_io_backend.load(path)[0]
-        self.path = os.path.splitext(path)[0]
-        os.rename(path, self.path)
+        libsox does not check header for mp3
 
-    @parameterized.expand([
-        ('WAV', ), ('wav', ), ('MP3', ), ('mp3', ), ('FLAC', ), ('flac',),
-    ], name_func=name_func)
-    def test_format(self, format_):
-        """Providing format allows to read file without extension"""
-        self._make_file(format_)
-        found, _ = sox_io_backend.load(self.path)
-        self.assertEqual(found, self.original)
+        https://github.com/pytorch/audio/issues/1040
+
+        The file was generated with the following command
+            ffmpeg -f lavfi -i "sine=frequency=1000:duration=5" -ar 16000 -f mp3 test_noext
+        """
+        path = get_asset_path("mp3_without_ext")
+        _, sr = sox_io_backend.load(path, format="mp3")
+        assert sr == 16000

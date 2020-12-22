@@ -92,13 +92,14 @@ c10::intrusive_ptr<TensorSignal> apply_effects_file(
     const std::string path,
     std::vector<std::vector<std::string>> effects,
     c10::optional<bool>& normalize,
-    c10::optional<bool>& channels_first) {
+    c10::optional<bool>& channels_first,
+    c10::optional<std::string>& format) {
   // Open input file
   SoxFormat sf(sox_open_read(
       path.c_str(),
       /*signal=*/nullptr,
       /*encoding=*/nullptr,
-      /*filetype=*/nullptr));
+      /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
   validate_input_file(sf);
 
