@@ -1,5 +1,6 @@
 #include <torchaudio/csrc/sox.h>
 #include <torchaudio/csrc/sox_effects.h>
+#include <torchaudio/csrc/sox_effects_chain.h>
 #include <torchaudio/csrc/sox_io.h>
 
 #include <algorithm>
@@ -205,6 +206,18 @@ std::tuple<torch::Tensor, int64_t> load_audio_bytes(
   return std::make_tuple(result->getTensor(), result->getSampleRate());
 }
 
+std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
+    py::object fileobj,
+    c10::optional<int64_t> frame_offset,
+    c10::optional<int64_t> num_frames,
+    c10::optional<bool> normalize,
+    c10::optional<bool> channels_first,
+    c10::optional<std::string>& format) {
+  auto result = torchaudio::sox_io::load_audio_fileobj(
+      fileobj, frame_offset, num_frames, normalize, channels_first, format);
+  return std::make_tuple(result->getTensor(), result->getSampleRate());
+}
+
 std::tuple<torch::Tensor, int64_t> apply_effects_bytes(
     py::bytes src,
     std::vector<std::vector<std::string>> effects,
@@ -214,6 +227,17 @@ std::tuple<torch::Tensor, int64_t> apply_effects_bytes(
   auto bytes = static_cast<std::string>(src);
   auto result = torchaudio::sox_effects::apply_effects_bytes(
       bytes, effects, normalize, channels_first, format);
+  return std::make_tuple(result->getTensor(), result->getSampleRate());
+}
+
+std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
+    py::object fileobj,
+    std::vector<std::vector<std::string>> effects,
+    c10::optional<bool>& normalize,
+    c10::optional<bool>& channels_first,
+    c10::optional<std::string>& format) {
+  auto result = torchaudio::sox_effects::apply_effects_fileobj(
+      fileobj, effects, normalize, channels_first, format);
   return std::make_tuple(result->getTensor(), result->getSampleRate());
 }
 
@@ -315,8 +339,13 @@ PYBIND11_MODULE(_torchaudio, m) {
   m.def(
       "get_info_bytes", &get_info_bytes, "Get information about an audio file");
   m.def("load_audio_bytes", &load_audio_bytes, "Load audio from byte string.");
+  m.def("load_audio_fileobj", &load_audio_fileobj, "Load audio from file object.");
   m.def(
       "apply_effects_bytes",
       &apply_effects_bytes,
       "Decode audio data from byte string and apply sox effects.");
+  m.def(
+      "apply_effects_fileobj",
+      &apply_effects_fileobj,
+      "Decode audio data from file-like obj and apply sox effects.");
 }

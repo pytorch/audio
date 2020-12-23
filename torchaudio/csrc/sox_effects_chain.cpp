@@ -283,5 +283,114 @@ int64_t SoxEffectsChain::getOutputSampleRate() {
   return interm_sig_.rate;
 }
 
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+
+namespace {
+
+/// helper classes for passing file-like object to SoxEffectChain
+struct FileObjInputPriv {
+  sox_format_t* sf;
+  py::object* fileobj;
+  void* buffer;
+  uint64_t buffer_size;
+};
+
+/// Callback function to feed byte string
+int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
+  auto priv = static_cast<FileObjInputPriv *>(effp->priv);
+  auto sf = priv->sf;
+  auto fileobj = priv->fileobj;
+  auto buffer = priv->buffer;
+  auto buffer_size = priv->buffer_size;
+
+  // 1.Refresh the buffer
+  auto num_consumed = sf->tell_off;
+  auto num_remain = buffer_size - num_consumed;
+
+  // 1.1. First, we fetch the data to see if there is data to fill the buffer
+  py::bytes chunk_ = fileobj->attr("read")(num_consumed);
+  auto num_refill = py::len(chunk_);
+  auto num_offset = buffer_size - (num_remain + num_refill);
+
+  if(num_refill > num_consumed) {
+    std::ostringstream message;
+    message << "Tried to read up to " << num_consumed << " bytes but, "
+            << "recieved " << num_refill << "bytes. "
+            << "The given object does not confirm to read protocol of file object.";
+    throw std::runtime_error(message.str());
+  }
+
+  // 1.2. Move the unconsumed data towards the beginning of buffer.
+  // NOTE: Since the underlying FILE pointer was opened with fmemopen, the only way
+  // libsox detect EOF is reaching the end of buffer. (null byte won't help)
+  // Therefore we need to align the content at the end of buffer, otherwise,
+  // libsox might keep reading the content beyond intended length.
+  if (num_remain) {
+    auto remain_start = static_cast<char*>(buffer) + num_consumed;
+    auto head = static_cast<char*>(buffer) + num_offset;
+    memmove(static_cast<void*>(head), static_cast<void*>(remain_start), num_remain);
+  }
+
+  sf->tell_off = num_offset;
+  fseek ((FILE*)sf->fp, num_offset, SEEK_SET);
+
+  // 1.3. Refill the remaining buffer.
+  if (num_refill) {
+    auto chunk = static_cast<std::string>(chunk_);
+    auto head = static_cast<char*>(buffer) + num_offset + num_remain;
+    memcpy(head, static_cast<void*>(const_cast<char*>(chunk.c_str())), num_refill);
+  }
+
+  // Perform decoding operation
+  // The following part is practically same as "input" effect
+  // https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/input.c#L30-L48
+
+  // Ensure that it's a multiple of the number of channels
+  *osamp -= *osamp % effp->out_signal.channels;
+
+  // Read up to *osamp samples into obuf;
+  // store the actual number read back to *osamp
+  *osamp = sox_read(sf, obuf, *osamp);
+
+  return *osamp? SOX_SUCCESS : SOX_EOF;
+}
+
+sox_effect_handler_t* get_fileobj_input_handler() {
+  static sox_effect_handler_t handler{/*name=*/"input_fileobj_object",
+                                      /*usage=*/NULL,
+                                      /*flags=*/SOX_EFF_MCHAN,
+                                      /*getopts=*/NULL,
+                                      /*start=*/NULL,
+                                      /*flow=*/NULL,
+                                      /*drain=*/fileobj_input_drain,
+                                      /*stop=*/NULL,
+                                      /*kill=*/NULL,
+                                      /*priv_size=*/sizeof(FileObjInputPriv)};
+  return &handler;
+}
+
+} // namespace
+
+void SoxEffectsChain::addInputFileObj(
+    sox_format_t* sf,
+    void* buffer,
+    uint64_t buffer_size,
+    py::object* fileobj) {
+  in_sig_ = sf->signal;
+  interm_sig_ = in_sig_;
+
+  SoxEffect e(sox_create_effect(get_fileobj_input_handler()));
+  auto priv = static_cast<FileObjInputPriv*>(e->priv);
+  priv->sf = sf;
+  priv->fileobj = fileobj;
+  priv->buffer = buffer;
+  priv->buffer_size = buffer_size;
+  if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
+    throw std::runtime_error("Failed to add effect: fileobj");
+  }
+}
+
+#endif // TORCH_API_INCLUDE_EXTENSION_H
+
 } // namespace sox_effects_chain
 } // namespace torchaudio

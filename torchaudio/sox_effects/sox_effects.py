@@ -263,8 +263,8 @@ def apply_effects_file(
             return torchaudio._torchaudio.apply_effects_bytes(
                 path, effects, normalize, channels_first, format)
         if hasattr(path, 'read'):
-            return torchaudio._torchaudio.apply_effects_bytes(
-                path.read(), effects, normalize, channels_first, format)
+            return torchaudio._torchaudio.apply_effects_fileobj(
+                path, effects, normalize, channels_first, format)
         raise RuntimeError('The `path` must be str, Path, bytes, or file-like object.')
     signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
         path, effects, normalize, channels_first, format)

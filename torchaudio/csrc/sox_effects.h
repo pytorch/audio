@@ -1,6 +1,10 @@
 #ifndef TORCHAUDIO_SOX_EFFECTS_H
 #define TORCHAUDIO_SOX_EFFECTS_H
 
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+#include <torch/extension.h>
+#endif // TORCH_API_INCLUDE_EXTENSION_H
+
 #include <torch/script.h>
 #include <torchaudio/csrc/sox_utils.h>
 
@@ -28,6 +32,17 @@ c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> apply_effects_bytes(
     c10::optional<bool>& normalize,
     c10::optional<bool>& channels_first,
     c10::optional<std::string>& format);
+
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+
+c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> apply_effects_fileobj(
+    py::object fileobj,
+    std::vector<std::vector<std::string>> effects,
+    c10::optional<bool>& normalize,
+    c10::optional<bool>& channels_first,
+    c10::optional<std::string>& format);
+
+#endif // TORCH_API_INCLUDE_EXTENSION_H
 
 } // namespace sox_effects
 } // namespace torchaudio

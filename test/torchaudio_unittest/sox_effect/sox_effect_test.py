@@ -288,7 +288,7 @@ class TestFileLikeObject(TempDirMixin, PytorchTestCase):
         channels_first = True
         effects = [['band', '300', '10']]
         sample_rate = 16000
-        input_path = self.get_temp_path(f'test.{ext}')
+        input_path = self.get_temp_path(f'input.{ext}')
         reference_path = self.get_temp_path('reference.wav')
         sox_utils.gen_audio_file(
             input_path, sample_rate, num_channels=2,
@@ -302,6 +302,7 @@ class TestFileLikeObject(TempDirMixin, PytorchTestCase):
                 effects,
                 channels_first=channels_first,
                 format=ext if ext in ['mp3'] else None)
+        save_wav(self.get_temp_path('result.wav'), found, sr, channels_first=channels_first)
         assert sr == expected_sr
         self.assertEqual(found, expected)
 
@@ -325,7 +326,7 @@ class TestFileLikeObject(TempDirMixin, PytorchTestCase):
         channels_first = True
         effects = [['band', '300', '10']]
         sample_rate = 16000
-        input_path = self.get_temp_path(f'test.{ext}')
+        input_path = self.get_temp_path(f'input.{ext}')
         reference_path = self.get_temp_path('reference.wav')
         sox_utils.gen_audio_file(
             input_path, sample_rate, num_channels=2,
@@ -339,5 +340,6 @@ class TestFileLikeObject(TempDirMixin, PytorchTestCase):
                 effects,
                 channels_first=channels_first,
                 format=ext if ext in ['mp3'] else None)
+        save_wav(self.get_temp_path('result.wav'), found, sr, channels_first=channels_first)
         assert sr == expected_sr
         self.assertEqual(found, expected)

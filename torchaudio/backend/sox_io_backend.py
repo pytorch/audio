@@ -149,8 +149,8 @@ def load(
             return torchaudio._torchaudio.load_audio_bytes(
                 filepath, frame_offset, num_frames, normalize, channels_first, format)
         if hasattr(filepath, 'read'):
-            return torchaudio._torchaudio.load_audio_bytes(
-                filepath.read(), frame_offset, num_frames, normalize, channels_first, format)
+            return torchaudio._torchaudio.load_audio_fileobj(
+                filepath, frame_offset, num_frames, normalize, channels_first, format)
         raise RuntimeError('The `filepath` object must be one of str, Path, bytes, file-like object.')
     signal = torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, format)

@@ -165,5 +165,21 @@ void save_audio_file(
   chain.run();
 }
 
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+
+c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> load_audio_fileobj(
+    py::object fileobj,
+    c10::optional<int64_t>& frame_offset,
+    c10::optional<int64_t>& num_frames,
+    c10::optional<bool>& normalize,
+    c10::optional<bool>& channels_first,
+    c10::optional<std::string>& format) {
+  auto effects = get_effects(frame_offset, num_frames);
+  return torchaudio::sox_effects::apply_effects_fileobj(
+      fileobj, effects, normalize, channels_first, format);
+}
+
+#endif // TORCH_API_INCLUDE_EXTENSION_H
+
 } // namespace sox_io
 } // namespace torchaudio
