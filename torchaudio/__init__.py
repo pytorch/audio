@@ -6,8 +6,7 @@ from torchaudio import (
     kaldi_io,
     utils,
     sox_effects,
-    transforms,
-    transducer,
+    transforms
 )
 
 USE_SOUNDFILE_LEGACY_INTERFACE = None

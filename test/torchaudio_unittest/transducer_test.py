@@ -1,7 +1,7 @@
 import torch
 
 from torchaudio_unittest import common_utils
-from torchaudio.transducer import RNNTLoss
+from torchaudio.prototype.transducer import RNNTLoss
 
 
 class TransducerTester:

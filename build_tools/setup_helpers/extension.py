@@ -149,17 +149,19 @@ def _get_ext_transducer(debug):
         print("Not building GPU extensions for warp_transudcer.")
 
     librairies = ['warprnnt']
-    warp_rnnt_path = _TP_TRANSDUCER_MODULE_DIR / "build"
+    build_path = _TP_TRANSDUCER_MODULE_DIR / 'build'
+    include_path = _TP_TRANSDUCER_MODULE_DIR / 'include'
+    source_path = _TP_TRANSDUCER_BASE_DIR / 'binding.cpp'
 
     return CppExtension(
         name='_warp_transducer',
-        sources=[os.path.realpath(_TP_TRANSDUCER_BASE_DIR / 'binding.cpp')],
+        sources=[os.path.realpath(source_path)],
         libraries=librairies,
-        include_dirs=[os.path.realpath(_TP_TRANSDUCER_MODULE_DIR / 'include')],
-        library_dirs=[os.path.realpath(warp_rnnt_path)],
+        include_dirs=[os.path.realpath(include_path)],
+        library_dirs=[os.path.realpath(build_path)],
         extra_compile_args=extra_compile_args,
-        extra_objects=[str(warp_rnnt_path / f'lib{l}.a') for l in librairies],
-        extra_link_args=['-Wl,-rpath,' + os.path.realpath(warp_rnnt_path)],
+        extra_objects=[str(build_path / f'lib{l}.a') for l in librairies],
+        extra_link_args=['-Wl,-rpath,' + os.path.realpath(build_path)],
     )
 
 
