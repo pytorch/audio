@@ -479,7 +479,7 @@ effects applied. Sample rate can also be different based on the effects applied.
 <h3>Applying effects on file<a class="headerlink" href="#applying-effects-on-file" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.sox_effects.apply_effects_file">
-<code class="sig-prename descclassname">torchaudio.sox_effects.</code><code class="sig-name descname">apply_effects_file</code><span class="sig-paren">(</span><em class="sig-param">path: str, effects: List[List[str]], normalize: bool = True, channels_first: bool = True</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int]<a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#apply_effects_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.apply_effects_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.sox_effects.</code><code class="sig-name descname">apply_effects_file</code><span class="sig-paren">(</span><em class="sig-param">path: str, effects: List[List[str]], normalize: bool = True, channels_first: bool = True, format: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int]<a class="reference internal" href="_modules/torchaudio/sox_effects/sox_effects.html#apply_effects_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.sox_effects.apply_effects_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply sox effects to the audio file and load the resulting data as Tensor</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -503,6 +503,9 @@ integer type. This argument has no effect for formats other
 than integer WAV type.</p></li>
 <li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – When True, the returned Tensor has dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
 Otherwise, the returned Tensor’s dimension is <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Override the format detection with the given format.
+Providing the argument might help when libsox can not infer the format
+from header or extension,</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

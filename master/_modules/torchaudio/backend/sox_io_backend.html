@@ -315,20 +315,27 @@
 
 
 <div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">info</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Get signal information of an audio file.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        filepath (str or pathlib.Path):</span>
 <span class="sd">            Path to audio file. This function also handles ``pathlib.Path`` objects,</span>
 <span class="sd">            but is annotated as ``str`` for TorchScript compatibility.</span>
+<span class="sd">        format (str, optional):</span>
+<span class="sd">            Override the format detection with the given format.</span>
+<span class="sd">            Providing the argument might help when libsox can not infer the format</span>
+<span class="sd">            from header or extension,</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        AudioMetaData: Metadata of the given audio.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Cast to str in case type is `pathlib.Path`</span>
     <span class="n">filepath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-    <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_get_info</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_get_info</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">(),</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">get_num_frames</span><span class="p">(),</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">get_num_channels</span><span class="p">())</span></div>
 
 
@@ -339,6 +346,7 @@
         <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Load audio data from file.</span>
 
@@ -399,6 +407,10 @@
 <span class="sd">        channels_first (bool):</span>
 <span class="sd">            When True, the returned Tensor has dimension ``[channel, time]``.</span>
 <span class="sd">            Otherwise, the returned Tensor&#39;s dimension is ``[time, channel]``.</span>
+<span class="sd">        format (str, optional):</span>
+<span class="sd">            Override the format detection with the given format.</span>
+<span class="sd">            Providing the argument might help when libsox can not infer the format</span>
+<span class="sd">            from header or extension,</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.Tensor:</span>
@@ -409,7 +421,7 @@
     <span class="c1"># Cast to str in case type is `pathlib.Path`</span>
     <span class="n">filepath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_load_audio_file</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span>
+        <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_tensor</span><span class="p">(),</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">()</span></div>
 
 
