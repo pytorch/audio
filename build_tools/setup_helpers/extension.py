@@ -106,12 +106,12 @@ def _get_libraries():
     return [] if _BUILD_SOX else ['sox']
 
 
-def _build_third_party(base_dir, options=[]):
+def _build_third_party(base_dir, target=['..'], options=[]):
     print(f"Building third party library in {base_dir}...")
     build_dir = str(base_dir / 'build')
     os.makedirs(build_dir, exist_ok=True)
     subprocess.run(
-        args=['cmake', '..'] + options,
+        args=['cmake'] + target + options,
         cwd=build_dir,
         check=True,
     )
@@ -135,45 +135,31 @@ def _get_ext(debug):
 
 
 def _get_ext_transducer(debug):
-    warp_rnnt_path = _TP_TRANSDUCER_MODULE_DIR / "build"
-
-    include_dirs = [
-        os.path.realpath(os.path.join(_TP_TRANSDUCER_MODULE_DIR, 'include')),
+    extra_compile_args = [
+        '-fPIC',
+        '-std=c++14',
     ]
 
-    librairies = ['warprnnt']
-    if platform.system() == 'Darwin':
-        lib_ext = ".dylib"
-    else:
-        lib_ext = ".so"
-    extra_objects = [str(os.path.join(warp_rnnt_path, f'lib{l}{lib_ext}')) for l in librairies]
-
-    extra_compile_args = ['-fPIC']
-    extra_compile_args += ['-std=c++14']
-
     if _BUILD_CUDA_WARP_TRANSDUCER and torch.cuda.is_available():
-        print("Building GPU extensions.")
+        print("Building GPU extensions for warp_transudcer.")
         if "CUDA_HOME" not in os.environ:
             raise RuntimeError("Please specify the environment variable CUDA_HOME.")
         extra_compile_args += ['-DWARPRNNT_ENABLE_GPU']
     else:
-        print("Not building GPU extensions.")
+        print("Not building GPU extensions for warp_transudcer.")
 
-    # if platform.system() == 'Darwin':
-    #     root_dir = "@loader_path"
-    # else:
-    #     root_dir = "$ORIGIN"
-    rel_warp_rnnt_path = os.path.realpath(warp_rnnt_path)
+    librairies = ['warprnnt']
+    warp_rnnt_path = _TP_TRANSDUCER_MODULE_DIR / "build"
 
     return CppExtension(
         name='_warp_transducer',
         sources=[os.path.realpath(_TP_TRANSDUCER_BASE_DIR / 'binding.cpp')],
-        include_dirs=include_dirs,
-        extra_objects=extra_objects,
-        library_dirs=[os.path.realpath(warp_rnnt_path)],
         libraries=librairies,
-        extra_link_args=['-Wl,-rpath,' + rel_warp_rnnt_path],
-        extra_compile_args=extra_compile_args
+        include_dirs=[os.path.realpath(_TP_TRANSDUCER_MODULE_DIR / 'include')],
+        library_dirs=[os.path.realpath(warp_rnnt_path)],
+        extra_compile_args=extra_compile_args,
+        extra_objects=[str(warp_rnnt_path / f'lib{l}.a') for l in librairies],
+        extra_link_args=['-Wl,-rpath,' + os.path.realpath(warp_rnnt_path)],
     )
 
 
@@ -195,5 +181,12 @@ class BuildExtension(TorchBuildExtension):
             _build_third_party(_TP_BASE_DIR)
         if ext.name == "_warp_transducer":
             # TODO Support OMP on MacOS
-            _build_third_party(_TP_TRANSDUCER_MODULE_DIR, ["-DWITH_OMP=OFF"])
+            _build_third_party(
+                _TP_TRANSDUCER_MODULE_DIR,
+                target=[str(_TP_TRANSDUCER_BASE_DIR)],
+                options=[
+                    "-DWITH_OMP=OFF",
+                    "-DWITH_GPU=ON" if _BUILD_CUDA_WARP_TRANSDUCER else "-DWITH_GPU=OFF",
+                ]
+            )
         super().build_extension(ext)
