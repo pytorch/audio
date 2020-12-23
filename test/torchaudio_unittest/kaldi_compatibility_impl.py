@@ -28,7 +28,7 @@ def _convert_args(**kwargs):
 def _run_kaldi(command, input_type, input_value):
     """Run provided Kaldi command, pass a tensor and get the resulting tensor
 
-    Arguments:
+    Args:
         input_type: str
             'ark' or 'scp'
         input_value:
