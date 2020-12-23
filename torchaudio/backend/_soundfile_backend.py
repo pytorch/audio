@@ -103,11 +103,15 @@ def load(
         format (str, optional):
             Not used. PySoundFile does not accept format hint.
 
-    Returns:
-        torch.Tensor:
-            If the input file has integer wav format and normalization is off, then it has
-            integer type, else ``float32`` type. If ``channels_first=True``, it has
-            ``[channel, time]`` else ``[time, channel]``.
+    :rtype:
+            tuple(torch.Tensor, int)
+    :returns:
+            torch.Tensor:
+                If the input file has integer wav format and normalization is off, then it has
+                integer type, else ``float32`` type. If ``channels_first=True``, it has
+                ``[channel, time]`` else ``[time, channel]``.
+            int:
+                Sample rate of the audio.
     """
     with soundfile.SoundFile(filepath, "r") as file_:
         if file_.format != "WAV" or normalize:
