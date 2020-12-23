@@ -82,12 +82,12 @@ Code:
 
 ```python
 waveform = common_utils.get_sinusoid(
-	frequency=300,
-	sample_rate=16000,
-	duration=1,  # seconds
-	n_channels=1,
-	dtype="float32",
-	device="cpu",
+    frequency=300,
+    sample_rate=16000,
+    duration=1,  # seconds
+    n_channels=1,
+    dtype="float32",
+    device="cpu",
 )
 ```
 
