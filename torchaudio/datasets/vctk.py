@@ -1,11 +1,12 @@
 import os
 import warnings
-from typing import Any, Tuple, Union
 from pathlib import Path
+from typing import Tuple, Union
 
-import torchaudio
 from torch import Tensor
 from torch.utils.data import Dataset
+
+import torchaudio
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
@@ -66,8 +67,6 @@ class VCTK(Dataset):
             Giving ``download=True`` will result in error as the dataset is no longer
             publicly available.
         downsample (bool, optional): Not used.
-        transform (callable, optional): Optional transform applied on waveform. (default: ``None``)
-        target_transform (callable, optional): Optional transform applied on utterance. (default: ``None``)
     """
 
     _folder_txt = "txt"
@@ -81,9 +80,7 @@ class VCTK(Dataset):
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  download: bool = False,
-                 downsample: bool = False,
-                 transform: Any = None,
-                 target_transform: Any = None) -> None:
+                 downsample: bool = False) -> None:
 
         if downsample:
             warnings.warn(
@@ -92,17 +89,7 @@ class VCTK(Dataset):
                 "and suppress this warning."
             )
 
-        if transform is not None or target_transform is not None:
-            warnings.warn(
-                "In the next version, transforms will not be part of the dataset. "
-                "Please remove the option `transform=True` and "
-                "`target_transform=True` to suppress this warning."
-            )
-
         self.downsample = downsample
-        self.transform = transform
-        self.target_transform = target_transform
-
         # Get string representation of 'root' in case Path object is passed
         root = os.fspath(root)
 
@@ -149,10 +136,6 @@ class VCTK(Dataset):
         # return item
 
         waveform, sample_rate, utterance, speaker_id, utterance_id = item
-        if self.transform is not None:
-            waveform = self.transform(waveform)
-        if self.target_transform is not None:
-            utterance = self.target_transform(utterance)
         return waveform, sample_rate, utterance, speaker_id, utterance_id
 
     def __len__(self) -> int:
@@ -182,12 +165,12 @@ class VCTK_092(Dataset):
     """
 
     def __init__(
-        self,
-        root: str,
-        mic_id: str = "mic2",
-        download: bool = False,
-        url: str = URL,
-        audio_ext=".flac",
+            self,
+            root: str,
+            mic_id: str = "mic2",
+            download: bool = False,
+            url: str = URL,
+            audio_ext=".flac",
     ):
         if mic_id not in ["mic1", "mic2"]:
             raise RuntimeError(
@@ -233,7 +216,7 @@ class VCTK_092(Dataset):
                 continue
             utterance_dir = os.path.join(self._txt_dir, speaker_id)
             for utterance_file in sorted(
-                f for f in os.listdir(utterance_dir) if f.endswith(".txt")
+                    f for f in os.listdir(utterance_dir) if f.endswith(".txt")
             ):
                 utterance_id = os.path.splitext(utterance_file)[0]
                 audio_path_mic = os.path.join(
