@@ -46,7 +46,7 @@ class TestCommonVoice(TempDirMixin, TorchaudioTestCase):
                 writer.writerow(content)
 
                 # Generate and store audio
-                audio_path = os.path.join(audio_base_path, content[1], COMMONVOICE._ext_audio)
+                audio_path = os.path.join(audio_base_path, content[1] + COMMONVOICE._ext_audio)
                 data = get_whitenoise(sample_rate=cls.sample_rate, duration=1, n_channels=1, seed=i, dtype='float32')
                 save_wav(audio_path, data, cls.sample_rate)
 
