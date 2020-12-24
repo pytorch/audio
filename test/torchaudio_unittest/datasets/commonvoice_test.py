@@ -22,12 +22,12 @@ class TestCommonVoice(TempDirMixin, TorchaudioTestCase):
     # Note: the first content is missing values for `age`, `gender` and `accent` as in the original data.
     _train_csv_contents = [
         ["9d16c5d980247861130e0480e2719f448be73d86a496c36d01a477cbdecd8cfd1399403d7a77bf458d211a70711b2da0845c",
-            "common_voice_en_18885784.wav",
+            "common_voice_en_18885784",
             "He was accorded a State funeral, and was buried in Drayton and Toowoomba Cemetery.", "2", "0", "", "", ""],
         ["c82eb9291328620f06025a1f8112b909099e447e485e99236cb87df008650250e79fea5ca772061fb6a370830847b9c44d20",
-            "common_voice_en_556542.wav", "Once more into the breach", "2", "0", "thirties", "male", "us"],
+            "common_voice_en_556542", "Once more into the breach", "2", "0", "thirties", "male", "us"],
         ["f74d880c5ad4c5917f314a604d3fc4805159d255796fb9f8defca35333ecc002bdf53dc463503c12674ea840b21b4a507b7c",
-            "common_voice_en_18607573.wav",
+            "common_voice_en_18607573",
             "Caddy, show Miss Clare and Miss Summerson their rooms.", "2", "0", "twenties", "male", "canada"],
     ]
     sample_rate = 48000
@@ -46,7 +46,7 @@ class TestCommonVoice(TempDirMixin, TorchaudioTestCase):
                 writer.writerow(content)
 
                 # Generate and store audio
-                audio_path = os.path.join(audio_base_path, content[1])
+                audio_path = os.path.join(audio_base_path, content[1], COMMONVOICE._ext_audio)
                 data = get_whitenoise(sample_rate=cls.sample_rate, duration=1, n_channels=1, seed=i, dtype='float32')
                 save_wav(audio_path, data, cls.sample_rate)
 
