@@ -12,14 +12,15 @@ from torch.utils.data import Dataset
 def load_commonvoice_item(line: List[str],
                           header: List[str],
                           path: str,
-                          folder_audio: str) -> Tuple[Tensor, int, Dict[str, str]]:
+                          folder_audio: str,
+                          ext_audio: str) -> Tuple[Tensor, int, Dict[str, str]]:
     # Each line as the following data:
     # client_id, path, sentence, up_votes, down_votes, age, gender, accent
 
     assert header[1] == "path"
     fileid = line[1]
 
-    filename = os.path.join(path, folder_audio, fileid)
+    filename = os.path.join(path, folder_audio, fileid, ext_audio)
 
     waveform, sample_rate = torchaudio.load(filename)
 
@@ -95,7 +96,7 @@ class COMMONVOICE(Dataset):
             ``up_votes``, ``down_votes``, ``age``, ``gender`` and ``accent``.
         """
         line = self._walker[n]
-        return load_commonvoice_item(line, self._header, self._path, self._folder_audio)
+        return load_commonvoice_item(line, self._header, self._path, self._folder_audio, self._ext_audio)
 
     def __len__(self) -> int:
         return len(self._walker)
