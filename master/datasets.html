@@ -683,7 +683,7 @@ Note that some words have empty phonemes.</p>
 <h2><a class="toc-backref" href="#id9">VCTK</a><a class="headerlink" href="#vctk" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.VCTK">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">VCTK</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip', folder_in_archive: str = 'VCTK-Corpus', download: bool = False, downsample: bool = False, transform: Any = None, target_transform: Any = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">VCTK</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'https://datashare.is.ed.ac.uk/bitstream/handle/10283/3443/VCTK-Corpus-0.92.zip', folder_in_archive: str = 'VCTK-Corpus', download: bool = False, downsample: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/vctk.html#VCTK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.VCTK" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for VCTK.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -703,8 +703,6 @@ For more information about the dataset visit: <a class="reference external" href
 Giving <code class="docutils literal notranslate"><span class="pre">download=True</span></code> will result in error as the dataset is no longer
 publicly available.</p></li>
 <li><p><strong>downsample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Not used.</p></li>
-<li><p><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – Optional transform applied on waveform. (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>target_transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – Optional transform applied on utterance. (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -779,7 +777,7 @@ publicly available.</p></li>
 <h2><a class="toc-backref" href="#id11">YESNO</a><a class="headerlink" href="#yesno" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.YESNO">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">YESNO</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'http://www.openslr.org/resources/1/waves_yesno.tar.gz', folder_in_archive: str = 'waves_yesno', download: bool = False, transform: Any = None, target_transform: Any = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/yesno.html#YESNO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.YESNO" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.datasets.</code><code class="sig-name descname">YESNO</code><span class="sig-paren">(</span><em class="sig-param">root: Union[str, pathlib.Path], url: str = 'http://www.openslr.org/resources/1/waves_yesno.tar.gz', folder_in_archive: str = 'waves_yesno', download: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/datasets/yesno.html#YESNO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.datasets.YESNO" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Dataset for YesNo.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -789,8 +787,6 @@ publicly available.</p></li>
 (default: <code class="docutils literal notranslate"><span class="pre">&quot;http://www.openslr.org/resources/1/waves_yesno.tar.gz&quot;</span></code>)</p></li>
 <li><p><strong>folder_in_archive</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The top-level directory of the dataset. (default: <code class="docutils literal notranslate"><span class="pre">&quot;waves_yesno&quot;</span></code>)</p></li>
 <li><p><strong>download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to download the dataset if it is not found at root path. (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
-<li><p><strong>transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – Optional transform applied on waveform. (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>target_transform</strong> (<em>callable</em><em>, </em><em>optional</em>) – Optional transform applied on utterance. (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
 </dd>
 </dl>

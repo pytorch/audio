@@ -413,7 +413,7 @@
 <span class="sd">            from header or extension,</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        torch.Tensor:</span>
+<span class="sd">        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.</span>
 <span class="sd">            If the input file has integer wav format and normalization is off, then it has</span>
 <span class="sd">            integer type, else ``float32`` type. If ``channels_first=True``, it has</span>
 <span class="sd">            ``[channel, time]`` else ``[time, channel]``.</span>
