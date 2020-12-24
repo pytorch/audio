@@ -51,6 +51,7 @@ class TestCommonVoice(TempDirMixin, TorchaudioTestCase):
 
     sample_rate = 48000
 
+    @classmethod
     def fill_data(cls, train_csv_contents):
         cls.root_dir = cls.get_base_temp_dir()
         # Tsv file name difference does not mean different subset, testing as a whole dataset here
