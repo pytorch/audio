@@ -15,7 +15,7 @@ target=$2
 
 echo "committing docs from ${src} to ${target}"
 
-pushd $src
+pushd "${src}"
 git checkout gh-pages
 mkdir -p ./"${target}"
 rm -rf ./"${target}"/*
