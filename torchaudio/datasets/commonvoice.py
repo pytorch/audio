@@ -19,8 +19,10 @@ def load_commonvoice_item(line: List[str],
 
     assert header[1] == "path"
     fileid = line[1]
-
-    filename = os.path.join(path, folder_audio, fileid + ext_audio)
+    if fileid.endswith("mp3"):
+        filename = os.path.join(path, folder_audio, fileid)
+    else:
+        filename = os.path.join(path, folder_audio, fileid + ext_audio)
 
     waveform, sample_rate = torchaudio.load(filename)
 
