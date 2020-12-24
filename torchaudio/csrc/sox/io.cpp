@@ -95,26 +95,31 @@ c10::intrusive_ptr<TensorSignal> load_audio_file(
 }
 
 void save_audio_file(
-    const std::string& file_name,
-    const c10::intrusive_ptr<TensorSignal>& signal,
-    const double compression) {
-  auto tensor = signal->tensor;
-
+    const std::string& path,
+    torch::Tensor tensor,
+    int64_t sample_rate,
+    bool channels_first,
+    c10::optional<double> compression,
+    c10::optional<std::string> format) {
   validate_input_tensor(tensor);
 
-  const auto filetype = get_filetype(file_name);
+  auto signal = TensorSignal(tensor, sample_rate, channels_first);
+
+  const auto filetype = [&](){
+    if (format.has_value()) return format.value();
+    return get_filetype(path);
+  }();
   if (filetype == "amr-nb") {
-    const auto num_channels = tensor.size(signal->channels_first ? 0 : 1);
+    const auto num_channels = tensor.size(channels_first ? 0 : 1);
     TORCH_CHECK(
         num_channels == 1, "amr-nb format only supports single channel audio.");
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
-  const auto signal_info = get_signalinfo(signal.get(), filetype);
-  const auto encoding_info =
-      get_encodinginfo(filetype, tensor.dtype(), compression);
+  const auto signal_info = get_signalinfo(&signal, filetype);
+  const auto encoding_info = get_encodinginfo(filetype, tensor.dtype(), compression);
 
   SoxFormat sf(sox_open_write(
-      file_name.c_str(),
+      path.c_str(),
       &signal_info,
       &encoding_info,
       /*filetype=*/filetype.c_str(),
@@ -126,9 +131,9 @@ void save_audio_file(
   }
 
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
-      /*input_encoding=*/get_encodinginfo("wav", tensor.dtype(), 0.),
+      /*input_encoding=*/get_encodinginfo("wav", tensor.dtype()),
       /*output_encoding=*/sf->encoding);
-  chain.addInputTensor(signal.get());
+  chain.addInputTensor(&signal);
   chain.addOutputFile(sf);
   chain.run();
 }
@@ -145,6 +150,74 @@ std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
   auto effects = get_effects(frame_offset, num_frames);
   return torchaudio::sox_effects::apply_effects_fileobj(
       fileobj, effects, normalize, channels_first, format);
+}
+
+namespace {
+
+// helper class to automatically release buffer, to be used by save_audio_fileobj
+struct AutoReleaseBuffer {
+  char* ptr;
+  size_t size;
+
+  AutoReleaseBuffer() : ptr(nullptr), size(0) {}
+  AutoReleaseBuffer(const AutoReleaseBuffer& other) = delete;
+  AutoReleaseBuffer(AutoReleaseBuffer&& other) = delete;
+  AutoReleaseBuffer& operator=(const AutoReleaseBuffer& other) = delete;
+  AutoReleaseBuffer& operator=(AutoReleaseBuffer&& other) = delete;
+  ~AutoReleaseBuffer() {
+    if (ptr) {
+      free(ptr);
+    }
+  }
+};
+
+} // namespace
+
+void save_audio_fileobj(
+    py::object fileobj,
+    torch::Tensor tensor,
+    int64_t sample_rate,
+    bool channels_first,
+    c10::optional<double> compression,
+    std::string filetype) {
+  validate_input_tensor(tensor);
+
+  auto signal = TensorSignal(tensor, sample_rate, channels_first);
+
+  if (filetype == "amr-nb") {
+    const auto num_channels = tensor.size(channels_first ? 0 : 1);
+    if (num_channels != 1) {
+      throw std::runtime_error("amr-nb format only supports single channel audio.");
+    }
+    tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
+  }
+  const auto signal_info = get_signalinfo(&signal, filetype);
+  const auto encoding_info = get_encodinginfo(filetype, tensor.dtype(), compression);
+
+  AutoReleaseBuffer buffer;
+
+  SoxFormat sf(sox_open_memstream_write(
+      &buffer.ptr,
+      &buffer.size,
+      &signal_info,
+      &encoding_info,
+      filetype.c_str(),
+      /*oob=*/nullptr));
+
+  if (static_cast<sox_format_t*>(sf) == nullptr) {
+    throw std::runtime_error("Error saving audio file: failed to open memory stream.");
+  }
+
+  torchaudio::sox_effects_chain::SoxEffectsChain chain(
+      /*input_encoding=*/get_encodinginfo("wav", tensor.dtype()),
+      /*output_encoding=*/sf->encoding);
+  chain.addInputTensor(&signal);
+  chain.addOutputFileObj(sf, &buffer.ptr, &buffer.size, &fileobj);
+  chain.run();
+
+  sf.close();
+
+  fileobj.attr("write")(py::bytes(buffer.ptr, buffer.size));
 }
 
 #endif // TORCH_API_INCLUDE_EXTENSION_H

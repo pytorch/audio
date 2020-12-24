@@ -7,7 +7,7 @@ from torchaudio._internal import (
 )
 
 import torchaudio
-from .common import AudioMetaData
+from .common import AudioMetaData, get_ext
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -134,6 +134,27 @@ def load(
     return signal.get_tensor(), signal.get_sample_rate()
 
 
+@torch.jit.unused
+def _save(
+        filepath: str,
+        src: torch.Tensor,
+        sample_rate: int,
+        channels_first: bool = True,
+        compression: Optional[float] = None,
+        format: Optional[str] = None,
+):
+    try:
+        ext = get_ext(filepath, format)
+    except Exception:
+        raise RuntimeError('Cannot detect the output format. Provide `format` argument.') from None
+    if hasattr(filepath, 'write'):
+        torchaudio._torchaudio.save_audio_fileobj(
+            filepath, src, sample_rate, channels_first, compression, ext)
+    else:
+        torch.ops.torchaudio.sox_io_save_audio_file(
+            os.fspath(filepath), src, sample_rate, channels_first, compression, ext)
+
+
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def save(
         filepath: str,
@@ -141,6 +162,7 @@ def save(
         sample_rate: int,
         channels_first: bool = True,
         compression: Optional[float] = None,
+        format: Optional[str] = None,
 ):
     """Save audio data to file.
 
@@ -184,23 +206,15 @@ def save(
                   | and lowest quality. Default: ``3``.
 
             See the detail at http://sox.sourceforge.net/soxformat.html.
+        format (str, optional):
+            Output audio format. This is required when the output audio format cannot be infered from
+            ``filepath``, (such as file extension or ``name`` attribute of the given file object).
     """
-    # Cast to str in case type is `pathlib.Path`
-    filepath = str(filepath)
-    if compression is None:
-        ext = str(filepath).split('.')[-1].lower()
-        if ext in ['wav', 'sph', 'amb', 'amr-nb']:
-            compression = 0.
-        elif ext == 'mp3':
-            compression = -4.5
-        elif ext == 'flac':
-            compression = 8.
-        elif ext in ['ogg', 'vorbis']:
-            compression = 3.
-        else:
-            raise RuntimeError(f'Unsupported file type: "{ext}"')
-    signal = torch.classes.torchaudio.TensorSignal(src, sample_rate, channels_first)
-    torch.ops.torchaudio.sox_io_save_audio_file(filepath, signal, compression)
+    if not torch.jit.is_scripting():
+        _save(filepath, src, sample_rate, channels_first, compression, format)
+        return
+    torch.ops.torchaudio.sox_io_save_audio_file(
+        filepath, src, sample_rate, channels_first, compression, format)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')

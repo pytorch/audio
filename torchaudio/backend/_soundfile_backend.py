@@ -1,10 +1,11 @@
 """The new soundfile backend which will become default in 0.8.0 onward"""
+import os
 from typing import Tuple, Optional
 import warnings
 
 import torch
 from torchaudio._internal import module_utils as _mod_utils
-from .common import AudioMetaData
+from .common import AudioMetaData, get_ext
 
 
 if _mod_utils.is_module_available("soundfile"):
@@ -138,6 +139,7 @@ def save(
     sample_rate: int,
     channels_first: bool = True,
     compression: Optional[float] = None,
+    format: Optional[str] = None,
 ):
     """Save audio data to file.
 
@@ -168,6 +170,9 @@ def save(
             otherwise ``[time, channel]``.
         compression (Optional[float]):
             Not used. It is here only for interface compatibility reson with "sox_io" backend.
+        format (str, optional):
+            Output audio format. This is required when the output audio format cannot be infered from
+            ``filepath``, (such as file extension or ``name`` attribute of the given file object).
     """
     if src.ndim != 2:
         raise ValueError(f"Expected 2D Tensor, got {src.ndim}D.")
@@ -177,7 +182,11 @@ def save(
             "The argument is silently ignored."
         )
 
-    ext = str(filepath).split(".")[-1].lower()
+    try:
+        ext = get_ext(filepath, format)
+    except Exception:
+        raise RuntimeError('Cannot detect the output format. Provide `format` argument.') from None
+
     if ext != "wav":
         subtype = None
     elif src.dtype == torch.uint8:
@@ -193,17 +202,16 @@ def save(
     else:
         raise ValueError(f"Unsupported dtype for WAV: {src.dtype}")
 
-    format_ = None
     # sph is a extension used in TED-LIUM but soundfile does not recognize it as NIST format,
     # so we extend the extensions manually here
-    if ext in ["nis", "nist", "sph"]:
-        format_ = "NIST"
+    if ext in ["nis", "nist", "sph"] and format is None:
+        format = "NIST"
 
     if channels_first:
         src = src.t()
 
     soundfile.write(
-        file=filepath, data=src, samplerate=sample_rate, subtype=subtype, format=format_
+        file=filepath, data=src, samplerate=sample_rate, subtype=subtype, format=format
     )
 
 

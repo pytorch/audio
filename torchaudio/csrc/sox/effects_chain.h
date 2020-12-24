@@ -46,6 +46,12 @@ class SoxEffectsChain {
       uint64_t buffer_size,
       py::object* fileobj);
 
+  void addOutputFileObj(
+      sox_format_t* sf,
+      char** buffer,
+      size_t* buffer_size,
+      py::object* fileobj);
+
 #endif // TORCH_API_INCLUDE_EXTENSION_H
 };
 

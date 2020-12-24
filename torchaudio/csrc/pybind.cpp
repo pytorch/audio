@@ -100,4 +100,8 @@ PYBIND11_MODULE(_torchaudio, m) {
       "load_audio_fileobj",
       &torchaudio::sox_io::load_audio_fileobj,
       "Load audio from file object.");
+  m.def(
+      "save_audio_fileobj",
+      &torchaudio::sox_io::save_audio_fileobj,
+      "Save audio to file obj.");
 }
