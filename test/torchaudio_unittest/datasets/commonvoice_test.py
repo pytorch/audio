@@ -18,9 +18,6 @@ _headers = [u"client_ids", u"path", u"sentence", u"up_votes", u"down_votes", u"a
 
 
 def get_mock_dataset_en(root_dir):
-    """
-    root_dir: path
-    """
     mocked_data = []
     # Note: extension is changed to wav for the sake of test
     # Note: the first content is missing values for `age`, `gender` and `accent` as in the original data.
@@ -59,8 +56,6 @@ def get_mock_dataset_fr(root_dir):
     root_dir: path
     """
     mocked_data = []
-    # Note: extension is changed to wav for the sake of test
-    # Note: the first content is missing values for `age`, `gender` and `accent` as in the original data.
     _fr_train_csv_contents = [
         [
             "a2e8e1e1cc74d08c92a53d7b9ff84e077eb90410edd85b8882f16fd037cecfcb6a19413c6c63ce6458cfea9579878fa91cef"
