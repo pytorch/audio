@@ -39,8 +39,7 @@ class YESNO(Dataset):
         root: Union[str, Path],
         url: str = _RELEASE_CONFIGS["release1"]["url"],
         folder_in_archive: str = _RELEASE_CONFIGS["release1"]["folder_in_archive"],
-        download: bool = False
-        ) -> None:
+        download: bool = False) -> None:
 
         self._parse_filesystem(root, url, folder_in_archive, download)
 
