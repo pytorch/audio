@@ -1,8 +1,7 @@
-import os
 import csv
+import os
 from pathlib import Path
 
-from torchaudio.datasets import COMMONVOICE
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -10,6 +9,8 @@ from torchaudio_unittest.common_utils import (
     save_wav,
     normalize_wav,
 )
+
+from torchaudio.datasets import COMMONVOICE
 
 original_ext_audio = COMMONVOICE._ext_audio
 sample_rate = 48000
@@ -45,7 +46,6 @@ def get_mock_dataset_en(root_dir):
             writer.writerow(content)
             # Generate and store audio
             audio_path = os.path.join(audio_base_path, content[1])
-            print(audio_path)
             data = get_whitenoise(sample_rate=sample_rate, duration=1, n_channels=1, seed=i, dtype='float32')
             save_wav(audio_path, data, sample_rate)
 
@@ -87,7 +87,6 @@ def get_mock_dataset_fr(root_dir):
             writer.writerow(content)
             # Generate and store audio
             audio_path = os.path.join(audio_base_path, content[1] + COMMONVOICE._ext_audio)
-            print(audio_path)
             data = get_whitenoise(sample_rate=sample_rate, duration=1, n_channels=1, seed=i, dtype='float32')
             save_wav(audio_path, data, sample_rate)
 
@@ -100,6 +99,7 @@ class TestCommonVoiceEN(TempDirMixin, TorchaudioTestCase):
     backend = 'default'
     root_dir = None
     sample_rate = 48000
+
     @classmethod
     def setUpClass(cls):
         cls.root_dir = cls.get_base_temp_dir()
@@ -134,7 +134,6 @@ class TestCommonVoiceFR(TempDirMixin, TorchaudioTestCase):
     backend = 'default'
     root_dir = None
     sample_rate = 48000
-
 
     @classmethod
     def setUpClass(cls):
