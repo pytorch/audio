@@ -49,7 +49,7 @@ class YESNO(Dataset):
         archive = os.path.basename(url)
         archive = root / archive
 
-        self._path = os.path.join(root, folder_in_archive)
+        self._path = root / folder_in_archive
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
