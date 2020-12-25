@@ -75,7 +75,7 @@ def get_mock_dataset_fr(root_dir):
     tsv_filename = os.path.join(root_dir, "train.tsv")
     audio_base_path = os.path.join(root_dir, "clips")
     os.makedirs(audio_base_path, exist_ok=True)
-    with open(tsv_filename, "w", newline='') as tsv:
+    with open(tsv_filename, "w", newline='', encoding="utf-8") as tsv:
         writer = csv.writer(tsv, delimiter='\t')
         writer.writerow(_headers)
         for i, content in enumerate(_fr_train_csv_contents):
