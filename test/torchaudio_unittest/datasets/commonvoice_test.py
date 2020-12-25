@@ -1,7 +1,8 @@
-import csv
 import os
+import csv
 from pathlib import Path
 
+from torchaudio.datasets import COMMONVOICE
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -10,29 +11,56 @@ from torchaudio_unittest.common_utils import (
     normalize_wav,
 )
 
-from torchaudio.datasets import COMMONVOICE
+original_ext_audio = COMMONVOICE._ext_audio
+sample_rate = 48000
+_headers = [u"client_ids", u"path", u"sentence", u"up_votes", u"down_votes", u"age", u"gender", u"accent"]
 
 
-class TestCommonVoice(TempDirMixin, TorchaudioTestCase):
-    backend = 'default'
-
-    root_dir = None
-    data = []
-    en_data = []
-    fr_data = []
-    _headers = [u"client_ids", u"path", u"sentence", u"up_votes", u"down_votes", u"age", u"gender", u"accent"]
+def get_mock_dataset_en(root_dir):
+    """
+    root_dir: path
+    """
+    mocked_data = []
     # Note: extension is changed to wav for the sake of test
     # Note: the first content is missing values for `age`, `gender` and `accent` as in the original data.
     _en_train_csv_contents = [
         ["9d16c5d980247861130e0480e2719f448be73d86a496c36d01a477cbdecd8cfd1399403d7a77bf458d211a70711b2da0845c",
          "common_voice_en_18885784.wav",
-         "He was accorded a State funeral, and was buried in Drayton and Toowoomba Cemetery.", "2", "0", "", "", ""],
+         "He was accorded a State funeral, and was buried in Drayton and Toowoomba Cemetery.", "2", "0", "", "",
+         ""],
         ["c82eb9291328620f06025a1f8112b909099e447e485e99236cb87df008650250e79fea5ca772061fb6a370830847b9c44d20",
          "common_voice_en_556542.wav", "Once more into the breach", "2", "0", "thirties", "male", "us"],
         ["f74d880c5ad4c5917f314a604d3fc4805159d255796fb9f8defca35333ecc002bdf53dc463503c12674ea840b21b4a507b7c",
          "common_voice_en_18607573.wav",
          "Caddy, show Miss Clare and Miss Summerson their rooms.", "2", "0", "twenties", "male", "canada"],
     ]
+    # Tsv file name difference does not mean different subset, testing as a whole dataset here
+    tsv_filename = os.path.join(root_dir, "train.tsv")
+    audio_base_path = os.path.join(root_dir, "clips")
+    os.makedirs(audio_base_path, exist_ok=True)
+    with open(tsv_filename, "w", newline='') as tsv:
+        writer = csv.writer(tsv, delimiter='\t')
+        writer.writerow(_headers)
+        for i, content in enumerate(_en_train_csv_contents):
+            writer.writerow(content)
+            # Generate and store audio
+            audio_path = os.path.join(audio_base_path, content[1])
+            print(audio_path)
+            data = get_whitenoise(sample_rate=sample_rate, duration=1, n_channels=1, seed=i, dtype='float32')
+            save_wav(audio_path, data, sample_rate)
+
+            # Append data entry
+            mocked_data.append((normalize_wav(data), sample_rate, dict(zip(_headers, content))))
+    return mocked_data
+
+
+def get_mock_dataset_fr(root_dir):
+    """
+    root_dir: path
+    """
+    mocked_data = []
+    # Note: extension is changed to wav for the sake of test
+    # Note: the first content is missing values for `age`, `gender` and `accent` as in the original data.
     _fr_train_csv_contents = [
         [
             "a2e8e1e1cc74d08c92a53d7b9ff84e077eb90410edd85b8882f16fd037cecfcb6a19413c6c63ce6458cfea9579878fa91cef"
@@ -48,71 +76,87 @@ class TestCommonVoice(TempDirMixin, TorchaudioTestCase):
             "Monsieur de La Verpillière, laissez parler le ministre", "2", "0", "twenties", "male", "france"],
 
     ]
+    # Tsv file name difference does not mean different subset, testing as a whole dataset here
+    tsv_filename = os.path.join(root_dir, "train.tsv")
+    audio_base_path = os.path.join(root_dir, "clips")
+    os.makedirs(audio_base_path, exist_ok=True)
+    with open(tsv_filename, "w", newline='') as tsv:
+        writer = csv.writer(tsv, delimiter='\t')
+        writer.writerow(_headers)
+        for i, content in enumerate(_fr_train_csv_contents):
+            writer.writerow(content)
+            # Generate and store audio
+            audio_path = os.path.join(audio_base_path, content[1] + COMMONVOICE._ext_audio)
+            print(audio_path)
+            data = get_whitenoise(sample_rate=sample_rate, duration=1, n_channels=1, seed=i, dtype='float32')
+            save_wav(audio_path, data, sample_rate)
 
+            # Append data entry
+            mocked_data.append((normalize_wav(data), sample_rate, dict(zip(_headers, content))))
+    return mocked_data
+
+
+class TestCommonVoiceEN(TempDirMixin, TorchaudioTestCase):
+    backend = 'default'
+    root_dir = None
     sample_rate = 48000
+    @classmethod
+    def setUpClass(cls):
+        cls.root_dir = cls.get_base_temp_dir()
+        cls.data = get_mock_dataset_en(cls.root_dir)
+        COMMONVOICE._ext_audio = ".wav"
 
     @classmethod
-    def fill_data(cls, train_csv_contents):
-        cls.root_dir = cls.get_base_temp_dir()
-        # Tsv file name difference does not mean different subset, testing as a whole dataset here
-        tsv_filename = os.path.join(cls.root_dir, "train.tsv")
-        audio_base_path = os.path.join(cls.root_dir, "clips")
-        os.makedirs(audio_base_path, exist_ok=True)
-        with open(tsv_filename, "w", newline='') as tsv:
-            writer = csv.writer(tsv, delimiter='\t')
-            writer.writerow(cls._headers)
-            for i, content in enumerate(train_csv_contents):
-                writer.writerow(content)
-                # Generate and store audio
-                if content[1].endswith(".wav"):
-                    audio_path = os.path.join(audio_base_path, content[1])
-                else:
-                    audio_path = os.path.join(audio_base_path, content[1] + COMMONVOICE._ext_audio)
-                data = get_whitenoise(sample_rate=cls.sample_rate, duration=1, n_channels=1, seed=i, dtype='float32')
-                save_wav(audio_path, data, cls.sample_rate)
-                # Append data entry
-                cls.data.append((normalize_wav(data), cls.sample_rate, dict(zip(cls._headers, content))))
-        return cls.data
+    def tearDownClass(cls):
+        COMMONVOICE._ext_audio = original_ext_audio
+
+    def _test_commonvoice(self, dataset):
+        n_ite = 0
+        for i, (waveform, sample_rate, dictionary) in enumerate(dataset):
+            expected_dictionary = self.data[i][2]
+            expected_data = self.data[i][0]
+            self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
+            assert sample_rate == TestCommonVoiceEN.sample_rate
+            assert dictionary == expected_dictionary
+            n_ite += 1
+        assert n_ite == len(self.data)
+
+    def test_commonvoice_str(self):
+        dataset = COMMONVOICE(self.root_dir)
+        self._test_commonvoice(dataset)
+
+    def test_commonvoice_path(self):
+        dataset = COMMONVOICE(Path(self.root_dir))
+        self._test_commonvoice(dataset)
+
+
+class TestCommonVoiceFR(TempDirMixin, TorchaudioTestCase):
+    backend = 'default'
+    root_dir = None
+    sample_rate = 48000
+
 
     @classmethod
     def setUpClass(cls):
-        cls.en_data = cls.fill_data(train_csv_contents=cls._en_train_csv_contents)
-        cls.fr_data = cls.fill_data(train_csv_contents=cls._fr_train_csv_contents)
+        cls.root_dir = cls.get_base_temp_dir()
+        cls.data = get_mock_dataset_fr(cls.root_dir)
+        COMMONVOICE._ext_audio = ".mp3"
 
-    def _en_test_commonvoice(self, dataset):
+    @classmethod
+    def tearDownClass(cls):
+        COMMONVOICE._ext_audio = original_ext_audio
+
+    def _test_commonvoice(self, dataset):
         n_ite = 0
         for i, (waveform, sample_rate, dictionary) in enumerate(dataset):
-            expected_dictionary = self.en_data[i][2]
-            expected_data = self.en_data[i][0]
+            expected_dictionary = self.data[i][2]
+            expected_data = self.data[i][0]
             self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
-            assert sample_rate == TestCommonVoice.sample_rate
+            assert sample_rate == TestCommonVoiceFR.sample_rate
             assert dictionary == expected_dictionary
             n_ite += 1
-        assert n_ite == len(self.en_data)
+        assert n_ite == len(self.data)
 
-    def _fr_test_commonvoice(self, dataset):
-        n_ite = 0
-        for i, (waveform, sample_rate, dictionary) in enumerate(dataset):
-            expected_dictionary = self.fr_data[i][2]
-            expected_data = self.fr_data[i][0]
-            self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
-            assert sample_rate == TestCommonVoice.sample_rate
-            assert dictionary == expected_dictionary
-            n_ite += 1
-        assert n_ite == len(self.fr_data)
-
-    def test_en_commonvoice_str(self):
+    def test_commonvoice_str(self):
         dataset = COMMONVOICE(self.root_dir)
-        self._en_test_commonvoice(dataset)
-
-    def test_en_commonvoice_path(self):
-        dataset = COMMONVOICE(Path(self.root_dir))
-        self._en_test_commonvoice(dataset)
-
-    def test_fr_commonvoice_str(self):
-        dataset = COMMONVOICE(self.root_dir)
-        self._fr_test_commonvoice(dataset)
-
-    def test_fr_commonvoice_path(self):
-        dataset = COMMONVOICE(Path(self.root_dir))
-        self._fr_test_commonvoice(dataset)
+        self._test_commonvoice(dataset)
