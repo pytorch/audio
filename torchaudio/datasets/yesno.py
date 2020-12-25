@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from torch import Tensor
 from torch.utils.data import Dataset
@@ -36,13 +36,12 @@ class YESNO(Dataset):
 
     def __init__(
         self,
-        root: str,
+        root: Union[str, Path],
         url: str = _RELEASE_CONFIGS["release1"]["url"],
         folder_in_archive: str = _RELEASE_CONFIGS["release1"]["folder_in_archive"],
         download: bool = False
         ) -> None:
 
-        self._ext_audio = ".wav"
         self._parse_filesystem(root, url, folder_in_archive, download)
 
     def _parse_filesystem(self, root: str, url: str, folder_in_archive: str, download: bool):
@@ -63,17 +62,25 @@ class YESNO(Dataset):
                 "Dataset not found. Please use `download=True` to download it."
             )
 
-        self._walker = sorted(str(p.stem) for p in Path(self._path).glob('*' + self._ext_audio))
+        self._walker = sorted(str(p.stem) for p in Path(self._path).glob("*.wav"))
 
-    def _load_item(self, fileid: str, path: str, ext_audio: str):
+    def _load_item(self, fileid: str, path: str):
         labels = [int(c) for c in fileid.split("_")]
-        file_audio = os.path.join(path, fileid + ext_audio)
+        file_audio = os.path.join(path, fileid + "*.wav")
         waveform, sample_rate = torchaudio.load(file_audio)
         return waveform, sample_rate, labels
 
     def __getitem__(self, n: int):
+        """Load the n-th sample from the dataset.
+
+        Args:
+            n (int): The index of the sample to be loaded
+
+        Returns:
+            tuple: ``(waveform, sample_rate, labels)``
+        """
         fileid = self._walker[n]
-        item = self._load_item(fileid, self._path, self._ext_audio)
+        item = self._load_item(fileid, self._path)
         return item
 
     def __len__(self):
