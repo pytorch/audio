@@ -2,6 +2,7 @@ import csv
 import os
 from pathlib import Path
 from typing import Tuple, Dict
+
 from torch import Tensor
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
@@ -77,6 +78,7 @@ def get_mock_dataset_fr(root_dir) -> Tuple[Tensor, int, Dict[str, str]]:
         writer = csv.writer(tsv, delimiter='\t')
         writer.writerow(_headers)
         for i, content in enumerate(_fr_train_csv_contents):
+            content[2] = str(content[2].encode("utf-8"))
             writer.writerow(content)
             # Generate and store audio
             audio_path = os.path.join(audio_base_path, content[1] + COMMONVOICE._ext_audio)
