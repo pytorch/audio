@@ -1,7 +1,8 @@
 import csv
 import os
 from pathlib import Path
-
+from typing import Tuple, Dict
+from torch import Tensor
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -17,7 +18,7 @@ sample_rate = 48000
 _headers = [u"client_ids", u"path", u"sentence", u"up_votes", u"down_votes", u"age", u"gender", u"accent"]
 
 
-def get_mock_dataset_en(root_dir):
+def get_mock_dataset_en(root_dir) -> Tuple[Tensor, int, Dict[str, str]]:
     mocked_data = []
     # Note: extension is changed to wav for the sake of test
     # Note: the first content is missing values for `age`, `gender` and `accent` as in the original data.
@@ -51,10 +52,7 @@ def get_mock_dataset_en(root_dir):
     return mocked_data
 
 
-def get_mock_dataset_fr(root_dir):
-    """
-    root_dir: path
-    """
+def get_mock_dataset_fr(root_dir) -> Tuple[Tensor, int, Dict[str, str]]:
     mocked_data = []
     _fr_train_csv_contents = [
         [
