@@ -14,9 +14,9 @@ from torchaudio_unittest.common_utils import (
 
 from torchaudio.datasets import COMMONVOICE
 
-original_ext_audio = COMMONVOICE._ext_audio
-sample_rate = 48000
-_headers = [u"client_ids", u"path", u"sentence", u"up_votes", u"down_votes", u"age", u"gender", u"accent"]
+_ORIGINAL_EXT_AUDIO = COMMONVOICE._ext_audio
+_SAMPLE_RATE = 48000
+_HEADERS = [u"client_ids", u"path", u"sentence", u"up_votes", u"down_votes", u"age", u"gender", u"accent"]
 
 
 def get_mock_dataset_en(root_dir) -> Tuple[Tensor, int, Dict[str, str]]:
@@ -40,16 +40,16 @@ def get_mock_dataset_en(root_dir) -> Tuple[Tensor, int, Dict[str, str]]:
     os.makedirs(audio_base_path, exist_ok=True)
     with open(tsv_filename, "w", newline='') as tsv:
         writer = csv.writer(tsv, delimiter='\t')
-        writer.writerow(_headers)
+        writer.writerow(_HEADERS)
         for i, content in enumerate(_en_train_csv_contents):
             writer.writerow(content)
             # Generate and store audio
             audio_path = os.path.join(audio_base_path, content[1])
-            data = get_whitenoise(sample_rate=sample_rate, duration=1, n_channels=1, seed=i, dtype='float32')
-            save_wav(audio_path, data, sample_rate)
+            data = get_whitenoise(sample_rate=_SAMPLE_RATE, duration=1, n_channels=1, seed=i, dtype='float32')
+            save_wav(audio_path, data, _SAMPLE_RATE)
 
             # Append data entry
-            mocked_data.append((normalize_wav(data), sample_rate, dict(zip(_headers, content))))
+            mocked_data.append((normalize_wav(data), _SAMPLE_RATE, dict(zip(_HEADERS, content))))
     return mocked_data
 
 
@@ -76,24 +76,23 @@ def get_mock_dataset_fr(root_dir) -> Tuple[Tensor, int, Dict[str, str]]:
     os.makedirs(audio_base_path, exist_ok=True)
     with open(tsv_filename, "w", newline='') as tsv:
         writer = csv.writer(tsv, delimiter='\t')
-        writer.writerow(_headers)
+        writer.writerow(_HEADERS)
         for i, content in enumerate(_fr_train_csv_contents):
             content[2] = str(content[2].encode("utf-8"))
             writer.writerow(content)
             # Generate and store audio
-            audio_path = os.path.join(audio_base_path, content[1] + COMMONVOICE._ext_audio)
-            data = get_whitenoise(sample_rate=sample_rate, duration=1, n_channels=1, seed=i, dtype='float32')
-            save_wav(audio_path, data, sample_rate)
+            audio_path = os.path.join(audio_base_path, content[1] + _ORIGINAL_EXT_AUDIO)
+            data = get_whitenoise(sample_rate=_SAMPLE_RATE, duration=1, n_channels=1, seed=i, dtype='float32')
+            save_wav(audio_path, data, _SAMPLE_RATE)
 
             # Append data entry
-            mocked_data.append((normalize_wav(data), sample_rate, dict(zip(_headers, content))))
+            mocked_data.append((normalize_wav(data), _SAMPLE_RATE, dict(zip(_HEADERS, content))))
     return mocked_data
 
 
 class TestCommonVoiceEN(TempDirMixin, TorchaudioTestCase):
     backend = 'default'
     root_dir = None
-    sample_rate = 48000
 
     @classmethod
     def setUpClass(cls):
@@ -103,7 +102,7 @@ class TestCommonVoiceEN(TempDirMixin, TorchaudioTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        COMMONVOICE._ext_audio = original_ext_audio
+        COMMONVOICE._ext_audio = _ORIGINAL_EXT_AUDIO
 
     def _test_commonvoice(self, dataset):
         n_ite = 0
@@ -111,7 +110,7 @@ class TestCommonVoiceEN(TempDirMixin, TorchaudioTestCase):
             expected_dictionary = self.data[i][2]
             expected_data = self.data[i][0]
             self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
-            assert sample_rate == TestCommonVoiceEN.sample_rate
+            assert sample_rate == _SAMPLE_RATE
             assert dictionary == expected_dictionary
             n_ite += 1
         assert n_ite == len(self.data)
@@ -128,7 +127,6 @@ class TestCommonVoiceEN(TempDirMixin, TorchaudioTestCase):
 class TestCommonVoiceFR(TempDirMixin, TorchaudioTestCase):
     backend = 'default'
     root_dir = None
-    sample_rate = 48000
 
     @classmethod
     def setUpClass(cls):
@@ -138,7 +136,7 @@ class TestCommonVoiceFR(TempDirMixin, TorchaudioTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        COMMONVOICE._ext_audio = original_ext_audio
+        COMMONVOICE._ext_audio = _ORIGINAL_EXT_AUDIO
 
     def _test_commonvoice(self, dataset):
         n_ite = 0
@@ -146,7 +144,7 @@ class TestCommonVoiceFR(TempDirMixin, TorchaudioTestCase):
             expected_dictionary = self.data[i][2]
             expected_data = self.data[i][0]
             self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
-            assert sample_rate == TestCommonVoiceFR.sample_rate
+            assert sample_rate == _SAMPLE_RATE
             assert dictionary == expected_dictionary
             n_ite += 1
         assert n_ite == len(self.data)
