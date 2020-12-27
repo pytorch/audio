@@ -47,7 +47,6 @@ def get_mock_dataset_en(root_dir) -> Tuple[Tensor, int, Dict[str, str]]:
             audio_path = os.path.join(audio_base_path, content[1])
             data = get_whitenoise(sample_rate=_SAMPLE_RATE, duration=1, n_channels=1, seed=i, dtype='float32')
             save_wav(audio_path, data, _SAMPLE_RATE)
-
             # Append data entry
             mocked_data.append((normalize_wav(data), _SAMPLE_RATE, dict(zip(_HEADERS, content))))
     return mocked_data
