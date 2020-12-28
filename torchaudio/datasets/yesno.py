@@ -39,11 +39,12 @@ class YESNO(Dataset):
         root: Union[str, Path],
         url: str = _RELEASE_CONFIGS["release1"]["url"],
         folder_in_archive: str = _RELEASE_CONFIGS["release1"]["folder_in_archive"],
-        download: bool = False) -> None:
+        download: bool = False
+                ) -> None:
 
         self._parse_filesystem(root, url, folder_in_archive, download)
 
-    def _parse_filesystem(self, root: str, url: str, folder_in_archive: str, download: bool):
+    def _parse_filesystem(self, root: str, url: str, folder_in_archive: str, download: bool) -> None:
         root = Path(root)
         archive = os.path.basename(url)
         archive = root / archive
@@ -69,7 +70,7 @@ class YESNO(Dataset):
         waveform, sample_rate = torchaudio.load(file_audio)
         return waveform, sample_rate, labels
 
-    def __getitem__(self, n: int):
+    def __getitem__(self, n: int) -> Tuple[Tensor, int, List[int]]:
         """Load the n-th sample from the dataset.
 
         Args:
@@ -82,5 +83,5 @@ class YESNO(Dataset):
         item = self._load_item(fileid, self._path)
         return item
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._walker)
