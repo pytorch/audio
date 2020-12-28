@@ -318,7 +318,7 @@
 
 
 <div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend._soundfile_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Get signal information of an audio file.</span>
 
 <span class="sd">    Args:</span>
@@ -326,6 +326,8 @@
 <span class="sd">            This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``</span>
 <span class="sd">            for the consistency with &quot;sox_io&quot; backend, which has a restriction on type annotation</span>
 <span class="sd">            for TorchScript compiler compatiblity.</span>
+<span class="sd">        format (str, optional):</span>
+<span class="sd">            Not used. PySoundFile does not accept format hint.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        AudioMetaData: meta data of the given audio.</span>

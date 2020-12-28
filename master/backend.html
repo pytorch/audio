@@ -945,14 +945,17 @@ primarily for effects</p>
 </div>
 <dl class="function">
 <dt id="torchaudio.backend._soundfile_backend.info">
-<code class="sig-prename descclassname">torchaudio.backend._soundfile_backend.</code><code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em><span class="sig-paren">)</span> &#x2192; torchaudio.backend.common.AudioMetaData<a class="reference internal" href="_modules/torchaudio/backend/_soundfile_backend.html#info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend._soundfile_backend.info" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.backend._soundfile_backend.</code><code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">format: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; torchaudio.backend.common.AudioMetaData<a class="reference internal" href="_modules/torchaudio/backend/_soundfile_backend.html#info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend._soundfile_backend.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get signal information of an audio file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><em>pathlib.Path</em></a>) – Path to audio file.
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><em>pathlib.Path</em></a>) – Path to audio file.
 This functionalso handles <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> objects, but is annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code>
 for the consistency with “sox_io” backend, which has a restriction on type annotation
-for TorchScript compiler compatiblity.</p>
+for TorchScript compiler compatiblity.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Not used. PySoundFile does not accept format hint.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>meta data of the given audio.</p>
