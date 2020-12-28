@@ -1,14 +1,23 @@
-from torchaudio.datasets import utils as dataset_utils
-from torchaudio.datasets.commonvoice import COMMONVOICE
-
 from torchaudio_unittest.common_utils import (
-    TempDirMixin,
     TorchaudioTestCase,
     get_asset_path,
 )
 
+from torchaudio.datasets import utils as dataset_utils
+from torchaudio.datasets.commonvoice import COMMONVOICE
+
+original_ext_audio = COMMONVOICE._ext_audio
+
 
 class TestIterator(TorchaudioTestCase):
+    @classmethod
+    def setUpClass(cls):
+        COMMONVOICE._ext_audio = ".wav"
+
+    @classmethod
+    def tearDownClass(cls):
+        COMMONVOICE._ext_audio = original_ext_audio
+
     backend = 'default'
     path = get_asset_path('CommonVoice', 'cv-corpus-4-2019-12-10', 'tt')
 

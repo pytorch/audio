@@ -12,7 +12,7 @@ if _mod_utils.is_module_available("soundfile"):
 
 
 @_mod_utils.requires_module("soundfile")
-def info(filepath: str) -> AudioMetaData:
+def info(filepath: str, format: Optional[str] = None) -> AudioMetaData:
     """Get signal information of an audio file.
 
     Args:
@@ -20,6 +20,8 @@ def info(filepath: str) -> AudioMetaData:
             This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``
             for the consistency with "sox_io" backend, which has a restriction on type annotation
             for TorchScript compiler compatiblity.
+        format (str, optional):
+            Not used. PySoundFile does not accept format hint.
 
     Returns:
         AudioMetaData: meta data of the given audio.
