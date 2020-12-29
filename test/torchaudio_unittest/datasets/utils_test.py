@@ -10,31 +10,29 @@ from torchaudio.datasets import utils as dataset_utils
 
 class Dataset(torch.utils.data.Dataset):
     def __getitem__(self, n):
-        return torch.randn(32, 2, 256), 2
+        sample_rate = 8000
+        waveform = n * torch.ones(2, 256)
+        return waveform, sample_rate
 
     def __len__(self) -> int:
-        return 32
+        return 2
 
     def __iter__(self):
-        return iter(range(32))
+        for i in range(len(self)):
+            yield self[i]
 
 
 class TestIterator(TorchaudioTestCase, TempDirMixin):
-    @classmethod
-    def setUpClass(cls):
-        cls.location = cls.get_base_temp_dir()
-        cls.dataset = Dataset()
-
     backend = 'default'
 
     def test_disckcache_iterator(self):
-        data = dataset_utils.diskcache_iterator(self.dataset, location=self.location)
+        data = dataset_utils.diskcache_iterator(Dataset(), self.get_base_temp_dir())
         # Save
         data[0]
         # Load
         data[0]
 
     def test_bg_iterator(self):
-        data = dataset_utils.bg_iterator(self.dataset, 5)
+        data = dataset_utils.bg_iterator(Dataset(), 5)
         for _ in data:
             pass
