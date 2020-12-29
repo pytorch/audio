@@ -6,17 +6,17 @@ from torchaudio_unittest.common_utils import (
 )
 
 from torchaudio.datasets import utils as dataset_utils
-from torchaudio.datasets.commonvoice import COMMONVOICE
-
-original_ext_audio = COMMONVOICE._ext_audio
 
 
 class Dataset(torch.utils.data.Dataset):
     def __getitem__(self, n):
-        return torch.randn(32, 2, 256)
+        return torch.randn(32, 2, 256), 2
 
     def __len__(self) -> int:
         return 32
+
+    def __iter__(self):
+        return iter(range(32))
 
 
 class TestIterator(TorchaudioTestCase, TempDirMixin):
@@ -35,6 +35,6 @@ class TestIterator(TorchaudioTestCase, TempDirMixin):
         data[0]
 
     def test_bg_iterator(self):
-        data = dataset_utils.bg_iterator(self.dataset, 2)
+        data = dataset_utils.bg_iterator(self.dataset, 5)
         for _ in data:
             pass
