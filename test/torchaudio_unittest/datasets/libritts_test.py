@@ -1,8 +1,6 @@
 import os
 from pathlib import Path
 
-from torchaudio.datasets.libritts import LIBRITTS
-
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
@@ -11,10 +9,12 @@ from torchaudio_unittest.common_utils import (
     normalize_wav,
 )
 
+from torchaudio.datasets.libritts import LIBRITTS
+
 _UTTERANCE_IDS = [
-        [19, 198, '000000', '000000'],
-        [26, 495, '000004', '000000'],
-    ]
+    [19, 198, '000000', '000000'],
+    [26, 495, '000004', '000000'],
+]
 _ORIGINAL_TEXT = 'this is the original text.'
 _NORMALIZED_TEXT = 'this is the normalized text.'
 
@@ -67,7 +67,6 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
                 speaker_id,
                 chapter_id,
                 utterance_id) in enumerate(dataset):
-
             expected_ids = _UTTERANCE_IDS[i]
             expected_data = self.data[i]
             self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
