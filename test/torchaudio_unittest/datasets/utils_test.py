@@ -1,8 +1,7 @@
 import torch
 from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
-    TempDirMixin,
-    get_asset_path
+    TempDirMixin
 )
 
 from torchaudio.datasets import utils as dataset_utils
