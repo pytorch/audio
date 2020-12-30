@@ -170,7 +170,7 @@ def _get_transducer_module():
         '-std=c++14',
     ]
 
-    librairies = ['warprnnt']
+    libraries = ['warprnnt']
 
     source_paths = [
         _TP_TRANSDUCER_BASE_DIR / 'binding.cpp',
@@ -182,10 +182,10 @@ def _get_transducer_module():
     return CppExtension(
         name=_TRANSDUCER_NAME,
         sources=[os.path.realpath(path) for path in source_paths],
-        libraries=librairies,
+        libraries=libraries,
         include_dirs=[os.path.realpath(include_path)],
         library_dirs=[os.path.realpath(build_path)],
         extra_compile_args=extra_compile_args,
-        extra_objects=[str(build_path / f'lib{lib}.a') for lib in librairies],
+        extra_objects=[str(build_path / f'lib{lib}.a') for lib in libraries],
         extra_link_args=['-Wl,-rpath,' + os.path.realpath(build_path)],
     )

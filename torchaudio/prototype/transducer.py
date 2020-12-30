@@ -12,10 +12,12 @@ class _RNNT(Function):
     @staticmethod
     def forward(ctx, acts, labels, act_lens, label_lens, blank, reduction):
         """
-        acts: Tensor of (batch x seqLength x labelLength x outputDim) containing output from network
-        labels: 2 dimensional Tensor containing all the targets of the batch with zero padded
-        act_lens: Tensor of size (batch) containing size of each output sequence from the network
-        label_lens: Tensor of (batch) containing label length of each example
+        Args:
+            acts (Tensor): Tensor of dimension (batch, time, label, class) containing output from network
+                before applying ``torch.nn.functional.log_softmax``.
+            labels (Tensor): Tensor of dimension (batch, max label length) containing the labels padded by zero
+            act_lens (Tensor): Tensor of dimension (batch) containing the length of each output sequence
+            label_lens (Tensor): Tensor of dimension (batch) containing the length of each output sequence
         """
 
         device = acts.device
@@ -53,18 +55,25 @@ class _RNNT(Function):
 
 @_mod_utils.requires_module('_warp_transducer')
 def rnnt_loss(acts, labels, act_lens, label_lens, blank=0, reduction="mean"):
-    """RNN Transducer Loss
+    """Compute the RNN Transducer Loss.
+
+    The RNN Transducer loss (`Graves 2012 <https://arxiv.org/pdf/1211.3711.pdf>`__) extends the CTC loss by defining
+    a distribution over output sequences of all lengths, and by jointly modelling both input-output and output-output
+    dependencies.
+
+    The implementation uses `warp-transducer <https://github.com/HawkAaron/warp-transducer>`__.
 
     Args:
-        acts: Tensor of (batch x seqLength x labelLength x outputDim) containing output from network
-        labels: 2 dimensional Tensor containing all the targets of the batch with zero padded
-        act_lens: Tensor of size (batch) containing size of each output sequence from the network
-        label_lens: Tensor of (batch) containing label length of each example
-        blank (int, optional): blank label. Default: 0.
-        reduction (string, optional): Specifies the reduction to apply to the output:
-            'none' | 'mean' | 'sum'. 'none': no reduction will be applied,
-            'mean': the output losses will be divided by the target lengths and
-            then the mean over the batch is taken. Default: 'mean'
+        acts (Tensor): Tensor of dimension (batch, time, label, class) containing output from network
+            before applying ``torch.nn.functional.log_softmax``.
+        labels (Tensor): Tensor of dimension (batch, max label length) containing the labels padded by zero
+        act_lens (Tensor): Tensor of dimension (batch) containing the length of each output sequence
+        label_lens (Tensor): Tensor of dimension (batch) containing the length of each output sequence
+        blank (int): blank label. (Default: ``0``)
+        reduction (string): If ``'sum'``, the output losses will be summed.
+            If ``'mean'``, the output losses will be divided by the target lengths and
+            then the mean over the batch is taken. If ``'none'``, no reduction will be applied.
+            (Default: ``'mean'``)
     """
 
     # NOTE manually done log_softmax for CPU version,
@@ -76,12 +85,12 @@ def rnnt_loss(acts, labels, act_lens, label_lens, blank=0, reduction="mean"):
 @_mod_utils.requires_module('_warp_transducer')
 class RNNTLoss(Module):
     """
-    Parameters:
-        blank (int, optional): blank label. Default: 0.
-        reduction (string, optional): Specifies the reduction to apply to the output:
-            'none' | 'mean' | 'sum'. 'none': no reduction will be applied,
-            'mean': the output losses will be divided by the target lengths and
-            then the mean over the batch is taken. Default: 'mean'
+    Args:
+        blank (int): blank label. (Default: ``0``)
+        reduction (string): If ``'sum'``, the output losses will be summed.
+            If ``'mean'``, the output losses will be divided by the target lengths and
+            then the mean over the batch is taken. If ``'none'``, no reduction will be applied.
+            (Default: ``'mean'``)
     """
 
     def __init__(self, blank=0, reduction="mean"):
@@ -92,10 +101,12 @@ class RNNTLoss(Module):
 
     def forward(self, acts, labels, act_lens, label_lens):
         """
-        acts: Tensor of (batch x seqLength x labelLength x outputDim) containing output from network
-        labels: 2 dimensional Tensor containing all the targets of the batch with zero padded
-        act_lens: Tensor of size (batch) containing size of each output sequence from the network
-        label_lens: Tensor of (batch) containing label length of each example
+        Args:
+            acts (Tensor): Tensor of dimension (batch, time, label, class) containing output from network
+                before applying ``torch.nn.functional.log_softmax``.
+            labels (Tensor): Tensor of dimension (batch, max label length) containing the labels padded by zero
+            act_lens (Tensor): Tensor of dimension (batch) containing the length of each output sequence
+            label_lens (Tensor): Tensor of dimension (batch) containing the length of each output sequence
         """
 
         # NOTE manually done log_softmax for CPU version,
