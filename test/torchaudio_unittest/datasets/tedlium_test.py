@@ -1,18 +1,15 @@
 import os
 import platform
-import unittest
 from pathlib import Path
 
-from torchaudio.datasets import tedlium
-
 from torchaudio_unittest.common_utils import (
-    TestBaseMixin,
     TempDirMixin,
     TorchaudioTestCase,
     get_whitenoise,
     save_wav,
-    normalize_wav,
 )
+
+from torchaudio.datasets import tedlium
 
 # Used to generate a unique utterance for each dummy audio file
 _UTTERANCES = [
