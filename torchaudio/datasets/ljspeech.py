@@ -37,7 +37,7 @@ class LJSPEECH(Dataset):
                  download: bool = False) -> None:
 
         self._parse_filesystem(root, url, folder_in_archive, download)
-    
+
     def _parse_filesystem(self, root: str, url: str, folder_in_archive: str, download: bool) -> None:
         root = Path(root)
 
@@ -60,7 +60,7 @@ class LJSPEECH(Dataset):
         with open(self._metadata_path, "r", newline='') as metadata:
             walker = csv.reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
             self._walker = list(walker)
-    
+
     def _load_item(self, line: List[str], path: str) -> Tuple[Tensor, int, str, str]:
         assert len(line) == 3
         fileid, transcript, normalized_transcript = line
