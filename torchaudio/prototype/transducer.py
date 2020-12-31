@@ -28,7 +28,7 @@ class _RNNT(Function):
         act_lens = act_lens.to("cpu")
         label_lens = label_lens.to("cpu")
 
-        loss_func = torch.ops.warprnnt_pytorch_warp_rnnt.rnnt
+        loss_func = torch.ops.torchaudio.rnnt_loss
 
         grads = torch.zeros_like(acts)
         minibatch_size = acts.size(0)

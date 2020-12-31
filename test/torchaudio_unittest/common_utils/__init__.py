@@ -16,7 +16,6 @@ from .case_utils import (
     skipIfNoModule,
     skipIfNoExtension,
     skipIfNoSoxBackend,
-    skipIfNoTransducer,
 )
 from .wav_utils import (
     get_wav_data,

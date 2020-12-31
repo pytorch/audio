@@ -286,6 +286,6 @@ class TransducerTester:
         )
 
 
-@common_utils.skipIfNoTransducer
+@common_utils.skipIfNoExtension
 class CPUTransducerTester(TransducerTester, common_utils.PytorchTestCase):
     device = "cpu"
