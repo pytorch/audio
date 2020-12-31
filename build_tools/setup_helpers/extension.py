@@ -18,8 +18,6 @@ _ROOT_DIR = _THIS_DIR.parent.parent.resolve()
 _CSRC_DIR = _ROOT_DIR / 'torchaudio' / 'csrc'
 _TP_BASE_DIR = _ROOT_DIR / 'third_party'
 _TP_INSTALL_DIR = _TP_BASE_DIR / 'install'
-_TRANSDUCER_BUILD_DIR = _TP_BASE_DIR / 'build' / 'transducer'
-_TRANSDUCER_BASE_DIR = _TP_BASE_DIR / 'transducer' / 'submodule'
 
 
 def _get_build_sox():
@@ -66,7 +64,7 @@ def _get_srcs():
 def _get_include_dirs():
     dirs = [
         str(_ROOT_DIR),
-        str(_TRANSDUCER_BASE_DIR / 'include'),
+        str(_TP_BASE_DIR / 'transducer' / 'submodule'/ 'include'),
     ]
     if _BUILD_SOX:
         dirs.append(str(_TP_INSTALL_DIR / 'include'))
@@ -97,7 +95,7 @@ def _get_extra_objects():
         ]
         for lib in libs:
             objs.append(str(_TP_INSTALL_DIR / 'lib' / lib))
-    objs.append(str(_TRANSDUCER_BUILD_DIR / 'libwarprnnt.a'))
+    objs.append(str(_TP_BASE_DIR / 'build' / 'transducer' / 'libwarprnnt.a'))
     return objs
 
 
