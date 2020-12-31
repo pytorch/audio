@@ -1,7 +1,7 @@
 #include <iostream>
 #include <numeric>
 
-#include <torch/extension.h>
+#include <torch/script.h>
 #include "rnnt.h"
 
 int64_t cpu_rnnt_loss(torch::Tensor acts,
