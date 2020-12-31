@@ -11,7 +11,6 @@ setup_wheel_python
 pip_install numpy future
 setup_pip_pytorch_version
 python setup.py clean
-git submodule update --init --recursive
 if [[ "$OSTYPE" == "msys" ]]; then
     python_tag="$(echo "cp$PYTHON_VERSION" | tr -d '.')"
     python setup.py bdist_wheel --plat-name win_amd64 --python-tag $python_tag
