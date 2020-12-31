@@ -42,8 +42,7 @@ ENDIF()
 ADD_LIBRARY(warprnnt STATIC submodule/src/rnnt_entrypoint.cpp)
 
 INSTALL(TARGETS warprnnt
-        RUNTIME DESTINATION "bin"
         LIBRARY DESTINATION "lib"
-        ARCHIVE DESTINATION "lib")
+        ARCHIVE DESTINATION "archives")
 
 INSTALL(FILES submodule/include/rnnt.h DESTINATION "submodule/include")
