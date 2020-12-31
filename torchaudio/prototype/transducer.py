@@ -21,7 +21,7 @@ class _RNNT(Function):
         """
 
         device = acts.device
-        certify_inputs(acts, labels, act_lens, label_lens)
+        check_inputs(acts, labels, act_lens, label_lens)
 
         acts = acts.to("cpu")
         labels = labels.to("cpu")
@@ -130,8 +130,7 @@ def check_dim(var, dim, name):
         raise ValueError("{} must be {}D".format(name, dim))
 
 
-def certify_inputs(log_probs, labels, lengths, label_lengths):
-    # check_type(log_probs, torch.float32, "log_probs")
+def check_inputs(log_probs, labels, lengths, label_lengths):
     check_type(labels, torch.int32, "labels")
     check_type(label_lengths, torch.int32, "label_lengths")
     check_type(lengths, torch.int32, "lengths")
