@@ -1,0 +1,4 @@
+[submodule "third_party/warp_transducer/submodule"]
+	path = third_party/transducer/submodule
+	url = https://github.com/HawkAaron/warp-transducer
+	branch = master
