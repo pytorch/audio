@@ -8,29 +8,13 @@ from torchaudio.datasets.utils import download_url, extract_archive
 from torch import Tensor
 from torch.utils.data import Dataset
 
-URL = "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"
-FOLDER_IN_ARCHIVE = "wavs"
-_CHECKSUMS = {
-    "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2":
-    "be1a30453f28eb8dd26af4101ae40cbf2c50413b1bb21936cbcdc6fae3de8aa5"
+_RELEASE_CONFIGS = {
+    "release1": {
+        "folder_in_archive": "wavs",
+        "url": "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2",
+        "checksum": "be1a30453f28eb8dd26af4101ae40cbf2c50413b1bb21936cbcdc6fae3de8aa5",
+    }
 }
-
-
-def load_ljspeech_item(line: List[str], path: str, ext_audio: str) -> Tuple[Tensor, int, str, str]:
-    assert len(line) == 3
-    fileid, transcript, normalized_transcript = line
-    fileid_audio = fileid + ext_audio
-    fileid_audio = os.path.join(path, fileid_audio)
-
-    # Load audio
-    waveform, sample_rate = torchaudio.load(fileid_audio)
-
-    return (
-        waveform,
-        sample_rate,
-        transcript,
-        normalized_transcript,
-    )
 
 
 class LJSPEECH(Dataset):
@@ -46,22 +30,21 @@ class LJSPEECH(Dataset):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
 
-    _ext_audio = ".wav"
-    _ext_archive = '.tar.bz2'
-
     def __init__(self,
                  root: Union[str, Path],
-                 url: str = URL,
-                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
+                 url: str = _RELEASE_CONFIGS["release1"]["url"],
+                 folder_in_archive: str = _RELEASE_CONFIGS["release1"]["folder_in_archive"],
                  download: bool = False) -> None:
 
-        # Get string representation of 'root' in case Path object is passed
-        root = os.fspath(root)
+        self._parse_filesystem(root, url, folder_in_archive, download)
+    
+    def _parse_filesystem(self, root: str, url: str, folder_in_archive: str, download: bool) -> None:
+        root = Path(root)
 
         basename = os.path.basename(url)
-        archive = os.path.join(root, basename)
+        archive = root / basename
 
-        basename = basename.split(self._ext_archive)[0]
+        basename = basename.split(".tar.bz2")[0]
         folder_in_archive = os.path.join(basename, folder_in_archive)
 
         self._path = os.path.join(root, folder_in_archive)
@@ -77,6 +60,22 @@ class LJSPEECH(Dataset):
         with open(self._metadata_path, "r", newline='') as metadata:
             walker = csv.reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
             self._walker = list(walker)
+    
+    def _load_item(self, line: List[str], path: str) -> Tuple[Tensor, int, str, str]:
+        assert len(line) == 3
+        fileid, transcript, normalized_transcript = line
+        fileid_audio = fileid + ".wav"
+        fileid_audio = os.path.join(path, fileid_audio)
+
+        # Load audio
+        waveform, sample_rate = torchaudio.load(fileid_audio)
+
+        return (
+            waveform,
+            sample_rate,
+            transcript,
+            normalized_transcript,
+        )
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
         """Load the n-th sample from the dataset.
@@ -88,7 +87,8 @@ class LJSPEECH(Dataset):
             tuple: ``(waveform, sample_rate, transcript, normalized_transcript)``
         """
         line = self._walker[n]
-        return load_ljspeech_item(line, self._path, self._ext_audio)
+        item = self._load_item(line, self._path)
+        return item
 
     def __len__(self) -> int:
         return len(self._walker)
