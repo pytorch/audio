@@ -1,3 +1,4 @@
+MESSAGE("path to cmake current source dir: ${CMAKE_CURRENT_SOURCE_DIR}")
 IF(APPLE)
     CMAKE_MINIMUM_REQUIRED(VERSION 3.4)
 ELSE()
