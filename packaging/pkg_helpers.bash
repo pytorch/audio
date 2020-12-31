@@ -103,6 +103,7 @@ setup_macos() {
 #
 # Usage: setup_env 0.2.0
 setup_env() {
+  git submodule update --init --recursive
   setup_cuda
   setup_build_version "$1"
   setup_macos

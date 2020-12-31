@@ -66,5 +66,6 @@ build_master() {
     conda install -y -q pytorch "cpuonly" -c pytorch-nightly
     printf "* Installing torchaudio\n"
     cd "${_root_dir}" || exit 1
+    git submodule update --init --recursive
     BUILD_SOX=1 python setup.py clean install
 }
