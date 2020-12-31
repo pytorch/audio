@@ -64,7 +64,7 @@ def _get_srcs():
 def _get_include_dirs():
     dirs = [
         str(_ROOT_DIR),
-        str(_TP_BASE_DIR / 'transducer' / 'submodule'/ 'include'),
+        str(_TP_BASE_DIR / 'transducer' / 'submodule' / 'include'),
     ]
     if _BUILD_SOX:
         dirs.append(str(_TP_INSTALL_DIR / 'include'))
