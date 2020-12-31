@@ -53,7 +53,7 @@ class LJSPEECH(Dataset):
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    checksum = _CHECKSUMS.get(url, None)
+                    checksum = _RELEASE_CONFIGS["release1"]["checksum"]
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
