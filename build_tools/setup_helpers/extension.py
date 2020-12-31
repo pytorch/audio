@@ -18,8 +18,8 @@ _ROOT_DIR = _THIS_DIR.parent.parent.resolve()
 _CSRC_DIR = _ROOT_DIR / 'torchaudio' / 'csrc'
 _TP_BASE_DIR = _ROOT_DIR / 'third_party'
 _TP_INSTALL_DIR = _TP_BASE_DIR / 'install'
-_TRANSDUCER_BUILD_DIR = _TP_BASE_DIR / 'build' / 'warp_transducer'
-_TRANSDUCER_BASE_DIR = _TP_BASE_DIR / 'warp_transducer' / 'submodule'
+_TRANSDUCER_BUILD_DIR = _TP_BASE_DIR / 'build' / 'transducer'
+_TRANSDUCER_BASE_DIR = _TP_BASE_DIR / 'transducer' / 'submodule'
 
 
 def _get_build_sox():
