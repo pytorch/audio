@@ -11,6 +11,7 @@ from torchaudio_unittest.common_utils import (
     normalize_wav,
 )
 
+
 def get_mock_dataset(root_dir):
     """
     root_dir: directory to the mocked dataset
