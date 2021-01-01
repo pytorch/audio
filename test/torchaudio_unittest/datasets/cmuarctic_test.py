@@ -52,6 +52,7 @@ def get_mock_dataset(root_dir):
                 seed += 1
     return mocked_data
 
+
 class TestCMUARCTIC(TempDirMixin, TorchaudioTestCase):
     backend = "default"
 
