@@ -39,14 +39,14 @@ int64_t cpu_rnnt_loss(torch::Tensor acts,
         get_workspace_size(maxT, maxU, minibatch_size,
                            false, &cpu_size_bytes);
 
-        float* cpu_workspace = (float*) new unsigned char[cpu_size_bytes];
+        std::vector<float> cpu_workspace(cpu_size_bytes / sizeof(float), 0);
+
         compute_rnnt_loss(acts.data<float>(), grads.data<float>(),
                           labels.data<int>(), label_lengths.data<int>(),
                           input_lengths.data<int>(), alphabet_size,
                           minibatch_size, costs.data<float>(),
-                          cpu_workspace, options);
+                          cpu_workspace.data(), options);
 
-        delete cpu_workspace;
         return 0;
         }
       case torch::ScalarType::Double:
@@ -55,14 +55,14 @@ int64_t cpu_rnnt_loss(torch::Tensor acts,
                            false, &cpu_size_bytes,
                            sizeof(double));
 
-        double* cpu_workspace = (double*) new unsigned char[cpu_size_bytes];
+        std::vector<double> cpu_workspace(cpu_size_bytes / sizeof(double), 0);
+
         compute_rnnt_loss_fp64(acts.data<double>(), grads.data<double>(),
                                labels.data<int>(), label_lengths.data<int>(),
                                input_lengths.data<int>(), alphabet_size,
                                minibatch_size, costs.data<double>(),
-                               cpu_workspace, options);
+                               cpu_workspace.data(), options);
 
-        delete cpu_workspace;
         return 0;
         }
       default:
