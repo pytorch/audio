@@ -44,7 +44,7 @@ def get_mock_dataset(root_dir):
         path_normalized = os.path.join(file_dir, normalized_text_filename)
         with open(path_normalized, 'w') as file_:
             file_.write(_NORMALIZED_TEXT)
-    return mocked_data
+    return mocked_data, _UTTERANCE_IDS, _ORIGINAL_TEXT, _NORMALIZED_TEXT
 
 
 class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
@@ -52,11 +52,12 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
 
     root_dir = None
     data = []
+    _utterance_ids, _original_text, _normalized_text = [], [], []
 
     @classmethod
     def setUpClass(cls):
         cls.root_dir = cls.get_base_temp_dir()
-        cls.data = get_mock_dataset(cls.root_dir)
+        cls.data, cls._utterance_ids, cls._original_text, cls._normalized_text = get_mock_dataset(cls.root_dir)
 
     def _test_libritts(self, dataset):
         n_ites = 0
@@ -67,17 +68,17 @@ class TestLibriTTS(TempDirMixin, TorchaudioTestCase):
                 speaker_id,
                 chapter_id,
                 utterance_id) in enumerate(dataset):
-            expected_ids = _UTTERANCE_IDS[i]
+            expected_ids = self._utterance_ids[i]
             expected_data = self.data[i]
             self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
             assert sample_rate == 24000
             assert speaker_id == expected_ids[0]
             assert chapter_id == expected_ids[1]
-            assert original_text == _ORIGINAL_TEXT
-            assert normalized_text == _NORMALIZED_TEXT
+            assert original_text == self._original_text
+            assert normalized_text == self._normalized_text
             assert utterance_id == f'{"_".join(str(u) for u in expected_ids[-4:])}'
             n_ites += 1
-        assert n_ites == len(_UTTERANCE_IDS)
+        assert n_ites == len(self._utterance_ids)
 
     def test_libritts_str(self):
         dataset = LIBRITTS(self.root_dir)
