@@ -151,6 +151,5 @@ if platform.system() != "Windows":
     class TestTedliumSox(Tedlium, TorchaudioTestCase):
         backend = "sox"
 
-
     class TestTedliumSoxIO(Tedlium, TorchaudioTestCase):
         backend = "sox_io"
