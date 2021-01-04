@@ -47,6 +47,9 @@ _FR_TRAIN_CSV_CONTENTS = [
 
 
 def get_mock_dataset(root_dir, train_csv_contents, ext_audio) -> Tuple[Tensor, int, Dict[str, str]]:
+    """
+    prepares mocked dataset
+    """
     mocked_data = []
     # Note: extension is changed to wav for the sake of test
     # Note: the first content is missing values for `age`, `gender` and `accent` as in the original data.
@@ -72,18 +75,33 @@ def get_mock_dataset(root_dir, train_csv_contents, ext_audio) -> Tuple[Tensor, i
     return mocked_data
 
 
-class TestCommonVoiceEN(TempDirMixin, TorchaudioTestCase):
-    backend = 'default'
+def get_mock_dataset_en(root_dir, ext_audio) -> Tuple[Tensor, int, Dict[str, str]]:
+    """
+    prepares english mocked dataset
+    """
+    return get_mock_dataset(root_dir, _EN_TRAIN_CSV_CONTENTS, ext_audio)
+
+
+def get_mock_dataset_fr(root_dir, ext_audio) -> Tuple[Tensor, int, Dict[str, str]]:
+    """
+    prepares french mocked dataset
+    """
+    return get_mock_dataset(root_dir, _FR_TRAIN_CSV_CONTENTS, ext_audio)
+
+
+class BaseTestCommonVoice(TempDirMixin):
     root_dir = None
+    data = None
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
         cls.root_dir = cls.get_base_temp_dir()
         COMMONVOICE._ext_audio = ".wav"
-        cls.data = get_mock_dataset(cls.root_dir, _EN_TRAIN_CSV_CONTENTS, COMMONVOICE._ext_audio)
 
     @classmethod
     def tearDownClass(cls):
+        super().tearDownClass()
         COMMONVOICE._ext_audio = _ORIGINAL_EXT_AUDIO
 
     def _test_commonvoice(self, dataset):
@@ -96,6 +114,16 @@ class TestCommonVoiceEN(TempDirMixin, TorchaudioTestCase):
             assert dictionary == expected_dictionary
             n_ite += 1
         assert n_ite == len(self.data)
+
+
+class TestCommonVoiceEN(BaseTestCommonVoice, TorchaudioTestCase):
+    backend = 'default'
+    root_dir = None
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.data = get_mock_dataset_en(cls.root_dir, COMMONVOICE._ext_audio)
 
     def test_commonvoice_str(self):
         dataset = COMMONVOICE(self.root_dir)
@@ -106,30 +134,14 @@ class TestCommonVoiceEN(TempDirMixin, TorchaudioTestCase):
         self._test_commonvoice(dataset)
 
 
-class TestCommonVoiceFR(TempDirMixin, TorchaudioTestCase):
+class TestCommonVoiceFR(BaseTestCommonVoice, TorchaudioTestCase):
     backend = 'default'
     root_dir = None
 
     @classmethod
     def setUpClass(cls):
-        cls.root_dir = cls.get_base_temp_dir()
-        COMMONVOICE._ext_audio = ".mp3"
-        cls.data = get_mock_dataset(cls.root_dir, _FR_TRAIN_CSV_CONTENTS, COMMONVOICE._ext_audio)
-
-    @classmethod
-    def tearDownClass(cls):
-        COMMONVOICE._ext_audio = _ORIGINAL_EXT_AUDIO
-
-    def _test_commonvoice(self, dataset):
-        n_ite = 0
-        for i, (waveform, sample_rate, dictionary) in enumerate(dataset):
-            expected_dictionary = self.data[i][2]
-            expected_data = self.data[i][0]
-            self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
-            assert sample_rate == _SAMPLE_RATE
-            assert dictionary == expected_dictionary
-            n_ite += 1
-        assert n_ite == len(self.data)
+        super().setUpClass()
+        cls.data = get_mock_dataset_fr(cls.root_dir, COMMONVOICE._ext_audio)
 
     def test_commonvoice_str(self):
         dataset = COMMONVOICE(self.root_dir)
