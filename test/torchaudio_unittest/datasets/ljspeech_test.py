@@ -54,27 +54,27 @@ def get_mock_dataset(root_dir):
             )
             save_wav(path, data, sample_rate)
             mocked_data.append(normalize_wav(data))
-    return mocked_data
+    return mocked_data, _TRANSCRIPTS, _NORMALIZED_TRANSCRIPT
 
 
 class TestLJSpeech(TempDirMixin, TorchaudioTestCase):
     backend = "default"
 
     root_dir = None
-    data = []
+    data, _transcripts, _normalized_transcript = [], [], []
 
     @classmethod
     def setUpClass(cls):
         cls.root_dir = cls.get_base_temp_dir()
-        cls.data = get_mock_dataset(cls.root_dir)
+        cls.data, cls._transcripts, cls._normalized_transcript = get_mock_dataset(cls.root_dir)
 
     def _test_ljspeech(self, dataset):
         n_ite = 0
         for i, (waveform, sample_rate, transcript, normalized_transcript) in enumerate(
                 dataset
         ):
-            expected_transcript = _TRANSCRIPTS[i]
-            expected_normalized_transcript = _NORMALIZED_TRANSCRIPT[i]
+            expected_transcript = self._transcripts[i]
+            expected_normalized_transcript = self._normalized_transcript[i]
             expected_data = self.data[i]
             self.assertEqual(expected_data, waveform, atol=5e-5, rtol=1e-8)
             assert sample_rate == sample_rate
