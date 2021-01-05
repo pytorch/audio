@@ -12,6 +12,23 @@ from torchaudio_unittest.common_utils import (
 )
 
 
+def get_mock_data(root_dir, labels):
+    """
+    root_dir: path
+    labels: list of labels
+    """
+    mocked_data = []
+    base_dir = os.path.join(root_dir, 'waves_yesno')
+    os.makedirs(base_dir, exist_ok=True)
+    for i, label in enumerate(labels):
+        filename = f'{"_".join(str(l) for l in label)}.wav'
+        path = os.path.join(base_dir, filename)
+        data = get_whitenoise(sample_rate=8000, duration=6, n_channels=1, dtype='int16', seed=i)
+        save_wav(path, data, 8000)
+        mocked_data.append(normalize_wav(data))
+    return mocked_data
+
+
 class TestYesNo(TempDirMixin, TorchaudioTestCase):
     backend = 'default'
 
@@ -28,14 +45,7 @@ class TestYesNo(TempDirMixin, TorchaudioTestCase):
     @classmethod
     def setUpClass(cls):
         cls.root_dir = cls.get_base_temp_dir()
-        base_dir = os.path.join(cls.root_dir, 'waves_yesno')
-        os.makedirs(base_dir, exist_ok=True)
-        for i, label in enumerate(cls.labels):
-            filename = f'{"_".join(str(l) for l in label)}.wav'
-            path = os.path.join(base_dir, filename)
-            data = get_whitenoise(sample_rate=8000, duration=6, n_channels=1, dtype='int16', seed=i)
-            save_wav(path, data, 8000)
-            cls.data.append(normalize_wav(data))
+        cls.data = get_mock_data(cls.root_dir, cls.labels)
 
     def _test_yesno(self, dataset):
         n_ite = 0
