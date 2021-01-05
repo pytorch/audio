@@ -20,20 +20,21 @@ _TP_BASE_DIR = _ROOT_DIR / 'third_party'
 _TP_INSTALL_DIR = _TP_BASE_DIR / 'install'
 
 
-def _get_build_sox():
-    val = os.environ.get('BUILD_SOX', '0')
+def _get_build(var):
+    val = os.environ.get(var, '0')
     trues = ['1', 'true', 'TRUE', 'on', 'ON', 'yes', 'YES']
     falses = ['0', 'false', 'FALSE', 'off', 'OFF', 'no', 'NO']
     if val in trues:
         return True
     if val not in falses:
         print(
-            f'WARNING: Unexpected environment variable value `BUILD_SOX={val}`. '
+            f'WARNING: Unexpected environment variable value `{var}={val}`. '
             f'Expected one of {trues + falses}')
     return False
 
 
-_BUILD_SOX = _get_build_sox()
+_BUILD_SOX = _get_build("BUILD_SOX")
+_BUILD_TRANSDUCER = _get_build("BUILD_TRANSDUCER")
 
 
 def _get_eca(debug):
@@ -42,6 +43,8 @@ def _get_eca(debug):
         eca += ["-O0", "-g"]
     else:
         eca += ["-O3"]
+    if _BUILD_TRANSDUCER:
+        eca += ['-DBUILD_TRANSDUCER']
     return eca
 
 
@@ -64,10 +67,11 @@ def _get_srcs():
 def _get_include_dirs():
     dirs = [
         str(_ROOT_DIR),
-        str(_TP_BASE_DIR / 'transducer' / 'submodule' / 'include'),
     ]
     if _BUILD_SOX:
         dirs.append(str(_TP_INSTALL_DIR / 'include'))
+    if _BUILD_TRANSDUCER:
+        dirs.append(str(_TP_BASE_DIR / 'transducer' / 'submodule' / 'include'))
     return dirs
 
 
@@ -95,7 +99,8 @@ def _get_extra_objects():
         ]
         for lib in libs:
             objs.append(str(_TP_INSTALL_DIR / 'lib' / lib))
-    objs.append(str(_TP_BASE_DIR / 'build' / 'transducer' / 'libwarprnnt.a'))
+    if _BUILD_TRANSDUCER:
+        objs.append(str(_TP_BASE_DIR / 'build' / 'transducer' / 'libwarprnnt.a'))
     return objs
 
 

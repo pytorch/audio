@@ -81,6 +81,7 @@ TORCH_LIBRARY(torchaudio, m) {
   //////////////////////////////////////////////////////////////////////////////
   // transducer.cpp
   //////////////////////////////////////////////////////////////////////////////
+  #ifdef BUILD_TRANSDUCER
   m.def("rnnt_loss(Tensor acts,"
                   "Tensor labels,"
                   "Tensor input_lengths,"
@@ -89,5 +90,6 @@ TORCH_LIBRARY(torchaudio, m) {
                   "Tensor grads,"
                   "int blank_label,"
                   "int num_threads) -> int");
+  #endif
 }
 #endif

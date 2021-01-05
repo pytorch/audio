@@ -1,3 +1,5 @@
+#ifdef BUILD_TRANSDUCER
+
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -76,3 +78,5 @@ int64_t cpu_rnnt_loss(torch::Tensor acts,
 TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
     m.impl("rnnt_loss", &cpu_rnnt_loss);
 }
+
+#endif
