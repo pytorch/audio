@@ -237,7 +237,7 @@ def amplitude_to_DB(
 
         x (Tensor): Input spectrogram(s) before being converted to decibel scale. Input should take
           the form `(..., freq, time)`. Batched inputs must include a channel dimension and should
-          take the form `(item, channel, freq, time)`.
+          take the form `(batch, channel, freq, time)`.
         multiplier (float): Use 10. for power and 20. for amplitude
         amin (float): Number to clamp ``x``
         db_multiplier (float): Log10(max(reference value and amin))
@@ -251,13 +251,15 @@ def amplitude_to_DB(
     x_db -= multiplier * db_multiplier
 
     if top_db is not None:
-        dims = x_db.dim()
-        if dims > 3:
-            db_floors = x_db.reshape(x_db.size(0), -1).amax(dim=1) - top_db
-            broadcast_shape = (...,) + (None,)*(dims-1)
-            x_db = torch.max(x_db, db_floors[broadcast_shape])
-        else:
-            x_db = x_db.clamp(min=x_db.max().item() - top_db)
+        # Expand batch
+        shape = x_db.size()
+        packed_channels = shape[-3] if x_db.dim() > 2 else 1
+        x_db = x_db.reshape(-1, packed_channels, shape[-2], shape[-1])
+
+        x_db = torch.max(x_db, (x_db.amax(dim=(-3, -2, -1)) - top_db).view(-1, 1, 1, 1))
+
+        # Repack batch
+        x_db = x_db.reshape(shape)
 
     return x_db
 
