@@ -43,6 +43,7 @@ conda activate "${env_dir}"
 pip --quiet install cmake ninja
 
 # 4. Buld codecs
+git submodule update --init --recursive
 mkdir -p third_party/build
 (
     cd third_party/build
