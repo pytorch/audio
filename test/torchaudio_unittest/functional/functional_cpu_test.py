@@ -153,7 +153,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         spec[0, 0, 0, 0] = 0
         spec[1, 0, 0, 0] = 200
 
-        # Ensure the clamp applies per-item, not at the batch level.
+        # Ensure separate clamps are applied per-item in a batch.
         batchwise_dbs = F.amplitude_to_DB(spec, AMPLITUDE_MULT, AMIN,
                                           DB_MULT, top_db=TOP_DB)
         itemwise_dbs = torch.stack([
