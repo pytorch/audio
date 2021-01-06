@@ -89,7 +89,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         db = F.amplitude_to_DB(spec, POWER_MULT, AMIN, DB_MULT, top_db=None)
         x2 = F.DB_to_amplitude(db, REF, 1.)
 
-        torch.testing.assert_allclose(x2, spec, atol=5e-5, rtol=1e-5)
+        self.assertEqual(x2, spec)
 
     def test_amplitude_to_DB_batch(self):
         spec = torch.rand([2, 2, 100, 100]) * 200
@@ -162,7 +162,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
             for item in spec
         ])
 
-        torch.testing.assert_allclose(batchwise_dbs, itemwise_dbs, atol=5e-5, rtol=1e-5)
+        self.assertEqual(batchwise_dbs, itemwise_dbs)
 
     def test_per_spectrogram(self):
         AMPLITUDE_MULT = 20.
