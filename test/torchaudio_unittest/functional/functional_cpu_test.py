@@ -143,7 +143,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         AMIN = 1e-10
         REF = 1.0
         DB_MULT = math.log10(max(AMIN, REF))
-        top_db = 40.
+        TOP_DB = 40.
 
         # Make a batch of noise
         spec = torch.rand([2, 2, 100, 100]) * 200
@@ -154,10 +154,10 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
 
         # Ensure the clamp applies per-item, not at the batch level.
         batchwise_dbs = F.amplitude_to_DB(spec, AMPLITUDE_MULT, AMIN,
-                                          DB_MULT, top_db=top_db)
+                                          DB_MULT, top_db=TOP_DB)
         itemwise_dbs = torch.stack([
             F.amplitude_to_DB(item, AMPLITUDE_MULT, AMIN,
-                              DB_MULT, top_db=top_db)
+                              DB_MULT, top_db=TOP_DB)
             for item in spec
         ])
 
@@ -170,7 +170,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         REF = 1.0
         DB_MULT = math.log10(max(AMIN, REF))
         channels = 2
-        top_db = 40.
+        TOP_DB = 40.
 
         spec = torch.rand([1, channels, 100, 100]) * 200
         # Make the second channel blow out the first
@@ -180,11 +180,11 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
 
         # Ensure the clamp applies per-item, not per-channel.
         specwise_dbs = F.amplitude_to_DB(spec, AMPLITUDE_MULT, AMIN,
-                                         DB_MULT, top_db=top_db)
+                                         DB_MULT, top_db=TOP_DB)
         channelwise_dbs = torch.stack([
             for i in range(channels)
             F.amplitude_to_DB(spec[:, i], AMPLITUDE_MULT, AMIN,
-                              DB_MULT, top_db=top_db)
+                              DB_MULT, top_db=TOP_DB)
         ])
 
         # Just check channelwise gives a different answer.
