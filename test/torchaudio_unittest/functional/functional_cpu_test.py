@@ -98,10 +98,12 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
 
         torch.testing.assert_allclose(x2, spec, atol=5e-5, rtol=1e-5)
 
-    def test_amplitude_to_DB(self):
+    def test_amplitude_to_DB_batch(self):
         spec = self._make_spectrogram(2, 2, 1000, scale=0.5)
-        # Ensure it works on both batches and items
         self._ensure_reversible(spec)
+
+    def test_amplitude_to_DB_channels(self):
+        spec = self._make_spectrogram(1, 2, 1000, scale=0.5)
         self._ensure_reversible(spec[0])
 
     def test_top_db(self):
