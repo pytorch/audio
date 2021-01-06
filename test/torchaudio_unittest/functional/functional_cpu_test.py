@@ -99,7 +99,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         spec = torch.rand([2, 100, 100]) * 200
         self._ensure_reversible(spec)
 
-    def test_amplitude_to_DB_item(self):
+    def test_amplitude_to_DB_freq(self):
         spec = torch.rand([100, 100]) * 200
         self._ensure_reversible(spec)
 
