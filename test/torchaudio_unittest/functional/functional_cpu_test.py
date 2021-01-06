@@ -78,12 +78,6 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
     # FIXME: So the DB multiplier is 0?
     DB_MULT = math.log10(max(AMIN, REF))
 
-    def _make_spectrogram(self, items, channels, wave_samples, scale=1.):
-        # Make some noise, -1 to 1 (then scale it)
-        wave = (torch.rand(items, channels, wave_samples) * 2. - 1.) * scale
-        spectrogram = torchaudio.transforms.Spectrogram()
-        return spectrogram(wave)
-
     def _ensure_reversible(self, spec):
         """Check `amplitude_to_db` returns the original when reversed."""
         # Spectrogram amplitude -> DB -> amplitude
@@ -99,21 +93,21 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         torch.testing.assert_allclose(x2, spec, atol=5e-5, rtol=1e-5)
 
     def test_amplitude_to_DB_batch(self):
-        spec = self._make_spectrogram(2, 2, 1000, scale=0.5)
+        spec = torch.rand([2, 2, 100, 100]) * 200
         self._ensure_reversible(spec)
 
     def test_amplitude_to_DB_channels(self):
-        spec = self._make_spectrogram(1, 2, 1000, scale=0.5)
-        self._ensure_reversible(spec[0])
+        spec = torch.rand([2, 100, 100]) * 200
+        self._ensure_reversible(spec)
 
     def test_amplitude_to_DB_item(self):
-        spec = self._make_spectrogram(1, 2, 1000, scale=0.5)
-        self._ensure_reversible(spec[0][0])
+        spec = torch.rand([100, 100]) * 200
+        self._ensure_reversible(spec)
 
     def test_top_db(self):
         top_db = 40.
 
-        spec = self._make_spectrogram(1, 2, 1000, scale=0.5)
+        spec = torch.rand([1, 2, 100, 100]) * 200
         # Make the max value (and thus DB cutoff) predictable.
         spec[0,0,0] = 200
 
@@ -140,7 +134,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         top_db = 40.
 
         # Make a batch of noise
-        spec = self._make_spectrogram(2, 2, 1000)
+        spec = torch.rand([2, 2, 100, 100]) * 200
         # Make the second item blow out the first
         spec[0] *= 0.5
         # Predictability
@@ -161,7 +155,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         channels = 2
         top_db = 40.
 
-        spec = self._make_spectrogram(1, channels, 1000)
+        spec = torch.rand([1, channels, 100, 100]) * 200
         # Make the second channel blow out the first
         spec[:, 0] *= 0.5
         # Predictability
