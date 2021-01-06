@@ -169,10 +169,9 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         AMIN = 1e-10
         REF = 1.0
         DB_MULT = math.log10(max(AMIN, REF))
-        channels = 2
         TOP_DB = 40.
 
-        spec = torch.rand([1, channels, 100, 100]) * 200
+        spec = torch.rand([1, 2, 100, 100]) * 200
         # Make the second channel blow out the first
         spec[:, 0] *= 0.5
         # Predictability
@@ -182,9 +181,9 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         specwise_dbs = F.amplitude_to_DB(spec, AMPLITUDE_MULT, AMIN,
                                          DB_MULT, top_db=TOP_DB)
         channelwise_dbs = torch.stack([
-            for i in range(channels)
             F.amplitude_to_DB(spec[:, i], AMPLITUDE_MULT, AMIN,
                               DB_MULT, top_db=TOP_DB)
+            for i in range(spec.size(-3))
         ])
 
         # Just check channelwise gives a different answer.
