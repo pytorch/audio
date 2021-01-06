@@ -1,9 +1,15 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)
 
 project(torchaudio_third_parties)
-include(ExternalProject)
 
-set(INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/install)
+option(BUILD_SOX "Build libsox statically")
+option(BUILD_TRANSDUCER "Build transducer")
+
+SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+if (BUILD_SOX)
+include(ExternalProject)
+set(INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
 set(ARCHIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/archives)
 set(COMMON_ARGS --quiet --disable-shared --enable-static --prefix=${INSTALL_DIR} --with-pic --disable-dependency-tracking --disable-debug --disable-examples --disable-doc)
 
@@ -88,5 +94,8 @@ ExternalProject_Add(libsox
   # See https://github.com/pytorch/audio/pull/1026
   CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/build_codec_helper.sh ${CMAKE_CURRENT_SOURCE_DIR}/src/libsox/configure ${COMMON_ARGS} --with-lame --with-flac --with-mad --with-oggvorbis --without-alsa --without-coreaudio --without-png --without-oss --without-sndfile --with-opus --with-amrwb --with-amrnb --disable-openmp --without-sndio --without-pulseaudio
 )
+endif()
 
+if(BUILD_TRANSDUCER)
 add_subdirectory(transducer)
+endif()

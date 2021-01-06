@@ -1,20 +1,7 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
-
-PROJECT(rnnt_release)
-
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
-
-IF(APPLE)
-    ADD_DEFINITIONS(-DAPPLE)
-ENDIF()
-
-INCLUDE_DIRECTORIES(submodule/include)
-
-SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
 ADD_DEFINITIONS(-DRNNT_DISABLE_OMP)
 
 IF(APPLE)
+    ADD_DEFINITIONS(-DAPPLE)
     EXEC_PROGRAM(uname ARGS -v  OUTPUT_VARIABLE DARWIN_VERSION)
     STRING(REGEX MATCH "[0-9]+" DARWIN_VERSION ${DARWIN_VERSION})
     MESSAGE(STATUS "DARWIN_VERSION=${DARWIN_VERSION}")
@@ -30,9 +17,11 @@ ELSE()
 ENDIF()
 
 ADD_LIBRARY(warprnnt STATIC submodule/src/rnnt_entrypoint.cpp)
+target_include_directories(warprnnt PUBLIC submodule/include)
+set_target_properties(warprnnt PROPERTIES PUBLIC_HEADER submodule/include/rnnt.h)
 
-INSTALL(TARGETS warprnnt
-        LIBRARY DESTINATION "lib"
-        ARCHIVE DESTINATION "lib")
 
-INSTALL(FILES submodule/include/rnnt.h DESTINATION "submodule/include")
+INSTALL(
+  TARGETS warprnnt
+  ARCHIVE DESTINATION "lib"
+  PUBLIC_HEADER DESTINATION "include")

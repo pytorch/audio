@@ -61,29 +61,31 @@ def _get_ela(debug):
 
 
 def _get_srcs():
-    return [str(p) for p in _CSRC_DIR.glob('**/*.cpp')]
+    srcs = [_CSRC_DIR / 'pybind.cpp']
+    srcs += list(_CSRC_DIR.glob('sox/**/*.cpp'))
+    if _BUILD_TRANSDUCER:
+        srcs += [_CSRC_DIR / 'transducer.cpp']
+    return [str(path) for path in srcs]
 
 
 def _get_include_dirs():
     dirs = [
         str(_ROOT_DIR),
     ]
-    if _BUILD_SOX:
+    if _BUILD_SOX or _BUILD_TRANSDUCER:
         dirs.append(str(_TP_INSTALL_DIR / 'include'))
-    if _BUILD_TRANSDUCER:
-        dirs.append(str(_TP_BASE_DIR / 'transducer' / 'submodule' / 'include'))
     return dirs
 
 
 def _get_extra_objects():
-    objs = []
+    libs = []
     if _BUILD_SOX:
         # NOTE: The order of the library listed bellow matters.
         #
         # (the most important thing is that dependencies come after a library
         # e.g., sox comes first, flac/vorbis comes before ogg, and
         # vorbisenc/vorbisfile comes before vorbis
-        libs = [
+        libs += [
             'libsox.a',
             'libmad.a',
             'libFLAC.a',
@@ -97,27 +99,34 @@ def _get_extra_objects():
             'libopencore-amrnb.a',
             'libopencore-amrwb.a',
         ]
-        for lib in libs:
-            objs.append(str(_TP_INSTALL_DIR / 'lib' / lib))
     if _BUILD_TRANSDUCER:
-        objs.append(str(_TP_BASE_DIR / 'build' / 'transducer' / 'libwarprnnt.a'))
-    return objs
+        libs += ['libwarprnnt.a']
+
+    return [str(_TP_INSTALL_DIR / 'lib' / lib) for lib in libs]
 
 
 def _get_libraries():
     return [] if _BUILD_SOX else ['sox']
 
 
-def _build_third_party():
-    build_dir = str(_TP_BASE_DIR / 'build')
+def _build_third_party(base_build_dir):
+    build_dir = os.path.join(base_build_dir, 'third_party')
     os.makedirs(build_dir, exist_ok=True)
     subprocess.run(
-        args=['cmake', '..'],
+        args=[
+            'cmake',
+            f'-DCMAKE_INSTALL_PREFIX={_TP_INSTALL_DIR}',
+            f'-DBUILD_SOX={"ON" if _BUILD_SOX else "OFF"}',
+            f'-DBUILD_TRANSDUCER={"ON" if _BUILD_TRANSDUCER else "OFF"}',
+            f'{_TP_BASE_DIR}'],
         cwd=build_dir,
         check=True,
     )
+    command = ['cmake', '--build', '.']
+    if _BUILD_TRANSDUCER:
+        command += ['--target', 'install']
     subprocess.run(
-        args=['cmake', '--build', '.'],
+        args=command,
         cwd=build_dir,
         check=True,
     )
@@ -145,5 +154,5 @@ def get_ext_modules(debug=False):
 class BuildExtension(TorchBuildExtension):
     def build_extension(self, ext):
         if ext.name == _EXT_NAME and _BUILD_SOX:
-            _build_third_party()
+            _build_third_party(self.build_temp)
         super().build_extension(ext)
