@@ -1,10 +1,5 @@
 #include <torchaudio/csrc/sox/legacy.h>
 
-#include <algorithm>
-#include <cstdint>
-#include <stdexcept>
-#include <vector>
-
 namespace torch {
 namespace audio {
 namespace {
