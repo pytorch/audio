@@ -4,7 +4,7 @@
 #include <tuple>
 #include <vector>
 
-#include <torch/extension.h>
+#include <torch/torch.h>
 
 namespace at {
 struct Tensor;

@@ -1,9 +1,6 @@
-#ifndef TORCHAUDIO_REGISTER_H
-#define TORCHAUDIO_REGISTER_H
-
-#include <torchaudio/csrc/sox/sox_effects.h>
-#include <torchaudio/csrc/sox/sox_io.h>
-#include <torchaudio/csrc/sox/sox_utils.h>
+#include <torchaudio/csrc/sox/effects.h>
+#include <torchaudio/csrc/sox/io.h>
+#include <torchaudio/csrc/sox/utils.h>
 
 TORCH_LIBRARY(torchaudio, m) {
   //////////////////////////////////////////////////////////////////////////////
@@ -92,4 +89,3 @@ TORCH_LIBRARY(torchaudio, m) {
                   "int num_threads) -> int");
   #endif
 }
-#endif
