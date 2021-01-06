@@ -150,6 +150,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         # Make the second item blow out the first
         spec[0] *= 0.5
         # Predictability
+        spec[0, 0, 0, 0] = 0
         spec[1, 0, 0, 0] = 200
 
         # Ensure the clamp applies per-item, not at the batch level.
@@ -175,6 +176,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         # Make the second channel blow out the first
         spec[:, 0] *= 0.5
         # Predictability
+        spec[0, 0, 0, 0] = 0
         spec[0, 1, 0, 0] = 200
 
         # Ensure the clamp applies per-item, not per-channel.
