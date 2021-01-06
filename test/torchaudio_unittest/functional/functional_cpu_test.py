@@ -103,31 +103,39 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         spec = torch.rand([100, 100]) * 200
         self._ensure_reversible(spec)
 
-    def test_top_db(self):
-        top_db = 40.
+    def _check_top_db(self, spec):
+        AMPLITUDE_MULT = 20.
+        POWER_MULT = 10.
+        AMIN = 1e-10
+        REF = 1.0
+        DB_MULT = math.log10(max(AMIN, REF))
+        TOP_DB = 40.
 
-        spec = torch.rand([1, 2, 100, 100]) * 200
-        # Make the max value (and thus DB cutoff) predictable.
-        spec[0,0,0] = 200
-
-        decibels = F.amplitude_to_DB(spec[0], self.AMPLITUDE_MULT, self.AMIN,
-                                     self.DB_MULT, top_db=top_db)
-        # The actual db floor will be just below 6.0206 - use 6.0205 to deal
-        # with rounding error.
+        decibels = F.amplitude_to_DB(spec, AMPLITUDE_MULT, AMIN,
+                                           DB_MULT, top_db=TOP_DB)
         above_top = decibels >= 6.0205
         assert above_top.all(), decibels
 
-        # And check it works with batch dimension
-        decibels_batch = F.amplitude_to_DB(spec, self.AMPLITUDE_MULT, self.AMIN,
-                                           self.DB_MULT, top_db=top_db)
-        above_top_batch = decibels_batch >= 6.0205
-        assert above_top_batch.all(), decibels_batch
+    def test_top_db_batch(self):
+        spec = torch.rand([1, 2, 100, 100]) * 200
+        # Predictability
+        spec[0, 0, 1] = 0
+        spec[0, 0, 0] = 200
+        self._check_top_db(spec)
 
-        # And check it works with shape (freq, time) only
-        decibels_batch = F.amplitude_to_DB(spec[0][0], self.AMPLITUDE_MULT, self.AMIN,
-                                           self.DB_MULT, top_db=top_db)
-        above_top_batch = decibels_batch >= 6.0205
-        assert above_top_batch.all(), decibels_batch
+    def test_top_db_channel(self):
+        spec = torch.rand([1, 2, 100, 100]) * 200
+        # Predictability
+        spec[0, 0, 1] = 0
+        spec[0, 0, 0] = 200
+        self._check_top_db(spec[0])
+
+    def test_top_db_freq(self):
+        spec = torch.rand([1, 2, 100, 100]) * 200
+        # Predictability
+        spec[0, 0, 1] = 0
+        spec[0, 0, 0] = 200
+        self._check_top_db(spec[0][0])
 
     def test_batched(self):
         AMPLITUDE_MULT = 20.
