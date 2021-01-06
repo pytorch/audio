@@ -121,16 +121,18 @@ class TestDB_to_amplitude(common_utils.TorchaudioTestCase):
         torch.testing.assert_allclose(x2, spec, atol=5e-5, rtol=1e-5)
 
 
-@pytest.mark.parametrize('complex_tensor', [
-    torch.randn(1, 2, 1025, 400, 2),
-    torch.randn(1025, 400, 2)
-])
-@pytest.mark.parametrize('power', [1, 2, 0.7])
-def test_complex_norm(complex_tensor, power):
-    expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
-    norm_tensor = F.complex_norm(complex_tensor, power)
+class TestComplexNorm(common_utils.TorchaudioTestCase):
 
-    torch.testing.assert_allclose(norm_tensor, expected_norm_tensor, atol=1e-5, rtol=1e-5)
+    @parameterized.expand([
+        (torch.randn(1, 2, 1025, 400, 2),  1),
+        (torch.randn(1025, 400, 2), 2)
+    ])
+    def test_complex_norm(self, complex_tensor, power):
+        torch.random.manual_seed(42)
+
+        expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
+        norm_tensor = F.complex_norm(complex_tensor, power)
+        torch.testing.assert_allclose(norm_tensor, expected_norm_tensor, atol=1e-5, rtol=1e-5)
 
 
 @pytest.mark.parametrize('specgram', [
