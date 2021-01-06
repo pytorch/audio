@@ -106,6 +106,10 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         spec = self._make_spectrogram(1, 2, 1000, scale=0.5)
         self._ensure_reversible(spec[0])
 
+    def test_amplitude_to_DB_item(self):
+        spec = self._make_spectrogram(1, 2, 1000, scale=0.5)
+        self._ensure_reversible(spec[0][0])
+
     def test_top_db(self):
         top_db = 40.
 
@@ -122,6 +126,12 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
 
         # And check it works with batch dimension
         decibels_batch = F.amplitude_to_DB(spec, self.AMPLITUDE_MULT, self.AMIN,
+                                           self.DB_MULT, top_db=top_db)
+        above_top_batch = decibels_batch >= 6.0205
+        assert above_top_batch.all(), decibels_batch
+
+        # And check it works with shape (freq, time) only
+        decibels_batch = F.amplitude_to_DB(spec[0][0], self.AMPLITUDE_MULT, self.AMIN,
                                            self.DB_MULT, top_db=top_db)
         above_top_batch = decibels_batch >= 6.0205
         assert above_top_batch.all(), decibels_batch
