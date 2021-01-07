@@ -8,6 +8,7 @@ from .backend_utils import (
 )
 from .case_utils import (
     TempDirMixin,
+    HttpServerMixin,
     TestBaseMixin,
     PytorchTestCase,
     TorchaudioTestCase,

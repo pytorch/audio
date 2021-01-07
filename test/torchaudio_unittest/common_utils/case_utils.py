@@ -1,6 +1,8 @@
 import shutil
 import os.path
+import subprocess
 import tempfile
+import time
 import unittest
 
 import torch
@@ -38,6 +40,32 @@ class TempDirMixin:
         path = os.path.join(temp_dir, *paths)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         return path
+
+
+class HttpServerMixin(TempDirMixin):
+    """Mixin that serves temporary directory as web server
+
+    This class creates temporary directory and serve the directory as HTTP service.
+    The server is up through the execution of all the test suite defined under the subclass.
+    """
+    _proc = None
+    _port = 8000
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls._proc = subprocess.Popen(
+            ['python', '-m', 'http.server', f'{cls._port}'],
+            cwd=cls.get_base_temp_dir())
+        time.sleep(1.0)
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        cls._proc.kill()
+
+    def get_url(self, *route):
+        return f'http://localhost:{self._port}/{self.id()}/{"/".join(route)}'
 
 
 class TestBaseMixin:
