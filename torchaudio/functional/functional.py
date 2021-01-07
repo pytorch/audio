@@ -229,9 +229,8 @@ def amplitude_to_DB(
 ) -> Tensor:
     r"""Turn a spectrogram from the power/amplitude scale to the decibel scale.
 
-    This output depends on the maximum value in the input tensor, and so
-    may return different values for an audio clip split into snippets vs. a
-    full clip.
+    The output of each tensor in a batch depends on the maximum value of that tensor,
+    and so may return different values for an audio clip split into snippets vs. a full clip.
 
     Args:
 
