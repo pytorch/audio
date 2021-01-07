@@ -96,12 +96,14 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         spec = torch.rand([2, 2, 100, 100]) * 200
         self._ensure_reversible(spec)
 
-    def test_amplitude_to_DB_channels(self):
+    def test_amplitude_to_DB_3dims(self):
+        """Test on a spectrogram with no batch dimension."""
         torch.manual_seed(0)
         spec = torch.rand([2, 100, 100]) * 200
         self._ensure_reversible(spec)
 
-    def test_amplitude_to_DB_freq(self):
+    def test_amplitude_to_DB_2dims(self):
+        """Test on a spectrogram with no batch or channel dimensions."""
         torch.manual_seed(0)
         spec = torch.rand([100, 100]) * 200
         self._ensure_reversible(spec)
@@ -130,7 +132,8 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         spec[0, 0, 0] = 200
         self._check_top_db(spec)
 
-    def test_top_db_channel(self):
+    def test_top_db_3dims(self):
+        """Test on a spectrogram with no batch dimension."""
         torch.manual_seed(0)
         spec = torch.rand([1, 2, 100, 100]) * 200
         # Predictability
@@ -138,7 +141,8 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         spec[0, 0, 0] = 200
         self._check_top_db(spec[0])
 
-    def test_top_db_freq(self):
+    def test_top_db_2dims(self):
+        """Test on a spectrogram with no batch or channel dimensions."""
         torch.manual_seed(0)
         spec = torch.rand([1, 2, 100, 100]) * 200
         # Predictability
