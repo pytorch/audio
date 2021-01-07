@@ -198,7 +198,7 @@ void SoxEffectsChain::addInputTensor(TensorSignal* signal) {
   priv->signal = signal;
   priv->index = 0;
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
-    throw std::runtime_error("Failed to add effect: input_tensor");
+    throw std::runtime_error("Internal Error: Failed to add effect: input_tensor");
   }
 }
 
@@ -207,7 +207,7 @@ void SoxEffectsChain::addOutputBuffer(
   SoxEffect e(sox_create_effect(get_tensor_output_handler()));
   static_cast<TensorOutputPriv*>(e->priv)->buffer = output_buffer;
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
-    throw std::runtime_error("Failed to add effect: output_tensor");
+    throw std::runtime_error("Internal Error: Failed to add effect: output_tensor");
   }
 }
 
@@ -219,7 +219,7 @@ void SoxEffectsChain::addInputFile(sox_format_t* sf) {
   sox_effect_options(e, 1, opts);
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
     std::ostringstream stream;
-    stream << "Failed to add effect: input " << sf->filename;
+    stream << "Internal Error: Failed to add effect: input " << sf->filename;
     throw std::runtime_error(stream.str());
   }
 }
@@ -230,7 +230,7 @@ void SoxEffectsChain::addOutputFile(sox_format_t* sf) {
   static_cast<FileOutputPriv*>(e->priv)->sf = sf;
   if (sox_add_effect(sec_, e, &interm_sig_, &out_sig_) != SOX_SUCCESS) {
     std::ostringstream stream;
-    stream << "Failed to add effect: output " << sf->filename;
+    stream << "Internal Error: Failed to add effect: output " << sf->filename;
     throw std::runtime_error(stream.str());
   }
 }
@@ -266,7 +266,7 @@ void SoxEffectsChain::addEffect(const std::vector<std::string> effect) {
 
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
     std::ostringstream stream;
-    stream << "Failed to add effect: \"" << name;
+    stream << "Internal Error: Failed to add effect: \"" << name;
     for (size_t i = 1; i < num_args; ++i) {
       stream << " " << effect[i];
     }
@@ -403,7 +403,7 @@ void SoxEffectsChain::addInputFileObj(
   priv->buffer = buffer;
   priv->buffer_size = buffer_size;
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
-    throw std::runtime_error("Failed to add effect: input fileobj");
+    throw std::runtime_error("Internal Error: Failed to add effect: input fileobj");
   }
 }
 

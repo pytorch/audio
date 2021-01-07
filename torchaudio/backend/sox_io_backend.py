@@ -87,8 +87,9 @@ def load(
         filepath (path-like object or file-like object):
             Source of audio data. When the function is not compiled by TorchScript,
             (e.g. ``torch.jit.script``), the following types are accepted;
-                  * ``path-like object``: file path
-                  * ``file-like object``: Any object with ``read`` method that returns ``bytes``.
+                  * ``path-like``: file path
+                  * ``file-like``: Object with ``read(size: int) -> bytes`` method,
+                    which returns byte string of at most ``size`` length.
             When the function is compiled by TorchScript, only ``str`` type is allowed.
 
             Note:

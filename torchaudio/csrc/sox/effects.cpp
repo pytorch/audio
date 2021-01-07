@@ -178,7 +178,7 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
       /*signal=*/nullptr,
       /*encoding=*/nullptr,
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
-  validate_input_file(sf);
+  validate_input_file(sf, /*check_length=*/false);
 
   const auto dtype = get_dtype(sf->encoding.encoding, sf->signal.precision);
 

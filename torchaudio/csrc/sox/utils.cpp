@@ -92,12 +92,16 @@ SoxFormat::operator sox_format_t*() const noexcept {
   return fd_;
 }
 
-void validate_input_file(const SoxFormat& sf) {
+void validate_input_file(const SoxFormat& sf, bool check_length) {
   if (static_cast<sox_format_t*>(sf) == nullptr) {
     throw std::runtime_error("Error loading audio file: failed to open file.");
   }
   if (sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
     throw std::runtime_error("Error loading audio file: unknown encoding.");
+  }
+
+  if (check_length && sf->signal.length == 0) {
+    throw std::runtime_error("Error reading audio file: unknown length.");
   }
 }
 
