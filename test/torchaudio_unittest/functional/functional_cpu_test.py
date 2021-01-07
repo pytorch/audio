@@ -73,21 +73,21 @@ class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
 class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
     def _ensure_reversible(self, spec):
         """Check `amplitude_to_db` returns the original when reversed."""
-        AMPLITUDE_MULT = 20.
-        POWER_MULT = 10.
-        AMIN = 1e-10
-        REF = 1.0
-        DB_MULT = math.log10(max(AMIN, REF))
+        amplitude_mult = 20.
+        power_mult = 10.
+        amin = 1e-10
+        ref = 1.0
+        db_mult = math.log10(max(amin, ref))
 
         # Spectrogram amplitude -> DB -> amplitude
-        db = F.amplitude_to_DB(spec, AMPLITUDE_MULT, AMIN, DB_MULT, top_db=None)
-        x2 = F.DB_to_amplitude(db, REF, 0.5)
+        db = F.amplitude_to_DB(spec, amplitude_mult, amin, db_mult, top_db=None)
+        x2 = F.DB_to_amplitude(db, ref, 0.5)
 
         torch.testing.assert_allclose(x2, spec, atol=5e-5, rtol=1e-5)
 
         # Spectrogram power -> DB -> power
-        db = F.amplitude_to_DB(spec, POWER_MULT, AMIN, DB_MULT, top_db=None)
-        x2 = F.DB_to_amplitude(db, REF, 1.)
+        db = F.amplitude_to_DB(spec, power_mult, amin, db_mult, top_db=None)
+        x2 = F.DB_to_amplitude(db, ref, 1.)
 
         self.assertEqual(x2, spec)
 
@@ -104,14 +104,14 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         self._ensure_reversible(spec)
 
     def _check_top_db(self, spec):
-        AMPLITUDE_MULT = 20.
-        AMIN = 1e-10
-        REF = 1.0
-        DB_MULT = math.log10(max(AMIN, REF))
-        TOP_DB = 40.
+        amplitude_mult = 20.
+        amin = 1e-10
+        ref = 1.0
+        db_mult = math.log10(max(amin, ref))
+        top_db = 40.
 
-        decibels = F.amplitude_to_DB(spec, AMPLITUDE_MULT, AMIN,
-                                     DB_MULT, top_db=TOP_DB)
+        decibels = F.amplitude_to_DB(spec, amplitude_mult, amin,
+                                     db_mult, top_db=top_db)
         above_top = decibels >= 6.0205
         assert above_top.all(), decibels
 
@@ -137,11 +137,11 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         self._check_top_db(spec[0][0])
 
     def test_batched(self):
-        AMPLITUDE_MULT = 20.
-        AMIN = 1e-10
-        REF = 1.0
-        DB_MULT = math.log10(max(AMIN, REF))
-        TOP_DB = 40.
+        amplitude_mult = 20.
+        amin = 1e-10
+        ref = 1.0
+        db_mult = math.log10(max(amin, ref))
+        top_db = 40.
 
         # Make a batch of noise
         spec = torch.rand([2, 2, 100, 100]) * 200
@@ -152,22 +152,22 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         spec[1, 0, 0, 0] = 200
 
         # Ensure separate clamps are applied per-item in a batch.
-        batchwise_dbs = F.amplitude_to_DB(spec, AMPLITUDE_MULT, AMIN,
-                                          DB_MULT, top_db=TOP_DB)
+        batchwise_dbs = F.amplitude_to_DB(spec, amplitude_mult, amin,
+                                          db_mult, top_db=top_db)
         itemwise_dbs = torch.stack([
-            F.amplitude_to_DB(item, AMPLITUDE_MULT, AMIN,
-                              DB_MULT, top_db=TOP_DB)
+            F.amplitude_to_DB(item, amplitude_mult, amin,
+                              db_mult, top_db=top_db)
             for item in spec
         ])
 
         self.assertEqual(batchwise_dbs, itemwise_dbs)
 
     def test_per_spectrogram(self):
-        AMPLITUDE_MULT = 20.
-        AMIN = 1e-10
-        REF = 1.0
-        DB_MULT = math.log10(max(AMIN, REF))
-        TOP_DB = 40.
+        amplitude_mult = 20.
+        amin = 1e-10
+        ref = 1.0
+        db_mult = math.log10(max(amin, ref))
+        top_db = 40.
 
         spec = torch.rand([1, 2, 100, 100]) * 200
         # Make the second channel blow out the first
@@ -177,11 +177,11 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         spec[0, 1, 0, 0] = 200
 
         # Ensure the clamp applies per-item, not per-channel.
-        specwise_dbs = F.amplitude_to_DB(spec, AMPLITUDE_MULT, AMIN,
-                                         DB_MULT, top_db=TOP_DB)
+        specwise_dbs = F.amplitude_to_DB(spec, amplitude_mult, amin,
+                                         db_mult, top_db=top_db)
         channelwise_dbs = torch.stack([
-            F.amplitude_to_DB(spec[:, i], AMPLITUDE_MULT, AMIN,
-                              DB_MULT, top_db=TOP_DB)
+            F.amplitude_to_DB(spec[:, i], amplitude_mult, amin,
+                              db_mult, top_db=top_db)
             for i in range(spec.size(-3))
         ])
 
