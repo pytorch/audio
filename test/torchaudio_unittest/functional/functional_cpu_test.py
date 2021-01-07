@@ -82,6 +82,7 @@ class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
 
 class TestDB_to_amplitude(common_utils.TorchaudioTestCase):
     def test_DB_to_amplitude(self):
+        torch.random.manual_seed(42)
         # Make some noise
         x = torch.rand(1000)
         spectrogram = torchaudio.transforms.Spectrogram()
@@ -128,7 +129,7 @@ class TestComplexNorm(common_utils.TorchaudioTestCase):
         [1, 2, 0.7]
     )))
     def test_complex_norm(self, shape, power):
-        torch.random.manual_seed(0)
+        torch.random.manual_seed(42)
         complex_tensor = torch.randn(*shape)
         expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
         norm_tensor = F.complex_norm(complex_tensor, power)
@@ -143,7 +144,7 @@ class TestMaskAlongAxis(common_utils.TorchaudioTestCase):
         [1, 2]
     )))
     def test_mask_along_axis(self, shape, mask_param, mask_value, axis):
-        torch.random.manual_seed(0)
+        torch.random.manual_seed(42)
         specgram = torch.randn(*shape)
         mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis)
 
