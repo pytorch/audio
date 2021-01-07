@@ -150,7 +150,7 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
   //  - URL input -> call wget in suprocess and pipe the data -> FILE pointer
   //  - stdin -> FILE pointer
   //
-  // We want to, instead, consume byte strings chunk by chunk, discarding the consumed chunks,
+  // We want to, instead, fetch byte strings chunk by chunk, consume them, and discard.
   //
   // Here is the approach
   // 1. Initialize sox_format_t using sox_open_mem_read, providing the initial chunk of byte string
@@ -161,36 +161,39 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
   //    starts with unseen data, and append the new data read from the given fileobj.
   //    This will trick libsox as if it keeps reading from the FILE* continuously.
 
-  // Fetch the header.
+  // Prepare the buffer used throughout the lifecycle of SoxEffectChain.
+  // Using std::string and let it manage memory.
   // 4096 is minimum size requried by auto_detect_format
   // https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/formats.c#L40-L48
   const size_t in_buffer_size = 4096;
   std::string in_buffer(in_buffer_size, 'x');
   auto* in_buf = const_cast<char*>(in_buffer.data());
 
+  // Fetch the header, and copy it to the buffer.
   auto header = static_cast<std::string>(static_cast<py::bytes>(fileobj.attr("read")(4096)));
   memcpy(static_cast<void*>(in_buf),
          static_cast<void*>(const_cast<char*>(header.data())), header.length());
 
+  // Open file (this starts reading the header)
   SoxFormat sf(sox_open_mem_read(
       in_buf,
       in_buffer_size,
       /*signal=*/nullptr,
       /*encoding=*/nullptr,
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
+
+  // In case of streamed data, length can be 0
   validate_input_file(sf, /*check_length=*/false);
 
-  const auto dtype = get_dtype(sf->encoding.encoding, sf->signal.precision);
-
-  // Prepare output
+  // Prepare output buffer
   std::vector<sox_sample_t> out_buffer;
   out_buffer.reserve(sf->signal.length);
 
   // Create and run SoxEffectsChain
+  const auto dtype = get_dtype(sf->encoding.encoding, sf->signal.precision);
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
       /*input_encoding=*/sf->encoding,
       /*output_encoding=*/get_encodinginfo("wav", dtype, 0.));
-
   chain.addInputFileObj(sf, in_buf, in_buffer_size, &fileobj);
   for (const auto& effect : effects) {
     chain.addEffect(effect);

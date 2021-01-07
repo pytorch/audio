@@ -296,6 +296,7 @@ struct FileObjInputPriv {
 };
 
 /// Callback function to feed byte string
+/// https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/sox.h#L1268-L1278
 int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   auto priv = static_cast<FileObjInputPriv *>(effp->priv);
   auto sf = priv->sf;
