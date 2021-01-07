@@ -115,8 +115,12 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
 
         decibels = F.amplitude_to_DB(spec, amplitude_mult, amin,
                                      db_mult, top_db=top_db)
-        above_top = decibels >= 6.0205
-        assert above_top.all(), decibels
+        below_limit = decibels < 6.0205
+        assert not below_limit.any(), (
+            "{} decibel values were below the expected cutoff:\n{}".format(
+                below_limit.sum().item(), decibels
+            )
+        )
 
     def test_top_db_batch(self):
         torch.manual_seed(0)
