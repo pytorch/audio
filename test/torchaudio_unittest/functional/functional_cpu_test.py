@@ -151,6 +151,15 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         self._check_top_db(spec[0][0])
 
     def test_batched(self):
+        """Ensure that the clamps are separate for each spectrogram in a batch.
+
+        The clamp was determined per-batch in a prior implementation, which
+        meant items were not independent and information could leak between
+        them. See:
+
+        https://github.com/pytorch/audio/issues/994
+
+        """
         amplitude_mult = 20.
         amin = 1e-10
         ref = 1.0
@@ -178,15 +187,6 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         self.assertEqual(batchwise_dbs, itemwise_dbs)
 
     def test_per_spectrogram(self):
-        """Ensure that the clamps are separate for each spectrogram in a batch.
-
-        The clamp was determined per-batch in a prior implementation, which
-        meant items were not independent and information could leak between
-        them.
-
-        https://github.com/pytorch/audio/issues/994
-
-        """
         amplitude_mult = 20.
         amin = 1e-10
         ref = 1.0
