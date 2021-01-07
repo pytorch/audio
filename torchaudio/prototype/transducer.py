@@ -148,8 +148,8 @@ def check_inputs(log_probs, labels, lengths, label_lengths):
 
     check_dim(log_probs, 4, "log_probs")
     check_dim(labels, 2, "labels")
-    check_dim(lengths, 1, "lenghts")
-    check_dim(label_lengths, 1, "label_lenghts")
+    check_dim(lengths, 1, "lengths")
+    check_dim(label_lengths, 1, "label_lengths")
     max_T = torch.max(lengths)
     max_U = torch.max(label_lengths)
     T, U = log_probs.shape[1:3]
