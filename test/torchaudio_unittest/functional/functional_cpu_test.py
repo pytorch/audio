@@ -5,6 +5,7 @@ import torchaudio
 import torchaudio.functional as F
 from parameterized import parameterized
 import pytest
+import itertools
 
 from torchaudio_unittest import common_utils
 from .functional_impl import Lfilter, Spectrogram
@@ -122,53 +123,55 @@ class TestDB_to_amplitude(common_utils.TorchaudioTestCase):
 
 
 class TestComplexNorm(common_utils.TorchaudioTestCase):
-
-    @parameterized.expand([
-        (torch.randn(1, 2, 1025, 400, 2),  1),
-        (torch.randn(1025, 400, 2), 2)
-    ])
-    def test_complex_norm(self, complex_tensor, power):
-        torch.random.manual_seed(42)
-
+    @parameterized.expand(list(itertools.product(
+        [(1, 2, 1025, 400, 2),  (1025, 400, 2)],
+        [1, 2, 0.7]
+    )))
+    def test_complex_norm(self, shape, power):
+        torch.random.manual_seed(0)
+        complex_tensor = torch.randn(*shape)
         expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
         norm_tensor = F.complex_norm(complex_tensor, power)
         torch.testing.assert_allclose(norm_tensor, expected_norm_tensor, atol=1e-5, rtol=1e-5)
 
 
-@pytest.mark.parametrize('specgram', [
-    torch.randn(2, 1025, 400),
-    torch.randn(1, 201, 100)
-])
-@pytest.mark.parametrize('mask_param', [100])
-@pytest.mark.parametrize('mask_value', [0., 30.])
-@pytest.mark.parametrize('axis', [1, 2])
-def test_mask_along_axis(specgram, mask_param, mask_value, axis):
+class TestMaskAlongAxis(common_utils.TorchaudioTestCase):
+    @parameterized.expand(list(itertools.product(
+        [(2, 1025, 400),  (1, 201, 100)],
+        [100],
+        [0., 30.],
+        [1, 2]
+    )))
+    def test_mask_along_axis(self, shape, mask_param, mask_value, axis):
+        torch.random.manual_seed(0)
+        specgram = torch.randn(*shape)
+        mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis)
 
-    mask_specgram = F.mask_along_axis(specgram, mask_param, mask_value, axis)
+        other_axis = 1 if axis == 2 else 2
 
-    other_axis = 1 if axis == 2 else 2
+        masked_columns = (mask_specgram == mask_value).sum(other_axis)
+        num_masked_columns = (masked_columns == mask_specgram.size(other_axis)).sum()
+        num_masked_columns //= mask_specgram.size(0)
 
-    masked_columns = (mask_specgram == mask_value).sum(other_axis)
-    num_masked_columns = (masked_columns == mask_specgram.size(other_axis)).sum()
-    num_masked_columns //= mask_specgram.size(0)
+        assert mask_specgram.size() == specgram.size()
+        assert num_masked_columns < mask_param
 
-    assert mask_specgram.size() == specgram.size()
-    assert num_masked_columns < mask_param
+class TestMaskAlongAxisIID(common_utils.TorchaudioTestCase):
+    @parameterized.expand(list(itertools.product(
+        [100],
+        [0., 30.],
+        [2, 3]
+    )))
+    def test_mask_along_axis_iid(self, mask_param, mask_value, axis):
+        torch.random.manual_seed(42)
+        specgrams = torch.randn(4, 2, 1025, 400)
 
+        mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
 
-@pytest.mark.parametrize('mask_param', [100])
-@pytest.mark.parametrize('mask_value', [0., 30.])
-@pytest.mark.parametrize('axis', [2, 3])
-def test_mask_along_axis_iid(mask_param, mask_value, axis):
-    torch.random.manual_seed(42)
-    specgrams = torch.randn(4, 2, 1025, 400)
+        other_axis = 2 if axis == 3 else 3
 
-    mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
+        masked_columns = (mask_specgrams == mask_value).sum(other_axis)
+        num_masked_columns = (masked_columns == mask_specgrams.size(other_axis)).sum(-1)
 
-    other_axis = 2 if axis == 3 else 3
-
-    masked_columns = (mask_specgrams == mask_value).sum(other_axis)
-    num_masked_columns = (masked_columns == mask_specgrams.size(other_axis)).sum(-1)
-
-    assert mask_specgrams.size() == specgrams.size()
-    assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
+        assert mask_specgrams.size() == specgrams.size()
+        assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
