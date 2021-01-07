@@ -111,7 +111,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         TOP_DB = 40.
 
         decibels = F.amplitude_to_DB(spec, AMPLITUDE_MULT, AMIN,
-                                           DB_MULT, top_db=TOP_DB)
+                                     DB_MULT, top_db=TOP_DB)
         above_top = decibels >= 6.0205
         assert above_top.all(), decibels
 
