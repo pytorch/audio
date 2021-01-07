@@ -2,7 +2,7 @@
 #define TORCHAUDIO_SOX_IO_H
 
 #include <torch/script.h>
-#include <torchaudio/csrc/sox_utils.h>
+#include <torchaudio/csrc/sox/utils.h>
 
 namespace torchaudio {
 namespace sox_io {

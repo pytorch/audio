@@ -1,6 +1,7 @@
 """Test defintion common to CPU and CUDA"""
 import torch
 import torchaudio.functional as F
+from parameterized import parameterized
 
 from torchaudio_unittest import common_utils
 
@@ -29,3 +30,25 @@ class Lfilter(common_utils.TestBaseMixin):
         assert output_signal.max() <= 1
         output_signal = F.lfilter(input_signal, a_coeffs, b_coeffs, clamp=False)
         assert output_signal.max() > 1
+
+
+class Spectrogram(common_utils.TestBaseMixin):
+    @parameterized.expand([(0., ), (1., ), (2., ), (3., )])
+    def test_grad_at_zero(self, power):
+        """The gradient of power spectrogram should not be nan but zero near x=0
+
+        https://github.com/pytorch/audio/issues/993
+        """
+        x = torch.zeros(1, 22050, requires_grad=True)
+        spec = F.spectrogram(
+            x,
+            pad=0,
+            window=None,
+            n_fft=2048,
+            hop_length=None,
+            win_length=None,
+            power=power,
+            normalized=False,
+        )
+        spec.sum().backward()
+        assert not x.grad.isnan().sum()

@@ -1,5 +1,4 @@
 import math
-import unittest
 
 import torch
 import torchaudio
@@ -8,7 +7,7 @@ from parameterized import parameterized
 import pytest
 
 from torchaudio_unittest import common_utils
-from .functional_impl import Lfilter
+from .functional_impl import Lfilter, Spectrogram
 
 
 class TestLFilterFloat32(Lfilter, common_utils.PytorchTestCase):
@@ -17,6 +16,16 @@ class TestLFilterFloat32(Lfilter, common_utils.PytorchTestCase):
 
 
 class TestLFilterFloat64(Lfilter, common_utils.PytorchTestCase):
+    dtype = torch.float64
+    device = torch.device('cpu')
+
+
+class TestSpectrogramFloat32(Spectrogram, common_utils.PytorchTestCase):
+    dtype = torch.float32
+    device = torch.device('cpu')
+
+
+class TestSpectrogramFloat64(Spectrogram, common_utils.PytorchTestCase):
     dtype = torch.float64
     device = torch.device('cpu')
 

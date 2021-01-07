@@ -1,14 +1,5 @@
 #include <sox.h>
-
-#include <string>
-#include <tuple>
-#include <vector>
-
-#include <torch/extension.h>
-
-namespace at {
-struct Tensor;
-} // namespace at
+#include <torch/torch.h>
 
 namespace torch { namespace audio {
 

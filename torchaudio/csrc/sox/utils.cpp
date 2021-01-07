@@ -1,6 +1,6 @@
 #include <c10/core/ScalarType.h>
 #include <sox.h>
-#include <torchaudio/csrc/sox_utils.h>
+#include <torchaudio/csrc/sox/utils.h>
 
 namespace torchaudio {
 namespace sox_utils {

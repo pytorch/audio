@@ -70,30 +70,29 @@ def spectrogram(
     waveform = waveform.reshape(-1, shape[-1])
 
     # default values are consistent with librosa.core.spectrum._spectrogram
-    spec_f = torch.view_as_real(
-        torch.stft(
-            input=waveform,
-            n_fft=n_fft,
-            hop_length=hop_length,
-            win_length=win_length,
-            window=window,
-            center=True,
-            pad_mode="reflect",
-            normalized=False,
-            onesided=True,
-            return_complex=True,
-        )
+    spec_f = torch.stft(
+        input=waveform,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        win_length=win_length,
+        window=window,
+        center=True,
+        pad_mode="reflect",
+        normalized=False,
+        onesided=True,
+        return_complex=True,
     )
 
     # unpack batch
-    spec_f = spec_f.reshape(shape[:-1] + spec_f.shape[-3:])
+    spec_f = spec_f.reshape(shape[:-1] + spec_f.shape[-2:])
 
     if normalized:
         spec_f /= window.pow(2.).sum().sqrt()
     if power is not None:
-        spec_f = complex_norm(spec_f, power=power)
-
-    return spec_f
+        if power == 1.0:
+            return spec_f.abs()
+        return spec_f.abs().pow(power)
+    return torch.view_as_real(spec_f)
 
 
 def griffinlim(
