@@ -92,14 +92,17 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         self.assertEqual(x2, spec)
 
     def test_amplitude_to_DB_batch(self):
+        torch.manual_seed(0)
         spec = torch.rand([2, 2, 100, 100]) * 200
         self._ensure_reversible(spec)
 
     def test_amplitude_to_DB_channels(self):
+        torch.manual_seed(0)
         spec = torch.rand([2, 100, 100]) * 200
         self._ensure_reversible(spec)
 
     def test_amplitude_to_DB_freq(self):
+        torch.manual_seed(0)
         spec = torch.rand([100, 100]) * 200
         self._ensure_reversible(spec)
 
@@ -116,6 +119,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         assert above_top.all(), decibels
 
     def test_top_db_batch(self):
+        torch.manual_seed(0)
         spec = torch.rand([1, 2, 100, 100]) * 200
         # Predictability
         spec[0, 0, 1] = 0
@@ -123,6 +127,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         self._check_top_db(spec)
 
     def test_top_db_channel(self):
+        torch.manual_seed(0)
         spec = torch.rand([1, 2, 100, 100]) * 200
         # Predictability
         spec[0, 0, 1] = 0
@@ -130,6 +135,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         self._check_top_db(spec[0])
 
     def test_top_db_freq(self):
+        torch.manual_seed(0)
         spec = torch.rand([1, 2, 100, 100]) * 200
         # Predictability
         spec[0, 0, 1] = 0
@@ -144,6 +150,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         top_db = 40.
 
         # Make a batch of noise
+        torch.manual_seed(0)
         spec = torch.rand([2, 2, 100, 100]) * 200
         # Make the second item blow out the first
         spec[0] *= 0.5
@@ -169,6 +176,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         db_mult = math.log10(max(amin, ref))
         top_db = 40.
 
+        torch.manual_seed(0)
         spec = torch.rand([1, 2, 100, 100]) * 200
         # Make the second channel blow out the first
         spec[:, 0] *= 0.5
