@@ -127,7 +127,11 @@ class TestPhaseVocoder(common_utils.TorchaudioTestCase):
         torch.random.manual_seed(42)
         complex_specgrams = torch.randn(*shape)
         complex_specgrams = complex_specgrams.type(torch.float64)
-        phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-3], dtype=torch.float64)[..., None]
+        phase_advance = torch.linspace(
+            0,
+            np.pi * hop_length,
+            complex_specgrams.shape[-3],
+            dtype=torch.float64)[..., None]
 
         complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
 
@@ -143,9 +147,10 @@ class TestPhaseVocoder(common_utils.TorchaudioTestCase):
         mono_complex_specgram = complex_specgrams[index].numpy()
         mono_complex_specgram = mono_complex_specgram[..., 0] + \
             mono_complex_specgram[..., 1] * 1j
-        expected_complex_stretch = librosa.phase_vocoder(mono_complex_specgram,
-                                                        rate=rate,
-                                                        hop_length=hop_length)
+        expected_complex_stretch = librosa.phase_vocoder(
+            mono_complex_specgram,
+            rate=rate,
+            hop_length=hop_length)
 
         complex_stretch = complex_specgrams_stretch[index].numpy()
         complex_stretch = complex_stretch[..., 0] + 1j * complex_stretch[..., 1]

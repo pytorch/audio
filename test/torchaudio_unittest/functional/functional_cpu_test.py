@@ -125,7 +125,7 @@ class TestDB_to_amplitude(common_utils.TorchaudioTestCase):
 
 class TestComplexNorm(common_utils.TorchaudioTestCase):
     @parameterized.expand(list(itertools.product(
-        [(1, 2, 1025, 400, 2),  (1025, 400, 2)],
+        [(1, 2, 1025, 400, 2), (1025, 400, 2)],
         [1, 2, 0.7]
     )))
     def test_complex_norm(self, shape, power):
@@ -138,7 +138,7 @@ class TestComplexNorm(common_utils.TorchaudioTestCase):
 
 class TestMaskAlongAxis(common_utils.TorchaudioTestCase):
     @parameterized.expand(list(itertools.product(
-        [(2, 1025, 400),  (1, 201, 100)],
+        [(2, 1025, 400), (1, 201, 100)],
         [100],
         [0., 30.],
         [1, 2]
@@ -156,6 +156,7 @@ class TestMaskAlongAxis(common_utils.TorchaudioTestCase):
 
         assert mask_specgram.size() == specgram.size()
         assert num_masked_columns < mask_param
+
 
 class TestMaskAlongAxisIID(common_utils.TorchaudioTestCase):
     @parameterized.expand(list(itertools.product(
