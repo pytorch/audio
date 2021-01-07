@@ -235,8 +235,8 @@ def amplitude_to_DB(
     Args:
 
         x (Tensor): Input spectrogram(s) before being converted to decibel scale. Input should take
-          the form `(..., freq, time)`. Batched inputs must include a channel dimension and should
-          take the form `(batch, channel, freq, time)`.
+          the form `(..., freq, time)`. Batched inputs should include a channel dimension and
+          have the form `(batch, channel, freq, time)`.
         multiplier (float): Use 10. for power and 20. for amplitude
         amin (float): Number to clamp ``x``
         db_multiplier (float): Log10(max(reference value and amin))
