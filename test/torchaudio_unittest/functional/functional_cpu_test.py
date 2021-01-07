@@ -105,7 +105,6 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
 
     def _check_top_db(self, spec):
         AMPLITUDE_MULT = 20.
-        POWER_MULT = 10.
         AMIN = 1e-10
         REF = 1.0
         DB_MULT = math.log10(max(AMIN, REF))
@@ -139,7 +138,6 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
 
     def test_batched(self):
         AMPLITUDE_MULT = 20.
-        POWER_MULT = 10.
         AMIN = 1e-10
         REF = 1.0
         DB_MULT = math.log10(max(AMIN, REF))
@@ -166,7 +164,6 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
 
     def test_per_spectrogram(self):
         AMPLITUDE_MULT = 20.
-        POWER_MULT = 10.
         AMIN = 1e-10
         REF = 1.0
         DB_MULT = math.log10(max(AMIN, REF))
