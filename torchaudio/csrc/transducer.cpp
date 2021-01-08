@@ -43,10 +43,10 @@ int64_t cpu_rnnt_loss(torch::Tensor acts,
 
         std::vector<float> cpu_workspace(cpu_size_bytes / sizeof(float), 0);
 
-        compute_rnnt_loss(acts.data<float>(), grads.data<float>(),
-                          labels.data<int>(), label_lengths.data<int>(),
-                          input_lengths.data<int>(), alphabet_size,
-                          minibatch_size, costs.data<float>(),
+        compute_rnnt_loss(acts.data_ptr<float>(), grads.data_ptr<float>(),
+                          labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
+                          input_lengths.data_ptr<int>(), alphabet_size,
+                          minibatch_size, costs.data_ptr<float>(),
                           cpu_workspace.data(), options);
 
         return 0;
@@ -59,10 +59,10 @@ int64_t cpu_rnnt_loss(torch::Tensor acts,
 
         std::vector<double> cpu_workspace(cpu_size_bytes / sizeof(double), 0);
 
-        compute_rnnt_loss_fp64(acts.data<double>(), grads.data<double>(),
-                               labels.data<int>(), label_lengths.data<int>(),
-                               input_lengths.data<int>(), alphabet_size,
-                               minibatch_size, costs.data<double>(),
+        compute_rnnt_loss_fp64(acts.data_ptr<double>(), grads.data_ptr<double>(),
+                               labels.data_ptr<int>(), label_lengths.data_ptr<int>(),
+                               input_lengths.data_ptr<int>(), alphabet_size,
+                               minibatch_size, costs.data_ptr<double>(),
                                cpu_workspace.data(), options);
 
         return 0;

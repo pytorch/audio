@@ -4,6 +4,10 @@
 #include <sox.h>
 #include <torchaudio/csrc/sox/utils.h>
 
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+#include <torch/extension.h>
+#endif // TORCH_API_INCLUDE_EXTENSION_H
+
 namespace torchaudio {
 namespace sox_effects_chain {
 
@@ -33,6 +37,16 @@ class SoxEffectsChain {
   void addEffect(const std::vector<std::string> effect);
   int64_t getOutputNumChannels();
   int64_t getOutputSampleRate();
+
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+
+  void addInputFileObj(
+      sox_format_t* sf,
+      char* buffer,
+      uint64_t buffer_size,
+      py::object* fileobj);
+
+#endif // TORCH_API_INCLUDE_EXTENSION_H
 };
 
 } // namespace sox_effects_chain
