@@ -388,10 +388,12 @@
 <span class="sd">    ``[-1.0, 1.0]``.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filepath (str or pathlib.Path): Path to audio file.</span>
-<span class="sd">            This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``</span>
-<span class="sd">            for the consistency with &quot;sox_io&quot; backend, which has a restriction on type annotation</span>
-<span class="sd">            for TorchScript compiler compatiblity.</span>
+<span class="sd">        filepath (path-like object or file-like object):</span>
+<span class="sd">            Source of audio data.</span>
+<span class="sd">            Note:</span>
+<span class="sd">                  * This argument is intentionally annotated as ``str`` only,</span>
+<span class="sd">                    for the consistency with &quot;sox_io&quot; backend, which has a restriction</span>
+<span class="sd">                    on type annotation due to TorchScript compiler compatiblity.</span>
 <span class="sd">        frame_offset (int):</span>
 <span class="sd">            Number of frames to skip before start reading data.</span>
 <span class="sd">        num_frames (int):</span>

@@ -304,13 +304,15 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.backend.sox_io_backend</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">AudioMetaData</span>
 
 
@@ -388,9 +390,17 @@
 <span class="sd">    ``[-1.0, 1.0]``.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filepath (str or pathlib.Path):</span>
-<span class="sd">            Path to audio file. This function also handles ``pathlib.Path`` objects, but is</span>
-<span class="sd">            annotated as ``str`` for TorchScript compiler compatibility.</span>
+<span class="sd">        filepath (path-like object or file-like object):</span>
+<span class="sd">            Source of audio data. When the function is not compiled by TorchScript,</span>
+<span class="sd">            (e.g. ``torch.jit.script``), the following types are accepted;</span>
+<span class="sd">                  * ``path-like``: file path</span>
+<span class="sd">                  * ``file-like``: Object with ``read(size: int) -&gt; bytes`` method,</span>
+<span class="sd">                    which returns byte string of at most ``size`` length.</span>
+<span class="sd">            When the function is compiled by TorchScript, only ``str`` type is allowed.</span>
+
+<span class="sd">            Note:</span>
+<span class="sd">                * This argument is intentionally annotated as ``str`` only due to</span>
+<span class="sd">                  TorchScript compiler compatibility.</span>
 <span class="sd">        frame_offset (int):</span>
 <span class="sd">            Number of frames to skip before start reading data.</span>
 <span class="sd">        num_frames (int):</span>
@@ -418,8 +428,13 @@
 <span class="sd">            integer type, else ``float32`` type. If ``channels_first=True``, it has</span>
 <span class="sd">            ``[channel, time]`` else ``[time, channel]``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Cast to str in case type is `pathlib.Path`</span>
-    <span class="n">filepath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;read&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">load_audio_fileobj</span><span class="p">(</span>
+                <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_load_audio_file</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">),</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_tensor</span><span class="p">(),</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">()</span>
     <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_load_audio_file</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_tensor</span><span class="p">(),</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">()</span></div>
