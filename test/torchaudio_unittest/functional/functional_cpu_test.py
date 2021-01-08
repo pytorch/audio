@@ -156,6 +156,7 @@ class TestMaskAlongAxis(common_utils.TorchaudioTestCase):
         assert mask_specgram.size() == specgram.size()
         assert num_masked_columns < mask_param
 
+
 class TestMaskAlongAxisIID(common_utils.TorchaudioTestCase):
     @parameterized.expand(list(itertools.product(
         [100],
