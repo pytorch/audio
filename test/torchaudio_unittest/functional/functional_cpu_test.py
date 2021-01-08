@@ -54,7 +54,7 @@ class TestComputeDeltas(common_utils.TorchaudioTestCase):
         specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0]]])
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5]]])
         computed = F.compute_deltas(specgram, win_length=3)
-        torch.testing.assert_allclose(computed, expected)
+        self.assertEqual(computed, expected)
 
     def test_two_channels(self):
         specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0],
@@ -62,7 +62,7 @@ class TestComputeDeltas(common_utils.TorchaudioTestCase):
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5],
                                   [0.5, 1.0, 1.0, 0.5]]])
         computed = F.compute_deltas(specgram, win_length=3)
-        torch.testing.assert_allclose(computed, expected)
+        self.assertEqual(computed, expected)
 
 
 class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
@@ -82,7 +82,6 @@ class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
 
 class TestDB_to_amplitude(common_utils.TorchaudioTestCase):
     def test_DB_to_amplitude(self):
-        torch.random.manual_seed(42)
         # Make some noise
         x = torch.rand(1000)
         spectrogram = torchaudio.transforms.Spectrogram()
@@ -99,13 +98,13 @@ class TestDB_to_amplitude(common_utils.TorchaudioTestCase):
         db = F.amplitude_to_DB(torch.abs(x), multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        torch.testing.assert_allclose(x2, torch.abs(x), atol=5e-5, rtol=1e-5)
+        self.assertEqual(x2, torch.abs(x), atol=5e-5, rtol=1e-5)
 
         # Spectrogram amplitude -> DB -> amplitude
         db = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        torch.testing.assert_allclose(x2, spec, atol=5e-5, rtol=1e-5)
+        self.assertEqual(x2, spec, atol=5e-5, rtol=1e-5)
 
         # Waveform power -> DB -> power
         multiplier = 10.
@@ -114,13 +113,13 @@ class TestDB_to_amplitude(common_utils.TorchaudioTestCase):
         db = F.amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        torch.testing.assert_allclose(x2, torch.abs(x), atol=5e-5, rtol=1e-5)
+        self.assertEqual(x2, torch.abs(x), atol=5e-5, rtol=1e-5)
 
         # Spectrogram power -> DB -> power
         db = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db=None)
         x2 = F.DB_to_amplitude(db, ref, power)
 
-        torch.testing.assert_allclose(x2, spec, atol=5e-5, rtol=1e-5)
+        self.assertEqual(x2, spec, atol=5e-5, rtol=1e-5)
 
 
 class TestComplexNorm(common_utils.TorchaudioTestCase):
@@ -133,7 +132,7 @@ class TestComplexNorm(common_utils.TorchaudioTestCase):
         complex_tensor = torch.randn(*shape)
         expected_norm_tensor = complex_tensor.pow(2).sum(-1).pow(power / 2)
         norm_tensor = F.complex_norm(complex_tensor, power)
-        torch.testing.assert_allclose(norm_tensor, expected_norm_tensor, atol=1e-5, rtol=1e-5)
+        self.assertEqual(norm_tensor, expected_norm_tensor, atol=1e-5, rtol=1e-5)
 
 
 class TestMaskAlongAxis(common_utils.TorchaudioTestCase):
@@ -156,7 +155,6 @@ class TestMaskAlongAxis(common_utils.TorchaudioTestCase):
 
         assert mask_specgram.size() == specgram.size()
         assert num_masked_columns < mask_param
-
 
 class TestMaskAlongAxisIID(common_utils.TorchaudioTestCase):
     @parameterized.expand(list(itertools.product(

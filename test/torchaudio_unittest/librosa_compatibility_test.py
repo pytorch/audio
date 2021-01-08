@@ -155,7 +155,7 @@ class TestPhaseVocoder(common_utils.TorchaudioTestCase):
         complex_stretch = complex_specgrams_stretch[index].numpy()
         complex_stretch = complex_stretch[..., 0] + 1j * complex_stretch[..., 1]
 
-        assert np.allclose(complex_stretch, expected_complex_stretch, atol=1e-5)
+        self.assertEqual(complex_stretch, torch.from_numpy(expected_complex_stretch), atol=1e-5, rtol=1e-5)
 
 
 def _load_audio_asset(*asset_paths, **kwargs):
