@@ -17,4 +17,4 @@ declare -a args=(
 )
 
 cd test
-pytest "${args[@]}" torchaudio_unittest --pdb
+PYTHONFAULTHANDLER=1 pytest "${args[@]}" torchaudio_unittest
