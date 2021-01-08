@@ -224,6 +224,17 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(
             torch_mfcc.type(librosa_mfcc_tensor.dtype), librosa_mfcc_tensor, atol=5e-3, rtol=1e-5)
 
+        # test SpectralCentroid
+        spect_centroid = torchaudio.transforms.SpectralCentroid(
+            sample_rate=sample_rate, n_fft=n_fft, hop_length=hop_length)
+        out_torch = spect_centroid(sound).squeeze().cpu()
+
+        out_librosa = librosa.feature.spectral_centroid(
+            y=sound_librosa, sr=sample_rate, n_fft=n_fft, hop_length=hop_length)
+        out_librosa = torch.from_numpy(out_librosa)[0]
+
+        self.assertEqual(out_torch.type(out_librosa.dtype), out_librosa, atol=1e-5, rtol=1e-5)
+
     def test_basics1(self):
         kwargs = {
             'n_fft': 400,
