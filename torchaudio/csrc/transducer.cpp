@@ -1,5 +1,3 @@
-#ifdef BUILD_TRANSDUCER
-
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -7,6 +5,8 @@
 
 #include <torch/script.h>
 #include "rnnt.h"
+
+namespace {
 
 int64_t cpu_rnnt_loss(torch::Tensor acts,
                       torch::Tensor labels,
@@ -75,8 +75,19 @@ int64_t cpu_rnnt_loss(torch::Tensor acts,
     return -1;
 }
 
+} // namespace
+
 TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
-    m.impl("rnnt_loss", &cpu_rnnt_loss);
+  m.impl("rnnt_loss", &cpu_rnnt_loss);
 }
 
-#endif
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+  m.def("rnnt_loss(Tensor acts,"
+                  "Tensor labels,"
+                  "Tensor input_lengths,"
+                  "Tensor label_lengths,"
+                  "Tensor costs,"
+                  "Tensor grads,"
+                  "int blank_label,"
+                  "int num_threads) -> int");
+}
