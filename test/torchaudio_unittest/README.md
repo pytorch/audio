@@ -2,7 +2,7 @@
 
 ## How to run test
 
-You can use `pytest` to run `torchaudio`'s test suites. See https://docs.pytest.org/ for the detail of how to use `pytest` command.
+You can use `pytest` to run `torchaudio`'s test suites. See https://docs.pytest.org/ for the detail of how to use `pytest` command. The `parametrized` package is also needed; it can be installed via `pip` or with ` conda install -c conda-forge parameterized`.
 
 ```
 # List up all the tests

@@ -50,7 +50,6 @@ class clean(distutils.command.clean.clean):
         # Remove build directory
         build_dirs = [
             ROOT_DIR / 'build',
-            ROOT_DIR / 'third_party' / 'build',
         ]
         for path in build_dirs:
             if path.exists():
