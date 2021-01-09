@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.5)
 project(torchaudio_third_parties)
 
 option(BUILD_SOX "Build libsox statically")
-option(BUILD_TRANSDUCER "Build transducer")
+option(BUILD_TRANSDUCER "Build transducer statically")
 
-SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if (BUILD_SOX)
 include(ExternalProject)
