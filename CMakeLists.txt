@@ -20,6 +20,23 @@ endif()
 
 add_subdirectory(third_party)
 
+IF (APPLE)
+    EXEC_PROGRAM(uname ARGS -v  OUTPUT_VARIABLE DARWIN_VERSION)
+    STRING(REGEX MATCH "[0-9]+" DARWIN_VERSION ${DARWIN_VERSION})
+    MESSAGE(STATUS "DARWIN_VERSION=${DARWIN_VERSION}")
+
+    #for el capitain have to use rpath
+
+    IF (DARWIN_VERSION LESS 15)
+        set(CMAKE_SKIP_RPATH TRUE)
+    ENDIF ()
+
+ELSE()
+    #always skip for linux
+    set(CMAKE_SKIP_RPATH TRUE)
+ENDIF()
+
+
 ################################################################################
 # Beginning of torchaudio extension configuration
 ################################################################################
