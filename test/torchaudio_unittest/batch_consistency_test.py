@@ -283,3 +283,14 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         # Batch then transform
         computed = torchaudio.transforms.Vol(gain=1.1)(waveform.repeat(3, 1, 1))
         self.assertEqual(computed, expected)
+
+    def test_batch_spectral_centroid(self):
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
+        waveform, sample_rate = torchaudio.load(test_filepath)  # (2, 278756), 44100
+
+        # Single then transform then batch
+        expected = torchaudio.transforms.SpectralCentroid(sample_rate)(waveform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = torchaudio.transforms.SpectralCentroid(sample_rate)(waveform.repeat(3, 1, 1))
+        self.assertEqual(computed, expected)
