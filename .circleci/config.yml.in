@@ -101,14 +101,14 @@ jobs:
           {% endraw %}
       - run:
           command: |
-              mkdir -p third_party/archives/
-              wget --no-clobber --directory-prefix=third_party/archives/ $(awk '/URL /{print $2}' third_party/CMakeLists.txt)
+              mkdir -p third_party/sox/archives/
+              wget --no-clobber --directory-prefix=third_party/sox/archives/ $(awk '/URL /{print $2}' third_party/sox/CMakeLists.txt)
       - save_cache:
           {% raw %}
           key: tp-nix-v2-{{ checksum ".cachekey" }}
           {% endraw %}
           paths:
-            - third_party/archives
+            - third_party/sox/archives
       - persist_to_workspace:
           root: third_party
           paths:
@@ -411,9 +411,7 @@ jobs:
           paths:
             - conda
             - env
-            - third_party/build
             - third_party/install
-            - third_party/src
       - run:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
@@ -458,9 +456,7 @@ jobs:
           paths:
             - conda
             - env
-            - third_party/build
             - third_party/install
-            - third_party/src
       - run:
           name: Install torchaudio
           command: docker run -t --gpus all -e UPLOAD_CHANNEL -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
@@ -573,9 +569,7 @@ jobs:
           paths:
             - conda
             - env
-            - third_party/build
             - third_party/install
-            - third_party/src
       - run:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
@@ -612,9 +606,7 @@ jobs:
           paths:
             - conda
             - env
-            - third_party/build
             - third_party/install
-            - third_party/src
       - run:
           name: Run style check
           command: .circleci/unittest/linux/scripts/run_style_checks.sh

@@ -1,11 +1,8 @@
-#ifndef TORCHAUDIO_REGISTER_H
-#define TORCHAUDIO_REGISTER_H
+#include <torchaudio/csrc/sox/effects.h>
+#include <torchaudio/csrc/sox/io.h>
+#include <torchaudio/csrc/sox/utils.h>
 
-#include <torchaudio/csrc/sox_effects.h>
-#include <torchaudio/csrc/sox_io.h>
-#include <torchaudio/csrc/sox_utils.h>
-
-TORCH_LIBRARY(torchaudio, m) {
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   //////////////////////////////////////////////////////////////////////////////
   // sox_utils.h
   //////////////////////////////////////////////////////////////////////////////
@@ -49,7 +46,14 @@ TORCH_LIBRARY(torchaudio, m) {
 
   m.def("torchaudio::sox_io_get_info", &torchaudio::sox_io::get_info);
   m.def(
-      "torchaudio::sox_io_load_audio_file",
+      "torchaudio::sox_io_load_audio_file("
+          "str path,"
+          "int? frame_offset=None,"
+          "int? num_frames=None,"
+          "bool? normalize=True,"
+          "bool? channels_first=False,"
+          "str? format=None"
+      ") -> __torch__.torch.classes.torchaudio.TensorSignal",
       &torchaudio::sox_io::load_audio_file);
   m.def(
       "torchaudio::sox_io_save_audio_file",
@@ -71,4 +75,3 @@ TORCH_LIBRARY(torchaudio, m) {
       "torchaudio::sox_effects_apply_effects_file",
       &torchaudio::sox_effects::apply_effects_file);
 }
-#endif

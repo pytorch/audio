@@ -20,20 +20,21 @@ _TP_BASE_DIR = _ROOT_DIR / 'third_party'
 _TP_INSTALL_DIR = _TP_BASE_DIR / 'install'
 
 
-def _get_build_sox():
-    val = os.environ.get('BUILD_SOX', '0')
+def _get_build(var):
+    val = os.environ.get(var, '0')
     trues = ['1', 'true', 'TRUE', 'on', 'ON', 'yes', 'YES']
     falses = ['0', 'false', 'FALSE', 'off', 'OFF', 'no', 'NO']
     if val in trues:
         return True
     if val not in falses:
         print(
-            f'WARNING: Unexpected environment variable value `BUILD_SOX={val}`. '
+            f'WARNING: Unexpected environment variable value `{var}={val}`. '
             f'Expected one of {trues + falses}')
     return False
 
 
-_BUILD_SOX = _get_build_sox()
+_BUILD_SOX = _get_build("BUILD_SOX")
+_BUILD_TRANSDUCER = _get_build("BUILD_TRANSDUCER")
 
 
 def _get_eca(debug):
@@ -42,6 +43,8 @@ def _get_eca(debug):
         eca += ["-O0", "-g"]
     else:
         eca += ["-O3"]
+    if _BUILD_TRANSDUCER:
+        eca += ['-DBUILD_TRANSDUCER']
     return eca
 
 
@@ -58,27 +61,31 @@ def _get_ela(debug):
 
 
 def _get_srcs():
-    return [str(p) for p in _CSRC_DIR.glob('**/*.cpp')]
+    srcs = [_CSRC_DIR / 'pybind.cpp']
+    srcs += list(_CSRC_DIR.glob('sox/**/*.cpp'))
+    if _BUILD_TRANSDUCER:
+        srcs += [_CSRC_DIR / 'transducer.cpp']
+    return [str(path) for path in srcs]
 
 
 def _get_include_dirs():
     dirs = [
         str(_ROOT_DIR),
     ]
-    if _BUILD_SOX:
+    if _BUILD_SOX or _BUILD_TRANSDUCER:
         dirs.append(str(_TP_INSTALL_DIR / 'include'))
     return dirs
 
 
 def _get_extra_objects():
-    objs = []
+    libs = []
     if _BUILD_SOX:
         # NOTE: The order of the library listed bellow matters.
         #
         # (the most important thing is that dependencies come after a library
         # e.g., sox comes first, flac/vorbis comes before ogg, and
         # vorbisenc/vorbisfile comes before vorbis
-        libs = [
+        libs += [
             'libsox.a',
             'libmad.a',
             'libFLAC.a',
@@ -92,25 +99,34 @@ def _get_extra_objects():
             'libopencore-amrnb.a',
             'libopencore-amrwb.a',
         ]
-        for lib in libs:
-            objs.append(str(_TP_INSTALL_DIR / 'lib' / lib))
-    return objs
+    if _BUILD_TRANSDUCER:
+        libs += ['libwarprnnt.a']
+
+    return [str(_TP_INSTALL_DIR / 'lib' / lib) for lib in libs]
 
 
 def _get_libraries():
     return [] if _BUILD_SOX else ['sox']
 
 
-def _build_third_party():
-    build_dir = str(_TP_BASE_DIR / 'build')
+def _build_third_party(base_build_dir):
+    build_dir = os.path.join(base_build_dir, 'third_party')
     os.makedirs(build_dir, exist_ok=True)
     subprocess.run(
-        args=['cmake', '..'],
+        args=[
+            'cmake',
+            f'-DCMAKE_INSTALL_PREFIX={_TP_INSTALL_DIR}',
+            f'-DBUILD_SOX={"ON" if _BUILD_SOX else "OFF"}',
+            f'-DBUILD_TRANSDUCER={"ON" if _BUILD_TRANSDUCER else "OFF"}',
+            f'{_TP_BASE_DIR}'],
         cwd=build_dir,
         check=True,
     )
+    command = ['cmake', '--build', '.']
+    if _BUILD_TRANSDUCER:
+        command += ['--target', 'install']
     subprocess.run(
-        args=['cmake', '--build', '.'],
+        args=command,
         cwd=build_dir,
         check=True,
     )
@@ -138,5 +154,5 @@ def get_ext_modules(debug=False):
 class BuildExtension(TorchBuildExtension):
     def build_extension(self, ext):
         if ext.name == _EXT_NAME and _BUILD_SOX:
-            _build_third_party()
+            _build_third_party(self.build_temp)
         super().build_extension(ext)

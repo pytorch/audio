@@ -1,8 +1,8 @@
 #include <sox.h>
-#include <torchaudio/csrc/sox_effects.h>
-#include <torchaudio/csrc/sox_effects_chain.h>
-#include <torchaudio/csrc/sox_io.h>
-#include <torchaudio/csrc/sox_utils.h>
+#include <torchaudio/csrc/sox/effects.h>
+#include <torchaudio/csrc/sox/effects_chain.h>
+#include <torchaudio/csrc/sox/io.h>
+#include <torchaudio/csrc/sox/utils.h>
 
 using namespace torch::indexing;
 using namespace torchaudio::sox_utils;
@@ -30,12 +30,14 @@ int64_t SignalInfo::getNumFrames() const {
   return num_frames;
 }
 
-c10::intrusive_ptr<SignalInfo> get_info(const std::string& path) {
+c10::intrusive_ptr<SignalInfo> get_info(
+    const std::string& path,
+    c10::optional<std::string>& format) {
   SoxFormat sf(sox_open_read(
       path.c_str(),
       /*signal=*/nullptr,
       /*encoding=*/nullptr,
-      /*filetype=*/nullptr));
+      /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
   if (static_cast<sox_format_t*>(sf) == nullptr) {
     throw std::runtime_error("Error opening audio file");
@@ -47,12 +49,11 @@ c10::intrusive_ptr<SignalInfo> get_info(const std::string& path) {
       static_cast<int64_t>(sf->signal.length / sf->signal.channels));
 }
 
-c10::intrusive_ptr<TensorSignal> load_audio_file(
-    const std::string& path,
+namespace {
+
+std::vector<std::vector<std::string>> get_effects(
     c10::optional<int64_t>& frame_offset,
-    c10::optional<int64_t>& num_frames,
-    c10::optional<bool>& normalize,
-    c10::optional<bool>& channels_first) {
+    c10::optional<int64_t>& num_frames) {
   const auto offset = frame_offset.value_or(0);
   if (offset < 0) {
     throw std::runtime_error(
@@ -76,9 +77,21 @@ c10::intrusive_ptr<TensorSignal> load_audio_file(
     os_offset << offset << "s";
     effects.emplace_back(std::vector<std::string>{"trim", os_offset.str()});
   }
+  return effects;
+}
 
+} // namespace
+
+c10::intrusive_ptr<TensorSignal> load_audio_file(
+    const std::string& path,
+    c10::optional<int64_t>& frame_offset,
+    c10::optional<int64_t>& num_frames,
+    c10::optional<bool>& normalize,
+    c10::optional<bool>& channels_first,
+    c10::optional<std::string>& format) {
+  auto effects = get_effects(frame_offset, num_frames);
   return torchaudio::sox_effects::apply_effects_file(
-      path, effects, normalize, channels_first);
+      path, effects, normalize, channels_first, format);
 }
 
 void save_audio_file(
@@ -119,6 +132,22 @@ void save_audio_file(
   chain.addOutputFile(sf);
   chain.run();
 }
+
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+
+std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
+    py::object fileobj,
+    c10::optional<int64_t>& frame_offset,
+    c10::optional<int64_t>& num_frames,
+    c10::optional<bool>& normalize,
+    c10::optional<bool>& channels_first,
+    c10::optional<std::string>& format) {
+  auto effects = get_effects(frame_offset, num_frames);
+  return torchaudio::sox_effects::apply_effects_fileobj(
+      fileobj, effects, normalize, channels_first, format);
+}
+
+#endif // TORCH_API_INCLUDE_EXTENSION_H
 
 } // namespace sox_io
 } // namespace torchaudio

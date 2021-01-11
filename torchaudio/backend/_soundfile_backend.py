@@ -12,7 +12,7 @@ if _mod_utils.is_module_available("soundfile"):
 
 
 @_mod_utils.requires_module("soundfile")
-def info(filepath: str) -> AudioMetaData:
+def info(filepath: str, format: Optional[str] = None) -> AudioMetaData:
     """Get signal information of an audio file.
 
     Args:
@@ -20,6 +20,8 @@ def info(filepath: str) -> AudioMetaData:
             This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``
             for the consistency with "sox_io" backend, which has a restriction on type annotation
             for TorchScript compiler compatiblity.
+        format (str, optional):
+            Not used. PySoundFile does not accept format hint.
 
     Returns:
         AudioMetaData: meta data of the given audio.
@@ -45,6 +47,7 @@ def load(
     num_frames: int = -1,
     normalize: bool = True,
     channels_first: bool = True,
+    format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Load audio data from file.
 
@@ -79,10 +82,12 @@ def load(
     ``[-1.0, 1.0]``.
 
     Args:
-        filepath (str or pathlib.Path): Path to audio file.
-            This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``
-            for the consistency with "sox_io" backend, which has a restriction on type annotation
-            for TorchScript compiler compatiblity.
+        filepath (path-like object or file-like object):
+            Source of audio data.
+            Note:
+                  * This argument is intentionally annotated as ``str`` only,
+                    for the consistency with "sox_io" backend, which has a restriction
+                    on type annotation due to TorchScript compiler compatiblity.
         frame_offset (int):
             Number of frames to skip before start reading data.
         num_frames (int):
@@ -99,9 +104,11 @@ def load(
         channels_first (bool):
             When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+        format (str, optional):
+            Not used. PySoundFile does not accept format hint.
 
     Returns:
-        torch.Tensor:
+        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
             If the input file has integer wav format and normalization is off, then it has
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             ``[channel, time]`` else ``[time, channel]``.
