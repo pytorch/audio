@@ -17,4 +17,4 @@ declare -a args=(
 )
 
 cd test
-pytest "${args[@]}" torchaudio_unittest -k "not fileobj"
+pytest "${args[@]}" torchaudio_unittest
