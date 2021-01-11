@@ -640,6 +640,6 @@ class Transforms(common_utils.TestBaseMixin):
         self._assert_consistency(T.Vad(sample_rate=sample_rate), waveform)
 
     def test_SpectralCentroid(self):
-        filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
-        waveform, sample_rate = common_utils.load_wav(filepath)
+        sample_rate = 44100
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
         self._assert_consistency(T.SpectralCentroid(sample_rate=sample_rate), waveform)
