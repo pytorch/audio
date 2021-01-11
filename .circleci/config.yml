@@ -656,7 +656,11 @@ jobs:
           command: .circleci/build_docs/install_wheels.sh
       - run:
           name: Build docs
-          command: .circleci/build_docs/build_docs.sh
+          command: |
+            set -ex
+            tag=${CIRCLE_TAG:1:5}
+            target=${tag:-master}
+            .circleci/build_docs/build_docs.sh $target
       - persist_to_workspace:
           root: ./
           paths:
