@@ -966,6 +966,6 @@ def spectral_centroid(
         Tensor: Dimension (..., time)
     """
     specgram = spectrogram(waveform, pad=pad, window=window, n_fft=n_fft, hop_length=hop_length,
-                           win_length=win_length, power=1, normalized=False)
+                           win_length=win_length, power=1., normalized=False)
     freqs = torch.linspace(0, sample_rate // 2, steps=1 + n_fft // 2).reshape((-1, 1))
     return (freqs * specgram).sum(dim=1) / specgram.sum(dim=1)
