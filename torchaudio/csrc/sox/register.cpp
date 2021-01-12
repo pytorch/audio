@@ -2,7 +2,7 @@
 #include <torchaudio/csrc/sox/io.h>
 #include <torchaudio/csrc/sox/utils.h>
 
-TORCH_LIBRARY(torchaudio, m) {
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   //////////////////////////////////////////////////////////////////////////////
   // sox_utils.h
   //////////////////////////////////////////////////////////////////////////////
@@ -74,18 +74,4 @@ TORCH_LIBRARY(torchaudio, m) {
   m.def(
       "torchaudio::sox_effects_apply_effects_file",
       &torchaudio::sox_effects::apply_effects_file);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // transducer.cpp
-  //////////////////////////////////////////////////////////////////////////////
-  #ifdef BUILD_TRANSDUCER
-  m.def("rnnt_loss(Tensor acts,"
-                  "Tensor labels,"
-                  "Tensor input_lengths,"
-                  "Tensor label_lengths,"
-                  "Tensor costs,"
-                  "Tensor grads,"
-                  "int blank_label,"
-                  "int num_threads) -> int");
-  #endif
 }

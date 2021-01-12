@@ -7,6 +7,8 @@ import torch
 import torchaudio
 import torchaudio.functional as F
 from torchaudio._internal.module_utils import is_module_available
+from parameterized import parameterized
+import itertools
 
 LIBROSA_AVAILABLE = is_module_available('librosa')
 
@@ -111,42 +113,49 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assertEqual(ta_out, lr_out, atol=5e-5, rtol=1e-5)
 
 
-@pytest.mark.parametrize('complex_specgrams', [
-    torch.randn(2, 1025, 400, 2)
-])
-@pytest.mark.parametrize('rate', [0.5, 1.01, 1.3])
-@pytest.mark.parametrize('hop_length', [256])
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
-def test_phase_vocoder(complex_specgrams, rate, hop_length):
-    # Due to cummulative sum, numerical error in using torch.float32 will
-    # result in bottom right values of the stretched sectrogram to not
-    # match with librosa.
+class TestPhaseVocoder(common_utils.TorchaudioTestCase):
+    @parameterized.expand(list(itertools.product(
+        [(2, 1025, 400, 2)],
+        [0.5, 1.01, 1.3],
+        [256]
+    )))
+    def test_phase_vocoder(self, shape, rate, hop_length):
+        # Due to cummulative sum, numerical error in using torch.float32 will
+        # result in bottom right values of the stretched sectrogram to not
+        # match with librosa.
+        torch.random.manual_seed(42)
+        complex_specgrams = torch.randn(*shape)
+        complex_specgrams = complex_specgrams.type(torch.float64)
+        phase_advance = torch.linspace(
+            0,
+            np.pi * hop_length,
+            complex_specgrams.shape[-3],
+            dtype=torch.float64)[..., None]
 
-    complex_specgrams = complex_specgrams.type(torch.float64)
-    phase_advance = torch.linspace(0, np.pi * hop_length, complex_specgrams.shape[-3], dtype=torch.float64)[..., None]
+        complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
 
-    complex_specgrams_stretch = F.phase_vocoder(complex_specgrams, rate=rate, phase_advance=phase_advance)
+        # == Test shape
+        expected_size = list(complex_specgrams.size())
+        expected_size[-2] = int(np.ceil(expected_size[-2] / rate))
 
-    # == Test shape
-    expected_size = list(complex_specgrams.size())
-    expected_size[-2] = int(np.ceil(expected_size[-2] / rate))
+        assert complex_specgrams.dim() == complex_specgrams_stretch.dim()
+        assert complex_specgrams_stretch.size() == torch.Size(expected_size)
 
-    assert complex_specgrams.dim() == complex_specgrams_stretch.dim()
-    assert complex_specgrams_stretch.size() == torch.Size(expected_size)
+        # == Test values
+        index = [0] * (complex_specgrams.dim() - 3) + [slice(None)] * 3
+        mono_complex_specgram = complex_specgrams[index].numpy()
+        mono_complex_specgram = mono_complex_specgram[..., 0] + \
+            mono_complex_specgram[..., 1] * 1j
+        expected_complex_stretch = librosa.phase_vocoder(
+            mono_complex_specgram,
+            rate=rate,
+            hop_length=hop_length)
 
-    # == Test values
-    index = [0] * (complex_specgrams.dim() - 3) + [slice(None)] * 3
-    mono_complex_specgram = complex_specgrams[index].numpy()
-    mono_complex_specgram = mono_complex_specgram[..., 0] + \
-        mono_complex_specgram[..., 1] * 1j
-    expected_complex_stretch = librosa.phase_vocoder(mono_complex_specgram,
-                                                     rate=rate,
-                                                     hop_length=hop_length)
+        complex_stretch = complex_specgrams_stretch[index].numpy()
+        complex_stretch = complex_stretch[..., 0] + 1j * complex_stretch[..., 1]
 
-    complex_stretch = complex_specgrams_stretch[index].numpy()
-    complex_stretch = complex_stretch[..., 0] + 1j * complex_stretch[..., 1]
-
-    assert np.allclose(complex_stretch, expected_complex_stretch, atol=1e-5)
+        self.assertEqual(complex_stretch, torch.from_numpy(expected_complex_stretch), atol=1e-5, rtol=1e-5)
 
 
 def _load_audio_asset(*asset_paths, **kwargs):
