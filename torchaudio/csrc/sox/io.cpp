@@ -13,10 +13,12 @@ namespace sox_io {
 SignalInfo::SignalInfo(
     const int64_t sample_rate_,
     const int64_t num_channels_,
-    const int64_t num_frames_)
+    const int64_t num_frames_,
+    const int64_t bits_per_sample_)
     : sample_rate(sample_rate_),
       num_channels(num_channels_),
-      num_frames(num_frames_){};
+      num_frames(num_frames_),
+      bits_per_sample(bits_per_sample_){};
 
 int64_t SignalInfo::getSampleRate() const {
   return sample_rate;
@@ -28,6 +30,10 @@ int64_t SignalInfo::getNumChannels() const {
 
 int64_t SignalInfo::getNumFrames() const {
   return num_frames;
+}
+
+int64_t SignalInfo::getBitsPerSample() const {
+  return bits_per_sample;
 }
 
 c10::intrusive_ptr<SignalInfo> get_info(
@@ -46,7 +52,8 @@ c10::intrusive_ptr<SignalInfo> get_info(
   return c10::make_intrusive<SignalInfo>(
       static_cast<int64_t>(sf->signal.rate),
       static_cast<int64_t>(sf->signal.channels),
-      static_cast<int64_t>(sf->signal.length / sf->signal.channels));
+      static_cast<int64_t>(sf->signal.length / sf->signal.channels),
+      static_cast<int64_t>(sf->encoding.bits_per_sample));
 }
 
 namespace {

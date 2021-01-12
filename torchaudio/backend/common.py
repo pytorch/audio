@@ -12,11 +12,13 @@ class AudioMetaData:
     :ivar int sample_rate: Sample rate
     :ivar int num_frames: The number of frames
     :ivar int num_channels: The number of channels
+    :ivar int bits_per_sample: The number of bits per sample
     """
-    def __init__(self, sample_rate: int, num_frames: int, num_channels: int):
+    def __init__(self, sample_rate: int, num_frames: int, num_channels: int, bits_per_sample: int = 0):
         self.sample_rate = sample_rate
         self.num_frames = num_frames
         self.num_channels = num_channels
+        self.bits_per_sample = bits_per_sample
 
 
 @_mod_utils.deprecated('Please migrate to `AudioMetaData`.', '0.9.0')
