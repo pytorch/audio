@@ -3,6 +3,7 @@ import platform
 import subprocess
 from pathlib import Path
 
+import torch
 from torch.utils.cpp_extension import (
     CppExtension,
     BuildExtension as TorchBuildExtension
@@ -109,12 +110,22 @@ def _get_libraries():
     return [] if _BUILD_SOX else ['sox']
 
 
+def _get_cxx11_abi():
+    try:
+        value = int(torch._C._GLIBCXX_USE_CXX11_ABI)
+    except ImportError:
+        value = 0
+    return f'-D_GLIBCXX_USE_CXX11_ABI={value}'
+
+
 def _build_third_party(base_build_dir):
     build_dir = os.path.join(base_build_dir, 'third_party')
     os.makedirs(build_dir, exist_ok=True)
     subprocess.run(
         args=[
             'cmake',
+            f"-DCMAKE_CXX_FLAGS='{_get_cxx11_abi()}'",
+            '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON',
             f'-DCMAKE_INSTALL_PREFIX={_TP_INSTALL_DIR}',
             f'-DBUILD_SOX={"ON" if _BUILD_SOX else "OFF"}',
             f'-DBUILD_TRANSDUCER={"ON" if _BUILD_TRANSDUCER else "OFF"}',
