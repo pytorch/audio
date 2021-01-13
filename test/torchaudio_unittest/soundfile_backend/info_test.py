@@ -8,6 +8,7 @@ from torchaudio_unittest.common_utils import (
     skipIfNoModule,
     get_wav_data,
     save_wav,
+    sox_utils,
 )
 from .common import skipIfFormatNotSupported, parameterize
 
@@ -32,6 +33,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
+        assert info.bits_per_sample == sox_utils.get_bit_depth(dtype)
 
     @parameterize(
         ["float32", "int32", "int16", "uint8"], [8000, 16000], [4, 8, 16, 32],
@@ -48,6 +50,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
+        assert info.bits_per_sample == sox_utils.get_bit_depth(dtype)
 
     @parameterize([8000, 16000], [1, 2])
     @skipIfFormatNotSupported("FLAC")
@@ -63,6 +66,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == num_frames
         assert info.num_channels == num_channels
+        assert info.bits_per_sample == 24
 
     @parameterize([8000, 16000], [1, 2])
     @skipIfFormatNotSupported("OGG")
@@ -78,18 +82,21 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
+        assert info.num_channels == 123  # TODO fix that (can't debug locally)
 
-    @parameterize([8000, 16000], [1, 2])
+    @parameterize([8000, 16000], [1, 2], [('PCM_24', 24), ('PCM_32', 32)])
     @skipIfFormatNotSupported("NIST")
-    def test_sphere(self, sample_rate, num_channels):
+    def test_sphere(self, sample_rate, num_channels, subtype_and_bit_depth):
         """`soundfile_backend.info` can check sph file correctly"""
         duration = 1
         num_frames = sample_rate * duration
         data = torch.randn(num_frames, num_channels).numpy()
         path = self.get_temp_path("data.nist")
-        soundfile.write(path, data, sample_rate)
+        subtype, bits_per_sample = subtype_and_bit_depth
+        soundfile.write(path, data, sample_rate, subtype=subtype)
 
         info = soundfile_backend.info(path)
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
+        assert info.bits_per_sample == bits_per_sample

@@ -11,6 +11,42 @@ if _mod_utils.is_module_available("soundfile"):
     import soundfile
 
 
+# mapping from soundfile subtype to number of bits per sample.
+# This is mostly heuristical and value is set to 0 when value is irrelevant
+# (lossy formats) or can't be inferred.
+# The dict is inspired from
+# https://github.com/bastibe/python-soundfile/blob/744efb4b01abc72498a96b09115b42a4cabd85e4/soundfile.py#L66-L94
+SUBTYPE_TO_BITS_PER_SAMPLE = {
+    'PCM_S8': 8,  # Signed 8 bit data
+    'PCM_16': 16,  # Signed 16 bit data
+    'PCM_24': 24,  # Signed 24 bit data
+    'PCM_32': 32,  # Signed 32 bit data
+    'PCM_U8': 8,  # Unsigned 8 bit data (WAV and RAW only)
+    'FLOAT': 32,  # 32 bit float data
+    'DOUBLE': 64,  # 64 bit float data
+    'ULAW': 0,  # U-Law encoded.
+    'ALAW': 0,  # A-Law encoded.
+    'IMA_ADPCM': 0,  # IMA ADPCM.
+    'MS_ADPCM': 0,  # Microsoft ADPCM.
+    'GSM610': 0,  # GSM 6.10 encoding.
+    'VOX_ADPCM': 0,  # OKI / Dialogix ADPCM
+    'G721_32': 0,  # 32kbs G721 ADPCM encoding.
+    'G723_24': 0,  # 24kbs G723 ADPCM encoding.
+    'G723_40': 0,  # 40kbs G723 ADPCM encoding.
+    'DWVW_12': 12,  # 12 bit Delta Width Variable Word encoding.
+    'DWVW_16': 16,  # 16 bit Delta Width Variable Word encoding.
+    'DWVW_24': 24,  # 24 bit Delta Width Variable Word encoding.
+    'DWVW_N': 0,  # N bit Delta Width Variable Word encoding.
+    'DPCM_8': 8,  # 8 bit differential PCM (XI only)
+    'DPCM_16': 16,  # 16 bit differential PCM (XI only)
+    'VORBIS': 0,  # Xiph Vorbis encoding.
+    'ALAC_16': 16,  # Apple Lossless Audio Codec (16 bit).
+    'ALAC_20': 20,  # Apple Lossless Audio Codec (20 bit).
+    'ALAC_24': 24,  # Apple Lossless Audio Codec (24 bit).
+    'ALAC_32': 32,  # Apple Lossless Audio Codec (32 bit).
+}
+
+
 @_mod_utils.requires_module("soundfile")
 def info(filepath: str, format: Optional[str] = None) -> AudioMetaData:
     """Get signal information of an audio file.
@@ -27,7 +63,8 @@ def info(filepath: str, format: Optional[str] = None) -> AudioMetaData:
         AudioMetaData: meta data of the given audio.
     """
     sinfo = soundfile.info(filepath)
-    return AudioMetaData(sinfo.samplerate, sinfo.frames, sinfo.channels)
+    bits_per_sample = SUBTYPE_TO_BITS_PER_SAMPLE[sinfo.subtype]
+    return AudioMetaData(sinfo.samplerate, sinfo.frames, sinfo.channels, bits_per_sample=bits_per_sample)
 
 
 _SUBTYPE2DTYPE = {
