@@ -82,7 +82,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
-        assert info.bits_per_sample == 123  # TODO fix that (can't debug locally)
+        assert info.bits_per_sample == 0
 
     @parameterize([8000, 16000], [1, 2], [('PCM_24', 24), ('PCM_32', 32)])
     @skipIfFormatNotSupported("NIST")
