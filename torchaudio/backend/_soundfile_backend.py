@@ -11,9 +11,9 @@ if _mod_utils.is_module_available("soundfile"):
     import soundfile
 
 
-# mapping from soundfile subtype to number of bits per sample.
-# This is mostly heuristical and value is set to 0 when value is irrelevant
-# (lossy formats) or can't be inferred.
+# Mapping from soundfile subtype to number of bits per sample.
+# This is mostly heuristical and the value is set to 0 when it is irrelevant
+# (lossy formats) or when it can't be inferred.
 # The dict is inspired from
 # https://github.com/bastibe/python-soundfile/blob/744efb4b01abc72498a96b09115b42a4cabd85e4/soundfile.py#L66-L94
 SUBTYPE_TO_BITS_PER_SAMPLE = {
