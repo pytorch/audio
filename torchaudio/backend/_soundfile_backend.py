@@ -138,6 +138,7 @@ def save(
     sample_rate: int,
     channels_first: bool = True,
     compression: Optional[float] = None,
+    format: Optional[str] = None,
 ):
     """Save audio data to file.
 
@@ -168,6 +169,9 @@ def save(
             otherwise ``[time, channel]``.
         compression (Optional[float]):
             Not used. It is here only for interface compatibility reson with "sox_io" backend.
+        format (str, optional):
+            Output audio format. This is required when the output audio format cannot be infered from
+            ``filepath``, (such as file extension or ``name`` attribute of the given file object).
     """
     if src.ndim != 2:
         raise ValueError(f"Expected 2D Tensor, got {src.ndim}D.")
@@ -176,8 +180,13 @@ def save(
             '`save` function of "soundfile" backend does not support "compression" parameter. '
             "The argument is silently ignored."
         )
+    if hasattr(filepath, 'write'):
+        if format is None:
+            raise RuntimeError('`format` is required when saving to file object.')
+        ext = format
+    else:
+        ext = str(filepath).split(".")[-1].lower()
 
-    ext = str(filepath).split(".")[-1].lower()
     if ext != "wav":
         subtype = None
     elif src.dtype == torch.uint8:
@@ -193,17 +202,16 @@ def save(
     else:
         raise ValueError(f"Unsupported dtype for WAV: {src.dtype}")
 
-    format_ = None
     # sph is a extension used in TED-LIUM but soundfile does not recognize it as NIST format,
     # so we extend the extensions manually here
-    if ext in ["nis", "nist", "sph"]:
-        format_ = "NIST"
+    if ext in ["nis", "nist", "sph"] and format is None:
+        format = "NIST"
 
     if channels_first:
         src = src.t()
 
     soundfile.write(
-        file=filepath, data=src, samplerate=sample_rate, subtype=subtype, format=format_
+        file=filepath, data=src, samplerate=sample_rate, subtype=subtype, format=format
     )
 
 
