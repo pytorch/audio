@@ -12,6 +12,9 @@ from torchaudio_unittest.common_utils import (
 )
 from .common import skipIfFormatNotSupported, parameterize
 
+import pytest
+from _pytest.monkeypatch import MonkeyPatch
+
 if _mod_utils.is_module_available("soundfile"):
     import soundfile
 
@@ -100,3 +103,31 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == bits_per_sample
+
+    def test_unknown_subtype_warning(self):
+        """soundfile_backend.info issues a warning when the subtype is unknown
+
+        This will happen if a new subtype is supported in SoundFile: the _SUBTYPE_TO_BITS_PER_SAMPLE
+        dict should be updated.
+        """
+
+        soundfile_info_original = soundfile.info
+
+        def info_wrapper(filepath):
+            # Wraps soundfile.info and sets the subtype to some unknown value
+            sinfo = soundfile_info_original(filepath)
+            sinfo.subtype = 'SOME_UNKNOWN_SUBTYPE'
+            return sinfo
+
+        mp = MonkeyPatch()
+        mp.setattr(soundfile, "info", info_wrapper)
+
+        path = self.get_temp_path("data.wav")
+        data = get_wav_data(
+            dtype='float32', num_channels=1, normalize=False, num_frames=16000
+        )
+        save_wav(path, data, sample_rate=16000)
+        with pytest.warns(UserWarning, match="subtype is unknown to TorchAudio"):
+            info = soundfile_backend.info(path)
+        assert info.bits_per_sample == 0
+        mp.undo()

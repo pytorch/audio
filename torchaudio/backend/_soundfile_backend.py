@@ -14,9 +14,12 @@ if _mod_utils.is_module_available("soundfile"):
 # Mapping from soundfile subtype to number of bits per sample.
 # This is mostly heuristical and the value is set to 0 when it is irrelevant
 # (lossy formats) or when it can't be inferred.
+# For ADPCM (and G72X) subtypes, it's hard to infer the bit depth because it's not part of the standard:
+# According to https://en.wikipedia.org/wiki/Adaptive_differential_pulse-code_modulation#In_telephony,
+# the default seems to be 8 bits but it can be compressed further to 4 bits.
 # The dict is inspired from
 # https://github.com/bastibe/python-soundfile/blob/744efb4b01abc72498a96b09115b42a4cabd85e4/soundfile.py#L66-L94
-SUBTYPE_TO_BITS_PER_SAMPLE = {
+_SUBTYPE_TO_BITS_PER_SAMPLE = {
     'PCM_S8': 8,  # Signed 8 bit data
     'PCM_16': 16,  # Signed 16 bit data
     'PCM_24': 24,  # Signed 24 bit data
@@ -24,11 +27,11 @@ SUBTYPE_TO_BITS_PER_SAMPLE = {
     'PCM_U8': 8,  # Unsigned 8 bit data (WAV and RAW only)
     'FLOAT': 32,  # 32 bit float data
     'DOUBLE': 64,  # 64 bit float data
-    'ULAW': 0,  # U-Law encoded.
-    'ALAW': 0,  # A-Law encoded.
+    'ULAW': 8,  # U-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types
+    'ALAW': 8,  # A-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types
     'IMA_ADPCM': 0,  # IMA ADPCM.
     'MS_ADPCM': 0,  # Microsoft ADPCM.
-    'GSM610': 0,  # GSM 6.10 encoding.
+    'GSM610': 0,  # GSM 6.10 encoding. (Wikipedia says 1.625 bit depth?? https://en.wikipedia.org/wiki/Full_Rate)
     'VOX_ADPCM': 0,  # OKI / Dialogix ADPCM
     'G721_32': 0,  # 32kbs G721 ADPCM encoding.
     'G723_24': 0,  # 24kbs G723 ADPCM encoding.
@@ -39,7 +42,7 @@ SUBTYPE_TO_BITS_PER_SAMPLE = {
     'DWVW_N': 0,  # N bit Delta Width Variable Word encoding.
     'DPCM_8': 8,  # 8 bit differential PCM (XI only)
     'DPCM_16': 16,  # 16 bit differential PCM (XI only)
-    'VORBIS': 0,  # Xiph Vorbis encoding.
+    'VORBIS': 0,  # Xiph Vorbis encoding. (lossy)
     'ALAC_16': 16,  # Apple Lossless Audio Codec (16 bit).
     'ALAC_20': 20,  # Apple Lossless Audio Codec (20 bit).
     'ALAC_24': 24,  # Apple Lossless Audio Codec (24 bit).
@@ -63,7 +66,16 @@ def info(filepath: str, format: Optional[str] = None) -> AudioMetaData:
         AudioMetaData: meta data of the given audio.
     """
     sinfo = soundfile.info(filepath)
-    bits_per_sample = SUBTYPE_TO_BITS_PER_SAMPLE[sinfo.subtype]
+    try:
+        bits_per_sample = _SUBTYPE_TO_BITS_PER_SAMPLE[sinfo.subtype]
+    except KeyError:
+        bits_per_sample = 0
+        warnings.warn(
+            "The {subtype} subtype is unknown to TorchAudio. As a result, the bits_per_sample "
+            "attribute will be set to 0. If you are seeing this warning, please "
+            "report by opening an issue on github (after checking for existing/closed ones). "
+            "You may otherwise ignore this warning."
+        )
     return AudioMetaData(sinfo.samplerate, sinfo.frames, sinfo.channels, bits_per_sample=bits_per_sample)
 
 
