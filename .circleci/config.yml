@@ -112,7 +112,7 @@ jobs:
       - persist_to_workspace:
           root: third_party
           paths:
-            - archives
+            - sox/archives
 
   binary_linux_wheel:
     <<: *binary_common
