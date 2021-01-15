@@ -12,7 +12,8 @@ class AudioMetaData:
     :ivar int sample_rate: Sample rate
     :ivar int num_frames: The number of frames
     :ivar int num_channels: The number of channels
-    :ivar int bits_per_sample: The number of bits per sample. This is 0 for lossy formats.
+    :ivar int bits_per_sample: The number of bits per sample. This is 0 for lossy formats,
+        or when it cannot be accurately inferred.
     """
     def __init__(self, sample_rate: int, num_frames: int, num_channels: int, bits_per_sample: int):
         self.sample_rate = sample_rate
