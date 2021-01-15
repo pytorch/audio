@@ -154,16 +154,13 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         num_channels = 1
         sample_rate = 8000
         path = self.get_temp_path('data.amr-nb')
-        bits_per_sample = 16
         sox_utils.gen_audio_file(
-            path, sample_rate=sample_rate, num_channels=num_channels, bit_depth=bits_per_sample,
-            duration=duration)
+            path, sample_rate=sample_rate, num_channels=num_channels, duration=duration)
         info = sox_io_backend.info(path)
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.num_channels == num_channels
-        assert info.bits_per_sample == bits_per_sample
 
 
 @skipIfNoExtension
