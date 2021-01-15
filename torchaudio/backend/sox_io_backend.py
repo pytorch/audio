@@ -7,7 +7,7 @@ from torchaudio._internal import (
 )
 
 import torchaudio
-from .common import AudioMetaData, get_ext
+from .common import AudioMetaData
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -143,16 +143,14 @@ def _save(
         compression: Optional[float] = None,
         format: Optional[str] = None,
 ):
-    try:
-        ext = get_ext(filepath, format)
-    except Exception:
-        raise RuntimeError('Cannot detect the output format. Provide `format` argument.') from None
     if hasattr(filepath, 'write'):
+        if format is None:
+            raise RuntimeError('`format` is required when saving to file object.')
         torchaudio._torchaudio.save_audio_fileobj(
-            filepath, src, sample_rate, channels_first, compression, ext)
+            filepath, src, sample_rate, channels_first, compression, format)
     else:
         torch.ops.torchaudio.sox_io_save_audio_file(
-            os.fspath(filepath), src, sample_rate, channels_first, compression, ext)
+            os.fspath(filepath), src, sample_rate, channels_first, compression, format)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')

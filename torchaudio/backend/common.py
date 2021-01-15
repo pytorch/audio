@@ -1,4 +1,3 @@
-import os
 from typing import Any, Optional
 
 from torchaudio._internal import module_utils as _mod_utils
@@ -18,22 +17,6 @@ class AudioMetaData:
         self.sample_rate = sample_rate
         self.num_frames = num_frames
         self.num_channels = num_channels
-
-
-def get_ext(
-        src: Any,
-        format: Optional[str]):
-    """Get the file extension from either the given format or target file information
-
-    Args:
-        src (path-like object or file-like object): Target file.
-        format (optional, str): format provided by user.
-    """
-    if format is not None:
-        return format.lower()
-    if hasattr(src, 'name'):
-        src = src.name
-    return os.path.splitext(src)[-1][1:].lower()
 
 
 @_mod_utils.deprecated('Please migrate to `AudioMetaData`.', '0.9.0')

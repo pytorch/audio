@@ -456,7 +456,7 @@ class TestFileObject(SaveTestBase):
         with open(res_path, 'wb') as fileobj:
             sox_io_backend.save(
                 fileobj, data, channels_first=channels_first,
-                sample_rate=sample_rate, compression=compression)
+                sample_rate=sample_rate, compression=compression, format=ext)
 
         expected_data, _ = sox_io_backend.load(ref_path)
         data, sr = sox_io_backend.load(res_path)

@@ -1,11 +1,10 @@
 """The new soundfile backend which will become default in 0.8.0 onward"""
-import os
 from typing import Tuple, Optional
 import warnings
 
 import torch
 from torchaudio._internal import module_utils as _mod_utils
-from .common import AudioMetaData, get_ext
+from .common import AudioMetaData
 
 
 if _mod_utils.is_module_available("soundfile"):
@@ -181,11 +180,12 @@ def save(
             '`save` function of "soundfile" backend does not support "compression" parameter. '
             "The argument is silently ignored."
         )
-
-    try:
-        ext = get_ext(filepath, format)
-    except Exception:
-        raise RuntimeError('Cannot detect the output format. Provide `format` argument.') from None
+    if hasattr(filepath, 'write'):
+        if format is None:
+            raise RuntimeError('`format` is required when saving to file object.')
+        ext = format
+    else:
+        ext = str(filepath).split(".")[-1].lower()
 
     if ext != "wav":
         subtype = None

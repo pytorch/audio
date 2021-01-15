@@ -215,6 +215,7 @@ void save_audio_fileobj(
   chain.addOutputFileObj(sf, &buffer.ptr, &buffer.size, &fileobj);
   chain.run();
 
+  // Closing the sox_format_t is necessary for flushing the last chunk to the buffer
   sf.close();
 
   fileobj.attr("write")(py::bytes(buffer.ptr, buffer.size));
