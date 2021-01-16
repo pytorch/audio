@@ -411,7 +411,6 @@ jobs:
           paths:
             - conda
             - env
-            - third_party/install
       - run:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
@@ -456,7 +455,6 @@ jobs:
           paths:
             - conda
             - env
-            - third_party/install
       - run:
           name: Install torchaudio
           command: docker run -t --gpus all -e UPLOAD_CHANNEL -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
@@ -569,7 +567,6 @@ jobs:
           paths:
             - conda
             - env
-            - third_party/install
       - run:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
@@ -606,7 +603,6 @@ jobs:
           paths:
             - conda
             - env
-            - third_party/install
       - run:
           name: Run style check
           command: .circleci/unittest/linux/scripts/run_style_checks.sh
