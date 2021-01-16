@@ -445,6 +445,7 @@
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">compression</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Save audio data to file.</span>
 
@@ -475,6 +476,9 @@
 <span class="sd">            otherwise ``[time, channel]``.</span>
 <span class="sd">        compression (Optional[float]):</span>
 <span class="sd">            Not used. It is here only for interface compatibility reson with &quot;sox_io&quot; backend.</span>
+<span class="sd">        format (str, optional):</span>
+<span class="sd">            Output audio format. This is required when the output audio format cannot be infered from</span>
+<span class="sd">            ``filepath``, (such as file extension or ``name`` attribute of the given file object).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected 2D Tensor, got </span><span class="si">{</span><span class="n">src</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">D.&quot;</span><span class="p">)</span>
@@ -483,8 +487,13 @@
             <span class="s1">&#39;`save` function of &quot;soundfile&quot; backend does not support &quot;compression&quot; parameter. &#39;</span>
             <span class="s2">&quot;The argument is silently ignored.&quot;</span>
         <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;`format` is required when saving to file object.&#39;</span><span class="p">)</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="nb">format</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-    <span class="n">ext</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">ext</span> <span class="o">!=</span> <span class="s2">&quot;wav&quot;</span><span class="p">:</span>
         <span class="n">subtype</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">elif</span> <span class="n">src</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">:</span>
@@ -500,17 +509,16 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported dtype for WAV: </span><span class="si">{</span><span class="n">src</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="n">format_</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1"># sph is a extension used in TED-LIUM but soundfile does not recognize it as NIST format,</span>
     <span class="c1"># so we extend the extensions manually here</span>
-    <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;nis&quot;</span><span class="p">,</span> <span class="s2">&quot;nist&quot;</span><span class="p">,</span> <span class="s2">&quot;sph&quot;</span><span class="p">]:</span>
-        <span class="n">format_</span> <span class="o">=</span> <span class="s2">&quot;NIST&quot;</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;nis&quot;</span><span class="p">,</span> <span class="s2">&quot;nist&quot;</span><span class="p">,</span> <span class="s2">&quot;sph&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="s2">&quot;NIST&quot;</span>
 
     <span class="k">if</span> <span class="n">channels_first</span><span class="p">:</span>
         <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
 
     <span class="n">soundfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
-        <span class="n">file</span><span class="o">=</span><span class="n">filepath</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="n">samplerate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">format_</span>
+        <span class="n">file</span><span class="o">=</span><span class="n">filepath</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="n">samplerate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span>
     <span class="p">)</span></div>
 
 

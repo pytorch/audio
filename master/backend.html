@@ -591,7 +591,7 @@ The implementation is same as <a class="reference internal" href="#torchaudio.ba
 <h3>save<a class="headerlink" href="#save" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend.sox_io_backend.save">
-<code class="sig-prename descclassname">torchaudio.backend.sox_io_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.save" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.backend.sox_io_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em>, <em class="sig-param">format: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save audio data to file.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -648,6 +648,8 @@ otherwise <code class="docutils literal notranslate"><span class="pre">[time,</s
 </div></blockquote>
 <p>See the detail at <a class="reference external" href="http://sox.sourceforge.net/soxformat.html">http://sox.sourceforge.net/soxformat.html</a>.</p>
 </p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Output audio format. This is required when the output audio format cannot be infered from
+<code class="docutils literal notranslate"><span class="pre">filepath</span></code>, (such as file extension or <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute of the given file object).</p></li>
 </ul>
 </dd>
 </dl>
@@ -1071,7 +1073,7 @@ The implementation is same as <a class="reference internal" href="#torchaudio.ba
 
 <dl class="function">
 <dt id="torchaudio.backend._soundfile_backend.save">
-<code class="sig-prename descclassname">torchaudio.backend._soundfile_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/_soundfile_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend._soundfile_backend.save" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.backend._soundfile_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em>, <em class="sig-param">format: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/_soundfile_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend._soundfile_backend.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save audio data to file.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1105,6 +1107,8 @@ for TorchScript compiler compatiblity.</p></li>
 <li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>,
 otherwise <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
 <li><p><strong>compression</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – Not used. It is here only for interface compatibility reson with “sox_io” backend.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Output audio format. This is required when the output audio format cannot be infered from
+<code class="docutils literal notranslate"><span class="pre">filepath</span></code>, (such as file extension or <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute of the given file object).</p></li>
 </ul>
 </dd>
 </dl>
