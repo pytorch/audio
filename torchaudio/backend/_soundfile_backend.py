@@ -68,10 +68,10 @@ def info(filepath: str, format: Optional[str] = None) -> AudioMetaData:
     sinfo = soundfile.info(filepath)
     if sinfo.subtype not in _SUBTYPE_TO_BITS_PER_SAMPLE:
         warnings.warn(
-            "The {subtype} subtype is unknown to TorchAudio. As a result, the bits_per_sample "
+            f"The {sinfo.subtype} subtype is unknown to TorchAudio. As a result, the bits_per_sample "
             "attribute will be set to 0. If you are seeing this warning, please "
             "report by opening an issue on github (after checking for existing/closed ones). "
-            "You may otherwise ignore this warning.".format(subtype=sinfo.subtype)
+            "You may otherwise ignore this warning."
         )
     bits_per_sample = _SUBTYPE_TO_BITS_PER_SAMPLE.get(sinfo.subtype, 0)
     return AudioMetaData(sinfo.samplerate, sinfo.frames, sinfo.channels, bits_per_sample=bits_per_sample)
