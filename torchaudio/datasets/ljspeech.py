@@ -72,7 +72,7 @@ class LJSPEECH(Dataset):
         """
         line = self._walker[n]
         fileid, transcript, normalized_transcript = line
-        fileid_audio = os.path.join(self.path, fileid + ".wav")
+        fileid_audio = os.path.join(self._path, fileid + ".wav")
 
         # Load audio
         waveform, sample_rate = torchaudio.load(fileid_audio)
