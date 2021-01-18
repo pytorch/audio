@@ -71,9 +71,7 @@ class LJSPEECH(Dataset):
             tuple: ``(waveform, sample_rate, transcript, normalized_transcript)``
         """
         line = self._walker[n]
-        item = self._load_item(line, self._path)
-
-        fileid, transcript, normalized_transcript = item
+        fileid, transcript, normalized_transcript = line
         fileid_audio = os.path.join(self.path, fileid + ".wav")
 
         # Load audio
