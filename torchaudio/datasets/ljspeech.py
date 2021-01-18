@@ -61,22 +61,6 @@ class LJSPEECH(Dataset):
             walker = csv.reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
             self._walker = list(walker)
 
-    def _load_item(self, line: List[str], path: str) -> Tuple[Tensor, int, str, str]:
-        assert len(line) == 3
-        fileid, transcript, normalized_transcript = line
-        fileid_audio = fileid + ".wav"
-        fileid_audio = os.path.join(path, fileid_audio)
-
-        # Load audio
-        waveform, sample_rate = torchaudio.load(fileid_audio)
-
-        return (
-            waveform,
-            sample_rate,
-            transcript,
-            normalized_transcript,
-        )
-
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
         """Load the n-th sample from the dataset.
 
@@ -88,6 +72,13 @@ class LJSPEECH(Dataset):
         """
         line = self._walker[n]
         item = self._load_item(line, self._path)
+
+        fileid, transcript, normalized_transcript = line
+        fileid_audio = os.path.join(self.path, fileid + ".wav")
+
+        # Load audio
+        waveform, sample_rate = torchaudio.load(fileid_audio)
+
         return item
 
     def __len__(self) -> int:
