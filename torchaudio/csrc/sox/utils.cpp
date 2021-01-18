@@ -80,16 +80,20 @@ bool TensorSignal::getChannelsFirst() const {
 }
 
 SoxFormat::SoxFormat(sox_format_t* fd) noexcept : fd_(fd) {}
-SoxFormat::~SoxFormat() {
-  if (fd_ != nullptr) {
-    sox_close(fd_);
-  }
-}
+SoxFormat::~SoxFormat() { close(); }
+
 sox_format_t* SoxFormat::operator->() const noexcept {
   return fd_;
 }
 SoxFormat::operator sox_format_t*() const noexcept {
   return fd_;
+}
+
+void SoxFormat::close() {
+  if (fd_ != nullptr) {
+    sox_close(fd_);
+    fd_ = nullptr;
+  }
 }
 
 void validate_input_file(const SoxFormat& sf, bool check_length) {
@@ -286,27 +290,23 @@ sox_signalinfo_t get_signalinfo(
 
 sox_encodinginfo_t get_encodinginfo(
     const std::string filetype,
-    const caffe2::TypeMeta dtype,
-    const double compression) {
-  const double compression_ = [&]() {
-    if (filetype == "mp3")
-      return compression;
-    if (filetype == "flac")
-      return compression;
-    if (filetype == "ogg" || filetype == "vorbis")
-      return compression;
-    if (filetype == "wav" || filetype == "amb")
-      return 0.;
-    if (filetype == "sph")
-      return 0.;
-    if (filetype == "amr-nb")
-      return 0.;
-    throw std::runtime_error("Unsupported file type: " + filetype);
-  }();
-
+    const caffe2::TypeMeta dtype) {
   return sox_encodinginfo_t{/*encoding=*/get_encoding(filetype, dtype),
                             /*bits_per_sample=*/get_precision(filetype, dtype),
-                            /*compression=*/compression_,
+                            /*compression=*/HUGE_VAL,
+                            /*reverse_bytes=*/sox_option_default,
+                            /*reverse_nibbles=*/sox_option_default,
+                            /*reverse_bits=*/sox_option_default,
+                            /*opposite_endian=*/sox_false};
+}
+
+sox_encodinginfo_t get_encodinginfo(
+    const std::string filetype,
+    const caffe2::TypeMeta dtype,
+    c10::optional<double>& compression) {
+  return sox_encodinginfo_t{/*encoding=*/get_encoding(filetype, dtype),
+                            /*bits_per_sample=*/get_precision(filetype, dtype),
+                            /*compression=*/compression.value_or(HUGE_VAL),
                             /*reverse_bytes=*/sox_option_default,
                             /*reverse_nibbles=*/sox_option_default,
                             /*reverse_bits=*/sox_option_default,

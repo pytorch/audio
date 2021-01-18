@@ -61,6 +61,8 @@ struct SoxFormat {
   sox_format_t* operator->() const noexcept;
   operator sox_format_t*() const noexcept;
 
+  void close();
+
  private:
   sox_format_t* fd_;
 };
@@ -118,8 +120,12 @@ sox_signalinfo_t get_signalinfo(
 /// Get sox_encofinginfo_t for saving audoi file
 sox_encodinginfo_t get_encodinginfo(
     const std::string filetype,
+    const caffe2::TypeMeta dtype);
+
+sox_encodinginfo_t get_encodinginfo(
+    const std::string filetype,
     const caffe2::TypeMeta dtype,
-    const double compression);
+    c10::optional<double>& compression);
 
 } // namespace sox_utils
 } // namespace torchaudio

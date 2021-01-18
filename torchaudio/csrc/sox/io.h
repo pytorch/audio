@@ -41,9 +41,12 @@ c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> load_audio_file(
     c10::optional<std::string>& format);
 
 void save_audio_file(
-    const std::string& file_name,
-    const c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal>& signal,
-    const double compression = 0.);
+    const std::string& path,
+    torch::Tensor tensor,
+    int64_t sample_rate,
+    bool channels_first,
+    c10::optional<double> compression,
+    c10::optional<std::string> format);
 
 #ifdef TORCH_API_INCLUDE_EXTENSION_H
 
@@ -54,6 +57,14 @@ std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
     c10::optional<bool>& normalize,
     c10::optional<bool>& channels_first,
     c10::optional<std::string>& format);
+
+void save_audio_fileobj(
+    py::object fileobj,
+    torch::Tensor tensor,
+    int64_t sample_rate,
+    bool channels_first,
+    c10::optional<double> compression,
+    std::string filetype);
 
 #endif // TORCH_API_INCLUDE_EXTENSION_H
 

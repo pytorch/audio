@@ -295,6 +295,13 @@ struct FileObjInputPriv {
   uint64_t buffer_size;
 };
 
+struct FileObjOutputPriv {
+  sox_format_t* sf;
+  py::object* fileobj;
+  char** buffer;
+  size_t* buffer_size;
+};
+
 /// Callback function to feed byte string
 /// https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/sox.h#L1268-L1278
 int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
@@ -373,6 +380,45 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   return *osamp? SOX_SUCCESS : SOX_EOF;
 }
 
+int fileobj_output_flow(
+    sox_effect_t* effp,
+    sox_sample_t const* ibuf,
+    sox_sample_t* obuf LSX_UNUSED,
+    size_t* isamp,
+    size_t* osamp) {
+  *osamp = 0;
+  if (*isamp) {
+    auto priv = static_cast<FileObjOutputPriv*>(effp->priv);
+    auto sf = priv->sf;
+    auto fp = static_cast<FILE*>(sf->fp);
+    auto fileobj = priv->fileobj;
+    auto buffer = priv->buffer;
+    auto buffer_size = priv->buffer_size;
+
+    // Encode chunk
+    auto num_samples_written = sox_write(sf, ibuf, *isamp);
+    fflush(fp);
+
+    // Copy the encoded chunk to python object.
+    fileobj->attr("write")(py::bytes(*buffer, *buffer_size));
+
+    // Reset FILE*
+    sf->tell_off = 0;
+    fseek(fp, 0, SEEK_SET);
+
+    if (num_samples_written != *isamp) {
+      if (sf->sox_errno) {
+        std::ostringstream stream;
+        stream << sf->sox_errstr << " " << sox_strerror(sf->sox_errno) << " "
+               << sf->filename;
+        throw std::runtime_error(stream.str());
+      }
+      return SOX_EOF;
+    }
+  }
+  return SOX_SUCCESS;
+}
+
 sox_effect_handler_t* get_fileobj_input_handler() {
   static sox_effect_handler_t handler{/*name=*/"input_fileobj_object",
                                       /*usage=*/NULL,
@@ -384,6 +430,20 @@ sox_effect_handler_t* get_fileobj_input_handler() {
                                       /*stop=*/NULL,
                                       /*kill=*/NULL,
                                       /*priv_size=*/sizeof(FileObjInputPriv)};
+  return &handler;
+}
+
+sox_effect_handler_t* get_fileobj_output_handler() {
+  static sox_effect_handler_t handler{/*name=*/"output_fileobj_object",
+                                      /*usage=*/NULL,
+                                      /*flags=*/SOX_EFF_MCHAN,
+                                      /*getopts=*/NULL,
+                                      /*start=*/NULL,
+                                      /*flow=*/fileobj_output_flow,
+                                      /*drain=*/NULL,
+                                      /*stop=*/NULL,
+                                      /*kill=*/NULL,
+                                      /*priv_size=*/sizeof(FileObjOutputPriv)};
   return &handler;
 }
 
@@ -405,6 +465,23 @@ void SoxEffectsChain::addInputFileObj(
   priv->buffer_size = buffer_size;
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
     throw std::runtime_error("Internal Error: Failed to add effect: input fileobj");
+  }
+}
+
+void SoxEffectsChain::addOutputFileObj(
+    sox_format_t* sf,
+    char** buffer,
+    size_t* buffer_size,
+    py::object* fileobj) {
+  out_sig_ = sf->signal;
+  SoxEffect e(sox_create_effect(get_fileobj_output_handler()));
+  auto priv = static_cast<FileObjOutputPriv*>(e->priv);
+  priv->sf = sf;
+  priv->fileobj = fileobj;
+  priv->buffer = buffer;
+  priv->buffer_size = buffer_size;
+  if (sox_add_effect(sec_, e, &interm_sig_, &out_sig_) != SOX_SUCCESS) {
+    throw std::runtime_error("Internal Error: Failed to add effect: output fileobj");
   }
 }
 
