@@ -77,7 +77,12 @@ class LJSPEECH(Dataset):
         # Load audio
         waveform, sample_rate = torchaudio.load(fileid_audio)
 
-        return item
+        return (
+            waveform,
+            sample_rate,
+            transcript,
+            normalized_transcript,
+        )
 
     def __len__(self) -> int:
         return len(self._walker)
