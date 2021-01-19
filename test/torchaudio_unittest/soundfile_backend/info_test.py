@@ -12,7 +12,6 @@ from torchaudio_unittest.common_utils import (
 from .common import skipIfFormatNotSupported, parameterize
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch
 
 if _mod_utils.is_module_available("soundfile"):
     import soundfile
