@@ -102,7 +102,7 @@
                   <span class="dropdown-title">torchtext</span>
                   <p></p>
                 </a>
-                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/torchvision/">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
                   <span class="dropdown-title">torchvision</span>
                   <p></p>
                 </a>
@@ -318,23 +318,14 @@
     <span class="n">extract_archive</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;http://www.openslr.org/resources/1/waves_yesno.tar.gz&quot;</span>
-<span class="n">FOLDER_IN_ARCHIVE</span> <span class="o">=</span> <span class="s2">&quot;waves_yesno&quot;</span>
-<span class="n">_CHECKSUMS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;http://www.openslr.org/resources/1/waves_yesno.tar.gz&quot;</span><span class="p">:</span>
-        <span class="s2">&quot;962ff6e904d2df1126132ecec6978786&quot;</span>
+
+<span class="n">_RELEASE_CONFIGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;release1&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;folder_in_archive&quot;</span><span class="p">:</span> <span class="s2">&quot;waves_yesno&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.openslr.org/resources/1/waves_yesno.tar.gz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;30301975fd8c5cac4040c261c0852f57cfa8adbbad2ce78e77e4986957445f27&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
 <span class="p">}</span>
-
-
-<span class="k">def</span> <span class="nf">load_yesno_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ext_audio</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
-    <span class="c1"># Read label</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">fileid</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)]</span>
-
-    <span class="c1"># Read wav</span>
-    <span class="n">file_audio</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fileid</span> <span class="o">+</span> <span class="n">ext_audio</span><span class="p">)</span>
-    <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_audio</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">labels</span>
 
 
 <div class="viewcode-block" id="YESNO"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.YESNO">[docs]</a><span class="k">class</span> <span class="nc">YESNO</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
@@ -350,25 +341,26 @@
 <span class="sd">            Whether to download the dataset if it is not found at root path. (default: ``False``).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_ext_audio</span> <span class="o">=</span> <span class="s2">&quot;.wav&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_RELEASE_CONFIGS</span><span class="p">[</span><span class="s2">&quot;release1&quot;</span><span class="p">][</span><span class="s2">&quot;url&quot;</span><span class="p">],</span>
+        <span class="n">folder_in_archive</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_RELEASE_CONFIGS</span><span class="p">[</span><span class="s2">&quot;release1&quot;</span><span class="p">][</span><span class="s2">&quot;folder_in_archive&quot;</span><span class="p">],</span>
+        <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
-                 <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">URL</span><span class="p">,</span>
-                 <span class="n">folder_in_archive</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">FOLDER_IN_ARCHIVE</span><span class="p">,</span>
-                 <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_filesystem</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">,</span> <span class="n">download</span><span class="p">)</span>
 
-        <span class="c1"># Get string representation of &#39;root&#39; in case Path object is passed</span>
-        <span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
-
+    <span class="k">def</span> <span class="nf">_parse_filesystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
         <span class="n">archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="n">archive</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">archive</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">folder_in_archive</span><span class="p">)</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="n">archive</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="n">folder_in_archive</span>
         <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">archive</span><span class="p">):</span>
-                    <span class="n">checksum</span> <span class="o">=</span> <span class="n">_CHECKSUMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="n">checksum</span> <span class="o">=</span> <span class="n">_RELEASE_CONFIGS</span><span class="p">[</span><span class="s2">&quot;release1&quot;</span><span class="p">][</span><span class="s2">&quot;checksum&quot;</span><span class="p">]</span>
                     <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;md5&quot;</span><span class="p">)</span>
                 <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">)</span>
 
@@ -377,7 +369,13 @@
                 <span class="s2">&quot;Dataset not found. Please use `download=True` to download it.&quot;</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.wav&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_load_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">fileid</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)]</span>
+        <span class="n">file_audio</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fileid</span> <span class="o">+</span> <span class="s2">&quot;.wav&quot;</span><span class="p">)</span>
+        <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_audio</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">labels</span>
 
 <div class="viewcode-block" id="YESNO.__getitem__"><a class="viewcode-back" href="../../../datasets.html#torchaudio.datasets.YESNO.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Load the n-th sample from the dataset.</span>
@@ -389,13 +387,8 @@
 <span class="sd">            tuple: ``(waveform, sample_rate, labels)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fileid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-        <span class="n">item</span> <span class="o">=</span> <span class="n">load_yesno_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ext_audio</span><span class="p">)</span>
-
-        <span class="c1"># TODO Upon deprecation, uncomment line below and remove following code</span>
-        <span class="c1"># return item</span>
-
-        <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">item</span>
-        <span class="k">return</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">labels</span></div>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_item</span><span class="p">(</span><span class="n">fileid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">item</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_walker</span><span class="p">)</span></div>
@@ -636,7 +629,7 @@
             </li>
 
             <li>
-              <a href="https://pytorch.org/docs/stable/torchvision/">torchvision</a>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
             </li>
 
             <li>
