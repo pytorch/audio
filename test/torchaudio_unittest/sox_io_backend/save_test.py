@@ -1,3 +1,4 @@
+import io
 import itertools
 
 from torchaudio.backend import sox_io_backend
@@ -417,3 +418,88 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
         sox_io_backend.save(path, data, 8000)
 
         self.assertEqual(data, expected)
+
+
+@skipIfNoExtension
+@skipIfNoExec('sox')
+class TestFileObject(SaveTestBase):
+    """
+    We campare the result of file-like object input against file path input because
+    `save` function is rigrously tested for file path inputs to match libsox's result,
+    """
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_fileobj(self, ext, compression):
+        """Saving audio to file object returns the same result as via file path."""
+        sample_rate = 16000
+        dtype = 'float32'
+        num_channels = 2
+        num_frames = 16000
+        channels_first = True
+
+        data = get_wav_data(dtype, num_channels, num_frames=num_frames)
+
+        ref_path = self.get_temp_path(f'reference.{ext}')
+        res_path = self.get_temp_path(f'test.{ext}')
+        sox_io_backend.save(
+            ref_path, data, channels_first=channels_first,
+            sample_rate=sample_rate, compression=compression)
+        with open(res_path, 'wb') as fileobj:
+            sox_io_backend.save(
+                fileobj, data, channels_first=channels_first,
+                sample_rate=sample_rate, compression=compression, format=ext)
+
+        expected_data, _ = sox_io_backend.load(ref_path)
+        data, sr = sox_io_backend.load(res_path)
+
+        assert sample_rate == sr
+        self.assertEqual(expected_data, data)
+
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_bytesio(self, ext, compression):
+        """Saving audio to BytesIO object returns the same result as via file path."""
+        sample_rate = 16000
+        dtype = 'float32'
+        num_channels = 2
+        num_frames = 16000
+        channels_first = True
+
+        data = get_wav_data(dtype, num_channels, num_frames=num_frames)
+
+        ref_path = self.get_temp_path(f'reference.{ext}')
+        res_path = self.get_temp_path(f'test.{ext}')
+        sox_io_backend.save(
+            ref_path, data, channels_first=channels_first,
+            sample_rate=sample_rate, compression=compression)
+        fileobj = io.BytesIO()
+        sox_io_backend.save(
+            fileobj, data, channels_first=channels_first,
+            sample_rate=sample_rate, compression=compression, format=ext)
+        fileobj.seek(0)
+        with open(res_path, 'wb') as file_:
+            file_.write(fileobj.read())
+
+        expected_data, _ = sox_io_backend.load(ref_path)
+        data, sr = sox_io_backend.load(res_path)
+
+        assert sample_rate == sr
+        self.assertEqual(expected_data, data)

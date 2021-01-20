@@ -59,8 +59,8 @@ c10::intrusive_ptr<TensorSignal> apply_effects_tensor(
   // Create SoxEffectsChain
   const auto dtype = in_tensor.dtype();
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
-      /*input_encoding=*/get_encodinginfo("wav", dtype, 0.),
-      /*output_encoding=*/get_encodinginfo("wav", dtype, 0.));
+      /*input_encoding=*/get_encodinginfo("wav", dtype),
+      /*output_encoding=*/get_encodinginfo("wav", dtype));
 
   // Prepare output buffer
   std::vector<sox_sample_t> out_buffer;
@@ -112,7 +112,7 @@ c10::intrusive_ptr<TensorSignal> apply_effects_file(
   // Create and run SoxEffectsChain
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
       /*input_encoding=*/sf->encoding,
-      /*output_encoding=*/get_encodinginfo("wav", dtype, 0.));
+      /*output_encoding=*/get_encodinginfo("wav", dtype));
 
   chain.addInputFile(sf);
   for (const auto& effect : effects) {
@@ -163,7 +163,7 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
 
   // Prepare the buffer used throughout the lifecycle of SoxEffectChain.
   // Using std::string and let it manage memory.
-  // 4096 is minimum size required by auto_detect_format
+  // 4096 is minimum size requried by auto_detect_format
   // https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/formats.c#L40-L48
   const size_t in_buffer_size = 4096;
   std::string in_buffer(in_buffer_size, 'x');
@@ -193,7 +193,7 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
   const auto dtype = get_dtype(sf->encoding.encoding, sf->signal.precision);
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
       /*input_encoding=*/sf->encoding,
-      /*output_encoding=*/get_encodinginfo("wav", dtype, 0.));
+      /*output_encoding=*/get_encodinginfo("wav", dtype));
   chain.addInputFileObj(sf, in_buf, in_buffer_size, &fileobj);
   for (const auto& effect : effects) {
     chain.addEffect(effect);
