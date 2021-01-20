@@ -12,5 +12,5 @@ setup_wheel_python
 pushd docs
 VERSION=$1
 pip install -r requirements.txt
-make html 
+make html
 popd
