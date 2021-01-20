@@ -61,6 +61,21 @@ class TestFunctional(common_utils.TorchaudioTestCase):
                                              n_channels=n_channels, duration=5)
         self.assert_batch_consistencies(F.detect_pitch_frequency, waveform, sample_rate)
 
+    def test_amplitude_to_DB(self):
+        torch.manual_seed(0)
+        spec = torch.rand(2, 100, 100) * 200
+
+        amplitude_mult = 20.
+        amin = 1e-10
+        ref = 1.0
+        db_mult = math.log10(max(amin, ref))
+
+        # Test with & without a `top_db` clamp
+        self.assert_batch_consistencies(F.amplitude_to_DB, spec, amplitude_mult,
+                                        amin, db_mult, top_db=None)
+        self.assert_batch_consistencies(F.amplitude_to_DB, spec, amplitude_mult,
+                                        amin, db_mult, top_db=40.)
+
     def test_amplitude_to_DB_itemwise_clamps(self):
         """Ensure that the clamps are separate for each spectrogram in a batch.
 
