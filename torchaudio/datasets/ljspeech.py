@@ -41,10 +41,10 @@ class LJSPEECH(Dataset):
     def _parse_filesystem(self, root: str, url: str, folder_in_archive: str, download: bool) -> None:
         root = Path(root)
 
-        basename = Path(url)
+        basename = os.path.basename(url)
         archive = root / basename
 
-        basename = basename.split(".tar.bz2")[0]
+        basename = Path(basename.split(".tar.bz2")[0])
         folder_in_archive = basename / folder_in_archive
 
         self._path = root / folder_in_archive
