@@ -665,6 +665,9 @@ jobs:
           root: ./
           paths:
             - "*"
+      - store_artifacts:
+          path: ./docs/build/html
+          destination: docs
 
   upload_docs:
     <<: *binary_common
