@@ -41,14 +41,14 @@ class LJSPEECH(Dataset):
     def _parse_filesystem(self, root: str, url: str, folder_in_archive: str, download: bool) -> None:
         root = Path(root)
 
-        basename = os.path.basename(url)
+        basename = Path(url)
         archive = root / basename
 
         basename = basename.split(".tar.bz2")[0]
-        folder_in_archive = os.path.join(basename, folder_in_archive)
+        folder_in_archive = basename / folder_in_archive
 
-        self._path = os.path.join(root, folder_in_archive)
-        self._metadata_path = os.path.join(root, basename, 'metadata.csv')
+        self._path = root / folder_in_archive
+        self._metadata_path = root / basename / 'metadata.csv'
 
         if download:
             if not os.path.isdir(self._path):
@@ -58,8 +58,8 @@ class LJSPEECH(Dataset):
                 extract_archive(archive)
 
         with open(self._metadata_path, "r", newline='') as metadata:
-            walker = csv.reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
-            self._walker = list(walker)
+            flist = csv.reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
+            self._flist = list(flist)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
         """Load the n-th sample from the dataset.
@@ -70,9 +70,9 @@ class LJSPEECH(Dataset):
         Returns:
             tuple: ``(waveform, sample_rate, transcript, normalized_transcript)``
         """
-        line = self._walker[n]
+        line = self._flist[n]
         fileid, transcript, normalized_transcript = line
-        fileid_audio = os.path.join(self._path, fileid + ".wav")
+        fileid_audio = self._path / (fileid + ".wav")
 
         # Load audio
         waveform, sample_rate = torchaudio.load(fileid_audio)
@@ -85,4 +85,4 @@ class LJSPEECH(Dataset):
         )
 
     def __len__(self) -> int:
-        return len(self._walker)
+        return len(self._flist)
