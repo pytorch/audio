@@ -103,7 +103,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
     """Test suite for classes defined in `transforms` module"""
     def test_batch_AmplitudeToDB(self):
-        spec = torch.rand((6, 201))
+        spec = torch.rand((2, 6, 201))
 
         # Single then transform then batch
         expected = torchaudio.transforms.AmplitudeToDB()(spec).repeat(3, 1, 1)
