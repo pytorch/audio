@@ -54,10 +54,10 @@ function find_parallel_page() {
            deployed will be https://pytorch.org/audio/stable/generated/torch.Generator.html
                    or maybe https://pytorch.org/audio/0.8.0rc2/generated/torch.Generator.html
            local build will be file:///audio/docs/build/html/generated/torch.Generator.html
-           So we want to capture '/audio', then any of '/build/html',
-           '/' + version[i], or an empty string (the final '|'), in that order.
+           So we want to capture 'audio/docs/build/html', '0/docs', or
+           'audio/' + version[i], in that order.
          */
-        const pathPattern = /audio(\/docs\/build\/html|\/stable|\/master|\/[0-9.rc]+|)(.*)/;
+        const pathPattern = /(audio\/docs\/build\/html|0\/docs\/|audio\/stable|audio\/master|audio\/[0-9.rc])(.*)/;
         const m = location.pathname.match(pathPattern);
         base_url = 'https://pytorch.org/audio/' + versions[i];
         if (m == null) {
