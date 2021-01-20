@@ -72,7 +72,11 @@ class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
 
 class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
     def _ensure_reversible(self, spec):
-        """Check `amplitude_to_db` returns the original when reversed."""
+        """Check `amplitude_to_db` returns the original when reversed.
+
+        This implicitly also tests `DB_to_amplitude`.
+
+        """
         amplitude_mult = 20.
         power_mult = 10.
         amin = 1e-10
