@@ -1,10 +1,10 @@
 import math
+import warnings
 
 import torch
 import torchaudio
 import torchaudio.functional as F
 from parameterized import parameterized
-import pytest
 import itertools
 
 from torchaudio_unittest import common_utils
@@ -33,17 +33,20 @@ class TestSpectrogramFloat64(Spectrogram, common_utils.PytorchTestCase):
 
 class TestCreateFBMatrix(common_utils.TorchaudioTestCase):
     def test_no_warning_high_n_freq(self):
-        with pytest.warns(None) as w:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
             F.create_fb_matrix(288, 0, 8000, 128, 16000)
         assert len(w) == 0
 
     def test_no_warning_low_n_mels(self):
-        with pytest.warns(None) as w:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
             F.create_fb_matrix(201, 0, 8000, 89, 16000)
         assert len(w) == 0
 
     def test_warning(self):
-        with pytest.warns(None) as w:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
             F.create_fb_matrix(201, 0, 8000, 128, 16000)
         assert len(w) == 1
 
