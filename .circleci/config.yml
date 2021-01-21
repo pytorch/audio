@@ -388,7 +388,7 @@ jobs:
   unittest_linux_cpu:
     <<: *binary_common
     docker:
-      - image: "pytorch/torchaudio_unittest_base:manylinux"
+      - image: pytorch/torchaudio_unittest_base:manylinux-20210121
     resource_class: 2xlarge+
     steps:
       - checkout
@@ -417,7 +417,7 @@ jobs:
     resource_class: gpu.small
     environment:
       <<: *environment
-      image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.1-cudnn7-20201203
+      image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.1-cudnn7-20210121
     steps:
       - checkout
       - attach_workspace:
