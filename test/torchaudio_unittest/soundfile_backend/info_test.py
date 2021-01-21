@@ -111,19 +111,17 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         This will happen if a new subtype is supported in SoundFile: the _SUBTYPE_TO_BITS_PER_SAMPLE
         dict should be updated.
         """
-        dtype, sample_rate, duration, num_channels = 'float32', 16000, 1, 1
-        duration = 1
-        path = self.get_temp_path("data.wav")
-        data = get_wav_data(
-            dtype, num_channels, normalize=False, num_frames=duration * sample_rate
-        )
-        save_wav(path, data, sample_rate=16000)
+        def _mock_info_func(_):
+            class MockSoundFileInfo:
+                samplerate = 8000
+                frames = 356
+                channels = 2
+                subtype = 'UNSEEN_SUBTYPE'
+            return MockSoundFileInfo()
 
-        # We pretend the _SUBTYPE_TO_BITS_PER_SAMPLE dict knows no subtype / is empty.
-        # It's easier to mock the internal dict rather than to mock the entire soundfile.info function
-        with patch.dict(soundfile_backend._SUBTYPE_TO_BITS_PER_SAMPLE, {}, clear=True):
+        with patch("soundfile.info", _mock_info_func):
             with warnings.catch_warnings(record=True) as w:
-                info = soundfile_backend.info(path)
-        assert len(w) == 1
-        assert "subtype is unknown to TorchAudio" in str(w[-1].message)
-        assert info.bits_per_sample == 0
+                info = soundfile_backend.info("foo")
+                assert len(w) == 1
+                assert "UNSEEN_SUBTYPE subtype is unknown to TorchAudio" in str(w[-1].message)
+                assert info.bits_per_sample == 0
