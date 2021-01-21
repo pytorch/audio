@@ -161,7 +161,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
-        assert info.bits_per_sample == 16
+        assert info.bits_per_sample == 0
 
 
 @skipIfNoExtension
