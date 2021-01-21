@@ -11,7 +11,7 @@ set(COMMON_ARGS --quiet --disable-shared --enable-static --prefix=${INSTALL_DIR}
 set(envs
   "PKG_CONFIG_PATH=${INSTALL_DIR}/lib/pkgconfig"
   "LDFLAGS=-L${INSTALL_DIR}/lib $ENV{LDFLAGS}"
-  "CPPFLAGS=-I${INSTALL_DIR}/include $ENV{CPPFLAGS}"
+  "CFLAGS=-I${INSTALL_DIR}/include -fvisibility=hidden $ENV{CFLAGS}"
 )
 
 ExternalProject_Add(mad
