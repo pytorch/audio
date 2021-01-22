@@ -43,8 +43,6 @@ BUILD_TRANSDUCER=1 BUILD_SOX=1 python setup.py install
 # 3. Install Test tools
 printf "* Installing test tools\n"
 if [ "${os}" == Linux ] ; then
-    # TODO: move this to docker
-    apt install -y -q libsndfile1
     conda install -y -c conda-forge codecov pytest pytest-cov
     pip install kaldi-io 'librosa>=0.8.0' parameterized SoundFile scipy 'requests>=2.20'
 else
