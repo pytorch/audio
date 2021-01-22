@@ -17,8 +17,6 @@ if LIBROSA_AVAILABLE:
     import librosa
     import scipy
 
-import pytest
-
 from torchaudio_unittest import common_utils
 
 
