@@ -469,7 +469,10 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
         ('amb', None),
     ])
     def test_bytesio_clogged(self, ext, compression):
-        """Loading audio via BytesIO object returns the same result as via file path."""
+        """Loading audio via clogged file object returns the same result as via file path.
+
+        This test case validates the case where fileobject returns shorter bytes than requeted.
+        """
         sample_rate = 16000
         format_ = ext if ext in ['mp3'] else None
         path = self.get_temp_path(f'test.{ext}')
@@ -498,7 +501,8 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
         ('amb', None),
     ])
     def test_bytesio_tiny(self, ext, compression):
-        """Loading audio via BytesIO object returns the same result as via file path."""
+        """Loading very small audio via file object returns the same result as via file path.
+        """
         sample_rate = 16000
         format_ = ext if ext in ['mp3'] else None
         path = self.get_temp_path(f'test.{ext}')
