@@ -74,7 +74,7 @@ class LJSPEECH(Dataset):
         fileid, transcript, normalized_transcript = line
         fileid_audio = self._path / (fileid + ".wav")
 
-        # Load audio
+        # Load audio 
         waveform, sample_rate = torchaudio.load(fileid_audio)
 
         return (
