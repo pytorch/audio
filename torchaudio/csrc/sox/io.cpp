@@ -112,8 +112,9 @@ void save_audio_file(
 
   auto signal = TensorSignal(tensor, sample_rate, channels_first);
 
-  const auto filetype = [&](){
-    if (format.has_value()) return format.value();
+  const auto filetype = [&]() {
+    if (format.has_value())
+      return format.value();
     return get_filetype(path);
   }();
   if (filetype == "amr-nb") {
@@ -123,7 +124,8 @@ void save_audio_file(
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
   const auto signal_info = get_signalinfo(&signal, filetype);
-  const auto encoding_info = get_encodinginfo(filetype, tensor.dtype(), compression);
+  const auto encoding_info =
+      get_encodinginfo(filetype, tensor.dtype(), compression);
 
   SoxFormat sf(sox_open_write(
       path.c_str(),
@@ -161,7 +163,8 @@ std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
 
 namespace {
 
-// helper class to automatically release buffer, to be used by save_audio_fileobj
+// helper class to automatically release buffer, to be used by
+// save_audio_fileobj
 struct AutoReleaseBuffer {
   char* ptr;
   size_t size;
@@ -194,12 +197,14 @@ void save_audio_fileobj(
   if (filetype == "amr-nb") {
     const auto num_channels = tensor.size(channels_first ? 0 : 1);
     if (num_channels != 1) {
-      throw std::runtime_error("amr-nb format only supports single channel audio.");
+      throw std::runtime_error(
+          "amr-nb format only supports single channel audio.");
     }
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
   const auto signal_info = get_signalinfo(&signal, filetype);
-  const auto encoding_info = get_encodinginfo(filetype, tensor.dtype(), compression);
+  const auto encoding_info =
+      get_encodinginfo(filetype, tensor.dtype(), compression);
 
   AutoReleaseBuffer buffer;
 
@@ -212,7 +217,8 @@ void save_audio_fileobj(
       /*oob=*/nullptr));
 
   if (static_cast<sox_format_t*>(sf) == nullptr) {
-    throw std::runtime_error("Error saving audio file: failed to open memory stream.");
+    throw std::runtime_error(
+        "Error saving audio file: failed to open memory stream.");
   }
 
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
@@ -222,7 +228,8 @@ void save_audio_fileobj(
   chain.addOutputFileObj(sf, &buffer.ptr, &buffer.size, &fileobj);
   chain.run();
 
-  // Closing the sox_format_t is necessary for flushing the last chunk to the buffer
+  // Closing the sox_format_t is necessary for flushing the last chunk to the
+  // buffer
   sf.close();
 
   fileobj.attr("write")(py::bytes(buffer.ptr, buffer.size));
