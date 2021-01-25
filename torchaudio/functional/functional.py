@@ -27,6 +27,7 @@ __all__ = [
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
+    "spectral_centroid",
 ]
 
 
@@ -935,3 +936,38 @@ def sliding_window_cmn(
     if len(input_shape) == 2:
         cmn_waveform = cmn_waveform.squeeze(0)
     return cmn_waveform
+
+
+def spectral_centroid(
+        waveform: Tensor,
+        sample_rate: int,
+        pad: int,
+        window: Tensor,
+        n_fft: int,
+        hop_length: int,
+        win_length: int,
+) -> Tensor:
+    r"""
+    Compute the spectral centroid for each channel along the time axis.
+
+    The spectral centroid is defined as the weighted average of the
+    frequency values, weighted by their magnitude.
+
+    Args:
+        waveform (Tensor): Tensor of audio of dimension (..., time)
+        sample_rate (int): Sample rate of the audio waveform
+        pad (int): Two sided padding of signal
+        window (Tensor): Window tensor that is applied/multiplied to each frame/window
+        n_fft (int): Size of FFT
+        hop_length (int): Length of hop between STFT windows
+        win_length (int): Window size
+
+    Returns:
+        Tensor: Dimension (..., time)
+    """
+    specgram = spectrogram(waveform, pad=pad, window=window, n_fft=n_fft, hop_length=hop_length,
+                           win_length=win_length, power=1., normalized=False)
+    freqs = torch.linspace(0, sample_rate // 2, steps=1 + n_fft // 2,
+                           device=specgram.device).reshape((-1, 1))
+    freq_dim = -2
+    return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
