@@ -42,7 +42,8 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.class_<torchaudio::sox_io::SignalInfo>("SignalInfo")
       .def("get_sample_rate", &torchaudio::sox_io::SignalInfo::getSampleRate)
       .def("get_num_channels", &torchaudio::sox_io::SignalInfo::getNumChannels)
-      .def("get_num_frames", &torchaudio::sox_io::SignalInfo::getNumFrames);
+      .def("get_num_frames", &torchaudio::sox_io::SignalInfo::getNumFrames)
+      .def("get_bits_per_sample", &torchaudio::sox_io::SignalInfo::getBitsPerSample);
 
   m.def("torchaudio::sox_io_get_info", &torchaudio::sox_io::get_info);
   m.def(
