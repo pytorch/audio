@@ -9,6 +9,7 @@ import itertools
 
 from torchaudio_unittest import common_utils
 from .functional_impl import Lfilter, Spectrogram
+from torchaudio_unittest.sox_io_backend.common import name_func
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     PytorchTestCase,
@@ -187,8 +188,9 @@ class TestMaskAlongAxisIID(common_utils.TorchaudioTestCase):
         assert mask_specgrams.size() == specgrams.size()
         assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
 
+
+@_mod_utils.requires_module('torchaudio._torchaudio')
 class ApplyCodecTestBase(TempDirMixin, PytorchTestCase):
-    @_mod_utils.requires_module('torchaudio._torchaudio')
     def test_codec(self, compression):
         path = self.get_temp_path('data.wav')
         torch.random.manual_seed(42)
@@ -201,12 +203,9 @@ class ApplyCodecTestBase(TempDirMixin, PytorchTestCase):
 
 
 class ApplyCodecSoxIOTest(ApplyCodecTestBase):
-    backend = "sox_io"
-
-    # parameterize the compression
     @parameterized.expand(list(itertools.product(
         [4, 8, 16, 32],
-    )))
-    def test_mp3(self, compression):
+    )), name_func=name_func)
+    def test_wav(self, compression):
         self.test_codec(compression)
 
