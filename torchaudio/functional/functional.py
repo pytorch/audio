@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import io
-import math
-from typing import Optional, Tuple
 import warnings
 
+import math
 import torch
 from torch import Tensor
+from typing import Optional, Tuple
+
+import torchaudio
 
 __all__ = [
     "spectrogram",
@@ -29,6 +31,7 @@ __all__ = [
     'mask_along_axis_iid',
     'sliding_window_cmn',
     "spectral_centroid",
+    "apply_codec",
 ]
 
 
@@ -849,11 +852,11 @@ def detect_pitch_frequency(
 
 
 def sliding_window_cmn(
-    waveform: Tensor,
-    cmn_window: int = 600,
-    min_cmn_window: int = 100,
-    center: bool = False,
-    norm_vars: bool = False,
+        waveform: Tensor,
+        cmn_window: int = 600,
+        min_cmn_window: int = 100,
+        center: bool = False,
+        norm_vars: bool = False,
 ) -> Tensor:
     r"""
     Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
@@ -972,6 +975,7 @@ def spectral_centroid(
                            device=specgram.device).reshape((-1, 1))
     freq_dim = -2
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
+
 
 def apply_codec(waveform, sample_rate, format, channels_first=True, compression=None):
     """
