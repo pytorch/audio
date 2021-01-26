@@ -83,7 +83,7 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
         data_ref = load_wav(ref_path)[0]
         # 5. Compare
         assert sr == sample_rate
-        self.assertEqual(data, data_ref, atol=3e-03, rtol=1.3e-06)
+        self.assertEqual(data, data_ref, atol=5e-05, rtol=1.3e-06)
 
     def assert_flac(self, sample_rate, num_channels, compression_level, duration):
         """`sox_io_backend.load` can load flac format.

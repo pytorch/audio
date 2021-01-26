@@ -169,7 +169,7 @@ torch::Tensor convert_to_tensor(
   // So make sure to create a new copy after processing samples.
   if (normalize || dtype == torch::kFloat32) {
     t = t.to(torch::kFloat32);
-    t *= (t > 0) / 2147483647. + (t < 0) / 2147483648.;
+    t.divide_(2147483648);
   } else if (dtype == torch::kInt32) {
     t = t.clone();
   } else if (dtype == torch::kInt16) {
