@@ -189,8 +189,8 @@ class TestMaskAlongAxisIID(common_utils.TorchaudioTestCase):
         assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
 class ApplyCodecTestBase(TempDirMixin, PytorchTestCase):
+    @_mod_utils.requires_module('torchaudio._torchaudio')
     def test_codec(self, compression):
         path = self.get_temp_path('data.wav')
         torch.random.manual_seed(42)
@@ -206,6 +206,7 @@ class ApplyCodecSoxIOTest(ApplyCodecTestBase):
     @parameterized.expand(list(itertools.product(
         [4, 8, 16, 32],
     )), name_func=name_func)
+    @_mod_utils.requires_module('torchaudio._torchaudio')
     def test_wav(self, compression):
         self.test_codec(compression)
 
