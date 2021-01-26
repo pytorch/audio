@@ -17,6 +17,7 @@ from .functional import (
     sliding_window_cmn,
     spectrogram,
     spectral_centroid,
+    apply_codec,
 )
 from .filtering import (
     allpass_biquad,

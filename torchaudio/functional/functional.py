@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import io
 import math
 from typing import Optional, Tuple
 import warnings
@@ -971,3 +972,12 @@ def spectral_centroid(
                            device=specgram.device).reshape((-1, 1))
     freq_dim = -2
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
+
+def apply_codec(waveform, sample_rate, format, channels_first=True, compression=None):
+    """
+    """
+    bytes = io.BytesIO()
+    torchaudio.save(bytes, waveform, sample_rate, channels_first, compression=compression, format=format)
+    bytes.seek(0)
+    waveform, _ = torchaudio.load(bytes, channels_first=channels_first)
+    return waveform

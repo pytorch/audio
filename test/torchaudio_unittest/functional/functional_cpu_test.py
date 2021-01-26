@@ -9,6 +9,13 @@ import itertools
 
 from torchaudio_unittest import common_utils
 from .functional_impl import Lfilter, Spectrogram
+from torchaudio_unittest.common_utils import (
+    TempDirMixin,
+    PytorchTestCase,
+)
+from torchaudio._internal import (
+    module_utils as _mod_utils,
+)
 
 
 class TestLFilterFloat32(Lfilter, common_utils.PytorchTestCase):
@@ -179,3 +186,27 @@ class TestMaskAlongAxisIID(common_utils.TorchaudioTestCase):
 
         assert mask_specgrams.size() == specgrams.size()
         assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
+
+class ApplyCodecTestBase(TempDirMixin, PytorchTestCase):
+    @_mod_utils.requires_module('torchaudio._torchaudio')
+    def test_codec(self, compression):
+        path = self.get_temp_path('data.wav')
+        torch.random.manual_seed(42)
+        waveform = torch.rand(2, 44100 * 1)
+        sample_rate = 15000
+        augmented_data = F.apply_codec(waveform,sample_rate,format="wav", channels_first=True, compression=-1)
+        save_wav(path, augmented_data, sample_rate)
+        info = sox_io_backend.info(path)
+        assert info.sample_rate == sample_rate
+
+
+class ApplyCodecSoxIOTest(ApplyCodecTestBase):
+    backend = "sox_io"
+
+    # parameterize the compression
+    @parameterized.expand(list(itertools.product(
+        [4, 8, 16, 32],
+    )))
+    def test_mp3(self, compression):
+        self.test_codec(compression)
+
