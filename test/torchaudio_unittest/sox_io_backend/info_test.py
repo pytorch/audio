@@ -36,6 +36,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
+        assert info.bits_per_sample == sox_utils.get_bit_depth(dtype)
 
     @parameterized.expand(list(itertools.product(
         ['float32', 'int32', 'int16', 'uint8'],
@@ -52,6 +53,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
+        assert info.bits_per_sample == sox_utils.get_bit_depth(dtype)
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
@@ -71,6 +73,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         # mp3 does not preserve the number of samples
         # assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
+        assert info.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
@@ -89,6 +92,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
+        assert info.bits_per_sample == 24  # FLAC standard
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
@@ -107,20 +111,57 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
+        assert info.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
         [1, 2],
+        [16, 32],
     )), name_func=name_func)
-    def test_sphere(self, sample_rate, num_channels):
+    def test_sphere(self, sample_rate, num_channels, bits_per_sample):
         """`sox_io_backend.info` can check sph file correctly"""
         duration = 1
         path = self.get_temp_path('data.sph')
-        sox_utils.gen_audio_file(path, sample_rate, num_channels, duration=duration)
+        sox_utils.gen_audio_file(path, sample_rate, num_channels, duration=duration, bit_depth=bits_per_sample)
         info = sox_io_backend.info(path)
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
+        assert info.bits_per_sample == bits_per_sample
+
+    @parameterized.expand(list(itertools.product(
+        ['float32', 'int32', 'int16', 'uint8'],
+        [8000, 16000],
+        [1, 2],
+    )), name_func=name_func)
+    def test_amb(self, dtype, sample_rate, num_channels):
+        """`sox_io_backend.info` can check amb file correctly"""
+        duration = 1
+        path = self.get_temp_path('data.amb')
+        bits_per_sample = sox_utils.get_bit_depth(dtype)
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels,
+            bit_depth=bits_per_sample, duration=duration)
+        info = sox_io_backend.info(path)
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
+        assert info.bits_per_sample == bits_per_sample
+
+    def test_amr_nb(self):
+        """`sox_io_backend.info` can check amr-nb file correctly"""
+        duration = 1
+        num_channels = 1
+        sample_rate = 8000
+        path = self.get_temp_path('data.amr-nb')
+        sox_utils.gen_audio_file(
+            path, sample_rate=sample_rate, num_channels=num_channels, bit_depth=16,
+            duration=duration)
+        info = sox_io_backend.info(path)
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
+        assert info.bits_per_sample == 0
 
 
 @skipIfNoExtension
@@ -137,3 +178,22 @@ class TestInfoOpus(PytorchTestCase):
         assert info.sample_rate == 48000
         assert info.num_frames == 32768
         assert info.num_channels == num_channels
+        assert info.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats
+
+
+@skipIfNoExtension
+class TestLoadWithoutExtension(PytorchTestCase):
+    def test_mp3(self):
+        """Providing `format` allows to read mp3 without extension
+
+        libsox does not check header for mp3
+
+        https://github.com/pytorch/audio/issues/1040
+
+        The file was generated with the following command
+            ffmpeg -f lavfi -i "sine=frequency=1000:duration=5" -ar 16000 -f mp3 test_noext
+        """
+        path = get_asset_path("mp3_without_ext")
+        sinfo = sox_io_backend.info(path, format="mp3")
+        assert sinfo.sample_rate == 16000
+        assert sinfo.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats

@@ -24,10 +24,10 @@ __all__ = [
     "angle",
     "magphase",
     "phase_vocoder",
-    "detect_pitch_frequency",
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
+    "spectral_centroid",
 ]
 
 
@@ -90,18 +90,20 @@ def spectrogram(
         center=center,
         pad_mode=pad_mode,
         normalized=False,
-        onesided=onesided
+        onesided=onesided,
+        return_complex=True,
     )
 
     # unpack batch
-    spec_f = spec_f.reshape(shape[:-1] + spec_f.shape[-3:])
+    spec_f = spec_f.reshape(shape[:-1] + spec_f.shape[-2:])
 
     if normalized:
         spec_f /= window.pow(2.).sum().sqrt()
     if power is not None:
-        spec_f = complex_norm(spec_f, power=power)
-
-    return spec_f
+        if power == 1.0:
+            return spec_f.abs()
+        return spec_f.abs().pow(power)
+    return torch.view_as_real(spec_f)
 
 
 def griffinlim(
@@ -120,16 +122,14 @@ def griffinlim(
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
         Implementation ported from `librosa`.
 
-    .. [1] McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto.
+    *  [1] McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto.
         "librosa: Audio and music signal analysis in python."
         In Proceedings of the 14th python in science conference, pp. 18-25. 2015.
-
-    .. [2] Perraudin, N., Balazs, P., & Søndergaard, P. L.
+    *  [2] Perraudin, N., Balazs, P., & Søndergaard, P. L.
         "A fast Griffin-Lim algorithm,"
         IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (pp. 1-4),
         Oct. 2013.
-
-    .. [3] D. W. Griffin and J. S. Lim,
+    *  [3] D. W. Griffin and J. S. Lim,
         "Signal estimation from modified short-time Fourier transform,"
         IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
 
@@ -156,6 +156,12 @@ def griffinlim(
     """
     assert momentum < 1, 'momentum={} > 1 can be unstable'.format(momentum)
     assert momentum >= 0, 'momentum={} < 0'.format(momentum)
+
+    if normalized:
+        warnings.warn(
+            "The argument normalized is not used in Griffin-Lim, "
+            "and will be removed in v0.9.0 release. To suppress this warning, "
+            "please use `normalized=False`.")
 
     # pack batch
     shape = specgram.size()
@@ -189,8 +195,20 @@ def griffinlim(
                               length=length).float()
 
         # Rebuild the spectrogram
-        rebuilt = torch.stft(inverse, n_fft, hop_length, win_length, window,
-                             True, 'reflect', False, True)
+        rebuilt = torch.view_as_real(
+            torch.stft(
+                input=inverse,
+                n_fft=n_fft,
+                hop_length=hop_length,
+                win_length=win_length,
+                window=window,
+                center=True,
+                pad_mode='reflect',
+                normalized=False,
+                onesided=True,
+                return_complex=True,
+            )
+        )
 
         # Update our phase estimates
         angles = rebuilt
@@ -223,7 +241,7 @@ def amplitude_to_DB(
 
     This output depends on the maximum value in the input tensor, and so
     may return different values for an audio clip split into snippets vs. a
-    a full clip.
+    full clip.
 
     Args:
         x (Tensor): Input tensor before being converted to decibel scale
@@ -928,3 +946,38 @@ def sliding_window_cmn(
     if len(input_shape) == 2:
         cmn_waveform = cmn_waveform.squeeze(0)
     return cmn_waveform
+
+
+def spectral_centroid(
+        waveform: Tensor,
+        sample_rate: int,
+        pad: int,
+        window: Tensor,
+        n_fft: int,
+        hop_length: int,
+        win_length: int,
+) -> Tensor:
+    r"""
+    Compute the spectral centroid for each channel along the time axis.
+
+    The spectral centroid is defined as the weighted average of the
+    frequency values, weighted by their magnitude.
+
+    Args:
+        waveform (Tensor): Tensor of audio of dimension (..., time)
+        sample_rate (int): Sample rate of the audio waveform
+        pad (int): Two sided padding of signal
+        window (Tensor): Window tensor that is applied/multiplied to each frame/window
+        n_fft (int): Size of FFT
+        hop_length (int): Length of hop between STFT windows
+        win_length (int): Window size
+
+    Returns:
+        Tensor: Dimension (..., time)
+    """
+    specgram = spectrogram(waveform, pad=pad, window=window, n_fft=n_fft, hop_length=hop_length,
+                           win_length=win_length, power=1., normalized=False)
+    freqs = torch.linspace(0, sample_rate // 2, steps=1 + n_fft // 2,
+                           device=specgram.device).reshape((-1, 1))
+    freq_dim = -2
+    return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)

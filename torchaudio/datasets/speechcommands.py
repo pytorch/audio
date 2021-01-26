@@ -1,5 +1,6 @@
 import os
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
+from pathlib import Path
 
 import torchaudio
 from torch.utils.data import Dataset
@@ -7,7 +8,6 @@ from torch import Tensor
 from torchaudio.datasets.utils import (
     download_url,
     extract_archive,
-    walk_files
 )
 
 FOLDER_IN_ARCHIVE = "SpeechCommands"
@@ -48,7 +48,7 @@ class SPEECHCOMMANDS(Dataset):
     """Create a Dataset for Speech Commands.
 
     Args:
-        root (str): Path to the directory where the dataset is found or downloaded.
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
         url (str, optional): The URL to download the dataset from,
             or the type of the dataset to dowload.
             Allowed type values are ``"speech_commands_v0.01"`` and ``"speech_commands_v0.02"``
@@ -64,7 +64,7 @@ class SPEECHCOMMANDS(Dataset):
     """
 
     def __init__(self,
-                 root: str,
+                 root: Union[str, Path],
                  url: str = URL,
                  folder_in_archive: str = FOLDER_IN_ARCHIVE,
                  download: bool = False,
@@ -84,6 +84,9 @@ class SPEECHCOMMANDS(Dataset):
             ext_archive = ".tar.gz"
 
             url = os.path.join(base_url, url + ext_archive)
+
+        # Get string representation of 'root' in case Path object is passed
+        root = os.fspath(root)
 
         basename = os.path.basename(url)
         archive = os.path.join(root, basename)
@@ -106,7 +109,7 @@ class SPEECHCOMMANDS(Dataset):
             self._walker = _load_list(self._path, "testing_list.txt")
         elif subset == "training":
             excludes = set(_load_list(self._path, "validation_list.txt", "testing_list.txt"))
-            walker = walk_files(self._path, suffix=".wav", prefix=True)
+            walker = sorted(str(p) for p in Path(self._path).glob('*/*.wav'))
             self._walker = [
                 w for w in walker
                 if HASH_DIVIDER in w
@@ -114,7 +117,7 @@ class SPEECHCOMMANDS(Dataset):
                 and os.path.normpath(w) not in excludes
             ]
         else:
-            walker = walk_files(self._path, suffix=".wav", prefix=True)
+            walker = sorted(str(p) for p in Path(self._path).glob('*/*.wav'))
             self._walker = [w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w]
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:

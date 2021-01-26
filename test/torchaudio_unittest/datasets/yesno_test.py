@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from torchaudio.datasets import yesno
 
@@ -9,6 +10,23 @@ from torchaudio_unittest.common_utils import (
     save_wav,
     normalize_wav,
 )
+
+
+def get_mock_data(root_dir, labels):
+    """
+    root_dir: path
+    labels: list of labels
+    """
+    mocked_data = []
+    base_dir = os.path.join(root_dir, 'waves_yesno')
+    os.makedirs(base_dir, exist_ok=True)
+    for i, label in enumerate(labels):
+        filename = f'{"_".join(str(l) for l in label)}.wav'
+        path = os.path.join(base_dir, filename)
+        data = get_whitenoise(sample_rate=8000, duration=6, n_channels=1, dtype='int16', seed=i)
+        save_wav(path, data, 8000)
+        mocked_data.append(normalize_wav(data))
+    return mocked_data
 
 
 class TestYesNo(TempDirMixin, TorchaudioTestCase):
@@ -27,17 +45,9 @@ class TestYesNo(TempDirMixin, TorchaudioTestCase):
     @classmethod
     def setUpClass(cls):
         cls.root_dir = cls.get_base_temp_dir()
-        base_dir = os.path.join(cls.root_dir, 'waves_yesno')
-        os.makedirs(base_dir, exist_ok=True)
-        for i, label in enumerate(cls.labels):
-            filename = f'{"_".join(str(l) for l in label)}.wav'
-            path = os.path.join(base_dir, filename)
-            data = get_whitenoise(sample_rate=8000, duration=6, n_channels=1, dtype='int16', seed=i)
-            save_wav(path, data, 8000)
-            cls.data.append(normalize_wav(data))
+        cls.data = get_mock_data(cls.root_dir, cls.labels)
 
-    def test_yesno(self):
-        dataset = yesno.YESNO(self.root_dir)
+    def _test_yesno(self, dataset):
         n_ite = 0
         for i, (waveform, sample_rate, label) in enumerate(dataset):
             expected_label = self.labels[i]
@@ -47,3 +57,11 @@ class TestYesNo(TempDirMixin, TorchaudioTestCase):
             assert label == expected_label
             n_ite += 1
         assert n_ite == len(self.data)
+
+    def test_yesno_str(self):
+        dataset = yesno.YESNO(self.root_dir)
+        self._test_yesno(dataset)
+
+    def test_yesno_path(self):
+        dataset = yesno.YESNO(Path(self.root_dir))
+        self._test_yesno(dataset)

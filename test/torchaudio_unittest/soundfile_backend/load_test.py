@@ -1,4 +1,5 @@
-import itertools
+import os
+import tarfile
 from unittest.mock import patch
 
 import torch
@@ -263,3 +264,94 @@ class TestLoad(LoadTestBase):
     def test_flac(self, dtype, sample_rate, num_channels, channels_first):
         """`soundfile_backend.load` can load flac format correctly."""
         self.assert_flac(dtype, sample_rate, num_channels, channels_first)
+
+
+@skipIfNoModule("soundfile")
+class TestLoadFormat(TempDirMixin, PytorchTestCase):
+    """Given `format` parameter, `so.load` can load files without extension"""
+    original = None
+    path = None
+
+    def _make_file(self, format_):
+        sample_rate = 8000
+        path_with_ext = self.get_temp_path(f'test.{format_}')
+        data = get_wav_data('float32', num_channels=2).numpy().T
+        soundfile.write(path_with_ext, data, sample_rate)
+        expected = soundfile.read(path_with_ext, dtype='float32')[0].T
+        path = os.path.splitext(path_with_ext)[0]
+        os.rename(path_with_ext, path)
+        return path, expected
+
+    def _test_format(self, format_):
+        """Providing format allows to read file without extension"""
+        path, expected = self._make_file(format_)
+        found, _ = soundfile_backend.load(path)
+        self.assertEqual(found, expected)
+
+    @parameterized.expand([
+        ('WAV', ), ('wav', ),
+    ])
+    def test_wav(self, format_):
+        self._test_format(format_)
+
+    @parameterized.expand([
+        ('FLAC', ), ('flac',),
+    ])
+    @skipIfFormatNotSupported("FLAC")
+    def test_flac(self, format_):
+        self._test_format(format_)
+
+
+@skipIfNoModule("soundfile")
+class TestFileObject(TempDirMixin, PytorchTestCase):
+    def _test_fileobj(self, ext):
+        """Loading audio via file-like object works"""
+        sample_rate = 16000
+        path = self.get_temp_path(f'test.{ext}')
+
+        data = get_wav_data('float32', num_channels=2).numpy().T
+        soundfile.write(path, data, sample_rate)
+        expected = soundfile.read(path, dtype='float32')[0].T
+
+        with open(path, 'rb') as fileobj:
+            found, sr = soundfile_backend.load(fileobj)
+        assert sr == sample_rate
+        self.assertEqual(expected, found)
+
+    def test_fileobj_wav(self):
+        """Loading audio via file-like object works"""
+        self._test_fileobj('wav')
+
+    @skipIfFormatNotSupported("FLAC")
+    def test_fileobj_flac(self):
+        """Loading audio via file-like object works"""
+        self._test_fileobj('flac')
+
+    def _test_tarfile(self, ext):
+        """Loading audio via file-like object works"""
+        sample_rate = 16000
+        audio_file = f'test.{ext}'
+        audio_path = self.get_temp_path(audio_file)
+        archive_path = self.get_temp_path('archive.tar.gz')
+
+        data = get_wav_data('float32', num_channels=2).numpy().T
+        soundfile.write(audio_path, data, sample_rate)
+        expected = soundfile.read(audio_path, dtype='float32')[0].T
+
+        with tarfile.TarFile(archive_path, 'w') as tarobj:
+            tarobj.add(audio_path, arcname=audio_file)
+        with tarfile.TarFile(archive_path, 'r') as tarobj:
+            fileobj = tarobj.extractfile(audio_file)
+            found, sr = soundfile_backend.load(fileobj)
+
+        assert sr == sample_rate
+        self.assertEqual(expected, found)
+
+    def test_tarfile_wav(self):
+        """Loading audio via file-like object works"""
+        self._test_tarfile('wav')
+
+    @skipIfFormatNotSupported("FLAC")
+    def test_tarfile_flac(self):
+        """Loading audio via file-like object works"""
+        self._test_tarfile('flac')

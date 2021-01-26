@@ -1,3 +1,4 @@
+import os
 from typing import Tuple, Optional
 
 import torch
@@ -5,25 +6,34 @@ from torchaudio._internal import (
     module_utils as _mod_utils,
 )
 
+import torchaudio
 from .common import AudioMetaData
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
-def info(filepath: str) -> AudioMetaData:
+def info(
+        filepath: str,
+        format: Optional[str] = None,
+) -> AudioMetaData:
     """Get signal information of an audio file.
 
     Args:
         filepath (str or pathlib.Path):
             Path to audio file. This function also handles ``pathlib.Path`` objects,
             but is annotated as ``str`` for TorchScript compatibility.
+        format (str, optional):
+            Override the format detection with the given format.
+            Providing the argument might help when libsox can not infer the format
+            from header or extension,
 
     Returns:
         AudioMetaData: Metadata of the given audio.
     """
     # Cast to str in case type is `pathlib.Path`
     filepath = str(filepath)
-    sinfo = torch.ops.torchaudio.sox_io_get_info(filepath)
-    return AudioMetaData(sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels())
+    sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
+    return AudioMetaData(sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels(),
+                         sinfo.get_bits_per_sample())
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -33,6 +43,7 @@ def load(
         num_frames: int = -1,
         normalize: bool = True,
         channels_first: bool = True,
+        format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Load audio data from file.
 
@@ -40,18 +51,19 @@ def load(
         This function can handle all the codecs that underlying libsox can handle,
         however it is tested on the following formats;
 
-        * WAV
+        * WAV, AMB
 
             * 32-bit floating-point
             * 32-bit signed integer
             * 16-bit signed integer
-            * 8-bit unsigned integer
+            * 8-bit unsigned integer (WAV only)
 
         * MP3
         * FLAC
         * OGG/VORBIS
         * OPUS
         * SPHERE
+        * AMR-NB
 
         To load ``MP3``, ``FLAC``, ``OGG/VORBIS``, ``OPUS`` and other codecs ``libsox`` does not
         handle natively, your installation of ``torchaudio`` has to be linked to ``libsox``
@@ -73,9 +85,17 @@ def load(
     ``[-1.0, 1.0]``.
 
     Args:
-        filepath (str or pathlib.Path):
-            Path to audio file. This function also handles ``pathlib.Path`` objects, but is
-            annotated as ``str`` for TorchScript compiler compatibility.
+        filepath (path-like object or file-like object):
+            Source of audio data. When the function is not compiled by TorchScript,
+            (e.g. ``torch.jit.script``), the following types are accepted;
+                  * ``path-like``: file path
+                  * ``file-like``: Object with ``read(size: int) -> bytes`` method,
+                    which returns byte string of at most ``size`` length.
+            When the function is compiled by TorchScript, only ``str`` type is allowed.
+
+            Note:
+                * This argument is intentionally annotated as ``str`` only due to
+                  TorchScript compiler compatibility.
         frame_offset (int):
             Number of frames to skip before start reading data.
         num_frames (int):
@@ -92,18 +112,46 @@ def load(
         channels_first (bool):
             When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+        format (str, optional):
+            Override the format detection with the given format.
+            Providing the argument might help when libsox can not infer the format
+            from header or extension,
 
     Returns:
-        torch.Tensor:
+        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
             If the input file has integer wav format and normalization is off, then it has
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             ``[channel, time]`` else ``[time, channel]``.
     """
-    # Cast to str in case type is `pathlib.Path`
-    filepath = str(filepath)
+    if not torch.jit.is_scripting():
+        if hasattr(filepath, 'read'):
+            return torchaudio._torchaudio.load_audio_fileobj(
+                filepath, frame_offset, num_frames, normalize, channels_first, format)
+        signal = torch.ops.torchaudio.sox_io_load_audio_file(
+            os.fspath(filepath), frame_offset, num_frames, normalize, channels_first, format)
+        return signal.get_tensor(), signal.get_sample_rate()
     signal = torch.ops.torchaudio.sox_io_load_audio_file(
-        filepath, frame_offset, num_frames, normalize, channels_first)
+        filepath, frame_offset, num_frames, normalize, channels_first, format)
     return signal.get_tensor(), signal.get_sample_rate()
+
+
+@torch.jit.unused
+def _save(
+        filepath: str,
+        src: torch.Tensor,
+        sample_rate: int,
+        channels_first: bool = True,
+        compression: Optional[float] = None,
+        format: Optional[str] = None,
+):
+    if hasattr(filepath, 'write'):
+        if format is None:
+            raise RuntimeError('`format` is required when saving to file object.')
+        torchaudio._torchaudio.save_audio_fileobj(
+            filepath, src, sample_rate, channels_first, compression, format)
+    else:
+        torch.ops.torchaudio.sox_io_save_audio_file(
+            os.fspath(filepath), src, sample_rate, channels_first, compression, format)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -113,13 +161,14 @@ def save(
         sample_rate: int,
         channels_first: bool = True,
         compression: Optional[float] = None,
+        format: Optional[str] = None,
 ):
     """Save audio data to file.
 
     Note:
         Supported formats are;
 
-        * WAV
+        * WAV, AMB
 
             * 32-bit floating-point
             * 32-bit signed integer
@@ -130,6 +179,7 @@ def save(
         * FLAC
         * OGG/VORBIS
         * SPHERE
+        * AMR-NB
 
         To save ``MP3``, ``FLAC``, ``OGG/VORBIS``, and other codecs ``libsox`` does not
         handle natively, your installation of ``torchaudio`` has to be linked to ``libsox``
@@ -155,23 +205,15 @@ def save(
                   | and lowest quality. Default: ``3``.
 
             See the detail at http://sox.sourceforge.net/soxformat.html.
+        format (str, optional):
+            Output audio format. This is required when the output audio format cannot be infered from
+            ``filepath``, (such as file extension or ``name`` attribute of the given file object).
     """
-    # Cast to str in case type is `pathlib.Path`
-    filepath = str(filepath)
-    if compression is None:
-        ext = str(filepath).split('.')[-1].lower()
-        if ext in ['wav', 'sph']:
-            compression = 0.
-        elif ext == 'mp3':
-            compression = -4.5
-        elif ext == 'flac':
-            compression = 8.
-        elif ext in ['ogg', 'vorbis']:
-            compression = 3.
-        else:
-            raise RuntimeError(f'Unsupported file type: "{ext}"')
-    signal = torch.classes.torchaudio.TensorSignal(src, sample_rate, channels_first)
-    torch.ops.torchaudio.sox_io_save_audio_file(filepath, signal, compression)
+    if not torch.jit.is_scripting():
+        _save(filepath, src, sample_rate, channels_first, compression, format)
+        return
+    torch.ops.torchaudio.sox_io_save_audio_file(
+        filepath, src, sample_rate, channels_first, compression, format)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')

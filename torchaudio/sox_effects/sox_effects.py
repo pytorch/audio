@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import torch
 
@@ -157,6 +157,7 @@ def apply_effects_file(
         effects: List[List[str]],
         normalize: bool = True,
         channels_first: bool = True,
+        format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Apply sox effects to the audio file and load the resulting data as Tensor
 
@@ -169,7 +170,8 @@ def apply_effects_file(
         rate and leave samples untouched.
 
     Args:
-        path (str): Path to the audio file.
+        path (str or pathlib.Path): Path to the audio file. This function also handles ``pathlib.Path`` objects, but is
+            annotated as ``str`` for TorchScript compiler compatibility.
         effects (List[List[str]]): List of effects.
         normalize (bool):
             When ``True``, this function always return ``float32``, and sample values are
@@ -179,6 +181,10 @@ def apply_effects_file(
             than integer WAV type.
         channels_first (bool): When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+        format (str, optional):
+            Override the format detection with the given format.
+            Providing the argument might help when libsox can not infer the format
+            from header or extension,
 
     Returns:
         Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
@@ -223,10 +229,9 @@ def apply_effects_file(
         ...         super().__init__()
         ...         self.flist = flist
         ...         self.sample_rate = sample_rate
-        ...         self.rng = None
         ...
         ...     def __getitem__(self, index):
-        ...         speed = self.rng.uniform(0.5, 2.0)
+        ...         speed = 0.5 + 1.5 * random.randn()
         ...         effects = [
         ...             ['gain', '-n', '-10'],  # apply 10 db attenuation
         ...             ['remix', '-'],  # merge all the channels
@@ -247,5 +252,8 @@ def apply_effects_file(
         >>> for batch in loader:
         >>>     pass
     """
-    signal = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first)
+    # Get string representation of 'path' in case Path object is passed
+    path = str(path)
+    signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
+        path, effects, normalize, channels_first, format)
     return signal.get_tensor(), signal.get_sample_rate()

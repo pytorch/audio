@@ -1,4 +1,5 @@
 import itertools
+from pathlib import Path
 
 from torchaudio import sox_effects
 from parameterized import parameterized
@@ -7,6 +8,7 @@ from torchaudio_unittest.common_utils import (
     TempDirMixin,
     PytorchTestCase,
     skipIfNoExtension,
+    get_asset_path,
     get_sinusoid,
     get_wav_data,
     save_wav,
@@ -104,7 +106,7 @@ class TestSoxEffectsFile(TempDirMixin, PytorchTestCase):
         load_params("sox_effect_test_args.json"),
         name_func=lambda f, i, p: f'{f.__name__}_{i}_{p.args[0]["effects"][0][0]}',
     )
-    def test_apply_effects(self, args):
+    def test_apply_effects_str(self, args):
         """`apply_effects_file` should return identical data as sox command"""
         dtype = 'int32'
         channels_first = True
@@ -123,6 +125,29 @@ class TestSoxEffectsFile(TempDirMixin, PytorchTestCase):
         expected, expected_sr = load_wav(reference_path)
         found, sr = sox_effects.apply_effects_file(
             input_path, effects, normalize=False, channels_first=channels_first)
+
+        assert sr == expected_sr
+        self.assertEqual(found, expected)
+
+    def test_apply_effects_path(self):
+        """`apply_effects_file` should return identical data as sox command when file path is given as a Path Object"""
+        dtype = 'int32'
+        channels_first = True
+        effects = [["hilbert"]]
+        num_channels = 2
+        input_sr = 8000
+        output_sr = 8000
+
+        input_path = self.get_temp_path('input.wav')
+        reference_path = self.get_temp_path('reference.wav')
+        data = get_wav_data(dtype, num_channels, channels_first=channels_first)
+        save_wav(input_path, data, input_sr, channels_first=channels_first)
+        sox_utils.run_sox_effect(
+            input_path, reference_path, effects, output_sample_rate=output_sr)
+
+        expected, expected_sr = load_wav(reference_path)
+        found, sr = sox_effects.apply_effects_file(
+            Path(input_path), effects, normalize=False, channels_first=channels_first)
 
         assert sr == expected_sr
         self.assertEqual(found, expected)
@@ -219,3 +244,21 @@ class TestFileFormats(TempDirMixin, PytorchTestCase):
 
         assert sr == expected_sr
         self.assertEqual(found, expected)
+
+
+@skipIfNoExtension
+class TestApplyEffectFileWithoutExtension(PytorchTestCase):
+    def test_mp3(self):
+        """Providing format allows to read mp3 without extension
+
+        libsox does not check header for mp3
+
+        https://github.com/pytorch/audio/issues/1040
+
+        The file was generated with the following command
+            ffmpeg -f lavfi -i "sine=frequency=1000:duration=5" -ar 16000 -f mp3 test_noext
+        """
+        effects = [['band', '300', '10']]
+        path = get_asset_path("mp3_without_ext")
+        _, sr = sox_effects.apply_effects_file(path, effects, format="mp3")
+        assert sr == 16000

@@ -61,13 +61,15 @@ struct SoxFormat {
   sox_format_t* operator->() const noexcept;
   operator sox_format_t*() const noexcept;
 
+  void close();
+
  private:
   sox_format_t* fd_;
 };
 
 ///
 /// Verify that input file is found, has known encoding, and not empty
-void validate_input_file(const SoxFormat& sf);
+void validate_input_file(const SoxFormat& sf, bool check_length = true);
 
 ///
 /// Verify that input Tensor is 2D, CPU and either uin8, int16, int32 or float32
@@ -118,8 +120,12 @@ sox_signalinfo_t get_signalinfo(
 /// Get sox_encofinginfo_t for saving audoi file
 sox_encodinginfo_t get_encodinginfo(
     const std::string filetype,
+    const caffe2::TypeMeta dtype);
+
+sox_encodinginfo_t get_encodinginfo(
+    const std::string filetype,
     const caffe2::TypeMeta dtype,
-    const double compression);
+    c10::optional<double>& compression);
 
 } // namespace sox_utils
 } // namespace torchaudio

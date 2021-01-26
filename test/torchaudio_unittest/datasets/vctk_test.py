@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from torchaudio.datasets import vctk
 
@@ -11,7 +12,7 @@ from torchaudio_unittest.common_utils import (
 )
 
 # Used to generate a unique utterance for each dummy audio file
-UTTERANCE = [
+_UTTERANCE = [
     'Please call Stella',
     'Ask her to bring these things',
     'with her from the store',
@@ -26,6 +27,54 @@ UTTERANCE = [
 ]
 
 
+def get_mock_dataset(root_dir):
+    """
+    root_dir: root directory of the mocked data
+    """
+    mocked_samples = []
+    dataset_dir = os.path.join(root_dir, 'VCTK-Corpus-0.92')
+    os.makedirs(dataset_dir, exist_ok=True)
+    sample_rate = 48000
+    seed = 0
+
+    for speaker in range(225, 230):
+        speaker_id = 'p' + str(speaker)
+        audio_dir = os.path.join(dataset_dir, 'wav48_silence_trimmed', speaker_id)
+        os.makedirs(audio_dir, exist_ok=True)
+
+        file_dir = os.path.join(dataset_dir, 'txt', speaker_id)
+        os.makedirs(file_dir, exist_ok=True)
+
+        for utterance_id in range(1, 11):
+            filename = f'{speaker_id}_{utterance_id:03d}_mic2'
+            audio_file_path = os.path.join(audio_dir, filename + '.wav')
+
+            data = get_whitenoise(
+                sample_rate=sample_rate,
+                duration=0.01,
+                n_channels=1,
+                dtype='float32',
+                seed=seed
+            )
+            save_wav(audio_file_path, data, sample_rate)
+
+            txt_file_path = os.path.join(file_dir, filename[:-5] + '.txt')
+            utterance = _UTTERANCE[utterance_id - 1]
+            with open(txt_file_path, 'w') as f:
+                f.write(utterance)
+
+            sample = (
+                normalize_wav(data),
+                sample_rate,
+                utterance,
+                speaker_id,
+                utterance_id
+            )
+            mocked_samples.append(sample)
+            seed += 1
+    return mocked_samples
+
+
 class TestVCTK(TempDirMixin, TorchaudioTestCase):
     backend = 'default'
 
@@ -35,50 +84,9 @@ class TestVCTK(TempDirMixin, TorchaudioTestCase):
     @classmethod
     def setUpClass(cls):
         cls.root_dir = cls.get_base_temp_dir()
-        dataset_dir = os.path.join(cls.root_dir, 'VCTK-Corpus-0.92')
-        os.makedirs(dataset_dir, exist_ok=True)
-        sample_rate = 48000
-        seed = 0
+        cls.samples = get_mock_dataset(cls.root_dir)
 
-        for speaker in range(225, 230):
-            speaker_id = 'p' + str(speaker)
-            audio_dir = os.path.join(dataset_dir, 'wav48_silence_trimmed', speaker_id)
-            os.makedirs(audio_dir, exist_ok=True)
-
-            file_dir = os.path.join(dataset_dir, 'txt', speaker_id)
-            os.makedirs(file_dir, exist_ok=True)
-
-            for utterance_id in range(1, 11):
-                filename = f'{speaker_id}_{utterance_id:03d}_mic2'
-                audio_file_path = os.path.join(audio_dir, filename + '.wav')
-
-                data = get_whitenoise(
-                    sample_rate=sample_rate,
-                    duration=0.01,
-                    n_channels=1,
-                    dtype='float32',
-                    seed=seed
-                )
-                save_wav(audio_file_path, data, sample_rate)
-
-                txt_file_path = os.path.join(file_dir, filename[:-5] + '.txt')
-                utterance = UTTERANCE[utterance_id - 1]
-                with open(txt_file_path, 'w') as f:
-                    f.write(utterance)
-
-                sample = (
-                    normalize_wav(data),
-                    sample_rate,
-                    utterance,
-                    speaker_id,
-                    utterance_id
-                )
-                cls.samples.append(sample)
-
-                seed += 1
-
-    def test_vctk(self):
-        dataset = vctk.VCTK_092(self.root_dir, audio_ext=".wav")
+    def _test_vctk(self, dataset):
         num_samples = 0
         for i, (data, sample_rate, utterance, speaker_id, utterance_id) in enumerate(dataset):
             self.assertEqual(data, self.samples[i][0], atol=5e-5, rtol=1e-8)
@@ -89,3 +97,11 @@ class TestVCTK(TempDirMixin, TorchaudioTestCase):
             num_samples += 1
 
         assert num_samples == len(self.samples)
+
+    def test_vctk_str(self):
+        dataset = vctk.VCTK_092(self.root_dir, audio_ext=".wav")
+        self._test_vctk(dataset)
+
+    def test_vctk_path(self):
+        dataset = vctk.VCTK_092(Path(self.root_dir), audio_ext=".wav")
+        self._test_vctk(dataset)

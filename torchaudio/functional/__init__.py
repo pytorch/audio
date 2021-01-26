@@ -16,6 +16,7 @@ from .functional import (
     phase_vocoder,
     sliding_window_cmn,
     spectrogram,
+    spectral_centroid,
 )
 from .filtering import (
     allpass_biquad,

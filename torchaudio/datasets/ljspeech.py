@@ -1,42 +1,27 @@
 import os
 import csv
-from typing import List, Tuple
+from typing import List, Tuple, Union
+from pathlib import Path
 
 import torchaudio
-from torchaudio.datasets.utils import download_url, extract_archive, unicode_csv_reader
+from torchaudio.datasets.utils import download_url, extract_archive
 from torch import Tensor
 from torch.utils.data import Dataset
 
-URL = "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"
-FOLDER_IN_ARCHIVE = "wavs"
-_CHECKSUMS = {
-    "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2":
-    "be1a30453f28eb8dd26af4101ae40cbf2c50413b1bb21936cbcdc6fae3de8aa5"
+_RELEASE_CONFIGS = {
+    "release1": {
+        "folder_in_archive": "wavs",
+        "url": "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2",
+        "checksum": "be1a30453f28eb8dd26af4101ae40cbf2c50413b1bb21936cbcdc6fae3de8aa5",
+    }
 }
-
-
-def load_ljspeech_item(line: List[str], path: str, ext_audio: str) -> Tuple[Tensor, int, str, str]:
-    assert len(line) == 3
-    fileid, transcript, normalized_transcript = line
-    fileid_audio = fileid + ext_audio
-    fileid_audio = os.path.join(path, fileid_audio)
-
-    # Load audio
-    waveform, sample_rate = torchaudio.load(fileid_audio)
-
-    return (
-        waveform,
-        sample_rate,
-        transcript,
-        normalized_transcript,
-    )
 
 
 class LJSPEECH(Dataset):
     """Create a Dataset for LJSpeech-1.1.
 
     Args:
-        root (str): Path to the directory where the dataset is found or downloaded.
+        root (str or Path): Path to the directory where the dataset is found or downloaded.
         url (str, optional): The URL to download the dataset from.
             (default: ``"https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"``)
         folder_in_archive (str, optional):
@@ -45,34 +30,36 @@ class LJSPEECH(Dataset):
             Whether to download the dataset if it is not found at root path. (default: ``False``).
     """
 
-    _ext_audio = ".wav"
-    _ext_archive = '.tar.bz2'
-
     def __init__(self,
-                 root: str,
-                 url: str = URL,
-                 folder_in_archive: str = FOLDER_IN_ARCHIVE,
+                 root: Union[str, Path],
+                 url: str = _RELEASE_CONFIGS["release1"]["url"],
+                 folder_in_archive: str = _RELEASE_CONFIGS["release1"]["folder_in_archive"],
                  download: bool = False) -> None:
 
+        self._parse_filesystem(root, url, folder_in_archive, download)
+
+    def _parse_filesystem(self, root: str, url: str, folder_in_archive: str, download: bool) -> None:
+        root = Path(root)
+
         basename = os.path.basename(url)
-        archive = os.path.join(root, basename)
+        archive = root / basename
 
-        basename = basename.split(self._ext_archive)[0]
-        folder_in_archive = os.path.join(basename, folder_in_archive)
+        basename = Path(basename.split(".tar.bz2")[0])
+        folder_in_archive = basename / folder_in_archive
 
-        self._path = os.path.join(root, folder_in_archive)
-        self._metadata_path = os.path.join(root, basename, 'metadata.csv')
+        self._path = root / folder_in_archive
+        self._metadata_path = root / basename / 'metadata.csv'
 
         if download:
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
-                    checksum = _CHECKSUMS.get(url, None)
+                    checksum = _RELEASE_CONFIGS["release1"]["checksum"]
                     download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
         with open(self._metadata_path, "r", newline='') as metadata:
-            walker = unicode_csv_reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
-            self._walker = list(walker)
+            flist = csv.reader(metadata, delimiter="|", quoting=csv.QUOTE_NONE)
+            self._flist = list(flist)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
         """Load the n-th sample from the dataset.
@@ -83,8 +70,19 @@ class LJSPEECH(Dataset):
         Returns:
             tuple: ``(waveform, sample_rate, transcript, normalized_transcript)``
         """
-        line = self._walker[n]
-        return load_ljspeech_item(line, self._path, self._ext_audio)
+        line = self._flist[n]
+        fileid, transcript, normalized_transcript = line
+        fileid_audio = self._path / (fileid + ".wav")
+
+        # Load audio
+        waveform, sample_rate = torchaudio.load(fileid_audio)
+
+        return (
+            waveform,
+            sample_rate,
+            transcript,
+            normalized_transcript,
+        )
 
     def __len__(self) -> int:
-        return len(self._walker)
+        return len(self._flist)

@@ -227,19 +227,22 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
 
-        kwargs = {
-            'n_fft': 2048,
-            'hop_length': 512,
-            'win_length': 2048,
-            'window': torch.hann_window(2048),
-            'center': True,
-            'pad_mode': 'reflect',
-            'normalized': True,
-            'onesided': True,
-        }
         rate = 2
 
-        complex_specgrams = torch.stft(waveform, **kwargs)
+        complex_specgrams = torch.view_as_real(
+            torch.stft(
+                input=waveform,
+                n_fft=2048,
+                hop_length=512,
+                win_length=2048,
+                window=torch.hann_window(2048),
+                center=True,
+                pad_mode='reflect',
+                normalized=True,
+                onesided=True,
+                return_complex=True,
+            )
+        )
 
         # Single then transform then batch
         expected = torchaudio.transforms.TimeStretch(
@@ -279,4 +282,15 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
         # Batch then transform
         computed = torchaudio.transforms.Vol(gain=1.1)(waveform.repeat(3, 1, 1))
+        self.assertEqual(computed, expected)
+
+    def test_batch_spectral_centroid(self):
+        sample_rate = 44100
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
+
+        # Single then transform then batch
+        expected = torchaudio.transforms.SpectralCentroid(sample_rate)(waveform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = torchaudio.transforms.SpectralCentroid(sample_rate)(waveform.repeat(3, 1, 1))
         self.assertEqual(computed, expected)

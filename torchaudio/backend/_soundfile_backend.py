@@ -11,8 +11,47 @@ if _mod_utils.is_module_available("soundfile"):
     import soundfile
 
 
+# Mapping from soundfile subtype to number of bits per sample.
+# This is mostly heuristical and the value is set to 0 when it is irrelevant
+# (lossy formats) or when it can't be inferred.
+# For ADPCM (and G72X) subtypes, it's hard to infer the bit depth because it's not part of the standard:
+# According to https://en.wikipedia.org/wiki/Adaptive_differential_pulse-code_modulation#In_telephony,
+# the default seems to be 8 bits but it can be compressed further to 4 bits.
+# The dict is inspired from
+# https://github.com/bastibe/python-soundfile/blob/744efb4b01abc72498a96b09115b42a4cabd85e4/soundfile.py#L66-L94
+_SUBTYPE_TO_BITS_PER_SAMPLE = {
+    'PCM_S8': 8,  # Signed 8 bit data
+    'PCM_16': 16,  # Signed 16 bit data
+    'PCM_24': 24,  # Signed 24 bit data
+    'PCM_32': 32,  # Signed 32 bit data
+    'PCM_U8': 8,  # Unsigned 8 bit data (WAV and RAW only)
+    'FLOAT': 32,  # 32 bit float data
+    'DOUBLE': 64,  # 64 bit float data
+    'ULAW': 8,  # U-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types
+    'ALAW': 8,  # A-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types
+    'IMA_ADPCM': 0,  # IMA ADPCM.
+    'MS_ADPCM': 0,  # Microsoft ADPCM.
+    'GSM610': 0,  # GSM 6.10 encoding. (Wikipedia says 1.625 bit depth?? https://en.wikipedia.org/wiki/Full_Rate)
+    'VOX_ADPCM': 0,  # OKI / Dialogix ADPCM
+    'G721_32': 0,  # 32kbs G721 ADPCM encoding.
+    'G723_24': 0,  # 24kbs G723 ADPCM encoding.
+    'G723_40': 0,  # 40kbs G723 ADPCM encoding.
+    'DWVW_12': 12,  # 12 bit Delta Width Variable Word encoding.
+    'DWVW_16': 16,  # 16 bit Delta Width Variable Word encoding.
+    'DWVW_24': 24,  # 24 bit Delta Width Variable Word encoding.
+    'DWVW_N': 0,  # N bit Delta Width Variable Word encoding.
+    'DPCM_8': 8,  # 8 bit differential PCM (XI only)
+    'DPCM_16': 16,  # 16 bit differential PCM (XI only)
+    'VORBIS': 0,  # Xiph Vorbis encoding. (lossy)
+    'ALAC_16': 16,  # Apple Lossless Audio Codec (16 bit).
+    'ALAC_20': 20,  # Apple Lossless Audio Codec (20 bit).
+    'ALAC_24': 24,  # Apple Lossless Audio Codec (24 bit).
+    'ALAC_32': 32,  # Apple Lossless Audio Codec (32 bit).
+}
+
+
 @_mod_utils.requires_module("soundfile")
-def info(filepath: str) -> AudioMetaData:
+def info(filepath: str, format: Optional[str] = None) -> AudioMetaData:
     """Get signal information of an audio file.
 
     Args:
@@ -20,12 +59,22 @@ def info(filepath: str) -> AudioMetaData:
             This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``
             for the consistency with "sox_io" backend, which has a restriction on type annotation
             for TorchScript compiler compatiblity.
+        format (str, optional):
+            Not used. PySoundFile does not accept format hint.
 
     Returns:
         AudioMetaData: meta data of the given audio.
     """
     sinfo = soundfile.info(filepath)
-    return AudioMetaData(sinfo.samplerate, sinfo.frames, sinfo.channels)
+    if sinfo.subtype not in _SUBTYPE_TO_BITS_PER_SAMPLE:
+        warnings.warn(
+            f"The {sinfo.subtype} subtype is unknown to TorchAudio. As a result, the bits_per_sample "
+            "attribute will be set to 0. If you are seeing this warning, please "
+            "report by opening an issue on github (after checking for existing/closed ones). "
+            "You may otherwise ignore this warning."
+        )
+    bits_per_sample = _SUBTYPE_TO_BITS_PER_SAMPLE.get(sinfo.subtype, 0)
+    return AudioMetaData(sinfo.samplerate, sinfo.frames, sinfo.channels, bits_per_sample=bits_per_sample)
 
 
 _SUBTYPE2DTYPE = {
@@ -45,6 +94,7 @@ def load(
     num_frames: int = -1,
     normalize: bool = True,
     channels_first: bool = True,
+    format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Load audio data from file.
 
@@ -79,10 +129,12 @@ def load(
     ``[-1.0, 1.0]``.
 
     Args:
-        filepath (str or pathlib.Path): Path to audio file.
-            This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``
-            for the consistency with "sox_io" backend, which has a restriction on type annotation
-            for TorchScript compiler compatiblity.
+        filepath (path-like object or file-like object):
+            Source of audio data.
+            Note:
+                  * This argument is intentionally annotated as ``str`` only,
+                    for the consistency with "sox_io" backend, which has a restriction
+                    on type annotation due to TorchScript compiler compatiblity.
         frame_offset (int):
             Number of frames to skip before start reading data.
         num_frames (int):
@@ -99,9 +151,11 @@ def load(
         channels_first (bool):
             When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+        format (str, optional):
+            Not used. PySoundFile does not accept format hint.
 
     Returns:
-        torch.Tensor:
+        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
             If the input file has integer wav format and normalization is off, then it has
             integer type, else ``float32`` type. If ``channels_first=True``, it has
             ``[channel, time]`` else ``[time, channel]``.
@@ -131,6 +185,7 @@ def save(
     sample_rate: int,
     channels_first: bool = True,
     compression: Optional[float] = None,
+    format: Optional[str] = None,
 ):
     """Save audio data to file.
 
@@ -161,6 +216,9 @@ def save(
             otherwise ``[time, channel]``.
         compression (Optional[float]):
             Not used. It is here only for interface compatibility reson with "sox_io" backend.
+        format (str, optional):
+            Output audio format. This is required when the output audio format cannot be infered from
+            ``filepath``, (such as file extension or ``name`` attribute of the given file object).
     """
     if src.ndim != 2:
         raise ValueError(f"Expected 2D Tensor, got {src.ndim}D.")
@@ -169,8 +227,13 @@ def save(
             '`save` function of "soundfile" backend does not support "compression" parameter. '
             "The argument is silently ignored."
         )
+    if hasattr(filepath, 'write'):
+        if format is None:
+            raise RuntimeError('`format` is required when saving to file object.')
+        ext = format
+    else:
+        ext = str(filepath).split(".")[-1].lower()
 
-    ext = str(filepath).split(".")[-1].lower()
     if ext != "wav":
         subtype = None
     elif src.dtype == torch.uint8:
@@ -186,17 +249,16 @@ def save(
     else:
         raise ValueError(f"Unsupported dtype for WAV: {src.dtype}")
 
-    format_ = None
     # sph is a extension used in TED-LIUM but soundfile does not recognize it as NIST format,
     # so we extend the extensions manually here
-    if ext in ["nis", "nist", "sph"]:
-        format_ = "NIST"
+    if ext in ["nis", "nist", "sph"] and format is None:
+        format = "NIST"
 
     if channels_first:
         src = src.t()
 
     soundfile.write(
-        file=filepath, data=src, samplerate=sample_rate, subtype=subtype, format=format_
+        file=filepath, data=src, samplerate=sample_rate, subtype=subtype, format=format
     )
 
 
