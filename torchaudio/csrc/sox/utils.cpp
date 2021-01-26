@@ -80,7 +80,9 @@ bool TensorSignal::getChannelsFirst() const {
 }
 
 SoxFormat::SoxFormat(sox_format_t* fd) noexcept : fd_(fd) {}
-SoxFormat::~SoxFormat() { close(); }
+SoxFormat::~SoxFormat() {
+  close();
+}
 
 sox_format_t* SoxFormat::operator->() const noexcept {
   return fd_;
@@ -291,26 +293,28 @@ sox_signalinfo_t get_signalinfo(
 sox_encodinginfo_t get_encodinginfo(
     const std::string filetype,
     const caffe2::TypeMeta dtype) {
-  return sox_encodinginfo_t{/*encoding=*/get_encoding(filetype, dtype),
-                            /*bits_per_sample=*/get_precision(filetype, dtype),
-                            /*compression=*/HUGE_VAL,
-                            /*reverse_bytes=*/sox_option_default,
-                            /*reverse_nibbles=*/sox_option_default,
-                            /*reverse_bits=*/sox_option_default,
-                            /*opposite_endian=*/sox_false};
+  return sox_encodinginfo_t{
+      /*encoding=*/get_encoding(filetype, dtype),
+      /*bits_per_sample=*/get_precision(filetype, dtype),
+      /*compression=*/HUGE_VAL,
+      /*reverse_bytes=*/sox_option_default,
+      /*reverse_nibbles=*/sox_option_default,
+      /*reverse_bits=*/sox_option_default,
+      /*opposite_endian=*/sox_false};
 }
 
 sox_encodinginfo_t get_encodinginfo(
     const std::string filetype,
     const caffe2::TypeMeta dtype,
     c10::optional<double>& compression) {
-  return sox_encodinginfo_t{/*encoding=*/get_encoding(filetype, dtype),
-                            /*bits_per_sample=*/get_precision(filetype, dtype),
-                            /*compression=*/compression.value_or(HUGE_VAL),
-                            /*reverse_bytes=*/sox_option_default,
-                            /*reverse_nibbles=*/sox_option_default,
-                            /*reverse_bits=*/sox_option_default,
-                            /*opposite_endian=*/sox_false};
+  return sox_encodinginfo_t{
+      /*encoding=*/get_encoding(filetype, dtype),
+      /*bits_per_sample=*/get_precision(filetype, dtype),
+      /*compression=*/compression.value_or(HUGE_VAL),
+      /*reverse_bytes=*/sox_option_default,
+      /*reverse_nibbles=*/sox_option_default,
+      /*reverse_bits=*/sox_option_default,
+      /*opposite_endian=*/sox_false};
 }
 
 } // namespace sox_utils

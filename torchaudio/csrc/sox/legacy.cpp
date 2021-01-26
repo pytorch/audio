@@ -40,10 +40,7 @@ int64_t write_audio(SoxDescriptor& fd, at::Tensor tensor) {
   return samples_written;
 }
 
-void read_audio(
-    SoxDescriptor& fd,
-    at::Tensor output,
-    int64_t buffer_length) {
+void read_audio(SoxDescriptor& fd, at::Tensor output, int64_t buffer_length) {
   std::vector<sox_sample_t> buffer(buffer_length);
 
   int number_of_channels = fd->signal.channels;
@@ -64,8 +61,7 @@ void read_audio(
 } // namespace
 
 std::tuple<sox_signalinfo_t, sox_encodinginfo_t> get_info(
-    const std::string& file_name
-  ) {
+    const std::string& file_name) {
   SoxDescriptor fd(sox_open_read(
       file_name.c_str(),
       /*signal=*/nullptr,
@@ -86,7 +82,6 @@ int read_audio_file(
     sox_signalinfo_t* si,
     sox_encodinginfo_t* ei,
     const char* ft) {
-
   SoxDescriptor fd(sox_open_read(file_name.c_str(), si, ei, ft));
   if (fd.get() == nullptr) {
     throw std::runtime_error("Error opening audio file");
@@ -112,15 +107,16 @@ int read_audio_file(
   // calculate buffer length
   int64_t buffer_length = total_length;
   if (offset > 0) {
-      buffer_length -= offset;
+    buffer_length -= offset;
   }
   if (nframes > 0 && buffer_length > nframes) {
-      buffer_length = nframes;
+    buffer_length = nframes;
   }
 
   // seek to offset point before reading data
   if (sox_seek(fd.get(), offset, 0) == SOX_EOF) {
-    throw std::runtime_error("sox_seek reached EOF, try reducing offset or num_samples");
+    throw std::runtime_error(
+        "sox_seek reached EOF, try reducing offset or num_samples");
   }
 
   // read data and fill output tensor

@@ -143,23 +143,27 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
     c10::optional<bool>& normalize,
     c10::optional<bool>& channels_first,
     c10::optional<std::string>& format) {
-
-  // Streaming decoding over file-like object is tricky because libsox operates on FILE pointer.
-  // The folloing is what `sox` and `play` commands do
+  // Streaming decoding over file-like object is tricky because libsox operates
+  // on FILE pointer. The folloing is what `sox` and `play` commands do
   //  - file input -> FILE pointer
   //  - URL input -> call wget in suprocess and pipe the data -> FILE pointer
   //  - stdin -> FILE pointer
   //
-  // We want to, instead, fetch byte strings chunk by chunk, consume them, and discard.
+  // We want to, instead, fetch byte strings chunk by chunk, consume them, and
+  // discard.
   //
   // Here is the approach
-  // 1. Initialize sox_format_t using sox_open_mem_read, providing the initial chunk of byte string
-  //    This will perform header-based format detection, if necessary, then fill the metadata of
-  //    sox_format_t. Internally, sox_open_mem_read uses fmemopen, which returns FILE* which points the
-  //    buffer of the provided byte string.
-  // 2. Each time sox reads a chunk from the FILE*, we update the underlying buffer in a way that it
-  //    starts with unseen data, and append the new data read from the given fileobj.
-  //    This will trick libsox as if it keeps reading from the FILE* continuously.
+  // 1. Initialize sox_format_t using sox_open_mem_read, providing the initial
+  // chunk of byte string
+  //    This will perform header-based format detection, if necessary, then fill
+  //    the metadata of sox_format_t. Internally, sox_open_mem_read uses
+  //    fmemopen, which returns FILE* which points the buffer of the provided
+  //    byte string.
+  // 2. Each time sox reads a chunk from the FILE*, we update the underlying
+  // buffer in a way that it
+  //    starts with unseen data, and append the new data read from the given
+  //    fileobj. This will trick libsox as if it keeps reading from the FILE*
+  //    continuously.
 
   // Prepare the buffer used throughout the lifecycle of SoxEffectChain.
   // Using std::string and let it manage memory.
@@ -170,9 +174,12 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
   auto* in_buf = const_cast<char*>(in_buffer.data());
 
   // Fetch the header, and copy it to the buffer.
-  auto header = static_cast<std::string>(static_cast<py::bytes>(fileobj.attr("read")(4096)));
-  memcpy(static_cast<void*>(in_buf),
-         static_cast<void*>(const_cast<char*>(header.data())), header.length());
+  auto header = static_cast<std::string>(
+      static_cast<py::bytes>(fileobj.attr("read")(4096)));
+  memcpy(
+      static_cast<void*>(in_buf),
+      static_cast<void*>(const_cast<char*>(header.data())),
+      header.length());
 
   // Open file (this starts reading the header)
   SoxFormat sf(sox_open_mem_read(
@@ -212,8 +219,7 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
       channels_first_);
 
   return std::make_tuple(
-      tensor,
-      static_cast<int64_t>(chain.getOutputSampleRate()));
+      tensor, static_cast<int64_t>(chain.getOutputSampleRate()));
 }
 
 #endif // TORCH_API_INCLUDE_EXTENSION_H
