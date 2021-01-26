@@ -12,7 +12,7 @@ from .functional_impl import Lfilter, Spectrogram
 from torchaudio_unittest.sox_io_backend.common import name_func
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
-    PytorchTestCase,
+    TorchaudioTestCase,
 )
 from torchaudio._internal import (
     module_utils as _mod_utils,
@@ -189,7 +189,7 @@ class TestMaskAlongAxisIID(common_utils.TorchaudioTestCase):
         assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
 
 
-class ApplyCodecTestBase(TempDirMixin, PytorchTestCase):
+class ApplyCodecTestBase(TempDirMixin, TorchaudioTestCase):
     @_mod_utils.requires_module('torchaudio._torchaudio')
     def test_codec(self, compression):
         path = self.get_temp_path('data.wav')
@@ -202,11 +202,10 @@ class ApplyCodecTestBase(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
 
 
-class ApplyCodecSoxIOTest(ApplyCodecTestBase):
+class TestApplyCodecSoxIO(ApplyCodecTestBase):
     @parameterized.expand(list(itertools.product(
-        [4, 8, 16, 32],
+        [4, 8, 16, 32]
     )), name_func=name_func)
-    @_mod_utils.requires_module('torchaudio._torchaudio')
     def test_wav(self, compression):
-        self.test_codec(compression)
+        self.test_codec(compression=compression)
 
