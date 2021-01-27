@@ -32,7 +32,8 @@ def info(
     # Cast to str in case type is `pathlib.Path`
     filepath = str(filepath)
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
-    return AudioMetaData(sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels())
+    return AudioMetaData(sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels(),
+                         sinfo.get_bits_per_sample())
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')

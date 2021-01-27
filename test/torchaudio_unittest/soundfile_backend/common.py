@@ -26,7 +26,7 @@ def skipIfFormatNotSupported(fmt):
         import soundfile
 
         fmts = soundfile.available_formats()
-        return skipIf(fmt not in fmts, f'"{fmt}" is not supported by sondfile')
+        return skipIf(fmt not in fmts, f'"{fmt}" is not supported by soundfile')
     return skipIf(True, '"soundfile" not available.')
 
 

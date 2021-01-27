@@ -123,44 +123,47 @@ int file_output_flow(
 }
 
 sox_effect_handler_t* get_tensor_input_handler() {
-  static sox_effect_handler_t handler{/*name=*/"input_tensor",
-                                      /*usage=*/NULL,
-                                      /*flags=*/SOX_EFF_MCHAN,
-                                      /*getopts=*/NULL,
-                                      /*start=*/NULL,
-                                      /*flow=*/NULL,
-                                      /*drain=*/tensor_input_drain,
-                                      /*stop=*/NULL,
-                                      /*kill=*/NULL,
-                                      /*priv_size=*/sizeof(TensorInputPriv)};
+  static sox_effect_handler_t handler{
+      /*name=*/"input_tensor",
+      /*usage=*/NULL,
+      /*flags=*/SOX_EFF_MCHAN,
+      /*getopts=*/NULL,
+      /*start=*/NULL,
+      /*flow=*/NULL,
+      /*drain=*/tensor_input_drain,
+      /*stop=*/NULL,
+      /*kill=*/NULL,
+      /*priv_size=*/sizeof(TensorInputPriv)};
   return &handler;
 }
 
 sox_effect_handler_t* get_tensor_output_handler() {
-  static sox_effect_handler_t handler{/*name=*/"output_tensor",
-                                      /*usage=*/NULL,
-                                      /*flags=*/SOX_EFF_MCHAN,
-                                      /*getopts=*/NULL,
-                                      /*start=*/NULL,
-                                      /*flow=*/tensor_output_flow,
-                                      /*drain=*/NULL,
-                                      /*stop=*/NULL,
-                                      /*kill=*/NULL,
-                                      /*priv_size=*/sizeof(TensorOutputPriv)};
+  static sox_effect_handler_t handler{
+      /*name=*/"output_tensor",
+      /*usage=*/NULL,
+      /*flags=*/SOX_EFF_MCHAN,
+      /*getopts=*/NULL,
+      /*start=*/NULL,
+      /*flow=*/tensor_output_flow,
+      /*drain=*/NULL,
+      /*stop=*/NULL,
+      /*kill=*/NULL,
+      /*priv_size=*/sizeof(TensorOutputPriv)};
   return &handler;
 }
 
 sox_effect_handler_t* get_file_output_handler() {
-  static sox_effect_handler_t handler{/*name=*/"output_file",
-                                      /*usage=*/NULL,
-                                      /*flags=*/SOX_EFF_MCHAN,
-                                      /*getopts=*/NULL,
-                                      /*start=*/NULL,
-                                      /*flow=*/file_output_flow,
-                                      /*drain=*/NULL,
-                                      /*stop=*/NULL,
-                                      /*kill=*/NULL,
-                                      /*priv_size=*/sizeof(FileOutputPriv)};
+  static sox_effect_handler_t handler{
+      /*name=*/"output_file",
+      /*usage=*/NULL,
+      /*flags=*/SOX_EFF_MCHAN,
+      /*getopts=*/NULL,
+      /*start=*/NULL,
+      /*flow=*/file_output_flow,
+      /*drain=*/NULL,
+      /*stop=*/NULL,
+      /*kill=*/NULL,
+      /*priv_size=*/sizeof(FileOutputPriv)};
   return &handler;
 }
 
@@ -198,7 +201,8 @@ void SoxEffectsChain::addInputTensor(TensorSignal* signal) {
   priv->signal = signal;
   priv->index = 0;
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
-    throw std::runtime_error("Internal Error: Failed to add effect: input_tensor");
+    throw std::runtime_error(
+        "Internal Error: Failed to add effect: input_tensor");
   }
 }
 
@@ -207,7 +211,8 @@ void SoxEffectsChain::addOutputBuffer(
   SoxEffect e(sox_create_effect(get_tensor_output_handler()));
   static_cast<TensorOutputPriv*>(e->priv)->buffer = output_buffer;
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
-    throw std::runtime_error("Internal Error: Failed to add effect: output_tensor");
+    throw std::runtime_error(
+        "Internal Error: Failed to add effect: output_tensor");
   }
 }
 
@@ -305,7 +310,7 @@ struct FileObjOutputPriv {
 /// Callback function to feed byte string
 /// https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/sox.h#L1268-L1278
 int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
-  auto priv = static_cast<FileObjInputPriv *>(effp->priv);
+  auto priv = static_cast<FileObjInputPriv*>(effp->priv);
   auto sf = priv->sf;
   auto fileobj = priv->fileobj;
   auto buffer = priv->buffer;
@@ -315,9 +320,9 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   //
   // NOTE:
   //   Since the underlying FILE* was opened with `fmemopen`, the only way
-  //   libsox detect EOF is reaching the end of the buffer. (null byte won't help)
-  //   Therefore we need to align the content at the end of buffer, otherwise,
-  //   libsox will keep reading the content beyond intended length.
+  //   libsox detect EOF is reaching the end of the buffer. (null byte won't
+  //   help) Therefore we need to align the content at the end of buffer,
+  //   otherwise, libsox will keep reading the content beyond intended length.
   //
   // Before:
   //
@@ -339,11 +344,12 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   const auto num_refill = py::len(chunk_);
   const auto offset = buffer_size - (num_remain + num_refill);
 
-  if(num_refill > num_consumed) {
+  if (num_refill > num_consumed) {
     std::ostringstream message;
-    message << "Tried to read up to " << num_consumed << " bytes but, "
-            << "recieved " << num_refill << " bytes. "
-            << "The given object does not confirm to read protocol of file object.";
+    message
+        << "Tried to read up to " << num_consumed << " bytes but, "
+        << "recieved " << num_refill << " bytes. "
+        << "The given object does not confirm to read protocol of file object.";
     throw std::runtime_error(message.str());
   }
 
@@ -364,7 +370,7 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
 
   // 1.4. Set the file pointer to the new offset
   sf->tell_off = offset;
-  fseek ((FILE*)sf->fp, offset, SEEK_SET);
+  fseek((FILE*)sf->fp, offset, SEEK_SET);
 
   // 2. Perform decoding operation
   // The following part is practically same as "input" effect
@@ -377,7 +383,7 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   // store the actual number read back to *osamp
   *osamp = sox_read(sf, obuf, *osamp);
 
-  return *osamp? SOX_SUCCESS : SOX_EOF;
+  return *osamp ? SOX_SUCCESS : SOX_EOF;
 }
 
 int fileobj_output_flow(
@@ -420,30 +426,32 @@ int fileobj_output_flow(
 }
 
 sox_effect_handler_t* get_fileobj_input_handler() {
-  static sox_effect_handler_t handler{/*name=*/"input_fileobj_object",
-                                      /*usage=*/NULL,
-                                      /*flags=*/SOX_EFF_MCHAN,
-                                      /*getopts=*/NULL,
-                                      /*start=*/NULL,
-                                      /*flow=*/NULL,
-                                      /*drain=*/fileobj_input_drain,
-                                      /*stop=*/NULL,
-                                      /*kill=*/NULL,
-                                      /*priv_size=*/sizeof(FileObjInputPriv)};
+  static sox_effect_handler_t handler{
+      /*name=*/"input_fileobj_object",
+      /*usage=*/NULL,
+      /*flags=*/SOX_EFF_MCHAN,
+      /*getopts=*/NULL,
+      /*start=*/NULL,
+      /*flow=*/NULL,
+      /*drain=*/fileobj_input_drain,
+      /*stop=*/NULL,
+      /*kill=*/NULL,
+      /*priv_size=*/sizeof(FileObjInputPriv)};
   return &handler;
 }
 
 sox_effect_handler_t* get_fileobj_output_handler() {
-  static sox_effect_handler_t handler{/*name=*/"output_fileobj_object",
-                                      /*usage=*/NULL,
-                                      /*flags=*/SOX_EFF_MCHAN,
-                                      /*getopts=*/NULL,
-                                      /*start=*/NULL,
-                                      /*flow=*/fileobj_output_flow,
-                                      /*drain=*/NULL,
-                                      /*stop=*/NULL,
-                                      /*kill=*/NULL,
-                                      /*priv_size=*/sizeof(FileObjOutputPriv)};
+  static sox_effect_handler_t handler{
+      /*name=*/"output_fileobj_object",
+      /*usage=*/NULL,
+      /*flags=*/SOX_EFF_MCHAN,
+      /*getopts=*/NULL,
+      /*start=*/NULL,
+      /*flow=*/fileobj_output_flow,
+      /*drain=*/NULL,
+      /*stop=*/NULL,
+      /*kill=*/NULL,
+      /*priv_size=*/sizeof(FileObjOutputPriv)};
   return &handler;
 }
 
@@ -464,7 +472,8 @@ void SoxEffectsChain::addInputFileObj(
   priv->buffer = buffer;
   priv->buffer_size = buffer_size;
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
-    throw std::runtime_error("Internal Error: Failed to add effect: input fileobj");
+    throw std::runtime_error(
+        "Internal Error: Failed to add effect: input fileobj");
   }
 }
 
@@ -481,7 +490,8 @@ void SoxEffectsChain::addOutputFileObj(
   priv->buffer = buffer;
   priv->buffer_size = buffer_size;
   if (sox_add_effect(sec_, e, &interm_sig_, &out_sig_) != SOX_SUCCESS) {
-    throw std::runtime_error("Internal Error: Failed to add effect: output fileobj");
+    throw std::runtime_error(
+        "Internal Error: Failed to add effect: output fileobj");
   }
 }
 

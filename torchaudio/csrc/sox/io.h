@@ -15,14 +15,17 @@ struct SignalInfo : torch::CustomClassHolder {
   int64_t sample_rate;
   int64_t num_channels;
   int64_t num_frames;
+  int64_t bits_per_sample;
 
   SignalInfo(
       const int64_t sample_rate_,
       const int64_t num_channels_,
-      const int64_t num_frames_);
+      const int64_t num_frames_,
+      const int64_t bits_per_sample_);
   int64_t getSampleRate() const;
   int64_t getNumChannels() const;
   int64_t getNumFrames() const;
+  int64_t getBitsPerSample() const;
 };
 
 c10::intrusive_ptr<SignalInfo> get_info(

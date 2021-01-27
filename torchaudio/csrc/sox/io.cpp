@@ -13,10 +13,12 @@ namespace sox_io {
 SignalInfo::SignalInfo(
     const int64_t sample_rate_,
     const int64_t num_channels_,
-    const int64_t num_frames_)
+    const int64_t num_frames_,
+    const int64_t bits_per_sample_)
     : sample_rate(sample_rate_),
       num_channels(num_channels_),
-      num_frames(num_frames_){};
+      num_frames(num_frames_),
+      bits_per_sample(bits_per_sample_){};
 
 int64_t SignalInfo::getSampleRate() const {
   return sample_rate;
@@ -28,6 +30,10 @@ int64_t SignalInfo::getNumChannels() const {
 
 int64_t SignalInfo::getNumFrames() const {
   return num_frames;
+}
+
+int64_t SignalInfo::getBitsPerSample() const {
+  return bits_per_sample;
 }
 
 c10::intrusive_ptr<SignalInfo> get_info(
@@ -46,7 +52,8 @@ c10::intrusive_ptr<SignalInfo> get_info(
   return c10::make_intrusive<SignalInfo>(
       static_cast<int64_t>(sf->signal.rate),
       static_cast<int64_t>(sf->signal.channels),
-      static_cast<int64_t>(sf->signal.length / sf->signal.channels));
+      static_cast<int64_t>(sf->signal.length / sf->signal.channels),
+      static_cast<int64_t>(sf->encoding.bits_per_sample));
 }
 
 namespace {
@@ -105,8 +112,9 @@ void save_audio_file(
 
   auto signal = TensorSignal(tensor, sample_rate, channels_first);
 
-  const auto filetype = [&](){
-    if (format.has_value()) return format.value();
+  const auto filetype = [&]() {
+    if (format.has_value())
+      return format.value();
     return get_filetype(path);
   }();
   if (filetype == "amr-nb") {
@@ -116,7 +124,8 @@ void save_audio_file(
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
   const auto signal_info = get_signalinfo(&signal, filetype);
-  const auto encoding_info = get_encodinginfo(filetype, tensor.dtype(), compression);
+  const auto encoding_info =
+      get_encodinginfo(filetype, tensor.dtype(), compression);
 
   SoxFormat sf(sox_open_write(
       path.c_str(),
@@ -154,7 +163,8 @@ std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
 
 namespace {
 
-// helper class to automatically release buffer, to be used by save_audio_fileobj
+// helper class to automatically release buffer, to be used by
+// save_audio_fileobj
 struct AutoReleaseBuffer {
   char* ptr;
   size_t size;
@@ -187,12 +197,14 @@ void save_audio_fileobj(
   if (filetype == "amr-nb") {
     const auto num_channels = tensor.size(channels_first ? 0 : 1);
     if (num_channels != 1) {
-      throw std::runtime_error("amr-nb format only supports single channel audio.");
+      throw std::runtime_error(
+          "amr-nb format only supports single channel audio.");
     }
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
   const auto signal_info = get_signalinfo(&signal, filetype);
-  const auto encoding_info = get_encodinginfo(filetype, tensor.dtype(), compression);
+  const auto encoding_info =
+      get_encodinginfo(filetype, tensor.dtype(), compression);
 
   AutoReleaseBuffer buffer;
 
@@ -205,7 +217,8 @@ void save_audio_fileobj(
       /*oob=*/nullptr));
 
   if (static_cast<sox_format_t*>(sf) == nullptr) {
-    throw std::runtime_error("Error saving audio file: failed to open memory stream.");
+    throw std::runtime_error(
+        "Error saving audio file: failed to open memory stream.");
   }
 
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
@@ -215,7 +228,8 @@ void save_audio_fileobj(
   chain.addOutputFileObj(sf, &buffer.ptr, &buffer.size, &fileobj);
   chain.run();
 
-  // Closing the sox_format_t is necessary for flushing the last chunk to the buffer
+  // Closing the sox_format_t is necessary for flushing the last chunk to the
+  // buffer
   sf.close();
 
   fileobj.attr("write")(py::bytes(buffer.ptr, buffer.size));
