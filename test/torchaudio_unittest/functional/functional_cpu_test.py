@@ -15,6 +15,7 @@ from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
     save_wav,
+    skipIfNoExec,
 )
 from torchaudio._internal import (
     module_utils as _mod_utils,
@@ -191,15 +192,15 @@ class TestMaskAlongAxisIID(common_utils.TorchaudioTestCase):
         assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
 
 
+@skipIfNoExec('sox')
 class ApplyCodecTestBase(TempDirMixin, TorchaudioTestCase):
     backend = "sox_io"
 
-    @_mod_utils.requires_module('torchaudio._torchaudio')
-    @parameterized.expand(list(itertools.product(
-        ["wav"],
-        [96, 128, 160, 192, 224, 256, 320]
-    )), name_func=name_func)
-    def test_codec(self, format, compression):
+    def smoke_test(self, format, compression):
+        """
+        The purpose of this test suite is to verify that apply_codec functionalities do not exhibit
+        abnormal behaviors.
+        """
         path = self.get_temp_path(f'data.{format}')
         torch.random.manual_seed(42)
         waveform = torch.rand(2, 44100 * 1)
@@ -208,3 +209,11 @@ class ApplyCodecTestBase(TempDirMixin, TorchaudioTestCase):
         save_wav(path, augmented_data, sample_rate)
         info = sox_io_backend.info(path)
         assert info.sample_rate == sample_rate
+
+    @_mod_utils.requires_module('torchaudio._torchaudio')
+    @parameterized.expand(list(itertools.product(
+        ["wav"],
+        [96, 128, 160, 192, 224, 256, 320]
+    )), name_func=name_func)
+    def test_codec(self, format, compression):
+        self.smoke_test(format, compression)
