@@ -318,6 +318,45 @@
     <span class="kn">import</span> <span class="nn">soundfile</span>
 
 
+<span class="c1"># Mapping from soundfile subtype to number of bits per sample.</span>
+<span class="c1"># This is mostly heuristical and the value is set to 0 when it is irrelevant</span>
+<span class="c1"># (lossy formats) or when it can&#39;t be inferred.</span>
+<span class="c1"># For ADPCM (and G72X) subtypes, it&#39;s hard to infer the bit depth because it&#39;s not part of the standard:</span>
+<span class="c1"># According to https://en.wikipedia.org/wiki/Adaptive_differential_pulse-code_modulation#In_telephony,</span>
+<span class="c1"># the default seems to be 8 bits but it can be compressed further to 4 bits.</span>
+<span class="c1"># The dict is inspired from</span>
+<span class="c1"># https://github.com/bastibe/python-soundfile/blob/744efb4b01abc72498a96b09115b42a4cabd85e4/soundfile.py#L66-L94</span>
+<span class="n">_SUBTYPE_TO_BITS_PER_SAMPLE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;PCM_S8&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># Signed 8 bit data</span>
+    <span class="s1">&#39;PCM_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># Signed 16 bit data</span>
+    <span class="s1">&#39;PCM_24&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>  <span class="c1"># Signed 24 bit data</span>
+    <span class="s1">&#39;PCM_32&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># Signed 32 bit data</span>
+    <span class="s1">&#39;PCM_U8&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># Unsigned 8 bit data (WAV and RAW only)</span>
+    <span class="s1">&#39;FLOAT&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># 32 bit float data</span>
+    <span class="s1">&#39;DOUBLE&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>  <span class="c1"># 64 bit float data</span>
+    <span class="s1">&#39;ULAW&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># U-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types</span>
+    <span class="s1">&#39;ALAW&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># A-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types</span>
+    <span class="s1">&#39;IMA_ADPCM&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># IMA ADPCM.</span>
+    <span class="s1">&#39;MS_ADPCM&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Microsoft ADPCM.</span>
+    <span class="s1">&#39;GSM610&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># GSM 6.10 encoding. (Wikipedia says 1.625 bit depth?? https://en.wikipedia.org/wiki/Full_Rate)</span>
+    <span class="s1">&#39;VOX_ADPCM&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># OKI / Dialogix ADPCM</span>
+    <span class="s1">&#39;G721_32&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># 32kbs G721 ADPCM encoding.</span>
+    <span class="s1">&#39;G723_24&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># 24kbs G723 ADPCM encoding.</span>
+    <span class="s1">&#39;G723_40&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># 40kbs G723 ADPCM encoding.</span>
+    <span class="s1">&#39;DWVW_12&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>  <span class="c1"># 12 bit Delta Width Variable Word encoding.</span>
+    <span class="s1">&#39;DWVW_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># 16 bit Delta Width Variable Word encoding.</span>
+    <span class="s1">&#39;DWVW_24&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>  <span class="c1"># 24 bit Delta Width Variable Word encoding.</span>
+    <span class="s1">&#39;DWVW_N&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># N bit Delta Width Variable Word encoding.</span>
+    <span class="s1">&#39;DPCM_8&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># 8 bit differential PCM (XI only)</span>
+    <span class="s1">&#39;DPCM_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># 16 bit differential PCM (XI only)</span>
+    <span class="s1">&#39;VORBIS&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Xiph Vorbis encoding. (lossy)</span>
+    <span class="s1">&#39;ALAC_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (16 bit).</span>
+    <span class="s1">&#39;ALAC_20&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (20 bit).</span>
+    <span class="s1">&#39;ALAC_24&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (24 bit).</span>
+    <span class="s1">&#39;ALAC_32&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (32 bit).</span>
+<span class="p">}</span>
+
+
 <div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend._soundfile_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Get signal information of an audio file.</span>
@@ -334,7 +373,15 @@
 <span class="sd">        AudioMetaData: meta data of the given audio.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sinfo</span> <span class="o">=</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">samplerate</span><span class="p">,</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">frames</span><span class="p">,</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">channels</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">subtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_SUBTYPE_TO_BITS_PER_SAMPLE</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The </span><span class="si">{</span><span class="n">sinfo</span><span class="o">.</span><span class="n">subtype</span><span class="si">}</span><span class="s2"> subtype is unknown to TorchAudio. As a result, the bits_per_sample &quot;</span>
+            <span class="s2">&quot;attribute will be set to 0. If you are seeing this warning, please &quot;</span>
+            <span class="s2">&quot;report by opening an issue on github (after checking for existing/closed ones). &quot;</span>
+            <span class="s2">&quot;You may otherwise ignore this warning.&quot;</span>
+        <span class="p">)</span>
+    <span class="n">bits_per_sample</span> <span class="o">=</span> <span class="n">_SUBTYPE_TO_BITS_PER_SAMPLE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">subtype</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">samplerate</span><span class="p">,</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">frames</span><span class="p">,</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="o">=</span><span class="n">bits_per_sample</span><span class="p">)</span></div>
 
 
 <span class="n">_SUBTYPE2DTYPE</span> <span class="o">=</span> <span class="p">{</span>

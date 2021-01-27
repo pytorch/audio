@@ -354,6 +354,13 @@
 <span class="sd">            If None, then the complex spectrum is returned instead. (Default: ``2``)</span>
 <span class="sd">        normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)</span>
 <span class="sd">        wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)</span>
+<span class="sd">        center (bool, optional): whether to pad :attr:`waveform` on both sides so</span>
+<span class="sd">            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.</span>
+<span class="sd">            Default: ``True``</span>
+<span class="sd">        pad_mode (string, optional): controls the padding method used when</span>
+<span class="sd">            :attr:`center` is ``True``. Default: ``&quot;reflect&quot;``</span>
+<span class="sd">        onesided (bool, optional): controls whether to return half of results to</span>
+<span class="sd">            avoid redundancy Default: ``True``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">,</span> <span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="s1">&#39;normalized&#39;</span><span class="p">]</span>
 
@@ -365,7 +372,10 @@
                  <span class="n">window_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">,</span>
                  <span class="n">power</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span><span class="p">,</span>
                  <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">wkwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                 <span class="n">wkwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
+                 <span class="n">onesided</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Spectrogram</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span> <span class="o">=</span> <span class="n">n_fft</span>
         <span class="c1"># number of FFT bins. the returned STFT result will have n_fft // 2 + 1</span>
@@ -377,6 +387,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">=</span> <span class="n">pad</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">power</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">normalized</span> <span class="o">=</span> <span class="n">normalized</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pad_mode</span> <span class="o">=</span> <span class="n">pad_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onesided</span> <span class="o">=</span> <span class="n">onesided</span>
 
 <div class="viewcode-block" id="Spectrogram.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Spectrogram.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -388,8 +401,19 @@
 <span class="sd">            ``n_fft // 2 + 1`` where ``n_fft`` is the number of</span>
 <span class="sd">            Fourier bins, and time is the number of window hops (n_frame).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">spectrogram</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hop_length</span><span class="p">,</span>
-                             <span class="bp">self</span><span class="o">.</span><span class="n">win_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalized</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">spectrogram</span><span class="p">(</span>
+            <span class="n">waveform</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hop_length</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">win_length</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">normalized</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pad_mode</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">onesided</span>
+        <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="GriffinLim"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.GriffinLim">[docs]</a><span class="k">class</span> <span class="nc">GriffinLim</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
