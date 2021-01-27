@@ -337,9 +337,6 @@ uint64_t read_fileobj(py::object* fileobj, const uint64_t size, char* buffer) {
           << "The given object does not confirm to read protocol of file object.";
       throw std::runtime_error(message.str());
     }
-
-    std::cerr << "req: " << request << ", fetched: " << chunk_len << std::endl;
-    std::cerr << "buffer: " << (void*)buffer << std::endl;
     memcpy(buffer, chunk.data(), chunk_len);
     buffer += chunk_len;
     num_read += chunk_len;
