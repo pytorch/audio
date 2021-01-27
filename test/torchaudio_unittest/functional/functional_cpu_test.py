@@ -7,12 +7,14 @@ import torchaudio.functional as F
 from parameterized import parameterized
 import itertools
 
+from torchaudio.backend import sox_io_backend
 from torchaudio_unittest import common_utils
 from .functional_impl import Lfilter, Spectrogram
 from torchaudio_unittest.sox_io_backend.common import name_func
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
+    save_wav,
 )
 from torchaudio._internal import (
     module_utils as _mod_utils,
@@ -190,22 +192,19 @@ class TestMaskAlongAxisIID(common_utils.TorchaudioTestCase):
 
 
 class ApplyCodecTestBase(TempDirMixin, TorchaudioTestCase):
+    backend = "sox_io"
+
     @_mod_utils.requires_module('torchaudio._torchaudio')
-    def test_codec(self, compression):
-        path = self.get_temp_path('data.wav')
+    @parameterized.expand(list(itertools.product(
+        ["wav"],
+        [96, 128, 160, 192, 224, 256, 320]
+    )), name_func=name_func)
+    def test_codec(self, format, compression):
+        path = self.get_temp_path(f'data.{format}')
         torch.random.manual_seed(42)
         waveform = torch.rand(2, 44100 * 1)
-        sample_rate = 15000
-        augmented_data = F.apply_codec(waveform,sample_rate,format="wav", channels_first=True, compression=-1)
+        sample_rate = 8000
+        augmented_data = F.apply_codec(waveform,sample_rate, format=format, channels_first=True, compression=-1)
         save_wav(path, augmented_data, sample_rate)
         info = sox_io_backend.info(path)
         assert info.sample_rate == sample_rate
-
-
-class TestApplyCodecSoxIO(ApplyCodecTestBase):
-    @parameterized.expand(list(itertools.product(
-        [4, 8, 16, 32]
-    )), name_func=name_func)
-    def test_wav(self, compression):
-        self.test_codec(compression=compression)
-

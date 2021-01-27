@@ -4,7 +4,7 @@ import io
 import math
 from typing import Optional, Tuple
 import warnings
-
+import torchaudio
 import torch
 from torch import Tensor
 
@@ -29,6 +29,7 @@ __all__ = [
     'mask_along_axis_iid',
     'sliding_window_cmn',
     "spectral_centroid",
+    "apply_codec",
 ]
 
 
