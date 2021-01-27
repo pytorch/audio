@@ -10,6 +10,26 @@ import torchaudio
 from .common import AudioMetaData
 
 
+@torch.jit.unused
+def _info(
+        filepath: str,
+        format: Optional[str] = None,
+) -> AudioMetaData:
+    if hasattr(filepath, 'read'):
+        sinfo = torchaudio._torchaudio.get_info_fileobj(
+            filepath, format)
+        sample_rate, num_channels, num_frames, bits_per_sample = sinfo
+        return AudioMetaData(
+            sample_rate, num_frames, num_channels, bits_per_sample)
+    sinfo = torch.ops.torchaudio.sox_io_get_info(os.fspath(filepath), format)
+    return AudioMetaData(
+        sinfo.get_sample_rate(),
+        sinfo.get_num_frames(),
+        sinfo.get_num_channels(),
+        sinfo.get_bits_per_sample(),
+    )
+
+
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def info(
         filepath: str,
@@ -18,9 +38,21 @@ def info(
     """Get signal information of an audio file.
 
     Args:
-        filepath (str or pathlib.Path):
-            Path to audio file. This function also handles ``pathlib.Path`` objects,
-            but is annotated as ``str`` for TorchScript compatibility.
+        filepath (path-like object or file-like object):
+            Source of audio data. When the function is not compiled by TorchScript,
+            (e.g. ``torch.jit.script``), the following types are accepted;
+                  * ``path-like``: file path
+                  * ``file-like``: Object with ``read(size: int) -> bytes`` method,
+                    which returns byte string of at most ``size`` length.
+            When the function is compiled by TorchScript, only ``str`` type is allowed.
+
+            Note:
+                  * When the input type is file-like object, this function cannot
+                    get the correct length (``num_samples``) for certain formats,
+                    such as ``mp3`` and ``vorbis``.
+                    In this case, the value of ``num_samples`` is ``0``.
+                  * This argument is intentionally annotated as ``str`` only due to
+                    TorchScript compiler compatibility.
         format (str, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
@@ -29,11 +61,14 @@ def info(
     Returns:
         AudioMetaData: Metadata of the given audio.
     """
-    # Cast to str in case type is `pathlib.Path`
-    filepath = str(filepath)
+    if not torch.jit.is_scripting():
+        return _info(filepath, format)
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
-    return AudioMetaData(sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels(),
-                         sinfo.get_bits_per_sample())
+    return AudioMetaData(
+        sinfo.get_sample_rate(),
+        sinfo.get_num_frames(),
+        sinfo.get_num_channels(),
+        sinfo.get_bits_per_sample())
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')

@@ -36,7 +36,7 @@ int64_t SignalInfo::getBitsPerSample() const {
   return bits_per_sample;
 }
 
-c10::intrusive_ptr<SignalInfo> get_info(
+c10::intrusive_ptr<SignalInfo> get_info_file(
     const std::string& path,
     c10::optional<std::string>& format) {
   SoxFormat sf(sox_open_read(
@@ -148,6 +148,56 @@ void save_audio_file(
 }
 
 #ifdef TORCH_API_INCLUDE_EXTENSION_H
+
+std::tuple<int64_t, int64_t, int64_t, int64_t> get_info_fileobj(
+    py::object fileobj,
+    c10::optional<std::string>& format) {
+  // Prepare in-memory file object
+  // When libsox opens a file, it also reads the header.
+  // When opening a file there are two functions that might touch FILE* (and the
+  // underlying buffer).
+  // * `auto_detect_format`
+  //   https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/formats.c#L43
+  // * `startread` handler of detected format.
+  //   https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/formats.c#L574
+  // To see the handler of a particular format, go to
+  //   https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/<FORMAT>.c
+  // For example, voribs can be found
+  //   https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/vorbis.c#L97-L158
+  //
+  // `auto_detect_format` function only requires 256 bytes, but format-dependant
+  // `startread` handler might require more data. In case of vorbis, the size of
+  // header is unbounded, but typically 4kB maximum.
+  //
+  // "The header size is unbounded, although for streaming a rule-of-thumb of
+  // 4kB or less is recommended (and Xiph.Org's Vorbis encoder follows this
+  // suggestion)."
+  //
+  // See:
+  // https://xiph.org/vorbis/doc/Vorbis_I_spec.html
+  auto capacity = 4096;
+  std::string buffer(capacity, '\0');
+  auto* buf = const_cast<char*>(buffer.data());
+  auto num_read = read_fileobj(&fileobj, capacity, buf);
+  // If the file is shorter than 256, then libsox cannot read the header.
+  auto buf_size = (num_read > 256) ? num_read : 256;
+
+  SoxFormat sf(sox_open_mem_read(
+      buf,
+      buf_size,
+      /*signal=*/nullptr,
+      /*encoding=*/nullptr,
+      /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
+
+  // In case of streamed data, length can be 0
+  validate_input_file(sf, /*check_length=*/false);
+
+  return std::make_tuple(
+      static_cast<int64_t>(sf->signal.rate),
+      static_cast<int64_t>(sf->signal.channels),
+      static_cast<int64_t>(sf->signal.length / sf->signal.channels),
+      static_cast<int64_t>(sf->encoding.bits_per_sample));
+}
 
 std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
     py::object fileobj,

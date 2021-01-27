@@ -1,5 +1,6 @@
 from unittest.mock import patch
 import warnings
+import tarfile
 
 import torch
 from torchaudio.backend import _soundfile_backend as soundfile_backend
@@ -125,3 +126,65 @@ class TestInfo(TempDirMixin, PytorchTestCase):
                 assert len(w) == 1
                 assert "UNSEEN_SUBTYPE subtype is unknown to TorchAudio" in str(w[-1].message)
                 assert info.bits_per_sample == 0
+
+
+@skipIfNoModule("soundfile")
+class TestFileObject(TempDirMixin, PytorchTestCase):
+    def _test_fileobj(self, ext, subtype, bits_per_sample):
+        """Query audio via file-like object works"""
+        duration = 2
+        sample_rate = 16000
+        num_channels = 2
+        num_frames = sample_rate * duration
+        path = self.get_temp_path(f'test.{ext}')
+
+        data = torch.randn(num_frames, num_channels).numpy()
+        soundfile.write(path, data, sample_rate, subtype=subtype)
+
+        with open(path, 'rb') as fileobj:
+            info = soundfile_backend.info(fileobj)
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == num_frames
+        assert info.num_channels == num_channels
+        assert info.bits_per_sample == bits_per_sample
+
+    def test_fileobj_wav(self):
+        """Loading audio via file-like object works"""
+        self._test_fileobj('wav', 'PCM_16', 16)
+
+    @skipIfFormatNotSupported("FLAC")
+    def test_fileobj_flac(self):
+        """Loading audio via file-like object works"""
+        self._test_fileobj('flac', 'PCM_16', 16)
+
+    def _test_tarobj(self, ext, subtype, bits_per_sample):
+        """Query compressed audio via file-like object works"""
+        duration = 2
+        sample_rate = 16000
+        num_channels = 2
+        num_frames = sample_rate * duration
+        audio_file = f'test.{ext}'
+        audio_path = self.get_temp_path(audio_file)
+        archive_path = self.get_temp_path('archive.tar.gz')
+
+        data = torch.randn(num_frames, num_channels).numpy()
+        soundfile.write(audio_path, data, sample_rate, subtype=subtype)
+
+        with tarfile.TarFile(archive_path, 'w') as tarobj:
+            tarobj.add(audio_path, arcname=audio_file)
+        with tarfile.TarFile(archive_path, 'r') as tarobj:
+            fileobj = tarobj.extractfile(audio_file)
+            info = soundfile_backend.info(fileobj)
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == num_frames
+        assert info.num_channels == num_channels
+        assert info.bits_per_sample == bits_per_sample
+
+    def test_tarobj_wav(self):
+        """Query compressed audio via file-like object works"""
+        self._test_tarobj('wav', 'PCM_16', 16)
+
+    @skipIfFormatNotSupported("FLAC")
+    def test_tarobj_flac(self):
+        """Query compressed audio via file-like object works"""
+        self._test_tarobj('flac', 'PCM_16', 16)
