@@ -2,11 +2,13 @@
 
 import io
 import math
-from typing import Optional, Tuple
 import warnings
-import torchaudio
+from typing import Optional, Tuple
+
 import torch
 from torch import Tensor
+
+import torchaudio
 
 __all__ = [
     "spectrogram",
@@ -850,11 +852,11 @@ def detect_pitch_frequency(
 
 
 def sliding_window_cmn(
-    waveform: Tensor,
-    cmn_window: int = 600,
-    min_cmn_window: int = 100,
-    center: bool = False,
-    norm_vars: bool = False,
+        waveform: Tensor,
+        cmn_window: int = 600,
+        min_cmn_window: int = 100,
+        center: bool = False,
+        norm_vars: bool = False,
 ) -> Tensor:
     r"""
     Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
@@ -974,8 +976,30 @@ def spectral_centroid(
     freq_dim = -2
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
 
-def apply_codec(waveform, sample_rate, format, channels_first=True, compression=None):
-    """
+
+def apply_codec(waveform, sample_rate, format, channels_first=True, compression=None) -> Tensor:
+    r"""
+    Applies codecs as a form of augmentation
+
+    Args:
+        waveform (Tensor): Tensor of audio of dimension (..., time)
+        sample_rate (int): Sample rate of the audio waveform
+        format (str): file format
+        channels_first (bool):
+            When True, the returned Tensor has dimension ``[channel, time]``.
+            Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+        compression (float):
+            Used for formats other than WAV. This corresponds to ``-C`` option of ``sox`` command.
+                * | ``MP3``: Either bitrate (in ``kbps``) with quality factor, such as ``128.2``, or
+                  | VBR encoding with quality factor such as ``-4.2``. Default: ``-4.5``.
+                * | ``FLAC``: compression level. Whole number from ``0`` to ``8``.
+                  | ``8`` is default and highest compression.
+                * | ``OGG/VORBIS``: number from ``-1`` to ``10``; ``-1`` is the highest compression
+                  | and lowest quality. Default: ``3``.
+            See the detail at http://sox.sourceforge.net/soxformat.html.
+
+    Returns:
+        Tensor: Dimension (..., time)
     """
     bytes = io.BytesIO()
     torchaudio.save(bytes, waveform, sample_rate, channels_first, compression=compression, format=format)
