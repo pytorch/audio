@@ -1,6 +1,7 @@
 import io
 import itertools
 
+import torch
 from torchaudio.backend import sox_io_backend
 from parameterized import parameterized
 
@@ -24,7 +25,7 @@ class SaveTestBase(TempDirMixin, PytorchTestCase):
         """`sox_io_backend.save` can save wav format."""
         path = self.get_temp_path('data.wav')
         expected = get_wav_data(dtype, num_channels, num_frames=num_frames)
-        sox_io_backend.save(path, expected, sample_rate)
+        sox_io_backend.save(path, expected, sample_rate, dtype=None)
         found, sr = load_wav(path)
         assert sample_rate == sr
         self.assertEqual(found, expected)
@@ -68,7 +69,7 @@ class SaveTestBase(TempDirMixin, PytorchTestCase):
         save_wav(src_path, data, sample_rate)
         # 2.1. Convert the original wav to mp3 with torchaudio
         sox_io_backend.save(
-            mp3_path, load_wav(src_path)[0], sample_rate, compression=bit_rate)
+            mp3_path, load_wav(src_path)[0], sample_rate, compression=bit_rate, dtype=None)
         # 2.2. Convert the mp3 to wav with Sox
         sox_utils.convert_audio_file(mp3_path, wav_path)
         # 2.3. Load
@@ -99,7 +100,7 @@ class SaveTestBase(TempDirMixin, PytorchTestCase):
         save_wav(src_path, data, sample_rate)
         # 2.1. Convert the original wav to flac with torchaudio
         sox_io_backend.save(
-            flc_path, load_wav(src_path)[0], sample_rate, compression=compression_level)
+            flc_path, load_wav(src_path)[0], sample_rate, compression=compression_level, dtype=None)
         # 2.2. Convert the flac to wav with Sox
         # converting to 32 bit because flac file has 24 bit depth which scipy cannot handle.
         sox_utils.convert_audio_file(flc_path, wav_path, bit_depth=32)
@@ -132,7 +133,7 @@ class SaveTestBase(TempDirMixin, PytorchTestCase):
         save_wav(src_path, data, sample_rate)
         # 2.1. Convert the original wav to vorbis with torchaudio
         sox_io_backend.save(
-            vbs_path, load_wav(src_path)[0], sample_rate, compression=quality_level)
+            vbs_path, load_wav(src_path)[0], sample_rate, compression=quality_level, dtype=None)
         # 2.2. Convert the vorbis to wav with Sox
         sox_utils.convert_audio_file(vbs_path, wav_path)
         # 2.3. Load
@@ -184,7 +185,7 @@ class SaveTestBase(TempDirMixin, PytorchTestCase):
         data = get_wav_data('float32', num_channels, normalize=True, num_frames=duration * sample_rate)
         save_wav(src_path, data, sample_rate)
         # 2.1. Convert the original wav to sph with torchaudio
-        sox_io_backend.save(flc_path, load_wav(src_path)[0], sample_rate)
+        sox_io_backend.save(flc_path, load_wav(src_path)[0], sample_rate, dtype=None)
         # 2.2. Convert the sph to wav with Sox
         # converting to 32 bit because sph file has 24 bit depth which scipy cannot handle.
         sox_utils.convert_audio_file(flc_path, wav_path, bit_depth=32)
@@ -216,7 +217,7 @@ class SaveTestBase(TempDirMixin, PytorchTestCase):
         data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
         save_wav(src_path, data, sample_rate)
         # 2.1. Convert the original wav to amb with torchaudio
-        sox_io_backend.save(amb_path, load_wav(src_path, normalize=False)[0], sample_rate)
+        sox_io_backend.save(amb_path, load_wav(src_path, normalize=False)[0], sample_rate, dtype=None)
         # 2.2. Convert the amb to wav with Sox
         sox_utils.convert_audio_file(amb_path, wav_path)
         # 2.3. Load
@@ -248,7 +249,7 @@ class SaveTestBase(TempDirMixin, PytorchTestCase):
         data = get_wav_data('int16', num_channels, normalize=False, num_frames=duration * sample_rate)
         save_wav(src_path, data, sample_rate)
         # 2.1. Convert the original wav to amr_nb with torchaudio
-        sox_io_backend.save(amr_path, load_wav(src_path, normalize=False)[0], sample_rate)
+        sox_io_backend.save(amr_path, load_wav(src_path, normalize=False)[0], sample_rate, dtype=None)
         # 2.2. Convert the amr_nb to wav with Sox
         sox_utils.convert_audio_file(amr_path, wav_path)
         # 2.3. Load
@@ -389,7 +390,7 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
         path = self.get_temp_path('data.wav')
         data = get_wav_data('int32', 2, channels_first=channels_first)
         sox_io_backend.save(
-            path, data, 8000, channels_first=channels_first)
+            path, data, 8000, channels_first=channels_first, dtype=None)
         found = load_wav(path)[0]
         expected = data if channels_first else data.transpose(1, 0)
         self.assertEqual(found, expected)
@@ -402,7 +403,7 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
         path = self.get_temp_path('data.wav')
         expected = get_wav_data(dtype, 4)[::2, ::2]
         assert not expected.is_contiguous()
-        sox_io_backend.save(path, expected, 8000)
+        sox_io_backend.save(path, expected, 8000, dtype=None)
         found = load_wav(path)[0]
         self.assertEqual(found, expected)
 
@@ -415,9 +416,24 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
         expected = get_wav_data(dtype, 4)[::2, ::2]
 
         data = expected.clone()
-        sox_io_backend.save(path, data, 8000)
+        sox_io_backend.save(path, data, 8000, dtype=None)
 
         self.assertEqual(data, expected)
+
+    @parameterized.expand([
+        ('float32', (-1, 1)),
+        ('int32', (-2147483648, 2147483647)),
+        ('int16', (-32768, 32767)),
+        ('uint8', (0, 255)),
+    ])
+    def test_dtype_conversion(self, dtype, range):
+        """`save` performs dtype conversion on float32 src tensors only."""
+        path = self.get_temp_path("data.wav")
+        data = get_wav_data("float32", 2)
+        sox_io_backend.save(path, data, 8000, dtype=dtype)
+        found = load_wav(path, normalize=False)[0]
+        self.assertEqual(found.dtype, getattr(torch, dtype))
+        assert(torch.all(found >= range[0]) and torch.all(found <= range[1]))
 
 
 @skipIfNoExtension
@@ -452,11 +468,11 @@ class TestFileObject(SaveTestBase):
         res_path = self.get_temp_path(f'test.{ext}')
         sox_io_backend.save(
             ref_path, data, channels_first=channels_first,
-            sample_rate=sample_rate, compression=compression)
+            sample_rate=sample_rate, compression=compression, dtype=None)
         with open(res_path, 'wb') as fileobj:
             sox_io_backend.save(
                 fileobj, data, channels_first=channels_first,
-                sample_rate=sample_rate, compression=compression, format=ext)
+                sample_rate=sample_rate, compression=compression, format=ext, dtype=None)
 
         expected_data, _ = sox_io_backend.load(ref_path)
         data, sr = sox_io_backend.load(res_path)
@@ -489,11 +505,11 @@ class TestFileObject(SaveTestBase):
         res_path = self.get_temp_path(f'test.{ext}')
         sox_io_backend.save(
             ref_path, data, channels_first=channels_first,
-            sample_rate=sample_rate, compression=compression)
+            sample_rate=sample_rate, compression=compression, dtype=None)
         fileobj = io.BytesIO()
         sox_io_backend.save(
             fileobj, data, channels_first=channels_first,
-            sample_rate=sample_rate, compression=compression, format=ext)
+            sample_rate=sample_rate, compression=compression, format=ext, dtype=None)
         fileobj.seek(0)
         with open(res_path, 'wb') as file_:
             file_.write(fileobj.read())
