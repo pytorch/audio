@@ -1,25 +1,25 @@
+import itertools
 import math
 import warnings
 
 import torch
-import torchaudio
-import torchaudio.functional as F
 from parameterized import parameterized
-import itertools
-
-from torchaudio.backend import sox_io_backend
 from torchaudio_unittest import common_utils
-from .functional_impl import Lfilter, Spectrogram
-from torchaudio_unittest.sox_io_backend.common import name_func
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
     save_wav,
     skipIfNoExec,
 )
+from torchaudio_unittest.sox_io_backend.common import name_func
+
+import torchaudio
+import torchaudio.functional as F
 from torchaudio._internal import (
     module_utils as _mod_utils,
 )
+from torchaudio.backend import sox_io_backend
+from .functional_impl import Lfilter, Spectrogram
 
 
 class TestLFilterFloat32(Lfilter, common_utils.PytorchTestCase):
@@ -64,6 +64,7 @@ class TestCreateFBMatrix(common_utils.TorchaudioTestCase):
 
 class TestComputeDeltas(common_utils.TorchaudioTestCase):
     """Test suite for correctness of compute_deltas"""
+
     def test_one_channel(self):
         specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0]]])
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5]]])
@@ -205,7 +206,8 @@ class ApplyCodecTestBase(TempDirMixin, TorchaudioTestCase):
         torch.random.manual_seed(42)
         waveform = torch.rand(2, 44100 * 1)
         sample_rate = 8000
-        augmented_data = F.apply_codec(waveform,sample_rate, format=format, channels_first=True, compression=compression)
+        augmented_data = F.apply_codec(waveform, sample_rate, format=format, channels_first=True,
+                                       compression=compression)
         save_wav(path, augmented_data, sample_rate)
         info = sox_io_backend.info(path)
         assert info.sample_rate == sample_rate
