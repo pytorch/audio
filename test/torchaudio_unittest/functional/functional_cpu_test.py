@@ -204,7 +204,7 @@ class ApplyCodecTestBase(TempDirMixin, TorchaudioTestCase):
         torch.random.manual_seed(42)
         waveform = torch.rand(2, 44100 * 1)
         sample_rate = 8000
-        augmented_data = F.apply_codec(waveform,sample_rate, format=format, channels_first=True, compression=-1)
+        augmented_data = F.apply_codec(waveform,sample_rate, format=format, channels_first=True, compression=compression)
         save_wav(path, augmented_data, sample_rate)
         info = sox_io_backend.info(path)
         assert info.sample_rate == sample_rate
