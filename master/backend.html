@@ -465,8 +465,28 @@ or when it cannot be accurately inferred.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><em>pathlib.Path</em></a>) – Path to audio file. This function also handles <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> objects,
-but is annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> for TorchScript compatibility.</p></li>
+<li><p><strong>filepath</strong> (<em>path-like object</em><em> or </em><em>file-like object</em>) – <p>Source of audio data. When the function is not compiled by TorchScript,
+(e.g. <code class="docutils literal notranslate"><span class="pre">torch.jit.script</span></code>), the following types are accepted;</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">path-like</span></code>: file path</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">file-like</span></code>: Object with <code class="docutils literal notranslate"><span class="pre">read(size:</span> <span class="pre">int)</span> <span class="pre">-&gt;</span> <span class="pre">bytes</span></code> method,
+which returns byte string of at most <code class="docutils literal notranslate"><span class="pre">size</span></code> length.</p></li>
+</ul>
+</div></blockquote>
+<p>When the function is compiled by TorchScript, only <code class="docutils literal notranslate"><span class="pre">str</span></code> type is allowed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul>
+<li><p>When the input type is file-like object, this function cannot
+get the correct length (<code class="docutils literal notranslate"><span class="pre">num_samples</span></code>) for certain formats,
+such as <code class="docutils literal notranslate"><span class="pre">mp3</span></code> and <code class="docutils literal notranslate"><span class="pre">vorbis</span></code>.
+In this case, the value of <code class="docutils literal notranslate"><span class="pre">num_samples</span></code> is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p>This argument is intentionally annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> only due to
+TorchScript compiler compatibility.</p></li>
+</ul>
+</div>
+</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Override the format detection with the given format.
 Providing the argument might help when libsox can not infer the format
 from header or extension,</p></li>
@@ -971,10 +991,14 @@ primarily for effects</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><em>pathlib.Path</em></a>) – Path to audio file.
-This functionalso handles <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> objects, but is annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code>
-for the consistency with “sox_io” backend, which has a restriction on type annotation
-for TorchScript compiler compatiblity.</p></li>
+<li><p><strong>filepath</strong> (<em>path-like object</em><em> or </em><em>file-like object</em>) – <p>Source of audio data.
+.. note:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* This argument is intentionally annotated as ``str`` only,
+  for the consistency with &quot;sox_io&quot; backend, which has a restriction
+  on type annotation due to TorchScript compiler compatiblity.
+</pre></div>
+</div>
+</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Not used. PySoundFile does not accept format hint.</p></li>
 </ul>
 </dd>
