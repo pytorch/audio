@@ -27,6 +27,14 @@ if _mod_utils.is_module_available("requests"):
     import requests
 
 
+_DTYPE_TO_ENCODING = {
+    'float32': 'PCM_F',
+    'int32': 'PCM_S',
+    'int16': 'PCM_S',
+    'uint8': 'PCM_U',
+}
+
+
 @skipIfNoExec('sox')
 @skipIfNoExtension
 class TestInfo(TempDirMixin, PytorchTestCase):
@@ -46,6 +54,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == sox_utils.get_bit_depth(dtype)
+        assert info.encoding == _DTYPE_TO_ENCODING[dtype]
 
     @parameterized.expand(list(itertools.product(
         ['float32', 'int32', 'int16', 'uint8'],
@@ -63,6 +72,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == sox_utils.get_bit_depth(dtype)
+        assert info.encoding == _DTYPE_TO_ENCODING[dtype]
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
@@ -83,6 +93,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         # assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats
+        assert info.encoding == "MP3"
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
@@ -102,6 +113,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == 24  # FLAC standard
+        assert info.encoding == "FLAC"
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
@@ -121,6 +133,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats
+        assert info.encoding == "VORBIS"
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
@@ -137,6 +150,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == bits_per_sample
+        assert info.encoding == "PCM_S"
 
     @parameterized.expand(list(itertools.product(
         ['float32', 'int32', 'int16', 'uint8'],
@@ -156,6 +170,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == bits_per_sample
+        assert info.encoding == "PCM_U" if dtype == 'uint8' else "PCM_S"
 
     def test_amr_nb(self):
         """`sox_io_backend.info` can check amr-nb file correctly"""
@@ -171,6 +186,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == 0
+        assert info.encoding == "AMR_NB"
 
 
 @skipIfNoExtension
@@ -188,6 +204,7 @@ class TestInfoOpus(PytorchTestCase):
         assert info.num_frames == 32768
         assert info.num_channels == num_channels
         assert info.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats
+        assert info.encoding == "OPUS"
 
 
 @skipIfNoExtension
@@ -206,6 +223,7 @@ class TestLoadWithoutExtension(PytorchTestCase):
         sinfo = sox_io_backend.info(path, format="mp3")
         assert sinfo.sample_rate == 16000
         assert sinfo.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats
+        assert sinfo.encoding == "MP3"
 
 
 @skipIfNoExtension
