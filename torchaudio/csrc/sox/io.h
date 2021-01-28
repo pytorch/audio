@@ -46,7 +46,8 @@ void save_audio_file(
     int64_t sample_rate,
     bool channels_first,
     c10::optional<double> compression,
-    c10::optional<std::string> format);
+    c10::optional<std::string> format,
+    c10::optional<std::string> dtype);
 
 #ifdef TORCH_API_INCLUDE_EXTENSION_H
 
@@ -68,7 +69,8 @@ void save_audio_fileobj(
     int64_t sample_rate,
     bool channels_first,
     c10::optional<double> compression,
-    std::string filetype);
+    std::string filetype,
+    c10::optional<std::string> dtype);
 
 #endif // TORCH_API_INCLUDE_EXTENSION_H
 
