@@ -254,8 +254,8 @@ def save(
     """
     if src.dtype == torch.float32 and dtype is None:
         warnings.warn(
-            '`dtype` default value will be changed to `int16` in 0.9 release'
-            'provide `dtype  argument to suppress this warning'
+            '`dtype` default value will be changed to `int16` in 0.9 release.'
+            'Specify `dtype` to suppress this warning.'
         )
     if not torch.jit.is_scripting():
         _save(filepath, src, sample_rate, channels_first, compression, format, dtype)
