@@ -28,7 +28,7 @@ if _mod_utils.is_module_available("requests"):
     import requests
 
 
-def _get_encoding(ext, dtype):
+def get_encoding(ext, dtype):
     exts = {
         'mp3',
         'flac',
@@ -43,7 +43,7 @@ def _get_encoding(ext, dtype):
     return ext.upper() if ext in exts else encodings[dtype]
 
 
-def _get_bits_per_sample(ext, dtype):
+def get_bits_per_sample(ext, dtype):
     bits_per_samples = {
         'flac': 24,
         'mp3': 0,
@@ -71,7 +71,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == sox_utils.get_bit_depth(dtype)
-        assert info.encoding == _get_encoding('wav', dtype)
+        assert info.encoding == get_encoding('wav', dtype)
 
     @parameterized.expand(list(itertools.product(
         ['float32', 'int32', 'int16', 'uint8'],
@@ -89,7 +89,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == sox_utils.get_bit_depth(dtype)
-        assert info.encoding == _get_encoding('wav', dtype)
+        assert info.encoding == get_encoding('wav', dtype)
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
@@ -187,7 +187,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == bits_per_sample
-        assert info.encoding == _get_encoding("amb", dtype)
+        assert info.encoding == get_encoding("amb", dtype)
 
     def test_amr_nb(self):
         """`sox_io_backend.info` can check amr-nb file correctly"""
@@ -239,7 +239,7 @@ class TestLoadWithoutExtension(PytorchTestCase):
         path = get_asset_path("mp3_without_ext")
         sinfo = sox_io_backend.info(path, format="mp3")
         assert sinfo.sample_rate == 16000
-        assert sinfo.num_frames == 0
+        assert sinfo.num_frames == 81216
         assert sinfo.num_channels == 1
         assert sinfo.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats
         assert sinfo.encoding == "MP3"
@@ -303,14 +303,14 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         num_channels = 2
         sinfo = self._query_fileobj(ext, dtype, sample_rate, num_channels, num_frames)
 
-        bits_per_sample = _get_bits_per_sample(ext, dtype)
+        bits_per_sample = get_bits_per_sample(ext, dtype)
         num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
         assert sinfo.num_frames == num_frames
         assert sinfo.bits_per_sample == bits_per_sample
-        assert sinfo.encoding == _get_encoding(ext, dtype)
+        assert sinfo.encoding == get_encoding(ext, dtype)
 
     @parameterized.expand([
         ('wav', "float32"),
@@ -329,14 +329,14 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         num_channels = 2
         sinfo = self._query_bytesio(ext, dtype, sample_rate, num_channels, num_frames)
 
-        bits_per_sample = _get_bits_per_sample(ext, dtype)
+        bits_per_sample = get_bits_per_sample(ext, dtype)
         num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
         assert sinfo.num_frames == num_frames
         assert sinfo.bits_per_sample == bits_per_sample
-        assert sinfo.encoding == _get_encoding(ext, dtype)
+        assert sinfo.encoding == get_encoding(ext, dtype)
 
     @parameterized.expand([
         ('wav', "float32"),
@@ -355,14 +355,14 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         num_channels = 2
         sinfo = self._query_bytesio(ext, dtype, sample_rate, num_channels, num_frames)
 
-        bits_per_sample = _get_bits_per_sample(ext, dtype)
+        bits_per_sample = get_bits_per_sample(ext, dtype)
         num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
         assert sinfo.num_frames == num_frames
         assert sinfo.bits_per_sample == bits_per_sample
-        assert sinfo.encoding == _get_encoding(ext, dtype)
+        assert sinfo.encoding == get_encoding(ext, dtype)
 
     @parameterized.expand([
         ('wav', "float32"),
@@ -381,14 +381,14 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         num_channels = 2
         sinfo = self._query_tarfile(ext, dtype, sample_rate, num_channels, num_frames)
 
-        bits_per_sample = _get_bits_per_sample(ext, dtype)
+        bits_per_sample = get_bits_per_sample(ext, dtype)
         num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
         assert sinfo.num_frames == num_frames
         assert sinfo.bits_per_sample == bits_per_sample
-        assert sinfo.encoding == _get_encoding(ext, dtype)
+        assert sinfo.encoding == get_encoding(ext, dtype)
 
 
 @skipIfNoExtension
@@ -421,11 +421,11 @@ class TestFileObjectHttp(HttpServerMixin, FileObjTestBase, PytorchTestCase):
         num_channels = 2
         sinfo = self._query_http(ext, dtype, sample_rate, num_channels, num_frames)
 
-        bits_per_sample = _get_bits_per_sample(ext, dtype)
+        bits_per_sample = get_bits_per_sample(ext, dtype)
         num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
         assert sinfo.num_frames == num_frames
         assert sinfo.bits_per_sample == bits_per_sample
-        assert sinfo.encoding == _get_encoding(ext, dtype)
+        assert sinfo.encoding == get_encoding(ext, dtype)
