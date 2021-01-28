@@ -1,4 +1,5 @@
 import io
+import os
 import itertools
 import tarfile
 
@@ -27,12 +28,28 @@ if _mod_utils.is_module_available("requests"):
     import requests
 
 
-_DTYPE_TO_ENCODING = {
-    'float32': 'PCM_F',
-    'int32': 'PCM_S',
-    'int16': 'PCM_S',
-    'uint8': 'PCM_U',
-}
+def _get_encoding(ext, dtype):
+    exts = {
+        'mp3',
+        'flac',
+        'vorbis',
+    }
+    encodings = {
+        'float32': 'PCM_F',
+        'int32': 'PCM_S',
+        'int16': 'PCM_S',
+        'uint8': 'PCM_U',
+    }
+    return ext.upper() if ext in exts else encodings[dtype]
+
+
+def _get_bits_per_sample(ext, dtype):
+    bits_per_samples = {
+        'flac': 24,
+        'mp3': 0,
+        'vorbis': 0,
+    }
+    return bits_per_samples.get(ext, sox_utils.get_bit_depth(dtype))
 
 
 @skipIfNoExec('sox')
@@ -54,7 +71,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == sox_utils.get_bit_depth(dtype)
-        assert info.encoding == _DTYPE_TO_ENCODING[dtype]
+        assert info.encoding == _get_encoding('wav', dtype)
 
     @parameterized.expand(list(itertools.product(
         ['float32', 'int32', 'int16', 'uint8'],
@@ -72,7 +89,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == sox_utils.get_bit_depth(dtype)
-        assert info.encoding == _DTYPE_TO_ENCODING[dtype]
+        assert info.encoding == _get_encoding('wav', dtype)
 
     @parameterized.expand(list(itertools.product(
         [8000, 16000],
@@ -153,7 +170,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.encoding == "PCM_S"
 
     @parameterized.expand(list(itertools.product(
-        ['float32', 'int32', 'int16', 'uint8'],
+        ['int32', 'int16', 'uint8'],
         [8000, 16000],
         [1, 2],
     )), name_func=name_func)
@@ -170,7 +187,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == bits_per_sample
-        assert info.encoding == "PCM_U" if dtype == 'uint8' else "PCM_S"
+        assert info.encoding == _get_encoding("amb", dtype)
 
     def test_amr_nb(self):
         """`sox_io_backend.info` can check amr-nb file correctly"""
@@ -222,145 +239,193 @@ class TestLoadWithoutExtension(PytorchTestCase):
         path = get_asset_path("mp3_without_ext")
         sinfo = sox_io_backend.info(path, format="mp3")
         assert sinfo.sample_rate == 16000
+        assert sinfo.num_frames == 0
+        assert sinfo.num_channels == 1
         assert sinfo.bits_per_sample == 0  # bit_per_sample is irrelevant for compressed formats
         assert sinfo.encoding == "MP3"
 
 
+class FileObjTestBase(TempDirMixin):
+    def _gen_file(self, ext, dtype, sample_rate, num_channels, num_frames):
+        path = self.get_temp_path(f'test.{ext}')
+        bit_depth = sox_utils.get_bit_depth(dtype)
+        duration = num_frames / sample_rate
+
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels=num_channels,
+            encoding=sox_utils.get_encoding(dtype),
+            bit_depth=bit_depth,
+            duration=duration)
+        return path
+
+
 @skipIfNoExtension
 @skipIfNoExec('sox')
-class TestFileObject(TempDirMixin, PytorchTestCase):
-    @parameterized.expand([
-        ('wav', 32),
-        ('mp3', 0),
-        ('flac', 24),
-        ('vorbis', 0),
-        ('amb', 32),
-    ])
-    def test_fileobj(self, ext, bits_per_sample):
-        """Querying audio via file object works"""
-        sample_rate = 16000
-        num_channels = 2
-        duration = 3
+class TestFileObject(FileObjTestBase, PytorchTestCase):
+    def _query_fileobj(self, ext, dtype, sample_rate, num_channels, num_frames):
+        path = self._gen_file(ext, dtype, sample_rate, num_channels, num_frames)
         format_ = ext if ext in ['mp3'] else None
-        path = self.get_temp_path(f'test.{ext}')
-
-        sox_utils.gen_audio_file(
-            path, sample_rate, num_channels=2,
-            duration=duration)
-
         with open(path, 'rb') as fileobj:
-            sinfo = sox_io_backend.info(fileobj, format_)
+            return sox_io_backend.info(fileobj, format_)
 
-        assert sinfo.sample_rate == sample_rate
-        assert sinfo.num_channels == num_channels
-        if ext not in ['mp3', 'vorbis']:  # these container formats do not have length info
-            assert sinfo.num_frames == sample_rate * duration
-        assert sinfo.bits_per_sample == bits_per_sample
-
-    def _test_bytesio(self, ext, bits_per_sample, duration):
-        sample_rate = 16000
-        num_channels = 2
+    def _query_bytesio(self, ext, dtype, sample_rate, num_channels, num_frames):
+        path = self._gen_file(ext, dtype, sample_rate, num_channels, num_frames)
         format_ = ext if ext in ['mp3'] else None
-        path = self.get_temp_path(f'test.{ext}')
-
-        sox_utils.gen_audio_file(
-            path, sample_rate, num_channels=2,
-            duration=duration)
-
         with open(path, 'rb') as file_:
             fileobj = io.BytesIO(file_.read())
-        sinfo = sox_io_backend.info(fileobj, format_)
+        return sox_io_backend.info(fileobj, format_)
 
-        assert sinfo.sample_rate == sample_rate
-        assert sinfo.num_channels == num_channels
-        if ext not in ['mp3', 'vorbis']:  # these container formats do not have length info
-            assert sinfo.num_frames == sample_rate * duration
-        assert sinfo.bits_per_sample == bits_per_sample
-
-    @parameterized.expand([
-        ('wav', 32),
-        ('mp3', 0),
-        ('flac', 24),
-        ('vorbis', 0),
-        ('amb', 32),
-    ])
-    def test_bytesio(self, ext, bits_per_sample):
-        """Querying audio via ByteIO object works"""
-        self._test_bytesio(ext, bits_per_sample, duration=3)
-
-    @parameterized.expand([
-        ('wav', 32),
-        ('mp3', 0),
-        ('flac', 24),
-        ('vorbis', 0),
-        ('amb', 32),
-    ])
-    def test_bytesio_tiny(self, ext, bits_per_sample):
-        """Querying audio via ByteIO object works for small data"""
-        self._test_bytesio(ext, bits_per_sample, duration=1 / 1600)
-
-    @parameterized.expand([
-        ('wav', 32),
-        ('mp3', 0),
-        ('flac', 24),
-        ('vorbis', 0),
-        ('amb', 32),
-    ])
-    def test_tarfile(self, ext, bits_per_sample):
-        """Querying compressed audio via file-like object works"""
-        sample_rate = 16000
-        num_channels = 2
-        duration = 3
-        format_ = ext if ext in ['mp3'] else None
-        audio_file = f'test.{ext}'
-        audio_path = self.get_temp_path(audio_file)
+    def _query_tarfile(self, ext, dtype, sample_rate, num_channels, num_frames):
+        audio_path = self._gen_file(ext, dtype, sample_rate, num_channels, num_frames)
+        audio_file = os.path.basename(audio_path)
         archive_path = self.get_temp_path('archive.tar.gz')
-
-        sox_utils.gen_audio_file(
-            audio_path, sample_rate, num_channels=num_channels, duration=duration)
-
         with tarfile.TarFile(archive_path, 'w') as tarobj:
             tarobj.add(audio_path, arcname=audio_file)
+        format_ = ext if ext in ['mp3'] else None
         with tarfile.TarFile(archive_path, 'r') as tarobj:
             fileobj = tarobj.extractfile(audio_file)
-            sinfo = sox_io_backend.info(fileobj, format=format_)
+            return sox_io_backend.info(fileobj, format_)
+
+    @parameterized.expand([
+        ('wav', "float32"),
+        ('wav', "int32"),
+        ('wav', "int16"),
+        ('wav', "uint8"),
+        ('mp3', "float32"),
+        ('flac', "float32"),
+        ('vorbis', "float32"),
+        ('amb', "int16"),
+    ])
+    def test_fileobj(self, ext, dtype):
+        """Querying audio via file object works"""
+        sample_rate = 16000
+        num_frames = 3 * sample_rate
+        num_channels = 2
+        sinfo = self._query_fileobj(ext, dtype, sample_rate, num_channels, num_frames)
+
+        bits_per_sample = _get_bits_per_sample(ext, dtype)
+        num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
-        if ext not in ['mp3', 'vorbis']:  # these container formats do not have length info
-            assert sinfo.num_frames == sample_rate * duration
+        assert sinfo.num_frames == num_frames
         assert sinfo.bits_per_sample == bits_per_sample
+        assert sinfo.encoding == _get_encoding(ext, dtype)
+
+    @parameterized.expand([
+        ('wav', "float32"),
+        ('wav', "int32"),
+        ('wav', "int16"),
+        ('wav', "uint8"),
+        ('mp3', "float32"),
+        ('flac', "float32"),
+        ('vorbis', "float32"),
+        ('amb', "int16"),
+    ])
+    def test_bytesio(self, ext, dtype):
+        """Querying audio via ByteIO object works for small data"""
+        sample_rate = 16000
+        num_frames = 3 * sample_rate
+        num_channels = 2
+        sinfo = self._query_bytesio(ext, dtype, sample_rate, num_channels, num_frames)
+
+        bits_per_sample = _get_bits_per_sample(ext, dtype)
+        num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
+
+        assert sinfo.sample_rate == sample_rate
+        assert sinfo.num_channels == num_channels
+        assert sinfo.num_frames == num_frames
+        assert sinfo.bits_per_sample == bits_per_sample
+        assert sinfo.encoding == _get_encoding(ext, dtype)
+
+    @parameterized.expand([
+        ('wav', "float32"),
+        ('wav', "int32"),
+        ('wav', "int16"),
+        ('wav', "uint8"),
+        ('mp3', "float32"),
+        ('flac', "float32"),
+        ('vorbis', "float32"),
+        ('amb', "int16"),
+    ])
+    def test_bytesio_tiny(self, ext, dtype):
+        """Querying audio via ByteIO object works for small data"""
+        sample_rate = 8000
+        num_frames = 4
+        num_channels = 2
+        sinfo = self._query_bytesio(ext, dtype, sample_rate, num_channels, num_frames)
+
+        bits_per_sample = _get_bits_per_sample(ext, dtype)
+        num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
+
+        assert sinfo.sample_rate == sample_rate
+        assert sinfo.num_channels == num_channels
+        assert sinfo.num_frames == num_frames
+        assert sinfo.bits_per_sample == bits_per_sample
+        assert sinfo.encoding == _get_encoding(ext, dtype)
+
+    @parameterized.expand([
+        ('wav', "float32"),
+        ('wav', "int32"),
+        ('wav', "int16"),
+        ('wav', "uint8"),
+        ('mp3', "float32"),
+        ('flac', "float32"),
+        ('vorbis', "float32"),
+        ('amb', "int16"),
+    ])
+    def test_tarfile(self, ext, dtype):
+        """Querying compressed audio via file-like object works"""
+        sample_rate = 16000
+        num_frames = 3.0 * sample_rate
+        num_channels = 2
+        sinfo = self._query_tarfile(ext, dtype, sample_rate, num_channels, num_frames)
+
+        bits_per_sample = _get_bits_per_sample(ext, dtype)
+        num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
+
+        assert sinfo.sample_rate == sample_rate
+        assert sinfo.num_channels == num_channels
+        assert sinfo.num_frames == num_frames
+        assert sinfo.bits_per_sample == bits_per_sample
+        assert sinfo.encoding == _get_encoding(ext, dtype)
 
 
 @skipIfNoExtension
 @skipIfNoExec('sox')
 @skipIfNoModule("requests")
-class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
-    @parameterized.expand([
-        ('wav', 32),
-        ('mp3', 0),
-        ('flac', 24),
-        ('vorbis', 0),
-        ('amb', 32),
-    ])
-    def test_requests(self, ext, bits_per_sample):
-        """Querying compressed audio via requests works"""
-        sample_rate = 16000
-        num_channels = 2
-        duration = 3
-        format_ = ext if ext in ['mp3'] else None
-        audio_file = f'test.{ext}'
-        audio_path = self.get_temp_path(audio_file)
-
-        sox_utils.gen_audio_file(
-            audio_path, sample_rate, num_channels=num_channels, duration=duration)
+class TestFileObjectHttp(HttpServerMixin, FileObjTestBase, PytorchTestCase):
+    def _query_http(self, ext, dtype, sample_rate, num_channels, num_frames):
+        audio_path = self._gen_file(ext, dtype, sample_rate, num_channels, num_frames)
+        audio_file = os.path.basename(audio_path)
 
         url = self.get_url(audio_file)
+        format_ = ext if ext in ['mp3'] else None
         with requests.get(url, stream=True) as resp:
-            sinfo = sox_io_backend.info(resp.raw, format=format_)
+            return sox_io_backend.info(resp.raw, format=format_)
+
+    @parameterized.expand([
+        ('wav', "float32"),
+        ('wav', "int32"),
+        ('wav', "int16"),
+        ('wav', "uint8"),
+        ('mp3', "float32"),
+        ('flac', "float32"),
+        ('vorbis', "float32"),
+        ('amb', "int16"),
+    ])
+    def test_requests(self, ext, dtype):
+        """Querying compressed audio via requests works"""
+        sample_rate = 16000
+        num_frames = 3.0 * sample_rate
+        num_channels = 2
+        sinfo = self._query_http(ext, dtype, sample_rate, num_channels, num_frames)
+
+        bits_per_sample = _get_bits_per_sample(ext, dtype)
+        num_frames = 0 if ext in ['mp3', 'vorbis'] else num_frames
 
         assert sinfo.sample_rate == sample_rate
         assert sinfo.num_channels == num_channels
-        if ext not in ['mp3', 'vorbis']:  # these container formats do not have length info
-            assert sinfo.num_frames == sample_rate * duration
+        assert sinfo.num_frames == num_frames
         assert sinfo.bits_per_sample == bits_per_sample
+        assert sinfo.encoding == _get_encoding(ext, dtype)
