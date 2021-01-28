@@ -252,8 +252,11 @@ def save(
             ``dtype=None`` means no conversion is performed.
             ``dtype`` parameter is only effective for ``float32`` Tensor.
     """
-    if src.dtype == torch.float32 and dtype == None:
-        warnings.warn('`dtype` default value will be changed to `int16` in 0.9 release')
+    if src.dtype == torch.float32 and dtype is None:
+        warnings.warn(
+            '`dtype` default value will be changed to `int16` in 0.9 release'
+            'provide `dtype  argument to suppress this warning'
+        )
     if not torch.jit.is_scripting():
         _save(filepath, src, sample_rate, channels_first, compression, format, dtype)
         return

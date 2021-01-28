@@ -421,19 +421,18 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
         self.assertEqual(data, expected)
 
     @parameterized.expand([
-        ('float32', (-1, 1)),
-        ('int32', (-2147483648, 2147483647)),
-        ('int16', (-32768, 32767)),
-        ('uint8', (0, 255)),
+        ('float32', torch.tensor([-1.0, -0.5, 0, 0.5, 1.0]).to(torch.float32)),
+        ('int32', torch.tensor([-2147483648, -1073741824, 0, 1073741824, 2147483647]).to(torch.int32)),
+        ('int16', torch.tensor([-32768, -16384, 0, 16384, 32767]).to(torch.int16)),
+        ('uint8', torch.tensor([0, 64, 128, 192, 255]).to(torch.uint8)),
     ])
-    def test_dtype_conversion(self, dtype, range):
+    def test_dtype_conversion(self, dtype, expected):
         """`save` performs dtype conversion on float32 src tensors only."""
         path = self.get_temp_path("data.wav")
-        data = get_wav_data("float32", 2)
+        data = torch.tensor([-1.0, -0.5, 0, 0.5, 1.0]).to(torch.float32).view(-1, 1)
         sox_io_backend.save(path, data, 8000, dtype=dtype)
         found = load_wav(path, normalize=False)[0]
-        self.assertEqual(found.dtype, getattr(torch, dtype))
-        assert(torch.all(found >= range[0]) and torch.all(found <= range[1]))
+        self.assertEqual(found, expected.view(-1, 1))
 
 
 @skipIfNoExtension
