@@ -296,6 +296,7 @@ namespace {
 struct FileObjInputPriv {
   sox_format_t* sf;
   py::object* fileobj;
+  bool eof_reached;
   char* buffer;
   uint64_t buffer_size;
 };
@@ -312,9 +313,7 @@ struct FileObjOutputPriv {
 int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   auto priv = static_cast<FileObjInputPriv*>(effp->priv);
   auto sf = priv->sf;
-  auto fileobj = priv->fileobj;
   auto buffer = priv->buffer;
-  auto buffer_size = priv->buffer_size;
 
   // 1. Refresh the buffer
   //
@@ -326,32 +325,30 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   //
   // Before:
   //
-  //     |<--------consumed------->|<-remaining->|
-  //     |*************************|-------------|
-  //                               ^ ftell
+  //     |<-------consumed------>|<---remaining--->|
+  //     |***********************|-----------------|
+  //                             ^ ftell
   //
   // After:
   //
-  //     |<-offset->|<-remaining->|<--new data-->|
-  //     |**********|-------------|++++++++++++++|
+  //     |<-offset->|<---remaining--->|<-new data->|
+  //     |**********|-----------------|++++++++++++|
   //                ^ ftell
 
   const auto num_consumed = sf->tell_off;
-  const auto num_remain = buffer_size - num_consumed;
+  const auto num_remain = priv->buffer_size - num_consumed;
 
-  // 1.1. First, we fetch the data to see if there is data to fill the buffer
-  py::bytes chunk_ = fileobj->attr("read")(num_consumed);
-  const auto num_refill = py::len(chunk_);
-  const auto offset = buffer_size - (num_remain + num_refill);
-
-  if (num_refill > num_consumed) {
-    std::ostringstream message;
-    message
-        << "Tried to read up to " << num_consumed << " bytes but, "
-        << "recieved " << num_refill << " bytes. "
-        << "The given object does not confirm to read protocol of file object.";
-    throw std::runtime_error(message.str());
+  // 1.1. Fetch the data to see if there is data to fill the buffer
+  uint64_t num_refill = 0;
+  std::string chunk(num_consumed, '\0');
+  if (num_consumed && !priv->eof_reached) {
+    num_refill = read_fileobj(
+        priv->fileobj, num_consumed, const_cast<char*>(chunk.data()));
+    if (num_refill < num_consumed) {
+      priv->eof_reached = true;
+    }
   }
+  const auto offset = num_consumed - num_refill;
 
   // 1.2. Move the unconsumed data towards the beginning of buffer.
   if (num_remain) {
@@ -362,7 +359,6 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
 
   // 1.3. Refill the remaining buffer.
   if (num_refill) {
-    auto chunk = static_cast<std::string>(chunk_);
     auto src = static_cast<void*>(const_cast<char*>(chunk.c_str()));
     auto dst = buffer + offset + num_remain;
     memcpy(dst, src, num_refill);
@@ -383,7 +379,9 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   // store the actual number read back to *osamp
   *osamp = sox_read(sf, obuf, *osamp);
 
-  return *osamp ? SOX_SUCCESS : SOX_EOF;
+  // Decoding is finished when fileobject is exhausted and sox can no longer
+  // decode a sample.
+  return (priv->eof_reached && !*osamp) ? SOX_EOF : SOX_SUCCESS;
 }
 
 int fileobj_output_flow(
@@ -469,6 +467,7 @@ void SoxEffectsChain::addInputFileObj(
   auto priv = static_cast<FileObjInputPriv*>(e->priv);
   priv->sf = sf;
   priv->fileobj = fileobj;
+  priv->eof_reached = false;
   priv->buffer = buffer;
   priv->buffer_size = buffer_size;
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {

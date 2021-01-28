@@ -380,6 +380,19 @@ class TestLoadWithoutExtension(PytorchTestCase):
         assert sr == 16000
 
 
+class CloggedFileObj:
+    def __init__(self, fileobj):
+        self.fileobj = fileobj
+        self.buffer = b''
+
+    def read(self, n):
+        if not self.buffer:
+            self.buffer += self.fileobj.read(n)
+        ret = self.buffer[:2]
+        self.buffer = self.buffer[2:]
+        return ret
+
+
 @skipIfNoExtension
 @skipIfNoExec('sox')
 class TestFileObject(TempDirMixin, PytorchTestCase):
@@ -435,6 +448,68 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
         sox_utils.gen_audio_file(
             path, sample_rate, num_channels=2,
             compression=compression)
+        expected, _ = sox_io_backend.load(path)
+
+        with open(path, 'rb') as file_:
+            fileobj = io.BytesIO(file_.read())
+        found, sr = sox_io_backend.load(fileobj, format=format_)
+
+        assert sr == sample_rate
+        self.assertEqual(expected, found)
+
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_bytesio_clogged(self, ext, compression):
+        """Loading audio via clogged file object returns the same result as via file path.
+
+        This test case validates the case where fileobject returns shorter bytes than requeted.
+        """
+        sample_rate = 16000
+        format_ = ext if ext in ['mp3'] else None
+        path = self.get_temp_path(f'test.{ext}')
+
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels=2,
+            compression=compression)
+        expected, _ = sox_io_backend.load(path)
+
+        with open(path, 'rb') as file_:
+            fileobj = CloggedFileObj(io.BytesIO(file_.read()))
+        found, sr = sox_io_backend.load(fileobj, format=format_)
+
+        assert sr == sample_rate
+        self.assertEqual(expected, found)
+
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_bytesio_tiny(self, ext, compression):
+        """Loading very small audio via file object returns the same result as via file path.
+        """
+        sample_rate = 16000
+        format_ = ext if ext in ['mp3'] else None
+        path = self.get_temp_path(f'test.{ext}')
+
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels=2,
+            compression=compression, duration=1 / 1600)
         expected, _ = sox_io_backend.load(path)
 
         with open(path, 'rb') as file_:
