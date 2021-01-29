@@ -219,3 +219,19 @@ class Tester(common_utils.TorchaudioTestCase):
         computed = transform(specgram)
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
         self.assertEqual(computed, expected, atol=1e-6, rtol=1e-8)
+
+
+class SmokeTest(common_utils.TorchaudioTestCase):
+
+    def test_spectrogram(self):
+        specgram = transforms.Spectrogram(center=False, pad_mode="reflect", onesided=False)
+        self.assertEqual(specgram.center, False)
+        self.assertEqual(specgram.pad_mode, "reflect")
+        self.assertEqual(specgram.onsided, False)
+
+    def test_melspectrogram(self):
+        melspecgram = transforms.MelSpectrogram(center=True, pad_mode="reflect", onesided=False)
+        specgram = melspecgram.spectrogram
+        self.assertEqual(specgram.center, True)
+        self.assertEqual(specgram.pad_mode, "reflect")
+        self.assertEqual(specgram.onsided, False)
