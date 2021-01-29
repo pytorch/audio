@@ -205,6 +205,40 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.bits_per_sample == 0
         assert info.encoding == "AMR_NB"
 
+    def test_ulaw(self):
+        """`sox_io_backend.info` can check ulaw file correctly"""
+        duration = 1
+        num_channels = 1
+        sample_rate = 8000
+        path = self.get_temp_path('data.wav')
+        sox_utils.gen_audio_file(
+            path, sample_rate=sample_rate, num_channels=num_channels,
+            bit_depth=8, encoding='u-law',
+            duration=duration)
+        info = sox_io_backend.info(path)
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
+        assert info.bits_per_sample == 8
+        assert info.encoding == "ULAW"
+
+    def test_alaw(self):
+        """`sox_io_backend.info` can check ulaw file correctly"""
+        duration = 1
+        num_channels = 1
+        sample_rate = 8000
+        path = self.get_temp_path('data.wav')
+        sox_utils.gen_audio_file(
+            path, sample_rate=sample_rate, num_channels=num_channels,
+            bit_depth=8, encoding='a-law',
+            duration=duration)
+        info = sox_io_backend.info(path)
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
+        assert info.bits_per_sample == 8
+        assert info.encoding == "ALAW"
+
 
 @skipIfNoExtension
 class TestInfoOpus(PytorchTestCase):
