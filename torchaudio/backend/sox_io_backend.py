@@ -17,17 +17,15 @@ def _info(
         format: Optional[str] = None,
 ) -> AudioMetaData:
     if hasattr(filepath, 'read'):
-        sinfo = torchaudio._torchaudio.get_info_fileobj(
-            filepath, format)
-        sample_rate, num_channels, num_frames, bits_per_sample = sinfo
-        return AudioMetaData(
-            sample_rate, num_frames, num_channels, bits_per_sample)
+        sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
+        return AudioMetaData(*sinfo)
     sinfo = torch.ops.torchaudio.sox_io_get_info(os.fspath(filepath), format)
     return AudioMetaData(
         sinfo.get_sample_rate(),
         sinfo.get_num_frames(),
         sinfo.get_num_channels(),
         sinfo.get_bits_per_sample(),
+        sinfo.get_encoding(),
     )
 
 
@@ -69,7 +67,8 @@ def info(
         sinfo.get_sample_rate(),
         sinfo.get_num_frames(),
         sinfo.get_num_channels(),
-        sinfo.get_bits_per_sample())
+        sinfo.get_bits_per_sample(),
+        sinfo.get_encoding())
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')

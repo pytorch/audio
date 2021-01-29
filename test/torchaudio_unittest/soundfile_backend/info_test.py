@@ -13,6 +13,8 @@ from torchaudio_unittest.common_utils import (
     get_wav_data,
     save_wav,
 )
+# TODO refactor and move these to common location
+from torchaudio_unittest.sox_io_backend.info_test import get_encoding, get_bits_per_sample
 from .common import skipIfFormatNotSupported, parameterize
 
 if _mod_utils.is_module_available("soundfile"):
@@ -22,11 +24,10 @@ if _mod_utils.is_module_available("soundfile"):
 @skipIfNoModule("soundfile")
 class TestInfo(TempDirMixin, PytorchTestCase):
     @parameterize(
-        [("float32", 32), ("int32", 32), ("int16", 16), ("uint8", 8)], [8000, 16000], [1, 2],
+        ["float32", "int32", "int16", "uint8"], [8000, 16000], [1, 2],
     )
-    def test_wav(self, dtype_and_bit_depth, sample_rate, num_channels):
+    def test_wav(self, dtype, sample_rate, num_channels):
         """`soundfile_backend.info` can check wav file correctly"""
-        dtype, bits_per_sample = dtype_and_bit_depth
         duration = 1
         path = self.get_temp_path("data.wav")
         data = get_wav_data(
@@ -37,25 +38,8 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
-        assert info.bits_per_sample == bits_per_sample
-
-    @parameterize(
-        [("float32", 32), ("int32", 32), ("int16", 16), ("uint8", 8)], [8000, 16000], [1, 2],
-    )
-    def test_wav_multiple_channels(self, dtype_and_bit_depth, sample_rate, num_channels):
-        """`soundfile_backend.info` can check wav file with channels more than 2 correctly"""
-        dtype, bits_per_sample = dtype_and_bit_depth
-        duration = 1
-        path = self.get_temp_path("data.wav")
-        data = get_wav_data(
-            dtype, num_channels, normalize=False, num_frames=duration * sample_rate
-        )
-        save_wav(path, data, sample_rate)
-        info = soundfile_backend.info(path)
-        assert info.sample_rate == sample_rate
-        assert info.num_frames == sample_rate * duration
-        assert info.num_channels == num_channels
-        assert info.bits_per_sample == bits_per_sample
+        assert info.bits_per_sample == get_bits_per_sample("wav", dtype)
+        assert info.encoding == get_encoding("wav", dtype)
 
     @parameterize([8000, 16000], [1, 2])
     @skipIfFormatNotSupported("FLAC")
@@ -72,6 +56,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == num_frames
         assert info.num_channels == num_channels
         assert info.bits_per_sample == 16
+        assert info.encoding == "FLAC"
 
     @parameterize([8000, 16000], [1, 2])
     @skipIfFormatNotSupported("OGG")
@@ -88,6 +73,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == 0
+        assert info.encoding == "VORBIS"
 
     @parameterize([8000, 16000], [1, 2], [('PCM_24', 24), ('PCM_32', 32)])
     @skipIfFormatNotSupported("NIST")
@@ -105,6 +91,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
         assert info.bits_per_sample == bits_per_sample
+        assert info.encoding == "PCM_S"
 
     def test_unknown_subtype_warning(self):
         """soundfile_backend.info issues a warning when the subtype is unknown
@@ -118,6 +105,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
                 frames = 356
                 channels = 2
                 subtype = 'UNSEEN_SUBTYPE'
+                format = 'UNKNOWN'
             return MockSoundFileInfo()
 
         with patch("soundfile.info", _mock_info_func):
@@ -147,6 +135,7 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
         assert info.num_frames == num_frames
         assert info.num_channels == num_channels
         assert info.bits_per_sample == bits_per_sample
+        assert info.encoding == "FLAC" if ext == 'flac' else "PCM_S"
 
     def test_fileobj_wav(self):
         """Loading audio via file-like object works"""
@@ -179,6 +168,7 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
         assert info.num_frames == num_frames
         assert info.num_channels == num_channels
         assert info.bits_per_sample == bits_per_sample
+        assert info.encoding == "FLAC" if ext == 'flac' else "PCM_S"
 
     def test_tarobj_wav(self):
         """Query compressed audio via file-like object works"""
