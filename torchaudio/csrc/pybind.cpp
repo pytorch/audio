@@ -1,4 +1,5 @@
 #include <torch/extension.h>
+#include <torchaudio/csrc/sox/effects.h>
 #include <torchaudio/csrc/sox/io.h>
 #include <torchaudio/csrc/sox/legacy.h>
 
@@ -112,4 +113,8 @@ PYBIND11_MODULE(_torchaudio, m) {
       "save_audio_fileobj",
       &torchaudio::sox_io::save_audio_fileobj,
       "Save audio to file obj.");
+  m.def(
+      "apply_effects_fileobj",
+      &torchaudio::sox_effects::apply_effects_fileobj,
+      "Decode audio data from file-like obj and apply effects.");
 }
