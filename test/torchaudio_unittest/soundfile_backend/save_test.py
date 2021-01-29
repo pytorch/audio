@@ -20,29 +20,31 @@ if _mod_utils.is_module_available("soundfile"):
 
 class MockedSaveTest(PytorchTestCase):
     @parameterize(
-        ["float32", "int32", "int16", "uint8"], [8000, 16000], [1, 2], [False, True],
+        ["float32", "int32", "int16", "uint8"],
+        [8000, 16000], [1, 2], [False, True],
+        [None, "float32", "int32", "int16", "uint8"],
     )
     @patch("soundfile.write")
-    def test_wav(self, dtype, sample_rate, num_channels, channels_first, mocked_write):
+    def test_wav(self, src_dtype, sample_rate, num_channels, channels_first, tgt_dtype, mocked_write):
         """soundfile_backend.save passes correct subtype to soundfile.write when WAV"""
         filepath = "foo.wav"
         input_tensor = get_wav_data(
-            dtype,
+            src_dtype,
             num_channels,
             num_frames=3 * sample_rate,
-            normalize=dtype == "flaot32",
+            normalize=src_dtype == "flaot32",
             channels_first=channels_first,
         ).t()
 
         soundfile_backend.save(
-            filepath, input_tensor, sample_rate, channels_first=channels_first
+            filepath, input_tensor, sample_rate, channels_first=channels_first, dtype=tgt_dtype
         )
 
         # on +Py3.8 call_args.kwargs is more descreptive
         args = mocked_write.call_args[1]
         assert args["file"] == filepath
         assert args["samplerate"] == sample_rate
-        assert args["subtype"] == dtype2subtype(dtype)
+        assert args["subtype"] == dtype2subtype(tgt_dtype or src_dtype)
         assert args["format"] is None
         self.assertEqual(
             args["data"], input_tensor.t() if channels_first else input_tensor

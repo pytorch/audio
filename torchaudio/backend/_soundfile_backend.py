@@ -209,6 +209,22 @@ def load(
     return waveform, sample_rate
 
 
+def _get_subtype(ext, dtype):
+    if ext != "wav":
+        return None
+    if dtype == torch.uint8:
+        return "PCM_U8"
+    if dtype == torch.int16:
+        return "PCM_16"
+    if dtype == torch.int32:
+        return "PCM_32"
+    if dtype == torch.float32:
+        return "FLOAT"
+    if dtype == torch.float64:
+        return "DOUBLE"
+    raise ValueError(f"Unsupported dtype for WAV: {dtype}")
+
+
 @_mod_utils.requires_module("soundfile")
 def save(
     filepath: str,
@@ -217,6 +233,7 @@ def save(
     channels_first: bool = True,
     compression: Optional[float] = None,
     format: Optional[str] = None,
+    dtype: Optional[str] = None,
 ):
     """Save audio data to file.
 
@@ -250,6 +267,11 @@ def save(
         format (str, optional):
             Output audio format. This is required when the output audio format cannot be infered from
             ``filepath``, (such as file extension or ``name`` attribute of the given file object).
+        dtype (Optional[str]):
+            Output tensor dtype. When the output format is WAVE, this value decides the bit depth of the
+            saved Tensor. For non-wav format, PySoundFile uses the default subtype.
+            Valid values: ``"uint8", "int16", "int32", "float32", "float64", None``
+            ``dtype=None`` means no conversion is performed.
     """
     if src.ndim != 2:
         raise ValueError(f"Expected 2D Tensor, got {src.ndim}D.")
@@ -265,20 +287,10 @@ def save(
     else:
         ext = str(filepath).split(".")[-1].lower()
 
-    if ext != "wav":
-        subtype = None
-    elif src.dtype == torch.uint8:
-        subtype = "PCM_U8"
-    elif src.dtype == torch.int16:
-        subtype = "PCM_16"
-    elif src.dtype == torch.int32:
-        subtype = "PCM_32"
-    elif src.dtype == torch.float32:
-        subtype = "FLOAT"
-    elif src.dtype == torch.float64:
-        subtype = "DOUBLE"
-    else:
-        raise ValueError(f"Unsupported dtype for WAV: {src.dtype}")
+    valid_dtypes = ['float64', 'float32', 'int32', 'int16', 'uint8']
+    if dtype and dtype not in valid_dtypes:
+        raise ValueError(f"`dtype` must be one of {valid_dtypes}")
+    subtype = _get_subtype(ext, src.dtype if dtype is None else getattr(torch, dtype))
 
     # sph is a extension used in TED-LIUM but soundfile does not recognize it as NIST format,
     # so we extend the extensions manually here
