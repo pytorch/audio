@@ -613,7 +613,7 @@ The implementation is same as <a class="reference internal" href="#torchaudio.ba
 <h3>save<a class="headerlink" href="#save" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend.sox_io_backend.save">
-<code class="sig-prename descclassname">torchaudio.backend.sox_io_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em>, <em class="sig-param">format: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.save" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.backend.sox_io_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em>, <em class="sig-param">format: Optional[str] = None</em>, <em class="sig-param">dtype: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save audio data to file.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -672,6 +672,10 @@ otherwise <code class="docutils literal notranslate"><span class="pre">[time,</s
 </p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Output audio format. This is required when the output audio format cannot be infered from
 <code class="docutils literal notranslate"><span class="pre">filepath</span></code>, (such as file extension or <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute of the given file object).</p></li>
+<li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Output tensor dtype.
+Valid values: <code class="docutils literal notranslate"><span class="pre">&quot;uint8&quot;,</span> <span class="pre">&quot;int16&quot;,</span> <span class="pre">&quot;int32&quot;,</span> <span class="pre">&quot;float32&quot;,</span> <span class="pre">&quot;float64&quot;,</span> <span class="pre">None</span></code>
+<code class="docutils literal notranslate"><span class="pre">dtype=None</span></code> means no conversion is performed.
+<code class="docutils literal notranslate"><span class="pre">dtype</span></code> parameter is only effective for <code class="docutils literal notranslate"><span class="pre">float32</span></code> Tensor.</p></li>
 </ul>
 </dd>
 </dl>
