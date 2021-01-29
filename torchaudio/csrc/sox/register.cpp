@@ -1,7 +1,7 @@
+/*
 #include <torchaudio/csrc/sox/effects.h>
 #include <torchaudio/csrc/sox/io.h>
 #include <torchaudio/csrc/sox/utils.h>
-
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   //////////////////////////////////////////////////////////////////////////////
   // sox_utils.h
@@ -15,7 +15,6 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       .def(
           "get_channels_first",
           &torchaudio::sox_utils::TensorSignal::getChannelsFirst);
-
   m.def("torchaudio::sox_utils_set_seed", &torchaudio::sox_utils::set_seed);
   m.def(
       "torchaudio::sox_utils_set_verbosity",
@@ -78,3 +77,4 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       "torchaudio::sox_effects_apply_effects_file",
       &torchaudio::sox_effects::apply_effects_file);
 }
+*/

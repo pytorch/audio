@@ -32,7 +32,7 @@ c10::intrusive_ptr<SignalInfo> get_info_file(
     const std::string& path,
     c10::optional<std::string>& format);
 
-c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> load_audio_file(
+std::tuple<torch::Tensor, int64_t> load_audio_file(
     const std::string& path,
     c10::optional<int64_t>& frame_offset,
     c10::optional<int64_t>& num_frames,

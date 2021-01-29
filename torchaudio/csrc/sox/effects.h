@@ -15,11 +15,12 @@ void initialize_sox_effects();
 
 void shutdown_sox_effects();
 
-c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> apply_effects_tensor(
-    const c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal>& input_signal,
-    std::vector<std::vector<std::string>> effects);
+std::tuple<torch::Tensor, int64_t> apply_effects_tensor(
+    std::tuple<torch::Tensor, int64_t> input_signal,
+    std::vector<std::vector<std::string>> effects,
+    c10::optional<bool>& channels_first);
 
-c10::intrusive_ptr<torchaudio::sox_utils::TensorSignal> apply_effects_file(
+std::tuple<torch::Tensor, int64_t> apply_effects_file(
     const std::string path,
     std::vector<std::vector<std::string>> effects,
     c10::optional<bool>& normalize,

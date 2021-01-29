@@ -164,10 +164,10 @@ def load(
                 filepath, frame_offset, num_frames, normalize, channels_first, format)
         signal = torch.ops.torchaudio.sox_io_load_audio_file(
             os.fspath(filepath), frame_offset, num_frames, normalize, channels_first, format)
-        return signal.get_tensor(), signal.get_sample_rate()
+        return signal
     signal = torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, format)
-    return signal.get_tensor(), signal.get_sample_rate()
+    return signal
 
 
 @torch.jit.unused

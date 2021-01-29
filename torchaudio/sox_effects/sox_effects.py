@@ -146,9 +146,10 @@ def apply_effects_tensor(
         >>> waveform, sample_rate = transform(waveform, input_sample_rate)
         >>> assert sample_rate == 8000
     """
-    in_signal = torch.classes.torchaudio.TensorSignal(tensor, sample_rate, channels_first)
-    out_signal = torch.ops.torchaudio.sox_effects_apply_effects_tensor(in_signal, effects)
-    return out_signal.get_tensor(), out_signal.get_sample_rate()
+    # in_signal = torch.classes.torchaudio.TensorSignal(tensor, sample_rate, channels_first)
+    out_signal = torch.ops.torchaudio.sox_effects_apply_effects_tensor(
+        (tensor, sample_rate), effects, channels_first)
+    return out_signal
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -256,4 +257,4 @@ def apply_effects_file(
     path = str(path)
     signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
         path, effects, normalize, channels_first, format)
-    return signal.get_tensor(), signal.get_sample_rate()
+    return signal

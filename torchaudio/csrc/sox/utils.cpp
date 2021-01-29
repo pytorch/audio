@@ -279,13 +279,14 @@ unsigned get_precision(
 }
 
 sox_signalinfo_t get_signalinfo(
-    const TensorSignal* signal,
-    const std::string filetype) {
-  auto tensor = signal->getTensor();
+    const std::tuple<torch::Tensor, int64_t> signal,
+    const std::string filetype,
+    bool channels_first) {
+  auto tensor = std::get<0>(signal);
   return sox_signalinfo_t{
-      /*rate=*/static_cast<sox_rate_t>(signal->getSampleRate()),
+      /*rate=*/static_cast<sox_rate_t>(std::get<1>(signal)),
       /*channels=*/
-      static_cast<unsigned>(tensor.size(signal->getChannelsFirst() ? 0 : 1)),
+      static_cast<unsigned>(channels_first),
       /*precision=*/get_precision(filetype, tensor.dtype()),
       /*length=*/static_cast<uint64_t>(tensor.numel())};
 }
@@ -348,6 +349,28 @@ uint64_t read_fileobj(py::object* fileobj, const uint64_t size, char* buffer) {
 }
 
 #endif // TORCH_API_INCLUDE_EXTENSION_H
+
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+  m.def("torchaudio::sox_utils_set_seed", &torchaudio::sox_utils::set_seed);
+  m.def(
+      "torchaudio::sox_utils_set_verbosity",
+      &torchaudio::sox_utils::set_verbosity);
+  m.def(
+      "torchaudio::sox_utils_set_use_threads",
+      &torchaudio::sox_utils::set_use_threads);
+  m.def(
+      "torchaudio::sox_utils_set_buffer_size",
+      &torchaudio::sox_utils::set_buffer_size);
+  m.def(
+      "torchaudio::sox_utils_list_effects",
+      &torchaudio::sox_utils::list_effects);
+  m.def(
+      "torchaudio::sox_utils_list_read_formats",
+      &torchaudio::sox_utils::list_read_formats);
+  m.def(
+      "torchaudio::sox_utils_list_write_formats",
+      &torchaudio::sox_utils::list_write_formats);
+}
 
 } // namespace sox_utils
 } // namespace torchaudio
