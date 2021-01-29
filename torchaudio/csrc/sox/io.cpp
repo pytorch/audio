@@ -107,10 +107,19 @@ void save_audio_file(
     int64_t sample_rate,
     bool channels_first,
     c10::optional<double> compression,
-    c10::optional<std::string> format) {
+    c10::optional<std::string> format,
+    c10::optional<std::string> dtype) {
   validate_input_tensor(tensor);
 
   auto signal = TensorSignal(tensor, sample_rate, channels_first);
+  if (tensor.dtype() != torch::kFloat32 && dtype.has_value()) {
+    throw std::runtime_error(
+        "dtype conversion only supported for float32 tensors");
+  }
+  const auto tgt_dtype =
+      (tensor.dtype() == torch::kFloat32 && dtype.has_value())
+      ? get_dtype_from_str(dtype.value())
+      : tensor.dtype();
 
   const auto filetype = [&]() {
     if (format.has_value())
@@ -124,8 +133,7 @@ void save_audio_file(
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
   const auto signal_info = get_signalinfo(&signal, filetype);
-  const auto encoding_info =
-      get_encodinginfo(filetype, tensor.dtype(), compression);
+  const auto encoding_info = get_encodinginfo(filetype, tgt_dtype, compression);
 
   SoxFormat sf(sox_open_write(
       path.c_str(),
@@ -239,10 +247,19 @@ void save_audio_fileobj(
     int64_t sample_rate,
     bool channels_first,
     c10::optional<double> compression,
-    std::string filetype) {
+    std::string filetype,
+    c10::optional<std::string> dtype) {
   validate_input_tensor(tensor);
 
   auto signal = TensorSignal(tensor, sample_rate, channels_first);
+  if (tensor.dtype() != torch::kFloat32 && dtype.has_value()) {
+    throw std::runtime_error(
+        "dtype conversion only supported for float32 tensors");
+  }
+  const auto tgt_dtype =
+      (tensor.dtype() == torch::kFloat32 && dtype.has_value())
+      ? get_dtype_from_str(dtype.value())
+      : tensor.dtype();
 
   if (filetype == "amr-nb") {
     const auto num_channels = tensor.size(channels_first ? 0 : 1);
@@ -253,8 +270,7 @@ void save_audio_fileobj(
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
   const auto signal_info = get_signalinfo(&signal, filetype);
-  const auto encoding_info =
-      get_encodinginfo(filetype, tensor.dtype(), compression);
+  const auto encoding_info = get_encodinginfo(filetype, tgt_dtype, compression);
 
   AutoReleaseBuffer buffer;
 
