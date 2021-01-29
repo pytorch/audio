@@ -267,9 +267,7 @@ def apply_effects_file(
         if hasattr(path, 'read'):
             return torchaudio._torchaudio.apply_effects_fileobj(
                 path, effects, normalize, channels_first, format)
-        signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
-            os.fspath(path), effects, normalize, channels_first, format)
-        return signal.get_tensor(), signal.get_sample_rate()
+        path = os.fspath(path)
     signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
         path, effects, normalize, channels_first, format)
     return signal.get_tensor(), signal.get_sample_rate()
