@@ -215,7 +215,7 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
   // For example, voribs can be found
   //   https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/vorbis.c#L97-L158
   //
-  // `auto_detect_format` function only requires 256 bytes, but format-dependant
+  // `auto_detect_format` function only requires 256 bytes, but format-dependent
   // `startread` handler might require more data. In case of vorbis, the size of
   // header is unbounded, but typically 4kB maximum.
   //

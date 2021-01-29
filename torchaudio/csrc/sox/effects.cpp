@@ -173,7 +173,7 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
   // the file.) Therefore buffer has to always contain valid data, except after
   // EOF. We default to `sox_get_globals()->bufsiz`* for buffer size and we
   // first check if there is enough data to fill the buffer. `read_fileobj`
-  // repeatedly calls `read`  method until it receives the requested lenght of
+  // repeatedly calls `read`  method until it receives the requested length of
   // bytes or it reaches EOF. If we get bytes shorter than requested, that means
   // the whole audio data are fetched.
   //
