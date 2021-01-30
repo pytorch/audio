@@ -324,17 +324,15 @@
         <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;read&#39;</span><span class="p">):</span>
-        <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">get_info_fileobj</span><span class="p">(</span>
-            <span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
-        <span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">bits_per_sample</span> <span class="o">=</span> <span class="n">sinfo</span>
-        <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span>
-            <span class="n">sample_rate</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">num_channels</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="p">)</span>
+        <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">get_info_fileobj</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="o">*</span><span class="n">sinfo</span><span class="p">)</span>
     <span class="n">sinfo</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_get_info</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">),</span> <span class="nb">format</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span>
         <span class="n">sinfo</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">(),</span>
         <span class="n">sinfo</span><span class="o">.</span><span class="n">get_num_frames</span><span class="p">(),</span>
         <span class="n">sinfo</span><span class="o">.</span><span class="n">get_num_channels</span><span class="p">(),</span>
         <span class="n">sinfo</span><span class="o">.</span><span class="n">get_bits_per_sample</span><span class="p">(),</span>
+        <span class="n">sinfo</span><span class="o">.</span><span class="n">get_encoding</span><span class="p">(),</span>
     <span class="p">)</span>
 
 
@@ -376,7 +374,8 @@
         <span class="n">sinfo</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">(),</span>
         <span class="n">sinfo</span><span class="o">.</span><span class="n">get_num_frames</span><span class="p">(),</span>
         <span class="n">sinfo</span><span class="o">.</span><span class="n">get_num_channels</span><span class="p">(),</span>
-        <span class="n">sinfo</span><span class="o">.</span><span class="n">get_bits_per_sample</span><span class="p">())</span></div>
+        <span class="n">sinfo</span><span class="o">.</span><span class="n">get_bits_per_sample</span><span class="p">(),</span>
+        <span class="n">sinfo</span><span class="o">.</span><span class="n">get_encoding</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.load">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>

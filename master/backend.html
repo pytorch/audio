@@ -381,7 +381,7 @@ deprecated)</p></td>
 <h3>AudioMetaData<a class="headerlink" href="#audiometadata" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="torchaudio.backend.common.AudioMetaData">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.backend.common.</code><code class="sig-name descname">AudioMetaData</code><span class="sig-paren">(</span><em class="sig-param">sample_rate: int</em>, <em class="sig-param">num_frames: int</em>, <em class="sig-param">num_channels: int</em>, <em class="sig-param">bits_per_sample: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/common.html#AudioMetaData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.common.AudioMetaData" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.backend.common.</code><code class="sig-name descname">AudioMetaData</code><span class="sig-paren">(</span><em class="sig-param">sample_rate: int</em>, <em class="sig-param">num_frames: int</em>, <em class="sig-param">num_channels: int</em>, <em class="sig-param">bits_per_sample: int</em>, <em class="sig-param">encoding: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/common.html#AudioMetaData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.common.AudioMetaData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return type of <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code> function.</p>
 <p>This class is used by <a class="reference internal" href="#sox-io-backend"><span class="std std-ref">“sox_io” backend</span></a> and
 <a class="reference internal" href="#soundfile-backend"><span class="std std-ref">“soundfile” backend with the new interface</span></a>.</p>
@@ -393,6 +393,7 @@ deprecated)</p></td>
 <li><p><strong>num_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The number of channels</p></li>
 <li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The number of bits per sample. This is 0 for lossy formats,
 or when it cannot be accurately inferred.</p></li>
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Audio encoding.</p></li>
 </ul>
 </dd>
 </dl>

@@ -357,6 +357,37 @@
 <span class="p">}</span>
 
 
+<span class="k">def</span> <span class="nf">_get_bit_depth</span><span class="p">(</span><span class="n">subtype</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">subtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_SUBTYPE_TO_BITS_PER_SAMPLE</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The </span><span class="si">{</span><span class="n">subtype</span><span class="si">}</span><span class="s2"> subtype is unknown to TorchAudio. As a result, the bits_per_sample &quot;</span>
+            <span class="s2">&quot;attribute will be set to 0. If you are seeing this warning, please &quot;</span>
+            <span class="s2">&quot;report by opening an issue on github (after checking for existing/closed ones). &quot;</span>
+            <span class="s2">&quot;You may otherwise ignore this warning.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_SUBTYPE_TO_BITS_PER_SAMPLE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subtype</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+
+<span class="n">_SUBTYPE_TO_ENCODING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;PCM_S8&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_S&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;PCM_16&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_S&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;PCM_24&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_S&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;PCM_32&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_S&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;PCM_U8&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_U&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;FLOAT&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_F&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;DOUBLE&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_F&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ULAW&#39;</span><span class="p">:</span> <span class="s1">&#39;ULAW&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ALAW&#39;</span><span class="p">:</span> <span class="s1">&#39;ALAW&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;VORBIS&#39;</span><span class="p">:</span> <span class="s1">&#39;VORBIS&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">_get_encoding</span><span class="p">(</span><span class="nb">format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;FLAC&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;FLAC&#39;</span>
+    <span class="k">return</span> <span class="n">_SUBTYPE_TO_ENCODING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subtype</span><span class="p">,</span> <span class="s1">&#39;UNKNOWN&#39;</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend._soundfile_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Get signal information of an audio file.</span>
@@ -375,15 +406,13 @@
 <span class="sd">        AudioMetaData: meta data of the given audio.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sinfo</span> <span class="o">=</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">subtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_SUBTYPE_TO_BITS_PER_SAMPLE</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;The </span><span class="si">{</span><span class="n">sinfo</span><span class="o">.</span><span class="n">subtype</span><span class="si">}</span><span class="s2"> subtype is unknown to TorchAudio. As a result, the bits_per_sample &quot;</span>
-            <span class="s2">&quot;attribute will be set to 0. If you are seeing this warning, please &quot;</span>
-            <span class="s2">&quot;report by opening an issue on github (after checking for existing/closed ones). &quot;</span>
-            <span class="s2">&quot;You may otherwise ignore this warning.&quot;</span>
-        <span class="p">)</span>
-    <span class="n">bits_per_sample</span> <span class="o">=</span> <span class="n">_SUBTYPE_TO_BITS_PER_SAMPLE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">subtype</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">samplerate</span><span class="p">,</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">frames</span><span class="p">,</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="o">=</span><span class="n">bits_per_sample</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span>
+        <span class="n">sinfo</span><span class="o">.</span><span class="n">samplerate</span><span class="p">,</span>
+        <span class="n">sinfo</span><span class="o">.</span><span class="n">frames</span><span class="p">,</span>
+        <span class="n">sinfo</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span>
+        <span class="n">bits_per_sample</span><span class="o">=</span><span class="n">_get_bit_depth</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">subtype</span><span class="p">),</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="n">_get_encoding</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">subtype</span><span class="p">),</span>
+    <span class="p">)</span></div>
 
 
 <span class="n">_SUBTYPE2DTYPE</span> <span class="o">=</span> <span class="p">{</span>

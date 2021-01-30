@@ -562,7 +562,7 @@ the estimated spectrogram and the filter banks using SGD.</p>
 <h2><span class="hidden-section">MelSpectrogram</span><a class="headerlink" href="#melspectrogram" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.MelSpectrogram">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">MelSpectrogram</code><span class="sig-paren">(</span><em class="sig-param">sample_rate: int = 16000, n_fft: int = 400, win_length: Optional[int] = None, hop_length: Optional[int] = None, f_min: float = 0.0, f_max: Optional[float] = None, pad: int = 0, n_mels: int = 128, window_fn: Callable[[...], torch.Tensor] = &lt;built-in method hann_window of type object&gt;, power: Optional[float] = 2.0, normalized: bool = False, wkwargs: Optional[dict] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MelSpectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MelSpectrogram" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">MelSpectrogram</code><span class="sig-paren">(</span><em class="sig-param">sample_rate: int = 16000, n_fft: int = 400, win_length: Optional[int] = None, hop_length: Optional[int] = None, f_min: float = 0.0, f_max: Optional[float] = None, pad: int = 0, n_mels: int = 128, window_fn: Callable[[...], torch.Tensor] = &lt;built-in method hann_window of type object&gt;, power: Optional[float] = 2.0, normalized: bool = False, wkwargs: Optional[dict] = None, center: bool = True, pad_mode: str = 'reflect', onesided: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#MelSpectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.MelSpectrogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create MelSpectrogram for a raw audio signal. This is a composition of Spectrogram
 and MelScale.</p>
 <dl class="simple">
@@ -587,6 +587,13 @@ and MelScale.</p>
 <li><p><strong>window_fn</strong> (<em>Callable</em><em>[</em><em>..</em><em>, </em><em>Tensor</em><em>]</em><em>, </em><em>optional</em>) – A function to create a window tensor
 that is applied/multiplied to each frame/window. (Default: <code class="docutils literal notranslate"><span class="pre">torch.hann_window</span></code>)</p></li>
 <li><p><strong>wkwargs</strong> (<em>Dict</em><em>[</em><em>..</em><em>, </em><em>..</em><em>] or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Arguments for window function. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – whether to pad <code class="xref py py-attr docutils literal notranslate"><span class="pre">waveform</span></code> on both sides so
+that the <span class="math">\(t\)</span>-th frame is centered at time <span class="math">\(t \times \text{hop\_length}\)</span>.
+Default: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>pad_mode</strong> (<em>string</em><em>, </em><em>optional</em>) – controls the padding method used when
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. Default: <code class="docutils literal notranslate"><span class="pre">&quot;reflect&quot;</span></code></p></li>
+<li><p><strong>onesided</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – controls whether to return half of results to
+avoid redundancy. Default: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
 </ul>
 </dd>
 </dl>

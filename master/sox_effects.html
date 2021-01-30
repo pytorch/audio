@@ -494,8 +494,22 @@ rate and leave samples untouched.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><em>pathlib.Path</em></a>) – Path to the audio file. This function also handles <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> objects, but is
-annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> for TorchScript compiler compatibility.</p></li>
+<li><p><strong>path</strong> (<em>path-like object</em><em> or </em><em>file-like object</em>) – <p>Source of audio data. When the function is not compiled by TorchScript,
+(e.g. <code class="docutils literal notranslate"><span class="pre">torch.jit.script</span></code>), the following types are accepted;</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">path-like</span></code>: file path</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">file-like</span></code>: Object with <code class="docutils literal notranslate"><span class="pre">read(size:</span> <span class="pre">int)</span> <span class="pre">-&gt;</span> <span class="pre">bytes</span></code> method,
+which returns byte string of at most <code class="docutils literal notranslate"><span class="pre">size</span></code> length.</p></li>
+</ul>
+</div></blockquote>
+<p>When the function is compiled by TorchScript, only <code class="docutils literal notranslate"><span class="pre">str</span></code> type is allowed.
+.. note:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* This argument is intentionally annotated as ``str`` only for
+  TorchScript compiler compatibility.
+</pre></div>
+</div>
+</p></li>
 <li><p><strong>effects</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em><em>]</em>) – List of effects.</p></li>
 <li><p><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function always return <code class="docutils literal notranslate"><span class="pre">float32</span></code>, and sample values are
 normalized to <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.
