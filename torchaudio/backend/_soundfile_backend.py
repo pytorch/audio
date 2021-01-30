@@ -50,6 +50,37 @@ _SUBTYPE_TO_BITS_PER_SAMPLE = {
 }
 
 
+def _get_bit_depth(subtype):
+    if subtype not in _SUBTYPE_TO_BITS_PER_SAMPLE:
+        warnings.warn(
+            f"The {subtype} subtype is unknown to TorchAudio. As a result, the bits_per_sample "
+            "attribute will be set to 0. If you are seeing this warning, please "
+            "report by opening an issue on github (after checking for existing/closed ones). "
+            "You may otherwise ignore this warning."
+        )
+    return _SUBTYPE_TO_BITS_PER_SAMPLE.get(subtype, 0)
+
+
+_SUBTYPE_TO_ENCODING = {
+    'PCM_S8': 'PCM_S',
+    'PCM_16': 'PCM_S',
+    'PCM_24': 'PCM_S',
+    'PCM_32': 'PCM_S',
+    'PCM_U8': 'PCM_U',
+    'FLOAT': 'PCM_F',
+    'DOUBLE': 'PCM_F',
+    'ULAW': 'ULAW',
+    'ALAW': 'ALAW',
+    'VORBIS': 'VORBIS',
+}
+
+
+def _get_encoding(format: str, subtype: str):
+    if format == 'FLAC':
+        return 'FLAC'
+    return _SUBTYPE_TO_ENCODING.get(subtype, 'UNKNOWN')
+
+
 @_mod_utils.requires_module("soundfile")
 def info(filepath: str, format: Optional[str] = None) -> AudioMetaData:
     """Get signal information of an audio file.
@@ -68,15 +99,13 @@ def info(filepath: str, format: Optional[str] = None) -> AudioMetaData:
         AudioMetaData: meta data of the given audio.
     """
     sinfo = soundfile.info(filepath)
-    if sinfo.subtype not in _SUBTYPE_TO_BITS_PER_SAMPLE:
-        warnings.warn(
-            f"The {sinfo.subtype} subtype is unknown to TorchAudio. As a result, the bits_per_sample "
-            "attribute will be set to 0. If you are seeing this warning, please "
-            "report by opening an issue on github (after checking for existing/closed ones). "
-            "You may otherwise ignore this warning."
-        )
-    bits_per_sample = _SUBTYPE_TO_BITS_PER_SAMPLE.get(sinfo.subtype, 0)
-    return AudioMetaData(sinfo.samplerate, sinfo.frames, sinfo.channels, bits_per_sample=bits_per_sample)
+    return AudioMetaData(
+        sinfo.samplerate,
+        sinfo.frames,
+        sinfo.channels,
+        bits_per_sample=_get_bit_depth(sinfo.subtype),
+        encoding=_get_encoding(sinfo.format, sinfo.subtype),
+    )
 
 
 _SUBTYPE2DTYPE = {

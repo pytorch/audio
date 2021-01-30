@@ -14,11 +14,13 @@ SignalInfo::SignalInfo(
     const int64_t sample_rate_,
     const int64_t num_channels_,
     const int64_t num_frames_,
-    const int64_t bits_per_sample_)
+    const int64_t bits_per_sample_,
+    const std::string encoding_)
     : sample_rate(sample_rate_),
       num_channels(num_channels_),
       num_frames(num_frames_),
-      bits_per_sample(bits_per_sample_){};
+      bits_per_sample(bits_per_sample_),
+      encoding(encoding_){};
 
 int64_t SignalInfo::getSampleRate() const {
   return sample_rate;
@@ -35,6 +37,45 @@ int64_t SignalInfo::getNumFrames() const {
 int64_t SignalInfo::getBitsPerSample() const {
   return bits_per_sample;
 }
+
+std::string SignalInfo::getEncoding() const {
+  return encoding;
+}
+
+namespace {
+
+std::string get_encoding(sox_encoding_t encoding) {
+  switch (encoding) {
+    case SOX_ENCODING_UNKNOWN:
+      return "UNKNOWN";
+    case SOX_ENCODING_SIGN2:
+      return "PCM_S";
+    case SOX_ENCODING_UNSIGNED:
+      return "PCM_U";
+    case SOX_ENCODING_FLOAT:
+      return "PCM_F";
+    case SOX_ENCODING_FLAC:
+      return "FLAC";
+    case SOX_ENCODING_ULAW:
+      return "ULAW";
+    case SOX_ENCODING_ALAW:
+      return "ALAW";
+    case SOX_ENCODING_MP3:
+      return "MP3";
+    case SOX_ENCODING_VORBIS:
+      return "VORBIS";
+    case SOX_ENCODING_AMR_WB:
+      return "AMR_WB";
+    case SOX_ENCODING_AMR_NB:
+      return "AMR_NB";
+    case SOX_ENCODING_OPUS:
+      return "OPUS";
+    default:
+      return "UNKNOWN";
+  }
+}
+
+} // namespace
 
 c10::intrusive_ptr<SignalInfo> get_info_file(
     const std::string& path,
@@ -53,7 +94,8 @@ c10::intrusive_ptr<SignalInfo> get_info_file(
       static_cast<int64_t>(sf->signal.rate),
       static_cast<int64_t>(sf->signal.channels),
       static_cast<int64_t>(sf->signal.length / sf->signal.channels),
-      static_cast<int64_t>(sf->encoding.bits_per_sample));
+      static_cast<int64_t>(sf->encoding.bits_per_sample),
+      get_encoding(sf->encoding.encoding));
 }
 
 namespace {
@@ -157,7 +199,7 @@ void save_audio_file(
 
 #ifdef TORCH_API_INCLUDE_EXTENSION_H
 
-std::tuple<int64_t, int64_t, int64_t, int64_t> get_info_fileobj(
+std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
     py::object fileobj,
     c10::optional<std::string>& format) {
   // Prepare in-memory file object
@@ -173,7 +215,7 @@ std::tuple<int64_t, int64_t, int64_t, int64_t> get_info_fileobj(
   // For example, voribs can be found
   //   https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/vorbis.c#L97-L158
   //
-  // `auto_detect_format` function only requires 256 bytes, but format-dependant
+  // `auto_detect_format` function only requires 256 bytes, but format-dependent
   // `startread` handler might require more data. In case of vorbis, the size of
   // header is unbounded, but typically 4kB maximum.
   //
@@ -202,9 +244,10 @@ std::tuple<int64_t, int64_t, int64_t, int64_t> get_info_fileobj(
 
   return std::make_tuple(
       static_cast<int64_t>(sf->signal.rate),
-      static_cast<int64_t>(sf->signal.channels),
       static_cast<int64_t>(sf->signal.length / sf->signal.channels),
-      static_cast<int64_t>(sf->encoding.bits_per_sample));
+      static_cast<int64_t>(sf->signal.channels),
+      static_cast<int64_t>(sf->encoding.bits_per_sample),
+      get_encoding(sf->encoding.encoding));
 }
 
 std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
