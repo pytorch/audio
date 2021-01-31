@@ -9,6 +9,7 @@ from .ljspeech import LJSPEECH
 from .cmuarctic import CMUARCTIC
 from .libritts import LIBRITTS
 from .tedlium import TEDLIUM
+from .folder import AudioFolder
 
 __all__ = (
     "COMMONVOICE",
@@ -24,4 +25,5 @@ __all__ = (
     "diskcache_iterator",
     "bg_iterator",
     "TEDLIUM",
+    "AudioFolder"
 )
