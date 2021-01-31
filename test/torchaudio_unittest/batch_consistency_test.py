@@ -1,5 +1,4 @@
 """Test numerical consistency among single input and batched input."""
-import unittest
 import itertools
 from parameterized import parameterized
 
