@@ -27,4 +27,3 @@ from .wav_utils import (
 from .parameterized_utils import (
     load_params,
 )
-from . import sox_utils
