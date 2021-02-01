@@ -129,11 +129,17 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
 
         decibels = F.amplitude_to_DB(spec, amplitude_mult, amin,
                                      db_mult, top_db=top_db)
+        # Ensure the clamp was applied
         below_limit = decibels < 6.0205
         assert not below_limit.any(), (
             "{} decibel values were below the expected cutoff:\n{}".format(
                 below_limit.sum().item(), decibels
             )
+        )
+        # Ensure it didn't over-clamp
+        close_to_limit = decibels < 6.0207
+        assert close_to_limit.any(), (
+            f"No values were close to the limit. Did it over-clamp?\n{decibels}"
         )
 
 
