@@ -14,11 +14,13 @@ SignalInfo::SignalInfo(
     const int64_t sample_rate_,
     const int64_t num_channels_,
     const int64_t num_frames_,
-    const int64_t bits_per_sample_)
+    const int64_t bits_per_sample_,
+    const std::string encoding_)
     : sample_rate(sample_rate_),
       num_channels(num_channels_),
       num_frames(num_frames_),
-      bits_per_sample(bits_per_sample_){};
+      bits_per_sample(bits_per_sample_),
+      encoding(encoding_){};
 
 int64_t SignalInfo::getSampleRate() const {
   return sample_rate;
@@ -35,6 +37,45 @@ int64_t SignalInfo::getNumFrames() const {
 int64_t SignalInfo::getBitsPerSample() const {
   return bits_per_sample;
 }
+
+std::string SignalInfo::getEncoding() const {
+  return encoding;
+}
+
+namespace {
+
+std::string get_encoding(sox_encoding_t encoding) {
+  switch (encoding) {
+    case SOX_ENCODING_UNKNOWN:
+      return "UNKNOWN";
+    case SOX_ENCODING_SIGN2:
+      return "PCM_S";
+    case SOX_ENCODING_UNSIGNED:
+      return "PCM_U";
+    case SOX_ENCODING_FLOAT:
+      return "PCM_F";
+    case SOX_ENCODING_FLAC:
+      return "FLAC";
+    case SOX_ENCODING_ULAW:
+      return "ULAW";
+    case SOX_ENCODING_ALAW:
+      return "ALAW";
+    case SOX_ENCODING_MP3:
+      return "MP3";
+    case SOX_ENCODING_VORBIS:
+      return "VORBIS";
+    case SOX_ENCODING_AMR_WB:
+      return "AMR_WB";
+    case SOX_ENCODING_AMR_NB:
+      return "AMR_NB";
+    case SOX_ENCODING_OPUS:
+      return "OPUS";
+    default:
+      return "UNKNOWN";
+  }
+}
+
+} // namespace
 
 c10::intrusive_ptr<SignalInfo> get_info_file(
     const std::string& path,
@@ -53,7 +94,8 @@ c10::intrusive_ptr<SignalInfo> get_info_file(
       static_cast<int64_t>(sf->signal.rate),
       static_cast<int64_t>(sf->signal.channels),
       static_cast<int64_t>(sf->signal.length / sf->signal.channels),
-      static_cast<int64_t>(sf->encoding.bits_per_sample));
+      static_cast<int64_t>(sf->encoding.bits_per_sample),
+      get_encoding(sf->encoding.encoding));
 }
 
 namespace {
@@ -107,10 +149,19 @@ void save_audio_file(
     int64_t sample_rate,
     bool channels_first,
     c10::optional<double> compression,
-    c10::optional<std::string> format) {
+    c10::optional<std::string> format,
+    c10::optional<std::string> dtype) {
   validate_input_tensor(tensor);
 
   auto signal = std::tuple<torch::Tensor, int64_t>(tensor, sample_rate);
+  if (tensor.dtype() != torch::kFloat32 && dtype.has_value()) {
+    throw std::runtime_error(
+        "dtype conversion only supported for float32 tensors");
+  }
+  const auto tgt_dtype =
+      (tensor.dtype() == torch::kFloat32 && dtype.has_value())
+      ? get_dtype_from_str(dtype.value())
+      : tensor.dtype();
 
   const auto filetype = [&]() {
     if (format.has_value())
@@ -124,8 +175,7 @@ void save_audio_file(
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
   const auto signal_info = get_signalinfo(&signal, filetype, channels_first);
-  const auto encoding_info =
-      get_encodinginfo(filetype, tensor.dtype(), compression);
+  const auto encoding_info = get_encodinginfo(filetype, tgt_dtype, compression);
 
   SoxFormat sf(sox_open_write(
       path.c_str(),
@@ -149,7 +199,7 @@ void save_audio_file(
 
 #ifdef TORCH_API_INCLUDE_EXTENSION_H
 
-std::tuple<int64_t, int64_t, int64_t, int64_t> get_info_fileobj(
+std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
     py::object fileobj,
     c10::optional<std::string>& format) {
   // Prepare in-memory file object
@@ -165,7 +215,7 @@ std::tuple<int64_t, int64_t, int64_t, int64_t> get_info_fileobj(
   // For example, voribs can be found
   //   https://github.com/dmkrepo/libsox/blob/b9dd1a86e71bbd62221904e3e59dfaa9e5e72046/src/vorbis.c#L97-L158
   //
-  // `auto_detect_format` function only requires 256 bytes, but format-dependant
+  // `auto_detect_format` function only requires 256 bytes, but format-dependent
   // `startread` handler might require more data. In case of vorbis, the size of
   // header is unbounded, but typically 4kB maximum.
   //
@@ -194,9 +244,10 @@ std::tuple<int64_t, int64_t, int64_t, int64_t> get_info_fileobj(
 
   return std::make_tuple(
       static_cast<int64_t>(sf->signal.rate),
-      static_cast<int64_t>(sf->signal.channels),
       static_cast<int64_t>(sf->signal.length / sf->signal.channels),
-      static_cast<int64_t>(sf->encoding.bits_per_sample));
+      static_cast<int64_t>(sf->signal.channels),
+      static_cast<int64_t>(sf->encoding.bits_per_sample),
+      get_encoding(sf->encoding.encoding));
 }
 
 std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
@@ -239,10 +290,19 @@ void save_audio_fileobj(
     int64_t sample_rate,
     bool channels_first,
     c10::optional<double> compression,
-    std::string filetype) {
+    std::string filetype,
+    c10::optional<std::string> dtype) {
   validate_input_tensor(tensor);
 
   auto signal = std::tuple<torch::Tensor, int64_t>(tensor, sample_rate);
+  if (tensor.dtype() != torch::kFloat32 && dtype.has_value()) {
+    throw std::runtime_error(
+        "dtype conversion only supported for float32 tensors");
+  }
+  const auto tgt_dtype =
+      (tensor.dtype() == torch::kFloat32 && dtype.has_value())
+      ? get_dtype_from_str(dtype.value())
+      : tensor.dtype();
 
   if (filetype == "amr-nb") {
     const auto num_channels = tensor.size(channels_first ? 0 : 1);
@@ -253,8 +313,7 @@ void save_audio_fileobj(
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
   const auto signal_info = get_signalinfo(&signal, filetype, channels_first);
-  const auto encoding_info =
-      get_encodinginfo(filetype, tensor.dtype(), compression);
+  const auto encoding_info = get_encodinginfo(filetype, tgt_dtype, compression);
 
   AutoReleaseBuffer buffer;
 
@@ -294,7 +353,8 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
       .def("get_num_frames", &torchaudio::sox_io::SignalInfo::getNumFrames)
       .def(
           "get_bits_per_sample",
-          &torchaudio::sox_io::SignalInfo::getBitsPerSample);
+          &torchaudio::sox_io::SignalInfo::getBitsPerSample)
+      .def("get_encoding", &torchaudio::sox_io::SignalInfo::getEncoding);
 
   m.def("torchaudio::sox_io_get_info", &torchaudio::sox_io::get_info_file);
   m.def(

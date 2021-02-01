@@ -411,6 +411,13 @@ class MelSpectrogram(torch.nn.Module):
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
+        center (bool, optional): whether to pad :attr:`waveform` on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            Default: ``True``
+        pad_mode (string, optional): controls the padding method used when
+            :attr:`center` is ``True``. Default: ``"reflect"``
+        onesided (bool, optional): controls whether to return half of results to
+            avoid redundancy. Default: ``True``
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
@@ -430,7 +437,10 @@ class MelSpectrogram(torch.nn.Module):
                  window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: Optional[float] = 2.,
                  normalized: bool = False,
-                 wkwargs: Optional[dict] = None) -> None:
+                 wkwargs: Optional[dict] = None,
+                 center: bool = True,
+                 pad_mode: str = "reflect",
+                 onesided: bool = True) -> None:
         super(MelSpectrogram, self).__init__()
         self.sample_rate = sample_rate
         self.n_fft = n_fft
@@ -445,7 +455,8 @@ class MelSpectrogram(torch.nn.Module):
         self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
                                        hop_length=self.hop_length,
                                        pad=self.pad, window_fn=window_fn, power=self.power,
-                                       normalized=self.normalized, wkwargs=wkwargs)
+                                       normalized=self.normalized, wkwargs=wkwargs,
+                                       center=center, pad_mode=pad_mode, onesided=onesided)
         self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1)
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -1076,8 +1087,9 @@ class SpectralCentroid(torch.nn.Module):
         win_length (int or None, optional): Window size. (Default: ``n_fft``)
         hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
         pad (int, optional): Two sided padding of signal. (Default: ``0``)
-        window(Tensor, optional): A window tensor that is applied/multiplied to each frame.
-            (Default: ``torch.hann_window(win_length)``)
+        window_fn (Callable[..., Tensor], optional): A function to create a window tensor
+            that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
@@ -1091,14 +1103,14 @@ class SpectralCentroid(torch.nn.Module):
                  win_length: Optional[int] = None,
                  hop_length: Optional[int] = None,
                  pad: int = 0,
-                 window: Optional[Tensor] = None) -> None:
+                 window_fn: Callable[..., Tensor] = torch.hann_window,
+                 wkwargs: Optional[dict] = None) -> None:
         super(SpectralCentroid, self).__init__()
         self.sample_rate = sample_rate
         self.n_fft = n_fft
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
-        if window is None:
-            window = torch.hann_window(self.win_length)
+        window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
         self.register_buffer('window', window)
         self.pad = pad
 

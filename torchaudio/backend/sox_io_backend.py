@@ -1,4 +1,5 @@
 import os
+import warnings
 from typing import Tuple, Optional
 
 import torch
@@ -16,17 +17,15 @@ def _info(
         format: Optional[str] = None,
 ) -> AudioMetaData:
     if hasattr(filepath, 'read'):
-        sinfo = torchaudio._torchaudio.get_info_fileobj(
-            filepath, format)
-        sample_rate, num_channels, num_frames, bits_per_sample = sinfo
-        return AudioMetaData(
-            sample_rate, num_frames, num_channels, bits_per_sample)
+        sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
+        return AudioMetaData(*sinfo)
     sinfo = torch.ops.torchaudio.sox_io_get_info(os.fspath(filepath), format)
     return AudioMetaData(
         sinfo.get_sample_rate(),
         sinfo.get_num_frames(),
         sinfo.get_num_channels(),
         sinfo.get_bits_per_sample(),
+        sinfo.get_encoding(),
     )
 
 
@@ -68,7 +67,8 @@ def info(
         sinfo.get_sample_rate(),
         sinfo.get_num_frames(),
         sinfo.get_num_channels(),
-        sinfo.get_bits_per_sample())
+        sinfo.get_bits_per_sample(),
+        sinfo.get_encoding())
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -178,15 +178,16 @@ def _save(
         channels_first: bool = True,
         compression: Optional[float] = None,
         format: Optional[str] = None,
+        dtype: Optional[str] = None,
 ):
     if hasattr(filepath, 'write'):
         if format is None:
             raise RuntimeError('`format` is required when saving to file object.')
         torchaudio._torchaudio.save_audio_fileobj(
-            filepath, src, sample_rate, channels_first, compression, format)
+            filepath, src, sample_rate, channels_first, compression, format, dtype)
     else:
         torch.ops.torchaudio.sox_io_save_audio_file(
-            os.fspath(filepath), src, sample_rate, channels_first, compression, format)
+            os.fspath(filepath), src, sample_rate, channels_first, compression, format, dtype)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -197,6 +198,7 @@ def save(
         channels_first: bool = True,
         compression: Optional[float] = None,
         format: Optional[str] = None,
+        dtype: Optional[str] = None,
 ):
     """Save audio data to file.
 
@@ -243,12 +245,22 @@ def save(
         format (str, optional):
             Output audio format. This is required when the output audio format cannot be infered from
             ``filepath``, (such as file extension or ``name`` attribute of the given file object).
+        dtype (str, optional)
+            Output tensor dtype.
+            Valid values: ``"uint8", "int16", "int32", "float32", "float64", None``
+            ``dtype=None`` means no conversion is performed.
+            ``dtype`` parameter is only effective for ``float32`` Tensor.
     """
+    if src.dtype == torch.float32 and dtype is None:
+        warnings.warn(
+            '`dtype` default value will be changed to `int16` in 0.9 release.'
+            'Specify `dtype` to suppress this warning.'
+        )
     if not torch.jit.is_scripting():
-        _save(filepath, src, sample_rate, channels_first, compression, format)
+        _save(filepath, src, sample_rate, channels_first, compression, format, dtype)
         return
     torch.ops.torchaudio.sox_io_save_audio_file(
-        filepath, src, sample_rate, channels_first, compression, format)
+        filepath, src, sample_rate, channels_first, compression, format, dtype)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')

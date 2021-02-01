@@ -138,6 +138,24 @@ caffe2::TypeMeta get_dtype(
   return c10::scalarTypeToTypeMeta(dtype);
 }
 
+caffe2::TypeMeta get_dtype_from_str(const std::string dtype) {
+  const auto tgt_dtype = [&]() {
+    if (dtype == "uint8")
+      return torch::kUInt8;
+    else if (dtype == "int16")
+      return torch::kInt16;
+    else if (dtype == "int32")
+      return torch::kInt32;
+    else if (dtype == "float32")
+      return torch::kFloat32;
+    else if (dtype == "float64")
+      return torch::kFloat64;
+    else
+      throw std::runtime_error("Unsupported dtype");
+  }();
+  return c10::scalarTypeToTypeMeta(tgt_dtype);
+}
+
 torch::Tensor convert_to_tensor(
     sox_sample_t* buffer,
     const int32_t num_samples,
@@ -320,9 +338,6 @@ uint64_t read_fileobj(py::object* fileobj, const uint64_t size, char* buffer) {
           << "The given object does not confirm to read protocol of file object.";
       throw std::runtime_error(message.str());
     }
-
-    std::cerr << "req: " << request << ", fetched: " << chunk_len << std::endl;
-    std::cerr << "buffer: " << (void*)buffer << std::endl;
     memcpy(buffer, chunk.data(), chunk_len);
     buffer += chunk_len;
     num_read += chunk_len;

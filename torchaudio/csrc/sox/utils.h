@@ -68,6 +68,8 @@ caffe2::TypeMeta get_dtype(
     const sox_encoding_t encoding,
     const unsigned precision);
 
+caffe2::TypeMeta get_dtype_from_str(const std::string dtype);
+
 ///
 /// Convert sox_sample_t buffer to uint8/int16/int32/float32 Tensor
 /// NOTE: This function might modify the values in the input buffer to
