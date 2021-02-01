@@ -103,13 +103,29 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
 
         self.assertEqual(x2, spec)
 
-
-    def _check_top_db(self, spec):
+    @parameterized.expand([
+        ([100, 100],),
+        ([2, 100, 100],),
+        ([2, 2, 100, 100],),
+    ])
+    def test_top_db_clamp(self, shape):
+        """Ensure values are properly clamped when `top_db` is supplied."""
         amplitude_mult = 20.
         amin = 1e-10
         ref = 1.0
         db_mult = math.log10(max(amin, ref))
         top_db = 40.
+
+        torch.manual_seed(0)
+        # A random tensor is used for increased entropy, but the max and min for
+        # each spectrogram still need to be predictable. The min determines the
+        # decibel cutoff, and the max must be large enough that it gets clamped.
+        spec = torch.rand(*shape)
+        # Bring each spectrogram into the range (0, 1)
+        spec -= spec.amin([-2, -1])[..., None, None]
+        spec /= spec.amax([-2, -1])[..., None, None]
+        # Expand the range to (0, 200) - wide enough to properly test clamping.
+        spec *= 200
 
         decibels = F.amplitude_to_DB(spec, amplitude_mult, amin,
                                      db_mult, top_db=top_db)
@@ -119,32 +135,6 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
                 below_limit.sum().item(), decibels
             )
         )
-
-    def test_top_db_batch(self):
-        torch.manual_seed(0)
-        spec = torch.rand([1, 2, 100, 100]) * 200
-        # Predictability
-        spec[0, 0, 1] = 0
-        spec[0, 0, 0] = 200
-        self._check_top_db(spec)
-
-    def test_top_db_3dims(self):
-        """Test on a spectrogram with no batch dimension."""
-        torch.manual_seed(0)
-        spec = torch.rand([1, 2, 100, 100]) * 200
-        # Predictability
-        spec[0, 0, 1] = 0
-        spec[0, 0, 0] = 200
-        self._check_top_db(spec[0])
-
-    def test_top_db_2dims(self):
-        """Test on a spectrogram with no batch or channel dimensions."""
-        torch.manual_seed(0)
-        spec = torch.rand([1, 2, 100, 100]) * 200
-        # Predictability
-        spec[0, 0, 1] = 0
-        spec[0, 0, 0] = 200
-        self._check_top_db(spec[0][0])
 
 
 @pytest.mark.parametrize('complex_tensor', [
