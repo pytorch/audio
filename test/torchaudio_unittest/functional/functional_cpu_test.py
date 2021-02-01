@@ -118,8 +118,9 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
 
         torch.manual_seed(0)
         # A random tensor is used for increased entropy, but the max and min for
-        # each spectrogram still need to be predictable. The min determines the
-        # decibel cutoff, and the max must be large enough that it gets clamped.
+        # each spectrogram still need to be predictable. The max determines the
+        # decibel cutoff, and the distance from the min must be large enough
+        # that it triggers a clamp.
         spec = torch.rand(*shape)
         # Ensure each spectrogram has a min of 0 and a max of 1.
         spec -= spec.amin([-2, -1])[..., None, None]
