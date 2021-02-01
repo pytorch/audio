@@ -43,7 +43,6 @@ class AudioFolder(Dataset):
         self._new_sample_rate = new_sample_rate
         self._label = label
 
-        #walker = torchaudio.datasets.utils.walk_files(self._path, suffix=suffix, prefix=True)
         walker = sorted(str(p) for p in Path(self._path).glob(f'{pattern}{suffix}'))
         self._walker = list(walker)
 
