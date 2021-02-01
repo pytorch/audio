@@ -77,7 +77,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         ([2, 2, 100, 100],),
     ])
     def test_reversible(self, shape):
-        """Check `amplitude_to_db` returns the original when reversed.
+        """Round trip between amplitude and db should return the original for various shape
 
         This implicitly also tests `DB_to_amplitude`.
 
