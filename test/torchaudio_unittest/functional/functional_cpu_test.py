@@ -71,7 +71,12 @@ class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
 
 
 class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
-    def _ensure_reversible(self, spec):
+    @parameterized.expand([
+        ([100, 100],),
+        ([2, 100, 100],),
+        ([2, 2, 100, 100],),
+    ])
+    def test_reversible(self, shape):
         """Check `amplitude_to_db` returns the original when reversed.
 
         This implicitly also tests `DB_to_amplitude`.
@@ -82,6 +87,9 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         amin = 1e-10
         ref = 1.0
         db_mult = math.log10(max(amin, ref))
+
+        torch.manual_seed(0)
+        spec = torch.rand(*shape) * 200
 
         # Spectrogram amplitude -> DB -> amplitude
         db = F.amplitude_to_DB(spec, amplitude_mult, amin, db_mult, top_db=None)
@@ -95,22 +103,6 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
 
         self.assertEqual(x2, spec)
 
-    def test_amplitude_to_DB_batch(self):
-        torch.manual_seed(0)
-        spec = torch.rand([2, 2, 100, 100]) * 200
-        self._ensure_reversible(spec)
-
-    def test_amplitude_to_DB_3dims(self):
-        """Test on a spectrogram with no batch dimension."""
-        torch.manual_seed(0)
-        spec = torch.rand([2, 100, 100]) * 200
-        self._ensure_reversible(spec)
-
-    def test_amplitude_to_DB_2dims(self):
-        """Test on a spectrogram with no batch or channel dimensions."""
-        torch.manual_seed(0)
-        spec = torch.rand([100, 100]) * 200
-        self._ensure_reversible(spec)
 
     def _check_top_db(self, spec):
         amplitude_mult = 20.
