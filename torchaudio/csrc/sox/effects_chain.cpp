@@ -60,7 +60,6 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   auto tensor = std::get<0>(*signal);
   auto num_channels = effp->out_signal.channels;
 
-
   // Adjust the number of samples to read
   const size_t num_samples = tensor.numel();
   if (index + *osamp > num_samples) {
@@ -195,7 +194,8 @@ void SoxEffectsChain::run() {
   sox_flow_effects(sec_, NULL, NULL);
 }
 
-void SoxEffectsChain::addInputTensor(std::tuple<torch::Tensor, int64_t>* signal,
+void SoxEffectsChain::addInputTensor(
+    std::tuple<torch::Tensor, int64_t>* signal,
     bool channels_first) {
   in_sig_ = get_signalinfo(signal, "wav", channels_first);
   interm_sig_ = in_sig_;
