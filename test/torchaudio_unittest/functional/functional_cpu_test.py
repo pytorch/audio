@@ -121,7 +121,7 @@ class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
         # each spectrogram still need to be predictable. The min determines the
         # decibel cutoff, and the max must be large enough that it gets clamped.
         spec = torch.rand(*shape)
-        # Bring each spectrogram into the range (0, 1)
+        # Ensure each spectrogram has a min of 0 and a max of 1.
         spec -= spec.amin([-2, -1])[..., None, None]
         spec /= spec.amax([-2, -1])[..., None, None]
         # Expand the range to (0, 200) - wide enough to properly test clamping.
