@@ -60,7 +60,7 @@ def apply_effects_tensor(
 
     Note:
         This function works in the way very similar to ``sox`` command, however there are slight
-        differences. For example, ``sox`` commnad adds certain effects automatically (such as
+        differences. For example, ``sox`` command adds certain effects automatically (such as
         ``rate`` effect after ``speed`` and ``pitch`` and other effects), but this function does
         only applies the given effects. (Therefore, to actually apply ``speed`` effect, you also
         need to give ``rate`` effect with desired sampling rate.)

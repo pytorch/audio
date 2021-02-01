@@ -68,7 +68,7 @@ std::tuple<torch::Tensor, int64_t> apply_effects_tensor(
   out_buffer.reserve(in_tensor.numel());
 
   // Build and run effects chain
-  chain.addInputTensor(input_signal, channels_first.value());
+  chain.addInputTensor(&input_signal, channels_first.value());
   for (const auto& effect : effects) {
     chain.addEffect(effect);
   }
@@ -84,8 +84,6 @@ std::tuple<torch::Tensor, int64_t> apply_effects_tensor(
       /*noramlize=*/false,
       channels_first.value());
 
-  //return c10::make_intrusive<std::tuple<torch::Tensor, int64_t>>(
-  //    out_tensor, chain.getOutputSampleRate());
   return std::tuple<torch::Tensor, int64_t>(
       out_tensor, chain.getOutputSampleRate());
 }

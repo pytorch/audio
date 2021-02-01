@@ -123,7 +123,7 @@ void save_audio_file(
         num_channels == 1, "amr-nb format only supports single channel audio.");
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
-  const auto signal_info = get_signalinfo(signal, filetype, channels_first);
+  const auto signal_info = get_signalinfo(&signal, filetype, channels_first);
   const auto encoding_info =
       get_encodinginfo(filetype, tensor.dtype(), compression);
 
@@ -142,7 +142,7 @@ void save_audio_file(
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
       /*input_encoding=*/get_encodinginfo("wav", tensor.dtype()),
       /*output_encoding=*/sf->encoding);
-  chain.addInputTensor(signal, channels_first);
+  chain.addInputTensor(&signal, channels_first);
   chain.addOutputFile(sf);
   chain.run();
 }
@@ -252,7 +252,7 @@ void save_audio_fileobj(
     }
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
-  const auto signal_info = get_signalinfo(signal, filetype, channels_first);
+  const auto signal_info = get_signalinfo(&signal, filetype, channels_first);
   const auto encoding_info =
       get_encodinginfo(filetype, tensor.dtype(), compression);
 
@@ -274,7 +274,7 @@ void save_audio_fileobj(
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
       /*input_encoding=*/get_encodinginfo("wav", tensor.dtype()),
       /*output_encoding=*/sf->encoding);
-  chain.addInputTensor(signal, channels_first);
+  chain.addInputTensor(&signal, channels_first);
   chain.addOutputFileObj(sf, &buffer.ptr, &buffer.size, &fileobj);
   chain.run();
 
@@ -298,14 +298,7 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
 
   m.def("torchaudio::sox_io_get_info", &torchaudio::sox_io::get_info_file);
   m.def(
-      "torchaudio::sox_io_load_audio_file("
-      "str path,"
-      "int? frame_offset=None,"
-      "int? num_frames=None,"
-      "bool? normalize=True,"
-      "bool? channels_first=False,"
-      "str? format=None"
-      ") -> __torch__.torch.classes.torchaudio.TensorSignal",
+      "torchaudio::sox_io_load_audio_file",
       &torchaudio::sox_io::load_audio_file);
   m.def(
       "torchaudio::sox_io_save_audio_file",

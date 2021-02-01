@@ -61,24 +61,6 @@ std::vector<std::string> list_read_formats() {
   return formats;
 }
 
-TensorSignal::TensorSignal(
-    torch::Tensor tensor_,
-    int64_t sample_rate_,
-    bool channels_first_)
-    : tensor(tensor_),
-      sample_rate(sample_rate_),
-      channels_first(channels_first_){};
-
-torch::Tensor TensorSignal::getTensor() const {
-  return tensor;
-}
-int64_t TensorSignal::getSampleRate() const {
-  return sample_rate;
-}
-bool TensorSignal::getChannelsFirst() const {
-  return channels_first;
-}
-
 SoxFormat::SoxFormat(sox_format_t* fd) noexcept : fd_(fd) {}
 SoxFormat::~SoxFormat() {
   close();
@@ -279,14 +261,14 @@ unsigned get_precision(
 }
 
 sox_signalinfo_t get_signalinfo(
-    const std::tuple<torch::Tensor, int64_t> signal,
+    const std::tuple<torch::Tensor, int64_t>* signal,
     const std::string filetype,
     bool channels_first) {
-  auto tensor = std::get<0>(signal);
+  auto tensor = std::get<0>(*signal);
   return sox_signalinfo_t{
-      /*rate=*/static_cast<sox_rate_t>(std::get<1>(signal)),
+      /*rate=*/static_cast<sox_rate_t>(std::get<1>(*signal)),
       /*channels=*/
-      static_cast<unsigned>(channels_first),
+      static_cast<unsigned>(tensor.size(channels_first ? 0 : 1)),
       /*precision=*/get_precision(filetype, tensor.dtype()),
       /*length=*/static_cast<uint64_t>(tensor.numel())};
 }

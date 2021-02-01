@@ -30,7 +30,9 @@ class SoxEffectsChain {
   SoxEffectsChain& operator=(SoxEffectsChain&& other) = delete;
   ~SoxEffectsChain();
   void run();
-  void addInputTensor(std::tuple<torch::Tensor, int64_t> signal, bool channels_first);
+  void addInputTensor(
+      std::tuple<torch::Tensor, int64_t>* signal,
+      bool channels_first);
   void addInputFile(sox_format_t* sf);
   void addOutputBuffer(std::vector<sox_sample_t>* output_buffer);
   void addOutputFile(sox_format_t* sf);

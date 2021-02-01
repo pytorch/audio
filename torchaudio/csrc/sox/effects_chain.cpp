@@ -36,13 +36,12 @@ struct SoxEffect {
 /// helper classes for passing the location of input tensor and output buffer
 ///
 /// drain/flow callback functions require plaing C style function signature and
-/// the way to pass extra data is to attach data to sox_fffect_t::priv pointer.
-/// The following structs will be assigned to sox_fffect_t::priv pointer which
+/// the way to pass extra data is to attach data to sox_effect_t::priv pointer.
+/// The following structs will be assigned to sox_effect_t::priv pointer which
 /// gives sox_effect_t an access to input Tensor and output buffer object.
 struct TensorInputPriv {
   size_t index;
-  //TensorSignal* signal;
-  std::tuple<torch::Tensor, int64_t> signal;
+  std::tuple<torch::Tensor, int64_t>* signal;
   bool channels_first;
 };
 struct TensorOutputPriv {
@@ -58,8 +57,9 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   auto priv = static_cast<TensorInputPriv*>(effp->priv);
   auto index = priv->index;
   auto signal = priv->signal;
-  auto tensor = std::get<0>(signal);
+  auto tensor = std::get<0>(*signal);
   auto num_channels = effp->out_signal.channels;
+
 
   // Adjust the number of samples to read
   const size_t num_samples = tensor.numel();
@@ -195,7 +195,7 @@ void SoxEffectsChain::run() {
   sox_flow_effects(sec_, NULL, NULL);
 }
 
-void SoxEffectsChain::addInputTensor(std::tuple<torch::Tensor, int64_t> signal,
+void SoxEffectsChain::addInputTensor(std::tuple<torch::Tensor, int64_t>* signal,
     bool channels_first) {
   in_sig_ = get_signalinfo(signal, "wav", channels_first);
   interm_sig_ = in_sig_;
