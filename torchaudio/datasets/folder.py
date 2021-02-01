@@ -5,9 +5,11 @@ from torch.utils.data import Dataset
 from torch import Tensor
 from torchaudio.datasets.utils import walk_files
 
-def load_audio_item(filepath: str, path: str) -> Tuple[Tensor, int, str, str]:
+def load_audio_item(filepath: str, path: str, label_name: str) -> Tuple[Tensor, int, str, str]:
     relpath = os.path.relpath(filepath, path)
     label, filename = os.path.split(relpath)
+    if label_name is not None:
+        label = label_name
     waveform, sample_rate = torchaudio.load(filepath)
     return waveform, sample_rate, label, filename
 
@@ -31,13 +33,16 @@ class AudioFolder(Dataset):
             self,
             root: str,
             suffix: str = ".wav",
-            transform: Optional[Callable] = None,
-            target_transform: Optional[Callable] = None,
-            loader: Optional[Callable] = None,
-            is_valid_file: Optional[Callable] = None
+            new_sample_rate: int = None,
+            spectrogram_transform: bool = False,
+            label_name: str = None
         ):
         
         self._path = root
+        self._spectrogram_transform = spectrogram_transform
+        self._new_sample_rate = new_sample_rate
+        self._label_name = label_name
+
         walker = walk_files(self._path, suffix=suffix, prefix=True)
         self._walker = list(walker)
 
@@ -51,17 +56,16 @@ class AudioFolder(Dataset):
             tuple: ``(waveform, sample_rate, label, filename)``
         """
         fileid = self._walker[n]
-        return load_audio_item(fileid, self._path)
-        
 
-        #path, target = self.samples[index]
-        #sample = self.loader(path)
-        #if self.transform is not None:
-        #    sample = self.transform(sample)
-        #if self.target_transform is not None:
-        #    target = self.target_transform(target)
+        waveform, sample_rate, label, filename =  load_audio_item(fileid, self._path, self._label_name)
 
-        #return sample, target
+        if self._new_sample_rate is not None:
+            waveform = torchaudio.transforms.Resample(sample_rate, self._new_sample_rate)(waveform)
+            sample_rate = self._new_sample_rate
+        if self._spectrogram_transform is not None:
+           waveform = torchaudio.transforms.Spectrogram()(waveform)
+
+        return waveform, sample_rate, label, filename
 
 
 
