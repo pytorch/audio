@@ -335,7 +335,17 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   //     |**********|-----------------|++++++++++++|
   //                ^ ftell
 
-  const auto num_consumed = sf->tell_off;
+  // NOTE:
+  //   Do not use `sf->tell_off` here. Presumably, `tell_off` and `fseek` are
+  //   supposed to be in sync, but there are cases (Vorbis) they are not
+  //   in sync and `tell_off` has seemingly uninitialized value, which
+  //   leads num_remain to be negative and cause segmentation fault
+  //   in `memmove`.
+  const auto num_consumed = ftell((FILE*)sf->fp);
+  if (num_consumed > priv->buffer_size) {
+    throw std::runtime_error("Internal Error: buffer overrun.");
+  }
+
   const auto num_remain = priv->buffer_size - num_consumed;
 
   // 1.1. Fetch the data to see if there is data to fill the buffer
