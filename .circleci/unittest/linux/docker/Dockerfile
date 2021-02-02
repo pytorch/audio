@@ -45,14 +45,11 @@ RUN apt update && apt install -y \
         gfortran \
         git \
         libatlas3-base \
+        libsndfile1 \
         wget \
         curl \
         make \
         file \
-        sox \
-        libsox-dev \
-        libsox-fmt-all \
-        cmake \
         pkg-config \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /kaldi /kaldi

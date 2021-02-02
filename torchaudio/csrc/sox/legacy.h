@@ -1,7 +1,8 @@
 #include <sox.h>
 #include <torch/torch.h>
 
-namespace torch { namespace audio {
+namespace torch {
+namespace audio {
 
 /// Reads an audio file from the given `path` into the `output` `Tensor` and
 /// returns the sample rate of the audio file.
@@ -30,9 +31,10 @@ void write_audio_file(
 
 /// Reads an audio file from the given `path` and returns a tuple of
 /// sox_signalinfo_t and sox_encodinginfo_t, which contain information about
-/// the audio file such as sample rate, length, bit precision, encoding and more.
-/// Throws `std::runtime_error` if the audio file could not be opened, or an
-/// error occurred during reading of the audio data.
+/// the audio file such as sample rate, length, bit precision, encoding and
+/// more. Throws `std::runtime_error` if the audio file could not be opened, or
+/// an error occurred during reading of the audio data.
 std::tuple<sox_signalinfo_t, sox_encodinginfo_t> get_info(
     const std::string& file_name);
-}} // namespace torch::audio
+} // namespace audio
+} // namespace torch

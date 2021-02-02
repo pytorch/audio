@@ -388,29 +388,16 @@ jobs:
   unittest_linux_cpu:
     <<: *binary_common
     docker:
-      - image: "pytorch/torchaudio_unittest_base:manylinux"
+      - image: pytorch/torchaudio_unittest_base:manylinux-20210121
     resource_class: 2xlarge+
     steps:
       - checkout
       - attach_workspace:
           at: third_party
       - designate_upload_channel
-      - generate_cache_key
-      - restore_cache:
-
-          keys:
-            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
-
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
-      - save_cache:
-
-          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
-
-          paths:
-            - conda
-            - env
       - run:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
@@ -430,31 +417,18 @@ jobs:
     resource_class: gpu.small
     environment:
       <<: *environment
-      image_name: "pytorch/torchaudio_unittest_base:manylinux-cuda10.1"
+      image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.1-cudnn7-20210121
     steps:
       - checkout
       - attach_workspace:
           at: third_party
       - designate_upload_channel
-      - generate_cache_key
-      - restore_cache:
-
-          keys:
-            - env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
-
       - run:
           name: Pull Docker image
           command: docker pull --quiet "${image_name}"
       - run:
           name: Setup
           command: docker run -t --gpus all -e PYTHON_VERSION -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
-      - save_cache:
-
-          key: env-v3-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
-
-          paths:
-            - conda
-            - env
       - run:
           name: Install torchaudio
           command: docker run -t --gpus all -e UPLOAD_CHANNEL -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
@@ -474,22 +448,9 @@ jobs:
     steps:
       - checkout
       - designate_upload_channel
-      - generate_cache_key
-      - restore_cache:
-
-          keys:
-            - env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
-
       - run:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
-      - save_cache:
-
-          key: env-v3-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
-
-          paths:
-            - conda
-            - env
       - run:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
@@ -512,22 +473,9 @@ jobs:
     steps:
       - checkout
       - designate_upload_channel
-      - generate_cache_key
-      - restore_cache:
-
-          keys:
-            - env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
-
       - run:
           name: Setup
           command: .circleci/unittest/windows/scripts/setup_env.sh
-      - save_cache:
-
-          key: env-v1-windows-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/windows/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
-
-          paths:
-            - conda
-            - env
       - run:
           name: Install torchaudio
           command: .circleci/unittest/windows/scripts/install.sh
@@ -551,22 +499,9 @@ jobs:
       - attach_workspace:
           at: third_party
       - designate_upload_channel
-      - generate_cache_key
-      - restore_cache:
-
-          keys:
-            - env-v3-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
-
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
-      - save_cache:
-
-          key: env-v3-macos-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum "third_party/CMakeLists.txt" }}-{{ checksum ".cachekey" }}
-
-          paths:
-            - conda
-            - env
       - run:
           name: Install torchaudio
           command: .circleci/unittest/linux/scripts/install.sh
@@ -587,61 +522,13 @@ jobs:
     steps:
       - checkout
       - designate_upload_channel
-      - generate_cache_key
-      - restore_cache:
-
-          keys:
-            - env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
-
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
-      - save_cache:
-
-          key: env-v2-linux-{{ arch }}-py<< parameters.python_version >>-{{ checksum ".circleci/unittest/linux/scripts/setup_env.sh" }}-{{ checksum ".cachekey" }}
-
-          paths:
-            - conda
-            - env
       - run:
           name: Run style check
           command: .circleci/unittest/linux/scripts/run_style_checks.sh
 
-  torchscript_bc_test:
-    docker:
-      - image: "pytorch/torchaudio_unittest_base:manylinux"
-    resource_class: large
-    steps:
-      - checkout
-      - generate_cache_key
-      - restore_cache:
-
-          keys:
-            - torchscript-bc-test-release-envs-v1-{{ arch }}-{{ checksum ".cachekey" }}
-
-      - run:
-          name: Generate Objects
-          command: |
-             .circleci/torchscript_bc_test/setup_release_envs.sh
-             .circleci/torchscript_bc_test/generate_objects.sh
-      - save_cache:
-
-          key: torchscript-bc-test-release-envs-v1-{{ arch }}-{{ checksum ".cachekey" }}
-
-          paths:
-            - conda
-            - envs
-      - store_artifacts:
-          path: test/torchscript_bc_test/assets
-      - persist_to_workspace:
-          root: .
-          paths:
-            - test/torchscript_bc_test/assets
-      - run:
-          name: Run BC check test
-          command: |
-            .circleci/torchscript_bc_test/setup_master_envs.sh
-            .circleci/torchscript_bc_test/validate_objects.sh
   build_docs:
     <<: *binary_common
     docker:
@@ -793,9 +680,6 @@ workflows:
           - build_docs
   unittest:
     jobs:
-      - torchscript_bc_test:
-          requires:
-          - download_third_parties_nix
       - download_third_parties_nix:
           name: download_third_parties_nix
       - unittest_linux_cpu:

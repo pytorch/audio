@@ -535,6 +535,20 @@ class Functional(common_utils.TestBaseMixin):
 
         self._assert_consistency(func, waveform)
 
+    def test_spectral_centroid(self):
+
+        def func(tensor):
+            sample_rate = 44100
+            n_fft = 400
+            ws = 400
+            hop = 200
+            pad = 0
+            window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
+            return F.spectral_centroid(tensor, sample_rate, pad, window, n_fft, hop, ws)
+
+        tensor = common_utils.get_whitenoise(sample_rate=44100)
+        self._assert_consistency(func, tensor)
+
 
 class Transforms(common_utils.TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
@@ -624,3 +638,8 @@ class Transforms(common_utils.TestBaseMixin):
         filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
         waveform, sample_rate = common_utils.load_wav(filepath)
         self._assert_consistency(T.Vad(sample_rate=sample_rate), waveform)
+
+    def test_SpectralCentroid(self):
+        sample_rate = 44100
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
+        self._assert_consistency(T.SpectralCentroid(sample_rate=sample_rate), waveform)

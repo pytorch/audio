@@ -28,6 +28,7 @@ __all__ = [
     'TimeMasking',
     'SlidingWindowCmn',
     'Vad',
+    'SpectralCentroid',
 ]
 
 
@@ -46,6 +47,13 @@ class Spectrogram(torch.nn.Module):
             If None, then the complex spectrum is returned instead. (Default: ``2``)
         normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
+        center (bool, optional): whether to pad :attr:`waveform` on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            Default: ``True``
+        pad_mode (string, optional): controls the padding method used when
+            :attr:`center` is ``True``. Default: ``"reflect"``
+        onesided (bool, optional): controls whether to return half of results to
+            avoid redundancy Default: ``True``
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -57,7 +65,10 @@ class Spectrogram(torch.nn.Module):
                  window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: Optional[float] = 2.,
                  normalized: bool = False,
-                 wkwargs: Optional[dict] = None) -> None:
+                 wkwargs: Optional[dict] = None,
+                 center: bool = True,
+                 pad_mode: str = "reflect",
+                 onesided: bool = True) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -69,6 +80,9 @@ class Spectrogram(torch.nn.Module):
         self.pad = pad
         self.power = power
         self.normalized = normalized
+        self.center = center
+        self.pad_mode = pad_mode
+        self.onesided = onesided
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -80,8 +94,19 @@ class Spectrogram(torch.nn.Module):
             ``n_fft // 2 + 1`` where ``n_fft`` is the number of
             Fourier bins, and time is the number of window hops (n_frame).
         """
-        return F.spectrogram(waveform, self.pad, self.window, self.n_fft, self.hop_length,
-                             self.win_length, self.power, self.normalized)
+        return F.spectrogram(
+            waveform,
+            self.pad,
+            self.window,
+            self.n_fft,
+            self.hop_length,
+            self.win_length,
+            self.power,
+            self.normalized,
+            self.center,
+            self.pad_mode,
+            self.onesided
+        )
 
 
 class GriffinLim(torch.nn.Module):
@@ -386,6 +411,13 @@ class MelSpectrogram(torch.nn.Module):
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
+        center (bool, optional): whether to pad :attr:`waveform` on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            Default: ``True``
+        pad_mode (string, optional): controls the padding method used when
+            :attr:`center` is ``True``. Default: ``"reflect"``
+        onesided (bool, optional): controls whether to return half of results to
+            avoid redundancy. Default: ``True``
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
@@ -405,7 +437,10 @@ class MelSpectrogram(torch.nn.Module):
                  window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: Optional[float] = 2.,
                  normalized: bool = False,
-                 wkwargs: Optional[dict] = None) -> None:
+                 wkwargs: Optional[dict] = None,
+                 center: bool = True,
+                 pad_mode: str = "reflect",
+                 onesided: bool = True) -> None:
         super(MelSpectrogram, self).__init__()
         self.sample_rate = sample_rate
         self.n_fft = n_fft
@@ -420,7 +455,8 @@ class MelSpectrogram(torch.nn.Module):
         self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
                                        hop_length=self.hop_length,
                                        pad=self.pad, window_fn=window_fn, power=self.power,
-                                       normalized=self.normalized, wkwargs=wkwargs)
+                                       normalized=self.normalized, wkwargs=wkwargs,
+                                       center=center, pad_mode=pad_mode, onesided=onesided)
         self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1)
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -1037,3 +1073,55 @@ class Vad(torch.nn.Module):
             hp_lifter_freq=self.hp_lifter_freq,
             lp_lifter_freq=self.lp_lifter_freq,
         )
+
+
+class SpectralCentroid(torch.nn.Module):
+    r"""Compute the spectral centroid for each channel along the time axis.
+
+    The spectral centroid is defined as the weighted average of the
+    frequency values, weighted by their magnitude.
+
+    Args:
+        sample_rate (int): Sample rate of audio signal.
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
+        win_length (int or None, optional): Window size. (Default: ``n_fft``)
+        hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
+        pad (int, optional): Two sided padding of signal. (Default: ``0``)
+        window_fn (Callable[..., Tensor], optional): A function to create a window tensor
+            that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
+
+    Example
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
+        >>> spectral_centroid = transforms.SpectralCentroid(sample_rate)(waveform)  # (channel, time)
+    """
+    __constants__ = ['sample_rate', 'n_fft', 'win_length', 'hop_length', 'pad']
+
+    def __init__(self,
+                 sample_rate: int,
+                 n_fft: int = 400,
+                 win_length: Optional[int] = None,
+                 hop_length: Optional[int] = None,
+                 pad: int = 0,
+                 window_fn: Callable[..., Tensor] = torch.hann_window,
+                 wkwargs: Optional[dict] = None) -> None:
+        super(SpectralCentroid, self).__init__()
+        self.sample_rate = sample_rate
+        self.n_fft = n_fft
+        self.win_length = win_length if win_length is not None else n_fft
+        self.hop_length = hop_length if hop_length is not None else self.win_length // 2
+        window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
+        self.register_buffer('window', window)
+        self.pad = pad
+
+    def forward(self, waveform: Tensor) -> Tensor:
+        r"""
+        Args:
+            waveform (Tensor): Tensor of audio of dimension (..., time).
+
+        Returns:
+            Tensor: Spectral Centroid of size (..., time).
+        """
+
+        return F.spectral_centroid(waveform, self.sample_rate, self.pad, self.window, self.n_fft, self.hop_length,
+                                   self.win_length)

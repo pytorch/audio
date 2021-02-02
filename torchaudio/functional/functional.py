@@ -27,6 +27,7 @@ __all__ = [
     'mask_along_axis',
     'mask_along_axis_iid',
     'sliding_window_cmn',
+    "spectral_centroid",
 ]
 
 
@@ -38,7 +39,10 @@ def spectrogram(
         hop_length: int,
         win_length: int,
         power: Optional[float],
-        normalized: bool
+        normalized: bool,
+        center: bool = True,
+        pad_mode: str = "reflect",
+        onesided: bool = True
 ) -> Tensor:
     r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
@@ -54,6 +58,13 @@ def spectrogram(
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
             If None, then the complex spectrum is returned instead.
         normalized (bool): Whether to normalize by magnitude after stft
+        center (bool, optional): whether to pad :attr:`waveform` on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            Default: ``True``
+        pad_mode (string, optional): controls the padding method used when
+            :attr:`center` is ``True``. Default: ``"reflect"``
+        onesided (bool, optional): controls whether to return half of results to
+            avoid redundancy. Default: ``True``
 
     Returns:
         Tensor: Dimension (..., freq, time), freq is
@@ -76,10 +87,10 @@ def spectrogram(
         hop_length=hop_length,
         win_length=win_length,
         window=window,
-        center=True,
-        pad_mode="reflect",
+        center=center,
+        pad_mode=pad_mode,
         normalized=False,
-        onesided=True,
+        onesided=onesided,
         return_complex=True,
     )
 
@@ -935,3 +946,38 @@ def sliding_window_cmn(
     if len(input_shape) == 2:
         cmn_waveform = cmn_waveform.squeeze(0)
     return cmn_waveform
+
+
+def spectral_centroid(
+        waveform: Tensor,
+        sample_rate: int,
+        pad: int,
+        window: Tensor,
+        n_fft: int,
+        hop_length: int,
+        win_length: int,
+) -> Tensor:
+    r"""
+    Compute the spectral centroid for each channel along the time axis.
+
+    The spectral centroid is defined as the weighted average of the
+    frequency values, weighted by their magnitude.
+
+    Args:
+        waveform (Tensor): Tensor of audio of dimension (..., time)
+        sample_rate (int): Sample rate of the audio waveform
+        pad (int): Two sided padding of signal
+        window (Tensor): Window tensor that is applied/multiplied to each frame/window
+        n_fft (int): Size of FFT
+        hop_length (int): Length of hop between STFT windows
+        win_length (int): Window size
+
+    Returns:
+        Tensor: Dimension (..., time)
+    """
+    specgram = spectrogram(waveform, pad=pad, window=window, n_fft=n_fft, hop_length=hop_length,
+                           win_length=win_length, power=1., normalized=False)
+    freqs = torch.linspace(0, sample_rate // 2, steps=1 + n_fft // 2,
+                           device=specgram.device).reshape((-1, 1))
+    freq_dim = -2
+    return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)

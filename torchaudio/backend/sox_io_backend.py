@@ -1,4 +1,5 @@
 import os
+import warnings
 from typing import Tuple, Optional
 
 import torch
@@ -10,6 +11,24 @@ import torchaudio
 from .common import AudioMetaData
 
 
+@torch.jit.unused
+def _info(
+        filepath: str,
+        format: Optional[str] = None,
+) -> AudioMetaData:
+    if hasattr(filepath, 'read'):
+        sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
+        return AudioMetaData(*sinfo)
+    sinfo = torch.ops.torchaudio.sox_io_get_info(os.fspath(filepath), format)
+    return AudioMetaData(
+        sinfo.get_sample_rate(),
+        sinfo.get_num_frames(),
+        sinfo.get_num_channels(),
+        sinfo.get_bits_per_sample(),
+        sinfo.get_encoding(),
+    )
+
+
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def info(
         filepath: str,
@@ -18,9 +37,21 @@ def info(
     """Get signal information of an audio file.
 
     Args:
-        filepath (str or pathlib.Path):
-            Path to audio file. This function also handles ``pathlib.Path`` objects,
-            but is annotated as ``str`` for TorchScript compatibility.
+        filepath (path-like object or file-like object):
+            Source of audio data. When the function is not compiled by TorchScript,
+            (e.g. ``torch.jit.script``), the following types are accepted;
+                  * ``path-like``: file path
+                  * ``file-like``: Object with ``read(size: int) -> bytes`` method,
+                    which returns byte string of at most ``size`` length.
+            When the function is compiled by TorchScript, only ``str`` type is allowed.
+
+            Note:
+                  * When the input type is file-like object, this function cannot
+                    get the correct length (``num_samples``) for certain formats,
+                    such as ``mp3`` and ``vorbis``.
+                    In this case, the value of ``num_samples`` is ``0``.
+                  * This argument is intentionally annotated as ``str`` only due to
+                    TorchScript compiler compatibility.
         format (str, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
@@ -29,10 +60,15 @@ def info(
     Returns:
         AudioMetaData: Metadata of the given audio.
     """
-    # Cast to str in case type is `pathlib.Path`
-    filepath = str(filepath)
+    if not torch.jit.is_scripting():
+        return _info(filepath, format)
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
-    return AudioMetaData(sinfo.get_sample_rate(), sinfo.get_num_frames(), sinfo.get_num_channels())
+    return AudioMetaData(
+        sinfo.get_sample_rate(),
+        sinfo.get_num_frames(),
+        sinfo.get_num_channels(),
+        sinfo.get_bits_per_sample(),
+        sinfo.get_encoding())
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -142,15 +178,16 @@ def _save(
         channels_first: bool = True,
         compression: Optional[float] = None,
         format: Optional[str] = None,
+        dtype: Optional[str] = None,
 ):
     if hasattr(filepath, 'write'):
         if format is None:
             raise RuntimeError('`format` is required when saving to file object.')
         torchaudio._torchaudio.save_audio_fileobj(
-            filepath, src, sample_rate, channels_first, compression, format)
+            filepath, src, sample_rate, channels_first, compression, format, dtype)
     else:
         torch.ops.torchaudio.sox_io_save_audio_file(
-            os.fspath(filepath), src, sample_rate, channels_first, compression, format)
+            os.fspath(filepath), src, sample_rate, channels_first, compression, format, dtype)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -161,6 +198,7 @@ def save(
         channels_first: bool = True,
         compression: Optional[float] = None,
         format: Optional[str] = None,
+        dtype: Optional[str] = None,
 ):
     """Save audio data to file.
 
@@ -207,12 +245,22 @@ def save(
         format (str, optional):
             Output audio format. This is required when the output audio format cannot be infered from
             ``filepath``, (such as file extension or ``name`` attribute of the given file object).
+        dtype (str, optional)
+            Output tensor dtype.
+            Valid values: ``"uint8", "int16", "int32", "float32", "float64", None``
+            ``dtype=None`` means no conversion is performed.
+            ``dtype`` parameter is only effective for ``float32`` Tensor.
     """
+    if src.dtype == torch.float32 and dtype is None:
+        warnings.warn(
+            '`dtype` default value will be changed to `int16` in 0.9 release.'
+            'Specify `dtype` to suppress this warning.'
+        )
     if not torch.jit.is_scripting():
-        _save(filepath, src, sample_rate, channels_first, compression, format)
+        _save(filepath, src, sample_rate, channels_first, compression, format, dtype)
         return
     torch.ops.torchaudio.sox_io_save_audio_file(
-        filepath, src, sample_rate, channels_first, compression, format)
+        filepath, src, sample_rate, channels_first, compression, format, dtype)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
