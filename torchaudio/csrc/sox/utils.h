@@ -30,23 +30,6 @@ std::vector<std::string> list_read_formats();
 
 std::vector<std::string> list_write_formats();
 
-/// Class for exchanging signal infomation (tensor + meta data) between
-/// C++ and Python for read/write operation.
-struct TensorSignal : torch::CustomClassHolder {
-  torch::Tensor tensor;
-  int64_t sample_rate;
-  bool channels_first;
-
-  TensorSignal(
-      torch::Tensor tensor_,
-      int64_t sample_rate_,
-      bool channels_first_);
-
-  torch::Tensor getTensor() const;
-  int64_t getSampleRate() const;
-  bool getChannelsFirst() const;
-};
-
 ////////////////////////////////////////////////////////////////////////////////
 // Utilities for sox_io / sox_effects implementations
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,8 +103,10 @@ const std::string get_filetype(const std::string path);
 
 /// Get sox_signalinfo_t for passing a torch::Tensor object.
 sox_signalinfo_t get_signalinfo(
-    const TensorSignal* signal,
-    const std::string filetype);
+    const torch::Tensor* waveform,
+    const int64_t sample_rate,
+    const std::string filetype,
+    const bool channels_first);
 
 /// Get sox_encofinginfo_t for saving audoi file
 sox_encodinginfo_t get_encodinginfo(

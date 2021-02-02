@@ -131,7 +131,7 @@ std::vector<std::vector<std::string>> get_effects(
 
 } // namespace
 
-c10::intrusive_ptr<TensorSignal> load_audio_file(
+std::tuple<torch::Tensor, int64_t> load_audio_file(
     const std::string& path,
     c10::optional<int64_t>& frame_offset,
     c10::optional<int64_t>& num_frames,
@@ -153,7 +153,6 @@ void save_audio_file(
     c10::optional<std::string> dtype) {
   validate_input_tensor(tensor);
 
-  auto signal = TensorSignal(tensor, sample_rate, channels_first);
   if (tensor.dtype() != torch::kFloat32 && dtype.has_value()) {
     throw std::runtime_error(
         "dtype conversion only supported for float32 tensors");
@@ -174,7 +173,8 @@ void save_audio_file(
         num_channels == 1, "amr-nb format only supports single channel audio.");
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
-  const auto signal_info = get_signalinfo(&signal, filetype);
+  const auto signal_info =
+      get_signalinfo(&tensor, sample_rate, filetype, channels_first);
   const auto encoding_info = get_encodinginfo(filetype, tgt_dtype, compression);
 
   SoxFormat sf(sox_open_write(
@@ -192,7 +192,7 @@ void save_audio_file(
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
       /*input_encoding=*/get_encodinginfo("wav", tensor.dtype()),
       /*output_encoding=*/sf->encoding);
-  chain.addInputTensor(&signal);
+  chain.addInputTensor(&tensor, sample_rate, channels_first);
   chain.addOutputFile(sf);
   chain.run();
 }
@@ -294,7 +294,6 @@ void save_audio_fileobj(
     c10::optional<std::string> dtype) {
   validate_input_tensor(tensor);
 
-  auto signal = TensorSignal(tensor, sample_rate, channels_first);
   if (tensor.dtype() != torch::kFloat32 && dtype.has_value()) {
     throw std::runtime_error(
         "dtype conversion only supported for float32 tensors");
@@ -312,7 +311,8 @@ void save_audio_fileobj(
     }
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
-  const auto signal_info = get_signalinfo(&signal, filetype);
+  const auto signal_info =
+      get_signalinfo(&tensor, sample_rate, filetype, channels_first);
   const auto encoding_info = get_encodinginfo(filetype, tgt_dtype, compression);
 
   AutoReleaseBuffer buffer;
@@ -333,7 +333,7 @@ void save_audio_fileobj(
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
       /*input_encoding=*/get_encodinginfo("wav", tensor.dtype()),
       /*output_encoding=*/sf->encoding);
-  chain.addInputTensor(&signal);
+  chain.addInputTensor(&tensor, sample_rate, channels_first);
   chain.addOutputFileObj(sf, &buffer.ptr, &buffer.size, &fileobj);
   chain.run();
 
@@ -345,6 +345,25 @@ void save_audio_fileobj(
 }
 
 #endif // TORCH_API_INCLUDE_EXTENSION_H
+
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+  m.class_<torchaudio::sox_io::SignalInfo>("SignalInfo")
+      .def("get_sample_rate", &torchaudio::sox_io::SignalInfo::getSampleRate)
+      .def("get_num_channels", &torchaudio::sox_io::SignalInfo::getNumChannels)
+      .def("get_num_frames", &torchaudio::sox_io::SignalInfo::getNumFrames)
+      .def(
+          "get_bits_per_sample",
+          &torchaudio::sox_io::SignalInfo::getBitsPerSample)
+      .def("get_encoding", &torchaudio::sox_io::SignalInfo::getEncoding);
+
+  m.def("torchaudio::sox_io_get_info", &torchaudio::sox_io::get_info_file);
+  m.def(
+      "torchaudio::sox_io_load_audio_file",
+      &torchaudio::sox_io::load_audio_file);
+  m.def(
+      "torchaudio::sox_io_save_audio_file",
+      &torchaudio::sox_io::save_audio_file);
+}
 
 } // namespace sox_io
 } // namespace torchaudio

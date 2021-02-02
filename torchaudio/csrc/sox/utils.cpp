@@ -61,24 +61,6 @@ std::vector<std::string> list_read_formats() {
   return formats;
 }
 
-TensorSignal::TensorSignal(
-    torch::Tensor tensor_,
-    int64_t sample_rate_,
-    bool channels_first_)
-    : tensor(tensor_),
-      sample_rate(sample_rate_),
-      channels_first(channels_first_){};
-
-torch::Tensor TensorSignal::getTensor() const {
-  return tensor;
-}
-int64_t TensorSignal::getSampleRate() const {
-  return sample_rate;
-}
-bool TensorSignal::getChannelsFirst() const {
-  return channels_first;
-}
-
 SoxFormat::SoxFormat(sox_format_t* fd) noexcept : fd_(fd) {}
 SoxFormat::~SoxFormat() {
   close();
@@ -297,15 +279,16 @@ unsigned get_precision(
 }
 
 sox_signalinfo_t get_signalinfo(
-    const TensorSignal* signal,
-    const std::string filetype) {
-  auto tensor = signal->getTensor();
+    const torch::Tensor* waveform,
+    const int64_t sample_rate,
+    const std::string filetype,
+    const bool channels_first) {
   return sox_signalinfo_t{
-      /*rate=*/static_cast<sox_rate_t>(signal->getSampleRate()),
+      /*rate=*/static_cast<sox_rate_t>(sample_rate),
       /*channels=*/
-      static_cast<unsigned>(tensor.size(signal->getChannelsFirst() ? 0 : 1)),
-      /*precision=*/get_precision(filetype, tensor.dtype()),
-      /*length=*/static_cast<uint64_t>(tensor.numel())};
+      static_cast<unsigned>(waveform->size(channels_first ? 0 : 1)),
+      /*precision=*/get_precision(filetype, waveform->dtype()),
+      /*length=*/static_cast<uint64_t>(waveform->numel())};
 }
 
 sox_encodinginfo_t get_encodinginfo(
@@ -363,6 +346,28 @@ uint64_t read_fileobj(py::object* fileobj, const uint64_t size, char* buffer) {
 }
 
 #endif // TORCH_API_INCLUDE_EXTENSION_H
+
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+  m.def("torchaudio::sox_utils_set_seed", &torchaudio::sox_utils::set_seed);
+  m.def(
+      "torchaudio::sox_utils_set_verbosity",
+      &torchaudio::sox_utils::set_verbosity);
+  m.def(
+      "torchaudio::sox_utils_set_use_threads",
+      &torchaudio::sox_utils::set_use_threads);
+  m.def(
+      "torchaudio::sox_utils_set_buffer_size",
+      &torchaudio::sox_utils::set_buffer_size);
+  m.def(
+      "torchaudio::sox_utils_list_effects",
+      &torchaudio::sox_utils::list_effects);
+  m.def(
+      "torchaudio::sox_utils_list_read_formats",
+      &torchaudio::sox_utils::list_read_formats);
+  m.def(
+      "torchaudio::sox_utils_list_write_formats",
+      &torchaudio::sox_utils::list_write_formats);
+}
 
 } // namespace sox_utils
 } // namespace torchaudio
