@@ -1,13 +1,20 @@
+import io
 import itertools
 from pathlib import Path
+import tarfile
 
-from torchaudio import sox_effects
 from parameterized import parameterized
+from torchaudio import sox_effects
+from torchaudio._internal import module_utils as _mod_utils
 
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
+    HttpServerMixin,
     PytorchTestCase,
     skipIfNoExtension,
+    skipIfNoModule,
+    skipIfNoExec,
+    get_asset_path,
     get_sinusoid,
     get_wav_data,
     save_wav,
@@ -18,6 +25,10 @@ from .common import (
     load_params,
     name_func,
 )
+
+
+if _mod_utils.is_module_available("requests"):
+    import requests
 
 
 @skipIfNoExtension
@@ -241,5 +252,172 @@ class TestFileFormats(TempDirMixin, PytorchTestCase):
             input_path, effects, channels_first=channels_first)
         save_wav(self.get_temp_path('result.wav'), found, sr, channels_first=channels_first)
 
+        assert sr == expected_sr
+        self.assertEqual(found, expected)
+
+
+@skipIfNoExtension
+class TestApplyEffectFileWithoutExtension(PytorchTestCase):
+    def test_mp3(self):
+        """Providing format allows to read mp3 without extension
+
+        libsox does not check header for mp3
+
+        https://github.com/pytorch/audio/issues/1040
+
+        The file was generated with the following command
+            ffmpeg -f lavfi -i "sine=frequency=1000:duration=5" -ar 16000 -f mp3 test_noext
+        """
+        effects = [['band', '300', '10']]
+        path = get_asset_path("mp3_without_ext")
+        _, sr = sox_effects.apply_effects_file(path, effects, format="mp3")
+        assert sr == 16000
+
+
+@skipIfNoExec('sox')
+@skipIfNoExtension
+class TestFileObject(TempDirMixin, PytorchTestCase):
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_fileobj(self, ext, compression):
+        """Applying effects via file object works"""
+        sample_rate = 16000
+        channels_first = True
+        effects = [['band', '300', '10']]
+        format_ = ext if ext in ['mp3'] else None
+        input_path = self.get_temp_path(f'input.{ext}')
+        reference_path = self.get_temp_path('reference.wav')
+
+        sox_utils.gen_audio_file(
+            input_path, sample_rate, num_channels=2, compression=compression)
+        sox_utils.run_sox_effect(
+            input_path, reference_path, effects, output_bitdepth=32)
+        expected, expected_sr = load_wav(reference_path)
+
+        with open(input_path, 'rb') as fileobj:
+            found, sr = sox_effects.apply_effects_file(
+                fileobj, effects, channels_first=channels_first, format=format_)
+        save_wav(self.get_temp_path('result.wav'), found, sr, channels_first=channels_first)
+        assert sr == expected_sr
+        self.assertEqual(found, expected)
+
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_bytesio(self, ext, compression):
+        """Applying effects via BytesIO object works"""
+        sample_rate = 16000
+        channels_first = True
+        effects = [['band', '300', '10']]
+        format_ = ext if ext in ['mp3'] else None
+        input_path = self.get_temp_path(f'input.{ext}')
+        reference_path = self.get_temp_path('reference.wav')
+
+        sox_utils.gen_audio_file(
+            input_path, sample_rate, num_channels=2, compression=compression)
+        sox_utils.run_sox_effect(
+            input_path, reference_path, effects, output_bitdepth=32)
+        expected, expected_sr = load_wav(reference_path)
+
+        with open(input_path, 'rb') as file_:
+            fileobj = io.BytesIO(file_.read())
+        found, sr = sox_effects.apply_effects_file(
+            fileobj, effects, channels_first=channels_first, format=format_)
+        save_wav(self.get_temp_path('result.wav'), found, sr, channels_first=channels_first)
+        assert sr == expected_sr
+        self.assertEqual(found, expected)
+
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_tarfile(self, ext, compression):
+        """Applying effects to compressed audio via file-like file works"""
+        sample_rate = 16000
+        channels_first = True
+        effects = [['band', '300', '10']]
+        format_ = ext if ext in ['mp3'] else None
+        audio_file = f'input.{ext}'
+
+        input_path = self.get_temp_path(audio_file)
+        reference_path = self.get_temp_path('reference.wav')
+        archive_path = self.get_temp_path('archive.tar.gz')
+
+        sox_utils.gen_audio_file(
+            input_path, sample_rate, num_channels=2, compression=compression)
+        sox_utils.run_sox_effect(
+            input_path, reference_path, effects, output_bitdepth=32)
+        expected, expected_sr = load_wav(reference_path)
+
+        with tarfile.TarFile(archive_path, 'w') as tarobj:
+            tarobj.add(input_path, arcname=audio_file)
+        with tarfile.TarFile(archive_path, 'r') as tarobj:
+            fileobj = tarobj.extractfile(audio_file)
+            found, sr = sox_effects.apply_effects_file(
+                fileobj, effects, channels_first=channels_first, format=format_)
+        save_wav(self.get_temp_path('result.wav'), found, sr, channels_first=channels_first)
+        assert sr == expected_sr
+        self.assertEqual(found, expected)
+
+
+@skipIfNoExtension
+@skipIfNoExec('sox')
+@skipIfNoModule("requests")
+class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
+    @parameterized.expand([
+        ('wav', None),
+        ('mp3', 128),
+        ('mp3', 320),
+        ('flac', 0),
+        ('flac', 5),
+        ('flac', 8),
+        ('vorbis', -1),
+        ('vorbis', 10),
+        ('amb', None),
+    ])
+    def test_requests(self, ext, compression):
+        sample_rate = 16000
+        channels_first = True
+        effects = [['band', '300', '10']]
+        format_ = ext if ext in ['mp3'] else None
+        audio_file = f'input.{ext}'
+        input_path = self.get_temp_path(audio_file)
+        reference_path = self.get_temp_path('reference.wav')
+
+        sox_utils.gen_audio_file(
+            input_path, sample_rate, num_channels=2, compression=compression)
+        sox_utils.run_sox_effect(
+            input_path, reference_path, effects, output_bitdepth=32)
+        expected, expected_sr = load_wav(reference_path)
+
+        url = self.get_url(audio_file)
+        with requests.get(url, stream=True) as resp:
+            found, sr = sox_effects.apply_effects_file(
+                resp.raw, effects, channels_first=channels_first, format=format_)
+        save_wav(self.get_temp_path('result.wav'), found, sr, channels_first=channels_first)
         assert sr == expected_sr
         self.assertEqual(found, expected)

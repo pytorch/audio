@@ -1,26 +1,28 @@
+import csv
 import os
 import warnings
 from pathlib import Path
 from typing import List, Dict, Tuple, Union, Optional
 
-import torchaudio
-from torchaudio.datasets.utils import unicode_csv_reader
 from torch import Tensor
 from torch.utils.data import Dataset
+
+import torchaudio
 
 
 def load_commonvoice_item(line: List[str],
                           header: List[str],
                           path: str,
-                          folder_audio: str) -> Tuple[Tensor, int, Dict[str, str]]:
+                          folder_audio: str,
+                          ext_audio: str) -> Tuple[Tensor, int, Dict[str, str]]:
     # Each line as the following data:
     # client_id, path, sentence, up_votes, down_votes, age, gender, accent
 
     assert header[1] == "path"
     fileid = line[1]
-
     filename = os.path.join(path, folder_audio, fileid)
-
+    if not filename.endswith(ext_audio):
+        filename += ext_audio
     waveform, sample_rate = torchaudio.load(filename)
 
     dic = dict(zip(header, line))
@@ -79,7 +81,7 @@ class COMMONVOICE(Dataset):
         self._tsv = os.path.join(self._path, tsv)
 
         with open(self._tsv, "r") as tsv_:
-            walker = unicode_csv_reader(tsv_, delimiter="\t")
+            walker = csv.reader(tsv_, delimiter="\t")
             self._header = next(walker)
             self._walker = list(walker)
 
@@ -95,7 +97,7 @@ class COMMONVOICE(Dataset):
             ``up_votes``, ``down_votes``, ``age``, ``gender`` and ``accent``.
         """
         line = self._walker[n]
-        return load_commonvoice_item(line, self._header, self._path, self._folder_audio)
+        return load_commonvoice_item(line, self._header, self._path, self._folder_audio, self._ext_audio)
 
     def __len__(self) -> int:
         return len(self._walker)

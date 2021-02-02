@@ -50,7 +50,6 @@ class clean(distutils.command.clean.clean):
         # Remove build directory
         build_dirs = [
             ROOT_DIR / 'build',
-            ROOT_DIR / 'third_party' / 'build',
         ]
         for path in build_dirs:
             if path.exists():
@@ -74,8 +73,9 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX",
         "Programming Language :: C++",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Multimedia :: Sound/Audio",
         "Topic :: Scientific/Engineering :: Artificial Intelligence"
@@ -83,7 +83,8 @@ setup(
     packages=find_packages(exclude=["build*", "test*", "torchaudio.csrc*", "third_party*", "build_tools*"]),
     ext_modules=setup_helpers.get_ext_modules(),
     cmdclass={
-        'build_ext': setup_helpers.BuildExtension.with_options(no_python_abi_suffix=True)
+        'build_ext': setup_helpers.BuildExtension.with_options(no_python_abi_suffix=True),
+        'clean': clean,
     },
     install_requires=[pytorch_package_dep],
     zip_safe=False,

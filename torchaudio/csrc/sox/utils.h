@@ -4,6 +4,10 @@
 #include <sox.h>
 #include <torch/script.h>
 
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+#include <torch/extension.h>
+#endif // TORCH_API_INCLUDE_EXTENSION_H
+
 namespace torchaudio {
 namespace sox_utils {
 
@@ -61,13 +65,15 @@ struct SoxFormat {
   sox_format_t* operator->() const noexcept;
   operator sox_format_t*() const noexcept;
 
+  void close();
+
  private:
   sox_format_t* fd_;
 };
 
 ///
 /// Verify that input file is found, has known encoding, and not empty
-void validate_input_file(const SoxFormat& sf);
+void validate_input_file(const SoxFormat& sf, bool check_length = true);
 
 ///
 /// Verify that input Tensor is 2D, CPU and either uin8, int16, int32 or float32
@@ -78,6 +84,8 @@ void validate_input_tensor(const torch::Tensor);
 caffe2::TypeMeta get_dtype(
     const sox_encoding_t encoding,
     const unsigned precision);
+
+caffe2::TypeMeta get_dtype_from_str(const std::string dtype);
 
 ///
 /// Convert sox_sample_t buffer to uint8/int16/int32/float32 Tensor
@@ -118,8 +126,18 @@ sox_signalinfo_t get_signalinfo(
 /// Get sox_encofinginfo_t for saving audoi file
 sox_encodinginfo_t get_encodinginfo(
     const std::string filetype,
+    const caffe2::TypeMeta dtype);
+
+sox_encodinginfo_t get_encodinginfo(
+    const std::string filetype,
     const caffe2::TypeMeta dtype,
-    const double compression);
+    c10::optional<double>& compression);
+
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+
+uint64_t read_fileobj(py::object* fileobj, uint64_t size, char* buffer);
+
+#endif // TORCH_API_INCLUDE_EXTENSION_H
 
 } // namespace sox_utils
 } // namespace torchaudio

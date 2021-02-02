@@ -1,9 +1,9 @@
+import io
 import itertools
 from unittest.mock import patch
 
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.backend import _soundfile_backend as soundfile_backend
-from parameterized import parameterized
 
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
@@ -209,3 +209,43 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
         found = load_wav(path)[0]
         expected = data if channels_first else data.transpose(1, 0)
         self.assertEqual(found, expected, atol=1e-4, rtol=1e-8)
+
+
+@skipIfNoModule("soundfile")
+class TestFileObject(TempDirMixin, PytorchTestCase):
+    def _test_fileobj(self, ext):
+        """Saving audio to file-like object works"""
+        sample_rate = 16000
+        path = self.get_temp_path(f'test.{ext}')
+
+        subtype = 'FLOAT' if ext == 'wav' else None
+        data = get_wav_data('float32', num_channels=2)
+        soundfile.write(path, data.numpy().T, sample_rate, subtype=subtype)
+        expected = soundfile.read(path, dtype='float32')[0]
+
+        fileobj = io.BytesIO()
+        soundfile_backend.save(fileobj, data, sample_rate, format=ext)
+        fileobj.seek(0)
+        found, sr = soundfile.read(fileobj, dtype='float32')
+
+        assert sr == sample_rate
+        self.assertEqual(expected, found)
+
+    def test_fileobj_wav(self):
+        """Saving audio via file-like object works"""
+        self._test_fileobj('wav')
+
+    @skipIfFormatNotSupported("FLAC")
+    def test_fileobj_flac(self):
+        """Saving audio via file-like object works"""
+        self._test_fileobj('flac')
+
+    @skipIfFormatNotSupported("NIST")
+    def test_fileobj_nist(self):
+        """Saving audio via file-like object works"""
+        self._test_fileobj('NIST')
+
+    @skipIfFormatNotSupported("OGG")
+    def test_fileobj_ogg(self):
+        """Saving audio via file-like object works"""
+        self._test_fileobj('OGG')

@@ -1,7 +1,10 @@
-from typing import List, Tuple
+import os
+from pathlib import Path
+from typing import List, Tuple, Optional
 
 import torch
 
+import torchaudio
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.utils.sox_utils import list_effects
 
@@ -157,6 +160,7 @@ def apply_effects_file(
         effects: List[List[str]],
         normalize: bool = True,
         channels_first: bool = True,
+        format: Optional[str] = None,
 ) -> Tuple[torch.Tensor, int]:
     """Apply sox effects to the audio file and load the resulting data as Tensor
 
@@ -169,8 +173,16 @@ def apply_effects_file(
         rate and leave samples untouched.
 
     Args:
-        path (str or pathlib.Path): Path to the audio file. This function also handles ``pathlib.Path`` objects, but is
-            annotated as ``str`` for TorchScript compiler compatibility.
+        path (path-like object or file-like object):
+            Source of audio data. When the function is not compiled by TorchScript,
+            (e.g. ``torch.jit.script``), the following types are accepted;
+                  * ``path-like``: file path
+                  * ``file-like``: Object with ``read(size: int) -> bytes`` method,
+                    which returns byte string of at most ``size`` length.
+            When the function is compiled by TorchScript, only ``str`` type is allowed.
+            Note:
+                * This argument is intentionally annotated as ``str`` only for
+                  TorchScript compiler compatibility.
         effects (List[List[str]]): List of effects.
         normalize (bool):
             When ``True``, this function always return ``float32``, and sample values are
@@ -180,6 +192,10 @@ def apply_effects_file(
             than integer WAV type.
         channels_first (bool): When True, the returned Tensor has dimension ``[channel, time]``.
             Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+        format (str, optional):
+            Override the format detection with the given format.
+            Providing the argument might help when libsox can not infer the format
+            from header or extension,
 
     Returns:
         Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.
@@ -226,7 +242,7 @@ def apply_effects_file(
         ...         self.sample_rate = sample_rate
         ...
         ...     def __getitem__(self, index):
-        ...         speed = 0.5 + 1.5 * torch.rand()
+        ...         speed = 0.5 + 1.5 * random.randn()
         ...         effects = [
         ...             ['gain', '-n', '-10'],  # apply 10 db attenuation
         ...             ['remix', '-'],  # merge all the channels
@@ -247,7 +263,11 @@ def apply_effects_file(
         >>> for batch in loader:
         >>>     pass
     """
-    # Get string representation of 'path' in case Path object is passed
-    path = str(path)
-    signal = torch.ops.torchaudio.sox_effects_apply_effects_file(path, effects, normalize, channels_first)
+    if not torch.jit.is_scripting():
+        if hasattr(path, 'read'):
+            return torchaudio._torchaudio.apply_effects_fileobj(
+                path, effects, normalize, channels_first, format)
+        path = os.fspath(path)
+    signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
+        path, effects, normalize, channels_first, format)
     return signal.get_tensor(), signal.get_sample_rate()

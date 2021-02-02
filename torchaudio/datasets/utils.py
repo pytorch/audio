@@ -1,64 +1,17 @@
-import csv
-import errno
 import hashlib
 import logging
 import os
-import sys
 import tarfile
 import threading
-import zipfile
-from _io import TextIOWrapper
-from queue import Queue
-from typing import Any, Iterable, List, Optional, Tuple, Union
-
-import torch
 import urllib
 import urllib.request
+import zipfile
+from queue import Queue
+from typing import Any, Iterable, List, Optional
+
+import torch
 from torch.utils.data import Dataset
 from torch.utils.model_zoo import tqdm
-
-
-def unicode_csv_reader(unicode_csv_data: TextIOWrapper, **kwargs: Any) -> Any:
-    r"""Since the standard csv library does not handle unicode in Python 2, we need a wrapper.
-    Borrowed and slightly modified from the Python docs:
-    https://docs.python.org/2/library/csv.html#csv-examples
-    Args:
-        unicode_csv_data (TextIOWrapper): unicode csv data (see example below)
-
-    Examples:
-        >>> from torchaudio.datasets.utils import unicode_csv_reader
-        >>> import io
-        >>> with io.open(data_path, encoding="utf8") as f:
-        >>>     reader = unicode_csv_reader(f)
-    """
-
-    # Fix field larger than field limit error
-    maxInt = sys.maxsize
-    while True:
-        # decrease the maxInt value by factor 10
-        # as long as the OverflowError occurs.
-        try:
-            csv.field_size_limit(maxInt)
-            break
-        except OverflowError:
-            maxInt = int(maxInt / 10)
-    csv.field_size_limit(maxInt)
-
-    for line in csv.reader(unicode_csv_data, **kwargs):
-        yield line
-
-
-def makedir_exist_ok(dirpath: str) -> None:
-    """
-    Python2 support for os.makedirs(.., exist_ok=True)
-    """
-    try:
-        os.makedirs(dirpath)
-    except OSError as e:
-        if e.errno == errno.EEXIST:
-            pass
-        else:
-            raise
 
 
 def stream_url(url: str,
@@ -85,11 +38,11 @@ def stream_url(url: str,
         req.headers["Range"] = "bytes={}-".format(start_byte)
 
     with urllib.request.urlopen(req) as upointer, tqdm(
-        unit="B",
-        unit_scale=True,
-        unit_divisor=1024,
-        total=url_size,
-        disable=not progress_bar,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            total=url_size,
+            disable=not progress_bar,
     ) as pbar:
 
         num_bytes = 0
@@ -247,42 +200,6 @@ def extract_archive(from_path: str, to_path: Optional[str] = None, overwrite: bo
     raise NotImplementedError("We currently only support tar.gz, tgz, and zip achives.")
 
 
-def walk_files(root: str,
-               suffix: Union[str, Tuple[str]],
-               prefix: bool = False,
-               remove_suffix: bool = False) -> Iterable[str]:
-    """List recursively all files ending with a suffix at a given root
-    Args:
-        root (str): Path to directory whose folders need to be listed
-        suffix (str or tuple): Suffix of the files to match, e.g. '.png' or ('.jpg', '.png').
-            It uses the Python "str.endswith" method and is passed directly
-        prefix (bool, optional): If true, prepends the full path to each result, otherwise
-            only returns the name of the files found (Default: ``False``)
-        remove_suffix (bool, optional): If true, removes the suffix to each result defined in suffix,
-            otherwise will return the result as found (Default: ``False``).
-    """
-
-    root = os.path.expanduser(root)
-
-    for dirpath, dirs, files in os.walk(root):
-        dirs.sort()
-        # `dirs` is the list used in os.walk function and by sorting it in-place here, we change the
-        # behavior of os.walk to traverse sub directory alphabetically
-        # see also
-        # https://stackoverflow.com/questions/6670029/can-i-force-python3s-os-walk-to-visit-directories-in-alphabetical-order-how#comment71993866_6670926
-        files.sort()
-        for f in files:
-            if f.endswith(suffix):
-
-                if remove_suffix:
-                    f = f[: -len(suffix)]
-
-                if prefix:
-                    f = os.path.join(dirpath, f)
-
-                yield f
-
-
 class _DiskCache(Dataset):
     """
     Wrap a dataset so that, whenever a new item is returned, it is saved to disk.
@@ -305,7 +222,7 @@ class _DiskCache(Dataset):
         item = self.dataset[n]
 
         self._cache[n] = f
-        makedir_exist_ok(self.location)
+        os.makedirs(self.location, exist_ok=True)
         torch.save(item, f)
 
         return item

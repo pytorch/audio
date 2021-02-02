@@ -1,6 +1,6 @@
 #include <c10/core/ScalarType.h>
 #include <sox.h>
-#include <torchaudio/csrc/sox_utils.h>
+#include <torchaudio/csrc/sox/utils.h>
 
 namespace torchaudio {
 namespace sox_utils {
@@ -81,10 +81,9 @@ bool TensorSignal::getChannelsFirst() const {
 
 SoxFormat::SoxFormat(sox_format_t* fd) noexcept : fd_(fd) {}
 SoxFormat::~SoxFormat() {
-  if (fd_ != nullptr) {
-    sox_close(fd_);
-  }
+  close();
 }
+
 sox_format_t* SoxFormat::operator->() const noexcept {
   return fd_;
 }
@@ -92,15 +91,22 @@ SoxFormat::operator sox_format_t*() const noexcept {
   return fd_;
 }
 
-void validate_input_file(const SoxFormat& sf) {
+void SoxFormat::close() {
+  if (fd_ != nullptr) {
+    sox_close(fd_);
+    fd_ = nullptr;
+  }
+}
+
+void validate_input_file(const SoxFormat& sf, bool check_length) {
   if (static_cast<sox_format_t*>(sf) == nullptr) {
     throw std::runtime_error("Error loading audio file: failed to open file.");
   }
   if (sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
     throw std::runtime_error("Error loading audio file: unknown encoding.");
   }
-  if (sf->signal.length == 0) {
-    throw std::runtime_error("Error reading audio file: unkown length.");
+  if (check_length && sf->signal.length == 0) {
+    throw std::runtime_error("Error reading audio file: unknown length.");
   }
 }
 
@@ -148,6 +154,24 @@ caffe2::TypeMeta get_dtype(
     }
   }();
   return c10::scalarTypeToTypeMeta(dtype);
+}
+
+caffe2::TypeMeta get_dtype_from_str(const std::string dtype) {
+  const auto tgt_dtype = [&]() {
+    if (dtype == "uint8")
+      return torch::kUInt8;
+    else if (dtype == "int16")
+      return torch::kInt16;
+    else if (dtype == "int32")
+      return torch::kInt32;
+    else if (dtype == "float32")
+      return torch::kFloat32;
+    else if (dtype == "float64")
+      return torch::kFloat64;
+    else
+      throw std::runtime_error("Unsupported dtype");
+  }();
+  return c10::scalarTypeToTypeMeta(tgt_dtype);
 }
 
 torch::Tensor convert_to_tensor(
@@ -286,32 +310,59 @@ sox_signalinfo_t get_signalinfo(
 
 sox_encodinginfo_t get_encodinginfo(
     const std::string filetype,
-    const caffe2::TypeMeta dtype,
-    const double compression) {
-  const double compression_ = [&]() {
-    if (filetype == "mp3")
-      return compression;
-    if (filetype == "flac")
-      return compression;
-    if (filetype == "ogg" || filetype == "vorbis")
-      return compression;
-    if (filetype == "wav" || filetype == "amb")
-      return 0.;
-    if (filetype == "sph")
-      return 0.;
-    if (filetype == "amr-nb")
-      return 0.;
-    throw std::runtime_error("Unsupported file type: " + filetype);
-  }();
-
-  return sox_encodinginfo_t{/*encoding=*/get_encoding(filetype, dtype),
-                            /*bits_per_sample=*/get_precision(filetype, dtype),
-                            /*compression=*/compression_,
-                            /*reverse_bytes=*/sox_option_default,
-                            /*reverse_nibbles=*/sox_option_default,
-                            /*reverse_bits=*/sox_option_default,
-                            /*opposite_endian=*/sox_false};
+    const caffe2::TypeMeta dtype) {
+  return sox_encodinginfo_t{
+      /*encoding=*/get_encoding(filetype, dtype),
+      /*bits_per_sample=*/get_precision(filetype, dtype),
+      /*compression=*/HUGE_VAL,
+      /*reverse_bytes=*/sox_option_default,
+      /*reverse_nibbles=*/sox_option_default,
+      /*reverse_bits=*/sox_option_default,
+      /*opposite_endian=*/sox_false};
 }
+
+sox_encodinginfo_t get_encodinginfo(
+    const std::string filetype,
+    const caffe2::TypeMeta dtype,
+    c10::optional<double>& compression) {
+  return sox_encodinginfo_t{
+      /*encoding=*/get_encoding(filetype, dtype),
+      /*bits_per_sample=*/get_precision(filetype, dtype),
+      /*compression=*/compression.value_or(HUGE_VAL),
+      /*reverse_bytes=*/sox_option_default,
+      /*reverse_nibbles=*/sox_option_default,
+      /*reverse_bits=*/sox_option_default,
+      /*opposite_endian=*/sox_false};
+}
+
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+
+uint64_t read_fileobj(py::object* fileobj, const uint64_t size, char* buffer) {
+  uint64_t num_read = 0;
+  while (num_read < size) {
+    auto request = size - num_read;
+    auto chunk = static_cast<std::string>(
+        static_cast<py::bytes>(fileobj->attr("read")(request)));
+    auto chunk_len = chunk.length();
+    if (chunk_len == 0) {
+      break;
+    }
+    if (chunk_len > request) {
+      std::ostringstream message;
+      message
+          << "Requested up to " << request << " bytes but, "
+          << "received " << chunk_len << " bytes. "
+          << "The given object does not confirm to read protocol of file object.";
+      throw std::runtime_error(message.str());
+    }
+    memcpy(buffer, chunk.data(), chunk_len);
+    buffer += chunk_len;
+    num_read += chunk_len;
+  }
+  return num_read;
+}
+
+#endif // TORCH_API_INCLUDE_EXTENSION_H
 
 } // namespace sox_utils
 } // namespace torchaudio
