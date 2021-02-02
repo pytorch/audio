@@ -549,6 +549,40 @@ class Functional(common_utils.TestBaseMixin):
         tensor = common_utils.get_whitenoise(sample_rate=44100)
         self._assert_consistency(func, tensor)
 
+    @common_utils.skipIfNoExtension
+    def test_rnnt_loss(self):
+        from torchaudio.prototype.transducer import rnnt_loss
+
+        batch_dim = 1
+        seq_dim = 2
+        label_dim = 3
+        class_dim = 5
+
+        torch.random.manual_seed(40)
+
+        tensor = torch.rand((batch_dim, seq_dim, label_dim, class_dim), dtype=torch.float)
+        label = torch.randint(1, class_dim, (batch_dim, seq_dim), dtype=torch.int)
+        tensor_length = torch.randint(1, seq_dim, (batch_dim,), dtype=torch.int)
+        label_length = torch.randint(1, label_dim-1, (batch_dim,), dtype=torch.int)  # NOT including blank
+
+        tensor_length[0] = seq_dim
+        label_length[0] = label_dim-1
+
+        tensor = tensor.to(self.device)
+        label = label.to(self.device)
+        tensor_length = tensor_length.to(self.device)
+        label_length = label_length.to(self.device)
+
+        def func(
+            tensor,
+            label=label,
+            tensor_length=tensor_length,
+            label_length=label_length,
+        ):
+            return rnnt_loss(tensor, label, tensor_length, label_length)
+
+        self._assert_consistency(func, tensor)
+
 
 class Transforms(common_utils.TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
@@ -643,3 +677,36 @@ class Transforms(common_utils.TestBaseMixin):
         sample_rate = 44100
         waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
         self._assert_consistency(T.SpectralCentroid(sample_rate=sample_rate), waveform)
+
+    @common_utils.skipIfNoExtension
+    def test_rnnt_loss(self):
+        from torchaudio.prototype.transducer import RNNTLoss
+
+        transform = RNNTLoss()
+
+        batch_dim = 1
+        seq_dim = 2
+        label_dim = 3
+        class_dim = 5
+
+        torch.random.manual_seed(40)
+
+        tensor = torch.rand((batch_dim, seq_dim, label_dim, class_dim), dtype=torch.float)
+        label = torch.randint(1, class_dim, (batch_dim, seq_dim), dtype=torch.int)
+        tensor_length = torch.randint(1, seq_dim, (batch_dim,), dtype=torch.int)
+        label_length = torch.randint(1, label_dim-1, (batch_dim,), dtype=torch.int)  # NOT including blank
+
+        tensor_length[0] = seq_dim
+        label_length[0] = label_dim-1
+
+        tensor = tensor.to(device=self.device, dtype=self.dtype)
+        label = label.to(self.device)
+        tensor_length = tensor_length.to(self.device)
+        label_length = label_length.to(self.device)
+
+        transform = transform.to(device=self.device, dtype=self.dtype)
+
+        ts_transform = torch.jit.script(transform)
+        output = transform(tensor, label, tensor_length, label_length)
+        ts_output = ts_transform(tensor, label, tensor_length, label_length)
+        self.assertEqual(ts_output, output)
