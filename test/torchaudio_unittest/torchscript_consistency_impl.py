@@ -550,7 +550,42 @@ class Functional(common_utils.TestBaseMixin):
         self._assert_consistency(func, tensor)
 
     @common_utils.skipIfNoExtension
-    def test_rnnt_loss(self):
+    def test_rnnt_loss_1(self):
+        from torchaudio.prototype.transducer import RNNTLoss
+        rnnt_loss = RNNTLoss()
+
+        batch_dim = 1
+        seq_dim = 2
+        label_dim = 3
+        class_dim = 5
+
+        torch.random.manual_seed(40)
+
+        tensor = torch.rand((batch_dim, seq_dim, label_dim, class_dim), dtype=torch.float)
+        label = torch.randint(1, class_dim, (batch_dim, seq_dim), dtype=torch.int)
+        tensor_length = torch.randint(1, seq_dim, (batch_dim,), dtype=torch.int)
+        label_length = torch.randint(1, label_dim-1, (batch_dim,), dtype=torch.int)  # NOT including blank
+
+        tensor_length[0] = seq_dim
+        label_length[0] = label_dim-1
+
+        tensor = tensor.to(self.device)
+        label = label.to(self.device)
+        tensor_length = tensor_length.to(self.device)
+        label_length = label_length.to(self.device)
+
+        def func(
+            tensor,
+            label=label,
+            tensor_length=tensor_length,
+            label_length=label_length,
+        ):
+            return rnnt_loss(tensor, label, tensor_length, label_length)
+
+        self._assert_consistency(func, tensor)
+
+    @common_utils.skipIfNoExtension
+    def test_rnnt_loss_2(self):
         from torchaudio.prototype.transducer import rnnt_loss
 
         batch_dim = 1
@@ -679,7 +714,7 @@ class Transforms(common_utils.TestBaseMixin):
         self._assert_consistency(T.SpectralCentroid(sample_rate=sample_rate), waveform)
 
     @common_utils.skipIfNoExtension
-    def test_rnnt_loss(self):
+    def test_rnnt_loss_3(self):
         from torchaudio.prototype.transducer import RNNTLoss
 
         transform = RNNTLoss()
