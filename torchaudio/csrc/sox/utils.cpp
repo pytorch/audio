@@ -291,12 +291,11 @@ sox_signalinfo_t get_signalinfo(
       /*length=*/static_cast<uint64_t>(waveform->numel())};
 }
 
-sox_encodinginfo_t get_encodinginfo(
-    const std::string filetype,
+sox_encodinginfo_t get_tensor_encodinginfo(
     const caffe2::TypeMeta dtype) {
   return sox_encodinginfo_t{
-      /*encoding=*/get_encoding(filetype, dtype),
-      /*bits_per_sample=*/get_precision(filetype, dtype),
+      /*encoding=*/get_encoding("wav", dtype),
+      /*bits_per_sample=*/get_precision("wav", dtype),
       /*compression=*/HUGE_VAL,
       /*reverse_bytes=*/sox_option_default,
       /*reverse_nibbles=*/sox_option_default,
@@ -304,7 +303,7 @@ sox_encodinginfo_t get_encodinginfo(
       /*opposite_endian=*/sox_false};
 }
 
-sox_encodinginfo_t get_encodinginfo(
+sox_encodinginfo_t get_encodinginfo_for_save(
     const std::string filetype,
     const caffe2::TypeMeta dtype,
     c10::optional<double>& compression) {
