@@ -1,12 +1,13 @@
 import io
-import itertools
+import unittest
+from itertools import product
 
-import torch
 from torchaudio.backend import sox_io_backend
 from parameterized import parameterized
 
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
+    TorchaudioTestCase,
     PytorchTestCase,
     skipIfNoExec,
     skipIfNoExtension,
@@ -17,37 +18,61 @@ from torchaudio_unittest.common_utils import (
 )
 from .common import (
     name_func,
+    get_enc_params,
 )
 
 
-class SaveTestBase(TempDirMixin, PytorchTestCase):
-    def assert_wav(self, dtype, sample_rate, num_channels, num_frames):
-        """`sox_io_backend.save` can save wav format."""
-        path = self.get_temp_path('data.wav')
-        expected = get_wav_data(dtype, num_channels, num_frames=num_frames)
-        sox_io_backend.save(path, expected, sample_rate, dtype=None)
-        found, sr = load_wav(path)
-        assert sample_rate == sr
-        self.assertEqual(found, expected)
+def _get_sox_encoding(encoding):
+    encodings = {
+        'PCM_F': 'floating-point',
+        'PCM_S': 'signed-integer',
+        'PCM_U': 'unsigned-integer',
+        'ULAW': 'u-law',
+        'ALAW': 'a-law',
+    }
+    return encodings.get(encoding)
 
-    def assert_mp3(self, sample_rate, num_channels, bit_rate, duration):
-        """`sox_io_backend.save` can save mp3 format.
 
-        mp3 encoding introduces delay and boundary effects so
-        we convert the resulting mp3 to wav and compare the results there
+class SaveTestBase(TempDirMixin, TorchaudioTestCase):
+    def assert_save_consistency(
+            self,
+            format: str,
+            *,
+            compression: float = None,
+            encoding: str = None,
+            bits_per_sample: int = None,
+            sample_rate: float = 8000,
+            num_channels: int = 2,
+            num_frames: float = 3 * 8000,
+            test_mode: str = "path",
+    ):
+        """`save` function produces file that is comparable with `sox` command
 
-                          |
-                          | 1. Generate original wav file with SciPy
+        To compare that the file produced by `save` function agains the file produced by
+        the equivalent `sox` command, we need to load both files.
+        But there are many formats that cannot be opened with common Python modules (like
+        SciPy).
+        So we use `sox` command to prepare the original data and convert the saved files
+        into a format that SciPy can read (PCM wav).
+        The following diagram illustrates this process. The difference is 2.1. and 3.1.
+
+        This assumes that
+         - loading data with SciPy preserves the data well.
+         - converting the resulting files into WAV format with `sox` preserve the data well.
+
+                          x
+                          | 1. Generate source wav file with SciPy
                           |
                           v
           -------------- wav ----------------
          |                                   |
-         | 2.1. load with scipy              | 3.1. Convert to mp3 with Sox
-         | then save with torchaudio         |
+         | 2.1. load with scipy              | 3.1. Convert to the target
+         |   then save it into the target    |      format depth with sox
+         |   format with torchaudio          |
          v                                   v
-        mp3                                 mp3
+        target format                       target format
          |                                   |
-         | 2.2. Convert to wav with Sox      | 3.2. Convert to wav with Sox
+         | 2.2. Convert to wav with sox      | 3.2. Convert to wav with sox
          |                                   |
          v                                   v
         wav                                 wav
@@ -58,326 +83,242 @@ class SaveTestBase(TempDirMixin, PytorchTestCase):
         tensor -------> compare <--------- tensor
 
         """
-        src_path = self.get_temp_path('1.reference.wav')
-        mp3_path = self.get_temp_path('2.1.torchaudio.mp3')
-        wav_path = self.get_temp_path('2.2.torchaudio.wav')
-        mp3_path_sox = self.get_temp_path('3.1.sox.mp3')
-        wav_path_sox = self.get_temp_path('3.2.sox.wav')
+        cmp_encoding = 'floating-point'
+        cmp_bit_depth = 32
+
+        src_path = self.get_temp_path('1.source.wav')
+        tgt_path = self.get_temp_path(f'2.1.torchaudio.{format}')
+        tst_path = self.get_temp_path('2.2.result.wav')
+        sox_path = self.get_temp_path(f'3.1.sox.{format}')
+        ref_path = self.get_temp_path('3.2.ref.wav')
 
         # 1. Generate original wav
-        data = get_wav_data('float32', num_channels, normalize=True, num_frames=duration * sample_rate)
+        data = get_wav_data('int32', num_channels, normalize=False, num_frames=num_frames)
         save_wav(src_path, data, sample_rate)
-        # 2.1. Convert the original wav to mp3 with torchaudio
-        sox_io_backend.save(
-            mp3_path, load_wav(src_path)[0], sample_rate, compression=bit_rate, dtype=None)
-        # 2.2. Convert the mp3 to wav with Sox
-        sox_utils.convert_audio_file(mp3_path, wav_path)
-        # 2.3. Load
-        found = load_wav(wav_path)[0]
 
-        # 3.1. Convert the original wav to mp3 with SoX
-        sox_utils.convert_audio_file(src_path, mp3_path_sox, compression=bit_rate)
-        # 3.2. Convert the mp3 to wav with Sox
-        sox_utils.convert_audio_file(mp3_path_sox, wav_path_sox)
-        # 3.3. Load
-        expected = load_wav(wav_path_sox)[0]
-
-        self.assertEqual(found, expected)
-
-    def assert_flac(self, sample_rate, num_channels, compression_level, duration):
-        """`sox_io_backend.save` can save flac format.
-
-        This test takes the same strategy as mp3 to compare the result
-        """
-        src_path = self.get_temp_path('1.reference.wav')
-        flc_path = self.get_temp_path('2.1.torchaudio.flac')
-        wav_path = self.get_temp_path('2.2.torchaudio.wav')
-        flc_path_sox = self.get_temp_path('3.1.sox.flac')
-        wav_path_sox = self.get_temp_path('3.2.sox.wav')
-
-        # 1. Generate original wav
-        data = get_wav_data('float32', num_channels, normalize=True, num_frames=duration * sample_rate)
-        save_wav(src_path, data, sample_rate)
-        # 2.1. Convert the original wav to flac with torchaudio
-        sox_io_backend.save(
-            flc_path, load_wav(src_path)[0], sample_rate, compression=compression_level, dtype=None)
-        # 2.2. Convert the flac to wav with Sox
-        # converting to 32 bit because flac file has 24 bit depth which scipy cannot handle.
-        sox_utils.convert_audio_file(flc_path, wav_path, bit_depth=32)
-        # 2.3. Load
-        found = load_wav(wav_path)[0]
-
-        # 3.1. Convert the original wav to flac with SoX
-        sox_utils.convert_audio_file(src_path, flc_path_sox, compression=compression_level)
-        # 3.2. Convert the flac to wav with Sox
-        # converting to 32 bit because flac file has 24 bit depth which scipy cannot handle.
-        sox_utils.convert_audio_file(flc_path_sox, wav_path_sox, bit_depth=32)
-        # 3.3. Load
-        expected = load_wav(wav_path_sox)[0]
-
-        self.assertEqual(found, expected)
-
-    def _assert_vorbis(self, sample_rate, num_channels, quality_level, duration):
-        """`sox_io_backend.save` can save vorbis format.
-
-        This test takes the same strategy as mp3 to compare the result
-        """
-        src_path = self.get_temp_path('1.reference.wav')
-        vbs_path = self.get_temp_path('2.1.torchaudio.vorbis')
-        wav_path = self.get_temp_path('2.2.torchaudio.wav')
-        vbs_path_sox = self.get_temp_path('3.1.sox.vorbis')
-        wav_path_sox = self.get_temp_path('3.2.sox.wav')
-
-        # 1. Generate original wav
-        data = get_wav_data('int16', num_channels, normalize=False, num_frames=duration * sample_rate)
-        save_wav(src_path, data, sample_rate)
-        # 2.1. Convert the original wav to vorbis with torchaudio
-        sox_io_backend.save(
-            vbs_path, load_wav(src_path)[0], sample_rate, compression=quality_level, dtype=None)
-        # 2.2. Convert the vorbis to wav with Sox
-        sox_utils.convert_audio_file(vbs_path, wav_path)
-        # 2.3. Load
-        found = load_wav(wav_path)[0]
-
-        # 3.1. Convert the original wav to vorbis with SoX
-        sox_utils.convert_audio_file(src_path, vbs_path_sox, compression=quality_level)
-        # 3.2. Convert the vorbis to wav with Sox
-        sox_utils.convert_audio_file(vbs_path_sox, wav_path_sox)
-        # 3.3. Load
-        expected = load_wav(wav_path_sox)[0]
-
-        # sox's vorbis encoding has some random boundary effect, which cause small number of
-        # samples yields higher descrepency than the others.
-        # so we allow small portions of data to be outside of absolute torelance.
-        # make sure to pass somewhat long duration
-        atol = 1.0e-4
-        max_failure_allowed = 0.01  # this percent of samples are allowed to outside of atol.
-        failure_ratio = ((found - expected).abs() > atol).sum().item() / found.numel()
-        if failure_ratio > max_failure_allowed:
-            # it's failed and this will give a better error message.
-            self.assertEqual(found, expected, atol=atol, rtol=1.3e-6)
-
-    def assert_vorbis(self, *args, **kwargs):
-        # sox's vorbis encoding has some randomness, so we run tests multiple time
-        max_retry = 5
-        error = None
-        for _ in range(max_retry):
-            try:
-                self._assert_vorbis(*args, **kwargs)
-                break
-            except AssertionError as e:
-                error = e
+        # 2.1. Convert the original wav to target format with torchaudio
+        data = load_wav(src_path, normalize=False)[0]
+        if test_mode == "path":
+            sox_io_backend.save(
+                tgt_path, data, sample_rate,
+                compression=compression, encoding=encoding, bits_per_sample=bits_per_sample)
+        elif test_mode == "fileobj":
+            with open(tgt_path, 'bw') as file_:
+                sox_io_backend.save(
+                    file_, data, sample_rate,
+                    format=format, compression=compression,
+                    encoding=encoding, bits_per_sample=bits_per_sample)
+        elif test_mode == "bytesio":
+            file_ = io.BytesIO()
+            sox_io_backend.save(
+                file_, data, sample_rate,
+                format=format, compression=compression,
+                encoding=encoding, bits_per_sample=bits_per_sample)
+            file_.seek(0)
+            with open(tgt_path, 'bw') as f:
+                f.write(file_.read())
         else:
-            raise error
+            raise ValueError(f"Unexpected test mode: {test_mode}")
+        # 2.2. Convert the target format to wav with sox
+        sox_utils.convert_audio_file(
+            tgt_path, tst_path, encoding=cmp_encoding, bit_depth=cmp_bit_depth)
+        # 2.3. Load with SciPy
+        found = load_wav(tst_path, normalize=False)[0]
 
-    def assert_sphere(self, sample_rate, num_channels, duration):
-        """`sox_io_backend.save` can save sph format.
-
-        This test takes the same strategy as mp3 to compare the result
-        """
-        src_path = self.get_temp_path('1.reference.wav')
-        flc_path = self.get_temp_path('2.1.torchaudio.sph')
-        wav_path = self.get_temp_path('2.2.torchaudio.wav')
-        flc_path_sox = self.get_temp_path('3.1.sox.sph')
-        wav_path_sox = self.get_temp_path('3.2.sox.wav')
-
-        # 1. Generate original wav
-        data = get_wav_data('float32', num_channels, normalize=True, num_frames=duration * sample_rate)
-        save_wav(src_path, data, sample_rate)
-        # 2.1. Convert the original wav to sph with torchaudio
-        sox_io_backend.save(flc_path, load_wav(src_path)[0], sample_rate, dtype=None)
-        # 2.2. Convert the sph to wav with Sox
-        # converting to 32 bit because sph file has 24 bit depth which scipy cannot handle.
-        sox_utils.convert_audio_file(flc_path, wav_path, bit_depth=32)
-        # 2.3. Load
-        found = load_wav(wav_path)[0]
-
-        # 3.1. Convert the original wav to sph with SoX
-        sox_utils.convert_audio_file(src_path, flc_path_sox)
-        # 3.2. Convert the sph to wav with Sox
-        # converting to 32 bit because sph file has 24 bit depth which scipy cannot handle.
-        sox_utils.convert_audio_file(flc_path_sox, wav_path_sox, bit_depth=32)
-        # 3.3. Load
-        expected = load_wav(wav_path_sox)[0]
+        # 3.1. Convert the original wav to target format with sox
+        sox_encoding = _get_sox_encoding(encoding)
+        sox_utils.convert_audio_file(
+            src_path, sox_path,
+            compression=compression, encoding=sox_encoding, bit_depth=bits_per_sample)
+        # 3.2. Convert the target format to wav with sox
+        sox_utils.convert_audio_file(
+            sox_path, ref_path, encoding=cmp_encoding, bit_depth=cmp_bit_depth)
+        # 3.3. Load with SciPy
+        expected = load_wav(ref_path, normalize=False)[0]
 
         self.assertEqual(found, expected)
 
-    def assert_amb(self, dtype, sample_rate, num_channels, duration):
-        """`sox_io_backend.save` can save amb format.
 
-        This test takes the same strategy as mp3 to compare the result
-        """
-        src_path = self.get_temp_path('1.reference.wav')
-        amb_path = self.get_temp_path('2.1.torchaudio.amb')
-        wav_path = self.get_temp_path('2.2.torchaudio.wav')
-        amb_path_sox = self.get_temp_path('3.1.sox.amb')
-        wav_path_sox = self.get_temp_path('3.2.sox.wav')
+def nested_params(*params):
+    def _name_func(func, _, params):
+        strs = []
+        for arg in params.args:
+            if isinstance(arg, tuple):
+                strs.append("_".join(str(a) for a in arg))
+            else:
+                strs.append(str(arg))
+        return f'{func.__name__}_{"_".join(strs)}'
 
-        # 1. Generate original wav
-        data = get_wav_data(dtype, num_channels, normalize=False, num_frames=duration * sample_rate)
-        save_wav(src_path, data, sample_rate)
-        # 2.1. Convert the original wav to amb with torchaudio
-        sox_io_backend.save(amb_path, load_wav(src_path, normalize=False)[0], sample_rate, dtype=None)
-        # 2.2. Convert the amb to wav with Sox
-        sox_utils.convert_audio_file(amb_path, wav_path)
-        # 2.3. Load
-        found = load_wav(wav_path)[0]
-
-        # 3.1. Convert the original wav to amb with SoX
-        sox_utils.convert_audio_file(src_path, amb_path_sox)
-        # 3.2. Convert the amb to wav with Sox
-        sox_utils.convert_audio_file(amb_path_sox, wav_path_sox)
-        # 3.3. Load
-        expected = load_wav(wav_path_sox)[0]
-
-        self.assertEqual(found, expected)
-
-    def assert_amr_nb(self, duration):
-        """`sox_io_backend.save` can save amr_nb format.
-
-        This test takes the same strategy as mp3 to compare the result
-        """
-        sample_rate = 8000
-        num_channels = 1
-        src_path = self.get_temp_path('1.reference.wav')
-        amr_path = self.get_temp_path('2.1.torchaudio.amr-nb')
-        wav_path = self.get_temp_path('2.2.torchaudio.wav')
-        amr_path_sox = self.get_temp_path('3.1.sox.amr-nb')
-        wav_path_sox = self.get_temp_path('3.2.sox.wav')
-
-        # 1. Generate original wav
-        data = get_wav_data('int16', num_channels, normalize=False, num_frames=duration * sample_rate)
-        save_wav(src_path, data, sample_rate)
-        # 2.1. Convert the original wav to amr_nb with torchaudio
-        sox_io_backend.save(amr_path, load_wav(src_path, normalize=False)[0], sample_rate, dtype=None)
-        # 2.2. Convert the amr_nb to wav with Sox
-        sox_utils.convert_audio_file(amr_path, wav_path)
-        # 2.3. Load
-        found = load_wav(wav_path)[0]
-
-        # 3.1. Convert the original wav to amr_nb with SoX
-        sox_utils.convert_audio_file(src_path, amr_path_sox)
-        # 3.2. Convert the amr_nb to wav with Sox
-        sox_utils.convert_audio_file(amr_path_sox, wav_path_sox)
-        # 3.3. Load
-        expected = load_wav(wav_path_sox)[0]
-
-        self.assertEqual(found, expected)
+    return parameterized.expand(
+        list(product(*params)),
+        name_func=_name_func
+    )
 
 
 @skipIfNoExec('sox')
 @skipIfNoExtension
-class TestSave(SaveTestBase):
-    @parameterized.expand(list(itertools.product(
-        ['float32', 'int32', 'int16', 'uint8'],
-        [8000, 16000],
-        [1, 2],
-    )), name_func=name_func)
-    def test_wav(self, dtype, sample_rate, num_channels):
-        """`sox_io_backend.save` can save wav format."""
-        self.assert_wav(dtype, sample_rate, num_channels, num_frames=None)
+class SaveTest(SaveTestBase):
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
+        [
+            ('PCM_U', 8),
+            ('PCM_S', 16),
+            ('PCM_S', 32),
+            ('PCM_F', 32),
+            ('ULAW', 8),
+            ('ALAW', 8),
+        ],
+    )
+    def test_save_wav(self, test_mode, enc_params):
+        encoding, bits_per_sample = enc_params
+        self.assert_save_consistency(
+            "wav", encoding=encoding, bits_per_sample=bits_per_sample, test_mode=test_mode)
 
-    @parameterized.expand(list(itertools.product(
-        ['float32'],
-        [16000],
-        [2],
-    )), name_func=name_func)
-    def test_wav_large(self, dtype, sample_rate, num_channels):
-        """`sox_io_backend.save` can save large wav file."""
-        two_hours = 2 * 60 * 60 * sample_rate
-        self.assert_wav(dtype, sample_rate, num_channels, num_frames=two_hours)
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
+        [
+            None,
+            -4.2,
+            -0.2,
+            0,
+            0.2,
+            96,
+            128,
+            160,
+            192,
+            224,
+            256,
+            320,
+        ],
+    )
+    def test_save_mp3(self, test_mode, bit_rate):
+        if test_mode in ["fileobj", "bytesio"]:
+            if bit_rate is not None and bit_rate < 1:
+                raise unittest.SkipTest(
+                    "mp3 format with variable bit rate is known to "
+                    "not yield the exact same result as sox command.")
+        self.assert_save_consistency(
+            "mp3", compression=bit_rate, test_mode=test_mode)
 
-    @parameterized.expand(list(itertools.product(
-        ['float32', 'int32', 'int16', 'uint8'],
-        [4, 8, 16, 32],
-    )), name_func=name_func)
-    def test_multiple_channels(self, dtype, num_channels):
-        """`sox_io_backend.save` can save wav with more than 2 channels."""
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
+        [
+            None,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+        ],
+    )
+    def test_save_flac(self, test_mode, compression_level):
+        self.assert_save_consistency(
+            "flac", compression=compression_level, test_mode=test_mode)
+
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
+        [
+            None,
+            -1,
+            0,
+            1,
+            2,
+            3,
+            3.6,
+            5,
+            10,
+        ],
+    )
+    def test_save_vorbis(self, test_mode, quality_level):
+        self.assert_save_consistency(
+            "vorbis", compression=quality_level, test_mode=test_mode)
+
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
+        [
+            ('PCM_S', 8, ),
+            ('PCM_S', 16, ),
+            ('PCM_S', 24, ),
+            ('PCM_S', 32, ),
+            ('ULAW', 8),
+            ('ALAW', 8),
+            ('ALAW', 16),
+            ('ALAW', 24),
+            ('ALAW', 32),
+        ],
+    )
+    def test_save_sphere(self, test_mode, enc_params):
+        encoding, bits_per_sample = enc_params
+        self.assert_save_consistency(
+            "sph", encoding=encoding, bits_per_sample=bits_per_sample, test_mode=test_mode)
+
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
+        [
+            ('PCM_U', 8, ),
+            ('PCM_S', 16, ),
+            ('PCM_S', 24, ),
+            ('PCM_S', 32, ),
+            ('PCM_F', 32, ),
+            ('PCM_F', 64, ),
+            ('ULAW', 8, ),
+            ('ALAW', 8, ),
+        ],
+    )
+    def test_save_amb(self, test_mode, enc_params):
+        encoding, bits_per_sample = enc_params
+        self.assert_save_consistency(
+            "amb", encoding=encoding, bits_per_sample=bits_per_sample, test_mode=test_mode)
+
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
+        [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+        ],
+    )
+    def test_save_amr_nb(self, test_mode, bit_rate):
+        self.assert_save_consistency(
+            "amr-nb", compression=bit_rate, num_channels=1, test_mode=test_mode)
+
+    @parameterized.expand([
+        ("wav", "PCM_S", 16),
+        ("mp3", ),
+        ("flac", ),
+        ("vorbis", ),
+        ("sph", "PCM_S", 16),
+        ("amr-nb", ),
+        ("amb", "PCM_S", 16),
+    ], name_func=name_func)
+    def test_save_large(self, format, encoding=None, bits_per_sample=None):
+        """`sox_io_backend.save` can save large files."""
         sample_rate = 8000
-        self.assert_wav(dtype, sample_rate, num_channels, num_frames=None)
+        one_hour = 60 * 60 * sample_rate
+        self.assert_save_consistency(
+            format, num_channels=1, sample_rate=8000, num_frames=one_hour,
+            encoding=encoding, bits_per_sample=bits_per_sample)
 
-    @parameterized.expand(list(itertools.product(
-        [8000, 16000],
-        [1, 2],
-        [-4.2, -0.2, 0, 0.2, 96, 128, 160, 192, 224, 256, 320],
-    )), name_func=name_func)
-    def test_mp3(self, sample_rate, num_channels, bit_rate):
-        """`sox_io_backend.save` can save mp3 format."""
-        self.assert_mp3(sample_rate, num_channels, bit_rate, duration=1)
-
-    @parameterized.expand(list(itertools.product(
-        [16000],
-        [2],
-        [128],
-    )), name_func=name_func)
-    def test_mp3_large(self, sample_rate, num_channels, bit_rate):
-        """`sox_io_backend.save` can save large mp3 file."""
-        two_hours = 2 * 60 * 60
-        self.assert_mp3(sample_rate, num_channels, bit_rate, duration=two_hours)
-
-    @parameterized.expand(list(itertools.product(
-        [8000, 16000],
-        [1, 2],
-        [None] + list(range(9)),
-    )), name_func=name_func)
-    def test_flac(self, sample_rate, num_channels, compression_level):
-        """`sox_io_backend.save` can save flac format."""
-        self.assert_flac(sample_rate, num_channels, compression_level, duration=1)
-
-    @parameterized.expand(list(itertools.product(
-        [16000],
-        [2],
-        [0],
-    )), name_func=name_func)
-    def test_flac_large(self, sample_rate, num_channels, compression_level):
-        """`sox_io_backend.save` can save large flac file."""
-        two_hours = 2 * 60 * 60
-        self.assert_flac(sample_rate, num_channels, compression_level, duration=two_hours)
-
-    @parameterized.expand(list(itertools.product(
-        [8000, 16000],
-        [1, 2],
-        [None, -1, 0, 1, 2, 3, 3.6, 5, 10],
-    )), name_func=name_func)
-    def test_vorbis(self, sample_rate, num_channels, quality_level):
-        """`sox_io_backend.save` can save vorbis format."""
-        self.assert_vorbis(sample_rate, num_channels, quality_level, duration=20)
-
-    # note: torchaudio can load large vorbis file, but cannot save large volbis file
-    # the following test causes Segmentation fault
-    #
-    '''
-    @parameterized.expand(list(itertools.product(
-        [16000],
-        [2],
-        [10],
-    )), name_func=name_func)
-    def test_vorbis_large(self, sample_rate, num_channels, quality_level):
-        """`sox_io_backend.save` can save large vorbis file correctly."""
-        two_hours = 2 * 60 * 60
-        self.assert_vorbis(sample_rate, num_channels, quality_level, two_hours)
-    '''
-
-    @parameterized.expand(list(itertools.product(
-        [8000, 16000],
-        [1, 2],
-    )), name_func=name_func)
-    def test_sphere(self, sample_rate, num_channels):
-        """`sox_io_backend.save` can save sph format."""
-        self.assert_sphere(sample_rate, num_channels, duration=1)
-
-    @parameterized.expand(list(itertools.product(
-        ['float32', 'int32', 'int16', 'uint8'],
-        [8000, 16000],
-        [1, 2],
-    )), name_func=name_func)
-    def test_amb(self, dtype, sample_rate, num_channels):
-        """`sox_io_backend.save` can save amb format."""
-        self.assert_amb(dtype, sample_rate, num_channels, duration=1)
-
-    def test_amr_nb(self):
-        """`sox_io_backend.save` can save amr-nb format."""
-        self.assert_amr_nb(duration=1)
+    @parameterized.expand([
+        (32, ),
+        (64, ),
+        (128, ),
+        (256, ),
+    ], name_func=name_func)
+    def test_save_multi_channels(self, num_channels):
+        """`sox_io_backend.save` can save audio with many channels"""
+        self.assert_save_consistency(
+            "wav", encoding="PCM_U", bits_per_sample=16,
+            num_channels=num_channels)
 
 
 @skipIfNoExec('sox')
@@ -385,136 +326,40 @@ class TestSave(SaveTestBase):
 class TestSaveParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of optional parameters of `sox_io_backend.save`"""
     @parameterized.expand([(True, ), (False, )], name_func=name_func)
-    def test_channels_first(self, channels_first):
+    def test_save_channels_first(self, channels_first):
         """channels_first swaps axes"""
         path = self.get_temp_path('data.wav')
-        data = get_wav_data('int32', 2, channels_first=channels_first)
+        data = get_wav_data(
+            'int16', 2, channels_first=channels_first, normalize=False)
         sox_io_backend.save(
-            path, data, 8000, channels_first=channels_first, dtype=None)
-        found = load_wav(path)[0]
+            path, data, 8000, channels_first=channels_first)
+        found = load_wav(path, normalize=False)[0]
         expected = data if channels_first else data.transpose(1, 0)
         self.assertEqual(found, expected)
 
     @parameterized.expand([
         'float32', 'int32', 'int16', 'uint8'
     ], name_func=name_func)
-    def test_noncontiguous(self, dtype):
+    def test_save_noncontiguous(self, dtype):
         """Noncontiguous tensors are saved correctly"""
         path = self.get_temp_path('data.wav')
-        expected = get_wav_data(dtype, 4)[::2, ::2]
+        enc, bps = get_enc_params(dtype)
+        expected = get_wav_data(dtype, 4, normalize=False)[::2, ::2]
         assert not expected.is_contiguous()
-        sox_io_backend.save(path, expected, 8000, dtype=None)
-        found = load_wav(path)[0]
+        sox_io_backend.save(
+            path, expected, 8000, encoding=enc, bits_per_sample=bps)
+        found = load_wav(path, normalize=False)[0]
         self.assertEqual(found, expected)
 
     @parameterized.expand([
         'float32', 'int32', 'int16', 'uint8',
     ])
-    def test_tensor_preserve(self, dtype):
+    def test_save_tensor_preserve(self, dtype):
         """save function should not alter Tensor"""
         path = self.get_temp_path('data.wav')
-        expected = get_wav_data(dtype, 4)[::2, ::2]
+        expected = get_wav_data(dtype, 4, normalize=False)[::2, ::2]
 
         data = expected.clone()
-        sox_io_backend.save(path, data, 8000, dtype=None)
+        sox_io_backend.save(path, data, 8000)
 
         self.assertEqual(data, expected)
-
-    @parameterized.expand([
-        ('float32', torch.tensor([-1.0, -0.5, 0, 0.5, 1.0]).to(torch.float32)),
-        ('int32', torch.tensor([-2147483648, -1073741824, 0, 1073741824, 2147483647]).to(torch.int32)),
-        ('int16', torch.tensor([-32768, -16384, 0, 16384, 32767]).to(torch.int16)),
-        ('uint8', torch.tensor([0, 64, 128, 192, 255]).to(torch.uint8)),
-    ])
-    def test_dtype_conversion(self, dtype, expected):
-        """`save` performs dtype conversion on float32 src tensors only."""
-        path = self.get_temp_path("data.wav")
-        data = torch.tensor([-1.0, -0.5, 0, 0.5, 1.0]).to(torch.float32).view(-1, 1)
-        sox_io_backend.save(path, data, 8000, dtype=dtype)
-        found = load_wav(path, normalize=False)[0]
-        self.assertEqual(found, expected.view(-1, 1))
-
-
-@skipIfNoExtension
-@skipIfNoExec('sox')
-class TestFileObject(SaveTestBase):
-    """
-    We campare the result of file-like object input against file path input because
-    `save` function is rigrously tested for file path inputs to match libsox's result,
-    """
-    @parameterized.expand([
-        ('wav', None),
-        ('mp3', 128),
-        ('mp3', 320),
-        ('flac', 0),
-        ('flac', 5),
-        ('flac', 8),
-        ('vorbis', -1),
-        ('vorbis', 10),
-        ('amb', None),
-    ])
-    def test_fileobj(self, ext, compression):
-        """Saving audio to file object returns the same result as via file path."""
-        sample_rate = 16000
-        dtype = 'float32'
-        num_channels = 2
-        num_frames = 16000
-        channels_first = True
-
-        data = get_wav_data(dtype, num_channels, num_frames=num_frames)
-
-        ref_path = self.get_temp_path(f'reference.{ext}')
-        res_path = self.get_temp_path(f'test.{ext}')
-        sox_io_backend.save(
-            ref_path, data, channels_first=channels_first,
-            sample_rate=sample_rate, compression=compression, dtype=None)
-        with open(res_path, 'wb') as fileobj:
-            sox_io_backend.save(
-                fileobj, data, channels_first=channels_first,
-                sample_rate=sample_rate, compression=compression, format=ext, dtype=None)
-
-        expected_data, _ = sox_io_backend.load(ref_path)
-        data, sr = sox_io_backend.load(res_path)
-
-        assert sample_rate == sr
-        self.assertEqual(expected_data, data)
-
-    @parameterized.expand([
-        ('wav', None),
-        ('mp3', 128),
-        ('mp3', 320),
-        ('flac', 0),
-        ('flac', 5),
-        ('flac', 8),
-        ('vorbis', -1),
-        ('vorbis', 10),
-        ('amb', None),
-    ])
-    def test_bytesio(self, ext, compression):
-        """Saving audio to BytesIO object returns the same result as via file path."""
-        sample_rate = 16000
-        dtype = 'float32'
-        num_channels = 2
-        num_frames = 16000
-        channels_first = True
-
-        data = get_wav_data(dtype, num_channels, num_frames=num_frames)
-
-        ref_path = self.get_temp_path(f'reference.{ext}')
-        res_path = self.get_temp_path(f'test.{ext}')
-        sox_io_backend.save(
-            ref_path, data, channels_first=channels_first,
-            sample_rate=sample_rate, compression=compression, dtype=None)
-        fileobj = io.BytesIO()
-        sox_io_backend.save(
-            fileobj, data, channels_first=channels_first,
-            sample_rate=sample_rate, compression=compression, format=ext, dtype=None)
-        fileobj.seek(0)
-        with open(res_path, 'wb') as file_:
-            file_.write(fileobj.read())
-
-        expected_data, _ = sox_io_backend.load(ref_path)
-        data, sr = sox_io_backend.load(res_path)
-
-        assert sample_rate == sr
-        self.assertEqual(expected_data, data)

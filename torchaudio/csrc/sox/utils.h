@@ -34,6 +34,19 @@ std::vector<std::string> list_write_formats();
 // Utilities for sox_io / sox_effects implementations
 ////////////////////////////////////////////////////////////////////////////////
 
+const std::string ENCODING_UNKNOWN = "UNKNOWN";
+const std::string ENCODING_PCM_SIGNED = "PCM_S";
+const std::string ENCODING_PCM_UNSIGNED = "PCM_U";
+const std::string ENCODING_PCM_FLOAT = "PCM_F";
+const std::string ENCODING_FLAC = "FLAC";
+const std::string ENCODING_ULAW = "ULAW";
+const std::string ENCODING_ALAW = "ALAW";
+const std::string ENCODING_MP3 = "MP3";
+const std::string ENCODING_VORBIS = "VORBIS";
+const std::string ENCODING_AMR_WB = "AMR_WB";
+const std::string ENCODING_AMR_NB = "AMR_NB";
+const std::string ENCODING_OPUS = "OPUS";
+
 const std::unordered_set<std::string> UNSUPPORTED_EFFECTS =
     {"input", "output", "spectrogram", "noiseprof", "noisered", "splice"};
 
@@ -93,11 +106,6 @@ torch::Tensor convert_to_tensor(
     const bool normalize,
     const bool channels_first);
 
-///
-/// Convert float32/int32/int16/uint8 Tensor to int32 for Torch -> Sox
-/// conversion.
-torch::Tensor unnormalize_wav(const torch::Tensor);
-
 /// Extract extension from file path
 const std::string get_filetype(const std::string path);
 
@@ -113,9 +121,10 @@ sox_encodinginfo_t get_tensor_encodinginfo(const caffe2::TypeMeta dtype);
 
 /// Get sox_encodinginfo_t for saving to file/file object
 sox_encodinginfo_t get_encodinginfo_for_save(
-    const std::string filetype,
-    const caffe2::TypeMeta dtype,
-    c10::optional<double>& compression);
+    const std::string& format,
+    const c10::optional<double>& compression,
+    const c10::optional<std::string>& encoding,
+    const c10::optional<int64_t>& bits_per_sample);
 
 #ifdef TORCH_API_INCLUDE_EXTENSION_H
 

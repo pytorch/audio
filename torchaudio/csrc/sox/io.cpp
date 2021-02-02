@@ -14,32 +14,31 @@ namespace {
 
 std::string get_encoding(sox_encoding_t encoding) {
   switch (encoding) {
-    case SOX_ENCODING_UNKNOWN:
-      return "UNKNOWN";
     case SOX_ENCODING_SIGN2:
-      return "PCM_S";
+      return ENCODING_PCM_SIGNED;
     case SOX_ENCODING_UNSIGNED:
-      return "PCM_U";
+      return ENCODING_PCM_UNSIGNED;
     case SOX_ENCODING_FLOAT:
-      return "PCM_F";
+      return ENCODING_PCM_FLOAT;
     case SOX_ENCODING_FLAC:
-      return "FLAC";
+      return ENCODING_FLAC;
     case SOX_ENCODING_ULAW:
-      return "ULAW";
+      return ENCODING_ULAW;
     case SOX_ENCODING_ALAW:
-      return "ALAW";
+      return ENCODING_ALAW;
     case SOX_ENCODING_MP3:
-      return "MP3";
+      return ENCODING_MP3;
     case SOX_ENCODING_VORBIS:
-      return "VORBIS";
+      return ENCODING_VORBIS;
     case SOX_ENCODING_AMR_WB:
-      return "AMR_WB";
+      return ENCODING_AMR_WB;
     case SOX_ENCODING_AMR_NB:
-      return "AMR_NB";
+      return ENCODING_AMR_NB;
     case SOX_ENCODING_OPUS:
-      return "OPUS";
+      return ENCODING_OPUS;
+    case SOX_ENCODING_UNKNOWN:
     default:
-      return "UNKNOWN";
+      return ENCODING_UNKNOWN;
   }
 }
 
@@ -116,35 +115,27 @@ void save_audio_file(
     torch::Tensor tensor,
     int64_t sample_rate,
     bool channels_first,
-    c10::optional<double> compression,
-    c10::optional<std::string> format,
-    c10::optional<std::string> dtype) {
+    c10::optional<double>& compression,
+    c10::optional<std::string>& format,
+    c10::optional<std::string>& encoding,
+    c10::optional<int64_t>& bits_per_sample) {
   validate_input_tensor(tensor);
-
-  if (tensor.dtype() != torch::kFloat32 && dtype.has_value()) {
-    throw std::runtime_error(
-        "dtype conversion only supported for float32 tensors");
-  }
-  const auto tgt_dtype =
-      (tensor.dtype() == torch::kFloat32 && dtype.has_value())
-      ? get_dtype_from_str(dtype.value())
-      : tensor.dtype();
 
   const auto filetype = [&]() {
     if (format.has_value())
       return format.value();
     return get_filetype(path);
   }();
+
   if (filetype == "amr-nb") {
     const auto num_channels = tensor.size(channels_first ? 0 : 1);
     TORCH_CHECK(
         num_channels == 1, "amr-nb format only supports single channel audio.");
-    tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
   const auto signal_info =
       get_signalinfo(&tensor, sample_rate, filetype, channels_first);
-  const auto encoding_info =
-      get_encodinginfo_for_save(filetype, tgt_dtype, compression);
+  const auto encoding_info = get_encodinginfo_for_save(
+      filetype, compression, encoding, bits_per_sample);
 
   SoxFormat sf(sox_open_write(
       path.c_str(),
@@ -258,19 +249,17 @@ void save_audio_fileobj(
     torch::Tensor tensor,
     int64_t sample_rate,
     bool channels_first,
-    c10::optional<double> compression,
-    std::string filetype,
-    c10::optional<std::string> dtype) {
+    c10::optional<double>& compression,
+    c10::optional<std::string>& format,
+    c10::optional<std::string>& encoding,
+    c10::optional<int64_t>& bits_per_sample) {
   validate_input_tensor(tensor);
 
-  if (tensor.dtype() != torch::kFloat32 && dtype.has_value()) {
+  if (!format.has_value()) {
     throw std::runtime_error(
-        "dtype conversion only supported for float32 tensors");
+        "`format` is required when saving to file object.");
   }
-  const auto tgt_dtype =
-      (tensor.dtype() == torch::kFloat32 && dtype.has_value())
-      ? get_dtype_from_str(dtype.value())
-      : tensor.dtype();
+  const auto filetype = format.value();
 
   if (filetype == "amr-nb") {
     const auto num_channels = tensor.size(channels_first ? 0 : 1);
@@ -278,12 +267,11 @@ void save_audio_fileobj(
       throw std::runtime_error(
           "amr-nb format only supports single channel audio.");
     }
-    tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
   const auto signal_info =
       get_signalinfo(&tensor, sample_rate, filetype, channels_first);
-  const auto encoding_info =
-      get_encodinginfo_for_save(filetype, tgt_dtype, compression);
+  const auto encoding_info = get_encodinginfo_for_save(
+      filetype, compression, encoding, bits_per_sample);
 
   AutoReleaseBuffer buffer;
 

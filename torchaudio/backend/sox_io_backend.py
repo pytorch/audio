@@ -1,5 +1,4 @@
 import os
-import warnings
 from typing import Tuple, Optional
 
 import torch
@@ -152,26 +151,6 @@ def load(
         filepath, frame_offset, num_frames, normalize, channels_first, format)
 
 
-@torch.jit.unused
-def _save(
-        filepath: str,
-        src: torch.Tensor,
-        sample_rate: int,
-        channels_first: bool = True,
-        compression: Optional[float] = None,
-        format: Optional[str] = None,
-        dtype: Optional[str] = None,
-):
-    if hasattr(filepath, 'write'):
-        if format is None:
-            raise RuntimeError('`format` is required when saving to file object.')
-        torchaudio._torchaudio.save_audio_fileobj(
-            filepath, src, sample_rate, channels_first, compression, format, dtype)
-    else:
-        torch.ops.torchaudio.sox_io_save_audio_file(
-            os.fspath(filepath), src, sample_rate, channels_first, compression, format, dtype)
-
-
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def save(
         filepath: str,
@@ -180,7 +159,8 @@ def save(
         channels_first: bool = True,
         compression: Optional[float] = None,
         format: Optional[str] = None,
-        dtype: Optional[str] = None,
+        encoding: Optional[str] = None,
+        bits_per_sample: Optional[int] = None,
 ):
     """Save audio data to file.
 
@@ -223,24 +203,65 @@ def save(
                   | and lowest quality. Default: ``3``.
 
             See the detail at http://sox.sourceforge.net/soxformat.html.
-        format (str, optional): Output audio format.
-            This is required when the output audio format cannot be infered from
-            ``filepath``, (such as file extension or ``name`` attribute of the given file object).
-        dtype (str, optional): Output tensor dtype.
-            Valid values: ``"uint8", "int16", "int32", "float32", "float64", None``
-            ``dtype=None`` means no conversion is performed.
-            ``dtype`` parameter is only effective for ``float32`` Tensor.
+        format (str, optional):
+            If provided, overwrite the audio format. This parameter is required in cases where
+            the ``filepath`` parameter is file-like object or ``filepath`` parameter represents
+            the path to a file on a local system but missing file extension or has different
+            extension.
+            When not provided, the value of file extension is used.
+            Valid values are ``"wav"``, ``"mp3"``, ``"ogg"``, ``"vorbis"``, ``"amr-nb"``,
+            ``"amb"``, ``"flac"`` and ``"sph"``.
+        encoding (str, optional):
+            Changes the encoding for the supported formats, such as ``"wav"``, ``"sph"``.
+            and ``"amb"``.
+            Valid values are ``"PCM_S"`` (signed integer Linear PCM), ``"PCM_U"``
+            (unsigned integer Linear PCM), ``"PCM_F"`` (floating point PCM),
+            ``"ULAW"`` (mu-law) and ``"ALAW"`` (a-law).
+            Different formats support different set of encodings. Providing a value that is not
+            supported by the format will not cause an error, but will fallback to its default value.
+
+            If not provided, the default values are picked based on ``format`` and
+            ``bits_per_sample``;
+
+            For ``"wav"`` and ``"amb"`` formats, the default value is;
+                - ``"PCM_U"`` if ``bits_per_sample=8``
+                - ``"PCM_S"`` otherwise
+            For ``"sph"`` format, the default value is ``"PCM_S"``.
+
+        bits_per_sample (int, optional):
+            Change the bit depth for the supported formats, such as ``"wav"``, ``"flac"``,
+            ``"sph"``, and ``"amb"``.
+            Valid values are ``8``, ``16``, ``32`` and ``64``.
+            Different formats support different set of encodings. Providing a value that is not
+            supported by the format will not cause an error, but will fallback to its default value.
+
+            If not provided, the default values are picked based on ``format`` and ``"encoding"``;
+
+            For ``"wav"`` format, the default value is;
+                - ``8`` if ``encoding`` is ``"PCM_U"``, ``"ULAW"`` or ``"ALAW"``
+                - ``16`` if ``encoding`` is ``"PCM_S"`` or not provided.
+                - ``32`` if ``encoding`` is ``"PCM_F"``
+
+            For ``"flac"`` format, the default value is ``24``.
+
+            For ``"sph"`` format, the default value is;
+                - ``16`` if ``encoding`` is ``"PCM_U"``, ``"PCM_S"``, ``"PCM_F"`` or not provided.
+                - ``8`` if ``encoding`` is ``"ULAW"`` or ``"ALAW"``
+
+            For ``"amb"`` format,  the default value is;
+                - ``8`` if ``encoding`` is ``"PCM_U"``, ``"ULAW"`` or ``"ALAW"``
+                - ``16`` if ``encoding`` is ``"PCM_S"`` or not provided.
+                - ``32`` if ``encoding`` is ``"PCM_F"``
     """
-    if src.dtype == torch.float32 and dtype is None:
-        warnings.warn(
-            '`dtype` default value will be changed to `int16` in 0.9 release.'
-            'Specify `dtype` to suppress this warning.'
-        )
     if not torch.jit.is_scripting():
-        _save(filepath, src, sample_rate, channels_first, compression, format, dtype)
-        return
+        if hasattr(filepath, 'write'):
+            torchaudio._torchaudio.save_audio_fileobj(
+                filepath, src, sample_rate, channels_first, compression,
+                format, encoding, bits_per_sample)
+            return
+        filepath = os.fspath(filepath)
     torch.ops.torchaudio.sox_io_save_audio_file(
-        filepath, src, sample_rate, channels_first, compression, format, dtype)
+        filepath, src, sample_rate, channels_first, compression, format, encoding, bits_per_sample)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
