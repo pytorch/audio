@@ -258,7 +258,13 @@ void SoxEffectsChain::addEffect(const std::vector<std::string> effect) {
     throw std::runtime_error(stream.str());
   }
 
-  SoxEffect e(sox_create_effect(sox_find_effect(name.c_str())));
+  auto returned_effect = sox_find_effect(name.c_str());
+  if (!returned_effect) {
+    std::ostringstream stream;
+    stream << "Unsupported effect: " << name;
+    throw std::runtime_error(stream.str());
+  }
+  SoxEffect e(sox_create_effect(returned_effect));
   const auto num_options = num_args - 1;
 
   std::vector<char*> opts;
