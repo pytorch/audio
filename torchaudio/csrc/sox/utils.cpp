@@ -279,16 +279,16 @@ unsigned get_precision(
 }
 
 sox_signalinfo_t get_signalinfo(
-    const std::tuple<torch::Tensor, int64_t>* signal,
+    const torch::Tensor* waveform,
+    const int64_t sample_rate,
     const std::string filetype,
-    bool channels_first) {
-  auto tensor = std::get<0>(*signal);
+    const bool channels_first) {
   return sox_signalinfo_t{
-      /*rate=*/static_cast<sox_rate_t>(std::get<1>(*signal)),
+      /*rate=*/static_cast<sox_rate_t>(sample_rate),
       /*channels=*/
-      static_cast<unsigned>(tensor.size(channels_first ? 0 : 1)),
-      /*precision=*/get_precision(filetype, tensor.dtype()),
-      /*length=*/static_cast<uint64_t>(tensor.numel())};
+      static_cast<unsigned>(waveform->size(channels_first ? 0 : 1)),
+      /*precision=*/get_precision(filetype, waveform->dtype()),
+      /*length=*/static_cast<uint64_t>(waveform->numel())};
 }
 
 sox_encodinginfo_t get_encodinginfo(

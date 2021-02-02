@@ -51,24 +51,24 @@ void shutdown_sox_effects() {
 }
 
 std::tuple<torch::Tensor, int64_t> apply_effects_tensor(
-    std::tuple<torch::Tensor, int64_t> input_signal,
+    torch::Tensor waveform,
+    int64_t sample_rate,
     std::vector<std::vector<std::string>> effects,
-    c10::optional<bool>& channels_first) {
-  auto in_tensor = std::get<0>(input_signal);
-  validate_input_tensor(in_tensor);
+    bool channels_first) {
+  validate_input_tensor(waveform);
 
   // Create SoxEffectsChain
-  const auto dtype = in_tensor.dtype();
+  const auto dtype = waveform.dtype();
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
       /*input_encoding=*/get_encodinginfo("wav", dtype),
       /*output_encoding=*/get_encodinginfo("wav", dtype));
 
   // Prepare output buffer
   std::vector<sox_sample_t> out_buffer;
-  out_buffer.reserve(in_tensor.numel());
+  out_buffer.reserve(waveform.numel());
 
   // Build and run effects chain
-  chain.addInputTensor(&input_signal, channels_first.value());
+  chain.addInputTensor(&waveform, sample_rate, channels_first);
   for (const auto& effect : effects) {
     chain.addEffect(effect);
   }
@@ -82,7 +82,7 @@ std::tuple<torch::Tensor, int64_t> apply_effects_tensor(
       /*num_channels=*/chain.getOutputNumChannels(),
       dtype,
       /*noramlize=*/false,
-      channels_first.value());
+      channels_first);
 
   return std::tuple<torch::Tensor, int64_t>(
       out_tensor, chain.getOutputSampleRate());

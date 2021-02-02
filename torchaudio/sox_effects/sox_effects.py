@@ -150,7 +150,7 @@ def apply_effects_tensor(
         >>> assert sample_rate == 8000
     """
     return torch.ops.torchaudio.sox_effects_apply_effects_tensor(
-        (tensor, sample_rate), effects, channels_first)
+        tensor, sample_rate, effects, channels_first)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')

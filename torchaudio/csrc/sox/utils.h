@@ -103,9 +103,10 @@ const std::string get_filetype(const std::string path);
 
 /// Get sox_signalinfo_t for passing a torch::Tensor object.
 sox_signalinfo_t get_signalinfo(
-    const std::tuple<torch::Tensor, int64_t>* signal,
+    const torch::Tensor* waveform,
+    const int64_t sample_rate,
     const std::string filetype,
-    bool channels_first);
+    const bool channels_first);
 
 /// Get sox_encofinginfo_t for saving audoi file
 sox_encodinginfo_t get_encodinginfo(

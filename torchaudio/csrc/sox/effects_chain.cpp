@@ -41,7 +41,8 @@ struct SoxEffect {
 /// gives sox_effect_t an access to input Tensor and output buffer object.
 struct TensorInputPriv {
   size_t index;
-  std::tuple<torch::Tensor, int64_t>* signal;
+  torch::Tensor* waveform;
+  int64_t sample_rate;
   bool channels_first;
 };
 struct TensorOutputPriv {
@@ -56,8 +57,7 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   // Retrieve the input Tensor and current index
   auto priv = static_cast<TensorInputPriv*>(effp->priv);
   auto index = priv->index;
-  auto signal = priv->signal;
-  auto tensor = std::get<0>(*signal);
+  auto tensor = *(priv->waveform);
   auto num_channels = effp->out_signal.channels;
 
   // Adjust the number of samples to read
@@ -195,14 +195,16 @@ void SoxEffectsChain::run() {
 }
 
 void SoxEffectsChain::addInputTensor(
-    std::tuple<torch::Tensor, int64_t>* signal,
+    torch::Tensor* waveform,
+    int64_t sample_rate,
     bool channels_first) {
-  in_sig_ = get_signalinfo(signal, "wav", channels_first);
+  in_sig_ = get_signalinfo(waveform, sample_rate, "wav", channels_first);
   interm_sig_ = in_sig_;
   SoxEffect e(sox_create_effect(get_tensor_input_handler()));
   auto priv = static_cast<TensorInputPriv*>(e->priv);
-  priv->signal = signal;
   priv->index = 0;
+  priv->waveform = waveform;
+  priv->sample_rate = sample_rate;
   priv->channels_first = channels_first;
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
     throw std::runtime_error(

@@ -153,7 +153,6 @@ void save_audio_file(
     c10::optional<std::string> dtype) {
   validate_input_tensor(tensor);
 
-  auto signal = std::tuple<torch::Tensor, int64_t>(tensor, sample_rate);
   if (tensor.dtype() != torch::kFloat32 && dtype.has_value()) {
     throw std::runtime_error(
         "dtype conversion only supported for float32 tensors");
@@ -174,7 +173,8 @@ void save_audio_file(
         num_channels == 1, "amr-nb format only supports single channel audio.");
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
-  const auto signal_info = get_signalinfo(&signal, filetype, channels_first);
+  const auto signal_info =
+      get_signalinfo(&tensor, sample_rate, filetype, channels_first);
   const auto encoding_info = get_encodinginfo(filetype, tgt_dtype, compression);
 
   SoxFormat sf(sox_open_write(
@@ -192,7 +192,7 @@ void save_audio_file(
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
       /*input_encoding=*/get_encodinginfo("wav", tensor.dtype()),
       /*output_encoding=*/sf->encoding);
-  chain.addInputTensor(&signal, channels_first);
+  chain.addInputTensor(&tensor, sample_rate, channels_first);
   chain.addOutputFile(sf);
   chain.run();
 }
@@ -294,7 +294,6 @@ void save_audio_fileobj(
     c10::optional<std::string> dtype) {
   validate_input_tensor(tensor);
 
-  auto signal = std::tuple<torch::Tensor, int64_t>(tensor, sample_rate);
   if (tensor.dtype() != torch::kFloat32 && dtype.has_value()) {
     throw std::runtime_error(
         "dtype conversion only supported for float32 tensors");
@@ -312,7 +311,8 @@ void save_audio_fileobj(
     }
     tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
-  const auto signal_info = get_signalinfo(&signal, filetype, channels_first);
+  const auto signal_info =
+      get_signalinfo(&tensor, sample_rate, filetype, channels_first);
   const auto encoding_info = get_encodinginfo(filetype, tgt_dtype, compression);
 
   AutoReleaseBuffer buffer;
@@ -333,7 +333,7 @@ void save_audio_fileobj(
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
       /*input_encoding=*/get_encodinginfo("wav", tensor.dtype()),
       /*output_encoding=*/sf->encoding);
-  chain.addInputTensor(&signal, channels_first);
+  chain.addInputTensor(&tensor, sample_rate, channels_first);
   chain.addOutputFileObj(sf, &buffer.ptr, &buffer.size, &fileobj);
   chain.run();
 

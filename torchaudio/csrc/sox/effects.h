@@ -16,9 +16,10 @@ void initialize_sox_effects();
 void shutdown_sox_effects();
 
 std::tuple<torch::Tensor, int64_t> apply_effects_tensor(
-    std::tuple<torch::Tensor, int64_t> input_signal,
+    torch::Tensor waveform,
+    int64_t sample_rate,
     std::vector<std::vector<std::string>> effects,
-    c10::optional<bool>& channels_first);
+    bool channels_first);
 
 std::tuple<torch::Tensor, int64_t> apply_effects_file(
     const std::string path,
