@@ -293,9 +293,31 @@ sox_signalinfo_t get_signalinfo(
 
 sox_encodinginfo_t get_tensor_encodinginfo(
     const caffe2::TypeMeta dtype) {
+  sox_encoding_t encoding = [&](){
+    if (dtype == torch::kUInt8)
+      return SOX_ENCODING_UNSIGNED;
+    if (dtype == torch::kInt16)
+      return SOX_ENCODING_SIGN2;
+    if (dtype == torch::kInt32)
+      return SOX_ENCODING_SIGN2;
+    if (dtype == torch::kFloat32)
+      return SOX_ENCODING_FLOAT;
+    throw std::runtime_error("Unsupported dtype.");
+  }();
+  unsigned bits_per_sample = [&](){
+    if (dtype == torch::kUInt8)
+      return 8;
+    if (dtype == torch::kInt16)
+      return 16;
+    if (dtype == torch::kInt32)
+      return 32;
+    if (dtype == torch::kFloat32)
+      return 32;
+    throw std::runtime_error("Unsupported dtype.");
+  }();
   return sox_encodinginfo_t{
-      /*encoding=*/get_encoding("wav", dtype),
-      /*bits_per_sample=*/get_precision("wav", dtype),
+      /*encoding=*/encoding,
+      /*bits_per_sample=*/bits_per_sample,
       /*compression=*/HUGE_VAL,
       /*reverse_bytes=*/sox_option_default,
       /*reverse_nibbles=*/sox_option_default,
