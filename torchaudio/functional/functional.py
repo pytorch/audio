@@ -852,11 +852,11 @@ def detect_pitch_frequency(
 
 
 def sliding_window_cmn(
-        waveform: Tensor,
-        cmn_window: int = 600,
-        min_cmn_window: int = 100,
-        center: bool = False,
-        norm_vars: bool = False,
+    waveform: Tensor,
+    cmn_window: int = 600,
+    min_cmn_window: int = 100,
+    center: bool = False,
+    norm_vars: bool = False,
 ) -> Tensor:
     r"""
     Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.
@@ -977,12 +977,12 @@ def spectral_centroid(
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
 
 
-def apply_codec(waveform, sample_rate, format, channels_first=True, compression=None) -> Tensor:
+def apply_codec(waveform, sample_rate, compression, format, channels_first=True) -> Tensor:
     r"""
     Applies codecs as a form of augmentation
 
     Args:
-        waveform (Tensor): Tensor of audio of dimension (..., time)
+        waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```
         sample_rate (int): Sample rate of the audio waveform
         format (str): file format
         channels_first (bool):
@@ -999,7 +999,7 @@ def apply_codec(waveform, sample_rate, format, channels_first=True, compression=
             See the detail at http://sox.sourceforge.net/soxformat.html.
 
     Returns:
-        Tensor: Dimension (..., time)
+        Tensor
     """
     bytes = io.BytesIO()
     torchaudio.save(bytes, waveform, sample_rate, channels_first, compression=compression, format=format)
