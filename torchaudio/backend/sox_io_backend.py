@@ -16,17 +16,10 @@ def _info(
         filepath: str,
         format: Optional[str] = None,
 ) -> AudioMetaData:
-    if hasattr(filepath, 'read'):
-        sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
-        return AudioMetaData(*sinfo)
-    sinfo = torch.ops.torchaudio.sox_io_get_info(os.fspath(filepath), format)
-    return AudioMetaData(
-        sinfo.get_sample_rate(),
-        sinfo.get_num_frames(),
-        sinfo.get_num_channels(),
-        sinfo.get_bits_per_sample(),
-        sinfo.get_encoding(),
-    )
+    sinfo = (torchaudio._torchaudio.get_info_fileobj(filepath, format)
+             if hasattr(filepath, 'read') else
+             torch.ops.torchaudio.sox_io_get_info(os.fspath(filepath), format))
+    return AudioMetaData(*sinfo)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -63,12 +56,7 @@ def info(
     if not torch.jit.is_scripting():
         return _info(filepath, format)
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
-    return AudioMetaData(
-        sinfo.get_sample_rate(),
-        sinfo.get_num_frames(),
-        sinfo.get_num_channels(),
-        sinfo.get_bits_per_sample(),
-        sinfo.get_encoding())
+    return AudioMetaData(*sinfo)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')

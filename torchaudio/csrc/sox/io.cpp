@@ -10,38 +10,6 @@ using namespace torchaudio::sox_utils;
 namespace torchaudio {
 namespace sox_io {
 
-SignalInfo::SignalInfo(
-    const int64_t sample_rate_,
-    const int64_t num_channels_,
-    const int64_t num_frames_,
-    const int64_t bits_per_sample_,
-    const std::string encoding_)
-    : sample_rate(sample_rate_),
-      num_channels(num_channels_),
-      num_frames(num_frames_),
-      bits_per_sample(bits_per_sample_),
-      encoding(encoding_){};
-
-int64_t SignalInfo::getSampleRate() const {
-  return sample_rate;
-}
-
-int64_t SignalInfo::getNumChannels() const {
-  return num_channels;
-}
-
-int64_t SignalInfo::getNumFrames() const {
-  return num_frames;
-}
-
-int64_t SignalInfo::getBitsPerSample() const {
-  return bits_per_sample;
-}
-
-std::string SignalInfo::getEncoding() const {
-  return encoding;
-}
-
 namespace {
 
 std::string get_encoding(sox_encoding_t encoding) {
@@ -77,7 +45,7 @@ std::string get_encoding(sox_encoding_t encoding) {
 
 } // namespace
 
-c10::intrusive_ptr<SignalInfo> get_info_file(
+std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_file(
     const std::string& path,
     c10::optional<std::string>& format) {
   SoxFormat sf(sox_open_read(
@@ -90,10 +58,10 @@ c10::intrusive_ptr<SignalInfo> get_info_file(
     throw std::runtime_error("Error opening audio file");
   }
 
-  return c10::make_intrusive<SignalInfo>(
+  return std::make_tuple(
       static_cast<int64_t>(sf->signal.rate),
-      static_cast<int64_t>(sf->signal.channels),
       static_cast<int64_t>(sf->signal.length / sf->signal.channels),
+      static_cast<int64_t>(sf->signal.channels),
       static_cast<int64_t>(sf->encoding.bits_per_sample),
       get_encoding(sf->encoding.encoding));
 }
@@ -347,15 +315,6 @@ void save_audio_fileobj(
 #endif // TORCH_API_INCLUDE_EXTENSION_H
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.class_<torchaudio::sox_io::SignalInfo>("SignalInfo")
-      .def("get_sample_rate", &torchaudio::sox_io::SignalInfo::getSampleRate)
-      .def("get_num_channels", &torchaudio::sox_io::SignalInfo::getNumChannels)
-      .def("get_num_frames", &torchaudio::sox_io::SignalInfo::getNumFrames)
-      .def(
-          "get_bits_per_sample",
-          &torchaudio::sox_io::SignalInfo::getBitsPerSample)
-      .def("get_encoding", &torchaudio::sox_io::SignalInfo::getEncoding);
-
   m.def("torchaudio::sox_io_get_info", &torchaudio::sox_io::get_info_file);
   m.def(
       "torchaudio::sox_io_load_audio_file",
