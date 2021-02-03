@@ -143,7 +143,8 @@ void save_audio_file(
   }
   const auto signal_info =
       get_signalinfo(&tensor, sample_rate, filetype, channels_first);
-  const auto encoding_info = get_encodinginfo(filetype, tgt_dtype, compression);
+  const auto encoding_info =
+      get_encodinginfo_for_save(filetype, tgt_dtype, compression);
 
   SoxFormat sf(sox_open_write(
       path.c_str(),
@@ -158,7 +159,7 @@ void save_audio_file(
   }
 
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
-      /*input_encoding=*/get_encodinginfo("wav", tensor.dtype()),
+      /*input_encoding=*/get_tensor_encodinginfo(tensor.dtype()),
       /*output_encoding=*/sf->encoding);
   chain.addInputTensor(&tensor, sample_rate, channels_first);
   chain.addOutputFile(sf);
@@ -281,7 +282,8 @@ void save_audio_fileobj(
   }
   const auto signal_info =
       get_signalinfo(&tensor, sample_rate, filetype, channels_first);
-  const auto encoding_info = get_encodinginfo(filetype, tgt_dtype, compression);
+  const auto encoding_info =
+      get_encodinginfo_for_save(filetype, tgt_dtype, compression);
 
   AutoReleaseBuffer buffer;
 
@@ -299,7 +301,7 @@ void save_audio_fileobj(
   }
 
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
-      /*input_encoding=*/get_encodinginfo("wav", tensor.dtype()),
+      /*input_encoding=*/get_tensor_encodinginfo(tensor.dtype()),
       /*output_encoding=*/sf->encoding);
   chain.addInputTensor(&tensor, sample_rate, channels_first);
   chain.addOutputFileObj(sf, &buffer.ptr, &buffer.size, &fileobj);
