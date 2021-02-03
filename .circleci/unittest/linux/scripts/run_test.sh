@@ -5,8 +5,15 @@ set -e
 eval "$(./conda/bin/conda shell.bash hook)"
 conda activate ./env
 
+case "$(uname -s)" in
+    Darwin*) os=MacOSX;;
+    *) os=Linux
+esac
+
 python -m torch.utils.collect_env
-cat /proc/cpuinfo
+if [ "${os}" == Linux ]; then
+    cat /proc/cpuinfo
+fi
 export TORCHAUDIO_TEST_FAIL_IF_NO_EXTENSION=1
 export PATH="${PWD}/third_party/install/bin/:${PATH}"
 
