@@ -1,14 +1,14 @@
 import torch
 
 from torchaudio_unittest.common_utils import PytorchTestCase
-from .torchscript_consistency_impl import Transforms
+from .torchscript_consistency_impl import Functional
 
 
-class TestTransformsFloat32(Transforms, PytorchTestCase):
+class TestFunctionalFloat32(Functional, PytorchTestCase):
     dtype = torch.float32
     device = torch.device('cpu')
 
 
-class TestTransformsFloat64(Transforms, PytorchTestCase):
+class TestFunctionalFloat64(Functional, PytorchTestCase):
     dtype = torch.float64
     device = torch.device('cpu')
