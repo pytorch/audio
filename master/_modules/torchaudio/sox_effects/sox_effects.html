@@ -370,7 +370,7 @@
 
 <span class="sd">    Note:</span>
 <span class="sd">        This function works in the way very similar to ``sox`` command, however there are slight</span>
-<span class="sd">        differences. For example, ``sox`` commnad adds certain effects automatically (such as</span>
+<span class="sd">        differences. For example, ``sox`` command adds certain effects automatically (such as</span>
 <span class="sd">        ``rate`` effect after ``speed`` and ``pitch`` and other effects), but this function does</span>
 <span class="sd">        only applies the given effects. (Therefore, to actually apply ``speed`` effect, you also</span>
 <span class="sd">        need to give ``rate`` effect with desired sampling rate.)</span>
@@ -456,9 +456,8 @@
 <span class="sd">        &gt;&gt;&gt; waveform, sample_rate = transform(waveform, input_sample_rate)</span>
 <span class="sd">        &gt;&gt;&gt; assert sample_rate == 8000</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">in_signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">TensorSignal</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span>
-    <span class="n">out_signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_tensor</span><span class="p">(</span><span class="n">in_signal</span><span class="p">,</span> <span class="n">effects</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">out_signal</span><span class="o">.</span><span class="n">get_tensor</span><span class="p">(),</span> <span class="n">out_signal</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_tensor</span><span class="p">(</span>
+        <span class="n">tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="apply_effects_file"><a class="viewcode-back" href="../../../sox_effects.html#torchaudio.sox_effects.apply_effects_file">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
@@ -575,9 +574,8 @@
             <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">apply_effects_fileobj</span><span class="p">(</span>
                 <span class="n">path</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">signal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_file</span><span class="p">(</span>
-        <span class="n">path</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_tensor</span><span class="p">(),</span> <span class="n">signal</span><span class="o">.</span><span class="n">get_sample_rate</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects_apply_effects_file</span><span class="p">(</span>
+        <span class="n">path</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span></div>
 </pre></div>
 
              </article>
