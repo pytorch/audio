@@ -291,9 +291,8 @@ sox_signalinfo_t get_signalinfo(
       /*length=*/static_cast<uint64_t>(waveform->numel())};
 }
 
-sox_encodinginfo_t get_tensor_encodinginfo(
-    const caffe2::TypeMeta dtype) {
-  sox_encoding_t encoding = [&](){
+sox_encodinginfo_t get_tensor_encodinginfo(const caffe2::TypeMeta dtype) {
+  sox_encoding_t encoding = [&]() {
     if (dtype == torch::kUInt8)
       return SOX_ENCODING_UNSIGNED;
     if (dtype == torch::kInt16)
@@ -304,7 +303,7 @@ sox_encodinginfo_t get_tensor_encodinginfo(
       return SOX_ENCODING_FLOAT;
     throw std::runtime_error("Unsupported dtype.");
   }();
-  unsigned bits_per_sample = [&](){
+  unsigned bits_per_sample = [&]() {
     if (dtype == torch::kUInt8)
       return 8;
     if (dtype == torch::kInt16)
