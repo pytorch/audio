@@ -190,6 +190,31 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         # shape = (3, 2, 201, 1394)
         self.assertEqual(computed, expected)
 
+    def test_batch_alaw(self):
+        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
+        waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
+
+        # Single then transform then batch
+        waveform_encoded = torchaudio.transforms.ALawEncoding()(waveform)
+        expected = waveform_encoded.unsqueeze(0).repeat(3, 1, 1)
+
+        # Batch then transform
+        waveform_batched = waveform.unsqueeze(0).repeat(3, 1, 1)
+        computed = torchaudio.transforms.ALawEncoding()(waveform_batched)
+
+        # shape = (3, 2, 201, 1394)
+        self.assertEqual(computed, expected)
+
+        # Single then transform then batch
+        waveform_decoded = torchaudio.transforms.ALawDecoding()(waveform_encoded)
+        expected = waveform_decoded.unsqueeze(0).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = torchaudio.transforms.ALawDecoding()(computed)
+
+        # shape = (3, 2, 201, 1394)
+        self.assertEqual(computed, expected)
+
     def test_batch_spectrogram(self):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
         waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100

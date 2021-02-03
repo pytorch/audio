@@ -20,6 +20,8 @@ __all__ = [
     "DB_to_amplitude",
     "mu_law_encoding",
     "mu_law_decoding",
+    "a_law_encoding",
+    "a_law_decoding",
     "complex_norm",
     "angle",
     "magphase",
@@ -425,6 +427,69 @@ def mu_law_decoding(
     mu = torch.tensor(mu, dtype=x_mu.dtype)
     x = ((x_mu) / mu) * 2 - 1.0
     x = torch.sign(x) * (torch.exp(torch.abs(x) * torch.log1p(mu)) - 1.0) / mu
+    return x
+
+
+def a_law_encoding(
+        x: Tensor,
+        quantization_channels: int,
+        compression: float
+) -> Tensor:
+    r"""Encode signal based on A-law companding.  For more info see the
+    `Wikipedia Entry <https://en.wikipedia.org/wiki/A-law_algorithm>`_
+
+    This algorithm assumes the signal has been scaled to between -1 and 1 and
+    returns a signal encoded with values from 0 to quantization_channels - 1.
+
+    Args:
+        x (Tensor): Input tensor
+        quantization_channels (int): Number of channels
+
+    Returns:
+        Tensor: Input after A-law encoding
+    """
+    quant = quantization_channels - 1.0
+    if not x.is_floating_point():
+        x = x.to(torch.float)
+    A = torch.tensor(compression, dtype=x.dtype)
+    x_abs = torch.abs(x)
+    x_narrow = A * x_abs
+    x_wide = (1 + torch.log(x_narrow))
+    x_numerator = torch.where(x_abs < (1 / A), x_narrow, x_wide)
+    a = torch.sign(x) * x_numerator / (1 + torch.log(A))
+    x_a = ((a + 1) / 2 * quant + 0.5).to(torch.int64)
+    return x_a
+
+
+def a_law_decoding(
+        x_q: Tensor,
+        quantization_channels: int,
+        compression: float
+) -> Tensor:
+    r"""Decode A-law encoded signal.  For more info see the
+    `Wikipedia Entry <https://en.wikipedia.org/wiki/A-law_algorithm>`_
+
+    This expects an input with values between 0 and quantization_channels - 1
+    and returns a signal scaled between -1 and 1.
+
+    Args:
+        x_q (Tensor): Input tensor
+        quantization_channels (int): Number of channels
+
+    Returns:
+        Tensor: Input after A-law decoding
+    """
+    quant = quantization_channels - 1.0
+    if not x_q.is_floating_point():
+        x_q = x_q.to(torch.float)
+    A = torch.tensor(compression, dtype=x_q.dtype)
+    x_a = (x_q / quant) * 2 - 1.0
+    ln_a = 1 + torch.log(A)
+    x_abs = torch.abs(x_a)
+    x_narrow = x_abs * ln_a
+    x_wide = torch.exp(x_narrow - 1)
+    x_numerator = torch.where(x_abs < (1 / ln_a), x_narrow, x_wide)
+    x = torch.sign(x_a) * x_numerator / A
     return x
 
 
