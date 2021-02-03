@@ -50,24 +50,25 @@ void shutdown_sox_effects() {
   }
 }
 
-c10::intrusive_ptr<TensorSignal> apply_effects_tensor(
-    const c10::intrusive_ptr<TensorSignal>& input_signal,
-    std::vector<std::vector<std::string>> effects) {
-  auto in_tensor = input_signal->getTensor();
-  validate_input_tensor(in_tensor);
+std::tuple<torch::Tensor, int64_t> apply_effects_tensor(
+    torch::Tensor waveform,
+    int64_t sample_rate,
+    std::vector<std::vector<std::string>> effects,
+    bool channels_first) {
+  validate_input_tensor(waveform);
 
   // Create SoxEffectsChain
-  const auto dtype = in_tensor.dtype();
+  const auto dtype = waveform.dtype();
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
       /*input_encoding=*/get_encodinginfo("wav", dtype),
       /*output_encoding=*/get_encodinginfo("wav", dtype));
 
   // Prepare output buffer
   std::vector<sox_sample_t> out_buffer;
-  out_buffer.reserve(in_tensor.numel());
+  out_buffer.reserve(waveform.numel());
 
   // Build and run effects chain
-  chain.addInputTensor(input_signal.get());
+  chain.addInputTensor(&waveform, sample_rate, channels_first);
   for (const auto& effect : effects) {
     chain.addEffect(effect);
   }
@@ -75,7 +76,6 @@ c10::intrusive_ptr<TensorSignal> apply_effects_tensor(
   chain.run();
 
   // Create tensor from buffer
-  const auto channels_first = input_signal->getChannelsFirst();
   auto out_tensor = convert_to_tensor(
       /*buffer=*/out_buffer.data(),
       /*num_samples=*/out_buffer.size(),
@@ -84,11 +84,11 @@ c10::intrusive_ptr<TensorSignal> apply_effects_tensor(
       /*noramlize=*/false,
       channels_first);
 
-  return c10::make_intrusive<TensorSignal>(
-      out_tensor, chain.getOutputSampleRate(), channels_first);
+  return std::tuple<torch::Tensor, int64_t>(
+      out_tensor, chain.getOutputSampleRate());
 }
 
-c10::intrusive_ptr<TensorSignal> apply_effects_file(
+std::tuple<torch::Tensor, int64_t> apply_effects_file(
     const std::string path,
     std::vector<std::vector<std::string>> effects,
     c10::optional<bool>& normalize,
@@ -131,8 +131,8 @@ c10::intrusive_ptr<TensorSignal> apply_effects_file(
       normalize.value_or(true),
       channels_first_);
 
-  return c10::make_intrusive<TensorSignal>(
-      tensor, chain.getOutputSampleRate(), channels_first_);
+  return std::tuple<torch::Tensor, int64_t>(
+      tensor, chain.getOutputSampleRate());
 }
 
 #ifdef TORCH_API_INCLUDE_EXTENSION_H
@@ -237,6 +237,21 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
 }
 
 #endif // TORCH_API_INCLUDE_EXTENSION_H
+
+TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+  m.def(
+      "torchaudio::sox_effects_initialize_sox_effects",
+      &torchaudio::sox_effects::initialize_sox_effects);
+  m.def(
+      "torchaudio::sox_effects_shutdown_sox_effects",
+      &torchaudio::sox_effects::shutdown_sox_effects);
+  m.def(
+      "torchaudio::sox_effects_apply_effects_tensor",
+      &torchaudio::sox_effects::apply_effects_tensor);
+  m.def(
+      "torchaudio::sox_effects_apply_effects_file",
+      &torchaudio::sox_effects::apply_effects_file);
+}
 
 } // namespace sox_effects
 } // namespace torchaudio

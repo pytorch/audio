@@ -162,12 +162,9 @@ def load(
         if hasattr(filepath, 'read'):
             return torchaudio._torchaudio.load_audio_fileobj(
                 filepath, frame_offset, num_frames, normalize, channels_first, format)
-        signal = torch.ops.torchaudio.sox_io_load_audio_file(
-            os.fspath(filepath), frame_offset, num_frames, normalize, channels_first, format)
-        return signal.get_tensor(), signal.get_sample_rate()
-    signal = torch.ops.torchaudio.sox_io_load_audio_file(
+        filepath = os.fspath(filepath)
+    return torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, format)
-    return signal.get_tensor(), signal.get_sample_rate()
 
 
 @torch.jit.unused

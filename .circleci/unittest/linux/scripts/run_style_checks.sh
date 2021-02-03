@@ -37,7 +37,7 @@ if [ "${status}" -ne 0 ]; then
 fi
 
 printf "\x1b[34mRunning clang-format:\x1b[0m\n"
-"${this_dir}"/run-clang-format.py \
+"${this_dir}"/run_clang_format.py \
   -r torchaudio/csrc \
   --clang-format-executable "${clangformat_path}" \
     && git diff --exit-code
