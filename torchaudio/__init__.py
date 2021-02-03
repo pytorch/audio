@@ -3,6 +3,7 @@ from torchaudio._internal import module_utils as _mod_utils
 from torchaudio import (
     compliance,
     datasets,
+    functional,
     kaldi_io,
     utils,
     sox_effects,
