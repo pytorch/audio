@@ -36,12 +36,14 @@ struct SoxEffect {
 /// helper classes for passing the location of input tensor and output buffer
 ///
 /// drain/flow callback functions require plaing C style function signature and
-/// the way to pass extra data is to attach data to sox_fffect_t::priv pointer.
-/// The following structs will be assigned to sox_fffect_t::priv pointer which
+/// the way to pass extra data is to attach data to sox_effect_t::priv pointer.
+/// The following structs will be assigned to sox_effect_t::priv pointer which
 /// gives sox_effect_t an access to input Tensor and output buffer object.
 struct TensorInputPriv {
   size_t index;
-  TensorSignal* signal;
+  torch::Tensor* waveform;
+  int64_t sample_rate;
+  bool channels_first;
 };
 struct TensorOutputPriv {
   std::vector<sox_sample_t>* buffer;
@@ -55,8 +57,7 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   // Retrieve the input Tensor and current index
   auto priv = static_cast<TensorInputPriv*>(effp->priv);
   auto index = priv->index;
-  auto signal = priv->signal;
-  auto tensor = signal->getTensor();
+  auto tensor = *(priv->waveform);
   auto num_channels = effp->out_signal.channels;
 
   // Adjust the number of samples to read
@@ -71,7 +72,7 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   const auto tensor_ = [&]() {
     auto i_frame = index / num_channels;
     auto num_frames = *osamp / num_channels;
-    auto t = (signal->getChannelsFirst())
+    auto t = (priv->channels_first)
         ? tensor.index({Slice(), Slice(i_frame, i_frame + num_frames)}).t()
         : tensor.index({Slice(i_frame, i_frame + num_frames), Slice()});
     return unnormalize_wav(t.reshape({-1})).contiguous();
@@ -193,13 +194,18 @@ void SoxEffectsChain::run() {
   sox_flow_effects(sec_, NULL, NULL);
 }
 
-void SoxEffectsChain::addInputTensor(TensorSignal* signal) {
-  in_sig_ = get_signalinfo(signal, "wav");
+void SoxEffectsChain::addInputTensor(
+    torch::Tensor* waveform,
+    int64_t sample_rate,
+    bool channels_first) {
+  in_sig_ = get_signalinfo(waveform, sample_rate, "wav", channels_first);
   interm_sig_ = in_sig_;
   SoxEffect e(sox_create_effect(get_tensor_input_handler()));
   auto priv = static_cast<TensorInputPriv*>(e->priv);
-  priv->signal = signal;
   priv->index = 0;
+  priv->waveform = waveform;
+  priv->sample_rate = sample_rate;
+  priv->channels_first = channels_first;
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {
     throw std::runtime_error(
         "Internal Error: Failed to add effect: input_tensor");
@@ -252,7 +258,13 @@ void SoxEffectsChain::addEffect(const std::vector<std::string> effect) {
     throw std::runtime_error(stream.str());
   }
 
-  SoxEffect e(sox_create_effect(sox_find_effect(name.c_str())));
+  auto returned_effect = sox_find_effect(name.c_str());
+  if (!returned_effect) {
+    std::ostringstream stream;
+    stream << "Unsupported effect: " << name;
+    throw std::runtime_error(stream.str());
+  }
+  SoxEffect e(sox_create_effect(returned_effect));
   const auto num_options = num_args - 1;
 
   std::vector<char*> opts;
@@ -296,6 +308,7 @@ namespace {
 struct FileObjInputPriv {
   sox_format_t* sf;
   py::object* fileobj;
+  bool eof_reached;
   char* buffer;
   uint64_t buffer_size;
 };
@@ -312,9 +325,7 @@ struct FileObjOutputPriv {
 int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   auto priv = static_cast<FileObjInputPriv*>(effp->priv);
   auto sf = priv->sf;
-  auto fileobj = priv->fileobj;
   auto buffer = priv->buffer;
-  auto buffer_size = priv->buffer_size;
 
   // 1. Refresh the buffer
   //
@@ -326,32 +337,44 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   //
   // Before:
   //
-  //     |<--------consumed------->|<-remaining->|
-  //     |*************************|-------------|
-  //                               ^ ftell
+  //     |<-------consumed------>|<---remaining--->|
+  //     |***********************|-----------------|
+  //                             ^ ftell
   //
   // After:
   //
-  //     |<-offset->|<-remaining->|<--new data-->|
-  //     |**********|-------------|++++++++++++++|
+  //     |<-offset->|<---remaining--->|<-new data->|
+  //     |**********|-----------------|++++++++++++|
   //                ^ ftell
 
-  const auto num_consumed = sf->tell_off;
-  const auto num_remain = buffer_size - num_consumed;
-
-  // 1.1. First, we fetch the data to see if there is data to fill the buffer
-  py::bytes chunk_ = fileobj->attr("read")(num_consumed);
-  const auto num_refill = py::len(chunk_);
-  const auto offset = buffer_size - (num_remain + num_refill);
-
-  if (num_refill > num_consumed) {
-    std::ostringstream message;
-    message
-        << "Tried to read up to " << num_consumed << " bytes but, "
-        << "recieved " << num_refill << " bytes. "
-        << "The given object does not confirm to read protocol of file object.";
-    throw std::runtime_error(message.str());
+  // NOTE:
+  //   Do not use `sf->tell_off` here. Presumably, `tell_off` and `fseek` are
+  //   supposed to be in sync, but there are cases (Vorbis) they are not
+  //   in sync and `tell_off` has seemingly uninitialized value, which
+  //   leads num_remain to be negative and cause segmentation fault
+  //   in `memmove`.
+  const auto tell = ftell((FILE*)sf->fp);
+  if (tell < 0) {
+    throw std::runtime_error("Internal Error: ftell failed.");
   }
+  const auto num_consumed = static_cast<size_t>(tell);
+  if (num_consumed > priv->buffer_size) {
+    throw std::runtime_error("Internal Error: buffer overrun.");
+  }
+
+  const auto num_remain = priv->buffer_size - num_consumed;
+
+  // 1.1. Fetch the data to see if there is data to fill the buffer
+  size_t num_refill = 0;
+  std::string chunk(num_consumed, '\0');
+  if (num_consumed && !priv->eof_reached) {
+    num_refill = read_fileobj(
+        priv->fileobj, num_consumed, const_cast<char*>(chunk.data()));
+    if (num_refill < num_consumed) {
+      priv->eof_reached = true;
+    }
+  }
+  const auto offset = num_consumed - num_refill;
 
   // 1.2. Move the unconsumed data towards the beginning of buffer.
   if (num_remain) {
@@ -362,7 +385,6 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
 
   // 1.3. Refill the remaining buffer.
   if (num_refill) {
-    auto chunk = static_cast<std::string>(chunk_);
     auto src = static_cast<void*>(const_cast<char*>(chunk.c_str()));
     auto dst = buffer + offset + num_remain;
     memcpy(dst, src, num_refill);
@@ -383,7 +405,9 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   // store the actual number read back to *osamp
   *osamp = sox_read(sf, obuf, *osamp);
 
-  return *osamp ? SOX_SUCCESS : SOX_EOF;
+  // Decoding is finished when fileobject is exhausted and sox can no longer
+  // decode a sample.
+  return (priv->eof_reached && !*osamp) ? SOX_EOF : SOX_SUCCESS;
 }
 
 int fileobj_output_flow(
@@ -469,6 +493,7 @@ void SoxEffectsChain::addInputFileObj(
   auto priv = static_cast<FileObjInputPriv*>(e->priv);
   priv->sf = sf;
   priv->fileobj = fileobj;
+  priv->eof_reached = false;
   priv->buffer = buffer;
   priv->buffer_size = buffer_size;
   if (sox_add_effect(sec_, e, &interm_sig_, &in_sig_) != SOX_SUCCESS) {

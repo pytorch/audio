@@ -1,7 +1,10 @@
+import os
+from pathlib import Path
 from typing import List, Tuple, Optional
 
 import torch
 
+import torchaudio
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.utils.sox_utils import list_effects
 
@@ -60,7 +63,7 @@ def apply_effects_tensor(
 
     Note:
         This function works in the way very similar to ``sox`` command, however there are slight
-        differences. For example, ``sox`` commnad adds certain effects automatically (such as
+        differences. For example, ``sox`` command adds certain effects automatically (such as
         ``rate`` effect after ``speed`` and ``pitch`` and other effects), but this function does
         only applies the given effects. (Therefore, to actually apply ``speed`` effect, you also
         need to give ``rate`` effect with desired sampling rate.)
@@ -146,9 +149,8 @@ def apply_effects_tensor(
         >>> waveform, sample_rate = transform(waveform, input_sample_rate)
         >>> assert sample_rate == 8000
     """
-    in_signal = torch.classes.torchaudio.TensorSignal(tensor, sample_rate, channels_first)
-    out_signal = torch.ops.torchaudio.sox_effects_apply_effects_tensor(in_signal, effects)
-    return out_signal.get_tensor(), out_signal.get_sample_rate()
+    return torch.ops.torchaudio.sox_effects_apply_effects_tensor(
+        tensor, sample_rate, effects, channels_first)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -170,8 +172,16 @@ def apply_effects_file(
         rate and leave samples untouched.
 
     Args:
-        path (str or pathlib.Path): Path to the audio file. This function also handles ``pathlib.Path`` objects, but is
-            annotated as ``str`` for TorchScript compiler compatibility.
+        path (path-like object or file-like object):
+            Source of audio data. When the function is not compiled by TorchScript,
+            (e.g. ``torch.jit.script``), the following types are accepted;
+                  * ``path-like``: file path
+                  * ``file-like``: Object with ``read(size: int) -> bytes`` method,
+                    which returns byte string of at most ``size`` length.
+            When the function is compiled by TorchScript, only ``str`` type is allowed.
+            Note:
+                * This argument is intentionally annotated as ``str`` only for
+                  TorchScript compiler compatibility.
         effects (List[List[str]]): List of effects.
         normalize (bool):
             When ``True``, this function always return ``float32``, and sample values are
@@ -252,8 +262,10 @@ def apply_effects_file(
         >>> for batch in loader:
         >>>     pass
     """
-    # Get string representation of 'path' in case Path object is passed
-    path = str(path)
-    signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
+    if not torch.jit.is_scripting():
+        if hasattr(path, 'read'):
+            return torchaudio._torchaudio.apply_effects_fileobj(
+                path, effects, normalize, channels_first, format)
+        path = os.fspath(path)
+    return torch.ops.torchaudio.sox_effects_apply_effects_file(
         path, effects, normalize, channels_first, format)
-    return signal.get_tensor(), signal.get_sample_rate()

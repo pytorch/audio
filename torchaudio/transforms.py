@@ -47,6 +47,13 @@ class Spectrogram(torch.nn.Module):
             If None, then the complex spectrum is returned instead. (Default: ``2``)
         normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
+        center (bool, optional): whether to pad :attr:`waveform` on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            Default: ``True``
+        pad_mode (string, optional): controls the padding method used when
+            :attr:`center` is ``True``. Default: ``"reflect"``
+        onesided (bool, optional): controls whether to return half of results to
+            avoid redundancy Default: ``True``
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -58,7 +65,10 @@ class Spectrogram(torch.nn.Module):
                  window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: Optional[float] = 2.,
                  normalized: bool = False,
-                 wkwargs: Optional[dict] = None) -> None:
+                 wkwargs: Optional[dict] = None,
+                 center: bool = True,
+                 pad_mode: str = "reflect",
+                 onesided: bool = True) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -70,6 +80,9 @@ class Spectrogram(torch.nn.Module):
         self.pad = pad
         self.power = power
         self.normalized = normalized
+        self.center = center
+        self.pad_mode = pad_mode
+        self.onesided = onesided
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -81,8 +94,19 @@ class Spectrogram(torch.nn.Module):
             ``n_fft // 2 + 1`` where ``n_fft`` is the number of
             Fourier bins, and time is the number of window hops (n_frame).
         """
-        return F.spectrogram(waveform, self.pad, self.window, self.n_fft, self.hop_length,
-                             self.win_length, self.power, self.normalized)
+        return F.spectrogram(
+            waveform,
+            self.pad,
+            self.window,
+            self.n_fft,
+            self.hop_length,
+            self.win_length,
+            self.power,
+            self.normalized,
+            self.center,
+            self.pad_mode,
+            self.onesided
+        )
 
 
 class GriffinLim(torch.nn.Module):
@@ -224,6 +248,8 @@ class MelScale(torch.nn.Module):
         f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
         n_stft (int, optional): Number of bins in STFT. Calculated from first input
             if None is given.  See ``n_fft`` in :class:`Spectrogram`. (Default: ``None``)
+        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
+        (area normalization). (Default: ``None``)
     """
     __constants__ = ['n_mels', 'sample_rate', 'f_min', 'f_max']
 
@@ -232,17 +258,19 @@ class MelScale(torch.nn.Module):
                  sample_rate: int = 16000,
                  f_min: float = 0.,
                  f_max: Optional[float] = None,
-                 n_stft: Optional[int] = None) -> None:
+                 n_stft: Optional[int] = None,
+                 norm: Optional[str] = None) -> None:
         super(MelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
         self.f_max = f_max if f_max is not None else float(sample_rate // 2)
         self.f_min = f_min
+        self.norm = norm
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
-            n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
+            n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm)
         self.register_buffer('fb', fb)
 
     def forward(self, specgram: Tensor) -> Tensor:
@@ -259,7 +287,8 @@ class MelScale(torch.nn.Module):
         specgram = specgram.reshape(-1, shape[-2], shape[-1])
 
         if self.fb.numel() == 0:
-            tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max, self.n_mels, self.sample_rate)
+            tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max,
+                                        self.n_mels, self.sample_rate, self.norm)
             # Attributes cannot be reassigned outside __init__ so workaround
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)
@@ -291,6 +320,8 @@ class InverseMelScale(torch.nn.Module):
         tolerance_loss (float, optional): Value of loss to stop optimization at. (Default: ``1e-5``)
         tolerance_change (float, optional): Difference in losses to stop optimization at. (Default: ``1e-8``)
         sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)
+        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
+        (area normalization). (Default: ``None``)
     """
     __constants__ = ['n_stft', 'n_mels', 'sample_rate', 'f_min', 'f_max', 'max_iter', 'tolerance_loss',
                      'tolerance_change', 'sgdargs']
@@ -304,7 +335,8 @@ class InverseMelScale(torch.nn.Module):
                  max_iter: int = 100000,
                  tolerance_loss: float = 1e-5,
                  tolerance_change: float = 1e-8,
-                 sgdargs: Optional[dict] = None) -> None:
+                 sgdargs: Optional[dict] = None,
+                 norm: Optional[str] = None) -> None:
         super(InverseMelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
@@ -317,7 +349,7 @@ class InverseMelScale(torch.nn.Module):
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
-        fb = F.create_fb_matrix(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate)
+        fb = F.create_fb_matrix(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm)
         self.register_buffer('fb', fb)
 
     def forward(self, melspec: Tensor) -> Tensor:
@@ -387,6 +419,15 @@ class MelSpectrogram(torch.nn.Module):
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
+        center (bool, optional): whether to pad :attr:`waveform` on both sides so
+            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
+            Default: ``True``
+        pad_mode (string, optional): controls the padding method used when
+            :attr:`center` is ``True``. Default: ``"reflect"``
+        onesided (bool, optional): controls whether to return half of results to
+            avoid redundancy. Default: ``True``
+        norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
+        (area normalization). (Default: ``None``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
@@ -406,7 +447,11 @@ class MelSpectrogram(torch.nn.Module):
                  window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: Optional[float] = 2.,
                  normalized: bool = False,
-                 wkwargs: Optional[dict] = None) -> None:
+                 wkwargs: Optional[dict] = None,
+                 center: bool = True,
+                 pad_mode: str = "reflect",
+                 onesided: bool = True,
+                 norm: Optional[str] = None) -> None:
         super(MelSpectrogram, self).__init__()
         self.sample_rate = sample_rate
         self.n_fft = n_fft
@@ -421,8 +466,9 @@ class MelSpectrogram(torch.nn.Module):
         self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
                                        hop_length=self.hop_length,
                                        pad=self.pad, window_fn=window_fn, power=self.power,
-                                       normalized=self.normalized, wkwargs=wkwargs)
-        self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1)
+                                       normalized=self.normalized, wkwargs=wkwargs,
+                                       center=center, pad_mode=pad_mode, onesided=onesided)
+        self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1, norm)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -495,24 +541,16 @@ class MFCC(torch.nn.Module):
         Returns:
             Tensor: specgram_mel_db of size (..., ``n_mfcc``, time).
         """
-
-        # pack batch
-        shape = waveform.size()
-        waveform = waveform.reshape(-1, shape[-1])
-
         mel_specgram = self.MelSpectrogram(waveform)
         if self.log_mels:
             log_offset = 1e-6
             mel_specgram = torch.log(mel_specgram + log_offset)
         else:
             mel_specgram = self.amplitude_to_DB(mel_specgram)
-        # (channel, n_mels, time).tranpose(...) dot (n_mels, n_mfcc)
-        # -> (channel, time, n_mfcc).tranpose(...)
-        mfcc = torch.matmul(mel_specgram.transpose(1, 2), self.dct_mat).transpose(1, 2)
 
-        # unpack batch
-        mfcc = mfcc.reshape(shape[:-1] + mfcc.shape[-2:])
-
+        # (..., channel, n_mels, time).tranpose(...) dot (n_mels, n_mfcc)
+        # -> (..., channel, time, n_mfcc).tranpose(...)
+        mfcc = torch.matmul(mel_specgram.transpose(-2, -1), self.dct_mat).transpose(-2, -1)
         return mfcc
 
 
@@ -1052,8 +1090,9 @@ class SpectralCentroid(torch.nn.Module):
         win_length (int or None, optional): Window size. (Default: ``n_fft``)
         hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
         pad (int, optional): Two sided padding of signal. (Default: ``0``)
-        window(Tensor, optional): A window tensor that is applied/multiplied to each frame.
-            (Default: ``torch.hann_window(win_length)``)
+        window_fn (Callable[..., Tensor], optional): A function to create a window tensor
+            that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
@@ -1067,14 +1106,14 @@ class SpectralCentroid(torch.nn.Module):
                  win_length: Optional[int] = None,
                  hop_length: Optional[int] = None,
                  pad: int = 0,
-                 window: Optional[Tensor] = None) -> None:
+                 window_fn: Callable[..., Tensor] = torch.hann_window,
+                 wkwargs: Optional[dict] = None) -> None:
         super(SpectralCentroid, self).__init__()
         self.sample_rate = sample_rate
         self.n_fft = n_fft
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
-        if window is None:
-            window = torch.hann_window(self.win_length)
+        window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
         self.register_buffer('window', window)
         self.pad = pad
 

@@ -4,6 +4,10 @@
 #include <sox.h>
 #include <torch/script.h>
 
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+#include <torch/extension.h>
+#endif // TORCH_API_INCLUDE_EXTENSION_H
+
 namespace torchaudio {
 namespace sox_utils {
 
@@ -25,23 +29,6 @@ std::vector<std::vector<std::string>> list_effects();
 std::vector<std::string> list_read_formats();
 
 std::vector<std::string> list_write_formats();
-
-/// Class for exchanging signal infomation (tensor + meta data) between
-/// C++ and Python for read/write operation.
-struct TensorSignal : torch::CustomClassHolder {
-  torch::Tensor tensor;
-  int64_t sample_rate;
-  bool channels_first;
-
-  TensorSignal(
-      torch::Tensor tensor_,
-      int64_t sample_rate_,
-      bool channels_first_);
-
-  torch::Tensor getTensor() const;
-  int64_t getSampleRate() const;
-  bool getChannelsFirst() const;
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Utilities for sox_io / sox_effects implementations
@@ -81,6 +68,8 @@ caffe2::TypeMeta get_dtype(
     const sox_encoding_t encoding,
     const unsigned precision);
 
+caffe2::TypeMeta get_dtype_from_str(const std::string dtype);
+
 ///
 /// Convert sox_sample_t buffer to uint8/int16/int32/float32 Tensor
 /// NOTE: This function might modify the values in the input buffer to
@@ -114,18 +103,25 @@ const std::string get_filetype(const std::string path);
 
 /// Get sox_signalinfo_t for passing a torch::Tensor object.
 sox_signalinfo_t get_signalinfo(
-    const TensorSignal* signal,
-    const std::string filetype);
-
-/// Get sox_encofinginfo_t for saving audoi file
-sox_encodinginfo_t get_encodinginfo(
+    const torch::Tensor* waveform,
+    const int64_t sample_rate,
     const std::string filetype,
-    const caffe2::TypeMeta dtype);
+    const bool channels_first);
 
-sox_encodinginfo_t get_encodinginfo(
+/// Get sox_encodinginfo_t for Tensor I/O
+sox_encodinginfo_t get_tensor_encodinginfo(const caffe2::TypeMeta dtype);
+
+/// Get sox_encodinginfo_t for saving to file/file object
+sox_encodinginfo_t get_encodinginfo_for_save(
     const std::string filetype,
     const caffe2::TypeMeta dtype,
     c10::optional<double>& compression);
+
+#ifdef TORCH_API_INCLUDE_EXTENSION_H
+
+uint64_t read_fileobj(py::object* fileobj, uint64_t size, char* buffer);
+
+#endif // TORCH_API_INCLUDE_EXTENSION_H
 
 } // namespace sox_utils
 } // namespace torchaudio
