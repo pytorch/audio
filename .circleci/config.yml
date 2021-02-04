@@ -42,8 +42,8 @@ commands:
     description: "installs tools required to build torchaudio"
     steps:
       - run:
-          name: Install cmake and pkg-config
-          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install cmake pkg-config wget
+          name: Install pkg-config
+          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pkg-config wget
           # Disable brew auto update which is very slow
 
 binary_common: &binary_common
