@@ -14,12 +14,8 @@ from torchaudio_unittest.common_utils import (
     save_wav,
     skipIfNoExec,
 )
-from torchaudio_unittest.sox_io_backend.common import name_func
+from torchaudio_unittest.backend.sox_io.common import name_func
 
-from torchaudio._internal import (
-    module_utils as _mod_utils,
-)
-from torchaudio.backend import sox_io_backend
 from .functional_impl import Lfilter, Spectrogram
 
 
@@ -240,8 +236,9 @@ class TestApplyCodec(TorchaudioTestCase):
         num_frames = 3 * sample_rate
         num_channels = 2
         waveform = torch.rand(num_channels, num_frames)
-        augmented = F.apply_codec(
-            waveform, sample_rate, compression, format, channels_first=True)
+        augmented = F.apply_codec(waveform=waveform, sample_rate=sample_rate,
+                                  format=format, compression=compression,
+                                  channels_first=True)
         assert augmented.dtype == waveform.dtype
         assert augmented.shape[0] == num_channels
         if check_num_frames:

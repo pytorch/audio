@@ -7,7 +7,9 @@ from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
-
+from torchaudio._internal import (
+    module_utils as _mod_utils,
+)
 import torchaudio
 
 __all__ = [
@@ -997,7 +999,14 @@ def spectral_centroid(
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
 
 
-def apply_codec(waveform, sample_rate, compression, format, channels_first=True) -> Tensor:
+@_mod_utils.requires_module('torchaudio._torchaudio')
+def apply_codec(
+    waveform: Tensor,
+    sample_rate: int,
+    format: str,
+    compression: Optional[float] = None,
+    channels_first: bool = True,
+) -> Tensor:
     r"""
     Applies codecs as a form of augmentation
 
@@ -1006,8 +1015,8 @@ def apply_codec(waveform, sample_rate, compression, format, channels_first=True)
         sample_rate (int): Sample rate of the audio waveform
         format (str): file format
         channels_first (bool):
-            When True, the returned Tensor has dimension ``[channel, time]``.
-            Otherwise, the returned Tensor's dimension is ``[time, channel]``.
+            When True, both the input and output Tensor have dimension ``[channel, time]``.
+            Otherwise, they have dimension ``[time, channel]``.
         compression (float):
             Used for formats other than WAV. This corresponds to ``-C`` option of ``sox`` command.
                 * | ``MP3``: Either bitrate (in ``kbps``) with quality factor, such as ``128.2``, or
@@ -1019,10 +1028,12 @@ def apply_codec(waveform, sample_rate, compression, format, channels_first=True)
             See the detail at http://sox.sourceforge.net/soxformat.html.
 
     Returns:
-        Tensor
+        torch.Tensor: Resulting Tensor.
+        If ``channels_first=True``, it has ``[channel, time]`` else ``[time, channel]``
     """
     bytes = io.BytesIO()
-    torchaudio.save(bytes, waveform, sample_rate, channels_first, compression=compression, format=format)
+    torchaudio.backend.sox_io_backend.save(bytes, waveform, sample_rate, channels_first, compression=compression, format=format)
     bytes.seek(0)
-    waveform, _ = torchaudio.load(bytes, channels_first=channels_first)
-    return waveform
+    augmented, _ = torchaudio.sox_effects.sox_effects.apply_effects_file(
+        bytes, effects=[["rate", f"{sample_rate}"]], channels_first=channels_first, format=format)
+    return augmented
