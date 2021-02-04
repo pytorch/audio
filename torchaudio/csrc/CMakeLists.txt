@@ -49,7 +49,7 @@ endif()
 ################################################################################
 # _torchaudio.so
 ################################################################################
-if (BUILD_PYTHON_EXTENSION)
+if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   add_library(
     _torchaudio
     SHARED
