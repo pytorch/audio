@@ -1032,7 +1032,8 @@ def apply_codec(
         If ``channels_first=True``, it has ``[channel, time]`` else ``[time, channel]``
     """
     bytes = io.BytesIO()
-    torchaudio.backend.sox_io_backend.save(bytes, waveform, sample_rate, channels_first, compression=compression, format=format)
+    torchaudio.backend.sox_io_backend.save(bytes, waveform, sample_rate, channels_first, compression=compression,
+                                           format=format)
     bytes.seek(0)
     augmented, _ = torchaudio.sox_effects.sox_effects.apply_effects_file(
         bytes, effects=[["rate", f"{sample_rate}"]], channels_first=channels_first, format=format)
