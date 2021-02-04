@@ -1,4 +1,4 @@
-from . import utils
+from . import utils 
 from .utils import (
     list_audio_backends,
     get_audio_backend,
@@ -11,10 +11,10 @@ from .sox_backend import (
     get_sox_option_t,
     get_sox_encoding_t,
     get_sox_bool,
-)
+)   # noqa: F401
 from .common import (
     SignalInfo,
-    EncodingInfo,
+    EncodingInfo,   # noqa: F401
 )
 
 
