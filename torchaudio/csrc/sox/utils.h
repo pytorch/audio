@@ -108,12 +108,11 @@ sox_signalinfo_t get_signalinfo(
     const std::string filetype,
     const bool channels_first);
 
-/// Get sox_encofinginfo_t for saving audoi file
-sox_encodinginfo_t get_encodinginfo(
-    const std::string filetype,
-    const caffe2::TypeMeta dtype);
+/// Get sox_encodinginfo_t for Tensor I/O
+sox_encodinginfo_t get_tensor_encodinginfo(const caffe2::TypeMeta dtype);
 
-sox_encodinginfo_t get_encodinginfo(
+/// Get sox_encodinginfo_t for saving to file/file object
+sox_encodinginfo_t get_encodinginfo_for_save(
     const std::string filetype,
     const caffe2::TypeMeta dtype,
     c10::optional<double>& compression);
