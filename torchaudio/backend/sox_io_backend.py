@@ -11,24 +11,6 @@ import torchaudio
 from .common import AudioMetaData
 
 
-@torch.jit.unused
-def _info(
-        filepath: str,
-        format: Optional[str] = None,
-) -> AudioMetaData:
-    if hasattr(filepath, 'read'):
-        sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
-        return AudioMetaData(*sinfo)
-    sinfo = torch.ops.torchaudio.sox_io_get_info(os.fspath(filepath), format)
-    return AudioMetaData(
-        sinfo.get_sample_rate(),
-        sinfo.get_num_frames(),
-        sinfo.get_num_channels(),
-        sinfo.get_bits_per_sample(),
-        sinfo.get_encoding(),
-    )
-
-
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def info(
         filepath: str,
@@ -61,14 +43,12 @@ def info(
         AudioMetaData: Metadata of the given audio.
     """
     if not torch.jit.is_scripting():
-        return _info(filepath, format)
+        if hasattr(filepath, 'read'):
+            sinfo = torchaudio._torchaudio.get_info_fileobj(filepath, format)
+            return AudioMetaData(*sinfo)
+        filepath = os.fspath(filepath)
     sinfo = torch.ops.torchaudio.sox_io_get_info(filepath, format)
-    return AudioMetaData(
-        sinfo.get_sample_rate(),
-        sinfo.get_num_frames(),
-        sinfo.get_num_channels(),
-        sinfo.get_bits_per_sample(),
-        sinfo.get_encoding())
+    return AudioMetaData(*sinfo)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -162,12 +142,9 @@ def load(
         if hasattr(filepath, 'read'):
             return torchaudio._torchaudio.load_audio_fileobj(
                 filepath, frame_offset, num_frames, normalize, channels_first, format)
-        signal = torch.ops.torchaudio.sox_io_load_audio_file(
-            os.fspath(filepath), frame_offset, num_frames, normalize, channels_first, format)
-        return signal.get_tensor(), signal.get_sample_rate()
-    signal = torch.ops.torchaudio.sox_io_load_audio_file(
+        filepath = os.fspath(filepath)
+    return torch.ops.torchaudio.sox_io_load_audio_file(
         filepath, frame_offset, num_frames, normalize, channels_first, format)
-    return signal.get_tensor(), signal.get_sample_rate()
 
 
 @torch.jit.unused
