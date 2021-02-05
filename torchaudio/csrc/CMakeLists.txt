@@ -49,6 +49,7 @@ if(BUILD_LIBTORCHAUDIO)
 
   target_link_libraries(
     libtorchaudio
+    ${TORCH_LIBRARIES}
     ${TORCHAUDIO_THIRD_PARTIES}
     )
 
