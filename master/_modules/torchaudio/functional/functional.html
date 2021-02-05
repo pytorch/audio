@@ -544,14 +544,16 @@
         <span class="n">db_multiplier</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">top_db</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a tensor from the power/amplitude scale to the decibel scale.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a spectrogram from the power/amplitude scale to the decibel scale.</span>
 
-<span class="sd">    This output depends on the maximum value in the input tensor, and so</span>
-<span class="sd">    may return different values for an audio clip split into snippets vs. a</span>
-<span class="sd">    full clip.</span>
+<span class="sd">    The output of each tensor in a batch depends on the maximum value of that tensor,</span>
+<span class="sd">    and so may return different values for an audio clip split into snippets vs. a full clip.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x (Tensor): Input tensor before being converted to decibel scale</span>
+
+<span class="sd">        x (Tensor): Input spectrogram(s) before being converted to decibel scale. Input should take</span>
+<span class="sd">          the form `(..., freq, time)`. Batched inputs should include a channel dimension and</span>
+<span class="sd">          have the form `(batch, channel, freq, time)`.</span>
 <span class="sd">        multiplier (float): Use 10. for power and 20. for amplitude</span>
 <span class="sd">        amin (float): Number to clamp ``x``</span>
 <span class="sd">        db_multiplier (float): Log10(max(reference value and amin))</span>
@@ -565,7 +567,15 @@
     <span class="n">x_db</span> <span class="o">-=</span> <span class="n">multiplier</span> <span class="o">*</span> <span class="n">db_multiplier</span>
 
     <span class="k">if</span> <span class="n">top_db</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">x_db</span> <span class="o">=</span> <span class="n">x_db</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">x_db</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">-</span> <span class="n">top_db</span><span class="p">)</span>
+        <span class="c1"># Expand batch</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">x_db</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="n">packed_channels</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="n">x_db</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">x_db</span> <span class="o">=</span> <span class="n">x_db</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">packed_channels</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">x_db</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x_db</span><span class="p">,</span> <span class="p">(</span><span class="n">x_db</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="n">top_db</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># Repack batch</span>
+        <span class="n">x_db</span> <span class="o">=</span> <span class="n">x_db</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">x_db</span></div>
 

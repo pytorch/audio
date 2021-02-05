@@ -1061,14 +1061,15 @@ Values near 1 can lead to faster convergence, but above 1 may not converge.</p><
 <dl class="function">
 <dt id="torchaudio.functional.amplitude_to_DB">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">amplitude_to_DB</code><span class="sig-paren">(</span><em class="sig-param">x: torch.Tensor</em>, <em class="sig-param">multiplier: float</em>, <em class="sig-param">amin: float</em>, <em class="sig-param">db_multiplier: float</em>, <em class="sig-param">top_db: Optional[float] = None</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#amplitude_to_DB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.amplitude_to_DB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Turn a tensor from the power/amplitude scale to the decibel scale.</p>
-<p>This output depends on the maximum value in the input tensor, and so
-may return different values for an audio clip split into snippets vs. a
-full clip.</p>
+<dd><p>Turn a spectrogram from the power/amplitude scale to the decibel scale.</p>
+<p>The output of each tensor in a batch depends on the maximum value of that tensor,
+and so may return different values for an audio clip split into snippets vs. a full clip.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>Tensor</em>) – Input tensor before being converted to decibel scale</p></li>
+<li><p><strong>x</strong> (<em>Tensor</em>) – Input spectrogram(s) before being converted to decibel scale. Input should take
+the form <cite>(…, freq, time)</cite>. Batched inputs should include a channel dimension and
+have the form <cite>(batch, channel, freq, time)</cite>.</p></li>
 <li><p><strong>multiplier</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Use 10. for power and 20. for amplitude</p></li>
 <li><p><strong>amin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Number to clamp <code class="docutils literal notranslate"><span class="pre">x</span></code></p></li>
 <li><p><strong>db_multiplier</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Log10(max(reference value and amin))</p></li>
