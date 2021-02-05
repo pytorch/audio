@@ -547,16 +547,3 @@ class Functional(common_utils.TestBaseMixin):
 
         tensor = common_utils.get_whitenoise(sample_rate=44100)
         self._assert_consistency(func, tensor)
-
-    def test_apply_codec(self):
-        def func(tensor):
-            sample_rate = 8000
-            compression = None
-            format = "wav"
-            return F.apply_codec(waveform=tensor, sample_rate=sample_rate,
-                                 format=format, compression=compression,
-                                 channels_first=True)
-
-        torch.random.manual_seed(42)
-        tensor = torch.rand(2, 24000)
-        self._assert_consistency(func, tensor)
