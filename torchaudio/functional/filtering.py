@@ -877,13 +877,8 @@ def lfilter(
 
     input_signal_windows.div_(a_coeffs[0])
     a_coeffs_flipped.div_(a_coeffs[0])
-    for i_sample, o0 in enumerate(input_signal_windows.t()):
-        windowed_output_signal = padded_output_waveform[
-            :, i_sample:i_sample + n_order
-        ]
-        o0.addmv_(windowed_output_signal, a_coeffs_flipped, alpha=-1)
-        padded_output_waveform[:, i_sample + n_order - 1] = o0
-
+       
+    torch.ops.torchaudio._lfilter_core_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
     output = padded_output_waveform[:, n_order - 1:]
 
     if clamp:
