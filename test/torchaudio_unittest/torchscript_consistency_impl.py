@@ -7,7 +7,7 @@ from torchaudio_unittest import common_utils
 
 
 class Transforms(common_utils.TestBaseMixin):
-    """Implements test for Transforms that are performed for different devices"""
+    """Implements tests for Transforms that are performed for different devices"""
     def _assert_consistency(self, transform, tensor):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
