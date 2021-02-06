@@ -1,8 +1,3 @@
-#include <iostream>
-#include <numeric>
-#include <string>
-#include <vector>
-
 #include <torch/script.h>
 
 namespace {
