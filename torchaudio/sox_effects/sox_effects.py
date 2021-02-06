@@ -62,7 +62,7 @@ def apply_effects_tensor(
 
     Note:
         This function works in the way very similar to ``sox`` command, however there are slight
-        differences. For example, ``sox`` commnad adds certain effects automatically (such as
+        differences. For example, ``sox`` command adds certain effects automatically (such as
         ``rate`` effect after ``speed`` and ``pitch`` and other effects), but this function does
         only applies the given effects. (Therefore, to actually apply ``speed`` effect, you also
         need to give ``rate`` effect with desired sampling rate.)
@@ -148,9 +148,8 @@ def apply_effects_tensor(
         >>> waveform, sample_rate = transform(waveform, input_sample_rate)
         >>> assert sample_rate == 8000
     """
-    in_signal = torch.classes.torchaudio.TensorSignal(tensor, sample_rate, channels_first)
-    out_signal = torch.ops.torchaudio.sox_effects_apply_effects_tensor(in_signal, effects)
-    return out_signal.get_tensor(), out_signal.get_sample_rate()
+    return torch.ops.torchaudio.sox_effects_apply_effects_tensor(
+        tensor, sample_rate, effects, channels_first)
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
@@ -267,6 +266,5 @@ def apply_effects_file(
             return torchaudio._torchaudio.apply_effects_fileobj(
                 path, effects, normalize, channels_first, format)
         path = os.fspath(path)
-    signal = torch.ops.torchaudio.sox_effects_apply_effects_file(
+    return torch.ops.torchaudio.sox_effects_apply_effects_file(
         path, effects, normalize, channels_first, format)
-    return signal.get_tensor(), signal.get_sample_rate()

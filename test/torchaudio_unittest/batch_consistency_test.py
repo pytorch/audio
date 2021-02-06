@@ -2,6 +2,8 @@
 import itertools
 from parameterized import parameterized
 
+import math
+
 import torch
 import torchaudio
 import torchaudio.functional as F
@@ -58,6 +60,78 @@ class TestFunctional(common_utils.TorchaudioTestCase):
                                              n_channels=n_channels, duration=5)
         self.assert_batch_consistencies(F.detect_pitch_frequency, waveform, sample_rate)
 
+    def test_amplitude_to_DB(self):
+        torch.manual_seed(0)
+        spec = torch.rand(2, 100, 100) * 200
+
+        amplitude_mult = 20.
+        amin = 1e-10
+        ref = 1.0
+        db_mult = math.log10(max(amin, ref))
+
+        # Test with & without a `top_db` clamp
+        self.assert_batch_consistencies(F.amplitude_to_DB, spec, amplitude_mult,
+                                        amin, db_mult, top_db=None)
+        self.assert_batch_consistencies(F.amplitude_to_DB, spec, amplitude_mult,
+                                        amin, db_mult, top_db=40.)
+
+    def test_amplitude_to_DB_itemwise_clamps(self):
+        """Ensure that the clamps are separate for each spectrogram in a batch.
+
+        The clamp was determined per-batch in a prior implementation, which
+        meant it was determined by the loudest item, thus items weren't
+        independent. See:
+
+        https://github.com/pytorch/audio/issues/994
+
+        """
+        amplitude_mult = 20.
+        amin = 1e-10
+        ref = 1.0
+        db_mult = math.log10(max(amin, ref))
+        top_db = 20.
+
+        # Make a batch of noise
+        torch.manual_seed(0)
+        spec = torch.rand([2, 2, 100, 100]) * 200
+        # Make one item blow out the other
+        spec[0] += 50
+
+        batchwise_dbs = F.amplitude_to_DB(spec, amplitude_mult, amin,
+                                          db_mult, top_db=top_db)
+        itemwise_dbs = torch.stack([
+            F.amplitude_to_DB(item, amplitude_mult, amin,
+                              db_mult, top_db=top_db)
+            for item in spec
+        ])
+
+        self.assertEqual(batchwise_dbs, itemwise_dbs)
+
+    def test_amplitude_to_DB_not_channelwise_clamps(self):
+        """Check that clamps are applied per-item, not per channel."""
+        amplitude_mult = 20.
+        amin = 1e-10
+        ref = 1.0
+        db_mult = math.log10(max(amin, ref))
+        top_db = 40.
+
+        torch.manual_seed(0)
+        spec = torch.rand([1, 2, 100, 100]) * 200
+        # Make one channel blow out the other
+        spec[:, 0] += 50
+
+        specwise_dbs = F.amplitude_to_DB(spec, amplitude_mult, amin,
+                                         db_mult, top_db=top_db)
+        channelwise_dbs = torch.stack([
+            F.amplitude_to_DB(spec[:, i], amplitude_mult, amin,
+                              db_mult, top_db=top_db)
+            for i in range(spec.size(-3))
+        ])
+
+        # Just check channelwise gives a different answer.
+        difference = (specwise_dbs - channelwise_dbs).abs()
+        assert (difference >= 1e-5).any()
+
     def test_contrast(self):
         waveform = torch.rand(2, 100) - 0.5
         self.assert_batch_consistencies(F.contrast, waveform, enhancement_amount=80.)
@@ -102,7 +176,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
     """Test suite for classes defined in `transforms` module"""
     def test_batch_AmplitudeToDB(self):
-        spec = torch.rand((6, 201))
+        spec = torch.rand((2, 6, 201))
 
         # Single then transform then batch
         expected = torchaudio.transforms.AmplitudeToDB()(spec).repeat(3, 1, 1)
