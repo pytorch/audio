@@ -53,8 +53,8 @@ option(BUILD_PYTHON_EXTENSION "Build Python extension" OFF)
 
 find_package(Torch REQUIRED)
 
-# Set -D_GLIBCXX_USE_CXX11_ABI for third party builds
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+# TORCH_CXX_FLAGS contains the same -D_GLIBCXX_USE_CXX11_ABI value as PyTorch
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall ${TORCH_CXX_FLAGS}")
 
 add_subdirectory(third_party)
 add_subdirectory(torchaudio/csrc)
