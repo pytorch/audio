@@ -1,6 +1,6 @@
 import os
 import csv
-from typing import List, Tuple, Union
+from typing import Tuple, Union
 from pathlib import Path
 
 import torchaudio

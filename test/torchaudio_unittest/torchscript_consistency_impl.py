@@ -1,5 +1,4 @@
 """Test suites for jit-ability and its numerical compatibility"""
-import unittest
 
 import torch
 import torchaudio.transforms as T
