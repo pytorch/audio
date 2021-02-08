@@ -6,7 +6,23 @@ int64_t cpu_lfilter_core_loop(
   const torch::Tensor& input_signal_windows,
   const torch::Tensor& a_coeff_flipped,
   torch::Tensor& padded_output_waveform) {
-    //TODO: Implement all checks
+   
+    TORCH_CHECK(input_signal_windows.device().is_cpu() &&
+                a_coeff_flipped.device().is_cpu() &&
+                padded_output_waveform.device().is_cpu());
+
+    TORCH_CHECK(input_signal_windows.is_contiguous() && 
+                a_coeff_flipped.is_contiguous() &&
+                padded_output_waveform.is_contiguous());
+
+    TORCH_CHECK(input_signal_windows.dtype().name()=="float" &&
+                a_coeff_flipped.dtype().name()=="float" &&
+                padded_output_waveform.dtype().name()=="float");
+                
+    TORCH_CHECK(input_signal_windows.size(0)==padded_output_waveform.size(0));
+
+    TORCH_CHECK(input_signal_windows.size(1)+a_coeff_flipped.size(0)-1==padded_output_waveform.size(1));
+   
     int64_t n_channel = input_signal_windows.size(0);
     int64_t n_samples_input = input_signal_windows.size(1);
     int64_t n_samples_output = padded_output_waveform.size(1);
