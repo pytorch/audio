@@ -185,6 +185,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistencies(
             F.vad, waveform, sample_rate=sample_rate)
 
+    @common_utils.skipIfNoExtension
     def test_compute_kaldi_pitch(self):
         sample_rate = 44100
         waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
