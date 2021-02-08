@@ -42,7 +42,7 @@ conda install pytorch -c pytorch-nightly
 ### Install Torchaudio
 
 ```bash
-conda install cmake
+pip install cmake ninja
 ```
 
 ```bash
