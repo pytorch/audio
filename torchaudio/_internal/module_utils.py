@@ -45,6 +45,7 @@ def deprecated(direction: str, version: Optional[str] = None):
     """
     def decorator(obj):
         # get __init__ if obj is a class, else get the function itself
+        # FIXME: remove when SignalInfo and EncodingInfo are properly removed
         func = getattr(obj, '__init__', obj)
 
         @wraps(func)
