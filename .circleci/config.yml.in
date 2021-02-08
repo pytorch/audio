@@ -577,6 +577,21 @@ jobs:
             target=${tag:-master}
             ~/workspace/.circleci/build_docs/commit_docs.sh ~/workspace $target
 
+  docstring_parameters_sync:
+    <<: *binary_common
+    docker:
+      - image: "pytorch/manylinux-cuda100"
+    resource_class: 2xlarge+
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - checkout
+      - run:
+          name: Check parameters docstring sync
+          command: |
+            pip install --user pydocstyle
+            pydocstyle torchaudio
+
 workflows:
   build:
     jobs:

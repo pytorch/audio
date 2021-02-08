@@ -29,11 +29,10 @@ def _run_kaldi(command, input_type, input_value):
     """Run provided Kaldi command, pass a tensor and get the resulting tensor
 
     Args:
-        input_type: str
-            'ark' or 'scp'
-        input_value:
-            Tensor for 'ark'
-            string for 'scp' (path to an audio file)
+        command (list of str): The command with arguments
+        input_type (str): 'ark' or 'scp'
+        input_value (Tensor for 'ark', string for 'scp'): The input to pass.
+            Must be a path to an audio file for 'scp'.
     """
     key = 'foo'
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
