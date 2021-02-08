@@ -22,18 +22,22 @@ def info(
         filepath (path-like object or file-like object):
             Source of audio data. When the function is not compiled by TorchScript,
             (e.g. ``torch.jit.script``), the following types are accepted;
+
                   * ``path-like``: file path
                   * ``file-like``: Object with ``read(size: int) -> bytes`` method,
                     which returns byte string of at most ``size`` length.
+
             When the function is compiled by TorchScript, only ``str`` type is allowed.
 
             Note:
+
                   * When the input type is file-like object, this function cannot
                     get the correct length (``num_samples``) for certain formats,
                     such as ``mp3`` and ``vorbis``.
                     In this case, the value of ``num_samples`` is ``0``.
                   * This argument is intentionally annotated as ``str`` only due to
                     TorchScript compiler compatibility.
+
         format (str, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
@@ -103,14 +107,15 @@ def load(
         filepath (path-like object or file-like object):
             Source of audio data. When the function is not compiled by TorchScript,
             (e.g. ``torch.jit.script``), the following types are accepted;
+
                   * ``path-like``: file path
                   * ``file-like``: Object with ``read(size: int) -> bytes`` method,
                     which returns byte string of at most ``size`` length.
+
             When the function is compiled by TorchScript, only ``str`` type is allowed.
 
-            Note:
-                * This argument is intentionally annotated as ``str`` only due to
-                  TorchScript compiler compatibility.
+            Note: This argument is intentionally annotated as ``str`` only due to
+            TorchScript compiler compatibility.
         frame_offset (int):
             Number of frames to skip before start reading data.
         num_frames (int):

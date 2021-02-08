@@ -157,12 +157,12 @@ You can switch from another backend to the ``"soundfile"`` backend with the foll
     If you are switching from `"soundfile" (legacy interface) <soundfile_legacy_backend>` backend, set ``torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE`` flag **before** switching the backend.
 
 info
-^^^^
+----
 
 .. autofunction:: torchaudio.backend._soundfile_backend.info
 
 load
-^^^^
+----
 
 .. autofunction:: torchaudio.backend._soundfile_backend.load
 
@@ -170,7 +170,7 @@ load
 
 
 save
-^^^^
+----
 
 .. autofunction:: torchaudio.backend._soundfile_backend.save
 

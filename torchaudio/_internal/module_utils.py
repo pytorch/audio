@@ -43,7 +43,10 @@ def deprecated(direction: str, version: Optional[str] = None):
     Args:
         direction: Migration steps to be given to users.
     """
-    def decorator(func):
+    def decorator(obj):
+        # get __init__ if obj is a class, else get the function itself
+        func = getattr(obj, '__init__', obj)
+
         @wraps(func)
         def wrapped(*args, **kwargs):
             message = (
