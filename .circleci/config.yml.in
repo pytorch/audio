@@ -580,7 +580,7 @@ jobs:
   docstring_parameters_sync:
     <<: *binary_common
     docker:
-      - image: "pytorch/manylinux-cuda100"
+      - image: continuumio/miniconda
     resource_class: 2xlarge+
     steps:
       - attach_workspace:
@@ -589,7 +589,6 @@ jobs:
       - run:
           name: Check parameters docstring sync
           command: |
-            source /usr/local/etc/profile.d/conda.sh && conda activate base
             conda install -c conda-forge pydocstyle
             pydocstyle torchaudio
 
