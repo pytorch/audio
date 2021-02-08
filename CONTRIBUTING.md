@@ -48,6 +48,7 @@ pip install cmake ninja
 ```bash
 git clone https://github.com/pytorch/audio.git
 cd audio
+git submodule update --init --recursive
 BUILD_SOX=1 python setup.py develop
 # or, for OSX
 # BUILD_SOX=1 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py develop
@@ -56,9 +57,14 @@ BUILD_SOX=1 python setup.py develop
 ```
 
 Note: you don't need to use `BUILD_SOX=1` if you have `libsox-dev` installed
-already.
+already. If you built sox however, set the `PATH` variable so that the tests
+properly use the newly built `sox` binary:
 
-dependencies for testing:
+```bash
+export PATH="<path_to_torchaudio>/third_party/install/bin:${PATH}"
+```
+
+The following dependencies are also needed for testing:
 
 ```bash
 pip install typing pytest scipy numpy parametrized
