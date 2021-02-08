@@ -589,6 +589,7 @@ jobs:
       - run:
           name: Check parameters docstring sync
           command: |
+            source /usr/local/etc/profile.d/conda.sh && conda activate base
             conda install -c conda-forge pydocstyle
             pydocstyle torchaudio
 
