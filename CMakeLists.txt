@@ -49,7 +49,7 @@ endif()
 option(BUILD_SOX "Build libsox statically" OFF)
 option(BUILD_TRANSDUCER "Enable transducer" OFF)
 option(BUILD_LIBTORCHAUDIO "Build C++ Library" ON)
-option(BUILD_PYTHON_EXTENSION "Build Python extension" OFF)
+option(BUILD_TORCHAUDIO_PYTHON_EXTENSION "Build Python extension" OFF)
 
 find_package(Torch REQUIRED)
 
