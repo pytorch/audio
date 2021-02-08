@@ -589,7 +589,7 @@ jobs:
       - run:
           name: Check parameters docstring sync
           command: |
-            pip install --user pydocstyle
+            conda install -c conda-forge pydocstyle
             pydocstyle torchaudio
 
 workflows:
