@@ -9,6 +9,7 @@ from .ljspeech import LJSPEECH
 from .cmuarctic import CMUARCTIC
 from .libritts import LIBRITTS
 from .tedlium import TEDLIUM
+from .esc import ESC10, ESC50
 
 __all__ = (
     "COMMONVOICE",
@@ -24,4 +25,6 @@ __all__ = (
     "diskcache_iterator",
     "bg_iterator",
     "TEDLIUM",
+    "ESC10",
+    "ESC50",
 )
