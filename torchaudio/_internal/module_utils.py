@@ -44,10 +44,7 @@ def deprecated(direction: str, version: Optional[str] = None):
     Args:
         direction: Migration steps to be given to users.
     """
-    def decorator(obj):
-        # get __init__ if obj is a class, else get the function itself
-        # FIXME: remove when SignalInfo and EncodingInfo are properly removed
-        func = obj.__init__ if inspect.isclass(obj) else obj
+    def decorator(func):
 
         @wraps(func)
         def wrapped(*args, **kwargs):
