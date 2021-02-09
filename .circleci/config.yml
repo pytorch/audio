@@ -578,8 +578,9 @@ jobs:
             ~/workspace/.circleci/build_docs/commit_docs.sh ~/workspace $target
 
   docstring_parameters_sync:
+    <<: *binary_common
     docker:
-      - image: continuumio/miniconda
+      - image: "pytorch/manylinux-cuda100"
     steps:
       - attach_workspace:
           at: ~/workspace
