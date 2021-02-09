@@ -2,7 +2,6 @@ import warnings
 import importlib.util
 from typing import Optional
 from functools import wraps
-import inspect
 
 
 def is_module_available(*modules: str) -> bool:
