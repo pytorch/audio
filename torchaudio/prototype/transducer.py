@@ -5,7 +5,10 @@ from torchaudio._internal import (
     module_utils as _mod_utils,
 )
 
-__all__ = ["rnnt_loss", "RNNTLoss"]
+__all__ = [
+    "rnnt_loss",
+    "RNNTLoss",
+]
 
 
 class _RNNT(Function):
