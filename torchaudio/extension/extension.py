@@ -1,6 +1,5 @@
 import warnings
 import importlib
-from collections import namedtuple
 
 import torch
 from torchaudio._internal import module_utils as _mod_utils

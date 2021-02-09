@@ -2,9 +2,25 @@
 
 ## How to run test
 
-You can use `pytest` to run `torchaudio`'s test suites. See https://docs.pytest.org/ for the detail of how to use `pytest` command. The `parametrized` package is also needed; it can be installed via `pip` or with ` conda install -c conda-forge parameterized`.
+You can use `pytest` to run `torchaudio`'s test suites. See
+https://docs.pytest.org/ for the detail of how to use `pytest` command.
 
+For testing, the following packages are needed:
+
+```bash
+pip install typing pytest scipy numpy parametrized
 ```
+
+Make sure to follow the installation instruction in the [contributing
+guide](../../CONTRIBUTING.md) first. For running `kaldi`-related tests:
+
+```bash
+export PATH="${PATH}:<path_to_kaldi>/src/featbin/"
+```
+
+Some useful pytest commands:
+
+```bash
 # List up all the tests
 pytest test --collect-only
 # Run all the test suites
@@ -21,6 +37,11 @@ pytest test/torchaudio_unittest/sox_io_backend -k load  # only runs tests where 
 
 **Note**
 We use PyTorch's test utilities instead of `pytest` frameworks when writing tests to avoid reinventing the wheel for Tensor comparison.
+Also, while we recommend using `pytest` for *running* the tests, we cannot
+make `pytest` a testing dependency of `torchaudio`. As a result, you should
+not import `pytest` or its submodules in the test files; Use the Python
+`unittest` builtin module instead, or the `parametrized` package to
+parametrize tests.
 
 ## Structure of tests
 
@@ -28,7 +49,7 @@ The following is an overview of the tests and related modules for `torchaudio`.
 
 ### Purpose specific test suites
 
-#### Numerical compatibility agains existing software
+#### Numerical compatibility against existing software
 - [Librosa compatibility test](./librosa_compatibility_test.py)
     Test suite for numerical compatibility against librosa.
 - [SoX compatibility test](./sox_compatibility_test.py)
