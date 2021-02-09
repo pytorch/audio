@@ -1,5 +1,4 @@
 import io
-import itertools
 from unittest.mock import patch
 
 from torchaudio._internal import module_utils as _mod_utils
