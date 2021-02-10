@@ -71,7 +71,7 @@ class SPEECHCOMMANDS(Dataset):
             "testing_list.txt", respectively, and "training" is the rest. Details for the files
             "validation_list.txt" and "testing_list.txt" are explained in the README of the dataset
             and in the introduction of Section 7 of the original paper and its reference 12. The
-            original paper can be found here: https://arxiv.org/pdf/1804.03209.pdf (default: ``None``)
+            original paper can be found `here <https://arxiv.org/pdf/1804.03209.pdf>`_. (Default: ``None``)
     """
 
     def __init__(self,
