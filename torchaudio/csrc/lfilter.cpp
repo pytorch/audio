@@ -3,7 +3,7 @@
 namespace {
 
 template<typename scalar_t>
-int64_t host_lfilter_core_loop(
+void host_lfilter_core_loop(
   const torch::Tensor& input_signal_windows,
   const torch::Tensor& a_coeff_flipped,
   torch::Tensor& padded_output_waveform) {
@@ -25,10 +25,9 @@ int64_t host_lfilter_core_loop(
       output_data[offset_output+i_sample+n_order-1] = a0;
     }
   }
-  return 0;
 }
 
-int64_t cpu_lfilter_core_loop(
+void cpu_lfilter_core_loop(
   const torch::Tensor& input_signal_windows,
   const torch::Tensor& a_coeff_flipped,
   torch::Tensor& padded_output_waveform) {
@@ -49,21 +48,12 @@ int64_t cpu_lfilter_core_loop(
 
   TORCH_CHECK(input_signal_windows.size(1)+a_coeff_flipped.size(0)-1==padded_output_waveform.size(1));
 
-  int64_t output = AT_DISPATCH_FLOATING_TYPES(input_signal_windows.scalar_type(), "lfilter_core_loop", [&] {
-    return host_lfilter_core_loop<scalar_t>(input_signal_windows, a_coeff_flipped, padded_output_waveform);});
-
-  return output;
+  AT_DISPATCH_FLOATING_TYPES(input_signal_windows.scalar_type(), "lfilter_core_loop", [&] {
+    host_lfilter_core_loop<scalar_t>(input_signal_windows, a_coeff_flipped, padded_output_waveform);});
 }
  
 } // namespace
 
-TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
-  m.impl("_lfilter_core_loop", &cpu_lfilter_core_loop);
-}
-
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def(
-       "_lfilter_core_loop(Tensor input_signal_windows,"
-       "Tensor a_coeff_flipped_flipped,"
-       "Tensor padded_output_waveform) -> int");
+  m.def("torchaudio::_lfilter_core_loop", &cpu_lfilter_core_loop);
 }
