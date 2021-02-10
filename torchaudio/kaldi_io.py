@@ -57,7 +57,7 @@ def read_vec_int_ark(file_or_fd: Any) -> Iterable[Tuple[str, Tensor]]:
         >>> d = { u:d for u,d in torchaudio.kaldi_io.read_vec_int_ark(file) }
     """
     # Requires convert_contiguous to be True because elements from int32 vector are
-    # sored in tuples: (sizeof(int32), value) so strides are (5,) instead of (4,) which will throw an error
+    # sorted in tuples: (sizeof(int32), value) so strides are (5,) instead of (4,) which will throw an error
     # in from_numpy as it expects strides to be a multiple of 4 (int32).
     return _convert_method_output_to_tensor(file_or_fd, kaldi_io.read_vec_int_ark, convert_contiguous=True)
 
