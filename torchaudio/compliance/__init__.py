@@ -1,3 +1,5 @@
 from . import kaldi
 
-__all__ = ['kaldi']
+__all__ = [
+    'kaldi',
+]
