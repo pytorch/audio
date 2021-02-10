@@ -13,4 +13,10 @@ if _mod_utils.is_module_available('torchaudio._torchaudio'):
     init_sox_effects()
     atexit.register(shutdown_sox_effects)
 
-__all__ = ['init_sox_effects', 'shutdown_sox_effects', 'effect_names', 'apply_effects_tensor', 'apply_effects_file']
+__all__ = [
+    'init_sox_effects',
+    'shutdown_sox_effects',
+    'effect_names',
+    'apply_effects_tensor',
+    'apply_effects_file',
+]

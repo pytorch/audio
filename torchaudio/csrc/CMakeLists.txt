@@ -15,6 +15,10 @@ if(BUILD_TRANSDUCER)
   list(APPEND LIBTORCHAUDIO_SOURCES transducer.cpp)
 endif()
 
+if(BUILD_KALDI)
+  list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
+endif()
+
 ################################################################################
 # libtorchaudio.so
 ################################################################################

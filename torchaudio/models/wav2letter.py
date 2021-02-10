@@ -1,7 +1,9 @@
 from torch import Tensor
 from torch import nn
 
-__all__ = ["Wav2Letter"]
+__all__ = [
+    "Wav2Letter",
+]
 
 
 class Wav2Letter(nn.Module):

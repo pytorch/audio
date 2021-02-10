@@ -47,6 +47,7 @@ endif()
 
 # Options
 option(BUILD_SOX "Build libsox statically" OFF)
+option(BUILD_KALDI "Build kaldi statically" ON)
 option(BUILD_TRANSDUCER "Enable transducer" OFF)
 option(BUILD_LIBTORCHAUDIO "Build C++ Library" ON)
 option(BUILD_TORCHAUDIO_PYTHON_EXTENSION "Build Python extension" OFF)

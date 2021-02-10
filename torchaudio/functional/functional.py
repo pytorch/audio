@@ -13,6 +13,7 @@ __all__ = [
     "amplitude_to_DB",
     "DB_to_amplitude",
     "compute_deltas",
+    "compute_kaldi_pitch",
     "create_fb_matrix",
     "create_dct",
     "compute_deltas",
@@ -991,3 +992,105 @@ def spectral_centroid(
                            device=specgram.device).reshape((-1, 1))
     freq_dim = -2
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
+
+
+def compute_kaldi_pitch(
+        waveform: torch.Tensor,
+        sample_rate: float,
+        frame_length: float = 25.0,
+        frame_shift: float = 10.0,
+        min_f0: float = 50,
+        max_f0: float = 400,
+        soft_min_f0: float = 10.0,
+        penalty_factor: float = 0.1,
+        lowpass_cutoff: float = 1000,
+        resample_frequency: float = 4000,
+        delta_pitch: float = 0.005,
+        nccf_ballast: float = 7000,
+        lowpass_filter_width: int = 1,
+        upsample_filter_width: int = 5,
+        max_frames_latency: int = 0,
+        frames_per_chunk: int = 0,
+        simulate_first_pass_online: bool = False,
+        recompute_frame: int = 500,
+        snip_edges: bool = True,
+) -> torch.Tensor:
+    """Extract pitch based on method described in [1].
+
+    This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.
+
+    Args:
+        waveform (Tensor):
+            The input waveform of shape `(..., time)`.
+        sample_rate (float):
+            Sample rate of `waveform`.
+        frame_length (float, optional):
+            Frame length in milliseconds.
+        frame_shift (float, optional):
+            Frame shift in milliseconds.
+        min_f0 (float, optional):
+            Minimum F0 to search for (Hz)
+        max_f0 (float, optional):
+            Maximum F0 to search for (Hz)
+        soft_min_f0 (float, optional):
+            Minimum f0, applied in soft way, must not exceed min-f0
+        penalty_factor (float, optional):
+            Cost factor for FO change.
+        lowpass_cutoff (float, optional):
+            Cutoff frequency for LowPass filter (Hz)
+        resample_frequency (float, optional):
+            Frequency that we down-sample the signal to. Must be more than twice lowpass-cutoff.
+        delta_pitch( float, optional):
+            Smallest relative change in pitch that our algorithm measures.
+        nccf_ballast (float, optional):
+            Increasing this factor reduces NCCF for quiet frames
+        lowpass_filter_width (int, optional):
+            Integer that determines filter width of lowpass filter, more gives sharper filter.
+        upsample_filter_width (int, optional):
+            Integer that determines filter width when upsampling NCCF.
+        max_frames_latency (int, optional):
+            Maximum number of frames of latency that we allow pitch tracking to introduce into
+            the feature processing (affects output only if ``frames_per_chunk > 0`` and
+            ``simulate_first_pass_online=True``)
+        frames_per_chunk (int, optional):
+            The number of frames used for energy normalization.
+        simulate_first_pass_online (bool, optional):
+            If true, the function will output features that correspond to what an online decoder
+            would see in the first pass of decoding -- not the final version of the features,
+            which is the default.
+            Relevant if ``frames_per_chunk > 0``.
+        recompute_frame (int, optional):
+            Only relevant for compatibility with online pitch extraction.
+            A non-critical parameter; the frame at which we recompute some of the forward pointers,
+            after revising our estimate of the signal energy.
+            Relevant if ``frames_per_chunk > 0``.
+        snip_edges (bool, optional):
+            If this is set to false, the incomplete frames near the ending edge won't be snipped,
+            so that the number of frames is the file size divided by the frame-shift.
+            This makes different types of features give the same number of frames.
+
+    Returns:
+       Tensor: Pitch feature. Shape: `(batch, frames 2)` where the last dimension
+           corresponds to pitch and NCCF.
+
+    Reference:
+        - A pitch extraction algorithm tuned for automatic speech recognition
+
+          P. Ghahremani, B. BabaAli, D. Povey, K. Riedhammer, J. Trmal and S. Khudanpur
+
+          2014 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP),
+
+          Florence, 2014, pp. 2494-2498, doi: 10.1109/ICASSP.2014.6854049.
+    """
+    shape = waveform.shape
+    waveform = waveform.reshape(-1, shape[-1])
+    result = torch.ops.torchaudio.kaldi_ComputeKaldiPitch(
+        waveform, sample_rate, frame_length, frame_shift,
+        min_f0, max_f0, soft_min_f0, penalty_factor, lowpass_cutoff,
+        resample_frequency, delta_pitch, nccf_ballast,
+        lowpass_filter_width, upsample_filter_width, max_frames_latency,
+        frames_per_chunk, simulate_first_pass_online, recompute_frame,
+        snip_edges,
+    )
+    result = result.reshape(shape[:-1] + result.shape[-2:])
+    return result
