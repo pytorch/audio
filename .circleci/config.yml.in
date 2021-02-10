@@ -580,15 +580,13 @@ jobs:
   docstring_parameters_sync:
     <<: *binary_common
     docker:
-      - image: "pytorch/manylinux-cuda100"
+      - image: circleci/python:3.8
     steps:
-      - attach_workspace:
-          at: ~/workspace
       - checkout
       - run:
           name: Check parameters docstring sync
           command: |
-            pip install pydocstyle
+            pip install --user pydocstyle
             pydocstyle torchaudio
 
 workflows:
