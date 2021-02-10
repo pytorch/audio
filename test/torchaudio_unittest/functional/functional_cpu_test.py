@@ -83,46 +83,78 @@ class TestDetectPitchFrequency(common_utils.TorchaudioTestCase):
         self.assertFalse(s)
 
 
-class TestDB_to_amplitude(common_utils.TorchaudioTestCase):
-    def test_DB_to_amplitude(self):
-        # Make some noise
-        x = torch.rand(1000)
-        spectrogram = torchaudio.transforms.Spectrogram()
-        spec = spectrogram(x)
+class Testamplitude_to_DB(common_utils.TorchaudioTestCase):
+    @parameterized.expand([
+        ([100, 100],),
+        ([2, 100, 100],),
+        ([2, 2, 100, 100],),
+    ])
+    def test_reversible(self, shape):
+        """Round trip between amplitude and db should return the original for various shape
 
+        This implicitly also tests `DB_to_amplitude`.
+
+        """
+        amplitude_mult = 20.
+        power_mult = 10.
         amin = 1e-10
         ref = 1.0
-        db_multiplier = math.log10(max(amin, ref))
+        db_mult = math.log10(max(amin, ref))
 
-        # Waveform amplitude -> DB -> amplitude
-        multiplier = 20.
-        power = 0.5
-
-        db = F.amplitude_to_DB(torch.abs(x), multiplier, amin, db_multiplier, top_db=None)
-        x2 = F.DB_to_amplitude(db, ref, power)
-
-        self.assertEqual(x2, torch.abs(x), atol=5e-5, rtol=1e-5)
+        torch.manual_seed(0)
+        spec = torch.rand(*shape) * 200
 
         # Spectrogram amplitude -> DB -> amplitude
-        db = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db=None)
-        x2 = F.DB_to_amplitude(db, ref, power)
+        db = F.amplitude_to_DB(spec, amplitude_mult, amin, db_mult, top_db=None)
+        x2 = F.DB_to_amplitude(db, ref, 0.5)
 
         self.assertEqual(x2, spec, atol=5e-5, rtol=1e-5)
-
-        # Waveform power -> DB -> power
-        multiplier = 10.
-        power = 1.
-
-        db = F.amplitude_to_DB(x, multiplier, amin, db_multiplier, top_db=None)
-        x2 = F.DB_to_amplitude(db, ref, power)
-
-        self.assertEqual(x2, torch.abs(x), atol=5e-5, rtol=1e-5)
 
         # Spectrogram power -> DB -> power
-        db = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db=None)
-        x2 = F.DB_to_amplitude(db, ref, power)
+        db = F.amplitude_to_DB(spec, power_mult, amin, db_mult, top_db=None)
+        x2 = F.DB_to_amplitude(db, ref, 1.)
 
-        self.assertEqual(x2, spec, atol=5e-5, rtol=1e-5)
+        self.assertEqual(x2, spec)
+
+    @parameterized.expand([
+        ([100, 100],),
+        ([2, 100, 100],),
+        ([2, 2, 100, 100],),
+    ])
+    def test_top_db_clamp(self, shape):
+        """Ensure values are properly clamped when `top_db` is supplied."""
+        amplitude_mult = 20.
+        amin = 1e-10
+        ref = 1.0
+        db_mult = math.log10(max(amin, ref))
+        top_db = 40.
+
+        torch.manual_seed(0)
+        # A random tensor is used for increased entropy, but the max and min for
+        # each spectrogram still need to be predictable. The max determines the
+        # decibel cutoff, and the distance from the min must be large enough
+        # that it triggers a clamp.
+        spec = torch.rand(*shape)
+        # Ensure each spectrogram has a min of 0 and a max of 1.
+        spec -= spec.amin([-2, -1])[..., None, None]
+        spec /= spec.amax([-2, -1])[..., None, None]
+        # Expand the range to (0, 200) - wide enough to properly test clamping.
+        spec *= 200
+
+        decibels = F.amplitude_to_DB(spec, amplitude_mult, amin,
+                                     db_mult, top_db=top_db)
+        # Ensure the clamp was applied
+        below_limit = decibels < 6.0205
+        assert not below_limit.any(), (
+            "{} decibel values were below the expected cutoff:\n{}".format(
+                below_limit.sum().item(), decibels
+            )
+        )
+        # Ensure it didn't over-clamp
+        close_to_limit = decibels < 6.0207
+        assert close_to_limit.any(), (
+            f"No values were close to the limit. Did it over-clamp?\n{decibels}"
+        )
 
 
 class TestComplexNorm(common_utils.TorchaudioTestCase):

@@ -353,7 +353,11 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   //   in sync and `tell_off` has seemingly uninitialized value, which
   //   leads num_remain to be negative and cause segmentation fault
   //   in `memmove`.
-  const auto num_consumed = ftell((FILE*)sf->fp);
+  const auto tell = ftell((FILE*)sf->fp);
+  if (tell < 0) {
+    throw std::runtime_error("Internal Error: ftell failed.");
+  }
+  const auto num_consumed = static_cast<size_t>(tell);
   if (num_consumed > priv->buffer_size) {
     throw std::runtime_error("Internal Error: buffer overrun.");
   }
@@ -361,7 +365,7 @@ int fileobj_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   const auto num_remain = priv->buffer_size - num_consumed;
 
   // 1.1. Fetch the data to see if there is data to fill the buffer
-  uint64_t num_refill = 0;
+  size_t num_refill = 0;
   std::string chunk(num_consumed, '\0');
   if (num_consumed && !priv->eof_reached) {
     num_refill = read_fileobj(

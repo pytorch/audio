@@ -13,8 +13,10 @@ from torchaudio_unittest.common_utils import (
     get_wav_data,
     save_wav,
 )
-# TODO refactor and move these to common location
-from torchaudio_unittest.sox_io_backend.info_test import get_encoding, get_bits_per_sample
+from torchaudio_unittest.backend.common import (
+    get_bits_per_sample,
+    get_encoding,
+)
 from .common import skipIfFormatNotSupported, parameterize
 
 if _mod_utils.is_module_available("soundfile"):

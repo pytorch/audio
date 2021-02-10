@@ -10,7 +10,7 @@ from .cmuarctic import CMUARCTIC
 from .libritts import LIBRITTS
 from .tedlium import TEDLIUM
 
-__all__ = (
+__all__ = [
     "COMMONVOICE",
     "LIBRISPEECH",
     "SPEECHCOMMANDS",
@@ -24,4 +24,4 @@ __all__ = (
     "diskcache_iterator",
     "bg_iterator",
     "TEDLIUM",
-)
+]

@@ -1,5 +1,3 @@
-from torchaudio.datasets.librispeech import LIBRISPEECH
-from torchaudio.datasets.speechcommands import SPEECHCOMMANDS
 from torchaudio.datasets.vctk import VCTK
 
 from torchaudio_unittest.common_utils import (
