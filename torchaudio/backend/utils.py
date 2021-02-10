@@ -44,7 +44,7 @@ def set_audio_backend(backend: Optional[str]):
     """
     if torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE is not None:
         warnings.warn(
-            '"torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE" flag is depredated and will be removed in 0.9.0. '
+            '"torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE" flag is deprecated and will be removed in 0.9.0. '
             'Please remove the use of flag.'
         )
 
@@ -57,7 +57,7 @@ def set_audio_backend(backend: Optional[str]):
         module = no_backend
     elif backend == 'sox':
         warnings.warn(
-            '"sox" backend is depredated and will be removed in 0.9.0. '
+            '"sox" backend is deprecated and will be removed in 0.9.0. '
             'Please use "sox_io" backend.'
         )
         module = sox_backend
@@ -66,7 +66,7 @@ def set_audio_backend(backend: Optional[str]):
     elif backend == 'soundfile':
         if torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE:
             warnings.warn(
-                'The legacy interface of "soundfile" backend is depredated and will be removed in 0.9.0. '
+                'The legacy interface of "soundfile" backend is deprecated and will be removed in 0.9.0. '
                 'Please migrate to the new interface.'
             )
             module = soundfile_backend
