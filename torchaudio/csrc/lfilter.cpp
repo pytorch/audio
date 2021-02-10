@@ -54,6 +54,8 @@ void cpu_lfilter_core_loop(
  
 } // namespace
 
+// Note: We want to avoid using "catch-all" kernel. 
+// The following registration should be replaced with CPU specific registration. 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def("torchaudio::_lfilter_core_loop", &cpu_lfilter_core_loop);
 }

@@ -878,9 +878,9 @@ def lfilter(
     input_signal_windows.div_(a_coeffs[0])
     a_coeffs_flipped.div_(a_coeffs[0])
 
-    if input_signal_windows.device==torch.device('cpu') and\
-       a_coeffs_flipped.device==torch.device('cpu') and\
-       padded_output_waveform.device==torch.device('cpu'):
+    if input_signal_windows.device == torch.device('cpu') and\
+       a_coeffs_flipped.device == torch.device('cpu') and\
+       padded_output_waveform.device == torch.device('cpu'):
         torch.ops.torchaudio._lfilter_core_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
     else:
         for i_sample, o0 in enumerate(input_signal_windows.t()):
@@ -889,8 +889,6 @@ def lfilter(
             ]
             o0.addmv_(windowed_output_signal, a_coeffs_flipped, alpha=-1)
             padded_output_waveform[:, i_sample + n_order - 1] = o0
-
-    
 
     output = padded_output_waveform[:, n_order - 1:]
 
