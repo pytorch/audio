@@ -240,15 +240,14 @@ def save(
             This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``
             for the consistency with "sox_io" backend, which has a restriction on type annotation
             for TorchScript compiler compatiblity.
-        tensor (torch.Tensor): Audio data to save. must be 2D tensor.
+        src (torch.Tensor): Audio data to save. must be 2D tensor.
         sample_rate (int): sampling rate
-        channels_first (bool):
-            If ``True``, the given tensor is interpreted as ``[channel, time]``,
+        channels_first (bool): If ``True``, the given tensor is interpreted as ``[channel, time]``,
             otherwise ``[time, channel]``.
-        compression (Optional[float]):
-            Not used. It is here only for interface compatibility reson with "sox_io" backend.
-        format (str, optional):
-            Output audio format. This is required when the output audio format cannot be infered from
+        compression (Optional[float]): Not used.
+            It is here only for interface compatibility reson with "sox_io" backend.
+        format (str, optional): Output audio format.
+            This is required when the output audio format cannot be infered from
             ``filepath``, (such as file extension or ``name`` attribute of the given file object).
     """
     if src.ndim != 2:
