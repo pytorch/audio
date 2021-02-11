@@ -351,7 +351,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">USE_SOUNDFILE_LEGACY_INTERFACE</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s1">&#39;&quot;torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE&quot; flag is depredated and will be removed in 0.9.0. &#39;</span>
+            <span class="s1">&#39;&quot;torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE&quot; flag is deprecated and will be removed in 0.9.0. &#39;</span>
             <span class="s1">&#39;Please remove the use of flag.&#39;</span>
         <span class="p">)</span>
 
@@ -364,7 +364,7 @@
         <span class="n">module</span> <span class="o">=</span> <span class="n">no_backend</span>
     <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;sox&#39;</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s1">&#39;&quot;sox&quot; backend is depredated and will be removed in 0.9.0. &#39;</span>
+            <span class="s1">&#39;&quot;sox&quot; backend is deprecated and will be removed in 0.9.0. &#39;</span>
             <span class="s1">&#39;Please use &quot;sox_io&quot; backend.&#39;</span>
         <span class="p">)</span>
         <span class="n">module</span> <span class="o">=</span> <span class="n">sox_backend</span>
@@ -373,7 +373,7 @@
     <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;soundfile&#39;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">USE_SOUNDFILE_LEGACY_INTERFACE</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s1">&#39;The legacy interface of &quot;soundfile&quot; backend is depredated and will be removed in 0.9.0. &#39;</span>
+                <span class="s1">&#39;The legacy interface of &quot;soundfile&quot; backend is deprecated and will be removed in 0.9.0. &#39;</span>
                 <span class="s1">&#39;Please migrate to the new interface.&#39;</span>
             <span class="p">)</span>
             <span class="n">module</span> <span class="o">=</span> <span class="n">soundfile_backend</span>

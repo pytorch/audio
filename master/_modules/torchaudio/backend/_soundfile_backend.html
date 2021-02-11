@@ -547,15 +547,14 @@
 <span class="sd">            This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``</span>
 <span class="sd">            for the consistency with &quot;sox_io&quot; backend, which has a restriction on type annotation</span>
 <span class="sd">            for TorchScript compiler compatiblity.</span>
-<span class="sd">        tensor (torch.Tensor): Audio data to save. must be 2D tensor.</span>
+<span class="sd">        src (torch.Tensor): Audio data to save. must be 2D tensor.</span>
 <span class="sd">        sample_rate (int): sampling rate</span>
-<span class="sd">        channels_first (bool):</span>
-<span class="sd">            If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
+<span class="sd">        channels_first (bool): If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
 <span class="sd">            otherwise ``[time, channel]``.</span>
-<span class="sd">        compression (Optional[float]):</span>
-<span class="sd">            Not used. It is here only for interface compatibility reson with &quot;sox_io&quot; backend.</span>
-<span class="sd">        format (str, optional):</span>
-<span class="sd">            Output audio format. This is required when the output audio format cannot be infered from</span>
+<span class="sd">        compression (Optional[float]): Not used.</span>
+<span class="sd">            It is here only for interface compatibility reson with &quot;sox_io&quot; backend.</span>
+<span class="sd">        format (str, optional): Output audio format.</span>
+<span class="sd">            This is required when the output audio format cannot be infered from</span>
 <span class="sd">            ``filepath``, (such as file extension or ``name`` attribute of the given file object).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>

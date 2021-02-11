@@ -364,7 +364,7 @@
 <span class="sd">        &gt;&gt;&gt; d = { u:d for u,d in torchaudio.kaldi_io.read_vec_int_ark(file) }</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Requires convert_contiguous to be True because elements from int32 vector are</span>
-    <span class="c1"># sored in tuples: (sizeof(int32), value) so strides are (5,) instead of (4,) which will throw an error</span>
+    <span class="c1"># sorted in tuples: (sizeof(int32), value) so strides are (5,) instead of (4,) which will throw an error</span>
     <span class="c1"># in from_numpy as it expects strides to be a multiple of 4 (int32).</span>
     <span class="k">return</span> <span class="n">_convert_method_output_to_tensor</span><span class="p">(</span><span class="n">file_or_fd</span><span class="p">,</span> <span class="n">kaldi_io</span><span class="o">.</span><span class="n">read_vec_int_ark</span><span class="p">,</span> <span class="n">convert_contiguous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 

@@ -329,18 +329,22 @@
 <span class="sd">        filepath (path-like object or file-like object):</span>
 <span class="sd">            Source of audio data. When the function is not compiled by TorchScript,</span>
 <span class="sd">            (e.g. ``torch.jit.script``), the following types are accepted;</span>
+
 <span class="sd">                  * ``path-like``: file path</span>
 <span class="sd">                  * ``file-like``: Object with ``read(size: int) -&gt; bytes`` method,</span>
 <span class="sd">                    which returns byte string of at most ``size`` length.</span>
+
 <span class="sd">            When the function is compiled by TorchScript, only ``str`` type is allowed.</span>
 
 <span class="sd">            Note:</span>
+
 <span class="sd">                  * When the input type is file-like object, this function cannot</span>
 <span class="sd">                    get the correct length (``num_samples``) for certain formats,</span>
 <span class="sd">                    such as ``mp3`` and ``vorbis``.</span>
 <span class="sd">                    In this case, the value of ``num_samples`` is ``0``.</span>
 <span class="sd">                  * This argument is intentionally annotated as ``str`` only due to</span>
 <span class="sd">                    TorchScript compiler compatibility.</span>
+
 <span class="sd">        format (str, optional):</span>
 <span class="sd">            Override the format detection with the given format.</span>
 <span class="sd">            Providing the argument might help when libsox can not infer the format</span>
@@ -410,14 +414,15 @@
 <span class="sd">        filepath (path-like object or file-like object):</span>
 <span class="sd">            Source of audio data. When the function is not compiled by TorchScript,</span>
 <span class="sd">            (e.g. ``torch.jit.script``), the following types are accepted;</span>
+
 <span class="sd">                  * ``path-like``: file path</span>
 <span class="sd">                  * ``file-like``: Object with ``read(size: int) -&gt; bytes`` method,</span>
 <span class="sd">                    which returns byte string of at most ``size`` length.</span>
+
 <span class="sd">            When the function is compiled by TorchScript, only ``str`` type is allowed.</span>
 
-<span class="sd">            Note:</span>
-<span class="sd">                * This argument is intentionally annotated as ``str`` only due to</span>
-<span class="sd">                  TorchScript compiler compatibility.</span>
+<span class="sd">            Note: This argument is intentionally annotated as ``str`` only due to</span>
+<span class="sd">            TorchScript compiler compatibility.</span>
 <span class="sd">        frame_offset (int):</span>
 <span class="sd">            Number of frames to skip before start reading data.</span>
 <span class="sd">        num_frames (int):</span>
@@ -507,16 +512,15 @@
 <span class="sd">        and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filepath (str or pathlib.Path):</span>
-<span class="sd">            Path to save file. This function also handles ``pathlib.Path`` objects, but is annotated</span>
+<span class="sd">        filepath (str or pathlib.Path): Path to save file.</span>
+<span class="sd">            This function also handles ``pathlib.Path`` objects, but is annotated</span>
 <span class="sd">            as ``str`` for TorchScript compiler compatibility.</span>
-<span class="sd">        tensor (torch.Tensor): Audio data to save. must be 2D tensor.</span>
+<span class="sd">        src (torch.Tensor): Audio data to save. must be 2D tensor.</span>
 <span class="sd">        sample_rate (int): sampling rate</span>
-<span class="sd">        channels_first (bool):</span>
-<span class="sd">            If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
+<span class="sd">        channels_first (bool): If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
 <span class="sd">            otherwise ``[time, channel]``.</span>
-<span class="sd">        compression (Optional[float]):</span>
-<span class="sd">            Used for formats other than WAV. This corresponds to ``-C`` option of ``sox`` command.</span>
+<span class="sd">        compression (Optional[float]): Used for formats other than WAV.</span>
+<span class="sd">            This corresponds to ``-C`` option of ``sox`` command.</span>
 
 <span class="sd">                * | ``MP3``: Either bitrate (in ``kbps``) with quality factor, such as ``128.2``, or</span>
 <span class="sd">                  | VBR encoding with quality factor such as ``-4.2``. Default: ``-4.5``.</span>
@@ -526,11 +530,10 @@
 <span class="sd">                  | and lowest quality. Default: ``3``.</span>
 
 <span class="sd">            See the detail at http://sox.sourceforge.net/soxformat.html.</span>
-<span class="sd">        format (str, optional):</span>
-<span class="sd">            Output audio format. This is required when the output audio format cannot be infered from</span>
+<span class="sd">        format (str, optional): Output audio format.</span>
+<span class="sd">            This is required when the output audio format cannot be infered from</span>
 <span class="sd">            ``filepath``, (such as file extension or ``name`` attribute of the given file object).</span>
-<span class="sd">        dtype (str, optional)</span>
-<span class="sd">            Output tensor dtype.</span>
+<span class="sd">        dtype (str, optional): Output tensor dtype.</span>
 <span class="sd">            Valid values: ``&quot;uint8&quot;, &quot;int16&quot;, &quot;int32&quot;, &quot;float32&quot;, &quot;float64&quot;, None``</span>
 <span class="sd">            ``dtype=None`` means no conversion is performed.</span>
 <span class="sd">            ``dtype`` parameter is only effective for ``float32`` Tensor.</span>

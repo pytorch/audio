@@ -480,14 +480,16 @@
 <span class="sd">    Args:</span>
 <span class="sd">        path (path-like object or file-like object):</span>
 <span class="sd">            Source of audio data. When the function is not compiled by TorchScript,</span>
-<span class="sd">            (e.g. ``torch.jit.script``), the following types are accepted;</span>
+<span class="sd">            (e.g. ``torch.jit.script``), the following types are accepted:</span>
+
 <span class="sd">                  * ``path-like``: file path</span>
 <span class="sd">                  * ``file-like``: Object with ``read(size: int) -&gt; bytes`` method,</span>
 <span class="sd">                    which returns byte string of at most ``size`` length.</span>
+
 <span class="sd">            When the function is compiled by TorchScript, only ``str`` type is allowed.</span>
-<span class="sd">            Note:</span>
-<span class="sd">                * This argument is intentionally annotated as ``str`` only for</span>
-<span class="sd">                  TorchScript compiler compatibility.</span>
+
+<span class="sd">            Note: This argument is intentionally annotated as ``str`` only for</span>
+<span class="sd">            TorchScript compiler compatibility.</span>
 <span class="sd">        effects (List[List[str]]): List of effects.</span>
 <span class="sd">        normalize (bool):</span>
 <span class="sd">            When ``True``, this function always return ``float32``, and sample values are</span>

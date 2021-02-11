@@ -306,8 +306,7 @@
               
   <h1>Source code for torchaudio.backend.common</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
-
-<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 
 <div class="viewcode-block" id="AudioMetaData"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.common.AudioMetaData">[docs]</a><span class="k">class</span> <span class="nc">AudioMetaData</span><span class="p">:</span>
@@ -338,8 +337,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">encoding</span></div>
 
 
-<div class="viewcode-block" id="SignalInfo"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.common.SignalInfo">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="s1">&#39;Please migrate to `AudioMetaData`.&#39;</span><span class="p">,</span> <span class="s1">&#39;0.9.0&#39;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">SignalInfo</span><span class="p">:</span>
+<div class="viewcode-block" id="SignalInfo"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.common.SignalInfo">[docs]</a><span class="k">class</span> <span class="nc">SignalInfo</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;One of return types of ``torchaudio.info`` functions.</span>
 
 <span class="sd">    This class is used by :ref:`&quot;sox&quot; backend (deprecated)&lt;sox_backend&gt;` and</span>
@@ -358,14 +356,19 @@
                  <span class="n">rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> has been deprecated &#39;</span>
+            <span class="s1">&#39;and will be removed from 0.9.0 release. &#39;</span>
+            <span class="s1">&#39;Please migrate to `AudioMetaData`.&#39;</span>
+        <span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="n">channels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="o">=</span> <span class="n">precision</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span></div>
 
 
-<div class="viewcode-block" id="EncodingInfo"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.common.EncodingInfo">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="s1">&#39;Please migrate to `AudioMetaData`.&#39;</span><span class="p">,</span> <span class="s1">&#39;0.9.0&#39;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">EncodingInfo</span><span class="p">:</span>
+<div class="viewcode-block" id="EncodingInfo"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.common.EncodingInfo">[docs]</a><span class="k">class</span> <span class="nc">EncodingInfo</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;One of return types of ``torchaudio.info`` functions.</span>
 
 <span class="sd">    This class is used by :ref:`&quot;sox&quot; backend (deprecated)&lt;sox_backend&gt;` and</span>
@@ -389,6 +392,12 @@
                  <span class="n">reverse_nibbles</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">reverse_bits</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">opposite_endian</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> has been deprecated &#39;</span>
+            <span class="s1">&#39;and will be removed from 0.9.0 release. &#39;</span>
+            <span class="s1">&#39;Please migrate to `AudioMetaData`.&#39;</span>
+        <span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">encoding</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bits_per_sample</span> <span class="o">=</span> <span class="n">bits_per_sample</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">=</span> <span class="n">compression</span>

@@ -341,7 +341,15 @@
 <span class="k">def</span> <span class="nf">load_speechcommands_item</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
     <span class="n">relpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
     <span class="n">label</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">relpath</span><span class="p">)</span>
+    <span class="c1"># Besides the officially supported split method for datasets defined by &quot;validation_list.txt&quot;</span>
+    <span class="c1"># and &quot;testing_list.txt&quot; over &quot;speech_commands_v0.0x.tar.gz&quot; archives, an alternative split</span>
+    <span class="c1"># method referred to in paragraph 2-3 of Section 7.1, references 13 and 14 of the original</span>
+    <span class="c1"># paper, and the checksums file from the tensorflow_datasets package [1] is also supported.</span>
+    <span class="c1"># Some filenames in those &quot;speech_commands_test_set_v0.0x.tar.gz&quot; archives have the form</span>
+    <span class="c1"># &quot;xxx.wav.wav&quot;, so file extensions twice needs to be stripped twice.</span>
+    <span class="c1"># [1] https://github.com/tensorflow/datasets/blob/master/tensorflow_datasets/url_checksums/speech_commands.txt</span>
     <span class="n">speaker</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">speaker</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">speaker</span><span class="p">)</span>
 
     <span class="n">speaker_id</span><span class="p">,</span> <span class="n">utterance_number</span> <span class="o">=</span> <span class="n">speaker</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">HASH_DIVIDER</span><span class="p">)</span>
     <span class="n">utterance_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">utterance_number</span><span class="p">)</span>
@@ -367,7 +375,10 @@
 <span class="sd">        subset (Optional[str]):</span>
 <span class="sd">            Select a subset of the dataset [None, &quot;training&quot;, &quot;validation&quot;, &quot;testing&quot;]. None means</span>
 <span class="sd">            the whole dataset. &quot;validation&quot; and &quot;testing&quot; are defined in &quot;validation_list.txt&quot; and</span>
-<span class="sd">            &quot;testing_list.txt&quot;, respectively, and &quot;training&quot; is the rest. (default: ``None``)</span>
+<span class="sd">            &quot;testing_list.txt&quot;, respectively, and &quot;training&quot; is the rest. Details for the files</span>
+<span class="sd">            &quot;validation_list.txt&quot; and &quot;testing_list.txt&quot; are explained in the README of the dataset</span>
+<span class="sd">            and in the introduction of Section 7 of the original paper and its reference 12. The</span>
+<span class="sd">            original paper can be found `here &lt;https://arxiv.org/pdf/1804.03209.pdf&gt;`_. (Default: ``None``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>

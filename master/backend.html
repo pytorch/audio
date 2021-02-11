@@ -404,7 +404,7 @@ or when it cannot be accurately inferred.</p></li>
 <h3>SignalInfo (Deprecated)<a class="headerlink" href="#signalinfo-deprecated" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="torchaudio.backend.common.SignalInfo">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.backend.common.</code><code class="sig-name descname">SignalInfo</code><a class="reference internal" href="_modules/torchaudio/backend/common.html#SignalInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.common.SignalInfo" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.backend.common.</code><code class="sig-name descname">SignalInfo</code><span class="sig-paren">(</span><em class="sig-param">channels: Optional[int] = None</em>, <em class="sig-param">rate: Optional[float] = None</em>, <em class="sig-param">precision: Optional[int] = None</em>, <em class="sig-param">length: Optional[int] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/common.html#SignalInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.common.SignalInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>One of return types of <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code> functions.</p>
 <p>This class is used by <a class="reference internal" href="#sox-backend"><span class="std std-ref">“sox” backend (deprecated)</span></a> and
 <a class="reference internal" href="#soundfile-legacy-backend"><span class="std std-ref">“soundfile” backend with the legacy interface (deprecated)</span></a>.</p>
@@ -427,7 +427,7 @@ or when it cannot be accurately inferred.</p></li>
 <h3>EncodingInfo (Deprecated)<a class="headerlink" href="#encodinginfo-deprecated" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="torchaudio.backend.common.EncodingInfo">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.backend.common.</code><code class="sig-name descname">EncodingInfo</code><a class="reference internal" href="_modules/torchaudio/backend/common.html#EncodingInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.common.EncodingInfo" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.backend.common.</code><code class="sig-name descname">EncodingInfo</code><span class="sig-paren">(</span><em class="sig-param">encoding: Any = None</em>, <em class="sig-param">bits_per_sample: Optional[int] = None</em>, <em class="sig-param">compression: Optional[float] = None</em>, <em class="sig-param">reverse_bytes: Any = None</em>, <em class="sig-param">reverse_nibbles: Any = None</em>, <em class="sig-param">reverse_bits: Any = None</em>, <em class="sig-param">opposite_endian: Optional[bool] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/common.html#EncodingInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.common.EncodingInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>One of return types of <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code> functions.</p>
 <p>This class is used by <a class="reference internal" href="#sox-backend"><span class="std std-ref">“sox” backend (deprecated)</span></a> and
 <a class="reference internal" href="#soundfile-legacy-backend"><span class="std std-ref">“soundfile” backend with the legacy interface (deprecated)</span></a>.</p>
@@ -560,13 +560,8 @@ which returns byte string of at most <code class="docutils literal notranslate">
 </ul>
 </div></blockquote>
 <p>When the function is compiled by TorchScript, only <code class="docutils literal notranslate"><span class="pre">str</span></code> type is allowed.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<ul>
-<li><p>This argument is intentionally annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> only due to
-TorchScript compiler compatibility.</p></li>
-</ul>
-</div>
+<p>Note: This argument is intentionally annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code> only due to
+TorchScript compiler compatibility.</p>
 </p></li>
 <li><p><strong>frame_offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of frames to skip before start reading data.</p></li>
 <li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Maximum number of frames to read. <code class="docutils literal notranslate"><span class="pre">-1</span></code> reads all the remaining samples,
@@ -643,13 +638,15 @@ and corresponding codec libraries such as <code class="docutils literal notransl
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><em>pathlib.Path</em></a>) – Path to save file. This function also handles <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> objects, but is annotated
+<li><p><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><em>pathlib.Path</em></a>) – Path to save file.
+This function also handles <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> objects, but is annotated
 as <code class="docutils literal notranslate"><span class="pre">str</span></code> for TorchScript compiler compatibility.</p></li>
-<li><p><strong>tensor</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))"><em>torch.Tensor</em></a>) – Audio data to save. must be 2D tensor.</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))"><em>torch.Tensor</em></a>) – Audio data to save. must be 2D tensor.</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – sampling rate</p></li>
 <li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>,
 otherwise <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
-<li><p><strong>compression</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – <p>Used for formats other than WAV. This corresponds to <code class="docutils literal notranslate"><span class="pre">-C</span></code> option of <code class="docutils literal notranslate"><span class="pre">sox</span></code> command.</p>
+<li><p><strong>compression</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – <p>Used for formats other than WAV.
+This corresponds to <code class="docutils literal notranslate"><span class="pre">-C</span></code> option of <code class="docutils literal notranslate"><span class="pre">sox</span></code> command.</p>
 <blockquote>
 <div><ul>
 <li><div class="line-block">
@@ -671,7 +668,8 @@ otherwise <code class="docutils literal notranslate"><span class="pre">[time,</s
 </div></blockquote>
 <p>See the detail at <a class="reference external" href="http://sox.sourceforge.net/soxformat.html">http://sox.sourceforge.net/soxformat.html</a>.</p>
 </p></li>
-<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Output audio format. This is required when the output audio format cannot be infered from
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Output audio format.
+This is required when the output audio format cannot be infered from
 <code class="docutils literal notranslate"><span class="pre">filepath</span></code>, (such as file extension or <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute of the given file object).</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Output tensor dtype.
 Valid values: <code class="docutils literal notranslate"><span class="pre">&quot;uint8&quot;,</span> <span class="pre">&quot;int16&quot;,</span> <span class="pre">&quot;int32&quot;,</span> <span class="pre">&quot;float32&quot;,</span> <span class="pre">&quot;float64&quot;,</span> <span class="pre">None</span></code>
@@ -989,6 +987,8 @@ primarily for effects</p>
 <p class="admonition-title">Note</p>
 <p>If you are switching from <cite>“soundfile” (legacy interface) &lt;soundfile_legacy_backend&gt;</cite> backend, set <code class="docutils literal notranslate"><span class="pre">torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE</span></code> flag <strong>before</strong> switching the backend.</p>
 </div>
+<div class="section" id="id7">
+<h3>info<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend._soundfile_backend.info">
 <code class="sig-prename descclassname">torchaudio.backend._soundfile_backend.</code><code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">format: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; torchaudio.backend.common.AudioMetaData<a class="reference internal" href="_modules/torchaudio/backend/_soundfile_backend.html#info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend._soundfile_backend.info" title="Permalink to this definition">¶</a></dt>
@@ -1016,6 +1016,9 @@ primarily for effects</p>
 </dl>
 </dd></dl>
 
+</div>
+<div class="section" id="id8">
+<h3>load<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend._soundfile_backend.load">
 <code class="sig-prename descclassname">torchaudio.backend._soundfile_backend.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">frame_offset: int = 0</em>, <em class="sig-param">num_frames: int = -1</em>, <em class="sig-param">normalize: bool = True</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">format: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int]<a class="reference internal" href="_modules/torchaudio/backend/_soundfile_backend.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend._soundfile_backend.load" title="Permalink to this definition">¶</a></dt>
@@ -1102,6 +1105,9 @@ for simple usecases, such as <code class="docutils literal notranslate"><span cl
 The implementation is same as <a class="reference internal" href="#torchaudio.backend._soundfile_backend.load" title="torchaudio.backend._soundfile_backend.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">load()</span></code></a>.</p>
 </dd></dl>
 
+</div>
+<div class="section" id="id9">
+<h3>save<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend._soundfile_backend.save">
 <code class="sig-prename descclassname">torchaudio.backend._soundfile_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em>, <em class="sig-param">format: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/_soundfile_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend._soundfile_backend.save" title="Permalink to this definition">¶</a></dt>
@@ -1133,18 +1139,21 @@ This function is tested on the following formats;</p>
 This functionalso handles <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> objects, but is annotated as <code class="docutils literal notranslate"><span class="pre">str</span></code>
 for the consistency with “sox_io” backend, which has a restriction on type annotation
 for TorchScript compiler compatiblity.</p></li>
-<li><p><strong>tensor</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))"><em>torch.Tensor</em></a>) – Audio data to save. must be 2D tensor.</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))"><em>torch.Tensor</em></a>) – Audio data to save. must be 2D tensor.</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – sampling rate</p></li>
 <li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the given tensor is interpreted as <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>,
 otherwise <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
-<li><p><strong>compression</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – Not used. It is here only for interface compatibility reson with “sox_io” backend.</p></li>
-<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Output audio format. This is required when the output audio format cannot be infered from
+<li><p><strong>compression</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – Not used.
+It is here only for interface compatibility reson with “sox_io” backend.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Output audio format.
+This is required when the output audio format cannot be infered from
 <code class="docutils literal notranslate"><span class="pre">filepath</span></code>, (such as file extension or <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute of the given file object).</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
+</div>
 <div class="section" id="legacy-interface-deprecated">
 <span id="soundfile-legacy-backend"></span><h3>Legacy Interface (Deprecated)<a class="headerlink" href="#legacy-interface-deprecated" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code> backend with legacy interface is made available for backward compatibility reason, however this interface is deprecated and will be removed in the <code class="docutils literal notranslate"><span class="pre">0.9.0</span></code> release.</p>
@@ -1153,8 +1162,8 @@ otherwise <code class="docutils literal notranslate"><span class="pre">[time,</s
 <span class="n">torchaudio</span><span class="o">.</span><span class="n">set_audio_backend</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>  <span class="c1"># The legacy interface</span>
 </pre></div>
 </div>
-<div class="section" id="id7">
-<h4>info<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id10">
+<h4>info<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
 <dl class="function">
 <dt id="torchaudio.backend.soundfile_backend.info">
 <code class="sig-prename descclassname">torchaudio.backend.soundfile_backend.</code><code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em><span class="sig-paren">)</span> &#x2192; Tuple[torchaudio.backend.common.SignalInfo, torchaudio.backend.common.EncodingInfo]<a class="reference internal" href="_modules/torchaudio/backend/soundfile_backend.html#info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.soundfile_backend.info" title="Permalink to this definition">¶</a></dt>
@@ -1184,8 +1193,8 @@ otherwise <code class="docutils literal notranslate"><span class="pre">[time,</s
 </dd></dl>
 
 </div>
-<div class="section" id="id8">
-<h4>load<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id11">
+<h4>load<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
 <dl class="function">
 <dt id="torchaudio.backend.soundfile_backend.load">
 <code class="sig-prename descclassname">torchaudio.backend.soundfile_backend.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">out: Optional[torch.Tensor] = None</em>, <em class="sig-param">normalization: Optional[bool] = True</em>, <em class="sig-param">channels_first: Optional[bool] = True</em>, <em class="sig-param">num_frames: int = 0</em>, <em class="sig-param">offset: int = 0</em>, <em class="sig-param">signalinfo: torchaudio.backend.common.SignalInfo = None</em>, <em class="sig-param">encodinginfo: torchaudio.backend.common.EncodingInfo = None</em>, <em class="sig-param">filetype: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int]<a class="reference internal" href="_modules/torchaudio/backend/soundfile_backend.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.soundfile_backend.load" title="Permalink to this definition">¶</a></dt>
@@ -1267,8 +1276,8 @@ audio (as listed in the metadata of the file)</p>
 </dd></dl>
 
 </div>
-<div class="section" id="id9">
-<h4>save<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id12">
+<h4>save<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
 <dl class="function">
 <dt id="torchaudio.backend.soundfile_backend.save">
 <code class="sig-prename descclassname">torchaudio.backend.soundfile_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">precision: int = 16</em>, <em class="sig-param">channels_first: bool = True</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/torchaudio/backend/soundfile_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.soundfile_backend.save" title="Permalink to this definition">¶</a></dt>
@@ -1363,10 +1372,13 @@ Default: <code class="docutils literal notranslate"><span class="pre">True</span
 </ul>
 </li>
 <li><a class="reference internal" href="#soundfile-backend">Soundfile Backend</a><ul>
-<li><a class="reference internal" href="#legacy-interface-deprecated">Legacy Interface (Deprecated)</a><ul>
 <li><a class="reference internal" href="#id7">info</a></li>
 <li><a class="reference internal" href="#id8">load</a></li>
 <li><a class="reference internal" href="#id9">save</a></li>
+<li><a class="reference internal" href="#legacy-interface-deprecated">Legacy Interface (Deprecated)</a><ul>
+<li><a class="reference internal" href="#id10">info</a></li>
+<li><a class="reference internal" href="#id11">load</a></li>
+<li><a class="reference internal" href="#id12">save</a></li>
 </ul>
 </li>
 </ul>
