@@ -22,18 +22,22 @@ def info(
         filepath (path-like object or file-like object):
             Source of audio data. When the function is not compiled by TorchScript,
             (e.g. ``torch.jit.script``), the following types are accepted;
+
                   * ``path-like``: file path
                   * ``file-like``: Object with ``read(size: int) -> bytes`` method,
                     which returns byte string of at most ``size`` length.
+
             When the function is compiled by TorchScript, only ``str`` type is allowed.
 
             Note:
+
                   * When the input type is file-like object, this function cannot
                     get the correct length (``num_samples``) for certain formats,
                     such as ``mp3`` and ``vorbis``.
                     In this case, the value of ``num_samples`` is ``0``.
                   * This argument is intentionally annotated as ``str`` only due to
                     TorchScript compiler compatibility.
+
         format (str, optional):
             Override the format detection with the given format.
             Providing the argument might help when libsox can not infer the format
@@ -103,14 +107,15 @@ def load(
         filepath (path-like object or file-like object):
             Source of audio data. When the function is not compiled by TorchScript,
             (e.g. ``torch.jit.script``), the following types are accepted;
+
                   * ``path-like``: file path
                   * ``file-like``: Object with ``read(size: int) -> bytes`` method,
                     which returns byte string of at most ``size`` length.
+
             When the function is compiled by TorchScript, only ``str`` type is allowed.
 
-            Note:
-                * This argument is intentionally annotated as ``str`` only due to
-                  TorchScript compiler compatibility.
+            Note: This argument is intentionally annotated as ``str`` only due to
+            TorchScript compiler compatibility.
         frame_offset (int):
             Number of frames to skip before start reading data.
         num_frames (int):
@@ -200,16 +205,15 @@ def save(
         and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.
 
     Args:
-        filepath (str or pathlib.Path):
-            Path to save file. This function also handles ``pathlib.Path`` objects, but is annotated
+        filepath (str or pathlib.Path): Path to save file.
+            This function also handles ``pathlib.Path`` objects, but is annotated
             as ``str`` for TorchScript compiler compatibility.
-        tensor (torch.Tensor): Audio data to save. must be 2D tensor.
+        src (torch.Tensor): Audio data to save. must be 2D tensor.
         sample_rate (int): sampling rate
-        channels_first (bool):
-            If ``True``, the given tensor is interpreted as ``[channel, time]``,
+        channels_first (bool): If ``True``, the given tensor is interpreted as ``[channel, time]``,
             otherwise ``[time, channel]``.
-        compression (Optional[float]):
-            Used for formats other than WAV. This corresponds to ``-C`` option of ``sox`` command.
+        compression (Optional[float]): Used for formats other than WAV.
+            This corresponds to ``-C`` option of ``sox`` command.
 
                 * | ``MP3``: Either bitrate (in ``kbps``) with quality factor, such as ``128.2``, or
                   | VBR encoding with quality factor such as ``-4.2``. Default: ``-4.5``.
@@ -219,11 +223,10 @@ def save(
                   | and lowest quality. Default: ``3``.
 
             See the detail at http://sox.sourceforge.net/soxformat.html.
-        format (str, optional):
-            Output audio format. This is required when the output audio format cannot be infered from
+        format (str, optional): Output audio format.
+            This is required when the output audio format cannot be infered from
             ``filepath``, (such as file extension or ``name`` attribute of the given file object).
-        dtype (str, optional)
-            Output tensor dtype.
+        dtype (str, optional): Output tensor dtype.
             Valid values: ``"uint8", "int16", "int32", "float32", "float64", None``
             ``dtype=None`` means no conversion is performed.
             ``dtype`` parameter is only effective for ``float32`` Tensor.

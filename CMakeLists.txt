@@ -47,14 +47,15 @@ endif()
 
 # Options
 option(BUILD_SOX "Build libsox statically" OFF)
+option(BUILD_KALDI "Build kaldi statically" ON)
 option(BUILD_TRANSDUCER "Enable transducer" OFF)
 option(BUILD_LIBTORCHAUDIO "Build C++ Library" ON)
-option(BUILD_PYTHON_EXTENSION "Build Python extension" OFF)
+option(BUILD_TORCHAUDIO_PYTHON_EXTENSION "Build Python extension" OFF)
 
 find_package(Torch REQUIRED)
 
-# Set -D_GLIBCXX_USE_CXX11_ABI for third party builds
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+# TORCH_CXX_FLAGS contains the same -D_GLIBCXX_USE_CXX11_ABI value as PyTorch
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall ${TORCH_CXX_FLAGS}")
 
 add_subdirectory(third_party)
 add_subdirectory(torchaudio/csrc)

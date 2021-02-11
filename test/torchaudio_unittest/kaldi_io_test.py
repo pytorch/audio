@@ -1,5 +1,3 @@
-import unittest
-
 import torch
 import torchaudio.kaldi_io as kio
 

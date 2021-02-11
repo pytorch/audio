@@ -2,7 +2,7 @@
 #
 
 # You can set these variables from the command line.
-SPHINXOPTS    =
+SPHINXOPTS    = -W  # converts warnings into error
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = torchaudio
 SOURCEDIR     = source

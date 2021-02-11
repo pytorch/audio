@@ -4,7 +4,13 @@ import torch
 from torch import Tensor
 from torch import nn
 
-__all__ = ["ResBlock", "MelResNet", "Stretch2d", "UpsampleNetwork", "WaveRNN"]
+__all__ = [
+    "ResBlock",
+    "MelResNet",
+    "Stretch2d",
+    "UpsampleNetwork",
+    "WaveRNN",
+]
 
 
 class ResBlock(nn.Module):

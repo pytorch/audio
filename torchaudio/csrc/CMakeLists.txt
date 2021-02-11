@@ -15,6 +15,10 @@ if(BUILD_TRANSDUCER)
   list(APPEND LIBTORCHAUDIO_SOURCES transducer.cpp)
 endif()
 
+if(BUILD_KALDI)
+  list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
+endif()
+
 ################################################################################
 # libtorchaudio.so
 ################################################################################
@@ -28,19 +32,19 @@ if(BUILD_LIBTORCHAUDIO)
 
   target_include_directories(
     libtorchaudio
-    PRIVATE
-    ${CMAKE_CURRENT_PROJECT_DIR}
+    PUBLIC
+    ${PROJECT_SOURCE_DIR}
     )
 
   target_link_libraries(
     libtorchaudio
     ${TORCHAUDIO_THIRD_PARTIES}
-    ${PROJECT_SOURCE_DIR}
     )
 
   install(
     TARGETS
     libtorchaudio
+    LIBRARY DESTINATION lib
     )
 
   set(TORCHAUDIO_LIBRARY -Wl,--no-as-needed libtorchaudio -Wl,--as-needed CACHE INTERNAL "")

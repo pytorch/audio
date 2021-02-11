@@ -41,9 +41,11 @@ def deprecated(direction: str, version: Optional[str] = None):
     """Decorator to add deprecation message
 
     Args:
-        direction: Migration steps to be given to users.
+        direction (str): Migration steps to be given to users.
+        version (str or int): The version when the object will be removed
     """
     def decorator(func):
+
         @wraps(func)
         def wrapped(*args, **kwargs):
             message = (
