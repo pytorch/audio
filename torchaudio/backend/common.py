@@ -1,6 +1,5 @@
 from typing import Any, Optional
-
-from torchaudio._internal import module_utils as _mod_utils
+import warnings
 
 
 class AudioMetaData:
@@ -31,7 +30,6 @@ class AudioMetaData:
         self.encoding = encoding
 
 
-@_mod_utils.deprecated('Please migrate to `AudioMetaData`.', '0.9.0')
 class SignalInfo:
     """One of return types of ``torchaudio.info`` functions.
 
@@ -51,13 +49,18 @@ class SignalInfo:
                  rate: Optional[float] = None,
                  precision: Optional[int] = None,
                  length: Optional[int] = None) -> None:
+        message = (
+            f'{self.__module__}.{self.__class__.__name__} has been deprecated '
+            'and will be removed from 0.9.0 release. '
+            'Please migrate to `AudioMetaData`.'
+        )
+        warnings.warn(message)
         self.channels = channels
         self.rate = rate
         self.precision = precision
         self.length = length
 
 
-@_mod_utils.deprecated('Please migrate to `AudioMetaData`.', '0.9.0')
 class EncodingInfo:
     """One of return types of ``torchaudio.info`` functions.
 
@@ -82,6 +85,12 @@ class EncodingInfo:
                  reverse_nibbles: Any = None,
                  reverse_bits: Any = None,
                  opposite_endian: Optional[bool] = None) -> None:
+        message = (
+            f'{self.__module__}.{self.__class__.__name__} has been deprecated '
+            'and will be removed from 0.9.0 release. '
+            'Please migrate to `AudioMetaData`.'
+        )
+        warnings.warn(message)
         self.encoding = encoding
         self.bits_per_sample = bits_per_sample
         self.compression = compression

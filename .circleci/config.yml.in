@@ -577,6 +577,18 @@ jobs:
             target=${tag:-master}
             ~/workspace/.circleci/build_docs/commit_docs.sh ~/workspace $target
 
+  docstring_parameters_sync:
+    <<: *binary_common
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout
+      - run:
+          name: Check parameters docstring sync
+          command: |
+            pip install --user pydocstyle
+            pydocstyle torchaudio
+
 workflows:
   build:
     jobs:

@@ -195,16 +195,16 @@ Conventions
 
 With torchaudio being a machine learning library and built on top of PyTorch,
 torchaudio is standardized around the following naming conventions. Tensors are
-assumed to have channels as the first dimension and time as the last
+assumed to have "channel" as the first dimension and time as the last
 dimension (when applicable). This makes it consistent with PyTorch's dimensions.
 For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`, `n_mel`)")
 whereas dimension names do not have this prefix (e.g. "a tensor of
-dimension (channels, time)")
+dimension (channel, time)")
 
-* `waveform`: a tensor of audio samples with dimensions (channels, time)
+* `waveform`: a tensor of audio samples with dimensions (channel, time)
 * `sample_rate`: the rate of audio dimensions (samples per second)
-* `specgram`: a tensor of spectrogram with dimensions (channels, freq, time)
-* `mel_specgram`: a mel spectrogram with dimensions (channels, mel, time)
+* `specgram`: a tensor of spectrogram with dimensions (channel, freq, time)
+* `mel_specgram`: a mel spectrogram with dimensions (channel, mel, time)
 * `hop_length`: the number of samples between the starts of consecutive frames
 * `n_fft`: the number of Fourier bins
 * `n_mel`, `n_mfcc`: the number of mel and MFCC bins
@@ -216,16 +216,16 @@ dimension (channels, time)")
 
 Transforms expect and return the following dimensions.
 
-* `Spectrogram`: (channels, time) -> (channels, freq, time)
-* `AmplitudeToDB`: (channels, freq, time) -> (channels, freq, time)
-* `MelScale`: (channels, freq, time) -> (channels, mel, time)
-* `MelSpectrogram`: (channels, time) -> (channels, mel, time)
-* `MFCC`: (channels, time) -> (channel, mfcc, time)
-* `MuLawEncode`: (channels, time) -> (channels, time)
-* `MuLawDecode`: (channels, time) -> (channels, time)
-* `Resample`: (channels, time) -> (channels, time)
-* `Fade`: (channels, time) -> (channels, time)
-* `Vol`: (channels, time) -> (channels, time)
+* `Spectrogram`: (channel, time) -> (channel, freq, time)
+* `AmplitudeToDB`: (channel, freq, time) -> (channel, freq, time)
+* `MelScale`: (channel, freq, time) -> (channel, mel, time)
+* `MelSpectrogram`: (channel, time) -> (channel, mel, time)
+* `MFCC`: (channel, time) -> (channel, mfcc, time)
+* `MuLawEncode`: (channel, time) -> (channel, time)
+* `MuLawDecode`: (channel, time) -> (channel, time)
+* `Resample`: (channel, time) -> (channel, time)
+* `Fade`: (channel, time) -> (channel, time)
+* `Vol`: (channel, time) -> (channel, time)
 
 Complex numbers are supported via tensors of dimension (..., 2), and torchaudio provides `complex_norm` and `angle` to convert such a tensor into its magnitude and phase. Here, and in the documentation, we use an ellipsis "..." as a placeholder for the rest of the dimensions of a tensor, e.g. optional batching and channel dimensions.
 
