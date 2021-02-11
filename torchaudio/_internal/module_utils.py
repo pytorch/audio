@@ -44,6 +44,7 @@ def deprecated(direction: str, version: Optional[str] = None):
         direction: Migration steps to be given to users.
     """
     def decorator(func):
+
         @wraps(func)
         def wrapped(*args, **kwargs):
             message = (
