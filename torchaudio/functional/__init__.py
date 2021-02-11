@@ -85,4 +85,5 @@ __all__ = [
     'riaa_biquad',
     'treble_biquad',
     'vad',
+    'apply_codec'
 ]

@@ -11,8 +11,6 @@ from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
     skipIfNoExtension,
-    save_wav,
-    skipIfNoExec,
 )
 from torchaudio_unittest.backend.sox_io.common import name_func
 
