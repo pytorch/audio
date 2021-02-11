@@ -1040,6 +1040,7 @@ def apply_codec(
         bytes, effects=[["rate", f"{sample_rate}"]], channels_first=channels_first, format=format)
     return augmented
 
+
 def compute_kaldi_pitch(
         waveform: torch.Tensor,
         sample_rate: float,

@@ -548,6 +548,22 @@ class Functional(common_utils.TestBaseMixin):
         tensor = common_utils.get_whitenoise(sample_rate=44100)
         self._assert_consistency(func, tensor)
 
+    def test_apply_codec(self):
+
+        def func(tensor):
+            sample_rate = 8000,
+            format = "wav",
+            compression = None,
+            channels_first = True
+            return F.apply_codec(tensor,
+                                 sample_rate,
+                                 format,
+                                 compression,
+                                 channels_first)
+
+        tensor = common_utils.get_whitenoise(sample_rate=8000)
+        self._assert_consistency(func, tensor)
+
     @common_utils.skipIfNoExtension
     def test_compute_kaldi_pitch(self):
         if self.dtype != torch.float32 or self.device != torch.device('cpu'):
