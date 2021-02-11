@@ -202,6 +202,7 @@ class SaveTest(SaveTestBase):
 
     @nested_params(
         ["path", "fileobj", "bytesio"],
+        [8, 16, 24],
         [
             None,
             0,
@@ -215,9 +216,10 @@ class SaveTest(SaveTestBase):
             8,
         ],
     )
-    def test_save_flac(self, test_mode, compression_level):
+    def test_save_flac(self, test_mode, bits_per_sample, compression_level):
         self.assert_save_consistency(
-            "flac", compression=compression_level, test_mode=test_mode)
+            "flac", compression=compression_level,
+            bits_per_sample=bits_per_sample, test_mode=test_mode)
 
     @nested_params(
         ["path", "fileobj", "bytesio"],
@@ -277,6 +279,7 @@ class SaveTest(SaveTestBase):
     @nested_params(
         ["path", "fileobj", "bytesio"],
         [
+            None,
             0,
             1,
             2,

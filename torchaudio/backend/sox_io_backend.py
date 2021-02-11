@@ -164,25 +164,48 @@ def save(
 ):
     """Save audio data to file.
 
+    Supported formats/encodings/bit depths/compression are;
+
+    ``"wav"``, ``"amb"``
+        - 32-bit floating-point PCM
+        - 32-bit signed integer PCM
+        - 24-bit signed integer PCM
+        - 16-bit signed integer PCM (default)
+        - 8-bit unsigned integer PCM
+        - 8-bit mu-law
+        - 8-bit a-law
+
+    ``"mp3"``
+        Fixed bit rate (such as 128kHz) and variable bit rate compression.
+        Default: VBR with high quality.
+
+    ``"flac"``
+        - 8-bit
+        - 16-bit
+        - 24-bit (default)
+
+    ``"ogg"``, ``"vorbis"``
+        - Different quality level. Default: approx. 112kbps
+
+    ``"sph"``
+        - 8-bit signed integer PCM
+        - 16-bit signed integer PCM (default)
+        - 24-bit signed integer PCM
+        - 32-bit signed integer PCM
+        - 8-bit mu-law
+        - 8-bit a-law
+        - 16-bit a-law
+        - 24-bit a-law
+        - 32-bit a-law
+
+    ``"amr-nb"``
+        Bitrate ranging from 4.75 kbit/s to 12.2 kbit/s. Default: 4.75 kbit/s
+
     Note:
-        Supported formats are;
-
-        * WAV, AMB
-
-            * 32-bit floating-point
-            * 32-bit signed integer
-            * 16-bit signed integer
-            * 8-bit unsigned integer
-
-        * MP3
-        * FLAC
-        * OGG/VORBIS
-        * SPHERE
-        * AMR-NB
-
-        To save ``MP3``, ``FLAC``, ``OGG/VORBIS``, and other codecs ``libsox`` does not
-        handle natively, your installation of ``torchaudio`` has to be linked to ``libsox``
-        and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.
+        To save into formats that ``libsox`` does not handle natively, (such as ``"mp3"``,
+        ``"flac"``, ``"ogg"`` and ``"vorbis"``), your installation of ``torchaudio`` has
+        to be linked to ``libsox`` and corresponding codec libraries such as ``libmad``
+        or ``libmp3lame`` etc.
 
     Args:
         filepath (str or pathlib.Path): Path to save file.
@@ -195,12 +218,16 @@ def save(
         compression (Optional[float]): Used for formats other than WAV.
             This corresponds to ``-C`` option of ``sox`` command.
 
-                * | ``MP3``: Either bitrate (in ``kbps``) with quality factor, such as ``128.2``, or
-                  | VBR encoding with quality factor such as ``-4.2``. Default: ``-4.5``.
-                * | ``FLAC``: compression level. Whole number from ``0`` to ``8``.
-                  | ``8`` is default and highest compression.
-                * | ``OGG/VORBIS``: number from ``-1`` to ``10``; ``-1`` is the highest compression
-                  | and lowest quality. Default: ``3``.
+            ``"mp3"``
+                Either bitrate (in ``kbps``) with quality factor, such as ``128.2``, or
+                VBR encoding with quality factor such as ``-4.2``. Default: ``-4.5``.
+
+            ``"flac"``
+                Whole number from ``0`` to ``8``. ``8`` is default and highest compression.
+
+            ``"ogg"``, ``"vorbis"``
+                Number from ``-1`` to ``10``; ``-1`` is the highest compression
+                and lowest quality. Default: ``3``.
 
             See the detail at http://sox.sourceforge.net/soxformat.html.
         format (str, optional):
@@ -211,47 +238,55 @@ def save(
             When not provided, the value of file extension is used.
             Valid values are ``"wav"``, ``"mp3"``, ``"ogg"``, ``"vorbis"``, ``"amr-nb"``,
             ``"amb"``, ``"flac"`` and ``"sph"``.
-        encoding (str, optional):
-            Changes the encoding for the supported formats, such as ``"wav"``, ``"sph"``.
-            and ``"amb"``.
-            Valid values are ``"PCM_S"`` (signed integer Linear PCM), ``"PCM_U"``
-            (unsigned integer Linear PCM), ``"PCM_F"`` (floating point PCM),
-            ``"ULAW"`` (mu-law) and ``"ALAW"`` (a-law).
+        encoding (str, optional): Changes the encoding for the supported formats.
+            This argument is effective only for supported formats, cush as ``"wav"``, ``""amb"``
+            and ``"sph"``. Valid values are;
+
+                - ``"PCM_S"`` (signed integer Linear PCM)
+                - ``"PCM_U"`` (unsigned integer Linear PCM)
+                - ``"PCM_F"`` (floating point PCM)
+                - ``"ULAW"`` (mu-law)
+                - ``"ALAW"`` (a-law)
+
+            Default values
+                If not provided, the default value is picked based on ``format`` and ``bits_per_sample``.
+
+                ``"wav"``, ``"amb"``
+                    - ``"PCM_U"`` if ``bits_per_sample=8``
+                    - ``"PCM_S"`` otherwise
+
+                ``"sph"`` format;
+                    -  the default value is ``"PCM_S"``
+
             Different formats support different set of encodings. Providing a value that is not
             supported by the format will not cause an error, but will fallback to its default value.
 
-            If not provided, the default values are picked based on ``format`` and
-            ``bits_per_sample``;
+        bits_per_sample (int, optional): Changes the bit depth for the supported formats.
+            When ``format`` is one of ``"wav"``, ``"flac"``, ``"sph"``, or ``"amb"``, you can change the
+            bit depth. Valid values are ``8``, ``16``, ``32`` and ``64``.
 
-            For ``"wav"`` and ``"amb"`` formats, the default value is;
-                - ``"PCM_U"`` if ``bits_per_sample=8``
-                - ``"PCM_S"`` otherwise
-            For ``"sph"`` format, the default value is ``"PCM_S"``.
+            Default Value;
+                If not provided, the default values are picked based on ``format`` and ``"encoding"``;
 
-        bits_per_sample (int, optional):
-            Change the bit depth for the supported formats, such as ``"wav"``, ``"flac"``,
-            ``"sph"``, and ``"amb"``.
-            Valid values are ``8``, ``16``, ``32`` and ``64``.
+                ``"wav"`` format;
+                    - ``8`` if ``encoding`` is ``"PCM_U"``, ``"ULAW"`` or ``"ALAW"``
+                    - ``16`` if ``encoding`` is ``"PCM_S"`` or not provided.
+                    - ``32`` if ``encoding`` is ``"PCM_F"``
+
+                ``"flac"`` format;
+                    - the default value is ``24``
+
+                ``"sph"`` format;
+                    - ``16`` if ``encoding`` is ``"PCM_U"``, ``"PCM_S"``, ``"PCM_F"`` or not provided.
+                    - ``8`` if ``encoding`` is ``"ULAW"`` or ``"ALAW"``
+
+                ``"amb"`` format;
+                    - ``8`` if ``encoding`` is ``"PCM_U"``, ``"ULAW"`` or ``"ALAW"``
+                    - ``16`` if ``encoding`` is ``"PCM_S"`` or not provided.
+                    - ``32`` if ``encoding`` is ``"PCM_F"``
+
             Different formats support different set of encodings. Providing a value that is not
             supported by the format will not cause an error, but will fallback to its default value.
-
-            If not provided, the default values are picked based on ``format`` and ``"encoding"``;
-
-            For ``"wav"`` format, the default value is;
-                - ``8`` if ``encoding`` is ``"PCM_U"``, ``"ULAW"`` or ``"ALAW"``
-                - ``16`` if ``encoding`` is ``"PCM_S"`` or not provided.
-                - ``32`` if ``encoding`` is ``"PCM_F"``
-
-            For ``"flac"`` format, the default value is ``24``.
-
-            For ``"sph"`` format, the default value is;
-                - ``16`` if ``encoding`` is ``"PCM_U"``, ``"PCM_S"``, ``"PCM_F"`` or not provided.
-                - ``8`` if ``encoding`` is ``"ULAW"`` or ``"ALAW"``
-
-            For ``"amb"`` format,  the default value is;
-                - ``8`` if ``encoding`` is ``"PCM_U"``, ``"ULAW"`` or ``"ALAW"``
-                - ``16`` if ``encoding`` is ``"PCM_S"`` or not provided.
-                - ``32`` if ``encoding`` is ``"PCM_F"``
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, 'write'):
