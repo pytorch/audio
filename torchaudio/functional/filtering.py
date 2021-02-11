@@ -1,4 +1,5 @@
 import math
+import os
 from typing import Optional
 
 import torch
@@ -878,7 +879,8 @@ def lfilter(
     input_signal_windows.div_(a_coeffs[0])
     a_coeffs_flipped.div_(a_coeffs[0])
 
-    if input_signal_windows.device == torch.device('cpu') and\
+    if os.name == 'posix' and\
+       input_signal_windows.device == torch.device('cpu') and\
        a_coeffs_flipped.device == torch.device('cpu') and\
        padded_output_waveform.device == torch.device('cpu'):
         torch.ops.torchaudio._lfilter_core_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
