@@ -34,19 +34,6 @@ std::vector<std::string> list_write_formats();
 // Utilities for sox_io / sox_effects implementations
 ////////////////////////////////////////////////////////////////////////////////
 
-const std::string ENCODING_UNKNOWN = "UNKNOWN";
-const std::string ENCODING_PCM_SIGNED = "PCM_S";
-const std::string ENCODING_PCM_UNSIGNED = "PCM_U";
-const std::string ENCODING_PCM_FLOAT = "PCM_F";
-const std::string ENCODING_FLAC = "FLAC";
-const std::string ENCODING_ULAW = "ULAW";
-const std::string ENCODING_ALAW = "ALAW";
-const std::string ENCODING_MP3 = "MP3";
-const std::string ENCODING_VORBIS = "VORBIS";
-const std::string ENCODING_AMR_WB = "AMR_WB";
-const std::string ENCODING_AMR_NB = "AMR_NB";
-const std::string ENCODING_OPUS = "OPUS";
-
 const std::unordered_set<std::string> UNSUPPORTED_EFFECTS =
     {"input", "output", "spectrogram", "noiseprof", "noisered", "splice"};
 
