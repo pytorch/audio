@@ -3,7 +3,7 @@
 namespace torchaudio {
 namespace sox_utils {
 
-Format from_string(const std::string& format) {
+Format get_format_from_string(const std::string& format) {
   if (format == "wav")
     return Format::WAV;
   if (format == "mp3")
@@ -56,7 +56,7 @@ std::string to_string(Encoding v) {
   }
 }
 
-Encoding from_option(const c10::optional<std::string>& encoding) {
+Encoding get_encoding_from_option(const c10::optional<std::string>& encoding) {
   if (!encoding.has_value())
     return Encoding::NOT_PROVIDED;
   std::string v = encoding.value();
@@ -75,23 +75,27 @@ Encoding from_option(const c10::optional<std::string>& encoding) {
   throw std::runtime_error(stream.str());
 }
 
-BitDepth from_option(const c10::optional<int64_t>& bit_depth) {
+BitDepth get_bit_depth_from_option(const c10::optional<int64_t>& bit_depth) {
   if (!bit_depth.has_value())
     return BitDepth::NOT_PROVIDED;
   int64_t v = bit_depth.value();
-  if (v == 8)
-    return BitDepth::B8;
-  if (v == 16)
-    return BitDepth::B16;
-  if (v == 24)
-    return BitDepth::B24;
-  if (v == 32)
-    return BitDepth::B32;
-  if (v == 64)
-    return BitDepth::B64;
-  std::ostringstream stream;
-  stream << "Internal Error: unexpected bit depth value: " << v;
-  throw std::runtime_error(stream.str());
+  switch(v) {
+    case 8:
+      return BitDepth::B8;
+    case 16:
+      return BitDepth::B16;
+    case 24:
+      return BitDepth::B24;
+    case 32:
+      return BitDepth::B32;
+    case 64:
+      return BitDepth::B64;
+    default: {
+      std::ostringstream s;
+      s << "Internal Error: unexpected bit depth value: " << v;
+      throw std::runtime_error(s.str());
+    }
+  }
 }
 
 } // namespace sox_utils

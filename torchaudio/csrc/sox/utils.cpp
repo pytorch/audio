@@ -292,9 +292,9 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
     const caffe2::TypeMeta dtype,
     const c10::optional<std::string>& encoding,
     const c10::optional<int64_t>& bits_per_sample) {
-  const Format fmt = from_string(format);
-  const Encoding enc = from_option(encoding);
-  const BitDepth bps = from_option(bits_per_sample);
+  const Format fmt = get_format_from_string(format);
+  const Encoding enc = get_encoding_from_option(encoding);
+  const BitDepth bps = get_bit_depth_from_option(bits_per_sample);
 
   switch (fmt) {
     case Format::WAV:
