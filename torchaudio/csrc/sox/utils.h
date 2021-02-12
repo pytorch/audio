@@ -122,6 +122,7 @@ sox_encodinginfo_t get_tensor_encodinginfo(const caffe2::TypeMeta dtype);
 /// Get sox_encodinginfo_t for saving to file/file object
 sox_encodinginfo_t get_encodinginfo_for_save(
     const std::string& format,
+    const caffe2::TypeMeta dtype,
     const c10::optional<double>& compression,
     const c10::optional<std::string>& encoding,
     const c10::optional<int64_t>& bits_per_sample);

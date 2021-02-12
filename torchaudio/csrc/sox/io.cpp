@@ -135,7 +135,7 @@ void save_audio_file(
   const auto signal_info =
       get_signalinfo(&tensor, sample_rate, filetype, channels_first);
   const auto encoding_info = get_encodinginfo_for_save(
-      filetype, compression, encoding, bits_per_sample);
+      filetype, tensor.dtype(), compression, encoding, bits_per_sample);
 
   SoxFormat sf(sox_open_write(
       path.c_str(),
@@ -271,7 +271,7 @@ void save_audio_fileobj(
   const auto signal_info =
       get_signalinfo(&tensor, sample_rate, filetype, channels_first);
   const auto encoding_info = get_encodinginfo_for_save(
-      filetype, compression, encoding, bits_per_sample);
+      filetype, tensor.dtype(), compression, encoding, bits_per_sample);
 
   AutoReleaseBuffer buffer;
 

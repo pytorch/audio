@@ -44,6 +44,7 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
             sample_rate: float = 8000,
             num_channels: int = 2,
             num_frames: float = 3 * 8000,
+            src_dtype: str = 'int32',
             test_mode: str = "path",
     ):
         """`save` function produces file that is comparable with `sox` command
@@ -93,7 +94,7 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
         ref_path = self.get_temp_path('3.2.ref.wav')
 
         # 1. Generate original wav
-        data = get_wav_data('int32', num_channels, normalize=False, num_frames=num_frames)
+        data = get_wav_data(src_dtype, num_channels, normalize=False, num_frames=num_frames)
         save_wav(src_path, data, sample_rate)
 
         # 2.1. Convert the original wav to target format with torchaudio
@@ -165,6 +166,7 @@ class SaveTest(SaveTestBase):
             ('PCM_S', 16),
             ('PCM_S', 32),
             ('PCM_F', 32),
+            ('PCM_F', 64),
             ('ULAW', 8),
             ('ALAW', 8),
         ],
@@ -173,6 +175,20 @@ class SaveTest(SaveTestBase):
         encoding, bits_per_sample = enc_params
         self.assert_save_consistency(
             "wav", encoding=encoding, bits_per_sample=bits_per_sample, test_mode=test_mode)
+
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
+        [
+            ('float32', ),
+            ('int32', ),
+            ('int16', ),
+            ('uint8', ),
+        ],
+    )
+    def test_save_wav_dtype(self, test_mode, params):
+        dtype, = params
+        self.assert_save_consistency(
+            "wav", src_dtype=dtype, test_mode=test_mode)
 
     @nested_params(
         ["path", "fileobj", "bytesio"],

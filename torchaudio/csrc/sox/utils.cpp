@@ -209,13 +209,22 @@ namespace {
 
 std::tuple<sox_encoding_t, unsigned> get_save_encoding_for_wav(
     const std::string format,
+    const caffe2::TypeMeta dtype,
     const Encoding& encoding,
     const BitDepth& bits_per_sample) {
   switch (encoding) {
     case Encoding::NOT_PROVIDED:
       switch (bits_per_sample) {
         case BitDepth::NOT_PROVIDED:
-          return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
+          if (dtype == torch::kFloat32)
+            return std::make_tuple<>(SOX_ENCODING_FLOAT, 32);
+          if (dtype == torch::kInt32)
+            return std::make_tuple<>(SOX_ENCODING_SIGN2, 32);
+          if (dtype == torch::kInt16)
+            return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
+          if (dtype == torch::kUInt8)
+            return std::make_tuple<>(SOX_ENCODING_UNSIGNED, 8);
+          throw std::runtime_error("Internal Error: Unexpected dtype.");
         case BitDepth::B8:
           return std::make_tuple<>(SOX_ENCODING_UNSIGNED, 8);
         default:
@@ -225,7 +234,7 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding_for_wav(
     case Encoding::PCM_SIGNED:
       switch (bits_per_sample) {
         case BitDepth::NOT_PROVIDED:
-          return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
+          return std::make_tuple<>(SOX_ENCODING_SIGN2, 32);
         case BitDepth::B8:
           throw std::runtime_error(
               format + " does not support 8-bit signed PCM encoding.");
@@ -280,6 +289,7 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding_for_wav(
 
 std::tuple<sox_encoding_t, unsigned> get_save_encoding(
     const std::string& format,
+    const caffe2::TypeMeta dtype,
     const c10::optional<std::string>& encoding,
     const c10::optional<int64_t>& bits_per_sample) {
   const Format fmt = from_string(format);
@@ -289,7 +299,7 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
   switch (fmt) {
     case Format::WAV:
     case Format::AMB:
-      return get_save_encoding_for_wav(format, enc, bps);
+      return get_save_encoding_for_wav(format, dtype, enc, bps);
     case Format::MP3:
       if (enc != Encoding::NOT_PROVIDED)
         throw std::runtime_error("mp3 does not support `encoding` option.");
@@ -329,7 +339,7 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
         case Encoding::PCM_SIGNED:
           switch (bps) {
             case BitDepth::NOT_PROVIDED:
-              return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
+              return std::make_tuple<>(SOX_ENCODING_SIGN2, 32);
             default:
               return std::make_tuple<>(
                   SOX_ENCODING_SIGN2, static_cast<unsigned>(bps));
@@ -444,10 +454,11 @@ sox_encodinginfo_t get_tensor_encodinginfo(const caffe2::TypeMeta dtype) {
 
 sox_encodinginfo_t get_encodinginfo_for_save(
     const std::string& format,
+    const caffe2::TypeMeta dtype,
     const c10::optional<double>& compression,
     const c10::optional<std::string>& encoding,
     const c10::optional<int64_t>& bits_per_sample) {
-  auto enc = get_save_encoding(format, encoding, bits_per_sample);
+  auto enc = get_save_encoding(format, dtype, encoding, bits_per_sample);
   return sox_encodinginfo_t{
       /*encoding=*/std::get<0>(enc),
       /*bits_per_sample=*/std::get<1>(enc),

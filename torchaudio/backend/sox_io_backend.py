@@ -170,7 +170,7 @@ def save(
         - 32-bit floating-point PCM
         - 32-bit signed integer PCM
         - 24-bit signed integer PCM
-        - 16-bit signed integer PCM (default)
+        - 16-bit signed integer PCM
         - 8-bit unsigned integer PCM
         - 8-bit mu-law
         - 8-bit a-law
@@ -189,7 +189,7 @@ def save(
 
     ``"sph"``
         - 8-bit signed integer PCM
-        - 16-bit signed integer PCM (default)
+        - 16-bit signed integer PCM
         - 24-bit signed integer PCM
         - 32-bit signed integer PCM
         - 8-bit mu-law
