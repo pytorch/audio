@@ -187,12 +187,13 @@ def save(
                 and lowest quality. Default: ``3``.
 
             See the detail at http://sox.sourceforge.net/soxformat.html.
-        format (str, optional):
-            If provided, overwrite the audio format. This parameter is required in cases where
-            the ``filepath`` parameter is file-like object or ``filepath`` parameter represents
-            the path to a file on a local system but missing file extension or has different
-            extension.
-            When not provided, the value of file extension is used.
+        format (str, optional): Override the audio format.
+            When ``filepath`` argument is path-like object, audio format is infered from
+            file extension. If file extension is missing or different, you can specify the
+            correct format with this argument.
+
+            When ``filepath`` argument is file-like object, this argument is required.
+
             Valid values are ``"wav"``, ``"mp3"``, ``"ogg"``, ``"vorbis"``, ``"amr-nb"``,
             ``"amb"``, ``"flac"`` and ``"sph"``.
         encoding (str, optional): Changes the encoding for the supported formats.
