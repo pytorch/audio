@@ -609,32 +609,8 @@ The implementation is same as <a class="reference internal" href="#torchaudio.ba
 <h3>save<a class="headerlink" href="#save" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend.sox_io_backend.save">
-<code class="sig-prename descclassname">torchaudio.backend.sox_io_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em>, <em class="sig-param">format: Optional[str] = None</em>, <em class="sig-param">dtype: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.save" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.backend.sox_io_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em>, <em class="sig-param">format: Optional[str] = None</em>, <em class="sig-param">encoding: Optional[str] = None</em>, <em class="sig-param">bits_per_sample: Optional[int] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save audio data to file.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Supported formats are;</p>
-<ul>
-<li><p>WAV, AMB</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>32-bit floating-point</p></li>
-<li><p>32-bit signed integer</p></li>
-<li><p>16-bit signed integer</p></li>
-<li><p>8-bit unsigned integer</p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p>MP3</p></li>
-<li><p>FLAC</p></li>
-<li><p>OGG/VORBIS</p></li>
-<li><p>SPHERE</p></li>
-<li><p>AMR-NB</p></li>
-</ul>
-<p>To save <code class="docutils literal notranslate"><span class="pre">MP3</span></code>, <code class="docutils literal notranslate"><span class="pre">FLAC</span></code>, <code class="docutils literal notranslate"><span class="pre">OGG/VORBIS</span></code>, and other codecs <code class="docutils literal notranslate"><span class="pre">libsox</span></code> does not
-handle natively, your installation of <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> has to be linked to <code class="docutils literal notranslate"><span class="pre">libsox</span></code>
-and corresponding codec libraries such as <code class="docutils literal notranslate"><span class="pre">libmad</span></code> or <code class="docutils literal notranslate"><span class="pre">libmp3lame</span></code> etc.</p>
-</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -647,37 +623,152 @@ as <code class="docutils literal notranslate"><span class="pre">str</span></code
 otherwise <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
 <li><p><strong>compression</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – <p>Used for formats other than WAV.
 This corresponds to <code class="docutils literal notranslate"><span class="pre">-C</span></code> option of <code class="docutils literal notranslate"><span class="pre">sox</span></code> command.</p>
-<blockquote>
-<div><ul>
-<li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">MP3</span></code>: Either bitrate (in <code class="docutils literal notranslate"><span class="pre">kbps</span></code>) with quality factor, such as <code class="docutils literal notranslate"><span class="pre">128.2</span></code>, or</div>
-<div class="line">VBR encoding with quality factor such as <code class="docutils literal notranslate"><span class="pre">-4.2</span></code>. Default: <code class="docutils literal notranslate"><span class="pre">-4.5</span></code>.</div>
-</div>
-</li>
-<li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">FLAC</span></code>: compression level. Whole number from <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">8</span></code>.</div>
-<div class="line"><code class="docutils literal notranslate"><span class="pre">8</span></code> is default and highest compression.</div>
-</div>
-</li>
-<li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">OGG/VORBIS</span></code>: number from <code class="docutils literal notranslate"><span class="pre">-1</span></code> to <code class="docutils literal notranslate"><span class="pre">10</span></code>; <code class="docutils literal notranslate"><span class="pre">-1</span></code> is the highest compression</div>
-<div class="line">and lowest quality. Default: <code class="docutils literal notranslate"><span class="pre">3</span></code>.</div>
-</div>
-</li>
-</ul>
-</div></blockquote>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;mp3&quot;</span></code></dt><dd><p>Either bitrate (in <code class="docutils literal notranslate"><span class="pre">kbps</span></code>) with quality factor, such as <code class="docutils literal notranslate"><span class="pre">128.2</span></code>, or
+VBR encoding with quality factor such as <code class="docutils literal notranslate"><span class="pre">-4.2</span></code>. Default: <code class="docutils literal notranslate"><span class="pre">-4.5</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code></dt><dd><p>Whole number from <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">8</span></code>. <code class="docutils literal notranslate"><span class="pre">8</span></code> is default and highest compression.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code></dt><dd><p>Number from <code class="docutils literal notranslate"><span class="pre">-1</span></code> to <code class="docutils literal notranslate"><span class="pre">10</span></code>; <code class="docutils literal notranslate"><span class="pre">-1</span></code> is the highest compression
+and lowest quality. Default: <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p>
+</dd>
+</dl>
 <p>See the detail at <a class="reference external" href="http://sox.sourceforge.net/soxformat.html">http://sox.sourceforge.net/soxformat.html</a>.</p>
 </p></li>
-<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Output audio format.
-This is required when the output audio format cannot be infered from
-<code class="docutils literal notranslate"><span class="pre">filepath</span></code>, (such as file extension or <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute of the given file object).</p></li>
-<li><p><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Output tensor dtype.
-Valid values: <code class="docutils literal notranslate"><span class="pre">&quot;uint8&quot;,</span> <span class="pre">&quot;int16&quot;,</span> <span class="pre">&quot;int32&quot;,</span> <span class="pre">&quot;float32&quot;,</span> <span class="pre">&quot;float64&quot;,</span> <span class="pre">None</span></code>
-<code class="docutils literal notranslate"><span class="pre">dtype=None</span></code> means no conversion is performed.
-<code class="docutils literal notranslate"><span class="pre">dtype</span></code> parameter is only effective for <code class="docutils literal notranslate"><span class="pre">float32</span></code> Tensor.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Override the audio format.
+When <code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is path-like object, audio format is infered from
+file extension. If file extension is missing or different, you can specify the
+correct format with this argument.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is file-like object, this argument is required.</p>
+<p>Valid values are <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;mp3&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amr-nb&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>.</p>
+</p></li>
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Changes the encoding for the supported formats.
+This argument is effective only for supported formats, cush as <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;&quot;amb&quot;</span></code>
+and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>. Valid values are;</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> (signed integer Linear PCM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code> (unsigned integer Linear PCM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_F&quot;</span></code> (floating point PCM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;ULAW&quot;</span></code> (mu-law)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;ALAW&quot;</span></code> (a-law)</p></li>
+</ul>
+</div></blockquote>
+<dl>
+<dt>Default values</dt><dd><p>If not provided, the default value is picked based on <code class="docutils literal notranslate"><span class="pre">format</span></code> and <code class="docutils literal notranslate"><span class="pre">bits_per_sample</span></code>.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code></dt><dd><ul>
+<li><div class="line-block">
+<div class="line">If both <code class="docutils literal notranslate"><span class="pre">encoding</span></code> and <code class="docutils literal notranslate"><span class="pre">bits_per_sample</span></code> are not provided, the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> of the</div>
+<div class="line">Tensor is used to determine the default value.
+- <code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">uint8</span></code>
+- <code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">int16</span></code> or <code class="docutils literal notranslate"><span class="pre">int32`</span>
+<span class="pre">-</span> <span class="pre">``&quot;PCM_F&quot;</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">float32</span></code></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code> if <code class="docutils literal notranslate"><span class="pre">bits_per_sample=8</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> otherwise</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code> format;</dt><dd><ul>
+<li><p>the default value is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code></p></li>
 </ul>
 </dd>
 </dl>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Changes the bit depth for the supported formats.
+When <code class="docutils literal notranslate"><span class="pre">format</span></code> is one of <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code>, you can change the
+bit depth. Valid values are <code class="docutils literal notranslate"><span class="pre">8</span></code>, <code class="docutils literal notranslate"><span class="pre">16</span></code>, <code class="docutils literal notranslate"><span class="pre">32</span></code> and <code class="docutils literal notranslate"><span class="pre">64</span></code>.</p>
+<dl>
+<dt>Default Value;</dt><dd><p>If not provided, the default values are picked based on <code class="docutils literal notranslate"><span class="pre">format</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;encoding&quot;</span></code>;</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code>;</dt><dd><ul>
+<li><div class="line-block">
+<div class="line">If both <code class="docutils literal notranslate"><span class="pre">encoding</span></code> and <code class="docutils literal notranslate"><span class="pre">bits_per_sample</span></code> are not provided, the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> of the</div>
+<div class="line">Tensor is used.
+- <code class="docutils literal notranslate"><span class="pre">8</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">uint8</span></code>
+- <code class="docutils literal notranslate"><span class="pre">16</span></code> if dtype is <code class="docutils literal notranslate"><span class="pre">int16</span></code>
+- <code class="docutils literal notranslate"><span class="pre">32</span></code> if dtype is  <code class="docutils literal notranslate"><span class="pre">int32</span></code> or <code class="docutils literal notranslate"><span class="pre">float32</span></code></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ULAW&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;ALAW&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">32</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_F&quot;</span></code></p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code> format;</dt><dd><ul>
+<li><p>the default value is <code class="docutils literal notranslate"><span class="pre">24</span></code></p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code> format;</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;PCM_F&quot;</span></code> or not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;ULAW&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;ALAW&quot;</span></code></p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code> format;</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">8</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ULAW&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;ALAW&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> or not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">32</span></code> if <code class="docutils literal notranslate"><span class="pre">encoding</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;PCM_F&quot;</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p>Supported formats/encodings/bit depth/compression are;</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code></dt><dd><ul class="simple">
+<li><p>32-bit floating-point PCM</p></li>
+<li><p>32-bit signed integer PCM</p></li>
+<li><p>24-bit signed integer PCM</p></li>
+<li><p>16-bit signed integer PCM</p></li>
+<li><p>8-bit unsigned integer PCM</p></li>
+<li><p>8-bit mu-law</p></li>
+<li><p>8-bit a-law</p></li>
+</ul>
+<p>Note: Default encoding/bit depth is determined by the dtype of the input Tensor.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;mp3&quot;</span></code></dt><dd><p>Fixed bit rate (such as 128kHz) and variable bit rate compression.
+Default: VBR with high quality.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code></dt><dd><ul class="simple">
+<li><p>8-bit</p></li>
+<li><p>16-bit</p></li>
+<li><p>24-bit (default)</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code></dt><dd><ul class="simple">
+<li><p>Different quality level. Default: approx. 112kbps</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code></dt><dd><ul class="simple">
+<li><p>8-bit signed integer PCM</p></li>
+<li><p>16-bit signed integer PCM</p></li>
+<li><p>24-bit signed integer PCM</p></li>
+<li><p>32-bit signed integer PCM (default)</p></li>
+<li><p>8-bit mu-law</p></li>
+<li><p>8-bit a-law</p></li>
+<li><p>16-bit a-law</p></li>
+<li><p>24-bit a-law</p></li>
+<li><p>32-bit a-law</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;amr-nb&quot;</span></code></dt><dd><p>Bitrate ranging from 4.75 kbit/s to 12.2 kbit/s. Default: 4.75 kbit/s</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To save into formats that <code class="docutils literal notranslate"><span class="pre">libsox</span></code> does not handle natively, (such as <code class="docutils literal notranslate"><span class="pre">&quot;mp3&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code>), your installation of <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> has
+to be linked to <code class="docutils literal notranslate"><span class="pre">libsox</span></code> and corresponding codec libraries such as <code class="docutils literal notranslate"><span class="pre">libmad</span></code>
+or <code class="docutils literal notranslate"><span class="pre">libmp3lame</span></code> etc.</p>
+</div>
 </dd></dl>
 
 </div>

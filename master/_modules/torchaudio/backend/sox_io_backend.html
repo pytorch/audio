@@ -306,7 +306,6 @@
               
   <h1>Source code for torchaudio.backend.sox_io_backend</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -459,26 +458,6 @@
         <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span></div>
 
 
-<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">unused</span>
-<span class="k">def</span> <span class="nf">_save</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">src</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">compression</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;`format` is required when saving to file object.&#39;</span><span class="p">)</span>
-        <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">save_audio_fileobj</span><span class="p">(</span>
-            <span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="n">compression</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_save_audio_file</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">),</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="n">compression</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
-
-
 <div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.save">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">save</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -487,29 +466,10 @@
         <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">compression</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">bits_per_sample</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Save audio data to file.</span>
-
-<span class="sd">    Note:</span>
-<span class="sd">        Supported formats are;</span>
-
-<span class="sd">        * WAV, AMB</span>
-
-<span class="sd">            * 32-bit floating-point</span>
-<span class="sd">            * 32-bit signed integer</span>
-<span class="sd">            * 16-bit signed integer</span>
-<span class="sd">            * 8-bit unsigned integer</span>
-
-<span class="sd">        * MP3</span>
-<span class="sd">        * FLAC</span>
-<span class="sd">        * OGG/VORBIS</span>
-<span class="sd">        * SPHERE</span>
-<span class="sd">        * AMR-NB</span>
-
-<span class="sd">        To save ``MP3``, ``FLAC``, ``OGG/VORBIS``, and other codecs ``libsox`` does not</span>
-<span class="sd">        handle natively, your installation of ``torchaudio`` has to be linked to ``libsox``</span>
-<span class="sd">        and corresponding codec libraries such as ``libmad`` or ``libmp3lame`` etc.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        filepath (str or pathlib.Path): Path to save file.</span>
@@ -522,32 +482,137 @@
 <span class="sd">        compression (Optional[float]): Used for formats other than WAV.</span>
 <span class="sd">            This corresponds to ``-C`` option of ``sox`` command.</span>
 
-<span class="sd">                * | ``MP3``: Either bitrate (in ``kbps``) with quality factor, such as ``128.2``, or</span>
-<span class="sd">                  | VBR encoding with quality factor such as ``-4.2``. Default: ``-4.5``.</span>
-<span class="sd">                * | ``FLAC``: compression level. Whole number from ``0`` to ``8``.</span>
-<span class="sd">                  | ``8`` is default and highest compression.</span>
-<span class="sd">                * | ``OGG/VORBIS``: number from ``-1`` to ``10``; ``-1`` is the highest compression</span>
-<span class="sd">                  | and lowest quality. Default: ``3``.</span>
+<span class="sd">            ``&quot;mp3&quot;``</span>
+<span class="sd">                Either bitrate (in ``kbps``) with quality factor, such as ``128.2``, or</span>
+<span class="sd">                VBR encoding with quality factor such as ``-4.2``. Default: ``-4.5``.</span>
+
+<span class="sd">            ``&quot;flac&quot;``</span>
+<span class="sd">                Whole number from ``0`` to ``8``. ``8`` is default and highest compression.</span>
+
+<span class="sd">            ``&quot;ogg&quot;``, ``&quot;vorbis&quot;``</span>
+<span class="sd">                Number from ``-1`` to ``10``; ``-1`` is the highest compression</span>
+<span class="sd">                and lowest quality. Default: ``3``.</span>
 
 <span class="sd">            See the detail at http://sox.sourceforge.net/soxformat.html.</span>
-<span class="sd">        format (str, optional): Output audio format.</span>
-<span class="sd">            This is required when the output audio format cannot be infered from</span>
-<span class="sd">            ``filepath``, (such as file extension or ``name`` attribute of the given file object).</span>
-<span class="sd">        dtype (str, optional): Output tensor dtype.</span>
-<span class="sd">            Valid values: ``&quot;uint8&quot;, &quot;int16&quot;, &quot;int32&quot;, &quot;float32&quot;, &quot;float64&quot;, None``</span>
-<span class="sd">            ``dtype=None`` means no conversion is performed.</span>
-<span class="sd">            ``dtype`` parameter is only effective for ``float32`` Tensor.</span>
+<span class="sd">        format (str, optional): Override the audio format.</span>
+<span class="sd">            When ``filepath`` argument is path-like object, audio format is infered from</span>
+<span class="sd">            file extension. If file extension is missing or different, you can specify the</span>
+<span class="sd">            correct format with this argument.</span>
+
+<span class="sd">            When ``filepath`` argument is file-like object, this argument is required.</span>
+
+<span class="sd">            Valid values are ``&quot;wav&quot;``, ``&quot;mp3&quot;``, ``&quot;ogg&quot;``, ``&quot;vorbis&quot;``, ``&quot;amr-nb&quot;``,</span>
+<span class="sd">            ``&quot;amb&quot;``, ``&quot;flac&quot;`` and ``&quot;sph&quot;``.</span>
+<span class="sd">        encoding (str, optional): Changes the encoding for the supported formats.</span>
+<span class="sd">            This argument is effective only for supported formats, cush as ``&quot;wav&quot;``, ``&quot;&quot;amb&quot;``</span>
+<span class="sd">            and ``&quot;sph&quot;``. Valid values are;</span>
+
+<span class="sd">                - ``&quot;PCM_S&quot;`` (signed integer Linear PCM)</span>
+<span class="sd">                - ``&quot;PCM_U&quot;`` (unsigned integer Linear PCM)</span>
+<span class="sd">                - ``&quot;PCM_F&quot;`` (floating point PCM)</span>
+<span class="sd">                - ``&quot;ULAW&quot;`` (mu-law)</span>
+<span class="sd">                - ``&quot;ALAW&quot;`` (a-law)</span>
+
+<span class="sd">            Default values</span>
+<span class="sd">                If not provided, the default value is picked based on ``format`` and ``bits_per_sample``.</span>
+
+<span class="sd">                ``&quot;wav&quot;``, ``&quot;amb&quot;``</span>
+<span class="sd">                    - | If both ``encoding`` and ``bits_per_sample`` are not provided, the ``dtype`` of the</span>
+<span class="sd">                      | Tensor is used to determine the default value.</span>
+<span class="sd">                        - ``&quot;PCM_U&quot;`` if dtype is ``uint8``</span>
+<span class="sd">                        - ``&quot;PCM_S&quot;`` if dtype is ``int16`` or ``int32`</span>
+<span class="sd">                        - ``&quot;PCM_F&quot;`` if dtype is ``float32``</span>
+
+<span class="sd">                    - ``&quot;PCM_U&quot;`` if ``bits_per_sample=8``</span>
+<span class="sd">                    - ``&quot;PCM_S&quot;`` otherwise</span>
+
+<span class="sd">                ``&quot;sph&quot;`` format;</span>
+<span class="sd">                    - the default value is ``&quot;PCM_S&quot;``</span>
+
+<span class="sd">        bits_per_sample (int, optional): Changes the bit depth for the supported formats.</span>
+<span class="sd">            When ``format`` is one of ``&quot;wav&quot;``, ``&quot;flac&quot;``, ``&quot;sph&quot;``, or ``&quot;amb&quot;``, you can change the</span>
+<span class="sd">            bit depth. Valid values are ``8``, ``16``, ``32`` and ``64``.</span>
+
+<span class="sd">            Default Value;</span>
+<span class="sd">                If not provided, the default values are picked based on ``format`` and ``&quot;encoding&quot;``;</span>
+
+<span class="sd">                ``&quot;wav&quot;``, ``&quot;amb&quot;``;</span>
+<span class="sd">                    - | If both ``encoding`` and ``bits_per_sample`` are not provided, the ``dtype`` of the</span>
+<span class="sd">                      | Tensor is used.</span>
+<span class="sd">                        - ``8`` if dtype is ``uint8``</span>
+<span class="sd">                        - ``16`` if dtype is ``int16``</span>
+<span class="sd">                        - ``32`` if dtype is  ``int32`` or ``float32``</span>
+
+<span class="sd">                    - ``8`` if ``encoding`` is ``&quot;PCM_U&quot;``, ``&quot;ULAW&quot;`` or ``&quot;ALAW&quot;``</span>
+<span class="sd">                    - ``16`` if ``encoding`` is ``&quot;PCM_S&quot;``</span>
+<span class="sd">                    - ``32`` if ``encoding`` is ``&quot;PCM_F&quot;``</span>
+
+<span class="sd">                ``&quot;flac&quot;`` format;</span>
+<span class="sd">                    - the default value is ``24``</span>
+
+<span class="sd">                ``&quot;sph&quot;`` format;</span>
+<span class="sd">                    - ``16`` if ``encoding`` is ``&quot;PCM_U&quot;``, ``&quot;PCM_S&quot;``, ``&quot;PCM_F&quot;`` or not provided.</span>
+<span class="sd">                    - ``8`` if ``encoding`` is ``&quot;ULAW&quot;`` or ``&quot;ALAW&quot;``</span>
+
+<span class="sd">                ``&quot;amb&quot;`` format;</span>
+<span class="sd">                    - ``8`` if ``encoding`` is ``&quot;PCM_U&quot;``, ``&quot;ULAW&quot;`` or ``&quot;ALAW&quot;``</span>
+<span class="sd">                    - ``16`` if ``encoding`` is ``&quot;PCM_S&quot;`` or not provided.</span>
+<span class="sd">                    - ``32`` if ``encoding`` is ``&quot;PCM_F&quot;``</span>
+
+<span class="sd">    Supported formats/encodings/bit depth/compression are;</span>
+
+<span class="sd">    ``&quot;wav&quot;``, ``&quot;amb&quot;``</span>
+<span class="sd">        - 32-bit floating-point PCM</span>
+<span class="sd">        - 32-bit signed integer PCM</span>
+<span class="sd">        - 24-bit signed integer PCM</span>
+<span class="sd">        - 16-bit signed integer PCM</span>
+<span class="sd">        - 8-bit unsigned integer PCM</span>
+<span class="sd">        - 8-bit mu-law</span>
+<span class="sd">        - 8-bit a-law</span>
+
+<span class="sd">        Note: Default encoding/bit depth is determined by the dtype of the input Tensor.</span>
+
+<span class="sd">    ``&quot;mp3&quot;``</span>
+<span class="sd">        Fixed bit rate (such as 128kHz) and variable bit rate compression.</span>
+<span class="sd">        Default: VBR with high quality.</span>
+
+<span class="sd">    ``&quot;flac&quot;``</span>
+<span class="sd">        - 8-bit</span>
+<span class="sd">        - 16-bit</span>
+<span class="sd">        - 24-bit (default)</span>
+
+<span class="sd">    ``&quot;ogg&quot;``, ``&quot;vorbis&quot;``</span>
+<span class="sd">        - Different quality level. Default: approx. 112kbps</span>
+
+<span class="sd">    ``&quot;sph&quot;``</span>
+<span class="sd">        - 8-bit signed integer PCM</span>
+<span class="sd">        - 16-bit signed integer PCM</span>
+<span class="sd">        - 24-bit signed integer PCM</span>
+<span class="sd">        - 32-bit signed integer PCM (default)</span>
+<span class="sd">        - 8-bit mu-law</span>
+<span class="sd">        - 8-bit a-law</span>
+<span class="sd">        - 16-bit a-law</span>
+<span class="sd">        - 24-bit a-law</span>
+<span class="sd">        - 32-bit a-law</span>
+
+<span class="sd">    ``&quot;amr-nb&quot;``</span>
+<span class="sd">        Bitrate ranging from 4.75 kbit/s to 12.2 kbit/s. Default: 4.75 kbit/s</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        To save into formats that ``libsox`` does not handle natively, (such as ``&quot;mp3&quot;``,</span>
+<span class="sd">        ``&quot;flac&quot;``, ``&quot;ogg&quot;`` and ``&quot;vorbis&quot;``), your installation of ``torchaudio`` has</span>
+<span class="sd">        to be linked to ``libsox`` and corresponding codec libraries such as ``libmad``</span>
+<span class="sd">        or ``libmp3lame`` etc.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span> <span class="ow">and</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s1">&#39;`dtype` default value will be changed to `int16` in 0.9 release.&#39;</span>
-            <span class="s1">&#39;Specify `dtype` to suppress this warning.&#39;</span>
-        <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">is_scripting</span><span class="p">():</span>
-        <span class="n">_save</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="n">compression</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
-        <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">):</span>
+            <span class="n">torchaudio</span><span class="o">.</span><span class="n">_torchaudio</span><span class="o">.</span><span class="n">save_audio_fileobj</span><span class="p">(</span>
+                <span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="n">compression</span><span class="p">,</span>
+                <span class="nb">format</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_io_save_audio_file</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="n">compression</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span></div>
+        <span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="n">compression</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="load_wav"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.load_wav">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
