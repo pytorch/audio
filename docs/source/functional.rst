@@ -203,3 +203,8 @@ vad
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: sliding_window_cmn
+
+:hidden:`compute_kaldi_pitch`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: compute_kaldi_pitch

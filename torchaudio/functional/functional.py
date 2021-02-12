@@ -1025,53 +1025,55 @@ def compute_kaldi_pitch(
         sample_rate (float):
             Sample rate of `waveform`.
         frame_length (float, optional):
-            Frame length in milliseconds.
+            Frame length in milliseconds. (default: 25.0)
         frame_shift (float, optional):
-            Frame shift in milliseconds.
+            Frame shift in milliseconds. (default: 10.0)
         min_f0 (float, optional):
-            Minimum F0 to search for (Hz)
+            Minimum F0 to search for (Hz)  (default: 50.0)
         max_f0 (float, optional):
-            Maximum F0 to search for (Hz)
+            Maximum F0 to search for (Hz)  (default: 400.0)
         soft_min_f0 (float, optional):
-            Minimum f0, applied in soft way, must not exceed min-f0
+            Minimum f0, applied in soft way, must not exceed min-f0  (default: 10.0)
         penalty_factor (float, optional):
-            Cost factor for FO change.
+            Cost factor for FO change.  (default: 0.1)
         lowpass_cutoff (float, optional):
-            Cutoff frequency for LowPass filter (Hz)
+            Cutoff frequency for LowPass filter (Hz) (default: 1000)
         resample_frequency (float, optional):
             Frequency that we down-sample the signal to. Must be more than twice lowpass-cutoff.
+            (default: 4000)
         delta_pitch( float, optional):
-            Smallest relative change in pitch that our algorithm measures.
+            Smallest relative change in pitch that our algorithm measures. (default: 0.005)
         nccf_ballast (float, optional):
-            Increasing this factor reduces NCCF for quiet frames
+            Increasing this factor reduces NCCF for quiet frames (default: 7000)
         lowpass_filter_width (int, optional):
             Integer that determines filter width of lowpass filter, more gives sharper filter.
+            (default: 1)
         upsample_filter_width (int, optional):
-            Integer that determines filter width when upsampling NCCF.
+            Integer that determines filter width when upsampling NCCF. (default: 5)
         max_frames_latency (int, optional):
             Maximum number of frames of latency that we allow pitch tracking to introduce into
             the feature processing (affects output only if ``frames_per_chunk > 0`` and
-            ``simulate_first_pass_online=True``)
+            ``simulate_first_pass_online=True``) (default: 0)
         frames_per_chunk (int, optional):
-            The number of frames used for energy normalization.
+            The number of frames used for energy normalization. (default: 0)
         simulate_first_pass_online (bool, optional):
             If true, the function will output features that correspond to what an online decoder
             would see in the first pass of decoding -- not the final version of the features,
-            which is the default.
+            which is the default. (default: False)
             Relevant if ``frames_per_chunk > 0``.
         recompute_frame (int, optional):
             Only relevant for compatibility with online pitch extraction.
             A non-critical parameter; the frame at which we recompute some of the forward pointers,
             after revising our estimate of the signal energy.
-            Relevant if ``frames_per_chunk > 0``.
+            Relevant if ``frames_per_chunk > 0``. (default: 500)
         snip_edges (bool, optional):
             If this is set to false, the incomplete frames near the ending edge won't be snipped,
             so that the number of frames is the file size divided by the frame-shift.
-            This makes different types of features give the same number of frames.
+            This makes different types of features give the same number of frames. (default: True)
 
     Returns:
-       Tensor: Pitch feature. Shape: `(batch, frames 2)` where the last dimension
-           corresponds to pitch and NCCF.
+       Tensor: Pitch feature. Shape: ``(batch, frames 2)`` where the last dimension
+       corresponds to pitch and NCCF.
 
     Reference:
         - A pitch extraction algorithm tuned for automatic speech recognition
