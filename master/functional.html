@@ -1474,6 +1474,72 @@ Only applicable if center == false, ignored if center==true (int, default = 100)
 </dd></dl>
 
 </div>
+<div class="section" id="compute-kaldi-pitch">
+<h2><span class="hidden-section">compute_kaldi_pitch</span><a class="headerlink" href="#compute-kaldi-pitch" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="torchaudio.functional.compute_kaldi_pitch">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">compute_kaldi_pitch</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">sample_rate: float</em>, <em class="sig-param">frame_length: float = 25.0</em>, <em class="sig-param">frame_shift: float = 10.0</em>, <em class="sig-param">min_f0: float = 50</em>, <em class="sig-param">max_f0: float = 400</em>, <em class="sig-param">soft_min_f0: float = 10.0</em>, <em class="sig-param">penalty_factor: float = 0.1</em>, <em class="sig-param">lowpass_cutoff: float = 1000</em>, <em class="sig-param">resample_frequency: float = 4000</em>, <em class="sig-param">delta_pitch: float = 0.005</em>, <em class="sig-param">nccf_ballast: float = 7000</em>, <em class="sig-param">lowpass_filter_width: int = 1</em>, <em class="sig-param">upsample_filter_width: int = 5</em>, <em class="sig-param">max_frames_latency: int = 0</em>, <em class="sig-param">frames_per_chunk: int = 0</em>, <em class="sig-param">simulate_first_pass_online: bool = False</em>, <em class="sig-param">recompute_frame: int = 500</em>, <em class="sig-param">snip_edges: bool = True</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#compute_kaldi_pitch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.compute_kaldi_pitch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract pitch based on method described in [1].</p>
+<p>This function computes the equivalent of <cite>compute-kaldi-pitch-feats</cite> from Kaldi.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>waveform</strong> (<em>Tensor</em>) – The input waveform of shape <cite>(…, time)</cite>.</p></li>
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Sample rate of <cite>waveform</cite>.</p></li>
+<li><p><strong>frame_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Frame length in milliseconds. (default: 25.0)</p></li>
+<li><p><strong>frame_shift</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Frame shift in milliseconds. (default: 10.0)</p></li>
+<li><p><strong>min_f0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Minimum F0 to search for (Hz)  (default: 50.0)</p></li>
+<li><p><strong>max_f0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum F0 to search for (Hz)  (default: 400.0)</p></li>
+<li><p><strong>soft_min_f0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Minimum f0, applied in soft way, must not exceed min-f0  (default: 10.0)</p></li>
+<li><p><strong>penalty_factor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Cost factor for FO change.  (default: 0.1)</p></li>
+<li><p><strong>lowpass_cutoff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Cutoff frequency for LowPass filter (Hz) (default: 1000)</p></li>
+<li><p><strong>resample_frequency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Frequency that we down-sample the signal to. Must be more than twice lowpass-cutoff.
+(default: 4000)</p></li>
+<li><p><strong>delta_pitch</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Smallest relative change in pitch that our algorithm measures. (default: 0.005)</p></li>
+<li><p><strong>nccf_ballast</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Increasing this factor reduces NCCF for quiet frames (default: 7000)</p></li>
+<li><p><strong>lowpass_filter_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Integer that determines filter width of lowpass filter, more gives sharper filter.
+(default: 1)</p></li>
+<li><p><strong>upsample_filter_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Integer that determines filter width when upsampling NCCF. (default: 5)</p></li>
+<li><p><strong>max_frames_latency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of frames of latency that we allow pitch tracking to introduce into
+the feature processing (affects output only if <code class="docutils literal notranslate"><span class="pre">frames_per_chunk</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> and
+<code class="docutils literal notranslate"><span class="pre">simulate_first_pass_online=True</span></code>) (default: 0)</p></li>
+<li><p><strong>frames_per_chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The number of frames used for energy normalization. (default: 0)</p></li>
+<li><p><strong>simulate_first_pass_online</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If true, the function will output features that correspond to what an online decoder
+would see in the first pass of decoding – not the final version of the features,
+which is the default. (default: False)
+Relevant if <code class="docutils literal notranslate"><span class="pre">frames_per_chunk</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.</p></li>
+<li><p><strong>recompute_frame</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Only relevant for compatibility with online pitch extraction.
+A non-critical parameter; the frame at which we recompute some of the forward pointers,
+after revising our estimate of the signal energy.
+Relevant if <code class="docutils literal notranslate"><span class="pre">frames_per_chunk</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>. (default: 500)</p></li>
+<li><p><strong>snip_edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If this is set to false, the incomplete frames near the ending edge won’t be snipped,
+so that the number of frames is the file size divided by the frame-shift.
+This makes different types of features give the same number of frames. (default: True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pitch feature. Shape: <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">frames</span> <span class="pre">2)</span></code> where the last dimension
+corresponds to pitch and NCCF.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+<dl>
+<dt>Reference:</dt><dd><ul>
+<li><p>A pitch extraction algorithm tuned for automatic speech recognition</p>
+<ol class="upperalpha simple" start="16">
+<li><p>Ghahremani, B. BabaAli, D. Povey, K. Riedhammer, J. Trmal and S. Khudanpur</p></li>
+</ol>
+<p>2014 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP),</p>
+<p>Florence, 2014, pp. 2494-2498, doi: 10.1109/ICASSP.2014.6854049.</p>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -1561,6 +1627,7 @@ Only applicable if center == false, ignored if center==true (int, default = 100)
 <li><a class="reference internal" href="#compute-deltas"><span class="hidden-section">compute_deltas</span></a></li>
 <li><a class="reference internal" href="#detect-pitch-frequency"><span class="hidden-section">detect_pitch_frequency</span></a></li>
 <li><a class="reference internal" href="#sliding-window-cmn"><span class="hidden-section">sliding_window_cmn</span></a></li>
+<li><a class="reference internal" href="#compute-kaldi-pitch"><span class="hidden-section">compute_kaldi_pitch</span></a></li>
 </ul>
 </li>
 </ul>

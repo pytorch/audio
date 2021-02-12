@@ -1301,7 +1301,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">freqs</span> <span class="o">*</span> <span class="n">specgram</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">freq_dim</span><span class="p">)</span> <span class="o">/</span> <span class="n">specgram</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">freq_dim</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">compute_kaldi_pitch</span><span class="p">(</span>
+<div class="viewcode-block" id="compute_kaldi_pitch"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.compute_kaldi_pitch">[docs]</a><span class="k">def</span> <span class="nf">compute_kaldi_pitch</span><span class="p">(</span>
         <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">frame_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">25.0</span><span class="p">,</span>
@@ -1332,53 +1332,55 @@
 <span class="sd">        sample_rate (float):</span>
 <span class="sd">            Sample rate of `waveform`.</span>
 <span class="sd">        frame_length (float, optional):</span>
-<span class="sd">            Frame length in milliseconds.</span>
+<span class="sd">            Frame length in milliseconds. (default: 25.0)</span>
 <span class="sd">        frame_shift (float, optional):</span>
-<span class="sd">            Frame shift in milliseconds.</span>
+<span class="sd">            Frame shift in milliseconds. (default: 10.0)</span>
 <span class="sd">        min_f0 (float, optional):</span>
-<span class="sd">            Minimum F0 to search for (Hz)</span>
+<span class="sd">            Minimum F0 to search for (Hz)  (default: 50.0)</span>
 <span class="sd">        max_f0 (float, optional):</span>
-<span class="sd">            Maximum F0 to search for (Hz)</span>
+<span class="sd">            Maximum F0 to search for (Hz)  (default: 400.0)</span>
 <span class="sd">        soft_min_f0 (float, optional):</span>
-<span class="sd">            Minimum f0, applied in soft way, must not exceed min-f0</span>
+<span class="sd">            Minimum f0, applied in soft way, must not exceed min-f0  (default: 10.0)</span>
 <span class="sd">        penalty_factor (float, optional):</span>
-<span class="sd">            Cost factor for FO change.</span>
+<span class="sd">            Cost factor for FO change.  (default: 0.1)</span>
 <span class="sd">        lowpass_cutoff (float, optional):</span>
-<span class="sd">            Cutoff frequency for LowPass filter (Hz)</span>
+<span class="sd">            Cutoff frequency for LowPass filter (Hz) (default: 1000)</span>
 <span class="sd">        resample_frequency (float, optional):</span>
 <span class="sd">            Frequency that we down-sample the signal to. Must be more than twice lowpass-cutoff.</span>
+<span class="sd">            (default: 4000)</span>
 <span class="sd">        delta_pitch( float, optional):</span>
-<span class="sd">            Smallest relative change in pitch that our algorithm measures.</span>
+<span class="sd">            Smallest relative change in pitch that our algorithm measures. (default: 0.005)</span>
 <span class="sd">        nccf_ballast (float, optional):</span>
-<span class="sd">            Increasing this factor reduces NCCF for quiet frames</span>
+<span class="sd">            Increasing this factor reduces NCCF for quiet frames (default: 7000)</span>
 <span class="sd">        lowpass_filter_width (int, optional):</span>
 <span class="sd">            Integer that determines filter width of lowpass filter, more gives sharper filter.</span>
+<span class="sd">            (default: 1)</span>
 <span class="sd">        upsample_filter_width (int, optional):</span>
-<span class="sd">            Integer that determines filter width when upsampling NCCF.</span>
+<span class="sd">            Integer that determines filter width when upsampling NCCF. (default: 5)</span>
 <span class="sd">        max_frames_latency (int, optional):</span>
 <span class="sd">            Maximum number of frames of latency that we allow pitch tracking to introduce into</span>
 <span class="sd">            the feature processing (affects output only if ``frames_per_chunk &gt; 0`` and</span>
-<span class="sd">            ``simulate_first_pass_online=True``)</span>
+<span class="sd">            ``simulate_first_pass_online=True``) (default: 0)</span>
 <span class="sd">        frames_per_chunk (int, optional):</span>
-<span class="sd">            The number of frames used for energy normalization.</span>
+<span class="sd">            The number of frames used for energy normalization. (default: 0)</span>
 <span class="sd">        simulate_first_pass_online (bool, optional):</span>
 <span class="sd">            If true, the function will output features that correspond to what an online decoder</span>
 <span class="sd">            would see in the first pass of decoding -- not the final version of the features,</span>
-<span class="sd">            which is the default.</span>
+<span class="sd">            which is the default. (default: False)</span>
 <span class="sd">            Relevant if ``frames_per_chunk &gt; 0``.</span>
 <span class="sd">        recompute_frame (int, optional):</span>
 <span class="sd">            Only relevant for compatibility with online pitch extraction.</span>
 <span class="sd">            A non-critical parameter; the frame at which we recompute some of the forward pointers,</span>
 <span class="sd">            after revising our estimate of the signal energy.</span>
-<span class="sd">            Relevant if ``frames_per_chunk &gt; 0``.</span>
+<span class="sd">            Relevant if ``frames_per_chunk &gt; 0``. (default: 500)</span>
 <span class="sd">        snip_edges (bool, optional):</span>
 <span class="sd">            If this is set to false, the incomplete frames near the ending edge won&#39;t be snipped,</span>
 <span class="sd">            so that the number of frames is the file size divided by the frame-shift.</span>
-<span class="sd">            This makes different types of features give the same number of frames.</span>
+<span class="sd">            This makes different types of features give the same number of frames. (default: True)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">       Tensor: Pitch feature. Shape: `(batch, frames 2)` where the last dimension</span>
-<span class="sd">           corresponds to pitch and NCCF.</span>
+<span class="sd">       Tensor: Pitch feature. Shape: ``(batch, frames 2)`` where the last dimension</span>
+<span class="sd">       corresponds to pitch and NCCF.</span>
 
 <span class="sd">    Reference:</span>
 <span class="sd">        - A pitch extraction algorithm tuned for automatic speech recognition</span>
@@ -1400,7 +1402,7 @@
         <span class="n">snip_edges</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">result</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
-    <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">result</span></div>
 </pre></div>
 
              </article>
