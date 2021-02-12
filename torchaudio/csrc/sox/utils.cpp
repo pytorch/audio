@@ -1,5 +1,6 @@
 #include <c10/core/ScalarType.h>
 #include <sox.h>
+#include <torchaudio/csrc/sox/types.h>
 #include <torchaudio/csrc/sox/utils.h>
 
 namespace torchaudio {
@@ -163,22 +164,32 @@ torch::Tensor convert_to_tensor(
     const caffe2::TypeMeta dtype,
     const bool normalize,
     const bool channels_first) {
-  auto t = torch::from_blob(
-      buffer, {num_samples / num_channels, num_channels}, torch::kInt32);
-  // Note: Tensor created from_blob does not own data but borrwos
-  // So make sure to create a new copy after processing samples.
+  torch::Tensor t;
+  uint64_t dummy;
+  SOX_SAMPLE_LOCALS;
   if (normalize || dtype == torch::kFloat32) {
-    t = t.to(torch::kFloat32);
-    t *= (t > 0) / 2147483647. + (t < 0) / 2147483648.;
+    t = torch::empty(
+        {num_samples / num_channels, num_channels}, torch::kFloat32);
+    auto ptr = t.data_ptr<float_t>();
+    for (int32_t i = 0; i < num_samples; ++i) {
+      ptr[i] = SOX_SAMPLE_TO_FLOAT_32BIT(buffer[i], dummy);
+    }
   } else if (dtype == torch::kInt32) {
-    t = t.clone();
+    t = torch::from_blob(
+            buffer, {num_samples / num_channels, num_channels}, torch::kInt32)
+            .clone();
   } else if (dtype == torch::kInt16) {
-    t.floor_divide_(1 << 16);
-    t = t.to(torch::kInt16);
+    t = torch::empty({num_samples / num_channels, num_channels}, torch::kInt16);
+    auto ptr = t.data_ptr<int16_t>();
+    for (int32_t i = 0; i < num_samples; ++i) {
+      ptr[i] = SOX_SAMPLE_TO_SIGNED_16BIT(buffer[i], dummy);
+    }
   } else if (dtype == torch::kUInt8) {
-    t.floor_divide_(1 << 24);
-    t += 128;
-    t = t.to(torch::kUInt8);
+    t = torch::empty({num_samples / num_channels, num_channels}, torch::kUInt8);
+    auto ptr = t.data_ptr<uint8_t>();
+    for (int32_t i = 0; i < num_samples; ++i) {
+      ptr[i] = SOX_SAMPLE_TO_UNSIGNED_8BIT(buffer[i], dummy);
+    }
   } else {
     throw std::runtime_error("Unsupported dtype.");
   }
@@ -188,63 +199,181 @@ torch::Tensor convert_to_tensor(
   return t.contiguous();
 }
 
-torch::Tensor unnormalize_wav(const torch::Tensor input_tensor) {
-  const auto dtype = input_tensor.dtype();
-  auto tensor = input_tensor;
-  if (dtype == torch::kFloat32) {
-    double multi_pos = 2147483647.;
-    double multi_neg = -2147483648.;
-    auto mult = (tensor > 0) * multi_pos - (tensor < 0) * multi_neg;
-    tensor = tensor.to(torch::dtype(torch::kFloat64));
-    tensor *= mult;
-    tensor.clamp_(multi_neg, multi_pos);
-    tensor = tensor.to(torch::dtype(torch::kInt32));
-  } else if (dtype == torch::kInt32) {
-    // already denormalized
-  } else if (dtype == torch::kInt16) {
-    tensor = tensor.to(torch::dtype(torch::kInt32));
-    tensor *= ((tensor != 0) * 65536);
-  } else if (dtype == torch::kUInt8) {
-    tensor = tensor.to(torch::dtype(torch::kInt32));
-    tensor -= 128;
-    tensor *= 16777216;
-  } else {
-    throw std::runtime_error("Unexpected dtype.");
-  }
-  return tensor;
-}
-
 const std::string get_filetype(const std::string path) {
   std::string ext = path.substr(path.find_last_of(".") + 1);
   std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
   return ext;
 }
 
-sox_encoding_t get_encoding(
-    const std::string filetype,
-    const caffe2::TypeMeta dtype) {
-  if (filetype == "mp3")
-    return SOX_ENCODING_MP3;
-  if (filetype == "flac")
-    return SOX_ENCODING_FLAC;
-  if (filetype == "ogg" || filetype == "vorbis")
-    return SOX_ENCODING_VORBIS;
-  if (filetype == "wav" || filetype == "amb") {
-    if (dtype == torch::kUInt8)
-      return SOX_ENCODING_UNSIGNED;
-    if (dtype == torch::kInt16)
-      return SOX_ENCODING_SIGN2;
-    if (dtype == torch::kInt32)
-      return SOX_ENCODING_SIGN2;
-    if (dtype == torch::kFloat32)
-      return SOX_ENCODING_FLOAT;
-    throw std::runtime_error("Unsupported dtype.");
+namespace {
+
+std::tuple<sox_encoding_t, unsigned> get_save_encoding_for_wav(
+    const std::string format,
+    const caffe2::TypeMeta dtype,
+    const Encoding& encoding,
+    const BitDepth& bits_per_sample) {
+  switch (encoding) {
+    case Encoding::NOT_PROVIDED:
+      switch (bits_per_sample) {
+        case BitDepth::NOT_PROVIDED:
+          if (dtype == torch::kFloat32)
+            return std::make_tuple<>(SOX_ENCODING_FLOAT, 32);
+          if (dtype == torch::kInt32)
+            return std::make_tuple<>(SOX_ENCODING_SIGN2, 32);
+          if (dtype == torch::kInt16)
+            return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
+          if (dtype == torch::kUInt8)
+            return std::make_tuple<>(SOX_ENCODING_UNSIGNED, 8);
+          throw std::runtime_error("Internal Error: Unexpected dtype.");
+        case BitDepth::B8:
+          return std::make_tuple<>(SOX_ENCODING_UNSIGNED, 8);
+        default:
+          return std::make_tuple<>(
+              SOX_ENCODING_SIGN2, static_cast<unsigned>(bits_per_sample));
+      }
+    case Encoding::PCM_SIGNED:
+      switch (bits_per_sample) {
+        case BitDepth::NOT_PROVIDED:
+          return std::make_tuple<>(SOX_ENCODING_SIGN2, 32);
+        case BitDepth::B8:
+          throw std::runtime_error(
+              format + " does not support 8-bit signed PCM encoding.");
+        default:
+          return std::make_tuple<>(
+              SOX_ENCODING_SIGN2, static_cast<unsigned>(bits_per_sample));
+      }
+    case Encoding::PCM_UNSIGNED:
+      switch (bits_per_sample) {
+        case BitDepth::NOT_PROVIDED:
+        case BitDepth::B8:
+          return std::make_tuple<>(SOX_ENCODING_UNSIGNED, 8);
+        default:
+          throw std::runtime_error(
+              format + " only supports 8-bit for unsigned PCM encoding.");
+      }
+    case Encoding::PCM_FLOAT:
+      switch (bits_per_sample) {
+        case BitDepth::NOT_PROVIDED:
+        case BitDepth::B32:
+          return std::make_tuple<>(SOX_ENCODING_FLOAT, 32);
+        case BitDepth::B64:
+          return std::make_tuple<>(SOX_ENCODING_FLOAT, 64);
+        default:
+          throw std::runtime_error(
+              format +
+              " only supports 32-bit or 64-bit for floating-point PCM encoding.");
+      }
+    case Encoding::ULAW:
+      switch (bits_per_sample) {
+        case BitDepth::NOT_PROVIDED:
+        case BitDepth::B8:
+          return std::make_tuple<>(SOX_ENCODING_ULAW, 8);
+        default:
+          throw std::runtime_error(
+              format + " only supports 8-bit for mu-law encoding.");
+      }
+    case Encoding::ALAW:
+      switch (bits_per_sample) {
+        case BitDepth::NOT_PROVIDED:
+        case BitDepth::B8:
+          return std::make_tuple<>(SOX_ENCODING_ALAW, 8);
+        default:
+          throw std::runtime_error(
+              format + " only supports 8-bit for a-law encoding.");
+      }
+    default:
+      throw std::runtime_error(
+          format + " does not support encoding: " + to_string(encoding));
   }
-  if (filetype == "sph")
-    return SOX_ENCODING_SIGN2;
-  if (filetype == "amr-nb")
-    return SOX_ENCODING_AMR_NB;
-  throw std::runtime_error("Unsupported file type: " + filetype);
+}
+
+std::tuple<sox_encoding_t, unsigned> get_save_encoding(
+    const std::string& format,
+    const caffe2::TypeMeta dtype,
+    const c10::optional<std::string>& encoding,
+    const c10::optional<int64_t>& bits_per_sample) {
+  const Format fmt = get_format_from_string(format);
+  const Encoding enc = get_encoding_from_option(encoding);
+  const BitDepth bps = get_bit_depth_from_option(bits_per_sample);
+
+  switch (fmt) {
+    case Format::WAV:
+    case Format::AMB:
+      return get_save_encoding_for_wav(format, dtype, enc, bps);
+    case Format::MP3:
+      if (enc != Encoding::NOT_PROVIDED)
+        throw std::runtime_error("mp3 does not support `encoding` option.");
+      if (bps != BitDepth::NOT_PROVIDED)
+        throw std::runtime_error(
+            "mp3 does not support `bits_per_sample` option.");
+      return std::make_tuple<>(SOX_ENCODING_MP3, 16);
+    case Format::VORBIS:
+      if (enc != Encoding::NOT_PROVIDED)
+        throw std::runtime_error("vorbis does not support `encoding` option.");
+      if (bps != BitDepth::NOT_PROVIDED)
+        throw std::runtime_error(
+            "vorbis does not support `bits_per_sample` option.");
+      return std::make_tuple<>(SOX_ENCODING_VORBIS, 16);
+    case Format::AMR_NB:
+      if (enc != Encoding::NOT_PROVIDED)
+        throw std::runtime_error("amr-nb does not support `encoding` option.");
+      if (bps != BitDepth::NOT_PROVIDED)
+        throw std::runtime_error(
+            "amr-nb does not support `bits_per_sample` option.");
+      return std::make_tuple<>(SOX_ENCODING_AMR_NB, 16);
+    case Format::FLAC:
+      if (enc != Encoding::NOT_PROVIDED)
+        throw std::runtime_error("flac does not support `encoding` option.");
+      switch (bps) {
+        case BitDepth::B32:
+        case BitDepth::B64:
+          throw std::runtime_error(
+              "flac does not support `bits_per_sample` larger than 24.");
+        default:
+          return std::make_tuple<>(
+              SOX_ENCODING_FLAC, static_cast<unsigned>(bps));
+      }
+    case Format::SPHERE:
+      switch (enc) {
+        case Encoding::NOT_PROVIDED:
+        case Encoding::PCM_SIGNED:
+          switch (bps) {
+            case BitDepth::NOT_PROVIDED:
+              return std::make_tuple<>(SOX_ENCODING_SIGN2, 32);
+            default:
+              return std::make_tuple<>(
+                  SOX_ENCODING_SIGN2, static_cast<unsigned>(bps));
+          }
+        case Encoding::PCM_UNSIGNED:
+          throw std::runtime_error(
+              "sph does not support unsigned integer PCM.");
+        case Encoding::PCM_FLOAT:
+          throw std::runtime_error("sph does not support floating point PCM.");
+        case Encoding::ULAW:
+          switch (bps) {
+            case BitDepth::NOT_PROVIDED:
+            case BitDepth::B8:
+              return std::make_tuple<>(SOX_ENCODING_ULAW, 8);
+            default:
+              throw std::runtime_error(
+                  "sph only supports 8-bit for mu-law encoding.");
+          }
+        case Encoding::ALAW:
+          switch (bps) {
+            case BitDepth::NOT_PROVIDED:
+            case BitDepth::B8:
+              return std::make_tuple<>(SOX_ENCODING_ALAW, 8);
+            default:
+              return std::make_tuple<>(
+                  SOX_ENCODING_ALAW, static_cast<unsigned>(bps));
+          }
+        default:
+          throw std::runtime_error(
+              "sph does not support encoding: " + encoding.value());
+      }
+    default:
+      throw std::runtime_error("Unsupported format: " + format);
+  }
 }
 
 unsigned get_precision(
@@ -270,13 +399,12 @@ unsigned get_precision(
   if (filetype == "sph")
     return 32;
   if (filetype == "amr-nb") {
-    TORCH_INTERNAL_ASSERT(
-        dtype == torch::kInt16,
-        "When saving to AMR-NB format, the input tensor must be int16 type.");
     return 16;
   }
   throw std::runtime_error("Unsupported file type: " + filetype);
 }
+
+} // namespace
 
 sox_signalinfo_t get_signalinfo(
     const torch::Tensor* waveform,
@@ -325,12 +453,15 @@ sox_encodinginfo_t get_tensor_encodinginfo(const caffe2::TypeMeta dtype) {
 }
 
 sox_encodinginfo_t get_encodinginfo_for_save(
-    const std::string filetype,
+    const std::string& format,
     const caffe2::TypeMeta dtype,
-    c10::optional<double>& compression) {
+    const c10::optional<double>& compression,
+    const c10::optional<std::string>& encoding,
+    const c10::optional<int64_t>& bits_per_sample) {
+  auto enc = get_save_encoding(format, dtype, encoding, bits_per_sample);
   return sox_encodinginfo_t{
-      /*encoding=*/get_encoding(filetype, dtype),
-      /*bits_per_sample=*/get_precision(filetype, dtype),
+      /*encoding=*/std::get<0>(enc),
+      /*bits_per_sample=*/std::get<1>(enc),
       /*compression=*/compression.value_or(HUGE_VAL),
       /*reverse_bytes=*/sox_option_default,
       /*reverse_nibbles=*/sox_option_default,

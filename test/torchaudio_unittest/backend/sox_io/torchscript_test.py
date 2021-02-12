@@ -17,6 +17,7 @@ from torchaudio_unittest.common_utils import (
 )
 from .common import (
     name_func,
+    get_enc_params,
 )
 
 
@@ -35,8 +36,12 @@ def py_save_func(
         sample_rate: int,
         channels_first: bool = True,
         compression: Optional[float] = None,
+        encoding: Optional[str] = None,
+        bits_per_sample: Optional[int] = None,
 ):
-    torchaudio.save(filepath, tensor, sample_rate, channels_first, compression)
+    torchaudio.save(
+        filepath, tensor, sample_rate, channels_first,
+        compression, None, encoding, bits_per_sample)
 
 
 @skipIfNoExec('sox')
@@ -102,15 +107,16 @@ class SoxIO(TempDirMixin, TorchaudioTestCase):
         torch.jit.script(py_save_func).save(script_path)
         ts_save_func = torch.jit.load(script_path)
 
-        expected = get_wav_data(dtype, num_channels)
+        expected = get_wav_data(dtype, num_channels, normalize=False)
         py_path = self.get_temp_path(f'test_save_py_{dtype}_{sample_rate}_{num_channels}.wav')
         ts_path = self.get_temp_path(f'test_save_ts_{dtype}_{sample_rate}_{num_channels}.wav')
+        enc, bps = get_enc_params(dtype)
 
-        py_save_func(py_path, expected, sample_rate, True, None)
-        ts_save_func(ts_path, expected, sample_rate, True, None)
+        py_save_func(py_path, expected, sample_rate, True, None, enc, bps)
+        ts_save_func(ts_path, expected, sample_rate, True, None, enc, bps)
 
-        py_data, py_sr = load_wav(py_path)
-        ts_data, ts_sr = load_wav(ts_path)
+        py_data, py_sr = load_wav(py_path, normalize=False)
+        ts_data, ts_sr = load_wav(ts_path, normalize=False)
 
         self.assertEqual(sample_rate, py_sr)
         self.assertEqual(sample_rate, ts_sr)
@@ -131,8 +137,8 @@ class SoxIO(TempDirMixin, TorchaudioTestCase):
         py_path = self.get_temp_path(f'test_save_py_{sample_rate}_{num_channels}_{compression_level}.flac')
         ts_path = self.get_temp_path(f'test_save_ts_{sample_rate}_{num_channels}_{compression_level}.flac')
 
-        py_save_func(py_path, expected, sample_rate, True, compression_level)
-        ts_save_func(ts_path, expected, sample_rate, True, compression_level)
+        py_save_func(py_path, expected, sample_rate, True, compression_level, None, None)
+        ts_save_func(ts_path, expected, sample_rate, True, compression_level, None, None)
 
         # converting to 32 bit because flac file has 24 bit depth which scipy cannot handle.
         py_path_wav = f'{py_path}.wav'
