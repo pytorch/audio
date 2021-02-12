@@ -1,28 +1,10 @@
 import math
-import os
 from typing import Optional
 
 import torch
 from torch import Tensor
 
 import torchaudio._internal.fft
-
-
-def lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: Tensor, padded_output_waveform: Tensor):
-    n_order = a_coeffs_flipped.size(0)
-    for i_sample, o0 in enumerate(input_signal_windows.t()):
-        windowed_output_signal = padded_output_waveform[
-            :, i_sample:i_sample + n_order
-        ]
-        o0.addmv_(windowed_output_signal, a_coeffs_flipped, alpha=-1)
-        padded_output_waveform[:, i_sample + n_order - 1] = o0
-
-
-try:
-    lfilter_core_cpu_loop = torch.ops.torchaudio._lfilter_core_loop
-except RuntimeError as err:
-    assert str(err) == 'No such operator torchaudio::_lfilter_core_loop'
-    lfilter_core_cpu_loop = lfilter_core_generic_loop
 
 
 def _dB2Linear(x: float) -> float:
@@ -826,6 +808,23 @@ def highpass_biquad(
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
+def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: Tensor, padded_output_waveform: Tensor):
+    n_order = a_coeffs_flipped.size(0)
+    for i_sample, o0 in enumerate(input_signal_windows.t()):
+        windowed_output_signal = padded_output_waveform[
+            :, i_sample:i_sample + n_order
+        ]
+        o0.addmv_(windowed_output_signal, a_coeffs_flipped, alpha=-1)
+        padded_output_waveform[:, i_sample + n_order - 1] = o0
+
+
+try:
+    _lfilter_core_cpu_loop = torch.ops.torchaudio._lfilter_core_loop
+except RuntimeError as err:
+    assert str(err) == 'No such operator torchaudio::_lfilter_core_loop'
+    _lfilter_core_cpu_loop = _lfilter_core_generic_loop
+
+
 def lfilter(
     waveform: Tensor,
     a_coeffs: Tensor,
@@ -899,9 +898,9 @@ def lfilter(
     if input_signal_windows.device == torch.device('cpu') and\
        a_coeffs_flipped.device == torch.device('cpu') and\
        padded_output_waveform.device == torch.device('cpu'):
-        lfilter_core_cpu_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
+        _lfilter_core_cpu_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
     else:
-        lfilter_core_generic_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
+        _lfilter_core_generic_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
 
     output = padded_output_waveform[:, n_order - 1:]
 
