@@ -12,6 +12,7 @@ from torchaudio_unittest.common_utils import (
 )
 from .common import (
     name_func,
+    get_enc_params,
 )
 
 
@@ -27,10 +28,11 @@ class TestRoundTripIO(TempDirMixin, PytorchTestCase):
     def test_wav(self, dtype, sample_rate, num_channels):
         """save/load round trip should not degrade data for wav formats"""
         original = get_wav_data(dtype, num_channels, normalize=False)
+        enc, bps = get_enc_params(dtype)
         data = original
         for i in range(10):
             path = self.get_temp_path(f'{i}.wav')
-            sox_io_backend.save(path, data, sample_rate)
+            sox_io_backend.save(path, data, sample_rate, encoding=enc, bits_per_sample=bps)
             data, sr = sox_io_backend.load(path, normalize=False)
             assert sr == sample_rate
             self.assertEqual(original, data)
