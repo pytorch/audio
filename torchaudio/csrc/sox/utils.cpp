@@ -211,65 +211,70 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding_for_wav(
     const std::string format,
     const Encoding& encoding,
     const BitDepth& bits_per_sample) {
-
-  switch(encoding) {
-  case Encoding::NOT_PROVIDED:
-    switch(bits_per_sample) {
-    case BitDepth::NOT_PROVIDED:
-      return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
-    case BitDepth::B8:
-      return std::make_tuple<>(SOX_ENCODING_UNSIGNED, 8);
-    default:
-      return std::make_tuple<>(SOX_ENCODING_SIGN2, static_cast<unsigned>(bits_per_sample));
-    }
-  case Encoding::PCM_SIGNED:
-    switch(bits_per_sample) {
-    case BitDepth::NOT_PROVIDED:
-      return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
-    case BitDepth::B8:
-      throw std::runtime_error(format + " does not support 8-bit signed PCM encoding.");
-    default:
-      return std::make_tuple<>(SOX_ENCODING_SIGN2, static_cast<unsigned>(bits_per_sample));
-    }
-  case Encoding::PCM_UNSIGNED:
-    switch(bits_per_sample) {
-    case BitDepth::NOT_PROVIDED:
-    case BitDepth::B8:
-      return std::make_tuple<>(SOX_ENCODING_UNSIGNED, 8);
+  switch (encoding) {
+    case Encoding::NOT_PROVIDED:
+      switch (bits_per_sample) {
+        case BitDepth::NOT_PROVIDED:
+          return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
+        case BitDepth::B8:
+          return std::make_tuple<>(SOX_ENCODING_UNSIGNED, 8);
+        default:
+          return std::make_tuple<>(
+              SOX_ENCODING_SIGN2, static_cast<unsigned>(bits_per_sample));
+      }
+    case Encoding::PCM_SIGNED:
+      switch (bits_per_sample) {
+        case BitDepth::NOT_PROVIDED:
+          return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
+        case BitDepth::B8:
+          throw std::runtime_error(
+              format + " does not support 8-bit signed PCM encoding.");
+        default:
+          return std::make_tuple<>(
+              SOX_ENCODING_SIGN2, static_cast<unsigned>(bits_per_sample));
+      }
+    case Encoding::PCM_UNSIGNED:
+      switch (bits_per_sample) {
+        case BitDepth::NOT_PROVIDED:
+        case BitDepth::B8:
+          return std::make_tuple<>(SOX_ENCODING_UNSIGNED, 8);
+        default:
+          throw std::runtime_error(
+              format + " only supports 8-bit for unsigned PCM encoding.");
+      }
+    case Encoding::PCM_FLOAT:
+      switch (bits_per_sample) {
+        case BitDepth::NOT_PROVIDED:
+        case BitDepth::B32:
+          return std::make_tuple<>(SOX_ENCODING_FLOAT, 32);
+        case BitDepth::B64:
+          return std::make_tuple<>(SOX_ENCODING_FLOAT, 64);
+        default:
+          throw std::runtime_error(
+              format +
+              " only supports 32-bit or 64-bit for floating-point PCM encoding.");
+      }
+    case Encoding::ULAW:
+      switch (bits_per_sample) {
+        case BitDepth::NOT_PROVIDED:
+        case BitDepth::B8:
+          return std::make_tuple<>(SOX_ENCODING_ULAW, 8);
+        default:
+          throw std::runtime_error(
+              format + " only supports 8-bit for mu-law encoding.");
+      }
+    case Encoding::ALAW:
+      switch (bits_per_sample) {
+        case BitDepth::NOT_PROVIDED:
+        case BitDepth::B8:
+          return std::make_tuple<>(SOX_ENCODING_ALAW, 8);
+        default:
+          throw std::runtime_error(
+              format + " only supports 8-bit for a-law encoding.");
+      }
     default:
       throw std::runtime_error(
-          format + " only supports 8-bit for unsigned PCM encoding.");
-    }
-  case Encoding::PCM_FLOAT:
-    switch(bits_per_sample) {
-    case BitDepth::NOT_PROVIDED:
-    case BitDepth::B32:
-      return std::make_tuple<>(SOX_ENCODING_FLOAT, 32);
-    case BitDepth::B64:
-      return std::make_tuple<>(SOX_ENCODING_FLOAT, 64);
-    default:
-      throw std::runtime_error(
-          format + " only supports 32-bit or 64-bit for floating-point PCM encoding.");
-    }
-  case Encoding::ULAW:
-    switch(bits_per_sample) {
-    case BitDepth::NOT_PROVIDED:
-    case BitDepth::B8:
-      return std::make_tuple<>(SOX_ENCODING_ULAW, 8);
-    default:
-      throw std::runtime_error(format + " only supports 8-bit for mu-law encoding.");      
-    }
-  case Encoding::ALAW:
-    switch(bits_per_sample) {
-    case BitDepth::NOT_PROVIDED:
-    case BitDepth::B8:
-      return std::make_tuple<>(SOX_ENCODING_ALAW, 8);
-    default:
-      throw std::runtime_error(format + " only supports 8-bit for a-law encoding.");
-  }
-  default:
-    throw std::runtime_error(
-        format + " does not support encoding: " + to_string(encoding));
+          format + " does not support encoding: " + to_string(encoding));
   }
 }
 
@@ -277,79 +282,87 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
     const std::string& format,
     const c10::optional<std::string>& encoding,
     const c10::optional<int64_t>& bits_per_sample) {
-
   const Format fmt = from_string(format);
   const Encoding enc = from_option(encoding);
   const BitDepth bps = from_option(bits_per_sample);
 
-  switch(fmt) {
-  case Format::WAV:
-  case Format::AMB:
-    return get_save_encoding_for_wav(format, enc, bps);
-  case Format::MP3:
-    if (enc != Encoding::NOT_PROVIDED)
-      throw std::runtime_error("mp3 does not support `encoding` option.");
-    if (bps != BitDepth::NOT_PROVIDED)
-      throw std::runtime_error("mp3 does not support `bits_per_sample` option.");
-    return std::make_tuple<>(SOX_ENCODING_MP3, 16);
-  case Format::VORBIS:
-    if (enc != Encoding::NOT_PROVIDED)
-      throw std::runtime_error("vorbis does not support `encoding` option.");
-    if (bps != BitDepth::NOT_PROVIDED)
-      throw std::runtime_error("vorbis does not support `bits_per_sample` option.");
-    return std::make_tuple<>(SOX_ENCODING_VORBIS, 16);
-  case Format::AMR_NB:
-    if (enc != Encoding::NOT_PROVIDED)
-      throw std::runtime_error("amr-nb does not support `encoding` option.");
-    if (bps != BitDepth::NOT_PROVIDED)
-      throw std::runtime_error("amr-nb does not support `bits_per_sample` option.");
-    return std::make_tuple<>(SOX_ENCODING_AMR_NB, 16);
-  case Format::FLAC:
-    if (enc != Encoding::NOT_PROVIDED)
-      throw std::runtime_error("flac does not support `encoding` option.");
-    switch(bps) {
-    case BitDepth::B32:
-    case BitDepth::B64:
-      throw std::runtime_error("flac does not support `bits_per_sample` larger than 24.");
+  switch (fmt) {
+    case Format::WAV:
+    case Format::AMB:
+      return get_save_encoding_for_wav(format, enc, bps);
+    case Format::MP3:
+      if (enc != Encoding::NOT_PROVIDED)
+        throw std::runtime_error("mp3 does not support `encoding` option.");
+      if (bps != BitDepth::NOT_PROVIDED)
+        throw std::runtime_error(
+            "mp3 does not support `bits_per_sample` option.");
+      return std::make_tuple<>(SOX_ENCODING_MP3, 16);
+    case Format::VORBIS:
+      if (enc != Encoding::NOT_PROVIDED)
+        throw std::runtime_error("vorbis does not support `encoding` option.");
+      if (bps != BitDepth::NOT_PROVIDED)
+        throw std::runtime_error(
+            "vorbis does not support `bits_per_sample` option.");
+      return std::make_tuple<>(SOX_ENCODING_VORBIS, 16);
+    case Format::AMR_NB:
+      if (enc != Encoding::NOT_PROVIDED)
+        throw std::runtime_error("amr-nb does not support `encoding` option.");
+      if (bps != BitDepth::NOT_PROVIDED)
+        throw std::runtime_error(
+            "amr-nb does not support `bits_per_sample` option.");
+      return std::make_tuple<>(SOX_ENCODING_AMR_NB, 16);
+    case Format::FLAC:
+      if (enc != Encoding::NOT_PROVIDED)
+        throw std::runtime_error("flac does not support `encoding` option.");
+      switch (bps) {
+        case BitDepth::B32:
+        case BitDepth::B64:
+          throw std::runtime_error(
+              "flac does not support `bits_per_sample` larger than 24.");
+        default:
+          return std::make_tuple<>(
+              SOX_ENCODING_FLAC, static_cast<unsigned>(bps));
+      }
+    case Format::SPHERE:
+      switch (enc) {
+        case Encoding::NOT_PROVIDED:
+        case Encoding::PCM_SIGNED:
+          switch (bps) {
+            case BitDepth::NOT_PROVIDED:
+              return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
+            default:
+              return std::make_tuple<>(
+                  SOX_ENCODING_SIGN2, static_cast<unsigned>(bps));
+          }
+        case Encoding::PCM_UNSIGNED:
+          throw std::runtime_error(
+              "sph does not support unsigned integer PCM.");
+        case Encoding::PCM_FLOAT:
+          throw std::runtime_error("sph does not support floating point PCM.");
+        case Encoding::ULAW:
+          switch (bps) {
+            case BitDepth::NOT_PROVIDED:
+            case BitDepth::B8:
+              return std::make_tuple<>(SOX_ENCODING_ULAW, 8);
+            default:
+              throw std::runtime_error(
+                  "sph only supports 8-bit for mu-law encoding.");
+          }
+        case Encoding::ALAW:
+          switch (bps) {
+            case BitDepth::NOT_PROVIDED:
+            case BitDepth::B8:
+              return std::make_tuple<>(SOX_ENCODING_ALAW, 8);
+            default:
+              return std::make_tuple<>(
+                  SOX_ENCODING_ALAW, static_cast<unsigned>(bps));
+          }
+        default:
+          throw std::runtime_error(
+              "sph does not support encoding: " + encoding.value());
+      }
     default:
-      return std::make_tuple<>(SOX_ENCODING_FLAC, static_cast<unsigned>(bps));
-    }
-  case Format::SPHERE:
-    switch(enc) {
-    case Encoding::NOT_PROVIDED:
-    case Encoding::PCM_SIGNED:
-      switch(bps) {
-      case BitDepth::NOT_PROVIDED:
-        return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
-      default:
-        return std::make_tuple<>(SOX_ENCODING_SIGN2, static_cast<unsigned>(bps));
-      }
-    case Encoding::PCM_UNSIGNED:
-      throw std::runtime_error("sph does not support unsigned integer PCM.");
-    case Encoding::PCM_FLOAT:
-      throw std::runtime_error("sph does not support floating point PCM.");
-    case Encoding::ULAW:
-      switch(bps) {
-      case BitDepth::NOT_PROVIDED:
-      case BitDepth::B8:
-        return std::make_tuple<>(SOX_ENCODING_ULAW, 8);
-      default:
-        throw std::runtime_error("sph only supports 8-bit for mu-law encoding.");
-      }
-    case Encoding::ALAW:
-      switch(bps) {
-      case BitDepth::NOT_PROVIDED:
-      case BitDepth::B8:
-        return std::make_tuple<>(SOX_ENCODING_ALAW, 8);
-      default:
-        return std::make_tuple<>(SOX_ENCODING_ALAW, static_cast<unsigned>(bps));
-      }
-    default: {
-      throw std::runtime_error("sph does not support encoding: " + encoding.value());
-    }
-    }
-  default:
-    throw std::runtime_error("Unsupported format: " + format);
+      throw std::runtime_error("Unsupported format: " + format);
   }
 }
 

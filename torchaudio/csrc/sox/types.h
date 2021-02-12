@@ -18,7 +18,7 @@ enum class Format {
 };
 
 Format from_string(const std::string& format);
-  
+
 enum class Encoding {
   NOT_PROVIDED,
   UNKNOWN,
@@ -48,7 +48,7 @@ enum class BitDepth : unsigned {
 };
 
 BitDepth from_option(const c10::optional<int64_t>& bit_depth);
-  
+
 } // namespace sox_utils
 } // namespace torchaudio
 

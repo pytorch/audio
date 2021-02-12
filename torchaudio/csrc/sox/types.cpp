@@ -24,35 +24,35 @@ Format from_string(const std::string& format) {
   stream << "Internal Error: unexpected format value: " << format;
   throw std::runtime_error(stream.str());
 }
-  
+
 std::string to_string(Encoding v) {
-  switch(v) {
-  case Encoding::UNKNOWN:
-    return "UNKNOWN";
-  case Encoding::PCM_SIGNED:
-    return "PCM_S";
-  case Encoding::PCM_UNSIGNED:
-    return "PCM_U";
-  case Encoding::PCM_FLOAT:
-    return "PCM_F";
-  case Encoding::FLAC:
-    return "FLAC";
-  case Encoding::ULAW:
-    return "ULAW";
-  case Encoding::ALAW:
-    return "ALAW";
-  case Encoding::MP3:
-    return "MP3";
-  case Encoding::VORBIS:
-    return "VORBIS";
-  case Encoding::AMR_WB:
-    return "AMR_WB";
-  case Encoding::AMR_NB:
-    return "AMR_NB";
-  case Encoding::OPUS:
-    return "OPUS";
-  default:
-    throw std::runtime_error("Internal Error: unexpected encoding.");
+  switch (v) {
+    case Encoding::UNKNOWN:
+      return "UNKNOWN";
+    case Encoding::PCM_SIGNED:
+      return "PCM_S";
+    case Encoding::PCM_UNSIGNED:
+      return "PCM_U";
+    case Encoding::PCM_FLOAT:
+      return "PCM_F";
+    case Encoding::FLAC:
+      return "FLAC";
+    case Encoding::ULAW:
+      return "ULAW";
+    case Encoding::ALAW:
+      return "ALAW";
+    case Encoding::MP3:
+      return "MP3";
+    case Encoding::VORBIS:
+      return "VORBIS";
+    case Encoding::AMR_WB:
+      return "AMR_WB";
+    case Encoding::AMR_NB:
+      return "AMR_NB";
+    case Encoding::OPUS:
+      return "OPUS";
+    default:
+      throw std::runtime_error("Internal Error: unexpected encoding.");
   }
 }
 
@@ -93,6 +93,6 @@ BitDepth from_option(const c10::optional<int64_t>& bit_depth) {
   stream << "Internal Error: unexpected bit depth value: " << v;
   throw std::runtime_error(stream.str());
 }
-  
+
 } // namespace sox_utils
 } // namespace torchaudio
