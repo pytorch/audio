@@ -1,7 +1,6 @@
 import os
-import warnings
 from pathlib import Path
-from typing import Any, Tuple, Optional, Union
+from typing import Tuple, Optional, Union
 
 import torchaudio
 from torch import Tensor

@@ -63,7 +63,7 @@ class WSJ0Mix(Dataset):
     def __getitem__(self, key: int) -> SampleType:
         """Load the n-th sample from the dataset.
         Args:
-            n (int): The index of the sample to be loaded
+            key (int): The index of the sample to be loaded
         Returns:
             tuple: ``(sample_rate, mix_waveform, list_of_source_waveforms)``
         """

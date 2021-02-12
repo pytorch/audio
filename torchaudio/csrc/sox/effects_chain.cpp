@@ -68,21 +68,43 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   // Ensure that it's a multiple of the number of channels
   *osamp -= *osamp % num_channels;
 
-  // Slice the input Tensor and unnormalize the values
+  // Slice the input Tensor
   const auto tensor_ = [&]() {
     auto i_frame = index / num_channels;
     auto num_frames = *osamp / num_channels;
     auto t = (priv->channels_first)
         ? tensor.index({Slice(), Slice(i_frame, i_frame + num_frames)}).t()
         : tensor.index({Slice(i_frame, i_frame + num_frames), Slice()});
-    return unnormalize_wav(t.reshape({-1})).contiguous();
+    return t.reshape({-1}).contiguous();
   }();
+
+  // Convert to sox_sample_t (int32_t) and write to buffer
+  SOX_SAMPLE_LOCALS;
+  const auto dtype = tensor_.dtype();
+  if (dtype == torch::kFloat32) {
+    auto ptr = tensor_.data_ptr<float_t>();
+    for (size_t i = 0; i < *osamp; ++i) {
+      obuf[i] = SOX_FLOAT_32BIT_TO_SAMPLE(ptr[i], effp->clips);
+    }
+  } else if (dtype == torch::kInt32) {
+    auto ptr = tensor_.data_ptr<int32_t>();
+    for (size_t i = 0; i < *osamp; ++i) {
+      obuf[i] = SOX_SIGNED_32BIT_TO_SAMPLE(ptr[i], effp->clips);
+    }
+  } else if (dtype == torch::kInt16) {
+    auto ptr = tensor_.data_ptr<int16_t>();
+    for (size_t i = 0; i < *osamp; ++i) {
+      obuf[i] = SOX_SIGNED_16BIT_TO_SAMPLE(ptr[i], effp->clips);
+    }
+  } else if (dtype == torch::kUInt8) {
+    auto ptr = tensor_.data_ptr<uint8_t>();
+    for (size_t i = 0; i < *osamp; ++i) {
+      obuf[i] = SOX_UNSIGNED_8BIT_TO_SAMPLE(ptr[i], effp->clips);
+    }
+  } else {
+    throw std::runtime_error("Unexpected dtype.");
+  }
   priv->index += *osamp;
-
-  // Write data to SoxEffectsChain buffer.
-  auto ptr = tensor_.data_ptr<int32_t>();
-  std::copy(ptr, ptr + *osamp, obuf);
-
   return (priv->index == num_samples) ? SOX_EOF : SOX_SUCCESS;
 }
 
@@ -430,7 +452,7 @@ int fileobj_output_flow(
     fflush(fp);
 
     // Copy the encoded chunk to python object.
-    fileobj->attr("write")(py::bytes(*buffer, *buffer_size));
+    fileobj->attr("write")(py::bytes(*buffer, ftell(fp)));
 
     // Reset FILE*
     sf->tell_off = 0;

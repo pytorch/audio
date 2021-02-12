@@ -793,7 +793,7 @@ def _get_sinc_resample_kernel(orig_freq: int, new_freq: int, lowpass_filter_widt
         t = t.clamp_(-lowpass_filter_width, lowpass_filter_width)
         t *= math.pi
         # we do not use torch.hann_window here as we need to evaluate the window
-        # at spectifics positions, not over a regular grid.
+        # at specific positions, not over a regular grid.
         window = torch.cos(t / lowpass_filter_width / 2)**2
         kernel = torch.where(t == 0, torch.tensor(1.).to(t), torch.sin(t) / t)
         kernel.mul_(window)

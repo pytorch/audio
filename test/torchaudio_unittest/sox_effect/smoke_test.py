@@ -10,7 +10,6 @@ from torchaudio_unittest.common_utils import (
     save_wav,
 )
 from .common import (
-    name_func,
     load_params,
 )
 

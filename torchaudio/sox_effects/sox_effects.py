@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 from typing import List, Tuple, Optional
 
 import torch
@@ -174,14 +173,16 @@ def apply_effects_file(
     Args:
         path (path-like object or file-like object):
             Source of audio data. When the function is not compiled by TorchScript,
-            (e.g. ``torch.jit.script``), the following types are accepted;
+            (e.g. ``torch.jit.script``), the following types are accepted:
+
                   * ``path-like``: file path
                   * ``file-like``: Object with ``read(size: int) -> bytes`` method,
                     which returns byte string of at most ``size`` length.
+
             When the function is compiled by TorchScript, only ``str`` type is allowed.
-            Note:
-                * This argument is intentionally annotated as ``str`` only for
-                  TorchScript compiler compatibility.
+
+            Note: This argument is intentionally annotated as ``str`` only for
+            TorchScript compiler compatibility.
         effects (List[List[str]]): List of effects.
         normalize (bool):
             When ``True``, this function always return ``float32``, and sample values are

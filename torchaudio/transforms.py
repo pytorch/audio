@@ -2,7 +2,6 @@
 
 import math
 from typing import Callable, Optional
-from warnings import warn
 
 import torch
 from torch import Tensor
@@ -72,7 +71,7 @@ class Spectrogram(torch.nn.Module):
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
-        # number of frequecies due to onesided=True in torch.stft
+        # number of frequencies due to onesided=True in torch.stft
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
@@ -548,8 +547,8 @@ class MFCC(torch.nn.Module):
         else:
             mel_specgram = self.amplitude_to_DB(mel_specgram)
 
-        # (..., channel, n_mels, time).tranpose(...) dot (n_mels, n_mfcc)
-        # -> (..., channel, time, n_mfcc).tranpose(...)
+        # (..., channel, n_mels, time).transpose(...) dot (n_mels, n_mfcc)
+        # -> (..., channel, time, n_mfcc).transpose(...)
         mfcc = torch.matmul(mel_specgram.transpose(-2, -1), self.dct_mat).transpose(-2, -1)
         return mfcc
 
