@@ -320,7 +320,7 @@ class SaveTest(SaveTestBase):
     def test_save_multi_channels(self, num_channels):
         """`sox_io_backend.save` can save audio with many channels"""
         self.assert_save_consistency(
-            "wav", encoding="PCM_U", bits_per_sample=16,
+            "wav", encoding="PCM_S", bits_per_sample=16,
             num_channels=num_channels)
 
 

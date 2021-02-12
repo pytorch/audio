@@ -4,14 +4,27 @@
 #include <torch/script.h>
 
 namespace torchaudio {
-namespace sox {
+namespace sox_utils {
 
+enum class Format {
+  WAV,
+  MP3,
+  FLAC,
+  VORBIS,
+  AMR_NB,
+  AMR_WB,
+  AMB,
+  SPHERE,
+};
+
+Format from_string(const std::string& format);
+  
 enum class Encoding {
   NOT_PROVIDED,
   UNKNOWN,
-  PCM_S,
-  PCM_U,
-  PCM_F,
+  PCM_SIGNED,
+  PCM_UNSIGNED,
+  PCM_FLOAT,
   FLAC,
   ULAW,
   ALAW,
@@ -23,9 +36,20 @@ enum class Encoding {
 };
 
 std::string to_string(Encoding v);
-Encoding from_string(const c10::optional<std::string>& encoding);
+Encoding from_option(const c10::optional<std::string>& encoding);
 
-} // namespace sox
+enum class BitDepth : unsigned {
+  NOT_PROVIDED = 0,
+  B8 = 8,
+  B16 = 16,
+  B24 = 24,
+  B32 = 32,
+  B64 = 64,
+};
+
+BitDepth from_option(const c10::optional<int64_t>& bit_depth);
+  
+} // namespace sox_utils
 } // namespace torchaudio
 
 #endif

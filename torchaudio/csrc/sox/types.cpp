@@ -1,17 +1,39 @@
 #include <torchaudio/csrc/sox/types.h>
 
 namespace torchaudio {
-namespace sox {
+namespace sox_utils {
 
+Format from_string(const std::string& format) {
+  if (format == "wav")
+    return Format::WAV;
+  if (format == "mp3")
+    return Format::MP3;
+  if (format == "flac")
+    return Format::FLAC;
+  if (format == "ogg" || format == "vorbis")
+    return Format::VORBIS;
+  if (format == "amr-nb")
+    return Format::AMR_NB;
+  if (format == "amr-wb")
+    return Format::AMR_WB;
+  if (format == "amb")
+    return Format::AMB;
+  if (format == "sph")
+    return Format::SPHERE;
+  std::ostringstream stream;
+  stream << "Internal Error: unexpected format value: " << format;
+  throw std::runtime_error(stream.str());
+}
+  
 std::string to_string(Encoding v) {
   switch(v) {
   case Encoding::UNKNOWN:
     return "UNKNOWN";
-  case Encoding::PCM_S:
+  case Encoding::PCM_SIGNED:
     return "PCM_S";
-  case Encoding::PCM_U:
+  case Encoding::PCM_UNSIGNED:
     return "PCM_U";
-  case Encoding::PCM_F:
+  case Encoding::PCM_FLOAT:
     return "PCM_F";
   case Encoding::FLAC:
     return "FLAC";
@@ -34,16 +56,16 @@ std::string to_string(Encoding v) {
   }
 }
 
-Encoding from_string(const c10::optional<std::string>& encoding) {
+Encoding from_option(const c10::optional<std::string>& encoding) {
   if (!encoding.has_value())
     return Encoding::NOT_PROVIDED;
-  std::string v = encoding.get();
+  std::string v = encoding.value();
   if (v == "PCM_S")
-    return Encoding::PCM_S;
+    return Encoding::PCM_SIGNED;
   if (v == "PCM_U")
-    return Encoding::PCM_U;
+    return Encoding::PCM_UNSIGNED;
   if (v == "PCM_F")
-    return Encoding::PCM_F;
+    return Encoding::PCM_FLOAT;
   if (v == "ULAW")
     return Encoding::ULAW;
   if (v == "ALAW")
@@ -53,5 +75,24 @@ Encoding from_string(const c10::optional<std::string>& encoding) {
   throw std::runtime_error(stream.str());
 }
 
-} // namespace sox
+BitDepth from_option(const c10::optional<int64_t>& bit_depth) {
+  if (!bit_depth.has_value())
+    return BitDepth::NOT_PROVIDED;
+  int64_t v = bit_depth.value();
+  if (v == 8)
+    return BitDepth::B8;
+  if (v == 16)
+    return BitDepth::B16;
+  if (v == 24)
+    return BitDepth::B24;
+  if (v == 32)
+    return BitDepth::B32;
+  if (v == 64)
+    return BitDepth::B64;
+  std::ostringstream stream;
+  stream << "Internal Error: unexpected bit depth value: " << v;
+  throw std::runtime_error(stream.str());
+}
+  
+} // namespace sox_utils
 } // namespace torchaudio
