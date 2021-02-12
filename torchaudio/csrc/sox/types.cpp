@@ -79,7 +79,7 @@ BitDepth get_bit_depth_from_option(const c10::optional<int64_t>& bit_depth) {
   if (!bit_depth.has_value())
     return BitDepth::NOT_PROVIDED;
   int64_t v = bit_depth.value();
-  switch(v) {
+  switch (v) {
     case 8:
       return BitDepth::B8;
     case 16:
