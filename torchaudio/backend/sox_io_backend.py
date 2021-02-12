@@ -164,49 +164,6 @@ def save(
 ):
     """Save audio data to file.
 
-    Supported formats/encodings/bit depths/compression are;
-
-    ``"wav"``, ``"amb"``
-        - 32-bit floating-point PCM
-        - 32-bit signed integer PCM
-        - 24-bit signed integer PCM
-        - 16-bit signed integer PCM
-        - 8-bit unsigned integer PCM
-        - 8-bit mu-law
-        - 8-bit a-law
-
-    ``"mp3"``
-        Fixed bit rate (such as 128kHz) and variable bit rate compression.
-        Default: VBR with high quality.
-
-    ``"flac"``
-        - 8-bit
-        - 16-bit
-        - 24-bit (default)
-
-    ``"ogg"``, ``"vorbis"``
-        - Different quality level. Default: approx. 112kbps
-
-    ``"sph"``
-        - 8-bit signed integer PCM
-        - 16-bit signed integer PCM
-        - 24-bit signed integer PCM
-        - 32-bit signed integer PCM
-        - 8-bit mu-law
-        - 8-bit a-law
-        - 16-bit a-law
-        - 24-bit a-law
-        - 32-bit a-law
-
-    ``"amr-nb"``
-        Bitrate ranging from 4.75 kbit/s to 12.2 kbit/s. Default: 4.75 kbit/s
-
-    Note:
-        To save into formats that ``libsox`` does not handle natively, (such as ``"mp3"``,
-        ``"flac"``, ``"ogg"`` and ``"vorbis"``), your installation of ``torchaudio`` has
-        to be linked to ``libsox`` and corresponding codec libraries such as ``libmad``
-        or ``libmp3lame`` etc.
-
     Args:
         filepath (str or pathlib.Path): Path to save file.
             This function also handles ``pathlib.Path`` objects, but is annotated
@@ -252,14 +209,17 @@ def save(
                 If not provided, the default value is picked based on ``format`` and ``bits_per_sample``.
 
                 ``"wav"``, ``"amb"``
+                    - | If both ``encoding`` and ``bits_per_sample`` are not provided, the ``dtype`` of the
+                      | Tensor is used to determine the default value.
+                        - ``"PCM_U"`` if dtype is ``uint8``
+                        - ``"PCM_S"`` if dtype is ``int16`` or ``int32`
+                        - ``"PCM_F"`` if dtype is ``float32``
+
                     - ``"PCM_U"`` if ``bits_per_sample=8``
                     - ``"PCM_S"`` otherwise
 
                 ``"sph"`` format;
-                    -  the default value is ``"PCM_S"``
-
-            Different formats support different set of encodings. Providing a value that is not
-            supported by the format will not cause an error, but will fallback to its default value.
+                    - the default value is ``"PCM_S"``
 
         bits_per_sample (int, optional): Changes the bit depth for the supported formats.
             When ``format`` is one of ``"wav"``, ``"flac"``, ``"sph"``, or ``"amb"``, you can change the
@@ -268,9 +228,15 @@ def save(
             Default Value;
                 If not provided, the default values are picked based on ``format`` and ``"encoding"``;
 
-                ``"wav"`` format;
+                ``"wav"``, ``"amb"``;
+                    - | If both ``encoding`` and ``bits_per_sample`` are not provided, the ``dtype`` of the
+                      | Tensor is used.
+                        - ``8`` if dtype is ``uint8``
+                        - ``16`` if dtype is ``int16``
+                        - ``32`` if dtype is  ``int32`` or ``float32``
+
                     - ``8`` if ``encoding`` is ``"PCM_U"``, ``"ULAW"`` or ``"ALAW"``
-                    - ``16`` if ``encoding`` is ``"PCM_S"`` or not provided.
+                    - ``16`` if ``encoding`` is ``"PCM_S"``
                     - ``32`` if ``encoding`` is ``"PCM_F"``
 
                 ``"flac"`` format;
@@ -285,8 +251,50 @@ def save(
                     - ``16`` if ``encoding`` is ``"PCM_S"`` or not provided.
                     - ``32`` if ``encoding`` is ``"PCM_F"``
 
-            Different formats support different set of encodings. Providing a value that is not
-            supported by the format will not cause an error, but will fallback to its default value.
+    Supported formats/encodings/bit depth/compression are;
+
+    ``"wav"``, ``"amb"``
+        - 32-bit floating-point PCM
+        - 32-bit signed integer PCM
+        - 24-bit signed integer PCM
+        - 16-bit signed integer PCM
+        - 8-bit unsigned integer PCM
+        - 8-bit mu-law
+        - 8-bit a-law
+
+        Note: Default encoding/bit depth is determined by the dtype of the input Tensor.
+
+    ``"mp3"``
+        Fixed bit rate (such as 128kHz) and variable bit rate compression.
+        Default: VBR with high quality.
+
+    ``"flac"``
+        - 8-bit
+        - 16-bit
+        - 24-bit (default)
+
+    ``"ogg"``, ``"vorbis"``
+        - Different quality level. Default: approx. 112kbps
+
+    ``"sph"``
+        - 8-bit signed integer PCM
+        - 16-bit signed integer PCM
+        - 24-bit signed integer PCM
+        - 32-bit signed integer PCM (default)
+        - 8-bit mu-law
+        - 8-bit a-law
+        - 16-bit a-law
+        - 24-bit a-law
+        - 32-bit a-law
+
+    ``"amr-nb"``
+        Bitrate ranging from 4.75 kbit/s to 12.2 kbit/s. Default: 4.75 kbit/s
+
+    Note:
+        To save into formats that ``libsox`` does not handle natively, (such as ``"mp3"``,
+        ``"flac"``, ``"ogg"`` and ``"vorbis"``), your installation of ``torchaudio`` has
+        to be linked to ``libsox`` and corresponding codec libraries such as ``libmad``
+        or ``libmp3lame`` etc.
     """
     if not torch.jit.is_scripting():
         if hasattr(filepath, 'write'):
