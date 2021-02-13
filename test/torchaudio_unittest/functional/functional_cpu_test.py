@@ -233,10 +233,13 @@ class TestApplyCodec(TorchaudioTestCase):
         sample_rate = 8000
         num_frames = 3 * sample_rate
         num_channels = 2
+
         waveform = torch.rand(num_channels, num_frames)
-        augmented = F.apply_codec(waveform=waveform, sample_rate=sample_rate,
-                                  format=format, compression=compression,
-                                  channels_first=True)
+        augmented = F.apply_codec(waveform,
+                                  sample_rate,
+                                  format,
+                                  compression,
+                                  True)
         assert augmented.dtype == waveform.dtype
         assert augmented.shape[0] == num_channels
         if check_num_frames:
@@ -245,20 +248,17 @@ class TestApplyCodec(TorchaudioTestCase):
     def test_wave(self):
         self._smoke_test("wav", compression=None, check_num_frames=True)
 
-    @parameterized.expand(list(itertools.product(
-        [96, 128, 160, 192, 224, 256, 320],
-    )), name_func=name_func)
+    @parameterized.expand([(96,), (128,), (160,), (192,), (224,), (256,), (320,)],
+                          name_func=name_func)
     def test_mp3(self, compression):
         self._smoke_test("mp3", compression, check_num_frames=False)
 
-    @parameterized.expand(list(itertools.product(
-        list(range(9)),
-    )), name_func=name_func)
+    @parameterized.expand([(0,), (1,), (2,), (3,), (4,), (5,), (6,), (7,), (8,)],
+                          name_func=name_func)
     def test_flac(self, compression):
         self._smoke_test("flac", compression, check_num_frames=False)
 
-    @parameterized.expand(list(itertools.product(
-        [-1, 0, 1, 2, 3, 3.6, 5, 10],
-    )), name_func=name_func)
+    @parameterized.expand([(-1,), (0,), (1,), (2,), (3,), (3.6,), (5,), (10,)],
+                          name_func=name_func)
     def test_vorbis(self, compression):
         self._smoke_test("vorbis", compression, check_num_frames=False)
