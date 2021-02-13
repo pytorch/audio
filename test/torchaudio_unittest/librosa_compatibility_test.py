@@ -215,15 +215,11 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(
             power_to_db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3, rtol=1e-5)
 
-    def assert_compatibilities_mfcc(self, n_fft, hop_length, n_mfcc, norm, sound, sample_rate, sound_librosa):
+    def assert_compatibilities_mfcc(self, n_fft, hop_length, n_mels, n_mfcc, sound, sample_rate, sound_librosa):
         librosa_mel = librosa.feature.melspectrogram(
             y=sound_librosa, sr=sample_rate, n_fft=n_fft,
-            hop_length=hop_length, n_mels=n_mels, htk=True, norm=norm)
+            hop_length=hop_length, n_mels=n_mels, htk=True, norm=None)
         db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
-
-        melkwargs = {'hop_length': hop_length, 'n_fft': n_fft}
-        mfcc_transform = torchaudio.transforms.MFCC(
-            sample_rate=sample_rate, n_mfcc=n_mfcc, norm='ortho', melkwargs=melkwargs)
 
         # librosa.feature.mfcc doesn't pass kwargs properly since some of the
         # kwargs for melspectrogram and mfcc are the same. We just follow the
@@ -237,6 +233,10 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
         librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm='ortho')[:n_mfcc]
         librosa_mfcc_tensor = torch.from_numpy(librosa_mfcc)
+
+        melkwargs = {'hop_length': hop_length, 'n_fft': n_fft}
+        mfcc_transform = torchaudio.transforms.MFCC(
+            sample_rate=sample_rate, n_mfcc=n_mfcc, norm='ortho', melkwargs=melkwargs)
         torch_mfcc = mfcc_transform(sound).squeeze().cpu()
 
         self.assertEqual(
@@ -319,7 +319,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
             # restrict to unique parameter combinations
             params_list_unique = [dict(uniq) for uniq in set(tuple(sorted(d.items())) for d in params_list_restricted)]
             for params in params_list_unique:
-                with self.subTest(msg=test_name, **params):
+                with self.subTest(test=test_name, **params):
                     if params.get('skip_CI') and 'CI' in os.environ:
                         self.skipTest('Test is known to fail on CI')
                     test_fn(**params, **data_dict_restricted)
