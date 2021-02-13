@@ -186,8 +186,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(
             torch_mel.type(librosa_mel_tensor.dtype), librosa_mel_tensor, atol=5e-3, rtol=1e-5)
 
-    def assert_compatibilities_s2db(self, n_fft, hop_length, power, n_mels, norm,
-                                              sound, sample_rate, sound_librosa):
+    def assert_compatibilities_s2db(self, n_fft, hop_length, power, n_mels, norm, sound, sample_rate, sound_librosa):
         spect_transform = torchaudio.transforms.Spectrogram(
             n_fft=n_fft, hop_length=hop_length, power=power)
         out_librosa, _ = librosa.core.spectrum._spectrogram(
@@ -317,7 +316,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
             ]
             data_dict_restricted = {k: v for k, v in data_dict.items() if k in varnames}
             # restrict to unique parameter combinations
-            params_list_unique = [dict(uniq) for uniq in set(tuple(sorted(d.items())) for d in params_list_restricted)]
+            params_list_unique = [dict(uniq) for uniq in {tuple(sorted(d.items())) for d in params_list_restricted}]
             for params in params_list_unique:
                 with self.subTest(test=test_name, **params):
                     if params.get('skip_CI') and 'CI' in os.environ:
