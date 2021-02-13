@@ -1115,6 +1115,23 @@
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">_lfilter_core_generic_loop</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">a_coeffs_flipped</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">padded_output_waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
+    <span class="n">n_order</span> <span class="o">=</span> <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i_sample</span><span class="p">,</span> <span class="n">o0</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="o">.</span><span class="n">t</span><span class="p">()):</span>
+        <span class="n">windowed_output_signal</span> <span class="o">=</span> <span class="n">padded_output_waveform</span><span class="p">[</span>
+            <span class="p">:,</span> <span class="n">i_sample</span><span class="p">:</span><span class="n">i_sample</span> <span class="o">+</span> <span class="n">n_order</span>
+        <span class="p">]</span>
+        <span class="n">o0</span><span class="o">.</span><span class="n">addmv_</span><span class="p">(</span><span class="n">windowed_output_signal</span><span class="p">,</span> <span class="n">a_coeffs_flipped</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="n">i_sample</span> <span class="o">+</span> <span class="n">n_order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">o0</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">_lfilter_core_cpu_loop</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_lfilter_core_loop</span>
+<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;No such operator torchaudio::_lfilter_core_loop&#39;</span>
+    <span class="n">_lfilter_core_cpu_loop</span> <span class="o">=</span> <span class="n">_lfilter_core_generic_loop</span>
+
+
 <div class="viewcode-block" id="lfilter"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.lfilter">[docs]</a><span class="k">def</span> <span class="nf">lfilter</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">a_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -1184,12 +1201,13 @@
 
     <span class="n">input_signal_windows</span><span class="o">.</span><span class="n">div_</span><span class="p">(</span><span class="n">a_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">div_</span><span class="p">(</span><span class="n">a_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="k">for</span> <span class="n">i_sample</span><span class="p">,</span> <span class="n">o0</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="o">.</span><span class="n">t</span><span class="p">()):</span>
-        <span class="n">windowed_output_signal</span> <span class="o">=</span> <span class="n">padded_output_waveform</span><span class="p">[</span>
-            <span class="p">:,</span> <span class="n">i_sample</span><span class="p">:</span><span class="n">i_sample</span> <span class="o">+</span> <span class="n">n_order</span>
-        <span class="p">]</span>
-        <span class="n">o0</span><span class="o">.</span><span class="n">addmv_</span><span class="p">(</span><span class="n">windowed_output_signal</span><span class="p">,</span> <span class="n">a_coeffs_flipped</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="n">i_sample</span> <span class="o">+</span> <span class="n">n_order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">o0</span>
+
+    <span class="k">if</span> <span class="n">input_signal_windows</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span> <span class="ow">and</span>\
+       <span class="n">a_coeffs_flipped</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span> <span class="ow">and</span>\
+       <span class="n">padded_output_waveform</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
+        <span class="n">_lfilter_core_cpu_loop</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="p">,</span> <span class="n">a_coeffs_flipped</span><span class="p">,</span> <span class="n">padded_output_waveform</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_lfilter_core_generic_loop</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="p">,</span> <span class="n">a_coeffs_flipped</span><span class="p">,</span> <span class="n">padded_output_waveform</span><span class="p">)</span>
 
     <span class="n">output</span> <span class="o">=</span> <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="n">n_order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:]</span>
 
