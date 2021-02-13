@@ -116,35 +116,27 @@ void save_audio_file(
     torch::Tensor tensor,
     int64_t sample_rate,
     bool channels_first,
-    c10::optional<double> compression,
-    c10::optional<std::string> format,
-    c10::optional<std::string> dtype) {
+    c10::optional<double>& compression,
+    c10::optional<std::string>& format,
+    c10::optional<std::string>& encoding,
+    c10::optional<int64_t>& bits_per_sample) {
   validate_input_tensor(tensor);
-
-  if (tensor.dtype() != torch::kFloat32 && dtype.has_value()) {
-    throw std::runtime_error(
-        "dtype conversion only supported for float32 tensors");
-  }
-  const auto tgt_dtype =
-      (tensor.dtype() == torch::kFloat32 && dtype.has_value())
-      ? get_dtype_from_str(dtype.value())
-      : tensor.dtype();
 
   const auto filetype = [&]() {
     if (format.has_value())
       return format.value();
     return get_filetype(path);
   }();
+
   if (filetype == "amr-nb") {
     const auto num_channels = tensor.size(channels_first ? 0 : 1);
     TORCH_CHECK(
         num_channels == 1, "amr-nb format only supports single channel audio.");
-    tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
   const auto signal_info =
       get_signalinfo(&tensor, sample_rate, filetype, channels_first);
-  const auto encoding_info =
-      get_encodinginfo_for_save(filetype, tgt_dtype, compression);
+  const auto encoding_info = get_encodinginfo_for_save(
+      filetype, tensor.dtype(), compression, encoding, bits_per_sample);
 
   SoxFormat sf(sox_open_write(
       path.c_str(),
@@ -258,19 +250,17 @@ void save_audio_fileobj(
     torch::Tensor tensor,
     int64_t sample_rate,
     bool channels_first,
-    c10::optional<double> compression,
-    std::string filetype,
-    c10::optional<std::string> dtype) {
+    c10::optional<double>& compression,
+    c10::optional<std::string>& format,
+    c10::optional<std::string>& encoding,
+    c10::optional<int64_t>& bits_per_sample) {
   validate_input_tensor(tensor);
 
-  if (tensor.dtype() != torch::kFloat32 && dtype.has_value()) {
+  if (!format.has_value()) {
     throw std::runtime_error(
-        "dtype conversion only supported for float32 tensors");
+        "`format` is required when saving to file object.");
   }
-  const auto tgt_dtype =
-      (tensor.dtype() == torch::kFloat32 && dtype.has_value())
-      ? get_dtype_from_str(dtype.value())
-      : tensor.dtype();
+  const auto filetype = format.value();
 
   if (filetype == "amr-nb") {
     const auto num_channels = tensor.size(channels_first ? 0 : 1);
@@ -278,12 +268,11 @@ void save_audio_fileobj(
       throw std::runtime_error(
           "amr-nb format only supports single channel audio.");
     }
-    tensor = (unnormalize_wav(tensor) / 65536).to(torch::kInt16);
   }
   const auto signal_info =
       get_signalinfo(&tensor, sample_rate, filetype, channels_first);
-  const auto encoding_info =
-      get_encodinginfo_for_save(filetype, tgt_dtype, compression);
+  const auto encoding_info = get_encodinginfo_for_save(
+      filetype, tensor.dtype(), compression, encoding, bits_per_sample);
 
   AutoReleaseBuffer buffer;
 
