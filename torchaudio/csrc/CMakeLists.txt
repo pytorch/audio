@@ -10,6 +10,7 @@ set(
   sox/effects.cpp
   sox/effects_chain.cpp
   sox/types.cpp
+  lfilter.cpp
   )
 
 if(BUILD_TRANSDUCER)
