@@ -296,6 +296,10 @@ class TestTransforms(common_utils.TorchaudioTestCase):
             for params in params_list
             for norm in [None, 'slaney']
         ]
+        params_list_skipped = [
+            params for params in params_list
+            if not (params.get('skip_CI') and 'CI' in os.environ)
+        ]
 
         common_utils.set_audio_backend('default')
         path = common_utils.get_asset_path('sinewave.wav')
@@ -312,15 +316,13 @@ class TestTransforms(common_utils.TorchaudioTestCase):
             varnames = test_fn.__code__.co_varnames
             params_list_restricted = [
                 {k: v for k, v in params.items() if k in varnames}
-                for params in params_list
+                for params in params_list_skipped
             ]
             data_dict_restricted = {k: v for k, v in data_dict.items() if k in varnames}
             # restrict to unique parameter combinations
             params_list_unique = [dict(uniq) for uniq in {tuple(sorted(d.items())) for d in params_list_restricted}]
             for params in params_list_unique:
-                with self.subTest(test=test_name, **params):
-                    if params.get('skip_CI') and 'CI' in os.environ:
-                        self.skipTest('Test is known to fail on CI')
+                with self.subTest(msg=test_name, **params):
                     test_fn(**params, **data_dict_restricted)
 
     def test_MelScale(self):
