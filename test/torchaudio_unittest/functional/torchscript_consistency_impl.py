@@ -7,7 +7,6 @@ import torchaudio.functional as F
 from torchaudio_unittest import common_utils
 
 
-
 class Functional(common_utils.TestBaseMixin):
     """Implements test for `functinoal` modul that are performed for different devices"""
     def _assert_consistency(self, func, tensor, shape_only=False):
@@ -548,23 +547,6 @@ class Functional(common_utils.TestBaseMixin):
 
         tensor = common_utils.get_whitenoise(sample_rate=44100)
         self._assert_consistency(func, tensor)
-
-    def test_apply_codec(self):
-
-        def func(tensor):
-            sample_rate = 8000
-            format = "wav"
-            compression = None
-            channels_first = True
-            return F.apply_codec(tensor,
-                                 sample_rate,
-                                 format,
-                                 compression,
-                                 channels_first)
-
-        waveform = common_utils.get_whitenoise(sample_rate=8000)
-        self._assert_consistency(func, waveform)
-
 
     @common_utils.skipIfNoExtension
     def test_compute_kaldi_pitch(self):
