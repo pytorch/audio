@@ -7,7 +7,7 @@ import torch
 import torchaudio
 import torchaudio.functional as F
 from torchaudio._internal.module_utils import is_module_available
-from parameterized import parameterized
+from parameterized import parameterized, param
 import itertools
 
 LIBROSA_AVAILABLE = is_module_available('librosa')
@@ -165,7 +165,23 @@ def _load_audio_asset(*asset_paths, **kwargs):
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
 class TestTransforms(common_utils.TorchaudioTestCase):
     """Test suite for functions in `transforms` module."""
-    def assert_compatibilities_core(self, n_fft, hop_length, power, sound, sound_librosa):
+
+    @staticmethod
+    def _set_up_sound():
+        common_utils.set_audio_backend('default')
+        path = common_utils.get_asset_path('sinewave.wav')
+        sound, sample_rate = common_utils.load_wav(path)
+        sound_librosa = sound.cpu().numpy().squeeze()  # (64000)
+        return sound, sample_rate, sound_librosa
+
+    @parameterized.expand([
+        param(n_fft=400, hop_length=200, power=2.0),
+        param(n_fft=600, hop_length=100, power=2.0),
+        param(n_fft=400, hop_length=200, power=3.0),
+        param(n_fft=200, hop_length=50,  power=2.0),
+    ])
+    def test_spectrogram(self, n_fft, hop_length, power):
+        sound, sample_rate, sound_librosa = self._set_up_sound()
         spect_transform = torchaudio.transforms.Spectrogram(
             n_fft=n_fft, hop_length=hop_length, power=power)
         out_librosa, _ = librosa.core.spectrum._spectrogram(
@@ -174,7 +190,17 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         out_torch = spect_transform(sound).squeeze().cpu()
         self.assertEqual(out_torch, torch.from_numpy(out_librosa), atol=1e-5, rtol=1e-5)
 
-    def assert_compatibilities_mel_spectogram(self, n_fft, hop_length, n_mels, norm, sound, sample_rate, sound_librosa):
+    @parameterized.expand([
+        p._replace(kwargs={'norm': norm, **p.kwargs})
+        for p in [
+            param(n_fft=400, hop_length=200, n_mels=128),
+            param(n_fft=600, hop_length=100, n_mels=128),
+            param(n_fft=200, hop_length=50, n_mels=128),
+        ]
+        for norm in [None, 'slaney']
+    ])
+    def test_mel_spectrogram(self, n_fft, hop_length, n_mels, norm):
+        sound, sample_rate, sound_librosa = self._set_up_sound()
         melspect_transform = torchaudio.transforms.MelSpectrogram(
             sample_rate=sample_rate, window_fn=torch.hann_window,
             hop_length=hop_length, n_mels=n_mels, n_fft=n_fft, norm=norm)
@@ -186,7 +212,18 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(
             torch_mel.type(librosa_mel_tensor.dtype), librosa_mel_tensor, atol=5e-3, rtol=1e-5)
 
-    def assert_compatibilities_s2db(self, n_fft, hop_length, power, n_mels, norm, sound, sample_rate, sound_librosa):
+    @parameterized.expand([
+        p._replace(kwargs={'norm': norm, **p.kwargs})
+        for p in [
+            param(n_fft=400, hop_length=200, power=2.0, n_mels=128),
+            param(n_fft=600, hop_length=100, power=2.0, n_mels=128),
+            param(n_fft=400, hop_length=200, power=3.0, n_mels=128),
+            param(n_fft=200, hop_length=50,  power=2.0, n_mels=128),
+        ]
+        for norm in [None, 'slaney']
+    ])
+    def test_s2db(self, n_fft, hop_length, power, n_mels, norm):
+        sound, sample_rate, sound_librosa = self._set_up_sound()
         spect_transform = torchaudio.transforms.Spectrogram(
             n_fft=n_fft, hop_length=hop_length, power=power)
         out_librosa, _ = librosa.core.spectrum._spectrogram(
@@ -214,7 +251,15 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(
             power_to_db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3, rtol=1e-5)
 
-    def assert_compatibilities_mfcc(self, n_fft, hop_length, n_mels, n_mfcc, sound, sample_rate, sound_librosa):
+    @parameterized.expand([
+        param(n_fft=400, hop_length=200, n_mels=128, n_mfcc=40),
+        param(n_fft=600, hop_length=100, n_mels=128, n_mfcc=20),
+    ] + ([] if 'CI' in os.environ else [
+        # NOTE: Test passes offline, but fails on TravisCI (and CircleCI), see #372.
+        param(n_fft=200, hop_length=50,  n_mels=128, n_mfcc=50),
+    ]))
+    def test_mfcc(self, n_fft, hop_length, n_mels, n_mfcc):
+        sound, sample_rate, sound_librosa = self._set_up_sound()
         librosa_mel = librosa.feature.melspectrogram(
             y=sound_librosa, sr=sample_rate, n_fft=n_fft,
             hop_length=hop_length, n_mels=n_mels, htk=True, norm=None)
@@ -241,7 +286,13 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(
             torch_mfcc.type(librosa_mfcc_tensor.dtype), librosa_mfcc_tensor, atol=5e-3, rtol=1e-5)
 
-    def assert_compatibilities_spectral_centroid(self, sample_rate, n_fft, hop_length, sound, sound_librosa):
+    @parameterized.expand([
+        param(n_fft=400, hop_length=200),
+        param(n_fft=600, hop_length=100),
+        param(n_fft=200, hop_length=50),
+    ])
+    def test_spectral_centroid(self, n_fft, hop_length):
+        sound, sample_rate, sound_librosa = self._set_up_sound()
         spect_centroid = torchaudio.transforms.SpectralCentroid(
             sample_rate=sample_rate, n_fft=n_fft, hop_length=hop_length)
         out_torch = spect_centroid(sound).squeeze().cpu()
@@ -251,79 +302,6 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         out_librosa = torch.from_numpy(out_librosa)[0]
 
         self.assertEqual(out_torch.type(out_librosa.dtype), out_librosa, atol=1e-5, rtol=1e-5)
-
-    def test_basic_compatibilities(self):
-        compat_tests = {
-            'assert_compatibilities_core': self.assert_compatibilities_core,
-            'assert_compatibilities_mel_spectogram': self.assert_compatibilities_mel_spectogram,
-            'assert_compatibilities_s2db': self.assert_compatibilities_s2db,
-            'assert_compatibilities_mfcc': self.assert_compatibilities_mfcc,
-            'assert_compatibilities_spectral_centroid': self.assert_compatibilities_spectral_centroid,
-        }
-        params_list = [
-            {
-                'n_fft': 400,
-                'hop_length': 200,
-                'power': 2.0,
-                'n_mels': 128,
-                'n_mfcc': 40,
-            },
-            {
-                'n_fft': 600,
-                'hop_length': 100,
-                'power': 2.0,
-                'n_mels': 128,
-                'n_mfcc': 20,
-            },
-            {
-                'n_fft': 400,
-                'hop_length': 200,
-                'power': 3.0,
-                'n_mels': 128,
-                'n_mfcc': 40,
-            },
-            {
-                'n_fft': 200,
-                'hop_length': 50,
-                'power': 2.0,
-                'n_mels': 128,
-                'n_mfcc': 50,
-                'skip_CI': True,  # NOTE: Test passes offline, but fails on TravisCI (and CircleCI), see #372.
-            },
-        ]
-        params_list = [
-            {'norm': norm, **params}
-            for params in params_list
-            for norm in [None, 'slaney']
-        ]
-        params_list_skipped = [
-            params for params in params_list
-            if not (params.get('skip_CI') and 'CI' in os.environ)
-        ]
-
-        common_utils.set_audio_backend('default')
-        path = common_utils.get_asset_path('sinewave.wav')
-        sound, sample_rate = common_utils.load_wav(path)
-        sound_librosa = sound.cpu().numpy().squeeze()  # (64000)
-        data_dict = {
-            'sound': sound,
-            'sample_rate': sample_rate,
-            'sound_librosa': sound_librosa,
-        }
-
-        for test_name, test_fn in compat_tests.items():
-            # what variables does our test function take
-            varnames = test_fn.__code__.co_varnames
-            params_list_restricted = [
-                {k: v for k, v in params.items() if k in varnames}
-                for params in params_list_skipped
-            ]
-            data_dict_restricted = {k: v for k, v in data_dict.items() if k in varnames}
-            # restrict to unique parameter combinations
-            params_list_unique = [dict(uniq) for uniq in {tuple(sorted(d.items())) for d in params_list_restricted}]
-            for params in params_list_unique:
-                with self.subTest(msg=test_name, **params):
-                    test_fn(**params, **data_dict_restricted)
 
     def test_MelScale(self):
         """MelScale transform is comparable to that of librosa"""
