@@ -233,13 +233,14 @@ class TestApplyCodec(TorchaudioTestCase):
         sample_rate = 8000
         num_frames = 3 * sample_rate
         num_channels = 2
-
         waveform = torch.rand(num_channels, num_frames)
+
         augmented = F.apply_codec(waveform,
                                   sample_rate,
                                   format,
-                                  compression,
-                                  True)
+                                  True,
+                                  compression
+                                  )
         assert augmented.dtype == waveform.dtype
         assert augmented.shape[0] == num_channels
         if check_num_frames:
