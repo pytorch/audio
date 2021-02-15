@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
+import io
 import math
-from typing import Optional, Tuple
 import warnings
+from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
+from torchaudio._internal import (
+    module_utils as _mod_utils,
+)
+import torchaudio
 
 __all__ = [
     "spectrogram",
@@ -29,6 +34,7 @@ __all__ = [
     'mask_along_axis_iid',
     'sliding_window_cmn',
     "spectral_centroid",
+    "apply_codec",
 ]
 
 
@@ -992,6 +998,52 @@ def spectral_centroid(
                            device=specgram.device).reshape((-1, 1))
     freq_dim = -2
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
+
+
+@_mod_utils.requires_module('torchaudio._torchaudio')
+def apply_codec(
+    waveform: Tensor,
+    sample_rate: int,
+    format: str,
+    channels_first: bool = True,
+    compression: Optional[float] = None,
+    encoding: Optional[str] = None,
+    bits_per_sample: Optional[int] = None,
+) -> Tensor:
+    r"""
+    Applies codecs as a form of augmentation
+    Args:
+        waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```
+        sample_rate (int): Sample rate of the audio waveform
+        format (str): file format
+        channels_first (bool):
+            When True, both the input and output Tensor have dimension ``[channel, time]``.
+            Otherwise, they have dimension ``[time, channel]``.
+        compression (float): Used for formats other than WAV.
+            For mor details see :py:func:`torchaudio.backend.sox_io_backend.save`
+        encoding (str, optional): Changes the encoding for the supported formats.
+            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`
+        bits_per_sample (int, optional): Changes the bit depth for the supported formats.
+            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`
+
+    Returns:
+        torch.Tensor: Resulting Tensor.
+        If ``channels_first=True``, it has ``[channel, time]`` else ``[time, channel]``
+    """
+    bytes = io.BytesIO()
+    torchaudio.backend.sox_io_backend.save(bytes,
+                                           waveform,
+                                           sample_rate,
+                                           channels_first,
+                                           compression,
+                                           format,
+                                           encoding,
+                                           bits_per_sample
+                                           )
+    bytes.seek(0)
+    augmented, _ = torchaudio.sox_effects.sox_effects.apply_effects_file(
+        bytes, effects=[["rate", f"{sample_rate}"]], channels_first=channels_first, format=format)
+    return augmented
 
 
 def compute_kaldi_pitch(
