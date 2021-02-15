@@ -8,7 +8,7 @@ https://docs.pytest.org/ for the detail of how to use `pytest` command.
 For testing, the following packages are needed:
 
 ```bash
-pip install typing pytest scipy numpy parametrized
+pip install typing pytest scipy numpy parameterized
 ```
 
 Make sure to follow the installation instruction in the [contributing
@@ -40,7 +40,7 @@ We use PyTorch's test utilities instead of `pytest` frameworks when writing test
 Also, while we recommend using `pytest` for *running* the tests, we cannot
 make `pytest` a testing dependency of `torchaudio`. As a result, you should
 not import `pytest` or its submodules in the test files; Use the Python
-`unittest` builtin module instead, or the `parametrized` package to
+`unittest` builtin module instead, or the `parameterized` package to
 parametrize tests.
 
 ## Structure of tests
