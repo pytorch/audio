@@ -255,11 +255,9 @@ class TestTransforms(common_utils.TorchaudioTestCase):
     @parameterized.expand([
         param(n_fft=400, hop_length=200, n_mels=128, n_mfcc=40),
         param(n_fft=600, hop_length=100, n_mels=128, n_mfcc=20),
-        param(n_fft=200, hop_length=50, n_mels=128, n_mfcc=50, skip_ci=True),
+        param(n_fft=200, hop_length=50, n_mels=128, n_mfcc=50),
     ])
-    def test_mfcc(self, n_fft, hop_length, n_mels, n_mfcc, skip_ci=False):
-        if skip_ci and 'CI' in os.environ:
-            self.skipTest('Test is known to fail on CI')
+    def test_mfcc(self, n_fft, hop_length, n_mels, n_mfcc):
         sample_rate = 16000
         sound = common_utils.get_sinusoid(n_channels=1, sample_rate=sample_rate)
         sound_librosa = sound.cpu().numpy().squeeze()
