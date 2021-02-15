@@ -217,6 +217,8 @@ def save(
     channels_first: bool = True,
     compression: Optional[float] = None,
     format: Optional[str] = None,
+    encoding: Optional[str] = None,
+    bits_per_sample: Optional[int] = None,
 ):
     """Save audio data to file.
 
@@ -246,9 +248,106 @@ def save(
             otherwise ``[time, channel]``.
         compression (Optional[float]): Not used.
             It is here only for interface compatibility reson with "sox_io" backend.
-        format (str, optional): Output audio format.
-            This is required when the output audio format cannot be infered from
-            ``filepath``, (such as file extension or ``name`` attribute of the given file object).
+        format (str, optional): Override the audio format.
+            When ``filepath`` argument is path-like object, audio format is
+            inferred from file extension. If the file extension is missing or
+            different, you can specify the correct format with this argument.
+
+            When ``filepath`` argument is file-like object,
+            this argument is required.
+
+            Valid values are ``"wav"``, ``"ogg"``, ``"vorbis"``,
+            ``"flac"`` and ``"sph"``.
+        encoding (str, optional): Changes the encoding for supported formats.
+            This argument is effective only for supported formats, sush as
+            ``"wav"``, ``""flac"`` and ``"sph"``. Valid values are;
+
+                - ``"PCM_S"`` (signed integer Linear PCM)
+                - ``"PCM_U"`` (unsigned integer Linear PCM)
+                - ``"PCM_F"`` (floating point PCM)
+                - ``"ULAW"`` (mu-law)
+                - ``"ALAW"`` (a-law)
+
+            Default values:
+                If not provided, the default value is picked based on
+                ``format`` and ``bits_per_sample``.
+
+                ``"wav"``:
+                    - | If both ``encoding`` and ``bits_per_sample`` are not
+                      | provided, the ``dtype`` of the Tensor is used to
+                      | determine the default value.
+                        - ``"PCM_U"`` if dtype is ``uint8``
+                        - ``"PCM_S"`` if dtype is ``int16`` or ``int32`
+                        - ``"PCM_F"`` if dtype is ``float32``
+
+                    - ``"PCM_U"`` if ``bits_per_sample=8``
+                    - ``"PCM_S"`` otherwise
+
+                ``"sph"``:
+                    - the default value is ``"PCM_S"``
+
+        bits_per_sample (int, optional): Changes the bit depth for the
+                                         supported formats.
+            When ``format`` is one of ``"wav"``, ``"flac"`` or ``"sph"``,
+            you can change the bit depth.
+            Valid values are ``8``, ``16``, ``32`` and ``64``.
+
+            Default Value:
+                If not provided, the default values are picked based on
+                ``format`` and ``"encoding"``;
+
+                ``"wav"``:
+                    - | If both ``encoding`` and ``bits_per_sample`` are not
+                      | provided, the ``dtype`` of the Tensor is used.
+                        - ``8`` if dtype is ``uint8``
+                        - ``16`` if dtype is ``int16``
+                        - ``32`` if dtype is  ``int32`` or ``float32``
+
+                    - ``8`` if ``encoding`` is ``"PCM_U"``, ``"ULAW"`` or
+                                               ``"ALAW"``
+                    - ``16`` if ``encoding`` is ``"PCM_S"``
+                    - ``32`` if ``encoding`` is ``"PCM_F"``
+
+                ``"flac"``:
+                    - the default value is ``24``
+
+                ``"sph"``:
+                    - ``16`` if ``encoding`` is ``"PCM_U"``, ``"PCM_S"``,
+                                                ``"PCM_F"`` or not provided.
+                    - ``8`` if ``encoding`` is ``"ULAW"`` or ``"ALAW"``
+
+    Supported formats/encodings/bit depth/compression are:
+
+    ``"wav"``
+        - 32-bit floating-point PCM
+        - 32-bit signed integer PCM
+        - 24-bit signed integer PCM
+        - 16-bit signed integer PCM
+        - 8-bit unsigned integer PCM
+        - 8-bit mu-law
+        - 8-bit a-law
+
+        Note: Default encoding/bit depth is determined by the dtype of
+              the input Tensor.
+
+    ``"flac"``
+        - 8-bit
+        - 16-bit
+        - 24-bit (default)
+
+    ``"ogg"``, ``"vorbis"``
+        - Different quality level. Default: approx. 112kbps
+
+    ``"sph"``
+        - 8-bit signed integer PCM
+        - 16-bit signed integer PCM
+        - 24-bit signed integer PCM
+        - 32-bit signed integer PCM (default)
+        - 8-bit mu-law
+        - 8-bit a-law
+        - 16-bit a-law
+        - 24-bit a-law
+        - 32-bit a-law
     """
     if src.ndim != 2:
         raise ValueError(f"Expected 2D Tensor, got {src.ndim}D.")
@@ -264,6 +363,7 @@ def save(
     else:
         ext = str(filepath).split(".")[-1].lower()
 
+    """
     if ext != "wav":
         subtype = None
     elif src.dtype == torch.uint8:
@@ -278,6 +378,27 @@ def save(
         subtype = "DOUBLE"
     else:
         raise ValueError(f"Unsupported dtype for WAV: {src.dtype}")
+    """
+
+    subtype = None
+    if ext == "wav":
+        if not encoding and not bits_per_sample:
+            mapper = {
+                torch.uint8: "PCM_U8",
+                torch.int16: "PCM_16",
+                torch.int32: "PCM_32",
+                torch.float32: "FLOAT",
+                torch.float64: "DOUBLE",
+            }
+            subtype = mapper.get(src.dtype, None)
+            if not subtype:
+                raise ValueError(f"Unsupported dtype for WAV: {src.dtype}")
+        elif bits_per_sample == 8:
+            subtype = "PCM_U8"
+        else:
+            subtype = "PCM_S8"
+    elif ext == "sph":
+        subtype = "PCM_S8"
 
     # sph is a extension used in TED-LIUM but soundfile does not recognize it as NIST format,
     # so we extend the extensions manually here
