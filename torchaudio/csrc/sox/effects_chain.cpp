@@ -80,29 +80,37 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
 
   // Convert to sox_sample_t (int32_t) and write to buffer
   SOX_SAMPLE_LOCALS;
-  const auto dtype = tensor_.dtype();
-  if (dtype == torch::kFloat32) {
-    auto ptr = tensor_.data_ptr<float_t>();
-    for (size_t i = 0; i < *osamp; ++i) {
-      obuf[i] = SOX_FLOAT_32BIT_TO_SAMPLE(ptr[i], effp->clips);
+  switch (tensor_.dtype().toScalarType()) {
+    case c10::ScalarType::Float: {
+      auto ptr = tensor_.data_ptr<float_t>();
+      for (size_t i = 0; i < *osamp; ++i) {
+        obuf[i] = SOX_FLOAT_32BIT_TO_SAMPLE(ptr[i], effp->clips);
+      }
+      break;
     }
-  } else if (dtype == torch::kInt32) {
-    auto ptr = tensor_.data_ptr<int32_t>();
-    for (size_t i = 0; i < *osamp; ++i) {
-      obuf[i] = SOX_SIGNED_32BIT_TO_SAMPLE(ptr[i], effp->clips);
+    case c10::ScalarType::Int: {
+      auto ptr = tensor_.data_ptr<int32_t>();
+      for (size_t i = 0; i < *osamp; ++i) {
+        obuf[i] = SOX_SIGNED_32BIT_TO_SAMPLE(ptr[i], effp->clips);
+      }
+      break;
     }
-  } else if (dtype == torch::kInt16) {
-    auto ptr = tensor_.data_ptr<int16_t>();
-    for (size_t i = 0; i < *osamp; ++i) {
-      obuf[i] = SOX_SIGNED_16BIT_TO_SAMPLE(ptr[i], effp->clips);
+    case c10::ScalarType::Short: {
+      auto ptr = tensor_.data_ptr<int16_t>();
+      for (size_t i = 0; i < *osamp; ++i) {
+        obuf[i] = SOX_SIGNED_16BIT_TO_SAMPLE(ptr[i], effp->clips);
+      }
+      break;
     }
-  } else if (dtype == torch::kUInt8) {
-    auto ptr = tensor_.data_ptr<uint8_t>();
-    for (size_t i = 0; i < *osamp; ++i) {
-      obuf[i] = SOX_UNSIGNED_8BIT_TO_SAMPLE(ptr[i], effp->clips);
+    case c10::ScalarType::Byte: {
+      auto ptr = tensor_.data_ptr<uint8_t>();
+      for (size_t i = 0; i < *osamp; ++i) {
+        obuf[i] = SOX_UNSIGNED_8BIT_TO_SAMPLE(ptr[i], effp->clips);
+      }
+      break;
     }
-  } else {
-    throw std::runtime_error("Unexpected dtype.");
+    default:
+      throw std::runtime_error("Unexpected dtype.");
   }
   priv->index += *osamp;
   return (priv->index == num_samples) ? SOX_EOF : SOX_SUCCESS;
