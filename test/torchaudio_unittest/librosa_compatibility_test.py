@@ -166,13 +166,6 @@ def _load_audio_asset(*asset_paths, **kwargs):
 class TestTransforms(common_utils.TorchaudioTestCase):
     """Test suite for functions in `transforms` module."""
 
-    @staticmethod
-    def _set_up_sound():
-        common_utils.set_audio_backend('default')
-        path = common_utils.get_asset_path('sinewave.wav')
-        sound, sample_rate = common_utils.load_wav(path)
-        sound_librosa = sound.cpu().numpy().squeeze()  # (64000)
-        return sound, sample_rate, sound_librosa
 
     @parameterized.expand([
         param(n_fft=400, hop_length=200, power=2.0),
@@ -181,7 +174,9 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         param(n_fft=200, hop_length=50, power=2.0),
     ])
     def test_spectrogram(self, n_fft, hop_length, power):
-        sound, sample_rate, sound_librosa = self._set_up_sound()
+        sample_rate = 16000
+        sound = common_utils.get_sinusoid(n_channels=1, sample_rate=sample_rate)
+        sound_librosa = sound.cpu().numpy().squeeze()
         spect_transform = torchaudio.transforms.Spectrogram(
             n_fft=n_fft, hop_length=hop_length, power=power)
         out_librosa, _ = librosa.core.spectrum._spectrogram(
@@ -191,7 +186,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(out_torch, torch.from_numpy(out_librosa), atol=1e-5, rtol=1e-5)
 
     @parameterized.expand([
-        p._replace(kwargs={'norm': norm, **p.kwargs})
+        param(norm=norm, **p.kwargs)
         for p in [
             param(n_fft=400, hop_length=200, n_mels=128),
             param(n_fft=600, hop_length=100, n_mels=128),
@@ -200,7 +195,9 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         for norm in [None, 'slaney']
     ])
     def test_mel_spectrogram(self, n_fft, hop_length, n_mels, norm):
-        sound, sample_rate, sound_librosa = self._set_up_sound()
+        sample_rate = 16000
+        sound = common_utils.get_sinusoid(n_channels=1, sample_rate=sample_rate)
+        sound_librosa = sound.cpu().numpy().squeeze()
         melspect_transform = torchaudio.transforms.MelSpectrogram(
             sample_rate=sample_rate, window_fn=torch.hann_window,
             hop_length=hop_length, n_mels=n_mels, n_fft=n_fft, norm=norm)
@@ -213,7 +210,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
             torch_mel.type(librosa_mel_tensor.dtype), librosa_mel_tensor, atol=5e-3, rtol=1e-5)
 
     @parameterized.expand([
-        p._replace(kwargs={'norm': norm, **p.kwargs})
+        param(norm=norm, **p.kwargs)
         for p in [
             param(n_fft=400, hop_length=200, power=2.0, n_mels=128),
             param(n_fft=600, hop_length=100, power=2.0, n_mels=128),
@@ -226,7 +223,9 @@ class TestTransforms(common_utils.TorchaudioTestCase):
     def test_s2db(self, n_fft, hop_length, power, n_mels, norm, skip_ci=False):
         if skip_ci and 'CI' in os.environ:
             self.skipTest('Test is known to fail on CI')
-        sound, sample_rate, sound_librosa = self._set_up_sound()
+        sample_rate = 16000
+        sound = common_utils.get_sinusoid(n_channels=1, sample_rate=sample_rate)
+        sound_librosa = sound.cpu().numpy().squeeze()
         spect_transform = torchaudio.transforms.Spectrogram(
             n_fft=n_fft, hop_length=hop_length, power=power)
         out_librosa, _ = librosa.core.spectrum._spectrogram(
@@ -257,13 +256,14 @@ class TestTransforms(common_utils.TorchaudioTestCase):
     @parameterized.expand([
         param(n_fft=400, hop_length=200, n_mels=128, n_mfcc=40),
         param(n_fft=600, hop_length=100, n_mels=128, n_mfcc=20),
-        # NOTE: Test passes offline, but fails on TravisCI (and CircleCI), see #372.
         param(n_fft=200, hop_length=50, n_mels=128, n_mfcc=50, skip_ci=True),
     ])
     def test_mfcc(self, n_fft, hop_length, n_mels, n_mfcc, skip_ci=False):
         if skip_ci and 'CI' in os.environ:
             self.skipTest('Test is known to fail on CI')
-        sound, sample_rate, sound_librosa = self._set_up_sound()
+        sample_rate = 16000
+        sound = common_utils.get_sinusoid(n_channels=1, sample_rate=sample_rate)
+        sound_librosa = sound.cpu().numpy().squeeze()
         librosa_mel = librosa.feature.melspectrogram(
             y=sound_librosa, sr=sample_rate, n_fft=n_fft,
             hop_length=hop_length, n_mels=n_mels, htk=True, norm=None)
@@ -296,7 +296,9 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         param(n_fft=200, hop_length=50),
     ])
     def test_spectral_centroid(self, n_fft, hop_length):
-        sound, sample_rate, sound_librosa = self._set_up_sound()
+        sample_rate = 16000
+        sound = common_utils.get_sinusoid(n_channels=1, sample_rate=sample_rate)
+        sound_librosa = sound.cpu().numpy().squeeze()
         spect_centroid = torchaudio.transforms.SpectralCentroid(
             sample_rate=sample_rate, n_fft=n_fft, hop_length=hop_length)
         out_torch = spect_centroid(sound).squeeze().cpu()
