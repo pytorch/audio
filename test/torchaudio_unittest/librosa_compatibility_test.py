@@ -166,7 +166,6 @@ def _load_audio_asset(*asset_paths, **kwargs):
 class TestTransforms(common_utils.TorchaudioTestCase):
     """Test suite for functions in `transforms` module."""
 
-
     @parameterized.expand([
         param(n_fft=400, hop_length=200, power=2.0),
         param(n_fft=600, hop_length=100, power=2.0),
