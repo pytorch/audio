@@ -239,6 +239,12 @@ class SaveTest(SaveTestBase):
 
     @nested_params(
         ["path", "fileobj", "bytesio"],
+    )
+    def test_save_gsm(self, test_mode):
+        self.assert_save_consistency("gsm", test_mode=test_mode)
+
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
         [
             None,
             -1,

@@ -4,22 +4,25 @@ namespace torchaudio {
 namespace sox_utils {
 
 Format get_format_from_string(const std::string& format) {
-  if (format == "wav")
+  if (format == "wav") {
     return Format::WAV;
-  if (format == "mp3")
+  } else if (format == "mp3") {
     return Format::MP3;
-  if (format == "flac")
+  } else if (format == "flac") {
     return Format::FLAC;
-  if (format == "ogg" || format == "vorbis")
+  } else if (format == "ogg" || format == "vorbis") {
     return Format::VORBIS;
-  if (format == "amr-nb")
+  } else if (format == "amr-nb") {
     return Format::AMR_NB;
-  if (format == "amr-wb")
+  } else if (format == "amr-wb") {
     return Format::AMR_WB;
-  if (format == "amb")
+  } else if (format == "amb") {
     return Format::AMB;
-  if (format == "sph")
+  } else if (format == "sph") {
     return Format::SPHERE;
+  } else if (format == "gsm") {
+    return Format::GSM;
+  }
   std::ostringstream stream;
   stream << "Internal Error: unexpected format value: " << format;
   throw std::runtime_error(stream.str());
@@ -57,19 +60,21 @@ std::string to_string(Encoding v) {
 }
 
 Encoding get_encoding_from_option(const c10::optional<std::string>& encoding) {
-  if (!encoding.has_value())
+  if (!encoding.has_value()) {
     return Encoding::NOT_PROVIDED;
+  }
   std::string v = encoding.value();
-  if (v == "PCM_S")
+  if (v == "PCM_S") {
     return Encoding::PCM_SIGNED;
-  if (v == "PCM_U")
+  } else if (v == "PCM_U") {
     return Encoding::PCM_UNSIGNED;
-  if (v == "PCM_F")
+  } else if (v == "PCM_F") {
     return Encoding::PCM_FLOAT;
-  if (v == "ULAW")
+  } else if (v == "ULAW") {
     return Encoding::ULAW;
-  if (v == "ALAW")
+  } else if (v == "ALAW") {
     return Encoding::ALAW;
+  }
   std::ostringstream stream;
   stream << "Internal Error: unexpected encoding value: " << v;
   throw std::runtime_error(stream.str());
