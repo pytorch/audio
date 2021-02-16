@@ -374,9 +374,10 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
           throw std::runtime_error(
               "sph does not support unsigned integer PCM.");
         }
-        case Encoding::PCM_FLOAT: 
+        case Encoding::PCM_FLOAT: {
           throw std::runtime_error(
               "sph does not support floating point PCM.");
+        }
         case Encoding::ULAW: {
           switch (bps) {
             case BitDepth::NOT_PROVIDED:
@@ -397,9 +398,10 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
                   SOX_ENCODING_ALAW, static_cast<unsigned>(bps));
           }
         }
-        default:
+        default: {
           throw std::runtime_error(
               "sph does not support encoding: " + encoding.value());
+        }
       }
     }
     default:
