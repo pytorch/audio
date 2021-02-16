@@ -307,12 +307,17 @@
   <h1>Source code for torchaudio.functional.functional</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 
+<span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">import</span> <span class="nn">torchaudio</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;spectrogram&quot;</span><span class="p">,</span>
@@ -336,6 +341,7 @@
     <span class="s1">&#39;mask_along_axis_iid&#39;</span><span class="p">,</span>
     <span class="s1">&#39;sliding_window_cmn&#39;</span><span class="p">,</span>
     <span class="s2">&quot;spectral_centroid&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;apply_codec&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 
@@ -1299,6 +1305,52 @@
                            <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
     <span class="n">freq_dim</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">freqs</span> <span class="o">*</span> <span class="n">specgram</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">freq_dim</span><span class="p">)</span> <span class="o">/</span> <span class="n">specgram</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">freq_dim</span><span class="p">)</span>
+
+
+<span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">apply_codec</span><span class="p">(</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">compression</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">bits_per_sample</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies codecs as a form of augmentation</span>
+<span class="sd">    Args:</span>
+<span class="sd">        waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```</span>
+<span class="sd">        sample_rate (int): Sample rate of the audio waveform</span>
+<span class="sd">        format (str): file format</span>
+<span class="sd">        channels_first (bool):</span>
+<span class="sd">            When True, both the input and output Tensor have dimension ``[channel, time]``.</span>
+<span class="sd">            Otherwise, they have dimension ``[time, channel]``.</span>
+<span class="sd">        compression (float): Used for formats other than WAV.</span>
+<span class="sd">            For mor details see :py:func:`torchaudio.backend.sox_io_backend.save`</span>
+<span class="sd">        encoding (str, optional): Changes the encoding for the supported formats.</span>
+<span class="sd">            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`</span>
+<span class="sd">        bits_per_sample (int, optional): Changes the bit depth for the supported formats.</span>
+<span class="sd">            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Resulting Tensor.</span>
+<span class="sd">        If ``channels_first=True``, it has ``[channel, time]`` else ``[time, channel]``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">bytes</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
+    <span class="n">torchaudio</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">sox_io_backend</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span>
+                                           <span class="n">waveform</span><span class="p">,</span>
+                                           <span class="n">sample_rate</span><span class="p">,</span>
+                                           <span class="n">channels_first</span><span class="p">,</span>
+                                           <span class="n">compression</span><span class="p">,</span>
+                                           <span class="nb">format</span><span class="p">,</span>
+                                           <span class="n">encoding</span><span class="p">,</span>
+                                           <span class="n">bits_per_sample</span>
+                                           <span class="p">)</span>
+    <span class="nb">bytes</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">augmented</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">apply_effects_file</span><span class="p">(</span>
+        <span class="nb">bytes</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]],</span> <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">augmented</span>
 
 
 <div class="viewcode-block" id="compute_kaldi_pitch"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.compute_kaldi_pitch">[docs]</a><span class="k">def</span> <span class="nf">compute_kaldi_pitch</span><span class="p">(</span>
