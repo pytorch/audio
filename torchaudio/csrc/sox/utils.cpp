@@ -335,7 +335,7 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
       if (bps != BitDepth::NOT_PROVIDED)
         throw std::runtime_error(
             "gsm does not support `bits_per_sample` option.");
-      return std::make_tuple<>(SOX_ENCODING_MP3, 16);
+      return std::make_tuple<>(SOX_ENCODING_GSM, 16);
     }
     case Format::VORBIS: {
       if (enc != Encoding::NOT_PROVIDED)
