@@ -8,6 +8,12 @@ from parameterized import parameterized
 import itertools
 
 from torchaudio_unittest import common_utils
+from torchaudio_unittest.common_utils import (
+    TorchaudioTestCase,
+    skipIfNoExtension,
+)
+from torchaudio_unittest.backend.sox_io.common import name_func
+
 from .functional_impl import Lfilter, Spectrogram
 
 
@@ -53,6 +59,7 @@ class TestCreateFBMatrix(common_utils.TorchaudioTestCase):
 
 class TestComputeDeltas(common_utils.TorchaudioTestCase):
     """Test suite for correctness of compute_deltas"""
+
     def test_one_channel(self):
         specgram = torch.tensor([[[1.0, 2.0, 3.0, 4.0]]])
         expected = torch.tensor([[[0.5, 1.0, 1.0, 0.5]]])
@@ -211,3 +218,48 @@ class TestMaskAlongAxisIID(common_utils.TorchaudioTestCase):
 
         assert mask_specgrams.size() == specgrams.size()
         assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
+
+
+@skipIfNoExtension
+class TestApplyCodec(TorchaudioTestCase):
+    backend = "sox_io"
+
+    def _smoke_test(self, format, compression, check_num_frames):
+        """
+        The purpose of this test suite is to verify that apply_codec functionalities do not exhibit
+        abnormal behaviors.
+        """
+        torch.random.manual_seed(42)
+        sample_rate = 8000
+        num_frames = 3 * sample_rate
+        num_channels = 2
+        waveform = torch.rand(num_channels, num_frames)
+
+        augmented = F.apply_codec(waveform,
+                                  sample_rate,
+                                  format,
+                                  True,
+                                  compression
+                                  )
+        assert augmented.dtype == waveform.dtype
+        assert augmented.shape[0] == num_channels
+        if check_num_frames:
+            assert augmented.shape[1] == num_frames
+
+    def test_wave(self):
+        self._smoke_test("wav", compression=None, check_num_frames=True)
+
+    @parameterized.expand([(96,), (128,), (160,), (192,), (224,), (256,), (320,)],
+                          name_func=name_func)
+    def test_mp3(self, compression):
+        self._smoke_test("mp3", compression, check_num_frames=False)
+
+    @parameterized.expand([(0,), (1,), (2,), (3,), (4,), (5,), (6,), (7,), (8,)],
+                          name_func=name_func)
+    def test_flac(self, compression):
+        self._smoke_test("flac", compression, check_num_frames=False)
+
+    @parameterized.expand([(-1,), (0,), (1,), (2,), (3,), (3.6,), (5,), (10,)],
+                          name_func=name_func)
+    def test_vorbis(self, compression):
+        self._smoke_test("vorbis", compression, check_num_frames=False)

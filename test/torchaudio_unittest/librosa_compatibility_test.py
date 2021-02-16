@@ -7,7 +7,7 @@ import torch
 import torchaudio
 import torchaudio.functional as F
 from torchaudio._internal.module_utils import is_module_available
-from parameterized import parameterized
+from parameterized import parameterized, param
 import itertools
 
 LIBROSA_AVAILABLE = is_module_available('librosa')
@@ -165,13 +165,17 @@ def _load_audio_asset(*asset_paths, **kwargs):
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
 class TestTransforms(common_utils.TorchaudioTestCase):
     """Test suite for functions in `transforms` module."""
-    def assert_compatibilities(self, n_fft, hop_length, power, n_mels, n_mfcc, sample_rate):
-        common_utils.set_audio_backend('default')
-        path = common_utils.get_asset_path('sinewave.wav')
-        sound, sample_rate = common_utils.load_wav(path)
-        sound_librosa = sound.cpu().numpy().squeeze()  # (64000)
 
-        # test core spectrogram
+    @parameterized.expand([
+        param(n_fft=400, hop_length=200, power=2.0),
+        param(n_fft=600, hop_length=100, power=2.0),
+        param(n_fft=400, hop_length=200, power=3.0),
+        param(n_fft=200, hop_length=50, power=2.0),
+    ])
+    def test_spectrogram(self, n_fft, hop_length, power):
+        sample_rate = 16000
+        sound = common_utils.get_sinusoid(n_channels=1, sample_rate=sample_rate)
+        sound_librosa = sound.cpu().numpy().squeeze()
         spect_transform = torchaudio.transforms.Spectrogram(
             n_fft=n_fft, hop_length=hop_length, power=power)
         out_librosa, _ = librosa.core.spectrum._spectrogram(
@@ -180,19 +184,58 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         out_torch = spect_transform(sound).squeeze().cpu()
         self.assertEqual(out_torch, torch.from_numpy(out_librosa), atol=1e-5, rtol=1e-5)
 
-        # test mel spectrogram
+    @parameterized.expand([
+        param(norm=norm, **p.kwargs)
+        for p in [
+            param(n_fft=400, hop_length=200, n_mels=128),
+            param(n_fft=600, hop_length=100, n_mels=128),
+            param(n_fft=200, hop_length=50, n_mels=128),
+        ]
+        for norm in [None, 'slaney']
+    ])
+    def test_mel_spectrogram(self, n_fft, hop_length, n_mels, norm):
+        sample_rate = 16000
+        sound = common_utils.get_sinusoid(n_channels=1, sample_rate=sample_rate)
+        sound_librosa = sound.cpu().numpy().squeeze()
         melspect_transform = torchaudio.transforms.MelSpectrogram(
             sample_rate=sample_rate, window_fn=torch.hann_window,
-            hop_length=hop_length, n_mels=n_mels, n_fft=n_fft)
+            hop_length=hop_length, n_mels=n_mels, n_fft=n_fft, norm=norm)
         librosa_mel = librosa.feature.melspectrogram(
             y=sound_librosa, sr=sample_rate, n_fft=n_fft,
-            hop_length=hop_length, n_mels=n_mels, htk=True, norm=None)
+            hop_length=hop_length, n_mels=n_mels, htk=True, norm=norm)
         librosa_mel_tensor = torch.from_numpy(librosa_mel)
         torch_mel = melspect_transform(sound).squeeze().cpu()
         self.assertEqual(
             torch_mel.type(librosa_mel_tensor.dtype), librosa_mel_tensor, atol=5e-3, rtol=1e-5)
 
-        # test s2db
+    @parameterized.expand([
+        param(norm=norm, **p.kwargs)
+        for p in [
+            param(n_fft=400, hop_length=200, power=2.0, n_mels=128),
+            param(n_fft=600, hop_length=100, power=2.0, n_mels=128),
+            param(n_fft=400, hop_length=200, power=3.0, n_mels=128),
+            # NOTE: Test passes offline, but fails on TravisCI (and CircleCI), see #372.
+            param(n_fft=200, hop_length=50, power=2.0, n_mels=128, skip_ci=True),
+        ]
+        for norm in [None, 'slaney']
+    ])
+    def test_s2db(self, n_fft, hop_length, power, n_mels, norm, skip_ci=False):
+        if skip_ci and 'CI' in os.environ:
+            self.skipTest('Test is known to fail on CI')
+        sample_rate = 16000
+        sound = common_utils.get_sinusoid(n_channels=1, sample_rate=sample_rate)
+        sound_librosa = sound.cpu().numpy().squeeze()
+        spect_transform = torchaudio.transforms.Spectrogram(
+            n_fft=n_fft, hop_length=hop_length, power=power)
+        out_librosa, _ = librosa.core.spectrum._spectrogram(
+            y=sound_librosa, n_fft=n_fft, hop_length=hop_length, power=power)
+        melspect_transform = torchaudio.transforms.MelSpectrogram(
+            sample_rate=sample_rate, window_fn=torch.hann_window,
+            hop_length=hop_length, n_mels=n_mels, n_fft=n_fft, norm=norm)
+        librosa_mel = librosa.feature.melspectrogram(
+            y=sound_librosa, sr=sample_rate, n_fft=n_fft,
+            hop_length=hop_length, n_mels=n_mels, htk=True, norm=norm)
+
         power_to_db_transform = torchaudio.transforms.AmplitudeToDB('power', 80.)
         power_to_db_torch = power_to_db_transform(spect_transform(sound)).squeeze().cpu()
         power_to_db_librosa = librosa.core.spectrum.power_to_db(out_librosa)
@@ -209,10 +252,19 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(
             power_to_db_torch.type(db_librosa_tensor.dtype), db_librosa_tensor, atol=5e-3, rtol=1e-5)
 
-        # test MFCC
-        melkwargs = {'hop_length': hop_length, 'n_fft': n_fft}
-        mfcc_transform = torchaudio.transforms.MFCC(
-            sample_rate=sample_rate, n_mfcc=n_mfcc, norm='ortho', melkwargs=melkwargs)
+    @parameterized.expand([
+        param(n_fft=400, hop_length=200, n_mels=128, n_mfcc=40),
+        param(n_fft=600, hop_length=100, n_mels=128, n_mfcc=20),
+        param(n_fft=200, hop_length=50, n_mels=128, n_mfcc=50),
+    ])
+    def test_mfcc(self, n_fft, hop_length, n_mels, n_mfcc):
+        sample_rate = 16000
+        sound = common_utils.get_sinusoid(n_channels=1, sample_rate=sample_rate)
+        sound_librosa = sound.cpu().numpy().squeeze()
+        librosa_mel = librosa.feature.melspectrogram(
+            y=sound_librosa, sr=sample_rate, n_fft=n_fft,
+            hop_length=hop_length, n_mels=n_mels, htk=True, norm=None)
+        db_librosa = librosa.core.spectrum.power_to_db(librosa_mel)
 
         # librosa.feature.mfcc doesn't pass kwargs properly since some of the
         # kwargs for melspectrogram and mfcc are the same. We just follow the
@@ -226,14 +278,24 @@ class TestTransforms(common_utils.TorchaudioTestCase):
 
         librosa_mfcc = scipy.fftpack.dct(db_librosa, axis=0, type=2, norm='ortho')[:n_mfcc]
         librosa_mfcc_tensor = torch.from_numpy(librosa_mfcc)
+
+        melkwargs = {'hop_length': hop_length, 'n_fft': n_fft}
+        mfcc_transform = torchaudio.transforms.MFCC(
+            sample_rate=sample_rate, n_mfcc=n_mfcc, norm='ortho', melkwargs=melkwargs)
         torch_mfcc = mfcc_transform(sound).squeeze().cpu()
 
         self.assertEqual(
             torch_mfcc.type(librosa_mfcc_tensor.dtype), librosa_mfcc_tensor, atol=5e-3, rtol=1e-5)
 
-        self.assert_compatibilities_spectral_centroid(sample_rate, n_fft, hop_length, sound, sound_librosa)
-
-    def assert_compatibilities_spectral_centroid(self, sample_rate, n_fft, hop_length, sound, sound_librosa):
+    @parameterized.expand([
+        param(n_fft=400, hop_length=200),
+        param(n_fft=600, hop_length=100),
+        param(n_fft=200, hop_length=50),
+    ])
+    def test_spectral_centroid(self, n_fft, hop_length):
+        sample_rate = 16000
+        sound = common_utils.get_sinusoid(n_channels=1, sample_rate=sample_rate)
+        sound_librosa = sound.cpu().numpy().squeeze()
         spect_centroid = torchaudio.transforms.SpectralCentroid(
             sample_rate=sample_rate, n_fft=n_fft, hop_length=hop_length)
         out_torch = spect_centroid(sound).squeeze().cpu()
@@ -243,52 +305,6 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         out_librosa = torch.from_numpy(out_librosa)[0]
 
         self.assertEqual(out_torch.type(out_librosa.dtype), out_librosa, atol=1e-5, rtol=1e-5)
-
-    def test_basics1(self):
-        kwargs = {
-            'n_fft': 400,
-            'hop_length': 200,
-            'power': 2.0,
-            'n_mels': 128,
-            'n_mfcc': 40,
-            'sample_rate': 16000
-        }
-        self.assert_compatibilities(**kwargs)
-
-    def test_basics2(self):
-        kwargs = {
-            'n_fft': 600,
-            'hop_length': 100,
-            'power': 2.0,
-            'n_mels': 128,
-            'n_mfcc': 20,
-            'sample_rate': 16000
-        }
-        self.assert_compatibilities(**kwargs)
-
-    # NOTE: Test passes offline, but fails on TravisCI (and CircleCI), see #372.
-    @unittest.skipIf('CI' in os.environ, 'Test is known to fail on CI')
-    def test_basics3(self):
-        kwargs = {
-            'n_fft': 200,
-            'hop_length': 50,
-            'power': 2.0,
-            'n_mels': 128,
-            'n_mfcc': 50,
-            'sample_rate': 24000
-        }
-        self.assert_compatibilities(**kwargs)
-
-    def test_basics4(self):
-        kwargs = {
-            'n_fft': 400,
-            'hop_length': 200,
-            'power': 3.0,
-            'n_mels': 128,
-            'n_mfcc': 40,
-            'sample_rate': 16000
-        }
-        self.assert_compatibilities(**kwargs)
 
     def test_MelScale(self):
         """MelScale transform is comparable to that of librosa"""

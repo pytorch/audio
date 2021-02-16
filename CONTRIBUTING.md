@@ -53,7 +53,7 @@ BUILD_SOX=1 python setup.py develop
 # or, for OSX
 # BUILD_SOX=1 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py develop
 # for C++ debugging, please use DEBUG=1
-# DEBUG=1 python setup.py install
+# DEBUG=1 python setup.py develop
 ```
 
 Note: you don't need to use `BUILD_SOX=1` if you have `libsox-dev` installed
