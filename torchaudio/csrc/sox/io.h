@@ -13,15 +13,15 @@ namespace sox_io {
 
 std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_file(
     const std::string& path,
-    c10::optional<std::string>& format);
+    const c10::optional<std::string>& format);
 
 std::tuple<torch::Tensor, int64_t> load_audio_file(
     const std::string& path,
-    c10::optional<int64_t>& frame_offset,
-    c10::optional<int64_t>& num_frames,
-    c10::optional<bool>& normalize,
-    c10::optional<bool>& channels_first,
-    c10::optional<std::string>& format);
+    const c10::optional<int64_t>& frame_offset,
+    const c10::optional<int64_t>& num_frames,
+    c10::optional<bool> normalize,
+    c10::optional<bool> channels_first,
+    const c10::optional<std::string>& format);
 
 void save_audio_file(
     const std::string& path,
