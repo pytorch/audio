@@ -356,6 +356,7 @@ def save(
                 - ``"PCM_F"`` (floating point PCM)
                 - ``"ULAW"`` (mu-law)
                 - ``"ALAW"`` (a-law)
+
         bits_per_sample (int, optional): Changes the bit depth for the
                                          supported formats.
             When ``format`` is one of ``"wav"``, ``"flac"`` or ``"sph"``,
@@ -394,6 +395,7 @@ def save(
         - 16-bit a-law
         - 24-bit a-law
         - 32-bit a-law
+
     """
     if src.ndim != 2:
         raise ValueError(f"Expected 2D Tensor, got {src.ndim}D.")
