@@ -239,6 +239,12 @@ class SaveTest(SaveTestBase):
 
     @nested_params(
         ["path", "fileobj", "bytesio"],
+    )
+    def test_save_hkt(self, test_mode, ):
+        self.assert_save_consistency("hkt", test_mode=test_mode, num_channels=1)
+
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
         [
             None,
             -1,
