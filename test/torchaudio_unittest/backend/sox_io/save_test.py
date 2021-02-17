@@ -240,7 +240,7 @@ class SaveTest(SaveTestBase):
     @nested_params(
         ["path", "fileobj", "bytesio"],
     )
-    def test_save_htk(self, test_mode, ):
+    def test_save_htk(self, test_mode):
         self.assert_save_consistency("htk", test_mode=test_mode, num_channels=1)
 
     @nested_params(
