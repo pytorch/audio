@@ -238,6 +238,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.bits_per_sample == 0
         assert info.encoding == "GSM"
 
+
 @skipIfNoExtension
 class TestInfoOpus(PytorchTestCase):
     @parameterized.expand(list(itertools.product(
