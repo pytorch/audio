@@ -215,14 +215,13 @@ def _get_subtype_for_wav(
         bits_per_sample: int):
     if not encoding:
         if not bits_per_sample:
-            mapper = {
+            subtype = {
                 torch.uint8: "PCM_U8",
                 torch.int16: "PCM_16",
                 torch.int32: "PCM_32",
                 torch.float32: "FLOAT",
                 torch.float64: "DOUBLE",
-            }
-            subtype = mapper.get(dtype, None)
+            }.get(dtype)
             if not subtype:
                 raise ValueError(f"Unsupported dtype for wav: {dtype}")
             return subtype
@@ -247,11 +246,11 @@ def _get_subtype_for_wav(
         raise ValueError("wav only supports 32/64-bit float PCM encoding.")
     if encoding == "ULAW":
         if bits_per_sample in (None, 8):
-            return "PCM_U8"
+            return "ULAW"
         raise ValueError("wav only supports 8-bit mu-law encoding.")
     if encoding == "ALAW":
         if bits_per_sample in (None, 8):
-            return "PCM_U8"
+            return "ALAW"
         raise ValueError("wav only supports 8-bit a-law encoding.")
     raise ValueError(f"wav does not support {encoding}.")
 
@@ -263,11 +262,10 @@ def _get_subtype_for_sphere(encoding: str, bits_per_sample: int):
         raise ValueError(f"sph does not support {encoding} encoding.")
     if encoding == "ULAW":
         if bits_per_sample in (None, 8):
-            return "PCM_U8"
+            return "ULAW"
         raise ValueError("sph only supports 8-bit for mu-law encoding.")
     if encoding == "ALAW":
-        return ("PCM_U8" if bits_per_sample in (None, 8)
-                else f"PCM_{bits_per_sample}")
+        return "ALAW"
     raise ValueError(f"sph does not support {encoding}.")
 
 
@@ -383,7 +381,7 @@ def save(
         - 24-bit (default)
 
     ``"ogg"``, ``"vorbis"``
-        - Different quality level. Default: approx. 112kbps
+        - Doesn't accept changing configuration.
 
     ``"sph"``
         - 8-bit signed integer PCM

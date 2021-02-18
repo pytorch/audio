@@ -11,7 +11,11 @@ from torchaudio_unittest.common_utils import (
     get_wav_data,
     load_wav,
 )
-from .common import parameterize, skipIfFormatNotSupported
+from .common import (
+    fetch_wav_subtype,
+    parameterize,
+    skipIfFormatNotSupported,
+)
 
 if _mod_utils.is_module_available("soundfile"):
     import soundfile
@@ -21,12 +25,18 @@ class MockedSaveTest(PytorchTestCase):
     @parameterize(
         ["float32", "int32", "int16", "uint8"], [8000, 16000], [1, 2], [False, True],
         [
+            (None, None),
+            ('PCM_U', None),
             ('PCM_U', 8),
+            ('PCM_S', None),
             ('PCM_S', 16),
             ('PCM_S', 32),
+            ('PCM_F', None),
             ('PCM_F', 32),
             ('PCM_F', 64),
+            ('ULAW', None),
             ('ULAW', 8),
+            ('ALAW', None),
             ('ALAW', 8),
         ],
     )
@@ -53,6 +63,8 @@ class MockedSaveTest(PytorchTestCase):
         args = mocked_write.call_args[1]
         assert args["file"] == filepath
         assert args["samplerate"] == sample_rate
+        assert args["subtype"] == fetch_wav_subtype(
+            dtype, encoding, bits_per_sample)
         assert args["format"] is None
         self.assertEqual(
             args["data"], input_tensor.t() if channels_first else input_tensor
@@ -96,10 +108,10 @@ class MockedSaveTest(PytorchTestCase):
         [1, 2],
         [False, True],
         [
-            ('PCM_S', 8, ),
-            ('PCM_S', 16, ),
-            ('PCM_S', 24, ),
-            ('PCM_S', 32, ),
+            ('PCM_S', 8),
+            ('PCM_S', 16),
+            ('PCM_S', 24),
+            ('PCM_S', 32),
             ('ULAW', 8),
             ('ALAW', 8),
             ('ALAW', 16),
