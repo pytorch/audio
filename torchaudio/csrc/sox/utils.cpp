@@ -424,10 +424,10 @@ unsigned get_precision(const std::string filetype, caffe2::TypeMeta dtype) {
   if (filetype == "amr-nb") {
     return 16;
   }
-  if (filetype == "htk") {
+  if (filetype == "gsm") {
     return 16;
   }
-  if (filetype == "gsm") {
+  if (filetype == "htk") {
     return 16;
   }
   throw std::runtime_error("Unsupported file type: " + filetype);
