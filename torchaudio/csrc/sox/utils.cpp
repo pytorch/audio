@@ -378,6 +378,14 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
           throw std::runtime_error(
               "sph does not support encoding: " + encoding.value());
       }
+    case Format::GSM:
+      if (enc != Encoding::NOT_PROVIDED)
+        throw std::runtime_error("gsm does not support `encoding` option.");
+      if (bps != BitDepth::NOT_PROVIDED)
+        throw std::runtime_error(
+            "gsm does not support `bits_per_sample` option.");
+      return std::make_tuple<>(SOX_ENCODING_GSM, 16);
+
     default:
       throw std::runtime_error("Unsupported format: " + format);
   }
@@ -409,6 +417,8 @@ unsigned get_precision(const std::string filetype, caffe2::TypeMeta dtype) {
   if (filetype == "amr-nb") {
     return 16;
   }
+  if (filetype == "gsm")
+    return 16;
   throw std::runtime_error("Unsupported file type: " + filetype);
 }
 
