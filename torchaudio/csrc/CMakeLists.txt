@@ -5,11 +5,11 @@ get_property(TORCHAUDIO_THIRD_PARTIES GLOBAL PROPERTY TORCHAUDIO_THIRD_PARTIES)
 ################################################################################
 set(
   LIBTORCHAUDIO_SOURCES
-  sox/types.cpp
   sox/io.cpp
   sox/utils.cpp
   sox/effects.cpp
   sox/effects_chain.cpp
+  sox/types.cpp
   lfilter.cpp
   )
 
