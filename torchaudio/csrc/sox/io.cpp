@@ -1,8 +1,8 @@
 #include <torchaudio/csrc/sox/effects.h>
 #include <torchaudio/csrc/sox/effects_chain.h>
 #include <torchaudio/csrc/sox/io.h>
-#include <torchaudio/csrc/sox/utils.h>
 #include <torchaudio/csrc/sox/types.h>
+#include <torchaudio/csrc/sox/utils.h>
 
 using namespace torch::indexing;
 using namespace torchaudio::sox_utils;
