@@ -39,7 +39,6 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    compliance.kaldi
    kaldi_io
    utils
-   transducer
    
    
 .. toctree::
