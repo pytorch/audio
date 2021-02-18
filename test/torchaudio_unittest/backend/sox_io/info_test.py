@@ -226,7 +226,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         duration = 1
         num_channels = 1
         sample_rate = 8000
-        path = self.get_temp_path('data.wav')
+        path = self.get_temp_path('data.htk')
         sox_utils.gen_audio_file(
             path, sample_rate=sample_rate, num_channels=num_channels,
             bit_depth=16, duration=duration)
@@ -236,6 +236,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_channels == num_channels
         assert info.bits_per_sample == 16
         assert info.encoding == "PCM_S"
+
 
 @skipIfNoExtension
 class TestInfoOpus(PytorchTestCase):
