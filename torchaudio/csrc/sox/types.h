@@ -1,8 +1,8 @@
 #ifndef TORCHAUDIO_SOX_TYPES_H
 #define TORCHAUDIO_SOX_TYPES_H
 
-#include <torch/script.h>
 #include <sox.h>
+#include <torch/script.h>
 
 namespace torchaudio {
 namespace sox_utils {

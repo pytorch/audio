@@ -127,7 +127,7 @@ std::string get_encoding(sox_encoding_t encoding) {
     case SOX_ENCODING_OPUS:
       return "OPUS";
     case SOX_ENCODING_GSM:
-      return "GSM";   
+      return "GSM";
     default:
       return "UNKNOWN";
   }
