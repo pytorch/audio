@@ -22,6 +22,8 @@ Format get_format_from_string(const std::string& format) {
     return Format::SPHERE;
   if (format == "htk")
     return Format::HTK;
+  if (format == "gsm")
+    return Format::GSM;
   std::ostringstream stream;
   stream << "Internal Error: unexpected format value: " << format;
   throw std::runtime_error(stream.str());

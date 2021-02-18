@@ -15,6 +15,7 @@ enum class Format {
   AMR_WB,
   AMB,
   SPHERE,
+  GSM,
   HTK,
 };
 
