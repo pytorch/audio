@@ -90,18 +90,14 @@ This will require libsox v14.3.2 or above.
 
 <Details><Summary>Click here for the examples on how to install SoX</Summary>
 
-OSX (Homebrew):
 ```bash
+# OSX (Homebrew)
 brew install sox
-```
 
-Linux (Ubuntu):
-```bash
+# Linux (Ubuntu)
 sudo apt-get install sox libsox-dev libsox-fmt-all
-```
 
-Anaconda
-```bash
+# Anaconda
 conda install -c conda-forge sox
 ```
 
