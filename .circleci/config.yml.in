@@ -119,6 +119,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: third_party
+      - designate_upload_channel
       - run: packaging/build_wheel.sh
       - store_artifacts:
           path: dist
@@ -136,6 +137,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: third_party
+      - designate_upload_channel
       - run: packaging/build_conda.sh
       - store_artifacts:
           path: /opt/conda/conda-bld/linux-64
@@ -153,6 +155,7 @@ jobs:
       - install_build_tools_macos
       - attach_workspace:
           at: third_party
+      - designate_upload_channel
       - run:
           # Cannot easily deduplicate this as source'ing activate
           # will set environment variables which we need to propagate
@@ -178,6 +181,7 @@ jobs:
       - install_build_tools_macos
       - attach_workspace:
           at: third_party
+      - designate_upload_channel
       - run:
           command: |
             curl -o conda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
@@ -198,6 +202,7 @@ jobs:
       name: windows-cpu
     steps:
       - checkout
+      - designate_upload_channel
       - run:
           name: build
           command: |
@@ -217,6 +222,7 @@ jobs:
       name: windows-cpu
     steps:
       - checkout
+      - designate_upload_channel
       - run:
           name: build
           command: |
@@ -534,6 +540,7 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - checkout
+      - designate_upload_channel
       - run:
           name: Install pytorch-audio
           command: .circleci/build_docs/install_wheels.sh
