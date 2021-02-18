@@ -67,5 +67,5 @@ build_master() {
     printf "* Installing torchaudio\n"
     cd "${_root_dir}" || exit 1
     git submodule update --init --recursive
-    BUILD_TRANSDUCER=1 BUILD_SOX=1 python setup.py clean install
+    BUILD_TRANSDUCER=0 BUILD_SOX=1 python setup.py clean install
 }
