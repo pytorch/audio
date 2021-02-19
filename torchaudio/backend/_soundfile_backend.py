@@ -356,7 +356,7 @@ def save(
                 - ``"ALAW"`` (a-law)
 
         bits_per_sample (int, optional): Changes the bit depth for the
-                                         supported formats.
+            supported formats.
             When ``format`` is one of ``"wav"``, ``"flac"`` or ``"sph"``,
             you can change the bit depth.
             Valid values are ``8``, ``16``, ``24``, ``32`` and ``64``.
