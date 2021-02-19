@@ -297,8 +297,8 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding_for_wav(
 std::tuple<sox_encoding_t, unsigned> get_save_encoding(
     const std::string& format,
     const caffe2::TypeMeta dtype,
-    const c10::optional<std::string> encoding,
-    const c10::optional<int64_t> bits_per_sample) {
+    const c10::optional<std::string>& encoding,
+    const c10::optional<int64_t>& bits_per_sample) {
   const Format fmt = get_format_from_string(format);
   const Encoding enc = get_encoding_from_option(encoding);
   const BitDepth bps = get_bit_depth_from_option(bits_per_sample);
@@ -490,9 +490,9 @@ sox_encodinginfo_t get_tensor_encodinginfo(caffe2::TypeMeta dtype) {
 sox_encodinginfo_t get_encodinginfo_for_save(
     const std::string& format,
     const caffe2::TypeMeta dtype,
-    const c10::optional<double> compression,
-    const c10::optional<std::string> encoding,
-    const c10::optional<int64_t> bits_per_sample) {
+    const c10::optional<double>& compression,
+    const c10::optional<std::string>& encoding,
+    const c10::optional<int64_t>& bits_per_sample) {
   auto enc = get_save_encoding(format, dtype, encoding, bits_per_sample);
   return sox_encodinginfo_t{
       /*encoding=*/std::get<0>(enc),

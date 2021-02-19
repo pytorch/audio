@@ -110,9 +110,9 @@ sox_encodinginfo_t get_tensor_encodinginfo(const caffe2::TypeMeta dtype);
 sox_encodinginfo_t get_encodinginfo_for_save(
     const std::string& format,
     const caffe2::TypeMeta dtype,
-    const c10::optional<double> compression,
-    const c10::optional<std::string> encoding,
-    const c10::optional<int64_t> bits_per_sample);
+    const c10::optional<double>& compression,
+    const c10::optional<std::string>& encoding,
+    const c10::optional<int64_t>& bits_per_sample);
 
 #ifdef TORCH_API_INCLUDE_EXTENSION_H
 

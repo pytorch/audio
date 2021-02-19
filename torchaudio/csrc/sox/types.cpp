@@ -60,7 +60,7 @@ std::string to_string(Encoding v) {
   }
 }
 
-Encoding get_encoding_from_option(const c10::optional<std::string> encoding) {
+Encoding get_encoding_from_option(const c10::optional<std::string>& encoding) {
   if (!encoding.has_value())
     return Encoding::NOT_PROVIDED;
   std::string v = encoding.value();
@@ -79,7 +79,7 @@ Encoding get_encoding_from_option(const c10::optional<std::string> encoding) {
   throw std::runtime_error(stream.str());
 }
 
-BitDepth get_bit_depth_from_option(const c10::optional<int64_t> bit_depth) {
+BitDepth get_bit_depth_from_option(const c10::optional<int64_t>& bit_depth) {
   if (!bit_depth.has_value())
     return BitDepth::NOT_PROVIDED;
   int64_t v = bit_depth.value();
