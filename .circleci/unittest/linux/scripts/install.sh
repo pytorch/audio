@@ -34,7 +34,7 @@ else
     cudatoolkit="cudatoolkit=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch ${cudatoolkit}
+conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch ${cudatoolkit}
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
@@ -43,11 +43,18 @@ BUILD_TRANSDUCER=1 BUILD_SOX=1 python setup.py install
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
+
+# TODO: Remove this after packages become available
+# Currently there's no librosa package available for Python 3.9, so lets just skip the dependency for now
+if [[ $(python --version) != *3.9* ]]; then
+    pip install 'librosa>=0.8.0'
+fi
+
 if [ "${os}" == Linux ] ; then
     conda install -y -c conda-forge codecov pytest pytest-cov
-    pip install kaldi-io 'librosa>=0.8.0' parameterized SoundFile scipy 'requests>=2.20'
+    pip install kaldi-io parameterized SoundFile scipy 'requests>=2.20'
 else
     # Note: installing librosa via pip fail because it will try to compile numba.
-    conda install -y -c conda-forge codecov pytest pytest-cov 'librosa>=0.8.0' parameterized scipy
+    conda install -y -c conda-forge codecov pytest pytest-cov parameterized scipy
     pip install kaldi-io SoundFile 'requests>=2.20'
 fi

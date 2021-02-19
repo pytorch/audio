@@ -25,7 +25,13 @@ else
     cudatoolkit="cudatoolkit=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch "${cudatoolkit}"
+conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch "${cudatoolkit}"
+
+# TODO: Remove this after packages become available
+# Currently there's no librosa package available for Python 3.9, so lets just skip the dependency for now
+if [[ $(python --version) != *3.9* ]]; then
+    pip install 'librosa>=0.8.0'
+fi
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
