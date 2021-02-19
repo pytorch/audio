@@ -36,6 +36,7 @@ fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 (
     set -x
+    conda install ${CONDA_CHANNEL_FLAGS:-} -y defaults::numpy
     conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch ${cudatoolkit}
 )
 
@@ -53,5 +54,5 @@ if [[ "${PYTORCH_VERSION}" = 3.9 ]]; then
     NUMBA_DEV_CHANNEL="-c numba/label/dev"
 fi
 # Note: installing librosa via pip fail because it will try to compile numba.
-conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} codecov pytest pytest-cov 'librosa>=0.8.0' parameterized scipy
-pip install kaldi-io SoundFile 'requests>=2.20'
+conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa>=0.8.0' parameterized scipy
+pip install kaldi-io SoundFile 'requests>=2.20' codecov pytest pytest-cov
