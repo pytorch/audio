@@ -32,12 +32,8 @@ commands:
       - run:
           name: adding UPLOAD_CHANNEL to BASH_ENV
           command: |
-            our_upload_channel=nightly
-            # On tags upload to test instead
-            if [[ -n "${CIRCLE_TAG}" ]] || [[ ${CIRCLE_BRANCH} =~ release/* ]]; then
-              our_upload_channel=test
-            fi
-            echo "export UPLOAD_CHANNEL=${our_upload_channel}" >> ${BASH_ENV}
+            # Hardcoded for release branch
+            echo "export UPLOAD_CHANNEL=test" >> ${BASH_ENV}
   install_build_tools_macos:
     description: "installs tools required to build torchaudio"
     steps:
@@ -62,11 +58,11 @@ binary_common: &binary_common
     build_version:
       description: "version number of release binary; by default, build a nightly"
       type: string
-      default: ""
+      default: "0.8.0"
     pytorch_version:
       description: "PyTorch version to build against; by default, use a nightly"
       type: string
-      default: ""
+      default: "1.8.0"
     # Don't edit these
     python_version:
       description: "Python version to build against (e.g., 3.8)"
@@ -133,6 +129,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: third_party
+      - designate_upload_channel
       - run: packaging/build_wheel.sh
       - store_artifacts:
           path: dist
@@ -151,6 +148,7 @@ jobs:
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
+      - designate_upload_channel
       - run: packaging/build_conda.sh
       - store_artifacts:
           path: /opt/conda/conda-bld/linux-64
@@ -169,6 +167,7 @@ jobs:
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
+      - designate_upload_channel
       - run:
           # Cannot easily deduplicate this as source'ing activate
           # will set environment variables which we need to propagate
@@ -195,6 +194,7 @@ jobs:
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
+      - designate_upload_channel
       - run:
           command: |
             curl -o conda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
@@ -216,6 +216,7 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
+      - designate_upload_channel
       - run:
           name: build
           command: |
@@ -236,6 +237,7 @@ jobs:
     steps:
       - checkout
       - load_conda_channel_flags
+      - designate_upload_channel
       - run:
           name: build
           command: |
@@ -564,6 +566,7 @@ jobs:
           at: ~/workspace
       - checkout
       - load_conda_channel_flags
+      - designate_upload_channel
       - run:
           name: Install pytorch-audio
           command: .circleci/build_docs/install_wheels.sh
