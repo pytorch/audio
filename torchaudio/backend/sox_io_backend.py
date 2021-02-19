@@ -195,7 +195,8 @@ def save(
             When ``filepath`` argument is file-like object, this argument is required.
 
             Valid values are ``"wav"``, ``"mp3"``, ``"ogg"``, ``"vorbis"``, ``"amr-nb"``,
-            ``"amb"``, ``"flac"``, ``"sph"`` and ``"gsm"``.
+            ``"amb"``, ``"flac"``, ``"sph"``, ``"gsm"``, and ``"htk"``.
+
         encoding (str, optional): Changes the encoding for the supported formats.
             This argument is effective only for supported formats, cush as ``"wav"``, ``""amb"``
             and ``"sph"``. Valid values are;
@@ -293,6 +294,9 @@ def save(
 
     ``"gsm"``
         Lossy Speech Compression, CPU intensive.
+
+    ``"htk"``
+        Uses a default single-channel 16-bit PCM format.
 
     Note:
         To save into formats that ``libsox`` does not handle natively, (such as ``"mp3"``,

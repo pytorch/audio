@@ -20,6 +20,8 @@ Format get_format_from_string(const std::string& format) {
     return Format::AMB;
   if (format == "sph")
     return Format::SPHERE;
+  if (format == "htk")
+    return Format::HTK;
   if (format == "gsm")
     return Format::GSM;
   std::ostringstream stream;
