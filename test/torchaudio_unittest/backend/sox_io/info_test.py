@@ -232,7 +232,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
             duration=duration, bit_depth=16)
         info = sox_io_backend.info(path)
         assert info.sample_rate == sample_rate
-        #TODO: need to confirm if this field should have a 0 value for GSM
+        # TODO: need to confirm if this field should have a 0 value for GSM
         assert info.num_frames == 0
         assert info.num_channels == num_channels
         assert info.bits_per_sample == 0
