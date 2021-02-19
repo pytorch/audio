@@ -17,6 +17,7 @@ enum class Format {
   AMB,
   SPHERE,
   GSM,
+  HTK,
 };
 
 Format get_format_from_string(const std::string& format);
