@@ -296,7 +296,7 @@ def save(
         Lossy Speech Compression, CPU intensive.
 
     ``"htk"``
-        Uses its default single-channel 16-bit PCM format.
+        Uses a default single-channel 16-bit PCM format.
 
     Note:
         To save into formats that ``libsox`` does not handle natively, (such as ``"mp3"``,
