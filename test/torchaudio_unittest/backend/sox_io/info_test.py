@@ -235,6 +235,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.sample_rate == sample_rate
         assert info.num_frames == sample_rate * duration
         assert info.num_channels == num_channels
+        # The 0 is not a typo
         assert info.bits_per_sample == 0
         assert info.encoding == "GSM"
 
