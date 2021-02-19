@@ -221,12 +221,10 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.bits_per_sample == 8
         assert info.encoding == "ALAW"
 
-    @parameterized.expand(list(itertools.product(
-        list(range(1, 17)),
-    )),)
     def test_gsm(self, num_channels):
         """`sox_io_backend.info` can check gsm file correctly"""
         duration = 1
+        num_channels = 1
         sample_rate = 8000
         path = self.get_temp_path('data.gsm')
         sox_utils.gen_audio_file(
@@ -234,10 +232,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
             duration=duration)
         info = sox_io_backend.info(path)
         assert info.sample_rate == sample_rate
-        # TODO: need to confirm if this field should have a 0 value for GSM
-        assert info.num_frames == 0
-        # num_channels is being returned as 1 even if they are 16
-        assert info.num_channels == 1
+        assert info.num_channels == num_channels
         assert info.bits_per_sample == 0
         assert info.encoding == "GSM"
 
