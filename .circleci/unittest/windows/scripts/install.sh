@@ -25,7 +25,7 @@ else
     cudatoolkit="cudatoolkit=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch "${cudatoolkit}"
+conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
@@ -33,5 +33,15 @@ python setup.py install
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
-conda install -y -c conda-forge codecov pytest pytest-cov
-pip install kaldi-io 'librosa>=0.8.0' parameterized PySoundFile scipy
+NUMBA_DEV_CHANNEL=""
+if [[ "$(python --version)" = *3.9* ]]; then
+    # Numba isn't available for Python 3.9 except on the numba dev channel and building from source fails
+    # See https://github.com/librosa/librosa/issues/1270#issuecomment-759065048
+    NUMBA_DEV_CHANNEL="-c numba/label/dev"
+fi
+# Note: installing librosa via pip fail because it will try to compile numba.
+(
+    set -x
+    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa>=0.8.0' parameterized 'requests>=2.20'
+    pip install kaldi-io SoundFile codecov pytest pytest-cov scipy
+)
