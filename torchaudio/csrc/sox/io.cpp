@@ -47,7 +47,7 @@ std::string get_encoding(sox_encoding_t encoding) {
 
 std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_file(
     const std::string& path,
-    c10::optional<std::string>& format) {
+    c10::optional<std::string> format) {
   SoxFormat sf(sox_open_read(
       path.c_str(),
       /*signal=*/nullptr,
@@ -69,8 +69,8 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_file(
 namespace {
 
 std::vector<std::vector<std::string>> get_effects(
-    c10::optional<int64_t>& frame_offset,
-    c10::optional<int64_t>& num_frames) {
+    c10::optional<int64_t> frame_offset,
+    c10::optional<int64_t> num_frames) {
   const auto offset = frame_offset.value_or(0);
   if (offset < 0) {
     throw std::runtime_error(
@@ -101,11 +101,11 @@ std::vector<std::vector<std::string>> get_effects(
 
 std::tuple<torch::Tensor, int64_t> load_audio_file(
     const std::string& path,
-    c10::optional<int64_t>& frame_offset,
-    c10::optional<int64_t>& num_frames,
-    c10::optional<bool>& normalize,
-    c10::optional<bool>& channels_first,
-    c10::optional<std::string>& format) {
+    c10::optional<int64_t> frame_offset,
+    c10::optional<int64_t> num_frames,
+    c10::optional<bool> normalize,
+    c10::optional<bool> channels_first,
+    c10::optional<std::string> format) {
   auto effects = get_effects(frame_offset, num_frames);
   return torchaudio::sox_effects::apply_effects_file(
       path, effects, normalize, channels_first, format);
@@ -116,10 +116,10 @@ void save_audio_file(
     torch::Tensor tensor,
     int64_t sample_rate,
     bool channels_first,
-    c10::optional<double>& compression,
-    c10::optional<std::string>& format,
-    c10::optional<std::string>& encoding,
-    c10::optional<int64_t>& bits_per_sample) {
+    c10::optional<double> compression,
+    c10::optional<std::string> format,
+    c10::optional<std::string> encoding,
+    c10::optional<int64_t> bits_per_sample) {
   validate_input_tensor(tensor);
 
   const auto filetype = [&]() {
@@ -162,7 +162,7 @@ void save_audio_file(
 
 std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
     py::object fileobj,
-    c10::optional<std::string>& format) {
+    c10::optional<std::string> format) {
   // Prepare in-memory file object
   // When libsox opens a file, it also reads the header.
   // When opening a file there are two functions that might touch FILE* (and the
@@ -213,11 +213,11 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
 
 std::tuple<torch::Tensor, int64_t> load_audio_fileobj(
     py::object fileobj,
-    c10::optional<int64_t>& frame_offset,
-    c10::optional<int64_t>& num_frames,
-    c10::optional<bool>& normalize,
-    c10::optional<bool>& channels_first,
-    c10::optional<std::string>& format) {
+    c10::optional<int64_t> frame_offset,
+    c10::optional<int64_t> num_frames,
+    c10::optional<bool> normalize,
+    c10::optional<bool> channels_first,
+    c10::optional<std::string> format) {
   auto effects = get_effects(frame_offset, num_frames);
   return torchaudio::sox_effects::apply_effects_fileobj(
       fileobj, effects, normalize, channels_first, format);
@@ -250,10 +250,10 @@ void save_audio_fileobj(
     torch::Tensor tensor,
     int64_t sample_rate,
     bool channels_first,
-    c10::optional<double>& compression,
-    c10::optional<std::string>& format,
-    c10::optional<std::string>& encoding,
-    c10::optional<int64_t>& bits_per_sample) {
+    c10::optional<double> compression,
+    c10::optional<std::string> format,
+    c10::optional<std::string> encoding,
+    c10::optional<int64_t> bits_per_sample) {
   validate_input_tensor(tensor);
 
   if (!format.has_value()) {
