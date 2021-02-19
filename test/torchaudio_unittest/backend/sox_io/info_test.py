@@ -205,7 +205,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.encoding == "ULAW"
 
     def test_alaw(self):
-        """`sox_io_backend.info` can check ulaw file correctly"""
+        """`sox_io_backend.info` can check alaw file correctly"""
         duration = 1
         num_channels = 1
         sample_rate = 8000
@@ -220,6 +220,22 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_channels == num_channels
         assert info.bits_per_sample == 8
         assert info.encoding == "ALAW"
+
+    def test_htk(self):
+        """`sox_io_backend.info` can check HTK file correctly"""
+        duration = 1
+        num_channels = 1
+        sample_rate = 8000
+        path = self.get_temp_path('data.htk')
+        sox_utils.gen_audio_file(
+            path, sample_rate=sample_rate, num_channels=num_channels,
+            bit_depth=16, duration=duration)
+        info = sox_io_backend.info(path)
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
+        assert info.bits_per_sample == 16
+        assert info.encoding == "PCM_S"
 
 
 @skipIfNoExtension
