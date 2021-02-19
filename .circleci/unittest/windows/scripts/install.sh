@@ -25,7 +25,7 @@ else
     cudatoolkit="cudatoolkit=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" pytorch "${cudatoolkit}"
+conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
