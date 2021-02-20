@@ -221,7 +221,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.bits_per_sample == 8
         assert info.encoding == "ALAW"
 
-    def test_gsm(self, num_channels):
+    def test_gsm(self):
         """`sox_io_backend.info` can check gsm file correctly"""
         duration = 1
         num_channels = 1
