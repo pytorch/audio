@@ -1,6 +1,7 @@
 #ifndef TORCHAUDIO_SOX_TYPES_H
 #define TORCHAUDIO_SOX_TYPES_H
 
+#include <sox.h>
 #include <torch/script.h>
 
 namespace torchaudio {
@@ -50,6 +51,8 @@ enum class BitDepth : unsigned {
 };
 
 BitDepth get_bit_depth_from_option(const c10::optional<int64_t> bit_depth);
+
+std::string get_encoding(sox_encoding_t encoding);
 
 } // namespace sox_utils
 } // namespace torchaudio
