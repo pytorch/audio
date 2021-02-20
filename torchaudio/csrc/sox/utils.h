@@ -93,11 +93,6 @@ torch::Tensor convert_to_tensor(
     const bool normalize,
     const bool channels_first);
 
-///
-/// Convert float32/int32/int16/uint8 Tensor to int32 for Torch -> Sox
-/// conversion.
-torch::Tensor unnormalize_wav(const torch::Tensor);
-
 /// Extract extension from file path
 const std::string get_filetype(const std::string path);
 
@@ -113,9 +108,11 @@ sox_encodinginfo_t get_tensor_encodinginfo(const caffe2::TypeMeta dtype);
 
 /// Get sox_encodinginfo_t for saving to file/file object
 sox_encodinginfo_t get_encodinginfo_for_save(
-    const std::string filetype,
+    const std::string& format,
     const caffe2::TypeMeta dtype,
-    c10::optional<double>& compression);
+    const c10::optional<double> compression,
+    const c10::optional<std::string> encoding,
+    const c10::optional<int64_t> bits_per_sample);
 
 #ifdef TORCH_API_INCLUDE_EXTENSION_H
 
