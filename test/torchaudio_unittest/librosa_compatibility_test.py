@@ -7,7 +7,6 @@ import torchaudio
 import torchaudio.functional as F
 from torchaudio._internal.module_utils import is_module_available
 from parameterized import parameterized, param
-import itertools
 
 LIBROSA_AVAILABLE = is_module_available('librosa')
 
