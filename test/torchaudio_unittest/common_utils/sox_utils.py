@@ -49,6 +49,8 @@ def gen_audio_file(
     ]
     if compression is not None:
         command += ['--compression', str(compression)]
+    if bit_depth is not None:
+        command += ['--bits', str(bit_depth)]
     if encoding is not None:
         command += ['--encoding', str(encoding)]
     command += [
