@@ -495,7 +495,8 @@
 <span class="sd">            When ``filepath`` argument is file-like object, this argument is required.</span>
 
 <span class="sd">            Valid values are ``&quot;wav&quot;``, ``&quot;mp3&quot;``, ``&quot;ogg&quot;``, ``&quot;vorbis&quot;``, ``&quot;amr-nb&quot;``,</span>
-<span class="sd">            ``&quot;amb&quot;``, ``&quot;flac&quot;``, ``&quot;sph&quot;`` and ``&quot;gsm&quot;``.</span>
+<span class="sd">            ``&quot;amb&quot;``, ``&quot;flac&quot;``, ``&quot;sph&quot;``, ``&quot;gsm&quot;``, and ``&quot;htk&quot;``.</span>
+
 <span class="sd">        encoding (str, optional): Changes the encoding for the supported formats.</span>
 <span class="sd">            This argument is effective only for supported formats, cush as ``&quot;wav&quot;``, ``&quot;&quot;amb&quot;``</span>
 <span class="sd">            and ``&quot;sph&quot;``. Valid values are;</span>
@@ -593,6 +594,9 @@
 
 <span class="sd">    ``&quot;gsm&quot;``</span>
 <span class="sd">        Lossy Speech Compression, CPU intensive.</span>
+
+<span class="sd">    ``&quot;htk&quot;``</span>
+<span class="sd">        Uses a default single-channel 16-bit PCM format.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        To save into formats that ``libsox`` does not handle natively, (such as ``&quot;mp3&quot;``,</span>

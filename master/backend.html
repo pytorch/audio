@@ -634,7 +634,7 @@ file extension. If file extension is missing or different, you can specify the
 correct format with this argument.</p>
 <p>When <code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is file-like object, this argument is required.</p>
 <p>Valid values are <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;mp3&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amr-nb&quot;</span></code>,
-<code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;gsm&quot;</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;gsm&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&quot;htk&quot;</span></code>.</p>
 </p></li>
 <li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Changes the encoding for the supported formats.
 This argument is effective only for supported formats, cush as <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;&quot;amb&quot;</span></code>
@@ -755,6 +755,8 @@ Default: VBR with high quality.</p>
 <dt><code class="docutils literal notranslate"><span class="pre">&quot;amr-nb&quot;</span></code></dt><dd><p>Bitrate ranging from 4.75 kbit/s to 12.2 kbit/s. Default: 4.75 kbit/s</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">&quot;gsm&quot;</span></code></dt><dd><p>Lossy Speech Compression, CPU intensive.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;htk&quot;</span></code></dt><dd><p>Uses a default single-channel 16-bit PCM format.</p>
 </dd>
 </dl>
 <div class="admonition note">
