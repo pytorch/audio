@@ -195,6 +195,13 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             F.vad, waveform.unsqueeze(0).repeat(3, 1, 1),
             sample_rate=sample_rate)
 
+    def test_vad_different_items(self):
+        """Separate test to ensure VAD consistency with differing items."""
+        sample_rate = 44100
+        waveforms = torch.rand(3, 2, 100) - 0.5
+        self.assert_batch_consistencies(
+            F.vad, waveforms, sample_rate=sample_rate)
+
     @common_utils.skipIfNoExtension
     def test_compute_kaldi_pitch(self):
         sample_rate = 44100
