@@ -257,7 +257,7 @@ def _get_subtype_for_wav(
 
 def _get_subtype_for_sphere(encoding: str, bits_per_sample: int):
     if encoding in (None, "PCM_S"):
-        return f"PCM{bits_per_sample}" if bits_per_sample else "PCM_32"
+        return f"PCM_{bits_per_sample}" if bits_per_sample else "PCM_32"
     if encoding in ("PCM_U", "PCM_F"):
         raise ValueError(f"sph does not support {encoding} encoding.")
     if encoding == "ULAW":
