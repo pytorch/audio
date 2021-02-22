@@ -280,7 +280,7 @@ def _get_subtype(
         if encoding:
             raise ValueError("flac does not support encoding.")
         if not bits_per_sample:
-            return "PCM_16"
+            return "PCM_24"
         if bits_per_sample > 24:
             raise ValueError("flac does not support bits_per_sample > 24.")
         return "PCM_S8" if bits_per_sample == 8 else f"PCM_{bits_per_sample}"
