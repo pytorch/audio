@@ -11,8 +11,9 @@ from torchaudio_unittest import common_utils
 
 
 class TestFunctional(common_utils.TorchaudioTestCase):
-    backend = 'default'
     """Test functions defined in `functional` module"""
+    backend = 'default'
+
     def assert_batch_consistency(
             self, functional, batch, *args, atol=1e-8, rtol=1e-5, seed=42,
             **kwargs):
