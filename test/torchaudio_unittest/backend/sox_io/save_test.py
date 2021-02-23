@@ -317,6 +317,12 @@ class SaveTest(SaveTestBase):
         self.assert_save_consistency(
             "gsm", test_mode=test_mode)
 
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
+    )
+    def test_save_htk(self, test_mode):
+        self.assert_save_consistency("htk", test_mode=test_mode, num_channels=1)
+
     @parameterized.expand([
         ("wav", "PCM_S", 16),
         ("mp3", ),
