@@ -220,7 +220,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.num_channels == num_channels
         assert info.bits_per_sample == 8
         assert info.encoding == "ALAW"
-        
+
     def test_htk(self):
         """`sox_io_backend.info` can check HTK file correctly"""
         duration = 1
