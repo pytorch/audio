@@ -197,6 +197,7 @@ ExternalProject_Add(sox
   URL https://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2
   URL_HASH SHA256=81a6956d4330e75b5827316e44ae381e6f1e8928003c6aa45896da9041ea149c
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env ${envs} ${CMAKE_CURRENT_BINARY_DIR}/src/sox/configure ${COMMON_ARGS} ${SOX_OPTIONS}
+  PATCH_COMMAND patch < ${CMAKE_CURRENT_SOURCE_DIR}/patch/sox.patch
   BUILD_BYPRODUCTS ${SOX_LIBRARIES}
   DOWNLOAD_NO_PROGRESS ON
   LOG_DOWNLOAD ON
