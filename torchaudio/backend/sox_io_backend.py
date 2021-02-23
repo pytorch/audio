@@ -198,7 +198,7 @@ def save(
             ``"amb"``, ``"flac"``, ``"sph"``, ``"gsm"``, and ``"htk"``.
 
         encoding (str, optional): Changes the encoding for the supported formats.
-            This argument is effective only for supported formats, cush as ``"wav"``, ``""amb"``
+            This argument is effective only for supported formats, such as ``"wav"``, ``""amb"``
             and ``"sph"``. Valid values are;
 
                 - ``"PCM_S"`` (signed integer Linear PCM)

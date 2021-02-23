@@ -209,6 +209,93 @@ def load(
     return waveform, sample_rate
 
 
+def _get_subtype_for_wav(
+        dtype: torch.dtype,
+        encoding: str,
+        bits_per_sample: int):
+    if not encoding:
+        if not bits_per_sample:
+            subtype = {
+                torch.uint8: "PCM_U8",
+                torch.int16: "PCM_16",
+                torch.int32: "PCM_32",
+                torch.float32: "FLOAT",
+                torch.float64: "DOUBLE",
+            }.get(dtype)
+            if not subtype:
+                raise ValueError(f"Unsupported dtype for wav: {dtype}")
+            return subtype
+        if bits_per_sample == 8:
+            return "PCM_U8"
+        return f"PCM_{bits_per_sample}"
+    if encoding == "PCM_S":
+        if not bits_per_sample:
+            return "PCM_32"
+        if bits_per_sample == 8:
+            raise ValueError("wav does not support 8-bit signed PCM encoding.")
+        return f"PCM_{bits_per_sample}"
+    if encoding == "PCM_U":
+        if bits_per_sample in (None, 8):
+            return "PCM_U8"
+        raise ValueError("wav only supports 8-bit unsigned PCM encoding.")
+    if encoding == "PCM_F":
+        if bits_per_sample in (None, 32):
+            return "FLOAT"
+        if bits_per_sample == 64:
+            return "DOUBLE"
+        raise ValueError("wav only supports 32/64-bit float PCM encoding.")
+    if encoding == "ULAW":
+        if bits_per_sample in (None, 8):
+            return "ULAW"
+        raise ValueError("wav only supports 8-bit mu-law encoding.")
+    if encoding == "ALAW":
+        if bits_per_sample in (None, 8):
+            return "ALAW"
+        raise ValueError("wav only supports 8-bit a-law encoding.")
+    raise ValueError(f"wav does not support {encoding}.")
+
+
+def _get_subtype_for_sphere(encoding: str, bits_per_sample: int):
+    if encoding in (None, "PCM_S"):
+        return f"PCM_{bits_per_sample}" if bits_per_sample else "PCM_32"
+    if encoding in ("PCM_U", "PCM_F"):
+        raise ValueError(f"sph does not support {encoding} encoding.")
+    if encoding == "ULAW":
+        if bits_per_sample in (None, 8):
+            return "ULAW"
+        raise ValueError("sph only supports 8-bit for mu-law encoding.")
+    if encoding == "ALAW":
+        return "ALAW"
+    raise ValueError(f"sph does not support {encoding}.")
+
+
+def _get_subtype(
+        dtype: torch.dtype,
+        format: str,
+        encoding: str,
+        bits_per_sample: int):
+    if format == "wav":
+        return _get_subtype_for_wav(dtype, encoding, bits_per_sample)
+    if format == "flac":
+        if encoding:
+            raise ValueError("flac does not support encoding.")
+        if not bits_per_sample:
+            return "PCM_24"
+        if bits_per_sample > 24:
+            raise ValueError("flac does not support bits_per_sample > 24.")
+        return "PCM_S8" if bits_per_sample == 8 else f"PCM_{bits_per_sample}"
+    if format in ("ogg", "vorbis"):
+        if encoding or bits_per_sample:
+            raise ValueError(
+                "ogg/vorbis does not support encoding/bits_per_sample.")
+        return "VORBIS"
+    if format == "sph":
+        return _get_subtype_for_sphere(encoding, bits_per_sample)
+    if format in ("nis", "nist"):
+        return "PCM_16"
+    raise ValueError(f"Unsupported format: {format}")
+
+
 @_mod_utils.requires_module("soundfile")
 def save(
     filepath: str,
@@ -217,6 +304,8 @@ def save(
     channels_first: bool = True,
     compression: Optional[float] = None,
     format: Optional[str] = None,
+    encoding: Optional[str] = None,
+    bits_per_sample: Optional[int] = None,
 ):
     """Save audio data to file.
 
@@ -246,9 +335,65 @@ def save(
             otherwise ``[time, channel]``.
         compression (Optional[float]): Not used.
             It is here only for interface compatibility reson with "sox_io" backend.
-        format (str, optional): Output audio format.
-            This is required when the output audio format cannot be infered from
-            ``filepath``, (such as file extension or ``name`` attribute of the given file object).
+        format (str, optional): Override the audio format.
+            When ``filepath`` argument is path-like object, audio format is
+            inferred from file extension. If the file extension is missing or
+            different, you can specify the correct format with this argument.
+
+            When ``filepath`` argument is file-like object,
+            this argument is required.
+
+            Valid values are ``"wav"``, ``"ogg"``, ``"vorbis"``,
+            ``"flac"`` and ``"sph"``.
+        encoding (str, optional): Changes the encoding for supported formats.
+            This argument is effective only for supported formats, sush as
+            ``"wav"``, ``""flac"`` and ``"sph"``. Valid values are;
+
+                - ``"PCM_S"`` (signed integer Linear PCM)
+                - ``"PCM_U"`` (unsigned integer Linear PCM)
+                - ``"PCM_F"`` (floating point PCM)
+                - ``"ULAW"`` (mu-law)
+                - ``"ALAW"`` (a-law)
+
+        bits_per_sample (int, optional): Changes the bit depth for the
+            supported formats.
+            When ``format`` is one of ``"wav"``, ``"flac"`` or ``"sph"``,
+            you can change the bit depth.
+            Valid values are ``8``, ``16``, ``24``, ``32`` and ``64``.
+
+    Supported formats/encodings/bit depth/compression are:
+
+    ``"wav"``
+        - 32-bit floating-point PCM
+        - 32-bit signed integer PCM
+        - 24-bit signed integer PCM
+        - 16-bit signed integer PCM
+        - 8-bit unsigned integer PCM
+        - 8-bit mu-law
+        - 8-bit a-law
+
+        Note: Default encoding/bit depth is determined by the dtype of
+              the input Tensor.
+
+    ``"flac"``
+        - 8-bit
+        - 16-bit
+        - 24-bit (default)
+
+    ``"ogg"``, ``"vorbis"``
+        - Doesn't accept changing configuration.
+
+    ``"sph"``
+        - 8-bit signed integer PCM
+        - 16-bit signed integer PCM
+        - 24-bit signed integer PCM
+        - 32-bit signed integer PCM (default)
+        - 8-bit mu-law
+        - 8-bit a-law
+        - 16-bit a-law
+        - 24-bit a-law
+        - 32-bit a-law
+
     """
     if src.ndim != 2:
         raise ValueError(f"Expected 2D Tensor, got {src.ndim}D.")
@@ -260,24 +405,13 @@ def save(
     if hasattr(filepath, 'write'):
         if format is None:
             raise RuntimeError('`format` is required when saving to file object.')
-        ext = format
+        ext = format.lower()
     else:
         ext = str(filepath).split(".")[-1].lower()
 
-    if ext != "wav":
-        subtype = None
-    elif src.dtype == torch.uint8:
-        subtype = "PCM_U8"
-    elif src.dtype == torch.int16:
-        subtype = "PCM_16"
-    elif src.dtype == torch.int32:
-        subtype = "PCM_32"
-    elif src.dtype == torch.float32:
-        subtype = "FLOAT"
-    elif src.dtype == torch.float64:
-        subtype = "DOUBLE"
-    else:
-        raise ValueError(f"Unsupported dtype for WAV: {src.dtype}")
+    if bits_per_sample not in (None, 8, 16, 24, 32, 64):
+        raise ValueError("Invalid bits_per_sample.")
+    subtype = _get_subtype(src.dtype, ext, encoding, bits_per_sample)
 
     # sph is a extension used in TED-LIUM but soundfile does not recognize it as NIST format,
     # so we extend the extensions manually here
