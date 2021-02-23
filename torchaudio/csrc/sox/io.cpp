@@ -97,6 +97,10 @@ void save_audio_file(
     const auto num_channels = tensor.size(channels_first ? 0 : 1);
     TORCH_CHECK(
         num_channels == 1, "amr-nb format only supports single channel audio.");
+  } else if (filetype == "htk") {
+    const auto num_channels = tensor.size(channels_first ? 0 : 1);
+    TORCH_CHECK(
+        num_channels == 1, "htk format only supports single channel audio.");
   }
   const auto signal_info =
       get_signalinfo(&tensor, sample_rate, filetype, channels_first);
@@ -232,6 +236,12 @@ void save_audio_fileobj(
     if (num_channels != 1) {
       throw std::runtime_error(
           "amr-nb format only supports single channel audio.");
+    }
+  } else if (filetype == "htk") {
+    const auto num_channels = tensor.size(channels_first ? 0 : 1);
+    if (num_channels != 1) {
+      throw std::runtime_error(
+          "htk format only supports single channel audio.");
     }
   }
   const auto signal_info =
