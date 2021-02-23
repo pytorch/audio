@@ -15,6 +15,7 @@ enum class Format {
   AMR_WB,
   AMB,
   SPHERE,
+  GSM,
 };
 
 Format get_format_from_string(const std::string& format);
