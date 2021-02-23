@@ -637,7 +637,7 @@ correct format with this argument.</p>
 <code class="docutils literal notranslate"><span class="pre">&quot;amb&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;gsm&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&quot;htk&quot;</span></code>.</p>
 </p></li>
 <li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Changes the encoding for the supported formats.
-This argument is effective only for supported formats, cush as <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;&quot;amb&quot;</span></code>
+This argument is effective only for supported formats, such as <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;&quot;amb&quot;</span></code>
 and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>. Valid values are;</p>
 <blockquote>
 <div><ul>
@@ -1198,7 +1198,7 @@ The implementation is same as <a class="reference internal" href="#torchaudio.ba
 <h3>save<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend._soundfile_backend.save">
-<code class="sig-prename descclassname">torchaudio.backend._soundfile_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em>, <em class="sig-param">format: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/_soundfile_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend._soundfile_backend.save" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.backend._soundfile_backend.</code><code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">src: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em>, <em class="sig-param">format: Optional[str] = None</em>, <em class="sig-param">encoding: Optional[str] = None</em>, <em class="sig-param">bits_per_sample: Optional[int] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/backend/_soundfile_backend.html#save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend._soundfile_backend.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save audio data to file.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1233,9 +1233,72 @@ for TorchScript compiler compatiblity.</p></li>
 otherwise <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
 <li><p><strong>compression</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – Not used.
 It is here only for interface compatibility reson with “sox_io” backend.</p></li>
-<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Output audio format.
-This is required when the output audio format cannot be infered from
-<code class="docutils literal notranslate"><span class="pre">filepath</span></code>, (such as file extension or <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute of the given file object).</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Override the audio format.
+When <code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is path-like object, audio format is
+inferred from file extension. If the file extension is missing or
+different, you can specify the correct format with this argument.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">filepath</span></code> argument is file-like object,
+this argument is required.</p>
+<p>Valid values are <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>.</p>
+</p></li>
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Changes the encoding for supported formats.
+This argument is effective only for supported formats, sush as
+<code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;&quot;flac&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>. Valid values are;</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_S&quot;</span></code> (signed integer Linear PCM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_U&quot;</span></code> (unsigned integer Linear PCM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;PCM_F&quot;</span></code> (floating point PCM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;ULAW&quot;</span></code> (mu-law)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;ALAW&quot;</span></code> (a-law)</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Changes the bit depth for the
+supported formats.
+When <code class="docutils literal notranslate"><span class="pre">format</span></code> is one of <code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code>,
+you can change the bit depth.
+Valid values are <code class="docutils literal notranslate"><span class="pre">8</span></code>, <code class="docutils literal notranslate"><span class="pre">16</span></code>, <code class="docutils literal notranslate"><span class="pre">24</span></code>, <code class="docutils literal notranslate"><span class="pre">32</span></code> and <code class="docutils literal notranslate"><span class="pre">64</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Supported formats/encodings/bit depth/compression are:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;wav&quot;</span></code></dt><dd><ul class="simple">
+<li><p>32-bit floating-point PCM</p></li>
+<li><p>32-bit signed integer PCM</p></li>
+<li><p>24-bit signed integer PCM</p></li>
+<li><p>16-bit signed integer PCM</p></li>
+<li><p>8-bit unsigned integer PCM</p></li>
+<li><p>8-bit mu-law</p></li>
+<li><p>8-bit a-law</p></li>
+</ul>
+<dl class="simple">
+<dt>Note: Default encoding/bit depth is determined by the dtype of</dt><dd><p>the input Tensor.</p>
+</dd>
+</dl>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;flac&quot;</span></code></dt><dd><ul class="simple">
+<li><p>8-bit</p></li>
+<li><p>16-bit</p></li>
+<li><p>24-bit (default)</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;ogg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;vorbis&quot;</span></code></dt><dd><ul class="simple">
+<li><p>Doesn’t accept changing configuration.</p></li>
+</ul>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sph&quot;</span></code></dt><dd><ul class="simple">
+<li><p>8-bit signed integer PCM</p></li>
+<li><p>16-bit signed integer PCM</p></li>
+<li><p>24-bit signed integer PCM</p></li>
+<li><p>32-bit signed integer PCM (default)</p></li>
+<li><p>8-bit mu-law</p></li>
+<li><p>8-bit a-law</p></li>
+<li><p>16-bit a-law</p></li>
+<li><p>24-bit a-law</p></li>
+<li><p>32-bit a-law</p></li>
 </ul>
 </dd>
 </dl>
