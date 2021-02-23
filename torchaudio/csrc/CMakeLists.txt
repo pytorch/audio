@@ -11,6 +11,7 @@ set(
   sox/effects_chain.cpp
   sox/types.cpp
   lfilter.cpp
+  overdrive.cpp
   )
 
 if(BUILD_TRANSDUCER)

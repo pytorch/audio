@@ -981,8 +981,23 @@ def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
 
     output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
 
-    # TODO: Implement a torch CPP extension
-    for i in range(waveform.shape[-1]):
+    # # TODO: Implement a torch CPP extension
+    # for i in range(waveform.shape[-1]):
+    #     last_out = temp[:, i] - last_in + 0.995 * last_out
+    #     last_in = temp[:, i]
+    #     output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
+
+
+    try:
+        _overdrive_core_loop_cpu = torch.ops.torchaudio._overdrive_core_loop
+    except RuntimeError as err:
+        assert str(err) == 'No such operator torchaudio::_overdrive_core_loop'
+        
+    
+    if device == torch.device('cpu'):
+        _overdrive_core_loop_cpu(waveform, temp, last_in, last_out, output_waveform)
+    else:
+        for i in range(waveform.shape[-1]):
         last_out = temp[:, i] - last_in + 0.995 * last_out
         last_in = temp[:, i]
         output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
