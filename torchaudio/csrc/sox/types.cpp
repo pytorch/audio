@@ -100,5 +100,38 @@ BitDepth get_bit_depth_from_option(const c10::optional<int64_t>& bit_depth) {
   }
 }
 
+std::string get_encoding(sox_encoding_t encoding) {
+  switch (encoding) {
+    case SOX_ENCODING_UNKNOWN:
+      return "UNKNOWN";
+    case SOX_ENCODING_SIGN2:
+      return "PCM_S";
+    case SOX_ENCODING_UNSIGNED:
+      return "PCM_U";
+    case SOX_ENCODING_FLOAT:
+      return "PCM_F";
+    case SOX_ENCODING_FLAC:
+      return "FLAC";
+    case SOX_ENCODING_ULAW:
+      return "ULAW";
+    case SOX_ENCODING_ALAW:
+      return "ALAW";
+    case SOX_ENCODING_MP3:
+      return "MP3";
+    case SOX_ENCODING_VORBIS:
+      return "VORBIS";
+    case SOX_ENCODING_AMR_WB:
+      return "AMR_WB";
+    case SOX_ENCODING_AMR_NB:
+      return "AMR_NB";
+    case SOX_ENCODING_OPUS:
+      return "OPUS";
+    case SOX_ENCODING_GSM:
+      return "GSM";
+    default:
+      return "UNKNOWN";
+  }
+}
+
 } // namespace sox_utils
 } // namespace torchaudio
