@@ -67,7 +67,7 @@ export PATH="<path_to_torchaudio>/third_party/install/bin:${PATH}"
 The following dependencies are also needed for testing:
 
 ```bash
-pip install typing pytest scipy numpy parametrized
+pip install typing pytest scipy numpy parameterized
 ```
 
 ## Development Process
