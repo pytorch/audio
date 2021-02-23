@@ -1,7 +1,7 @@
 See https://github.com/pytorch/audio/pull/1297
-diff -ru src/formats.c src/formats.c
---- src/formats.c	2014-10-26 19:55:50.000000000 -0700
-+++ src/formats.c.new	2021-02-22 16:01:02.833144070 -0800
+diff -ru sox/src/formats.c sox/src/formats.c
+--- sox/src/formats.c	2014-10-26 19:55:50.000000000 -0700
++++ sox/src/formats.c	2021-02-22 16:01:02.833144070 -0800
 @@ -333,6 +333,9 @@
    assert(ft);
    if (!ft->fp)
