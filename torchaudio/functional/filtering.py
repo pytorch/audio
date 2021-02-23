@@ -939,6 +939,26 @@ def lowpass_biquad(
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
+def _overdrive_core_loop_generic(
+    waveform: Tensor,
+    temp: Tensor,
+    last_in: Tensor,
+    last_out: Tensor,
+    output_waveform: Tensor
+):
+    for i in range(waveform.shape[-1]):
+        last_out = temp[:, i] - last_in + 0.995 * last_out
+        last_in = temp[:, i]
+        output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
+
+
+try:
+    _overdrive_core_loop_cpu = torch.ops.torchaudio._overdrive_core_loop
+except RuntimeError as err:
+    assert str(err) == 'No such operator torchaudio::_overdrive_core_loop'
+    _overdrive_core_loop_cpu = _overdrive_core_loop_generic
+
+
 def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
     r"""Apply a overdrive effect to the audio. Similar to SoX implementation.
     This effect applies a non linear distortion to the audio signal.
@@ -987,18 +1007,10 @@ def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
     #     last_in = temp[:, i]
     #     output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
 
-    try:
-        _overdrive_core_loop_cpu = torch.ops.torchaudio._overdrive_core_loop
-    except RuntimeError as err:
-        assert str(err) == 'No such operator torchaudio::_overdrive_core_loop'
-
     if device == torch.device('cpu'):
         _overdrive_core_loop_cpu(waveform, temp, last_in, last_out, output_waveform)
     else:
-        for i in range(waveform.shape[-1]):
-            last_out = temp[:, i] - last_in + 0.995 * last_out
-            last_in = temp[:, i]
-            output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
+        _overdrive_core_loop_generic(waveform, temp, last_in, last_out, output_waveform)
 
     return output_waveform.clamp(min=-1, max=1).view(actual_shape)
 
