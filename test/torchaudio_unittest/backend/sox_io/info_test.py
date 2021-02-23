@@ -221,6 +221,21 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.bits_per_sample == 8
         assert info.encoding == "ALAW"
 
+    def test_gsm(self):
+        """`sox_io_backend.info` can check gsm file correctly"""
+        duration = 1
+        num_channels = 1
+        sample_rate = 8000
+        path = self.get_temp_path('data.gsm')
+        sox_utils.gen_audio_file(
+            path, sample_rate=sample_rate, num_channels=num_channels,
+            duration=duration)
+        info = sox_io_backend.info(path)
+        assert info.sample_rate == sample_rate
+        assert info.num_channels == num_channels
+        assert info.bits_per_sample == 0
+        assert info.encoding == "GSM"
+
 
 @skipIfNoExtension
 class TestInfoOpus(PytorchTestCase):
