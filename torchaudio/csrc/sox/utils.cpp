@@ -425,7 +425,7 @@ unsigned get_precision(const std::string filetype, caffe2::TypeMeta dtype) {
     return 16;
   }
   if (filetype == "gsm") {
-    return 16;      return 16;
+    return 16;
   }
   if (filetype == "htk") {
     return 16;
