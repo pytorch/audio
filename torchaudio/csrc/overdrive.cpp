@@ -12,17 +12,18 @@ void overdrive_cpu_kernel(
   int64_t n_frames = waveform_accessor.size(1);
   int64_t n_channels = waveform_accessor.size(0);
 
-  for (int64_t i_channel = 0; i_channel < n_channels; ++i_channel) {
-    for (int64_t i_frame = 0; i_frame < n_frames; ++i_frame) {
-      last_out_accessor[i_channel] = temp_accessor[i_channel][i_frame] -
-          last_in_accessor[i_channel] + 0.995 * last_out_accessor[i_channel];
-      last_in_accessor[i_channel] = temp_accessor[i_channel][i_frame];
-      output_waveform_accessor[i_channel][i_frame] =
-          waveform_accessor[i_channel][i_frame] * 0.5 +
-          last_out_accessor[i_channel] * 0.75;
+  at::parallel_for(0, n_channels, 1, [&](int64_t begin, int64_t end) {
+    for (int64_t i_channel = begin; i_channel < end; ++i_channel) {
+      for (int64_t i_frame = 0; i_frame < n_frames; ++i_frame) {
+        last_out_accessor[i_channel] = temp_accessor[i_channel][i_frame] -
+            last_in_accessor[i_channel] + 0.995 * last_out_accessor[i_channel];
+        last_in_accessor[i_channel] = temp_accessor[i_channel][i_frame];
+        output_waveform_accessor[i_channel][i_frame] =
+            waveform_accessor[i_channel][i_frame] * 0.5 +
+            last_out_accessor[i_channel] * 0.75;
+      }
     }
-  }
-}
+  });
 
 void overdrive_core_loop_cpu(
     at::Tensor& waveform,
