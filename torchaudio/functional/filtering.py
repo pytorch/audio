@@ -818,11 +818,7 @@ def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: T
         padded_output_waveform[:, i_sample + n_order - 1] = o0
 
 
-try:
-    _lfilter_core_cpu_loop = torch.ops.torchaudio._lfilter_core_loop
-except RuntimeError as err:
-    assert str(err) == 'No such operator torchaudio::_lfilter_core_loop'
-    _lfilter_core_cpu_loop = _lfilter_core_generic_loop
+_lfilter = torch.ops.torchaudio._lfilter
 
 
 def lfilter(
@@ -846,69 +842,13 @@ def lfilter(
     Returns:
         Tensor: Waveform with dimension of ``(..., time)``.
     """
-    # pack batch
-    shape = waveform.size()
-    waveform = waveform.reshape(-1, shape[-1])
-
-    assert a_coeffs.size(0) == b_coeffs.size(0)
-    assert len(waveform.size()) == 2
-    assert waveform.device == a_coeffs.device
-    assert b_coeffs.device == a_coeffs.device
-
-    device = waveform.device
-    dtype = waveform.dtype
-    n_channel, n_sample = waveform.size()
-    n_order = a_coeffs.size(0)
-    n_sample_padded = n_sample + n_order - 1
-    assert n_order > 0
-
-    # Pad the input and create output
-    padded_waveform = torch.zeros(
-        n_channel, n_sample_padded, dtype=dtype, device=device
-    )
-    padded_waveform[:, n_order - 1:] = waveform
-    padded_output_waveform = torch.zeros(
-        n_channel, n_sample_padded, dtype=dtype, device=device
-    )
-
-    # Set up the coefficients matrix
-    # Flip coefficients' order
-    a_coeffs_flipped = a_coeffs.flip(0)
-    b_coeffs_flipped = b_coeffs.flip(0)
-
-    # calculate windowed_input_signal in parallel
-    # create indices of original with shape (n_channel, n_order, n_sample)
-    window_idxs = torch.arange(n_sample, device=device).unsqueeze(0) + torch.arange(
-        n_order, device=device
-    ).unsqueeze(1)
-    window_idxs = window_idxs.repeat(n_channel, 1, 1)
-    window_idxs += (
-        torch.arange(n_channel, device=device).unsqueeze(-1).unsqueeze(-1)
-        * n_sample_padded
-    )
-    window_idxs = window_idxs.long()
-    # (n_order, ) matmul (n_channel, n_order, n_sample) -> (n_channel, n_sample)
-    input_signal_windows = torch.matmul(
-        b_coeffs_flipped, torch.take(padded_waveform, window_idxs)
-    )
-
-    input_signal_windows.div_(a_coeffs[0])
-    a_coeffs_flipped.div_(a_coeffs[0])
-
-    if input_signal_windows.device == torch.device('cpu') and\
-       a_coeffs_flipped.device == torch.device('cpu') and\
-       padded_output_waveform.device == torch.device('cpu'):
-        _lfilter_core_cpu_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
-    else:
-        _lfilter_core_generic_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
-
-    output = padded_output_waveform[:, n_order - 1:]
+    output = _lfilter(waveform, a_coeffs, b_coeffs)
 
     if clamp:
         output = torch.clamp(output, min=-1.0, max=1.0)
 
     # unpack batch
-    output = output.reshape(shape[:-1] + output.shape[-1:])
+    output = output.reshape(waveform.shape)
 
     return output
 
