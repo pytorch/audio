@@ -818,11 +818,7 @@ def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: T
         padded_output_waveform[:, i_sample + n_order - 1] = o0
 
 
-try:
-    _lfilter_core_cpu_loop = torch.ops.torchaudio._lfilter_core_loop
-except RuntimeError as err:
-    assert str(err) == 'No such operator torchaudio::_lfilter_core_loop'
-    _lfilter_core_cpu_loop = _lfilter_core_generic_loop
+_lfilter = torch.ops.torchaudio._lfilter
 
 
 def lfilter(
@@ -846,6 +842,7 @@ def lfilter(
     Returns:
         Tensor: Waveform with dimension of ``(..., time)``.
     """
+<<<<<<< HEAD
     # pack batch
     shape = waveform.size()
     waveform = waveform.reshape(-1, shape[-1])
@@ -886,12 +883,15 @@ def lfilter(
         _lfilter_core_generic_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
 
     output = padded_output_waveform[:, n_order - 1:]
+=======
+    output = _lfilter(waveform, a_coeffs, b_coeffs)
+>>>>>>> add prototype of differentiable lfilter
 
     if clamp:
         output = torch.clamp(output, min=-1.0, max=1.0)
 
     # unpack batch
-    output = output.reshape(shape[:-1] + output.shape[-1:])
+    output = output.reshape(waveform.shape)
 
     return output
 
