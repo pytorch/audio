@@ -10,7 +10,7 @@ import torchaudio
 from .common import AudioMetaData
 
 if _mod_utils.is_module_available('torchaudio._torchaudio'):
-    from torchaudio import _torchaudio
+    from torchaudio import _torchaudio  # noqa
 
 
 @_mod_utils.requires_module('torchaudio._torchaudio')
