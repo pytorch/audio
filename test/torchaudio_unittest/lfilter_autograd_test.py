@@ -15,7 +15,7 @@ class AutogradLfilter(common_utils.TestBaseMixin):
 
     def _get_waveform(self):
         torch.random.manual_seed(2434)
-        return torch.rand(2, 256 * 2, dtype=self.dtype, device=self.device)
+        return torch.rand(2, 4, 256 * 2, dtype=self.dtype, device=self.device)
 
     def test_x_grad(self):
         x, a, b = self._get_waveform(), self._get_a(), self._get_b()
