@@ -143,13 +143,6 @@ class TestTedliumSoundfile(Tedlium, TorchaudioTestCase):
     backend = "soundfile"
 
 
-class TestTedliumSoundfileNew(Tedlium, TorchaudioTestCase):
-    backend = "soundfile-new"
-
-
 if platform.system() != "Windows":
-    class TestTedliumSox(Tedlium, TorchaudioTestCase):
-        backend = "sox"
-
     class TestTedliumSoxIO(Tedlium, TorchaudioTestCase):
         backend = "sox_io"

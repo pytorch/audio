@@ -3,7 +3,7 @@ import warnings
 import tarfile
 
 import torch
-from torchaudio.backend import _soundfile_backend as soundfile_backend
+from torchaudio.backend import soundfile_backend
 from torchaudio._internal import module_utils as _mod_utils
 
 from torchaudio_unittest.common_utils import (

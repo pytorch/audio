@@ -60,7 +60,6 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     _torchaudio
     SHARED
     pybind.cpp
-    sox/legacy.cpp
     ${LIBTORCHAUDIO_SOURCES}
     )
 
