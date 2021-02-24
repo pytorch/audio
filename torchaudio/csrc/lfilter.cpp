@@ -266,13 +266,13 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
 
 TORCH_LIBRARY(torchaudio, m) {
   m.def(
-      "_lfilter(Tensor waveform, Tensor a_coeffs, Tensor b_coeffs) -> Tensor");
+      "torchaudio::_lfilter(Tensor waveform, Tensor a_coeffs, Tensor b_coeffs) -> Tensor");
 }
 
 TORCH_LIBRARY_IMPL(torchaudio, DefaultBackend, m) {
-  m.impl("_lfilter", lfilter_simple);
+  m.impl("torchaudio::_lfilter", lfilter_simple);
 }
 
 TORCH_LIBRARY_IMPL(torchaudio, Autograd, m) {
-  m.impl("_lfilter", lfilter_autograd);
+  m.impl("torchaudio::_lfilter", lfilter_autograd);
 }
