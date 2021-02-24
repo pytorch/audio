@@ -24,6 +24,7 @@ void overdrive_cpu_kernel(
       }
     }
   });
+}
 
 void overdrive_core_loop_cpu(
     at::Tensor& waveform,
