@@ -192,7 +192,7 @@ class DifferentiableFilter
 
     db = F::conv1d(
              F::pad(
-                 waveform.view({1, n_channel, n_sample}),
+                 xh.unsqueeze(0),
                  F::PadFuncOptions({n_order - 1, 0})),
              dy.view({n_channel, 1, n_sample}),
              F::Conv1dFuncOptions().groups(n_channel))
@@ -201,9 +201,9 @@ class DifferentiableFilter
              .flip(0);
     auto dxh = F::conv1d(
                    F::pad(
-                       dy.view({1, n_channel, n_sample}),
+                       dy.view({n_channel, 1, n_sample}),
                        F::PadFuncOptions({0, n_order - 1})),
-                   b_coeffs.view({1, 1, n_order}))
+                   b_coeffs.view({1, 1, n_order}) / a_coeffs[0])
                    .view({n_channel, n_sample});
 
     auto options = torch::TensorOptions().dtype(dtype).device(device);
@@ -215,9 +215,12 @@ class DifferentiableFilter
       lfilter_core_generic_loop(dxh.flip(1), a_coeff_flipped, dx);
     }
 
-    dx = dx.flip(1).view(shape);
+    dx = dx.index({torch::indexing::Slice(),
+                   torch::indexing::Slice(n_order - 1, torch::indexing::None)})
+             .flip(1)
+             .view(shape);
 
-    auto dxhda = torch::zeros_like(dx);
+    auto dxhda = torch::zeros({n_channel, n_sample_padded}, options);
     if (device.is_cpu()) {
       cpu_lfilter_core_loop(-xh, a_coeff_flipped, dxhda);
     } else {
@@ -225,9 +228,7 @@ class DifferentiableFilter
     }
 
     da = F::conv1d(
-             F::pad(
-                 dxhda.view({1, n_channel, n_sample}),
-                 F::PadFuncOptions({n_order - 1, 0})),
+             dxhda.unsqueeze(0),
              dxh.view({n_channel, 1, n_sample}),
              F::Conv1dFuncOptions().groups(n_channel))
              .sum(1)
@@ -235,6 +236,7 @@ class DifferentiableFilter
              .flip(0);
 
     da.div_(a_coeffs[0]);
+    db.div_(a_coeffs[0]);
 
     return {dx, da, db};
   }
