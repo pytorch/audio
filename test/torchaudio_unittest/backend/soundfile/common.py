@@ -32,3 +32,26 @@ def skipIfFormatNotSupported(fmt):
 
 def parameterize(*params):
     return parameterized.expand(list(itertools.product(*params)), name_func=name_func)
+
+
+def fetch_wav_subtype(dtype, encoding, bits_per_sample):
+    subtype = {
+        (None, None): dtype2subtype(dtype),
+        (None, 8): "PCM_U8",
+        ('PCM_U', None): "PCM_U8",
+        ('PCM_U', 8): "PCM_U8",
+        ('PCM_S', None): "PCM_32",
+        ('PCM_S', 16): "PCM_16",
+        ('PCM_S', 32): "PCM_32",
+        ('PCM_F', None): "FLOAT",
+        ('PCM_F', 32): "FLOAT",
+        ('PCM_F', 64): "DOUBLE",
+        ('ULAW', None): "ULAW",
+        ('ULAW', 8): "ULAW",
+        ('ALAW', None): "ALAW",
+        ('ALAW', 8): "ALAW",
+    }.get((encoding, bits_per_sample))
+    if subtype:
+        return subtype
+    raise ValueError(
+        f"wav does not support ({encoding}, {bits_per_sample}).")
