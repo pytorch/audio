@@ -23,14 +23,6 @@ Availability
 
 ``"soundfile"`` backend requires ``SoundFile``. Please refer to `the SoundFile documentation <https://pysoundfile.readthedocs.io/en/latest/>`_ for the installation.
 
- +--------------------+-----------------------+------------------------+
- | **Backend**        | **0.8.0**             | **0.9.0**              |
- +====================+=======================+========================+
- | ``"sox_io"``       | Default on Linx/macOS | Default on Linux/macOS |
- +--------------------+-----------------------+------------------------+
- | ``"soundfile"``    | Default on Windows    | Default on Windows     |
- +--------------------+-----------------------+------------------------+
-
 Common Data Structure
 ~~~~~~~~~~~~~~~~~~~~~
 
