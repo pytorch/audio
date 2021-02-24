@@ -1239,6 +1239,26 @@
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">_overdrive_core_loop_generic</span><span class="p">(</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">temp</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">last_in</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">last_out</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">output_waveform</span><span class="p">:</span> <span class="n">Tensor</span>
+<span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">last_out</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">last_in</span> <span class="o">+</span> <span class="mf">0.995</span> <span class="o">*</span> <span class="n">last_out</span>
+        <span class="n">last_in</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
+        <span class="n">output_waveform</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">waveform</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="n">last_out</span> <span class="o">*</span> <span class="mf">0.75</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">_overdrive_core_loop_cpu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_overdrive_core_loop</span>
+<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;No such operator torchaudio::_overdrive_core_loop&#39;</span>
+    <span class="n">_overdrive_core_loop_cpu</span> <span class="o">=</span> <span class="n">_overdrive_core_loop_generic</span>
+
+
 <div class="viewcode-block" id="overdrive"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.overdrive">[docs]</a><span class="k">def</span> <span class="nf">overdrive</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">gain</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">colour</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a overdrive effect to the audio. Similar to SoX implementation.</span>
 <span class="sd">    This effect applies a non linear distortion to the audio signal.</span>
@@ -1281,11 +1301,11 @@
 
     <span class="n">output_waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
-    <span class="c1"># TODO: Implement a torch CPP extension</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
-        <span class="n">last_out</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">last_in</span> <span class="o">+</span> <span class="mf">0.995</span> <span class="o">*</span> <span class="n">last_out</span>
-        <span class="n">last_in</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
-        <span class="n">output_waveform</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">waveform</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="n">last_out</span> <span class="o">*</span> <span class="mf">0.75</span>
+    <span class="c1"># Uses CPU optimized loop function if available for CPU device</span>
+    <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
+        <span class="n">_overdrive_core_loop_cpu</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">last_in</span><span class="p">,</span> <span class="n">last_out</span><span class="p">,</span> <span class="n">output_waveform</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_overdrive_core_loop_generic</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">last_in</span><span class="p">,</span> <span class="n">last_out</span><span class="p">,</span> <span class="n">output_waveform</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">output_waveform</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">actual_shape</span><span class="p">)</span></div>
 
