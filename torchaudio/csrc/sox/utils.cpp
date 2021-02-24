@@ -169,7 +169,7 @@ torch::Tensor convert_to_tensor(
     const bool normalize,
     const bool channels_first) {
   torch::Tensor t;
-  uint64_t dummy;
+  uint64_t dummy = 0;
   SOX_SAMPLE_LOCALS;
   if (normalize || dtype == torch::kFloat32) {
     t = torch::empty(

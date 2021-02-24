@@ -36,7 +36,6 @@ fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 (
     set -x
-    conda install ${CONDA_CHANNEL_FLAGS:-} -y defaults::numpy
     conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
 )
 
