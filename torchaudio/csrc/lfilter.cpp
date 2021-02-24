@@ -108,8 +108,6 @@ std::vector<torch::Tensor> lfilter_with_hidden_output(
 
   auto options = torch::TensorOptions().dtype(dtype).device(device);
   auto hidden_waveform = torch::zeros({n_channel, n_sample_padded}, options);
-  // auto hidden_waveform = F::pad(waveform, F::PadFuncOptions({n_order - 1,
-  // 0}));
 
   auto a_coeff_flipped = a_coeffs.flip(0).contiguous();
   auto b_coeff_flipped = b_coeffs.flip(0).contiguous();
@@ -176,10 +174,10 @@ class DifferentiableFilter
     int64_t n_sample = waveform.size(1);
     int64_t n_order = a_coeffs.size(0);
     int64_t n_sample_padded = n_sample + n_order - 1;
+    
+    xh = xh.view({n_channel, n_sample});
 
     auto a_coeff_flipped = a_coeffs.flip(0).contiguous();
-    auto b_coeff_flipped = b_coeffs.flip(0).contiguous();
-    b_coeff_flipped.div_(a_coeffs[0]);
     a_coeff_flipped.div_(a_coeffs[0]);
 
     auto dx = torch::Tensor();
@@ -190,53 +188,62 @@ class DifferentiableFilter
     at::AutoNonVariableTypeMode g;
     namespace F = torch::nn::functional;
 
-    db = F::conv1d(
-             F::pad(
-                 xh.unsqueeze(0),
-                 F::PadFuncOptions({n_order - 1, 0})),
-             dy.view({n_channel, 1, n_sample}),
-             F::Conv1dFuncOptions().groups(n_channel))
-             .sum(1)
-             .squeeze(0)
-             .flip(0);
-    auto dxh = F::conv1d(
-                   F::pad(
-                       dy.view({n_channel, 1, n_sample}),
-                       F::PadFuncOptions({0, n_order - 1})),
-                   b_coeffs.view({1, 1, n_order}) / a_coeffs[0])
-                   .view({n_channel, n_sample});
-
-    auto options = torch::TensorOptions().dtype(dtype).device(device);
-    dx = torch::zeros({n_channel, n_sample_padded}, options);
-
-    if (device.is_cpu()) {
-      cpu_lfilter_core_loop(dxh.flip(1), a_coeff_flipped, dx);
-    } else {
-      lfilter_core_generic_loop(dxh.flip(1), a_coeff_flipped, dx);
+    if (b_coeffs.requires_grad()) {
+      db = F::conv1d(
+               F::pad(xh.unsqueeze(0), F::PadFuncOptions({n_order - 1, 0})),
+               dy.view({n_channel, 1, n_sample}),
+               F::Conv1dFuncOptions().groups(n_channel))
+               .sum(1)
+               .squeeze(0)
+               .flip(0);
+      db.div_(a_coeffs[0]);
     }
 
-    dx = dx.index({torch::indexing::Slice(),
-                   torch::indexing::Slice(n_order - 1, torch::indexing::None)})
-             .flip(1)
-             .view(shape);
+    if (a_coeffs.requires_grad() || raw_waveform.requires_grad()) {
+      auto dxh = F::conv1d(
+                     F::pad(
+                         dy.view({n_channel, 1, n_sample}),
+                         F::PadFuncOptions({0, n_order - 1})),
+                     b_coeffs.view({1, 1, n_order}) / a_coeffs[0])
+                     .view({n_channel, n_sample});
 
-    auto dxhda = torch::zeros({n_channel, n_sample_padded}, options);
-    if (device.is_cpu()) {
-      cpu_lfilter_core_loop(-xh, a_coeff_flipped, dxhda);
-    } else {
-      lfilter_core_generic_loop(-xh, a_coeff_flipped, dxhda);
+      auto options = torch::TensorOptions().dtype(dtype).device(device);
+
+      if (raw_waveform.requires_grad()) {
+        dx = torch::zeros({n_channel, n_sample_padded}, options);
+
+        if (device.is_cpu()) {
+          cpu_lfilter_core_loop(dxh.flip(1), a_coeff_flipped, dx);
+        } else {
+          lfilter_core_generic_loop(dxh.flip(1), a_coeff_flipped, dx);
+        }
+
+        dx = dx.index(
+                   {torch::indexing::Slice(),
+                    torch::indexing::Slice(n_order - 1, torch::indexing::None)})
+                 .flip(1)
+                 .view(shape);
+      }
+
+      if (a_coeffs.requires_grad()) {
+        auto dxhda = torch::zeros({n_channel, n_sample_padded}, options);
+        if (device.is_cpu()) {
+          cpu_lfilter_core_loop(-xh, a_coeff_flipped, dxhda);
+        } else {
+          lfilter_core_generic_loop(-xh, a_coeff_flipped, dxhda);
+        }
+
+        da = F::conv1d(
+                 dxhda.unsqueeze(0),
+                 dxh.view({n_channel, 1, n_sample}),
+                 F::Conv1dFuncOptions().groups(n_channel))
+                 .sum(1)
+                 .squeeze(0)
+                 .flip(0);
+
+        da.div_(a_coeffs[0]);
+      }
     }
-
-    da = F::conv1d(
-             dxhda.unsqueeze(0),
-             dxh.view({n_channel, 1, n_sample}),
-             F::Conv1dFuncOptions().groups(n_channel))
-             .sum(1)
-             .squeeze(0)
-             .flip(0);
-
-    da.div_(a_coeffs[0]);
-    db.div_(a_coeffs[0]);
 
     return {dx, da, db};
   }
