@@ -66,6 +66,8 @@ save
 
 .. autofunction:: torchaudio.backend.sox_io_backend.save
 
+.. _soundfile_backend:
+
 Soundfile Backend
 ~~~~~~~~~~~~~~~~~
 
