@@ -5,7 +5,6 @@ from torch.autograd import gradcheck
 from torchaudio_unittest import common_utils
 
 
-
 class AutogradLfilter(common_utils.TestBaseMixin):
     def _get_a(self):
         return torch.tensor([0.7, 0.2, 0.6], dtype=self.dtype, device=self.device)
@@ -31,7 +30,7 @@ class AutogradLfilter(common_utils.TestBaseMixin):
         x, a, b = self._get_waveform(), self._get_a(), self._get_b()
         b.requires_grad = True
         assert gradcheck(F.lfilter, (x, a, b), eps=1e-10)
-    
+
     def test_all_grad(self):
         x, a, b = self._get_waveform(), self._get_a(), self._get_b()
         b.requires_grad = True
@@ -39,10 +38,14 @@ class AutogradLfilter(common_utils.TestBaseMixin):
         x.requires_grad = True
         assert gradcheck(F.lfilter, (x, a, b), eps=1e-10)
 
+
+@common_utils.skipIfNoExtension
 class TestAutogradLfilterCPU(AutogradLfilter, common_utils.PytorchTestCase):
     dtype = torch.float64
     device = torch.device('cpu')
 
+
+@common_utils.skipIfNoExtension
 @common_utils.skipIfNoCuda
 class TestAutogradLfilterCUDA(AutogradLfilter, common_utils.PytorchTestCase):
     dtype = torch.float64
