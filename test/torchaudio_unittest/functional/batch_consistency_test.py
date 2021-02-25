@@ -190,7 +190,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
         waveform, sample_rate = torchaudio.load(filepath)
         self.assert_batch_consistency(
-            F.vad, waveform.unsqueeze(0).repeat(self.batch_size, 1, 1),
+            F.vad, waveform.repeat(self.batch_size, 1, 1),
             sample_rate=sample_rate)
 
     def test_vad_different_items(self):
