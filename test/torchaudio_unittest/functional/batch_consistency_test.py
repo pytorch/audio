@@ -164,7 +164,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         n_channels = 2
         waveform = common_utils.get_whitenoise(
             sample_rate=sample_rate, n_channels=self.batch_size*n_channels,
-            duration=5)
+            duration=1)
         batch = waveform.view(self.batch_size, n_channels, waveform.size(-1))
         self.assert_batch_consistency(F.phaser, batch, sample_rate)
 
