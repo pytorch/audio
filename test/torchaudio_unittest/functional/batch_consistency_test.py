@@ -35,7 +35,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         batch_input = batch.clone()
         batch_result = functional(batch_input, *args, **kwargs)
 
-        self.assertEqual(items_input,  batch_input,  rtol=rtol, atol=atol)
+        self.assertEqual(items_input, batch_input, rtol=rtol, atol=atol)
         self.assertEqual(items_result, batch_result, rtol=rtol, atol=atol)
 
     def test_griffinlim(self):
@@ -163,7 +163,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         sample_rate = 44100
         n_channels = 2
         waveform = common_utils.get_whitenoise(
-            sample_rate=sample_rate, n_channels=self.batch_size*n_channels,
+            sample_rate=sample_rate, n_channels=self.batch_size * n_channels,
             duration=1)
         batch = waveform.view(self.batch_size, n_channels, waveform.size(-1))
         self.assert_batch_consistency(F.phaser, batch, sample_rate)
@@ -205,7 +205,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         sample_rate = 44100
         n_channels = 2
         waveform = common_utils.get_whitenoise(
-            sample_rate=sample_rate, n_channels=self.batch_size*n_channels)
+            sample_rate=sample_rate, n_channels=self.batch_size * n_channels)
         batch = waveform.view(self.batch_size, n_channels, waveform.size(-1))
         self.assert_batch_consistency(
             F.compute_kaldi_pitch, batch, sample_rate=sample_rate)
