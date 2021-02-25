@@ -174,7 +174,7 @@ class DifferentiableFilter
     int64_t n_sample = waveform.size(1);
     int64_t n_order = a_coeffs.size(0);
     int64_t n_sample_padded = n_sample + n_order - 1;
-    
+
     xh = xh.view({n_channel, n_sample});
 
     auto a_coeff_flipped = a_coeffs.flip(0).contiguous();
