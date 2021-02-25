@@ -1,6 +1,5 @@
 import torch
 import torchaudio.functional as F
-from parameterized import parameterized
 from torch.autograd import gradcheck
 from torchaudio_unittest import common_utils
 
