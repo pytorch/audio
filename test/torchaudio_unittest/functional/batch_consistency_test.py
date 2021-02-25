@@ -25,14 +25,17 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
         # Compute items separately, then batch the result
         torch.random.manual_seed(seed)
+        items_input = batch.clone()
         items_result = torch.stack([
-            functional(batch[i].clone(), *args, **kwargs) for i in range(n)
+            functional(items_input[i], *args, **kwargs) for i in range(n)
         ])
 
         # Batch the input and run
         torch.random.manual_seed(seed)
-        batch_result = functional(batch.clone(), *args, **kwargs)
+        batch_input = batch.clone()
+        batch_result = functional(batch_input, *args, **kwargs)
 
+        self.assertEqual(items_input,  batch_input,  rtol=rtol, atol=atol)
         self.assertEqual(items_result, batch_result, rtol=rtol, atol=atol)
 
     def test_griffinlim(self):
