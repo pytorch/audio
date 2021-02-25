@@ -170,7 +170,7 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
   // In case of streamed data, length can be 0
-  validate_input_file(sf, /*check_length=*/false);
+  validate_input_file(sf);
 
   return std::make_tuple(
       static_cast<int64_t>(sf->signal.rate),

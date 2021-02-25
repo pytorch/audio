@@ -26,30 +26,12 @@ class TestBackendSwitch_NoBackend(BackendSwitchMixin, common_utils.TorchaudioTes
 
 
 @common_utils.skipIfNoExtension
-class TestBackendSwitch_SoX(BackendSwitchMixin, common_utils.TorchaudioTestCase):
-    backend = 'sox'
-    backend_module = torchaudio.backend.sox_backend
-
-
-@common_utils.skipIfNoExtension
 class TestBackendSwitch_SoXIO(BackendSwitchMixin, common_utils.TorchaudioTestCase):
     backend = 'sox_io'
     backend_module = torchaudio.backend.sox_io_backend
 
 
 @common_utils.skipIfNoModule('soundfile')
-class TestBackendSwitch_soundfile_legacy(BackendSwitchMixin, common_utils.TorchaudioTestCase):
-    backend = 'soundfile'
-    backend_module = torchaudio.backend.soundfile_backend
-
-    def setUp(self):
-        torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = True
-
-    def tearDown(self):
-        torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE = None
-
-
-@common_utils.skipIfNoModule('soundfile')
 class TestBackendSwitch_soundfile(BackendSwitchMixin, common_utils.TorchaudioTestCase):
     backend = 'soundfile'
-    backend_module = torchaudio.backend._soundfile_backend
+    backend_module = torchaudio.backend.soundfile_backend
