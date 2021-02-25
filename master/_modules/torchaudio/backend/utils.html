@@ -306,10 +306,8 @@
 <span class="kn">from</span> <span class="nn">torchaudio._internal.module_utils</span> <span class="kn">import</span> <span class="n">is_module_available</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">no_backend</span><span class="p">,</span>
-    <span class="n">sox_backend</span><span class="p">,</span>
     <span class="n">sox_io_backend</span><span class="p">,</span>
     <span class="n">soundfile_backend</span><span class="p">,</span>
-    <span class="n">_soundfile_backend</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
@@ -329,7 +327,6 @@
     <span class="k">if</span> <span class="n">is_module_available</span><span class="p">(</span><span class="s1">&#39;soundfile&#39;</span><span class="p">):</span>
         <span class="n">backends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;soundfile&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">is_module_available</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">):</span>
-        <span class="n">backends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sox&#39;</span><span class="p">)</span>
         <span class="n">backends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sox_io&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">backends</span></div>
 
@@ -339,15 +336,9 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        backend (Optional[str]): Name of the backend.</span>
-<span class="sd">            One of ``&quot;sox&quot;``, ``&quot;sox_io&quot;`` or ``&quot;soundfile&quot;`` based on availability</span>
+<span class="sd">            One of ``&quot;sox_io&quot;`` or ``&quot;soundfile&quot;`` based on availability</span>
 <span class="sd">            of the system. If ``None`` is provided the  current backend is unassigned.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">USE_SOUNDFILE_LEGACY_INTERFACE</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s1">&#39;&quot;torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE&quot; flag is deprecated and will be removed in 0.9.0. &#39;</span>
-            <span class="s1">&#39;Please remove the use of flag.&#39;</span>
-        <span class="p">)</span>
-
     <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">list_audio_backends</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s1">&#39;Backend &quot;</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s1">&quot; is not one of &#39;</span>
@@ -355,23 +346,10 @@
 
     <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">module</span> <span class="o">=</span> <span class="n">no_backend</span>
-    <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;sox&#39;</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s1">&#39;&quot;sox&quot; backend is deprecated and will be removed in 0.9.0. &#39;</span>
-            <span class="s1">&#39;Please use &quot;sox_io&quot; backend.&#39;</span>
-        <span class="p">)</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="n">sox_backend</span>
     <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;sox_io&#39;</span><span class="p">:</span>
         <span class="n">module</span> <span class="o">=</span> <span class="n">sox_io_backend</span>
     <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;soundfile&#39;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">USE_SOUNDFILE_LEGACY_INTERFACE</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s1">&#39;The legacy interface of &quot;soundfile&quot; backend is deprecated and will be removed in 0.9.0. &#39;</span>
-                <span class="s1">&#39;Please migrate to the new interface.&#39;</span>
-            <span class="p">)</span>
-            <span class="n">module</span> <span class="o">=</span> <span class="n">soundfile_backend</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">module</span> <span class="o">=</span> <span class="n">_soundfile_backend</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">soundfile_backend</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected backend &quot;</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
 
@@ -398,11 +376,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="o">==</span> <span class="n">no_backend</span><span class="o">.</span><span class="n">load</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="o">==</span> <span class="n">sox_backend</span><span class="o">.</span><span class="n">load</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s1">&#39;sox&#39;</span>
     <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="o">==</span> <span class="n">sox_io_backend</span><span class="o">.</span><span class="n">load</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;sox_io&#39;</span>
-    <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="ow">in</span> <span class="p">[</span><span class="n">soundfile_backend</span><span class="o">.</span><span class="n">load</span><span class="p">,</span> <span class="n">_soundfile_backend</span><span class="o">.</span><span class="n">load</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span> <span class="o">==</span> <span class="n">soundfile_backend</span><span class="o">.</span><span class="n">load</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;soundfile&#39;</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown backend.&#39;</span><span class="p">)</span></div>
 </pre></div>

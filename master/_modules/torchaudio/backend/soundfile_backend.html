@@ -298,133 +298,455 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.backend.soundfile_backend</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="sd">&quot;&quot;&quot;The new soundfile backend which will become default in 0.8.0 onward&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
+<span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">AudioMetaData</span>
 
-<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span><span class="p">,</span>
-    <span class="n">misc_ops</span> <span class="k">as</span> <span class="n">_misc_ops</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">common</span>
-<span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">SignalInfo</span><span class="p">,</span> <span class="n">EncodingInfo</span>
 
-<span class="k">if</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">is_module_available</span><span class="p">(</span><span class="s1">&#39;soundfile&#39;</span><span class="p">):</span>
+<span class="k">if</span> <span class="n">_mod_utils</span><span class="o">.</span><span class="n">is_module_available</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">):</span>
     <span class="kn">import</span> <span class="nn">soundfile</span>
 
 
-<span class="n">_subtype_to_precision</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;PCM_S8&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
-    <span class="s1">&#39;PCM_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
-    <span class="s1">&#39;PCM_24&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>
-    <span class="s1">&#39;PCM_32&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
-    <span class="s1">&#39;PCM_U8&#39;</span><span class="p">:</span> <span class="mi">8</span>
+<span class="c1"># Mapping from soundfile subtype to number of bits per sample.</span>
+<span class="c1"># This is mostly heuristical and the value is set to 0 when it is irrelevant</span>
+<span class="c1"># (lossy formats) or when it can&#39;t be inferred.</span>
+<span class="c1"># For ADPCM (and G72X) subtypes, it&#39;s hard to infer the bit depth because it&#39;s not part of the standard:</span>
+<span class="c1"># According to https://en.wikipedia.org/wiki/Adaptive_differential_pulse-code_modulation#In_telephony,</span>
+<span class="c1"># the default seems to be 8 bits but it can be compressed further to 4 bits.</span>
+<span class="c1"># The dict is inspired from</span>
+<span class="c1"># https://github.com/bastibe/python-soundfile/blob/744efb4b01abc72498a96b09115b42a4cabd85e4/soundfile.py#L66-L94</span>
+<span class="n">_SUBTYPE_TO_BITS_PER_SAMPLE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;PCM_S8&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># Signed 8 bit data</span>
+    <span class="s1">&#39;PCM_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># Signed 16 bit data</span>
+    <span class="s1">&#39;PCM_24&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>  <span class="c1"># Signed 24 bit data</span>
+    <span class="s1">&#39;PCM_32&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># Signed 32 bit data</span>
+    <span class="s1">&#39;PCM_U8&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># Unsigned 8 bit data (WAV and RAW only)</span>
+    <span class="s1">&#39;FLOAT&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># 32 bit float data</span>
+    <span class="s1">&#39;DOUBLE&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>  <span class="c1"># 64 bit float data</span>
+    <span class="s1">&#39;ULAW&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># U-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types</span>
+    <span class="s1">&#39;ALAW&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># A-Law encoded. See https://en.wikipedia.org/wiki/G.711#Types</span>
+    <span class="s1">&#39;IMA_ADPCM&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># IMA ADPCM.</span>
+    <span class="s1">&#39;MS_ADPCM&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Microsoft ADPCM.</span>
+    <span class="s1">&#39;GSM610&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># GSM 6.10 encoding. (Wikipedia says 1.625 bit depth?? https://en.wikipedia.org/wiki/Full_Rate)</span>
+    <span class="s1">&#39;VOX_ADPCM&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># OKI / Dialogix ADPCM</span>
+    <span class="s1">&#39;G721_32&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># 32kbs G721 ADPCM encoding.</span>
+    <span class="s1">&#39;G723_24&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># 24kbs G723 ADPCM encoding.</span>
+    <span class="s1">&#39;G723_40&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># 40kbs G723 ADPCM encoding.</span>
+    <span class="s1">&#39;DWVW_12&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>  <span class="c1"># 12 bit Delta Width Variable Word encoding.</span>
+    <span class="s1">&#39;DWVW_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># 16 bit Delta Width Variable Word encoding.</span>
+    <span class="s1">&#39;DWVW_24&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>  <span class="c1"># 24 bit Delta Width Variable Word encoding.</span>
+    <span class="s1">&#39;DWVW_N&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># N bit Delta Width Variable Word encoding.</span>
+    <span class="s1">&#39;DPCM_8&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># 8 bit differential PCM (XI only)</span>
+    <span class="s1">&#39;DPCM_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># 16 bit differential PCM (XI only)</span>
+    <span class="s1">&#39;VORBIS&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Xiph Vorbis encoding. (lossy)</span>
+    <span class="s1">&#39;ALAC_16&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (16 bit).</span>
+    <span class="s1">&#39;ALAC_20&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (20 bit).</span>
+    <span class="s1">&#39;ALAC_24&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (24 bit).</span>
+    <span class="s1">&#39;ALAC_32&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># Apple Lossless Audio Codec (32 bit).</span>
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.load">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;soundfile&#39;</span><span class="p">)</span>
-<span class="nd">@common</span><span class="o">.</span><span class="n">_impl_load</span>
-<span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-         <span class="n">out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-         <span class="n">normalization</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-         <span class="n">channels_first</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-         <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-         <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-         <span class="n">signalinfo</span><span class="p">:</span> <span class="n">SignalInfo</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-         <span class="n">encodinginfo</span><span class="p">:</span> <span class="n">EncodingInfo</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-         <span class="n">filetype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;See torchaudio.load&quot;&quot;&quot;</span>
-
-    <span class="k">assert</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span>
-    <span class="k">assert</span> <span class="n">normalization</span>
-    <span class="k">assert</span> <span class="n">signalinfo</span> <span class="ow">is</span> <span class="kc">None</span>
-    <span class="k">assert</span> <span class="n">encodinginfo</span> <span class="ow">is</span> <span class="kc">None</span>
-
-    <span class="c1"># stringify if `pathlib.Path` (noop if already `str`)</span>
-    <span class="n">filepath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-
-    <span class="c1"># check if valid file</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> not found or is a directory&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
-
-    <span class="k">if</span> <span class="n">num_frames</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected value for num_samples -1 (entire file) or &gt;=0&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">num_frames</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">num_frames</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-    <span class="k">if</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected positive offset value&quot;</span><span class="p">)</span>
-
-    <span class="c1"># initialize output tensor</span>
-    <span class="c1"># TODO call libsoundfile directly to avoid numpy</span>
-    <span class="n">out</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
-        <span class="n">filepath</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="n">num_frames</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="n">always_2d</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">channels_first</span><span class="p">:</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
-
-    <span class="c1"># normalize if needed</span>
-    <span class="c1"># _audio_normalization(out, normalization)</span>
-
-    <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">sample_rate</span></div>
+<span class="k">def</span> <span class="nf">_get_bit_depth</span><span class="p">(</span><span class="n">subtype</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">subtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_SUBTYPE_TO_BITS_PER_SAMPLE</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The </span><span class="si">{</span><span class="n">subtype</span><span class="si">}</span><span class="s2"> subtype is unknown to TorchAudio. As a result, the bits_per_sample &quot;</span>
+            <span class="s2">&quot;attribute will be set to 0. If you are seeing this warning, please &quot;</span>
+            <span class="s2">&quot;report by opening an issue on github (after checking for existing/closed ones). &quot;</span>
+            <span class="s2">&quot;You may otherwise ignore this warning.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_SUBTYPE_TO_BITS_PER_SAMPLE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subtype</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="load_wav"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.load_wav">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;soundfile&#39;</span><span class="p">)</span>
-<span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="s1">&#39;Please use &quot;torchaudio.load&quot;.&#39;</span><span class="p">,</span> <span class="s1">&#39;0.9.0&#39;</span><span class="p">)</span>
-<span class="nd">@common</span><span class="o">.</span><span class="n">_impl_load_wav</span>
-<span class="k">def</span> <span class="nf">load_wav</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;normalization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span>
-    <span class="k">return</span> <span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+<span class="n">_SUBTYPE_TO_ENCODING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;PCM_S8&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_S&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;PCM_16&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_S&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;PCM_24&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_S&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;PCM_32&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_S&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;PCM_U8&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_U&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;FLOAT&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_F&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;DOUBLE&#39;</span><span class="p">:</span> <span class="s1">&#39;PCM_F&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ULAW&#39;</span><span class="p">:</span> <span class="s1">&#39;ULAW&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ALAW&#39;</span><span class="p">:</span> <span class="s1">&#39;ALAW&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;VORBIS&#39;</span><span class="p">:</span> <span class="s1">&#39;VORBIS&#39;</span><span class="p">,</span>
+<span class="p">}</span>
 
 
-<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.save">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;soundfile&#39;</span><span class="p">)</span>
-<span class="nd">@common</span><span class="o">.</span><span class="n">_impl_save</span>
-<span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;See torchaudio.save&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_get_encoding</span><span class="p">(</span><span class="nb">format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subtype</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;FLAC&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;FLAC&#39;</span>
+    <span class="k">return</span> <span class="n">_SUBTYPE_TO_ENCODING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subtype</span><span class="p">,</span> <span class="s1">&#39;UNKNOWN&#39;</span><span class="p">)</span>
 
-    <span class="n">ch_idx</span><span class="p">,</span> <span class="n">len_idx</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">channels_first</span> <span class="k">else</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-    <span class="c1"># check if save directory exists</span>
-    <span class="n">abs_dirpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">abs_dirpath</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;Directory does not exist: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">abs_dirpath</span><span class="p">))</span>
-    <span class="c1"># check that src is a CPU tensor</span>
-    <span class="n">_misc_ops</span><span class="o">.</span><span class="n">check_input</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
-    <span class="c1"># Check/Fix shape of source data</span>
-    <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="c1"># 1d tensors as assumed to be mono signals</span>
-        <span class="n">src</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="n">ch_idx</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">src</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">src</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">ch_idx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">16</span><span class="p">:</span>
-        <span class="c1"># assumes num_channels &lt; 16</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Expected format where C &lt; 16, but found </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">size</span><span class="p">()))</span>
+<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Get signal information of an audio file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filepath (path-like object or file-like object):</span>
+<span class="sd">            Source of audio data.</span>
+<span class="sd">            Note:</span>
+<span class="sd">                  * This argument is intentionally annotated as ``str`` only,</span>
+<span class="sd">                    for the consistency with &quot;sox_io&quot; backend, which has a restriction</span>
+<span class="sd">                    on type annotation due to TorchScript compiler compatiblity.</span>
+<span class="sd">        format (str, optional):</span>
+<span class="sd">            Not used. PySoundFile does not accept format hint.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        AudioMetaData: meta data of the given audio.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sinfo</span> <span class="o">=</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span>
+        <span class="n">sinfo</span><span class="o">.</span><span class="n">samplerate</span><span class="p">,</span>
+        <span class="n">sinfo</span><span class="o">.</span><span class="n">frames</span><span class="p">,</span>
+        <span class="n">sinfo</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span>
+        <span class="n">bits_per_sample</span><span class="o">=</span><span class="n">_get_bit_depth</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">subtype</span><span class="p">),</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="n">_get_encoding</span><span class="p">(</span><span class="n">sinfo</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">sinfo</span><span class="o">.</span><span class="n">subtype</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+<span class="n">_SUBTYPE2DTYPE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;PCM_S8&quot;</span><span class="p">:</span> <span class="s2">&quot;int8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PCM_U8&quot;</span><span class="p">:</span> <span class="s2">&quot;uint8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PCM_16&quot;</span><span class="p">:</span> <span class="s2">&quot;int16&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PCM_32&quot;</span><span class="p">:</span> <span class="s2">&quot;int32&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FLOAT&quot;</span><span class="p">:</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DOUBLE&quot;</span><span class="p">:</span> <span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.load">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">load</span><span class="p">(</span>
+    <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">frame_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Load audio data from file.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The formats this function can handle depend on the soundfile installation.</span>
+<span class="sd">        This function is tested on the following formats;</span>
+
+<span class="sd">        * WAV</span>
+
+<span class="sd">            * 32-bit floating-point</span>
+<span class="sd">            * 32-bit signed integer</span>
+<span class="sd">            * 16-bit signed integer</span>
+<span class="sd">            * 8-bit unsigned integer</span>
+
+<span class="sd">        * FLAC</span>
+<span class="sd">        * OGG/VORBIS</span>
+<span class="sd">        * SPHERE</span>
+
+<span class="sd">    By default (``normalize=True``, ``channels_first=True``), this function returns Tensor with</span>
+<span class="sd">    ``float32`` dtype and the shape of ``[channel, time]``.</span>
+<span class="sd">    The samples are normalized to fit in the range of ``[-1.0, 1.0]``.</span>
+
+<span class="sd">    When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit</span>
+<span class="sd">    signed integer and 8-bit unsigned integer (24-bit signed integer is not supported),</span>
+<span class="sd">    by providing ``normalize=False``, this function can return integer Tensor, where the samples</span>
+<span class="sd">    are expressed within the whole range of the corresponding dtype, that is, ``int32`` tensor</span>
+<span class="sd">    for 32-bit signed PCM, ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM.</span>
+
+<span class="sd">    ``normalize`` parameter has no effect on 32-bit floating-point WAV and other formats, such as</span>
+<span class="sd">    ``flac`` and ``mp3``.</span>
+<span class="sd">    For these formats, this function always returns ``float32`` Tensor with values normalized to</span>
+<span class="sd">    ``[-1.0, 1.0]``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filepath (path-like object or file-like object):</span>
+<span class="sd">            Source of audio data.</span>
+<span class="sd">            Note:</span>
+<span class="sd">                  * This argument is intentionally annotated as ``str`` only,</span>
+<span class="sd">                    for the consistency with &quot;sox_io&quot; backend, which has a restriction</span>
+<span class="sd">                    on type annotation due to TorchScript compiler compatiblity.</span>
+<span class="sd">        frame_offset (int):</span>
+<span class="sd">            Number of frames to skip before start reading data.</span>
+<span class="sd">        num_frames (int):</span>
+<span class="sd">            Maximum number of frames to read. ``-1`` reads all the remaining samples,</span>
+<span class="sd">            starting from ``frame_offset``.</span>
+<span class="sd">            This function may return the less number of frames if there is not enough</span>
+<span class="sd">            frames in the given file.</span>
+<span class="sd">        normalize (bool):</span>
+<span class="sd">            When ``True``, this function always return ``float32``, and sample values are</span>
+<span class="sd">            normalized to ``[-1.0, 1.0]``.</span>
+<span class="sd">            If input file is integer WAV, giving ``False`` will change the resulting Tensor type to</span>
+<span class="sd">            integer type.</span>
+<span class="sd">            This argument has no effect for formats other than integer WAV type.</span>
+<span class="sd">        channels_first (bool):</span>
+<span class="sd">            When True, the returned Tensor has dimension ``[channel, time]``.</span>
+<span class="sd">            Otherwise, the returned Tensor&#39;s dimension is ``[time, channel]``.</span>
+<span class="sd">        format (str, optional):</span>
+<span class="sd">            Not used. PySoundFile does not accept format hint.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[torch.Tensor, int]: Resulting Tensor and sample rate.</span>
+<span class="sd">            If the input file has integer wav format and normalization is off, then it has</span>
+<span class="sd">            integer type, else ``float32`` type. If ``channels_first=True``, it has</span>
+<span class="sd">            ``[channel, time]`` else ``[time, channel]``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">SoundFile</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">file_</span><span class="o">.</span><span class="n">format</span> <span class="o">!=</span> <span class="s2">&quot;WAV&quot;</span> <span class="ow">or</span> <span class="n">normalize</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="s2">&quot;float32&quot;</span>
+        <span class="k">elif</span> <span class="n">file_</span><span class="o">.</span><span class="n">subtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_SUBTYPE2DTYPE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported subtype: </span><span class="si">{</span><span class="n">file_</span><span class="o">.</span><span class="n">subtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">_SUBTYPE2DTYPE</span><span class="p">[</span><span class="n">file_</span><span class="o">.</span><span class="n">subtype</span><span class="p">]</span>
+
+        <span class="n">frames</span> <span class="o">=</span> <span class="n">file_</span><span class="o">.</span><span class="n">_prepare_read</span><span class="p">(</span><span class="n">frame_offset</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">)</span>
+        <span class="n">waveform</span> <span class="o">=</span> <span class="n">file_</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">always_2d</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">file_</span><span class="o">.</span><span class="n">samplerate</span>
+
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">channels_first</span><span class="p">:</span>
+        <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_subtype_for_wav</span><span class="p">(</span>
+        <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">bits_per_sample</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">encoding</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bits_per_sample</span><span class="p">:</span>
+            <span class="n">subtype</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">:</span> <span class="s2">&quot;PCM_U8&quot;</span><span class="p">,</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">int16</span><span class="p">:</span> <span class="s2">&quot;PCM_16&quot;</span><span class="p">,</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">:</span> <span class="s2">&quot;PCM_32&quot;</span><span class="p">,</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span> <span class="s2">&quot;FLOAT&quot;</span><span class="p">,</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span> <span class="s2">&quot;DOUBLE&quot;</span><span class="p">,</span>
+            <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">subtype</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported dtype for wav: </span><span class="si">{</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">subtype</span>
+        <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;PCM_U8&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;PCM_</span><span class="si">{</span><span class="n">bits_per_sample</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="n">encoding</span> <span class="o">==</span> <span class="s2">&quot;PCM_S&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bits_per_sample</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;PCM_32&quot;</span>
+        <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wav does not support 8-bit signed PCM encoding.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;PCM_</span><span class="si">{</span><span class="n">bits_per_sample</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="n">encoding</span> <span class="o">==</span> <span class="s2">&quot;PCM_U&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;PCM_U8&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wav only supports 8-bit unsigned PCM encoding.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">encoding</span> <span class="o">==</span> <span class="s2">&quot;PCM_F&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">32</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;FLOAT&quot;</span>
+        <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="o">==</span> <span class="mi">64</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;DOUBLE&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wav only supports 32/64-bit float PCM encoding.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">encoding</span> <span class="o">==</span> <span class="s2">&quot;ULAW&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;ULAW&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wav only supports 8-bit mu-law encoding.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">encoding</span> <span class="o">==</span> <span class="s2">&quot;ALAW&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;ALAW&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wav only supports 8-bit a-law encoding.&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;wav does not support </span><span class="si">{</span><span class="n">encoding</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_subtype_for_sphere</span><span class="p">(</span><span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;PCM_S&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;PCM_</span><span class="si">{</span><span class="n">bits_per_sample</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="k">else</span> <span class="s2">&quot;PCM_32&quot;</span>
+    <span class="k">if</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;PCM_U&quot;</span><span class="p">,</span> <span class="s2">&quot;PCM_F&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sph does not support </span><span class="si">{</span><span class="n">encoding</span><span class="si">}</span><span class="s2"> encoding.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">encoding</span> <span class="o">==</span> <span class="s2">&quot;ULAW&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;ULAW&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sph only supports 8-bit for mu-law encoding.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">encoding</span> <span class="o">==</span> <span class="s2">&quot;ALAW&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;ALAW&quot;</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sph does not support </span><span class="si">{</span><span class="n">encoding</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_subtype</span><span class="p">(</span>
+        <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">bits_per_sample</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;wav&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_get_subtype_for_wav</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;flac&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">encoding</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;flac does not support encoding.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bits_per_sample</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;PCM_24&quot;</span>
+        <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="o">&gt;</span> <span class="mi">24</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;flac does not support bits_per_sample &gt; 24.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;PCM_S8&quot;</span> <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="o">==</span> <span class="mi">8</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;PCM_</span><span class="si">{</span><span class="n">bits_per_sample</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;ogg&quot;</span><span class="p">,</span> <span class="s2">&quot;vorbis&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">encoding</span> <span class="ow">or</span> <span class="n">bits_per_sample</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;ogg/vorbis does not support encoding/bits_per_sample.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;VORBIS&quot;</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;sph&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_get_subtype_for_sphere</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;nis&quot;</span><span class="p">,</span> <span class="s2">&quot;nist&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;PCM_16&quot;</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported format: </span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.save">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">save</span><span class="p">(</span>
+    <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">src</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">compression</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">bits_per_sample</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save audio data to file.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The formats this function can handle depend on the soundfile installation.</span>
+<span class="sd">        This function is tested on the following formats;</span>
+
+<span class="sd">        * WAV</span>
+
+<span class="sd">            * 32-bit floating-point</span>
+<span class="sd">            * 32-bit signed integer</span>
+<span class="sd">            * 16-bit signed integer</span>
+<span class="sd">            * 8-bit unsigned integer</span>
+
+<span class="sd">        * FLAC</span>
+<span class="sd">        * OGG/VORBIS</span>
+<span class="sd">        * SPHERE</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filepath (str or pathlib.Path): Path to audio file.</span>
+<span class="sd">            This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``</span>
+<span class="sd">            for the consistency with &quot;sox_io&quot; backend, which has a restriction on type annotation</span>
+<span class="sd">            for TorchScript compiler compatiblity.</span>
+<span class="sd">        src (torch.Tensor): Audio data to save. must be 2D tensor.</span>
+<span class="sd">        sample_rate (int): sampling rate</span>
+<span class="sd">        channels_first (bool): If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
+<span class="sd">            otherwise ``[time, channel]``.</span>
+<span class="sd">        compression (Optional[float]): Not used.</span>
+<span class="sd">            It is here only for interface compatibility reson with &quot;sox_io&quot; backend.</span>
+<span class="sd">        format (str, optional): Override the audio format.</span>
+<span class="sd">            When ``filepath`` argument is path-like object, audio format is</span>
+<span class="sd">            inferred from file extension. If the file extension is missing or</span>
+<span class="sd">            different, you can specify the correct format with this argument.</span>
+
+<span class="sd">            When ``filepath`` argument is file-like object,</span>
+<span class="sd">            this argument is required.</span>
+
+<span class="sd">            Valid values are ``&quot;wav&quot;``, ``&quot;ogg&quot;``, ``&quot;vorbis&quot;``,</span>
+<span class="sd">            ``&quot;flac&quot;`` and ``&quot;sph&quot;``.</span>
+<span class="sd">        encoding (str, optional): Changes the encoding for supported formats.</span>
+<span class="sd">            This argument is effective only for supported formats, sush as</span>
+<span class="sd">            ``&quot;wav&quot;``, ``&quot;&quot;flac&quot;`` and ``&quot;sph&quot;``. Valid values are;</span>
+
+<span class="sd">                - ``&quot;PCM_S&quot;`` (signed integer Linear PCM)</span>
+<span class="sd">                - ``&quot;PCM_U&quot;`` (unsigned integer Linear PCM)</span>
+<span class="sd">                - ``&quot;PCM_F&quot;`` (floating point PCM)</span>
+<span class="sd">                - ``&quot;ULAW&quot;`` (mu-law)</span>
+<span class="sd">                - ``&quot;ALAW&quot;`` (a-law)</span>
+
+<span class="sd">        bits_per_sample (int, optional): Changes the bit depth for the</span>
+<span class="sd">            supported formats.</span>
+<span class="sd">            When ``format`` is one of ``&quot;wav&quot;``, ``&quot;flac&quot;`` or ``&quot;sph&quot;``,</span>
+<span class="sd">            you can change the bit depth.</span>
+<span class="sd">            Valid values are ``8``, ``16``, ``24``, ``32`` and ``64``.</span>
+
+<span class="sd">    Supported formats/encodings/bit depth/compression are:</span>
+
+<span class="sd">    ``&quot;wav&quot;``</span>
+<span class="sd">        - 32-bit floating-point PCM</span>
+<span class="sd">        - 32-bit signed integer PCM</span>
+<span class="sd">        - 24-bit signed integer PCM</span>
+<span class="sd">        - 16-bit signed integer PCM</span>
+<span class="sd">        - 8-bit unsigned integer PCM</span>
+<span class="sd">        - 8-bit mu-law</span>
+<span class="sd">        - 8-bit a-law</span>
+
+<span class="sd">        Note: Default encoding/bit depth is determined by the dtype of</span>
+<span class="sd">              the input Tensor.</span>
+
+<span class="sd">    ``&quot;flac&quot;``</span>
+<span class="sd">        - 8-bit</span>
+<span class="sd">        - 16-bit</span>
+<span class="sd">        - 24-bit (default)</span>
+
+<span class="sd">    ``&quot;ogg&quot;``, ``&quot;vorbis&quot;``</span>
+<span class="sd">        - Doesn&#39;t accept changing configuration.</span>
+
+<span class="sd">    ``&quot;sph&quot;``</span>
+<span class="sd">        - 8-bit signed integer PCM</span>
+<span class="sd">        - 16-bit signed integer PCM</span>
+<span class="sd">        - 24-bit signed integer PCM</span>
+<span class="sd">        - 32-bit signed integer PCM (default)</span>
+<span class="sd">        - 8-bit mu-law</span>
+<span class="sd">        - 8-bit a-law</span>
+<span class="sd">        - 16-bit a-law</span>
+<span class="sd">        - 24-bit a-law</span>
+<span class="sd">        - 32-bit a-law</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected 2D Tensor, got </span><span class="si">{</span><span class="n">src</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">D.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">compression</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s1">&#39;`save` function of &quot;soundfile&quot; backend does not support &quot;compression&quot; parameter. &#39;</span>
+            <span class="s2">&quot;The argument is silently ignored.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;`format` is required when saving to file object.&#39;</span><span class="p">)</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="nb">format</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">bits_per_sample</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid bits_per_sample.&quot;</span><span class="p">)</span>
+    <span class="n">subtype</span> <span class="o">=</span> <span class="n">_get_subtype</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">bits_per_sample</span><span class="p">)</span>
+
+    <span class="c1"># sph is a extension used in TED-LIUM but soundfile does not recognize it as NIST format,</span>
+    <span class="c1"># so we extend the extensions manually here</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;nis&quot;</span><span class="p">,</span> <span class="s2">&quot;nist&quot;</span><span class="p">,</span> <span class="s2">&quot;sph&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="s2">&quot;NIST&quot;</span>
 
     <span class="k">if</span> <span class="n">channels_first</span><span class="p">:</span>
         <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">:</span>
-        <span class="c1"># Soundfile doesn&#39;t support int64</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-
-    <span class="n">precision</span> <span class="o">=</span> <span class="s2">&quot;PCM_S8&quot;</span> <span class="k">if</span> <span class="n">precision</span> <span class="o">==</span> <span class="mi">8</span> <span class="k">else</span> <span class="s2">&quot;PCM_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">precision</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">precision</span><span class="p">)</span></div>
+    <span class="n">soundfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+        <span class="n">file</span><span class="o">=</span><span class="n">filepath</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="n">samplerate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span>
+    <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;soundfile&#39;</span><span class="p">)</span>
-<span class="nd">@common</span><span class="o">.</span><span class="n">_impl_info</span>
-<span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">SignalInfo</span><span class="p">,</span> <span class="n">EncodingInfo</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;See torchaudio.info&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="load_wav"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.soundfile_backend.load_wav">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
+<span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span><span class="s1">&#39;Please use &quot;torchaudio.load&quot;.&#39;</span><span class="p">,</span> <span class="s2">&quot;0.9.0&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">load_wav</span><span class="p">(</span>
+    <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">frame_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Load wave file.</span>
 
-    <span class="n">sfi</span> <span class="o">=</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-
-    <span class="n">precision</span> <span class="o">=</span> <span class="n">_subtype_to_precision</span><span class="p">[</span><span class="n">sfi</span><span class="o">.</span><span class="n">subtype</span><span class="p">]</span>
-    <span class="n">si</span> <span class="o">=</span> <span class="n">SignalInfo</span><span class="p">(</span><span class="n">sfi</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span> <span class="n">sfi</span><span class="o">.</span><span class="n">samplerate</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">sfi</span><span class="o">.</span><span class="n">frames</span><span class="p">)</span>
-    <span class="n">ei</span> <span class="o">=</span> <span class="n">EncodingInfo</span><span class="p">(</span><span class="n">bits_per_sample</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">si</span><span class="p">,</span> <span class="n">ei</span></div>
+<span class="sd">    This function is defined only for the purpose of compatibility against other backend</span>
+<span class="sd">    for simple usecases, such as ``torchaudio.load_wav(filepath)``.</span>
+<span class="sd">    The implementation is same as :py:func:`load`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">load</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="p">,</span>
+        <span class="n">frame_offset</span><span class="p">,</span>
+        <span class="n">num_frames</span><span class="p">,</span>
+        <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">,</span>
+    <span class="p">)</span></div>
 </pre></div>
 
              </article>
