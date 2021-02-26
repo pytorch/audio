@@ -187,11 +187,12 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
     def test_vad_from_file(self):
         common_utils.set_audio_backend('default')
-        filepath = common_utils.get_asset_path("vad-go-mono-32000.wav")
+        filepath = common_utils.get_asset_path("vad-go-stereo-44100.wav")
         waveform, sample_rate = torchaudio.load(filepath)
-        self.assert_batch_consistency(
-            F.vad, waveform.repeat(self.batch_size, 1, 1),
-            sample_rate=sample_rate)
+        # Each channel is slightly offset - we can use this to create a batch
+        # with different items.
+        batch = waveform.view(2, 1, -1)
+        self.assert_batch_consistency(F.vad, batch, sample_rate=sample_rate)
 
     def test_vad_different_items(self):
         """Separate test to ensure VAD consistency with differing items."""
