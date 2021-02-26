@@ -855,42 +855,25 @@ def lfilter(
     assert waveform.device == a_coeffs.device
     assert b_coeffs.device == a_coeffs.device
 
-    device = waveform.device
-    dtype = waveform.dtype
     n_channel, n_sample = waveform.size()
     n_order = a_coeffs.size(0)
-    n_sample_padded = n_sample + n_order - 1
     assert n_order > 0
 
     # Pad the input and create output
-    padded_waveform = torch.zeros(
-        n_channel, n_sample_padded, dtype=dtype, device=device
-    )
-    padded_waveform[:, n_order - 1:] = waveform
-    padded_output_waveform = torch.zeros(
-        n_channel, n_sample_padded, dtype=dtype, device=device
-    )
+
+    padded_waveform = torch.nn.functional.pad(waveform, [n_order - 1, 0])
+    padded_output_waveform = torch.zeros_like(padded_waveform)
 
     # Set up the coefficients matrix
     # Flip coefficients' order
     a_coeffs_flipped = a_coeffs.flip(0)
     b_coeffs_flipped = b_coeffs.flip(0)
 
-    # calculate windowed_input_signal in parallel
-    # create indices of original with shape (n_channel, n_order, n_sample)
-    window_idxs = torch.arange(n_sample, device=device).unsqueeze(0) + torch.arange(
-        n_order, device=device
-    ).unsqueeze(1)
-    window_idxs = window_idxs.repeat(n_channel, 1, 1)
-    window_idxs += (
-        torch.arange(n_channel, device=device).unsqueeze(-1).unsqueeze(-1)
-        * n_sample_padded
-    )
-    window_idxs = window_idxs.long()
-    # (n_order, ) matmul (n_channel, n_order, n_sample) -> (n_channel, n_sample)
-    input_signal_windows = torch.matmul(
-        b_coeffs_flipped, torch.take(padded_waveform, window_idxs)
-    )
+    # calculate windowed_input_signal in parallel using convolution
+    input_signal_windows = torch.nn.functional.conv1d(
+        padded_waveform.unsqueeze(1),
+        b_coeffs_flipped.view(1, 1, -1)
+    ).squeeze(1)
 
     input_signal_windows.div_(a_coeffs[0])
     a_coeffs_flipped.div_(a_coeffs[0])
@@ -939,6 +922,26 @@ def lowpass_biquad(
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
+def _overdrive_core_loop_generic(
+    waveform: Tensor,
+    temp: Tensor,
+    last_in: Tensor,
+    last_out: Tensor,
+    output_waveform: Tensor
+):
+    for i in range(waveform.shape[-1]):
+        last_out = temp[:, i] - last_in + 0.995 * last_out
+        last_in = temp[:, i]
+        output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
+
+
+try:
+    _overdrive_core_loop_cpu = torch.ops.torchaudio._overdrive_core_loop
+except RuntimeError as err:
+    assert str(err) == 'No such operator torchaudio::_overdrive_core_loop'
+    _overdrive_core_loop_cpu = _overdrive_core_loop_generic
+
+
 def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
     r"""Apply a overdrive effect to the audio. Similar to SoX implementation.
     This effect applies a non linear distortion to the audio signal.
@@ -981,11 +984,11 @@ def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
 
     output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
 
-    # TODO: Implement a torch CPP extension
-    for i in range(waveform.shape[-1]):
-        last_out = temp[:, i] - last_in + 0.995 * last_out
-        last_in = temp[:, i]
-        output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
+    # Uses CPU optimized loop function if available for CPU device
+    if device == torch.device('cpu'):
+        _overdrive_core_loop_cpu(waveform, temp, last_in, last_out, output_waveform)
+    else:
+        _overdrive_core_loop_generic(waveform, temp, last_in, last_out, output_waveform)
 
     return output_waveform.clamp(min=-1, max=1).view(actual_shape)
 

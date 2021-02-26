@@ -1,7 +1,7 @@
-#include <sox.h>
 #include <torchaudio/csrc/sox/effects.h>
 #include <torchaudio/csrc/sox/effects_chain.h>
 #include <torchaudio/csrc/sox/io.h>
+#include <torchaudio/csrc/sox/types.h>
 #include <torchaudio/csrc/sox/utils.h>
 
 using namespace torch::indexing;
@@ -10,44 +10,9 @@ using namespace torchaudio::sox_utils;
 namespace torchaudio {
 namespace sox_io {
 
-namespace {
-
-std::string get_encoding(sox_encoding_t encoding) {
-  switch (encoding) {
-    case SOX_ENCODING_UNKNOWN:
-      return "UNKNOWN";
-    case SOX_ENCODING_SIGN2:
-      return "PCM_S";
-    case SOX_ENCODING_UNSIGNED:
-      return "PCM_U";
-    case SOX_ENCODING_FLOAT:
-      return "PCM_F";
-    case SOX_ENCODING_FLAC:
-      return "FLAC";
-    case SOX_ENCODING_ULAW:
-      return "ULAW";
-    case SOX_ENCODING_ALAW:
-      return "ALAW";
-    case SOX_ENCODING_MP3:
-      return "MP3";
-    case SOX_ENCODING_VORBIS:
-      return "VORBIS";
-    case SOX_ENCODING_AMR_WB:
-      return "AMR_WB";
-    case SOX_ENCODING_AMR_NB:
-      return "AMR_NB";
-    case SOX_ENCODING_OPUS:
-      return "OPUS";
-    default:
-      return "UNKNOWN";
-  }
-}
-
-} // namespace
-
 std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_file(
     const std::string& path,
-    c10::optional<std::string> format) {
+    const c10::optional<std::string>& format) {
   SoxFormat sf(sox_open_read(
       path.c_str(),
       /*signal=*/nullptr,
@@ -69,8 +34,8 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_file(
 namespace {
 
 std::vector<std::vector<std::string>> get_effects(
-    c10::optional<int64_t> frame_offset,
-    c10::optional<int64_t> num_frames) {
+    const c10::optional<int64_t>& frame_offset,
+    const c10::optional<int64_t>& num_frames) {
   const auto offset = frame_offset.value_or(0);
   if (offset < 0) {
     throw std::runtime_error(
@@ -101,11 +66,11 @@ std::vector<std::vector<std::string>> get_effects(
 
 std::tuple<torch::Tensor, int64_t> load_audio_file(
     const std::string& path,
-    c10::optional<int64_t> frame_offset,
-    c10::optional<int64_t> num_frames,
+    const c10::optional<int64_t>& frame_offset,
+    const c10::optional<int64_t>& num_frames,
     c10::optional<bool> normalize,
     c10::optional<bool> channels_first,
-    c10::optional<std::string> format) {
+    const c10::optional<std::string>& format) {
   auto effects = get_effects(frame_offset, num_frames);
   return torchaudio::sox_effects::apply_effects_file(
       path, effects, normalize, channels_first, format);
@@ -132,6 +97,10 @@ void save_audio_file(
     const auto num_channels = tensor.size(channels_first ? 0 : 1);
     TORCH_CHECK(
         num_channels == 1, "amr-nb format only supports single channel audio.");
+  } else if (filetype == "htk") {
+    const auto num_channels = tensor.size(channels_first ? 0 : 1);
+    TORCH_CHECK(
+        num_channels == 1, "htk format only supports single channel audio.");
   }
   const auto signal_info =
       get_signalinfo(&tensor, sample_rate, filetype, channels_first);
@@ -201,7 +170,7 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
   // In case of streamed data, length can be 0
-  validate_input_file(sf, /*check_length=*/false);
+  validate_input_file(sf);
 
   return std::make_tuple(
       static_cast<int64_t>(sf->signal.rate),
@@ -267,6 +236,12 @@ void save_audio_fileobj(
     if (num_channels != 1) {
       throw std::runtime_error(
           "amr-nb format only supports single channel audio.");
+    }
+  } else if (filetype == "htk") {
+    const auto num_channels = tensor.size(channels_first ? 0 : 1);
+    if (num_channels != 1) {
+      throw std::runtime_error(
+          "htk format only supports single channel audio.");
     }
   }
   const auto signal_info =
