@@ -855,11 +855,8 @@ def lfilter(
     assert waveform.device == a_coeffs.device
     assert b_coeffs.device == a_coeffs.device
 
-    device = waveform.device
-    dtype = waveform.dtype
     n_channel, n_sample = waveform.size()
     n_order = a_coeffs.size(0)
-    n_sample_padded = n_sample + n_order - 1
     assert n_order > 0
 
     # Pad the input and create output
