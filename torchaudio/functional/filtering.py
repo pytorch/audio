@@ -863,13 +863,9 @@ def lfilter(
     assert n_order > 0
 
     # Pad the input and create output
-    padded_waveform = torch.zeros(
-        n_channel, n_sample_padded, dtype=dtype, device=device
-    )
-    padded_waveform[:, n_order - 1:] = waveform
-    padded_output_waveform = torch.zeros(
-        n_channel, n_sample_padded, dtype=dtype, device=device
-    )
+
+    padded_waveform = torch.nn.functional.pad(waveform, [n_order - 1, 0])
+    padded_output_waveform = torch.zeros_like(padded_waveform)
 
     # Set up the coefficients matrix
     # Flip coefficients' order
