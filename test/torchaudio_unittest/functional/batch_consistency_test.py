@@ -4,7 +4,6 @@ import math
 
 from parameterized import parameterized, parameterized_class
 import torch
-import torchaudio
 import torchaudio.functional as F
 
 from torchaudio_unittest import common_utils
