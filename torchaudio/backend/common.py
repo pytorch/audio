@@ -19,10 +19,10 @@ class AudioMetaData:
             * ``ULAW``: Mu-law, [wikipedia]
             * ``ALAW``: A-law [wikipedia]
             * ``MP3`` : MP3, MPEG-1 Audio Layer III
-            * ``VORBIS``: OGG Vorbis [xiph.org]
-            * ``AMR_WB``: Adaptive Multi-Rate [wikipedia]
-            * ``AMR_NB``: Adaptive Multi-Rate Wideband [wikipedia]
-            * ``OPUS``: Opus [opus-codec.org]
+            * ``VORBIS``: OGG Vorbis
+            * ``AMR_WB``: Adaptive Multi-Rate
+            * ``AMR_NB``: Adaptive Multi-Rate Wideband
+            * ``OPUS``: Opus
             * ``UNKNOWN`` : None of above
     """
     def __init__(
