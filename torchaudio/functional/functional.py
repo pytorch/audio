@@ -1011,24 +1011,25 @@ def apply_codec(
     bits_per_sample: Optional[int] = None,
 ) -> Tensor:
     r"""
-    Applies codecs as a form of augmentation
+    Apply codecs as a form of augmentation.
+
     Args:
-        waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```
-        sample_rate (int): Sample rate of the audio waveform
-        format (str): file format
+        waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```.
+        sample_rate (int): Sample rate of the audio waveform.
+        format (str): File format.
         channels_first (bool):
             When True, both the input and output Tensor have dimension ``[channel, time]``.
             Otherwise, they have dimension ``[time, channel]``.
         compression (float): Used for formats other than WAV.
-            For mor details see :py:func:`torchaudio.backend.sox_io_backend.save`
+            For mor details see :py:func:`torchaudio.backend.sox_io_backend.save`.
         encoding (str, optional): Changes the encoding for the supported formats.
-            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`
+            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
         bits_per_sample (int, optional): Changes the bit depth for the supported formats.
-            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`
+            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
 
     Returns:
         torch.Tensor: Resulting Tensor.
-        If ``channels_first=True``, it has ``[channel, time]`` else ``[time, channel]``
+        If ``channels_first=True``, it has ``[channel, time]`` else ``[time, channel]``.
     """
     bytes = io.BytesIO()
     torchaudio.backend.sox_io_backend.save(bytes,
