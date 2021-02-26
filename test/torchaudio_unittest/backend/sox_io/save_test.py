@@ -239,6 +239,12 @@ class SaveTest(SaveTestBase):
 
     @nested_params(
         ["path", "fileobj", "bytesio"],
+    )
+    def test_save_htk(self, test_mode):
+        self.assert_save_consistency("htk", test_mode=test_mode, num_channels=1)
+
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
         [
             None,
             -1,
@@ -309,6 +315,13 @@ class SaveTest(SaveTestBase):
     def test_save_amr_nb(self, test_mode, bit_rate):
         self.assert_save_consistency(
             "amr-nb", compression=bit_rate, num_channels=1, test_mode=test_mode)
+
+    @nested_params(
+        ["path", "fileobj", "bytesio"],
+    )
+    def test_save_gsm(self, test_mode):
+        self.assert_save_consistency(
+            "gsm", test_mode=test_mode)
 
     @parameterized.expand([
         ("wav", "PCM_S", 16),

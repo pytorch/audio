@@ -11,6 +11,7 @@ set(
   sox/effects_chain.cpp
   sox/types.cpp
   lfilter.cpp
+  overdrive.cpp
   )
 
 if(BUILD_TRANSDUCER)
@@ -60,7 +61,6 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     _torchaudio
     SHARED
     pybind.cpp
-    sox/legacy.cpp
     ${LIBTORCHAUDIO_SOURCES}
     )
 

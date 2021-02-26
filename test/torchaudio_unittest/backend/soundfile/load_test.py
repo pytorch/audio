@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import torch
 from torchaudio._internal import module_utils as _mod_utils
-from torchaudio.backend import _soundfile_backend as soundfile_backend
+from torchaudio.backend import soundfile_backend
 from parameterized import parameterized
 
 from torchaudio_unittest.common_utils import (

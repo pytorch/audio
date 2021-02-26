@@ -1,6 +1,7 @@
 #ifndef TORCHAUDIO_SOX_TYPES_H
 #define TORCHAUDIO_SOX_TYPES_H
 
+#include <sox.h>
 #include <torch/script.h>
 
 namespace torchaudio {
@@ -15,6 +16,8 @@ enum class Format {
   AMR_WB,
   AMB,
   SPHERE,
+  GSM,
+  HTK,
 };
 
 Format get_format_from_string(const std::string& format);
@@ -36,7 +39,7 @@ enum class Encoding {
 };
 
 std::string to_string(Encoding v);
-Encoding get_encoding_from_option(const c10::optional<std::string>& encoding);
+Encoding get_encoding_from_option(const c10::optional<std::string> encoding);
 
 enum class BitDepth : unsigned {
   NOT_PROVIDED = 0,
@@ -47,7 +50,9 @@ enum class BitDepth : unsigned {
   B64 = 64,
 };
 
-BitDepth get_bit_depth_from_option(const c10::optional<int64_t>& bit_depth);
+BitDepth get_bit_depth_from_option(const c10::optional<int64_t> bit_depth);
+
+std::string get_encoding(sox_encoding_t encoding);
 
 } // namespace sox_utils
 } // namespace torchaudio
