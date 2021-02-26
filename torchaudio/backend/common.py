@@ -23,7 +23,7 @@ class AudioMetaData:
             * ``AMR_WB``: Adaptive Multi-Rate [wikipedia]
             * ``AMR_NB``: Adaptive Multi-Rate Wideband [wikipedia]
             * ``OPUS``: Opus [opus-codec.org]
-            * ``UNKNOWN`` : None of avobe
+            * ``UNKNOWN`` : None of above
     """
     def __init__(
             self,
