@@ -54,17 +54,22 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             n_iter, momentum, length, 0, atol=5e-5)
 
     @parameterized.expand(list(itertools.product(
-        [100, 440],
         [8000, 16000, 44100],
         [1, 2],
     )), name_func=lambda f, _, p: f'{f.__name__}_{"_".join(str(arg) for arg in p.args)}')
-    def test_detect_pitch_frequency(self, frequency, sample_rate, n_channels):
-        waveform = common_utils.get_sinusoid(
-            frequency=frequency, sample_rate=sample_rate,
-            n_channels=n_channels, duration=5)
+    def test_detect_pitch_frequency(self, sample_rate, n_channels):
+        # Use different frequencies to ensure each item in the batch returns a
+        # different answer.
+        torch.manual_seed(0)
+        frequencies = torch.randint(100, 1000, [self.batch_size])
+        waveforms = torch.stack([
+            common_utils.get_sinusoid(
+                frequency=frequency, sample_rate=sample_rate,
+                n_channels=n_channels, duration=5)
+            for frequency in frequencies
+        ])
         self.assert_batch_consistency(
-            F.detect_pitch_frequency, waveform.repeat(self.batch_size, 1, 1),
-            sample_rate)
+            F.detect_pitch_frequency, waveforms, sample_rate)
 
     def test_amplitude_to_DB(self):
         torch.manual_seed(0)
