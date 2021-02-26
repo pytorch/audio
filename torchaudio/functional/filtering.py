@@ -876,7 +876,7 @@ def lfilter(
     input_signal_windows = torch.nn.functional.conv1d(
         padded_waveform.unsqueeze(1),
         b_coeffs_flipped.view(1, 1, -1)
-    )
+    ).squeeze(1)
 
     input_signal_windows.div_(a_coeffs[0])
     a_coeffs_flipped.div_(a_coeffs[0])
