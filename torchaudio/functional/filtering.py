@@ -876,20 +876,10 @@ def lfilter(
     a_coeffs_flipped = a_coeffs.flip(0)
     b_coeffs_flipped = b_coeffs.flip(0)
 
-    # calculate windowed_input_signal in parallel
-    # create indices of original with shape (n_channel, n_order, n_sample)
-    window_idxs = torch.arange(n_sample, device=device).unsqueeze(0) + torch.arange(
-        n_order, device=device
-    ).unsqueeze(1)
-    window_idxs = window_idxs.repeat(n_channel, 1, 1)
-    window_idxs += (
-        torch.arange(n_channel, device=device).unsqueeze(-1).unsqueeze(-1)
-        * n_sample_padded
-    )
-    window_idxs = window_idxs.long()
-    # (n_order, ) matmul (n_channel, n_order, n_sample) -> (n_channel, n_sample)
-    input_signal_windows = torch.matmul(
-        b_coeffs_flipped, torch.take(padded_waveform, window_idxs)
+    # calculate windowed_input_signal in parallel using convolution
+    input_signal_windows = torch.nn.functional.conv1d(
+        padded_waveform.unsqueeze(1),
+        b_coeffs_flipped.view(1, 1, -1)
     )
 
     input_signal_windows.div_(a_coeffs[0])
