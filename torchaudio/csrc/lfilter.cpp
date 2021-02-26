@@ -124,14 +124,11 @@ torch::Tensor lfilter_core(
         input_signal_windows, a_coeff_flipped, padded_output_waveform);
   }
 
-  auto output =
-      padded_output_waveform
-          .index(
-              {torch::indexing::Slice(),
-               torch::indexing::Slice(n_order - 1, torch::indexing::None)})
-          .view(shape);
+  auto output = padded_output_waveform.index(
+      {torch::indexing::Slice(),
+       torch::indexing::Slice(n_order - 1, torch::indexing::None)});
 
-  return output;
+  return output.view(shape);
 }
 
 } // namespace

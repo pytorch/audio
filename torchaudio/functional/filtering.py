@@ -825,28 +825,11 @@ except RuntimeError as err:
     _lfilter_core_cpu_loop = _lfilter_core_generic_loop
 
 
-def lfilter(
+def _lfilter_core(
     waveform: Tensor,
     a_coeffs: Tensor,
     b_coeffs: Tensor,
-    clamp: bool = True,
 ) -> Tensor:
-    r"""Perform an IIR filter by evaluating difference equation.
-
-    Args:
-        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
-        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(n_order + 1)``.
-                                Lower delays coefficients are first, e.g. ``[a0, a1, a2, ...]``.
-                                Must be same size as b_coeffs (pad with 0's as necessary).
-        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of ``(n_order + 1)``.
-                                 Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.
-                                 Must be same size as a_coeffs (pad with 0's as necessary).
-        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
-
-    Returns:
-        Tensor: Waveform with dimension of ``(..., time)``.
-    """
-    # pack batch
     shape = waveform.size()
     waveform = waveform.reshape(-1, shape[-1])
 
@@ -887,11 +870,43 @@ def lfilter(
 
     output = padded_output_waveform[:, n_order - 1:]
 
-    if clamp:
-        output = torch.clamp(output, min=-1.0, max=1.0)
-
     # unpack batch
     output = output.reshape(shape[:-1] + output.shape[-1:])
+    return output
+
+try:
+    _lfilter = torch.ops.torchaudio._lfilter
+except RuntimeError as err:
+    assert str(err) == 'No such operator torchaudio::_lfilter'
+    _lfilter = _lfilter_core
+
+
+def lfilter(
+    waveform: Tensor,
+    a_coeffs: Tensor,
+    b_coeffs: Tensor,
+    clamp: bool = True,
+) -> Tensor:
+    r"""Perform an IIR filter by evaluating difference equation.
+
+    Args:
+        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
+        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(n_order + 1)``.
+                                Lower delays coefficients are first, e.g. ``[a0, a1, a2, ...]``.
+                                Must be same size as b_coeffs (pad with 0's as necessary).
+        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of ``(n_order + 1)``.
+                                 Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.
+                                 Must be same size as a_coeffs (pad with 0's as necessary).
+        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
+
+    Returns:
+        Tensor: Waveform with dimension of ``(..., time)``.
+    """
+    # pack batch
+    output = _lfilter(waveform, a_coeffs, b_coeffs)
+
+    if clamp:
+        output = torch.clamp(output, min=-1.0, max=1.0)
 
     return output
 
