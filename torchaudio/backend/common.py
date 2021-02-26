@@ -16,8 +16,8 @@ class AudioMetaData:
             * ``PCM_U``: Unsigned integer linear PCM
             * ``PCM_F``: Floating point linear PCM
             * ``FLAC``: Flac, Free Lossless Audio Codec
-            * ``ULAW``: Mu-law, [wikipedia]
-            * ``ALAW``: A-law [wikipedia]
+            * ``ULAW``: Mu-law
+            * ``ALAW``: A-law
             * ``MP3`` : MP3, MPEG-1 Audio Layer III
             * ``VORBIS``: OGG Vorbis
             * ``AMR_WB``: Adaptive Multi-Rate
