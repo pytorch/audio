@@ -81,15 +81,12 @@ void SoxFormat::close() {
   }
 }
 
-void validate_input_file(const SoxFormat& sf, bool check_length) {
+void validate_input_file(const SoxFormat& sf) {
   if (static_cast<sox_format_t*>(sf) == nullptr) {
     throw std::runtime_error("Error loading audio file: failed to open file.");
   }
   if (sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
     throw std::runtime_error("Error loading audio file: unknown encoding.");
-  }
-  if (check_length && sf->signal.length == 0) {
-    throw std::runtime_error("Error reading audio file: unknown length.");
   }
 }
 
@@ -169,7 +166,7 @@ torch::Tensor convert_to_tensor(
     const bool normalize,
     const bool channels_first) {
   torch::Tensor t;
-  uint64_t dummy;
+  uint64_t dummy = 0;
   SOX_SAMPLE_LOCALS;
   if (normalize || dtype == torch::kFloat32) {
     t = torch::empty(
@@ -297,8 +294,8 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding_for_wav(
 std::tuple<sox_encoding_t, unsigned> get_save_encoding(
     const std::string& format,
     const caffe2::TypeMeta dtype,
-    const c10::optional<std::string>& encoding,
-    const c10::optional<int64_t>& bits_per_sample) {
+    const c10::optional<std::string> encoding,
+    const c10::optional<int64_t> bits_per_sample) {
   const Format fmt = get_format_from_string(format);
   const Encoding enc = get_encoding_from_option(encoding);
   const BitDepth bps = get_bit_depth_from_option(bits_per_sample);
@@ -314,6 +311,13 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
         throw std::runtime_error(
             "mp3 does not support `bits_per_sample` option.");
       return std::make_tuple<>(SOX_ENCODING_MP3, 16);
+    case Format::HTK:
+      if (enc != Encoding::NOT_PROVIDED)
+        throw std::runtime_error("htk does not support `encoding` option.");
+      if (bps != BitDepth::NOT_PROVIDED)
+        throw std::runtime_error(
+            "htk does not support `bits_per_sample` option.");
+      return std::make_tuple<>(SOX_ENCODING_SIGN2, 16);
     case Format::VORBIS:
       if (enc != Encoding::NOT_PROVIDED)
         throw std::runtime_error("vorbis does not support `encoding` option.");
@@ -378,6 +382,14 @@ std::tuple<sox_encoding_t, unsigned> get_save_encoding(
           throw std::runtime_error(
               "sph does not support encoding: " + encoding.value());
       }
+    case Format::GSM:
+      if (enc != Encoding::NOT_PROVIDED)
+        throw std::runtime_error("gsm does not support `encoding` option.");
+      if (bps != BitDepth::NOT_PROVIDED)
+        throw std::runtime_error(
+            "gsm does not support `bits_per_sample` option.");
+      return std::make_tuple<>(SOX_ENCODING_GSM, 16);
+
     default:
       throw std::runtime_error("Unsupported format: " + format);
   }
@@ -407,6 +419,12 @@ unsigned get_precision(const std::string filetype, caffe2::TypeMeta dtype) {
   if (filetype == "sph")
     return 32;
   if (filetype == "amr-nb") {
+    return 16;
+  }
+  if (filetype == "gsm") {
+    return 16;
+  }
+  if (filetype == "htk") {
     return 16;
   }
   throw std::runtime_error("Unsupported file type: " + filetype);
@@ -469,9 +487,9 @@ sox_encodinginfo_t get_tensor_encodinginfo(caffe2::TypeMeta dtype) {
 sox_encodinginfo_t get_encodinginfo_for_save(
     const std::string& format,
     const caffe2::TypeMeta dtype,
-    const c10::optional<double>& compression,
-    const c10::optional<std::string>& encoding,
-    const c10::optional<int64_t>& bits_per_sample) {
+    const c10::optional<double> compression,
+    const c10::optional<std::string> encoding,
+    const c10::optional<int64_t> bits_per_sample) {
   auto enc = get_save_encoding(format, dtype, encoding, bits_per_sample);
   return sox_encodinginfo_t{
       /*encoding=*/std::get<0>(enc),

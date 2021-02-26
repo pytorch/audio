@@ -2,7 +2,7 @@ import io
 from unittest.mock import patch
 
 from torchaudio._internal import module_utils as _mod_utils
-from torchaudio.backend import _soundfile_backend as soundfile_backend
+from torchaudio.backend import soundfile_backend
 
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
@@ -11,7 +11,11 @@ from torchaudio_unittest.common_utils import (
     get_wav_data,
     load_wav,
 )
-from .common import parameterize, dtype2subtype, skipIfFormatNotSupported
+from .common import (
+    fetch_wav_subtype,
+    parameterize,
+    skipIfFormatNotSupported,
+)
 
 if _mod_utils.is_module_available("soundfile"):
     import soundfile
@@ -20,28 +24,47 @@ if _mod_utils.is_module_available("soundfile"):
 class MockedSaveTest(PytorchTestCase):
     @parameterize(
         ["float32", "int32", "int16", "uint8"], [8000, 16000], [1, 2], [False, True],
+        [
+            (None, None),
+            ('PCM_U', None),
+            ('PCM_U', 8),
+            ('PCM_S', None),
+            ('PCM_S', 16),
+            ('PCM_S', 32),
+            ('PCM_F', None),
+            ('PCM_F', 32),
+            ('PCM_F', 64),
+            ('ULAW', None),
+            ('ULAW', 8),
+            ('ALAW', None),
+            ('ALAW', 8),
+        ],
     )
     @patch("soundfile.write")
-    def test_wav(self, dtype, sample_rate, num_channels, channels_first, mocked_write):
+    def test_wav(self, dtype, sample_rate, num_channels, channels_first,
+                 enc_params, mocked_write):
         """soundfile_backend.save passes correct subtype to soundfile.write when WAV"""
         filepath = "foo.wav"
         input_tensor = get_wav_data(
             dtype,
             num_channels,
             num_frames=3 * sample_rate,
-            normalize=dtype == "flaot32",
+            normalize=dtype == "float32",
             channels_first=channels_first,
         ).t()
 
+        encoding, bits_per_sample = enc_params
         soundfile_backend.save(
-            filepath, input_tensor, sample_rate, channels_first=channels_first
+            filepath, input_tensor, sample_rate, channels_first=channels_first,
+            encoding=encoding, bits_per_sample=bits_per_sample
         )
 
         # on +Py3.8 call_args.kwargs is more descreptive
         args = mocked_write.call_args[1]
         assert args["file"] == filepath
         assert args["samplerate"] == sample_rate
-        assert args["subtype"] == dtype2subtype(dtype)
+        assert args["subtype"] == fetch_wav_subtype(
+            dtype, encoding, bits_per_sample)
         assert args["format"] is None
         self.assertEqual(
             args["data"], input_tensor.t() if channels_first else input_tensor
@@ -49,7 +72,8 @@ class MockedSaveTest(PytorchTestCase):
 
     @patch("soundfile.write")
     def assert_non_wav(
-        self, fmt, dtype, sample_rate, num_channels, channels_first, mocked_write
+        self, fmt, dtype, sample_rate, num_channels, channels_first, mocked_write,
+        encoding=None, bits_per_sample=None,
     ):
         """soundfile_backend.save passes correct subtype and format to soundfile.write when SPHERE"""
         filepath = f"foo.{fmt}"
@@ -63,14 +87,14 @@ class MockedSaveTest(PytorchTestCase):
         expected_data = input_tensor.t() if channels_first else input_tensor
 
         soundfile_backend.save(
-            filepath, input_tensor, sample_rate, channels_first=channels_first
+            filepath, input_tensor, sample_rate, channels_first,
+            encoding=encoding, bits_per_sample=bits_per_sample,
         )
 
         # on +Py3.8 call_args.kwargs is more descreptive
         args = mocked_write.call_args[1]
         assert args["file"] == filepath
         assert args["samplerate"] == sample_rate
-        assert args["subtype"] is None
         if fmt in ["sph", "nist", "nis"]:
             assert args["format"] == "NIST"
         else:
@@ -83,19 +107,36 @@ class MockedSaveTest(PytorchTestCase):
         [8000, 16000],
         [1, 2],
         [False, True],
+        [
+            ('PCM_S', 8),
+            ('PCM_S', 16),
+            ('PCM_S', 24),
+            ('PCM_S', 32),
+            ('ULAW', 8),
+            ('ALAW', 8),
+            ('ALAW', 16),
+            ('ALAW', 24),
+            ('ALAW', 32),
+        ],
     )
-    def test_sph(self, fmt, dtype, sample_rate, num_channels, channels_first):
+    def test_sph(self, fmt, dtype, sample_rate, num_channels, channels_first, enc_params):
         """soundfile_backend.save passes default format and subtype (None-s) to
         soundfile.write when not WAV"""
-        self.assert_non_wav(fmt, dtype, sample_rate, num_channels, channels_first)
+        encoding, bits_per_sample = enc_params
+        self.assert_non_wav(fmt, dtype, sample_rate, num_channels,
+                            channels_first, encoding=encoding,
+                            bits_per_sample=bits_per_sample)
 
     @parameterize(
         ["int32", "int16"], [8000, 16000], [1, 2], [False, True],
+        [8, 16, 24],
     )
-    def test_flac(self, dtype, sample_rate, num_channels, channels_first):
+    def test_flac(self, dtype, sample_rate, num_channels,
+                  channels_first, bits_per_sample):
         """soundfile_backend.save passes default format and subtype (None-s) to
         soundfile.write when not WAV"""
-        self.assert_non_wav("flac", dtype, sample_rate, num_channels, channels_first)
+        self.assert_non_wav("flac", dtype, sample_rate, num_channels,
+                            channels_first, bits_per_sample=bits_per_sample)
 
     @parameterize(
         ["int32", "int16"], [8000, 16000], [1, 2], [False, True],
@@ -228,7 +269,7 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
         found, sr = soundfile.read(fileobj, dtype='float32')
 
         assert sr == sample_rate
-        self.assertEqual(expected, found)
+        self.assertEqual(expected, found, atol=1e-4, rtol=1e-8)
 
     def test_fileobj_wav(self):
         """Saving audio via file-like object works"""
