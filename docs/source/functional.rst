@@ -208,3 +208,13 @@ vad
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: compute_kaldi_pitch
+
+:hidden:`spectral_centroid`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: spectral_centroid
+
+:hidden:`apply_codec`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: apply_codec
