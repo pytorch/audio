@@ -192,7 +192,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             F.sliding_window_cmn, waveforms, center=False, norm_vars=False)
 
     def test_vad_from_file(self):
-        common_utils.set_audio_backend('default')
         filepath = common_utils.get_asset_path("vad-go-stereo-44100.wav")
         waveform, sample_rate = common_utils.load_wav(filepath)
         # Each channel is slightly offset - we can use this to create a batch
