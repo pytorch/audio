@@ -38,3 +38,14 @@ class AudioMetaData:
         self.num_channels = num_channels
         self.bits_per_sample = bits_per_sample
         self.encoding = encoding
+
+    def __str__(self):
+        return (
+            f"{self.__class__.__name__}("
+            f"sample_rate={self.sample_rate}, "
+            f"num_frames={self.num_frames}, "
+            f"num_channels={self.num_channels}, "
+            f"bits_per_sample={self.bits_per_sample}, "
+            f"encoding={self.encoding}"
+            f")"
+        )
