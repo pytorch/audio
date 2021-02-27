@@ -309,7 +309,21 @@
 <span class="sd">    :ivar int num_channels: The number of channels</span>
 <span class="sd">    :ivar int bits_per_sample: The number of bits per sample. This is 0 for lossy formats,</span>
 <span class="sd">        or when it cannot be accurately inferred.</span>
-<span class="sd">    :ivar str encoding: Audio encoding.</span>
+<span class="sd">    :ivar str encoding: Audio encoding</span>
+<span class="sd">        The values encoding can take are one of the following:</span>
+
+<span class="sd">            * ``PCM_S``: Signed integer linear PCM</span>
+<span class="sd">            * ``PCM_U``: Unsigned integer linear PCM</span>
+<span class="sd">            * ``PCM_F``: Floating point linear PCM</span>
+<span class="sd">            * ``FLAC``: Flac, Free Lossless Audio Codec</span>
+<span class="sd">            * ``ULAW``: Mu-law</span>
+<span class="sd">            * ``ALAW``: A-law</span>
+<span class="sd">            * ``MP3`` : MP3, MPEG-1 Audio Layer III</span>
+<span class="sd">            * ``VORBIS``: OGG Vorbis</span>
+<span class="sd">            * ``AMR_WB``: Adaptive Multi-Rate</span>
+<span class="sd">            * ``AMR_NB``: Adaptive Multi-Rate Wideband</span>
+<span class="sd">            * ``OPUS``: Opus</span>
+<span class="sd">            * ``UNKNOWN`` : None of above</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>

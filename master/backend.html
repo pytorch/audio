@@ -340,7 +340,25 @@
 <li><p><strong>num_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The number of channels</p></li>
 <li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The number of bits per sample. This is 0 for lossy formats,
 or when it cannot be accurately inferred.</p></li>
-<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Audio encoding.</p></li>
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – <p>Audio encoding
+The values encoding can take are one of the following:</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCM_S</span></code>: Signed integer linear PCM</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCM_U</span></code>: Unsigned integer linear PCM</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCM_F</span></code>: Floating point linear PCM</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FLAC</span></code>: Flac, Free Lossless Audio Codec</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ULAW</span></code>: Mu-law</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ALAW</span></code>: A-law</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MP3</span></code> : MP3, MPEG-1 Audio Layer III</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VORBIS</span></code>: OGG Vorbis</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AMR_WB</span></code>: Adaptive Multi-Rate</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AMR_NB</span></code>: Adaptive Multi-Rate Wideband</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OPUS</span></code>: Opus</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">UNKNOWN</span></code> : None of above</p></li>
+</ul>
+</div></blockquote>
+</p></li>
 </ul>
 </dd>
 </dl>
