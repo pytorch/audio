@@ -10,6 +10,8 @@ from torchaudio_unittest import common_utils
 
 
 @parameterized_class([
+    # Single-item batch isolates problems that come purely from adding a
+    # dimension (rather than processing multiple items)
     {"batch_size": 1},
     {"batch_size": 3},
 ])
