@@ -1,3 +1,5 @@
+import time
+
 from parameterized import parameterized
 import torch
 import torchaudio.functional as F
@@ -38,7 +40,24 @@ class KaldiCPUOnly(TempDirMixin, TestBaseMixin):
         self.assert_equal(result, expected=kaldi_result)
 
 
+class Kaldi(TempDirMixin, TestBaseMixin):
+    def assert_equal(self, output, *, expected, rtol=None, atol=None):
+        expected = expected.to(dtype=self.dtype, device=self.device)
+        self.assertEqual(output, expected, rtol=rtol, atol=atol)
+
     def test_compute_fbank(self):
-        sample_rate = 16000
-        waveform = get_sinusoid(dtype='int16', sample_rate=sample_rate).to(torch.float32)[0]
-        F.compute_fbank(waveform, sample_rate)
+        kwargs = {'sample_rate': 16000}
+        sample_rate = kwargs['sample_rate']
+        waveform = get_sinusoid(dtype='int16', sample_rate=sample_rate).to(torch.float32)
+        t0 = time.monotonic()
+        result = F.compute_fbank(waveform[0], sample_rate)
+        print('Elapsed: ', time.monotonic() - t0)
+
+        waveform = get_sinusoid(dtype='int16', sample_rate=sample_rate)
+        wave_file = self.get_temp_path('test.wav')
+        save_wav(wave_file, waveform, sample_rate)
+
+        command = ['compute-fbank-feats'] + convert_args(**kwargs) + ['scp:-', 'ark:-']
+        kaldi_result = run_kaldi(command, 'scp', wave_file)
+        self.assert_equal(result, expected=kaldi_result)
+        
