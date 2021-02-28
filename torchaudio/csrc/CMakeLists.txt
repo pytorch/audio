@@ -20,6 +20,7 @@ endif()
 
 if(BUILD_KALDI)
   list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
+  list(APPEND LIBTORCHAUDIO_SOURCES kaldifeat.cpp)
 endif()
 
 ################################################################################

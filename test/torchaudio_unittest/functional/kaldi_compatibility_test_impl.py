@@ -1,4 +1,5 @@
 from parameterized import parameterized
+import torch
 import torchaudio.functional as F
 
 from torchaudio_unittest.common_utils import (
@@ -35,3 +36,9 @@ class KaldiCPUOnly(TempDirMixin, TestBaseMixin):
         command = ['compute-kaldi-pitch-feats'] + convert_args(**kwargs) + ['scp:-', 'ark:-']
         kaldi_result = run_kaldi(command, 'scp', wave_file)
         self.assert_equal(result, expected=kaldi_result)
+
+
+    def test_compute_fbank(self):
+        sample_rate = 16000
+        waveform = get_sinusoid(dtype='int16', sample_rate=sample_rate).to(torch.float32)[0]
+        F.compute_fbank(waveform, sample_rate)

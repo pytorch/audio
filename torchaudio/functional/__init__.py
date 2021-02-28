@@ -19,6 +19,7 @@ from .functional import (
     spectrogram,
     spectral_centroid,
     apply_codec,
+    compute_fbank,
 )
 from .filtering import (
     allpass_biquad,

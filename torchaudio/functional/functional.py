@@ -35,6 +35,7 @@ __all__ = [
     'sliding_window_cmn',
     "spectral_centroid",
     "apply_codec",
+    "compute_fbank",
 ]
 
 
@@ -1149,3 +1150,7 @@ def compute_kaldi_pitch(
     )
     result = result.reshape(shape[:-1] + result.shape[-2:])
     return result
+
+
+def compute_fbank(waveform: torch.Tensor, sample_rate: int) -> torch.Tensor:
+    return torch.ops.torchaudio.kaldifeat_compute_fbank(waveform, sample_rate)

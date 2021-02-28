@@ -23,6 +23,15 @@ list(APPEND TORCHAUDIO_THIRD_PARTIES libsox)
 if (BUILD_KALDI)
   add_subdirectory(kaldi)
   list(APPEND TORCHAUDIO_THIRD_PARTIES kaldi)
+
+  add_library(kaldifeat_core STATIC
+    kaldifeat/kaldifeat/csrc/feature-fbank.cc
+    kaldifeat/kaldifeat/csrc/feature-window.cc
+    kaldifeat/kaldifeat/csrc/mel-computations.cc
+  )
+  target_link_libraries(kaldifeat_core PRIVATE ${TORCH_LIBRARIES})
+  target_include_directories(kaldifeat_core PUBLIC kaldifeat)
+  list(APPEND TORCHAUDIO_THIRD_PARTIES kaldifeat_core)
 endif()
 
 ################################################################################

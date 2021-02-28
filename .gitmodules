@@ -6,3 +6,6 @@
 	path = third_party/kaldi/submodule
 	url = https://github.com/kaldi-asr/kaldi
 	ignore = dirty
+[submodule "kaldifeat"]
+	path = third_party/kaldifeat
+	url = https://github.com/csukuangfj/kaldifeat.git
