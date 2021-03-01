@@ -10,12 +10,8 @@ if (BUILD_SOX)
   add_subdirectory(sox)
   target_include_directories(libsox INTERFACE ${SOX_INCLUDE_DIR})
   target_link_libraries(libsox INTERFACE ${SOX_LIBRARIES})
-else()
-  # If not building and linking libsox statically, then we expect that
-  # sox library and header are found in search path
-  target_link_libraries(libsox INTERFACE -lsox)
+  list(APPEND TORCHAUDIO_THIRD_PARTIES libsox)
 endif()
-list(APPEND TORCHAUDIO_THIRD_PARTIES libsox)
 
 ################################################################################
 # kaldi

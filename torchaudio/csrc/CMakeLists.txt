@@ -5,11 +5,6 @@ get_property(TORCHAUDIO_THIRD_PARTIES GLOBAL PROPERTY TORCHAUDIO_THIRD_PARTIES)
 ################################################################################
 set(
   LIBTORCHAUDIO_SOURCES
-  sox/io.cpp
-  sox/utils.cpp
-  sox/effects.cpp
-  sox/effects_chain.cpp
-  sox/types.cpp
   lfilter.cpp
   overdrive.cpp
   )
@@ -20,6 +15,18 @@ endif()
 
 if(BUILD_KALDI)
   list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
+endif()
+
+if(BUILD_SOX)
+  set(
+    SOX_SOURCES
+    sox/io.cpp
+    sox/utils.cpp
+    sox/effects.cpp
+    sox/effects_chain.cpp
+    sox/types.cpp
+  )
+  list(APPEND LIBTORCHAUDIO_SOURCES ${SOX_SOURCES})
 endif()
 
 ################################################################################
@@ -57,10 +64,13 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
+  if (BUILD_SOX)
+    list(APPEND LIBTORCHAUDIO_SOURCES pybind.cpp)
+  endif()
+
   add_library(
     _torchaudio
     SHARED
-    pybind.cpp
     ${LIBTORCHAUDIO_SOURCES}
     )
 
