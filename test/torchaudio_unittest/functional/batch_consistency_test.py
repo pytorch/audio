@@ -9,6 +9,13 @@ import torchaudio.functional as F
 from torchaudio_unittest import common_utils
 
 
+def _name_from_args(func, _, params):
+    """Return a parameterized test name, based on parameter values."""
+    return "{}_{}".format(
+        func.__name__,
+        "_".join(str(arg) for arg in params.args))
+
+
 @parameterized_class([
     # Single-item batch isolates problems that come purely from adding a
     # dimension (rather than processing multiple items)
@@ -58,7 +65,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
     @parameterized.expand(list(itertools.product(
         [8000, 16000, 44100],
         [1, 2],
-    )), name_func=lambda f, _, p: f'{f.__name__}_{"_".join(str(arg) for arg in p.args)}')
+    )), name_func=_name_from_args)
     def test_detect_pitch_frequency(self, sample_rate, n_channels):
         # Use different frequencies to ensure each item in the batch returns a
         # different answer.
@@ -183,7 +190,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
     @parameterized.expand(list(itertools.product(
         [True, False],  # center
         [True, False],  # norm_vars
-    )), name_func=lambda f, _, p: f'{f.__name__}_{"_".join(str(arg) for arg in p.args)}')
+    )), name_func=_name_from_args)
     def test_sliding_window_cmn(self, center, norm_vars):
         waveforms = torch.randn(self.batch_size, 2, 1024) - 0.5
         self.assert_batch_consistency(
