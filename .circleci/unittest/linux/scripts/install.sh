@@ -41,6 +41,9 @@ printf "Installing PyTorch and torchaudio RC with %s\n" "${cudatoolkit}"
 )
 
 # 3. Install Test tools
+## Build sox command required for running tests
+BUILD_SOX=1 python setup.py build_ext
+
 printf "* Installing test tools\n"
 NUMBA_DEV_CHANNEL=""
 if [[ "$(python --version)" = *3.9* ]]; then
