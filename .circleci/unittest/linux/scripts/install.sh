@@ -42,6 +42,7 @@ printf "Installing PyTorch and torchaudio RC with %s\n" "${cudatoolkit}"
 
 # 3. Install Test tools
 ## Build sox command required for running tests
+git submodule update --init --recursive
 BUILD_SOX=1 python setup.py build_ext
 
 printf "* Installing test tools\n"
