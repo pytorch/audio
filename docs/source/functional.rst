@@ -186,44 +186,47 @@ treble_biquad
 vad
 ---
 
+:hidden:`Feature Extractions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. autofunction:: vad
 
 :hidden:`spectrogram`
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 .. autofunction:: spectrogram
 
 :hidden:`griffinlim`
-~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 .. autofunction:: griffinlim
 
 :hidden:`phase_vocoder`
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 .. autofunction:: phase_vocoder
 
 :hidden:`compute_deltas`
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 .. autofunction:: compute_deltas
 
 :hidden:`detect_pitch_frequency`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 .. autofunction:: detect_pitch_frequency
 
 :hidden:`sliding_window_cmn`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 .. autofunction:: sliding_window_cmn
 
 :hidden:`compute_kaldi_pitch`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 .. autofunction:: compute_kaldi_pitch
 
 :hidden:`spectral_centroid`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 .. autofunction:: spectral_centroid
