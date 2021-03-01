@@ -313,7 +313,7 @@ def _hz_to_mel(freq: Tensor, mel_scale: str = "htk") -> Tensor:
         raise ValueError('mel_scale should be one of "htk" or "slaney".')
 
     if mel_scale == "htk":
-        return 2595.0 * torch.log10((700.0 + freq) / 700.0)
+        return 2595.0 * math.log10((700.0 + freq) / 700.0)
 
     # Fill in the linear part
     f_min = 0.0
