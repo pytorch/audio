@@ -180,16 +180,14 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         sample_rate = 44100
         self.assert_batch_consistency(F.flanger, waveforms, sample_rate)
 
-    def test_sliding_window_cmn(self):
+    @parameterized.expand(list(itertools.product(
+        [True, False],  # center
+        [True, False],  # norm_vars
+    )), name_func=lambda f, _, p: f'{f.__name__}_{"_".join(str(arg) for arg in p.args)}')
+    def test_sliding_window_cmn(self, center, norm_vars):
         waveforms = torch.randn(self.batch_size, 2, 1024) - 0.5
         self.assert_batch_consistency(
-            F.sliding_window_cmn, waveforms, center=True, norm_vars=True)
-        self.assert_batch_consistency(
-            F.sliding_window_cmn, waveforms, center=True, norm_vars=False)
-        self.assert_batch_consistency(
-            F.sliding_window_cmn, waveforms, center=False, norm_vars=True)
-        self.assert_batch_consistency(
-            F.sliding_window_cmn, waveforms, center=False, norm_vars=False)
+            F.sliding_window_cmn, waveforms, center=center, norm_vars=norm_vars)
 
     def test_vad_from_file(self):
         filepath = common_utils.get_asset_path("vad-go-stereo-44100.wav")
