@@ -24,12 +24,8 @@ else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
     cudatoolkit="cudatoolkit=${version}"
 fi
-printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
-
-# 2. Install torchaudio
-printf "* Installing torchaudio\n"
-python setup.py install
+printf "Installing PyTorch and torchaudio RC with %s\n" "${cudatoolkit}"
+conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" "pytorch-${UPLOAD_CHANNEL}::torchaudio" ${cudatoolkit}
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
