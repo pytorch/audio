@@ -304,6 +304,330 @@
   <div class="section" id="torchaudio-functional">
 <h1>torchaudio.functional<a class="headerlink" href="#torchaudio-functional" title="Permalink to this headline">¶</a></h1>
 <p>Functions to perform common audio operations.</p>
+<div class="section" id="utility">
+<h2><span class="hidden-section">Utility</span><a class="headerlink" href="#utility" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="amplitude-to-db">
+<h3>amplitude_to_DB<a class="headerlink" href="#amplitude-to-db" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.amplitude_to_DB">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">amplitude_to_DB</code><span class="sig-paren">(</span><em class="sig-param">x: torch.Tensor</em>, <em class="sig-param">multiplier: float</em>, <em class="sig-param">amin: float</em>, <em class="sig-param">db_multiplier: float</em>, <em class="sig-param">top_db: Optional[float] = None</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#amplitude_to_DB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.amplitude_to_DB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn a spectrogram from the power/amplitude scale to the decibel scale.</p>
+<p>The output of each tensor in a batch depends on the maximum value of that tensor,
+and so may return different values for an audio clip split into snippets vs. a full clip.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>Tensor</em>) – Input spectrogram(s) before being converted to decibel scale. Input should take
+the form <cite>(…, freq, time)</cite>. Batched inputs should include a channel dimension and
+have the form <cite>(batch, channel, freq, time)</cite>.</p></li>
+<li><p><strong>multiplier</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Use 10. for power and 20. for amplitude</p></li>
+<li><p><strong>amin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Number to clamp <code class="docutils literal notranslate"><span class="pre">x</span></code></p></li>
+<li><p><strong>db_multiplier</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Log10(max(reference value and amin))</p></li>
+<li><p><strong>top_db</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Minimum negative cut-off in decibels. A reasonable number
+is 80. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output tensor in decibel scale</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="db-to-amplitude">
+<h3>DB_to_amplitude<a class="headerlink" href="#db-to-amplitude" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.DB_to_amplitude">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">DB_to_amplitude</code><span class="sig-paren">(</span><em class="sig-param">x: torch.Tensor</em>, <em class="sig-param">ref: float</em>, <em class="sig-param">power: float</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#DB_to_amplitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.DB_to_amplitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn a tensor from the decibel scale to the power/amplitude scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>Tensor</em>) – Input tensor before being converted to power/amplitude scale.</p></li>
+<li><p><strong>ref</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Reference which the output will be scaled by.</p></li>
+<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – If power equals 1, will compute DB to power. If 0.5, will compute DB to amplitude.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output tensor in power/amplitude scale.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="create-fb-matrix">
+<h3>create_fb_matrix<a class="headerlink" href="#create-fb-matrix" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.create_fb_matrix">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">create_fb_matrix</code><span class="sig-paren">(</span><em class="sig-param">n_freqs: int</em>, <em class="sig-param">f_min: float</em>, <em class="sig-param">f_max: float</em>, <em class="sig-param">n_mels: int</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">norm: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#create_fb_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.create_fb_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a frequency bin conversion matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_freqs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of frequencies to highlight/apply</p></li>
+<li><p><strong>f_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Minimum frequency (Hz)</p></li>
+<li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Maximum frequency (Hz)</p></li>
+<li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of mel filterbanks</p></li>
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Sample rate of the audio waveform</p></li>
+<li><p><strong>norm</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band</p></li>
+<li><p><strong>normalization). (Default</strong> (<em>(</em><em>area</em>) – <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Triangular filter banks (fb matrix) of size (<code class="docutils literal notranslate"><span class="pre">n_freqs</span></code>, <code class="docutils literal notranslate"><span class="pre">n_mels</span></code>)
+meaning number of frequencies to highlight/apply to x the number of filterbanks.
+Each column is a filterbank so that assuming there is a matrix A of
+size (…, <code class="docutils literal notranslate"><span class="pre">n_freqs</span></code>), the applied result would be
+<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">*</span> <span class="pre">create_fb_matrix(A.size(-1),</span> <span class="pre">...)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="create-dct">
+<h3>create_dct<a class="headerlink" href="#create-dct" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.create_dct">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">create_dct</code><span class="sig-paren">(</span><em class="sig-param">n_mfcc: int, n_mels: int, norm: Optional[str]</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#create_dct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.create_dct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a DCT transformation matrix with shape (<code class="docutils literal notranslate"><span class="pre">n_mels</span></code>, <code class="docutils literal notranslate"><span class="pre">n_mfcc</span></code>),
+normalized depending on norm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_mfcc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of mfc coefficients to retain</p></li>
+<li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of mel filterbanks</p></li>
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – Norm to use (either ‘ortho’ or None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The transformation matrix, to be right-multiplied to
+row-wise data of size (<code class="docutils literal notranslate"><span class="pre">n_mels</span></code>, <code class="docutils literal notranslate"><span class="pre">n_mfcc</span></code>).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="mask-along-axis">
+<h3>mask_along_axis<a class="headerlink" href="#mask-along-axis" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.mask_along_axis">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">mask_along_axis</code><span class="sig-paren">(</span><em class="sig-param">specgram: torch.Tensor</em>, <em class="sig-param">mask_param: int</em>, <em class="sig-param">mask_value: float</em>, <em class="sig-param">axis: int</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#mask_along_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.mask_along_axis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a mask along <code class="docutils literal notranslate"><span class="pre">axis</span></code>. Mask will be applied from indices <code class="docutils literal notranslate"><span class="pre">[v_0,</span> <span class="pre">v_0</span> <span class="pre">+</span> <span class="pre">v)</span></code>, where
+<code class="docutils literal notranslate"><span class="pre">v</span></code> is sampled from <code class="docutils literal notranslate"><span class="pre">uniform(0,</span> <span class="pre">mask_param)</span></code>, and <code class="docutils literal notranslate"><span class="pre">v_0</span></code> from <code class="docutils literal notranslate"><span class="pre">uniform(0,</span> <span class="pre">max_v</span> <span class="pre">-</span> <span class="pre">v)</span></code>.
+All examples will have the same mask interval.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>specgram</strong> (<em>Tensor</em>) – Real spectrogram (channel, freq, time)</p></li>
+<li><p><strong>mask_param</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of columns to be masked will be uniformly sampled from [0, mask_param]</p></li>
+<li><p><strong>mask_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Value to assign to the masked columns</p></li>
+<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Axis to apply masking on (1 -&gt; frequency, 2 -&gt; time)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Masked spectrogram of dimensions (channel, freq, time)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="mask-along-axis-iid">
+<h3>mask_along_axis_iid<a class="headerlink" href="#mask-along-axis-iid" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.mask_along_axis_iid">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">mask_along_axis_iid</code><span class="sig-paren">(</span><em class="sig-param">specgrams: torch.Tensor</em>, <em class="sig-param">mask_param: int</em>, <em class="sig-param">mask_value: float</em>, <em class="sig-param">axis: int</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#mask_along_axis_iid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.mask_along_axis_iid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a mask along <code class="docutils literal notranslate"><span class="pre">axis</span></code>. Mask will be applied from indices <code class="docutils literal notranslate"><span class="pre">[v_0,</span> <span class="pre">v_0</span> <span class="pre">+</span> <span class="pre">v)</span></code>, where
+<code class="docutils literal notranslate"><span class="pre">v</span></code> is sampled from <code class="docutils literal notranslate"><span class="pre">uniform(0,</span> <span class="pre">mask_param)</span></code>, and <code class="docutils literal notranslate"><span class="pre">v_0</span></code> from <code class="docutils literal notranslate"><span class="pre">uniform(0,</span> <span class="pre">max_v</span> <span class="pre">-</span> <span class="pre">v)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>specgrams</strong> (<em>Tensor</em>) – Real spectrograms (batch, channel, freq, time)</p></li>
+<li><p><strong>mask_param</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of columns to be masked will be uniformly sampled from [0, mask_param]</p></li>
+<li><p><strong>mask_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Value to assign to the masked columns</p></li>
+<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Axis to apply masking on (2 -&gt; frequency, 3 -&gt; time)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Masked spectrograms of dimensions (batch, channel, freq, time)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="mu-law-encoding">
+<h3>mu_law_encoding<a class="headerlink" href="#mu-law-encoding" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.mu_law_encoding">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">mu_law_encoding</code><span class="sig-paren">(</span><em class="sig-param">x: torch.Tensor</em>, <em class="sig-param">quantization_channels: int</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#mu_law_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.mu_law_encoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode signal based on mu-law companding.  For more info see the
+<a class="reference external" href="https://en.wikipedia.org/wiki/%CE%9C-law_algorithm">Wikipedia Entry</a></p>
+<p>This algorithm assumes the signal has been scaled to between -1 and 1 and
+returns a signal encoded with values from 0 to quantization_channels - 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>Tensor</em>) – Input tensor</p></li>
+<li><p><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of channels</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input after mu-law encoding</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="mu-law-decoding">
+<h3>mu_law_decoding<a class="headerlink" href="#mu-law-decoding" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.mu_law_decoding">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">mu_law_decoding</code><span class="sig-paren">(</span><em class="sig-param">x_mu: torch.Tensor</em>, <em class="sig-param">quantization_channels: int</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#mu_law_decoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.mu_law_decoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode mu-law encoded signal.  For more info see the
+<a class="reference external" href="https://en.wikipedia.org/wiki/%CE%9C-law_algorithm">Wikipedia Entry</a></p>
+<p>This expects an input with values between 0 and quantization_channels - 1
+and returns a signal scaled between -1 and 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_mu</strong> (<em>Tensor</em>) – Input tensor</p></li>
+<li><p><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of channels</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input after mu-law decoding</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="apply-codec">
+<h3>apply_codec<a class="headerlink" href="#apply-codec" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.apply_codec">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">apply_codec</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">format: str</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em>, <em class="sig-param">encoding: Optional[str] = None</em>, <em class="sig-param">bits_per_sample: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#apply_codec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.apply_codec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply codecs as a form of augmentation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>waveform</strong> (<em>Tensor</em>) – Audio data. Must be 2 dimensional. See also <code class="docutils literal notranslate"><span class="pre">`channels_first`</span></code>.</p></li>
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Sample rate of the audio waveform.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – File format.</p></li>
+<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – When True, both the input and output Tensor have dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
+Otherwise, they have dimension <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
+<li><p><strong>compression</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Used for formats other than WAV.
+For mor details see <a class="reference internal" href="backend.html#torchaudio.backend.sox_io_backend.save" title="torchaudio.backend.sox_io_backend.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.backend.sox_io_backend.save()</span></code></a>.</p></li>
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Changes the encoding for the supported formats.
+For more details see <a class="reference internal" href="backend.html#torchaudio.backend.sox_io_backend.save" title="torchaudio.backend.sox_io_backend.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.backend.sox_io_backend.save()</span></code></a>.</p></li>
+<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Changes the bit depth for the supported formats.
+For more details see <a class="reference internal" href="backend.html#torchaudio.backend.sox_io_backend.save" title="torchaudio.backend.sox_io_backend.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.backend.sox_io_backend.save()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Resulting Tensor.
+If <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>, it has <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code> else <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))">torch.Tensor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="complex-utility">
+<h2><span class="hidden-section">Complex Utility</span><a class="headerlink" href="#complex-utility" title="Permalink to this headline">¶</a></h2>
+<p>Utilities for pseudo complex tensor. This is not for the native complex dtype, such as <cite>cfloat64</cite>, but for tensors with real-value type and have extra dimension at the end for real and imaginary parts.</p>
+<div class="section" id="angle">
+<h3>angle<a class="headerlink" href="#angle" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.angle">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">angle</code><span class="sig-paren">(</span><em class="sig-param">complex_tensor: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the angle of complex tensor input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>complex_tensor</strong> (<em>Tensor</em>) – Tensor shape of <cite>(…, complex=2)</cite></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Angle of a complex tensor. Shape of <cite>(…, )</cite></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="complex-norm">
+<h3>complex_norm<a class="headerlink" href="#complex-norm" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.complex_norm">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">complex_norm</code><span class="sig-paren">(</span><em class="sig-param">complex_tensor: torch.Tensor</em>, <em class="sig-param">power: float = 1.0</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#complex_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.complex_norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the norm of complex tensor input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>complex_tensor</strong> (<em>Tensor</em>) – Tensor shape of <cite>(…, complex=2)</cite></p></li>
+<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Power of the norm. (Default: <cite>1.0</cite>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Power of the normed input tensor. Shape of <cite>(…, )</cite></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="magphase">
+<h3>magphase<a class="headerlink" href="#magphase" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.magphase">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">magphase</code><span class="sig-paren">(</span><em class="sig-param">complex_tensor: torch.Tensor</em>, <em class="sig-param">power: float = 1.0</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor]<a class="reference internal" href="_modules/torchaudio/functional/functional.html#magphase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.magphase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Separate a complex-valued spectrogram with shape <cite>(…, 2)</cite> into its magnitude and phase.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>complex_tensor</strong> (<em>Tensor</em>) – Tensor shape of <cite>(…, complex=2)</cite></p></li>
+<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Power of the norm. (Default: <cite>1.0</cite>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The magnitude and phase of the complex tensor</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(Tensor, Tensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
 <div class="section" id="filtering">
 <h2><span class="hidden-section">Filtering</span><a class="headerlink" href="#filtering" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="allpass-biquad">
@@ -892,6 +1216,10 @@ Allowed sample rates in Hz : <code class="docutils literal notranslate"><span cl
 </div>
 <div class="section" id="vad">
 <h3>vad<a class="headerlink" href="#vad" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="feature-extractions">
+<h2><span class="hidden-section">Feature Extractions</span><a class="headerlink" href="#feature-extractions" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="torchaudio.functional.vad">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">vad</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">trigger_level: float = 7.0</em>, <em class="sig-param">trigger_time: float = 0.25</em>, <em class="sig-param">search_time: float = 1.0</em>, <em class="sig-param">allowed_gap: float = 0.25</em>, <em class="sig-param">pre_trigger_time: float = 0.0</em>, <em class="sig-param">boot_time: float = 0.35</em>, <em class="sig-param">noise_up_time: float = 0.1</em>, <em class="sig-param">noise_down_time: float = 0.01</em>, <em class="sig-param">noise_reduction_amount: float = 1.35</em>, <em class="sig-param">measure_freq: float = 20.0</em>, <em class="sig-param">measure_duration: Optional[float] = None</em>, <em class="sig-param">measure_smooth_time: float = 0.4</em>, <em class="sig-param">hp_filter_freq: float = 50.0</em>, <em class="sig-param">lp_filter_freq: float = 6000.0</em>, <em class="sig-param">hp_lifter_freq: float = 150.0</em>, <em class="sig-param">lp_lifter_freq: float = 2000.0</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/filtering.html#vad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.vad" title="Permalink to this definition">¶</a></dt>
@@ -945,10 +1273,8 @@ This option sets the time for the initial noise estimate. (Default: 0.35)</p></l
 <p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
 </dd></dl>
 
-</div>
-</div>
 <div class="section" id="spectrogram">
-<h2><span class="hidden-section">spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h2>
+<h3><span class="hidden-section">spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.spectrogram">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">spectrogram</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor, pad: int, window: torch.Tensor, n_fft: int, hop_length: int, win_length: int, power: Optional[float], normalized: bool, center: bool = True, pad_mode: str = 'reflect', onesided: bool = True</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.spectrogram" title="Permalink to this definition">¶</a></dt>
@@ -989,7 +1315,7 @@ Fourier bins, and time is the number of window hops (n_frame).</p>
 
 </div>
 <div class="section" id="griffinlim">
-<h2><span class="hidden-section">griffinlim</span><a class="headerlink" href="#griffinlim" title="Permalink to this headline">¶</a></h2>
+<h3><span class="hidden-section">griffinlim</span><a class="headerlink" href="#griffinlim" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.griffinlim">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">griffinlim</code><span class="sig-paren">(</span><em class="sig-param">specgram: torch.Tensor, window: torch.Tensor, n_fft: int, hop_length: int, win_length: int, power: float, normalized: bool, n_iter: int, momentum: float, length: Optional[int], rand_init: bool</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#griffinlim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.griffinlim" title="Permalink to this definition">¶</a></dt>
@@ -1049,239 +1375,8 @@ Values near 1 can lead to faster convergence, but above 1 may not converge.</p><
 </dd></dl>
 
 </div>
-<div class="section" id="amplitude-to-db">
-<h2><span class="hidden-section">amplitude_to_DB</span><a class="headerlink" href="#amplitude-to-db" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.functional.amplitude_to_DB">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">amplitude_to_DB</code><span class="sig-paren">(</span><em class="sig-param">x: torch.Tensor</em>, <em class="sig-param">multiplier: float</em>, <em class="sig-param">amin: float</em>, <em class="sig-param">db_multiplier: float</em>, <em class="sig-param">top_db: Optional[float] = None</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#amplitude_to_DB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.amplitude_to_DB" title="Permalink to this definition">¶</a></dt>
-<dd><p>Turn a spectrogram from the power/amplitude scale to the decibel scale.</p>
-<p>The output of each tensor in a batch depends on the maximum value of that tensor,
-and so may return different values for an audio clip split into snippets vs. a full clip.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>Tensor</em>) – Input spectrogram(s) before being converted to decibel scale. Input should take
-the form <cite>(…, freq, time)</cite>. Batched inputs should include a channel dimension and
-have the form <cite>(batch, channel, freq, time)</cite>.</p></li>
-<li><p><strong>multiplier</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Use 10. for power and 20. for amplitude</p></li>
-<li><p><strong>amin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Number to clamp <code class="docutils literal notranslate"><span class="pre">x</span></code></p></li>
-<li><p><strong>db_multiplier</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Log10(max(reference value and amin))</p></li>
-<li><p><strong>top_db</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Minimum negative cut-off in decibels. A reasonable number
-is 80. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Output tensor in decibel scale</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="db-to-amplitude">
-<h2><span class="hidden-section">DB_to_amplitude</span><a class="headerlink" href="#db-to-amplitude" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.functional.DB_to_amplitude">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">DB_to_amplitude</code><span class="sig-paren">(</span><em class="sig-param">x: torch.Tensor</em>, <em class="sig-param">ref: float</em>, <em class="sig-param">power: float</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#DB_to_amplitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.DB_to_amplitude" title="Permalink to this definition">¶</a></dt>
-<dd><p>Turn a tensor from the decibel scale to the power/amplitude scale.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>Tensor</em>) – Input tensor before being converted to power/amplitude scale.</p></li>
-<li><p><strong>ref</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Reference which the output will be scaled by.</p></li>
-<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – If power equals 1, will compute DB to power. If 0.5, will compute DB to amplitude.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Output tensor in power/amplitude scale.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="create-fb-matrix">
-<h2><span class="hidden-section">create_fb_matrix</span><a class="headerlink" href="#create-fb-matrix" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.functional.create_fb_matrix">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">create_fb_matrix</code><span class="sig-paren">(</span><em class="sig-param">n_freqs: int</em>, <em class="sig-param">f_min: float</em>, <em class="sig-param">f_max: float</em>, <em class="sig-param">n_mels: int</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">norm: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#create_fb_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.create_fb_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a frequency bin conversion matrix.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n_freqs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of frequencies to highlight/apply</p></li>
-<li><p><strong>f_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Minimum frequency (Hz)</p></li>
-<li><p><strong>f_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Maximum frequency (Hz)</p></li>
-<li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of mel filterbanks</p></li>
-<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Sample rate of the audio waveform</p></li>
-<li><p><strong>norm</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band</p></li>
-<li><p><strong>normalization). (Default</strong> (<em>(</em><em>area</em>) – <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Triangular filter banks (fb matrix) of size (<code class="docutils literal notranslate"><span class="pre">n_freqs</span></code>, <code class="docutils literal notranslate"><span class="pre">n_mels</span></code>)
-meaning number of frequencies to highlight/apply to x the number of filterbanks.
-Each column is a filterbank so that assuming there is a matrix A of
-size (…, <code class="docutils literal notranslate"><span class="pre">n_freqs</span></code>), the applied result would be
-<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">*</span> <span class="pre">create_fb_matrix(A.size(-1),</span> <span class="pre">...)</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="create-dct">
-<h2><span class="hidden-section">create_dct</span><a class="headerlink" href="#create-dct" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.functional.create_dct">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">create_dct</code><span class="sig-paren">(</span><em class="sig-param">n_mfcc: int, n_mels: int, norm: Optional[str]</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#create_dct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.create_dct" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a DCT transformation matrix with shape (<code class="docutils literal notranslate"><span class="pre">n_mels</span></code>, <code class="docutils literal notranslate"><span class="pre">n_mfcc</span></code>),
-normalized depending on norm.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n_mfcc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of mfc coefficients to retain</p></li>
-<li><p><strong>n_mels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of mel filterbanks</p></li>
-<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – Norm to use (either ‘ortho’ or None)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The transformation matrix, to be right-multiplied to
-row-wise data of size (<code class="docutils literal notranslate"><span class="pre">n_mels</span></code>, <code class="docutils literal notranslate"><span class="pre">n_mfcc</span></code>).</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="mu-law-encoding">
-<h2><span class="hidden-section">mu_law_encoding</span><a class="headerlink" href="#mu-law-encoding" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.functional.mu_law_encoding">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">mu_law_encoding</code><span class="sig-paren">(</span><em class="sig-param">x: torch.Tensor</em>, <em class="sig-param">quantization_channels: int</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#mu_law_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.mu_law_encoding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Encode signal based on mu-law companding.  For more info see the
-<a class="reference external" href="https://en.wikipedia.org/wiki/%CE%9C-law_algorithm">Wikipedia Entry</a></p>
-<p>This algorithm assumes the signal has been scaled to between -1 and 1 and
-returns a signal encoded with values from 0 to quantization_channels - 1.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>Tensor</em>) – Input tensor</p></li>
-<li><p><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of channels</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Input after mu-law encoding</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="mu-law-decoding">
-<h2><span class="hidden-section">mu_law_decoding</span><a class="headerlink" href="#mu-law-decoding" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.functional.mu_law_decoding">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">mu_law_decoding</code><span class="sig-paren">(</span><em class="sig-param">x_mu: torch.Tensor</em>, <em class="sig-param">quantization_channels: int</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#mu_law_decoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.mu_law_decoding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decode mu-law encoded signal.  For more info see the
-<a class="reference external" href="https://en.wikipedia.org/wiki/%CE%9C-law_algorithm">Wikipedia Entry</a></p>
-<p>This expects an input with values between 0 and quantization_channels - 1
-and returns a signal scaled between -1 and 1.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x_mu</strong> (<em>Tensor</em>) – Input tensor</p></li>
-<li><p><strong>quantization_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of channels</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Input after mu-law decoding</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="complex-norm">
-<h2><span class="hidden-section">complex_norm</span><a class="headerlink" href="#complex-norm" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.functional.complex_norm">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">complex_norm</code><span class="sig-paren">(</span><em class="sig-param">complex_tensor: torch.Tensor</em>, <em class="sig-param">power: float = 1.0</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#complex_norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.complex_norm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the norm of complex tensor input.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>complex_tensor</strong> (<em>Tensor</em>) – Tensor shape of <cite>(…, complex=2)</cite></p></li>
-<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Power of the norm. (Default: <cite>1.0</cite>).</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Power of the normed input tensor. Shape of <cite>(…, )</cite></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="angle">
-<h2><span class="hidden-section">angle</span><a class="headerlink" href="#angle" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.functional.angle">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">angle</code><span class="sig-paren">(</span><em class="sig-param">complex_tensor: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.angle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the angle of complex tensor input.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>complex_tensor</strong> (<em>Tensor</em>) – Tensor shape of <cite>(…, complex=2)</cite></p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Angle of a complex tensor. Shape of <cite>(…, )</cite></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="magphase">
-<h2><span class="hidden-section">magphase</span><a class="headerlink" href="#magphase" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.functional.magphase">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">magphase</code><span class="sig-paren">(</span><em class="sig-param">complex_tensor: torch.Tensor</em>, <em class="sig-param">power: float = 1.0</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, torch.Tensor]<a class="reference internal" href="_modules/torchaudio/functional/functional.html#magphase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.magphase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Separate a complex-valued spectrogram with shape <cite>(…, 2)</cite> into its magnitude and phase.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>complex_tensor</strong> (<em>Tensor</em>) – Tensor shape of <cite>(…, complex=2)</cite></p></li>
-<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Power of the norm. (Default: <cite>1.0</cite>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The magnitude and phase of the complex tensor</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>(Tensor, Tensor)</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
 <div class="section" id="phase-vocoder">
-<h2><span class="hidden-section">phase_vocoder</span><a class="headerlink" href="#phase-vocoder" title="Permalink to this headline">¶</a></h2>
+<h3><span class="hidden-section">phase_vocoder</span><a class="headerlink" href="#phase-vocoder" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.phase_vocoder">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">phase_vocoder</code><span class="sig-paren">(</span><em class="sig-param">complex_specgrams: torch.Tensor</em>, <em class="sig-param">rate: float</em>, <em class="sig-param">phase_advance: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#phase_vocoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.phase_vocoder" title="Permalink to this definition">¶</a></dt>
@@ -1319,61 +1414,8 @@ factor of <code class="docutils literal notranslate"><span class="pre">rate</spa
 </dd></dl>
 
 </div>
-<div class="section" id="mask-along-axis">
-<h2><span class="hidden-section">mask_along_axis</span><a class="headerlink" href="#mask-along-axis" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.functional.mask_along_axis">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">mask_along_axis</code><span class="sig-paren">(</span><em class="sig-param">specgram: torch.Tensor</em>, <em class="sig-param">mask_param: int</em>, <em class="sig-param">mask_value: float</em>, <em class="sig-param">axis: int</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#mask_along_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.mask_along_axis" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply a mask along <code class="docutils literal notranslate"><span class="pre">axis</span></code>. Mask will be applied from indices <code class="docutils literal notranslate"><span class="pre">[v_0,</span> <span class="pre">v_0</span> <span class="pre">+</span> <span class="pre">v)</span></code>, where
-<code class="docutils literal notranslate"><span class="pre">v</span></code> is sampled from <code class="docutils literal notranslate"><span class="pre">uniform(0,</span> <span class="pre">mask_param)</span></code>, and <code class="docutils literal notranslate"><span class="pre">v_0</span></code> from <code class="docutils literal notranslate"><span class="pre">uniform(0,</span> <span class="pre">max_v</span> <span class="pre">-</span> <span class="pre">v)</span></code>.
-All examples will have the same mask interval.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>specgram</strong> (<em>Tensor</em>) – Real spectrogram (channel, freq, time)</p></li>
-<li><p><strong>mask_param</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of columns to be masked will be uniformly sampled from [0, mask_param]</p></li>
-<li><p><strong>mask_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Value to assign to the masked columns</p></li>
-<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Axis to apply masking on (1 -&gt; frequency, 2 -&gt; time)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Masked spectrogram of dimensions (channel, freq, time)</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="mask-along-axis-iid">
-<h2><span class="hidden-section">mask_along_axis_iid</span><a class="headerlink" href="#mask-along-axis-iid" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.functional.mask_along_axis_iid">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">mask_along_axis_iid</code><span class="sig-paren">(</span><em class="sig-param">specgrams: torch.Tensor</em>, <em class="sig-param">mask_param: int</em>, <em class="sig-param">mask_value: float</em>, <em class="sig-param">axis: int</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#mask_along_axis_iid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.mask_along_axis_iid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply a mask along <code class="docutils literal notranslate"><span class="pre">axis</span></code>. Mask will be applied from indices <code class="docutils literal notranslate"><span class="pre">[v_0,</span> <span class="pre">v_0</span> <span class="pre">+</span> <span class="pre">v)</span></code>, where
-<code class="docutils literal notranslate"><span class="pre">v</span></code> is sampled from <code class="docutils literal notranslate"><span class="pre">uniform(0,</span> <span class="pre">mask_param)</span></code>, and <code class="docutils literal notranslate"><span class="pre">v_0</span></code> from <code class="docutils literal notranslate"><span class="pre">uniform(0,</span> <span class="pre">max_v</span> <span class="pre">-</span> <span class="pre">v)</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>specgrams</strong> (<em>Tensor</em>) – Real spectrograms (batch, channel, freq, time)</p></li>
-<li><p><strong>mask_param</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of columns to be masked will be uniformly sampled from [0, mask_param]</p></li>
-<li><p><strong>mask_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Value to assign to the masked columns</p></li>
-<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Axis to apply masking on (2 -&gt; frequency, 3 -&gt; time)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Masked spectrograms of dimensions (batch, channel, freq, time)</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
 <div class="section" id="compute-deltas">
-<h2><span class="hidden-section">compute_deltas</span><a class="headerlink" href="#compute-deltas" title="Permalink to this headline">¶</a></h2>
+<h3><span class="hidden-section">compute_deltas</span><a class="headerlink" href="#compute-deltas" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.compute_deltas">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">compute_deltas</code><span class="sig-paren">(</span><em class="sig-param">specgram: torch.Tensor</em>, <em class="sig-param">win_length: int = 5</em>, <em class="sig-param">mode: str = 'replicate'</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#compute_deltas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.compute_deltas" title="Permalink to this definition">¶</a></dt>
@@ -1412,7 +1454,7 @@ All examples will have the same mask interval.</p>
 
 </div>
 <div class="section" id="detect-pitch-frequency">
-<h2><span class="hidden-section">detect_pitch_frequency</span><a class="headerlink" href="#detect-pitch-frequency" title="Permalink to this headline">¶</a></h2>
+<h3><span class="hidden-section">detect_pitch_frequency</span><a class="headerlink" href="#detect-pitch-frequency" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.detect_pitch_frequency">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">detect_pitch_frequency</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">frame_time: float = 0.01</em>, <em class="sig-param">win_length: int = 30</em>, <em class="sig-param">freq_low: int = 85</em>, <em class="sig-param">freq_high: int = 3400</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#detect_pitch_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.detect_pitch_frequency" title="Permalink to this definition">¶</a></dt>
@@ -1440,7 +1482,7 @@ All examples will have the same mask interval.</p>
 
 </div>
 <div class="section" id="sliding-window-cmn">
-<h2><span class="hidden-section">sliding_window_cmn</span><a class="headerlink" href="#sliding-window-cmn" title="Permalink to this headline">¶</a></h2>
+<h3><span class="hidden-section">sliding_window_cmn</span><a class="headerlink" href="#sliding-window-cmn" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.sliding_window_cmn">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">sliding_window_cmn</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">cmn_window: int = 600</em>, <em class="sig-param">min_cmn_window: int = 100</em>, <em class="sig-param">center: bool = False</em>, <em class="sig-param">norm_vars: bool = False</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#sliding_window_cmn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.sliding_window_cmn" title="Permalink to this definition">¶</a></dt>
@@ -1468,7 +1510,7 @@ Only applicable if center == false, ignored if center==true (int, default = 100)
 
 </div>
 <div class="section" id="compute-kaldi-pitch">
-<h2><span class="hidden-section">compute_kaldi_pitch</span><a class="headerlink" href="#compute-kaldi-pitch" title="Permalink to this headline">¶</a></h2>
+<h3><span class="hidden-section">compute_kaldi_pitch</span><a class="headerlink" href="#compute-kaldi-pitch" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.compute_kaldi_pitch">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">compute_kaldi_pitch</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">sample_rate: float</em>, <em class="sig-param">frame_length: float = 25.0</em>, <em class="sig-param">frame_shift: float = 10.0</em>, <em class="sig-param">min_f0: float = 50</em>, <em class="sig-param">max_f0: float = 400</em>, <em class="sig-param">soft_min_f0: float = 10.0</em>, <em class="sig-param">penalty_factor: float = 0.1</em>, <em class="sig-param">lowpass_cutoff: float = 1000</em>, <em class="sig-param">resample_frequency: float = 4000</em>, <em class="sig-param">delta_pitch: float = 0.005</em>, <em class="sig-param">nccf_ballast: float = 7000</em>, <em class="sig-param">lowpass_filter_width: int = 1</em>, <em class="sig-param">upsample_filter_width: int = 5</em>, <em class="sig-param">max_frames_latency: int = 0</em>, <em class="sig-param">frames_per_chunk: int = 0</em>, <em class="sig-param">simulate_first_pass_online: bool = False</em>, <em class="sig-param">recompute_frame: int = 500</em>, <em class="sig-param">snip_edges: bool = True</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#compute_kaldi_pitch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.compute_kaldi_pitch" title="Permalink to this definition">¶</a></dt>
@@ -1534,7 +1576,7 @@ corresponds to pitch and NCCF.</p>
 
 </div>
 <div class="section" id="spectral-centroid">
-<h2><span class="hidden-section">spectral_centroid</span><a class="headerlink" href="#spectral-centroid" title="Permalink to this headline">¶</a></h2>
+<h3><span class="hidden-section">spectral_centroid</span><a class="headerlink" href="#spectral-centroid" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.spectral_centroid">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">spectral_centroid</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">pad: int</em>, <em class="sig-param">window: torch.Tensor</em>, <em class="sig-param">n_fft: int</em>, <em class="sig-param">hop_length: int</em>, <em class="sig-param">win_length: int</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#spectral_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.spectral_centroid" title="Permalink to this definition">¶</a></dt>
@@ -1563,38 +1605,6 @@ frequency values, weighted by their magnitude.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="apply-codec">
-<h2><span class="hidden-section">apply_codec</span><a class="headerlink" href="#apply-codec" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="torchaudio.functional.apply_codec">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">apply_codec</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">format: str</em>, <em class="sig-param">channels_first: bool = True</em>, <em class="sig-param">compression: Optional[float] = None</em>, <em class="sig-param">encoding: Optional[str] = None</em>, <em class="sig-param">bits_per_sample: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#apply_codec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.apply_codec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply codecs as a form of augmentation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<em>Tensor</em>) – Audio data. Must be 2 dimensional. See also <code class="docutils literal notranslate"><span class="pre">`channels_first`</span></code>.</p></li>
-<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Sample rate of the audio waveform.</p></li>
-<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – File format.</p></li>
-<li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – When True, both the input and output Tensor have dimension <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
-Otherwise, they have dimension <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p></li>
-<li><p><strong>compression</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Used for formats other than WAV.
-For mor details see <a class="reference internal" href="backend.html#torchaudio.backend.sox_io_backend.save" title="torchaudio.backend.sox_io_backend.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.backend.sox_io_backend.save()</span></code></a>.</p></li>
-<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Changes the encoding for the supported formats.
-For more details see <a class="reference internal" href="backend.html#torchaudio.backend.sox_io_backend.save" title="torchaudio.backend.sox_io_backend.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.backend.sox_io_backend.save()</span></code></a>.</p></li>
-<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Changes the bit depth for the supported formats.
-For more details see <a class="reference internal" href="backend.html#torchaudio.backend.sox_io_backend.save" title="torchaudio.backend.sox_io_backend.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.backend.sox_io_backend.save()</span></code></a>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Resulting Tensor.
-If <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>, it has <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code> else <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))">torch.Tensor</a></p>
-</dd>
-</dl>
-</dd></dl>
-
 </div>
 </div>
 
@@ -1642,6 +1652,24 @@ If <code class="docutils literal notranslate"><span class="pre">channels_first=T
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">torchaudio.functional</a><ul>
+<li><a class="reference internal" href="#utility"><span class="hidden-section">Utility</span></a><ul>
+<li><a class="reference internal" href="#amplitude-to-db">amplitude_to_DB</a></li>
+<li><a class="reference internal" href="#db-to-amplitude">DB_to_amplitude</a></li>
+<li><a class="reference internal" href="#create-fb-matrix">create_fb_matrix</a></li>
+<li><a class="reference internal" href="#create-dct">create_dct</a></li>
+<li><a class="reference internal" href="#mask-along-axis">mask_along_axis</a></li>
+<li><a class="reference internal" href="#mask-along-axis-iid">mask_along_axis_iid</a></li>
+<li><a class="reference internal" href="#mu-law-encoding">mu_law_encoding</a></li>
+<li><a class="reference internal" href="#mu-law-decoding">mu_law_decoding</a></li>
+<li><a class="reference internal" href="#apply-codec">apply_codec</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#complex-utility"><span class="hidden-section">Complex Utility</span></a><ul>
+<li><a class="reference internal" href="#angle">angle</a></li>
+<li><a class="reference internal" href="#complex-norm">complex_norm</a></li>
+<li><a class="reference internal" href="#magphase">magphase</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#filtering"><span class="hidden-section">Filtering</span></a><ul>
 <li><a class="reference internal" href="#allpass-biquad">allpass_biquad</a></li>
 <li><a class="reference internal" href="#band-biquad">band_biquad</a></li>
@@ -1666,26 +1694,17 @@ If <code class="docutils literal notranslate"><span class="pre">channels_first=T
 <li><a class="reference internal" href="#vad">vad</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#feature-extractions"><span class="hidden-section">Feature Extractions</span></a><ul>
 <li><a class="reference internal" href="#spectrogram"><span class="hidden-section">spectrogram</span></a></li>
 <li><a class="reference internal" href="#griffinlim"><span class="hidden-section">griffinlim</span></a></li>
-<li><a class="reference internal" href="#amplitude-to-db"><span class="hidden-section">amplitude_to_DB</span></a></li>
-<li><a class="reference internal" href="#db-to-amplitude"><span class="hidden-section">DB_to_amplitude</span></a></li>
-<li><a class="reference internal" href="#create-fb-matrix"><span class="hidden-section">create_fb_matrix</span></a></li>
-<li><a class="reference internal" href="#create-dct"><span class="hidden-section">create_dct</span></a></li>
-<li><a class="reference internal" href="#mu-law-encoding"><span class="hidden-section">mu_law_encoding</span></a></li>
-<li><a class="reference internal" href="#mu-law-decoding"><span class="hidden-section">mu_law_decoding</span></a></li>
-<li><a class="reference internal" href="#complex-norm"><span class="hidden-section">complex_norm</span></a></li>
-<li><a class="reference internal" href="#angle"><span class="hidden-section">angle</span></a></li>
-<li><a class="reference internal" href="#magphase"><span class="hidden-section">magphase</span></a></li>
 <li><a class="reference internal" href="#phase-vocoder"><span class="hidden-section">phase_vocoder</span></a></li>
-<li><a class="reference internal" href="#mask-along-axis"><span class="hidden-section">mask_along_axis</span></a></li>
-<li><a class="reference internal" href="#mask-along-axis-iid"><span class="hidden-section">mask_along_axis_iid</span></a></li>
 <li><a class="reference internal" href="#compute-deltas"><span class="hidden-section">compute_deltas</span></a></li>
 <li><a class="reference internal" href="#detect-pitch-frequency"><span class="hidden-section">detect_pitch_frequency</span></a></li>
 <li><a class="reference internal" href="#sliding-window-cmn"><span class="hidden-section">sliding_window_cmn</span></a></li>
 <li><a class="reference internal" href="#compute-kaldi-pitch"><span class="hidden-section">compute_kaldi_pitch</span></a></li>
 <li><a class="reference internal" href="#spectral-centroid"><span class="hidden-section">spectral_centroid</span></a></li>
-<li><a class="reference internal" href="#apply-codec"><span class="hidden-section">apply_codec</span></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
