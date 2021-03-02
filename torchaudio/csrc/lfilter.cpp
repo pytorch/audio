@@ -128,7 +128,7 @@ torch::Tensor lfilter_core(
       {torch::indexing::Slice(),
        torch::indexing::Slice(n_order - 1, torch::indexing::None)});
 
-  return output.view(shape);
+  return output.reshape(shape);
 }
 
 } // namespace
