@@ -19,6 +19,9 @@ _TORCHAUDIO_DIR = _ROOT_DIR / 'torchaudio'
 
 
 def _get_build(var):
+    if (var == "BUILD_KALDI") and not os.environ.get(var):
+        return True
+
     val = os.environ.get(var, '0')
     trues = ['1', 'true', 'TRUE', 'on', 'ON', 'yes', 'YES']
     falses = ['0', 'false', 'FALSE', 'off', 'OFF', 'no', 'NO']
