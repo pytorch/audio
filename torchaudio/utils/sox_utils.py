@@ -3,12 +3,10 @@ from functools import wraps
 
 import torch
 
-from torchaudio._internal import (
-    module_utils as _mod_utils,
-)
 
 def is_sox_available():
     return torch.ops.torchaudio.is_sox_available()
+
 
 def requires_sox():
     if is_sox_available():
@@ -21,6 +19,7 @@ def requires_sox():
                 raise RuntimeError(f'{func.__module__}.{func.__name__} requires sox')
             return wrapped
     return decorator
+
 
 @requires_sox()
 def set_seed(seed: int):

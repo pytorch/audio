@@ -7,9 +7,6 @@ from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
-from torchaudio._internal import (
-    module_utils as _mod_utils,
-)
 from torchaudio.utils.sox_utils import requires_sox
 import torchaudio
 

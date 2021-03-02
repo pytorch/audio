@@ -99,6 +99,7 @@ skipIfNoSoxBackend = unittest.skipIf(
 skipIfNoCuda = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
 skipIfNoSox = unittest.skipIf(not sox_utils.is_sox_available(), reason='Sox not available')
 
+
 def skipIfNoExtension(test_item):
     if is_module_available('torchaudio._torchaudio'):
         return test_item

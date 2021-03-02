@@ -4,7 +4,6 @@ import unittest
 
 from torchaudio.utils import sox_utils
 from torchaudio.backend import sox_io_backend
-from torchaudio._internal.module_utils import is_module_available
 from parameterized import parameterized
 
 from torchaudio_unittest.common_utils import (

@@ -10,6 +10,7 @@ from torchaudio.utils.sox_utils import requires_sox
 import torchaudio
 from .common import AudioMetaData
 
+
 @requires_sox()
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def info(

@@ -7,6 +7,7 @@ import torchaudio
 from torchaudio._internal import module_utils as _mod_utils
 from torchaudio.utils.sox_utils import list_effects, requires_sox
 
+
 @requires_sox()
 def init_sox_effects():
     """Initialize resources required to use sox effects.
