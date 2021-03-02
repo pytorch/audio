@@ -32,6 +32,7 @@ def _get_build(var):
 
 
 _BUILD_SOX = _get_build("BUILD_SOX")
+_BUILD_KALDI = _get_build("BUILD_KALDI")
 _BUILD_TRANSDUCER = _get_build("BUILD_TRANSDUCER")
 
 
@@ -68,7 +69,7 @@ class CMakeBuild(build_ext):
             '-DCMAKE_VERBOSE_MAKEFILE=ON',
             f"-DPython_INCLUDE_DIR={distutils.sysconfig.get_python_inc()}",
             f"-DBUILD_SOX:BOOL={'ON' if _BUILD_SOX else 'OFF'}",
-            "-DBUILD_KALDI:BOOL=ON",
+            f"-DBUILD_KALDI:BOOL={'ON' if _BUILD_KALDI else 'OFF'}",
             f"-DBUILD_TRANSDUCER:BOOL={'ON' if _BUILD_TRANSDUCER else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",

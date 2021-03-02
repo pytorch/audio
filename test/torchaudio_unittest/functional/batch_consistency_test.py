@@ -206,7 +206,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(
             F.vad, waveforms, sample_rate=sample_rate)
 
-    @common_utils.skipIfNoExtension
+    @common_utils.skipIfNoKaldi
     def test_compute_kaldi_pitch(self):
         sample_rate = 44100
         n_channels = 2
