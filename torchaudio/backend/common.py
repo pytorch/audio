@@ -41,7 +41,7 @@ class AudioMetaData:
 
     def __str__(self):
         return (
-            f"{self.__class__.__name__}("
+            f"AudioMetaData("
             f"sample_rate={self.sample_rate}, "
             f"num_frames={self.num_frames}, "
             f"num_channels={self.num_channels}, "
