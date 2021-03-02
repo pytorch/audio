@@ -7,7 +7,6 @@ from torchaudio._internal.module_utils import (
     is_module_available,
     is_sox_available
 )
-from torchaudio.utils import sox_utils
 from . import (
     no_backend,
     sox_io_backend,

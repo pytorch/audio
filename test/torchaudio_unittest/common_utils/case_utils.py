@@ -12,7 +12,6 @@ from torchaudio._internal.module_utils import (
     is_module_available,
     is_sox_available
 )
-from torchaudio.utils import sox_utils
 
 from .backend_utils import set_audio_backend
 
