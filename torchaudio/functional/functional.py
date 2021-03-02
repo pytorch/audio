@@ -298,22 +298,22 @@ def DB_to_amplitude(
     return ref * torch.pow(torch.pow(10.0, 0.1 * x), power)
 
 
-def _hz_to_mel(freq: Tensor, mel_scale: str = "htk") -> Tensor:
+def _hz_to_mel(freq: float, mel_scale: str = "htk") -> float:
     r"""Convert Hz to Mels.
 
     Args:
-        freqs (Tensor): Frequencies in Hz
+        freqs (float): Frequencies in Hz
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Returns:
-        mels (Tensor): Input frequencies in Mels
+        mels (float): Frequency in Mels
     """
 
     if mel_scale not in ['slaney', 'htk']:
         raise ValueError('mel_scale should be one of "htk" or "slaney".')
 
     if mel_scale == "htk":
-        return 2595.0 * math.log10((700.0 + freq) / 700.0)
+        return 2595.0 * math.log10(1.0 + (freq / 700.0))
 
     # Fill in the linear part
     f_min = 0.0
@@ -326,8 +326,8 @@ def _hz_to_mel(freq: Tensor, mel_scale: str = "htk") -> Tensor:
     min_log_mel = (min_log_hz - f_min) / f_sp
     logstep = math.log(6.4) / 27.0
 
-    log_t = freq >= min_log_hz
-    mels[log_t] = min_log_mel + torch.log(freq[log_t] / min_log_hz) / logstep
+    if freq >= min_log_hz:
+        mels = min_log_mel + math.log(freq / min_log_hz) / logstep
 
     return mels
 
@@ -402,8 +402,8 @@ def create_fb_matrix(
     all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
 
     # calculate mel freq bins
-    m_min = _hz_to_mel(torch.tensor(f_min), mel_scale=mel_scale)
-    m_max = _hz_to_mel(torch.tensor(f_max), mel_scale=mel_scale)
+    m_min = _hz_to_mel(f_min, mel_scale=mel_scale)
+    m_max = _hz_to_mel(f_max, mel_scale=mel_scale)
 
     m_pts = torch.linspace(m_min, m_max, n_mels + 2)
     f_pts = _mel_to_hz(m_pts, mel_scale=mel_scale)
