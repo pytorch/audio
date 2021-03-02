@@ -192,6 +192,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         [True, False],  # norm_vars
     )), name_func=_name_from_args)
     def test_sliding_window_cmn(self, center, norm_vars):
+        torch.manual_seed(0)
         spectrogram = torch.rand(self.batch_size, 2, 1024, 1024) * 200
         self.assert_batch_consistency(
             F.sliding_window_cmn, spectrogram, center=center,
@@ -208,6 +209,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
     def test_vad_different_items(self):
         """Separate test to ensure VAD consistency with differing items."""
         sample_rate = 44100
+        torch.manual_seed(0)
         waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
         self.assert_batch_consistency(
             F.vad, waveforms, sample_rate=sample_rate)
