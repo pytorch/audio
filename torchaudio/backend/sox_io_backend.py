@@ -11,7 +11,6 @@ from .common import AudioMetaData
 
 
 @_mod_utils.requires_sox()
-@_mod_utils.requires_module('torchaudio._torchaudio')
 def info(
         filepath: str,
         format: Optional[str] = None,
@@ -56,7 +55,6 @@ def info(
 
 
 @_mod_utils.requires_sox()
-@_mod_utils.requires_module('torchaudio._torchaudio')
 def load(
         filepath: str,
         frame_offset: int = 0,
@@ -154,7 +152,6 @@ def load(
 
 
 @_mod_utils.requires_sox()
-@_mod_utils.requires_module('torchaudio._torchaudio')
 def save(
         filepath: str,
         src: torch.Tensor,

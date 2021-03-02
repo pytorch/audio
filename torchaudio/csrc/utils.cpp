@@ -1,5 +1,7 @@
 #include <torch/script.h>
 
+namespace torchaudio {
+
 namespace {
 
 bool is_sox_available() {
@@ -15,3 +17,5 @@ bool is_sox_available() {
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def("torchaudio::is_sox_available", &is_sox_available);
 }
+
+} // namespace torchaudio

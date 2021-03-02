@@ -153,7 +153,6 @@ def apply_effects_tensor(
 
 
 @_mod_utils.requires_sox()
-@_mod_utils.requires_module('torchaudio._torchaudio')
 def apply_effects_file(
         path: str,
         effects: List[List[str]],

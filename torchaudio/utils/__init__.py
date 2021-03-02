@@ -1,8 +1,8 @@
 from . import (
     sox_utils,
 )
-from torchaudio._internal.module_utils import is_sox_available
+from torchaudio._internal import module_utils as _mod_utils
 
 
-if is_sox_available():
+if _mod_utils.is_sox_available():
     sox_utils.set_verbosity(1)
