@@ -7,7 +7,7 @@ from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
-from torchaudio.utils.sox_utils import requires_sox
+from torchaudio._internal import module_utils as _mod_utils
 import torchaudio
 
 __all__ = [
@@ -998,7 +998,7 @@ def spectral_centroid(
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
 
 
-@requires_sox()
+@_mod_utils.requires_sox()
 def apply_codec(
     waveform: Tensor,
     sample_rate: int,

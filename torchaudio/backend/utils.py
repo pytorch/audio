@@ -3,7 +3,10 @@ import warnings
 from typing import Optional, List
 
 import torchaudio
-from torchaudio._internal.module_utils import is_module_available
+from torchaudio._internal.module_utils import (
+    is_module_available,
+    is_sox_available
+)
 from torchaudio.utils import sox_utils
 from . import (
     no_backend,
@@ -27,7 +30,7 @@ def list_audio_backends() -> List[str]:
     backends = []
     if is_module_available('soundfile'):
         backends.append('soundfile')
-    if sox_utils.is_sox_available():
+    if is_sox_available():
         backends.append('sox_io')
     return backends
 

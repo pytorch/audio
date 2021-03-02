@@ -1,4 +1,4 @@
-from torchaudio.utils import sox_utils
+from torchaudio._internal.module_utils import is_sox_available
 from .sox_effects import (
     init_sox_effects,
     shutdown_sox_effects,
@@ -8,7 +8,7 @@ from .sox_effects import (
 )
 
 
-if sox_utils.is_sox_available():
+if is_sox_available():
     import atexit
     init_sox_effects()
     atexit.register(shutdown_sox_effects)

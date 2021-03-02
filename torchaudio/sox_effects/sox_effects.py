@@ -5,10 +5,10 @@ import torch
 
 import torchaudio
 from torchaudio._internal import module_utils as _mod_utils
-from torchaudio.utils.sox_utils import list_effects, requires_sox
+from torchaudio.utils.sox_utils import list_effects
 
 
-@requires_sox()
+@_mod_utils.requires_sox()
 def init_sox_effects():
     """Initialize resources required to use sox effects.
 
@@ -23,7 +23,7 @@ def init_sox_effects():
     torch.ops.torchaudio.sox_effects_initialize_sox_effects()
 
 
-@requires_sox()
+@_mod_utils.requires_sox()
 def shutdown_sox_effects():
     """Clean up resources required to use sox effects.
 
@@ -37,7 +37,7 @@ def shutdown_sox_effects():
     torch.ops.torchaudio.sox_effects_shutdown_sox_effects()
 
 
-@requires_sox()
+@_mod_utils.requires_sox()
 def effect_names() -> List[str]:
     """Gets list of valid sox effect names
 
@@ -51,7 +51,7 @@ def effect_names() -> List[str]:
     return list(list_effects().keys())
 
 
-@requires_sox()
+@_mod_utils.requires_sox()
 def apply_effects_tensor(
         tensor: torch.Tensor,
         sample_rate: int,
@@ -152,7 +152,7 @@ def apply_effects_tensor(
         tensor, sample_rate, effects, channels_first)
 
 
-@requires_sox()
+@_mod_utils.requires_sox()
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def apply_effects_file(
         path: str,

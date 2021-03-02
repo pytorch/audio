@@ -5,13 +5,12 @@ import torch
 from torchaudio._internal import (
     module_utils as _mod_utils,
 )
-from torchaudio.utils.sox_utils import requires_sox
 
 import torchaudio
 from .common import AudioMetaData
 
 
-@requires_sox()
+@_mod_utils.requires_sox()
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def info(
         filepath: str,
@@ -56,7 +55,7 @@ def info(
     return AudioMetaData(*sinfo)
 
 
-@requires_sox()
+@_mod_utils.requires_sox()
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def load(
         filepath: str,
@@ -154,7 +153,7 @@ def load(
         filepath, frame_offset, num_frames, normalize, channels_first, format)
 
 
-@requires_sox()
+@_mod_utils.requires_sox()
 @_mod_utils.requires_module('torchaudio._torchaudio')
 def save(
         filepath: str,
