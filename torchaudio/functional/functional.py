@@ -1045,6 +1045,7 @@ def apply_codec(
     return augmented
 
 
+@_mod_utils.requires_kaldi()
 def compute_kaldi_pitch(
         waveform: torch.Tensor,
         sample_rate: float,
