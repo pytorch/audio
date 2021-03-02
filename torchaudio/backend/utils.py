@@ -59,7 +59,7 @@ def set_audio_backend(backend: Optional[str]):
 
 def _init_audio_backend():
     backends = list_audio_backends()
-    if 'sox' in backends:
+    if 'sox_io' in backends:
         set_audio_backend('sox_io')
     elif 'soundfile' in backends:
         set_audio_backend('soundfile')
