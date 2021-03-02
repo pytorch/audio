@@ -7,6 +7,7 @@ set(
   LIBTORCHAUDIO_SOURCES
   lfilter.cpp
   overdrive.cpp
+  utils.cpp
   )
 
 if(BUILD_TRANSDUCER)
@@ -64,13 +65,10 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
-  if (BUILD_SOX)
-    list(APPEND LIBTORCHAUDIO_SOURCES pybind.cpp)
-  endif()
-
   add_library(
     _torchaudio
     SHARED
+    pybind.cpp
     ${LIBTORCHAUDIO_SOURCES}
     )
 
@@ -85,6 +83,10 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   target_compile_definitions(
     _torchaudio PRIVATE TORCH_API_INCLUDE_EXTENSION_H
   )
+
+  if (BUILD_SOX)
+    target_compile_definitions(_torchaudio PRIVATE INCLUDE_SOX)
+  endif()
 
   target_include_directories(
     _torchaudio

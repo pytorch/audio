@@ -10,6 +10,7 @@ from torch import Tensor
 from torchaudio._internal import (
     module_utils as _mod_utils,
 )
+from torchaudio.utils.sox_utils import requires_sox
 import torchaudio
 
 __all__ = [
@@ -1000,7 +1001,7 @@ def spectral_centroid(
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@requires_sox()
 def apply_codec(
     waveform: Tensor,
     sample_rate: int,

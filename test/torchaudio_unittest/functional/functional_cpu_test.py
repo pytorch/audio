@@ -10,7 +10,7 @@ import itertools
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
-    skipIfNoExtension,
+    skipIfNoSox,
 )
 from torchaudio_unittest.backend.sox_io.common import name_func
 
@@ -220,7 +220,7 @@ class TestMaskAlongAxisIID(common_utils.TorchaudioTestCase):
         assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
 
 
-@skipIfNoExtension
+@skipIfNoSox
 class TestApplyCodec(TorchaudioTestCase):
     backend = "sox_io"
 

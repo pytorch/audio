@@ -7,7 +7,7 @@ from torchaudio_unittest.common_utils import (
     TempDirMixin,
     PytorchTestCase,
     skipIfNoExec,
-    skipIfNoExtension,
+    skipIfNoSox,
     get_wav_data,
 )
 from .common import (
@@ -17,7 +17,7 @@ from .common import (
 
 
 @skipIfNoExec('sox')
-@skipIfNoExtension
+@skipIfNoSox
 class TestRoundTripIO(TempDirMixin, PytorchTestCase):
     """save/load round trip should not degrade data for lossless formats"""
     @parameterized.expand(list(itertools.product(

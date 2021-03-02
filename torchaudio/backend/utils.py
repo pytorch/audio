@@ -4,6 +4,7 @@ from typing import Optional, List
 
 import torchaudio
 from torchaudio._internal.module_utils import is_module_available
+from torchaudio.utils import sox_utils
 from . import (
     no_backend,
     sox_io_backend,
@@ -26,7 +27,7 @@ def list_audio_backends() -> List[str]:
     backends = []
     if is_module_available('soundfile'):
         backends.append('soundfile')
-    if is_module_available('torchaudio._torchaudio'):
+    if sox_utils.is_sox_available():
         backends.append('sox_io')
     return backends
 

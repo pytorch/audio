@@ -15,6 +15,8 @@ namespace sox_utils {
 // APIs for Python interaction
 ////////////////////////////////////////////////////////////////////////////////
 
+bool is_sox_available();
+
 /// Set sox global options
 void set_seed(const int64_t seed);
 
