@@ -961,7 +961,7 @@ def sliding_window_cmn(
         norm_vars (bool, optional): If true, normalize variance to one. (bool, default = false)
 
     Returns:
-        Tensor: Tensor of freq of dimension (..., frame)
+        Tensor: Tensor matching input shape (..., freq, time)
     """
     input_shape = specgram.shape
     num_frames, num_feats = input_shape[-2:]
