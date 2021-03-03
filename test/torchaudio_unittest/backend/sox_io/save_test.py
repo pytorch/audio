@@ -10,7 +10,7 @@ from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
     PytorchTestCase,
     skipIfNoExec,
-    skipIfNoExtension,
+    skipIfNoSox,
     get_wav_data,
     load_wav,
     save_wav,
@@ -157,7 +157,7 @@ def nested_params(*params):
 
 
 @skipIfNoExec('sox')
-@skipIfNoExtension
+@skipIfNoSox
 class SaveTest(SaveTestBase):
     @nested_params(
         ["path", "fileobj", "bytesio"],
@@ -354,7 +354,7 @@ class SaveTest(SaveTestBase):
 
 
 @skipIfNoExec('sox')
-@skipIfNoExtension
+@skipIfNoSox
 class TestSaveParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of optional parameters of `sox_io_backend.save`"""
     @parameterized.expand([(True, ), (False, )], name_func=name_func)

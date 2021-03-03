@@ -25,7 +25,7 @@ class TestBackendSwitch_NoBackend(BackendSwitchMixin, common_utils.TorchaudioTes
     backend_module = torchaudio.backend.no_backend
 
 
-@common_utils.skipIfNoExtension
+@common_utils.skipIfNoSox
 class TestBackendSwitch_SoXIO(BackendSwitchMixin, common_utils.TorchaudioTestCase):
     backend = 'sox_io'
     backend_module = torchaudio.backend.sox_io_backend

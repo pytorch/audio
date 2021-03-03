@@ -8,7 +8,7 @@ from .sox_effects import (
 )
 
 
-if _mod_utils.is_module_available('torchaudio._torchaudio'):
+if _mod_utils.is_sox_available():
     import atexit
     init_sox_effects()
     atexit.register(shutdown_sox_effects)

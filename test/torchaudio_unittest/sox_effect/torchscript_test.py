@@ -7,7 +7,7 @@ from parameterized import parameterized
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     PytorchTestCase,
-    skipIfNoExtension,
+    skipIfNoSox,
     get_sinusoid,
     save_wav,
 )
@@ -43,7 +43,7 @@ class SoxEffectFileTransform(torch.nn.Module):
         return sox_effects.apply_effects_file(path, self.effects, self.channels_first)
 
 
-@skipIfNoExtension
+@skipIfNoSox
 class TestTorchScript(TempDirMixin, PytorchTestCase):
     @parameterized.expand(
         load_params("sox_effect_test_args.json"),
