@@ -1,4 +1,5 @@
 import os
+import platform
 import subprocess
 from pathlib import Path
 import distutils.sysconfig
@@ -33,8 +34,8 @@ def _get_build(var, default=False):
     return False
 
 
-_BUILD_SOX = _get_build("BUILD_SOX")
-_BUILD_KALDI = _get_build("BUILD_KALDI", True)
+_BUILD_SOX = False if platform.system() == 'Windows' else _get_build("BUILD_SOX")
+_BUILD_KALDI = False if platform.system() == 'Windows' else _get_build("BUILD_KALDI", True)
 _BUILD_TRANSDUCER = _get_build("BUILD_TRANSDUCER")
 
 
@@ -60,6 +61,7 @@ class CMakeBuild(build_ext):
         if not extdir.endswith(os.path.sep):
             extdir += os.path.sep
 
+        build_env = os.environ.copy()
         cfg = "Debug" if self.debug else "Release"
 
         cmake_args = [
@@ -79,12 +81,15 @@ class CMakeBuild(build_ext):
         ]
 
         # Default to Ninja
-        if 'CMAKE_GENERATOR' not in os.environ:
+        if 'CMAKE_GENERATOR' not in build_env or platform.system() == 'Windows':
             cmake_args += ["-GNinja"]
+        if platform.system() == 'Windows':
+            build_env.setdefault('CC', 'cl')
+            build_env.setdefault('CXX', 'cl')
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.
-        if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
+        if "CMAKE_BUILD_PARALLEL_LEVEL" not in build_env:
             # self.parallel is a Python 3 only way to set parallel jobs by hand
             # using -j in the build_ext call, not supported by pip or PyPA-build.
             if hasattr(self, "parallel") and self.parallel:
@@ -95,9 +100,9 @@ class CMakeBuild(build_ext):
             os.makedirs(self.build_temp)
 
         subprocess.check_call(
-            ["cmake", str(_ROOT_DIR)] + cmake_args, cwd=self.build_temp)
+            ["cmake", str(_ROOT_DIR)] + cmake_args, cwd=self.build_temp, env=build_env)
         subprocess.check_call(
-            ["cmake", "--build", "."] + build_args, cwd=self.build_temp)
+            ["cmake", "--build", "."] + build_args, cwd=self.build_temp, env=build_env)
 
     def get_ext_filename(self, fullname):
         ext_filename = super().get_ext_filename(fullname)

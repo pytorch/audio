@@ -1,6 +1,9 @@
 import torch
 from torch.autograd import Function
 from torch.nn import Module
+from torchaudio._internal import (
+    module_utils as _mod_utils,
+)
 
 __all__ = [
     "rnnt_loss",
@@ -48,6 +51,7 @@ class _RNNT(Function):
         return ctx.grads.mul_(grad_output), None, None, None, None, None
 
 
+@_mod_utils.requires_module("torchaudio._torchaudio")
 def rnnt_loss(acts, labels, act_lens, label_lens, blank=0, reduction="mean"):
     """Compute the RNN Transducer Loss.
 
@@ -76,6 +80,7 @@ def rnnt_loss(acts, labels, act_lens, label_lens, blank=0, reduction="mean"):
     return _RNNT.apply(acts, labels, act_lens, label_lens, blank, reduction)
 
 
+@_mod_utils.requires_module("torchaudio._torchaudio")
 class RNNTLoss(Module):
     """Compute the RNN Transducer Loss.
 
