@@ -307,9 +307,7 @@
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
@@ -598,13 +596,81 @@
     <span class="k">return</span> <span class="n">ref</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">x</span><span class="p">),</span> <span class="n">power</span><span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">_hz_to_mel</span><span class="p">(</span><span class="n">freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mel_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;htk&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert Hz to Mels.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        freqs (float): Frequencies in Hz</span>
+<span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        mels (float): Frequency in Mels</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">mel_scale</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;slaney&#39;</span><span class="p">,</span> <span class="s1">&#39;htk&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mel_scale should be one of &quot;htk&quot; or &quot;slaney&quot;.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mel_scale</span> <span class="o">==</span> <span class="s2">&quot;htk&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">2595.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">freq</span> <span class="o">/</span> <span class="mf">700.0</span><span class="p">))</span>
+
+    <span class="c1"># Fill in the linear part</span>
+    <span class="n">f_min</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">f_sp</span> <span class="o">=</span> <span class="mf">200.0</span> <span class="o">/</span> <span class="mi">3</span>
+
+    <span class="n">mels</span> <span class="o">=</span> <span class="p">(</span><span class="n">freq</span> <span class="o">-</span> <span class="n">f_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">f_sp</span>
+
+    <span class="c1"># Fill in the log-scale part</span>
+    <span class="n">min_log_hz</span> <span class="o">=</span> <span class="mf">1000.0</span>
+    <span class="n">min_log_mel</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_log_hz</span> <span class="o">-</span> <span class="n">f_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">f_sp</span>
+    <span class="n">logstep</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">6.4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">27.0</span>
+
+    <span class="k">if</span> <span class="n">freq</span> <span class="o">&gt;=</span> <span class="n">min_log_hz</span><span class="p">:</span>
+        <span class="n">mels</span> <span class="o">=</span> <span class="n">min_log_mel</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">freq</span> <span class="o">/</span> <span class="n">min_log_hz</span><span class="p">)</span> <span class="o">/</span> <span class="n">logstep</span>
+
+    <span class="k">return</span> <span class="n">mels</span>
+
+
+<span class="k">def</span> <span class="nf">_mel_to_hz</span><span class="p">(</span><span class="n">mels</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mel_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;htk&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert mel bin numbers to frequencies.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mels (Tensor): Mel frequencies</span>
+<span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        freqs (Tensor): Mels converted in Hz</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">mel_scale</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;slaney&#39;</span><span class="p">,</span> <span class="s1">&#39;htk&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mel_scale should be one of &quot;htk&quot; or &quot;slaney&quot;.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mel_scale</span> <span class="o">==</span> <span class="s2">&quot;htk&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">700.0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">10.0</span><span class="o">**</span><span class="p">(</span><span class="n">mels</span> <span class="o">/</span> <span class="mf">2595.0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="c1"># Fill in the linear scale</span>
+    <span class="n">f_min</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">f_sp</span> <span class="o">=</span> <span class="mf">200.0</span> <span class="o">/</span> <span class="mi">3</span>
+    <span class="n">freqs</span> <span class="o">=</span> <span class="n">f_min</span> <span class="o">+</span> <span class="n">f_sp</span> <span class="o">*</span> <span class="n">mels</span>
+
+    <span class="c1"># And now the nonlinear scale</span>
+    <span class="n">min_log_hz</span> <span class="o">=</span> <span class="mf">1000.0</span>
+    <span class="n">min_log_mel</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_log_hz</span> <span class="o">-</span> <span class="n">f_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">f_sp</span>
+    <span class="n">logstep</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">6.4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">27.0</span>
+
+    <span class="n">log_t</span> <span class="o">=</span> <span class="p">(</span><span class="n">mels</span> <span class="o">&gt;=</span> <span class="n">min_log_mel</span><span class="p">)</span>
+    <span class="n">freqs</span><span class="p">[</span><span class="n">log_t</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_log_hz</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">logstep</span> <span class="o">*</span> <span class="p">(</span><span class="n">mels</span><span class="p">[</span><span class="n">log_t</span><span class="p">]</span> <span class="o">-</span> <span class="n">min_log_mel</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">freqs</span>
+
+
 <div class="viewcode-block" id="create_fb_matrix"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.create_fb_matrix">[docs]</a><span class="k">def</span> <span class="nf">create_fb_matrix</span><span class="p">(</span>
         <span class="n">n_freqs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">f_min</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">f_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">n_mels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">norm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">norm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mel_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;htk&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a frequency bin conversion matrix.</span>
 
@@ -616,6 +682,7 @@
 <span class="sd">        sample_rate (int): Sample rate of the audio waveform</span>
 <span class="sd">        norm (Optional[str]): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
 <span class="sd">        (area normalization). (Default: ``None``)</span>
+<span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)</span>
@@ -633,12 +700,12 @@
     <span class="n">all_freqs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n_freqs</span><span class="p">)</span>
 
     <span class="c1"># calculate mel freq bins</span>
-    <span class="c1"># hertz to mel(f) is 2595. * math.log10(1. + (f / 700.))</span>
-    <span class="n">m_min</span> <span class="o">=</span> <span class="mf">2595.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">f_min</span> <span class="o">/</span> <span class="mf">700.0</span><span class="p">))</span>
-    <span class="n">m_max</span> <span class="o">=</span> <span class="mf">2595.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">f_max</span> <span class="o">/</span> <span class="mf">700.0</span><span class="p">))</span>
+    <span class="n">m_min</span> <span class="o">=</span> <span class="n">_hz_to_mel</span><span class="p">(</span><span class="n">f_min</span><span class="p">,</span> <span class="n">mel_scale</span><span class="o">=</span><span class="n">mel_scale</span><span class="p">)</span>
+    <span class="n">m_max</span> <span class="o">=</span> <span class="n">_hz_to_mel</span><span class="p">(</span><span class="n">f_max</span><span class="p">,</span> <span class="n">mel_scale</span><span class="o">=</span><span class="n">mel_scale</span><span class="p">)</span>
+
     <span class="n">m_pts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">m_min</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">n_mels</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="c1"># mel to hertz(mel) is 700. * (10**(mel / 2595.) - 1.)</span>
-    <span class="n">f_pts</span> <span class="o">=</span> <span class="mf">700.0</span> <span class="o">*</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">m_pts</span> <span class="o">/</span> <span class="mf">2595.0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">f_pts</span> <span class="o">=</span> <span class="n">_mel_to_hz</span><span class="p">(</span><span class="n">m_pts</span><span class="p">,</span> <span class="n">mel_scale</span><span class="o">=</span><span class="n">mel_scale</span><span class="p">)</span>
+
     <span class="c1"># calculate the difference between each mel point and each stft freq point in hertz</span>
     <span class="n">f_diff</span> <span class="o">=</span> <span class="n">f_pts</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">f_pts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># (n_mels + 1)</span>
     <span class="n">slopes</span> <span class="o">=</span> <span class="n">f_pts</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">all_freqs</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (n_freqs, n_mels + 2)</span>
@@ -1300,7 +1367,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">freqs</span> <span class="o">*</span> <span class="n">specgram</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">freq_dim</span><span class="p">)</span> <span class="o">/</span> <span class="n">specgram</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">freq_dim</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="apply_codec"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.apply_codec">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="apply_codec"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.apply_codec">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">apply_codec</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>

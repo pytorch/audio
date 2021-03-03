@@ -310,7 +310,7 @@
 <span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">AudioMetaData</span>
 
 
-<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.info">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">info</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -354,7 +354,7 @@
     <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span><span class="o">*</span><span class="n">sinfo</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.load">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.load">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">load</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">frame_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -451,7 +451,7 @@
         <span class="n">filepath</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.save">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../backend.html#torchaudio.backend.sox_io_backend.save">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">save</span><span class="p">(</span>
         <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">src</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>

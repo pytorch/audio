@@ -365,7 +365,7 @@ is 80. (Default: <code class="docutils literal notranslate"><span class="pre">No
 <h3>create_fb_matrix<a class="headerlink" href="#create-fb-matrix" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.create_fb_matrix">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">create_fb_matrix</code><span class="sig-paren">(</span><em class="sig-param">n_freqs: int</em>, <em class="sig-param">f_min: float</em>, <em class="sig-param">f_max: float</em>, <em class="sig-param">n_mels: int</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">norm: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#create_fb_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.create_fb_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">create_fb_matrix</code><span class="sig-paren">(</span><em class="sig-param">n_freqs: int</em>, <em class="sig-param">f_min: float</em>, <em class="sig-param">f_max: float</em>, <em class="sig-param">n_mels: int</em>, <em class="sig-param">sample_rate: int</em>, <em class="sig-param">norm: Optional[str] = None</em>, <em class="sig-param">mel_scale: str = 'htk'</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#create_fb_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.create_fb_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a frequency bin conversion matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -377,6 +377,7 @@ is 80. (Default: <code class="docutils literal notranslate"><span class="pre">No
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Sample rate of the audio waveform</p></li>
 <li><p><strong>norm</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – If ‘slaney’, divide the triangular mel weights by the width of the mel band</p></li>
 <li><p><strong>normalization). (Default</strong> (<em>(</em><em>area</em>) – <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>mel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Scale to use: <code class="docutils literal notranslate"><span class="pre">htk</span></code> or <code class="docutils literal notranslate"><span class="pre">slaney</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">htk</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

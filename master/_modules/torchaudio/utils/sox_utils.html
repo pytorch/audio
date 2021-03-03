@@ -301,13 +301,10 @@
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-
-<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">module_utils</span> <span class="k">as</span> <span class="n">_mod_utils</span>
 
 
-<div class="viewcode-block" id="set_seed"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.set_seed">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="set_seed"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.set_seed">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Set libsox&#39;s PRNG</span>
 
@@ -320,7 +317,7 @@
     <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_utils_set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="set_verbosity"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.set_verbosity">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="set_verbosity"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.set_verbosity">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">set_verbosity</span><span class="p">(</span><span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Set libsox&#39;s verbosity</span>
 
@@ -338,7 +335,7 @@
     <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_utils_set_verbosity</span><span class="p">(</span><span class="n">verbosity</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="set_buffer_size"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.set_buffer_size">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="set_buffer_size"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.set_buffer_size">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">set_buffer_size</span><span class="p">(</span><span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Set buffer size for sox effect chain</span>
 
@@ -351,7 +348,7 @@
     <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_utils_set_buffer_size</span><span class="p">(</span><span class="n">buffer_size</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="set_use_threads"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.set_use_threads">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="set_use_threads"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.set_use_threads">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">set_use_threads</span><span class="p">(</span><span class="n">use_threads</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Set multithread option for sox effect chain</span>
 
@@ -365,7 +362,7 @@
     <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_utils_set_use_threads</span><span class="p">(</span><span class="n">use_threads</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="list_effects"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.list_effects">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="list_effects"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.list_effects">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">list_effects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;List the available sox effect names</span>
 
@@ -375,7 +372,7 @@
     <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_utils_list_effects</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="list_read_formats"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.list_read_formats">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="list_read_formats"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.list_read_formats">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">list_read_formats</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;List the supported audio formats for read</span>
 
@@ -385,7 +382,7 @@
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_utils_list_read_formats</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="list_write_formats"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.list_write_formats">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_module</span><span class="p">(</span><span class="s1">&#39;torchaudio._torchaudio&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="list_write_formats"><a class="viewcode-back" href="../../../utils.html#torchaudio.utils.sox_utils.list_write_formats">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_sox</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">list_write_formats</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;List the supported audio formats for write</span>
 
