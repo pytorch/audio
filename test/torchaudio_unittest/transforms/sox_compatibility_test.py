@@ -1,4 +1,3 @@
-import torch
 import torchaudio.transforms as T
 from parameterized import parameterized
 
@@ -10,7 +9,6 @@ from torchaudio_unittest.common_utils import (
     get_asset_path,
     sox_utils,
     load_wav,
-    get_whitenoise,
 )
 
 
