@@ -18,9 +18,9 @@ _ROOT_DIR = _THIS_DIR.parent.parent.resolve()
 _TORCHAUDIO_DIR = _ROOT_DIR / 'torchaudio'
 
 
-def _get_build(var):
-    if (var == "BUILD_KALDI") and not os.environ.get(var):
-        return True
+def _get_build(var, default=False):
+    if var not in os.environ:
+        return default
 
     val = os.environ.get(var, '0')
     trues = ['1', 'true', 'TRUE', 'on', 'ON', 'yes', 'YES']
@@ -35,7 +35,7 @@ def _get_build(var):
 
 
 _BUILD_SOX = _get_build("BUILD_SOX")
-_BUILD_KALDI = _get_build("BUILD_KALDI")
+_BUILD_KALDI = _get_build("BUILD_KALDI", True)
 _BUILD_TRANSDUCER = _get_build("BUILD_TRANSDUCER")
 
 
