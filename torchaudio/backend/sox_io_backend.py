@@ -315,7 +315,6 @@ def save(
         filepath, src, sample_rate, channels_first, compression, format, encoding, bits_per_sample)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
 @_mod_utils.deprecated('Please use "torchaudio.load".', '0.9.0')
 def load_wav(
         filepath: str,

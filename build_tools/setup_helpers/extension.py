@@ -1,5 +1,4 @@
 import os
-import platform
 import subprocess
 from pathlib import Path
 import distutils.sysconfig
@@ -40,8 +39,6 @@ _BUILD_TRANSDUCER = _get_build("BUILD_TRANSDUCER")
 
 
 def get_ext_modules():
-    if platform.system() == 'Windows':
-        return None
     return [Extension(name='torchaudio._torchaudio', sources=[])]
 
 
