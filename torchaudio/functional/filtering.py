@@ -830,8 +830,6 @@ def _lfilter_core(
     a_coeffs: Tensor,
     b_coeffs: Tensor,
 ) -> Tensor:
-    shape = waveform.size()
-    waveform = waveform.reshape(-1, shape[-1])
 
     assert a_coeffs.size(0) == b_coeffs.size(0)
     assert len(waveform.size()) == 2
@@ -869,9 +867,6 @@ def _lfilter_core(
         _lfilter_core_generic_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
 
     output = padded_output_waveform[:, n_order - 1:]
-
-    # unpack batch
-    output = output.reshape(shape[:-1] + output.shape[-1:])
     return output
 
 try:
@@ -903,10 +898,16 @@ def lfilter(
         Tensor: Waveform with dimension of ``(..., time)``.
     """
     # pack batch
+    shape = waveform.size()
+    waveform = waveform.reshape(-1, shape[-1])
+
     output = _lfilter(waveform, a_coeffs, b_coeffs)
 
     if clamp:
         output = torch.clamp(output, min=-1.0, max=1.0)
+
+    # unpack batch
+    output = output.reshape(*shape)
 
     return output
 

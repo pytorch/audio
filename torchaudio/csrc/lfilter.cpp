@@ -81,17 +81,12 @@ void lfilter_core_generic_loop(
 }
 
 torch::Tensor lfilter_core(
-    const torch::Tensor& raw_waveform,
+    const torch::Tensor& waveform,
     const torch::Tensor& a_coeffs,
     const torch::Tensor& b_coeffs) {
-  TORCH_CHECK(raw_waveform.device() == a_coeffs.device());
+  TORCH_CHECK(waveform.device() == a_coeffs.device());
   TORCH_CHECK(b_coeffs.device() == a_coeffs.device());
   TORCH_CHECK(a_coeffs.size(0) == b_coeffs.size(0));
-
-  torch::Tensor waveform = raw_waveform.contiguous();
-
-  auto shape = waveform.sizes();
-  waveform = waveform.view({-1, waveform.size(-1)});
 
   TORCH_INTERNAL_ASSERT(waveform.sizes().size() == 2);
 
@@ -128,7 +123,7 @@ torch::Tensor lfilter_core(
       {torch::indexing::Slice(),
        torch::indexing::Slice(n_order - 1, torch::indexing::None)});
 
-  return output.reshape(shape);
+  return output;
 }
 
 } // namespace
