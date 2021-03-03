@@ -88,6 +88,10 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     target_compile_definitions(_torchaudio PRIVATE INCLUDE_SOX)
   endif()
 
+  if (BUILD_KALDI)
+    target_compile_definitions(_torchaudio PRIVATE INCLUDE_KALDI)
+  endif()
+
   target_include_directories(
     _torchaudio
     PRIVATE
