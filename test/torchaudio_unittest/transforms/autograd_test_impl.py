@@ -10,7 +10,7 @@ from torchaudio_unittest.common_utils import (
 
 class AutogradTestCase(TestBaseMixin):
     def assert_grad(self, transform, *inputs, eps=1e-06, atol=1e-05, rtol=0.001):
-        transform = transform.to(self.device)
+        transform = transform.to(self.device, self.dtype)
 
         inputs_ = []
         for i in inputs:
@@ -36,4 +36,10 @@ class AutogradTestCase(TestBaseMixin):
     def test_spectrogram(self, kwargs):
         transform = T.Spectrogram(**kwargs)
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        self.assert_grad(transform, waveform)
+
+    def test_melspectrogram(self):
+        sample_rate = 8000
+        transform = T.MelSpectrogram(sample_rate=sample_rate)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, waveform)
