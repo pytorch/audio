@@ -1,7 +1,5 @@
 import torch
 import torchaudio.functional as F
-import torchaudio.transforms as T
-from parameterized import parameterized
 
 from torchaudio_unittest.common_utils import (
     skipIfNoSoxBackend,
@@ -299,31 +297,3 @@ class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase):
         data, path = self.get_whitenoise()
         result = F.lfilter(data, torch.tensor([a0, a1, a2]), torch.tensor([b0, b1, b2]))
         self.assert_sox_effect(result, path, ['biquad', b0, b1, b2, a0, a1, a2])
-
-    @parameterized.expand([
-        ('q', 'quarter_sine'),
-        ('h', 'half_sine'),
-        ('t', 'linear'),
-    ])
-    def test_fade(self, fade_shape_sox, fade_shape):
-        fade_in_len, fade_out_len = 44100, 44100
-        data, path = self.get_whitenoise(sample_rate=44100)
-        result = T.Fade(fade_in_len, fade_out_len, fade_shape)(data)
-        self.assert_sox_effect(result, path, ['fade', fade_shape_sox, '1', '0', '1'])
-
-    @parameterized.expand([
-        ('amplitude', 1.1),
-        ('db', 2),
-        ('power', 2),
-    ])
-    def test_vol(self, gain_type, gain):
-        data, path = self.get_whitenoise()
-        result = T.Vol(gain, gain_type)(data)
-        self.assert_sox_effect(result, path, ['vol', f'{gain}', gain_type])
-
-    @parameterized.expand(['vad-go-stereo-44100.wav', 'vad-go-mono-32000.wav'])
-    def test_vad(self, filename):
-        path = get_asset_path(filename)
-        data, sample_rate = load_wav(path)
-        result = T.Vad(sample_rate)(data)
-        self.assert_sox_effect(result, path, ['vad'])
