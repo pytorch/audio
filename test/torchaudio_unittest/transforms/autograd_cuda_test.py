@@ -1,12 +1,10 @@
-import torch
 from torchaudio_unittest.common_utils import (
     PytorchTestCase,
     skipIfNoCuda,
 )
-from .autograd_test_impl import AutogradTestCase
+from .autograd_test_impl import AutogradTestMixin
 
 
 @skipIfNoCuda
-class AutogradCUDATest(AutogradTestCase, PytorchTestCase):
+class AutogradCUDATest(AutogradTestMixin, PytorchTestCase):
     device = 'cuda'
-    dtype = torch.float64

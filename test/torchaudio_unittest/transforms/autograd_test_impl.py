@@ -1,4 +1,5 @@
 from parameterized import parameterized
+import torch
 from torch.autograd import gradcheck, gradgradcheck
 import torchaudio.transforms as T
 
@@ -8,16 +9,16 @@ from torchaudio_unittest.common_utils import (
 )
 
 
-class AutogradTestCase(TestBaseMixin):
-    def assert_grad(self, transform, *inputs, eps=1e-06, atol=1e-05, rtol=0.001):
-        transform = transform.to(self.device, self.dtype)
+class AutogradTestMixin(TestBaseMixin):
+    def assert_grad(self, transform, *inputs):
+        transform = transform.to(dtype=torch.float64, device=self.device)
 
         inputs_ = []
         for i in inputs:
             i.requires_grad = True
-            inputs_.append(i.to(dtype=self.dtype, device=self.device))
-        assert gradcheck(transform, inputs_, eps=eps, atol=atol, rtol=rtol)
-        assert gradgradcheck(transform, inputs_, eps=eps, atol=atol, rtol=rtol)
+            inputs_.append(i.to(dtype=torch.float64, device=self.device))
+        assert gradcheck(transform, inputs_)
+        assert gradgradcheck(transform, inputs_)
 
     @parameterized.expand([
         ({'pad': 0, 'normalized': False, 'power': None}, ),
