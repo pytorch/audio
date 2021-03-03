@@ -905,7 +905,7 @@ def lfilter(
 
     if clamp:
         output = torch.clamp(output, min=-1.0, max=1.0)
-    
+
     # unpack batch
     output = output.reshape(shape[:-1] + output.shape[-1:])
 
