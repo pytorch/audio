@@ -35,7 +35,7 @@ def compute_spectral_flatness(frame, epsilon=0.01):
     return -10 * torch.log10(epsilon + geometric_mean / arithmetic_mean)
 
 
-class VoiceActivityDetection(object):
+class VoiceActivityDetection():
     def __init__(
         self,
         num_init_frames=30,
@@ -148,7 +148,7 @@ class VoiceActivityDetection(object):
                 return self.silence_mark
 
 
-class MicrophoneStream(object):
+class MicrophoneStream():
     """Opens a recording stream as a generator yielding the audio chunks."""
 
     def __init__(self, device=None, rate=22050, chunk=2205):
