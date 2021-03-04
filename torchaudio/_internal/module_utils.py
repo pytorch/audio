@@ -60,6 +60,23 @@ def deprecated(direction: str, version: Optional[str] = None):
     return decorator
 
 
+def is_kaldi_available():
+    return is_module_available('torchaudio._torchaudio') and torch.ops.torchaudio.is_kaldi_available()
+
+
+def requires_kaldi():
+    if is_kaldi_available():
+        def decorator(func):
+            return func
+    else:
+        def decorator(func):
+            @wraps(func)
+            def wrapped(*args, **kwargs):
+                raise RuntimeError(f'{func.__module__}.{func.__name__} requires kaldi')
+            return wrapped
+    return decorator
+
+
 def is_sox_available():
     return is_module_available('torchaudio._torchaudio') and torch.ops.torchaudio.is_sox_available()
 

@@ -49,6 +49,7 @@ if(BUILD_LIBTORCHAUDIO)
 
   target_link_libraries(
     libtorchaudio
+    ${TORCH_LIBRARIES}
     ${TORCHAUDIO_THIRD_PARTIES}
     )
 
@@ -86,6 +87,10 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
 
   if (BUILD_SOX)
     target_compile_definitions(_torchaudio PRIVATE INCLUDE_SOX)
+  endif()
+
+  if (BUILD_KALDI)
+    target_compile_definitions(_torchaudio PRIVATE INCLUDE_KALDI)
   endif()
 
   target_include_directories(

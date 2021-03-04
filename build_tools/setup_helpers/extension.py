@@ -18,7 +18,10 @@ _ROOT_DIR = _THIS_DIR.parent.parent.resolve()
 _TORCHAUDIO_DIR = _ROOT_DIR / 'torchaudio'
 
 
-def _get_build(var):
+def _get_build(var, default=False):
+    if var not in os.environ:
+        return default
+
     val = os.environ.get(var, '0')
     trues = ['1', 'true', 'TRUE', 'on', 'ON', 'yes', 'YES']
     falses = ['0', 'false', 'FALSE', 'off', 'OFF', 'no', 'NO']
@@ -32,6 +35,7 @@ def _get_build(var):
 
 
 _BUILD_SOX = _get_build("BUILD_SOX")
+_BUILD_KALDI = _get_build("BUILD_KALDI", True)
 _BUILD_TRANSDUCER = _get_build("BUILD_TRANSDUCER")
 
 
@@ -68,7 +72,7 @@ class CMakeBuild(build_ext):
             '-DCMAKE_VERBOSE_MAKEFILE=ON',
             f"-DPython_INCLUDE_DIR={distutils.sysconfig.get_python_inc()}",
             f"-DBUILD_SOX:BOOL={'ON' if _BUILD_SOX else 'OFF'}",
-            "-DBUILD_KALDI:BOOL=ON",
+            f"-DBUILD_KALDI:BOOL={'ON' if _BUILD_KALDI else 'OFF'}",
             f"-DBUILD_TRANSDUCER:BOOL={'ON' if _BUILD_TRANSDUCER else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
