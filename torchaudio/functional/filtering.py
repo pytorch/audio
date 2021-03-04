@@ -920,6 +920,7 @@ def lfilter(
         Tensor: Waveform with dimension of ``(..., time)``.
     """
 <<<<<<< HEAD
+<<<<<<< HEAD
     # pack batch
     shape = waveform.size()
     waveform = waveform.reshape(-1, shape[-1])
@@ -963,6 +964,9 @@ def lfilter(
 =======
     output = _lfilter(waveform, a_coeffs, b_coeffs)
 >>>>>>> add prototype of differentiable lfilter
+=======
+    output = _lfilter(waveform, a_coeffs, b_coeffs)
+>>>>>>> a68848809a596a6beebf074f22ac860525fa9c82
 
     if clamp:
         output = torch.clamp(output, min=-1.0, max=1.0)
