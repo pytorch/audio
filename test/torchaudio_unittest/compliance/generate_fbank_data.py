@@ -103,7 +103,7 @@ def decode(fn, sound_path, exe_path, scp_path, out_dir):
     inputs['dither'] = 0.0
     logging.info(inputs)
     sound, sample_rate = torchaudio.load_wav(sound_path)
-    kaldi_output_dict = {k: v for k, v in torchaudio.kaldi_io.read_mat_ark(out_fn)}
+    kaldi_output_dict = dict(torchaudio.kaldi_io.read_mat_ark(out_fn))
     res = torchaudio.compliance.kaldi.fbank(sound, **inputs)
     torch.set_printoptions(precision=10, sci_mode=False)
     logging.info(res)
