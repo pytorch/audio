@@ -74,6 +74,7 @@ class CMakeBuild(build_ext):
             f"-DBUILD_TRANSDUCER:BOOL={'ON' if _BUILD_TRANSDUCER else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
         ]
         build_args = [
             '--target', 'install'
@@ -102,6 +103,9 @@ class CMakeBuild(build_ext):
 
         subprocess.check_call(
             ["cmake", str(_ROOT_DIR)] + cmake_args, cwd=self.build_temp)
+        print('*** Command list Thirdparty ***')
+        with open(self.build_temp + '/compile_commands.json', 'r') as fileobj:
+            print(fileobj.read())
         subprocess.check_call(
             ["cmake", "--build", "."] + build_args, cwd=self.build_temp)
 
