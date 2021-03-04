@@ -83,39 +83,7 @@ conda install -y -c pytorch-nightly torchaudio
 
 ### From Source
 
-If your system configuration is not among the supported configurations
-above, you can build torchaudio from source.
-
-This will require libsox v14.3.2 or above.
-
-<Details><Summary>Click here for the examples on how to install SoX</Summary>
-
-OSX (Homebrew):
-```bash
-brew install sox
-```
-
-Linux (Ubuntu):
-```bash
-sudo apt-get install sox libsox-dev libsox-fmt-all
-```
-
-Anaconda
-```bash
-conda install -c conda-forge sox
-```
-
-</Details>
-
-```bash
-# Linux
-python setup.py install
-
-# OSX
-MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
-```
-
-Alternatively, the build process can build libsox and some optional codecs statically and torchaudio can link them, by setting environment variable `BUILD_SOX=1`.
+The build process builds libsox and some codecs that torchaudio need to link to. This is achieve by setting the environment variable `BUILD_SOX=1`.
 The build process will fetch and build libmad, lame, flac, vorbis, opus, and libsox before building extension. This process requires `cmake` and `pkg-config`.
 
 ```bash

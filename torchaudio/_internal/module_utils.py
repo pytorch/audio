@@ -3,6 +3,8 @@ import importlib.util
 from typing import Optional
 from functools import wraps
 
+import torch
+
 
 def is_module_available(*modules: str) -> bool:
     r"""Returns if a top-level module with :attr:`name` exists *without**
@@ -55,4 +57,38 @@ def deprecated(direction: str, version: Optional[str] = None):
             warnings.warn(message, stacklevel=2)
             return func(*args, **kwargs)
         return wrapped
+    return decorator
+
+
+def is_kaldi_available():
+    return is_module_available('torchaudio._torchaudio') and torch.ops.torchaudio.is_kaldi_available()
+
+
+def requires_kaldi():
+    if is_kaldi_available():
+        def decorator(func):
+            return func
+    else:
+        def decorator(func):
+            @wraps(func)
+            def wrapped(*args, **kwargs):
+                raise RuntimeError(f'{func.__module__}.{func.__name__} requires kaldi')
+            return wrapped
+    return decorator
+
+
+def is_sox_available():
+    return is_module_available('torchaudio._torchaudio') and torch.ops.torchaudio.is_sox_available()
+
+
+def requires_sox():
+    if is_sox_available():
+        def decorator(func):
+            return func
+    else:
+        def decorator(func):
+            @wraps(func)
+            def wrapped(*args, **kwargs):
+                raise RuntimeError(f'{func.__module__}.{func.__name__} requires sox')
+            return wrapped
     return decorator

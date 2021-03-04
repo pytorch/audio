@@ -7,9 +7,7 @@ from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
-from torchaudio._internal import (
-    module_utils as _mod_utils,
-)
+from torchaudio._internal import module_utils as _mod_utils
 import torchaudio
 
 __all__ = [
@@ -298,13 +296,81 @@ def DB_to_amplitude(
     return ref * torch.pow(torch.pow(10.0, 0.1 * x), power)
 
 
+def _hz_to_mel(freq: float, mel_scale: str = "htk") -> float:
+    r"""Convert Hz to Mels.
+
+    Args:
+        freqs (float): Frequencies in Hz
+        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
+
+    Returns:
+        mels (float): Frequency in Mels
+    """
+
+    if mel_scale not in ['slaney', 'htk']:
+        raise ValueError('mel_scale should be one of "htk" or "slaney".')
+
+    if mel_scale == "htk":
+        return 2595.0 * math.log10(1.0 + (freq / 700.0))
+
+    # Fill in the linear part
+    f_min = 0.0
+    f_sp = 200.0 / 3
+
+    mels = (freq - f_min) / f_sp
+
+    # Fill in the log-scale part
+    min_log_hz = 1000.0
+    min_log_mel = (min_log_hz - f_min) / f_sp
+    logstep = math.log(6.4) / 27.0
+
+    if freq >= min_log_hz:
+        mels = min_log_mel + math.log(freq / min_log_hz) / logstep
+
+    return mels
+
+
+def _mel_to_hz(mels: Tensor, mel_scale: str = "htk") -> Tensor:
+    """Convert mel bin numbers to frequencies.
+
+    Args:
+        mels (Tensor): Mel frequencies
+        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
+
+    Returns:
+        freqs (Tensor): Mels converted in Hz
+    """
+
+    if mel_scale not in ['slaney', 'htk']:
+        raise ValueError('mel_scale should be one of "htk" or "slaney".')
+
+    if mel_scale == "htk":
+        return 700.0 * (10.0**(mels / 2595.0) - 1.0)
+
+    # Fill in the linear scale
+    f_min = 0.0
+    f_sp = 200.0 / 3
+    freqs = f_min + f_sp * mels
+
+    # And now the nonlinear scale
+    min_log_hz = 1000.0
+    min_log_mel = (min_log_hz - f_min) / f_sp
+    logstep = math.log(6.4) / 27.0
+
+    log_t = (mels >= min_log_mel)
+    freqs[log_t] = min_log_hz * torch.exp(logstep * (mels[log_t] - min_log_mel))
+
+    return freqs
+
+
 def create_fb_matrix(
         n_freqs: int,
         f_min: float,
         f_max: float,
         n_mels: int,
         sample_rate: int,
-        norm: Optional[str] = None
+        norm: Optional[str] = None,
+        mel_scale: str = "htk",
 ) -> Tensor:
     r"""Create a frequency bin conversion matrix.
 
@@ -316,6 +382,7 @@ def create_fb_matrix(
         sample_rate (int): Sample rate of the audio waveform
         norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
         (area normalization). (Default: ``None``)
+        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Returns:
         Tensor: Triangular filter banks (fb matrix) of size (``n_freqs``, ``n_mels``)
@@ -333,12 +400,12 @@ def create_fb_matrix(
     all_freqs = torch.linspace(0, sample_rate // 2, n_freqs)
 
     # calculate mel freq bins
-    # hertz to mel(f) is 2595. * math.log10(1. + (f / 700.))
-    m_min = 2595.0 * math.log10(1.0 + (f_min / 700.0))
-    m_max = 2595.0 * math.log10(1.0 + (f_max / 700.0))
+    m_min = _hz_to_mel(f_min, mel_scale=mel_scale)
+    m_max = _hz_to_mel(f_max, mel_scale=mel_scale)
+
     m_pts = torch.linspace(m_min, m_max, n_mels + 2)
-    # mel to hertz(mel) is 700. * (10**(mel / 2595.) - 1.)
-    f_pts = 700.0 * (10 ** (m_pts / 2595.0) - 1.0)
+    f_pts = _mel_to_hz(m_pts, mel_scale=mel_scale)
+
     # calculate the difference between each mel point and each stft freq point in hertz
     f_diff = f_pts[1:] - f_pts[:-1]  # (n_mels + 1)
     slopes = f_pts.unsqueeze(0) - all_freqs.unsqueeze(1)  # (n_freqs, n_mels + 2)
@@ -1000,7 +1067,7 @@ def spectral_centroid(
     return (freqs * specgram).sum(dim=freq_dim) / specgram.sum(dim=freq_dim)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_sox()
 def apply_codec(
     waveform: Tensor,
     sample_rate: int,
@@ -1011,24 +1078,25 @@ def apply_codec(
     bits_per_sample: Optional[int] = None,
 ) -> Tensor:
     r"""
-    Applies codecs as a form of augmentation
+    Apply codecs as a form of augmentation.
+
     Args:
-        waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```
-        sample_rate (int): Sample rate of the audio waveform
-        format (str): file format
+        waveform (Tensor): Audio data. Must be 2 dimensional. See also ```channels_first```.
+        sample_rate (int): Sample rate of the audio waveform.
+        format (str): File format.
         channels_first (bool):
             When True, both the input and output Tensor have dimension ``[channel, time]``.
             Otherwise, they have dimension ``[time, channel]``.
         compression (float): Used for formats other than WAV.
-            For mor details see :py:func:`torchaudio.backend.sox_io_backend.save`
+            For mor details see :py:func:`torchaudio.backend.sox_io_backend.save`.
         encoding (str, optional): Changes the encoding for the supported formats.
-            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`
+            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
         bits_per_sample (int, optional): Changes the bit depth for the supported formats.
-            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`
+            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
 
     Returns:
         torch.Tensor: Resulting Tensor.
-        If ``channels_first=True``, it has ``[channel, time]`` else ``[time, channel]``
+        If ``channels_first=True``, it has ``[channel, time]`` else ``[time, channel]``.
     """
     bytes = io.BytesIO()
     torchaudio.backend.sox_io_backend.save(bytes,
@@ -1046,6 +1114,7 @@ def apply_codec(
     return augmented
 
 
+@_mod_utils.requires_kaldi()
 def compute_kaldi_pitch(
         waveform: torch.Tensor,
         sample_rate: float,

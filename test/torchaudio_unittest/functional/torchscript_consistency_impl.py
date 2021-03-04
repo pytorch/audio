@@ -548,7 +548,7 @@ class Functional(common_utils.TestBaseMixin):
         tensor = common_utils.get_whitenoise(sample_rate=44100)
         self._assert_consistency(func, tensor)
 
-    @common_utils.skipIfNoExtension
+    @common_utils.skipIfNoKaldi
     def test_compute_kaldi_pitch(self):
         if self.dtype != torch.float32 or self.device != torch.device('cpu'):
             raise unittest.SkipTest("Only float32, cpu is supported.")

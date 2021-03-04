@@ -46,20 +46,29 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
         self.assertEqual(ta_out, lr_out, atol=5e-5, rtol=1e-5)
 
-    def _test_create_fb(self, n_mels=40, sample_rate=22050, n_fft=2048, fmin=0.0, fmax=8000.0, norm=None):
+    def _test_create_fb(
+        self, n_mels=40,
+        sample_rate=22050,
+        n_fft=2048,
+        fmin=0.0,
+        fmax=8000.0,
+        norm=None,
+        mel_scale="htk",
+    ):
         librosa_fb = librosa.filters.mel(sr=sample_rate,
                                          n_fft=n_fft,
                                          n_mels=n_mels,
                                          fmax=fmax,
                                          fmin=fmin,
-                                         htk=True,
+                                         htk=mel_scale == "htk",
                                          norm=norm)
         fb = F.create_fb_matrix(sample_rate=sample_rate,
                                 n_mels=n_mels,
                                 f_max=fmax,
                                 f_min=fmin,
                                 n_freqs=(n_fft // 2 + 1),
-                                norm=norm)
+                                norm=norm,
+                                mel_scale=mel_scale)
 
         for i_mel_bank in range(n_mels):
             self.assertEqual(
@@ -73,6 +82,13 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self._test_create_fb(n_mels=56, fmin=800.0, fmax=900.0)
         self._test_create_fb(n_mels=56, fmin=1900.0, fmax=900.0)
         self._test_create_fb(n_mels=10, fmin=1900.0, fmax=900.0)
+        self._test_create_fb(mel_scale="slaney")
+        self._test_create_fb(n_mels=128, sample_rate=44100, mel_scale="slaney")
+        self._test_create_fb(n_mels=128, fmin=2000.0, fmax=5000.0, mel_scale="slaney")
+        self._test_create_fb(n_mels=56, fmin=100.0, fmax=9000.0, mel_scale="slaney")
+        self._test_create_fb(n_mels=56, fmin=800.0, fmax=900.0, mel_scale="slaney")
+        self._test_create_fb(n_mels=56, fmin=1900.0, fmax=900.0, mel_scale="slaney")
+        self._test_create_fb(n_mels=10, fmin=1900.0, fmax=900.0, mel_scale="slaney")
         if StrictVersion(librosa.__version__) < StrictVersion("0.7.2"):
             return
         self._test_create_fb(n_mels=128, sample_rate=44100, norm="slaney")
