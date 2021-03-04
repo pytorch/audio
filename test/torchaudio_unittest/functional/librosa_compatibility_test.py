@@ -62,14 +62,14 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             param(n_mels=56, fmin=800.0, fmax=900.0, mel_scale="slaney"),
             param(n_mels=56, fmin=1900.0, fmax=900.0, mel_scale="slaney"),
             param(n_mels=10, fmin=1900.0, fmax=900.0, mel_scale="slaney"),
-        ] + [
+        ] + ([
             param(n_mels=128, sample_rate=44100, norm="slaney"),
             param(n_mels=128, fmin=2000.0, fmax=5000.0, norm="slaney"),
             param(n_mels=56, fmin=100.0, fmax=9000.0, norm="slaney"),
             param(n_mels=56, fmin=800.0, fmax=900.0, norm="slaney"),
             param(n_mels=56, fmin=1900.0, fmax=900.0, norm="slaney"),
             param(n_mels=10, fmin=1900.0, fmax=900.0, norm="slaney"),
-        ] if StrictVersion(librosa.__version__) >= StrictVersion("0.7.2") else []
+        ] if StrictVersion(librosa.__version__) >= StrictVersion("0.7.2") else [])
     )
     def test_create_fb(self, n_mels=40, sample_rate=22050, n_fft=2048,
                        fmin=0.0, fmax=8000.0, norm=None, mel_scale="htk"):
