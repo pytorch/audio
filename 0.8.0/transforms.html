@@ -1053,6 +1053,54 @@ Only applicable if center == false, ignored if center==true (int, default = 100)
 </dd></dl>
 
 </div>
+<div class="section" id="spectralcentroid">
+<h2><span class="hidden-section">SpectralCentroid</span><a class="headerlink" href="#spectralcentroid" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.transforms.SpectralCentroid">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">SpectralCentroid</code><span class="sig-paren">(</span><em class="sig-param">sample_rate: int, n_fft: int = 400, win_length: Optional[int] = None, hop_length: Optional[int] = None, pad: int = 0, window_fn: Callable[[...], torch.Tensor] = &lt;built-in method hann_window of type object&gt;, wkwargs: Optional[dict] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#SpectralCentroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.SpectralCentroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the spectral centroid for each channel along the time axis.</p>
+<p>The spectral centroid is defined as the weighted average of the
+frequency values, weighted by their magnitude.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Sample rate of audio signal.</p></li>
+<li><p><strong>n_fft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Size of FFT, creates <code class="docutils literal notranslate"><span class="pre">n_fft</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code> bins. (Default: <code class="docutils literal notranslate"><span class="pre">400</span></code>)</p></li>
+<li><p><strong>win_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Window size. (Default: <code class="docutils literal notranslate"><span class="pre">n_fft</span></code>)</p></li>
+<li><p><strong>hop_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Length of hop between STFT windows. (Default: <code class="docutils literal notranslate"><span class="pre">win_length</span> <span class="pre">//</span> <span class="pre">2</span></code>)</p></li>
+<li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Two sided padding of signal. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
+<li><p><strong>window_fn</strong> (<em>Callable</em><em>[</em><em>..</em><em>, </em><em>Tensor</em><em>]</em><em>, </em><em>optional</em>) – A function to create a window tensor
+that is applied/multiplied to each frame/window. (Default: <code class="docutils literal notranslate"><span class="pre">torch.hann_window</span></code>)</p></li>
+<li><p><strong>wkwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Arguments for window function. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spectral_centroid</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">SpectralCentroid</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">)(</span><span class="n">waveform</span><span class="p">)</span>  <span class="c1"># (channel, time)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.transforms.SpectralCentroid.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/transforms.html#SpectralCentroid.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.SpectralCentroid.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Spectral Centroid of size (…, time).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="vad">
 <h2><span class="hidden-section">Vad</span><a class="headerlink" href="#vad" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -1176,6 +1224,7 @@ This option sets the time for the initial noise estimate. (Default: 0.35)</p></l
 <li><a class="reference internal" href="#timemasking"><span class="hidden-section">TimeMasking</span></a></li>
 <li><a class="reference internal" href="#vol"><span class="hidden-section">Vol</span></a></li>
 <li><a class="reference internal" href="#slidingwindowcmn"><span class="hidden-section">SlidingWindowCmn</span></a></li>
+<li><a class="reference internal" href="#spectralcentroid"><span class="hidden-section">SpectralCentroid</span></a></li>
 <li><a class="reference internal" href="#vad"><span class="hidden-section">Vad</span></a></li>
 </ul>
 </li>
