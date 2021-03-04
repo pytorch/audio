@@ -50,17 +50,17 @@ The following is an overview of the tests and related modules for `torchaudio`.
 ### Purpose specific test suites
 
 #### Numerical compatibility against existing software
-- [Librosa compatibility test](./librosa_compatibility_test.py)
+- [Librosa compatibility test](./transforms/librosa_compatibility_test.py)
     Test suite for numerical compatibility against librosa.
-- [SoX compatibility test](./sox_compatibility_test.py)
+- [SoX compatibility test](./transforms/sox_compatibility_test.py)
     Test suite for numerical compatibility against SoX.
 - [Kaldi compatibility test](./kaldi_compatibility_test.py)
     Test suite for numerical compatibility against Kaldi.
 
 #### Result consistency with PyTorch framework
-- [TorchScript consistency test](./torchscript_consistency_impl.py)
+- [TorchScript consistency test](./transforms/torchscript_consistency_impl.py)
     Test suite to check 1. if an API is TorchScript-able, and 2. the results from Python and Torchscript match.
-- [Batch consistency test](./batch_consistency_test.py)
+- [Batch consistency test](./transforms/batch_consistency_test.py)
     Test suite to check if functionals/Transforms handle single sample input and batch input and return the same result.
 
 ### Module specific test suites
@@ -69,7 +69,7 @@ The following test modules are defined for corresponding `torchaudio` module/fun
 
 - [`torchaudio.datasets`](./datasets)
 - [`torchaudio.functional`](./functional)
-- [`torchaudio.transforms`](./transforms_test.py)
+- [`torchaudio.transforms`](./transforms/transforms_test.py)
 - [`torchaudio.compliance.kaldi`](./compliance_kaldi_test.py)
 - [`torchaudio.kaldi_io`](./kaldi_io_test.py)
 - [`torchaudio.sox_effects`](./sox_effect)
@@ -142,7 +142,7 @@ The following is the current practice of torchaudio test suite.
   - Set class memeber `dtype`, `device` and `backend` for the desired behavior.
   - If you do not set `backend` value in your test suite, then I/O functions will be unassigned and attempt to load/save file will fail.
   - For `backend` value, in addition to available backends, you can also provide the value "default" and backend will be picked automatically based on availability.
-1. If you are writing tests that should pass on diffrent dtype/devices, write a common class inheriting `common_utils.TestBaseMixin`, then inherit `common_utils.PytorchTestCase` and define class attributes (`dtype` / `device` / `backend`) there. See [Torchscript consistency test implementation](./torchscript_consistency_impl.py) and test definitions for [CPU](./torchscript_consistency_cpu_test.py) and [CUDA](./torchscript_consistency_cuda_test.py) devices.
+1. If you are writing tests that should pass on diffrent dtype/devices, write a common class inheriting `common_utils.TestBaseMixin`, then inherit `common_utils.PytorchTestCase` and define class attributes (`dtype` / `device` / `backend`) there. See [Torchscript consistency test implementation](./transforms/torchscript_consistency_impl.py) and test definitions for [CPU](./transforms/torchscript_consistency_cpu_test.py) and [CUDA](./transforms/torchscript_consistency_cuda_test.py) devices.
 1. For numerically comparing Tensors, use `assertEqual` method from torchaudio_unittest.common_utils.PytorchTestCase` class. This method has a better support for a wide variety of Tensor types.
 
 When you add a new feature(functional/transform), consider the following
