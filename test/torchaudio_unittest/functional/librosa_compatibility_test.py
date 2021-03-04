@@ -46,8 +46,9 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
         self.assertEqual(ta_out, lr_out, atol=5e-5, rtol=1e-5)
 
-    @parameterized.expand(
-        [
+    @parameterized.expand([
+        param(norm=norm, mel_scale=mel_scale, **p.kwargs)
+        for p in [
             param(),
             param(n_mels=128, sample_rate=44100),
             param(n_mels=128, fmin=2000.0, fmax=5000.0),
@@ -55,24 +56,15 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             param(n_mels=56, fmin=800.0, fmax=900.0),
             param(n_mels=56, fmin=1900.0, fmax=900.0),
             param(n_mels=10, fmin=1900.0, fmax=900.0),
-            param(mel_scale="slaney"),
-            param(n_mels=128, sample_rate=44100, mel_scale="slaney"),
-            param(n_mels=128, fmin=2000.0, fmax=5000.0, mel_scale="slaney"),
-            param(n_mels=56, fmin=100.0, fmax=9000.0, mel_scale="slaney"),
-            param(n_mels=56, fmin=800.0, fmax=900.0, mel_scale="slaney"),
-            param(n_mels=56, fmin=1900.0, fmax=900.0, mel_scale="slaney"),
-            param(n_mels=10, fmin=1900.0, fmax=900.0, mel_scale="slaney"),
-        ] + ([
-            param(n_mels=128, sample_rate=44100, norm="slaney"),
-            param(n_mels=128, fmin=2000.0, fmax=5000.0, norm="slaney"),
-            param(n_mels=56, fmin=100.0, fmax=9000.0, norm="slaney"),
-            param(n_mels=56, fmin=800.0, fmax=900.0, norm="slaney"),
-            param(n_mels=56, fmin=1900.0, fmax=900.0, norm="slaney"),
-            param(n_mels=10, fmin=1900.0, fmax=900.0, norm="slaney"),
-        ] if StrictVersion(librosa.__version__) >= StrictVersion("0.7.2") else [])
-    )
+        ]
+        for norm in [None, 'slaney']
+        for mel_scale in ['htk', 'slaney']
+    ])
     def test_create_fb(self, n_mels=40, sample_rate=22050, n_fft=2048,
                        fmin=0.0, fmax=8000.0, norm=None, mel_scale="htk"):
+        if (norm == "slaney" and StrictVersion(librosa.__version__) < StrictVersion("0.7.2")):
+            self.skipTest('Test is known to fail with older versions of librosa.')
+
         librosa_fb = librosa.filters.mel(sr=sample_rate,
                                          n_fft=n_fft,
                                          n_mels=n_mels,
