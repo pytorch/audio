@@ -8,7 +8,7 @@ class LanguageModel:
         self.char_space = char_space
         self.char_blank = char_blank
 
-        labels = [l for l in labels]
+        labels = list(labels)
         self.length = len(labels)
         enumerated = list(enumerate(labels))
         flipped = [(sub[1], sub[0]) for sub in enumerated]
