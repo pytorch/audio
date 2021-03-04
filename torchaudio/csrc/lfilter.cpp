@@ -242,7 +242,6 @@ torch::Tensor lfilter_autograd(
   return DifferentiableLfilter::apply(waveform, a_coeffs, b_coeffs);
 }
 
-
 } // namespace
 
 // Note: We want to avoid using "catch-all" kernel.
