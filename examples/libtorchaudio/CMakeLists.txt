@@ -7,7 +7,7 @@ SET(BUILD_SOX ON CACHE BOOL "Build libsox into libtorchaudio")
 
 SET(BUILD_KALDI OFF CACHE BOOL "Build Kaldi into libtorchaudio")
 SET(BUILD_TRANSDUCER OFF CACHE BOOL "Build Python binding")
-SET(BUILD_TORCHAUDIO_PYTHON_EXTENSION OFF CACHEBOOL "Build Python binding")
+SET(BUILD_TORCHAUDIO_PYTHON_EXTENSION OFF CACHE BOOL "Build Python binding")
 
 find_package(Torch REQUIRED)
 message("libtorchaudio CMakeLists: ${TORCH_CXX_FLAGS}")
