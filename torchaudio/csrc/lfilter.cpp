@@ -80,7 +80,7 @@ void lfilter_core_generic_loop(
   }
 }
 
-torch::Tensor lfilter_core(
+std::vector<torch::Tensor> lfilter_core(
     const torch::Tensor& waveform,
     const torch::Tensor& a_coeffs,
     const torch::Tensor& b_coeffs) {
@@ -123,8 +123,16 @@ torch::Tensor lfilter_core(
       {torch::indexing::Slice(),
        torch::indexing::Slice(n_order - 1, torch::indexing::None)});
 
-  return output;
+  return {output, input_signal_windows};
 }
+
+torch::Tensor lfilter_simple(
+    const torch::Tensor& waveform,
+    const torch::Tensor& a_coeffs,
+    const torch::Tensor& b_coeffs) {
+  return lfilter_core(waveform, a_coeffs, b_coeffs)[0];
+}
+
 
 } // namespace
 
