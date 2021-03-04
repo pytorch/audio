@@ -1125,30 +1125,11 @@
     <span class="n">_lfilter_core_cpu_loop</span> <span class="o">=</span> <span class="n">_lfilter_core_generic_loop</span>
 
 
-<div class="viewcode-block" id="lfilter"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.lfilter">[docs]</a><span class="k">def</span> <span class="nf">lfilter</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">_lfilter_core</span><span class="p">(</span>
     <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">a_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">clamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform an IIR filter by evaluating difference equation.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.</span>
-<span class="sd">        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(n_order + 1)``.</span>
-<span class="sd">                                Lower delays coefficients are first, e.g. ``[a0, a1, a2, ...]``.</span>
-<span class="sd">                                Must be same size as b_coeffs (pad with 0&#39;s as necessary).</span>
-<span class="sd">        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of ``(n_order + 1)``.</span>
-<span class="sd">                                 Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.</span>
-<span class="sd">                                 Must be same size as a_coeffs (pad with 0&#39;s as necessary).</span>
-<span class="sd">        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Tensor: Waveform with dimension of ``(..., time)``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># pack batch</span>
-    <span class="n">shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="k">assert</span> <span class="n">a_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">b_coeffs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">==</span> <span class="mi">2</span>
@@ -1186,6 +1167,41 @@
         <span class="n">_lfilter_core_generic_loop</span><span class="p">(</span><span class="n">input_signal_windows</span><span class="p">,</span> <span class="n">a_coeffs_flipped</span><span class="p">,</span> <span class="n">padded_output_waveform</span><span class="p">)</span>
 
     <span class="n">output</span> <span class="o">=</span> <span class="n">padded_output_waveform</span><span class="p">[:,</span> <span class="n">n_order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">_lfilter</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">_lfilter</span>
+<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;No such operator torchaudio::_lfilter&#39;</span>
+    <span class="n">_lfilter</span> <span class="o">=</span> <span class="n">_lfilter_core</span>
+
+
+<div class="viewcode-block" id="lfilter"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.lfilter">[docs]</a><span class="k">def</span> <span class="nf">lfilter</span><span class="p">(</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">a_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">b_coeffs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">clamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform an IIR filter by evaluating difference equation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.</span>
+<span class="sd">        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(n_order + 1)``.</span>
+<span class="sd">                                Lower delays coefficients are first, e.g. ``[a0, a1, a2, ...]``.</span>
+<span class="sd">                                Must be same size as b_coeffs (pad with 0&#39;s as necessary).</span>
+<span class="sd">        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of ``(n_order + 1)``.</span>
+<span class="sd">                                 Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.</span>
+<span class="sd">                                 Must be same size as a_coeffs (pad with 0&#39;s as necessary).</span>
+<span class="sd">        clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: Waveform with dimension of ``(..., time)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pack batch</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">output</span> <span class="o">=</span> <span class="n">_lfilter</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">a_coeffs</span><span class="p">,</span> <span class="n">b_coeffs</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">clamp</span><span class="p">:</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="nb">min</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>

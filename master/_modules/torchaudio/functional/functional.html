@@ -1414,7 +1414,8 @@
     <span class="k">return</span> <span class="n">augmented</span></div>
 
 
-<div class="viewcode-block" id="compute_kaldi_pitch"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.compute_kaldi_pitch">[docs]</a><span class="k">def</span> <span class="nf">compute_kaldi_pitch</span><span class="p">(</span>
+<div class="viewcode-block" id="compute_kaldi_pitch"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.compute_kaldi_pitch">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">requires_kaldi</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">compute_kaldi_pitch</span><span class="p">(</span>
         <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">frame_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">25.0</span><span class="p">,</span>
