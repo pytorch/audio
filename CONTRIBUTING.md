@@ -56,9 +56,7 @@ BUILD_SOX=1 python setup.py develop
 # DEBUG=1 python setup.py develop
 ```
 
-Note: you don't need to use `BUILD_SOX=1` if you have `libsox-dev` installed
-already. If you built sox however, set the `PATH` variable so that the tests
-properly use the newly built `sox` binary:
+If you built sox, set the `PATH` variable so that the tests properly use the newly built `sox` binary:
 
 ```bash
 export PATH="<path_to_torchaudio>/third_party/install/bin:${PATH}"
