@@ -343,13 +343,13 @@
 <dd><p>Perform source separation. Generate audio source waveforms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>input</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))"><em>torch.Tensor</em></a>) – 3D Tensor with shape [batch, channel==1, frames]</p>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0)"><em>torch.Tensor</em></a>) – 3D Tensor with shape [batch, channel==1, frames]</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>3D Tensor with shape [batch, channel==num_sources, frames]</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0)">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -381,7 +381,7 @@ or <code class="docutils literal notranslate"><span class="pre">mfcc</span></cod
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/models/wav2letter.html#Wav2Letter.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Wav2Letter.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))"><em>torch.Tensor</em></a>) – Tensor of dimension (batch_size, num_features, input_length).</p>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0)"><em>torch.Tensor</em></a>) – Tensor of dimension (batch_size, num_features, input_length).</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Predictor tensor of dimension (batch_size, number_of_classes, input_length).</p>

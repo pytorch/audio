@@ -552,7 +552,7 @@ For more details see <a class="reference internal" href="backend.html#torchaudio
 If <code class="docutils literal notranslate"><span class="pre">channels_first=True</span></code>, it has <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code> else <code class="docutils literal notranslate"><span class="pre">[time,</span> <span class="pre">channel]</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0)">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -640,7 +640,7 @@ If <code class="docutils literal notranslate"><span class="pre">channels_first=T
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))"><em>torch.Tensor</em></a>) – audio waveform of dimension of <cite>(…, time)</cite></p></li>
+<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0)"><em>torch.Tensor</em></a>) – audio waveform of dimension of <cite>(…, time)</cite></p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – sampling rate of the waveform, e.g. 44100 (Hz)</p></li>
 <li><p><strong>central_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – central frequency (in Hz)</p></li>
 <li><p><strong>Q</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – <a class="reference external" href="https://en.wikipedia.org/wiki/Q_factor">https://en.wikipedia.org/wiki/Q_factor</a> (Default: <code class="docutils literal notranslate"><span class="pre">0.707</span></code>)</p></li>
@@ -1074,7 +1074,7 @@ Must be same size as a_coeffs (pad with 0’s as necessary).</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))"><em>torch.Tensor</em></a>) – audio waveform of dimension of <cite>(…, time)</cite></p></li>
+<li><p><strong>waveform</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0)"><em>torch.Tensor</em></a>) – audio waveform of dimension of <cite>(…, time)</cite></p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – sampling rate of the waveform, e.g. 44100 (Hz)</p></li>
 <li><p><strong>cutoff_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – filter cutoff frequency</p></li>
 <li><p><strong>Q</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – <a class="reference external" href="https://en.wikipedia.org/wiki/Q_factor">https://en.wikipedia.org/wiki/Q_factor</a> (Default: <code class="docutils literal notranslate"><span class="pre">0.707</span></code>)</p></li>
@@ -1370,7 +1370,7 @@ Values near 1 can lead to faster convergence, but above 1 may not converge.</p><
 <dd class="field-even"><p>waveform of (…, time), where time equals the <code class="docutils literal notranslate"><span class="pre">length</span></code> parameter if given.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch vmaster (1.7.0a0+57bffc3 ))">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0)">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
