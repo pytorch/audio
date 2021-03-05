@@ -884,6 +884,10 @@ def lfilter(
 ) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation.
 
+    Note:
+        To avoid numerical problems, small filter order or short input sequence is prefered.
+        Using double precision could also minimize numerical precision errors.
+
     Args:
         waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
         a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(n_order + 1)``.
