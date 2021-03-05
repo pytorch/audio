@@ -104,7 +104,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
 
   if (WIN32)
     set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION} 3.9 3.8 3.7 3.6)
-    find_package(Python3 COMPONENTS Development)
+    find_package(Python3 COMPONENTS Interpreter Development)
     set(ADDITIONAL_ITEMS Python3::Python)
   endif()
 
