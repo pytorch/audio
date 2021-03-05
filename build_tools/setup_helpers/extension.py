@@ -84,9 +84,12 @@ class CMakeBuild(build_ext):
         if 'CMAKE_GENERATOR' not in os.environ or platform.system() == 'Windows':
             cmake_args += ["-GNinja"]
         if platform.system() == 'Windows':
+            import sys
+            python_version = sys.version_info
             cmake_args += [
                 "-DCMAKE_C_COMPILER=cl",
-                "-DCMAKE_CXX_COMPILER=cl"
+                "-DCMAKE_CXX_COMPILER=cl",
+                f"-DPYTHON_VERSION={python_version.major}.{python_version.minor}",
             ]
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level

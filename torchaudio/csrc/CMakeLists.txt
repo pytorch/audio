@@ -103,8 +103,8 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
 
   if (WIN32)
-    set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION} 3.9 3.8 3.7 3.6)
-    find_package(Python3 COMPONENTS Interpreter Development)
+    message("PYTHON_VERSION ${PYTHON_VERSION}")
+    find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
     set(ADDITIONAL_ITEMS Python3::Python)
   endif()
 
