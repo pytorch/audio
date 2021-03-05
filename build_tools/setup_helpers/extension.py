@@ -34,14 +34,12 @@ def _get_build(var, default=False):
     return False
 
 
-_BUILD_SOX = _get_build("BUILD_SOX")
-_BUILD_KALDI = _get_build("BUILD_KALDI", True)
+_BUILD_SOX = False if platform.system() == 'Windows' else _get_build("BUILD_SOX")
+_BUILD_KALDI = False if platform.system() == 'Windows' else _get_build("BUILD_KALDI", True)
 _BUILD_TRANSDUCER = _get_build("BUILD_TRANSDUCER")
 
 
 def get_ext_modules():
-    if platform.system() == 'Windows':
-        return None
     return [Extension(name='torchaudio._torchaudio', sources=[])]
 
 
@@ -82,8 +80,16 @@ class CMakeBuild(build_ext):
         ]
 
         # Default to Ninja
-        if 'CMAKE_GENERATOR' not in os.environ:
+        if 'CMAKE_GENERATOR' not in os.environ or platform.system() == 'Windows':
             cmake_args += ["-GNinja"]
+        if platform.system() == 'Windows':
+            import sys
+            python_version = sys.version_info
+            cmake_args += [
+                "-DCMAKE_C_COMPILER=cl",
+                "-DCMAKE_CXX_COMPILER=cl",
+                f"-DPYTHON_VERSION={python_version.major}.{python_version.minor}",
+            ]
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.
