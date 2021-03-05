@@ -80,7 +80,7 @@ void lfilter_core_generic_loop(
   }
 }
 
-std::vector<torch::Tensor> lfilter_core(
+std::tuple<at::Tensor, at::Tensor> lfilter_core(
     const torch::Tensor& waveform,
     const torch::Tensor& a_coeffs,
     const torch::Tensor& b_coeffs) {
@@ -130,7 +130,7 @@ torch::Tensor lfilter_simple(
     const torch::Tensor& waveform,
     const torch::Tensor& a_coeffs,
     const torch::Tensor& b_coeffs) {
-  return lfilter_core(waveform, a_coeffs, b_coeffs)[0];
+  return std::get<0>(lfilter_core(waveform, a_coeffs, b_coeffs));
 }
 
 class DifferentiableLfilter
@@ -144,8 +144,8 @@ class DifferentiableLfilter
     at::AutoNonVariableTypeMode g;
     auto result = lfilter_core(waveform, a_coeffs, b_coeffs);
     ctx->save_for_backward(
-        {waveform, a_coeffs, b_coeffs, result[0], result[1]});
-    return result[0];
+        {waveform, a_coeffs, b_coeffs, std::get<0>(result), std::get<1>(result)});
+    return std::get<0>(result);
   }
 
   static torch::autograd::tensor_list backward(
