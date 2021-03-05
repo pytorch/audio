@@ -54,7 +54,7 @@ The following is an overview of the tests and related modules for `torchaudio`.
     Test suite for numerical compatibility against librosa.
 - [SoX compatibility test](./transforms/sox_compatibility_test.py)
     Test suite for numerical compatibility against SoX.
-- [Kaldi compatibility test](./kaldi_compatibility_test.py)
+- [Kaldi compatibility test](./transforms/kaldi_compatibility_impl.py)
     Test suite for numerical compatibility against Kaldi.
 
 #### Result consistency with PyTorch framework
