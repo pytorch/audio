@@ -17,6 +17,10 @@ from torchaudio_unittest.common_utils.kaldi_utils import (
 
 
 class Kaldi(TempDirMixin, TestBaseMixin):
+    def assert_equal(self, output, *, expected, rtol=None, atol=None):
+        expected = expected.to(dtype=self.dtype, device=self.device)
+        self.assertEqual(output, expected, rtol=rtol, atol=atol)
+
     @skipIfNoExec('apply-cmvn-sliding')
     def test_sliding_window_cmn(self):
         """sliding_window_cmn should be numerically compatible with apply-cmvn-sliding"""
