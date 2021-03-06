@@ -144,7 +144,11 @@ class DifferentiableLfilter
     at::AutoNonVariableTypeMode g;
     auto result = lfilter_core(waveform, a_coeffs, b_coeffs);
     ctx->save_for_backward(
-        {waveform, a_coeffs, b_coeffs, std::get<0>(result), std::get<1>(result)});
+        {waveform,
+         a_coeffs,
+         b_coeffs,
+         std::get<0>(result),
+         std::get<1>(result)});
     return std::get<0>(result);
   }
 
