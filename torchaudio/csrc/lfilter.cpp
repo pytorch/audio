@@ -264,5 +264,5 @@ TORCH_LIBRARY_IMPL(torchaudio, DefaultBackend, m) {
 }
 
 TORCH_LIBRARY_IMPL(torchaudio, Autograd, m) {
-  m.impl("_lfilter", lfilter_autograd);
+  m.impl("torchaudio::_lfilter", lfilter_autograd);
 }
