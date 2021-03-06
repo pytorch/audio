@@ -125,6 +125,14 @@ def spectrogram(
     return spec_f
 
 
+def _get_complex_dtype(real_dtype: torch.dtype):
+    if real_dtype == torch.double:
+        return torch.cdouble
+    if real_dtype == torch.float:
+        return torch.cfloat
+    raise ValueError(f'Unexpected dtype {real_dtype}')
+
+
 def griffinlim(
         specgram: Tensor,
         window: Tensor,
@@ -180,23 +188,19 @@ def griffinlim(
 
     specgram = specgram.pow(1 / power)
 
-    # randomly initialize the phase
-    batch, freq, frames = specgram.size()
+    # initialize the phase
     if rand_init:
-        angles = 2 * math.pi * torch.rand(batch, freq, frames)
+        angles = torch.rand(
+            specgram.size(),
+            dtype=_get_complex_dtype(specgram.dtype), device=specgram.device)
     else:
-        angles = torch.zeros(batch, freq, frames)
-    angles = torch.stack([angles.cos(), angles.sin()], dim=-1) \
-        .to(dtype=specgram.dtype, device=specgram.device)
-    specgram = specgram.unsqueeze(-1).expand_as(angles)
+        angles = torch.full(
+            specgram.size(), 1,
+            dtype=_get_complex_dtype(specgram.dtype), device=specgram.device)
 
     # And initialize the previous iterate to 0
-    rebuilt = torch.tensor(0.)
-
+    tprev = torch.tensor(0., dtype=specgram.dtype, device=specgram.device)
     for _ in range(n_iter):
-        # Store the previous iterate
-        tprev = rebuilt
-
         # Invert with our current estimate of the phases
         inverse = torch.istft(specgram * angles,
                               n_fft=n_fft,
@@ -206,26 +210,27 @@ def griffinlim(
                               length=length)
 
         # Rebuild the spectrogram
-        rebuilt = torch.view_as_real(
-            torch.stft(
-                input=inverse,
-                n_fft=n_fft,
-                hop_length=hop_length,
-                win_length=win_length,
-                window=window,
-                center=True,
-                pad_mode='reflect',
-                normalized=False,
-                onesided=True,
-                return_complex=True,
-            )
+        rebuilt = torch.stft(
+            input=inverse,
+            n_fft=n_fft,
+            hop_length=hop_length,
+            win_length=win_length,
+            window=window,
+            center=True,
+            pad_mode='reflect',
+            normalized=False,
+            onesided=True,
+            return_complex=True,
         )
 
         # Update our phase estimates
         angles = rebuilt
         if momentum:
             angles = angles - tprev.mul_(momentum / (1 + momentum))
-        angles = angles.div(complex_norm(angles).add(1e-16).unsqueeze(-1).expand_as(angles))
+        angles = angles.div(angles.abs().add(1e-16))
+
+        # Store the previous iterate
+        tprev = rebuilt
 
     # Return the final phase estimates
     waveform = torch.istft(specgram * angles,
