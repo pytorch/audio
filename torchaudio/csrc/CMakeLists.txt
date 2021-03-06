@@ -49,6 +49,7 @@ if(BUILD_LIBTORCHAUDIO)
 
   target_link_libraries(
     libtorchaudio
+    ${TORCH_LIBRARIES}
     ${TORCHAUDIO_THIRD_PARTIES}
     )
 
@@ -102,11 +103,17 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   # See https://github.com/pytorch/pytorch/issues/38122
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
 
+  if (WIN32)
+    find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
+    set(ADDITIONAL_ITEMS Python3::Python)
+  endif()
+
   target_link_libraries(
     _torchaudio
     ${TORCH_LIBRARIES}
     ${TORCH_PYTHON_LIBRARY}
     ${TORCHAUDIO_THIRD_PARTIES}
+    ${ADDITIONAL_ITEMS}
     )
 
   install(TARGETS _torchaudio LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX})

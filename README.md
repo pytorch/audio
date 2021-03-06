@@ -29,7 +29,6 @@ to use and feel like a natural extension.
 Dependencies
 ------------
 * PyTorch (See below for the compatible versions)
-* libsox v14.3.2 or above (only required when building from source)
 * [optional] vesis84/kaldi-io-for-python commit cb46cb1f44318a5d04d4941cf39084c5b021241e or above
 
 The following are the corresponding ``torchaudio`` versions and supported Python versions.

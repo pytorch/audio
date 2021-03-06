@@ -15,7 +15,6 @@ class BackendSwitchMixin:
         else:
             assert torchaudio.get_audio_backend() == self.backend
         assert torchaudio.load == self.backend_module.load
-        assert torchaudio.load_wav == self.backend_module.load_wav
         assert torchaudio.save == self.backend_module.save
         assert torchaudio.info == self.backend_module.info
 
