@@ -188,7 +188,7 @@ class GriffinLim(torch.nn.Module):
             Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.
         """
         return F.griffinlim(specgram, self.window, self.n_fft, self.hop_length, self.win_length, self.power,
-                            self.normalized, self.n_iter, self.momentum, self.length, self.rand_init)
+                            self.n_iter, self.momentum, self.length, self.rand_init)
 
 
 class AmplitudeToDB(torch.nn.Module):
