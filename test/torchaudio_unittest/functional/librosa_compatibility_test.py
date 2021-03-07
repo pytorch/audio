@@ -36,8 +36,8 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         rand_init = False
         init = 'random' if rand_init else None
 
-        specgram = F.spectrogram(tensor, 0, window, n_fft, hop, ws, 2, normalize).sqrt()
-        ta_out = F.griffinlim(specgram, window, n_fft, hop, ws, 1, normalize,
+        specgram = F.spectrogram(tensor, 0, window, n_fft, hop, ws, 2).sqrt()
+        ta_out = F.griffinlim(specgram, window, n_fft, hop, ws, 1,
                               n_iter, momentum, length, rand_init)
         lr_out = librosa.griffinlim(specgram.squeeze(0).numpy(), n_iter=n_iter, hop_length=hop,
                                     momentum=momentum, init=init, length=length)

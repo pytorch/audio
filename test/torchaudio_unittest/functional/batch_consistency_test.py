@@ -58,7 +58,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         torch.random.manual_seed(0)
         batch = torch.rand(self.batch_size, 1, 201, 6)
         self.assert_batch_consistency(
-            F.griffinlim, batch, window, n_fft, hop, ws, power, normalize,
+            F.griffinlim, batch, window, n_fft, hop, ws, power,
             n_iter, momentum, length, 0, atol=5e-5)
 
     @parameterized.expand(list(itertools.product(
