@@ -30,6 +30,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         ws = 400
         hop = 100
         window = torch.hann_window(ws)
+        normalize = False
         momentum = 0.99
         n_iter = 8
         length = 1000
