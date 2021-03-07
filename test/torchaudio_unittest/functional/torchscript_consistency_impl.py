@@ -41,7 +41,6 @@ class Functional(common_utils.TestBaseMixin):
             hop = 200
             window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
             power = 2.
-            normalize = False
             momentum = 0.99
             n_iter = 32
             length = 1000
