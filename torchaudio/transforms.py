@@ -172,7 +172,6 @@ class GriffinLim(torch.nn.Module):
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
         self.register_buffer('window', window)
-        self.normalized = normalized
         self.length = length
         self.power = power
         self.momentum = momentum / (1 + momentum)
