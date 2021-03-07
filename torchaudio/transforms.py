@@ -122,7 +122,6 @@ class GriffinLim(torch.nn.Module):
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         power (float, optional): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
-        normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
         momentum (float, optional): The momentum parameter for fast Griffin-Lim.
             Setting this to 0 recovers the original Griffin-Lim method.
@@ -158,7 +157,6 @@ class GriffinLim(torch.nn.Module):
                  hop_length: Optional[int] = None,
                  window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: float = 2.,
-                 normalized: bool = False,
                  wkwargs: Optional[dict] = None,
                  momentum: float = 0.99,
                  length: Optional[int] = None,
