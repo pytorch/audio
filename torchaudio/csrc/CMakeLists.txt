@@ -116,5 +116,10 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     ${ADDITIONAL_ITEMS}
     )
 
-  install(TARGETS _torchaudio LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX})
+  install(
+    TARGETS _torchaudio
+    LIBRARY DESTINATION .
+    ARCHIVE DESTINATION .  # For Windows
+    RUNTIME DESTINATION .  # For Windows
+    )
 endif()
