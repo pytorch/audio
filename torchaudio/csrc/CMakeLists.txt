@@ -119,7 +119,7 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   install(
     TARGETS _torchaudio
     LIBRARY DESTINATION .
-    ARCHIVE DESTINATION .  # For Windows
+    # ARCHIVE DESTINATION .  # For Windows
     RUNTIME DESTINATION .  # For Windows
     )
 endif()
