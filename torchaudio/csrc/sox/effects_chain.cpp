@@ -84,7 +84,7 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
       // Need to convert to 64-bit precision so that
       // values around INT32_MIN/MAX are handled correctly.
       chunk = chunk.to(c10::ScalarType::Double);
-      chunk *= (int)1<<31;
+      chunk *= 2147483648.;
       chunk.clamp_(INT32_MIN, INT32_MAX);
       chunk = chunk.to(c10::ScalarType::Int);
       break;
@@ -95,13 +95,13 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
     }
     case c10::ScalarType::Short: {
       chunk = chunk.to(c10::ScalarType::Int);
-      chunk *= (int)1<<16;
+      chunk *= 65536;
       break;
     }
     case c10::ScalarType::Byte: {
       chunk = chunk.to(c10::ScalarType::Int);
       chunk -= 128;
-      chunk *= (int)1<<24;
+      chunk *= 16777216;
       break;
     }
     default:
