@@ -108,7 +108,7 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
       throw std::runtime_error("Unexpected dtype.");
   }
   // Write to buffer
-  memcpy(obuf, chunk.data_ptr<int32_t>(), *osamp *4);
+  memcpy(obuf, chunk.data_ptr<int32_t>(), *osamp * 4);
   priv->index += *osamp;
   return (priv->index == num_samples) ? SOX_EOF : SOX_SUCCESS;
 }
