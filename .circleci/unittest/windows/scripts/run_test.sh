@@ -7,4 +7,5 @@ conda activate ./env
 
 python -m torch.utils.collect_env
 cd test
+python -c 'import torchaudio'
 pytest --cov=torchaudio --junitxml=../test-results/junit.xml -v --durations 20 torchaudio_unittest

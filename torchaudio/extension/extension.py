@@ -1,3 +1,4 @@
+import os
 import warnings
 import importlib
 
@@ -7,6 +8,9 @@ from torchaudio._internal import module_utils as _mod_utils
 
 def _init_extension():
     ext = 'torchaudio._torchaudio'
+    top_dir = os.path.join(os.path.dirname(__file__), '..')
+    for item in os.listdir(top_dir):
+        print(item)
     if _mod_utils.is_module_available(ext):
         _init_script_module(ext)
         import torchaudio._torchaudio  # noqa
