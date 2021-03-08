@@ -90,7 +90,6 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
       break;
     }
     case c10::ScalarType::Int: {
-      chunk = chunk.contiguous();
       break;
     }
     case c10::ScalarType::Short: {
@@ -108,6 +107,7 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
       throw std::runtime_error("Unexpected dtype.");
   }
   // Write to buffer
+  chunk = chunk.contiguous();
   memcpy(obuf, chunk.data_ptr<int32_t>(), *osamp * 4);
   priv->index += *osamp;
   return (priv->index == num_samples) ? SOX_EOF : SOX_SUCCESS;
