@@ -74,6 +74,9 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     )
 
   set_target_properties(_torchaudio PROPERTIES PREFIX "")
+  if (MSVC)
+    set_target_properties(_torchaudio PROPERTIES SUFFIX ".pyd")
+  endif(MSVC)
 
   if (APPLE)
     # https://github.com/facebookarchive/caffe2/issues/854#issuecomment-364538485
