@@ -1,6 +1,5 @@
 import io
 import unittest
-from itertools import product
 
 from torchaudio.backend import sox_io_backend
 from parameterized import parameterized
@@ -15,6 +14,7 @@ from torchaudio_unittest.common_utils import (
     load_wav,
     save_wav,
     sox_utils,
+    nested_params,
 )
 from .common import (
     name_func,
@@ -138,22 +138,6 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
         expected = load_wav(ref_path, normalize=False)[0]
 
         self.assertEqual(found, expected)
-
-
-def nested_params(*params):
-    def _name_func(func, _, params):
-        strs = []
-        for arg in params.args:
-            if isinstance(arg, tuple):
-                strs.append("_".join(str(a) for a in arg))
-            else:
-                strs.append(str(arg))
-        return f'{func.__name__}_{"_".join(strs)}'
-
-    return parameterized.expand(
-        list(product(*params)),
-        name_func=_name_func
-    )
 
 
 @skipIfNoExec('sox')
