@@ -13,6 +13,10 @@ core, please first open an issue and discuss the feature with us. Sending a PR
 without discussion might end up resulting in a rejected PR, because we might be
 taking the core in a different direction than you might be aware of.
 
+Facebook has a [bounty program](https://www.facebook.com/whitehat/) for the
+safe disclosure of security bugs. In those cases, please go through the
+process outlined on that page and do not file a public issue.
+
 Fixing bugs and implementing new features are not the only way you can
 contribute. It also helps the project when you report problems you're facing,
 and when you give a :+1: on issues that others reported and that are relevant
@@ -27,6 +31,12 @@ If you're not sure what you want to work on, you can pick an issue from the
 wanted"](https://github.com/pytorch/audio/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).
 Comment on the issue that you want to work on it and send a PR with your fix
 (see below).
+
+## Contributor License Agreement ("CLA")
+In order to accept your pull request, we need you to submit a CLA. You only need
+to do this once to work on any of Facebook's open source projects.
+
+Complete your CLA here: <https://code.facebook.com/cla>
 
 ## Development installation
 
