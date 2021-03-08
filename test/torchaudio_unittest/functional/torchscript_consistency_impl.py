@@ -41,12 +41,11 @@ class Functional(common_utils.TestBaseMixin):
             hop = 200
             window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
             power = 2.
-            normalize = False
             momentum = 0.99
             n_iter = 32
             length = 1000
             rand_int = False
-            return F.griffinlim(tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, rand_int)
+            return F.griffinlim(tensor, window, n_fft, hop, ws, power, n_iter, momentum, length, rand_int)
 
         tensor = torch.rand((1, 201, 6))
         self._assert_consistency(func, tensor)
