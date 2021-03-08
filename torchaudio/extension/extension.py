@@ -3,22 +3,25 @@ import warnings
 import importlib
 
 import torch
-from torchaudio._internal import module_utils as _mod_utils
 
 
 def _init_extension():
     ext = 'torchaudio._torchaudio'
-    top_dir = os.path.join(os.path.dirname(__file__), '..')
-    for item in os.listdir(top_dir):
-        print(item)
-    if _mod_utils.is_module_available(ext):
-        _init_script_module(ext)
-        import torchaudio._torchaudio  # noqa
-    else:
+    lib_dir = os.path.join(os.path.dirname(__file__), '..')
+    for item in os.listdir(lib_dir):
+        print(item, flush=True)
+
+    loader_details = (
+        importlib.machinery.ExtensionFileLoader,
+        importlib.machinery.EXTENSION_SUFFIXES
+    )
+
+    extfinder = importlib.machinery.FileFinder(lib_dir, loader_details)
+    spec = extfinder.find_spec("_torchaudio")
+    if spec is None:
         warnings.warn('torchaudio C++ extension is not available.')
-
-
-def _init_script_module(module):
-    path = importlib.util.find_spec(module).origin
-    torch.classes.load_library(path)
-    torch.ops.load_library(path)
+    else:
+        path = spec.origin
+        torch.classes.load_library(path)
+        torch.ops.load_library(path)
+        import torchaudio._torchaudio  # noqa
