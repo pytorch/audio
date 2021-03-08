@@ -1,8 +1,8 @@
 import os
+import sys
 import platform
 import subprocess
 from pathlib import Path
-import distutils.sysconfig
 
 from setuptools import Extension
 from setuptools.command.build_ext import build_ext
@@ -68,10 +68,10 @@ class CMakeBuild(build_ext):
             f"-DCMAKE_PREFIX_PATH={torch.utils.cmake_prefix_path}",
             f"-DCMAKE_INSTALL_PREFIX={extdir}",
             '-DCMAKE_VERBOSE_MAKEFILE=ON',
-            f"-DPython_INCLUDE_DIR={distutils.sysconfig.get_python_inc()}",
             f"-DBUILD_SOX:BOOL={'ON' if _BUILD_SOX else 'OFF'}",
             f"-DBUILD_KALDI:BOOL={'ON' if _BUILD_KALDI else 'OFF'}",
             f"-DBUILD_TRANSDUCER:BOOL={'ON' if _BUILD_TRANSDUCER else 'OFF'}",
+            f"-DPYTHON_VERSION={sys.version_info.major}.{sys.version_info.minor}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
         ]
@@ -83,12 +83,9 @@ class CMakeBuild(build_ext):
         if 'CMAKE_GENERATOR' not in os.environ or platform.system() == 'Windows':
             cmake_args += ["-GNinja"]
         if platform.system() == 'Windows':
-            import sys
-            python_version = sys.version_info
             cmake_args += [
                 "-DCMAKE_C_COMPILER=cl",
                 "-DCMAKE_CXX_COMPILER=cl",
-                f"-DPYTHON_VERSION={python_version.major}.{python_version.minor}",
             ]
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level

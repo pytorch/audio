@@ -66,6 +66,12 @@ endif()
 # _torchaudio.so
 ################################################################################
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
+  # Note: If PYTHON_VERSION is not set, this will fallback to any available Python version
+  find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
+  if (NOT Python3_FOUND)
+    message(FATAL_ERROR "Python ${PYTHON_VERSION} development component is not found.")
+  endif()
+
   add_library(
     _torchaudio
     SHARED
@@ -106,17 +112,12 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   # See https://github.com/pytorch/pytorch/issues/38122
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
 
-  if (WIN32)
-    find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
-    set(ADDITIONAL_ITEMS Python3::Python)
-  endif()
-
   target_link_libraries(
     _torchaudio
     ${TORCH_LIBRARIES}
     ${TORCH_PYTHON_LIBRARY}
     ${TORCHAUDIO_THIRD_PARTIES}
-    ${ADDITIONAL_ITEMS}
+    Python3::Python
     )
 
   install(
