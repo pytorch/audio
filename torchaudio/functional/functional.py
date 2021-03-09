@@ -118,7 +118,6 @@ def griffinlim(
         hop_length: int,
         win_length: int,
         power: float,
-        normalized: bool,
         n_iter: int,
         momentum: float,
         length: Optional[int],
@@ -148,7 +147,6 @@ def griffinlim(
         win_length (int): Window size. (Default: ``n_fft``)
         power (float): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc.
-        normalized (bool): Whether to normalize by magnitude after stft.
         n_iter (int): Number of iteration for phase recovery process.
         momentum (float): The momentum parameter for fast Griffin-Lim.
             Setting this to 0 recovers the original Griffin-Lim method.
@@ -161,12 +159,6 @@ def griffinlim(
     """
     assert momentum < 1, 'momentum={} > 1 can be unstable'.format(momentum)
     assert momentum >= 0, 'momentum={} < 0'.format(momentum)
-
-    if normalized:
-        warnings.warn(
-            "The argument normalized is not used in Griffin-Lim, "
-            "and will be removed in v0.9.0 release. To suppress this warning, "
-            "please use `normalized=False`.")
 
     # pack batch
     shape = specgram.size()

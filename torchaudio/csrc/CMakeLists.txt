@@ -74,6 +74,9 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     )
 
   set_target_properties(_torchaudio PROPERTIES PREFIX "")
+  if (MSVC)
+    set_target_properties(_torchaudio PROPERTIES SUFFIX ".pyd")
+  endif(MSVC)
 
   if (APPLE)
     # https://github.com/facebookarchive/caffe2/issues/854#issuecomment-364538485
@@ -103,12 +106,22 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   # See https://github.com/pytorch/pytorch/issues/38122
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
 
+  if (WIN32)
+    find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
+    set(ADDITIONAL_ITEMS Python3::Python)
+  endif()
+
   target_link_libraries(
     _torchaudio
     ${TORCH_LIBRARIES}
     ${TORCH_PYTHON_LIBRARY}
     ${TORCHAUDIO_THIRD_PARTIES}
+    ${ADDITIONAL_ITEMS}
     )
 
-  install(TARGETS _torchaudio LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX})
+  install(
+    TARGETS _torchaudio
+    LIBRARY DESTINATION .
+    RUNTIME DESTINATION .  # For Windows
+    )
 endif()

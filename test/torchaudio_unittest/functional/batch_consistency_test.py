@@ -52,14 +52,13 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         hop = 200
         window = torch.hann_window(ws)
         power = 2
-        normalize = False
         momentum = 0.99
         n_iter = 32
         length = 1000
         torch.random.manual_seed(0)
         batch = torch.rand(self.batch_size, 1, 201, 6)
         self.assert_batch_consistency(
-            F.griffinlim, batch, window, n_fft, hop, ws, power, normalize,
+            F.griffinlim, batch, window, n_fft, hop, ws, power,
             n_iter, momentum, length, 0, atol=5e-5)
 
     @parameterized.expand(list(itertools.product(
