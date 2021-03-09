@@ -885,7 +885,7 @@ def lfilter(
     r"""Perform an IIR filter by evaluating difference equation.
 
     Note:
-        To avoid numerical problems, small filter order or short input sequence is prefered.
+        To avoid numerical problems, small filter order is prefered.
         Using double precision could also minimize numerical precision errors.
 
     Args:
