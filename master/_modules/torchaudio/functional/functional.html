@@ -418,7 +418,6 @@
         <span class="n">hop_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">win_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">power</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">normalized</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">momentum</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
@@ -448,7 +447,6 @@
 <span class="sd">        win_length (int): Window size. (Default: ``n_fft``)</span>
 <span class="sd">        power (float): Exponent for the magnitude spectrogram,</span>
 <span class="sd">            (must be &gt; 0) e.g., 1 for energy, 2 for power, etc.</span>
-<span class="sd">        normalized (bool): Whether to normalize by magnitude after stft.</span>
 <span class="sd">        n_iter (int): Number of iteration for phase recovery process.</span>
 <span class="sd">        momentum (float): The momentum parameter for fast Griffin-Lim.</span>
 <span class="sd">            Setting this to 0 recovers the original Griffin-Lim method.</span>
@@ -461,12 +459,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">{}</span><span class="s1"> &gt; 1 can be unstable&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">momentum</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;momentum=</span><span class="si">{}</span><span class="s1"> &lt; 0&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">momentum</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">normalized</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;The argument normalized is not used in Griffin-Lim, &quot;</span>
-            <span class="s2">&quot;and will be removed in v0.9.0 release. To suppress this warning, &quot;</span>
-            <span class="s2">&quot;please use `normalized=False`.&quot;</span><span class="p">)</span>
 
     <span class="c1"># pack batch</span>
     <span class="n">shape</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>

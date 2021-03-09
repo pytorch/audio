@@ -305,7 +305,7 @@
 <span id="backend"></span><h1>torchaudio.backend<a class="headerlink" href="#torchaudio-backend" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.backend</span></code> module provides implementations for audio file I/O functionalities, which are <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load_wav</span></code> and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code>.</p>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.backend</span></code> module provides implementations for audio file I/O functionalities, which are <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code>.</p>
 <p>There are currently four implementations available.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#sox-io-backend"><span class="std std-ref">“sox_io”</span></a> (default on Linux/macOS)</p></li>
@@ -313,7 +313,7 @@
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Instead of calling functions in <code class="docutils literal notranslate"><span class="pre">torchaudio.backend</span></code> directly, please use <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load_wav</span></code> and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code> with proper backend set with <a class="reference internal" href="torchaudio.html#torchaudio.set_audio_backend" title="torchaudio.set_audio_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.set_audio_backend()</span></code></a>.</p>
+<p>Instead of calling functions in <code class="docutils literal notranslate"><span class="pre">torchaudio.backend</span></code> directly, please use <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code> with proper backend set with <a class="reference internal" href="torchaudio.html#torchaudio.set_audio_backend" title="torchaudio.set_audio_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.set_audio_backend()</span></code></a>.</p>
 </div>
 <div class="section" id="availability">
 <h3>Availability<a class="headerlink" href="#availability" title="Permalink to this headline">¶</a></h3>
@@ -510,15 +510,6 @@ integer type, else <code class="docutils literal notranslate"><span class="pre">
 <dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0)">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>]</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="torchaudio.backend.sox_io_backend.load_wav">
-<code class="sig-prename descclassname">torchaudio.backend.sox_io_backend.</code><code class="sig-name descname">load_wav</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">frame_offset: int = 0</em>, <em class="sig-param">num_frames: int = -1</em>, <em class="sig-param">channels_first: bool = True</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int]<a class="reference internal" href="_modules/torchaudio/backend/sox_io_backend.html#load_wav"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.sox_io_backend.load_wav" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load wave file.</p>
-<p>This function is defined only for the purpose of compatibility against other backend
-for simple usecases, such as <code class="docutils literal notranslate"><span class="pre">torchaudio.load_wav(filepath)</span></code>.
-The implementation is same as <a class="reference internal" href="#torchaudio.backend.sox_io_backend.load" title="torchaudio.backend.sox_io_backend.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">load()</span></code></a>.</p>
 </dd></dl>
 
 </div>
@@ -808,15 +799,6 @@ integer type, else <code class="docutils literal notranslate"><span class="pre">
 <dd class="field-odd"><p>Tuple[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0)">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a>]</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="torchaudio.backend.soundfile_backend.load_wav">
-<code class="sig-prename descclassname">torchaudio.backend.soundfile_backend.</code><code class="sig-name descname">load_wav</code><span class="sig-paren">(</span><em class="sig-param">filepath: str</em>, <em class="sig-param">frame_offset: int = 0</em>, <em class="sig-param">num_frames: int = -1</em>, <em class="sig-param">channels_first: bool = True</em><span class="sig-paren">)</span> &#x2192; Tuple[torch.Tensor, int]<a class="reference internal" href="_modules/torchaudio/backend/soundfile_backend.html#load_wav"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.backend.soundfile_backend.load_wav" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load wave file.</p>
-<p>This function is defined only for the purpose of compatibility against other backend
-for simple usecases, such as <code class="docutils literal notranslate"><span class="pre">torchaudio.load_wav(filepath)</span></code>.
-The implementation is same as <a class="reference internal" href="#torchaudio.backend.soundfile_backend.load" title="torchaudio.backend.soundfile_backend.load"><code class="xref py py-func docutils literal notranslate"><span class="pre">load()</span></code></a>.</p>
 </dd></dl>
 
 </div>

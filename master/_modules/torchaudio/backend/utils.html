@@ -353,7 +353,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected backend &quot;</span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;save&#39;</span><span class="p">,</span> <span class="s1">&#39;load&#39;</span><span class="p">,</span> <span class="s1">&#39;load_wav&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;save&#39;</span><span class="p">,</span> <span class="s1">&#39;load&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">]:</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="n">torchaudio</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">func</span><span class="p">))</span></div>
 
 

@@ -16,10 +16,6 @@ Refer to :ref:`backend` for the detail.
 
    Load audio file into torch.Tensor object. Refer to :ref:`backend` for the detail.
 
-.. function:: torchaudio.load_wav(filepath: str, ...)
-
-   Load audio file into torch.Tensor, Refer to :ref:`backend` for the detail.
-
 .. function:: torchaudio.save(filepath: str, src: torch.Tensor, sample_rate: int, ...)
 
    Save torch.Tensor object into an audio format. Refer to :ref:`backend` for the detail.

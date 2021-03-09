@@ -1319,7 +1319,7 @@ Fourier bins, and time is the number of window hops (n_frame).</p>
 <h3><span class="hidden-section">griffinlim</span><a class="headerlink" href="#griffinlim" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.griffinlim">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">griffinlim</code><span class="sig-paren">(</span><em class="sig-param">specgram: torch.Tensor, window: torch.Tensor, n_fft: int, hop_length: int, win_length: int, power: float, normalized: bool, n_iter: int, momentum: float, length: Optional[int], rand_init: bool</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#griffinlim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.griffinlim" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">griffinlim</code><span class="sig-paren">(</span><em class="sig-param">specgram: torch.Tensor, window: torch.Tensor, n_fft: int, hop_length: int, win_length: int, power: float, n_iter: int, momentum: float, length: Optional[int], rand_init: bool</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#griffinlim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.griffinlim" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.</dt><dd><p>Implementation ported from <cite>librosa</cite>.</p>
 </dd>
@@ -1357,7 +1357,6 @@ Default: <code class="docutils literal notranslate"><span class="pre">win_length
 <li><p><strong>win_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Window size. (Default: <code class="docutils literal notranslate"><span class="pre">n_fft</span></code>)</p></li>
 <li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Exponent for the magnitude spectrogram,
 (must be &gt; 0) e.g., 1 for energy, 2 for power, etc.</p></li>
-<li><p><strong>normalized</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether to normalize by magnitude after stft.</p></li>
 <li><p><strong>n_iter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of iteration for phase recovery process.</p></li>
 <li><p><strong>momentum</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The momentum parameter for fast Griffin-Lim.
 Setting this to 0 recovers the original Griffin-Lim method.
