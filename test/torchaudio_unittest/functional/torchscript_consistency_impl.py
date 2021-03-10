@@ -1,6 +1,5 @@
 """Test suites for jit-ability and its numerical compatibility"""
 import unittest
-import numpy as np
 
 import torch
 import torchaudio.functional as F
@@ -549,14 +548,15 @@ class Functional(common_utils.TestBaseMixin):
         self._assert_consistency(func, tensor)
 
     def test_phase_vocoder(self):
-        def func(tensor):
+        def func(tensor, device: torch.device = self.device):
             rate = 0.5
             hop_length = 256
             phase_advance = torch.linspace(
                 0,
-                np.pi * hop_length,
+                3.14 * hop_length,
                 tensor.shape[-3],
-                dtype=torch.float64)[..., None]
+                dtype=torch.float64,
+            ).to(device)[..., None]
             return F.phase_vocoder(tensor, rate, phase_advance)
 
         tensor = torch.randn(2, 1025, 400, 2)
