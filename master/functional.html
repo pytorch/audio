@@ -1485,12 +1485,12 @@ factor of <code class="docutils literal notranslate"><span class="pre">rate</spa
 <h3><span class="hidden-section">sliding_window_cmn</span><a class="headerlink" href="#sliding-window-cmn" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.sliding_window_cmn">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">sliding_window_cmn</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">cmn_window: int = 600</em>, <em class="sig-param">min_cmn_window: int = 100</em>, <em class="sig-param">center: bool = False</em>, <em class="sig-param">norm_vars: bool = False</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#sliding_window_cmn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.sliding_window_cmn" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">sliding_window_cmn</code><span class="sig-paren">(</span><em class="sig-param">specgram: torch.Tensor</em>, <em class="sig-param">cmn_window: int = 600</em>, <em class="sig-param">min_cmn_window: int = 100</em>, <em class="sig-param">center: bool = False</em>, <em class="sig-param">norm_vars: bool = False</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#sliding_window_cmn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.sliding_window_cmn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply sliding-window cepstral mean (and optionally variance) normalization per utterance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, freq, time)</p></li>
+<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, freq, time)</p></li>
 <li><p><strong>cmn_window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Window in frames for running average CMN computation (int, default = 600)</p></li>
 <li><p><strong>min_cmn_window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Minimum CMN window used at start of decoding (adds latency only at start).
 Only applicable if center == false, ignored if center==true (int, default = 100)</p></li>
@@ -1500,7 +1500,7 @@ Only applicable if center == false, ignored if center==true (int, default = 100)
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Tensor of freq of dimension (…, frame)</p>
+<dd class="field-even"><p>Tensor matching input shape (…, freq, time)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
