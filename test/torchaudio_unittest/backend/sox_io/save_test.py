@@ -305,7 +305,15 @@ class SaveTest(SaveTestBase):
     )
     def test_save_gsm(self, test_mode):
         self.assert_save_consistency(
-            "gsm", test_mode=test_mode)
+            "gsm", num_channels=1, test_mode=test_mode)
+        with self.assertRaises(
+                RuntimeError, msg="gsm format only supports single channel audio."):
+            self.assert_save_consistency(
+                "gsm", num_channels=2, test_mode=test_mode)
+        with self.assertRaises(
+                RuntimeError, msg="gsm format only supports a sampling rate of 8kHz."):
+            self.assert_save_consistency(
+                "gsm", sample_rate=16000, test_mode=test_mode)
 
     @parameterized.expand([
         ("wav", "PCM_S", 16),

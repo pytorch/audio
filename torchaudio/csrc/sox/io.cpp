@@ -101,6 +101,13 @@ void save_audio_file(
     const auto num_channels = tensor.size(channels_first ? 0 : 1);
     TORCH_CHECK(
         num_channels == 1, "htk format only supports single channel audio.");
+  } else if (filetype == "gsm") {
+    const auto num_channels = tensor.size(channels_first ? 0 : 1);
+    TORCH_CHECK(
+        num_channels == 1, "gsm format only supports single channel audio.");
+    TORCH_CHECK(
+        sample_rate == 8000,
+        "gsm format only supports a sampling rate of 8kHz.");
   }
   const auto signal_info =
       get_signalinfo(&tensor, sample_rate, filetype, channels_first);
@@ -242,6 +249,16 @@ void save_audio_fileobj(
     if (num_channels != 1) {
       throw std::runtime_error(
           "htk format only supports single channel audio.");
+    }
+  } else if (filetype == "gsm") {
+    const auto num_channels = tensor.size(channels_first ? 0 : 1);
+    if (num_channels != 1) {
+      throw std::runtime_error(
+          "gsm format only supports single channel audio.");
+    }
+    if (sample_rate != 8000) {
+      throw std::runtime_error(
+          "gsm format only supports a sampling rate of 8kHz.");
     }
   }
   const auto signal_info =
