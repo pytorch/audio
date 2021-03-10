@@ -4,8 +4,7 @@ from dataclasses import dataclass
 from typing import List, Tuple, Union
 
 from torch import Tensor
-from torch.utils.data import Dataset
-from torch.data.utils import datapipes
+from torch.utils.data import Dataset, IterDataPipe
 
 import torchaudio
 from torchaudio.datasets.utils import (
@@ -94,7 +93,7 @@ class YesNoItem:
     sample_rate: int
 
 
-class ListYesNoItems(datapipes.iter.IterDataPipe):
+class ListYesNoItems(IterDataPipe):
     """Given a root directory, return the list of files"""
     def __init__(self, root):
         self.data_dir = os.path.join(root, 'waves_yesno')
@@ -107,7 +106,7 @@ class ListYesNoItems(datapipes.iter.IterDataPipe):
             yield path, label
 
 
-class LoadYesNoItem:
+class LoadYesNoItem(IterDataPipe):
     def __init__(self, data_pipe):
         self.data_pipe = data_pipe
 
