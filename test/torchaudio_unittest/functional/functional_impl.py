@@ -71,7 +71,7 @@ class Lfilter(common_utils.TestBaseMixin):
         if self.dtype == torch.float64:
             self.assertEqual(yhat, y, atol=1e-4, rtol=1e-5)
         else:
-            self.assertEqual(yhat, y, atol=2, rtol=1e-5)
+            self.assertEqual(yhat, y, atol=10, rtol=1e-5)
 
 
 class Spectrogram(common_utils.TestBaseMixin):
