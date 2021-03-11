@@ -825,6 +825,57 @@ except RuntimeError as err:
     _lfilter_core_cpu_loop = _lfilter_core_generic_loop
 
 
+def _lfilter_core(
+    waveform: Tensor,
+    a_coeffs: Tensor,
+    b_coeffs: Tensor,
+) -> Tensor:
+
+    assert a_coeffs.size(0) == b_coeffs.size(0)
+    assert len(waveform.size()) == 2
+    assert waveform.device == a_coeffs.device
+    assert b_coeffs.device == a_coeffs.device
+
+    n_channel, n_sample = waveform.size()
+    n_order = a_coeffs.size(0)
+    assert n_order > 0
+
+    # Pad the input and create output
+
+    padded_waveform = torch.nn.functional.pad(waveform, [n_order - 1, 0])
+    padded_output_waveform = torch.zeros_like(padded_waveform)
+
+    # Set up the coefficients matrix
+    # Flip coefficients' order
+    a_coeffs_flipped = a_coeffs.flip(0)
+    b_coeffs_flipped = b_coeffs.flip(0)
+
+    # calculate windowed_input_signal in parallel using convolution
+    input_signal_windows = torch.nn.functional.conv1d(
+        padded_waveform.unsqueeze(1),
+        b_coeffs_flipped.view(1, 1, -1)
+    ).squeeze(1)
+
+    input_signal_windows.div_(a_coeffs[0])
+    a_coeffs_flipped.div_(a_coeffs[0])
+
+    if input_signal_windows.device == torch.device('cpu') and\
+       a_coeffs_flipped.device == torch.device('cpu') and\
+       padded_output_waveform.device == torch.device('cpu'):
+        _lfilter_core_cpu_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
+    else:
+        _lfilter_core_generic_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
+
+    output = padded_output_waveform[:, n_order - 1:]
+    return output
+
+try:
+    _lfilter = torch.ops.torchaudio._lfilter
+except RuntimeError as err:
+    assert str(err) == 'No such operator torchaudio::_lfilter'
+    _lfilter = _lfilter_core
+
+
 def lfilter(
     waveform: Tensor,
     a_coeffs: Tensor,
@@ -850,59 +901,7 @@ def lfilter(
     shape = waveform.size()
     waveform = waveform.reshape(-1, shape[-1])
 
-    assert a_coeffs.size(0) == b_coeffs.size(0)
-    assert len(waveform.size()) == 2
-    assert waveform.device == a_coeffs.device
-    assert b_coeffs.device == a_coeffs.device
-
-    device = waveform.device
-    dtype = waveform.dtype
-    n_channel, n_sample = waveform.size()
-    n_order = a_coeffs.size(0)
-    n_sample_padded = n_sample + n_order - 1
-    assert n_order > 0
-
-    # Pad the input and create output
-    padded_waveform = torch.zeros(
-        n_channel, n_sample_padded, dtype=dtype, device=device
-    )
-    padded_waveform[:, n_order - 1:] = waveform
-    padded_output_waveform = torch.zeros(
-        n_channel, n_sample_padded, dtype=dtype, device=device
-    )
-
-    # Set up the coefficients matrix
-    # Flip coefficients' order
-    a_coeffs_flipped = a_coeffs.flip(0)
-    b_coeffs_flipped = b_coeffs.flip(0)
-
-    # calculate windowed_input_signal in parallel
-    # create indices of original with shape (n_channel, n_order, n_sample)
-    window_idxs = torch.arange(n_sample, device=device).unsqueeze(0) + torch.arange(
-        n_order, device=device
-    ).unsqueeze(1)
-    window_idxs = window_idxs.repeat(n_channel, 1, 1)
-    window_idxs += (
-        torch.arange(n_channel, device=device).unsqueeze(-1).unsqueeze(-1)
-        * n_sample_padded
-    )
-    window_idxs = window_idxs.long()
-    # (n_order, ) matmul (n_channel, n_order, n_sample) -> (n_channel, n_sample)
-    input_signal_windows = torch.matmul(
-        b_coeffs_flipped, torch.take(padded_waveform, window_idxs)
-    )
-
-    input_signal_windows.div_(a_coeffs[0])
-    a_coeffs_flipped.div_(a_coeffs[0])
-
-    if input_signal_windows.device == torch.device('cpu') and\
-       a_coeffs_flipped.device == torch.device('cpu') and\
-       padded_output_waveform.device == torch.device('cpu'):
-        _lfilter_core_cpu_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
-    else:
-        _lfilter_core_generic_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
-
-    output = padded_output_waveform[:, n_order - 1:]
+    output = _lfilter(waveform, a_coeffs, b_coeffs)
 
     if clamp:
         output = torch.clamp(output, min=-1.0, max=1.0)
@@ -937,6 +936,26 @@ def lowpass_biquad(
     a1 = -2 * math.cos(w0)
     a2 = 1 - alpha
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
+
+
+def _overdrive_core_loop_generic(
+    waveform: Tensor,
+    temp: Tensor,
+    last_in: Tensor,
+    last_out: Tensor,
+    output_waveform: Tensor
+):
+    for i in range(waveform.shape[-1]):
+        last_out = temp[:, i] - last_in + 0.995 * last_out
+        last_in = temp[:, i]
+        output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
+
+
+try:
+    _overdrive_core_loop_cpu = torch.ops.torchaudio._overdrive_core_loop
+except RuntimeError as err:
+    assert str(err) == 'No such operator torchaudio::_overdrive_core_loop'
+    _overdrive_core_loop_cpu = _overdrive_core_loop_generic
 
 
 def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
@@ -981,11 +1000,11 @@ def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
 
     output_waveform = torch.zeros_like(waveform, dtype=dtype, device=device)
 
-    # TODO: Implement a torch CPP extension
-    for i in range(waveform.shape[-1]):
-        last_out = temp[:, i] - last_in + 0.995 * last_out
-        last_in = temp[:, i]
-        output_waveform[:, i] = waveform[:, i] * 0.5 + last_out * 0.75
+    # Uses CPU optimized loop function if available for CPU device
+    if device == torch.device('cpu'):
+        _overdrive_core_loop_cpu(waveform, temp, last_in, last_out, output_waveform)
+    else:
+        _overdrive_core_loop_generic(waveform, temp, last_in, last_out, output_waveform)
 
     return output_waveform.clamp(min=-1, max=1).view(actual_shape)
 

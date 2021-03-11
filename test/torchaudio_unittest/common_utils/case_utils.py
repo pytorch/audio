@@ -8,7 +8,11 @@ import unittest
 import torch
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 import torchaudio
-from torchaudio._internal.module_utils import is_module_available
+from torchaudio._internal.module_utils import (
+    is_module_available,
+    is_sox_available,
+    is_kaldi_available
+)
 
 from .backend_utils import set_audio_backend
 
@@ -95,11 +99,5 @@ def skipIfNoModule(module, display_name=None):
 skipIfNoSoxBackend = unittest.skipIf(
     'sox' not in torchaudio.list_audio_backends(), 'Sox backend not available')
 skipIfNoCuda = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
-
-
-def skipIfNoExtension(test_item):
-    if is_module_available('torchaudio._torchaudio'):
-        return test_item
-    if 'TORCHAUDIO_TEST_FAIL_IF_NO_EXTENSION' in os.environ:
-        raise RuntimeError('torchaudio C++ extension is not available.')
-    return unittest.skip('torchaudio C++ extension is not available')(test_item)
+skipIfNoSox = unittest.skipIf(not is_sox_available(), reason='Sox not available')
+skipIfNoKaldi = unittest.skipIf(not is_kaldi_available(), reason='Kaldi not available')

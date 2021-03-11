@@ -29,7 +29,8 @@ conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorc
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
-python setup.py install
+git submodule update --init --recursive
+"$root_dir/packaging/vc_env_helper.bat" python setup.py install
 
 # 3. Install Test tools
 printf "* Installing test tools\n"

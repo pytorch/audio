@@ -31,6 +31,20 @@ class Lfilter(common_utils.TestBaseMixin):
         output_signal = F.lfilter(input_signal, a_coeffs, b_coeffs, clamp=False)
         assert output_signal.max() > 1
 
+    @parameterized.expand([
+        ((44100,),),
+        ((3, 44100),),
+        ((2, 3, 44100),),
+        ((1, 2, 3, 44100),)
+    ])
+    def test_shape(self, shape):
+        torch.random.manual_seed(42)
+        waveform = torch.rand(*shape, dtype=self.dtype, device=self.device)
+        b_coeffs = torch.tensor([0, 0, 0, 1], dtype=self.dtype, device=self.device)
+        a_coeffs = torch.tensor([1, 0, 0, 0], dtype=self.dtype, device=self.device)
+        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
+        assert shape == waveform.size() == output_waveform.size()
+
 
 class Spectrogram(common_utils.TestBaseMixin):
     @parameterized.expand([(0., ), (1., ), (2., ), (3., )])

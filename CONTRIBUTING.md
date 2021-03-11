@@ -33,7 +33,7 @@ Comment on the issue that you want to work on it and send a PR with your fix
 We recommend using a `conda` environment to contribute efficiently to
 torchaudio.
 
-### Install PyTorch Nightly 
+### Install PyTorch Nightly
 
 ```bash
 conda install pytorch -c pytorch-nightly
@@ -56,9 +56,7 @@ BUILD_SOX=1 python setup.py develop
 # DEBUG=1 python setup.py develop
 ```
 
-Note: you don't need to use `BUILD_SOX=1` if you have `libsox-dev` installed
-already. If you built sox however, set the `PATH` variable so that the tests
-properly use the newly built `sox` binary:
+If you built sox, set the `PATH` variable so that the tests properly use the newly built `sox` binary:
 
 ```bash
 export PATH="<path_to_torchaudio>/third_party/install/bin:${PATH}"
@@ -75,19 +73,19 @@ pip install typing pytest scipy numpy parameterized
 If you plan to modify the code or documentation, please follow the steps below:
 
 1. Fork the repository and create your branch from `master`: `$ git checkout master && git checkout -b my_cool_feature`
-2. If you have modified the code (new feature or bug-fix), [please add tests](.test/torchaudio_unittest/).
+2. If you have modified the code (new feature or bug-fix), [please add tests](test/torchaudio_unittest/).
 3. If you have changed APIs, [update the documentation](#Documentation).
 
-For more details about pull requests, 
-please read [GitHub's guides](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request). 
+For more details about pull requests,
+please read [GitHub's guides](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request).
 
 If you would like to contribute a new model, please see [here](#New-model).
 
-If you would like to contribute a new dataset, please see [here](#New-dataset). 
+If you would like to contribute a new dataset, please see [here](#New-dataset).
 
 ## Testing
 
-Please refer to our [testing guidelines](.test/torchaudio_unittest/) for more
+Please refer to our [testing guidelines](test/torchaudio_unittest/) for more
 details.
 
 ## Documentation

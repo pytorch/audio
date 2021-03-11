@@ -144,7 +144,7 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
             atol (float): absolute tolerance
             rtol (float): relative tolerance
         """
-        sound, sr = torchaudio.load_wav(sound_filepath)
+        sound, sr = common_utils.load_wav(sound_filepath, normalize=False)
         files = self.test_filepaths[filepath_key]
 
         assert len(files) == expected_num_files, \

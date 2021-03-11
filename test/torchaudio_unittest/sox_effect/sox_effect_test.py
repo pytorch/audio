@@ -11,7 +11,7 @@ from torchaudio_unittest.common_utils import (
     TempDirMixin,
     HttpServerMixin,
     PytorchTestCase,
-    skipIfNoExtension,
+    skipIfNoSox,
     skipIfNoModule,
     skipIfNoExec,
     get_asset_path,
@@ -31,7 +31,7 @@ if _mod_utils.is_module_available("requests"):
     import requests
 
 
-@skipIfNoExtension
+@skipIfNoSox
 class TestSoxEffects(PytorchTestCase):
     def test_init(self):
         """Calling init_sox_effects multiple times does not crush"""
@@ -39,7 +39,7 @@ class TestSoxEffects(PytorchTestCase):
             sox_effects.init_sox_effects()
 
 
-@skipIfNoExtension
+@skipIfNoSox
 class TestSoxEffectsTensor(TempDirMixin, PytorchTestCase):
     """Test suite for `apply_effects_tensor` function"""
     @parameterized.expand(list(itertools.product(
@@ -91,7 +91,7 @@ class TestSoxEffectsTensor(TempDirMixin, PytorchTestCase):
         self.assertEqual(expected, found)
 
 
-@skipIfNoExtension
+@skipIfNoSox
 class TestSoxEffectsFile(TempDirMixin, PytorchTestCase):
     """Test suite for `apply_effects_file` function"""
     @parameterized.expand(list(itertools.product(
@@ -163,7 +163,7 @@ class TestSoxEffectsFile(TempDirMixin, PytorchTestCase):
         self.assertEqual(found, expected)
 
 
-@skipIfNoExtension
+@skipIfNoSox
 class TestFileFormats(TempDirMixin, PytorchTestCase):
     """`apply_effects_file` gives the same result as sox on various file formats"""
     @parameterized.expand(list(itertools.product(
@@ -256,7 +256,7 @@ class TestFileFormats(TempDirMixin, PytorchTestCase):
         self.assertEqual(found, expected)
 
 
-@skipIfNoExtension
+@skipIfNoSox
 class TestApplyEffectFileWithoutExtension(PytorchTestCase):
     def test_mp3(self):
         """Providing format allows to read mp3 without extension
@@ -275,7 +275,7 @@ class TestApplyEffectFileWithoutExtension(PytorchTestCase):
 
 
 @skipIfNoExec('sox')
-@skipIfNoExtension
+@skipIfNoSox
 class TestFileObject(TempDirMixin, PytorchTestCase):
     @parameterized.expand([
         ('wav', None),
@@ -384,7 +384,7 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
         self.assertEqual(found, expected)
 
 
-@skipIfNoExtension
+@skipIfNoSox
 @skipIfNoExec('sox')
 @skipIfNoModule("requests")
 class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
