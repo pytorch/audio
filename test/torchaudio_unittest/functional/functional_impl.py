@@ -50,11 +50,11 @@ class Lfilter(common_utils.TestBaseMixin):
         Testing numerical error when using high order filter.
 
         The filter coefficients `b` and `a` was get by `scipy.signal.butter(9, 850, 'hp', fs=22050, output='ba')`, 
-        and the file `"22050_9th_butter_850_hp_ir_1024.pt"` storing the target impulse response of the filter which was pre-computed using 
-        `scipy.signal.butter(9, 850, 'hp', fs=22050, output='sos')`.
+        and the file `"22050_9th_butter_850_hp_ir_1024.pt"` storing the target impulse response of the filter which 
+        was pre-computed using `scipy.signal.butter(9, 850, 'hp', fs=22050, output='sos')`.
 
-        The hi-pass frequency was selected so that when using double precision, the absolute error is less then 0.0001; but when using single precision,
-        the absolute error can be greater than 1. 
+        The hi-pass frequency was selected so that when using double precision, the absolute error is less then 1e-4;
+        but when using single precision, the absolute error can be greater than 1. 
         """
         ir_filepath = common_utils.get_asset_path('22050_9th_butter_850_hp_ir_1024.pt')
         y = torch.load(ir_filepath, map_location=self.device)
