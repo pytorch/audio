@@ -1490,7 +1490,7 @@ factor of <code class="docutils literal notranslate"><span class="pre">rate</spa
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, freq, time)</p></li>
+<li><p><strong>specgram</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time, freq)</p></li>
 <li><p><strong>cmn_window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Window in frames for running average CMN computation (int, default = 600)</p></li>
 <li><p><strong>min_cmn_window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Minimum CMN window used at start of decoding (adds latency only at start).
 Only applicable if center == false, ignored if center==true (int, default = 100)</p></li>
