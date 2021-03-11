@@ -47,8 +47,18 @@ class Lfilter(common_utils.TestBaseMixin):
 
     def test_9th_order_filter_stability(self):
         """
-        the filter coefficients is get by `scipy.signal.butter(9, 850, 'hp', fs=22050, output='ba')`
+        Testing numerical error when using high order filter.
+
+        The filter coefficients `b` and `a` was get by `scipy.signal.butter(9, 850, 'hp', fs=22050, output='ba')`, 
+        and the file `"22050_9th_butter_850_hp_ir_1024.pt"` storing the target impulse response of the filter which was pre-computed using 
+        `scipy.signal.butter(9, 850, 'hp', fs=22050, output='sos')`.
+
+        The hi-pass frequency was selected so that when using double precision, the absolute error is less then 0.0001; but when using single precision,
+        the absolute error can be greater than 1. 
         """
+        ir_filepath = common_utils.get_asset_path('22050_9th_butter_850_hp_ir_1024.pt')
+        y = torch.load(ir_filepath, map_location=self.device)
+        y = y.to(self.dtype)
         x = torch.zeros(1024, dtype=self.dtype, device=self.device)
         x[0] = 1
         a = torch.tensor([1., -7.60545606, 25.80187885, -51.23717435,
@@ -57,11 +67,11 @@ class Lfilter(common_utils.TestBaseMixin):
         b = torch.tensor([0.49676025, -4.47084227, 17.88336908, -41.72786118,
                           62.59179178, -62.59179178, 41.72786118, -17.88336908,
                           4.47084227, -0.49676025], dtype=self.dtype, device=self.device)
-        y = F.lfilter(x, a, b, False)
+        yhat = F.lfilter(x, a, b, False)
         if self.dtype == torch.float64:
-            assert torch.all(y.abs() < 0.8)
+            self.assertEqual(yhat, y, atol=1e-4, rtol=1e-5)
         else:
-            assert torch.any(y.abs() > 1)
+            self.assertEqual(yhat, y, atol=2, rtol=1e-5)
 
 
 class Spectrogram(common_utils.TestBaseMixin):
