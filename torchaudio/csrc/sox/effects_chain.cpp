@@ -69,46 +69,49 @@ int tensor_input_drain(sox_effect_t* effp, sox_sample_t* obuf, size_t* osamp) {
   *osamp -= *osamp % num_channels;
 
   // Slice the input Tensor
-  auto chunk = [&]() {
+  const auto tensor_ = [&]() {
     auto i_frame = index / num_channels;
     auto num_frames = *osamp / num_channels;
     auto t = (priv->channels_first)
         ? tensor.index({Slice(), Slice(i_frame, i_frame + num_frames)}).t()
         : tensor.index({Slice(i_frame, i_frame + num_frames), Slice()});
-    return t.reshape({-1});
+    return t.reshape({-1}).contiguous();
   }();
 
-  // Convert to sox_sample_t (int32_t)
-  switch (chunk.dtype().toScalarType()) {
+  // Convert to sox_sample_t (int32_t) and write to buffer
+  SOX_SAMPLE_LOCALS;
+  switch (tensor_.dtype().toScalarType()) {
     case c10::ScalarType::Float: {
-      // Need to convert to 64-bit precision so that
-      // values around INT32_MIN/MAX are handled correctly.
-      chunk = chunk.to(c10::ScalarType::Double);
-      chunk *= 2147483648.;
-      chunk.clamp_(INT32_MIN, INT32_MAX);
-      chunk = chunk.to(c10::ScalarType::Int);
+      auto ptr = tensor_.data_ptr<float_t>();
+      for (size_t i = 0; i < *osamp; ++i) {
+        obuf[i] = SOX_FLOAT_32BIT_TO_SAMPLE(ptr[i], effp->clips);
+      }
       break;
     }
     case c10::ScalarType::Int: {
+      auto ptr = tensor_.data_ptr<int32_t>();
+      for (size_t i = 0; i < *osamp; ++i) {
+        obuf[i] = SOX_SIGNED_32BIT_TO_SAMPLE(ptr[i], effp->clips);
+      }
       break;
     }
     case c10::ScalarType::Short: {
-      chunk = chunk.to(c10::ScalarType::Int);
-      chunk *= 65536;
+      auto ptr = tensor_.data_ptr<int16_t>();
+      for (size_t i = 0; i < *osamp; ++i) {
+        obuf[i] = SOX_SIGNED_16BIT_TO_SAMPLE(ptr[i], effp->clips);
+      }
       break;
     }
     case c10::ScalarType::Byte: {
-      chunk = chunk.to(c10::ScalarType::Int);
-      chunk -= 128;
-      chunk *= 16777216;
+      auto ptr = tensor_.data_ptr<uint8_t>();
+      for (size_t i = 0; i < *osamp; ++i) {
+        obuf[i] = SOX_UNSIGNED_8BIT_TO_SAMPLE(ptr[i], effp->clips);
+      }
       break;
     }
     default:
       throw std::runtime_error("Unexpected dtype.");
   }
-  // Write to buffer
-  chunk = chunk.contiguous();
-  memcpy(obuf, chunk.data_ptr<int32_t>(), *osamp * 4);
   priv->index += *osamp;
   return (priv->index == num_samples) ? SOX_EOF : SOX_SUCCESS;
 }

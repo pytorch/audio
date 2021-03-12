@@ -1,5 +1,6 @@
 import io
 import unittest
+from itertools import product
 
 from torchaudio.backend import sox_io_backend
 from parameterized import parameterized
@@ -9,12 +10,11 @@ from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
     PytorchTestCase,
     skipIfNoExec,
-    skipIfNoSox,
+    skipIfNoExtension,
     get_wav_data,
     load_wav,
     save_wav,
     sox_utils,
-    nested_params,
 )
 from .common import (
     name_func,
@@ -140,8 +140,24 @@ class SaveTestBase(TempDirMixin, TorchaudioTestCase):
         self.assertEqual(found, expected)
 
 
+def nested_params(*params):
+    def _name_func(func, _, params):
+        strs = []
+        for arg in params.args:
+            if isinstance(arg, tuple):
+                strs.append("_".join(str(a) for a in arg))
+            else:
+                strs.append(str(arg))
+        return f'{func.__name__}_{"_".join(strs)}'
+
+    return parameterized.expand(
+        list(product(*params)),
+        name_func=_name_func
+    )
+
+
 @skipIfNoExec('sox')
-@skipIfNoSox
+@skipIfNoExtension
 class SaveTest(SaveTestBase):
     @nested_params(
         ["path", "fileobj", "bytesio"],
@@ -338,7 +354,7 @@ class SaveTest(SaveTestBase):
 
 
 @skipIfNoExec('sox')
-@skipIfNoSox
+@skipIfNoExtension
 class TestSaveParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of optional parameters of `sox_io_backend.save`"""
     @parameterized.expand([(True, ), (False, )], name_func=name_func)

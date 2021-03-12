@@ -153,7 +153,11 @@ class TEDLIUM(Dataset):
         start_time = int(float(start_time) * sample_rate)
         end_time = int(float(end_time) * sample_rate)
 
-        kwargs = {"frame_offset": start_time, "num_frames": end_time - start_time}
+        backend = torchaudio.get_audio_backend()
+        if backend == "sox" or (backend == "soundfile" and torchaudio.USE_SOUNDFILE_LEGACY_INTERFACE):
+            kwargs = {"offset": start_time, "num_frames": end_time - start_time}
+        else:
+            kwargs = {"frame_offset": start_time, "num_frames": end_time - start_time}
 
         return torchaudio.load(path, **kwargs)
 

@@ -11,8 +11,8 @@ from torchaudio_unittest.common_utils import (
     HttpServerMixin,
     PytorchTestCase,
     skipIfNoExec,
+    skipIfNoExtension,
     skipIfNoModule,
-    skipIfNoSox,
     get_asset_path,
     get_wav_data,
     load_wav,
@@ -200,7 +200,7 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
 
 
 @skipIfNoExec('sox')
-@skipIfNoSox
+@skipIfNoExtension
 class TestLoad(LoadTestBase):
     """Test the correctness of `sox_io_backend.load` for various formats"""
     @parameterized.expand(list(itertools.product(
@@ -332,7 +332,7 @@ class TestLoad(LoadTestBase):
 
 
 @skipIfNoExec('sox')
-@skipIfNoSox
+@skipIfNoExtension
 class TestLoadParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of frame parameters of `sox_io_backend.load`"""
     original = None
@@ -363,7 +363,7 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
         self.assertEqual(found, expected)
 
 
-@skipIfNoSox
+@skipIfNoExtension
 class TestLoadWithoutExtension(PytorchTestCase):
     def test_mp3(self):
         """Providing format allows to read mp3 without extension
@@ -393,7 +393,7 @@ class CloggedFileObj:
         return ret
 
 
-@skipIfNoSox
+@skipIfNoExtension
 @skipIfNoExec('sox')
 class TestFileObject(TempDirMixin, PytorchTestCase):
     """
@@ -553,7 +553,7 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
         self.assertEqual(expected, found)
 
 
-@skipIfNoSox
+@skipIfNoExtension
 @skipIfNoExec('sox')
 @skipIfNoModule("requests")
 class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):

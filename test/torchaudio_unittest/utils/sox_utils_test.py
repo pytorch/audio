@@ -2,11 +2,11 @@ from torchaudio.utils import sox_utils
 
 from torchaudio_unittest.common_utils import (
     PytorchTestCase,
-    skipIfNoSox,
+    skipIfNoExtension,
 )
 
 
-@skipIfNoSox
+@skipIfNoExtension
 class TestSoxUtils(PytorchTestCase):
     """Smoke tests for sox_util module"""
     def test_set_seed(self):

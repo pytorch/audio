@@ -122,6 +122,7 @@ class GriffinLim(torch.nn.Module):
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
         power (float, optional): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
+        normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
         momentum (float, optional): The momentum parameter for fast Griffin-Lim.
             Setting this to 0 recovers the original Griffin-Lim method.
@@ -157,6 +158,7 @@ class GriffinLim(torch.nn.Module):
                  hop_length: Optional[int] = None,
                  window_fn: Callable[..., Tensor] = torch.hann_window,
                  power: float = 2.,
+                 normalized: bool = False,
                  wkwargs: Optional[dict] = None,
                  momentum: float = 0.99,
                  length: Optional[int] = None,
@@ -172,6 +174,7 @@ class GriffinLim(torch.nn.Module):
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
         self.register_buffer('window', window)
+        self.normalized = normalized
         self.length = length
         self.power = power
         self.momentum = momentum / (1 + momentum)
@@ -188,7 +191,7 @@ class GriffinLim(torch.nn.Module):
             Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.
         """
         return F.griffinlim(specgram, self.window, self.n_fft, self.hop_length, self.win_length, self.power,
-                            self.n_iter, self.momentum, self.length, self.rand_init)
+                            self.normalized, self.n_iter, self.momentum, self.length, self.rand_init)
 
 
 class AmplitudeToDB(torch.nn.Module):
@@ -246,7 +249,6 @@ class MelScale(torch.nn.Module):
             if None is given.  See ``n_fft`` in :class:`Spectrogram`. (Default: ``None``)
         norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
         (area normalization). (Default: ``None``)
-        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
     """
     __constants__ = ['n_mels', 'sample_rate', 'f_min', 'f_max']
 
@@ -256,21 +258,18 @@ class MelScale(torch.nn.Module):
                  f_min: float = 0.,
                  f_max: Optional[float] = None,
                  n_stft: Optional[int] = None,
-                 norm: Optional[str] = None,
-                 mel_scale: str = "htk") -> None:
+                 norm: Optional[str] = None) -> None:
         super(MelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
         self.f_max = f_max if f_max is not None else float(sample_rate // 2)
         self.f_min = f_min
         self.norm = norm
-        self.mel_scale = mel_scale
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
-            n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm,
-            self.mel_scale)
+            n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm)
         self.register_buffer('fb', fb)
 
     def forward(self, specgram: Tensor) -> Tensor:
@@ -288,8 +287,7 @@ class MelScale(torch.nn.Module):
 
         if self.fb.numel() == 0:
             tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max,
-                                        self.n_mels, self.sample_rate, self.norm,
-                                        self.mel_scale)
+                                        self.n_mels, self.sample_rate, self.norm)
             # Attributes cannot be reassigned outside __init__ so workaround
             self.fb.resize_(tmp_fb.size())
             self.fb.copy_(tmp_fb)
@@ -323,7 +321,6 @@ class InverseMelScale(torch.nn.Module):
         sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)
         norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
         (area normalization). (Default: ``None``)
-        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
     """
     __constants__ = ['n_stft', 'n_mels', 'sample_rate', 'f_min', 'f_max', 'max_iter', 'tolerance_loss',
                      'tolerance_change', 'sgdargs']
@@ -338,8 +335,7 @@ class InverseMelScale(torch.nn.Module):
                  tolerance_loss: float = 1e-5,
                  tolerance_change: float = 1e-8,
                  sgdargs: Optional[dict] = None,
-                 norm: Optional[str] = None,
-                 mel_scale: str = "htk") -> None:
+                 norm: Optional[str] = None) -> None:
         super(InverseMelScale, self).__init__()
         self.n_mels = n_mels
         self.sample_rate = sample_rate
@@ -352,8 +348,7 @@ class InverseMelScale(torch.nn.Module):
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
-        fb = F.create_fb_matrix(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm,
-                                mel_scale)
+        fb = F.create_fb_matrix(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, norm)
         self.register_buffer('fb', fb)
 
     def forward(self, melspec: Tensor) -> Tensor:
@@ -432,7 +427,6 @@ class MelSpectrogram(torch.nn.Module):
             avoid redundancy. Default: ``True``
         norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
         (area normalization). (Default: ``None``)
-        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
@@ -456,8 +450,7 @@ class MelSpectrogram(torch.nn.Module):
                  center: bool = True,
                  pad_mode: str = "reflect",
                  onesided: bool = True,
-                 norm: Optional[str] = None,
-                 mel_scale: str = "htk") -> None:
+                 norm: Optional[str] = None) -> None:
         super(MelSpectrogram, self).__init__()
         self.sample_rate = sample_rate
         self.n_fft = n_fft
@@ -474,15 +467,7 @@ class MelSpectrogram(torch.nn.Module):
                                        pad=self.pad, window_fn=window_fn, power=self.power,
                                        normalized=self.normalized, wkwargs=wkwargs,
                                        center=center, pad_mode=pad_mode, onesided=onesided)
-        self.mel_scale = MelScale(
-            self.n_mels,
-            self.sample_rate,
-            self.f_min,
-            self.f_max,
-            self.n_fft // 2 + 1,
-            norm,
-            mel_scale
-        )
+        self.mel_scale = MelScale(self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1, norm)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""

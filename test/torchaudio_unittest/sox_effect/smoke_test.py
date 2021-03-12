@@ -4,7 +4,7 @@ from parameterized import parameterized
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
-    skipIfNoSox,
+    skipIfNoExtension,
     get_wav_data,
     get_sinusoid,
     save_wav,
@@ -14,7 +14,7 @@ from .common import (
 )
 
 
-@skipIfNoSox
+@skipIfNoExtension
 class SmokeTest(TempDirMixin, TorchaudioTestCase):
     """Run smoke test on various effects
 

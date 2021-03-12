@@ -29,18 +29,17 @@ to use and feel like a natural extension.
 Dependencies
 ------------
 * PyTorch (See below for the compatible versions)
+* libsox v14.3.2 or above (only required when building from source)
 * [optional] vesis84/kaldi-io-for-python commit cb46cb1f44318a5d04d4941cf39084c5b021241e or above
 
 The following are the corresponding ``torchaudio`` versions and supported Python versions.
 
 | ``torch``                | ``torchaudio``           | ``python``                      |
 | ------------------------ | ------------------------ | ------------------------------- |
-| ``master`` / ``nightly`` | ``master`` / ``nightly`` | ``>=3.6``, ``<=3.9``            |
-| ``1.8.0``                | ``0.8.0``                | ``>=3.6``, ``<=3.9``            |
-| ``1.7.1``                | ``0.7.2``                | ``>=3.6``, ``<=3.9``            |
-| ``1.7.0``                | ``0.7.0``                | ``>=3.6``, ``<=3.8``            |
-| ``1.6.0``                | ``0.6.0``                | ``>=3.6``, ``<=3.8``            |
-| ``1.5.0``                | ``0.5.0``                | ``>=3.5``, ``<=3.8``            |
+| ``master`` / ``nightly`` | ``master`` / ``nightly`` | ``>=3.6``                       |
+| ``1.7.0``                | ``0.7.0``                | ``>=3.6``                       |
+| ``1.6.0``                | ``0.6.0``                | ``>=3.6``                       |
+| ``1.5.0``                | ``0.5.0``                | ``>=3.5``                       |
 | ``1.4.0``                | ``0.4.0``                | ``==2.7``, ``>=3.5``, ``<=3.8`` |
 
 
@@ -84,7 +83,39 @@ conda install -y -c pytorch-nightly torchaudio
 
 ### From Source
 
-The build process builds libsox and some codecs that torchaudio need to link to. This is achieve by setting the environment variable `BUILD_SOX=1`.
+If your system configuration is not among the supported configurations
+above, you can build torchaudio from source.
+
+This will require libsox v14.3.2 or above.
+
+<Details><Summary>Click here for the examples on how to install SoX</Summary>
+
+OSX (Homebrew):
+```bash
+brew install sox
+```
+
+Linux (Ubuntu):
+```bash
+sudo apt-get install sox libsox-dev libsox-fmt-all
+```
+
+Anaconda
+```bash
+conda install -c conda-forge sox
+```
+
+</Details>
+
+```bash
+# Linux
+python setup.py install
+
+# OSX
+MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
+```
+
+Alternatively, the build process can build libsox and some optional codecs statically and torchaudio can link them, by setting environment variable `BUILD_SOX=1`.
 The build process will fetch and build libmad, lame, flac, vorbis, opus, and libsox before building extension. This process requires `cmake` and `pkg-config`.
 
 ```bash

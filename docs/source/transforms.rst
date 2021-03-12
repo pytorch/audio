@@ -136,13 +136,6 @@ Transforms are common audio transforms. They can be chained together using :clas
 
   .. automethod:: forward
 
-:hidden:`SpectralCentroid`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: SpectralCentroid
-
-  .. automethod:: forward
-
 :hidden:`Vad`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -37,6 +37,3 @@ if [ ! -d "${env_dir}" ]; then
     conda create --prefix "${env_dir}" -y python="${PYTHON_VERSION}"
 fi
 conda activate "${env_dir}"
-
-# 3. Install minimal build tools
-pip --quiet install cmake ninja
