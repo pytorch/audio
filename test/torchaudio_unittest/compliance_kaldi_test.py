@@ -45,7 +45,7 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
             window[f, s] = wave[s_in_wave]
 
 
-@common_utils.skipIfNoSoxBackend
+@common_utils.skipIfNoSox
 class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
     backend = 'sox'
 

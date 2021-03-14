@@ -2,7 +2,7 @@ import torch
 import torchaudio.functional as F
 
 from torchaudio_unittest.common_utils import (
-    skipIfNoSoxBackend,
+    skipIfNoSox,
     skipIfNoExec,
     TempDirMixin,
     TorchaudioTestCase,

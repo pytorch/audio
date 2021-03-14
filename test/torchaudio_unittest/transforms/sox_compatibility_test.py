@@ -2,7 +2,7 @@ import torchaudio.transforms as T
 from parameterized import parameterized
 
 from torchaudio_unittest.common_utils import (
-    skipIfNoSoxBackend,
+    skipIfNoSox,
     skipIfNoExec,
     TempDirMixin,
     TorchaudioTestCase,
