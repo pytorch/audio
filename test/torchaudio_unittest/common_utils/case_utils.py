@@ -7,7 +7,6 @@ import unittest
 
 import torch
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
-import torchaudio
 from torchaudio._internal.module_utils import (
     is_module_available,
     is_sox_available,
