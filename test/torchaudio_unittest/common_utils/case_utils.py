@@ -6,6 +6,7 @@ import time
 import unittest
 
 import torch
+import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 from torchaudio._internal.module_utils import (
     is_module_available,
@@ -97,6 +98,5 @@ def skipIfNoModule(module, display_name=None):
 
 skipIfNoCuda = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
 skipIfNoSox = unittest.skipIf(
-    not is_sox_available() or
-    'sox' not in torchaudio.list_audio_backends(), reason='Sox not available')
+    not is_sox_available(), reason='Sox not available')
 skipIfNoKaldi = unittest.skipIf(not is_kaldi_available(), reason='Kaldi not available')
