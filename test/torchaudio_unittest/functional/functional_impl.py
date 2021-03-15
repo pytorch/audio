@@ -1,7 +1,9 @@
 """Test defintion common to CPU and CUDA"""
 import torch
+from torch._C import dtype
 import torchaudio.functional as F
 from parameterized import parameterized
+from scipy import signal
 
 from torchaudio_unittest import common_utils
 
@@ -47,31 +49,25 @@ class Lfilter(common_utils.TestBaseMixin):
 
     def test_9th_order_filter_stability(self):
         """
-        Testing numerical error when using high order filter.
-
-        The filter coefficients `b` and `a` was get by `scipy.signal.butter(9, 850, 'hp', fs=22050, output='ba')`,
-        and the file `"22050_9th_butter_850_hp_ir_1024.pt"` storing the target impulse response of the filter which
-        was pre-computed using `scipy.signal.butter(9, 850, 'hp', fs=22050, output='sos')`.
-
-        The hi-pass frequency was selected so that when using double precision, the absolute error is less then 1e-4;
-        but when using single precision, the absolute error can be greater than 1.
+        Validate the precision of lfilter against reference scipy implementation when using high order filter.
+        The reference implementation use cascaded second-order filters so is more numerically accurate.
         """
-        ir_filepath = common_utils.get_asset_path('22050_9th_butter_850_hp_ir_1024.pt')
-        y = torch.load(ir_filepath, map_location=self.device)
-        y = y.to(self.dtype)
+        # create an impulse signal
         x = torch.zeros(1024, dtype=self.dtype, device=self.device)
         x[0] = 1
-        a = torch.tensor([1., -7.60545606, 25.80187885, -51.23717435,
-                          65.62093428, -56.20096964, 32.18274279, -11.88025302,
-                          2.56506938, -0.24677075], dtype=self.dtype, device=self.device)
-        b = torch.tensor([0.49676025, -4.47084227, 17.88336908, -41.72786118,
-                          62.59179178, -62.59179178, 41.72786118, -17.88336908,
-                          4.47084227, -0.49676025], dtype=self.dtype, device=self.device)
+
+        # get target impulse response
+        sos = signal.butter(9, 850, 'hp', fs=22050, output='sos')
+        y = torch.from_numpy(signal.sosfilt(sos, x.cpu().numpy())).to(self.dtype).to(self.device)
+
+        # get lfilter coefficients
+        b, a = signal.butter(9, 850, 'hp', fs=22050, output='ba')
+        b, a = torch.from_numpy(b).to(self.dtype).to(self.device), torch.from_numpy(
+            a).to(self.dtype).to(self.device)
+
+        # predict impulse response
         yhat = F.lfilter(x, a, b, False)
-        if self.dtype == torch.float64:
-            self.assertEqual(yhat, y, atol=1e-4, rtol=1e-5)
-        else:
-            self.assertEqual(yhat, y, atol=10, rtol=1e-5)
+        self.assertEqual(yhat, y, atol=1e-4, rtol=1e-5)
 
 
 class Spectrogram(common_utils.TestBaseMixin):
