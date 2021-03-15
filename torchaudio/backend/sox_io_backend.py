@@ -73,6 +73,7 @@ def load(
 
             * 32-bit floating-point
             * 32-bit signed integer
+            * 24-bit signed integer
             * 16-bit signed integer
             * 8-bit unsigned integer (WAV only)
 
@@ -92,10 +93,11 @@ def load(
     The samples are normalized to fit in the range of ``[-1.0, 1.0]``.
 
     When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
-    signed integer and 8-bit unsigned integer (24-bit signed integer is not supported),
-    by providing ``normalize=False``, this function can return integer Tensor, where the samples
-    are expressed within the whole range of the corresponding dtype, that is, ``int32`` tensor
-    for 32-bit signed PCM, ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM.
+    signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing ``normalize=False``,
+    this function can return integer Tensor, where the samples are expressed within the whole range
+    of the corresponding dtype, that is, ``int32`` tensor for 32-bit signed PCM,
+    ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM. Since torch does not
+    support ``int24`` dtype, 24-bit signed PCM are converted to ``int32`` tensors.
 
     ``normalize`` parameter has no effect on 32-bit floating-point WAV and other formats, such as
     ``flac`` and ``mp3``.
