@@ -6,7 +6,6 @@ import time
 import unittest
 
 import torch
-import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 from torchaudio._internal.module_utils import (
     is_module_available,
