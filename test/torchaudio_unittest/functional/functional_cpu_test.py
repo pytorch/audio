@@ -6,6 +6,7 @@ import torchaudio
 import torchaudio.functional as F
 from parameterized import parameterized
 import itertools
+import unittest
 
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
@@ -20,6 +21,10 @@ from .functional_impl import Lfilter, Spectrogram
 class TestLFilterFloat32(Lfilter, common_utils.PytorchTestCase):
     dtype = torch.float32
     device = torch.device('cpu')
+
+    @unittest.expectedFailure
+    def test_9th_order_filter_stability(self):
+        super().test_9th_order_filter_stability()
 
 
 class TestLFilterFloat64(Lfilter, common_utils.PytorchTestCase):
