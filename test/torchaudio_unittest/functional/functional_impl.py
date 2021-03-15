@@ -1,6 +1,5 @@
 """Test defintion common to CPU and CUDA"""
 import torch
-from torch._C import dtype
 import torchaudio.functional as F
 from parameterized import parameterized
 from scipy import signal
