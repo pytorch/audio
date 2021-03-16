@@ -11,8 +11,8 @@ from torchaudio_unittest.common_utils import (
     HttpServerMixin,
     PytorchTestCase,
     skipIfNoExec,
-    skipIfNoExtension,
     skipIfNoModule,
+    skipIfNoSox,
     get_asset_path,
     get_wav_data,
     load_wav,
@@ -42,6 +42,49 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
         assert sr == sample_rate
         self.assertEqual(data, expected)
 
+    def assert_24bit_wav(self, sample_rate, num_channels, normalize, duration):
+        """ `sox_io_backend.load` can load 24-bit signed PCM wav format. Since torch does not support the ``int24`` dtype,
+        we implicitly cast the resulting tensor to the ``int32`` dtype.
+
+        It is not possible to use #assert_wav method above, as #get_wav_data does not support
+        the 'int24' dtype. This is because torch does not support the ``int24`` dtype.
+        Hence, we must use the following workaround.
+
+         x
+         |
+         |    1. Generate 24-bit wav with Sox.
+         |
+         v    2. Convert 24-bit wav to 32-bit wav with Sox.
+      wav(24-bit) ----------------------> wav(32-bit)
+         |                                   |
+         | 3. Load 24-bit wav with torchaudio| 4. Load 32-bit wav with scipy
+         |                                   |
+         v                                   v
+        tensor ----------> x <----------- tensor
+                       5. Compare
+
+        # Underlying assumptions are:
+        # i. Sox properly converts from 24-bit to 32-bit
+        # ii. Loading 32-bit wav file with scipy is correct.
+        """
+        path = self.get_temp_path('1.original.wav')
+        ref_path = self.get_temp_path('2.reference.wav')
+
+        # 1. Generate 24-bit signed wav with Sox
+        sox_utils.gen_audio_file(
+            path, sample_rate, num_channels,
+            bit_depth=24, duration=duration)
+
+        # 2. Convert from 24-bit wav to 32-bit wav with sox
+        sox_utils.convert_audio_file(path, ref_path, bit_depth=32)
+        # 3. Load 24-bit wav with torchaudio
+        data, sr = sox_io_backend.load(path, normalize=normalize)
+        # 4. Load 32-bit wav with scipy
+        data_ref = load_wav(ref_path, normalize=normalize)[0]
+        # 5. Compare
+        assert sr == sample_rate
+        self.assertEqual(data, data_ref, atol=3e-03, rtol=1.3e-06)
+
     def assert_mp3(self, sample_rate, num_channels, bit_rate, duration):
         """`sox_io_backend.load` can load mp3 format.
 
@@ -50,7 +93,7 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
 
          x
          |
-         | 1. Generate mp3 with Sox
+         |    1. Generate mp3 with Sox
          |
          v    2. Convert to wav with Sox
         mp3 ------------------------------> wav
@@ -61,7 +104,7 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
         tensor ----------> x <----------- tensor
                        5. Compare
 
-        Underlying assumptions are;
+        Underlying assumptions are:
         i. Conversion of mp3 to wav with Sox preserves data.
         ii. Loading wav file with scipy is correct.
 
@@ -200,7 +243,7 @@ class LoadTestBase(TempDirMixin, PytorchTestCase):
 
 
 @skipIfNoExec('sox')
-@skipIfNoExtension
+@skipIfNoSox
 class TestLoad(LoadTestBase):
     """Test the correctness of `sox_io_backend.load` for various formats"""
     @parameterized.expand(list(itertools.product(
@@ -212,6 +255,15 @@ class TestLoad(LoadTestBase):
     def test_wav(self, dtype, sample_rate, num_channels, normalize):
         """`sox_io_backend.load` can load wav format correctly."""
         self.assert_wav(dtype, sample_rate, num_channels, normalize, duration=1)
+
+    @parameterized.expand(list(itertools.product(
+        [8000, 16000],
+        [1, 2],
+        [False, True],
+    )), name_func=name_func)
+    def test_24bit_wav(self, sample_rate, num_channels, normalize):
+        """`sox_io_backend.load` can load 24bit wav format correctly. Corectly casts it to ``int32`` tensor dtype."""
+        self.assert_24bit_wav(sample_rate, num_channels, normalize, duration=1)
 
     @parameterized.expand(list(itertools.product(
         ['int16'],
@@ -332,7 +384,7 @@ class TestLoad(LoadTestBase):
 
 
 @skipIfNoExec('sox')
-@skipIfNoExtension
+@skipIfNoSox
 class TestLoadParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of frame parameters of `sox_io_backend.load`"""
     original = None
@@ -363,7 +415,7 @@ class TestLoadParams(TempDirMixin, PytorchTestCase):
         self.assertEqual(found, expected)
 
 
-@skipIfNoExtension
+@skipIfNoSox
 class TestLoadWithoutExtension(PytorchTestCase):
     def test_mp3(self):
         """Providing format allows to read mp3 without extension
@@ -393,7 +445,7 @@ class CloggedFileObj:
         return ret
 
 
-@skipIfNoExtension
+@skipIfNoSox
 @skipIfNoExec('sox')
 class TestFileObject(TempDirMixin, PytorchTestCase):
     """
@@ -553,7 +605,7 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
         self.assertEqual(expected, found)
 
 
-@skipIfNoExtension
+@skipIfNoSox
 @skipIfNoExec('sox')
 @skipIfNoModule("requests")
 class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):

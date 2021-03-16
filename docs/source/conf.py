@@ -20,8 +20,6 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import torch
-import torchaudio
 import pytorch_sphinx_theme
 
 # -- General configuration ------------------------------------------------
@@ -125,6 +123,7 @@ html_theme_options = {
     'collapse_navigation': False,
     'display_version': True,
     'logo_only': True,
+    'navigation_with_keys': True
 }
 
 html_logo = '_static/img/pytorch-logo-dark.svg'
@@ -133,6 +132,7 @@ html_logo = '_static/img/pytorch-logo-dark.svg'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
 
 def setup(app):
     # NOTE: in Sphinx 1.8+ `html_css_files` is an official configuration value
@@ -144,7 +144,7 @@ def setup(app):
 
     # In Sphinx 1.8 it was renamed to `add_css_file`, 1.7 and prior it is
     # `add_stylesheet` (deprecated in 1.8).
-    add_css = getattr(app, 'add_css_file', getattr(app, 'add_stylesheet'))
+    add_css = getattr(app, 'add_css_file', app.add_stylesheet)
     for css_file in html_css_files:
         add_css(css_file)
 
@@ -225,7 +225,7 @@ def patched_make_field(self, types, domain, items, **kw):
     # `kw` catches `env=None` needed for newer sphinx while maintaining
     #  backwards compatibility when passed along further down!
 
-    # type: (List, unicode, Tuple) -> nodes.field
+    # type: (list, str, tuple) -> nodes.field
     def handle_item(fieldarg, content):
         par = nodes.paragraph()
         par += addnodes.literal_strong('', fieldarg)  # Patch: this line added

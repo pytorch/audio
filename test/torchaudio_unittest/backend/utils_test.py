@@ -15,7 +15,6 @@ class BackendSwitchMixin:
         else:
             assert torchaudio.get_audio_backend() == self.backend
         assert torchaudio.load == self.backend_module.load
-        assert torchaudio.load_wav == self.backend_module.load_wav
         assert torchaudio.save == self.backend_module.save
         assert torchaudio.info == self.backend_module.info
 
@@ -25,7 +24,7 @@ class TestBackendSwitch_NoBackend(BackendSwitchMixin, common_utils.TorchaudioTes
     backend_module = torchaudio.backend.no_backend
 
 
-@common_utils.skipIfNoExtension
+@common_utils.skipIfNoSox
 class TestBackendSwitch_SoXIO(BackendSwitchMixin, common_utils.TorchaudioTestCase):
     backend = 'sox_io'
     backend_module = torchaudio.backend.sox_io_backend

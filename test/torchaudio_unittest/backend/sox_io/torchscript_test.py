@@ -9,7 +9,7 @@ from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
     skipIfNoExec,
-    skipIfNoExtension,
+    skipIfNoSox,
     get_wav_data,
     save_wav,
     load_wav,
@@ -45,7 +45,7 @@ def py_save_func(
 
 
 @skipIfNoExec('sox')
-@skipIfNoExtension
+@skipIfNoSox
 class SoxIO(TempDirMixin, TorchaudioTestCase):
     """TorchScript-ability Test suite for `sox_io_backend`"""
     backend = 'sox_io'

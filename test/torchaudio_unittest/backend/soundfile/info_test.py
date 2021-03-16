@@ -12,6 +12,7 @@ from torchaudio_unittest.common_utils import (
     skipIfNoModule,
     get_wav_data,
     save_wav,
+    nested_params,
 )
 from torchaudio_unittest.backend.common import (
     get_bits_per_sample,
@@ -77,7 +78,14 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.bits_per_sample == 0
         assert info.encoding == "VORBIS"
 
-    @parameterize([8000, 16000], [1, 2], [('PCM_24', 24), ('PCM_32', 32)])
+    @nested_params(
+        [8000, 16000],
+        [1, 2],
+        [
+            ('PCM_24', 24),
+            ('PCM_32', 32)
+        ],
+    )
     @skipIfFormatNotSupported("NIST")
     def test_sphere(self, sample_rate, num_channels, subtype_and_bit_depth):
         """`soundfile_backend.info` can check sph file correctly"""

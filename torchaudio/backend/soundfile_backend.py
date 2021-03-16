@@ -424,26 +424,3 @@ def save(
     soundfile.write(
         file=filepath, data=src, samplerate=sample_rate, subtype=subtype, format=format
     )
-
-
-@_mod_utils.requires_module("soundfile")
-@_mod_utils.deprecated('Please use "torchaudio.load".', "0.9.0")
-def load_wav(
-    filepath: str,
-    frame_offset: int = 0,
-    num_frames: int = -1,
-    channels_first: bool = True,
-) -> Tuple[torch.Tensor, int]:
-    """Load wave file.
-
-    This function is defined only for the purpose of compatibility against other backend
-    for simple usecases, such as ``torchaudio.load_wav(filepath)``.
-    The implementation is same as :py:func:`load`.
-    """
-    return load(
-        filepath,
-        frame_offset,
-        num_frames,
-        normalize=False,
-        channels_first=channels_first,
-    )

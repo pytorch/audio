@@ -1,8 +1,12 @@
 #include <torch/extension.h>
+
+#ifdef INCLUDE_SOX
 #include <torchaudio/csrc/sox/effects.h>
 #include <torchaudio/csrc/sox/io.h>
+#endif
 
 PYBIND11_MODULE(_torchaudio, m) {
+#ifdef INCLUDE_SOX
   m.def(
       "get_info_fileobj",
       &torchaudio::sox_io::get_info_fileobj,
@@ -19,4 +23,5 @@ PYBIND11_MODULE(_torchaudio, m) {
       "apply_effects_fileobj",
       &torchaudio::sox_effects::apply_effects_fileobj,
       "Decode audio data from file-like obj and apply effects.");
+#endif
 }

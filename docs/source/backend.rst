@@ -6,7 +6,7 @@ torchaudio.backend
 Overview
 ~~~~~~~~
 
-:mod:`torchaudio.backend` module provides implementations for audio file I/O functionalities, which are ``torchaudio.info``, ``torchaudio.load``, ``torchaudio.load_wav`` and ``torchaudio.save``.
+:mod:`torchaudio.backend` module provides implementations for audio file I/O functionalities, which are ``torchaudio.info``, ``torchaudio.load``, and ``torchaudio.save``.
 
 There are currently four implementations available.
 
@@ -14,7 +14,7 @@ There are currently four implementations available.
 * :ref:`"soundfile" <soundfile_backend>` (default on Windows)
 
 .. note::
-   Instead of calling functions in ``torchaudio.backend`` directly, please use ``torchaudio.info``, ``torchaudio.load``, ``torchaudio.load_wav`` and ``torchaudio.save`` with proper backend set with :func:`torchaudio.set_audio_backend`.
+   Instead of calling functions in ``torchaudio.backend`` directly, please use ``torchaudio.info``, ``torchaudio.load``, and ``torchaudio.save`` with proper backend set with :func:`torchaudio.set_audio_backend`.
 
 Availability
 ------------
@@ -58,9 +58,6 @@ load
 
 .. autofunction:: torchaudio.backend.sox_io_backend.load
 
-.. autofunction:: torchaudio.backend.sox_io_backend.load_wav
-
-
 save
 ----
 
@@ -88,9 +85,6 @@ load
 ----
 
 .. autofunction:: torchaudio.backend.soundfile_backend.load
-
-.. autofunction:: torchaudio.backend.soundfile_backend.load_wav
-
 
 save
 ----

@@ -4,7 +4,7 @@ from parameterized import parameterized
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     TorchaudioTestCase,
-    skipIfNoExtension,
+    skipIfNoSox,
     get_wav_data,
     get_sinusoid,
     save_wav,
@@ -14,7 +14,7 @@ from .common import (
 )
 
 
-@skipIfNoExtension
+@skipIfNoSox
 class SmokeTest(TempDirMixin, TorchaudioTestCase):
     """Run smoke test on various effects
 
@@ -25,7 +25,7 @@ class SmokeTest(TempDirMixin, TorchaudioTestCase):
     however without such tools, the correctness of each function cannot be verified.
     """
     @parameterized.expand(
-        load_params("sox_effect_test_args.json"),
+        load_params("sox_effect_test_args.jsonl"),
         name_func=lambda f, i, p: f'{f.__name__}_{i}_{p.args[0]["effects"][0][0]}',
     )
     def test_apply_effects_tensor(self, args):
@@ -39,7 +39,7 @@ class SmokeTest(TempDirMixin, TorchaudioTestCase):
         _found, _sr = sox_effects.apply_effects_tensor(original, input_sr, effects)
 
     @parameterized.expand(
-        load_params("sox_effect_test_args.json"),
+        load_params("sox_effect_test_args.jsonl"),
         name_func=lambda f, i, p: f'{f.__name__}_{i}_{p.args[0]["effects"][0][0]}',
     )
     def test_apply_effects_file(self, args):
@@ -58,7 +58,7 @@ class SmokeTest(TempDirMixin, TorchaudioTestCase):
             input_path, effects, normalize=False, channels_first=channels_first)
 
     @parameterized.expand(
-        load_params("sox_effect_test_args.json"),
+        load_params("sox_effect_test_args.jsonl"),
         name_func=lambda f, i, p: f'{f.__name__}_{i}_{p.args[0]["effects"][0][0]}',
     )
     def test_apply_effects_fileobj(self, args):

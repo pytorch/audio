@@ -10,7 +10,7 @@ import torchaudio
 from .common import AudioMetaData
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_sox()
 def info(
         filepath: str,
         format: Optional[str] = None,
@@ -54,7 +54,7 @@ def info(
     return AudioMetaData(*sinfo)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_sox()
 def load(
         filepath: str,
         frame_offset: int = 0,
@@ -73,6 +73,7 @@ def load(
 
             * 32-bit floating-point
             * 32-bit signed integer
+            * 24-bit signed integer
             * 16-bit signed integer
             * 8-bit unsigned integer (WAV only)
 
@@ -92,10 +93,11 @@ def load(
     The samples are normalized to fit in the range of ``[-1.0, 1.0]``.
 
     When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
-    signed integer and 8-bit unsigned integer (24-bit signed integer is not supported),
-    by providing ``normalize=False``, this function can return integer Tensor, where the samples
-    are expressed within the whole range of the corresponding dtype, that is, ``int32`` tensor
-    for 32-bit signed PCM, ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM.
+    signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing ``normalize=False``,
+    this function can return integer Tensor, where the samples are expressed within the whole range
+    of the corresponding dtype, that is, ``int32`` tensor for 32-bit signed PCM,
+    ``int16`` for 16-bit signed PCM and ``uint8`` for 8-bit unsigned PCM. Since torch does not
+    support ``int24`` dtype, 24-bit signed PCM are converted to ``int32`` tensors.
 
     ``normalize`` parameter has no effect on 32-bit floating-point WAV and other formats, such as
     ``flac`` and ``mp3``.
@@ -151,7 +153,7 @@ def load(
         filepath, frame_offset, num_frames, normalize, channels_first, format)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_sox()
 def save(
         filepath: str,
         src: torch.Tensor,
@@ -313,20 +315,3 @@ def save(
         filepath = os.fspath(filepath)
     torch.ops.torchaudio.sox_io_save_audio_file(
         filepath, src, sample_rate, channels_first, compression, format, encoding, bits_per_sample)
-
-
-@_mod_utils.requires_module('torchaudio._torchaudio')
-@_mod_utils.deprecated('Please use "torchaudio.load".', '0.9.0')
-def load_wav(
-        filepath: str,
-        frame_offset: int = 0,
-        num_frames: int = -1,
-        channels_first: bool = True,
-) -> Tuple[torch.Tensor, int]:
-    """Load wave file.
-
-    This function is defined only for the purpose of compatibility against other backend
-    for simple usecases, such as ``torchaudio.load_wav(filepath)``.
-    The implementation is same as :py:func:`load`.
-    """
-    return load(filepath, frame_offset, num_frames, normalize=False, channels_first=channels_first)

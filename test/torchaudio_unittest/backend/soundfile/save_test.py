@@ -10,6 +10,7 @@ from torchaudio_unittest.common_utils import (
     skipIfNoModule,
     get_wav_data,
     load_wav,
+    nested_params,
 )
 from .common import (
     fetch_wav_subtype,
@@ -22,8 +23,11 @@ if _mod_utils.is_module_available("soundfile"):
 
 
 class MockedSaveTest(PytorchTestCase):
-    @parameterize(
-        ["float32", "int32", "int16", "uint8"], [8000, 16000], [1, 2], [False, True],
+    @nested_params(
+        ["float32", "int32", "int16", "uint8"],
+        [8000, 16000],
+        [1, 2],
+        [False, True],
         [
             (None, None),
             ('PCM_U', None),
@@ -101,7 +105,7 @@ class MockedSaveTest(PytorchTestCase):
             assert args["format"] is None
         self.assertEqual(args["data"], expected_data)
 
-    @parameterize(
+    @nested_params(
         ["sph", "nist", "nis"],
         ["int32", "int16"],
         [8000, 16000],
@@ -240,7 +244,7 @@ class TestSave(SaveTestBase):
 class TestSaveParams(TempDirMixin, PytorchTestCase):
     """Test the correctness of optional parameters of `soundfile_backend.save`"""
 
-    @parameterize([(True,), (False,)])
+    @parameterize([True, False])
     def test_channels_first(self, channels_first):
         """channels_first swaps axes"""
         path = self.get_temp_path("data.wav")

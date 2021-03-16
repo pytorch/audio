@@ -12,7 +12,7 @@ ROOT_DIR = Path(__file__).parent.resolve()
 
 
 # Creating the version file
-version = '0.8.0a0'
+version = '0.9.0a0'
 sha = 'Unknown'
 
 try:
