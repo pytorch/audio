@@ -1042,6 +1042,11 @@ Allowed range of values are 0 to 100</p></li>
 <dt id="torchaudio.functional.lfilter">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">lfilter</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">a_coeffs: torch.Tensor</em>, <em class="sig-param">b_coeffs: torch.Tensor</em>, <em class="sig-param">clamp: bool = True</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/filtering.html#lfilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.lfilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform an IIR filter by evaluating difference equation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To avoid numerical problems, small filter order is prefered.
+Using double precision could also minimize numerical precision errors.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

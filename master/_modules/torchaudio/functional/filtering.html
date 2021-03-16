@@ -1184,6 +1184,10 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform an IIR filter by evaluating difference equation.</span>
 
+<span class="sd">    Note:</span>
+<span class="sd">        To avoid numerical problems, small filter order is prefered.</span>
+<span class="sd">        Using double precision could also minimize numerical precision errors.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.</span>
 <span class="sd">        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(n_order + 1)``.</span>

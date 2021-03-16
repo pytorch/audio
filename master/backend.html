@@ -436,6 +436,7 @@ however it is tested on the following formats;</p>
 <div><ul class="simple">
 <li><p>32-bit floating-point</p></li>
 <li><p>32-bit signed integer</p></li>
+<li><p>24-bit signed integer</p></li>
 <li><p>16-bit signed integer</p></li>
 <li><p>8-bit unsigned integer (WAV only)</p></li>
 </ul>
@@ -456,10 +457,11 @@ and corresponding codec libraries such as <code class="docutils literal notransl
 <code class="docutils literal notranslate"><span class="pre">float32</span></code> dtype and the shape of <code class="docutils literal notranslate"><span class="pre">[channel,</span> <span class="pre">time]</span></code>.
 The samples are normalized to fit in the range of <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code>.</p>
 <p>When the input format is WAV with integer type, such as 32-bit signed integer, 16-bit
-signed integer and 8-bit unsigned integer (24-bit signed integer is not supported),
-by providing <code class="docutils literal notranslate"><span class="pre">normalize=False</span></code>, this function can return integer Tensor, where the samples
-are expressed within the whole range of the corresponding dtype, that is, <code class="docutils literal notranslate"><span class="pre">int32</span></code> tensor
-for 32-bit signed PCM, <code class="docutils literal notranslate"><span class="pre">int16</span></code> for 16-bit signed PCM and <code class="docutils literal notranslate"><span class="pre">uint8</span></code> for 8-bit unsigned PCM.</p>
+signed integer, 24-bit signed integer, and 8-bit unsigned integer, by providing <code class="docutils literal notranslate"><span class="pre">normalize=False</span></code>,
+this function can return integer Tensor, where the samples are expressed within the whole range
+of the corresponding dtype, that is, <code class="docutils literal notranslate"><span class="pre">int32</span></code> tensor for 32-bit signed PCM,
+<code class="docutils literal notranslate"><span class="pre">int16</span></code> for 16-bit signed PCM and <code class="docutils literal notranslate"><span class="pre">uint8</span></code> for 8-bit unsigned PCM. Since torch does not
+support <code class="docutils literal notranslate"><span class="pre">int24</span></code> dtype, 24-bit signed PCM are converted to <code class="docutils literal notranslate"><span class="pre">int32</span></code> tensors.</p>
 <p><code class="docutils literal notranslate"><span class="pre">normalize</span></code> parameter has no effect on 32-bit floating-point WAV and other formats, such as
 <code class="docutils literal notranslate"><span class="pre">flac</span></code> and <code class="docutils literal notranslate"><span class="pre">mp3</span></code>.
 For these formats, this function always returns <code class="docutils literal notranslate"><span class="pre">float32</span></code> Tensor with values normalized to
