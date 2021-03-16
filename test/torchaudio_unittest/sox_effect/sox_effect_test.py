@@ -64,7 +64,7 @@ class TestSoxEffectsTensor(TempDirMixin, PytorchTestCase):
         self.assertEqual(expected, found)
 
     @parameterized.expand(
-        load_params("sox_effect_test_args.json"),
+        load_params("sox_effect_test_args.jsonl"),
         name_func=lambda f, i, p: f'{f.__name__}_{i}_{p.args[0]["effects"][0][0]}',
     )
     def test_apply_effects(self, args):
@@ -113,7 +113,7 @@ class TestSoxEffectsFile(TempDirMixin, PytorchTestCase):
         self.assertEqual(expected, found)
 
     @parameterized.expand(
-        load_params("sox_effect_test_args.json"),
+        load_params("sox_effect_test_args.jsonl"),
         name_func=lambda f, i, p: f'{f.__name__}_{i}_{p.args[0]["effects"][0][0]}',
     )
     def test_apply_effects_str(self, args):

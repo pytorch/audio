@@ -43,7 +43,7 @@ class KaldiCPUOnly(TempDirMixin, TestBaseMixin):
         expected = expected.to(dtype=self.dtype, device=self.device)
         self.assertEqual(output, expected, rtol=rtol, atol=atol)
 
-    @parameterized.expand(load_params('kaldi_test_pitch_args.json'))
+    @parameterized.expand(load_params('kaldi_test_pitch_args.jsonl'))
     @skipIfNoExec('compute-kaldi-pitch-feats')
     def test_pitch_feats(self, kwargs):
         """compute_kaldi_pitch produces numerically compatible result with compute-kaldi-pitch-feats"""
