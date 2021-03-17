@@ -319,7 +319,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">device</span> <span class="o">=</span> <span class="n">acts</span><span class="o">.</span><span class="n">device</span>
-        <span class="n">check_inputs</span><span class="p">(</span><span class="n">acts</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">act_lens</span><span class="p">,</span> <span class="n">label_lens</span><span class="p">)</span>
 
         <span class="n">acts</span> <span class="o">=</span> <span class="n">acts</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
@@ -418,48 +417,6 @@
         <span class="c1"># log_softmax is computed within GPU version.</span>
         <span class="n">acts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="n">acts</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">acts</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">act_lens</span><span class="p">,</span> <span class="n">label_lens</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">blank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span><span class="p">)</span></div></div>
-
-
-<span class="k">def</span> <span class="nf">check_type</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">t</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> must be </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">check_contiguous</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> must be contiguous&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">check_dim</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="n">dim</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> must be </span><span class="si">{}</span><span class="s2">D&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">check_inputs</span><span class="p">(</span><span class="n">log_probs</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">label_lengths</span><span class="p">):</span>
-    <span class="n">check_type</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="s2">&quot;labels&quot;</span><span class="p">)</span>
-    <span class="n">check_type</span><span class="p">(</span><span class="n">label_lengths</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="s2">&quot;label_lengths&quot;</span><span class="p">)</span>
-    <span class="n">check_type</span><span class="p">(</span><span class="n">lengths</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="s2">&quot;lengths&quot;</span><span class="p">)</span>
-    <span class="n">check_contiguous</span><span class="p">(</span><span class="n">log_probs</span><span class="p">,</span> <span class="s2">&quot;log_probs&quot;</span><span class="p">)</span>
-    <span class="n">check_contiguous</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="s2">&quot;labels&quot;</span><span class="p">)</span>
-    <span class="n">check_contiguous</span><span class="p">(</span><span class="n">label_lengths</span><span class="p">,</span> <span class="s2">&quot;label_lengths&quot;</span><span class="p">)</span>
-    <span class="n">check_contiguous</span><span class="p">(</span><span class="n">lengths</span><span class="p">,</span> <span class="s2">&quot;lengths&quot;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">lengths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">log_probs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have a length per example.&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">label_lengths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">log_probs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have a label length per example.&quot;</span><span class="p">)</span>
-
-    <span class="n">check_dim</span><span class="p">(</span><span class="n">log_probs</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;log_probs&quot;</span><span class="p">)</span>
-    <span class="n">check_dim</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;labels&quot;</span><span class="p">)</span>
-    <span class="n">check_dim</span><span class="p">(</span><span class="n">lengths</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lengths&quot;</span><span class="p">)</span>
-    <span class="n">check_dim</span><span class="p">(</span><span class="n">label_lengths</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;label_lengths&quot;</span><span class="p">)</span>
-    <span class="n">max_T</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
-    <span class="n">max_U</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">label_lengths</span><span class="p">)</span>
-    <span class="n">T</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="n">log_probs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">T</span> <span class="o">!=</span> <span class="n">max_T</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input length mismatch&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">U</span> <span class="o">!=</span> <span class="n">max_U</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Output length mismatch&quot;</span><span class="p">)</span>
 </pre></div>
 
              </article>
