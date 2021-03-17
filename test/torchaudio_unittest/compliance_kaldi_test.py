@@ -156,7 +156,7 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
 
             # Read kaldi's output from file
             kaldi_output_path = os.path.join(self.kaldi_output_dir, f)
-            kaldi_output_dict = {k: v for k, v in torchaudio.kaldi_io.read_mat_ark(kaldi_output_path)}
+            kaldi_output_dict = dict(torchaudio.kaldi_io.read_mat_ark(kaldi_output_path))
 
             assert len(kaldi_output_dict) == 1 and 'my_id' in kaldi_output_dict, 'invalid test kaldi ark file'
             kaldi_output = kaldi_output_dict['my_id']

@@ -17,10 +17,39 @@ int64_t cpu_rnnt_loss(
     torch::Tensor grads,
     int64_t blank_label,
     int64_t num_threads) {
+  TORCH_CHECK(labels.dtype() == torch::kInt32, "labels must be int32 type");
+  TORCH_CHECK(
+      label_lengths.dtype() == torch::kInt32,
+      "label_lengths must be int32 type");
+  TORCH_CHECK(
+      input_lengths.dtype() == torch::kInt32, "lengths must be int32 type");
+  TORCH_CHECK(acts.is_contiguous(), "acts must be contiguous");
+  TORCH_CHECK(labels.is_contiguous(), "labels must be contiguous");
+  TORCH_CHECK(
+      label_lengths.is_contiguous(), "label_lengths must be contiguous");
+  TORCH_CHECK(input_lengths.is_contiguous(), "lengths must be contiguous");
+  TORCH_CHECK(
+      input_lengths.size(0) == acts.size(0),
+      "batch dimension mismatch between acts and input_lengths: each example must have a length");
+  TORCH_CHECK(
+      label_lengths.size(0) == acts.size(0),
+      "batch dimension mismatch between acts and label_lengths: each example must have a label length");
+  TORCH_CHECK(acts.dim() == 4, "acts must be 4-D (batch, time, label, class)");
+  TORCH_CHECK(
+      labels.dim() == 2, "labels must be 2-D (batch, max label length)");
+  TORCH_CHECK(input_lengths.dim() == 1, "input_lengths must be 1-D");
+  TORCH_CHECK(label_lengths.dim() == 1, "label_lengths must be 1-D");
+
   int maxT = acts.size(1);
   int maxU = acts.size(2);
   int minibatch_size = acts.size(0);
   int alphabet_size = acts.size(3);
+
+  TORCH_CHECK(
+      at::max(input_lengths).item().toInt() == maxT, "input length mismatch");
+  TORCH_CHECK(
+      at::max(label_lengths).item().toInt() + 1 == maxU,
+      "output length mismatch");
 
   rnntOptions options;
   memset(&options, 0, sizeof(options));
