@@ -118,15 +118,16 @@ caffe2::TypeMeta get_dtype(
     switch (encoding) {
       case SOX_ENCODING_UNSIGNED: // 8-bit PCM WAV
         return torch::kUInt8;
-      case SOX_ENCODING_SIGN2: // 16-bit or 32-bit PCM WAV
+      case SOX_ENCODING_SIGN2: // 16-bit, 24-bit, or 32-bit PCM WAV
         switch (precision) {
           case 16:
             return torch::kInt16;
+          case 24: // Cast 24-bit to 32-bit.
           case 32:
             return torch::kInt32;
           default:
             throw std::runtime_error(
-                "Only 16 and 32 bits are supported for signed PCM.");
+                "Only 16, 24, and 32 bits are supported for signed PCM.");
         }
       default:
         // default to float32 for the other formats, including
