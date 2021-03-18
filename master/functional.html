@@ -962,7 +962,7 @@ Max 4 channels allowed</p></li>
 Allowed range of values are 0 to 30</p></li>
 <li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired delay depth in milliseconds(ms)
 Allowed range of values are 0 to 10</p></li>
-<li><p><strong>regen</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired regen(feeback gain) in dB
+<li><p><strong>regen</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired regen(feedback gain) in dB
 Allowed range of values are -95 to 95</p></li>
 <li><p><strong>width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired width(delay gain) in dB
 Allowed range of values are 0 to 100</p></li>
@@ -1044,7 +1044,7 @@ Allowed range of values are 0 to 100</p></li>
 <dd><p>Perform an IIR filter by evaluating difference equation.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To avoid numerical problems, small filter order is prefered.
+<p>To avoid numerical problems, small filter order is preferred.
 Using double precision could also minimize numerical precision errors.</p>
 </div>
 <dl class="field-list simple">
@@ -1139,7 +1139,7 @@ Allowed range of values are 0 to 100</p></li>
 Allowed range of values are 0 to 1</p></li>
 <li><p><strong>gain_out</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired output gain at the boost (or attenuation) in dB
 Allowed range of values are 0 to 1e9</p></li>
-<li><p><strong>delay_ms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired delay in milli seconds
+<li><p><strong>delay_ms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired delay in milliseconds
 Allowed range of values are 0 to 5.0</p></li>
 <li><p><strong>decay</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – desired decay relative to gain-in
 Allowed range of values are 0 to 0.99</p></li>
@@ -1169,7 +1169,7 @@ Scott Lehman, Effects Explained,
 <dl class="function">
 <dt id="torchaudio.functional.riaa_biquad">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">riaa_biquad</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">sample_rate: int</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/filtering.html#riaa_biquad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.riaa_biquad" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply RIAA vinyl playback equalisation.  Similar to SoX implementation.</p>
+<dd><p>Apply RIAA vinyl playback equalization.  Similar to SoX implementation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1249,7 +1249,7 @@ used to help ignore short bursts of sound. (Default: 0.25)</p></li>
 to search for quieter/shorter bursts of audio to include prior
 to the detected trigger point. (Default: 1.0)</p></li>
 <li><p><strong>allowed_gap</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The allowed gap (in seconds) between
-quiteter/shorter bursts of audio to include prior
+quieter/shorter bursts of audio to include prior
 to the detected trigger point. (Default: 0.25)</p></li>
 <li><p><strong>pre_trigger_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The amount of audio (in seconds) to preserve
 before the trigger point and any found quieter/shorter bursts. (Default: 0.0)</p></li>
