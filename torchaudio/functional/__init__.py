@@ -3,6 +3,7 @@ from .functional import (
     angle,
     complex_norm,
     compute_deltas,
+    compute_kaldi_pitch,
     create_dct,
     create_fb_matrix,
     DB_to_amplitude,
@@ -17,6 +18,7 @@ from .functional import (
     sliding_window_cmn,
     spectrogram,
     spectral_centroid,
+    apply_codec,
 )
 from .filtering import (
     allpass_biquad,
@@ -47,6 +49,7 @@ __all__ = [
     'angle',
     'complex_norm',
     'compute_deltas',
+    'compute_kaldi_pitch',
     'create_dct',
     'create_fb_matrix',
     'DB_to_amplitude',
@@ -82,4 +85,5 @@ __all__ = [
     'riaa_biquad',
     'treble_biquad',
     'vad',
+    'apply_codec'
 ]

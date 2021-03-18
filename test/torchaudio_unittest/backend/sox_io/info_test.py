@@ -16,8 +16,8 @@ from torchaudio_unittest.common_utils import (
     HttpServerMixin,
     PytorchTestCase,
     skipIfNoExec,
-    skipIfNoExtension,
     skipIfNoModule,
+    skipIfNoSox,
     get_asset_path,
     get_wav_data,
     save_wav,
@@ -33,7 +33,7 @@ if _mod_utils.is_module_available("requests"):
 
 
 @skipIfNoExec('sox')
-@skipIfNoExtension
+@skipIfNoSox
 class TestInfo(TempDirMixin, PytorchTestCase):
     @parameterized.expand(list(itertools.product(
         ['float32', 'int32', 'int16', 'uint8'],
@@ -205,7 +205,7 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.encoding == "ULAW"
 
     def test_alaw(self):
-        """`sox_io_backend.info` can check ulaw file correctly"""
+        """`sox_io_backend.info` can check alaw file correctly"""
         duration = 1
         num_channels = 1
         sample_rate = 8000
@@ -221,8 +221,39 @@ class TestInfo(TempDirMixin, PytorchTestCase):
         assert info.bits_per_sample == 8
         assert info.encoding == "ALAW"
 
+    def test_gsm(self):
+        """`sox_io_backend.info` can check gsm file correctly"""
+        duration = 1
+        num_channels = 1
+        sample_rate = 8000
+        path = self.get_temp_path('data.gsm')
+        sox_utils.gen_audio_file(
+            path, sample_rate=sample_rate, num_channels=num_channels,
+            duration=duration)
+        info = sox_io_backend.info(path)
+        assert info.sample_rate == sample_rate
+        assert info.num_channels == num_channels
+        assert info.bits_per_sample == 0
+        assert info.encoding == "GSM"
 
-@skipIfNoExtension
+    def test_htk(self):
+        """`sox_io_backend.info` can check HTK file correctly"""
+        duration = 1
+        num_channels = 1
+        sample_rate = 8000
+        path = self.get_temp_path('data.htk')
+        sox_utils.gen_audio_file(
+            path, sample_rate=sample_rate, num_channels=num_channels,
+            bit_depth=16, duration=duration)
+        info = sox_io_backend.info(path)
+        assert info.sample_rate == sample_rate
+        assert info.num_frames == sample_rate * duration
+        assert info.num_channels == num_channels
+        assert info.bits_per_sample == 16
+        assert info.encoding == "PCM_S"
+
+
+@skipIfNoSox
 class TestInfoOpus(PytorchTestCase):
     @parameterized.expand(list(itertools.product(
         ['96k'],
@@ -240,7 +271,7 @@ class TestInfoOpus(PytorchTestCase):
         assert info.encoding == "OPUS"
 
 
-@skipIfNoExtension
+@skipIfNoSox
 class TestLoadWithoutExtension(PytorchTestCase):
     def test_mp3(self):
         """Providing `format` allows to read mp3 without extension
@@ -275,7 +306,7 @@ class FileObjTestBase(TempDirMixin):
         return path
 
 
-@skipIfNoExtension
+@skipIfNoSox
 @skipIfNoExec('sox')
 class TestFileObject(FileObjTestBase, PytorchTestCase):
     def _query_fileobj(self, ext, dtype, sample_rate, num_channels, num_frames):
@@ -407,7 +438,7 @@ class TestFileObject(FileObjTestBase, PytorchTestCase):
         assert sinfo.encoding == get_encoding(ext, dtype)
 
 
-@skipIfNoExtension
+@skipIfNoSox
 @skipIfNoExec('sox')
 @skipIfNoModule("requests")
 class TestFileObjectHttp(HttpServerMixin, FileObjTestBase, PytorchTestCase):

@@ -1,3 +1,4 @@
+import sys
 import subprocess
 import warnings
 
@@ -32,6 +33,7 @@ def gen_audio_file(
     command = [
         'sox',
         '-V3',  # verbose
+        '--no-dither',  # disable automatic dithering
         '-R',
         # -R is supposed to be repeatable, though the implementation looks suspicious
         # and not setting the seed to a fixed value.
@@ -61,21 +63,23 @@ def gen_audio_file(
     ]
     if attenuation is not None:
         command += ['vol', f'-{attenuation}dB']
-    print(' '.join(command))
+    print(' '.join(command), file=sys.stderr)
     subprocess.run(command, check=True)
 
 
 def convert_audio_file(
         src_path, dst_path,
-        *, bit_depth=None, compression=None):
+        *, encoding=None, bit_depth=None, compression=None):
     """Convert audio file with `sox` command."""
-    command = ['sox', '-V3', '-R', str(src_path)]
+    command = ['sox', '-V3', '--no-dither', '-R', str(src_path)]
+    if encoding is not None:
+        command += ['--encoding', str(encoding)]
     if bit_depth is not None:
         command += ['--bits', str(bit_depth)]
     if compression is not None:
         command += ['--compression', str(compression)]
     command += [dst_path]
-    print(' '.join(command))
+    print(' '.join(command), file=sys.stderr)
     subprocess.run(command, check=True)
 
 

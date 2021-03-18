@@ -1,13 +1,10 @@
 from typing import List, Dict
 
 import torch
-
-from torchaudio._internal import (
-    module_utils as _mod_utils,
-)
+from torchaudio._internal import module_utils as _mod_utils
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_sox()
 def set_seed(seed: int):
     """Set libsox's PRNG
 
@@ -20,7 +17,7 @@ def set_seed(seed: int):
     torch.ops.torchaudio.sox_utils_set_seed(seed)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_sox()
 def set_verbosity(verbosity: int):
     """Set libsox's verbosity
 
@@ -38,7 +35,7 @@ def set_verbosity(verbosity: int):
     torch.ops.torchaudio.sox_utils_set_verbosity(verbosity)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_sox()
 def set_buffer_size(buffer_size: int):
     """Set buffer size for sox effect chain
 
@@ -51,7 +48,7 @@ def set_buffer_size(buffer_size: int):
     torch.ops.torchaudio.sox_utils_set_buffer_size(buffer_size)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_sox()
 def set_use_threads(use_threads: bool):
     """Set multithread option for sox effect chain
 
@@ -65,7 +62,7 @@ def set_use_threads(use_threads: bool):
     torch.ops.torchaudio.sox_utils_set_use_threads(use_threads)
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_sox()
 def list_effects() -> Dict[str, str]:
     """List the available sox effect names
 
@@ -75,7 +72,7 @@ def list_effects() -> Dict[str, str]:
     return dict(torch.ops.torchaudio.sox_utils_list_effects())
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_sox()
 def list_read_formats() -> List[str]:
     """List the supported audio formats for read
 
@@ -85,7 +82,7 @@ def list_read_formats() -> List[str]:
     return torch.ops.torchaudio.sox_utils_list_read_formats()
 
 
-@_mod_utils.requires_module('torchaudio._torchaudio')
+@_mod_utils.requires_sox()
 def list_write_formats() -> List[str]:
     """List the supported audio formats for write
 

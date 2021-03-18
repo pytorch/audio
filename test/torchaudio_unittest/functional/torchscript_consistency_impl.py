@@ -41,12 +41,11 @@ class Functional(common_utils.TestBaseMixin):
             hop = 200
             window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
             power = 2.
-            normalize = False
             momentum = 0.99
             n_iter = 32
             length = 1000
             rand_int = False
-            return F.griffinlim(tensor, window, n_fft, hop, ws, power, normalize, n_iter, momentum, length, rand_int)
+            return F.griffinlim(tensor, window, n_fft, hop, ws, power, n_iter, momentum, length, rand_int)
 
         tensor = torch.rand((1, 201, 6))
         self._assert_consistency(func, tensor)
@@ -544,6 +543,33 @@ class Functional(common_utils.TestBaseMixin):
             pad = 0
             window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
             return F.spectral_centroid(tensor, sample_rate, pad, window, n_fft, hop, ws)
+
+        tensor = common_utils.get_whitenoise(sample_rate=44100)
+        self._assert_consistency(func, tensor)
+
+    def test_phase_vocoder(self):
+        def func(tensor, device: torch.device = self.device):
+            rate = 0.5
+            hop_length = 256
+            phase_advance = torch.linspace(
+                0,
+                3.14 * hop_length,
+                tensor.shape[-3],
+                dtype=torch.float64,
+            ).to(device)[..., None]
+            return F.phase_vocoder(tensor, rate, phase_advance)
+
+        tensor = torch.randn(2, 1025, 400, 2)
+        self._assert_consistency(func, tensor)
+
+    @common_utils.skipIfNoKaldi
+    def test_compute_kaldi_pitch(self):
+        if self.dtype != torch.float32 or self.device != torch.device('cpu'):
+            raise unittest.SkipTest("Only float32, cpu is supported.")
+
+        def func(tensor):
+            sample_rate: float = 44100.
+            return F.compute_kaldi_pitch(tensor, sample_rate)
 
         tensor = common_utils.get_whitenoise(sample_rate=44100)
         self._assert_consistency(func, tensor)

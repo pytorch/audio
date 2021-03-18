@@ -12,7 +12,7 @@ ROOT_DIR = Path(__file__).parent.resolve()
 
 
 # Creating the version file
-version = '0.8.0a0'
+version = '0.9.0a0'
 sha = 'Unknown'
 
 try:
@@ -76,6 +76,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Multimedia :: Sound/Audio",
         "Topic :: Scientific/Engineering :: Artificial Intelligence"

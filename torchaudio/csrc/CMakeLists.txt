@@ -5,14 +5,29 @@ get_property(TORCHAUDIO_THIRD_PARTIES GLOBAL PROPERTY TORCHAUDIO_THIRD_PARTIES)
 ################################################################################
 set(
   LIBTORCHAUDIO_SOURCES
-  sox/io.cpp
-  sox/utils.cpp
-  sox/effects.cpp
-  sox/effects_chain.cpp
+  lfilter.cpp
+  overdrive.cpp
+  utils.cpp
   )
 
 if(BUILD_TRANSDUCER)
   list(APPEND LIBTORCHAUDIO_SOURCES transducer.cpp)
+endif()
+
+if(BUILD_KALDI)
+  list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
+endif()
+
+if(BUILD_SOX)
+  set(
+    SOX_SOURCES
+    sox/io.cpp
+    sox/utils.cpp
+    sox/effects.cpp
+    sox/effects_chain.cpp
+    sox/types.cpp
+  )
+  list(APPEND LIBTORCHAUDIO_SOURCES ${SOX_SOURCES})
 endif()
 
 ################################################################################
@@ -34,6 +49,7 @@ if(BUILD_LIBTORCHAUDIO)
 
   target_link_libraries(
     libtorchaudio
+    ${TORCH_LIBRARIES}
     ${TORCHAUDIO_THIRD_PARTIES}
     )
 
@@ -54,11 +70,13 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     _torchaudio
     SHARED
     pybind.cpp
-    sox/legacy.cpp
     ${LIBTORCHAUDIO_SOURCES}
     )
 
   set_target_properties(_torchaudio PROPERTIES PREFIX "")
+  if (MSVC)
+    set_target_properties(_torchaudio PROPERTIES SUFFIX ".pyd")
+  endif(MSVC)
 
   if (APPLE)
     # https://github.com/facebookarchive/caffe2/issues/854#issuecomment-364538485
@@ -70,6 +88,14 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
     _torchaudio PRIVATE TORCH_API_INCLUDE_EXTENSION_H
   )
 
+  if (BUILD_SOX)
+    target_compile_definitions(_torchaudio PRIVATE INCLUDE_SOX)
+  endif()
+
+  if (BUILD_KALDI)
+    target_compile_definitions(_torchaudio PRIVATE INCLUDE_KALDI)
+  endif()
+
   target_include_directories(
     _torchaudio
     PRIVATE
@@ -80,12 +106,22 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   # See https://github.com/pytorch/pytorch/issues/38122
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
 
+  if (WIN32)
+    find_package(Python3 ${PYTHON_VERSION} EXACT COMPONENTS Development)
+    set(ADDITIONAL_ITEMS Python3::Python)
+  endif()
+
   target_link_libraries(
     _torchaudio
     ${TORCH_LIBRARIES}
     ${TORCH_PYTHON_LIBRARY}
     ${TORCHAUDIO_THIRD_PARTIES}
+    ${ADDITIONAL_ITEMS}
     )
 
-  install(TARGETS _torchaudio LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX})
+  install(
+    TARGETS _torchaudio
+    LIBRARY DESTINATION .
+    RUNTIME DESTINATION .  # For Windows
+    )
 endif()

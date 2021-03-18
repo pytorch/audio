@@ -29,17 +29,18 @@ to use and feel like a natural extension.
 Dependencies
 ------------
 * PyTorch (See below for the compatible versions)
-* libsox v14.3.2 or above (only required when building from source)
 * [optional] vesis84/kaldi-io-for-python commit cb46cb1f44318a5d04d4941cf39084c5b021241e or above
 
 The following are the corresponding ``torchaudio`` versions and supported Python versions.
 
 | ``torch``                | ``torchaudio``           | ``python``                      |
 | ------------------------ | ------------------------ | ------------------------------- |
-| ``master`` / ``nightly`` | ``master`` / ``nightly`` | ``>=3.6``                       |
-| ``1.7.0``                | ``0.7.0``                | ``>=3.6``                       |
-| ``1.6.0``                | ``0.6.0``                | ``>=3.6``                       |
-| ``1.5.0``                | ``0.5.0``                | ``>=3.5``                       |
+| ``master`` / ``nightly`` | ``master`` / ``nightly`` | ``>=3.6``, ``<=3.9``            |
+| ``1.8.0``                | ``0.8.0``                | ``>=3.6``, ``<=3.9``            |
+| ``1.7.1``                | ``0.7.2``                | ``>=3.6``, ``<=3.9``            |
+| ``1.7.0``                | ``0.7.0``                | ``>=3.6``, ``<=3.8``            |
+| ``1.6.0``                | ``0.6.0``                | ``>=3.6``, ``<=3.8``            |
+| ``1.5.0``                | ``0.5.0``                | ``>=3.5``, ``<=3.8``            |
 | ``1.4.0``                | ``0.4.0``                | ``==2.7``, ``>=3.5``, ``<=3.8`` |
 
 
@@ -83,39 +84,7 @@ conda install -y -c pytorch-nightly torchaudio
 
 ### From Source
 
-If your system configuration is not among the supported configurations
-above, you can build torchaudio from source.
-
-This will require libsox v14.3.2 or above.
-
-<Details><Summary>Click here for the examples on how to install SoX</Summary>
-
-OSX (Homebrew):
-```bash
-brew install sox
-```
-
-Linux (Ubuntu):
-```bash
-sudo apt-get install sox libsox-dev libsox-fmt-all
-```
-
-Anaconda
-```bash
-conda install -c conda-forge sox
-```
-
-</Details>
-
-```bash
-# Linux
-python setup.py install
-
-# OSX
-MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
-```
-
-Alternatively, the build process can build libsox and some optional codecs statically and torchaudio can link them, by setting environment variable `BUILD_SOX=1`.
+The build process builds libsox and some codecs that torchaudio need to link to. This is achieve by setting the environment variable `BUILD_SOX=1`.
 The build process will fetch and build libmad, lame, flac, vorbis, opus, and libsox before building extension. This process requires `cmake` and `pkg-config`.
 
 ```bash
@@ -195,16 +164,16 @@ Conventions
 
 With torchaudio being a machine learning library and built on top of PyTorch,
 torchaudio is standardized around the following naming conventions. Tensors are
-assumed to have channels as the first dimension and time as the last
+assumed to have "channel" as the first dimension and time as the last
 dimension (when applicable). This makes it consistent with PyTorch's dimensions.
 For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`, `n_mel`)")
 whereas dimension names do not have this prefix (e.g. "a tensor of
-dimension (channels, time)")
+dimension (channel, time)")
 
-* `waveform`: a tensor of audio samples with dimensions (channels, time)
+* `waveform`: a tensor of audio samples with dimensions (channel, time)
 * `sample_rate`: the rate of audio dimensions (samples per second)
-* `specgram`: a tensor of spectrogram with dimensions (channels, freq, time)
-* `mel_specgram`: a mel spectrogram with dimensions (channels, mel, time)
+* `specgram`: a tensor of spectrogram with dimensions (channel, freq, time)
+* `mel_specgram`: a mel spectrogram with dimensions (channel, mel, time)
 * `hop_length`: the number of samples between the starts of consecutive frames
 * `n_fft`: the number of Fourier bins
 * `n_mel`, `n_mfcc`: the number of mel and MFCC bins
@@ -216,16 +185,16 @@ dimension (channels, time)")
 
 Transforms expect and return the following dimensions.
 
-* `Spectrogram`: (channels, time) -> (channels, freq, time)
-* `AmplitudeToDB`: (channels, freq, time) -> (channels, freq, time)
-* `MelScale`: (channels, freq, time) -> (channels, mel, time)
-* `MelSpectrogram`: (channels, time) -> (channels, mel, time)
-* `MFCC`: (channels, time) -> (channel, mfcc, time)
-* `MuLawEncode`: (channels, time) -> (channels, time)
-* `MuLawDecode`: (channels, time) -> (channels, time)
-* `Resample`: (channels, time) -> (channels, time)
-* `Fade`: (channels, time) -> (channels, time)
-* `Vol`: (channels, time) -> (channels, time)
+* `Spectrogram`: (channel, time) -> (channel, freq, time)
+* `AmplitudeToDB`: (channel, freq, time) -> (channel, freq, time)
+* `MelScale`: (channel, freq, time) -> (channel, mel, time)
+* `MelSpectrogram`: (channel, time) -> (channel, mel, time)
+* `MFCC`: (channel, time) -> (channel, mfcc, time)
+* `MuLawEncode`: (channel, time) -> (channel, time)
+* `MuLawDecode`: (channel, time) -> (channel, time)
+* `Resample`: (channel, time) -> (channel, time)
+* `Fade`: (channel, time) -> (channel, time)
+* `Vol`: (channel, time) -> (channel, time)
 
 Complex numbers are supported via tensors of dimension (..., 2), and torchaudio provides `complex_norm` and `angle` to convert such a tensor into its magnitude and phase. Here, and in the documentation, we use an ellipsis "..." as a placeholder for the rest of the dimensions of a tensor, e.g. optional batching and channel dimensions.
 
