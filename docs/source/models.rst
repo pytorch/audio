@@ -31,3 +31,10 @@ The models subpackage contains definitions of models for addressing common audio
 .. autoclass:: WaveRNN
 
   .. automethod:: forward
+
+:hidden:`DeepSpeech`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: DeepSpeech
+
+  .. automethod:: forward

@@ -3,7 +3,7 @@ from collections import namedtuple
 
 import torch
 from parameterized import parameterized
-from torchaudio.models import ConvTasNet, Wav2Letter, WaveRNN
+from torchaudio.models import ConvTasNet, Wav2Letter, WaveRNN, DeepSpeech
 from torchaudio.models.wavernn import MelResNet, UpsampleNetwork
 from torchaudio_unittest import common_utils
 
@@ -174,3 +174,20 @@ class TestConvTasNet(common_utils.TorchaudioTestCase):
         output = model(tensor)
 
         assert output.shape == (batch_size, num_sources, num_frames)
+
+
+class TestDeepSpeech(common_utils.TorchaudioTestCase):
+
+    def test_deepspeech(self):
+        batch_size = 2
+        num_features = 1
+        num_channels = 1
+        num_classes = 40
+        input_length = 320
+
+        model = DeepSpeech(in_features=1, num_classes=num_classes)
+
+        x = torch.rand(batch_size, num_channels, input_length, num_features)
+        out = model(x)
+
+        assert out.size() == (input_length, batch_size, num_classes)
