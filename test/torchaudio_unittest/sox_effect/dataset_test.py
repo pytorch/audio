@@ -11,7 +11,7 @@ import torchaudio
 from torchaudio_unittest.common_utils import (
     TempDirMixin,
     PytorchTestCase,
-    skipIfNoExtension,
+    skipIfNoSox,
     get_whitenoise,
     save_wav,
 )
@@ -71,7 +71,7 @@ def init_random_seed(worker_id):
     dataset.rng = np.random.RandomState(worker_id)
 
 
-@skipIfNoExtension
+@skipIfNoSox
 @skipIf(
     platform.system() == 'Darwin' and
     sys.version_info.major == 3 and
@@ -134,7 +134,7 @@ def speed(path):
     return torchaudio.sox_effects.apply_effects_tensor(wav, sample_rate, effects)[0]
 
 
-@skipIfNoExtension
+@skipIfNoSox
 class TestProcessPoolExecutor(TempDirMixin, PytorchTestCase):
     backend = "sox_io"
 

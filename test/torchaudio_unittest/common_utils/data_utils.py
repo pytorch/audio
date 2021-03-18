@@ -68,11 +68,11 @@ def get_whitenoise(
     # so we only fork on CPU, generate values and move the data to the given device
     with torch.random.fork_rng([]):
         torch.random.manual_seed(seed)
-        tensor = torch.randn([int(sample_rate * duration)], dtype=torch.float32, device='cpu')
+        tensor = torch.randn([n_channels, int(sample_rate * duration)],
+                             dtype=torch.float32, device='cpu')
     tensor /= 2.0
     tensor *= scale_factor
     tensor.clamp_(-1.0, 1.0)
-    tensor = tensor.repeat([n_channels, 1])
     if not channels_first:
         tensor = tensor.t()
     return convert_tensor_encoding(tensor, dtype)

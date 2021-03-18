@@ -7,6 +7,7 @@ from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
     get_whitenoise,
     save_wav,
+    skipIfNoSox
 )
 
 from torchaudio.datasets import tedlium
@@ -143,13 +144,7 @@ class TestTedliumSoundfile(Tedlium, TorchaudioTestCase):
     backend = "soundfile"
 
 
-class TestTedliumSoundfileNew(Tedlium, TorchaudioTestCase):
-    backend = "soundfile-new"
-
-
 if platform.system() != "Windows":
-    class TestTedliumSox(Tedlium, TorchaudioTestCase):
-        backend = "sox"
-
+    @skipIfNoSox
     class TestTedliumSoxIO(Tedlium, TorchaudioTestCase):
         backend = "sox_io"
