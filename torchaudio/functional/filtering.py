@@ -1,5 +1,5 @@
 import math
-from typing import Optional
+from typing import Optional, Union
 
 import torch
 from torch import Tensor
@@ -9,6 +9,12 @@ import torchaudio._internal.fft
 
 def _dB2Linear(x: float) -> float:
     return math.exp(x * math.log(10) / 20.0)
+
+
+def _float2Tensor(x: float, dtype=None, device=None):
+    if type(x) is not Tensor:
+        return torch.tensor([x], device=device, dtype=dtype)
+    return x
 
 
 def _generate_wave_table(
@@ -66,15 +72,15 @@ def _generate_wave_table(
 
 
 def allpass_biquad(
-    waveform: Tensor, sample_rate: int, central_freq: float, Q: float = 0.707
+    waveform: Tensor, sample_rate: int, central_freq: Union[float, Tensor], Q: Union[float, Tensor] = 0.707
 ) -> Tensor:
     r"""Design two-pole all-pass filter.  Similar to SoX implementation.
 
     Args:
         waveform(torch.Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
-        central_freq (float): central frequency (in Hz)
-        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)
+        central_freq (float or torch.Tensor): central frequency (in Hz)
+        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)
 
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
@@ -83,14 +89,20 @@ def allpass_biquad(
         http://sox.sourceforge.net/sox.html
         https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
+    dtype = waveform.dtype
+    device = waveform.device
+    central_freq = _float2Tensor(central_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
+
     w0 = 2 * math.pi * central_freq / sample_rate
-    alpha = math.sin(w0) / 2 / Q
+
+    alpha = torch.sin(w0) / 2 / Q
 
     b0 = 1 - alpha
-    b1 = -2 * math.cos(w0)
+    b1 = -2 * torch.cos(w0)
     b2 = 1 + alpha
     a0 = 1 + alpha
-    a1 = -2 * math.cos(w0)
+    a1 = -2 * torch.cos(w0)
     a2 = 1 - alpha
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
@@ -98,8 +110,8 @@ def allpass_biquad(
 def band_biquad(
     waveform: Tensor,
     sample_rate: int,
-    central_freq: float,
-    Q: float = 0.707,
+    central_freq: Union[float, Tensor],
+    Q: Union[float, Tensor] = 0.707,
     noise: bool = False,
 ) -> Tensor:
     r"""Design two-pole band filter.  Similar to SoX implementation.
@@ -107,8 +119,8 @@ def band_biquad(
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
-        central_freq (float): central frequency (in Hz)
-        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).
+        central_freq (float or torch.Tensor): central frequency (in Hz)
+        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).
         noise (bool, optional) : If ``True``, uses the alternate mode for un-pitched audio (e.g. percussion).
             If ``False``, uses mode oriented to pitched audio, i.e. voice, singing,
             or instrumental music (Default: ``False``).
@@ -120,18 +132,23 @@ def band_biquad(
         http://sox.sourceforge.net/sox.html
         https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
+    dtype = waveform.dtype
+    device = waveform.device
+    central_freq = _float2Tensor(central_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
+
     w0 = 2 * math.pi * central_freq / sample_rate
     bw_Hz = central_freq / Q
 
     a0 = 1.0
-    a2 = math.exp(-2 * math.pi * bw_Hz / sample_rate)
-    a1 = -4 * a2 / (1 + a2) * math.cos(w0)
+    a2 = torch.exp(-2 * math.pi * bw_Hz / sample_rate)
+    a1 = -4 * a2 / (1 + a2) * torch.cos(w0)
 
-    b0 = math.sqrt(1 - a1 * a1 / (4 * a2)) * (1 - a2)
+    b0 = torch.sqrt(1 - a1 * a1 / (4 * a2)) * (1 - a2)
 
     if noise:
-        mult = math.sqrt(((1 + a2) * (1 + a2) - a1 * a1) * (1 - a2) / (1 + a2)) / b0
-        b0 *= mult
+        mult = torch.sqrt(((1 + a2) * (1 + a2) - a1 * a1) * (1 - a2) / (1 + a2)) / b0
+        b0 = mult * b0
 
     b1 = 0.0
     b2 = 0.0
@@ -142,8 +159,8 @@ def band_biquad(
 def bandpass_biquad(
     waveform: Tensor,
     sample_rate: int,
-    central_freq: float,
-    Q: float = 0.707,
+    central_freq: Union[float, Tensor],
+    Q: Union[float, Tensor] = 0.707,
     const_skirt_gain: bool = False,
 ) -> Tensor:
     r"""Design two-pole band-pass filter.  Similar to SoX implementation.
@@ -151,8 +168,8 @@ def bandpass_biquad(
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
-        central_freq (float): central frequency (in Hz)
-        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)
+        central_freq (float or torch.Tensor): central frequency (in Hz)
+        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)
         const_skirt_gain (bool, optional) : If ``True``, uses a constant skirt gain (peak gain = Q).
             If ``False``, uses a constant 0dB peak gain. (Default: ``False``)
 
@@ -163,29 +180,34 @@ def bandpass_biquad(
         http://sox.sourceforge.net/sox.html
         https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
-    w0 = 2 * math.pi * central_freq / sample_rate
-    alpha = math.sin(w0) / 2 / Q
+    dtype = waveform.dtype
+    device = waveform.device
+    central_freq = _float2Tensor(central_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
 
-    temp = math.sin(w0) / 2 if const_skirt_gain else alpha
+    w0 = 2 * math.pi * central_freq / sample_rate
+    alpha = torch.sin(w0) / 2 / Q
+
+    temp = torch.sin(w0) / 2 if const_skirt_gain else alpha
     b0 = temp
     b1 = 0.0
     b2 = -temp
     a0 = 1 + alpha
-    a1 = -2 * math.cos(w0)
+    a1 = -2 * torch.cos(w0)
     a2 = 1 - alpha
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
 
 def bandreject_biquad(
-    waveform: Tensor, sample_rate: int, central_freq: float, Q: float = 0.707
+    waveform: Tensor, sample_rate: int, central_freq: Union[float, Tensor], Q: Union[float, Tensor] = 0.707
 ) -> Tensor:
     r"""Design two-pole band-reject filter.  Similar to SoX implementation.
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
-        central_freq (float): central frequency (in Hz)
-        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)
+        central_freq (float or torch.Tensor): central frequency (in Hz)
+        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)
 
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
@@ -194,14 +216,19 @@ def bandreject_biquad(
         http://sox.sourceforge.net/sox.html
         https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
+    dtype = waveform.dtype
+    device = waveform.device
+    central_freq = _float2Tensor(central_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
+
     w0 = 2 * math.pi * central_freq / sample_rate
-    alpha = math.sin(w0) / 2 / Q
+    alpha = torch.sin(w0) / 2 / Q
 
     b0 = 1.0
-    b1 = -2 * math.cos(w0)
+    b1 = -2 * torch.cos(w0)
     b2 = 1.0
     a0 = 1 + alpha
-    a1 = -2 * math.cos(w0)
+    a1 = -2 * torch.cos(w0)
     a2 = 1 - alpha
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
@@ -209,18 +236,18 @@ def bandreject_biquad(
 def bass_biquad(
     waveform: Tensor,
     sample_rate: int,
-    gain: float,
-    central_freq: float = 100,
-    Q: float = 0.707,
+    gain: Union[float, Tensor],
+    central_freq: Union[float, Tensor] = 100,
+    Q: Union[float, Tensor] = 0.707,
 ) -> Tensor:
     r"""Design a bass tone-control effect.  Similar to SoX implementation.
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
-        gain (float): desired gain at the boost (or attenuation) in dB.
-        central_freq (float, optional): central frequency (in Hz). (Default: ``100``)
-        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).
+        gain (float or torch.Tensor): desired gain at the boost (or attenuation) in dB.
+        central_freq (float or torch.Tensor, optional): central frequency (in Hz). (Default: ``100``)
+        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).
 
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
@@ -229,13 +256,19 @@ def bass_biquad(
         http://sox.sourceforge.net/sox.html
         https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
-    w0 = 2 * math.pi * central_freq / sample_rate
-    alpha = math.sin(w0) / 2 / Q
-    A = math.exp(gain / 40 * math.log(10))
+    dtype = waveform.dtype
+    device = waveform.device
+    central_freq = _float2Tensor(central_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
+    gain = _float2Tensor(gain, dtype, device)
 
-    temp1 = 2 * math.sqrt(A) * alpha
-    temp2 = (A - 1) * math.cos(w0)
-    temp3 = (A + 1) * math.cos(w0)
+    w0 = 2 * math.pi * central_freq / sample_rate
+    alpha = torch.sin(w0) / 2 / Q
+    A = torch.exp(gain / 40 * math.log(10))
+
+    temp1 = 2 * torch.sqrt(A) * alpha
+    temp2 = (A - 1) * torch.cos(w0)
+    temp3 = (A + 1) * torch.cos(w0)
 
     b0 = A * ((A + 1) - temp2 + temp1)
     b1 = 2 * A * ((A - 1) - temp3)
@@ -255,12 +288,12 @@ def biquad(
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
-        b0 (float): numerator coefficient of current input, x[n]
-        b1 (float): numerator coefficient of input one time step ago x[n-1]
-        b2 (float): numerator coefficient of input two time steps ago x[n-2]
-        a0 (float): denominator coefficient of current output y[n], typically 1
-        a1 (float): denominator coefficient of current output y[n-1]
-        a2 (float): denominator coefficient of current output y[n-2]
+        b0 (float or torch.Tensor): numerator coefficient of current input, x[n]
+        b1 (float or torch.Tensor): numerator coefficient of input one time step ago x[n-1]
+        b2 (float or torch.Tensor): numerator coefficient of input two time steps ago x[n-2]
+        a0 (float or torch.Tensor): denominator coefficient of current output y[n], typically 1
+        a1 (float or torch.Tensor): denominator coefficient of current output y[n-1]
+        a2 (float or torch.Tensor): denominator coefficient of current output y[n-2]
 
     Returns:
         Tensor: Waveform with dimension of `(..., time)`
@@ -269,10 +302,17 @@ def biquad(
     device = waveform.device
     dtype = waveform.dtype
 
+    b0 = _float2Tensor(b0, dtype, device)
+    b1 = _float2Tensor(b1, dtype, device)
+    b2 = _float2Tensor(b2, dtype, device)
+    a0 = _float2Tensor(a0, dtype, device)
+    a1 = _float2Tensor(a1, dtype, device)
+    a2 = _float2Tensor(a2, dtype, device)
+
     output_waveform = lfilter(
         waveform,
-        torch.tensor([a0, a1, a2], dtype=dtype, device=device),
-        torch.tensor([b0, b1, b2], dtype=dtype, device=device),
+        torch.cat([a0, a1, a2]),
+        torch.cat([b0, b1, b2]),
     )
     return output_waveform
 
@@ -574,9 +614,9 @@ def dither(
 def equalizer_biquad(
     waveform: Tensor,
     sample_rate: int,
-    center_freq: float,
-    gain: float,
-    Q: float = 0.707,
+    center_freq: Union[float, Tensor],
+    gain: Union[float, Tensor],
+    Q: Union[float, Tensor] = 0.707,
 ) -> Tensor:
     r"""Design biquad peaking equalizer filter and perform filtering.  Similar to SoX implementation.
 
@@ -584,21 +624,27 @@ def equalizer_biquad(
         waveform (Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
         center_freq (float): filter's central frequency
-        gain (float): desired gain at the boost (or attenuation) in dB
-        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)
+        gain (float or torch.Tensor): desired gain at the boost (or attenuation) in dB
+        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)
 
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
     """
+    dtype = waveform.dtype
+    device = waveform.device
+    center_freq = _float2Tensor(center_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
+    gain = _float2Tensor(gain, dtype, device)
+
     w0 = 2 * math.pi * center_freq / sample_rate
-    A = math.exp(gain / 40.0 * math.log(10))
-    alpha = math.sin(w0) / 2 / Q
+    A = torch.exp(gain / 40.0 * math.log(10))
+    alpha = torch.sin(w0) / 2 / Q
 
     b0 = 1 + alpha * A
-    b1 = -2 * math.cos(w0)
+    b1 = -2 * torch.cos(w0)
     b2 = 1 - alpha * A
     a0 = 1 + alpha / A
-    a1 = -2 * math.cos(w0)
+    a1 = -2 * torch.cos(w0)
     a2 = 1 - alpha / A
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
@@ -783,27 +829,32 @@ def gain(waveform: Tensor, gain_db: float = 1.0) -> Tensor:
 
 
 def highpass_biquad(
-    waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707
+    waveform: Tensor, sample_rate: int, cutoff_freq: Union[float, Tensor], Q: Union[float, Tensor] = 0.707
 ) -> Tensor:
     r"""Design biquad highpass filter and perform filtering.  Similar to SoX implementation.
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
-        cutoff_freq (float): filter cutoff frequency
-        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)
+        cutoff_freq (float or torch.Tensor): filter cutoff frequency
+        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)
 
     Returns:
         Tensor: Waveform dimension of `(..., time)`
     """
-    w0 = 2 * math.pi * cutoff_freq / sample_rate
-    alpha = math.sin(w0) / 2.0 / Q
+    dtype = waveform.dtype
+    device = waveform.device
+    cutoff_freq = _float2Tensor(cutoff_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
 
-    b0 = (1 + math.cos(w0)) / 2
-    b1 = -1 - math.cos(w0)
+    w0 = 2 * math.pi * cutoff_freq / sample_rate
+    alpha = torch.sin(w0) / 2.0 / Q
+
+    b0 = (1 + torch.cos(w0)) / 2
+    b1 = -1 - torch.cos(w0)
     b2 = b0
     a0 = 1 + alpha
-    a1 = -2 * math.cos(w0)
+    a1 = -2 * torch.cos(w0)
     a2 = 1 - alpha
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
@@ -917,27 +968,32 @@ def lfilter(
 
 
 def lowpass_biquad(
-    waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707
+    waveform: Tensor, sample_rate: int, cutoff_freq: Union[float, Tensor], Q: Union[float, Tensor] = 0.707
 ) -> Tensor:
     r"""Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.
 
     Args:
         waveform (torch.Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
-        cutoff_freq (float): filter cutoff frequency
-        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)
+        cutoff_freq (float or torch.Tensor): filter cutoff frequency
+        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)
 
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
     """
-    w0 = 2 * math.pi * cutoff_freq / sample_rate
-    alpha = math.sin(w0) / 2 / Q
+    dtype = waveform.dtype
+    device = waveform.device
+    cutoff_freq = _float2Tensor(cutoff_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
 
-    b0 = (1 - math.cos(w0)) / 2
-    b1 = 1 - math.cos(w0)
+    w0 = 2 * math.pi * cutoff_freq / sample_rate
+    alpha = torch.sin(w0) / 2 / Q
+
+    b0 = (1 - torch.cos(w0)) / 2
+    b1 = 1 - torch.cos(w0)
     b2 = b0
     a0 = 1 + alpha
-    a1 = -2 * math.cos(w0)
+    a1 = -2 * torch.cos(w0)
     a2 = 1 - alpha
     return biquad(waveform, b0, b1, b2, a0, a1, a2)
 
@@ -1167,18 +1223,18 @@ def riaa_biquad(waveform: Tensor, sample_rate: int) -> Tensor:
 def treble_biquad(
     waveform: Tensor,
     sample_rate: int,
-    gain: float,
-    central_freq: float = 3000,
-    Q: float = 0.707,
+    gain: Union[float, Tensor],
+    central_freq: Union[float, Tensor] = 3000,
+    Q: Union[float, Tensor] = 0.707,
 ) -> Tensor:
     r"""Design a treble tone-control effect.  Similar to SoX implementation.
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
         sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)
-        gain (float): desired gain at the boost (or attenuation) in dB.
-        central_freq (float, optional): central frequency (in Hz). (Default: ``3000``)
-        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).
+        gain (float or torch.Tensor): desired gain at the boost (or attenuation) in dB.
+        central_freq (float or torch.Tensor, optional): central frequency (in Hz). (Default: ``3000``)
+        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).
 
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
@@ -1187,13 +1243,19 @@ def treble_biquad(
         http://sox.sourceforge.net/sox.html
         https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
-    w0 = 2 * math.pi * central_freq / sample_rate
-    alpha = math.sin(w0) / 2 / Q
-    A = math.exp(gain / 40 * math.log(10))
+    dtype = waveform.dtype
+    device = waveform.device
+    central_freq = _float2Tensor(central_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
+    ga = _float2Tensor(gain, dtype, device)
 
-    temp1 = 2 * math.sqrt(A) * alpha
-    temp2 = (A - 1) * math.cos(w0)
-    temp3 = (A + 1) * math.cos(w0)
+    w0 = 2 * math.pi * central_freq / sample_rate
+    alpha = torch.sin(w0) / 2 / Q
+    A = torch.exp(gain / 40 * math.log(10))
+
+    temp1 = 2 * torch.sqrt(A) * alpha
+    temp2 = (A - 1) * torch.cos(w0)
+    temp3 = (A + 1) * torch.cos(w0)
 
     b0 = A * ((A + 1) + temp2 + temp1)
     b1 = -2 * A * ((A - 1) + temp3)
