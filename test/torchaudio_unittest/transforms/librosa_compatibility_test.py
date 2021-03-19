@@ -219,7 +219,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         spec_ta = spec_ta.sqrt()
 
         threshold = 2.0
-        # This threshold was choosen empirically, based on the following observation
+        # This threshold was chosen empirically, based on the following observation
         #
         # torch.dist(spec_lr, spec_ta, p=float('inf'))
         # >>> tensor(1.9666)
@@ -234,7 +234,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(spec_ta, spec_lr, atol=threshold, rtol=1e-5)
 
         threshold = 1700.0
-        # This threshold was choosen empirically, based on the following observations
+        # This threshold was chosen empirically, based on the following observations
         #
         # torch.dist(spec_orig, spec_ta, p=1)
         # >>> tensor(1644.3516)

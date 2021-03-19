@@ -20,7 +20,7 @@ def _generate_wave_table(
     phase: float,
     device: torch.device,
 ) -> Tensor:
-    r"""A helper fucntion for phaser. Generates a table with given parameters
+    r"""A helper function for phaser. Generates a table with given parameters.
 
     Args:
         wave_type (str): SINE or TRIANGULAR
@@ -625,7 +625,7 @@ def flanger(
             Allowed range of values are 0 to 30
         depth (float): desired delay depth in milliseconds(ms)
             Allowed range of values are 0 to 10
-        regen (float): desired regen(feeback gain) in dB
+        regen (float): desired regen(feedback gain) in dB
             Allowed range of values are -95 to 95
         width (float):  desired width(delay gain) in dB
             Allowed range of values are 0 to 100
@@ -884,6 +884,10 @@ def lfilter(
 ) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation.
 
+    Note:
+        To avoid numerical problems, small filter order is preferred.
+        Using double precision could also minimize numerical precision errors.
+
     Args:
         waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
         a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(n_order + 1)``.
@@ -1028,7 +1032,7 @@ def phaser(
             Allowed range of values are 0 to 1
         gain_out (float): desired output gain at the boost (or attenuation) in dB
             Allowed range of values are 0 to 1e9
-        delay_ms (float): desired delay in milli seconds
+        delay_ms (float): desired delay in milliseconds
             Allowed range of values are 0 to 5.0
         decay (float):  desired decay relative to gain-in
             Allowed range of values are 0 to 0.99
@@ -1101,7 +1105,7 @@ def phaser(
 
 
 def riaa_biquad(waveform: Tensor, sample_rate: int) -> Tensor:
-    r"""Apply RIAA vinyl playback equalisation.  Similar to SoX implementation.
+    r"""Apply RIAA vinyl playback equalization.  Similar to SoX implementation.
 
     Args:
         waveform (Tensor): audio waveform of dimension of `(..., time)`
@@ -1145,7 +1149,7 @@ def riaa_biquad(waveform: Tensor, sample_rate: int) -> Tensor:
     a1 = -(poles[0] + poles[1])
     a2 = poles[0] * poles[1]
 
-    # Normalise to 0dB at 1kHz
+    # Normalize to 0dB at 1kHz
     y = 2 * math.pi * 1000 / sample_rate
     b_re = b0 + b1 * math.cos(-y) + b2 * math.cos(-2 * y)
     a_re = a0 + a1 * math.cos(-y) + a2 * math.cos(-2 * y)
@@ -1325,7 +1329,7 @@ def vad(
             to search for quieter/shorter bursts of audio to include prior
             to the detected trigger point. (Default: 1.0)
         allowed_gap (float, optional): The allowed gap (in seconds) between
-            quiteter/shorter bursts of audio to include prior
+            quieter/shorter bursts of audio to include prior
             to the detected trigger point. (Default: 0.25)
         pre_trigger_time (float, optional): The amount of audio (in seconds) to preserve
             before the trigger point and any found quieter/shorter bursts. (Default: 0.0)

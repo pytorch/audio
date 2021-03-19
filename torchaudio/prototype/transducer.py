@@ -19,7 +19,6 @@ class _RNNT(Function):
         """
 
         device = acts.device
-        check_inputs(acts, labels, act_lens, label_lens)
 
         acts = acts.to("cpu")
         labels = labels.to("cpu")
@@ -118,45 +117,3 @@ class RNNTLoss(Module):
         # log_softmax is computed within GPU version.
         acts = torch.nn.functional.log_softmax(acts, -1)
         return self.loss(acts, labels, act_lens, label_lens, self.blank, self.reduction)
-
-
-def check_type(var, t, name):
-    if var.dtype is not t:
-        raise TypeError("{} must be {}".format(name, t))
-
-
-def check_contiguous(var, name):
-    if not var.is_contiguous():
-        raise ValueError("{} must be contiguous".format(name))
-
-
-def check_dim(var, dim, name):
-    if len(var.shape) != dim:
-        raise ValueError("{} must be {}D".format(name, dim))
-
-
-def check_inputs(log_probs, labels, lengths, label_lengths):
-    check_type(labels, torch.int32, "labels")
-    check_type(label_lengths, torch.int32, "label_lengths")
-    check_type(lengths, torch.int32, "lengths")
-    check_contiguous(log_probs, "log_probs")
-    check_contiguous(labels, "labels")
-    check_contiguous(label_lengths, "label_lengths")
-    check_contiguous(lengths, "lengths")
-
-    if lengths.shape[0] != log_probs.shape[0]:
-        raise ValueError("must have a length per example.")
-    if label_lengths.shape[0] != log_probs.shape[0]:
-        raise ValueError("must have a label length per example.")
-
-    check_dim(log_probs, 4, "log_probs")
-    check_dim(labels, 2, "labels")
-    check_dim(lengths, 1, "lengths")
-    check_dim(label_lengths, 1, "label_lengths")
-    max_T = torch.max(lengths)
-    max_U = torch.max(label_lengths)
-    T, U = log_probs.shape[1:3]
-    if T != max_T:
-        raise ValueError("Input length mismatch")
-    if U != max_U + 1:
-        raise ValueError("Output length mismatch")

@@ -118,15 +118,16 @@ caffe2::TypeMeta get_dtype(
     switch (encoding) {
       case SOX_ENCODING_UNSIGNED: // 8-bit PCM WAV
         return torch::kUInt8;
-      case SOX_ENCODING_SIGN2: // 16-bit or 32-bit PCM WAV
+      case SOX_ENCODING_SIGN2: // 16-bit, 24-bit, or 32-bit PCM WAV
         switch (precision) {
           case 16:
             return torch::kInt16;
+          case 24: // Cast 24-bit to 32-bit.
           case 32:
             return torch::kInt32;
           default:
             throw std::runtime_error(
-                "Only 16 and 32 bits are supported for signed PCM.");
+                "Only 16, 24, and 32 bits are supported for signed PCM.");
         }
       default:
         // default to float32 for the other formats, including
@@ -138,24 +139,6 @@ caffe2::TypeMeta get_dtype(
     }
   }();
   return c10::scalarTypeToTypeMeta(dtype);
-}
-
-caffe2::TypeMeta get_dtype_from_str(const std::string dtype) {
-  const auto tgt_dtype = [&]() {
-    if (dtype == "uint8")
-      return torch::kUInt8;
-    else if (dtype == "int16")
-      return torch::kInt16;
-    else if (dtype == "int32")
-      return torch::kInt32;
-    else if (dtype == "float32")
-      return torch::kFloat32;
-    else if (dtype == "float64")
-      return torch::kFloat64;
-    else
-      throw std::runtime_error("Unsupported dtype");
-  }();
-  return c10::scalarTypeToTypeMeta(tgt_dtype);
 }
 
 torch::Tensor convert_to_tensor(

@@ -21,7 +21,7 @@ class Kaldi(TempDirMixin, TestBaseMixin):
         expected = expected.to(dtype=self.dtype, device=self.device)
         self.assertEqual(output, expected, rtol=rtol, atol=atol)
 
-    @parameterized.expand(load_params('kaldi_test_fbank_args.json'))
+    @parameterized.expand(load_params('kaldi_test_fbank_args.jsonl'))
     @skipIfNoExec('compute-fbank-feats')
     def test_fbank(self, kwargs):
         """fbank should be numerically compatible with compute-fbank-feats"""
@@ -32,7 +32,7 @@ class Kaldi(TempDirMixin, TestBaseMixin):
         kaldi_result = run_kaldi(command, 'scp', wave_file)
         self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
 
-    @parameterized.expand(load_params('kaldi_test_spectrogram_args.json'))
+    @parameterized.expand(load_params('kaldi_test_spectrogram_args.jsonl'))
     @skipIfNoExec('compute-spectrogram-feats')
     def test_spectrogram(self, kwargs):
         """spectrogram should be numerically compatible with compute-spectrogram-feats"""
@@ -43,7 +43,7 @@ class Kaldi(TempDirMixin, TestBaseMixin):
         kaldi_result = run_kaldi(command, 'scp', wave_file)
         self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
 
-    @parameterized.expand(load_params('kaldi_test_mfcc_args.json'))
+    @parameterized.expand(load_params('kaldi_test_mfcc_args.jsonl'))
     @skipIfNoExec('compute-mfcc-feats')
     def test_mfcc(self, kwargs):
         """mfcc should be numerically compatible with compute-mfcc-feats"""
