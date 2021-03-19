@@ -5,7 +5,7 @@ from torchaudio_unittest import common_utils
 
 
 class Autograd(common_utils.TestBaseMixin):
-    def test_x_grad(self):
+    def test_lfilter_x(self):
         torch.random.manual_seed(2434)
         x = torch.rand(2, 4, 256 * 2, dtype=self.dtype, device=self.device)
         a = torch.tensor([0.7, 0.2, 0.6], dtype=self.dtype, device=self.device)
@@ -13,7 +13,7 @@ class Autograd(common_utils.TestBaseMixin):
         x.requires_grad = True
         assert gradcheck(F.lfilter, (x, a, b), eps=1e-10)
 
-    def test_a_grad(self):
+    def test_lfilter_a(self):
         torch.random.manual_seed(2434)
         x = torch.rand(2, 4, 256 * 2, dtype=self.dtype, device=self.device)
         a = torch.tensor([0.7, 0.2, 0.6], dtype=self.dtype, device=self.device)
@@ -21,7 +21,7 @@ class Autograd(common_utils.TestBaseMixin):
         a.requires_grad = True
         assert gradcheck(F.lfilter, (x, a, b), eps=1e-10)
 
-    def test_b_grad(self):
+    def test_lfilter_b(self):
         torch.random.manual_seed(2434)
         x = torch.rand(2, 4, 256 * 2, dtype=self.dtype, device=self.device)
         a = torch.tensor([0.7, 0.2, 0.6], dtype=self.dtype, device=self.device)
@@ -29,7 +29,7 @@ class Autograd(common_utils.TestBaseMixin):
         b.requires_grad = True
         assert gradcheck(F.lfilter, (x, a, b), eps=1e-10)
 
-    def test_all_grad(self):
+    def test_lfilter_all_inputs(self):
         torch.random.manual_seed(2434)
         x = torch.rand(2, 4, 256 * 2, dtype=self.dtype, device=self.device)
         a = torch.tensor([0.7, 0.2, 0.6], dtype=self.dtype, device=self.device)
