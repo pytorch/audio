@@ -1,5 +1,5 @@
 import math
-from typing import Optional, Union
+from typing import Optional
 
 import torch
 from torch import Tensor
@@ -11,9 +11,9 @@ def _dB2Linear(x: float) -> float:
     return math.exp(x * math.log(10) / 20.0)
 
 
-def _float2Tensor(x: float, dtype=None, device=None):
-    if type(x) is not Tensor:
-        return torch.tensor([x], device=device, dtype=dtype)
+def _float2Tensor(x: float, dtype: torch.dtype, device: torch.device):
+    if not isinstance(x, Tensor):
+        return torch.tensor(x, device=device, dtype=dtype)
     return x
 
 
@@ -72,7 +72,7 @@ def _generate_wave_table(
 
 
 def allpass_biquad(
-    waveform: Tensor, sample_rate: int, central_freq: Union[float, Tensor], Q: Union[float, Tensor] = 0.707
+    waveform: Tensor, sample_rate: int, central_freq: float, Q: float = 0.707
 ) -> Tensor:
     r"""Design two-pole all-pass filter.  Similar to SoX implementation.
 
@@ -91,8 +91,8 @@ def allpass_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    central_freq = _float2Tensor(central_freq, dtype, device)
-    Q = _float2Tensor(Q, dtype, device)
+    central_freq = _float2Tensor(central_freq, dtype, device).squeeze()
+    Q = _float2Tensor(Q, dtype, device).squeeze()
 
     w0 = 2 * math.pi * central_freq / sample_rate
 
@@ -110,8 +110,8 @@ def allpass_biquad(
 def band_biquad(
     waveform: Tensor,
     sample_rate: int,
-    central_freq: Union[float, Tensor],
-    Q: Union[float, Tensor] = 0.707,
+    central_freq: float,
+    Q: float = 0.707,
     noise: bool = False,
 ) -> Tensor:
     r"""Design two-pole band filter.  Similar to SoX implementation.
@@ -134,8 +134,8 @@ def band_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    central_freq = _float2Tensor(central_freq, dtype, device)
-    Q = _float2Tensor(Q, dtype, device)
+    central_freq = _float2Tensor(central_freq, dtype, device).squeeze()
+    Q = _float2Tensor(Q, dtype, device).squeeze()
 
     w0 = 2 * math.pi * central_freq / sample_rate
     bw_Hz = central_freq / Q
@@ -159,8 +159,8 @@ def band_biquad(
 def bandpass_biquad(
     waveform: Tensor,
     sample_rate: int,
-    central_freq: Union[float, Tensor],
-    Q: Union[float, Tensor] = 0.707,
+    central_freq: float,
+    Q: float = 0.707,
     const_skirt_gain: bool = False,
 ) -> Tensor:
     r"""Design two-pole band-pass filter.  Similar to SoX implementation.
@@ -182,8 +182,8 @@ def bandpass_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    central_freq = _float2Tensor(central_freq, dtype, device)
-    Q = _float2Tensor(Q, dtype, device)
+    central_freq = _float2Tensor(central_freq, dtype, device).squeeze()
+    Q = _float2Tensor(Q, dtype, device).squeeze()
 
     w0 = 2 * math.pi * central_freq / sample_rate
     alpha = torch.sin(w0) / 2 / Q
@@ -199,7 +199,7 @@ def bandpass_biquad(
 
 
 def bandreject_biquad(
-    waveform: Tensor, sample_rate: int, central_freq: Union[float, Tensor], Q: Union[float, Tensor] = 0.707
+    waveform: Tensor, sample_rate: int, central_freq: float, Q: float = 0.707
 ) -> Tensor:
     r"""Design two-pole band-reject filter.  Similar to SoX implementation.
 
@@ -218,8 +218,8 @@ def bandreject_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    central_freq = _float2Tensor(central_freq, dtype, device)
-    Q = _float2Tensor(Q, dtype, device)
+    central_freq = _float2Tensor(central_freq, dtype, device).squeeze()
+    Q = _float2Tensor(Q, dtype, device).squeeze()
 
     w0 = 2 * math.pi * central_freq / sample_rate
     alpha = torch.sin(w0) / 2 / Q
@@ -236,9 +236,9 @@ def bandreject_biquad(
 def bass_biquad(
     waveform: Tensor,
     sample_rate: int,
-    gain: Union[float, Tensor],
-    central_freq: Union[float, Tensor] = 100,
-    Q: Union[float, Tensor] = 0.707,
+    gain: float,
+    central_freq: float = 100,
+    Q: float = 0.707,
 ) -> Tensor:
     r"""Design a bass tone-control effect.  Similar to SoX implementation.
 
@@ -258,9 +258,9 @@ def bass_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    central_freq = _float2Tensor(central_freq, dtype, device)
-    Q = _float2Tensor(Q, dtype, device)
-    gain = _float2Tensor(gain, dtype, device)
+    central_freq = _float2Tensor(central_freq, dtype, device).squeeze()
+    Q = _float2Tensor(Q, dtype, device).squeeze()
+    gain = _float2Tensor(gain, dtype, device).squeeze()
 
     w0 = 2 * math.pi * central_freq / sample_rate
     alpha = torch.sin(w0) / 2 / Q
@@ -302,12 +302,12 @@ def biquad(
     device = waveform.device
     dtype = waveform.dtype
 
-    b0 = _float2Tensor(b0, dtype, device)
-    b1 = _float2Tensor(b1, dtype, device)
-    b2 = _float2Tensor(b2, dtype, device)
-    a0 = _float2Tensor(a0, dtype, device)
-    a1 = _float2Tensor(a1, dtype, device)
-    a2 = _float2Tensor(a2, dtype, device)
+    b0 = _float2Tensor(b0, dtype, device).view(1)
+    b1 = _float2Tensor(b1, dtype, device).view(1)
+    b2 = _float2Tensor(b2, dtype, device).view(1)
+    a0 = _float2Tensor(a0, dtype, device).view(1)
+    a1 = _float2Tensor(a1, dtype, device).view(1)
+    a2 = _float2Tensor(a2, dtype, device).view(1)
 
     output_waveform = lfilter(
         waveform,
@@ -614,9 +614,9 @@ def dither(
 def equalizer_biquad(
     waveform: Tensor,
     sample_rate: int,
-    center_freq: Union[float, Tensor],
-    gain: Union[float, Tensor],
-    Q: Union[float, Tensor] = 0.707,
+    center_freq: float,
+    gain: float,
+    Q: float = 0.707,
 ) -> Tensor:
     r"""Design biquad peaking equalizer filter and perform filtering.  Similar to SoX implementation.
 
@@ -632,9 +632,9 @@ def equalizer_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    center_freq = _float2Tensor(center_freq, dtype, device)
-    Q = _float2Tensor(Q, dtype, device)
-    gain = _float2Tensor(gain, dtype, device)
+    center_freq = _float2Tensor(center_freq, dtype, device).squeeze()
+    Q = _float2Tensor(Q, dtype, device).squeeze()
+    gain = _float2Tensor(gain, dtype, device).squeeze()
 
     w0 = 2 * math.pi * center_freq / sample_rate
     A = torch.exp(gain / 40.0 * math.log(10))
@@ -829,7 +829,7 @@ def gain(waveform: Tensor, gain_db: float = 1.0) -> Tensor:
 
 
 def highpass_biquad(
-    waveform: Tensor, sample_rate: int, cutoff_freq: Union[float, Tensor], Q: Union[float, Tensor] = 0.707
+    waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707
 ) -> Tensor:
     r"""Design biquad highpass filter and perform filtering.  Similar to SoX implementation.
 
@@ -844,8 +844,8 @@ def highpass_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    cutoff_freq = _float2Tensor(cutoff_freq, dtype, device)
-    Q = _float2Tensor(Q, dtype, device)
+    cutoff_freq = _float2Tensor(cutoff_freq, dtype, device).squeeze()
+    Q = _float2Tensor(Q, dtype, device).squeeze()
 
     w0 = 2 * math.pi * cutoff_freq / sample_rate
     alpha = torch.sin(w0) / 2.0 / Q
@@ -968,7 +968,7 @@ def lfilter(
 
 
 def lowpass_biquad(
-    waveform: Tensor, sample_rate: int, cutoff_freq: Union[float, Tensor], Q: Union[float, Tensor] = 0.707
+    waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707
 ) -> Tensor:
     r"""Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.
 
@@ -983,8 +983,8 @@ def lowpass_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    cutoff_freq = _float2Tensor(cutoff_freq, dtype, device)
-    Q = _float2Tensor(Q, dtype, device)
+    cutoff_freq = _float2Tensor(cutoff_freq, dtype, device).squeeze()
+    Q = _float2Tensor(Q, dtype, device).squeeze()
 
     w0 = 2 * math.pi * cutoff_freq / sample_rate
     alpha = torch.sin(w0) / 2 / Q
@@ -1223,9 +1223,9 @@ def riaa_biquad(waveform: Tensor, sample_rate: int) -> Tensor:
 def treble_biquad(
     waveform: Tensor,
     sample_rate: int,
-    gain: Union[float, Tensor],
-    central_freq: Union[float, Tensor] = 3000,
-    Q: Union[float, Tensor] = 0.707,
+    gain: float,
+    central_freq: float = 3000,
+    Q: float = 0.707,
 ) -> Tensor:
     r"""Design a treble tone-control effect.  Similar to SoX implementation.
 
@@ -1245,9 +1245,9 @@ def treble_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    central_freq = _float2Tensor(central_freq, dtype, device)
-    Q = _float2Tensor(Q, dtype, device)
-    ga = _float2Tensor(gain, dtype, device)
+    central_freq = _float2Tensor(central_freq, dtype, device).squeeze()
+    Q = _float2Tensor(Q, dtype, device).squeeze()
+    gain = _float2Tensor(gain, dtype, device).squeeze()
 
     w0 = 2 * math.pi * central_freq / sample_rate
     alpha = torch.sin(w0) / 2 / Q
