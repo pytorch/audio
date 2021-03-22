@@ -29,3 +29,8 @@ Functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: mfcc
+
+:hidden:`resample_waveform`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: resample_waveform

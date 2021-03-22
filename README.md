@@ -24,7 +24,7 @@ to use and feel like a natural extension.
 - Common audio transforms
     - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/stable/transforms.html)
 - Compliance interfaces: Run code using PyTorch that align with other libraries
-    - [Kaldi: spectrogram, fbank, mfcc](https://pytorch.org/audio/stable/compliance.kaldi.html)
+    - [Kaldi: spectrogram, fbank, mfcc, resample_waveform](https://pytorch.org/audio/stable/compliance.kaldi.html)
 
 Dependencies
 ------------

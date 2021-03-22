@@ -3,7 +3,6 @@ import math
 
 import torch
 import torchaudio
-import torchaudio.functional as F
 import torchaudio.compliance.kaldi as kaldi
 
 from torchaudio_unittest import common_utils
@@ -179,21 +178,21 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
 
     def test_resample_waveform(self):
         def get_output_fn(sound, args):
-            output = F.resample(sound.to(torch.float32), args[1], args[2])
+            output = kaldi.resample_waveform(sound.to(torch.float32), args[1], args[2])
             return output
 
         self._compliance_test_helper(self.test2_filepath, 'resample', 32, 3, get_output_fn, atol=1e-2, rtol=1e-5)
 
     def test_resample_waveform_upsample_size(self):
-        upsample_sound = F.resample(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr * 2)
+        upsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr * 2)
         self.assertTrue(upsample_sound.size(-1) == self.test1_signal.size(-1) * 2)
 
     def test_resample_waveform_downsample_size(self):
-        downsample_sound = F.resample(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr // 2)
+        downsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr // 2)
         self.assertTrue(downsample_sound.size(-1) == self.test1_signal.size(-1) // 2)
 
     def test_resample_waveform_identity_size(self):
-        downsample_sound = F.resample(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr)
+        downsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr)
         self.assertTrue(downsample_sound.size(-1) == self.test1_signal.size(-1))
 
     def _test_resample_waveform_accuracy(self, up_scale_factor=None, down_scale_factor=None,
@@ -213,7 +212,7 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
         original_timestamps = torch.arange(0, duration, 1.0 / sample_rate)
 
         sound = 123 * torch.cos(2 * math.pi * 3 * original_timestamps).unsqueeze(0)
-        estimate = F.resample(sound, sample_rate, new_sample_rate).squeeze()
+        estimate = kaldi.resample_waveform(sound, sample_rate, new_sample_rate).squeeze()
 
         new_timestamps = torch.arange(0, duration, 1.0 / new_sample_rate)[:estimate.size(0)]
         ground_truth = 123 * torch.cos(2 * math.pi * 3 * new_timestamps)
@@ -240,11 +239,11 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
         for i in range(num_channels):
             multi_sound[i, :] *= (i + 1) * 1.5
 
-        multi_sound_sampled = F.resample(multi_sound, self.test1_signal_sr, self.test1_signal_sr // 2)
+        multi_sound_sampled = kaldi.resample_waveform(multi_sound, self.test1_signal_sr, self.test1_signal_sr // 2)
 
         # check that sampling is same whether using separately or in a tensor of size (c, n)
         for i in range(num_channels):
             single_channel = self.test1_signal * (i + 1) * 1.5
-            single_channel_sampled = F.resample(single_channel, self.test1_signal_sr,
-                                                self.test1_signal_sr // 2)
+            single_channel_sampled = kaldi.resample_waveform(single_channel, self.test1_signal_sr,
+                                                             self.test1_signal_sr // 2)
             self.assertEqual(multi_sound_sampled[i, :], single_channel_sampled[0], rtol=1e-4, atol=1e-7)
