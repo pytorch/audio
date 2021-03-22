@@ -120,13 +120,13 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         lr_upsampled = librosa.resample(waveform.squeeze(0).numpy(), sample_rate, upsample_rate)
         lr_upsampled = torch.from_numpy(lr_upsampled).unsqueeze(0)
 
-        self.assertEqual(ta_upsampled, lr_upsampled, atol=1e-4, rtol=1e-5)
+        self.assertEqual(ta_upsampled, lr_upsampled, atol=1e-2, rtol=1e-5)
 
         ta_downsampled = F.resample(waveform, sample_rate, downsample_rate)
         lr_downsampled = librosa.resample(waveform.squeeze(0).numpy(), sample_rate, downsample_rate)
         lr_downsampled = torch.from_numpy(lr_downsampled).unsqueeze(0)
 
-        self.assertEqual(ta_downsampled, lr_downsampled, atol=1e-4, rtol=1e-5)
+        self.assertEqual(ta_downsampled, lr_downsampled, atol=1e-2, rtol=1e-5)
 
 
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
