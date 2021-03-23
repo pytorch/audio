@@ -1610,6 +1610,38 @@ frequency values, weighted by their magnitude.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="resample">
+<h3><span class="hidden-section">resample</span><a class="headerlink" href="#resample" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.resample">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">resample</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">orig_freq: float</em>, <em class="sig-param">new_freq: float</em>, <em class="sig-param">lowpass_filter_width: int = 6</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.resample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resamples the waveform at the new frequency. This matches Kaldi’s OfflineFeatureTpl ResampleWaveform
+which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
+a signal). LinearResample (LR) means that the output signal is at linearly spaced intervals (i.e
+the output signal has a frequency of <code class="docutils literal notranslate"><span class="pre">new_freq</span></code>). It uses sinc/bandlimited interpolation to
+upsample/downsample the signal.</p>
+<p><a class="reference external" href="https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html">https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html</a>
+<a class="reference external" href="https://github.com/kaldi-asr/kaldi/blob/master/src/feat/resample.h#L56">https://github.com/kaldi-asr/kaldi/blob/master/src/feat/resample.h#L56</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>waveform</strong> (<em>Tensor</em>) – The input signal of dimension (…, time)</p></li>
+<li><p><strong>orig_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The original frequency of the signal</p></li>
+<li><p><strong>new_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The desired frequency</p></li>
+<li><p><strong>lowpass_filter_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Controls the sharpness of the filter, more == sharper
+but less efficient. We suggest around 4 to 10 for normal use. (Default: <code class="docutils literal notranslate"><span class="pre">6</span></code>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The waveform at the new frequency of dimension (…, time).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 </div>
 
@@ -1708,6 +1740,7 @@ frequency values, weighted by their magnitude.</p>
 <li><a class="reference internal" href="#sliding-window-cmn"><span class="hidden-section">sliding_window_cmn</span></a></li>
 <li><a class="reference internal" href="#compute-kaldi-pitch"><span class="hidden-section">compute_kaldi_pitch</span></a></li>
 <li><a class="reference internal" href="#spectral-centroid"><span class="hidden-section">spectral_centroid</span></a></li>
+<li><a class="reference internal" href="#resample"><span class="hidden-section">resample</span></a></li>
 </ul>
 </li>
 </ul>

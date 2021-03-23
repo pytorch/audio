@@ -303,7 +303,6 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">import</span> <span class="nn">torchaudio._internal.fft</span>
@@ -1053,71 +1052,16 @@
     <span class="k">return</span> <span class="n">feature</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_sinc_resample_kernel</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                              <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="n">lowpass_filter_width</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="n">kernels</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">base_freq</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">)</span>
-    <span class="c1"># This will perform antialiasing filtering by removing the highest frequencies.</span>
-    <span class="c1"># At first I thought I only needed this when downsampling, but when upsampling</span>
-    <span class="c1"># you will get edge artifacts without this, as the edge is equivalent to zero padding,</span>
-    <span class="c1"># which will add high freq artifacts.</span>
-    <span class="n">base_freq</span> <span class="o">*=</span> <span class="mf">0.99</span>
-
-    <span class="c1"># The key idea of the algorithm is that x(t) can be exactly reconstructed from x[i] (tensor)</span>
-    <span class="c1"># using the sinc interpolation formula:</span>
-    <span class="c1">#   x(t) = sum_i x[i] sinc(pi * orig_freq * (i / orig_freq - t))</span>
-    <span class="c1"># We can then sample the function x(t) with a different sample rate:</span>
-    <span class="c1">#    y[j] = x(j / new_freq)</span>
-    <span class="c1"># or,</span>
-    <span class="c1">#    y[j] = sum_i x[i] sinc(pi * orig_freq * (i / orig_freq - j / new_freq))</span>
-
-    <span class="c1"># We see here that y[j] is the convolution of x[i] with a specific filter, for which</span>
-    <span class="c1"># we take an FIR approximation, stopping when we see at least `lowpass_filter_width` zeros crossing.</span>
-    <span class="c1"># But y[j+1] is going to have a different set of weights and so on, until y[j + new_freq].</span>
-    <span class="c1"># Indeed:</span>
-    <span class="c1"># y[j + new_freq] = sum_i x[i] sinc(pi * orig_freq * ((i / orig_freq - (j + new_freq) / new_freq))</span>
-    <span class="c1">#                 = sum_i x[i] sinc(pi * orig_freq * ((i - orig_freq) / orig_freq - j / new_freq))</span>
-    <span class="c1">#                 = sum_i x[i + orig_freq] sinc(pi * orig_freq * (i / orig_freq - j / new_freq))</span>
-    <span class="c1"># so y[j+new_freq] uses the same filter as y[j], but on a shifted version of x by `orig_freq`.</span>
-    <span class="c1"># This will explain the F.conv1d after, with a stride of orig_freq.</span>
-    <span class="n">width</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">lowpass_filter_width</span> <span class="o">*</span> <span class="n">orig_freq</span> <span class="o">/</span> <span class="n">base_freq</span><span class="p">)</span>
-    <span class="c1"># If orig_freq is still big after GCD reduction, most filters will be very unbalanced, i.e.,</span>
-    <span class="c1"># they will have a lot of almost zero values to the left or to the right...</span>
-    <span class="c1"># There is probably a way to evaluate those filters more efficiently, but this is kept for</span>
-    <span class="c1"># future work.</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">width</span><span class="p">,</span> <span class="n">width</span> <span class="o">+</span> <span class="n">orig_freq</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">new_freq</span><span class="p">):</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">i</span> <span class="o">/</span> <span class="n">new_freq</span> <span class="o">+</span> <span class="n">idx</span> <span class="o">/</span> <span class="n">orig_freq</span><span class="p">)</span> <span class="o">*</span> <span class="n">base_freq</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="o">-</span><span class="n">lowpass_filter_width</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">)</span>
-        <span class="n">t</span> <span class="o">*=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
-        <span class="c1"># we do not use torch.hann_window here as we need to evaluate the window</span>
-        <span class="c1"># at specific positions, not over a regular grid.</span>
-        <span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span> <span class="o">/</span> <span class="n">lowpass_filter_width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
-        <span class="n">kernel</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">t</span><span class="p">)</span>
-        <span class="n">kernel</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
-        <span class="n">kernels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
-
-    <span class="n">scale</span> <span class="o">=</span> <span class="n">base_freq</span> <span class="o">/</span> <span class="n">orig_freq</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">kernels</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">new_freq</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">scale</span><span class="p">),</span> <span class="n">width</span>
-
-
 <div class="viewcode-block" id="resample_waveform"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.resample_waveform">[docs]</a><span class="k">def</span> <span class="nf">resample_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
                       <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
                       <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
                       <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency. This matches Kaldi&#39;s OfflineFeatureTpl ResampleWaveform</span>
-<span class="sd">    which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample</span>
-<span class="sd">    a signal). LinearResample (LR) means that the output signal is at linearly spaced intervals (i.e</span>
-<span class="sd">    the output signal has a frequency of ``new_freq``). It uses sinc/bandlimited interpolation to</span>
-<span class="sd">    upsample/downsample the signal.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency.</span>
 
-<span class="sd">    https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html</span>
-<span class="sd">    https://github.com/kaldi-asr/kaldi/blob/master/src/feat/resample.h#L56</span>
+<span class="sd">    This is a wrapper around ``torchaudio.functional.resample``.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        waveform (Tensor): The input signal of size (c, n)</span>
+<span class="sd">        waveform (Tensor): The input signal of size (..., time)</span>
 <span class="sd">        orig_freq (float): The original frequency of the signal</span>
 <span class="sd">        new_freq (float): The desired frequency</span>
 <span class="sd">        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper</span>
@@ -1126,24 +1070,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: The waveform at the new frequency</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span>
-    <span class="k">assert</span> <span class="n">orig_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">new_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
-
-    <span class="n">orig_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span>
-    <span class="n">new_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span>
-    <span class="n">gcd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">)</span>
-    <span class="n">orig_freq</span> <span class="o">=</span> <span class="n">orig_freq</span> <span class="o">//</span> <span class="n">gcd</span>
-    <span class="n">new_freq</span> <span class="o">=</span> <span class="n">new_freq</span> <span class="o">//</span> <span class="n">gcd</span>
-
-    <span class="n">kernel</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">_get_sinc_resample_kernel</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">,</span>
-                                              <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-
-    <span class="n">num_wavs</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">waveform</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">width</span> <span class="o">+</span> <span class="n">orig_freq</span><span class="p">))</span>
-    <span class="n">resampled</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span><span class="n">waveform</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">orig_freq</span><span class="p">)</span>
-    <span class="n">resampled</span> <span class="o">=</span> <span class="n">resampled</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_wavs</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">target_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">new_freq</span> <span class="o">*</span> <span class="n">length</span> <span class="o">/</span> <span class="n">orig_freq</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">resampled</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">target_length</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">)</span></div>
 </pre></div>
 
              </article>
