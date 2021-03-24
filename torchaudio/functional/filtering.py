@@ -91,8 +91,8 @@ def allpass_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    central_freq = _float2Tensor(central_freq, dtype, device).squeeze()
-    Q = _float2Tensor(Q, dtype, device).squeeze()
+    central_freq = _float2Tensor(central_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
 
     w0 = 2 * math.pi * central_freq / sample_rate
 
@@ -134,8 +134,8 @@ def band_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    central_freq = _float2Tensor(central_freq, dtype, device).squeeze()
-    Q = _float2Tensor(Q, dtype, device).squeeze()
+    central_freq = _float2Tensor(central_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
 
     w0 = 2 * math.pi * central_freq / sample_rate
     bw_Hz = central_freq / Q
@@ -182,8 +182,8 @@ def bandpass_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    central_freq = _float2Tensor(central_freq, dtype, device).squeeze()
-    Q = _float2Tensor(Q, dtype, device).squeeze()
+    central_freq = _float2Tensor(central_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
 
     w0 = 2 * math.pi * central_freq / sample_rate
     alpha = torch.sin(w0) / 2 / Q
@@ -218,8 +218,8 @@ def bandreject_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    central_freq = _float2Tensor(central_freq, dtype, device).squeeze()
-    Q = _float2Tensor(Q, dtype, device).squeeze()
+    central_freq = _float2Tensor(central_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
 
     w0 = 2 * math.pi * central_freq / sample_rate
     alpha = torch.sin(w0) / 2 / Q
@@ -258,9 +258,9 @@ def bass_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    central_freq = _float2Tensor(central_freq, dtype, device).squeeze()
-    Q = _float2Tensor(Q, dtype, device).squeeze()
-    gain = _float2Tensor(gain, dtype, device).squeeze()
+    central_freq = _float2Tensor(central_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
+    gain = _float2Tensor(gain, dtype, device)
 
     w0 = 2 * math.pi * central_freq / sample_rate
     alpha = torch.sin(w0) / 2 / Q
@@ -632,9 +632,9 @@ def equalizer_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    center_freq = _float2Tensor(center_freq, dtype, device).squeeze()
-    Q = _float2Tensor(Q, dtype, device).squeeze()
-    gain = _float2Tensor(gain, dtype, device).squeeze()
+    center_freq = _float2Tensor(center_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
+    gain = _float2Tensor(gain, dtype, device)
 
     w0 = 2 * math.pi * center_freq / sample_rate
     A = torch.exp(gain / 40.0 * math.log(10))
@@ -844,8 +844,8 @@ def highpass_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    cutoff_freq = _float2Tensor(cutoff_freq, dtype, device).squeeze()
-    Q = _float2Tensor(Q, dtype, device).squeeze()
+    cutoff_freq = _float2Tensor(cutoff_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
 
     w0 = 2 * math.pi * cutoff_freq / sample_rate
     alpha = torch.sin(w0) / 2.0 / Q
@@ -983,8 +983,8 @@ def lowpass_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    cutoff_freq = _float2Tensor(cutoff_freq, dtype, device).squeeze()
-    Q = _float2Tensor(Q, dtype, device).squeeze()
+    cutoff_freq = _float2Tensor(cutoff_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
 
     w0 = 2 * math.pi * cutoff_freq / sample_rate
     alpha = torch.sin(w0) / 2 / Q
@@ -1245,9 +1245,9 @@ def treble_biquad(
     """
     dtype = waveform.dtype
     device = waveform.device
-    central_freq = _float2Tensor(central_freq, dtype, device).squeeze()
-    Q = _float2Tensor(Q, dtype, device).squeeze()
-    gain = _float2Tensor(gain, dtype, device).squeeze()
+    central_freq = _float2Tensor(central_freq, dtype, device)
+    Q = _float2Tensor(Q, dtype, device)
+    gain = _float2Tensor(gain, dtype, device)
 
     w0 = 2 * math.pi * central_freq / sample_rate
     alpha = torch.sin(w0) / 2 / Q
