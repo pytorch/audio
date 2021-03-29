@@ -18,6 +18,14 @@ endif()
 
 project(torchaudio)
 
+# Find the HIP package, set the HIP paths, load the HIP CMake.
+if(USE_ROCM)
+  include(cmake/LoadHIP.cmake)
+  if(NOT PYTORCH_FOUND_HIP)
+    set(USE_ROCM OFF)
+  endif()
+endif()
+
 # check and set CMAKE_CXX_STANDARD
 string(FIND "${CMAKE_CXX_FLAGS}" "-std=c++" env_cxx_standard)
 if(env_cxx_standard GREATER -1)

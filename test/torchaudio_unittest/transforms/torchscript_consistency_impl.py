@@ -4,6 +4,9 @@ import torch
 import torchaudio.transforms as T
 
 from torchaudio_unittest import common_utils
+from torchaudio_unittest.common_utils import (
+   skipCUDAIfRocm,
+)
 
 
 class Transforms(common_utils.TestBaseMixin):
@@ -21,6 +24,7 @@ class Transforms(common_utils.TestBaseMixin):
         tensor = torch.rand((1, 1000))
         self._assert_consistency(T.Spectrogram(), tensor)
 
+    @skipCUDAIfRocm
     def test_GriffinLim(self):
         tensor = torch.rand((1, 201, 6))
         self._assert_consistency(T.GriffinLim(length=1000, rand_init=False), tensor)
