@@ -9,6 +9,8 @@ from torchaudio_unittest.common_utils import (
     get_asset_path,
     sox_utils,
     load_wav,
+    save_wav,
+    get_whitenoise,
 )
 
 
@@ -23,6 +25,14 @@ class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase):
     def assert_sox_effect(self, result, input_path, effects, atol=1e-04, rtol=1e-5):
         expected, _ = self.run_sox_effect(input_path, effects)
         self.assertEqual(result, expected, atol=atol, rtol=rtol)
+
+    def get_whitenoise(self, sample_rate=8000):
+        noise = get_whitenoise(
+            sample_rate=sample_rate, duration=3, scale_factor=0.9,
+        )
+        path = self.get_temp_path("whitenoise.wav")
+        save_wav(path, noise, sample_rate)
+        return noise, path
 
     @parameterized.expand([
         ('q', 'quarter_sine'),
