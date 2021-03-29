@@ -37,7 +37,7 @@ def _get_build(var, default=False):
 _BUILD_SOX = False if platform.system() == 'Windows' else _get_build("BUILD_SOX")
 _BUILD_KALDI = False if platform.system() == 'Windows' else _get_build("BUILD_KALDI", True)
 _BUILD_TRANSDUCER = _get_build("BUILD_TRANSDUCER")
-_USE_ROCM= _get_build("USE_ROCM")
+_USE_ROCM = _get_build("USE_ROCM")
 
 
 def get_ext_modules():
