@@ -5,7 +5,7 @@ import torchaudio.transforms as T
 
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
-   skipCUDAIfRocm,
+    skipCUDAIfRocm,
 )
 
 
