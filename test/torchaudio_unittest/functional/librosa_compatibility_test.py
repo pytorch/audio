@@ -14,7 +14,7 @@ if LIBROSA_AVAILABLE:
     import librosa
 
 from torchaudio_unittest import common_utils
-from torcahduio_unittest.common_utils import (
+from torchaudio_unittest.common_utils import (
     nested_params,
 )
 
