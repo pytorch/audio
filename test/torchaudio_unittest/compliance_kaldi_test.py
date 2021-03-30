@@ -47,7 +47,6 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
 
 @common_utils.skipIfNoSox
 class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
-    backend = 'sox_io'
 
     kaldi_output_dir = common_utils.get_asset_path('kaldi')
     test_filepath = common_utils.get_asset_path('kaldi_file.wav')
@@ -113,7 +112,7 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
         # clear the last 16 bits because they aren't used anyways
         y = ((y >> 16) << 16).float()
         torchaudio.save(self.test_filepath, y, sr)
-        sound, sample_rate = torchaudio.load(self.test_filepath, normalization=False)
+        sound, sample_rate = common_utils.load_wav(self.test_filepath, normalize=False)
         print(y >> 16)
         self.assertTrue(sample_rate == sr)
         self.assertEqual(y, sound)
