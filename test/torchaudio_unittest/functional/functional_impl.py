@@ -103,6 +103,7 @@ class FunctionalComplex(common_utils.TestBaseMixin):
         [True, False],
     )
     def test_phase_vocoder_shape(self, rate, test_pseudo_complex):
+        """Verify the output shape of phase vocoder"""
         hop_length = 256
         num_freq = 1025
         num_frames = 400

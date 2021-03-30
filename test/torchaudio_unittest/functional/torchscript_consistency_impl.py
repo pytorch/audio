@@ -3,6 +3,7 @@ import unittest
 
 import torch
 import torchaudio.functional as F
+from parameterized import parameterized
 
 from torchaudio_unittest import common_utils
 
@@ -565,33 +566,32 @@ class FunctionalComplex:
     real_dtype = None
     device = None
 
-    def _assert_consistency(self, func, tensor):
+    def _assert_consistency(self, func, tensor, test_pseudo_complex=False):
         tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
         ts_func = torch.jit.script(func)
 
-        # on complex dtype
+        if test_pseudo_complex:
+            tensor = torch.view_as_real(tensor)
         output = func(tensor)
         ts_output = ts_func(tensor)
         self.assertEqual(ts_output, output)
 
-        # on pseudo complex dtype
-        tensor = torch.view_as_real(tensor)
-        output = func(tensor)
-        ts_output = ts_func(tensor)
-        self.assertEqual(ts_output, output)
+    @parameterized.expand([(True, ), (False, )])
+    def test_phase_vocoder(self, test_paseudo_complex):
+        def func(tensor):
+            is_complex = tensor.is_complex()
 
-    def test_phase_vocoder(self):
-        def func(tensor, device: torch.device = self.device):
-            n_freq = tensor.size(-2 if tensor.is_complex() else -3)
+            n_freq = tensor.size(-2 if is_complex else -3)
             rate = 0.5
             hop_length = 256
             phase_advance = torch.linspace(
                 0,
                 3.14 * hop_length,
                 n_freq,
-                dtype=torch.float64,
-            ).to(device)[..., None]
+                dtype=(torch.real(tensor) if is_complex else tensor).dtype,
+                device=tensor.device,
+            )[..., None]
             return F.phase_vocoder(tensor, rate, phase_advance)
 
         tensor = torch.randn(2, 1025, 400)
-        self._assert_consistency(func, tensor)
+        self._assert_consistency(func, tensor, test_paseudo_complex)
