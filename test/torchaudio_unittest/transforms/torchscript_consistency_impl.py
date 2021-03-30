@@ -2,6 +2,7 @@
 
 import torch
 import torchaudio.transforms as T
+from parameterized import parameterized
 
 from torchaudio_unittest import common_utils
 
@@ -97,6 +98,7 @@ class TransformsComplex:
     device = None
 
     def _assert_consistency(self, transform, tensor, test_pseudo_complex=False):
+        assert tensor.is_complex()
         tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
         transform = transform.to(device=self.device, dtype=self.real_dtype)
         ts_transform = torch.jit.script(transform)
@@ -108,7 +110,8 @@ class TransformsComplex:
         ts_output = ts_transform(tensor)
         self.assertEqual(ts_output, output)
 
-    def test_TimeStretch(self):
+    @parameterized.expand([(True, ), (False, )])
+    def test_TimeStretch(self, test_pseudo_complex):
         n_freq = 400
         hop_length = 512
         fixed_rate = 1.3
@@ -116,15 +119,5 @@ class TransformsComplex:
         self._assert_consistency(
             T.TimeStretch(n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate),
             tensor,
-        )
-
-    def test_TimeStretch_paseudo_complex(self):
-        n_freq = 400
-        hop_length = 512
-        fixed_rate = 1.3
-        tensor = torch.view_as_complex(torch.rand((10, 2, n_freq, 10, 2)))
-        self._assert_consistency(
-            T.TimeStretch(n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate),
-            tensor,
-            test_pseudo_complex=True
+            test_pseudo_complex
         )

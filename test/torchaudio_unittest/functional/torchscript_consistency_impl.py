@@ -567,6 +567,7 @@ class FunctionalComplex:
     device = None
 
     def _assert_consistency(self, func, tensor, test_pseudo_complex=False):
+        assert tensor.is_complex()
         tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
         ts_func = torch.jit.script(func)
 
@@ -593,5 +594,5 @@ class FunctionalComplex:
             )[..., None]
             return F.phase_vocoder(tensor, rate, phase_advance)
 
-        tensor = torch.randn(2, 1025, 400)
+        tensor = torch.view_as_complex(torch.randn(2, 1025, 400, 2))
         self._assert_consistency(func, tensor, test_paseudo_complex)
