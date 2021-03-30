@@ -1,6 +1,7 @@
 """Test numerical consistency among single input and batched input."""
 import torch
 import torchaudio
+from parameterized import parameterized
 
 from torchaudio_unittest import common_utils
 
@@ -130,49 +131,33 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         computed = torchaudio.transforms.MFCC()(waveform.repeat(3, 1, 1))
         self.assertEqual(computed, expected, atol=1e-4, rtol=1e-5)
 
-    def _assert_batch_TimeStretch(self, complex):
-        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
-
+    @parameterized.expand([(True, ), (False, )])
+    def test_batch_TimeStretch(self, test_pseudo_complex):
         rate = 2
+        num_freq = 1025
+        num_frames = 400
 
-        complex_specgrams = torch.stft(
-            input=waveform,
-            n_fft=2048,
-            hop_length=512,
-            win_length=2048,
-            window=torch.hann_window(2048),
-            center=True,
-            pad_mode='reflect',
-            normalized=True,
-            onesided=True,
-            return_complex=True,
-        )
-
-        if not complex:
-            complex_specgrams = torch.view_as_real(complex_specgrams)
+        spec = torch.randn(num_freq, num_frames, dtype=torch.complex64)
+        pattern = [3, 1, 1, 1]
+        if test_pseudo_complex:
+            spec = torch.view_as_real(spec)
+            pattern += [1]
 
         # Single then transform then batch
         expected = torchaudio.transforms.TimeStretch(
             fixed_rate=rate,
-            n_freq=1025,
+            n_freq=num_freq,
             hop_length=512,
-        )(complex_specgrams).repeat(3, 1, 1, 1, 1)
+        )(spec).repeat(*pattern)
 
         # Batch then transform
         computed = torchaudio.transforms.TimeStretch(
             fixed_rate=rate,
-            n_freq=1025,
+            n_freq=num_freq,
             hop_length=512,
-        )(complex_specgrams.repeat(3, 1, 1, 1, 1))
+        )(spec.repeat(*pattern))
 
         self.assertEqual(computed, expected, atol=1e-5, rtol=1e-5)
-
-    def test_batch_TimeStretch_complex(self):
-        self._assert_batch_TimeStretch(complex=True)
-
-    def test_batch_TimeStretch_paseudo_complex(self):
-        self._assert_batch_TimeStretch(complex=False)
 
     def test_batch_Fade(self):
         test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
