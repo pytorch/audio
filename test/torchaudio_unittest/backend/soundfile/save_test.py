@@ -11,7 +11,7 @@ from torchaudio_unittest.common_utils import (
     get_wav_data,
     load_wav,
     nested_params,
-    skipCUDAIfRocm,
+    skipIfRocm,
 )
 from .common import (
     fetch_wav_subtype,
@@ -281,7 +281,7 @@ class TestFileObject(TempDirMixin, PytorchTestCase):
         self._test_fileobj('wav')
 
     @skipIfFormatNotSupported("FLAC")
-    @skipCUDAIfRocm
+    @skipIfRocm
     def test_fileobj_flac(self):
         """Saving audio via file-like object works"""
         self._test_fileobj('flac')

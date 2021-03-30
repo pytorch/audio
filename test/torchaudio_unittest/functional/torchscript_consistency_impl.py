@@ -6,7 +6,7 @@ import torchaudio.functional as F
 
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
-    skipCUDAIfRocm,
+    skipIfRocm,
 )
 
 
@@ -37,7 +37,7 @@ class Functional(common_utils.TestBaseMixin):
         tensor = common_utils.get_whitenoise()
         self._assert_consistency(func, tensor)
 
-    @skipCUDAIfRocm
+    @skipIfRocm
     def test_griffinlim(self):
         def func(tensor):
             n_fft = 400
