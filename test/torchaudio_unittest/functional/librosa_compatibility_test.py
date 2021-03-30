@@ -14,6 +14,9 @@ if LIBROSA_AVAILABLE:
     import librosa
 
 from torchaudio_unittest import common_utils
+from torcahduio_unittest.common_utils import (
+    nested_params,
+)
 
 
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
@@ -130,7 +133,11 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
 class TestFunctionalComplex(common_utils.TorchaudioTestCase):
-    def _test_phase_vocoder(self, rate, test_pseudo_complex=False):
+    @nested_params(
+        [0.5, 1.01, 1.3],
+        [True, False],
+    )
+    def test_phase_vocoder(self, rate, test_pseudo_complex):
         hop_length = 256
         num_freq = 1025
         num_frames = 400
@@ -158,15 +165,3 @@ class TestFunctionalComplex(common_utils.TorchaudioTestCase):
         self.assertEqual(
             torch.view_as_complex(stretched) if test_pseudo_complex else stretched,
             torch.from_numpy(expected_stretched))
-
-    @parameterized.expand(
-        [(0.5, ), (1.01, ), (1.3, ), ],
-    )
-    def test_phase_vocoder(self, rate):
-        self._test_phase_vocoder(rate)
-
-    @parameterized.expand(
-        [(0.5, ), (1.01, ), (1.3, ), ],
-    )
-    def test_phase_vocoder_pseudo_complex(self, rate):
-        self._test_phase_vocoder(rate, test_pseudo_complex=True)
