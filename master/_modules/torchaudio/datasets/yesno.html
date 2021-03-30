@@ -316,7 +316,7 @@
     <span class="s2">&quot;release1&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;folder_in_archive&quot;</span><span class="p">:</span> <span class="s2">&quot;waves_yesno&quot;</span><span class="p">,</span>
         <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.openslr.org/resources/1/waves_yesno.tar.gz&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;30301975fd8c5cac4040c261c0852f57cfa8adbbad2ce78e77e4986957445f27&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;c3f49e0cca421f96b75b41640749167b52118f232498667ca7a5f9416aef8e73&quot;</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
@@ -354,7 +354,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">archive</span><span class="p">):</span>
                     <span class="n">checksum</span> <span class="o">=</span> <span class="n">_RELEASE_CONFIGS</span><span class="p">[</span><span class="s2">&quot;release1&quot;</span><span class="p">][</span><span class="s2">&quot;checksum&quot;</span><span class="p">]</span>
-                    <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;md5&quot;</span><span class="p">)</span>
+                    <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">hash_value</span><span class="o">=</span><span class="n">checksum</span><span class="p">)</span>
                 <span class="n">extract_archive</span><span class="p">(</span><span class="n">archive</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">):</span>
