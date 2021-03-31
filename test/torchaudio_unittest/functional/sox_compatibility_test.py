@@ -2,7 +2,7 @@ import torch
 import torchaudio.functional as F
 
 from torchaudio_unittest.common_utils import (
-    skipIfNoSoxBackend,
+    skipIfNoSox,
     skipIfNoExec,
     TempDirMixin,
     TorchaudioTestCase,
@@ -14,7 +14,7 @@ from torchaudio_unittest.common_utils import (
 )
 
 
-@skipIfNoSoxBackend
+@skipIfNoSox
 @skipIfNoExec('sox')
 class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase):
     def run_sox_effect(self, input_file, effect):

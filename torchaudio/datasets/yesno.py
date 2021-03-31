@@ -16,7 +16,7 @@ _RELEASE_CONFIGS = {
     "release1": {
         "folder_in_archive": "waves_yesno",
         "url": "http://www.openslr.org/resources/1/waves_yesno.tar.gz",
-        "checksum": "30301975fd8c5cac4040c261c0852f57cfa8adbbad2ce78e77e4986957445f27",
+        "checksum": "c3f49e0cca421f96b75b41640749167b52118f232498667ca7a5f9416aef8e73",
     }
 }
 
@@ -54,7 +54,7 @@ class YESNO(Dataset):
             if not os.path.isdir(self._path):
                 if not os.path.isfile(archive):
                     checksum = _RELEASE_CONFIGS["release1"]["checksum"]
-                    download_url(url, root, hash_value=checksum, hash_type="md5")
+                    download_url(url, root, hash_value=checksum)
                 extract_archive(archive)
 
         if not os.path.isdir(self._path):
