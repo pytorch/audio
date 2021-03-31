@@ -19,6 +19,7 @@ from .functional import (
     spectrogram,
     spectral_centroid,
     apply_codec,
+    resample,
 )
 from .filtering import (
     allpass_biquad,
@@ -85,5 +86,6 @@ __all__ = [
     'riaa_biquad',
     'treble_biquad',
     'vad',
-    'apply_codec'
+    'apply_codec',
+    'resample',
 ]
