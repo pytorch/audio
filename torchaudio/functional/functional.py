@@ -599,6 +599,14 @@ def phase_vocoder(
         >>> x.shape # with 231 == ceil(300 / 1.3)
         torch.Size([2, 1025, 231, 2])
     """
+    if rate == 1.0:
+        return complex_specgrams
+
+    if not complex_specgrams.is_complex() and complex_specgrams.size(-1) != 2:
+        raise ValueError(
+            "complex_specgrams must be either native complex tensors or "
+            "real valued tensors with shape (..., 2)")
+
     is_complex = complex_specgrams.is_complex()
 
     if not is_complex:
