@@ -373,8 +373,8 @@
 <span class="sd">    Args:</span>
 <span class="sd">        waveform(torch.Tensor): audio waveform of dimension of `(..., time)`</span>
 <span class="sd">        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)</span>
-<span class="sd">        central_freq (float): central frequency (in Hz)</span>
-<span class="sd">        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)</span>
+<span class="sd">        central_freq (float or torch.Tensor): central frequency (in Hz)</span>
+<span class="sd">        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
@@ -383,14 +383,20 @@
 <span class="sd">        http://sox.sourceforge.net/sox.html</span>
 <span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">central_freq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">central_freq</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
     <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">central_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
+
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
 
     <span class="n">b0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span>
-    <span class="n">b1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
     <span class="n">b2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span>
     <span class="n">a0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span>
-    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
     <span class="n">a2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span>
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
@@ -407,8 +413,8 @@
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`</span>
 <span class="sd">        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)</span>
-<span class="sd">        central_freq (float): central frequency (in Hz)</span>
-<span class="sd">        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).</span>
+<span class="sd">        central_freq (float or torch.Tensor): central frequency (in Hz)</span>
+<span class="sd">        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).</span>
 <span class="sd">        noise (bool, optional) : If ``True``, uses the alternate mode for un-pitched audio (e.g. percussion).</span>
 <span class="sd">            If ``False``, uses mode oriented to pitched audio, i.e. voice, singing,</span>
 <span class="sd">            or instrumental music (Default: ``False``).</span>
@@ -420,18 +426,23 @@
 <span class="sd">        http://sox.sourceforge.net/sox.html</span>
 <span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">central_freq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">central_freq</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
     <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">central_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
     <span class="n">bw_Hz</span> <span class="o">=</span> <span class="n">central_freq</span> <span class="o">/</span> <span class="n">Q</span>
 
     <span class="n">a0</span> <span class="o">=</span> <span class="mf">1.0</span>
-    <span class="n">a2</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">bw_Hz</span> <span class="o">/</span> <span class="n">sample_rate</span><span class="p">)</span>
-    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">4</span> <span class="o">*</span> <span class="n">a2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a2</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">a2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">bw_Hz</span> <span class="o">/</span> <span class="n">sample_rate</span><span class="p">)</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">4</span> <span class="o">*</span> <span class="n">a2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a2</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
 
-    <span class="n">b0</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a1</span> <span class="o">*</span> <span class="n">a1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">a2</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a2</span><span class="p">)</span>
+    <span class="n">b0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a1</span> <span class="o">*</span> <span class="n">a1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">a2</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a2</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">noise</span><span class="p">:</span>
-        <span class="n">mult</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a2</span><span class="p">)</span> <span class="o">-</span> <span class="n">a1</span> <span class="o">*</span> <span class="n">a1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a2</span><span class="p">))</span> <span class="o">/</span> <span class="n">b0</span>
-        <span class="n">b0</span> <span class="o">*=</span> <span class="n">mult</span>
+        <span class="n">mult</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a2</span><span class="p">)</span> <span class="o">-</span> <span class="n">a1</span> <span class="o">*</span> <span class="n">a1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a2</span><span class="p">))</span> <span class="o">/</span> <span class="n">b0</span>
+        <span class="n">b0</span> <span class="o">=</span> <span class="n">mult</span> <span class="o">*</span> <span class="n">b0</span>
 
     <span class="n">b1</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">b2</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -451,8 +462,8 @@
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`</span>
 <span class="sd">        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)</span>
-<span class="sd">        central_freq (float): central frequency (in Hz)</span>
-<span class="sd">        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)</span>
+<span class="sd">        central_freq (float or torch.Tensor): central frequency (in Hz)</span>
+<span class="sd">        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)</span>
 <span class="sd">        const_skirt_gain (bool, optional) : If ``True``, uses a constant skirt gain (peak gain = Q).</span>
 <span class="sd">            If ``False``, uses a constant 0dB peak gain. (Default: ``False``)</span>
 
@@ -463,15 +474,20 @@
 <span class="sd">        http://sox.sourceforge.net/sox.html</span>
 <span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">central_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">central_freq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">central_freq</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
-    <span class="n">temp</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">const_skirt_gain</span> <span class="k">else</span> <span class="n">alpha</span>
+    <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">central_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
+
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">const_skirt_gain</span> <span class="k">else</span> <span class="n">alpha</span>
     <span class="n">b0</span> <span class="o">=</span> <span class="n">temp</span>
     <span class="n">b1</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">b2</span> <span class="o">=</span> <span class="o">-</span><span class="n">temp</span>
     <span class="n">a0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span>
-    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
     <span class="n">a2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span>
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
@@ -484,8 +500,8 @@
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`</span>
 <span class="sd">        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)</span>
-<span class="sd">        central_freq (float): central frequency (in Hz)</span>
-<span class="sd">        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)</span>
+<span class="sd">        central_freq (float or torch.Tensor): central frequency (in Hz)</span>
+<span class="sd">        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
@@ -494,14 +510,19 @@
 <span class="sd">        http://sox.sourceforge.net/sox.html</span>
 <span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">central_freq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">central_freq</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
     <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">central_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
 
     <span class="n">b0</span> <span class="o">=</span> <span class="mf">1.0</span>
-    <span class="n">b1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
     <span class="n">b2</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="n">a0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span>
-    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
     <span class="n">a2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span>
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
@@ -518,9 +539,9 @@
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`</span>
 <span class="sd">        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)</span>
-<span class="sd">        gain (float): desired gain at the boost (or attenuation) in dB.</span>
-<span class="sd">        central_freq (float, optional): central frequency (in Hz). (Default: ``100``)</span>
-<span class="sd">        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).</span>
+<span class="sd">        gain (float or torch.Tensor): desired gain at the boost (or attenuation) in dB.</span>
+<span class="sd">        central_freq (float or torch.Tensor, optional): central frequency (in Hz). (Default: ``100``)</span>
+<span class="sd">        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
@@ -529,13 +550,19 @@
 <span class="sd">        http://sox.sourceforge.net/sox.html</span>
 <span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">central_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
-    <span class="n">A</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">gain</span> <span class="o">/</span> <span class="mi">40</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">central_freq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">central_freq</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">gain</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">gain</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
-    <span class="n">temp1</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">*</span> <span class="n">alpha</span>
-    <span class="n">temp2</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
-    <span class="n">temp3</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">central_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">gain</span> <span class="o">/</span> <span class="mi">40</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+
+    <span class="n">temp1</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">*</span> <span class="n">alpha</span>
+    <span class="n">temp2</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">temp3</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
 
     <span class="n">b0</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">temp2</span> <span class="o">+</span> <span class="n">temp1</span><span class="p">)</span>
     <span class="n">b1</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">A</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">temp3</span><span class="p">)</span>
@@ -555,12 +582,12 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`</span>
-<span class="sd">        b0 (float): numerator coefficient of current input, x[n]</span>
-<span class="sd">        b1 (float): numerator coefficient of input one time step ago x[n-1]</span>
-<span class="sd">        b2 (float): numerator coefficient of input two time steps ago x[n-2]</span>
-<span class="sd">        a0 (float): denominator coefficient of current output y[n], typically 1</span>
-<span class="sd">        a1 (float): denominator coefficient of current output y[n-1]</span>
-<span class="sd">        a2 (float): denominator coefficient of current output y[n-2]</span>
+<span class="sd">        b0 (float or torch.Tensor): numerator coefficient of current input, x[n]</span>
+<span class="sd">        b1 (float or torch.Tensor): numerator coefficient of input one time step ago x[n-1]</span>
+<span class="sd">        b2 (float or torch.Tensor): numerator coefficient of input two time steps ago x[n-2]</span>
+<span class="sd">        a0 (float or torch.Tensor): denominator coefficient of current output y[n], typically 1</span>
+<span class="sd">        a1 (float or torch.Tensor): denominator coefficient of current output y[n-1]</span>
+<span class="sd">        a2 (float or torch.Tensor): denominator coefficient of current output y[n-2]</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform with dimension of `(..., time)`</span>
@@ -569,10 +596,17 @@
     <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
     <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
 
+    <span class="n">b0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">b0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">b2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">b2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">a0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">a2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
     <span class="n">output_waveform</span> <span class="o">=</span> <span class="n">lfilter</span><span class="p">(</span>
         <span class="n">waveform</span><span class="p">,</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">]),</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">]),</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">output_waveform</span></div>
 
@@ -884,21 +918,27 @@
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`</span>
 <span class="sd">        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)</span>
 <span class="sd">        center_freq (float): filter&#39;s central frequency</span>
-<span class="sd">        gain (float): desired gain at the boost (or attenuation) in dB</span>
-<span class="sd">        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)</span>
+<span class="sd">        gain (float or torch.Tensor): desired gain at the boost (or attenuation) in dB</span>
+<span class="sd">        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">center_freq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">center_freq</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">gain</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">gain</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
     <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">center_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
-    <span class="n">A</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">gain</span> <span class="o">/</span> <span class="mf">40.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">gain</span> <span class="o">/</span> <span class="mf">40.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
 
     <span class="n">b0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">A</span>
-    <span class="n">b1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
     <span class="n">b2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">A</span>
     <span class="n">a0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">/</span> <span class="n">A</span>
-    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
     <span class="n">a2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">/</span> <span class="n">A</span>
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
@@ -1090,20 +1130,25 @@
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`</span>
 <span class="sd">        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)</span>
-<span class="sd">        cutoff_freq (float): filter cutoff frequency</span>
-<span class="sd">        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)</span>
+<span class="sd">        cutoff_freq (float or torch.Tensor): filter cutoff frequency</span>
+<span class="sd">        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform dimension of `(..., time)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">cutoff_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">Q</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">cutoff_freq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">cutoff_freq</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
-    <span class="n">b0</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
-    <span class="n">b1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">cutoff_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">Q</span>
+
+    <span class="n">b0</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
     <span class="n">b2</span> <span class="o">=</span> <span class="n">b0</span>
     <span class="n">a0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span>
-    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
     <span class="n">a2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span>
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
@@ -1224,20 +1269,25 @@
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (torch.Tensor): audio waveform of dimension of `(..., time)`</span>
 <span class="sd">        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)</span>
-<span class="sd">        cutoff_freq (float): filter cutoff frequency</span>
-<span class="sd">        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)</span>
+<span class="sd">        cutoff_freq (float or torch.Tensor): filter cutoff frequency</span>
+<span class="sd">        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">cutoff_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">cutoff_freq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">cutoff_freq</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
-    <span class="n">b0</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
-    <span class="n">b1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">cutoff_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
+
+    <span class="n">b0</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
     <span class="n">b2</span> <span class="o">=</span> <span class="n">b0</span>
     <span class="n">a0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span>
-    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
     <span class="n">a2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span>
     <span class="k">return</span> <span class="n">biquad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
 
@@ -1476,9 +1526,9 @@
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): audio waveform of dimension of `(..., time)`</span>
 <span class="sd">        sample_rate (int): sampling rate of the waveform, e.g. 44100 (Hz)</span>
-<span class="sd">        gain (float): desired gain at the boost (or attenuation) in dB.</span>
-<span class="sd">        central_freq (float, optional): central frequency (in Hz). (Default: ``3000``)</span>
-<span class="sd">        Q (float, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).</span>
+<span class="sd">        gain (float or torch.Tensor): desired gain at the boost (or attenuation) in dB.</span>
+<span class="sd">        central_freq (float or torch.Tensor, optional): central frequency (in Hz). (Default: ``3000``)</span>
+<span class="sd">        Q (float or torch.Tensor, optional): https://en.wikipedia.org/wiki/Q_factor (Default: ``0.707``).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
@@ -1487,13 +1537,19 @@
 <span class="sd">        http://sox.sourceforge.net/sox.html</span>
 <span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">central_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
-    <span class="n">A</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">gain</span> <span class="o">/</span> <span class="mi">40</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">central_freq</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">central_freq</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">gain</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">gain</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
-    <span class="n">temp1</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">*</span> <span class="n">alpha</span>
-    <span class="n">temp2</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
-    <span class="n">temp3</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">central_freq</span> <span class="o">/</span> <span class="n">sample_rate</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">Q</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">gain</span> <span class="o">/</span> <span class="mi">40</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+
+    <span class="n">temp1</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">*</span> <span class="n">alpha</span>
+    <span class="n">temp2</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
+    <span class="n">temp3</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w0</span><span class="p">)</span>
 
     <span class="n">b0</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">temp2</span> <span class="o">+</span> <span class="n">temp1</span><span class="p">)</span>
     <span class="n">b1</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">A</span> <span class="o">*</span> <span class="p">((</span><span class="n">A</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">temp3</span><span class="p">)</span>
