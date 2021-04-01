@@ -25,6 +25,10 @@ class Transforms(common_utils.TestBaseMixin):
         tensor = torch.rand((1, 1000))
         self._assert_consistency(T.Spectrogram(), tensor)
 
+    def test_Spectrogram_return_complex(self):
+        tensor = torch.rand((1, 1000))
+        self._assert_consistency(T.Spectrogram(power=None, return_complex=True), tensor)
+
     @skipIfRocm
     def test_GriffinLim(self):
         tensor = torch.rand((1, 201, 6))
