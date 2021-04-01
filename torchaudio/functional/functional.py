@@ -566,16 +566,15 @@ def phase_vocoder(
 
     Args:
         complex_specgrams (Tensor):
-            Either a real tensor of dimension of `(..., freq, time, complex=2)`
-            or a tensor of dimension `(..., freq, time)` with complex dtype.
+            Either a real tensor of dimension of ``(..., freq, num_frame, complex=2)``
+            or a tensor of dimension ``(..., freq, num_frame)`` with complex dtype.
         rate (float): Speed-up factor
         phase_advance (Tensor): Expected phase advance in each bin. Dimension of (freq, 1)
 
     Returns:
         Tensor:
-            Complex Specgrams Stretch with either a real dtype and dimension of
-            `(..., freq, ceil(time/rate), complex=2)` or
-            a complex dtype and dimension of `(..., freq, ceil(time/rate))`.
+            Stretched spectrogram. The resulting tensor is of the same dtype as the input
+            spectrogram, but the number of frames is changed to ``ceil(num_frame / rate)``.
 
     Example - With Tensor of complex dtype
         >>> freq, hop_length = 1025, 512
