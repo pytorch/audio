@@ -47,7 +47,6 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
 
 @common_utils.skipIfNoSox
 class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
-    backend = 'sox_io'
 
     kaldi_output_dir = common_utils.get_asset_path('kaldi')
     test_filepath = common_utils.get_asset_path('kaldi_file.wav')
@@ -113,7 +112,7 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
         # clear the last 16 bits because they aren't used anyways
         y = ((y >> 16) << 16).float()
         torchaudio.save(self.test_filepath, y, sr)
-        sound, sample_rate = torchaudio.load(self.test_filepath, normalization=False)
+        sound, sample_rate = common_utils.load_wav(self.test_filepath, normalize=False)
         print(y >> 16)
         self.assertTrue(sample_rate == sr)
         self.assertEqual(y, sound)
@@ -156,7 +155,7 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
 
             # Read kaldi's output from file
             kaldi_output_path = os.path.join(self.kaldi_output_dir, f)
-            kaldi_output_dict = {k: v for k, v in torchaudio.kaldi_io.read_mat_ark(kaldi_output_path)}
+            kaldi_output_dict = dict(torchaudio.kaldi_io.read_mat_ark(kaldi_output_path))
 
             assert len(kaldi_output_dict) == 1 and 'my_id' in kaldi_output_dict, 'invalid test kaldi ark file'
             kaldi_output = kaldi_output_dict['my_id']

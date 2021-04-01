@@ -109,6 +109,25 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
         self.assertEqual(ta_out, lr_out, atol=5e-5, rtol=1e-5)
 
+    def test_resample(self):
+        input_path = common_utils.get_asset_path('sinewave.wav')
+        waveform, sample_rate = common_utils.load_wav(input_path)
+
+        upsample_rate = sample_rate * 2
+        downsample_rate = sample_rate // 2
+
+        ta_upsampled = F.resample(waveform, sample_rate, upsample_rate)
+        lr_upsampled = librosa.resample(waveform.squeeze(0).numpy(), sample_rate, upsample_rate)
+        lr_upsampled = torch.from_numpy(lr_upsampled).unsqueeze(0)
+
+        self.assertEqual(ta_upsampled, lr_upsampled, atol=1e-2, rtol=1e-5)
+
+        ta_downsampled = F.resample(waveform, sample_rate, downsample_rate)
+        lr_downsampled = librosa.resample(waveform.squeeze(0).numpy(), sample_rate, downsample_rate)
+        lr_downsampled = torch.from_numpy(lr_downsampled).unsqueeze(0)
+
+        self.assertEqual(ta_downsampled, lr_downsampled, atol=1e-2, rtol=1e-5)
+
 
 @unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
 class TestPhaseVocoder(common_utils.TorchaudioTestCase):

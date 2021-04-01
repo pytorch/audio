@@ -6,7 +6,6 @@ from typing import Callable, Optional
 import torch
 from torch import Tensor
 from torchaudio import functional as F
-from torchaudio.compliance import kaldi
 
 
 __all__ = [
@@ -649,17 +648,7 @@ class Resample(torch.nn.Module):
             Tensor: Output signal of dimension (..., time).
         """
         if self.resampling_method == 'sinc_interpolation':
-
-            # pack batch
-            shape = waveform.size()
-            waveform = waveform.view(-1, shape[-1])
-
-            waveform = kaldi.resample_waveform(waveform, self.orig_freq, self.new_freq)
-
-            # unpack batch
-            waveform = waveform.view(shape[:-1] + waveform.shape[-1:])
-
-            return waveform
+            return F.resample(waveform, self.orig_freq, self.new_freq)
 
         raise ValueError('Invalid resampling method: {}'.format(self.resampling_method))
 
