@@ -465,8 +465,7 @@ class MelSpectrogram(torch.nn.Module):
                  pad_mode: str = "reflect",
                  onesided: bool = True,
                  norm: Optional[str] = None,
-                 mel_scale: str = "htk",
-                 return_complex: bool = False) -> None:
+                 mel_scale: str = "htk") -> None:
         super(MelSpectrogram, self).__init__()
         self.sample_rate = sample_rate
         self.n_fft = n_fft
@@ -478,20 +477,11 @@ class MelSpectrogram(torch.nn.Module):
         self.n_mels = n_mels  # number of mel frequency bins
         self.f_max = f_max
         self.f_min = f_min
-        self.spectrogram = Spectrogram(
-            n_fft=self.n_fft,
-            win_length=self.win_length,
-            hop_length=self.hop_length,
-            pad=self.pad,
-            window_fn=window_fn,
-            power=self.power,
-            normalized=self.normalized,
-            wkwargs=wkwargs,
-            center=center,
-            pad_mode=pad_mode,
-            onesided=onesided,
-            return_complex=return_complex,
-        )
+        self.spectrogram = Spectrogram(n_fft=self.n_fft, win_length=self.win_length,
+                                       hop_length=self.hop_length,
+                                       pad=self.pad, window_fn=window_fn, power=self.power,
+                                       normalized=self.normalized, wkwargs=wkwargs,
+                                       center=center, pad_mode=pad_mode, onesided=onesided)
         self.mel_scale = MelScale(
             self.n_mels,
             self.sample_rate,
