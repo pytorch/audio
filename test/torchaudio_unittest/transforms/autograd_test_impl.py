@@ -29,6 +29,10 @@ class AutogradTestMixin(TestBaseMixin):
         assert gradgradcheck(transform, inputs_, nondet_tol=nondet_tol)
 
     @parameterized.expand([
+        ({'pad': 0, 'normalized': False, 'power': None, 'return_complex': True}, ),
+        ({'pad': 3, 'normalized': False, 'power': None, 'return_complex': True}, ),
+        ({'pad': 0, 'normalized': True, 'power': None, 'return_complex': True}, ),
+        ({'pad': 3, 'normalized': True, 'power': None, 'return_complex': True}, ),
         ({'pad': 0, 'normalized': False, 'power': None}, ),
         ({'pad': 3, 'normalized': False, 'power': None}, ),
         ({'pad': 0, 'normalized': True, 'power': None}, ),
