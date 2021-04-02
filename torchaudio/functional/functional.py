@@ -565,14 +565,29 @@ def phase_vocoder(
     factor of ``rate``.
 
     Args:
-        complex_specgrams (Tensor): Dimension of `(..., freq, time, complex=2)`
+        complex_specgrams (Tensor):
+            Either a real tensor of dimension of ``(..., freq, num_frame, complex=2)``
+            or a tensor of dimension ``(..., freq, num_frame)`` with complex dtype.
         rate (float): Speed-up factor
         phase_advance (Tensor): Expected phase advance in each bin. Dimension of (freq, 1)
 
     Returns:
-        Tensor: Complex Specgrams Stretch with dimension of `(..., freq, ceil(time/rate), complex=2)`
+        Tensor:
+            Stretched spectrogram. The resulting tensor is of the same dtype as the input
+            spectrogram, but the number of frames is changed to ``ceil(num_frame / rate)``.
 
-    Example
+    Example - With Tensor of complex dtype
+        >>> freq, hop_length = 1025, 512
+        >>> # (channel, freq, time)
+        >>> complex_specgrams = torch.randn(2, freq, 300, dtype=torch.cfloat)
+        >>> rate = 1.3 # Speed up by 30%
+        >>> phase_advance = torch.linspace(
+        >>>    0, math.pi * hop_length, freq)[..., None]
+        >>> x = phase_vocoder(complex_specgrams, rate, phase_advance)
+        >>> x.shape # with 231 == ceil(300 / 1.3)
+        torch.Size([2, 1025, 231])
+
+    Example - With Tensor of real dtype and extra dimension for complex field
         >>> freq, hop_length = 1025, 512
         >>> # (channel, freq, time, complex=2)
         >>> complex_specgrams = torch.randn(2, freq, 300, 2)
@@ -583,32 +598,48 @@ def phase_vocoder(
         >>> x.shape # with 231 == ceil(300 / 1.3)
         torch.Size([2, 1025, 231, 2])
     """
+    if rate == 1.0:
+        return complex_specgrams
+
+    if not complex_specgrams.is_complex() and complex_specgrams.size(-1) != 2:
+        raise ValueError(
+            "complex_specgrams must be either native complex tensors or "
+            "real valued tensors with shape (..., 2)")
+
+    is_complex = complex_specgrams.is_complex()
+
+    if not is_complex:
+        complex_specgrams = torch.view_as_complex(complex_specgrams)
 
     # pack batch
     shape = complex_specgrams.size()
-    complex_specgrams = complex_specgrams.reshape([-1] + list(shape[-3:]))
+    complex_specgrams = complex_specgrams.reshape([-1] + list(shape[-2:]))
 
-    time_steps = torch.arange(0,
-                              complex_specgrams.size(-2),
-                              rate,
-                              device=complex_specgrams.device,
-                              dtype=complex_specgrams.dtype)
+    # Figures out the corresponding real dtype, i.e. complex128 -> float64, complex64 -> float32
+    # Note torch.real is a view so it does not incur any memory copy.
+    real_dtype = torch.real(complex_specgrams).dtype
+    time_steps = torch.arange(
+        0,
+        complex_specgrams.size(-1),
+        rate,
+        device=complex_specgrams.device,
+        dtype=real_dtype)
 
     alphas = time_steps % 1.0
-    phase_0 = angle(complex_specgrams[..., :1, :])
+    phase_0 = complex_specgrams[..., :1].angle()
 
     # Time Padding
-    complex_specgrams = torch.nn.functional.pad(complex_specgrams, [0, 0, 0, 2])
+    complex_specgrams = torch.nn.functional.pad(complex_specgrams, [0, 2])
 
     # (new_bins, freq, 2)
-    complex_specgrams_0 = complex_specgrams.index_select(-2, time_steps.long())
-    complex_specgrams_1 = complex_specgrams.index_select(-2, (time_steps + 1).long())
+    complex_specgrams_0 = complex_specgrams.index_select(-1, time_steps.long())
+    complex_specgrams_1 = complex_specgrams.index_select(-1, (time_steps + 1).long())
 
-    angle_0 = angle(complex_specgrams_0)
-    angle_1 = angle(complex_specgrams_1)
+    angle_0 = complex_specgrams_0.angle()
+    angle_1 = complex_specgrams_1.angle()
 
-    norm_0 = torch.norm(complex_specgrams_0, p=2, dim=-1)
-    norm_1 = torch.norm(complex_specgrams_1, p=2, dim=-1)
+    norm_0 = complex_specgrams_0.abs()
+    norm_1 = complex_specgrams_1.abs()
 
     phase = angle_1 - angle_0 - phase_advance
     phase = phase - 2 * math.pi * torch.round(phase / (2 * math.pi))
@@ -620,14 +651,13 @@ def phase_vocoder(
 
     mag = alphas * norm_1 + (1 - alphas) * norm_0
 
-    real_stretch = mag * torch.cos(phase_acc)
-    imag_stretch = mag * torch.sin(phase_acc)
-
-    complex_specgrams_stretch = torch.stack([real_stretch, imag_stretch], dim=-1)
+    complex_specgrams_stretch = torch.polar(mag, phase_acc)
 
     # unpack batch
-    complex_specgrams_stretch = complex_specgrams_stretch.reshape(shape[:-3] + complex_specgrams_stretch.shape[1:])
+    complex_specgrams_stretch = complex_specgrams_stretch.reshape(shape[:-2] + complex_specgrams_stretch.shape[1:])
 
+    if not is_complex:
+        return torch.view_as_real(complex_specgrams_stretch)
     return complex_specgrams_stretch
 
 
