@@ -98,3 +98,5 @@ def skipIfNoModule(module, display_name=None):
 skipIfNoCuda = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
 skipIfNoSox = unittest.skipIf(not is_sox_available(), reason='Sox not available')
 skipIfNoKaldi = unittest.skipIf(not is_kaldi_available(), reason='Kaldi not available')
+skipIfRocm = unittest.skipIf(os.getenv('TORCHAUDIO_TEST_WITH_ROCM', '0') == '1',
+                             reason="test doesn't currently work on the ROCm stack")
