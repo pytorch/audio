@@ -1,5 +1,5 @@
 import os.path
-from typing import Union
+from typing import Union, Optional
 
 import torch
 
@@ -62,7 +62,7 @@ def get_whitenoise(
     """
     if isinstance(dtype, str):
         dtype = getattr(torch, dtype)
-    if dtype not in [torch.float32, torch.int32, torch.int16, torch.uint8]:
+    if dtype not in [torch.float64, torch.float32, torch.int32, torch.int16, torch.uint8]:
         raise NotImplementedError(f'dtype {dtype} is not supported.')
     # According to the doc, folking rng on all CUDA devices is slow when there are many CUDA devices,
     # so we only fork on CPU, generate values and move the data to the given device
@@ -110,3 +110,43 @@ def get_sinusoid(
     if not channels_first:
         tensor = tensor.t()
     return convert_tensor_encoding(tensor, dtype)
+
+
+def get_spectrogram(
+        waveform,
+        *,
+        n_fft: int = 2048,
+        hop_length: Optional[int] = None,
+        win_length: Optional[int] = None,
+        window: Optional[torch.Tensor] = None,
+        center: bool = True,
+        pad_mode: str = 'reflect',
+        power: Optional[float] = None,
+):
+    """Generate a spectrogram of the given Tensor
+
+    Args:
+        n_fft: The number of FFT bins.
+        hop_length: Stride for sliding window. default: ``n_fft // 4``.
+        win_length: The size of window frame and STFT filter. default: ``n_fft``.
+        winwdow: Window function. default: Hann window
+        center: Pad the input sequence if True. See ``torch.stft`` for the detail.
+        pad_mode: Padding method used when center is True. Default: "reflect".
+        power: If ``None``, raw spectrogram with complex values are returned,
+            otherwise the norm of the spectrogram is returned.
+    """
+    hop_length = hop_length or n_fft // 4
+    win_length = win_length or n_fft
+    window = torch.hann_window(win_length) if window is None else window
+    spec = torch.stft(
+        waveform,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        win_length=win_length,
+        center=center,
+        window=window,
+        pad_mode=pad_mode,
+        return_complex=True)
+    if power is not None:
+        spec = spec.abs() ** power
+    return spec
