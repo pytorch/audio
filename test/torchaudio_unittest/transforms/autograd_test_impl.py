@@ -60,3 +60,11 @@ class AutogradTestMixin(TestBaseMixin):
         transform = T.MelSpectrogram(sample_rate=sample_rate)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
+
+    def test_griffinlim(self):
+        n_fft = 400
+        n_frames = 5
+        n_iter = 3
+        spec = torch.rand(n_fft // 2 + 1, n_frames) * n_fft
+        transform = T.GriffinLim(n_fft=n_fft, n_iter=n_iter, rand_init=False)
+        self.assert_grad(transform, [spec], nondet_tol=1e-10)
