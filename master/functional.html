@@ -1283,7 +1283,7 @@ This option sets the time for the initial noise estimate. (Default: 0.35)</p></l
 <h3><span class="hidden-section">spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.spectrogram">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">spectrogram</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor, pad: int, window: torch.Tensor, n_fft: int, hop_length: int, win_length: int, power: Optional[float], normalized: bool, center: bool = True, pad_mode: str = 'reflect', onesided: bool = True</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.spectrogram" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">spectrogram</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor, pad: int, window: torch.Tensor, n_fft: int, hop_length: int, win_length: int, power: Optional[float], normalized: bool, center: bool = True, pad_mode: str = 'reflect', onesided: bool = True, return_complex: bool = False</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.spectrogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a spectrogram or a batch of spectrograms from a raw audio signal.
 The spectrogram can be either magnitude-only or complex.</p>
 <dl class="field-list simple">
@@ -1306,6 +1306,11 @@ Default: <code class="docutils literal notranslate"><span class="pre">True</span
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. Default: <code class="docutils literal notranslate"><span class="pre">&quot;reflect&quot;</span></code></p></li>
 <li><p><strong>onesided</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – controls whether to return half of results to
 avoid redundancy. Default: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>return_complex</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – <code class="docutils literal notranslate"><span class="pre">return_complex</span> <span class="pre">=</span> <span class="pre">True</span></code>, this function returns the resulting Tensor in
+complex dtype, otherwise it returns the resulting Tensor in real dtype with extra
+dimension for real and imaginary parts. (see <code class="docutils literal notranslate"><span class="pre">torch.view_as_real</span></code>).
+When <code class="docutils literal notranslate"><span class="pre">power</span></code> is provided, the value must be False, as the resulting
+Tensor represents real-valued power.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1390,20 +1395,34 @@ factor of <code class="docutils literal notranslate"><span class="pre">rate</spa
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>complex_specgrams</strong> (<em>Tensor</em>) – Dimension of <cite>(…, freq, time, complex=2)</cite></p></li>
+<li><p><strong>complex_specgrams</strong> (<em>Tensor</em>) – Either a real tensor of dimension of <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">freq,</span> <span class="pre">num_frame,</span> <span class="pre">complex=2)</span></code>
+or a tensor of dimension <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">freq,</span> <span class="pre">num_frame)</span></code> with complex dtype.</p></li>
 <li><p><strong>rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Speed-up factor</p></li>
 <li><p><strong>phase_advance</strong> (<em>Tensor</em>) – Expected phase advance in each bin. Dimension of (freq, 1)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Complex Specgrams Stretch with dimension of <cite>(…, freq, ceil(time/rate), complex=2)</cite></p>
+<dd class="field-even"><p>Stretched spectrogram. The resulting tensor is of the same dtype as the input
+spectrogram, but the number of frames is changed to <code class="docutils literal notranslate"><span class="pre">ceil(num_frame</span> <span class="pre">/</span> <span class="pre">rate)</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
 </dd>
 </dl>
 <dl>
-<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">freq</span><span class="p">,</span> <span class="n">hop_length</span> <span class="o">=</span> <span class="mi">1025</span><span class="p">,</span> <span class="mi">512</span>
+<dt>Example - With Tensor of complex dtype</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">freq</span><span class="p">,</span> <span class="n">hop_length</span> <span class="o">=</span> <span class="mi">1025</span><span class="p">,</span> <span class="mi">512</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># (channel, freq, time)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">complex_specgrams</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cfloat</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rate</span> <span class="o">=</span> <span class="mf">1.3</span> <span class="c1"># Speed up by 30%</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phase_advance</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>   <span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">hop_length</span><span class="p">,</span> <span class="n">freq</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">phase_vocoder</span><span class="p">(</span><span class="n">complex_specgrams</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">phase_advance</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="c1"># with 231 == ceil(300 / 1.3)</span>
+<span class="go">torch.Size([2, 1025, 231])</span>
+</pre></div>
+</div>
+</dd>
+<dt>Example - With Tensor of real dtype and extra dimension for complex field</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">freq</span><span class="p">,</span> <span class="n">hop_length</span> <span class="o">=</span> <span class="mi">1025</span><span class="p">,</span> <span class="mi">512</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># (channel, freq, time, complex=2)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">complex_specgrams</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rate</span> <span class="o">=</span> <span class="mf">1.3</span> <span class="c1"># Speed up by 30%</span>

@@ -308,7 +308,7 @@
 <h2><span class="hidden-section">Spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.Spectrogram">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Spectrogram</code><span class="sig-paren">(</span><em class="sig-param">n_fft: int = 400, win_length: Optional[int] = None, hop_length: Optional[int] = None, pad: int = 0, window_fn: Callable[[...], torch.Tensor] = &lt;built-in method hann_window of type object&gt;, power: Optional[float] = 2.0, normalized: bool = False, wkwargs: Optional[dict] = None, center: bool = True, pad_mode: str = 'reflect', onesided: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Spectrogram" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Spectrogram</code><span class="sig-paren">(</span><em class="sig-param">n_fft: int = 400, win_length: Optional[int] = None, hop_length: Optional[int] = None, pad: int = 0, window_fn: Callable[[...], torch.Tensor] = &lt;built-in method hann_window of type object&gt;, power: Optional[float] = 2.0, normalized: bool = False, wkwargs: Optional[dict] = None, center: bool = True, pad_mode: str = 'reflect', onesided: bool = True, return_complex: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Spectrogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a spectrogram from a audio signal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -331,6 +331,11 @@ Default: <code class="docutils literal notranslate"><span class="pre">True</span
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. Default: <code class="docutils literal notranslate"><span class="pre">&quot;reflect&quot;</span></code></p></li>
 <li><p><strong>onesided</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – controls whether to return half of results to
 avoid redundancy Default: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>return_complex</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – <code class="docutils literal notranslate"><span class="pre">return_complex</span> <span class="pre">=</span> <span class="pre">True</span></code>, this function returns the resulting Tensor in
+complex dtype, otherwise it returns the resulting Tensor in real dtype with extra
+dimension for real and imaginary parts. (see <code class="docutils literal notranslate"><span class="pre">torch.view_as_real</span></code>).
+When <code class="docutils literal notranslate"><span class="pre">power</span></code> is provided, the value must be False, as the resulting
+Tensor represents real-valued power.</p></li>
 </ul>
 </dd>
 </dl>
@@ -853,13 +858,15 @@ If None is provided, rate must be passed to the forward method. (Default: <code 
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>complex_specgrams</strong> (<em>Tensor</em>) – complex spectrogram (…, freq, time, complex=2).</p></li>
+<li><p><strong>complex_specgrams</strong> (<em>Tensor</em>) – Either a real tensor of dimension of <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">freq,</span> <span class="pre">num_frame,</span> <span class="pre">complex=2)</span></code>
+or a tensor of dimension <code class="docutils literal notranslate"><span class="pre">(...,</span> <span class="pre">freq,</span> <span class="pre">num_frame)</span></code> with complex dtype.</p></li>
 <li><p><strong>overriding_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – speed up to apply to this batch.
 If no rate is passed, use <code class="docutils literal notranslate"><span class="pre">self.fixed_rate</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Stretched complex spectrogram of dimension (…, freq, ceil(time/rate), complex=2).</p>
+<dd class="field-even"><p>Stretched spectrogram. The resulting tensor is of the same dtype as the input
+spectrogram, but the number of frames is changed to <code class="docutils literal notranslate"><span class="pre">ceil(num_frame</span> <span class="pre">/</span> <span class="pre">rate)</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>

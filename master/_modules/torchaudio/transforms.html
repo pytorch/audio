@@ -352,6 +352,12 @@
 <span class="sd">            :attr:`center` is ``True``. Default: ``&quot;reflect&quot;``</span>
 <span class="sd">        onesided (bool, optional): controls whether to return half of results to</span>
 <span class="sd">            avoid redundancy Default: ``True``</span>
+<span class="sd">        return_complex (bool, optional):</span>
+<span class="sd">            ``return_complex = True``, this function returns the resulting Tensor in</span>
+<span class="sd">            complex dtype, otherwise it returns the resulting Tensor in real dtype with extra</span>
+<span class="sd">            dimension for real and imaginary parts. (see ``torch.view_as_real``).</span>
+<span class="sd">            When ``power`` is provided, the value must be False, as the resulting</span>
+<span class="sd">            Tensor represents real-valued power.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">,</span> <span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="s1">&#39;normalized&#39;</span><span class="p">]</span>
 
@@ -366,7 +372,8 @@
                  <span class="n">wkwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
-                 <span class="n">onesided</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                 <span class="n">onesided</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">return_complex</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Spectrogram</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span> <span class="o">=</span> <span class="n">n_fft</span>
         <span class="c1"># number of FFT bins. the returned STFT result will have n_fft // 2 + 1</span>
@@ -381,6 +388,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pad_mode</span> <span class="o">=</span> <span class="n">pad_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">onesided</span> <span class="o">=</span> <span class="n">onesided</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">return_complex</span> <span class="o">=</span> <span class="n">return_complex</span>
 
 <div class="viewcode-block" id="Spectrogram.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Spectrogram.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -403,7 +411,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">normalized</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pad_mode</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">onesided</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">onesided</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">return_complex</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 
@@ -1029,26 +1038,24 @@
 <div class="viewcode-block" id="TimeStretch.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.TimeStretch.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">complex_specgrams</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">overriding_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            complex_specgrams (Tensor): complex spectrogram (..., freq, time, complex=2).</span>
+<span class="sd">            complex_specgrams (Tensor):</span>
+<span class="sd">                Either a real tensor of dimension of ``(..., freq, num_frame, complex=2)``</span>
+<span class="sd">                or a tensor of dimension ``(..., freq, num_frame)`` with complex dtype.</span>
 <span class="sd">            overriding_rate (float or None, optional): speed up to apply to this batch.</span>
 <span class="sd">                If no rate is passed, use ``self.fixed_rate``. (Default: ``None``)</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: Stretched complex spectrogram of dimension (..., freq, ceil(time/rate), complex=2).</span>
+<span class="sd">            Tensor:</span>
+<span class="sd">                Stretched spectrogram. The resulting tensor is of the same dtype as the input</span>
+<span class="sd">                spectrogram, but the number of frames is changed to ``ceil(num_frame / rate)``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="n">complex_specgrams</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;complex_specgrams should be a complex tensor, shape (..., complex=2)&quot;</span>
-
         <span class="k">if</span> <span class="n">overriding_rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;If no fixed_rate is specified, must pass a valid rate to the forward method.&quot;</span><span class="p">)</span>
             <span class="n">rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_rate</span>
-            <span class="k">if</span> <span class="n">rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;If no fixed_rate is specified&quot;</span>
-                                 <span class="s2">&quot;, must pass a valid rate to the forward method.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">rate</span> <span class="o">=</span> <span class="n">overriding_rate</span>
-
-        <span class="k">if</span> <span class="n">rate</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">complex_specgrams</span>
-
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">phase_vocoder</span><span class="p">(</span><span class="n">complex_specgrams</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_advance</span><span class="p">)</span></div></div>
 
 
