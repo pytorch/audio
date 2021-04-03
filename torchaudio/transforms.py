@@ -52,6 +52,12 @@ class Spectrogram(torch.nn.Module):
             :attr:`center` is ``True``. Default: ``"reflect"``
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy Default: ``True``
+        return_complex (bool, optional):
+            ``return_complex = True``, this function returns the resulting Tensor in
+            complex dtype, otherwise it returns the resulting Tensor in real dtype with extra
+            dimension for real and imaginary parts. (see ``torch.view_as_real``).
+            When ``power`` is provided, the value must be False, as the resulting
+            Tensor represents real-valued power.
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -66,7 +72,8 @@ class Spectrogram(torch.nn.Module):
                  wkwargs: Optional[dict] = None,
                  center: bool = True,
                  pad_mode: str = "reflect",
-                 onesided: bool = True) -> None:
+                 onesided: bool = True,
+                 return_complex: bool = False) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -81,6 +88,7 @@ class Spectrogram(torch.nn.Module):
         self.center = center
         self.pad_mode = pad_mode
         self.onesided = onesided
+        self.return_complex = return_complex
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -103,7 +111,8 @@ class Spectrogram(torch.nn.Module):
             self.normalized,
             self.center,
             self.pad_mode,
-            self.onesided
+            self.onesided,
+            self.return_complex,
         )
 
 
@@ -729,26 +738,24 @@ class TimeStretch(torch.nn.Module):
     def forward(self, complex_specgrams: Tensor, overriding_rate: Optional[float] = None) -> Tensor:
         r"""
         Args:
-            complex_specgrams (Tensor): complex spectrogram (..., freq, time, complex=2).
+            complex_specgrams (Tensor):
+                Either a real tensor of dimension of ``(..., freq, num_frame, complex=2)``
+                or a tensor of dimension ``(..., freq, num_frame)`` with complex dtype.
             overriding_rate (float or None, optional): speed up to apply to this batch.
                 If no rate is passed, use ``self.fixed_rate``. (Default: ``None``)
 
         Returns:
-            Tensor: Stretched complex spectrogram of dimension (..., freq, ceil(time/rate), complex=2).
+            Tensor:
+                Stretched spectrogram. The resulting tensor is of the same dtype as the input
+                spectrogram, but the number of frames is changed to ``ceil(num_frame / rate)``.
         """
-        assert complex_specgrams.size(-1) == 2, "complex_specgrams should be a complex tensor, shape (..., complex=2)"
-
         if overriding_rate is None:
+            if self.fixed_rate is None:
+                raise ValueError(
+                    "If no fixed_rate is specified, must pass a valid rate to the forward method.")
             rate = self.fixed_rate
-            if rate is None:
-                raise ValueError("If no fixed_rate is specified"
-                                 ", must pass a valid rate to the forward method.")
         else:
             rate = overriding_rate
-
-        if rate == 1.0:
-            return complex_specgrams
-
         return F.phase_vocoder(complex_specgrams, rate, self.phase_advance)
 
 

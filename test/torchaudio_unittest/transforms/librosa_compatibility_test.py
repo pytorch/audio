@@ -45,6 +45,20 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         out_torch = spect_transform(sound).squeeze().cpu()
         self.assertEqual(out_torch, torch.from_numpy(out_librosa), atol=1e-5, rtol=1e-5)
 
+    def test_spectrogram_complex(self):
+        n_fft = 400
+        hop_length = 200
+        sample_rate = 16000
+        sound = common_utils.get_sinusoid(n_channels=1, sample_rate=sample_rate)
+        sound_librosa = sound.cpu().numpy().squeeze()
+        spect_transform = torchaudio.transforms.Spectrogram(
+            n_fft=n_fft, hop_length=hop_length, power=None, return_complex=True)
+        out_librosa, _ = librosa.core.spectrum._spectrogram(
+            y=sound_librosa, n_fft=n_fft, hop_length=hop_length, power=1)
+
+        out_torch = spect_transform(sound).squeeze()
+        self.assertEqual(out_torch.abs(), torch.from_numpy(out_librosa), atol=1e-5, rtol=1e-5)
+
     @parameterized.expand([
         param(norm=norm, mel_scale=mel_scale, **p.kwargs)
         for p in [
