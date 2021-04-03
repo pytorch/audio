@@ -2,9 +2,11 @@
 import torch
 import torchaudio.functional as F
 from parameterized import parameterized
+import numpy as np
 from scipy import signal
 
 from torchaudio_unittest import common_utils
+from torchaudio_unittest.common_utils import nested_params
 
 
 class Lfilter(common_utils.TestBaseMixin):
@@ -89,3 +91,39 @@ class Spectrogram(common_utils.TestBaseMixin):
         )
         spec.sum().backward()
         assert not x.grad.isnan().sum()
+
+
+class FunctionalComplex(common_utils.TestBaseMixin):
+    complex_dtype = None
+    real_dtype = None
+    device = None
+
+    @nested_params(
+        [0.5, 1.01, 1.3],
+        [True, False],
+    )
+    def test_phase_vocoder_shape(self, rate, test_pseudo_complex):
+        """Verify the output shape of phase vocoder"""
+        hop_length = 256
+        num_freq = 1025
+        num_frames = 400
+        batch_size = 2
+
+        torch.random.manual_seed(42)
+        spec = torch.randn(
+            batch_size, num_freq, num_frames, dtype=self.complex_dtype, device=self.device)
+        if test_pseudo_complex:
+            spec = torch.view_as_real(spec)
+
+        phase_advance = torch.linspace(
+            0,
+            np.pi * hop_length,
+            num_freq,
+            dtype=self.real_dtype, device=self.device)[..., None]
+
+        spec_stretch = F.phase_vocoder(spec, rate=rate, phase_advance=phase_advance)
+
+        assert spec.dim() == spec_stretch.dim()
+        expected_shape = torch.Size([batch_size, num_freq, int(np.ceil(num_frames / rate))])
+        output_shape = (torch.view_as_complex(spec_stretch) if test_pseudo_complex else spec_stretch).shape
+        assert output_shape == expected_shape

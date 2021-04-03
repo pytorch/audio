@@ -2,8 +2,12 @@
 
 import torch
 import torchaudio.transforms as T
+from parameterized import parameterized
 
 from torchaudio_unittest import common_utils
+from torchaudio_unittest.common_utils import (
+    skipIfRocm,
+)
 
 
 class Transforms(common_utils.TestBaseMixin):
@@ -21,6 +25,11 @@ class Transforms(common_utils.TestBaseMixin):
         tensor = torch.rand((1, 1000))
         self._assert_consistency(T.Spectrogram(), tensor)
 
+    def test_Spectrogram_return_complex(self):
+        tensor = torch.rand((1, 1000))
+        self._assert_consistency(T.Spectrogram(power=None, return_complex=True), tensor)
+
+    @skipIfRocm
     def test_GriffinLim(self):
         tensor = torch.rand((1, 201, 6))
         self._assert_consistency(T.GriffinLim(length=1000, rand_init=False), tensor)
@@ -58,16 +67,6 @@ class Transforms(common_utils.TestBaseMixin):
         tensor = torch.rand((1, 10))
         self._assert_consistency(T.MuLawDecoding(), tensor)
 
-    def test_TimeStretch(self):
-        n_freq = 400
-        hop_length = 512
-        fixed_rate = 1.3
-        tensor = torch.rand((10, 2, n_freq, 10, 2))
-        self._assert_consistency(
-            T.TimeStretch(n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate),
-            tensor,
-        )
-
     def test_Fade(self):
         waveform = common_utils.get_whitenoise()
         fade_in_len = 3000
@@ -99,3 +98,34 @@ class Transforms(common_utils.TestBaseMixin):
         sample_rate = 44100
         waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
         self._assert_consistency(T.SpectralCentroid(sample_rate=sample_rate), waveform)
+
+
+class TransformsComplex:
+    complex_dtype = None
+    real_dtype = None
+    device = None
+
+    def _assert_consistency(self, transform, tensor, test_pseudo_complex=False):
+        assert tensor.is_complex()
+        tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
+        transform = transform.to(device=self.device, dtype=self.real_dtype)
+        ts_transform = torch.jit.script(transform)
+
+        if test_pseudo_complex:
+            tensor = torch.view_as_real(tensor)
+
+        output = transform(tensor)
+        ts_output = ts_transform(tensor)
+        self.assertEqual(ts_output, output)
+
+    @parameterized.expand([(True, ), (False, )])
+    def test_TimeStretch(self, test_pseudo_complex):
+        n_freq = 400
+        hop_length = 512
+        fixed_rate = 1.3
+        tensor = torch.view_as_complex(torch.rand((10, 2, n_freq, 10, 2)))
+        self._assert_consistency(
+            T.TimeStretch(n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate),
+            tensor,
+            test_pseudo_complex
+        )
