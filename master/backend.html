@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>torchaudio.backend &mdash; Torchaudio master documentation</title>
@@ -206,7 +207,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Package Reference</span></p>
+              <p><span class="caption-text">Package Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.backend</a></li>
@@ -220,7 +221,7 @@
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transducer.html">torchaudio.prototype.transducer</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -301,9 +302,9 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchaudio-backend">
+  <section id="torchaudio-backend">
 <span id="backend"></span><h1>torchaudio.backend<a class="headerlink" href="#torchaudio-backend" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="overview">
+<section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.backend</span></code> module provides implementations for audio file I/O functionalities, which are <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code>.</p>
 <p>There are currently four implementations available.</p>
@@ -315,16 +316,16 @@
 <p class="admonition-title">Note</p>
 <p>Instead of calling functions in <code class="docutils literal notranslate"><span class="pre">torchaudio.backend</span></code> directly, please use <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code>, <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, and <code class="docutils literal notranslate"><span class="pre">torchaudio.save</span></code> with proper backend set with <a class="reference internal" href="torchaudio.html#torchaudio.set_audio_backend" title="torchaudio.set_audio_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.set_audio_backend()</span></code></a>.</p>
 </div>
-<div class="section" id="availability">
+<section id="availability">
 <h3>Availability<a class="headerlink" href="#availability" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">&quot;sox_io&quot;</span></code> backend requires C++ extension module, which is included in Linux/macOS binary distributions. This backend is not available on Windows.</p>
 <p><code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code> backend requires <code class="docutils literal notranslate"><span class="pre">SoundFile</span></code>. Please refer to <a class="reference external" href="https://pysoundfile.readthedocs.io/en/latest/">the SoundFile documentation</a> for the installation.</p>
-</div>
-</div>
-<div class="section" id="common-data-structure">
+</section>
+</section>
+<section id="common-data-structure">
 <h2>Common Data Structure<a class="headerlink" href="#common-data-structure" title="Permalink to this headline">¶</a></h2>
 <p>Structures used to report the metadata of audio files.</p>
-<div class="section" id="audiometadata">
+<section id="audiometadata">
 <h3>AudioMetaData<a class="headerlink" href="#audiometadata" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="torchaudio.backend.common.AudioMetaData">
@@ -364,9 +365,9 @@ The values encoding can take are one of the following:</p>
 </dl>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="sox-io-backend">
+</section>
+</section>
+<section id="sox-io-backend">
 <span id="id1"></span><h2>Sox IO Backend<a class="headerlink" href="#sox-io-backend" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">&quot;sox_io&quot;</span></code> backend is available and default on Linux/macOS and not available on Windows.</p>
 <p>I/O functions of this backend support <a class="reference external" href="https://pytorch.org/docs/stable/jit.html">TorchScript</a>.</p>
@@ -374,7 +375,7 @@ The values encoding can take are one of the following:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torchaudio</span><span class="o">.</span><span class="n">set_audio_backend</span><span class="p">(</span><span class="s2">&quot;sox_io&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="info">
+<section id="info">
 <h3>info<a class="headerlink" href="#info" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend.sox_io_backend.info">
@@ -419,8 +420,8 @@ from header or extension,</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="load">
+</section>
+<section id="load">
 <h3>load<a class="headerlink" href="#load" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend.sox_io_backend.load">
@@ -514,8 +515,8 @@ integer type, else <code class="docutils literal notranslate"><span class="pre">
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="save">
+</section>
+<section id="save">
 <h3>save<a class="headerlink" href="#save" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend.sox_io_backend.save">
@@ -685,16 +686,16 @@ or <code class="docutils literal notranslate"><span class="pre">libmp3lame</span
 </div>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="soundfile-backend">
+</section>
+</section>
+<section id="soundfile-backend">
 <span id="id2"></span><h2>Soundfile Backend<a class="headerlink" href="#soundfile-backend" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code> backend is available when <a class="reference external" href="https://pysoundfile.readthedocs.io/en/latest/">SoundFile</a> is installed. This backend is the default on Windows.</p>
 <p>You can switch from another backend to the <code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code> backend with the following;</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torchaudio</span><span class="o">.</span><span class="n">set_audio_backend</span><span class="p">(</span><span class="s2">&quot;soundfile&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="id3">
+<section id="id3">
 <h3>info<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend.soundfile_backend.info">
@@ -723,8 +724,8 @@ or <code class="docutils literal notranslate"><span class="pre">libmp3lame</span
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h3>load<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend.soundfile_backend.load">
@@ -803,8 +804,8 @@ integer type, else <code class="docutils literal notranslate"><span class="pre">
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h3>save<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.backend.soundfile_backend.save">
@@ -914,9 +915,9 @@ Valid values are <code class="docutils literal notranslate"><span class="pre">8<
 </dl>
 </dd></dl>
 
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
              </article>

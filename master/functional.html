@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>torchaudio.functional &mdash; Torchaudio master documentation</title>
@@ -206,7 +207,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Package Reference</span></p>
+              <p><span class="caption-text">Package Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
@@ -220,7 +221,7 @@
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transducer.html">torchaudio.prototype.transducer</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -301,12 +302,12 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchaudio-functional">
+  <section id="torchaudio-functional">
 <h1>torchaudio.functional<a class="headerlink" href="#torchaudio-functional" title="Permalink to this headline">¶</a></h1>
 <p>Functions to perform common audio operations.</p>
-<div class="section" id="utility">
+<section id="utility">
 <h2><span class="hidden-section">Utility</span><a class="headerlink" href="#utility" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="amplitude-to-db">
+<section id="amplitude-to-db">
 <h3>amplitude_to_DB<a class="headerlink" href="#amplitude-to-db" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.amplitude_to_DB">
@@ -336,8 +337,8 @@ is 80. (Default: <code class="docutils literal notranslate"><span class="pre">No
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="db-to-amplitude">
+</section>
+<section id="db-to-amplitude">
 <h3>DB_to_amplitude<a class="headerlink" href="#db-to-amplitude" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.DB_to_amplitude">
@@ -360,8 +361,8 @@ is 80. (Default: <code class="docutils literal notranslate"><span class="pre">No
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="create-fb-matrix">
+</section>
+<section id="create-fb-matrix">
 <h3>create_fb_matrix<a class="headerlink" href="#create-fb-matrix" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.create_fb_matrix">
@@ -393,8 +394,8 @@ size (…, <code class="docutils literal notranslate"><span class="pre">n_freqs<
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="create-dct">
+</section>
+<section id="create-dct">
 <h3>create_dct<a class="headerlink" href="#create-dct" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.create_dct">
@@ -419,8 +420,8 @@ row-wise data of size (<code class="docutils literal notranslate"><span class="p
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="mask-along-axis">
+</section>
+<section id="mask-along-axis">
 <h3>mask_along_axis<a class="headerlink" href="#mask-along-axis" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.mask_along_axis">
@@ -446,8 +447,8 @@ All examples will have the same mask interval.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="mask-along-axis-iid">
+</section>
+<section id="mask-along-axis-iid">
 <h3>mask_along_axis_iid<a class="headerlink" href="#mask-along-axis-iid" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.mask_along_axis_iid">
@@ -472,8 +473,8 @@ All examples will have the same mask interval.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="mu-law-encoding">
+</section>
+<section id="mu-law-encoding">
 <h3>mu_law_encoding<a class="headerlink" href="#mu-law-encoding" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.mu_law_encoding">
@@ -498,8 +499,8 @@ returns a signal encoded with values from 0 to quantization_channels - 1.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="mu-law-decoding">
+</section>
+<section id="mu-law-decoding">
 <h3>mu_law_decoding<a class="headerlink" href="#mu-law-decoding" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.mu_law_decoding">
@@ -524,8 +525,8 @@ and returns a signal scaled between -1 and 1.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="apply-codec">
+</section>
+<section id="apply-codec">
 <h3>apply_codec<a class="headerlink" href="#apply-codec" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.apply_codec">
@@ -557,12 +558,12 @@ If <code class="docutils literal notranslate"><span class="pre">channels_first=T
 </dl>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="complex-utility">
+</section>
+</section>
+<section id="complex-utility">
 <h2><span class="hidden-section">Complex Utility</span><a class="headerlink" href="#complex-utility" title="Permalink to this headline">¶</a></h2>
 <p>Utilities for pseudo complex tensor. This is not for the native complex dtype, such as <cite>cfloat64</cite>, but for tensors with real-value type and have extra dimension at the end for real and imaginary parts.</p>
-<div class="section" id="angle">
+<section id="angle">
 <h3>angle<a class="headerlink" href="#angle" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.angle">
@@ -581,8 +582,8 @@ If <code class="docutils literal notranslate"><span class="pre">channels_first=T
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="complex-norm">
+</section>
+<section id="complex-norm">
 <h3>complex_norm<a class="headerlink" href="#complex-norm" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.complex_norm">
@@ -604,8 +605,8 @@ If <code class="docutils literal notranslate"><span class="pre">channels_first=T
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="magphase">
+</section>
+<section id="magphase">
 <h3>magphase<a class="headerlink" href="#magphase" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.magphase">
@@ -627,11 +628,11 @@ If <code class="docutils literal notranslate"><span class="pre">channels_first=T
 </dl>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="filtering">
+</section>
+</section>
+<section id="filtering">
 <h2><span class="hidden-section">Filtering</span><a class="headerlink" href="#filtering" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="allpass-biquad">
+<section id="allpass-biquad">
 <h3>allpass_biquad<a class="headerlink" href="#allpass-biquad" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.allpass_biquad">
@@ -658,8 +659,8 @@ If <code class="docutils literal notranslate"><span class="pre">channels_first=T
 <a class="reference external" href="https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF">https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="band-biquad">
+</section>
+<section id="band-biquad">
 <h3>band_biquad<a class="headerlink" href="#band-biquad" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.band_biquad">
@@ -689,8 +690,8 @@ or instrumental music (Default: <code class="docutils literal notranslate"><span
 <a class="reference external" href="https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF">https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="bandpass-biquad">
+</section>
+<section id="bandpass-biquad">
 <h3>bandpass_biquad<a class="headerlink" href="#bandpass-biquad" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.bandpass_biquad">
@@ -719,8 +720,8 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <a class="reference external" href="https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF">https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="bandreject-biquad">
+</section>
+<section id="bandreject-biquad">
 <h3>bandreject_biquad<a class="headerlink" href="#bandreject-biquad" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.bandreject_biquad">
@@ -747,8 +748,8 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <a class="reference external" href="https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF">https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="bass-biquad">
+</section>
+<section id="bass-biquad">
 <h3>bass_biquad<a class="headerlink" href="#bass-biquad" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.bass_biquad">
@@ -776,8 +777,8 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 <a class="reference external" href="https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF">https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="biquad">
+</section>
+<section id="biquad">
 <h3>biquad<a class="headerlink" href="#biquad" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.biquad">
@@ -805,8 +806,8 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="contrast">
+</section>
+<section id="contrast">
 <h3>contrast<a class="headerlink" href="#contrast" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.contrast">
@@ -833,8 +834,8 @@ Note that enhancement_amount = 0 still gives a significant contrast enhancement<
 <p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="dcshift">
+</section>
+<section id="dcshift">
 <h3>dcshift<a class="headerlink" href="#dcshift" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.dcshift">
@@ -863,8 +864,8 @@ It should have a value much less than 1 (e.g. 0.05 or 0.02)</p></li>
 <p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="deemph-biquad">
+</section>
+<section id="deemph-biquad">
 <h3>deemph_biquad<a class="headerlink" href="#deemph-biquad" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.deemph_biquad">
@@ -889,8 +890,8 @@ It should have a value much less than 1 (e.g. 0.05 or 0.02)</p></li>
 <a class="reference external" href="https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF">https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="dither">
+</section>
+<section id="dither">
 <h3>dither<a class="headerlink" href="#dither" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.dither">
@@ -919,8 +920,8 @@ energy of quantisation error (Default: <code class="docutils literal notranslate
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="equalizer-biquad">
+</section>
+<section id="equalizer-biquad">
 <h3>equalizer_biquad<a class="headerlink" href="#equalizer-biquad" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.equalizer_biquad">
@@ -945,8 +946,8 @@ energy of quantisation error (Default: <code class="docutils literal notranslate
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="flanger">
+</section>
+<section id="flanger">
 <h3>flanger<a class="headerlink" href="#flanger" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.flanger">
@@ -987,8 +988,8 @@ Allowed range of values are 0 to 100</p></li>
 <a class="reference external" href="https://web.archive.org/web/20051125072557/http://www.harmony-central.com/Effects/effects-explained.html">https://web.archive.org/web/20051125072557/http://www.harmony-central.com/Effects/effects-explained.html</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="gain">
+</section>
+<section id="gain">
 <h3>gain<a class="headerlink" href="#gain" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.gain">
@@ -1010,8 +1011,8 @@ Allowed range of values are 0 to 100</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="highpass-biquad">
+</section>
+<section id="highpass-biquad">
 <h3>highpass_biquad<a class="headerlink" href="#highpass-biquad" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.highpass_biquad">
@@ -1035,8 +1036,8 @@ Allowed range of values are 0 to 100</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="lfilter">
+</section>
+<section id="lfilter">
 <h3>lfilter<a class="headerlink" href="#lfilter" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.lfilter">
@@ -1069,8 +1070,8 @@ Must be same size as a_coeffs (pad with 0’s as necessary).</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="lowpass-biquad">
+</section>
+<section id="lowpass-biquad">
 <h3>lowpass_biquad<a class="headerlink" href="#lowpass-biquad" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.lowpass_biquad">
@@ -1094,8 +1095,8 @@ Must be same size as a_coeffs (pad with 0’s as necessary).</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="overdrive">
+</section>
+<section id="overdrive">
 <h3>overdrive<a class="headerlink" href="#overdrive" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.overdrive">
@@ -1123,8 +1124,8 @@ Allowed range of values are 0 to 100</p></li>
 <p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="phaser">
+</section>
+<section id="phaser">
 <h3>phaser<a class="headerlink" href="#phaser" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.phaser">
@@ -1163,8 +1164,8 @@ Scott Lehman, Effects Explained,
 <a class="reference external" href="https://web.archive.org/web/20051125072557/http://www.harmony-central.com/Effects/effects-explained.html">https://web.archive.org/web/20051125072557/http://www.harmony-central.com/Effects/effects-explained.html</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="riaa-biquad">
+</section>
+<section id="riaa-biquad">
 <h3>riaa_biquad<a class="headerlink" href="#riaa-biquad" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.riaa_biquad">
@@ -1190,8 +1191,8 @@ Allowed sample rates in Hz : <code class="docutils literal notranslate"><span cl
 <a class="reference external" href="https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF">https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="treble-biquad">
+</section>
+<section id="treble-biquad">
 <h3>treble_biquad<a class="headerlink" href="#treble-biquad" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.treble_biquad">
@@ -1219,12 +1220,12 @@ Allowed sample rates in Hz : <code class="docutils literal notranslate"><span cl
 <a class="reference external" href="https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF">https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</a></p>
 </dd></dl>
 
-</div>
-<div class="section" id="vad">
+</section>
+<section id="vad">
 <h3>vad<a class="headerlink" href="#vad" title="Permalink to this headline">¶</a></h3>
-</div>
-</div>
-<div class="section" id="feature-extractions">
+</section>
+</section>
+<section id="feature-extractions">
 <h2><span class="hidden-section">Feature Extractions</span><a class="headerlink" href="#feature-extractions" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="torchaudio.functional.vad">
@@ -1279,7 +1280,7 @@ This option sets the time for the initial noise estimate. (Default: 0.35)</p></l
 <p><a class="reference external" href="http://sox.sourceforge.net/sox.html">http://sox.sourceforge.net/sox.html</a></p>
 </dd></dl>
 
-<div class="section" id="spectrogram">
+<section id="spectrogram">
 <h3><span class="hidden-section">spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.spectrogram">
@@ -1324,8 +1325,8 @@ Fourier bins, and time is the number of window hops (n_frame).</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="griffinlim">
+</section>
+<section id="griffinlim">
 <h3><span class="hidden-section">griffinlim</span><a class="headerlink" href="#griffinlim" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.griffinlim">
@@ -1384,8 +1385,8 @@ Values near 1 can lead to faster convergence, but above 1 may not converge.</p><
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="phase-vocoder">
+</section>
+<section id="phase-vocoder">
 <h3><span class="hidden-section">phase_vocoder</span><a class="headerlink" href="#phase-vocoder" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.phase_vocoder">
@@ -1437,8 +1438,8 @@ spectrogram, but the number of frames is changed to <code class="docutils litera
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="compute-deltas">
+</section>
+<section id="compute-deltas">
 <h3><span class="hidden-section">compute_deltas</span><a class="headerlink" href="#compute-deltas" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.compute_deltas">
@@ -1476,8 +1477,8 @@ spectrogram, but the number of frames is changed to <code class="docutils litera
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="detect-pitch-frequency">
+</section>
+<section id="detect-pitch-frequency">
 <h3><span class="hidden-section">detect_pitch_frequency</span><a class="headerlink" href="#detect-pitch-frequency" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.detect_pitch_frequency">
@@ -1504,8 +1505,8 @@ spectrogram, but the number of frames is changed to <code class="docutils litera
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="sliding-window-cmn">
+</section>
+<section id="sliding-window-cmn">
 <h3><span class="hidden-section">sliding_window_cmn</span><a class="headerlink" href="#sliding-window-cmn" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.sliding_window_cmn">
@@ -1532,8 +1533,8 @@ Only applicable if center == false, ignored if center==true (int, default = 100)
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="compute-kaldi-pitch">
+</section>
+<section id="compute-kaldi-pitch">
 <h3><span class="hidden-section">compute_kaldi_pitch</span><a class="headerlink" href="#compute-kaldi-pitch" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.compute_kaldi_pitch">
@@ -1598,8 +1599,8 @@ corresponds to pitch and NCCF.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="spectral-centroid">
+</section>
+<section id="spectral-centroid">
 <h3><span class="hidden-section">spectral_centroid</span><a class="headerlink" href="#spectral-centroid" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.spectral_centroid">
@@ -1628,8 +1629,8 @@ frequency values, weighted by their magnitude.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="resample">
+</section>
+<section id="resample">
 <h3><span class="hidden-section">resample</span><a class="headerlink" href="#resample" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.resample">
@@ -1660,9 +1661,9 @@ but less efficient. We suggest around 4 to 10 for normal use. (Default: <code cl
 </dl>
 </dd></dl>
 
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
              </article>

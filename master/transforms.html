@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>torchaudio.transforms &mdash; Torchaudio master documentation</title>
@@ -206,7 +207,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Package Reference</span></p>
+              <p><span class="caption-text">Package Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
@@ -220,7 +221,7 @@
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transducer.html">torchaudio.prototype.transducer</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -301,10 +302,10 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchaudio-transforms">
+  <section id="torchaudio-transforms">
 <h1>torchaudio.transforms<a class="headerlink" href="#torchaudio-transforms" title="Permalink to this headline">¶</a></h1>
 <p>Transforms are common audio transforms. They can be chained together using <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html#torch.nn.Sequential" title="(in PyTorch v1.8.0a0+56b43f4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Sequential</span></code></a></p>
-<div class="section" id="spectrogram">
+<section id="spectrogram">
 <h2><span class="hidden-section">Spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.Spectrogram">
@@ -359,8 +360,8 @@ Fourier bins, and time is the number of window hops (n_frame).</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="griffinlim">
+</section>
+<section id="griffinlim">
 <h2><span class="hidden-section">GriffinLim</span><a class="headerlink" href="#griffinlim" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.GriffinLim">
@@ -432,8 +433,8 @@ where freq is <code class="docutils literal notranslate"><span class="pre">n_fft
 
 </dd></dl>
 
-</div>
-<div class="section" id="amplitudetodb">
+</section>
+<section id="amplitudetodb">
 <h2><span class="hidden-section">AmplitudeToDB</span><a class="headerlink" href="#amplitudetodb" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.AmplitudeToDB">
@@ -472,8 +473,8 @@ is 80. (Default: <code class="docutils literal notranslate"><span class="pre">No
 
 </dd></dl>
 
-</div>
-<div class="section" id="melscale">
+</section>
+<section id="melscale">
 <h2><span class="hidden-section">MelScale</span><a class="headerlink" href="#melscale" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.MelScale">
@@ -514,8 +515,8 @@ if None is given.  See <code class="docutils literal notranslate"><span class="p
 
 </dd></dl>
 
-</div>
-<div class="section" id="inversemelscale">
+</section>
+<section id="inversemelscale">
 <h2><span class="hidden-section">InverseMelScale</span><a class="headerlink" href="#inversemelscale" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.InverseMelScale">
@@ -560,8 +561,8 @@ the estimated spectrogram and the filter banks using SGD.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="melspectrogram">
+</section>
+<section id="melspectrogram">
 <h2><span class="hidden-section">MelSpectrogram</span><a class="headerlink" href="#melspectrogram" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.MelSpectrogram">
@@ -628,8 +629,8 @@ avoid redundancy. Default: <code class="docutils literal notranslate"><span clas
 
 </dd></dl>
 
-</div>
-<div class="section" id="mfcc">
+</section>
+<section id="mfcc">
 <h2><span class="hidden-section">MFCC</span><a class="headerlink" href="#mfcc" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.MFCC">
@@ -671,8 +672,8 @@ a full clip.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="mulawencoding">
+</section>
+<section id="mulawencoding">
 <h2><span class="hidden-section">MuLawEncoding</span><a class="headerlink" href="#mulawencoding" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.MuLawEncoding">
@@ -704,8 +705,8 @@ returns a signal encoded with values from 0 to quantization_channels - 1</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="mulawdecoding">
+</section>
+<section id="mulawdecoding">
 <h2><span class="hidden-section">MuLawDecoding</span><a class="headerlink" href="#mulawdecoding" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.MuLawDecoding">
@@ -737,8 +738,8 @@ and returns a signal scaled between -1 and 1.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="resample">
+</section>
+<section id="resample">
 <h2><span class="hidden-section">Resample</span><a class="headerlink" href="#resample" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.Resample">
@@ -771,8 +772,8 @@ and returns a signal scaled between -1 and 1.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="complexnorm">
+</section>
+<section id="complexnorm">
 <h2><span class="hidden-section">ComplexNorm</span><a class="headerlink" href="#complexnorm" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.ComplexNorm">
@@ -801,8 +802,8 @@ and returns a signal scaled between -1 and 1.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="computedeltas">
+</section>
+<section id="computedeltas">
 <h2><span class="hidden-section">ComputeDeltas</span><a class="headerlink" href="#computedeltas" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.ComputeDeltas">
@@ -835,8 +836,8 @@ and returns a signal scaled between -1 and 1.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="timestretch">
+</section>
+<section id="timestretch">
 <h2><span class="hidden-section">TimeStretch</span><a class="headerlink" href="#timestretch" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.TimeStretch">
@@ -876,8 +877,8 @@ spectrogram, but the number of frames is changed to <code class="docutils litera
 
 </dd></dl>
 
-</div>
-<div class="section" id="fade">
+</section>
+<section id="fade">
 <h2><span class="hidden-section">Fade</span><a class="headerlink" href="#fade" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.Fade">
@@ -911,8 +912,8 @@ spectrogram, but the number of frames is changed to <code class="docutils litera
 
 </dd></dl>
 
-</div>
-<div class="section" id="frequencymasking">
+</section>
+<section id="frequencymasking">
 <h2><span class="hidden-section">FrequencyMasking</span><a class="headerlink" href="#frequencymasking" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.FrequencyMasking">
@@ -950,8 +951,8 @@ This option is applicable only when the input tensor is 4D.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="timemasking">
+</section>
+<section id="timemasking">
 <h2><span class="hidden-section">TimeMasking</span><a class="headerlink" href="#timemasking" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.TimeMasking">
@@ -989,8 +990,8 @@ This option is applicable only when the input tensor is 4D.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="vol">
+</section>
+<section id="vol">
 <h2><span class="hidden-section">Vol</span><a class="headerlink" href="#vol" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.Vol">
@@ -1025,8 +1026,8 @@ If <code class="docutils literal notranslate"><span class="pre">gain_type</span>
 
 </dd></dl>
 
-</div>
-<div class="section" id="slidingwindowcmn">
+</section>
+<section id="slidingwindowcmn">
 <h2><span class="hidden-section">SlidingWindowCmn</span><a class="headerlink" href="#slidingwindowcmn" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.SlidingWindowCmn">
@@ -1062,8 +1063,8 @@ Only applicable if center == false, ignored if center==true (int, default = 100)
 
 </dd></dl>
 
-</div>
-<div class="section" id="spectralcentroid">
+</section>
+<section id="spectralcentroid">
 <h2><span class="hidden-section">SpectralCentroid</span><a class="headerlink" href="#spectralcentroid" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.SpectralCentroid">
@@ -1110,8 +1111,8 @@ that is applied/multiplied to each frame/window. (Default: <code class="docutils
 
 </dd></dl>
 
-</div>
-<div class="section" id="vad">
+</section>
+<section id="vad">
 <h2><span class="hidden-section">Vad</span><a class="headerlink" href="#vad" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.Vad">
@@ -1169,8 +1170,8 @@ This option sets the time for the initial noise estimate. (Default: 0.35)</p></l
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
              </article>

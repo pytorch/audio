@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>torchaudio.datasets &mdash; Torchaudio master documentation</title>
@@ -206,7 +207,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Package Reference</span></p>
+              <p><span class="caption-text">Package Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">torchaudio.backend</a></li>
@@ -220,7 +221,7 @@
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transducer.html">torchaudio.prototype.transducer</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch Libraries</span></p>
+<p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
@@ -301,7 +302,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchaudio-datasets">
+  <section id="torchaudio-datasets">
 <h1>torchaudio.datasets<a class="headerlink" href="#torchaudio-datasets" title="Permalink to this headline">¶</a></h1>
 <p>All datasets are subclasses of <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="(in PyTorch v1.8.0a0+56b43f4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></a>
 and have <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> and <code class="docutils literal notranslate"><span class="pre">__len__</span></code> methods implemented.
@@ -334,7 +335,7 @@ For example:</p>
 </div>
 <p>All the datasets have almost similar API. They all have two common arguments:
 <code class="docutils literal notranslate"><span class="pre">transform</span></code> and  <code class="docutils literal notranslate"><span class="pre">target_transform</span></code> to transform the input and target respectively.</p>
-<div class="section" id="cmuarctic">
+<section id="cmuarctic">
 <h2><a class="toc-backref" href="#id1">CMUARCTIC</a><a class="headerlink" href="#cmuarctic" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.CMUARCTIC">
@@ -373,8 +374,8 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 
 </dd></dl>
 
-</div>
-<div class="section" id="commonvoice">
+</section>
+<section id="commonvoice">
 <h2><a class="toc-backref" href="#id2">COMMONVOICE</a><a class="headerlink" href="#commonvoice" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.COMMONVOICE">
@@ -416,8 +417,8 @@ from the TSV file with the following keys: <code class="docutils literal notrans
 
 </dd></dl>
 
-</div>
-<div class="section" id="gtzan">
+</section>
+<section id="gtzan">
 <h2><a class="toc-backref" href="#id3">GTZAN</a><a class="headerlink" href="#gtzan" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.GTZAN">
@@ -461,8 +462,8 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 
 </dd></dl>
 
-</div>
-<div class="section" id="librispeech">
+</section>
+<section id="librispeech">
 <h2><a class="toc-backref" href="#id4">LIBRISPEECH</a><a class="headerlink" href="#librispeech" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.LIBRISPEECH">
@@ -501,8 +502,8 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 
 </dd></dl>
 
-</div>
-<div class="section" id="libritts">
+</section>
+<section id="libritts">
 <h2><a class="toc-backref" href="#id5">LIBRITTS</a><a class="headerlink" href="#libritts" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.LIBRITTS">
@@ -542,8 +543,8 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 
 </dd></dl>
 
-</div>
-<div class="section" id="ljspeech">
+</section>
+<section id="ljspeech">
 <h2><a class="toc-backref" href="#id6">LJSPEECH</a><a class="headerlink" href="#ljspeech" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.LJSPEECH">
@@ -579,8 +580,8 @@ Allowed type values are <code class="docutils literal notranslate"><span class="
 
 </dd></dl>
 
-</div>
-<div class="section" id="speechcommands">
+</section>
+<section id="speechcommands">
 <h2><a class="toc-backref" href="#id7">SPEECHCOMMANDS</a><a class="headerlink" href="#speechcommands" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.SPEECHCOMMANDS">
@@ -624,8 +625,8 @@ original paper can be found <a class="reference external" href="https://arxiv.or
 
 </dd></dl>
 
-</div>
-<div class="section" id="tedlium">
+</section>
+<section id="tedlium">
 <h2><a class="toc-backref" href="#id8">TEDLIUM</a><a class="headerlink" href="#tedlium" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.TEDLIUM">
@@ -675,8 +676,8 @@ Note that some words have empty phonemes.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="vctk">
+</section>
+<section id="vctk">
 <h2><a class="toc-backref" href="#id9">VCTK</a><a class="headerlink" href="#vctk" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.VCTK">
@@ -722,8 +723,8 @@ publicly available.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="vctk-092">
+</section>
+<section id="vctk-092">
 <h2><a class="toc-backref" href="#id10">VCTK_092</a><a class="headerlink" href="#vctk-092" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.VCTK_092">
@@ -769,8 +770,8 @@ publicly available.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="yesno">
+</section>
+<section id="yesno">
 <h2><a class="toc-backref" href="#id11">YESNO</a><a class="headerlink" href="#yesno" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.datasets.YESNO">
@@ -806,8 +807,8 @@ publicly available.</p></li>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
