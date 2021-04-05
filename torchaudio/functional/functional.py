@@ -84,6 +84,14 @@ def spectrogram(
         ``n_fft // 2 + 1`` and ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frame).
     """
+    if power is None and not return_complex:
+        warnings.warn(
+            "spectrogram now supports returning native complex tensor "
+            "when `power=None` by setting `return_complex=True`. "
+            "Currently, the function returns pseudo complex type (..., 2) by default, "
+            "but this will change in the future and `return_complex` would be set to True by default. "
+            "Please refer to https://github.com/pytorch/audio/issues/1337 for the detail.")
+
     if power is not None and return_complex:
         raise ValueError(
             'When `power` is provided, the return value is real-valued. '
