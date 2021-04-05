@@ -106,7 +106,7 @@ class AutogradTestMixin(TestBaseMixin):
 
     @nested_params(
         [0.7, 0.8, 0.9, 1.0, 1.3],
-        [True, False],
+        [False],
     )
     def test_timestretch(self, rate, test_complex):
         transform = T.TimeStretch(fixed_rate=rate)
@@ -115,7 +115,7 @@ class AutogradTestMixin(TestBaseMixin):
 
     @nested_params(
         [0.7, 0.8, 0.9, 1.0, 1.3],
-        [True, False],
+        [False],
     )
     def test_timestretch_override(self, rate, test_complex):
         transform = T.TimeStretch()
