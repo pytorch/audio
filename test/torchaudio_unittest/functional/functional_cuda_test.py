@@ -2,7 +2,7 @@ import torch
 import unittest
 
 from torchaudio_unittest import common_utils
-from .functional_impl import Lfilter, Spectrogram, FunctionalComplex
+from .functional_impl import Lfilter, Spectrogram
 
 
 @common_utils.skipIfNoCuda
@@ -30,18 +30,4 @@ class TestSpectrogramFloat32(Spectrogram, common_utils.PytorchTestCase):
 @common_utils.skipIfNoCuda
 class TestSpectrogramFloat64(Spectrogram, common_utils.PytorchTestCase):
     dtype = torch.float64
-    device = torch.device('cuda')
-
-
-@common_utils.skipIfNoCuda
-class TestFunctionalComplex64(FunctionalComplex, common_utils.PytorchTestCase):
-    complex_dtype = torch.complex64
-    real_dtype = torch.float32
-    device = torch.device('cuda')
-
-
-@common_utils.skipIfNoCuda
-class TestFunctionalComplex128(FunctionalComplex, common_utils.PytorchTestCase):
-    complex_dtype = torch.complex64
-    real_dtype = torch.float32
     device = torch.device('cuda')

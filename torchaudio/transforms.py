@@ -738,24 +738,26 @@ class TimeStretch(torch.nn.Module):
     def forward(self, complex_specgrams: Tensor, overriding_rate: Optional[float] = None) -> Tensor:
         r"""
         Args:
-            complex_specgrams (Tensor):
-                Either a real tensor of dimension of ``(..., freq, num_frame, complex=2)``
-                or a tensor of dimension ``(..., freq, num_frame)`` with complex dtype.
+            complex_specgrams (Tensor): complex spectrogram (..., freq, time, complex=2).
             overriding_rate (float or None, optional): speed up to apply to this batch.
                 If no rate is passed, use ``self.fixed_rate``. (Default: ``None``)
 
         Returns:
-            Tensor:
-                Stretched spectrogram. The resulting tensor is of the same dtype as the input
-                spectrogram, but the number of frames is changed to ``ceil(num_frame / rate)``.
+            Tensor: Stretched complex spectrogram of dimension (..., freq, ceil(time/rate), complex=2).
         """
+        assert complex_specgrams.size(-1) == 2, "complex_specgrams should be a complex tensor, shape (..., complex=2)"
+
         if overriding_rate is None:
-            if self.fixed_rate is None:
-                raise ValueError(
-                    "If no fixed_rate is specified, must pass a valid rate to the forward method.")
             rate = self.fixed_rate
+            if rate is None:
+                raise ValueError("If no fixed_rate is specified"
+                                 ", must pass a valid rate to the forward method.")
         else:
             rate = overriding_rate
+
+        if rate == 1.0:
+            return complex_specgrams
+
         return F.phase_vocoder(complex_specgrams, rate, self.phase_advance)
 
 
