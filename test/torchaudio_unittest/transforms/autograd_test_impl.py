@@ -83,3 +83,9 @@ class AutogradTestMixin(TestBaseMixin):
         transform = T.Fade(fade_shape=fade_shape)
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
+
+    def test_spectral_centroid(self):
+        sample_rate = 8000
+        transform = T.SpectralCentroid(sample_rate=sample_rate)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
