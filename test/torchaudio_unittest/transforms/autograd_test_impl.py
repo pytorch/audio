@@ -77,3 +77,9 @@ class AutogradTestMixin(TestBaseMixin):
         transform = T.Resample(orig_freq=orig_freq, new_freq=new_freq)
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform])
+
+    @parameterized.expand([("linear", ), ("exponential", ), ("logarithmic", ), ("quarter_sine", ), ("half_sine", )])
+    def test_fade(self, fade_shape):
+        transform = T.Fade(fade_shape=fade_shape)
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
