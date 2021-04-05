@@ -72,6 +72,11 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform])
 
+    def test_compute_deltas(self):
+        transform = T.ComputeDeltas()
+        spec = torch.rand(10, 20)
+        self.assert_grad(transform, [spec])
+
     @parameterized.expand([(8000, 8000), (8000, 4000), (4000, 8000)])
     def test_resample(self, orig_freq, new_freq):
         transform = T.Resample(orig_freq=orig_freq, new_freq=new_freq)
