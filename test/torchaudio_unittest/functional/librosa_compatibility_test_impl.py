@@ -107,7 +107,7 @@ class Functional(TestBaseMixin):
         top_db = 80.0
         multiplier = 10.0
 
-        spec = get_spectrogram(get_whitenoise(device=self.device, dtype=self.dtype))
+        spec = get_spectrogram(get_whitenoise(device=self.device, dtype=self.dtype), power=2)
         result = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db)
         expected = librosa.core.power_to_db(spec[0].cpu().numpy())[None, ...]
         self.assertEqual(result, torch.from_numpy(expected))
@@ -118,7 +118,7 @@ class Functional(TestBaseMixin):
         top_db = 80.0
         multiplier = 20.0
 
-        spec = get_spectrogram(get_whitenoise(device=self.device, dtype=self.dtype))
+        spec = get_spectrogram(get_whitenoise(device=self.device, dtype=self.dtype), power=1)
         result = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db)
         expected = librosa.core.amplitude_to_db(spec[0].cpu().numpy())[None, ...]
         self.assertEqual(result, torch.from_numpy(expected))
