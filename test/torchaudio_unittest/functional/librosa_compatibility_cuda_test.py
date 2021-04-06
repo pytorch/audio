@@ -8,5 +8,5 @@ class TestFunctionalCUDA(Functional, PytorchTestCase):
 
 
 @skipIfNoCuda
-class TestFunctionalComplexCPU(FunctionalComplex, PytorchTestCase):
-    device = 'cpu'
+class TestFunctionalComplexCUDA(FunctionalComplex, PytorchTestCase):
+    device = 'cuda'

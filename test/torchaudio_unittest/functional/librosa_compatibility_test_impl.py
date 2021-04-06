@@ -40,7 +40,7 @@ class Functional(TestBaseMixin):
 
         waveform = get_whitenoise(device=self.device, dtype=self.dtype)
         specgram = get_spectrogram(
-            waveform, n_fft=n_fft, hop_length=hop_length, power=1,
+            waveform, n_fft=n_fft, hop_length=hop_length, power=power,
             win_length=win_length, window=window)
 
         result = F.griffinlim(
@@ -152,7 +152,7 @@ class FunctionalComplex(TestBaseMixin):
             rate=rate, phase_advance=phase_advance)
 
         expected_stretched = librosa.phase_vocoder(
-            spec.numpy(),
+            spec.cpu().numpy(),
             rate=rate,
             hop_length=hop_length)
 
