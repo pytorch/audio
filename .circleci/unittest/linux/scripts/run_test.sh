@@ -11,9 +11,7 @@ case "$(uname -s)" in
 esac
 
 python -m torch.utils.collect_env
-if [ "${os}" == Linux ]; then
-    cat /proc/cpuinfo
-fi
+
 export TORCHAUDIO_TEST_FAIL_IF_NO_EXTENSION=1
 export PATH="${PWD}/third_party/install/bin/:${PATH}"
 
