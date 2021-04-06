@@ -80,7 +80,91 @@ void lfilter_core_generic_loop(
   }
 }
 
-std::tuple<at::Tensor, at::Tensor> lfilter_core(
+torch::Tensor iir_autograd(const torch::Tensor&, const torch::Tensor&);
+
+class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
+ public:
+  static torch::Tensor forward(
+      torch::autograd::AutogradContext* ctx,
+      const torch::Tensor& waveform,
+      const torch::Tensor& a_coeffs) {
+    at::AutoNonVariableTypeMode g;
+    auto device = waveform.device();
+    auto dtype = waveform.dtype();
+    int64_t n_channel = waveform.size(0);
+    int64_t n_sample = waveform.size(1);
+    int64_t n_order = a_coeffs.size(0);
+    int64_t n_sample_padded = n_sample + n_order - 1;
+
+    auto a_coeff_flipped = a_coeffs.flip(0).contiguous();
+    a_coeff_flipped.div_(a_coeffs[0]);
+
+    auto options = torch::TensorOptions().dtype(dtype).device(device);
+    auto padded_output_waveform =
+        torch::zeros({n_channel, n_sample_padded}, options);
+
+    if (device.is_cpu()) {
+      cpu_lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform);
+    } else {
+      lfilter_core_generic_loop(
+          waveform, a_coeff_flipped, padded_output_waveform);
+    }
+
+    auto output = padded_output_waveform.index(
+        {torch::indexing::Slice(),
+         torch::indexing::Slice(n_order - 1, torch::indexing::None)});
+
+    ctx->save_for_backward({waveform, a_coeffs, output});
+    return output;
+  }
+
+  static torch::autograd::tensor_list backward(
+      torch::autograd::AutogradContext* ctx,
+      torch::autograd::tensor_list grad_outputs) {
+    auto saved = ctx->get_saved_variables();
+    auto x = saved[0];
+    auto a_coeffs = saved[1];
+    auto y = saved[2];
+
+    int64_t n_channel = x.size(0);
+    int64_t n_sample = x.size(1);
+    int64_t n_order = a_coeffs.size(0);
+
+    auto dx = torch::Tensor();
+    auto da = torch::Tensor();
+    auto dy = grad_outputs[0];
+
+    namespace F = torch::nn::functional;
+
+    if (a_coeffs.requires_grad()) {
+      auto dyda = F::pad(
+          iir_autograd(-y, a_coeffs), F::PadFuncOptions({n_order - 1, 0}));
+
+      da = F::conv1d(
+               dyda.unsqueeze(0),
+               dy.unsqueeze(1),
+               F::Conv1dFuncOptions().groups(n_channel))
+               .sum(1)
+               .squeeze(0)
+               .flip(0);
+      da.div_(a_coeffs[0].item());
+    }
+
+    if (x.requires_grad()) {
+      dx = iir_autograd(dy.flip(1), a_coeffs).flip(1);
+    }
+
+    return {dx, da};
+  }
+};
+
+torch::Tensor iir_autograd(
+    const torch::Tensor& waveform,
+    const torch::Tensor& a_coeffs) {
+  return DifferentiableIIR::apply(waveform, a_coeffs);
+}
+
+torch::Tensor lfilter_core(
     const torch::Tensor& waveform,
     const torch::Tensor& a_coeffs,
     const torch::Tensor& b_coeffs) {
@@ -90,160 +174,23 @@ std::tuple<at::Tensor, at::Tensor> lfilter_core(
 
   TORCH_INTERNAL_ASSERT(waveform.sizes().size() == 2);
 
-  auto device = waveform.device();
-  int64_t n_order = a_coeffs.size(0);
+  int64_t n_order = b_coeffs.size(0);
 
   TORCH_INTERNAL_ASSERT(n_order > 0);
 
   namespace F = torch::nn::functional;
 
   auto padded_waveform = F::pad(waveform, F::PadFuncOptions({n_order - 1, 0}));
-  auto padded_output_waveform = torch::zeros_like(padded_waveform);
-
-  auto a_coeff_flipped = a_coeffs.flip(0).contiguous();
   auto b_coeff_flipped = b_coeffs.flip(0).contiguous();
+  b_coeff_flipped.div_(a_coeffs[0].item());
 
-  auto input_signal_windows =
+  auto filtered_waveform =
       F::conv1d(
           padded_waveform.unsqueeze(1), b_coeff_flipped.view({1, 1, n_order}))
           .squeeze(1);
 
-  input_signal_windows.div_(a_coeffs[0]);
-  a_coeff_flipped.div_(a_coeffs[0]);
-
-  if (device.is_cpu()) {
-    cpu_lfilter_core_loop(
-        input_signal_windows, a_coeff_flipped, padded_output_waveform);
-  } else {
-    lfilter_core_generic_loop(
-        input_signal_windows, a_coeff_flipped, padded_output_waveform);
-  }
-
-  auto output = padded_output_waveform.index(
-      {torch::indexing::Slice(),
-       torch::indexing::Slice(n_order - 1, torch::indexing::None)});
-
-  return {output, input_signal_windows};
-}
-
-torch::Tensor lfilter_simple(
-    const torch::Tensor& waveform,
-    const torch::Tensor& a_coeffs,
-    const torch::Tensor& b_coeffs) {
-  return std::get<0>(lfilter_core(waveform, a_coeffs, b_coeffs));
-}
-
-class DifferentiableLfilter
-    : public torch::autograd::Function<DifferentiableLfilter> {
- public:
-  static torch::Tensor forward(
-      torch::autograd::AutogradContext* ctx,
-      const torch::Tensor& waveform,
-      const torch::Tensor& a_coeffs,
-      const torch::Tensor& b_coeffs) {
-    at::AutoNonVariableTypeMode g;
-    auto result = lfilter_core(waveform, a_coeffs, b_coeffs);
-    ctx->save_for_backward(
-        {waveform,
-         a_coeffs,
-         b_coeffs,
-         std::get<0>(result),
-         std::get<1>(result)});
-    return std::get<0>(result);
-  }
-
-  static torch::autograd::tensor_list backward(
-      torch::autograd::AutogradContext* ctx,
-      torch::autograd::tensor_list grad_outputs) {
-    auto saved = ctx->get_saved_variables();
-    auto waveform = saved[0];
-    auto a_coeffs = saved[1];
-    auto b_coeffs = saved[2];
-    auto y = saved[3];
-    auto xh = saved[4];
-
-    auto device = waveform.device();
-    auto dtype = waveform.dtype();
-    int64_t n_channel = waveform.size(0);
-    int64_t n_sample = waveform.size(1);
-    int64_t n_order = a_coeffs.size(0);
-    int64_t n_sample_padded = n_sample + n_order - 1;
-
-    auto a_coeff_flipped = a_coeffs.flip(0).contiguous();
-    auto b_coeff_flipped = b_coeffs.flip(0).contiguous();
-    b_coeff_flipped.div_(a_coeffs[0]);
-    a_coeff_flipped.div_(a_coeffs[0]);
-
-    auto dx = torch::Tensor();
-    auto da = torch::Tensor();
-    auto db = torch::Tensor();
-    auto dy = grad_outputs[0];
-
-    at::AutoNonVariableTypeMode g;
-    namespace F = torch::nn::functional;
-    auto options = torch::TensorOptions().dtype(dtype).device(device);
-
-    if (a_coeffs.requires_grad()) {
-      auto dyda = torch::zeros({n_channel, n_sample_padded}, options);
-      if (device.is_cpu()) {
-        cpu_lfilter_core_loop(-y, a_coeff_flipped, dyda);
-      } else {
-        lfilter_core_generic_loop(-y, a_coeff_flipped, dyda);
-      }
-
-      da = F::conv1d(
-               dyda.unsqueeze(0),
-               dy.unsqueeze(1),
-               F::Conv1dFuncOptions().groups(n_channel))
-               .sum(1)
-               .squeeze(0)
-               .flip(0);
-      da.div_(a_coeffs[0]);
-    }
-
-    if (b_coeffs.requires_grad() || waveform.requires_grad()) {
-      auto dxh = torch::zeros({n_channel, n_sample_padded}, options);
-      if (device.is_cpu()) {
-        cpu_lfilter_core_loop(dy.flip(1), a_coeff_flipped, dxh);
-      } else {
-        lfilter_core_generic_loop(dy.flip(1), a_coeff_flipped, dxh);
-      }
-
-      dxh = dxh.index(
-                   {torch::indexing::Slice(),
-                    torch::indexing::Slice(n_order - 1, torch::indexing::None)})
-                .flip(1);
-
-      if (waveform.requires_grad()) {
-        dx = F::conv1d(
-                 F::pad(dxh.unsqueeze(1), F::PadFuncOptions({0, n_order - 1})),
-                 b_coeffs.view({1, 1, n_order}))
-                 .squeeze(1);
-        dx.div_(a_coeffs[0]);
-      }
-      if (b_coeffs.requires_grad()) {
-        db =
-            F::conv1d(
-                F::pad(
-                    waveform.unsqueeze(0), F::PadFuncOptions({n_order - 1, 0})),
-                dxh.unsqueeze(1),
-                F::Conv1dFuncOptions().groups(n_channel))
-                .sum(1)
-                .squeeze(0)
-                .flip(0);
-        db.div_(a_coeffs[0]);
-      }
-    }
-
-    return {dx, da, db};
-  }
-};
-
-torch::Tensor lfilter_autograd(
-    const torch::Tensor& waveform,
-    const torch::Tensor& a_coeffs,
-    const torch::Tensor& b_coeffs) {
-  return DifferentiableLfilter::apply(waveform, a_coeffs, b_coeffs);
+  auto output = iir_autograd(filtered_waveform, a_coeffs);
+  return output;
 }
 
 } // namespace
@@ -259,10 +206,6 @@ TORCH_LIBRARY(torchaudio, m) {
       "torchaudio::_lfilter(Tensor waveform, Tensor a_coeffs, Tensor b_coeffs) -> Tensor");
 }
 
-TORCH_LIBRARY_IMPL(torchaudio, DefaultBackend, m) {
-  m.impl("torchaudio::_lfilter", lfilter_simple);
-}
-
-TORCH_LIBRARY_IMPL(torchaudio, Autograd, m) {
-  m.impl("torchaudio::_lfilter", lfilter_autograd);
+TORCH_LIBRARY_IMPL(torchaudio, CompositeImplicitAutograd, m) {
+  m.impl("torchaudio::_lfilter", lfilter_core);
 }
