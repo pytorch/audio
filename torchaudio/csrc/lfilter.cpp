@@ -87,17 +87,16 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
   static torch::Tensor forward(
       torch::autograd::AutogradContext* ctx,
       const torch::Tensor& waveform,
-      const torch::Tensor& a_coeffs) {
+      const torch::Tensor& a_coeffs_normalized) {
     at::AutoNonVariableTypeMode g;
     auto device = waveform.device();
     auto dtype = waveform.dtype();
     int64_t n_channel = waveform.size(0);
     int64_t n_sample = waveform.size(1);
-    int64_t n_order = a_coeffs.size(0);
+    int64_t n_order = a_coeffs_normalized.size(0);
     int64_t n_sample_padded = n_sample + n_order - 1;
 
-    auto a_coeff_flipped = a_coeffs.flip(0).contiguous();
-    a_coeff_flipped.div_(a_coeffs[0]);
+    auto a_coeff_flipped = a_coeffs_normalized.flip(0).contiguous();
 
     auto options = torch::TensorOptions().dtype(dtype).device(device);
     auto padded_output_waveform =
@@ -114,7 +113,7 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
         {torch::indexing::Slice(),
          torch::indexing::Slice(n_order - 1, torch::indexing::None)});
 
-    ctx->save_for_backward({waveform, a_coeffs, output});
+    ctx->save_for_backward({waveform, a_coeffs_normalized, output});
     return output;
   }
 
@@ -123,12 +122,11 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
       torch::autograd::tensor_list grad_outputs) {
     auto saved = ctx->get_saved_variables();
     auto x = saved[0];
-    auto a_coeffs = saved[1];
+    auto a_coeffs_normalized = saved[1];
     auto y = saved[2];
 
     int64_t n_channel = x.size(0);
-    int64_t n_sample = x.size(1);
-    int64_t n_order = a_coeffs.size(0);
+    int64_t n_order = a_coeffs_normalized.size(0);
 
     auto dx = torch::Tensor();
     auto da = torch::Tensor();
@@ -136,9 +134,10 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
 
     namespace F = torch::nn::functional;
 
-    if (a_coeffs.requires_grad()) {
+    if (a_coeffs_normalized.requires_grad()) {
       auto dyda = F::pad(
-          iir_autograd(-y, a_coeffs), F::PadFuncOptions({n_order - 1, 0}));
+          iir_autograd(-y, a_coeffs_normalized),
+          F::PadFuncOptions({n_order - 1, 0}));
 
       da = F::conv1d(
                dyda.unsqueeze(0),
@@ -147,12 +146,10 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
                .sum(1)
                .squeeze(0)
                .flip(0);
-      // use .item() to detach from graph
-      da.div_(a_coeffs[0].item());
     }
 
     if (x.requires_grad()) {
-      dx = iir_autograd(dy.flip(1), a_coeffs).flip(1);
+      dx = iir_autograd(dy.flip(1), a_coeffs_normalized).flip(1);
     }
 
     return {dx, da};
@@ -161,8 +158,8 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
 
 torch::Tensor iir_autograd(
     const torch::Tensor& waveform,
-    const torch::Tensor& a_coeffs) {
-  return DifferentiableIIR::apply(waveform, a_coeffs);
+    const torch::Tensor& a_coeffs_normalized) {
+  return DifferentiableIIR::apply(waveform, a_coeffs_normalized);
 }
 
 torch::Tensor lfilter_core(
@@ -184,15 +181,14 @@ torch::Tensor lfilter_core(
   auto padded_waveform = F::pad(waveform, F::PadFuncOptions({n_order - 1, 0}));
   auto b_coeff_flipped = b_coeffs.flip(0).contiguous();
 
-  // use .item() to detach a[0] from graph
-  b_coeff_flipped.div_(a_coeffs[0].item());
+  b_coeff_flipped.div_(a_coeffs[0]);
 
   auto filtered_waveform =
       F::conv1d(
           padded_waveform.unsqueeze(1), b_coeff_flipped.view({1, 1, n_order}))
           .squeeze(1);
 
-  auto output = iir_autograd(filtered_waveform, a_coeffs);
+  auto output = iir_autograd(filtered_waveform, a_coeffs / a_coeffs[0]);
   return output;
 }
 
