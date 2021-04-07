@@ -1,6 +1,6 @@
 from typing import Callable, List, Tuple
 import torch
-from torch import functional
+from parameterized import parameterized
 from torch import Tensor
 import torchaudio.functional as F
 from torch.autograd import gradcheck
@@ -21,9 +21,9 @@ class Autograd(TestBaseMixin):
         inputs_ = []
         for i in inputs:
             if torch.is_tensor(i):
+                i = i.to(dtype=self.dtype, device=self.device)
                 if enable_all_grad:
                     i.requires_grad = True
-                i = i.to(dtype=self.dtype, device=self.device)
             inputs_.append(i)
         assert gradcheck(transform, inputs_)
 
@@ -65,93 +65,151 @@ class Autograd(TestBaseMixin):
         b = torch.tensor([0.4, 0.2, 0.9])
         self.assert_grad(F.biquad, (x, b[0], b[1], b[2], a[0], a[1], a[2]))
 
-    def test_band_biquad(self):
+    @parameterized.expand([
+        (800, 0.7, True),
+        (800, 2, True),
+        (4000, 0.7, True),
+        (4000, 2, True),
+        (800, 0.7, False),
+        (800, 2, False),
+        (4000, 0.7, False),
+        (4000, 2, False),
+    ])
+    def test_band_biquad(self, central_freq, Q, noise):
         torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
-        central_freq = torch.tensor(800.)
-        Q = torch.tensor(0.7)
-        self.assert_grad(F.band_biquad, (x, sr, central_freq, Q))
+        central_freq = torch.tensor(central_freq)
+        Q = torch.tensor(Q)
+        self.assert_grad(F.band_biquad, (x, sr, central_freq, Q, noise))
 
-    def test_band_biquad_with_noise(self):
+    @parameterized.expand([
+        (800, 0.7, 10),
+        (800, 2, 10),
+        (100, 0.7, 10),
+        (100, 2, 10),
+        (800, 0.7, -10),
+        (800, 2, -10),
+        (100, 0.7, -10),
+        (100, 2, -10),
+    ])
+    def test_bass_biquad(self, central_freq, Q, gain):
         torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
-        central_freq = torch.tensor(800.)
-        Q = torch.tensor(0.7)
-        self.assert_grad(F.band_biquad, (x, sr, central_freq, Q, True))
-
-    def test_bass_biquad(self):
-        torch.random.manual_seed(2434)
-        sr = 22050
-        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
-        central_freq = torch.tensor(100.)
-        Q = torch.tensor(0.7)
-        gain = torch.tensor(10.)
+        central_freq = torch.tensor(central_freq)
+        Q = torch.tensor(Q)
+        gain = torch.tensor(gain)
         self.assert_grad(F.bass_biquad, (x, sr, gain, central_freq, Q))
 
-    def test_treble_biquad(self):
+    @parameterized.expand([
+        (3000, 0.7, 10),
+        (3000, 2, 10),
+        (8000, 0.7, 10),
+        (8000, 2, 10),
+        (3000, 0.7, -10),
+        (3000, 2, -10),
+        (8000, 0.7, -10),
+        (8000, 2, -10),
+    ])
+    def test_treble_biquad(self, central_freq, Q, gain):
         torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
-        central_freq = torch.tensor(3000.)
-        Q = torch.tensor(0.7)
-        gain = torch.tensor(10.)
+        central_freq = torch.tensor(central_freq)
+        Q = torch.tensor(Q)
+        gain = torch.tensor(gain)
         self.assert_grad(F.treble_biquad, (x, sr, gain, central_freq, Q))
 
-    def test_allpass_biquad(self):
+    @parameterized.expand([
+        (800, 0.7, ),
+        (800, 2, ),
+        (4000, 0.7, ),
+        (4000, 2, ),
+    ])
+    def test_allpass_biquad(self, central_freq, Q):
         torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
-        central_freq = torch.tensor(800.)
-        Q = torch.tensor(0.7)
+        central_freq = torch.tensor(central_freq)
+        Q = torch.tensor(Q)
         self.assert_grad(F.allpass_biquad, (x, sr, central_freq, Q))
 
-    def test_lowpass_biquad(self):
+    @parameterized.expand([
+        (800, 0.7, ),
+        (800, 2, ),
+        (8000, 0.7, ),
+        (8000, 2, ),
+    ])
+    def test_lowpass_biquad(self, cutoff_freq, Q):
         torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
-        cutoff_freq = torch.tensor(800.)
-        Q = torch.tensor(0.7)
+        cutoff_freq = torch.tensor(cutoff_freq)
+        Q = torch.tensor(Q)
         self.assert_grad(F.lowpass_biquad, (x, sr, cutoff_freq, Q))
 
-    def test_highpass_biquad(self):
+    @parameterized.expand([
+        (800, 0.7, ),
+        (800, 2, ),
+        (100, 0.7, ),
+        (100, 2, ),
+    ])
+    def test_highpass_biquad(self, cutoff_freq, Q):
         torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
-        cutoff_freq = torch.tensor(800.)
-        Q = torch.tensor(0.7)
+        cutoff_freq = torch.tensor(cutoff_freq)
+        Q = torch.tensor(Q)
         self.assert_grad(F.highpass_biquad, (x, sr, cutoff_freq, Q))
 
-    def test_bandpass_biquad(self):
+    @parameterized.expand([
+        (800, 0.7, True),
+        (800, 2, True),
+        (4000, 0.7, True),
+        (4000, 2, True),
+        (800, 0.7, False),
+        (800, 2, False),
+        (4000, 0.7, False),
+        (4000, 2, False),
+    ])
+    def test_bandpass_biquad(self, central_freq, Q, const_skirt_gain):
         torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
-        central_freq = torch.tensor(800.)
-        Q = torch.tensor(0.7)
-        self.assert_grad(F.bandpass_biquad, (x, sr, central_freq, Q))
+        central_freq = torch.tensor(central_freq)
+        Q = torch.tensor(Q)
+        self.assert_grad(F.bandpass_biquad, (x, sr, central_freq, Q, const_skirt_gain))
 
-    def test_bandpass_biquad_with_const_skirt_gain(self):
+    @parameterized.expand([
+        (800, 0.7, 10),
+        (800, 2, 10),
+        (4000, 0.7, 10),
+        (4000, 2, 10),
+        (800, 0.7, -10),
+        (800, 2, -10),
+        (4000, 0.7, -10),
+        (4000, 2, -10),
+    ])
+    def test_equalizer_biquad(self, central_freq, Q, gain):
         torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
-        central_freq = torch.tensor(800.)
-        Q = torch.tensor(0.7)
-        self.assert_grad(F.bandpass_biquad, (x, sr, central_freq, Q, True))
-
-    def test_equalizer_biquad(self):
-        torch.random.manual_seed(2434)
-        sr = 22050
-        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
-        central_freq = torch.tensor(800.)
-        Q = torch.tensor(0.7)
-        gain = torch.tensor(10.)
+        central_freq = torch.tensor(central_freq)
+        Q = torch.tensor(Q)
+        gain = torch.tensor(gain)
         self.assert_grad(F.equalizer_biquad, (x, sr, central_freq, gain, Q))
 
-    def test_bandreject_biquad(self):
+    @parameterized.expand([
+        (800, 0.7, ),
+        (800, 2, ),
+        (4000, 0.7, ),
+        (4000, 2, ),
+    ])
+    def test_bandreject_biquad(self, central_freq, Q):
         torch.random.manual_seed(2434)
         sr = 22050
         x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
-        central_freq = torch.tensor(800.)
-        Q = torch.tensor(0.7)
+        central_freq = torch.tensor(central_freq)
+        Q = torch.tensor(Q)
         self.assert_grad(F.bandreject_biquad, (x, sr, central_freq, Q))
