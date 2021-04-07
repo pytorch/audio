@@ -147,6 +147,7 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
                .sum(1)
                .squeeze(0)
                .flip(0);
+      // use .item() to detach from graph
       da.div_(a_coeffs[0].item());
     }
 
@@ -182,6 +183,8 @@ torch::Tensor lfilter_core(
 
   auto padded_waveform = F::pad(waveform, F::PadFuncOptions({n_order - 1, 0}));
   auto b_coeff_flipped = b_coeffs.flip(0).contiguous();
+
+  // use .item() to detach a[0] from graph
   b_coeff_flipped.div_(a_coeffs[0].item());
 
   auto filtered_waveform =
