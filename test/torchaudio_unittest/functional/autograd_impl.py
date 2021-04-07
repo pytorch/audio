@@ -1,7 +1,7 @@
 from typing import Callable, List, Tuple
 import torch
 from torch import functional
-from torch.tensor import Tensor
+from torch import Tensor
 import torchaudio.functional as F
 from torch.autograd import gradcheck
 from torchaudio_unittest.common_utils import (
