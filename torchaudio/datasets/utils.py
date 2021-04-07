@@ -29,7 +29,8 @@ def stream_url(url: str,
 
     # If we already have the whole file, there is no need to download it again
     req = urllib.request.Request(url, method="HEAD")
-    url_size = int(urllib.request.urlopen(req).info().get("Content-Length", -1))
+    with urllib.request.urlopen(req) as response:
+        url_size = int(response.info().get("Content-Length", -1))
     if url_size == start_byte:
         return
 

@@ -203,7 +203,7 @@ def griffinlim(
                               hop_length=hop_length,
                               win_length=win_length,
                               window=window,
-                              length=length).float()
+                              length=length)
 
         # Rebuild the spectrogram
         rebuilt = torch.view_as_real(
@@ -793,7 +793,7 @@ def compute_deltas(
 
     # pack batch
     shape = specgram.size()
-    specgram = specgram.reshape(-1, 1, shape[-1])
+    specgram = specgram.reshape(1, -1, shape[-1])
 
     assert win_length >= 3
 
@@ -804,9 +804,9 @@ def compute_deltas(
 
     specgram = torch.nn.functional.pad(specgram, (n, n), mode=mode)
 
-    kernel = torch.arange(-n, n + 1, 1, device=device, dtype=dtype).view(1, 1, -1)
+    kernel = torch.arange(-n, n + 1, 1, device=device, dtype=dtype).repeat(specgram.shape[1], 1, 1)
 
-    output = torch.nn.functional.conv1d(specgram, kernel) / denom
+    output = torch.nn.functional.conv1d(specgram, kernel, groups=specgram.shape[1]) / denom
 
     # unpack batch
     output = output.reshape(shape)
