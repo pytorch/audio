@@ -12,6 +12,7 @@ class Autograd(common_utils.TestBaseMixin):
         b = torch.tensor([0.4, 0.2, 0.9], dtype=self.dtype, device=self.device)
         x.requires_grad = True
         assert gradcheck(F.lfilter, (x, a, b), eps=1e-10)
+        assert gradgradcheck(F.lfilter, (x, a, b))
 
     def test_lfilter_a(self):
         torch.random.manual_seed(2434)
@@ -29,6 +30,7 @@ class Autograd(common_utils.TestBaseMixin):
         b = torch.tensor([0.4, 0.2, 0.9], dtype=self.dtype, device=self.device)
         b.requires_grad = True
         assert gradcheck(F.lfilter, (x, a, b), eps=1e-10)
+        assert gradgradcheck(F.lfilter, (x, a, b))
 
     def test_lfilter_all_inputs(self):
         torch.random.manual_seed(2434)
@@ -39,6 +41,7 @@ class Autograd(common_utils.TestBaseMixin):
         a.requires_grad = True
         x.requires_grad = True
         assert gradcheck(F.lfilter, (x, a, b), eps=1e-10)
+        assert gradgradcheck(F.lfilter, (x, a, b))
 
     def test_biquad(self):
         torch.random.manual_seed(2434)
