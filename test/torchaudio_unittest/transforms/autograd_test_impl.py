@@ -21,7 +21,7 @@ class _DeterministicWrapper(torch.nn.Module):
         self.transform = transform
 
     def forward(self, input: torch.Tensor):
-        torch.random.manual_seed(0)
+        torch.random.manual_seed(self.seed)
         return self.transform(input)
 
 
