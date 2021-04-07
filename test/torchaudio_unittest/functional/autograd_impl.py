@@ -67,13 +67,7 @@ class Autograd(TestBaseMixin):
 
     @parameterized.expand([
         (800, 0.7, True),
-        (800, 2, True),
-        (4000, 0.7, True),
-        (4000, 2, True),
         (800, 0.7, False),
-        (800, 2, False),
-        (4000, 0.7, False),
-        (4000, 2, False),
     ])
     def test_band_biquad(self, central_freq, Q, noise):
         torch.random.manual_seed(2434)
@@ -85,13 +79,7 @@ class Autograd(TestBaseMixin):
 
     @parameterized.expand([
         (800, 0.7, 10),
-        (800, 2, 10),
-        (100, 0.7, 10),
-        (100, 2, 10),
         (800, 0.7, -10),
-        (800, 2, -10),
-        (100, 0.7, -10),
-        (100, 2, -10),
     ])
     def test_bass_biquad(self, central_freq, Q, gain):
         torch.random.manual_seed(2434)
@@ -104,13 +92,8 @@ class Autograd(TestBaseMixin):
 
     @parameterized.expand([
         (3000, 0.7, 10),
-        (3000, 2, 10),
-        (8000, 0.7, 10),
-        (8000, 2, 10),
         (3000, 0.7, -10),
-        (3000, 2, -10),
-        (8000, 0.7, -10),
-        (8000, 2, -10),
+
     ])
     def test_treble_biquad(self, central_freq, Q, gain):
         torch.random.manual_seed(2434)
@@ -123,9 +106,6 @@ class Autograd(TestBaseMixin):
 
     @parameterized.expand([
         (800, 0.7, ),
-        (800, 2, ),
-        (4000, 0.7, ),
-        (4000, 2, ),
     ])
     def test_allpass_biquad(self, central_freq, Q):
         torch.random.manual_seed(2434)
@@ -137,9 +117,6 @@ class Autograd(TestBaseMixin):
 
     @parameterized.expand([
         (800, 0.7, ),
-        (800, 2, ),
-        (8000, 0.7, ),
-        (8000, 2, ),
     ])
     def test_lowpass_biquad(self, cutoff_freq, Q):
         torch.random.manual_seed(2434)
@@ -151,9 +128,6 @@ class Autograd(TestBaseMixin):
 
     @parameterized.expand([
         (800, 0.7, ),
-        (800, 2, ),
-        (100, 0.7, ),
-        (100, 2, ),
     ])
     def test_highpass_biquad(self, cutoff_freq, Q):
         torch.random.manual_seed(2434)
@@ -165,13 +139,7 @@ class Autograd(TestBaseMixin):
 
     @parameterized.expand([
         (800, 0.7, True),
-        (800, 2, True),
-        (4000, 0.7, True),
-        (4000, 2, True),
         (800, 0.7, False),
-        (800, 2, False),
-        (4000, 0.7, False),
-        (4000, 2, False),
     ])
     def test_bandpass_biquad(self, central_freq, Q, const_skirt_gain):
         torch.random.manual_seed(2434)
@@ -183,13 +151,7 @@ class Autograd(TestBaseMixin):
 
     @parameterized.expand([
         (800, 0.7, 10),
-        (800, 2, 10),
-        (4000, 0.7, 10),
-        (4000, 2, 10),
         (800, 0.7, -10),
-        (800, 2, -10),
-        (4000, 0.7, -10),
-        (4000, 2, -10),
     ])
     def test_equalizer_biquad(self, central_freq, Q, gain):
         torch.random.manual_seed(2434)
@@ -202,9 +164,6 @@ class Autograd(TestBaseMixin):
 
     @parameterized.expand([
         (800, 0.7, ),
-        (800, 2, ),
-        (4000, 0.7, ),
-        (4000, 2, ),
     ])
     def test_bandreject_biquad(self, central_freq, Q):
         torch.random.manual_seed(2434)
