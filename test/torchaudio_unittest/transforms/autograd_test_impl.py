@@ -8,8 +8,21 @@ import torchaudio.transforms as T
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     get_whitenoise,
+    get_spectrogram,
     nested_params,
 )
+
+
+class _DeterministicWrapper(torch.nn.Module):
+    """Helper transform wrapper to make the given transform deterministic"""
+    def __init__(self, transform, seed=0):
+        super().__init__()
+        self.seed = seed
+        self.transform = transform
+
+    def forward(self, input: torch.Tensor):
+        torch.random.manual_seed(0)
+        return self.transform(input)
 
 
 class AutogradTestMixin(TestBaseMixin):
@@ -72,10 +85,13 @@ class AutogradTestMixin(TestBaseMixin):
     )
     def test_griffinlim(self, momentum, rand_init):
         n_fft = 400
-        n_frames = 5
+        power = 1
         n_iter = 3
-        spec = torch.rand(n_fft // 2 + 1, n_frames) * n_fft
-        transform = T.GriffinLim(n_fft=n_fft, n_iter=n_iter, momentum=momentum, rand_init=rand_init)
+        spec = get_spectrogram(
+            get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2),
+            n_fft=n_fft, power=power)
+        transform = _DeterministicWrapper(
+            T.GriffinLim(n_fft=n_fft, n_iter=n_iter, momentum=momentum, rand_init=rand_init, power=power))
         self.assert_grad(transform, [spec])
 
     @parameterized.expand([(False, ), (True, )])
