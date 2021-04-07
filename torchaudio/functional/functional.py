@@ -86,11 +86,13 @@ def spectrogram(
     """
     if power is None and not return_complex:
         warnings.warn(
-            "spectrogram now supports returning native complex tensor "
+            "Spectrogram now supports returning native complex tensor "
             "when `power=None` by setting `return_complex=True`. "
-            "Currently, the function returns pseudo complex type (..., 2) by default, "
-            "but this will change in the future and `return_complex` would be set to True by default. "
-            "Please refer to https://github.com/pytorch/audio/issues/1337 for the detail.")
+            "Currently, this function returns pseudo complex type (..., 2) by default, "
+            "but this will change in the future and `return_complex` "
+            "will be set to True by default. Please refer to "
+            "https://github.com/pytorch/audio/issues/1337 "
+            "for more details about the migration plan.")
 
     if power is not None and return_complex:
         raise ValueError(
