@@ -80,8 +80,6 @@ void lfilter_core_generic_loop(
   }
 }
 
-torch::Tensor iir_autograd(const torch::Tensor&, const torch::Tensor&);
-
 class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
  public:
   static torch::Tensor forward(
@@ -136,7 +134,7 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
 
     if (a_coeffs_normalized.requires_grad()) {
       auto dyda = F::pad(
-          iir_autograd(-y, a_coeffs_normalized),
+          DifferentiableIIR::apply(-y, a_coeffs_normalized),
           F::PadFuncOptions({n_order - 1, 0}));
 
       da = F::conv1d(
@@ -149,18 +147,12 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
     }
 
     if (x.requires_grad()) {
-      dx = iir_autograd(dy.flip(1), a_coeffs_normalized).flip(1);
+      dx = DifferentiableIIR::apply(dy.flip(1), a_coeffs_normalized).flip(1);
     }
 
     return {dx, da};
   }
 };
-
-torch::Tensor iir_autograd(
-    const torch::Tensor& waveform,
-    const torch::Tensor& a_coeffs_normalized) {
-  return DifferentiableIIR::apply(waveform, a_coeffs_normalized);
-}
 
 torch::Tensor lfilter_core(
     const torch::Tensor& waveform,
@@ -188,7 +180,8 @@ torch::Tensor lfilter_core(
           padded_waveform.unsqueeze(1), b_coeff_flipped.view({1, 1, n_order}))
           .squeeze(1);
 
-  auto output = iir_autograd(filtered_waveform, a_coeffs / a_coeffs[0]);
+  auto output =
+      DifferentiableIIR::apply(filtered_waveform, a_coeffs / a_coeffs[0]);
   return output;
 }
 
