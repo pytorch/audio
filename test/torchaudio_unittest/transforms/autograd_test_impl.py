@@ -65,9 +65,41 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
+    @parameterized.expand([(0, ), (0.99, )])
+    def test_griffinlim(self, momentum):
+        n_fft = 400
+        n_frames = 5
+        n_iter = 3
+        spec = torch.rand(n_fft // 2 + 1, n_frames) * n_fft
+        transform = T.GriffinLim(n_fft=n_fft, n_iter=n_iter, momentum=momentum, rand_init=False)
+        self.assert_grad(transform, [spec], nondet_tol=1e-10)
+
     @parameterized.expand([(False, ), (True, )])
     def test_mfcc(self, log_mels):
         sample_rate = 8000
         transform = T.MFCC(sample_rate=sample_rate, log_mels=log_mels)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform])
+
+    def test_compute_deltas(self):
+        transform = T.ComputeDeltas()
+        spec = torch.rand(10, 20)
+        self.assert_grad(transform, [spec])
+
+    @parameterized.expand([(8000, 8000), (8000, 4000), (4000, 8000)])
+    def test_resample(self, orig_freq, new_freq):
+        transform = T.Resample(orig_freq=orig_freq, new_freq=new_freq)
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform])
+
+    @parameterized.expand([("linear", ), ("exponential", ), ("logarithmic", ), ("quarter_sine", ), ("half_sine", )])
+    def test_fade(self, fade_shape):
+        transform = T.Fade(fade_shape=fade_shape)
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
+
+    def test_spectral_centroid(self):
+        sample_rate = 8000
+        transform = T.SpectralCentroid(sample_rate=sample_rate)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)

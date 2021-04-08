@@ -155,7 +155,7 @@ class GriffinLim(torch.nn.Module):
            | "Signal estimation from modified short-time Fourier transform,"
            | IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
     """
-    __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power', 'normalized',
+    __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power',
                      'length', 'momentum', 'rand_init']
 
     def __init__(self,
@@ -172,7 +172,7 @@ class GriffinLim(torch.nn.Module):
         super(GriffinLim, self).__init__()
 
         assert momentum < 1, 'momentum={} > 1 can be unstable'.format(momentum)
-        assert momentum > 0, 'momentum={} < 0'.format(momentum)
+        assert momentum >= 0, 'momentum={} < 0'.format(momentum)
 
         self.n_fft = n_fft
         self.n_iter = n_iter
@@ -768,6 +768,7 @@ class Fade(torch.nn.Module):
         fade_shape (str, optional): Shape of fade. Must be one of: "quarter_sine",
             "half_sine", "linear", "logarithmic", "exponential". (Default: ``"linear"``)
     """
+
     def __init__(self,
                  fade_in_len: int = 0,
                  fade_out_len: int = 0,
@@ -877,6 +878,7 @@ class FrequencyMasking(_AxisMasking):
             example/channel in the batch. (Default: ``False``)
             This option is applicable only when the input tensor is 4D.
     """
+
     def __init__(self, freq_mask_param: int, iid_masks: bool = False) -> None:
         super(FrequencyMasking, self).__init__(freq_mask_param, 1, iid_masks)
 
@@ -891,6 +893,7 @@ class TimeMasking(_AxisMasking):
             example/channel in the batch. (Default: ``False``)
             This option is applicable only when the input tensor is 4D.
     """
+
     def __init__(self, time_mask_param: int, iid_masks: bool = False) -> None:
         super(TimeMasking, self).__init__(time_mask_param, 2, iid_masks)
 

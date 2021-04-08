@@ -203,7 +203,7 @@ def griffinlim(
                               hop_length=hop_length,
                               win_length=win_length,
                               window=window,
-                              length=length).float()
+                              length=length)
 
         # Rebuild the spectrogram
         rebuilt = torch.view_as_real(
