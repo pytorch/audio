@@ -3,7 +3,7 @@ import torch
 from parameterized import parameterized
 from torch import Tensor
 import torchaudio.functional as F
-from torch.autograd import gradcheck
+from torch.autograd import gradcheck, gradgradcheck
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     get_whitenoise,
@@ -26,6 +26,7 @@ class Autograd(TestBaseMixin):
                     i.requires_grad = True
             inputs_.append(i)
         assert gradcheck(transform, inputs_)
+        assert gradgradcheck(transform, inputs_)
 
     def test_lfilter_x(self):
         torch.random.manual_seed(2434)
@@ -41,14 +42,6 @@ class Autograd(TestBaseMixin):
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
         a.requires_grad = True
-        self.assert_grad(F.lfilter, (x, a, b), enable_all_grad=False)
-
-    def test_lfilter_b(self):
-        torch.random.manual_seed(2434)
-        x = get_whitenoise(sample_rate=22050, duration=0.05, n_channels=2)
-        a = torch.tensor([0.7, 0.2, 0.6])
-        b = torch.tensor([0.4, 0.2, 0.9])
-        b.requires_grad = True
         self.assert_grad(F.lfilter, (x, a, b), enable_all_grad=False)
 
     def test_lfilter_all_inputs(self):
