@@ -38,7 +38,7 @@ class Autograd(TestBaseMixin):
 
     def test_lfilter_a(self):
         torch.random.manual_seed(2434)
-        x = get_whitenoise(sample_rate=22050, duration=0.05, n_channels=2)
+        x = get_whitenoise(sample_rate=22050, duration=0.025, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
         a.requires_grad = True
@@ -46,14 +46,14 @@ class Autograd(TestBaseMixin):
 
     def test_lfilter_all_inputs(self):
         torch.random.manual_seed(2434)
-        x = get_whitenoise(sample_rate=22050, duration=0.05, n_channels=2)
+        x = get_whitenoise(sample_rate=22050, duration=0.025, n_channels=2)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
         self.assert_grad(F.lfilter, (x, a, b))
 
     def test_biquad(self):
         torch.random.manual_seed(2434)
-        x = get_whitenoise(sample_rate=22050, duration=0.05, n_channels=2)
+        x = get_whitenoise(sample_rate=22050, duration=0.025, n_channels=1)
         a = torch.tensor([0.7, 0.2, 0.6])
         b = torch.tensor([0.4, 0.2, 0.9])
         self.assert_grad(F.biquad, (x, b[0], b[1], b[2], a[0], a[1], a[2]))
@@ -65,7 +65,7 @@ class Autograd(TestBaseMixin):
     def test_band_biquad(self, central_freq, Q, noise):
         torch.random.manual_seed(2434)
         sr = 22050
-        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
+        x = get_whitenoise(sample_rate=sr, duration=0.025, n_channels=1)
         central_freq = torch.tensor(central_freq)
         Q = torch.tensor(Q)
         self.assert_grad(F.band_biquad, (x, sr, central_freq, Q, noise))
@@ -77,7 +77,7 @@ class Autograd(TestBaseMixin):
     def test_bass_biquad(self, central_freq, Q, gain):
         torch.random.manual_seed(2434)
         sr = 22050
-        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
+        x = get_whitenoise(sample_rate=sr, duration=0.025, n_channels=1)
         central_freq = torch.tensor(central_freq)
         Q = torch.tensor(Q)
         gain = torch.tensor(gain)
@@ -91,7 +91,7 @@ class Autograd(TestBaseMixin):
     def test_treble_biquad(self, central_freq, Q, gain):
         torch.random.manual_seed(2434)
         sr = 22050
-        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
+        x = get_whitenoise(sample_rate=sr, duration=0.025, n_channels=1)
         central_freq = torch.tensor(central_freq)
         Q = torch.tensor(Q)
         gain = torch.tensor(gain)
@@ -103,7 +103,7 @@ class Autograd(TestBaseMixin):
     def test_allpass_biquad(self, central_freq, Q):
         torch.random.manual_seed(2434)
         sr = 22050
-        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
+        x = get_whitenoise(sample_rate=sr, duration=0.025, n_channels=1)
         central_freq = torch.tensor(central_freq)
         Q = torch.tensor(Q)
         self.assert_grad(F.allpass_biquad, (x, sr, central_freq, Q))
@@ -114,7 +114,7 @@ class Autograd(TestBaseMixin):
     def test_lowpass_biquad(self, cutoff_freq, Q):
         torch.random.manual_seed(2434)
         sr = 22050
-        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
+        x = get_whitenoise(sample_rate=sr, duration=0.025, n_channels=1)
         cutoff_freq = torch.tensor(cutoff_freq)
         Q = torch.tensor(Q)
         self.assert_grad(F.lowpass_biquad, (x, sr, cutoff_freq, Q))
@@ -125,7 +125,7 @@ class Autograd(TestBaseMixin):
     def test_highpass_biquad(self, cutoff_freq, Q):
         torch.random.manual_seed(2434)
         sr = 22050
-        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
+        x = get_whitenoise(sample_rate=sr, duration=0.025, n_channels=1)
         cutoff_freq = torch.tensor(cutoff_freq)
         Q = torch.tensor(Q)
         self.assert_grad(F.highpass_biquad, (x, sr, cutoff_freq, Q))
@@ -137,7 +137,7 @@ class Autograd(TestBaseMixin):
     def test_bandpass_biquad(self, central_freq, Q, const_skirt_gain):
         torch.random.manual_seed(2434)
         sr = 22050
-        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
+        x = get_whitenoise(sample_rate=sr, duration=0.025, n_channels=1)
         central_freq = torch.tensor(central_freq)
         Q = torch.tensor(Q)
         self.assert_grad(F.bandpass_biquad, (x, sr, central_freq, Q, const_skirt_gain))
@@ -149,7 +149,7 @@ class Autograd(TestBaseMixin):
     def test_equalizer_biquad(self, central_freq, Q, gain):
         torch.random.manual_seed(2434)
         sr = 22050
-        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
+        x = get_whitenoise(sample_rate=sr, duration=0.025, n_channels=1)
         central_freq = torch.tensor(central_freq)
         Q = torch.tensor(Q)
         gain = torch.tensor(gain)
@@ -161,7 +161,7 @@ class Autograd(TestBaseMixin):
     def test_bandreject_biquad(self, central_freq, Q):
         torch.random.manual_seed(2434)
         sr = 22050
-        x = get_whitenoise(sample_rate=sr, duration=0.05, n_channels=2)
+        x = get_whitenoise(sample_rate=sr, duration=0.025, n_channels=1)
         central_freq = torch.tensor(central_freq)
         Q = torch.tensor(Q)
         self.assert_grad(F.bandreject_biquad, (x, sr, central_freq, Q))
