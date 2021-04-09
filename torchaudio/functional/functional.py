@@ -7,7 +7,7 @@ from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
-from torchaudio._internal import module_utils as _mod_utils
+from torchaudio._internal import module_utils as _mod_utils, deprecated
 import torchaudio
 
 __all__ = [
@@ -84,6 +84,14 @@ def spectrogram(
         ``n_fft // 2 + 1`` and ``n_fft`` is the number of
         Fourier bins, and time is the number of window hops (n_frame).
     """
+    if power is None and not return_complex:
+        warnings.warn(
+            "The use of pseudo complex type in spectrogram is now deprecated."
+            "Please migrate to native complex type by providing `return_complex=True`. "
+            "Please refer to https://github.com/pytorch/audio/issues/1337 "
+            "for more details about the torchaudio's plan to migrate to native complex type."
+        )
+
     if power is not None and return_complex:
         raise ValueError(
             'When `power` is provided, the return value is real-valued. '
@@ -525,6 +533,12 @@ def mu_law_decoding(
     return x
 
 
+@deprecated(
+    "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
+    "use `torch.abs`. "
+    "Please refer to https://github.com/pytorch/audio/issues/1337 "
+    "for more details about the torchaudio's plan to migrate to native complex type."
+)
 def complex_norm(
         complex_tensor: Tensor,
         power: float = 1.0
@@ -544,6 +558,12 @@ def complex_norm(
     return complex_tensor.pow(2.).sum(-1).pow(0.5 * power)
 
 
+@deprecated(
+    "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
+    "use `torch.angle`. "
+    "Please refer to https://github.com/pytorch/audio/issues/1337 "
+    "for more details about the torchaudio's plan to migrate to native complex type."
+)
 def angle(
         complex_tensor: Tensor
 ) -> Tensor:
@@ -621,10 +641,19 @@ def phase_vocoder(
     if rate == 1.0:
         return complex_specgrams
 
-    if not complex_specgrams.is_complex() and complex_specgrams.size(-1) != 2:
-        raise ValueError(
-            "complex_specgrams must be either native complex tensors or "
-            "real valued tensors with shape (..., 2)")
+    if not complex_specgrams.is_complex():
+        warnings.warn(
+            "The use of pseudo complex type in `torchaudio.functional.phase_vocoder` and "
+            "`torchaudio.transforms.TimeStretch` is now deprecated."
+            "Please migrate to native complex type by converting the input tensor with "
+            "`torch.view_as_complex`. "
+            "Please refer to https://github.com/pytorch/audio/issues/1337 "
+            "for more details about the torchaudio's plan to migrate to native complex type."
+        )
+        if complex_specgrams.size(-1) != 2:
+            raise ValueError(
+                "complex_specgrams must be either native complex tensors or "
+                "real valued tensors with shape (..., 2)")
 
     is_complex = complex_specgrams.is_complex()
 
