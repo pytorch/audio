@@ -269,12 +269,12 @@ def main(args):
     }
 
     transforms = torch.nn.Sequential(
-        torchaudio.transforms.Spectrogram(**melkwargs),
-        torchaudio.transforms.MelScale(
+        torchaudio.transforms.MelSpectrogram(
             sample_rate=args.sample_rate,
             n_mels=args.n_freq,
             f_min=args.f_min,
             mel_scale='slaney',
+            **melkwargs,
         ),
         NormalizeDB(min_level_db=args.min_level_db, normalization=args.normalization),
     )
