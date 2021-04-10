@@ -425,6 +425,16 @@
     <span class="k">return</span> <span class="n">spec_f</span></div>
 
 
+<span class="k">def</span> <span class="nf">_get_complex_dtype</span><span class="p">(</span><span class="n">real_dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">real_dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cdouble</span>
+    <span class="k">if</span> <span class="n">real_dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cfloat</span>
+    <span class="k">if</span> <span class="n">real_dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">half</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">complex32</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unexpected dtype </span><span class="si">{</span><span class="n">real_dtype</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="griffinlim"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.griffinlim">[docs]</a><span class="k">def</span> <span class="nf">griffinlim</span><span class="p">(</span>
         <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">window</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -480,23 +490,19 @@
 
     <span class="n">specgram</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">power</span><span class="p">)</span>
 
-    <span class="c1"># randomly initialize the phase</span>
-    <span class="n">batch</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">frames</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="c1"># initialize the phase</span>
     <span class="k">if</span> <span class="n">rand_init</span><span class="p">:</span>
-        <span class="n">angles</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">frames</span><span class="p">)</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span>
+            <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">_get_complex_dtype</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">angles</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">frames</span><span class="p">)</span>
-    <span class="n">angles</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">angles</span><span class="o">.</span><span class="n">cos</span><span class="p">(),</span> <span class="n">angles</span><span class="o">.</span><span class="n">sin</span><span class="p">()],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> \
-        <span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">specgram</span> <span class="o">=</span> <span class="n">specgram</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand_as</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+            <span class="n">specgram</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">_get_complex_dtype</span><span class="p">(</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
     <span class="c1"># And initialize the previous iterate to 0</span>
-    <span class="n">rebuilt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
-
+    <span class="n">tprev</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">specgram</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
-        <span class="c1"># Store the previous iterate</span>
-        <span class="n">tprev</span> <span class="o">=</span> <span class="n">rebuilt</span>
-
         <span class="c1"># Invert with our current estimate of the phases</span>
         <span class="n">inverse</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span><span class="n">specgram</span> <span class="o">*</span> <span class="n">angles</span><span class="p">,</span>
                               <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
@@ -506,26 +512,27 @@
                               <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span>
 
         <span class="c1"># Rebuild the spectrogram</span>
-        <span class="n">rebuilt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">view_as_real</span><span class="p">(</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span>
-                <span class="nb">input</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span>
-                <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
-                <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
-                <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
-                <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
-                <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">pad_mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">,</span>
-                <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">return_complex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="n">rebuilt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span>
+            <span class="nb">input</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span>
+            <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+            <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
+            <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
+            <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+            <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">pad_mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">,</span>
+            <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">return_complex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># Update our phase estimates</span>
         <span class="n">angles</span> <span class="o">=</span> <span class="n">rebuilt</span>
         <span class="k">if</span> <span class="n">momentum</span><span class="p">:</span>
             <span class="n">angles</span> <span class="o">=</span> <span class="n">angles</span> <span class="o">-</span> <span class="n">tprev</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">momentum</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">momentum</span><span class="p">))</span>
-        <span class="n">angles</span> <span class="o">=</span> <span class="n">angles</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">complex_norm</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1e-16</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand_as</span><span class="p">(</span><span class="n">angles</span><span class="p">))</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="n">angles</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">angles</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1e-16</span><span class="p">))</span>
+
+        <span class="c1"># Store the previous iterate</span>
+        <span class="n">tprev</span> <span class="o">=</span> <span class="n">rebuilt</span>
 
     <span class="c1"># Return the final phase estimates</span>
     <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span><span class="n">specgram</span> <span class="o">*</span> <span class="n">angles</span><span class="p">,</span>
