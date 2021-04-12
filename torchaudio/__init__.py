@@ -1,3 +1,5 @@
+import logging
+
 from . import extension  # noqa: F401
 from torchaudio._internal import module_utils as _mod_utils  # noqa: F401
 from torchaudio import (
@@ -20,6 +22,8 @@ try:
     from .version import __version__, git_version  # noqa: F401
 except ImportError:
     pass
+
+logging.getLogger().setLevel(logging.INFO)
 
 __all__ = [
     'compliance',
