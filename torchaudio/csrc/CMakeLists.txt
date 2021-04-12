@@ -11,7 +11,13 @@ set(
   )
 
 if(BUILD_TRANSDUCER)
-  list(APPEND LIBTORCHAUDIO_SOURCES transducer.cpp)
+  set(
+      TRANSDUCER_SOURCES
+      rnn_transducer/compute_alphas.cpp
+      rnn_transducer/compute_betas.cpp
+      rnn_transducer/compute.cpp
+  )
+  list(APPEND LIBTORCHAUDIO_SOURCES ${TRANSDUCER_SOURCES})
 endif()
 
 if(BUILD_KALDI)

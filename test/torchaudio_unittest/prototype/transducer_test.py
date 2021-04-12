@@ -492,6 +492,6 @@ class TransducerTester:
                 data=data, ref_costs=ref_costs, ref_gradients=ref_gradients
             )
 
-
+@skipIfNoTransducer
 class CPUTransducerTester(TransducerTester, TorchaudioTestCase):
     device = "cpu"
