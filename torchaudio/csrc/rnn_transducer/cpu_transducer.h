@@ -133,8 +133,6 @@ status_t ComputeAlphas(
   return SUCCESS;
 }
 
-
-
 template <typename DTYPE, typename CAST_DTYPE>
 status_t ComputeBetas(
     const Workspace<CAST_DTYPE>& workspace,

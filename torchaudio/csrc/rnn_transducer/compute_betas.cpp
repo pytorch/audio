@@ -74,13 +74,14 @@ TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
 }
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def("compute_transducer_betas(Tensor logits,"
-                                 "Tensor targets,"
-                                 "Tensor src_lengths,"
-                                 "Tensor tgt_lengths,"
-                                 "int blank,"
-                                 "float clamp) -> Tensor",
-    &torchaudio::transducer::compute_betas);
+  m.def(
+      "compute_transducer_betas(Tensor logits,"
+      "Tensor targets,"
+      "Tensor src_lengths,"
+      "Tensor tgt_lengths,"
+      "int blank,"
+      "float clamp) -> Tensor",
+      &torchaudio::transducer::compute_betas);
 }
 
 } // namespace transducer

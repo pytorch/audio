@@ -333,8 +333,7 @@ void ComputeGradientsOneSequence(
       CAST_DTYPE c = alpha({t, u}) + cost - denom({t, u});
       for (int d = 0; d < D; ++d) {
         CAST_DTYPE g = CAST_DTYPE(logits({t, u, d})) + c;
-        if (d == blank && t == T - 1 &&
-            u == U - 1) { // last blank transition.
+        if (d == blank && t == T - 1 && u == U - 1) { // last blank transition.
           gradients({t, u, d}) = std::exp(g + beta({t, u})) - std::exp(g);
         } else if (d == blank && t < T - 1) {
           gradients({t, u, d}) =
@@ -462,11 +461,11 @@ void ComputeAlphas(
   //#pragma omp parallel for
   for (int i = 0; i < B; ++i) { // use max 2 * B threads.
     ComputeAlphaOneSequence<DTYPE>(
-      options,
-      /*logProbs=*/seqlogProbs[i],
-      /*srcLen=*/srcLengths[i],
-      /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.
-      /*alpha=*/seq_alphas[i]);
+        options,
+        /*logProbs=*/seqlogProbs[i],
+        /*srcLen=*/srcLengths[i],
+        /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.
+        /*alpha=*/seq_alphas[i]);
   }
 }
 
@@ -504,11 +503,11 @@ void ComputeBetas(
   //#pragma omp parallel for
   for (int i = 0; i < B; ++i) { // use max 2 * B threads.
     ComputeBetaOneSequence<DTYPE>(
-      options,
-      /*logProbs=*/seqlogProbs[i],
-      /*srcLen=*/srcLengths[i],
-      /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.
-      /*betas=*/seq_betas[i]);
+        options,
+        /*logProbs=*/seqlogProbs[i],
+        /*srcLen=*/srcLengths[i],
+        /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.
+        /*betas=*/seq_betas[i]);
   }
 }
 

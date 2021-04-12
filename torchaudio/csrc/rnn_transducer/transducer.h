@@ -44,7 +44,6 @@ status_t ComputeAlphas(
       /*tgtLengths=*/tgtLengths,
       /*alphas=*/alphas);
   return status;
-
 }
 
 template <typename DTYPE, typename CAST_DTYPE>

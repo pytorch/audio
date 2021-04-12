@@ -2,12 +2,11 @@
 
 #include <cassert>
 
-#include <torchaudio/csrc/rnn_transducer/math.h>
 #include <torchaudio/csrc/rnn_transducer/kernel_utils.h>
+#include <torchaudio/csrc/rnn_transducer/math.h>
 
 namespace torchaudio {
 namespace transducer {
-
 
 template <typename DTYPE, typename CAST_DTYPE>
 HOST_AND_DEVICE void ComputeGradientsElement(
@@ -31,7 +30,6 @@ HOST_AND_DEVICE void ComputeGradientsElement(
     const int* cellsPerSample = nullptr,
     int H = 1,
     bool fusedLogSmax = true) {
-
   const int& maxT = maxSrcLen;
   const int& maxU = maxTgtLen;
   const int& D = numTargets;
@@ -45,7 +43,7 @@ HOST_AND_DEVICE void ComputeGradientsElement(
       // gradients and logits are pointing to the same memory location
       Indexer3D idxr3(maxT, maxU);
       int idx_b_t_u_zero = idxr3(bTgt, t, u);
-      if (idx_b_t_u_zero != -1 ) {
+      if (idx_b_t_u_zero != -1) {
         int start = idx_b_t_u_zero * D;
         for (int b_t_u_d = start; b_t_u_d < start + D; ++b_t_u_d) {
           gradients[b_t_u_d] = 0;
@@ -60,17 +58,16 @@ HOST_AND_DEVICE void ComputeGradientsElement(
 
   CAST_DTYPE cost = -(betas[costIdx]);
 
-
   Indexer2D idxr2(maxU - 1);
 
   int idx_b_t_u, idx_b_t_up1, idx_b_tp1_u, idx_b_tp1_up1;
   Indexer3D idxr3(maxT, maxU);
   idx_b_t_u = idxr3(bTgt, t, u);
-  idx_b_t_up1 = idxr3(bTgt, t, u+1);
-  idx_b_tp1_u = idxr3(bTgt, t+1, u);
-  idx_b_tp1_up1 = idxr3(bTgt, t+1, u+1);
+  idx_b_t_up1 = idxr3(bTgt, t, u + 1);
+  idx_b_tp1_u = idxr3(bTgt, t + 1, u);
+  idx_b_tp1_up1 = idxr3(bTgt, t + 1, u + 1);
 
-  if (idx_b_t_u == -1 ) {
+  if (idx_b_t_u == -1) {
     return;
   }
 
@@ -88,43 +85,40 @@ HOST_AND_DEVICE void ComputeGradientsElement(
     CAST_DTYPE g = CAST_DTYPE(logits[b_t_u_d]) + c;
 
     if (fusedLogSmax) {
-      if (d == blank && t == T - 1 && u == U - 1) {  // last blank transition.
+      if (d == blank && t == T - 1 && u == U - 1) { // last blank transition.
         gradients[b_t_u_d] = std::exp(g + betas[idx_b_t_u]) - std::exp(g);
       } else if (t < T - 1 && d == blank) {
         gradients[b_t_u_d] = std::exp(g + betas[idx_b_t_u]);
         if (idx_b_tp1_u != -1) {
-          gradients[b_t_u_d] = gradients[b_t_u_d] - std::exp(g + betas[idx_b_tp1_u]);
+          gradients[b_t_u_d] =
+              gradients[b_t_u_d] - std::exp(g + betas[idx_b_tp1_u]);
         }
-
       } else if (u < U - 1 && d == targets[idxr2(bTgt, u)]) {
         gradients[b_t_u_d] = std::exp(g + betas[idx_b_t_u]);
         if (idx_b_t_up1 != -1) {
-          gradients[b_t_u_d] = gradients[b_t_u_d] - std::exp(g + betas[idx_b_t_up1]);
+          gradients[b_t_u_d] =
+              gradients[b_t_u_d] - std::exp(g + betas[idx_b_t_up1]);
         }
       } else {
         gradients[b_t_u_d] = std::exp(g + betas[idx_b_t_u]);
       }
-    }
-    else { // Non fused log softmax case
+    } else { // Non fused log softmax case
       CAST_DTYPE g = cost + CAST_DTYPE(logits[b_t_u_d]);
       if (d == blank && t == T - 1 && u == U - 1) {
         gradients[b_t_u_d] = g + alphas[idx_b_t_u];
       } else if (t < T - 1 && d == blank) {
         if (idx_b_tp1_u != -1) {
           gradients[b_t_u_d] = g + alphas[idx_b_t_u] + betas[idx_b_tp1_u];
-          } else {
+        } else {
           gradients[b_t_u_d] = g + CAST_DTYPE(-INFINITY);
-          }
+        }
       } else if (u < U - 1 && d == targets[idxr2(bTgt, u)]) {
-
         if (idx_b_t_up1 != -1) {
           gradients[b_t_u_d] = g + alphas[idx_b_t_u] + betas[idx_b_t_up1];
         } else {
           gradients[b_t_u_d] = g + CAST_DTYPE(-INFINITY);
         }
-
-      }
-      else {
+      } else {
         gradients[b_t_u_d] = g + CAST_DTYPE(-INFINITY);
       }
       gradients[b_t_u_d] = -std::exp(gradients[b_t_u_d]);
@@ -138,5 +132,5 @@ HOST_AND_DEVICE void ComputeGradientsElement(
   }
 }
 
-}  // namespace transducer
-}  // namespace torchaudio
+} // namespace transducer
+} // namespace torchaudio
