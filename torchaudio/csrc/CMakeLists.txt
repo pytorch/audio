@@ -8,11 +8,10 @@ set(
   lfilter.cpp
   overdrive.cpp
   utils.cpp
+  rnn_transducer/compute_alphas.cpp
+  rnn_transducer/compute_betas.cpp
+  rnn_transducer/compute.cpp
   )
-
-if(BUILD_TRANSDUCER)
-  list(APPEND LIBTORCHAUDIO_SOURCES transducer.cpp)
-endif()
 
 if(BUILD_KALDI)
   list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)

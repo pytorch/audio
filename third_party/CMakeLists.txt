@@ -21,12 +21,5 @@ if (BUILD_KALDI)
   list(APPEND TORCHAUDIO_THIRD_PARTIES kaldi)
 endif()
 
-################################################################################
-# transducer
-################################################################################
-if (BUILD_TRANSDUCER)
-  add_subdirectory(transducer)
-  list(APPEND TORCHAUDIO_THIRD_PARTIES warprnnt)
-endif()
 
 set_property(GLOBAL PROPERTY TORCHAUDIO_THIRD_PARTIES "${TORCHAUDIO_THIRD_PARTIES}")

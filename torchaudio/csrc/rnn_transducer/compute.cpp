@@ -83,12 +83,6 @@ compute(
             /*gradients=*/(gradients == c10::nullopt)? nullptr : gradients->data<c10::Half>());
         break;
       }
-    default:
-      {
-        LOG(ERROR) << "unsupported logits.type().scalarType() = "
-                   << logits.type().scalarType();
-        break;
-      }
   };
 
   return std::make_tuple(costs, gradients);

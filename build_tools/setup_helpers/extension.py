@@ -36,7 +36,6 @@ def _get_build(var, default=False):
 
 _BUILD_SOX = False if platform.system() == 'Windows' else _get_build("BUILD_SOX")
 _BUILD_KALDI = False if platform.system() == 'Windows' else _get_build("BUILD_KALDI", True)
-_BUILD_TRANSDUCER = _get_build("BUILD_TRANSDUCER")
 
 
 def get_ext_modules():
@@ -71,7 +70,7 @@ class CMakeBuild(build_ext):
             f"-DPython_INCLUDE_DIR={distutils.sysconfig.get_python_inc()}",
             f"-DBUILD_SOX:BOOL={'ON' if _BUILD_SOX else 'OFF'}",
             f"-DBUILD_KALDI:BOOL={'ON' if _BUILD_KALDI else 'OFF'}",
-            f"-DBUILD_TRANSDUCER:BOOL={'ON' if _BUILD_TRANSDUCER else 'OFF'}",
+            # f"-DBUILD_TRANSDUCER:BOOL={'ON' if _BUILD_TRANSDUCER else 'OFF'}",
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
         ]
