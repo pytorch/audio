@@ -1,119 +1,288 @@
 import torch
-from torch.autograd import Function
-from torch.nn import Module
-from torchaudio._internal import (
-    module_utils as _mod_utils,
-)
 
-__all__ = [
-    "rnnt_loss",
-    "RNNTLoss",
-]
+def compute_alphas(
+    logits,
+    targets,
+    src_lengths,
+    tgt_lengths,
+    blank=-1,
+    clamp=-1,
+):
+    """
+    Wrapper function to compute alphas for RNNT loss.
+    This can also be used as a backpointer table, to backtrack
+    {from (T-1, U-1) to (0,0)} to find the best cost path.
+    Also, enables easy unit-testing of alphas with numpy
+    """
+    targets = targets.to(device=logits.device)
+    src_lengths = src_lengths.to(device=logits.device)
+    tgt_lengths = tgt_lengths.to(device=logits.device)
+
+    # make sure all int tensors are of type int32.
+    targets = targets.int()
+    src_lengths = src_lengths.int()
+    tgt_lengths = tgt_lengths.int()
+
+    return torch.ops.torchaudio.compute_transducer_alphas(
+        logits,
+        targets,
+        src_lengths,
+        tgt_lengths,
+        blank,
+        clamp,
+    )
 
 
-class _RNNT(Function):
+def compute_betas(
+    logits,
+    targets,
+    src_lengths,
+    tgt_lengths,
+    blank=-1,
+    clamp=-1,
+):
+    """
+    Wrapper function to compute betas for RNNT loss.
+    Enables easy unit-testing of alphas with numpy
+    """
+    targets = targets.to(device=logits.device)
+    src_lengths = src_lengths.to(device=logits.device)
+    tgt_lengths = tgt_lengths.to(device=logits.device)
+
+    # make sure all int tensors are of type int32.
+    targets = targets.int()
+    src_lengths = src_lengths.int()
+    tgt_lengths = tgt_lengths.int()
+
+    return torch.ops.torchaudio.compute_transducer_betas(
+        logits,
+        targets,
+        src_lengths,
+        tgt_lengths,
+        blank,
+        clamp,
+    )
+
+
+class _Transducer(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, acts, labels, act_lens, label_lens, blank, reduction):
+    def forward(
+        ctx,
+        logits,
+        targets,
+        src_lengths,
+        tgt_lengths,
+        blank=-1,
+        clamp=-1,
+        runtime_check=False,
+        fused_log_smax=True,
+        reuse_logits_for_grads=True,
+    ):
         """
-        See documentation for RNNTLoss.
+        logits: Tensor of (B, max_T, max_U, D) containing output from joiner
+        targets: Tensor of (B, max_U - 1) containing targets with zero padded
+        src_lengths: Tensor of (B) containing lengths of each sequence from encoder
+        tgt_lengths: Tensor of (B) containing lengths of targets for each sequence
+        fused_log_smax: [Optional] set to false if calling log_softmax outside loss
+        reuse_logits_for_grads: save memory by reusing logits memory for grads
         """
 
-        device = acts.device
+        # move everything to the same device.
+        targets = targets.to(device=logits.device)
+        src_lengths = src_lengths.to(device=logits.device)
+        tgt_lengths = tgt_lengths.to(device=logits.device)
 
-        acts = acts.to("cpu")
-        labels = labels.to("cpu")
-        act_lens = act_lens.to("cpu")
-        label_lens = label_lens.to("cpu")
+        # make sure all int tensors are of type int32.
+        targets = targets.int()
+        src_lengths = src_lengths.int()
+        tgt_lengths = tgt_lengths.int()
 
-        loss_func = torch.ops.torchaudio.rnnt_loss
+        if blank < 0:  # reinterpret blank index if blank < 0.
+            blank = logits.shape[-1] + blank
 
-        grads = torch.zeros_like(acts)
-        minibatch_size = acts.size(0)
-        costs = torch.zeros(minibatch_size, dtype=acts.dtype)
+        if runtime_check:
+            check_inputs(
+                logits=logits,
+                targets=targets,
+                src_lengths=src_lengths,
+                tgt_lengths=tgt_lengths,
+                blank=blank,
+            )
 
-        loss_func(acts, labels, act_lens, label_lens, costs, grads, blank, 0)
+        costs, gradients = torch.ops.torchaudio.compute_transducer_loss(
+            logits=logits,
+            targets=targets,
+            src_lengths=src_lengths,
+            tgt_lengths=tgt_lengths,
+            blank=blank,
+            clamp=clamp,
+            fused_log_smax=fused_log_smax,
+            reuse_logits_for_grads=reuse_logits_for_grads,
+        )
 
-        if reduction in ["sum", "mean"]:
-            costs = costs.sum().unsqueeze_(-1)
-            if reduction == "mean":
-                costs /= minibatch_size
-                grads /= minibatch_size
-
-        costs = costs.to(device)
-        ctx.grads = grads.to(device)
+        ctx.grads = gradients
 
         return costs
 
     @staticmethod
-    def backward(ctx, grad_output):
-        grad_output = grad_output.view(-1, 1, 1, 1).to(ctx.grads)
-        return ctx.grads.mul_(grad_output), None, None, None, None, None
+    def backward(ctx, output_gradients):
+        output_gradients = output_gradients.view(-1, 1, 1, 1).to(ctx.grads)
+        ctx.grads.mul_(output_gradients).to(ctx.grads)
+
+        return (
+            ctx.grads,  # logits
+            None,  # targets
+            None,  # src_lengths
+            None,  # tgt_lengths
+            None,  # blank
+            None,  # clamp
+            None,  # runtime_check
+            None,  # fused_log_smax
+            None,  # reuse_logits_for_grads
+        )
 
 
-@_mod_utils.requires_module("torchaudio._torchaudio")
-def rnnt_loss(acts, labels, act_lens, label_lens, blank=0, reduction="mean"):
-    """Compute the RNN Transducer Loss.
-
-    The RNN Transducer loss (`Graves 2012 <https://arxiv.org/pdf/1211.3711.pdf>`__) extends the CTC loss by defining
-    a distribution over output sequences of all lengths, and by jointly modelling both input-output and output-output
-    dependencies.
-
-    The implementation uses `warp-transducer <https://github.com/HawkAaron/warp-transducer>`__.
-
-    Args:
-        acts (Tensor): Tensor of dimension (batch, time, label, class) containing output from network
-            before applying ``torch.nn.functional.log_softmax``.
-        labels (Tensor): Tensor of dimension (batch, max label length) containing the labels padded by zero
-        act_lens (Tensor): Tensor of dimension (batch) containing the length of each output sequence
-        label_lens (Tensor): Tensor of dimension (batch) containing the length of each output sequence
-        blank (int): blank label. (Default: ``0``)
-        reduction (string): If ``'sum'``, the output losses will be summed.
-            If ``'mean'``, the output losses will be divided by the target lengths and
-            then the mean over the batch is taken. If ``'none'``, no reduction will be applied.
-            (Default: ``'mean'``)
+class TransducerLoss(torch.nn.Module):
+    """
+    Parameters:
+        blank (int, optional): blank label. Default: -1.
+        runtime_check (bool, optional): whether to do sanity check during runtime.
     """
 
-    # NOTE manually done log_softmax for CPU version,
-    # log_softmax is computed within GPU version.
-    acts = torch.nn.functional.log_softmax(acts, -1)
-    return _RNNT.apply(acts, labels, act_lens, label_lens, blank, reduction)
-
-
-@_mod_utils.requires_module("torchaudio._torchaudio")
-class RNNTLoss(Module):
-    """Compute the RNN Transducer Loss.
-
-    The RNN Transducer loss (`Graves 2012 <https://arxiv.org/pdf/1211.3711.pdf>`__) extends the CTC loss by defining
-    a distribution over output sequences of all lengths, and by jointly modelling both input-output and output-output
-    dependencies.
-
-    The implementation uses `warp-transducer <https://github.com/HawkAaron/warp-transducer>`__.
-
-    Args:
-        blank (int): blank label. (Default: ``0``)
-        reduction (string): If ``'sum'``, the output losses will be summed.
-            If ``'mean'``, the output losses will be divided by the target lengths and
-            then the mean over the batch is taken. If ``'none'``, no reduction will be applied.
-            (Default: ``'mean'``)
-    """
-
-    def __init__(self, blank=0, reduction="mean"):
-        super(RNNTLoss, self).__init__()
+    def __init__(
+        self,
+        blank=-1,
+        clamp=-1,
+        runtime_check=False,
+        fused_log_smax=True,
+        reuse_logits_for_grads=True,
+    ):
+        super().__init__()
         self.blank = blank
-        self.reduction = reduction
-        self.loss = _RNNT.apply
+        self.clamp = clamp
+        self.runtime_check = runtime_check
+        self.fused_log_smax = fused_log_smax
+        self.reuse_logits_for_grads = reuse_logits_for_grads
 
-    def forward(self, acts, labels, act_lens, label_lens):
+    def forward(
+        self,
+        logits,
+        targets,
+        src_lengths,
+        tgt_lengths,
+    ):
         """
-        Args:
-            acts (Tensor): Tensor of dimension (batch, time, label, class) containing output from network
-                before applying ``torch.nn.functional.log_softmax``.
-            labels (Tensor): Tensor of dimension (batch, max label length) containing the labels padded by zero
-            act_lens (Tensor): Tensor of dimension (batch) containing the length of each output sequence
-            label_lens (Tensor): Tensor of dimension (batch) containing the length of each output sequence
+        logits: Tensor of (B, max_T, max_U, D) containing output from joiner
+        targets: Tensor of (B, max_U - 1) containing targets with zero padded
+        src_lengths: Tensor of (B) containing lengths of each sequence from encoder
+        tgt_lengths: Tensor of (B) containing lengths of targets for each sequence
         """
 
-        # NOTE manually done log_softmax for CPU version,
-        # log_softmax is computed within GPU version.
-        acts = torch.nn.functional.log_softmax(acts, -1)
-        return self.loss(acts, labels, act_lens, label_lens, self.blank, self.reduction)
+        # Do not use fused log softmax if explicitly specified using
+        # fused_log_smax=False (for example to do Min WER training)
+        # For below cases, we call log_softmax outside of loss
+        if not self.fused_log_smax:
+            logits = torch.nn.functional.log_softmax(logits, dim=-1)
+            self.reuse_logits_for_grads = (
+                False  # softmax needs the original logits value
+            )
+
+        cost = _Transducer.apply(
+            logits,
+            targets,
+            src_lengths,
+            tgt_lengths,
+            self.blank,
+            self.clamp,
+            self.runtime_check,
+            self.fused_log_smax,
+            self.reuse_logits_for_grads,
+        )
+        return cost
+
+
+def check_type(var, t, name):
+    if var.dtype is not t:
+        raise TypeError("{} must be {}".format(name, t))
+
+
+def check_contiguous(var, name):
+    if not var.is_contiguous():
+        raise ValueError("{} must be contiguous".format(name))
+
+
+def check_dim(var, dim, name):
+    if len(var.shape) != dim:
+        raise ValueError("{} must be {}D".format(name, dim))
+
+
+def check_equal(var1, name1, var2, name2):
+    if var1 != var2:
+        raise ValueError(
+            "`{}` ({}) must equal to ".format(name1, var1)
+            + "`{}` ({})".format(name2, var2)
+        )
+
+
+def check_device(var1, name1, var2, name2):
+    if var1.device != var2.device:
+        raise ValueError(
+            "`{}` ({}) must be on the same ".format(name1, var1.device.type)
+            + "device as `{}` ({})".format(name2, var2.device.type)
+        )
+
+
+def check_inputs(logits, targets, src_lengths, tgt_lengths, blank):
+    check_device(logits, "logits", targets, "targets")
+    check_device(logits, "logits", targets, "src_lengths")
+    check_device(logits, "logits", targets, "tgt_lengths")
+
+    check_type(logits, torch.float32, "logits")
+    check_type(targets, torch.int32, "targets")
+    check_type(src_lengths, torch.int32, "src_lengths")
+    check_type(tgt_lengths, torch.int32, "tgt_lengths")
+
+    check_contiguous(logits, "logits")
+    check_contiguous(targets, "targets")
+    check_contiguous(tgt_lengths, "tgt_lengths")
+    check_contiguous(src_lengths, "src_lengths")
+
+    check_dim(logits, 4, "logits")
+    check_dim(targets, 2, "targets")
+    check_dim(src_lengths, 1, "src_lengths")
+    check_dim(tgt_lengths, 1, "tgt_lengths")
+
+    check_equal(
+        src_lengths.shape[0], "src_lengths.shape[0]", logits.shape[0], "logits.shape[0]"
+    )
+    check_equal(
+        tgt_lengths.shape[0], "tgt_lengths.shape[0]", logits.shape[0], "logits.shape[0]"
+    )
+    check_equal(
+        targets.shape[0], "targets.shape[0]", logits.shape[0], "logits.shape[0]"
+    )
+    check_equal(
+        targets.shape[1],
+        "targets.shape[1]",
+        torch.max(tgt_lengths),
+        "torch.max(tgt_lengths)",
+    )
+    check_equal(
+        logits.shape[1],
+        "logits.shape[1]",
+        torch.max(src_lengths),
+        "torch.max(src_lengths)",
+    )
+    check_equal(
+        logits.shape[2],
+        "logits.shape[2]",
+        torch.max(tgt_lengths) + 1,
+        "torch.max(tgt_lengths) + 1",
+    )
+
+    if blank < 0 or blank >= logits.shape[-1]:
+        raise ValueError(
+            "blank ({}) must be within [0, logits.shape[-1]={})".format(
+                blank, logits.shape[-1]
+            )
+        )
