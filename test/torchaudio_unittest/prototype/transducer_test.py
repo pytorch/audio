@@ -2,14 +2,14 @@ import unittest
 
 import numpy as np
 import torch
-from torchaudio.prototype import TransducerLoss
+from torchaudio.prototype import RNNTLoss
 
 from .numpy_transducer import NumpyTransducerLoss
 from torchaudio_unittest.common_utils import TorchaudioTestCase
 
 
 def compute_with_pytorch_transducer(data, reuse_logits_for_grads=False):
-    costs = TransducerLoss(
+    costs = RNNTLoss(
         blank=data["blank"],
         reuse_logits_for_grads=reuse_logits_for_grads,
     )(
@@ -453,13 +453,13 @@ class TransducerTester:
     def test_basic_fp16_no_error(self):
         """RNNT loss should support fp16
         """
-        rnnt_loss = TransducerLoss()
+        rnnt_loss = RNNTLoss()
         acts, labels, act_length, label_length = self._get_data_basic(device=self.device)
         acts = acts.to(torch.float16)
         rnnt_loss(acts, labels, act_length, label_length)
 
     def test_basic_backward(self):
-        rnnt_loss = TransducerLoss()
+        rnnt_loss = RNNTLoss()
         acts, labels, act_length, label_length = self._get_data_basic(device=self.device)
         loss = rnnt_loss(acts, labels, act_length, label_length)
         loss.backward()

@@ -1,7 +1,7 @@
 import torch
 
 
-def compute_alphas(
+def compute_rnnt_alphas(
     logits,
     targets,
     src_lengths,
@@ -9,11 +9,18 @@ def compute_alphas(
     blank=-1,
     clamp=-1,
 ):
-    """
-    Wrapper function to compute alphas for RNNT loss.
-    This can also be used as a backpointer table, to backtrack
-    {from (T-1, U-1) to (0,0)} to find the best cost path.
+    """Wrapper function to compute alphas for RNNT loss.
+
+    This can also be used as a backpointer table, to backtrack {from (T-1, U-1) to (0,0)} to find the best cost path.
     Also, enables easy unit-testing of alphas with numpy
+
+    Args:
+        logits (Tensor): Tensor of (B, max_T, max_U, D) containing output from joiner
+        targets (Tensor): Tensor of (B, max_U - 1) containing targets with zero padded
+        src_lengths (Tensor): Tensor of (B) containing lengths of each sequence from encoder
+        tgt_lengths (Tensor): Tensor of (B) containing lengths of targets for each sequence
+        blank (int): blank label. (Default: ``-1``)
+        clamp (float): clamp for gradients (Default: ``-1``)
     """
     targets = targets.to(device=logits.device)
     src_lengths = src_lengths.to(device=logits.device)
@@ -34,7 +41,7 @@ def compute_alphas(
     )
 
 
-def compute_betas(
+def compute_rnnt_betas(
     logits,
     targets,
     src_lengths,
@@ -42,9 +49,17 @@ def compute_betas(
     blank=-1,
     clamp=-1,
 ):
-    """
-    Wrapper function to compute betas for RNNT loss.
+    """Wrapper function to compute betas for RNNT loss.
+
     Enables easy unit-testing of alphas with numpy
+
+    Args:
+        logits (Tensor): Tensor of (B, max_T, max_U, D) containing output from joiner
+        targets (Tensor): Tensor of (B, max_U - 1) containing targets with zero padded
+        src_lengths (Tensor): Tensor of (B) containing lengths of each sequence from encoder
+        tgt_lengths (Tensor): Tensor of (B) containing lengths of targets for each sequence
+        blank (int): blank label. (Default: ``-1``)
+        clamp (float): clamp for gradients (Default: ``-1``)
     """
     targets = targets.to(device=logits.device)
     src_lengths = src_lengths.to(device=logits.device)
@@ -65,7 +80,7 @@ def compute_betas(
     )
 
 
-class _Transducer(torch.autograd.Function):
+class _RNNT(torch.autograd.Function):
     @staticmethod
     def forward(
         ctx,
@@ -80,12 +95,7 @@ class _Transducer(torch.autograd.Function):
         reuse_logits_for_grads=True,
     ):
         """
-        logits: Tensor of (B, max_T, max_U, D) containing output from joiner
-        targets: Tensor of (B, max_U - 1) containing targets with zero padded
-        src_lengths: Tensor of (B) containing lengths of each sequence from encoder
-        tgt_lengths: Tensor of (B) containing lengths of targets for each sequence
-        fused_log_smax: [Optional] set to false if calling log_softmax outside loss
-        reuse_logits_for_grads: save memory by reusing logits memory for grads
+        See documentation for RNNTLoss
         """
 
         # move everything to the same device.
@@ -143,11 +153,68 @@ class _Transducer(torch.autograd.Function):
         )
 
 
-class TransducerLoss(torch.nn.Module):
+def rnnt_loss(
+    logits,
+    targets,
+    src_lengths,
+    tgt_lengths,
+    blank=-1,
+    clamp=-1,
+    runtime_check=False,
+    fused_log_smax=True,
+    reuse_logits_for_grads=True
+):
+    """Compute the RNN Transducer Loss.
+
+    The RNN Transducer loss (`Graves 2012 <https://arxiv.org/pdf/1211.3711.pdf>`__) extends the CTC loss by defining
+    a distribution over output sequences of all lengths, and by jointly modelling both input-output and output-output
+    dependencies.
+
+    Args:
+        logits (Tensor): Tensor of (B, max_T, max_U, D) containing output from joiner
+        targets (Tensor): Tensor of (B, max_U - 1) containing targets with zero padded
+        src_lengths (Tensor): Tensor of (B) containing lengths of each sequence from encoder
+        tgt_lengths (Tensor): Tensor of (B) containing lengths of targets for each sequence
+        blank (int): blank label. (Default: ``-1``)
+        clamp (float): clamp for gradients (Default: ``-1``)
+        runtime_check (bool): whether to do sanity check during runtime. (Default: ``False``)
+        fused_log_smax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
+        reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)
     """
-    Parameters:
-        blank (int, optional): blank label. Default: -1.
-        runtime_check (bool, optional): whether to do sanity check during runtime.
+
+    if not fused_log_smax:
+        logits = torch.nn.functional.log_softmax(logits, dim=-1)
+        reuse_logits_for_grads = (
+            False  # softmax needs the original logits value
+        )
+
+    cost = _RNNT.apply(
+        logits,
+        targets,
+        src_lengths,
+        tgt_lengths,
+        blank,
+        clamp,
+        runtime_check,
+        fused_log_smax,
+        reuse_logits_for_grads,
+    )
+    return cost
+
+
+class RNNTLoss(torch.nn.Module):
+    """Compute the RNN Transducer Loss.
+
+    The RNN Transducer loss (`Graves 2012 <https://arxiv.org/pdf/1211.3711.pdf>`__) extends the CTC loss by defining
+    a distribution over output sequences of all lengths, and by jointly modelling both input-output and output-output
+    dependencies.
+
+    Args:
+        blank (int): blank label. (Default: ``-1``)
+        clamp (float): clamp for gradients (Default: ``-1``)
+        runtime_check (bool): whether to do sanity check during runtime. (Default: ``False``)
+        fused_log_smax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
+        reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)
     """
 
     def __init__(
@@ -173,10 +240,11 @@ class TransducerLoss(torch.nn.Module):
         tgt_lengths,
     ):
         """
-        logits: Tensor of (B, max_T, max_U, D) containing output from joiner
-        targets: Tensor of (B, max_U - 1) containing targets with zero padded
-        src_lengths: Tensor of (B) containing lengths of each sequence from encoder
-        tgt_lengths: Tensor of (B) containing lengths of targets for each sequence
+        Args:
+            logits (Tensor): Tensor of (B, max_T, max_U, D) containing output from joiner
+            targets (Tensor): Tensor of (B, max_U - 1) containing targets with zero padded
+            src_lengths (Tensor): Tensor of (B) containing lengths of each sequence from encoder
+            tgt_lengths (Tensor): Tensor of (B) containing lengths of targets for each sequence
         """
 
         # Do not use fused log softmax if explicitly specified using
@@ -188,7 +256,7 @@ class TransducerLoss(torch.nn.Module):
                 False  # softmax needs the original logits value
             )
 
-        cost = _Transducer.apply(
+        cost = _RNNT.apply(
             logits,
             targets,
             src_lengths,

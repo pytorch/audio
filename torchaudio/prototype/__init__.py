@@ -1,11 +1,13 @@
 from .transducer import (
-    compute_alphas,
-    compute_betas,
-    TransducerLoss,
+    compute_rnnt_alphas,
+    compute_rnnt_betas,
+    rnnt_loss,
+    RNNTLoss
 )
 
 __all__ = [
-    'compute_alphas',
-    'compute_betas',
-    'TransducerLoss',
+    'compute_rnnt_alphas',
+    'compute_rnnt_betas',
+    'rnnt_loss',
+    'RNNTLoss'
 ]
