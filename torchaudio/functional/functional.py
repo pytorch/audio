@@ -7,7 +7,7 @@ from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
-from torchaudio._internal import module_utils as _mod_utils, deprecated
+from torchaudio._internal import module_utils as _mod_utils
 import torchaudio
 
 __all__ = [
@@ -533,7 +533,7 @@ def mu_law_decoding(
     return x
 
 
-@deprecated(
+@_mod_utils.deprecated(
     "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
     "use `torch.abs`. "
     "Please refer to https://github.com/pytorch/audio/issues/1337 "
@@ -558,7 +558,7 @@ def complex_norm(
     return complex_tensor.pow(2.).sum(-1).pow(0.5 * power)
 
 
-@deprecated(
+@_mod_utils.deprecated(
     "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
     "use `torch.angle`. "
     "Please refer to https://github.com/pytorch/audio/issues/1337 "
