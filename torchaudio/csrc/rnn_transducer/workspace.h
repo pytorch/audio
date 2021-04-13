@@ -95,7 +95,7 @@ class IntWorkspace {
 
   void Reset(const Options& options, int* data, int size) {
     int needed_size = ComputeSizeFromOptions(options);
-    // CHECK_LE(needed_size, size);
+    CHECK_LE(needed_size, size);
     options_ = options;
     data_ = data;
     size_ = size;

@@ -37,7 +37,7 @@ status_t Compute(
   const int& D = options.numTargets_;
 
   { // compute denominators.
-    status_t status = LogSumExp2D<DTYPE, CAST_DTYPE>(
+    LogSumExp2D<DTYPE, CAST_DTYPE>(
         /*N=*/B * maxT * maxU,
         /*D=*/D,
         /*logits=*/logits,
@@ -45,7 +45,7 @@ status_t Compute(
   }
 
   { // compute log prob pairs.
-    status_t status = ComputeLogProbs<DTYPE, CAST_DTYPE>(
+    ComputeLogProbs<DTYPE, CAST_DTYPE>(
         /*options=*/options,
         /*logits=*/logits,
         /*targets=*/targets,
@@ -102,7 +102,7 @@ status_t ComputeAlphas(
   const int& D = options.numTargets_;
 
   { // compute denominators.
-    status_t status = LogSumExp2D<DTYPE, CAST_DTYPE>(
+    LogSumExp2D<DTYPE, CAST_DTYPE>(
         /*N=*/B * maxT * maxU,
         /*D=*/D,
         /*logits=*/logits,
@@ -110,7 +110,7 @@ status_t ComputeAlphas(
   }
 
   { // compute log prob pairs.
-    status_t status = ComputeLogProbs<DTYPE, CAST_DTYPE>(
+    ComputeLogProbs<DTYPE, CAST_DTYPE>(
         /*options=*/options,
         /*logits=*/logits,
         /*targets=*/targets,
@@ -153,7 +153,7 @@ status_t ComputeBetas(
   const int& D = options.numTargets_;
 
   { // compute denominators.
-    status_t status = LogSumExp2D<DTYPE, CAST_DTYPE>(
+    LogSumExp2D<DTYPE, CAST_DTYPE>(
         /*N=*/B * maxT * maxU,
         /*D=*/D,
         /*logits=*/logits,
@@ -161,7 +161,7 @@ status_t ComputeBetas(
   }
 
   { // compute log prob pairs.
-    status_t status = ComputeLogProbs<DTYPE, CAST_DTYPE>(
+    ComputeLogProbs<DTYPE, CAST_DTYPE>(
         /*options=*/options,
         /*logits=*/logits,
         /*targets=*/targets,
