@@ -129,4 +129,4 @@ class AutogradTestMixin(TestBaseMixin):
         sample_rate = 8000
         transform = T.AmplitudeToDB(top_db=top_db)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
-        self.assert_grad(transform, [waveform])
+        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
