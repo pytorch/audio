@@ -124,9 +124,8 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
-    @parameterized.expand([(None, ), (80, )])
-    def test_amplitude_to_db(self, top_db):
+    def test_amplitude_to_db(self):
         sample_rate = 8000
-        transform = T.AmplitudeToDB(top_db=top_db)
+        transform = T.AmplitudeToDB()
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
-        self.assert_grad(transform, [waveform], nondet_tol=1e-10)
+        self.assert_grad(transform, [waveform])
