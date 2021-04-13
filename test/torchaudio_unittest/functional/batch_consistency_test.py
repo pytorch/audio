@@ -197,22 +197,6 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             F.sliding_window_cmn, spectrogram, center=center,
             norm_vars=norm_vars)
 
-    def test_vad_from_file(self):
-        filepath = common_utils.get_asset_path("vad-go-stereo-44100.wav")
-        waveform, sample_rate = common_utils.load_wav(filepath)
-        # Each channel is slightly offset - we can use this to create a batch
-        # with different items.
-        batch = waveform.view(2, 1, -1)
-        self.assert_batch_consistency(F.vad, batch, sample_rate=sample_rate)
-
-    def test_vad_different_items(self):
-        """Separate test to ensure VAD consistency with differing items."""
-        sample_rate = 44100
-        torch.manual_seed(0)
-        waveforms = torch.rand(self.batch_size, 2, 100) - 0.5
-        self.assert_batch_consistency(
-            F.vad, waveforms, sample_rate=sample_rate)
-
     @common_utils.skipIfNoKaldi
     def test_compute_kaldi_pitch(self):
         sample_rate = 44100
