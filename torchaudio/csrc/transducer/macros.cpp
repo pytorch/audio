@@ -1,4 +1,4 @@
-#include <torchaudio/csrc/rnn_transducer/macros.h>
+#include <torchaudio/csrc/transducer/macros.h>
 
 const char* ToString(level_t level) {
   switch (level) {

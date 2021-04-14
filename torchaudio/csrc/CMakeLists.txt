@@ -13,9 +13,9 @@ set(
 if(BUILD_TRANSDUCER)
   set(
       TRANSDUCER_SOURCES
-      rnn_transducer/compute_alphas.cpp
-      rnn_transducer/compute_betas.cpp
-      rnn_transducer/compute.cpp
+      transducer/compute_alphas.cpp
+      transducer/compute_betas.cpp
+      transducer/compute.cpp
   )
   list(APPEND LIBTORCHAUDIO_SOURCES ${TRANSDUCER_SOURCES})
 endif()

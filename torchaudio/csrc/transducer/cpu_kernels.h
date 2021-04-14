@@ -1,8 +1,8 @@
 #pragma once
 
-#include <torchaudio/csrc/rnn_transducer/math.h>
-#include <torchaudio/csrc/rnn_transducer/options.h>
-#include <torchaudio/csrc/rnn_transducer/types.h>
+#include <torchaudio/csrc/transducer/math.h>
+#include <torchaudio/csrc/transducer/options.h>
+#include <torchaudio/csrc/transducer/types.h>
 
 #include <cstring>
 #include <limits>

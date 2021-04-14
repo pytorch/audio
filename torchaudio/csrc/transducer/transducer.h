@@ -1,6 +1,6 @@
 #pragma once
 
-#include <torchaudio/csrc/rnn_transducer/cpu_transducer.h>
+#include <torchaudio/csrc/transducer/cpu_transducer.h>
 
 namespace torchaudio {
 namespace transducer {

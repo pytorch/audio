@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include <torchaudio/csrc/rnn_transducer/math.h>
+#include <torchaudio/csrc/transducer/math.h>
 
 namespace torchaudio {
 namespace transducer {

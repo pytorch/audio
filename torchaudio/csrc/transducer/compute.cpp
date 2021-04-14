@@ -1,5 +1,5 @@
 #include <torch/script.h>
-#include <torchaudio/csrc/rnn_transducer/transducer.h>
+#include <torchaudio/csrc/transducer/transducer.h>
 
 namespace torchaudio {
 namespace transducer {

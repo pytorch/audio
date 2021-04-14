@@ -1,5 +1,10 @@
 import torch
 
+__all__ = [
+    'rnnt_loss',
+    'RNNTLoss'
+]
+
 
 def compute_rnnt_alphas(
     logits,
@@ -12,7 +17,6 @@ def compute_rnnt_alphas(
     """Wrapper function to compute alphas for RNNT loss.
 
     This can also be used as a backpointer table, to backtrack {from (T-1, U-1) to (0,0)} to find the best cost path.
-    Also, enables easy unit-testing of alphas with numpy
 
     Args:
         logits (Tensor): Tensor of (B, max_T, max_U, D) containing output from joiner
@@ -50,8 +54,6 @@ def compute_rnnt_betas(
     clamp=-1,
 ):
     """Wrapper function to compute betas for RNNT loss.
-
-    Enables easy unit-testing of alphas with numpy
 
     Args:
         logits (Tensor): Tensor of (B, max_T, max_U, D) containing output from joiner

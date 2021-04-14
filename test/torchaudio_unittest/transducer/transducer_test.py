@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 import torch
-from torchaudio.prototype import RNNTLoss
+from torchaudio.prototype.transducer import RNNTLoss
 
 from .numpy_transducer import NumpyTransducerLoss
 from torchaudio_unittest.common_utils import TorchaudioTestCase
@@ -73,6 +73,8 @@ class TransducerTester:
 
     @staticmethod
     def _get_numpy_data_B2_T4_U3_D3(dtype=np.float32):
+        # Test from D21322854
+
         logits = np.array(
             [
                 0.065357,
@@ -249,6 +251,8 @@ class TransducerTester:
 
     @staticmethod
     def _get_numpy_data_B1_T2_U3_D5(dtype=np.float32):
+        # Test from D21322854
+
         logits = np.array(
             [
                 0.1,

@@ -3,7 +3,7 @@
 #include <cstring>
 #include <vector>
 
-#include <torchaudio/csrc/rnn_transducer/options.h>
+#include <torchaudio/csrc/transducer/options.h>
 
 namespace torchaudio {
 namespace transducer {
