@@ -1,8 +1,8 @@
 import torch
 
 __all__ = [
-    'rnnt_loss',
-    'RNNTLoss'
+    "rnnt_loss",
+    "RNNTLoss",
 ]
 
 
@@ -14,16 +14,14 @@ def compute_rnnt_alphas(
     blank=-1,
     clamp=-1,
 ):
-    """Wrapper function to compute alphas for RNNT loss.
-
-    This can also be used as a backpointer table, to backtrack {from (T-1, U-1) to (0,0)} to find the best cost path.
+    """Compute alphas for RNN transducer loss.
 
     Args:
-        logits (Tensor): Tensor of (B, max_T, max_U, D) containing output from joiner
-        targets (Tensor): Tensor of (B, max_U - 1) containing targets with zero padded
-        src_lengths (Tensor): Tensor of (B) containing lengths of each sequence from encoder
-        tgt_lengths (Tensor): Tensor of (B) containing lengths of targets for each sequence
-        blank (int): blank label. (Default: ``-1``)
+        logits (Tensor): Tensor of dimension (batch, time, target, class) containing output from joiner
+        targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
+        src_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
+        tgt_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
+        blank (int): blank label (Default: ``-1``)
         clamp (float): clamp for gradients (Default: ``-1``)
     """
     targets = targets.to(device=logits.device)
@@ -53,14 +51,14 @@ def compute_rnnt_betas(
     blank=-1,
     clamp=-1,
 ):
-    """Wrapper function to compute betas for RNNT loss.
+    """Compute betas for RNN transducer loss.
 
     Args:
-        logits (Tensor): Tensor of (B, max_T, max_U, D) containing output from joiner
-        targets (Tensor): Tensor of (B, max_U - 1) containing targets with zero padded
-        src_lengths (Tensor): Tensor of (B) containing lengths of each sequence from encoder
-        tgt_lengths (Tensor): Tensor of (B) containing lengths of targets for each sequence
-        blank (int): blank label. (Default: ``-1``)
+        logits (Tensor): Tensor of dimension (batch, time, target, class) containing output from joiner
+        targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
+        src_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
+        tgt_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
+        blank (int): blank label (Default: ``-1``)
         clamp (float): clamp for gradients (Default: ``-1``)
     """
     targets = targets.to(device=logits.device)
@@ -97,7 +95,7 @@ class _RNNT(torch.autograd.Function):
         reuse_logits_for_grads=True,
     ):
         """
-        See documentation for RNNTLoss
+        See documentation for RNNTLoss.
         """
 
         # move everything to the same device.
@@ -173,11 +171,11 @@ def rnnt_loss(
     dependencies.
 
     Args:
-        logits (Tensor): Tensor of (B, max_T, max_U, D) containing output from joiner
-        targets (Tensor): Tensor of (B, max_U - 1) containing targets with zero padded
-        src_lengths (Tensor): Tensor of (B) containing lengths of each sequence from encoder
-        tgt_lengths (Tensor): Tensor of (B) containing lengths of targets for each sequence
-        blank (int): blank label. (Default: ``-1``)
+        logits (Tensor): Tensor of dimension (batch, time, target, class) containing output from joiner
+        targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
+        src_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
+        tgt_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
+        blank (int): blank label (Default: ``-1``)
         clamp (float): clamp for gradients (Default: ``-1``)
         runtime_check (bool): whether to do sanity check during runtime. (Default: ``False``)
         fused_log_smax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
@@ -212,7 +210,7 @@ class RNNTLoss(torch.nn.Module):
     dependencies.
 
     Args:
-        blank (int): blank label. (Default: ``-1``)
+        blank (int): blank label (Default: ``-1``)
         clamp (float): clamp for gradients (Default: ``-1``)
         runtime_check (bool): whether to do sanity check during runtime. (Default: ``False``)
         fused_log_smax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
@@ -243,10 +241,10 @@ class RNNTLoss(torch.nn.Module):
     ):
         """
         Args:
-            logits (Tensor): Tensor of (B, max_T, max_U, D) containing output from joiner
-            targets (Tensor): Tensor of (B, max_U - 1) containing targets with zero padded
-            src_lengths (Tensor): Tensor of (B) containing lengths of each sequence from encoder
-            tgt_lengths (Tensor): Tensor of (B) containing lengths of targets for each sequence
+            logits (Tensor): Tensor of dimension (batch, time, target, class) containing output from joiner
+            targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
+            src_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
+            tgt_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
         """
 
         # Do not use fused log softmax if explicitly specified using

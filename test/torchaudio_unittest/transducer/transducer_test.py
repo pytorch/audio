@@ -458,14 +458,14 @@ class TransducerTester:
         """RNNT loss should support fp16
         """
         rnnt_loss = RNNTLoss()
-        acts, labels, act_length, label_length = self._get_data_basic(device=self.device)
-        acts = acts.to(torch.float16)
-        rnnt_loss(acts, labels, act_length, label_length)
+        logits, targets, src_lengths, tgt_lengths = self._get_data_basic(device=self.device)
+        logits = logits.to(torch.float16)
+        rnnt_loss(logits, targets, src_lengths, tgt_lengths)
 
     def test_basic_backward(self):
         rnnt_loss = RNNTLoss()
-        acts, labels, act_length, label_length = self._get_data_basic(device=self.device)
-        loss = rnnt_loss(acts, labels, act_length, label_length)
+        logits, targets, src_lengths, tgt_lengths = self._get_data_basic(device=self.device)
+        loss = rnnt_loss(logits, targets, src_lengths, tgt_lengths)
         loss.backward()
 
     def test_costs_and_gradients_B1_T2_U3_D5_fp32_cpu(self):
