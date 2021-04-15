@@ -36,8 +36,8 @@ class AutogradTestMixin(TestBaseMixin):
     ):
         transform = transform.to(dtype=torch.float64, device=self.device)
 
-        # For the autograd test, float32 and cfloat64 are not good enough
-        # we make sure that all the tensors are of float64 or cfloat128
+        # gradcheck and gradgradcheck only pass if the input tensors are of dtype `torch.double` or 
+        # `torch.cdouble`, when the default eps and tolerance values are used.
         inputs_ = []
         for i in inputs:
             if torch.is_tensor(i):
