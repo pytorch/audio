@@ -154,7 +154,7 @@ class AutogradTestMixin(TestBaseMixin):
         [0.7, 0.8, 0.9, 1.0, 1.3],
         [False, True],
     )
-    def test_timestretch(self, rate, test_pseudo_complex):
+    def test_timestretch_non_zero(self, rate, test_pseudo_complex):
         """Verify that ``T.TimeStretch`` does not fail if it's not close to 0
 
         ``T.TimeStrech`` is not differentiable around 0, so this test checks the differentiability
