@@ -153,33 +153,29 @@ class AutogradTestMixin(TestBaseMixin):
         [False, True],
     )
     def test_timestretch(self, rate, test_pseudo_complex):
-        """Verify that ``T.TimeStretch`` does not fail if it's not too close to 0
+        """Verify that ``T.TimeStretch`` does not fail if it's not close to 0
 
         ``T.TimeStrech`` is not differentiable around 0, so this test checks the differentiability
-        for cases where input is not zero, and different configurations of `TimeStretch`.
+        for cases where input is not zero.
 
-        Ideally, we should be testing on Spectrogram of random waveform but it is hard to control
-        the values around zeros.
+        As tested above, when spectrogram contains values close to zero, the gradients are unstable
+        and gradcheck fails.
+
+        In this test, we generate spectrogram from random signal, then we push the points around
+        zero away from the origin.
+
+        This process does not reflect the real use-case, and it is not practical for users, but
+        this helps us understand to what degree the function is differentiable and when not.
         """
         n_fft = 16
         transform = T.TimeStretch(n_freq=n_fft // 2 + 1, fixed_rate=rate)
-        waveform = torch.zeros(2, 40)
+        waveform = get_whitenoise(sample_rate=40, duration=1, n_channels=2)
         spectrogram = get_spectrogram(waveform, n_fft=n_fft, power=None)
 
-        # Epsilon values tried
-        #
-        # Note:
-        #   This is not experimental and comprehensive.
-        #   The result also depends on ``n_fft``.
-        #
-        #                 CPU / CUDA
-        # * 1e-1           ok / ok
-        # * 1e-2           ok / ok
-        # * 1e-3           ok / ok
-        # * 1e-3 + 1e-3j   ok / ok
-        # * 1e-4           ok / NG
-
-        spectrogram += 1e-3
+        # 1e-3 is still too close on CPU
+        epsilon = 1e-2
+        too_close = spectrogram.abs() < epsilon
+        spectrogram[too_close] = spectrogram[too_close] / spectrogram[too_close].abs()
         if test_pseudo_complex:
             spectrogram = torch.view_as_real(spectrogram)
         self.assert_grad(transform, [spectrogram])
