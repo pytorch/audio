@@ -7,16 +7,21 @@ from parameterized import parameterized
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import (
     skipIfRocm,
+    TempDirMixin,
+    TestBaseMixin,
 )
 
 
-class Transforms(common_utils.TestBaseMixin):
+class Transforms(TempDirMixin, TestBaseMixin):
     """Implements test for Transforms that are performed for different devices"""
     def _assert_consistency(self, transform, tensor):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
 
-        ts_transform = torch.jit.script(transform)
+        path = self.get_temp_path('transform.zip')
+        torch.jit.script(transform).save(path)
+        ts_transform = torch.jit.load(path)
+
         output = transform(tensor)
         ts_output = ts_transform(tensor)
         self.assertEqual(ts_output, output)
@@ -39,8 +44,8 @@ class Transforms(common_utils.TestBaseMixin):
         self._assert_consistency(T.AmplitudeToDB(), spec)
 
     def test_MelScale(self):
-        spec_f = torch.rand((1, 6, 201))
-        self._assert_consistency(T.MelScale(), spec_f)
+        spec_f = torch.rand((1, 201, 6))
+        self._assert_consistency(T.MelScale(n_stft=201), spec_f)
 
     def test_MelSpectrogram(self):
         tensor = torch.rand((1, 1000))
@@ -100,7 +105,7 @@ class Transforms(common_utils.TestBaseMixin):
         self._assert_consistency(T.SpectralCentroid(sample_rate=sample_rate), waveform)
 
 
-class TransformsComplex:
+class TransformsComplex(TempDirMixin, TestBaseMixin):
     complex_dtype = None
     real_dtype = None
     device = None
@@ -109,7 +114,10 @@ class TransformsComplex:
         assert tensor.is_complex()
         tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
         transform = transform.to(device=self.device, dtype=self.real_dtype)
-        ts_transform = torch.jit.script(transform)
+
+        path = self.get_temp_path('transform.zip')
+        torch.jit.script(transform).save(path)
+        ts_transform = torch.jit.load(path)
 
         if test_pseudo_complex:
             tensor = torch.view_as_real(tensor)
