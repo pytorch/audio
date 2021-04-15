@@ -199,7 +199,8 @@ class TestMaskAlongAxis(common_utils.TorchaudioTestCase):
 
         masked_columns = (mask_specgram == mask_value).sum(other_axis)
         num_masked_columns = (masked_columns == mask_specgram.size(other_axis)).sum()
-        num_masked_columns //= mask_specgram.size(0)
+        num_masked_columns = torch.div(
+            num_masked_columns, mask_specgram.size(0), rounding_mode='floor')
 
         assert mask_specgram.size() == specgram.size()
         assert num_masked_columns < mask_param
