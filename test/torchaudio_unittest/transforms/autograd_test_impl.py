@@ -36,6 +36,8 @@ class AutogradTestMixin(TestBaseMixin):
     ):
         transform = transform.to(dtype=torch.float64, device=self.device)
 
+        # For the autograd test, float32 and cfloat64 are not good enough
+        # we make sure that all the tensors are of float64 or cfloat128
         inputs_ = []
         for i in inputs:
             if torch.is_tensor(i):
@@ -172,10 +174,10 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=40, duration=1, n_channels=2)
         spectrogram = get_spectrogram(waveform, n_fft=n_fft, power=None)
 
-        # 1e-3 is still too close on CPU
+        # 1e-3 is too small (on CPU)
         epsilon = 1e-2
         too_close = spectrogram.abs() < epsilon
-        spectrogram[too_close] = spectrogram[too_close] / spectrogram[too_close].abs()
+        spectrogram[too_close] = epsilon * spectrogram[too_close] / spectrogram[too_close].abs()
         if test_pseudo_complex:
             spectrogram = torch.view_as_real(spectrogram)
         self.assert_grad(transform, [spectrogram])
