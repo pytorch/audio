@@ -14,30 +14,32 @@ from torchaudio_unittest.common_utils import (
     skipIfNoSox,
 )
 
-from .functional_impl import Lfilter, Spectrogram
+from .functional_impl import Functional, FunctionalComplex
 
 
-class TestLFilterFloat32(Lfilter, common_utils.PytorchTestCase):
+class TestFunctionalFloat32(Functional, common_utils.PytorchTestCase):
     dtype = torch.float32
     device = torch.device('cpu')
 
     @unittest.expectedFailure
-    def test_9th_order_filter_stability(self):
-        super().test_9th_order_filter_stability()
+    def test_lfilter_9th_order_filter_stability(self):
+        super().test_lfilter_9th_order_filter_stability()
 
 
-class TestLFilterFloat64(Lfilter, common_utils.PytorchTestCase):
+class TestFunctionalFloat64(Functional, common_utils.PytorchTestCase):
     dtype = torch.float64
     device = torch.device('cpu')
 
 
-class TestSpectrogramFloat32(Spectrogram, common_utils.PytorchTestCase):
-    dtype = torch.float32
+class TestFunctionalComplex64(FunctionalComplex, common_utils.PytorchTestCase):
+    complex_dtype = torch.complex64
+    real_dtype = torch.float32
     device = torch.device('cpu')
 
 
-class TestSpectrogramFloat64(Spectrogram, common_utils.PytorchTestCase):
-    dtype = torch.float64
+class TestFunctionalComplex128(FunctionalComplex, common_utils.PytorchTestCase):
+    complex_dtype = torch.complex128
+    real_dtype = torch.float64
     device = torch.device('cpu')
 
 

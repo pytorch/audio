@@ -93,6 +93,15 @@ BUILD_SOX=1 python setup.py install
 
 # OSX
 BUILD_SOX=1 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
+
+# Windows
+# We need to use the MSVC x64 toolset for compilation, with Visual Studio's vcvarsall.bat or directly with vcvars64.bat.
+# These batch files are under Visual Studio's installation folder, under 'VC\Auxiliary\Build\'.
+# More information available at:
+#   https://docs.microsoft.com/en-us/cpp/build/how-to-enable-a-64-bit-visual-cpp-toolset-on-the-command-line?view=msvc-160#use-vcvarsallbat-to-set-a-64-bit-hosted-build-architecture
+call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 && set BUILD_SOX=0 && python setup.py install
+# or
+call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat" && set BUILD_SOX=0 && python setup.py install
 ```
 
 This is known to work on linux and unix distributions such as Ubuntu and CentOS 7 and macOS.
