@@ -18,7 +18,9 @@ def _name_func(func, _, params):
             strs.append("_".join(str(a) for a in arg))
         else:
             strs.append(str(arg))
-    return f'{func.__name__}_{"_".join(strs)}'
+    # sanitize the test name
+    name = "_".join(strs).replace(".", "_")
+    return f'{func.__name__}_{name}'
 
 
 def nested_params(*params_set):
