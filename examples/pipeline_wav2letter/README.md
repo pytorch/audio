@@ -4,8 +4,13 @@ This is an example pipeline for speech recognition using a greedy or Viterbi CTC
 
 More information about each command line parameters is available with the `--help` option. An example can be invoked as follows.
 ```
+DATASET_ROOT = <Top>/<level>/<folder>
+DATASET_FOLDER_IN_ARCHIVE =  'LibriSpeech'
+
 python main.py \
     --reduce-lr-valid \
+    --dataset-root "${DATASET_ROOT}" \
+    --dataset-folder-in-archive "${DATASET_FOLDER_IN_ARCHIVE}" \
     --dataset-train train-clean-100 train-clean-360 train-other-500 \
     --dataset-valid dev-clean \
     --batch-size 128 \
@@ -15,7 +20,6 @@ python main.py \
     --clip-grad 0. \
     --gamma .99 \
     --hop-length 160 \
-    --n-hidden-channels 2000 \
     --win-length 400 \
     --n-bins 13 \
     --normalize \
