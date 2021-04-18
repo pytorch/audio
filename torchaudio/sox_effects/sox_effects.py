@@ -68,7 +68,7 @@ def apply_effects_tensor(
         need to give ``rate`` effect with desired sampling rate.)
 
     Args:
-        tensor (torch.Tensor): Input 2D Tensor.
+        tensor (torch.Tensor): Input 2D CPU Tensor.
         sample_rate (int): Sample rate
         effects (List[List[str]]): List of effects.
         channels_first (bool): Indicates if the input Tensor's dimension is
