@@ -33,6 +33,29 @@ The models subpackage contains definitions of models for addressing common audio
   .. automethod:: forward
 
 
+
+:hidden:`Wav2Vec2.0`
+~~~~~~~~~~~~~~~~~~~~
+
+Model
+-----
+
+.. autoclass:: Wav2Vec2Model
+
+  .. automethod:: extract_features
+
+  .. automethod:: forward
+
+Factory Functions
+-----------------
+
+.. autofunction:: wav2vec2_base
+
+.. autofunction:: wav2vec2_large
+
+.. autofunction:: wav2vec2_large_lv60k
+
+
 :hidden:`WaveRNN`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
