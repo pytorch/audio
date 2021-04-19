@@ -426,9 +426,6 @@ jobs:
           command: .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
           path: test-results
-      - run:
-          name: Post process
-          command: .circleci/unittest/linux/scripts/post_process.sh
       - store_artifacts:
           path: htmlcov
   unittest_linux_gpu:
@@ -459,9 +456,6 @@ jobs:
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
           path: test-results
-      - run:
-          name: Post Process
-          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/post_process.sh
       - store_artifacts:
           path: htmlcov
 
@@ -484,9 +478,6 @@ jobs:
           command: .circleci/unittest/windows/scripts/run_test.sh
       - store_test_results:
           path: test-results
-      - run:
-          name: Post process
-          command: .circleci/unittest/windows/scripts/post_process.sh
       - store_artifacts:
           path: htmlcov
 
@@ -512,9 +503,6 @@ jobs:
           command: .circleci/unittest/windows/scripts/run_test.sh
       - store_test_results:
           path: test-results
-      - run:
-          name: Post process
-          command: .circleci/unittest/windows/scripts/post_process.sh
       - store_artifacts:
           path: htmlcov
 
@@ -539,11 +527,10 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
-      - run:
-          name: Post process
-          command: .circleci/unittest/linux/scripts/post_process.sh
       - store_test_results:
           path: test-results
+      - store_artifacts:
+          path: htmlcov
 
   stylecheck:
     <<: *binary_common
