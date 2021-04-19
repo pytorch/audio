@@ -427,7 +427,7 @@ jobs:
       - store_test_results:
           path: test-results
       - store_artifacts:
-          path: htmlcov
+          path: test/htmlcov
   unittest_linux_gpu:
     <<: *binary_common
     machine:
@@ -457,7 +457,7 @@ jobs:
       - store_test_results:
           path: test-results
       - store_artifacts:
-          path: htmlcov
+          path: test/htmlcov
 
   unittest_windows_cpu:
     <<: *binary_common
@@ -479,7 +479,7 @@ jobs:
       - store_test_results:
           path: test-results
       - store_artifacts:
-          path: htmlcov
+          path: test/htmlcov
 
   unittest_windows_gpu:
     <<: *binary_common
@@ -504,7 +504,7 @@ jobs:
       - store_test_results:
           path: test-results
       - store_artifacts:
-          path: htmlcov
+          path: test/htmlcov
 
   unittest_macos_cpu:
     <<: *binary_common
@@ -530,7 +530,7 @@ jobs:
       - store_test_results:
           path: test-results
       - store_artifacts:
-          path: htmlcov
+          path: test/htmlcov
 
   stylecheck:
     <<: *binary_common
