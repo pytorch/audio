@@ -24,3 +24,4 @@ declare -a args=(
 
 cd test
 pytest "${args[@]}" torchaudio_unittest
+coverage html
