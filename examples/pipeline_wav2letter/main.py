@@ -220,10 +220,12 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
     cers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
     cers = sum(cers)
     n = sum(len(t) for t in target)
-    metric["cer over target length"] = cers / n
-    metric["cumulative cer"] += cers
-    metric["total chars"] += n
-    metric["cumulative cer over target length"] = metric["cer"] / metric["total chars"]
+    metric["batch char error"] = cers
+    metric["batch char total"] = n
+    metric["batch char error rate"] = cers / n
+    metric["epoch char error"] += cers
+    metric["epoch char total"] += n
+    metric["epoch char error rate"] = metric["epoch char error"] / metric["epoch char total"]
 
     # Compute WER
 
@@ -233,10 +235,12 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
     wers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
     wers = sum(wers)
     n = sum(len(t) for t in target)
-    metric["wer over target length"] = wers / n
-    metric["cumulative wer"] += wers
-    metric["total words"] += n
-    metric["cumulative wer over target length"] = metric["wer"] / metric["total words"]
+    metric["batch word error"] = wers
+    metric["batch word total"] = n
+    metric["batch word error rate"] = wers / n
+    metric["epoch word error"] += wers
+    metric["epoch word total"] += n
+    metric["epoch word error rate"] = metric["epoch word error"] / metric["epoch word total"]
 
 
 def train_one_epoch(
