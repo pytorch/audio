@@ -1,12 +1,12 @@
 import torch
 import unittest
 
-from torchaudio_unittest import common_utils
+from torchaudio_unittest.common_utils import PytorchTestCase, skipIfNoCuda
 from .functional_impl import Functional, FunctionalComplex
 
 
-@common_utils.skipIfNoCuda
-class TestFunctionalloat32(Functional, common_utils.PytorchTestCase):
+@skipIfNoCuda
+class TestFunctionalFloat32(Functional, PytorchTestCase):
     dtype = torch.float32
     device = torch.device('cuda')
 
@@ -15,21 +15,21 @@ class TestFunctionalloat32(Functional, common_utils.PytorchTestCase):
         super().test_lfilter_9th_order_filter_stability()
 
 
-@common_utils.skipIfNoCuda
-class TestLFilterFloat64(Functional, common_utils.PytorchTestCase):
+@skipIfNoCuda
+class TestLFilterFloat64(Functional, PytorchTestCase):
     dtype = torch.float64
     device = torch.device('cuda')
 
 
-@common_utils.skipIfNoCuda
-class TestFunctionalComplex64(FunctionalComplex, common_utils.PytorchTestCase):
+@skipIfNoCuda
+class TestFunctionalComplex64(FunctionalComplex, PytorchTestCase):
     complex_dtype = torch.complex64
     real_dtype = torch.float32
     device = torch.device('cuda')
 
 
-@common_utils.skipIfNoCuda
-class TestFunctionalComplex128(FunctionalComplex, common_utils.PytorchTestCase):
+@skipIfNoCuda
+class TestFunctionalComplex128(FunctionalComplex, PytorchTestCase):
     complex_dtype = torch.complex64
     real_dtype = torch.float32
     device = torch.device('cuda')

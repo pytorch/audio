@@ -172,6 +172,7 @@ set(SOX_OPTIONS
   --without-sndio
   --without-sunaudio
   --without-waveaudio
+  --without-wavpack
   --without-twolame
   )
 
