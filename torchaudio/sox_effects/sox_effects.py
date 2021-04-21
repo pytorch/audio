@@ -14,6 +14,7 @@ def init_sox_effects():
 
     Note:
         You do not need to call this function manually. It is called automatically.
+        This function only works on CPU Tensors.
 
     Once initialized, you do not need to call this function again across the multiple uses of
     sox effects though it is safe to do so as long as :func:`shutdown_sox_effects` is not called yet.
