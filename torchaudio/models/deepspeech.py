@@ -66,6 +66,12 @@ class DeepSpeech(nn.Module):
         ])
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            x (torch.Tensor): Tensor of dimension (batch_size, num_channels, input_length, num_features).
+        Returns:
+            Tensor: Predictor tensor of dimension (input_length, batch_size, number_of_classes).
+        """
         # N x C x T x F
         x = self.fc1(x)
         # N x C x T x H
