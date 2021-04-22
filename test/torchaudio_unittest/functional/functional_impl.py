@@ -134,7 +134,7 @@ class Functional(TestBaseMixin):
         db_mult = math.log10(max(amin, ref))
 
         torch.manual_seed(0)
-        spec = torch.rand(*shaped, dtype=self.dtype, device=self.device) * 200
+        spec = torch.rand(*shape, dtype=self.dtype, device=self.device) * 200
 
         # Spectrogram amplitude -> DB -> amplitude
         db = F.amplitude_to_DB(spec, amplitude_mult, amin, db_mult, top_db=None)
