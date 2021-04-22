@@ -61,14 +61,15 @@ def apply_effects_tensor(
     """Apply sox effects to given Tensor
 
     Note:
+        This function only works on CPU Tensors.
         This function works in the way very similar to ``sox`` command, however there are slight
         differences. For example, ``sox`` command adds certain effects automatically (such as
         ``rate`` effect after ``speed`` and ``pitch`` and other effects), but this function does
         only applies the given effects. (Therefore, to actually apply ``speed`` effect, you also
-        need to give ``rate`` effect with desired sampling rate.)
+        need to give ``rate`` effect with desired sampling rate.).
 
     Args:
-        tensor (torch.Tensor): Input 2D Tensor.
+        tensor (torch.Tensor): Input 2D CPU Tensor.
         sample_rate (int): Sample rate
         effects (List[List[str]]): List of effects.
         channels_first (bool): Indicates if the input Tensor's dimension is
