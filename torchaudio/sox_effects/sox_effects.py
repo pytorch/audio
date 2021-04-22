@@ -14,7 +14,6 @@ def init_sox_effects():
 
     Note:
         You do not need to call this function manually. It is called automatically.
-        This function only works on CPU Tensors.
 
     Once initialized, you do not need to call this function again across the multiple uses of
     sox effects though it is safe to do so as long as :func:`shutdown_sox_effects` is not called yet.
@@ -62,11 +61,12 @@ def apply_effects_tensor(
     """Apply sox effects to given Tensor
 
     Note:
+        This function only works on CPU Tensors.
         This function works in the way very similar to ``sox`` command, however there are slight
         differences. For example, ``sox`` command adds certain effects automatically (such as
         ``rate`` effect after ``speed`` and ``pitch`` and other effects), but this function does
         only applies the given effects. (Therefore, to actually apply ``speed`` effect, you also
-        need to give ``rate`` effect with desired sampling rate.)
+        need to give ``rate`` effect with desired sampling rate.).
 
     Args:
         tensor (torch.Tensor): Input 2D CPU Tensor.
