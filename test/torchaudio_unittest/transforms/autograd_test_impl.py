@@ -137,6 +137,13 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform])
 
+    @parameterized.expand([(1.5, "amplitude"), (2, "power"), (10, "db")])
+    def test_vol(self, gain, gain_type):
+        sample_rate = 8000
+        transform = T.Vol(gain=gain, gain_type=gain_type)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform])
+
     @unittest.expectedFailure
     def test_timestretch_zeros_fail(self):
         """Test that ``T.TimeStretch`` fails gradcheck at 0

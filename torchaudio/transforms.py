@@ -27,6 +27,8 @@ __all__ = [
     'SlidingWindowCmn',
     'Vad',
     'SpectralCentroid',
+    'Vol',
+    'ComputeDeltas',
 ]
 
 

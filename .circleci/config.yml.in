@@ -424,12 +424,10 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
-      - run:
-          name: Post process
-          command: .circleci/unittest/linux/scripts/post_process.sh
       - store_test_results:
           path: test-results
-
+      - store_artifacts:
+          path: test/htmlcov
   unittest_linux_gpu:
     <<: *binary_common
     machine:
@@ -456,11 +454,10 @@ jobs:
       - run:
           name: Run tests
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
-      - run:
-          name: Post Process
-          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/post_process.sh
       - store_test_results:
           path: test-results
+      - store_artifacts:
+          path: test/htmlcov
 
   unittest_windows_cpu:
     <<: *binary_common
@@ -479,11 +476,10 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
-      - run:
-          name: Post process
-          command: .circleci/unittest/windows/scripts/post_process.sh
       - store_test_results:
           path: test-results
+      - store_artifacts:
+          path: test/htmlcov
 
   unittest_windows_gpu:
     <<: *binary_common
@@ -505,11 +501,10 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
-      - run:
-          name: Post process
-          command: .circleci/unittest/windows/scripts/post_process.sh
       - store_test_results:
           path: test-results
+      - store_artifacts:
+          path: test/htmlcov
 
   unittest_macos_cpu:
     <<: *binary_common
@@ -532,11 +527,10 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
-      - run:
-          name: Post process
-          command: .circleci/unittest/linux/scripts/post_process.sh
       - store_test_results:
           path: test-results
+      - store_artifacts:
+          path: test/htmlcov
 
   stylecheck:
     <<: *binary_common

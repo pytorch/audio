@@ -17,7 +17,7 @@ from torchaudio.models.wavernn import WaveRNN
 
 from datasets import collate_factory, split_process_dataset
 from losses import LongCrossEntropyLoss, MoLLoss
-from processing import LinearToMel, NormalizeDB
+from processing import NormalizeDB
 from utils import MetricLogger, count_parameters, save_checkpoint
 
 
@@ -269,12 +269,12 @@ def main(args):
     }
 
     transforms = torch.nn.Sequential(
-        torchaudio.transforms.Spectrogram(**melkwargs),
-        LinearToMel(
+        torchaudio.transforms.MelSpectrogram(
             sample_rate=args.sample_rate,
-            n_fft=args.n_fft,
             n_mels=args.n_freq,
-            fmin=args.f_min,
+            f_min=args.f_min,
+            mel_scale='slaney',
+            **melkwargs,
         ),
         NormalizeDB(min_level_db=args.min_level_db, normalization=args.normalization),
     )
