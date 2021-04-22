@@ -139,8 +139,11 @@ class AutogradTestMixin(TestBaseMixin):
 
     def test_melscale(self):
         sample_rate = 8000
+        n_fft = 400
         transform = T.MelScale(sample_rate=sample_rate)
-        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        waveform = get_spectrogram(
+            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2),
+            n_fft=n_fft, power=1)
         self.assert_grad(transform, [waveform])
 
     @parameterized.expand([(1.5, "amplitude"), (2, "power"), (10, "db")])
