@@ -123,7 +123,8 @@ html_theme_options = {
     'collapse_navigation': False,
     'display_version': True,
     'logo_only': True,
-    'navigation_with_keys': True
+    'navigation_with_keys': True,
+    'analytics_id': 'UA-117752657-2',
 }
 
 html_logo = '_static/img/pytorch-logo-dark.svg'
