@@ -1160,7 +1160,7 @@ def apply_codec(
             When True, both the input and output Tensor have dimension ``[channel, time]``.
             Otherwise, they have dimension ``[time, channel]``.
         compression (float): Used for formats other than WAV.
-            For mor details see :py:func:`torchaudio.backend.sox_io_backend.save`.
+            For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
         encoding (str, optional): Changes the encoding for the supported formats.
             For more details see :py:func:`torchaudio.backend.sox_io_backend.save`.
         bits_per_sample (int, optional): Changes the bit depth for the supported formats.
