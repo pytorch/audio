@@ -119,6 +119,10 @@ make html
 
 The built docs should now be available in `docs/build/html`
 
+The docs are also automatically built when you submit a PR. The job that
+builds the docs is named `build_docs`. If that job passes, a link to the
+rendered docs will be available in the `build_docs artifact` job.
+
 ## License
 
 By contributing to Torchaudio, you agree that your contributions will be licensed
