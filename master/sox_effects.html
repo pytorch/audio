@@ -380,16 +380,17 @@ initializing again will result in error.</p>
 <dd><p>Apply sox effects to given Tensor</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This function works in the way very similar to <code class="docutils literal notranslate"><span class="pre">sox</span></code> command, however there are slight
+<p>This function only works on CPU Tensors.
+This function works in the way very similar to <code class="docutils literal notranslate"><span class="pre">sox</span></code> command, however there are slight
 differences. For example, <code class="docutils literal notranslate"><span class="pre">sox</span></code> command adds certain effects automatically (such as
 <code class="docutils literal notranslate"><span class="pre">rate</span></code> effect after <code class="docutils literal notranslate"><span class="pre">speed</span></code> and <code class="docutils literal notranslate"><span class="pre">pitch</span></code> and other effects), but this function does
 only applies the given effects. (Therefore, to actually apply <code class="docutils literal notranslate"><span class="pre">speed</span></code> effect, you also
-need to give <code class="docutils literal notranslate"><span class="pre">rate</span></code> effect with desired sampling rate.)</p>
+need to give <code class="docutils literal notranslate"><span class="pre">rate</span></code> effect with desired sampling rate.).</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tensor</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0a0+56b43f4)"><em>torch.Tensor</em></a>) – Input 2D Tensor.</p></li>
+<li><p><strong>tensor</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0a0+56b43f4)"><em>torch.Tensor</em></a>) – Input 2D CPU Tensor.</p></li>
 <li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Sample rate</p></li>
 <li><p><strong>effects</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em><em>]</em>) – List of effects.</p></li>
 <li><p><strong>channels_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Indicates if the input Tensor’s dimension is
