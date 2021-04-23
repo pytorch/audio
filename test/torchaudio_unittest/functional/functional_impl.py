@@ -228,7 +228,6 @@ class Functional(TestBaseMixin):
         assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
 
 
-
 class FunctionalComplex(TestBaseMixin):
     complex_dtype = None
     real_dtype = None
