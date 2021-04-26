@@ -107,6 +107,10 @@ setup_cuda() {
       export FORCE_CUDA=1
       export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0"
       ;;
+    rocm*)
+      export FORCE_CUDA=1
+      export USE_ROCM=1
+      ;;
     cpu)
       ;;
     *)
