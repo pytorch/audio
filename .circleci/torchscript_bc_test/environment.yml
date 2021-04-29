@@ -1,0 +1,19 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - flake8
+  - numpy
+  - pytest
+  - pytest-cov
+  - codecov
+  - librosa>=0.8.0
+  - llvmlite==0.31  # See https://github.com/pytorch/audio/pull/766
+  - pip
+  - pip:
+    - cmake
+    - ninja
+    - kaldi-io
+    - scipy
+    - parameterized
+    - numba==0.48  # See https://github.com/librosa/librosa/issues/1160

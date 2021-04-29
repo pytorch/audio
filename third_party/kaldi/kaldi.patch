@@ -1,0 +1,76 @@
+diff --git a/src/base/kaldi-types.h b/src/base/kaldi-types.h
+index 7ebf4f853..c15b288b2 100644
+--- a/src/base/kaldi-types.h
++++ b/src/base/kaldi-types.h
+@@ -41,6 +41,7 @@ typedef float   BaseFloat;
+ 
+ // for discussion on what to do if you need compile kaldi
+ // without OpenFST, see the bottom of this this file
++/*
+ #include <fst/types.h>
+ 
+ namespace kaldi {
+@@ -53,10 +54,10 @@ namespace kaldi {
+   typedef float   float32;
+   typedef double double64;
+ }  // end namespace kaldi
++*/
+ 
+ // In a theoretical case you decide compile Kaldi without the OpenFST
+ // comment the previous namespace statement and uncomment the following
+-/*
+ namespace kaldi {
+   typedef int8_t   int8;
+   typedef int16_t  int16;
+@@ -70,6 +71,5 @@ namespace kaldi {
+   typedef float    float32;
+   typedef double   double64;
+ }  // end namespace kaldi
+-*/
+ 
+ #endif  // KALDI_BASE_KALDI_TYPES_H_
+diff --git a/src/matrix/matrix-lib.h b/src/matrix/matrix-lib.h
+index b6059b06c..4fb9e1b16 100644
+--- a/src/matrix/matrix-lib.h
++++ b/src/matrix/matrix-lib.h
+@@ -25,14 +25,14 @@
+ #include "base/kaldi-common.h"
+ #include "matrix/kaldi-vector.h"
+ #include "matrix/kaldi-matrix.h"
+-#include "matrix/sp-matrix.h"
+-#include "matrix/tp-matrix.h"
++// #include "matrix/sp-matrix.h"
++// #include "matrix/tp-matrix.h"
+ #include "matrix/matrix-functions.h"
+ #include "matrix/srfft.h"
+ #include "matrix/compressed-matrix.h"
+-#include "matrix/sparse-matrix.h"
++// #include "matrix/sparse-matrix.h"
+ #include "matrix/optimization.h"
+-#include "matrix/numpy-array.h"
++// #include "matrix/numpy-array.h"
+ 
+ #endif
+ 
+diff --git a/src/util/common-utils.h b/src/util/common-utils.h
+index cfb0c255c..48d199e97 100644
+--- a/src/util/common-utils.h
++++ b/src/util/common-utils.h
+@@ -21,11 +21,11 @@
+ 
+ #include "base/kaldi-common.h"
+ #include "util/parse-options.h"
+-#include "util/kaldi-io.h"
+-#include "util/simple-io-funcs.h"
+-#include "util/kaldi-holder.h"
+-#include "util/kaldi-table.h"
+-#include "util/table-types.h"
+-#include "util/text-utils.h"
++// #include "util/kaldi-io.h"
++// #include "util/simple-io-funcs.h"
++// #include "util/kaldi-holder.h"
++// #include "util/kaldi-table.h"
++// #include "util/table-types.h"
++// #include "util/text-utils.h"
+ 
+ #endif  // KALDI_UTIL_COMMON_UTILS_H_

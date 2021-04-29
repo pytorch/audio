@@ -6,6 +6,7 @@
 set -e
 
 python --version
+python -c 'import torch;print("torch:", torch.__version__)'
 
 run_tests() {
   # find all the test files that match "test*.py"

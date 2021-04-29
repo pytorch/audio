@@ -1,55 +1,56 @@
 torchaudio: an audio library for PyTorch
 ========================================
 
-[![Build Status](https://travis-ci.org/pytorch/audio.svg?branch=master)](https://travis-ci.org/pytorch/audio)
+[![Build Status](https://circleci.com/gh/pytorch/audio.svg?style=svg)](https://app.circleci.com/pipelines/github/pytorch/audio)
+[![Coverage](https://codecov.io/gh/pytorch/audio/branch/master/graph/badge.svg)](https://codecov.io/gh/pytorch/audio)
+[![Documentation](https://img.shields.io/badge/dynamic/json.svg?label=docs&url=https%3A%2F%2Fpypi.org%2Fpypi%2Ftorchaudio%2Fjson&query=%24.info.version&colorB=brightgreen&prefix=v)](https://pytorch.org/audio/)
 
 The aim of torchaudio is to apply [PyTorch](https://github.com/pytorch/pytorch) to
 the audio domain. By supporting PyTorch, torchaudio follows the same philosophy
 of providing strong GPU acceleration, having a focus on trainable features through
 the autograd system, and having consistent style (tensor names and dimension names).
 Therefore, it is primarily a machine learning library and not a general signal
-processing library. The benefits of Pytorch is be seen in torchaudio through
-having all the computations be through Pytorch operations which makes it easy
+processing library. The benefits of PyTorch can be seen in torchaudio through
+having all the computations be through PyTorch operations which makes it easy
 to use and feel like a natural extension.
 
-- [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/)
-  - Load the following formats into a torch Tensor using sox
+- [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/stable/)
+  - Load the following formats into a torch Tensor using SoX
     - mp3, wav, aac, ogg, flac, avr, cdda, cvs/vms,
     - aiff, au, amr, mp2, mp4, ac3, avi, wmv,
     - mpeg, ircam and any other format supported by libsox.
-    - [Kaldi (ark/scp)](http://pytorch.org/audio/kaldi_io.html)
-- [Dataloaders for common audio datasets (VCTK, YesNo)](http://pytorch.org/audio/datasets.html)
+    - [Kaldi (ark/scp)](http://pytorch.org/audio/stable/kaldi_io.html)
+- [Dataloaders for common audio datasets (VCTK, YesNo)](http://pytorch.org/audio/stable/datasets.html)
 - Common audio transforms
-    - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/transforms.html)
+    - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/stable/transforms.html)
 - Compliance interfaces: Run code using PyTorch that align with other libraries
-    - [Kaldi: spectrogram, fbank, mfcc, resample_waveform](https://pytorch.org/audio/compliance.kaldi.html)
+    - [Kaldi: spectrogram, fbank, mfcc, resample_waveform](https://pytorch.org/audio/stable/compliance.kaldi.html)
 
 Dependencies
 ------------
-* pytorch (nightly version needed for development)
-* libsox v14.3.2 or above
+* PyTorch (See below for the compatible versions)
 * [optional] vesis84/kaldi-io-for-python commit cb46cb1f44318a5d04d4941cf39084c5b021241e or above
 
-Quick install on
-OSX (Homebrew):
-```bash
-brew install sox
-```
-Linux (Ubuntu):
-```bash
-sudo apt-get install sox libsox-dev libsox-fmt-all
-```
-Anaconda
-```bash
-conda install -c conda-forge sox
-```
+The following are the corresponding ``torchaudio`` versions and supported Python versions.
+
+| ``torch``                | ``torchaudio``           | ``python``                      |
+| ------------------------ | ------------------------ | ------------------------------- |
+| ``master`` / ``nightly`` | ``master`` / ``nightly`` | ``>=3.6``, ``<=3.9``            |
+| ``1.8.0``                | ``0.8.0``                | ``>=3.6``, ``<=3.9``            |
+| ``1.7.1``                | ``0.7.2``                | ``>=3.6``, ``<=3.9``            |
+| ``1.7.0``                | ``0.7.0``                | ``>=3.6``, ``<=3.8``            |
+| ``1.6.0``                | ``0.6.0``                | ``>=3.6``, ``<=3.8``            |
+| ``1.5.0``                | ``0.5.0``                | ``>=3.5``, ``<=3.8``            |
+| ``1.4.0``                | ``0.4.0``                | ``==2.7``, ``>=3.5``, ``<=3.8`` |
+
 
 Installation
 ------------
 
-### Binaries
+### Binary Distributions
 
 To install the latest version using anaconda, run:
+
 ```
 conda install -c pytorch torchaudio
 ```
@@ -64,43 +65,103 @@ pip install torchaudio -f https://download.pytorch.org/whl/torch_stable.html
 torch from PyPI. If you need a different torch configuration, preinstall torch
 before running this command.)
 
-At the moment, there is no automated nightly build process, but we occasionally
-build nightlies based on PyTorch nightlies by hand following the instructions in
-[packaging](packaging).  To install the latest nightly via pip, run:
+### Nightly build
+
+Note that nightly build is build on PyTorch's nightly build. Therefore, you need to install the latest PyTorch when you use nightly build of torchaudio.
+
+**pip**
 
 ```
 pip install numpy
-pip install torchaudio_nightly -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+pip install --pre torchaudio -f https://download.pytorch.org/whl/nightly/torch_nightly.html
 ```
 
-To install the latest nightly via conda, run:
+**conda**
 
 ```
 conda install -y -c pytorch-nightly torchaudio
 ```
 
-
 ### From Source
 
-If your system configuration is not among the supported configurations
-above, you can build from source.
+The build process builds libsox and some codecs that torchaudio need to link to. This is achieve by setting the environment variable `BUILD_SOX=1`.
+The build process will fetch and build libmad, lame, flac, vorbis, opus, and libsox before building extension. This process requires `cmake` and `pkg-config`.
 
 ```bash
 # Linux
-python setup.py install
+BUILD_SOX=1 python setup.py install
 
 # OSX
-MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
+BUILD_SOX=1 MACOSX_DEPLOYMENT_TARGET=10.9 CC=clang CXX=clang++ python setup.py install
+
+# Windows
+# We need to use the MSVC x64 toolset for compilation, with Visual Studio's vcvarsall.bat or directly with vcvars64.bat.
+# These batch files are under Visual Studio's installation folder, under 'VC\Auxiliary\Build\'.
+# More information available at:
+#   https://docs.microsoft.com/en-us/cpp/build/how-to-enable-a-64-bit-visual-cpp-toolset-on-the-command-line?view=msvc-160#use-vcvarsallbat-to-set-a-64-bit-hosted-build-architecture
+call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 && set BUILD_SOX=0 && python setup.py install
+# or
+call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat" && set BUILD_SOX=0 && python setup.py install
 ```
+
+This is known to work on linux and unix distributions such as Ubuntu and CentOS 7 and macOS.
+If you try this on a new system and find a solution to make it work, feel free to share it by opening an issue.
+
+#### Troubleshooting
+
+<Details><Summary>checking build system type... ./config.guess: unable to guess system type</Summary>
+
+Since the configuration file for codecs are old, they cannot correctly detect the new environments, such as Jetson Aarch. You need to replace the `config.guess` file in `./third_party/tmp/lame-3.99.5/config.guess` and/or `./third_party/tmp/libmad-0.15.1b/config.guess` with [the latest one](https://github.com/gcc-mirror/gcc/blob/master/config.guess).
+
+See also: [#658](https://github.com/pytorch/audio/issues/658)
+
+</Details>
+
+<Details><Summary>Undefined reference to `tgetnum' when using `BUILD_SOX`</Summary>
+
+If while building from within an anaconda environment you come across errors similar to the following:
+
+```
+../bin/ld: console.c:(.text+0xc1): undefined reference to `tgetnum'
+```
+
+Install `ncurses` from `conda-forge` before running `python setup.py install`:
+
+```
+# Install ncurses from conda-forge
+conda install -c conda-forge ncurses
+```
+
+</Details>
+
 
 Quick Usage
 -----------
 
 ```python
 import torchaudio
-waveform, sample_rate = torchaudio.load('foo.mp3')  # load tensor from file
-torchaudio.save('foo_save.mp3', waveform, sample_rate)  # save tensor to file
+
+waveform, sample_rate = torchaudio.load('foo.wav')  # load tensor from file
+torchaudio.save('foo_save.wav', waveform, sample_rate)  # save tensor to file
 ```
+
+Backend Dispatch
+----------------
+
+By default in OSX and Linux, torchaudio uses SoX as a backend to load and save files.
+The backend can be changed to [SoundFile](https://pysoundfile.readthedocs.io/en/latest/)
+using the following. See [SoundFile](https://pysoundfile.readthedocs.io/en/latest/)
+for installation instructions.
+
+```python
+import torchaudio
+torchaudio.set_audio_backend("soundfile")  # switch backend
+
+waveform, sample_rate = torchaudio.load('foo.wav')  # load tensor from file, as usual
+torchaudio.save('foo_save.wav', waveform, sample_rate)  # save tensor to file, as usual
+```
+
+Unlike SoX, SoundFile does not currently support mp3.
 
 API Reference
 -------------
@@ -112,7 +173,7 @@ Conventions
 
 With torchaudio being a machine learning library and built on top of PyTorch,
 torchaudio is standardized around the following naming conventions. Tensors are
-assumed to have channel as the first dimension and time as the last
+assumed to have "channel" as the first dimension and time as the last
 dimension (when applicable). This makes it consistent with PyTorch's dimensions.
 For size names, the prefix `n_` is used (e.g. "a tensor of size (`n_freq`, `n_mel`)")
 whereas dimension names do not have this prefix (e.g. "a tensor of
@@ -149,15 +210,7 @@ Complex numbers are supported via tensors of dimension (..., 2), and torchaudio 
 Contributing Guidelines
 -----------------------
 
-Please let us know if you encounter a bug by filing an [issue](https://github.com/pytorch/audio/issues).
-
-We appreciate all contributions. If you are planning to contribute back
-bug-fixes, please do so without any further discussion.
-
-If you plan to contribute new features, utility functions or extensions to the
-core, please first open an issue and discuss the feature with us. Sending a PR
-without discussion might end up resulting in a rejected PR, because we might be
-taking the core in a different direction than you might be aware of.
+Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 Disclaimer on Datasets
 ----------------------

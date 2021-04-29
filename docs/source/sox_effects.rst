@@ -1,21 +1,33 @@
-.. role:: hidden
-    :class: hidden-section
+.. _sox_effects:
 
 torchaudio.sox_effects
 ======================
 
-Create SoX effects chain for preprocessing audio.
-
 .. currentmodule:: torchaudio.sox_effects
 
-:hidden:`SoxEffect`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Resource initialization / shutdown
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: SoxEffect
-  :members:
+.. autofunction:: init_sox_effects
 
-:hidden:`SoxEffectsChain`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: shutdown_sox_effects
 
-.. autoclass:: SoxEffectsChain
-  :members: append_effect_to_chain, sox_build_flow_effects, clear_chain, set_input_file
+Listing supported effects
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: effect_names
+
+Applying effects
+~~~~~~~~~~~~~~~~
+
+Apply SoX effects chain on torch.Tensor or on file and load as torch.Tensor.
+
+Applying effects on Tensor
+--------------------------
+
+.. autofunction:: apply_effects_tensor
+
+Applying effects on file
+------------------------
+
+.. autofunction:: apply_effects_file

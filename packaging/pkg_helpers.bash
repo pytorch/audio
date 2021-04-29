@@ -32,7 +32,7 @@ setup_cuda() {
   # First, compute version suffixes.  By default, assume no version suffixes
   export VERSION_SUFFIX=""
   export PYTORCH_VERSION_SUFFIX=""
-  export WHEEL_DIR=""
+  export WHEEL_DIR="cpu/"
   # Wheel builds need suffixes (but not if they're on OS X, which never has suffix)
   if [[ "$BUILD_TYPE" == "wheel" ]] && [[ "$(uname)" != Darwin ]]; then
     # The default CUDA has no suffix
@@ -103,6 +103,7 @@ setup_macos() {
 #
 # Usage: setup_env 0.2.0
 setup_env() {
+  git submodule update --init --recursive
   setup_cuda
   setup_build_version "$1"
   setup_macos
@@ -122,7 +123,7 @@ retry () {
 #
 # Precondition: If Linux, you are in a soumith/manylinux-cuda* Docker image
 setup_wheel_python() {
-  if [[ "$(uname)" == Darwin ]]; then
+  if [[ "$(uname)" == Darwin || "$OSTYPE" == "msys" ]]; then
     eval "$(conda shell.bash hook)"
     conda env remove -n "env$PYTHON_VERSION" || true
     conda create -yn "env$PYTHON_VERSION" python="$PYTHON_VERSION"
@@ -140,6 +141,7 @@ setup_wheel_python() {
       3.6) python_abi=cp36-cp36m ;;
       3.7) python_abi=cp37-cp37m ;;
       3.8) python_abi=cp38-cp38 ;;
+      3.9) python_abi=cp39-cp39 ;;
       *)
         echo "Unrecognized PYTHON_VERSION=$PYTHON_VERSION"
         exit 1
@@ -161,17 +163,12 @@ setup_pip_pytorch_version() {
     # Install latest prerelease version of torch, per our nightlies, consistent
     # with the requested cuda version
     pip_install --pre torch -f "https://download.pytorch.org/whl/nightly/${WHEEL_DIR}torch_nightly.html"
-    if [[ "$CUDA_VERSION" == "cpu" ]]; then
-      # CUDA and CPU are ABI compatible on the CPU-only parts, so strip
-      # in this case
-      export PYTORCH_VERSION="$(pip show torch | grep ^Version: | sed 's/Version:  *//' | sed 's/+.\+//')"
-    else
-      export PYTORCH_VERSION="$(pip show torch | grep ^Version: | sed 's/Version:  *//')"
-    fi
+    # CUDA and CPU are ABI compatible on the CPU-only parts, so strip in this case
+    export PYTORCH_VERSION="$(pip show torch | grep ^Version: | sed 's/Version:  *//' | sed 's/+.\+//')"
   else
     pip_install "torch==$PYTORCH_VERSION$PYTORCH_VERSION_SUFFIX" \
       -f https://download.pytorch.org/whl/torch_stable.html \
-      -f https://download.pytorch.org/whl/nightly/torch_nightly.html
+      -f "https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/torch_${UPLOAD_CHANNEL}.html"
   fi
 }
 
@@ -180,11 +177,16 @@ setup_pip_pytorch_version() {
 #
 # You MUST have populated PYTORCH_VERSION_SUFFIX before hand.
 setup_conda_pytorch_constraint() {
+  CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS}"
   if [[ -z "$PYTORCH_VERSION" ]]; then
-    export CONDA_CHANNEL_FLAGS="-c pytorch-nightly"
+    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch-nightly"
     export PYTORCH_VERSION="$(conda search --json 'pytorch[channel=pytorch-nightly]' | python -c "import sys, json, re; print(re.sub(r'\\+.*$', '', json.load(sys.stdin)['pytorch'][-1]['version']))")"
   else
-    export CONDA_CHANNEL_FLAGS="-c pytorch -c pytorch-nightly"
+    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c pytorch -c pytorch-test -c pytorch-nightly"
+  fi
+  # Some dependencies for Python 3.9 are only on conda-forge
+  if [[ "${PYTHON_VERSION}" = "3.9" ]]; then
+    export CONDA_CHANNEL_FLAGS="${CONDA_CHANNEL_FLAGS} -c conda-forge"
   fi
   if [[ "$CU_VERSION" == cpu ]]; then
     export CONDA_PYTORCH_BUILD_CONSTRAINT="- pytorch==$PYTORCH_VERSION${PYTORCH_VERSION_SUFFIX}"
@@ -217,5 +219,15 @@ setup_conda_cudatoolkit_constraint() {
         exit 1
         ;;
     esac
+  fi
+}
+
+# Build the proper compiler package before building the final package
+setup_visual_studio_constraint() {
+  if [[ "$OSTYPE" == "msys" ]]; then
+      export VSTOOLCHAIN_PACKAGE=vs2019
+      export VSDEVCMD_ARGS=''
+      conda build $CONDA_CHANNEL_FLAGS --no-anaconda-upload packaging/$VSTOOLCHAIN_PACKAGE
+      cp packaging/$VSTOOLCHAIN_PACKAGE/conda_build_config.yaml packaging/torchaudio/conda_build_config.yaml
   fi
 }
