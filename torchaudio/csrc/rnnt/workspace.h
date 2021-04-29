@@ -118,7 +118,20 @@ class IntWorkspace {
   }
 
  private:
-  void ResetAlphaBetaCounters();
+  inline void ResetAlphaBetaCounters() {
+#ifdef USE_CUDA
+    if (data_ != nullptr && options_.device_ == GPU) {
+      cudaMemset(
+          GetPointerToAlphaCounters(),
+          0,
+          ComputeSizeForAlphaCounters(options_) * sizeof(int));
+      cudaMemset(
+          GetPointerToBetaCounters(),
+          0,
+          ComputeSizeForBetaCounters(options_) * sizeof(int));
+    }
+#endif // USE_CUDA
+  }
 
   static int ComputeSizeForAlphaCounters(const Options& options) { // B * U
 #ifdef USE_CUDA

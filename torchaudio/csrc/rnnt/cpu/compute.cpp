@@ -83,8 +83,6 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
       }
     default:
       {
-        LOG(ERROR) << "unsupported logits.type().scalarType() = "
-                   << logits.type().scalarType();
         break;
       }
   };

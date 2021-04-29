@@ -39,8 +39,6 @@ status_t Compute(
       return status;
     }
     default: {
-      LOG(ERROR) << "unsupported workspace.GetOptions().device = "
-                 << workspace.GetOptions().device_;
       return FAILURE;
     }
   };
@@ -76,8 +74,6 @@ status_t ComputeAlphas(
       return status;
     }
     default: {
-      LOG(ERROR) << "unsupported workspace.GetOptions().device = "
-                 << workspace.GetOptions().device_;
       return FAILURE;
     }
   };
@@ -116,8 +112,6 @@ status_t ComputeBetas(
       return status;
     }
     default: {
-      LOG(ERROR) << "unsupported workspace.GetOptions().device = "
-                 << workspace.GetOptions().device_;
       return FAILURE;
     }
   };

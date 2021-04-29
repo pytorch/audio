@@ -169,7 +169,7 @@ def rnnt_loss(
         blank (int, opt): blank label (Default: ``-1``)
         clamp (float): clamp for gradients (Default: ``-1``)
         runtime_check (bool): whether to do sanity check during runtime. (Default: ``False``)
-        fused_log_smax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
+        fused_log_softmax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
         reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)
     """
     if not fused_log_softmax:
@@ -204,7 +204,7 @@ class RNNTLoss(torch.nn.Module):
         blank (int, opt): blank label (Default: ``-1``)
         clamp (float): clamp for gradients (Default: ``-1``)
         runtime_check (bool): whether to do sanity check during runtime. (Default: ``False``)
-        fused_log_smax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
+        fused_log_softmax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
         reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)
     """
 
