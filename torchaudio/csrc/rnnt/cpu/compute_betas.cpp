@@ -70,6 +70,6 @@ TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
   m.impl("rnnt_loss_betas", &compute_betas);
 }
 
-}  // namespace cpu
+} // namespace cpu
 } // namespace rnnt
 } // namespace torchaudio
