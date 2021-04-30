@@ -10,68 +10,6 @@ namespace rnnt {
 
 
 template <typename DTYPE, typename CAST_DTYPE>
-FORCE_INLINE HOST_AND_DEVICE void ComputeLogProbsSparseElement(
-    int bTgt,
-    int t,
-    int u,
-    int maxT,
-    int maxU,
-    int numTargets,
-    int blank,
-    const DTYPE* logits,
-    const int* targets,
-    const int* srcLengths,
-    const int* tgtLengths,
-    const CAST_DTYPE* denominators,
-    CAST_DTYPE* logProbs,
-    const int* wpEnds,
-    const int* validRanges=nullptr,
-    const int* cellsPerSample=nullptr,
-    int H=1,
-    bool fusedLogSmax=true) {
-
-  const int& D = numTargets;
-
-  const int bSrc = bTgt / H;
-  const int T = srcLengths[bSrc];
-  const int U = tgtLengths[bTgt] + 1;
-
-  if (t >= T || u >= U) { // out of boundary.
-    return;
-  }
-  const int* validRangesB = validRanges + (maxU*2) * bTgt;
-  int start = validRangesB[2*u];
-  int end = validRangesB[2*u + 1];
-
-  // out of boundary for alignment restriction condition
-  if (t < start || t > end) {
-    return;
-  }
-  SparseIndexer idxr(maxU, tgtLengths, validRanges, cellsPerSample);
-  int idx = idxr(bTgt, t, u);
-  logProbs[(idx << 1) + LOG_PROBS_SKIP_IDX] =
-      CAST_DTYPE(logits[idx * D + blank]) - denominators[idx];
-
-  if (!fusedLogSmax) {
-    logProbs[(idx << 1) + LOG_PROBS_SKIP_IDX] =
-      CAST_DTYPE(logits[idx * D + blank]);
-  }
-
-  if (u < U - 1) {
-    // emit: log_prob(b, t, u).emit() = logits(b, t, u, tgt[u]) - denom(b, t, u).
-    int target = targets[Indexer2D(maxU - 1)(bTgt, u)];
-    logProbs[(idx << 1) + LOG_PROBS_EMIT_IDX] =
-        CAST_DTYPE(logits[idx * D + target]) - denominators[idx];
-
-    if (!fusedLogSmax) {
-      logProbs[(idx << 1) + LOG_PROBS_EMIT_IDX] =
-        CAST_DTYPE(logits[idx * D + target]);
-    }
-  }
-}
-
-
-template <typename DTYPE, typename CAST_DTYPE>
 HOST_AND_DEVICE void ComputeGradientsElement(
     int bTgt,
     int t,
@@ -89,9 +27,6 @@ HOST_AND_DEVICE void ComputeGradientsElement(
     const CAST_DTYPE* alphas,
     const CAST_DTYPE* betas,
     DTYPE* gradients,
-    bool sparse = false,
-    const int* validRanges = nullptr,
-    const int* cellsPerSample = nullptr,
     int H = 1,
     bool fusedLogSmax = true) {
 
@@ -104,10 +39,7 @@ HOST_AND_DEVICE void ComputeGradientsElement(
   const int U = tgtLengths[bTgt] + 1;
 
   if (t >= T || u >= U) { // out of boundary.
-    if (sparse) {
-      // no extra elements needs to be set to 0
-      return;
-    } else if (gradients == logits && t < maxT && u < maxU) {
+    if (gradients == logits && t < maxT && u < maxU) {
       // gradients and logits are pointing to the same memory location
       Indexer3D idxr3(maxT, maxU);
       int idx_b_t_u_zero = idxr3(bTgt, t, u);
@@ -121,32 +53,18 @@ HOST_AND_DEVICE void ComputeGradientsElement(
     return;
   }
 
-  int costIdx;
-  if (!sparse) {
-    costIdx = bTgt * maxT * maxU;
-  } else {
-    SparseIndexer idxr(maxU, tgtLengths, validRanges, cellsPerSample);
-    costIdx = idxr(bTgt, 0, 0);
-  }
+  int costIdx = bTgt * maxT * maxU;
   CAST_DTYPE cost = -(betas[costIdx]);
 
 
   Indexer2D idxr2(maxU - 1);
 
   int idx_b_t_u, idx_b_t_up1, idx_b_tp1_u, idx_b_tp1_up1;
-  if (sparse) {
-    SparseIndexer idxr(maxU, tgtLengths, validRanges, cellsPerSample);
-    idx_b_t_u = idxr(bTgt, t, u);
-    idx_b_t_up1 = idxr(bTgt, t, u+1);
-    idx_b_tp1_u = idxr(bTgt, t+1, u);
-    idx_b_tp1_up1 = idxr(bTgt, t+1, u+1);
-  } else {
-    Indexer3D idxr3(maxT, maxU);
-    idx_b_t_u = idxr3(bTgt, t, u);
-    idx_b_t_up1 = idxr3(bTgt, t, u+1);
-    idx_b_tp1_u = idxr3(bTgt, t+1, u);
-    idx_b_tp1_up1 = idxr3(bTgt, t+1, u+1);
-  }
+  Indexer3D idxr3(maxT, maxU);
+  idx_b_t_u = idxr3(bTgt, t, u);
+  idx_b_t_up1 = idxr3(bTgt, t, u+1);
+  idx_b_tp1_u = idxr3(bTgt, t+1, u);
+  idx_b_tp1_up1 = idxr3(bTgt, t+1, u+1);
 
   if (idx_b_t_u == -1 ) {
     return;

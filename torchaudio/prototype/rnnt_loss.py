@@ -16,9 +16,6 @@ def _rnnt_loss_alphas(
     wordpiece_ends=None,
     left_buffer=0,
     right_buffer=0,
-    sparse=False,
-    valid_ranges=None,
-    cells_per_sample=None,
 ):
     """
     Compute alphas for RNN transducer loss.
@@ -35,37 +32,18 @@ def _rnnt_loss_alphas(
     targets = targets.int()
     logit_lengths = logit_lengths.int()
     target_lengths = target_lengths.int()
-    if not sparse:
-        return torch.ops.torchaudio.rnnt_loss_alphas(
-            logits,
-            targets,
-            logit_lengths,
-            target_lengths,
-            blank,
-            clamp,
-            wordpiece_ends,
-            left_buffer,
-            right_buffer,
-        )
-    else:
-        try:
-            return torch.ops.torchaudio.rnnt_loss_alphas_sparse(
-                logits,
-                targets,
-                logit_lengths,
-                target_lengths,
-                blank,
-                clamp,
-                torch.max(logit_lengths).item(),
-                torch.max(target_lengths).item() + 1,
-                wordpiece_ends,
-                left_buffer,
-                right_buffer,
-                valid_ranges,
-                cells_per_sample,
-            )
-        except RuntimeError:
-            raise RuntimeError("sparse is only supported on GPU with torchaudio compiled with GPU support")
+
+    return torch.ops.torchaudio.rnnt_loss_alphas(
+        logits,
+        targets,
+        logit_lengths,
+        target_lengths,
+        blank,
+        clamp,
+        wordpiece_ends,
+        left_buffer,
+        right_buffer,
+    )
 
 
 def _rnnt_loss_betas(
@@ -78,9 +56,6 @@ def _rnnt_loss_betas(
     wordpiece_ends=None,
     left_buffer=0,
     right_buffer=0,
-    sparse=False,
-    valid_ranges=None,
-    cells_per_sample=None,
 ):
     """
     Compute betas for RNN transducer loss
@@ -97,37 +72,18 @@ def _rnnt_loss_betas(
     targets = targets.int()
     logit_lengths = logit_lengths.int()
     target_lengths = target_lengths.int()
-    if not sparse:
-        return torch.ops.torchaudio.rnnt_loss_betas(
-            logits,
-            targets,
-            logit_lengths,
-            target_lengths,
-            blank,
-            clamp,
-            wordpiece_ends,
-            left_buffer,
-            right_buffer,
-        )
-    else:
-        try:
-            return torch.ops.torchaudio.rnnt_loss_betas_sparse(
-                logits,
-                targets,
-                logit_lengths,
-                target_lengths,
-                blank,
-                clamp,
-                torch.max(logit_lengths).item(),
-                torch.max(target_lengths).item() + 1,
-                wordpiece_ends,
-                left_buffer,
-                right_buffer,
-                valid_ranges,
-                cells_per_sample,
-            )
-        except RuntimeError:
-            raise RuntimeError("sparse is only supported on GPU with torchaudio compiled with GPU support")
+
+    return torch.ops.torchaudio.rnnt_loss_betas(
+        logits,
+        targets,
+        logit_lengths,
+        target_lengths,
+        blank,
+        clamp,
+        wordpiece_ends,
+        left_buffer,
+        right_buffer,
+    )
 
 
 class _RNNT(torch.autograd.Function):
@@ -144,9 +100,6 @@ class _RNNT(torch.autograd.Function):
         wordpiece_ends=None,
         left_buffer=0,
         right_buffer=0,
-        sparse=False,
-        valid_ranges=None,
-        cells_per_sample=None,
         fused_log_softmax=True,
         reuse_logits_for_grads=True,
     ):
@@ -160,10 +113,6 @@ class _RNNT(torch.autograd.Function):
         target_lengths = target_lengths.to(device=logits.device)
         if wordpiece_ends is not None:
             wordpiece_ends = wordpiece_ends.to(device=logits.device)
-        if valid_ranges is not None:
-            valid_ranges = valid_ranges.to(device=logits.device)
-        if cells_per_sample is not None:
-            cells_per_sample = cells_per_sample.to(device=logits.device)
 
         # make sure all int tensors are of type int32.
         targets = targets.int()
@@ -181,67 +130,29 @@ class _RNNT(torch.autograd.Function):
                 target_lengths=target_lengths,
                 blank=blank,
             )
-        if sparse:
-            try:
-                rnnt_loss_sparse = torch.ops.torchaudio.rnnt_loss_sparse
-            except RuntimeError:
-                raise RuntimeError("sparse is only supported on GPU with torchaudio compiled with GPU support")
 
-            max_T = torch.max(logit_lengths).item()  # note: not used for indexing
-            max_U = targets.shape[1] + 1  # used for indexing, e.g. wordpiece_ends
-            assert max_U >= torch.max(target_lengths).item() + 1
-            assert max_U == wordpiece_ends.shape[1] and max_U == valid_ranges.shape[1]
-            costs, gradients = rnnt_loss_sparse(
-                logits=logits,
-                targets=targets,
-                src_lengths=logit_lengths,
-                tgt_lengths=target_lengths,
-                blank=blank,
-                clamp=clamp,
-                wp_ends=wordpiece_ends,
-                l_buffer=left_buffer,
-                r_buffer=right_buffer,
-                max_T=max_T,
-                max_U=max_U,
-                valid_ranges=valid_ranges,
-                cells_per_sample=cells_per_sample,
-                fused_log_smax=fused_log_softmax,
-                reuse_logits_for_grads=reuse_logits_for_grads,
-            )
-            ctx.cells_per_sample = cells_per_sample
-        else:
-            costs, gradients = torch.ops.torchaudio.rnnt_loss(
-                logits=logits,
-                targets=targets,
-                src_lengths=logit_lengths,
-                tgt_lengths=target_lengths,
-                blank=blank,
-                clamp=clamp,
-                wp_ends=wordpiece_ends,
-                l_buffer=left_buffer,
-                r_buffer=right_buffer,
-                fused_log_smax=fused_log_softmax,
-                reuse_logits_for_grads=reuse_logits_for_grads,
-            )
+        costs, gradients = torch.ops.torchaudio.rnnt_loss(
+            logits=logits,
+            targets=targets,
+            src_lengths=logit_lengths,
+            tgt_lengths=target_lengths,
+            blank=blank,
+            clamp=clamp,
+            wp_ends=wordpiece_ends,
+            l_buffer=left_buffer,
+            r_buffer=right_buffer,
+            fused_log_smax=fused_log_softmax,
+            reuse_logits_for_grads=reuse_logits_for_grads,
+        )
 
         ctx.grads = gradients
-        ctx.sparse = sparse
 
         return costs
 
     @staticmethod
     def backward(ctx, output_gradients):
-        if ctx.sparse:
-            output_gradients = output_gradients.view(-1, 1).to(ctx.grads)
-            offset = 0
-            count = 0
-            for ncells in ctx.cells_per_sample:
-                ctx.grads[offset : offset + ncells, :].mul_(output_gradients[count])
-                offset += ncells
-                count += 1
-        else:
-            output_gradients = output_gradients.view(-1, 1, 1, 1).to(ctx.grads)
-            ctx.grads.mul_(output_gradients).to(ctx.grads)
+        output_gradients = output_gradients.view(-1, 1, 1, 1).to(ctx.grads)
+        ctx.grads.mul_(output_gradients).to(ctx.grads)
 
         return (
             ctx.grads,  # logits
@@ -254,9 +165,6 @@ class _RNNT(torch.autograd.Function):
             None,  # wordpiece_ends
             None,  # left_buffer
             None,  # right_buffer
-            None,  # sparse
-            None,  # valid_ranges
-            None,  # cells_per_sample
             None,  # fused_log_softmax
             None,  # reuse_logits_for_grads
         )
@@ -273,9 +181,6 @@ def rnnt_loss(
     wordpiece_ends=None,
     left_buffer=0,
     right_buffer=0,
-    sparse=False,
-    valid_ranges=None,
-    cells_per_sample=None,
     fused_log_softmax=True,
     reuse_logits_for_grads=True,
 ):
@@ -300,11 +205,6 @@ def rnnt_loss(
             Loss will not be imposed on frames smaller than wordpiece_end - left_buffer. (Default: ``0``)
         right_buffer (int): right buffer frames used for alignment restricted RNNT loss.
             Loss will not be imposed on frames greater than wordpiece_end + right_buffer. (Default: ``0``)
-        sparse (bool): set to true for sparse alignment restricted RNNT. (Default: ``False``)
-        valid_ranges (Tensor): Tensor of dimension (batch, target, 2) containing valid ranges for sparse AR-RNNT
-            (Default: ``None``)
-        cells_per_sample (Tensor): Tensor of dimension (batch) containing total valid cells for each (Default: ``None``)
-            sample while doing sparse AR-RNNT (Default: ``None``)
         fused_log_smax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
         reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)
     """
@@ -325,9 +225,6 @@ def rnnt_loss(
         wordpiece_ends,
         left_buffer,
         right_buffer,
-        sparse,
-        valid_ranges,
-        cells_per_sample,
         fused_log_softmax,
         reuse_logits_for_grads,
     )
@@ -350,7 +247,6 @@ class RNNTLoss(torch.nn.Module):
             Loss will not be imposed on frames smaller than wordpiece_end - left_buffer. (Default: ``0``)
         right_buffer (int): right buffer frames used for alignment restricted RNNT loss.
             Loss will not be imposed on frames greater than wordpiece_end + right_buffer. (Default: ``0``)
-        sparse (bool): set to true for sparse alignment restricted RNNT. (Default: ``False``)
         fused_log_smax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
         reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)
     """
@@ -362,7 +258,6 @@ class RNNTLoss(torch.nn.Module):
         runtime_check=False,
         left_buffer=0,
         right_buffer=0,
-        sparse=False,
         fused_log_softmax=True,
         reuse_logits_for_grads=True,
     ):
@@ -372,7 +267,6 @@ class RNNTLoss(torch.nn.Module):
         self.runtime_check = runtime_check
         self.left_buffer = left_buffer
         self.right_buffer = right_buffer
-        self.sparse = sparse
         self.fused_log_softmax = fused_log_softmax
         self.reuse_logits_for_grads = reuse_logits_for_grads
 
@@ -383,8 +277,6 @@ class RNNTLoss(torch.nn.Module):
         logit_lengths,
         target_lengths,
         wordpiece_ends=None,
-        valid_ranges=None,
-        cells_per_sample=None,
         left_buffer=None,
         right_buffer=None,
     ):
@@ -396,10 +288,6 @@ class RNNTLoss(torch.nn.Module):
             target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
             wordpiece_ends (Tensor): Tensor of dimension (batch, target) containing the end frames of targets
                 for each sequence (including bos end_frame = 0) (Default: ``None``)
-            valid_ranges (Tensor): Tensor of dimension (batch, target, 2) containing valid ranges for sparse AR-RNNT
-                (Default: ``None``)
-            cells_per_sample (Tensor): Tensor of dimension (batch) containing total valid cells for each
-                sample while doing sparse AR-RNNT (Default: ``None``)
             left_buffer (int): left buffer frames used for alignment restricted RNNT loss.
                 Loss will not be imposed on frames smaller than wordpiece_end - left_buffer. (Default: ``None``)
             right_buffer (int): right buffer frames used for alignment restricted RNNT loss.
@@ -425,9 +313,6 @@ class RNNTLoss(torch.nn.Module):
             wordpiece_ends,
             left_buffer,
             right_buffer,
-            self.sparse,
-            valid_ranges,
-            cells_per_sample,
             self.fused_log_softmax,
             self.reuse_logits_for_grads,
         )

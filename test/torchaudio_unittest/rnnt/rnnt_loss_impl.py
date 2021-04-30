@@ -9,7 +9,6 @@ from torchaudio.prototype.rnnt_loss import (
 from .numpy_transducer import _NumpyTransducer
 
 from .utils import (
-    assert_sparse_all_close,
     compute_with_numpy_transducer,
     compute_with_pytorch_transducer,
     get_B1_T10_U3_D4_data,
@@ -34,25 +33,20 @@ class RNNTLossTest:
                     data=data, reuse_logits_for_grads=reuse_logits_for_grads
                 )
                 np.testing.assert_allclose(costs, ref_costs, atol=atol, rtol=rtol)
-                if "logits_sparse" in data:
-                    assert_sparse_all_close(
-                        data, gradients, ref_gradients, atol=atol, rtol=rtol
-                    )
-                else:
-                    self.assertEqual(logits_shape, gradients.shape)
-                    if not np.allclose(gradients, ref_gradients, atol=atol, rtol=rtol):
-                        for b in range(len(gradients)):
-                            T = data["logit_lengths"][b]
-                            U = data["target_lengths"][b]
-                            for t in range(gradients.shape[1]):
-                                for u in range(gradients.shape[2]):
-                                    np.testing.assert_allclose(
-                                        gradients[b, t, u],
-                                        ref_gradients[b, t, u],
-                                        atol=atol,
-                                        rtol=rtol,
-                                        err_msg=f"failed on b={b}, t={t}/T={T}, u={u}/U={U}",
-                                    )
+                self.assertEqual(logits_shape, gradients.shape)
+                if not np.allclose(gradients, ref_gradients, atol=atol, rtol=rtol):
+                    for b in range(len(gradients)):
+                        T = data["logit_lengths"][b]
+                        U = data["target_lengths"][b]
+                        for t in range(gradients.shape[1]):
+                            for u in range(gradients.shape[2]):
+                                np.testing.assert_allclose(
+                                    gradients[b, t, u],
+                                    ref_gradients[b, t, u],
+                                    atol=atol,
+                                    rtol=rtol,
+                                    err_msg=f"failed on b={b}, t={t}/T={T}, u={u}/U={U}",
+                                )
 
     def test_basic_backward(self):
         rnnt_loss = RNNTLoss()
@@ -317,42 +311,36 @@ class RNNTLossCUDAOnly:
                     data=data, reuse_logits_for_grads=reuse_logits_for_grads
                 )
                 np.testing.assert_allclose(costs, ref_costs, atol=atol, rtol=rtol)
-                if "logits_sparse" in data:
-                    assert_sparse_all_close(
-                        data, gradients, ref_gradients, atol=atol, rtol=rtol
-                    )
-                else:
-                    self.assertEqual(logits_shape, gradients.shape)
-                    if not np.allclose(gradients, ref_gradients, atol=atol, rtol=rtol):
-                        for b in range(len(gradients)):
-                            T = data["logit_lengths"][b]
-                            U = data["target_lengths"][b]
-                            for t in range(gradients.shape[1]):
-                                for u in range(gradients.shape[2]):
-                                    np.testing.assert_allclose(
-                                        gradients[b, t, u],
-                                        ref_gradients[b, t, u],
-                                        atol=atol,
-                                        rtol=rtol,
-                                        err_msg=f"failed on b={b}, t={t}/T={T}, u={u}/U={U}",
-                                    )
+                self.assertEqual(logits_shape, gradients.shape)
+                if not np.allclose(gradients, ref_gradients, atol=atol, rtol=rtol):
+                    for b in range(len(gradients)):
+                        T = data["logit_lengths"][b]
+                        U = data["target_lengths"][b]
+                        for t in range(gradients.shape[1]):
+                            for u in range(gradients.shape[2]):
+                                np.testing.assert_allclose(
+                                    gradients[b, t, u],
+                                    ref_gradients[b, t, u],
+                                    atol=atol,
+                                    rtol=rtol,
+                                    err_msg=f"failed on b={b}, t={t}/T={T}, u={u}/U={U}",
+                                )
 
     def test_nan_logits(self):
-        for sparse in [False, True]:
-            for reuse_logits_for_grads in [False, True]:
-                data = get_B1_T10_U3_D4_data(
-                    random=True, left_buffer=10, right_buffer=10, sparse=sparse, nan=True
-                )
-                data = numpy_to_torch(
-                    data=data, device=self.device, requires_grad=True
-                )
-                data["left_buffer"] = 10
-                data["right_buffer"] = 10
-                costs, gradients = compute_with_pytorch_transducer(
-                    data=data, reuse_logits_for_grads=reuse_logits_for_grads
-                )
-                self.assertTrue(np.all(costs == 0))
-                self.assertTrue(np.all(gradients == 0))
+        for reuse_logits_for_grads in [False, True]:
+            data = get_B1_T10_U3_D4_data(
+                random=True, left_buffer=10, right_buffer=10, nan=True
+            )
+            data = numpy_to_torch(
+                data=data, device=self.device, requires_grad=True
+            )
+            data["left_buffer"] = 10
+            data["right_buffer"] = 10
+            costs, gradients = compute_with_pytorch_transducer(
+                data=data, reuse_logits_for_grads=reuse_logits_for_grads
+            )
+            self.assertTrue(np.all(costs == 0))
+            self.assertTrue(np.all(gradients == 0))
 
     def test_rnnt_restricted_betas_with_random_data(self):
         for u in range(50, 60):
@@ -375,53 +363,9 @@ class RNNTLossCUDAOnly:
                 targets=data["targets"],
                 wordpiece_ends=wordpiece_ends,
                 blank=4095,
-                sparse=False,
             )
 
     def test_rnnt_nonfused_log_softmax(self):
-        for random in [False, True]:
-            for sparse in [False, True]:
-                for left_buffer in [1, 2, 10]:
-                    for right_buffer in [1, 2, 5, 10]:
-                        data = get_B1_T10_U3_D4_data(
-                            random=random,
-                            left_buffer=left_buffer,
-                            right_buffer=right_buffer,
-                            sparse=sparse,
-                        )
-                        data = numpy_to_torch(
-                            data=data, device=self.device, requires_grad=True
-                        )
-                        data["left_buffer"] = left_buffer
-                        data["right_buffer"] = right_buffer
-                        data["fused_log_softmax"] = False
-                        ref_costs, ref_gradients = compute_with_numpy_transducer(
-                            data=data
-                        )
-                        self._test_costs_and_gradients(
-                            data=data, ref_costs=ref_costs, ref_gradients=ref_gradients
-                        )
-
-    def test_rnnt_sparse_B1_T10_U3_D4(self):
-        for random in [False, True]:
-            for left_buffer in [1, 2, 10]:
-                for right_buffer in [1, 2, 5, 10]:
-                    data = get_B1_T10_U3_D4_data(
-                        random=random, left_buffer=left_buffer, right_buffer=right_buffer, sparse=True
-                    )
-                    data = numpy_to_torch(
-                        data=data, device=self.device, requires_grad=True
-                    )
-                    data["left_buffer"] = left_buffer
-                    data["right_buffer"] = right_buffer
-                    ref_costs, ref_gradients = compute_with_numpy_transducer(
-                        data=data
-                    )
-                    self._test_costs_and_gradients(
-                        data=data, ref_costs=ref_costs, ref_gradients=ref_gradients
-                    )
-
-    def test_rnnt_sparse_B1_T10_U3_D4_fp16(self):
         for random in [False, True]:
             for left_buffer in [1, 2, 10]:
                 for right_buffer in [1, 2, 5, 10]:
@@ -429,107 +373,16 @@ class RNNTLossCUDAOnly:
                         random=random,
                         left_buffer=left_buffer,
                         right_buffer=right_buffer,
-                        sparse=True,
-                        dtype=np.float16,
                     )
                     data = numpy_to_torch(
                         data=data, device=self.device, requires_grad=True
                     )
                     data["left_buffer"] = left_buffer
                     data["right_buffer"] = right_buffer
+                    data["fused_log_softmax"] = False
                     ref_costs, ref_gradients = compute_with_numpy_transducer(
                         data=data
                     )
                     self._test_costs_and_gradients(
-                        data=data,
-                        ref_costs=ref_costs,
-                        ref_gradients=ref_gradients,
-                        atol=1e-3,
-                        rtol=10,
-                    )
-
-    def test_rnnt_sparse_alpha_beta_B1_T10_U3_D4(self):
-        for random in [False, True]:
-            for left_buffer in [1, 2, 10]:
-                for right_buffer in [1, 2, 10]:
-                    data = get_B1_T10_U3_D4_data(
-                        random=random, left_buffer=left_buffer, right_buffer=right_buffer, sparse=True
-                    )
-                    data = numpy_to_torch(
-                        data=data, device=self.device, requires_grad=True
-                    )
-                    data["left_buffer"] = left_buffer
-                    data["right_buffer"] = right_buffer
-                    logits = torch.tensor(data["logits"])
-                    log_probs = (
-                        torch.nn.functional.log_softmax(logits, dim=-1).cpu().numpy()
-                    )
-                    (
-                        np_gradients,
-                        np_costs,
-                        np_alphas,
-                        np_betas,
-                    ) = _NumpyTransducer.compute(
-                        log_probs=log_probs,
-                        logit_lengths=data["logit_lengths"],
-                        target_lengths=data["target_lengths"],
-                        targets=data["targets"],
-                        blank=data["blank"],
-                        wordpiece_ends=data["wordpiece_ends"],
-                        left_buffer=left_buffer,
-                        right_buffer=right_buffer,
-                    )
-                    pt_alphas = _rnnt_loss_alphas(
-                        logits=data["logits_sparse"],
-                        logit_lengths=data["logit_lengths"],
-                        target_lengths=data["target_lengths"],
-                        targets=data["targets"],
-                        wordpiece_ends=data["wordpiece_ends"],
-                        blank=data["blank"],
-                        left_buffer=left_buffer,
-                        right_buffer=right_buffer,
-                        sparse=True,
-                        valid_ranges=data["valid_ranges"],
-                        cells_per_sample=data["cells_per_sample"],
-                    )
-                    total_valid = torch.sum(data["cells_per_sample"])
-                    sparse_np_alphas = np.zeros((total_valid)).astype(np.float32)
-                    valid_ranges = data["valid_ranges"]
-                    offset = 0
-                    for b in range(2):
-                        for u in range(3):
-                            st, en = valid_ranges[b][u][0], valid_ranges[b][u][1]
-                            sparse_np_alphas[
-                                offset : offset + (en - st) + 1
-                            ] = np_alphas[b, st : en + 1, u]
-                            offset += (en - st) + 1
-                    np.testing.assert_allclose(
-                        pt_alphas.cpu(), sparse_np_alphas, atol=1e-6, rtol=1e-2
-                    )
-
-                    pt_betas = _rnnt_loss_betas(
-                        logits=data["logits_sparse"],
-                        logit_lengths=data["logit_lengths"],
-                        target_lengths=data["target_lengths"],
-                        targets=data["targets"],
-                        wordpiece_ends=data["wordpiece_ends"],
-                        blank=data["blank"],
-                        left_buffer=left_buffer,
-                        right_buffer=right_buffer,
-                        sparse=True,
-                        valid_ranges=data["valid_ranges"],
-                        cells_per_sample=data["cells_per_sample"],
-                    )
-                    sparse_np_betas = np.zeros((total_valid)).astype(np.float32)
-                    valid_ranges = data["valid_ranges"]
-                    offset = 0
-                    for b in range(2):
-                        for u in range(3):
-                            st, en = valid_ranges[b][u][0], valid_ranges[b][u][1]
-                            sparse_np_betas[offset : offset + (en - st) + 1] = np_betas[
-                                b, st : en + 1, u
-                            ]
-                            offset += (en - st) + 1
-                    np.testing.assert_allclose(
-                        pt_betas.cpu(), sparse_np_betas, atol=1e-6, rtol=1e-2
+                        data=data, ref_costs=ref_costs, ref_gradients=ref_gradients
                     )

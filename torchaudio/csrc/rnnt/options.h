@@ -48,11 +48,6 @@ typedef struct Options {
   // num_targets = D.
   int numTargets_;
 
-  // whether to use sparse layout for ar-rnnt
-  bool sparse_;
-
-  int sparseCells_;
-
   // if set to true, inputs are logits and gradients are
   // fused with logsoftmax gradients.
   // if set to false, log_softmax is computed outside of loss
@@ -72,8 +67,6 @@ typedef struct Options {
         maxSrcLen_(0),
         maxTgtLen_(0),
         numTargets_(0),
-        sparse_(false),
-        sparseCells_(0),
         fusedLogSmax_(true) {}
 
   int BU() const {

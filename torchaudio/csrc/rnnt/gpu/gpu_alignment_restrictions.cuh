@@ -11,48 +11,6 @@
 namespace torchaudio {
 namespace rnnt {
 
-template <typename DTYPE, typename CAST_DTYPE>
-__global__ void ComputeLogProbsSparse(
-    int maxT,
-    int maxU,
-    int numTargets,
-    int blank,
-    const DTYPE* logits,
-    const int* targets,
-    const int* srcLengths,
-    const int* tgtLengths,
-    const CAST_DTYPE* denominators,
-    CAST_DTYPE* logProbs,
-    const int* wpEnds,
-    const int* validRanges=nullptr,
-    const int* cellsPerSample=nullptr,
-    int H=1,
-    bool fusedLogSmax=true) {
-
-  const int bTgt = blockIdx.z;  // 0 <= b < B
-  const int t = blockIdx.x * blockDim.x + threadIdx.x;
-  const int u = blockIdx.y;
-
-  ComputeLogProbsSparseElement(
-      bTgt,
-      t,
-      u,
-      maxT,
-      maxU,
-      numTargets,
-      blank,
-      logits,
-      targets,
-      srcLengths,
-      tgtLengths,
-      denominators,
-      logProbs,
-      wpEnds,
-      validRanges,
-      cellsPerSample,
-      H=1,
-      fusedLogSmax);
-}
 
 template <typename DTYPE, typename CAST_DTYPE>
 __device__ void ComputeAlphasRestricted(
@@ -69,9 +27,6 @@ __device__ void ComputeAlphasRestricted(
     int lBuffer,
     int rBuffer,
     int warp_size,
-    bool sparse=false,
-    const int* validRanges=nullptr,
-    const int* cellsPerSample=nullptr,
     int H=1) {
 
     const int& maxT = maxSrcLen;
@@ -125,19 +80,11 @@ __device__ void ComputeAlphasRestricted(
     int idx_b_t_u = -1, idx_b_t_um1 = -1, idx_b_tm1_u = -1;
     int idx_b_prevWarpEndT_u = -1;
 
-    if (sparse) {
-        SparseIndexer idxr(maxU, tgtLengths, validRanges, cellsPerSample);
-        idx_b_t_u = idxr(bTgt, t, u);
-        idx_b_t_um1 = idxr(bTgt, t, u-1);
-        idx_b_tm1_u = idxr(bTgt, t-1, u);
-        idx_b_prevWarpEndT_u = idxr(bTgt, prevWarpEndT, u);
-    } else {
-        Indexer3D idxr(maxT, maxU);
-        idx_b_t_u = idxr(bTgt, t, u);
-        idx_b_t_um1 = idxr(bTgt, t, u - 1);
-        idx_b_tm1_u = idxr(bTgt, t - 1, u);
-        idx_b_prevWarpEndT_u = idxr(bTgt, prevWarpEndT, u);
-    }
+    Indexer3D idxr(maxT, maxU);
+    idx_b_t_u = idxr(bTgt, t, u);
+    idx_b_t_um1 = idxr(bTgt, t, u - 1);
+    idx_b_tm1_u = idxr(bTgt, t - 1, u);
+    idx_b_prevWarpEndT_u = idxr(bTgt, prevWarpEndT, u);
 
     alphas[idx_b_t_u] = CAST_DTYPE(-INFINITY);
 
@@ -285,9 +232,6 @@ __global__ void ComputeAlphasRestrictedWrapper(
     int lBuffer,
     int rBuffer,
     int warp_size,
-    bool sparse=false,
-    const int* validRanges=nullptr,
-    const int* cellsPerSample=nullptr,
     int H=1) {
     ComputeAlphasRestricted<DTYPE, CAST_DTYPE>(
       maxSrcLen,
@@ -303,9 +247,6 @@ __global__ void ComputeAlphasRestrictedWrapper(
       lBuffer,
       rBuffer,
       warp_size,
-      sparse,
-      validRanges,
-      cellsPerSample,
       H);
 }
 
@@ -327,9 +268,6 @@ __device__ void ComputeBetasCostsRestricted(
     int rBuffer,
     int warp_size,
     int num_warps,
-    bool sparse=false,
-    const int* validRanges=nullptr,
-    const int* cellsPerSample=nullptr,
     int H=1) {
 
     const int& maxT = maxSrcLen;
@@ -370,19 +308,12 @@ __device__ void ComputeBetasCostsRestricted(
 
     int idx_b_t_u = -1, idx_b_t_up1 = -1;
     int idx_b_tp1_up1 = -1, idx_b_rightBlockStartT_u = -1;
-    if (sparse) {
-        SparseIndexer idxr(maxU, tgtLengths, validRanges, cellsPerSample);
-        idx_b_t_u = idxr(bTgt, t, u);
-        idx_b_t_up1 = idxr(bTgt, t, u+1);
-        idx_b_tp1_up1 = idxr(bTgt, t+1, u+1);
-        idx_b_rightBlockStartT_u = idxr(bTgt, rightBlockStartT, u);
-    } else {
-        Indexer3D idxr(maxT, maxU);
-        idx_b_t_u = idxr(bTgt, t, u);
-        idx_b_t_up1 = idxr(bTgt, t, u+1);
-        idx_b_tp1_up1 = idxr(bTgt, t+1, u+1);
-        idx_b_rightBlockStartT_u = idxr(bTgt, rightBlockStartT, u);
-    }
+
+    Indexer3D idxr(maxT, maxU);
+    idx_b_t_u = idxr(bTgt, t, u);
+    idx_b_t_up1 = idxr(bTgt, t, u+1);
+    idx_b_tp1_up1 = idxr(bTgt, t+1, u+1);
+    idx_b_rightBlockStartT_u = idxr(bTgt, rightBlockStartT, u);
 
     if (t < T && u < U) {
         betas[idx_b_t_u] = CAST_DTYPE(-INFINITY);
@@ -519,9 +450,6 @@ __global__ void ComputeBetasCostsRestrictedWrapper(
     int rBuffer,
     int warp_size,
     int num_warp,
-    bool sparse=false,
-    const int* validRanges=nullptr,
-    const int* cellsPerSample=nullptr,
     int H=1) {
     ComputeBetasCostsRestricted<DTYPE, CAST_DTYPE>(
       maxSrcLen,
@@ -539,9 +467,6 @@ __global__ void ComputeBetasCostsRestrictedWrapper(
       rBuffer,
       warp_size,
       num_warp,
-      sparse,
-      validRanges,
-      cellsPerSample,
       H);
 }
 

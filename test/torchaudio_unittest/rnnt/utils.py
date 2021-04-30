@@ -10,54 +10,6 @@ from .numpy_transducer import (
 )
 
 
-def _get_sparse(data, dense_tensor, left_buffer, right_buffer, H=1):
-    B, _, U, D = 2, 10, 3, 4
-    total_valid = 0
-    valid_ranges = np.zeros((B * H, U, 2), dtype=np.int32)
-    cells_per_sample = np.zeros(B * H, dtype=np.int32)
-    wordpiece_ends = data["wordpiece_ends"]
-    for b_tgt in range(B * H):
-        b_src = int(b_tgt / H)
-        src_len = int(data["logit_lengths"][b_src])
-        tgt_len = int(data["target_lengths"][b_tgt]) + 1
-        ar_check = AlignmentRestrictionCheck(
-            tgt_len, src_len, wordpiece_ends[b_tgt][:tgt_len], left_buffer, right_buffer
-        )
-        sample_cells = 0
-        for u in range(tgt_len):
-            v_range = ar_check.valid_time_ranges(u)
-            valid_ranges[b_tgt, u, 0] = v_range[0]
-            valid_ranges[b_tgt, u, 1] = v_range[1]
-            total_valid += v_range[1] - v_range[0] + 1
-            sample_cells += v_range[1] - v_range[0] + 1
-        cells_per_sample[b_tgt] = sample_cells
-    sparse_joint_enc = np.zeros((total_valid, D)).astype(dense_tensor.dtype)
-    offset = 0
-    for b in range(B * H):
-        for u in range(U):
-            st, en = valid_ranges[b_tgt][u][0], valid_ranges[b_tgt][u][1]
-            sparse_joint_enc[offset : offset + (en - st) + 1, :] = dense_tensor[
-                b, st : en + 1, u, :
-            ]
-            offset += (en - st) + 1
-    return sparse_joint_enc, valid_ranges, cells_per_sample
-
-
-def assert_sparse_all_close(data, gradients, ref_gradients, atol=1e-6, rtol=1e-2):
-    valid_ranges = data["valid_ranges"]
-    idx = 0
-    for b in range(valid_ranges.size(0)):
-        for u in range(valid_ranges.size(1)):
-            st, en = valid_ranges[b, u, 0], valid_ranges[b, u, 1]
-            np.testing.assert_allclose(
-                gradients[idx : idx + (en - st + 1), :],
-                ref_gradients[b, st : en + 1, u, :],
-                atol=atol,
-                rtol=rtol,
-            )
-            idx += (en - st) + 1
-
-
 def compute_with_numpy_transducer(data):
     costs = NumpyTransducerLoss(
         blank=data["blank"],
@@ -88,19 +40,14 @@ def compute_with_pytorch_transducer(data, reuse_logits_for_grads=False):
         blank=data["blank"],
         left_buffer=left_buffer,
         right_buffer=right_buffer,
-        sparse=True if "logits_sparse" in data else False,
         fused_log_softmax=data.get("fused_log_softmax", True),
         reuse_logits_for_grads=reuse_logits_for_grads,
     )(
-        logits=data.get("logits_sparse", data["logits"]),
+        logits=data["logits"],
         logit_lengths=data["logit_lengths"],
         target_lengths=data["target_lengths"],
         targets=data["targets"],
         wordpiece_ends=data.get("wordpiece_ends", None),
-        valid_ranges=data.get("valid_ranges", None),
-        cells_per_sample=data["cells_per_sample"]
-        if "cells_per_sample" in data
-        else None,
     )
 
     loss = torch.sum(costs)
@@ -150,7 +97,6 @@ def get_B1_T10_U3_D4_data(
     random=False,
     left_buffer=0,
     right_buffer=0,
-    sparse=False,
     dtype=np.float32,
     nan=False,
 ):
@@ -168,13 +114,6 @@ def get_B1_T10_U3_D4_data(
     data["blank"] = 0
     data["wordpiece_ends"] = np.array([[0, 2, 7], [0, 2, 7]], dtype=np.int32)
 
-    if sparse:
-        sparse_joint_enc, valid_ranges, cells_per_sample = _get_sparse(
-            data, data["logits"], left_buffer, right_buffer
-        )
-        data["logits_sparse"] = sparse_joint_enc
-        data["valid_ranges"] = valid_ranges
-        data["cells_per_sample"] = cells_per_sample
     return data
 
 
@@ -517,20 +456,6 @@ def numpy_to_torch(data, device, requires_grad=True):
     data["target_lengths"] = target_lengths
     data["targets"] = targets
 
-    if "logits_sparse" in data:
-        logits_sparse = torch.from_numpy(data["logits_sparse"])
-        logits_sparse = torch.autograd.Variable(
-            logits_sparse, requires_grad=requires_grad
-        )
-        logits_sparse = logits_sparse.to(device=logits.device)
-        logits_sparse.register_hook(grad_hook)
-        data["logits_sparse"] = logits_sparse
-        valid_ranges = torch.from_numpy(data["valid_ranges"])
-        valid_ranges = valid_ranges.to(device=logits.device)
-        data["valid_ranges"] = valid_ranges
-        cells_per_sample = torch.from_numpy(data["cells_per_sample"])
-        cells_per_sample = cells_per_sample.to(device=logits.device)
-        data["cells_per_sample"] = cells_per_sample
     return data
 
 

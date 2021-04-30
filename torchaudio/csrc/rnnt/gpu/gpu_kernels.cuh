@@ -290,9 +290,6 @@ __global__ void ComputeAlphasBetasCosts(
     int rBuffer = 0,
     int warpSize = 0,
     int numWarps=0,
-    bool sparse=false,
-    const int* validRanges=nullptr,
-    const int* cellsPerSample=nullptr,
     int H = 1) {
 
   assert(threadIdx.y == 0 || threadIdx.y == 1);
@@ -326,9 +323,6 @@ __global__ void ComputeAlphasBetasCosts(
         /*lBuffer=*/lBuffer,
         /*rBuffer=*/rBuffer,
         /*warpSize=*/warpSize,
-        sparse,
-        validRanges,
-        cellsPerSample,
         H);
       }
   } else {  // threadIdx.y == 1
@@ -362,9 +356,6 @@ __global__ void ComputeAlphasBetasCosts(
         rBuffer,
         warpSize,
         numWarps,
-        sparse,
-        validRanges,
-        cellsPerSample,
         H);
     }
 
@@ -387,9 +378,6 @@ __global__ void ComputeGradients(
     const CAST_DTYPE* alphas,
     const CAST_DTYPE* betas,
     DTYPE* gradients,
-    bool sparse = false,
-    const int* validRanges = nullptr,
-    const int* cellsPerSample = nullptr,
     int H = 1,
     bool fusedLogSmax = true) {
 
@@ -414,9 +402,6 @@ __global__ void ComputeGradients(
       alphas,
       betas,
       gradients,
-      sparse,
-      validRanges,
-      cellsPerSample,
       H,
       fusedLogSmax);
 }

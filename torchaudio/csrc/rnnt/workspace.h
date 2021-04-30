@@ -60,19 +60,19 @@ class DtypeWorkspace {
 
  private:
   static int ComputeSizeForDenominators(const Options& options) { // B * T * U
-    return options.sparse_ ? options.sparseCells_ : options.BTU();
+    return options.BTU();
   }
 
   static int ComputeSizeForLogProbs(const Options& options) { // B * T * U * 2
-    return options.sparse_ ? options.sparseCells_ * 2 : options.BTU() * 2;
+    return options.BTU() * 2;
   }
 
   static int ComputeSizeForAlphas(const Options& options) { // B * T * U
-    return options.sparse_ ? options.sparseCells_ : options.BTU();
+    return options.BTU();
   }
 
   static int ComputeSizeForBetas(const Options& options) { // B * T * U
-    return options.sparse_ ? options.sparseCells_ : options.BTU();
+    return options.BTU();
   }
 
   Options options_;
