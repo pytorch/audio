@@ -1,6 +1,6 @@
 import unittest
 import torch
-from torchaudio.prototype.transducer import RNNTLoss
+from torchaudio.facebook.transducer import TransducerLoss
 
 from torchaudio_unittest.common_utils import TorchaudioTestCase
 
@@ -228,11 +228,11 @@ def get_data_B2_T4_U3_D3(dtype=torch.float32, device="cpu"):
 
 
 def compute_with_pytorch_transducer(data):
-    costs = RNNTLoss(blank=data["blank"], reduction="none")(
-        acts=data["logits"],
-        labels=data["targets"],
-        act_lens=data["src_lengths"],
-        label_lens=data["tgt_lengths"],
+    costs = TransducerLoss(blank=data["blank"])(
+        logits=data["logits"],
+        targets=data["targets"],
+        src_lengths=data["src_lengths"],
+        tgt_lengths=data["tgt_lengths"],
     )
 
     loss = torch.sum(costs)
@@ -244,24 +244,22 @@ def compute_with_pytorch_transducer(data):
 
 def skipIfNoTransducer(test_item):
     try:
-        torch.ops.torchaudio.rnnt_loss
+        torch.ops.torchaudio.compute
         return test_item
     except RuntimeError:
         return unittest.skip("torchaudio C++ extension is not compiled with RNN transducer loss")(test_item)
 
 
 class TransducerTester:
-    def test_basic_fp16_error(self):
-        rnnt_loss = RNNTLoss()
+    def test_basic_fp16_no_error(self):
+        # Test that fp16 is supported
+        rnnt_loss = TransducerLoss()
         acts, labels, act_length, label_length = get_data_basic(self.device)
         acts = acts.to(torch.float16)
-        # RuntimeError raised by log_softmax before reaching transducer's bindings
-        self.assertRaises(
-            RuntimeError, rnnt_loss, acts, labels, act_length, label_length
-        )
+        rnnt_loss(acts, labels, act_length, label_length)
 
     def test_basic_backward(self):
-        rnnt_loss = RNNTLoss()
+        rnnt_loss = TransducerLoss()
         acts, labels, act_length, label_length = get_data_basic(self.device)
         loss = rnnt_loss(acts, labels, act_length, label_length)
         loss.backward()
