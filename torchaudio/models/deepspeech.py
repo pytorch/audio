@@ -18,19 +18,15 @@ class FullyConnected(nn.Module):
                  relu_max_clip: int = 20) -> None:
         super(FullyConnected, self).__init__()
         self.fc = nn.Linear(in_features, hidden_size, bias=True)
-        self.nonlinearity = nn.Sequential(*[
-            nn.ReLU(),
-            nn.Hardtanh(0, relu_max_clip)
-        ])
-        if dropout:
-            self.nonlinearity = nn.Sequential(*[
-                self.nonlinearity,
-                nn.Dropout(dropout)
-            ])
+        self.relu_max_clip = relu_max_clip
+        self.dropout = dropout
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.fc(x)
-        x = self.nonlinearity(x)
+        x = torch.nn.functional.relu(x)
+        x = torch.nn.functional.hardtanh(x, 0, self.relu_max_clip)
+        if self.dropout:
+            x = torch.nn.functional.dropout(x, self.dropout, self.training)
         return x
 
 
@@ -58,19 +54,15 @@ class DeepSpeech(nn.Module):
         self.fc3 = FullyConnected(hidden_size, hidden_size, dropout)
         self.bi_rnn = nn.RNN(
             hidden_size, hidden_size, num_layers=1, nonlinearity='relu', bidirectional=True)
-        self.nonlinearity = nn.ReLU()
         self.fc4 = FullyConnected(hidden_size, hidden_size, dropout)
-        self.out = nn.Sequential(*[
-            nn.Linear(hidden_size, num_classes),
-            nn.LogSoftmax(dim=2)
-        ])
+        self.out = nn.Linear(hidden_size, num_classes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Args:
             x (torch.Tensor): Tensor of dimension (batch_size, num_channels, input_length, num_features).
         Returns:
-            Tensor: Predictor tensor of dimension (input_length, batch_size, number_of_classes).
+            Tensor: Predictor tensor of dimension (batch_size, input_length, number_of_classes).
         """
         # N x C x T x F
         x = self.fc1(x)
@@ -90,5 +82,9 @@ class DeepSpeech(nn.Module):
         x = self.fc4(x)
         # T x N x H
         x = self.out(x)
+        # T x N x num_classes
+        x = x.permute(1, 0, 2)
+        # N x T x num_classes
+        x = torch.nn.functional.log_softmax(x, dim=2)
         # T x N x num_classes
         return x
