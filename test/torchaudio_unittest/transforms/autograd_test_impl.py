@@ -157,7 +157,6 @@ class AutogradTestMixin(TestBaseMixin):
     @parameterized.expand([
         ({'cmn_window': 600, 'min_cmn_window': 100, 'center': False, 'norm_vars': False}, ),
         ({'cmn_window': 600, 'min_cmn_window': 100, 'center': True, 'norm_vars': False}, ),
-        ({'cmn_window': 600, 'min_cmn_window': 100, 'center': False, 'norm_vars': True}, ),
         ({'cmn_window': 600, 'min_cmn_window': 100, 'center': False, 'norm_vars': False}, ),
         ({'cmn_window': 500, 'min_cmn_window': 50, 'center': False, 'norm_vars': False}, ),
     ])
