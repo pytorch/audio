@@ -154,6 +154,19 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform])
 
+    @parameterized.expand([
+        ({'cmn_window': 600, 'min_cmn_window': 100, 'center': False, 'norm_vars': False}, ),
+        ({'cmn_window': 600, 'min_cmn_window': 100, 'center': True, 'norm_vars': False}, ),
+        ({'cmn_window': 600, 'min_cmn_window': 100, 'center': False, 'norm_vars': True}, ),
+        ({'cmn_window': 600, 'min_cmn_window': 100, 'center': False, 'norm_vars': False}, ),
+        ({'cmn_window': 500, 'min_cmn_window': 50, 'center': False, 'norm_vars': False}, ),
+    ])
+    def test_sliding_window_cmn(self, kwargs):
+        sample_rate = 8000
+        transform = T.SlidingWindowCmn(**kwargs)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform])
+
     @unittest.expectedFailure
     def test_timestretch_zeros_fail(self):
         """Test that ``T.TimeStretch`` fails gradcheck at 0
