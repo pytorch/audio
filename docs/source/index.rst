@@ -21,7 +21,7 @@ Features described in this documentation are classified by release status:
   *Prototype:*  These features are typically not available as part of
   binary distributions like PyPI or Conda, except sometimes behind run-time
   flags, and are at an early stage for feedback and testing.
-  
+
 
 The :mod:`torchaudio` package consists of I/O, popular datasets and common audio transformations.
 
@@ -39,9 +39,9 @@ The :mod:`torchaudio` package consists of I/O, popular datasets and common audio
    compliance.kaldi
    kaldi_io
    utils
-   transducer
-   
-   
+   rnnt_loss
+
+
 .. toctree::
    :maxdepth: 1
    :caption: PyTorch Libraries
