@@ -4,10 +4,7 @@ import numpy as np
 import torch
 from torchaudio.prototype.rnnt_loss import RNNTLoss
 
-from .numpy_transducer import (
-    AlignmentRestrictionCheck,
-    NumpyTransducerLoss,
-)
+from .numpy_transducer import NumpyTransducerLoss
 
 
 def compute_with_numpy_transducer(data):
@@ -18,9 +15,6 @@ def compute_with_numpy_transducer(data):
         logit_lengths=data["logit_lengths"],
         target_lengths=data["target_lengths"],
         targets=data["targets"],
-        wordpiece_ends=data.get("wordpiece_ends", None),
-        left_buffer=data.get("left_buffer", 0),
-        right_buffer=data.get("right_buffer", 0),
     )
 
     loss = torch.sum(costs)
@@ -33,13 +27,8 @@ def compute_with_numpy_transducer(data):
 
 
 def compute_with_pytorch_transducer(data, reuse_logits_for_grads=False):
-    left_buffer = data.get("left_buffer", 0)
-    right_buffer = data.get("right_buffer", 0)
-
     costs = RNNTLoss(
         blank=data["blank"],
-        left_buffer=left_buffer,
-        right_buffer=right_buffer,
         fused_log_softmax=data.get("fused_log_softmax", True),
         reuse_logits_for_grads=reuse_logits_for_grads,
     )(
@@ -47,7 +36,6 @@ def compute_with_pytorch_transducer(data, reuse_logits_for_grads=False):
         logit_lengths=data["logit_lengths"],
         target_lengths=data["target_lengths"],
         targets=data["targets"],
-        wordpiece_ends=data.get("wordpiece_ends", None),
     )
 
     loss = torch.sum(costs)
@@ -95,8 +83,6 @@ def get_data_basic(device):
 
 def get_B1_T10_U3_D4_data(
     random=False,
-    left_buffer=0,
-    right_buffer=0,
     dtype=np.float32,
     nan=False,
 ):
@@ -112,7 +98,6 @@ def get_B1_T10_U3_D4_data(
     data["target_lengths"] = np.array([2, 2], dtype=np.int32)
     data["targets"] = np.array([[1, 2], [1, 2]], dtype=np.int32)
     data["blank"] = 0
-    data["wordpiece_ends"] = np.array([[0, 2, 7], [0, 2, 7]], dtype=np.int32)
 
     return data
 
@@ -425,8 +410,6 @@ def numpy_to_torch(data, device, requires_grad=True):
     logit_lengths = torch.from_numpy(data["logit_lengths"])
     target_lengths = torch.from_numpy(data["target_lengths"])
 
-    if "wordpiece_ends" in data:
-        data["wordpiece_ends"] = torch.from_numpy(data["wordpiece_ends"]).to(device=device)
     if "nbest_wers" in data:
         data["nbest_wers"] = torch.from_numpy(data["nbest_wers"]).to(device=device)
     if "nbest_scores" in data:

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <torchaudio/csrc/rnnt/cpu/alignment_restrictions.h>
 #include <torchaudio/csrc/rnnt/cpu/math.h>
 #include <torchaudio/csrc/rnnt/options.h>
 #include <torchaudio/csrc/rnnt/types.h>
@@ -188,67 +187,6 @@ DTYPE ComputeAlphaOneSequence(
 }
 
 template <typename DTYPE>
-DTYPE ComputeAlphaOneSequenceRestricted(
-    const Options& options,
-    TensorView<const LogProbs<DTYPE>>& logProbs,
-    int srcLen,
-    int tgtLen,
-    TensorView<DTYPE>& alpha,
-    const int* wpEnds) {
-  const int& T = srcLen;
-  const int& U = tgtLen;
-
-  const int& lBuffer = options.lBuffer_;
-  const int& r_buffer = options.rBuffer_;
-
-  AlignmentRestrictionCheck check(wpEnds, T, U, lBuffer, r_buffer);
-
-  for (int t = 0; t < T; t++) {
-    for (int u = 0; u < U; u++) {
-      alpha({t, u}) = DTYPE(-INFINITY);
-    }
-  }
-  alpha({0, 0}) = DTYPE(0);
-
-  for (int t = 1; t < T; ++t) { // u == 0.
-    if (!check.alphaBlankTransition(t, 0)) {
-      break;
-    }
-    alpha({t, 0}) = alpha({t - 1, 0}) + logProbs({t - 1, 0}).skip();
-  }
-
-  for (int u = 1; u < U; ++u) { // t == 0.
-    if (!check.alphaEmitTransition(0, u)) {
-      break;
-    }
-    alpha({0, u}) = alpha({0, u - 1}) + logProbs({0, u - 1}).emit();
-  }
-
-  for (int u = 1; u < U; ++u) {
-    int start_t = 0, end_t = 0;
-    check.validTimeRanges(u, start_t, end_t);
-    for (int t = start_t; t < end_t + 1; ++t) {
-      DTYPE skip = DTYPE(-INFINITY), emit = DTYPE(-INFINITY);
-
-      if (check.alphaBlankTransition(t, u)) {
-        skip = alpha({t - 1, u}) + logProbs({t - 1, u}).skip();
-      }
-
-      if (check.alphaEmitTransition(t, u)) {
-        emit = alpha({t, u - 1}) + logProbs({t, u - 1}).emit();
-      }
-
-      if (skip != DTYPE(-INFINITY) || emit != DTYPE(-INFINITY)) {
-        alpha({t, u}) = math::lse(skip, emit);
-      }
-    }
-  }
-  DTYPE forward_score = alpha({T - 1, U - 1}) + logProbs({T - 1, U - 1}).skip();
-
-  return forward_score;
-}
-
-template <typename DTYPE>
 DTYPE ComputeBetaOneSequence(
     const Options& options,
     TensorView<const LogProbs<DTYPE>>& logProbs,
@@ -282,64 +220,6 @@ DTYPE ComputeBetaOneSequence(
 }
 
 template <typename DTYPE>
-DTYPE ComputeBetaOneSequenceRestricted(
-    const Options& options,
-    TensorView<const LogProbs<DTYPE>>& logProbs,
-    int srcLen,
-    int tgtLen,
-    TensorView<DTYPE>& beta,
-    const int* wpEnds = nullptr) {
-  const int& T = srcLen;
-  const int& U = tgtLen;
-  const int& lBuffer = options.lBuffer_;
-  const int& r_buffer = options.rBuffer_;
-  AlignmentRestrictionCheck check(wpEnds, T, U, lBuffer, r_buffer);
-
-  for (int t = 0; t < T; t++) {
-    for (int u = 0; u < U; u++) {
-      beta({t, u}) = DTYPE(-INFINITY);
-    }
-  }
-
-  beta({T - 1, U - 1}) = logProbs({T - 1, U - 1}).skip();
-
-  for (int t = T - 2; t >= 0; --t) { // u == U - 1.
-    if (!check.betaBlankTransition(t, U - 1)) {
-      break;
-    }
-    beta({t, U - 1}) = beta({t + 1, U - 1}) + logProbs({t, U - 1}).skip();
-  }
-
-  for (int u = U - 2; u >= 0; --u) { // t == T - 1.
-    if (!check.betaEmitTransition(T - 1, u)) {
-      break;
-    }
-    beta({T - 1, u}) = beta({T - 1, u + 1}) + logProbs({T - 1, u}).emit();
-  }
-  for (int u = U - 2; u >= 0; --u) {
-    int start_t = 0, end_t = 0;
-    check.validTimeRanges(u, start_t, end_t);
-    for (int t = end_t; t >= start_t; --t) {
-      DTYPE skip = DTYPE(-INFINITY), emit = DTYPE(-INFINITY);
-      if (check.betaBlankTransition(t, u)) {
-        skip = beta({t + 1, u}) + logProbs({t, u}).skip();
-      }
-
-      if (check.betaEmitTransition(t, u)) {
-        emit = beta({t, u + 1}) + logProbs({t, u}).emit();
-      }
-
-      if (skip != DTYPE(-INFINITY) || emit != DTYPE(-INFINITY)) {
-        beta({t, u}) = math::lse(skip, emit);
-      }
-    }
-  }
-  DTYPE backward_score = beta({0, 0});
-
-  return backward_score;
-}
-
-template <typename DTYPE>
 DTYPE ComputeAlphaOrBetaOneSequence(
     int thread,
     const Options& options,
@@ -347,42 +227,21 @@ DTYPE ComputeAlphaOrBetaOneSequence(
     int srcLen,
     int tgtLen,
     TensorView<DTYPE>& alpha,
-    TensorView<DTYPE>& beta,
-    const int* wpEnds = nullptr) {
-  if (wpEnds == nullptr) {
-    if (thread & 1) {
-      return ComputeAlphaOneSequence<DTYPE>(
-          /*options=*/options,
-          /*logProbs=*/logProbs,
-          /*srcLen=*/srcLen,
-          /*tgtLen=*/tgtLen,
-          /*alpha=*/alpha);
-    } else {
-      return ComputeBetaOneSequence<DTYPE>(
-          /*options=*/options,
-          /*logProbs=*/logProbs,
-          /*srcLen=*/srcLen,
-          /*tgtLen=*/tgtLen,
-          /*beta=*/beta);
-    }
+    TensorView<DTYPE>& beta) {
+  if (thread & 1) {
+    return ComputeAlphaOneSequence<DTYPE>(
+        /*options=*/options,
+        /*logProbs=*/logProbs,
+        /*srcLen=*/srcLen,
+        /*tgtLen=*/tgtLen,
+        /*alpha=*/alpha);
   } else {
-    if (thread & 1) {
-      return ComputeAlphaOneSequenceRestricted<DTYPE>(
-          /*options=*/options,
-          /*logProbs=*/logProbs,
-          /*srcLen=*/srcLen,
-          /*tgtLen=*/tgtLen,
-          /*alpha=*/alpha,
-          /*wpEnds=*/wpEnds);
-    } else {
-      return ComputeBetaOneSequenceRestricted<DTYPE>(
-          /*options=*/options,
-          /*logProbs=*/logProbs,
-          /*srcLen=*/srcLen,
-          /*tgtLen=*/tgtLen,
-          /*beta=*/beta,
-          /*wpEnds=*/wpEnds);
-    }
+    return ComputeBetaOneSequence<DTYPE>(
+        /*options=*/options,
+        /*logProbs=*/logProbs,
+        /*srcLen=*/srcLen,
+        /*tgtLen=*/tgtLen,
+        /*beta=*/beta);
   }
 }
 
@@ -394,12 +253,10 @@ void ComputeAlphasBetas(
     const int* tgtLengths,
     CAST_DTYPE* alphas,
     CAST_DTYPE* betas,
-    DTYPE* costs,
-    const int* wpEnds = nullptr) {
+    DTYPE* costs) {
   std::vector<TensorView<const LogProbs<CAST_DTYPE>>> seqlogProbs;
   std::vector<TensorView<CAST_DTYPE>> seq_alphas;
   std::vector<TensorView<CAST_DTYPE>> seq_betas;
-  std::vector<const int*> seq_wpEnds;
 
   const int& B = options.batchSize_;
   const int& maxT = options.maxSrcLen_;
@@ -415,10 +272,6 @@ void ComputeAlphasBetas(
         TensorView<CAST_DTYPE>({maxT, maxU}, alphas + b * maxT * maxU));
     seq_betas.push_back(
         TensorView<CAST_DTYPE>({maxT, maxU}, betas + b * maxT * maxU));
-
-    if (wpEnds != nullptr) {
-      seq_wpEnds.push_back(wpEnds + b * (maxU));
-    }
   }
 
   std::vector<CAST_DTYPE> scores(B << 1);
@@ -432,8 +285,7 @@ void ComputeAlphasBetas(
         /*srcLen=*/srcLengths[i],
         /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.
         /*alpha=*/seq_alphas[i],
-        /*beta=*/seq_betas[i],
-        /*wpEnds=*/(wpEnds == nullptr) ? nullptr : seq_wpEnds[i]);
+        /*beta=*/seq_betas[i]);
   }
   for (int b = 0; b < B; ++b) {
     costs[b] = -scores[b << 1];
@@ -575,11 +427,9 @@ void ComputeAlphas(
     const CAST_DTYPE* logProbs,
     const int* srcLengths,
     const int* tgtLengths,
-    CAST_DTYPE* alphas,
-    const int* wpEnds = nullptr) {
+    CAST_DTYPE* alphas) {
   std::vector<TensorView<const LogProbs<CAST_DTYPE>>> seqlogProbs;
   std::vector<TensorView<CAST_DTYPE>> seq_alphas;
-  std::vector<const int*> seq_wpEnds;
 
   const int& B = options.batchSize_;
   const int& maxT = options.maxSrcLen_;
@@ -593,30 +443,17 @@ void ComputeAlphas(
             b * maxT * maxU));
     seq_alphas.push_back(
         TensorView<CAST_DTYPE>({maxT, maxU}, alphas + b * maxT * maxU));
-    if (wpEnds != nullptr) {
-      seq_wpEnds.push_back(wpEnds + b * (maxU));
-    }
   }
 
   std::vector<CAST_DTYPE> scores(B << 1);
   //#pragma omp parallel for
   for (int i = 0; i < B; ++i) { // use max 2 * B threads.
-    if (wpEnds == nullptr) {
-      ComputeAlphaOneSequence<DTYPE>(
-          options,
-          /*logProbs=*/seqlogProbs[i],
-          /*srcLen=*/srcLengths[i],
-          /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.
-          /*alpha=*/seq_alphas[i]);
-    } else {
-      ComputeAlphaOneSequenceRestricted<DTYPE>(
-          /*options=*/options,
-          /*logProbs=*/seqlogProbs[i],
-          /*srcLen=*/srcLengths[i],
-          /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.
-          /*alpha=*/seq_alphas[i],
-          /*wpEnds=*/seq_wpEnds[i]);
-    }
+    ComputeAlphaOneSequence<DTYPE>(
+        options,
+        /*logProbs=*/seqlogProbs[i],
+        /*srcLen=*/srcLengths[i],
+        /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.
+        /*alpha=*/seq_alphas[i]);
   }
 }
 
@@ -627,11 +464,9 @@ void ComputeBetas(
     const int* srcLengths,
     const int* tgtLengths,
     CAST_DTYPE* costs,
-    CAST_DTYPE* betas,
-    const int* wpEnds = nullptr) {
+    CAST_DTYPE* betas) {
   std::vector<TensorView<const LogProbs<CAST_DTYPE>>> seqlogProbs;
   std::vector<TensorView<CAST_DTYPE>> seq_betas;
-  std::vector<const int*> seq_wpEnds;
 
   const int& B = options.batchSize_;
   const int& maxT = options.maxSrcLen_;
@@ -645,30 +480,17 @@ void ComputeBetas(
             b * maxT * maxU));
     seq_betas.push_back(
         TensorView<CAST_DTYPE>({maxT, maxU}, betas + b * maxT * maxU));
-    if (wpEnds != nullptr) {
-      seq_wpEnds.push_back(wpEnds + b * (maxU));
-    }
   }
 
   std::vector<CAST_DTYPE> scores(B << 1);
   //#pragma omp parallel for
   for (int i = 0; i < B; ++i) { // use max 2 * B threads.
-    if (wpEnds == nullptr) {
-      ComputeBetaOneSequence<DTYPE>(
-          options,
-          /*logProbs=*/seqlogProbs[i],
-          /*srcLen=*/srcLengths[i],
-          /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.
-          /*betas=*/seq_betas[i]);
-    } else {
-      ComputeBetaOneSequenceRestricted<DTYPE>(
-          /*options=*/options,
-          /*logProbs=*/seqlogProbs[i],
-          /*srcLen=*/srcLengths[i],
-          /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.
-          /*betas=*/seq_betas[i],
-          /*wpEnds=*/seq_wpEnds[i]);
-    }
+    ComputeBetaOneSequence<DTYPE>(
+        options,
+        /*logProbs=*/seqlogProbs[i],
+        /*srcLen=*/srcLengths[i],
+        /*tgtLen=*/tgtLengths[i] + 1, // with prepended blank.
+        /*betas=*/seq_betas[i]);
   }
 }
 

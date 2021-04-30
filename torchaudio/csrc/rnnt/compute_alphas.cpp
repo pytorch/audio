@@ -6,8 +6,5 @@ TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
                            "Tensor src_lengths,"
                            "Tensor tgt_lengths,"
                            "int blank,"
-                           "float clamp,"
-                           "Tensor? wp_ends=None,"
-                           "int l_buffer=0,"
-                           "int r_buffer=0) -> Tensor");
+                           "float clamp) -> Tensor");
 }

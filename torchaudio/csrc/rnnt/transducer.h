@@ -14,8 +14,7 @@ status_t Compute(
     const int* srcLengths,
     const int* tgtLengths,
     DTYPE* costs,
-    DTYPE* gradients = nullptr,
-    const int* wp_ends=nullptr) {
+    DTYPE* gradients = nullptr) {
   switch (workspace.GetOptions().device_) {
     case CPU: {
       status_t status = cpu::Compute<DTYPE, CAST_DTYPE>(
@@ -25,8 +24,7 @@ status_t Compute(
           /*srcLengths=*/srcLengths,
           /*tgtLengths=*/tgtLengths,
           /*costs=*/costs,
-          /*gradients=*/gradients,
-          /*wp_ends =*/wp_ends);
+          /*gradients=*/gradients);
       return status;
     }
     case GPU: {
@@ -37,8 +35,7 @@ status_t Compute(
           /*srcLengths=*/srcLengths,
           /*tgtLengths=*/tgtLengths,
           /*costs=*/costs,
-          /*gradients=*/gradients,
-          /*wp_ends =*/wp_ends);
+          /*gradients=*/gradients);
       return status;
     }
     default: {
@@ -56,8 +53,7 @@ status_t ComputeAlphas(
     const int* targets,
     const int* srcLengths,
     const int* tgtLengths,
-    DTYPE* alphas,
-    const int* wp_ends=nullptr) {
+    DTYPE* alphas) {
   switch (workspace.GetOptions().device_) {
     case CPU: {
       status_t status = cpu::ComputeAlphas<DTYPE, CAST_DTYPE>(
@@ -66,8 +62,7 @@ status_t ComputeAlphas(
           /*targets=*/targets,
           /*srcLengths=*/srcLengths,
           /*tgtLengths=*/tgtLengths,
-          /*alphas=*/alphas,
-          /*wp_ends =*/wp_ends);
+          /*alphas=*/alphas);
       return status;
     }
     case GPU: {
@@ -77,8 +72,7 @@ status_t ComputeAlphas(
           /*targets=*/targets,
           /*srcLengths=*/srcLengths,
           /*tgtLengths=*/tgtLengths,
-          /*costs=*/alphas,
-          /*wp_ends =*/wp_ends);
+          /*costs=*/alphas);
       return status;
     }
     default: {
@@ -97,8 +91,7 @@ status_t ComputeBetas(
     const int* srcLengths,
     const int* tgtLengths,
     DTYPE* costs,
-    DTYPE* betas,
-    const int* wp_ends=nullptr) {
+    DTYPE* betas) {
   switch (workspace.GetOptions().device_) {
     case CPU: {
       status_t status = cpu::ComputeBetas<DTYPE, CAST_DTYPE>(
@@ -108,8 +101,7 @@ status_t ComputeBetas(
           /*srcLengths=*/srcLengths,
           /*tgtLengths=*/tgtLengths,
           /*costs=*/costs,
-          /*betas=*/betas,
-          /*wp_ends =*/wp_ends);
+          /*betas=*/betas);
       return status;
     }
     case GPU: {
@@ -120,8 +112,7 @@ status_t ComputeBetas(
           /*srcLengths=*/srcLengths,
           /*tgtLengths=*/tgtLengths,
           /*costs=*/costs,
-          /*betas=*/betas,
-          /*wp_ends =*/wp_ends);
+          /*betas=*/betas);
       return status;
     }
     default: {

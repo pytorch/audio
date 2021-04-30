@@ -12,10 +12,7 @@ torch::Tensor compute_betas(
     const torch::Tensor& src_lengths,
     const torch::Tensor& tgt_lengths,
     int64_t blank,
-    double clamp,
-    const c10::optional<torch::Tensor>& wp_ends = c10::nullopt,
-    int64_t l_buffer = 0,
-    int64_t r_buffer = 0) {
+    double clamp) {
   Options options;
   options.batchSize_ = src_lengths.size(0);
   options.nHypos_ = tgt_lengths.size(0) / src_lengths.size(0);
@@ -24,8 +21,6 @@ torch::Tensor compute_betas(
   options.numTargets_ = logits.size(3);
   options.blank_ = blank;
   options.clamp_ = clamp;
-  options.lBuffer_ = l_buffer;
-  options.rBuffer_ = r_buffer;
 
   CHECK_EQ(logits.device().type(), torch::DeviceType::CUDA);
   options.stream_ = at::cuda::getCurrentCUDAStream();
@@ -70,8 +65,7 @@ torch::Tensor compute_betas(
       /*src_lengths=*/src_lengths.data<int>(),
       /*tgt_lengths=*/tgt_lengths.data<int>(),
       /*costs=*/costs.data<float>(),
-      /*betas=*/betas.data<float>(),
-      /*wp_ends=*/(wp_ends == c10::nullopt) ? nullptr : wp_ends->data<int>());
+      /*betas=*/betas.data<float>());
   return betas;
 }
 

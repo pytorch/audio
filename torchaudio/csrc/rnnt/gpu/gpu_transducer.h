@@ -4,7 +4,6 @@
 
 #include <torchaudio/csrc/rnnt/gpu/gpu_kernel_utils.cuh>
 #include <torchaudio/csrc/rnnt/gpu/gpu_kernels.cuh>
-#include <torchaudio/csrc/rnnt/gpu/gpu_alignment_restrictions.cuh>
 #include <torchaudio/csrc/rnnt/workspace.h>
 
 namespace torchaudio {
@@ -88,8 +87,7 @@ status_t Compute(
     const int* srcLengths,
     const int* tgtLengths,
     DTYPE* costs,
-    DTYPE* gradients = nullptr,
-    const int* wpEnds = nullptr) {
+    DTYPE* gradients = nullptr) {
   const Options& options = workspace.GetOptions();
 
   const cudaStream_t& stream = options.stream_;
@@ -101,8 +99,6 @@ status_t Compute(
   const int& blank = options.blank_;
   const CAST_DTYPE clamp = options.clamp_;
 
-  const int& l_buffer = options.lBuffer_;
-  const int& r_buffer = options.rBuffer_;
   const bool& fusedLogSmax = options.fusedLogSmax_;
 
   { // compute denominators.
@@ -170,9 +166,6 @@ status_t Compute(
             /*beta_counters=*/workspace.GetPointerToBetaCounters(),
             /*betas=*/workspace.GetPointerToBetas(),
             /*costs=*/costs,
-            /*wpEnds=*/wpEnds,
-            /*l_buffer=*/l_buffer,
-            /*r_buffer=*/r_buffer,
             /*warp_size=*/WARP_SIZE,
             /*num_warps=*/num_warps,
             H);
@@ -221,8 +214,7 @@ status_t ComputeAlphas(
     const int* targets,
     const int* srcLengths,
     const int* tgtLengths,
-    DTYPE* alphas,
-    const int* wpEnds = nullptr) {
+    DTYPE* alphas) {
   const Options& options = workspace.GetOptions();
 
   const cudaStream_t& stream = options.stream_;
@@ -232,9 +224,6 @@ status_t ComputeAlphas(
   const int& max_U = options.maxTgtLen_;
   const int& D = options.numTargets_;
   const int& blank = options.blank_;
-
-  const int& l_buffer = options.lBuffer_;
-  const int& r_buffer = options.rBuffer_;
 
   { // compute denominators.
     status_t status = LogSumExp2D<DTYPE, CAST_DTYPE>(
@@ -285,39 +274,20 @@ status_t ComputeAlphas(
     // 2nd dim is 1 for alpha only
     dim3 thread_dims(WARP_SIZE, 1);
 
-    if (wpEnds == nullptr) {
-      ComputeAlphasWrapper<DTYPE, CAST_DTYPE>
-          <<<block_dims, thread_dims, 0, stream>>>(
-              /*max_src_len=*/max_T,
-              /*max_tgt_len=*/max_U,
-              /*num_targets=*/D,
-              /*blank=*/blank,
-              /*log_probs=*/workspace.GetPointerToLogProbs(),
-              /*srcLengths=*/srcLengths,
-              /*tgtLengths=*/tgtLengths,
-              /*alpha_counters=*/workspace.GetPointerToAlphaCounters(),
-              /*alphas=*/(volatile DTYPE*)alphas,
-              H);
-    } else {
-      // cudaMemset(alphas, 0, B * max_T * max_U * sizeof(DTYPE));
-      ComputeAlphasRestrictedWrapper<DTYPE, CAST_DTYPE>
-          <<<block_dims, thread_dims, 0, stream>>>(
-              max_T,
-              max_U,
-              D,
-              blank,
-              workspace.GetPointerToLogProbs(),
-              srcLengths,
-              tgtLengths,
-              workspace.GetPointerToAlphaCounters(),
-              // workspace.GetPointerToAlphas(),
-              (volatile DTYPE*)alphas,
-              wpEnds,
-              l_buffer,
-              r_buffer,
-              WARP_SIZE,
-              H);
-    }
+
+    ComputeAlphasWrapper<DTYPE, CAST_DTYPE>
+        <<<block_dims, thread_dims, 0, stream>>>(
+            /*max_src_len=*/max_T,
+            /*max_tgt_len=*/max_U,
+            /*num_targets=*/D,
+            /*blank=*/blank,
+            /*log_probs=*/workspace.GetPointerToLogProbs(),
+            /*srcLengths=*/srcLengths,
+            /*tgtLengths=*/tgtLengths,
+            /*alpha_counters=*/workspace.GetPointerToAlphaCounters(),
+            /*alphas=*/(volatile DTYPE*)alphas,
+            H);
+
     if (cudaGetLastError() != cudaSuccess) {
       return COMPUTE_ALPHAS_BETAS_COSTS_FAILED;
     }
@@ -334,8 +304,7 @@ status_t ComputeBetas(
     const int* srcLengths,
     const int* tgtLengths,
     DTYPE* costs,
-    DTYPE* betas,
-    const int* wpEnds = nullptr) {
+    DTYPE* betas) {
   const Options& options = workspace.GetOptions();
 
   const cudaStream_t& stream = options.stream_;
@@ -345,9 +314,6 @@ status_t ComputeBetas(
   const int& max_U = options.maxTgtLen_;
   const int& D = options.numTargets_;
   const int& blank = options.blank_;
-
-  const int& l_buffer = options.lBuffer_;
-  const int& r_buffer = options.rBuffer_;
 
   { // compute denominators.
     status_t status = LogSumExp2D<DTYPE, CAST_DTYPE>(
@@ -398,41 +364,20 @@ status_t ComputeBetas(
     // 2nd dim is 1 for betas only
     dim3 thread_dims(WARP_SIZE, 1);
 
-    if (wpEnds == nullptr) {
-      ComputeBetasWrapper<DTYPE, CAST_DTYPE>
-          <<<block_dims, thread_dims, 0, stream>>>(
-              /*max_src_len=*/max_T,
-              /*max_tgt_len=*/max_U,
-              /*num_targets=*/D,
-              /*blank=*/blank,
-              /*log_probs=*/workspace.GetPointerToLogProbs(),
-              /*srcLengths=*/srcLengths,
-              /*tgtLengths=*/tgtLengths,
-              /*alpha_counters=*/workspace.GetPointerToBetaCounters(),
-              /*alphas=*/(volatile DTYPE*)betas,
-              costs,
-              H);
-    } else {
-      ComputeBetasCostsRestrictedWrapper<DTYPE, CAST_DTYPE>
-          <<<block_dims, thread_dims, 0, stream>>>(
-              max_T,
-              max_U,
-              D,
-              blank,
-              workspace.GetPointerToLogProbs(),
-              srcLengths,
-              tgtLengths,
-              workspace.GetPointerToBetaCounters(),
-              costs,
-              (volatile DTYPE*)betas,
-              wpEnds,
-              l_buffer,
-              r_buffer,
-              WARP_SIZE,
-              num_warps,
-              H);
-      cudaDeviceSynchronize();
-    }
+    ComputeBetasWrapper<DTYPE, CAST_DTYPE>
+        <<<block_dims, thread_dims, 0, stream>>>(
+            /*max_src_len=*/max_T,
+            /*max_tgt_len=*/max_U,
+            /*num_targets=*/D,
+            /*blank=*/blank,
+            /*log_probs=*/workspace.GetPointerToLogProbs(),
+            /*srcLengths=*/srcLengths,
+            /*tgtLengths=*/tgtLengths,
+            /*alpha_counters=*/workspace.GetPointerToBetaCounters(),
+            /*alphas=*/(volatile DTYPE*)betas,
+            costs,
+            H);
+
     if (cudaGetLastError() != cudaSuccess) {
       return COMPUTE_ALPHAS_BETAS_COSTS_FAILED;
     }

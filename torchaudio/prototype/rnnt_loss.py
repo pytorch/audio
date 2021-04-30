@@ -13,9 +13,6 @@ def _rnnt_loss_alphas(
     target_lengths,
     blank=-1,
     clamp=-1,
-    wordpiece_ends=None,
-    left_buffer=0,
-    right_buffer=0,
 ):
     """
     Compute alphas for RNN transducer loss.
@@ -25,8 +22,6 @@ def _rnnt_loss_alphas(
     targets = targets.to(device=logits.device)
     logit_lengths = logit_lengths.to(device=logits.device)
     target_lengths = target_lengths.to(device=logits.device)
-    if wordpiece_ends is not None:
-        wordpiece_ends = wordpiece_ends.to(device=logits.device)
 
     # make sure all int tensors are of type int32.
     targets = targets.int()
@@ -40,9 +35,6 @@ def _rnnt_loss_alphas(
         target_lengths,
         blank,
         clamp,
-        wordpiece_ends,
-        left_buffer,
-        right_buffer,
     )
 
 
@@ -53,9 +45,6 @@ def _rnnt_loss_betas(
     target_lengths,
     blank=-1,
     clamp=-1,
-    wordpiece_ends=None,
-    left_buffer=0,
-    right_buffer=0,
 ):
     """
     Compute betas for RNN transducer loss
@@ -65,8 +54,6 @@ def _rnnt_loss_betas(
     targets = targets.to(device=logits.device)
     logit_lengths = logit_lengths.to(device=logits.device)
     target_lengths = target_lengths.to(device=logits.device)
-    if wordpiece_ends is not None:
-        wordpiece_ends = wordpiece_ends.to(device=logits.device)
 
     # make sure all int tensors are of type int32.
     targets = targets.int()
@@ -80,9 +67,6 @@ def _rnnt_loss_betas(
         target_lengths,
         blank,
         clamp,
-        wordpiece_ends,
-        left_buffer,
-        right_buffer,
     )
 
 
@@ -97,9 +81,6 @@ class _RNNT(torch.autograd.Function):
         blank=-1,
         clamp=-1,
         runtime_check=False,
-        wordpiece_ends=None,
-        left_buffer=0,
-        right_buffer=0,
         fused_log_softmax=True,
         reuse_logits_for_grads=True,
     ):
@@ -111,8 +92,6 @@ class _RNNT(torch.autograd.Function):
         targets = targets.to(device=logits.device)
         logit_lengths = logit_lengths.to(device=logits.device)
         target_lengths = target_lengths.to(device=logits.device)
-        if wordpiece_ends is not None:
-            wordpiece_ends = wordpiece_ends.to(device=logits.device)
 
         # make sure all int tensors are of type int32.
         targets = targets.int()
@@ -138,9 +117,6 @@ class _RNNT(torch.autograd.Function):
             tgt_lengths=target_lengths,
             blank=blank,
             clamp=clamp,
-            wp_ends=wordpiece_ends,
-            l_buffer=left_buffer,
-            r_buffer=right_buffer,
             fused_log_smax=fused_log_softmax,
             reuse_logits_for_grads=reuse_logits_for_grads,
         )
@@ -162,9 +138,6 @@ class _RNNT(torch.autograd.Function):
             None,  # blank
             None,  # clamp
             None,  # runtime_check
-            None,  # wordpiece_ends
-            None,  # left_buffer
-            None,  # right_buffer
             None,  # fused_log_softmax
             None,  # reuse_logits_for_grads
         )
@@ -178,9 +151,6 @@ def rnnt_loss(
     blank=-1,
     clamp=-1,
     runtime_check=False,
-    wordpiece_ends=None,
-    left_buffer=0,
-    right_buffer=0,
     fused_log_softmax=True,
     reuse_logits_for_grads=True,
 ):
@@ -199,12 +169,6 @@ def rnnt_loss(
         blank (int, opt): blank label (Default: ``-1``)
         clamp (float): clamp for gradients (Default: ``-1``)
         runtime_check (bool): whether to do sanity check during runtime. (Default: ``False``)
-        wordpiece_ends (Tensor): Tensor of dimension (batch, target) containing the end frames of targets
-            for each sequence (including bos end_frame = 0) (Default: ``None``)
-        left_buffer (int): left buffer frames used for alignment restricted RNNT loss.
-            Loss will not be imposed on frames smaller than wordpiece_end - left_buffer. (Default: ``0``)
-        right_buffer (int): right buffer frames used for alignment restricted RNNT loss.
-            Loss will not be imposed on frames greater than wordpiece_end + right_buffer. (Default: ``0``)
         fused_log_smax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
         reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)
     """
@@ -222,9 +186,6 @@ def rnnt_loss(
         blank,
         clamp,
         runtime_check,
-        wordpiece_ends,
-        left_buffer,
-        right_buffer,
         fused_log_softmax,
         reuse_logits_for_grads,
     )
@@ -243,10 +204,6 @@ class RNNTLoss(torch.nn.Module):
         blank (int, opt): blank label (Default: ``-1``)
         clamp (float): clamp for gradients (Default: ``-1``)
         runtime_check (bool): whether to do sanity check during runtime. (Default: ``False``)
-        left_buffer (int): left buffer frames used for alignment restricted RNNT loss.
-            Loss will not be imposed on frames smaller than wordpiece_end - left_buffer. (Default: ``0``)
-        right_buffer (int): right buffer frames used for alignment restricted RNNT loss.
-            Loss will not be imposed on frames greater than wordpiece_end + right_buffer. (Default: ``0``)
         fused_log_smax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
         reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)
     """
@@ -256,8 +213,6 @@ class RNNTLoss(torch.nn.Module):
         blank=-1,
         clamp=-1,
         runtime_check=False,
-        left_buffer=0,
-        right_buffer=0,
         fused_log_softmax=True,
         reuse_logits_for_grads=True,
     ):
@@ -265,8 +220,6 @@ class RNNTLoss(torch.nn.Module):
         self.blank = blank
         self.clamp = clamp
         self.runtime_check = runtime_check
-        self.left_buffer = left_buffer
-        self.right_buffer = right_buffer
         self.fused_log_softmax = fused_log_softmax
         self.reuse_logits_for_grads = reuse_logits_for_grads
 
@@ -276,9 +229,6 @@ class RNNTLoss(torch.nn.Module):
         targets,
         logit_lengths,
         target_lengths,
-        wordpiece_ends=None,
-        left_buffer=None,
-        right_buffer=None,
     ):
         """
         Args:
@@ -286,22 +236,7 @@ class RNNTLoss(torch.nn.Module):
             targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
             logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
             target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
-            wordpiece_ends (Tensor): Tensor of dimension (batch, target) containing the end frames of targets
-                for each sequence (including bos end_frame = 0) (Default: ``None``)
-            left_buffer (int): left buffer frames used for alignment restricted RNNT loss.
-                Loss will not be imposed on frames smaller than wordpiece_end - left_buffer. (Default: ``None``)
-            right_buffer (int): right buffer frames used for alignment restricted RNNT loss.
-                Loss will not be imposed on frames greater than wordpiece_end + right_buffer. (Default: ``None``)
         """
-        # left_buffer / right_buffer is passed in forward,
-        # when we use dataset or sample specific left/right buffer
-        # self.left_buffer / right_buffer is used by default, or
-        # to preserve backward compatibility
-        if left_buffer is None:
-            left_buffer = self.left_buffer
-        if right_buffer is None:
-            right_buffer = self.right_buffer
-
         return rnnt_loss(
             logits,
             targets,
@@ -310,9 +245,6 @@ class RNNTLoss(torch.nn.Module):
             self.blank,
             self.clamp,
             self.runtime_check,
-            wordpiece_ends,
-            left_buffer,
-            right_buffer,
             self.fused_log_softmax,
             self.reuse_logits_for_grads,
         )

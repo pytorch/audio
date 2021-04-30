@@ -5,8 +5,8 @@
 #include <cassert>
 
 #include <torchaudio/csrc/rnnt/gpu/math.cuh>
+#include <torchaudio/csrc/rnnt/gpu/kernels.h>
 #include <torchaudio/csrc/rnnt/gpu/kernel_utils.h>
-#include <torchaudio/csrc/rnnt/gpu/gpu_alignment_restrictions.cuh>
 
 namespace torchaudio {
 namespace rnnt {
@@ -285,9 +285,6 @@ __global__ void ComputeAlphasBetasCosts(
     int* betaCounters,
     volatile CAST_DTYPE* betas,
     DTYPE* costs,
-    const int* wpEnds=nullptr,
-    int lBuffer = 0,
-    int rBuffer = 0,
     int warpSize = 0,
     int numWarps=0,
     int H = 1) {
@@ -295,7 +292,7 @@ __global__ void ComputeAlphasBetasCosts(
   assert(threadIdx.y == 0 || threadIdx.y == 1);
 
   if (threadIdx.y == 0) {
-    if (wpEnds == nullptr) {
+
     ComputeAlphas<DTYPE, CAST_DTYPE>(
         /*maxSrcLen=*/maxSrcLen,
         /*maxTgtLen=*/maxTgtLen,
@@ -307,26 +304,7 @@ __global__ void ComputeAlphasBetasCosts(
         /*alpha_counters=*/alpha_counters,
         /*alphas=*/alphas,
         H);
-      }
-      else {
-        ComputeAlphasRestricted<DTYPE, CAST_DTYPE>(
-        /*maxSrcLen=*/maxSrcLen,
-        /*maxTgtLen=*/maxTgtLen,
-        /*numTargets=*/numTargets,
-        /*blank=*/blank,
-        /*logProbs=*/logProbs,
-        /*srcLengths=*/srcLengths,
-        /*tgtLengths=*/tgtLengths,
-        /*alpha_counters=*/alpha_counters,
-        /*alphas=*/(CAST_DTYPE*)alphas,
-        /*wpEnds=*/wpEnds,
-        /*lBuffer=*/lBuffer,
-        /*rBuffer=*/rBuffer,
-        /*warpSize=*/warpSize,
-        H);
-      }
   } else {  // threadIdx.y == 1
-  if (wpEnds == nullptr) {
     ComputeBetasCosts<DTYPE, CAST_DTYPE>(
         /*maxSrcLen=*/maxSrcLen,
         /*maxTgtLen=*/maxTgtLen,
@@ -339,26 +317,6 @@ __global__ void ComputeAlphasBetasCosts(
         /*beta=*/betas,
         /*costs=*/costs,
         H);
-    } else {
-    ComputeBetasCostsRestricted<DTYPE, CAST_DTYPE>(
-        maxSrcLen,
-        maxTgtLen,
-        numTargets,
-        blank,
-        logProbs,
-        srcLengths,
-        tgtLengths,
-        betaCounters,
-        costs,
-        betas,
-        wpEnds,
-        lBuffer,
-        rBuffer,
-        warpSize,
-        numWarps,
-        H);
-    }
-
   }
 }
 

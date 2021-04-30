@@ -29,12 +29,6 @@ typedef struct Options {
   // gradient clamp value.
   float clamp_;
 
-  // alignment restricted loss l buffer
-  int lBuffer_;
-
-  // alignment restricted loss r buffer
-  int rBuffer_;
-
   // batch size = B.
   int batchSize_;
 
@@ -60,8 +54,6 @@ typedef struct Options {
         blank_(-1),
         backtrack_(false),
         clamp_(-1), // negative for disabling clamping by default.
-        lBuffer_(0),
-        rBuffer_(0),
         batchSize_(0),
         nHypos_(1),
         maxSrcLen_(0),

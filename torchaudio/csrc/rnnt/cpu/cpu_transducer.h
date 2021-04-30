@@ -25,8 +25,7 @@ status_t Compute(
     const int* srcLengths,
     const int* tgtLengths,
     DTYPE* costs,
-    DTYPE* gradients = nullptr,
-    const int* wpEnds = nullptr) {
+    DTYPE* gradients = nullptr) {
   const Options& options = workspace.GetOptions();
 
   CHECK_EQ(options.device_, CPU);
@@ -63,8 +62,7 @@ status_t Compute(
         /*tgtLengths=*/tgtLengths,
         /*alphas=*/workspace.GetPointerToAlphas(),
         /*betas=*/workspace.GetPointerToBetas(),
-        /*costs=*/costs,
-        /*wpEnds=*/wpEnds);
+        /*costs=*/costs);
   }
 
   if (gradients != nullptr) {
@@ -90,8 +88,7 @@ status_t ComputeAlphas(
     const int* targets,
     const int* srcLengths,
     const int* tgtLengths,
-    DTYPE* alphas,
-    const int* wpEnds = nullptr) {
+    DTYPE* alphas) {
   const Options& options = workspace.GetOptions();
 
   CHECK_EQ(options.device_, CPU);
@@ -126,8 +123,7 @@ status_t ComputeAlphas(
         /*log_probs=*/workspace.GetPointerToLogProbs(),
         /*srcLengths=*/srcLengths,
         /*tgtLengths=*/tgtLengths,
-        /*alphas=*/alphas,
-        /*wpEnds=*/wpEnds);
+        /*alphas=*/alphas);
   }
 
   return SUCCESS;
@@ -143,8 +139,7 @@ status_t ComputeBetas(
     const int* srcLengths,
     const int* tgtLengths,
     DTYPE* costs,
-    DTYPE* betas,
-    const int* wpEnds = nullptr) {
+    DTYPE* betas) {
   const Options& options = workspace.GetOptions();
 
   CHECK_EQ(options.device_, CPU);
@@ -180,8 +175,7 @@ status_t ComputeBetas(
         /*srcLengths=*/srcLengths,
         /*tgtLengths=*/tgtLengths,
         /*costs=*/costs,
-        /*betas=*/betas,
-        /*wpEnds=*/wpEnds);
+        /*betas=*/betas);
   }
 
   return SUCCESS;

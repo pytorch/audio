@@ -13,9 +13,6 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
     const torch::Tensor& tgt_lengths,
     int64_t blank,
     double clamp,
-    const c10::optional<torch::Tensor>& wp_ends = c10::nullopt,
-    int64_t l_buffer = 0,
-    int64_t r_buffer = 0,
     bool fused_log_smax = true,
     bool reuse_logits_for_grads = true) {
 
@@ -27,8 +24,6 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
   options.numTargets_ = logits.size(3);
   options.blank_ = blank;
   options.clamp_ = clamp;
-  options.lBuffer_ = l_buffer;
-  options.rBuffer_ = r_buffer;
   options.fusedLogSmax_ = fused_log_smax;
 
   CHECK_EQ(logits.device().type(), torch::DeviceType::CPU);
@@ -71,8 +66,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
             /*src_lengths=*/src_lengths.data<int>(),
             /*tgt_lengths=*/tgt_lengths.data<int>(),
             /*costs=*/costs.data<float>(),
-            /*gradients=*/(gradients == c10::nullopt)? nullptr : gradients->data<float>(),
-            /*wp_ends=*/(wp_ends == c10::nullopt)? nullptr : wp_ends->data<int>());
+            /*gradients=*/(gradients == c10::nullopt)? nullptr : gradients->data<float>());
         break;
       }
     case torch::ScalarType::Half:
@@ -84,8 +78,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
             /*src_lengths=*/src_lengths.data<int>(),
             /*tgt_lengths=*/tgt_lengths.data<int>(),
             /*costs=*/costs.data<c10::Half>(),
-            /*gradients=*/(gradients == c10::nullopt)? nullptr : gradients->data<c10::Half>(),
-            /*wp_ends=*/(wp_ends == c10::nullopt)? nullptr : wp_ends->data<int>());
+            /*gradients=*/(gradients == c10::nullopt)? nullptr : gradients->data<c10::Half>());
         break;
       }
     default:
