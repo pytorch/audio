@@ -2,9 +2,9 @@
 
 #ifdef USE_CUDA
 
+#include <torchaudio/csrc/rnnt/workspace.h>
 #include <torchaudio/csrc/rnnt/gpu/gpu_kernel_utils.cuh>
 #include <torchaudio/csrc/rnnt/gpu/gpu_kernels.cuh>
-#include <torchaudio/csrc/rnnt/workspace.h>
 
 namespace torchaudio {
 namespace rnnt {
@@ -13,8 +13,11 @@ namespace gpu {
 #define gpuErrchk(ans) \
   { gpuAssert((ans), __FILE__, __LINE__); }
 
-inline void
-gpuAssert(cudaError_t code, const char* file, int line, bool abort = true) {
+inline void gpuAssert(
+    cudaError_t code,
+    const char* file,
+    int line,
+    bool abort = true) {
   if (code != cudaSuccess) {
     fprintf(
         stderr,
@@ -273,7 +276,6 @@ status_t ComputeAlphas(
     // each thread is identified by a 2 d tuple
     // 2nd dim is 1 for alpha only
     dim3 thread_dims(WARP_SIZE, 1);
-
 
     ComputeAlphasWrapper<DTYPE, CAST_DTYPE>
         <<<block_dims, thread_dims, 0, stream>>>(

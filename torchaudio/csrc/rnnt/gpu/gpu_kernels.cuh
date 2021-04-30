@@ -4,13 +4,12 @@
 
 #include <cassert>
 
-#include <torchaudio/csrc/rnnt/gpu/math.cuh>
-#include <torchaudio/csrc/rnnt/gpu/kernels.h>
 #include <torchaudio/csrc/rnnt/gpu/kernel_utils.h>
+#include <torchaudio/csrc/rnnt/gpu/kernels.h>
+#include <torchaudio/csrc/rnnt/gpu/math.cuh>
 
 namespace torchaudio {
 namespace rnnt {
-
 
 template <typename DTYPE, typename CAST_DTYPE>
 __global__ void ComputeLogProbs(
@@ -24,14 +23,13 @@ __global__ void ComputeLogProbs(
     const int* tgtLengths,
     const CAST_DTYPE* denominators,
     CAST_DTYPE* logProbs,
-    int H=1,
-    bool fusedLogSmax=true) {
-
+    int H = 1,
+    bool fusedLogSmax = true) {
   const int& maxT = maxSrcLen;
   const int& maxU = maxTgtLen;
   const int& D = numTargets;
 
-  const int bTgt = blockIdx.z;  // 0 <= b < B
+  const int bTgt = blockIdx.z; // 0 <= b < B
   const int bSrc = bTgt / H;
   const int T = srcLengths[bSrc];
   const int U = tgtLengths[bTgt] + 1;
@@ -53,24 +51,22 @@ __global__ void ComputeLogProbs(
 
   if (!fusedLogSmax) {
     logProbs[(idx << 1) + LOG_PROBS_SKIP_IDX] =
-      CAST_DTYPE(logits[idx * D + blank]);
+        CAST_DTYPE(logits[idx * D + blank]);
   }
 
   if (u < U - 1) {
-    // emit: log_prob(b, t, u).emit() = logits(b, t, u, tgt[u]) - denom(b, t, u).
+    // emit: log_prob(b, t, u).emit() = logits(b, t, u, tgt[u]) - denom(b, t,
+    // u).
     int target = targets[Indexer2D(maxU - 1)(bTgt, u)];
     logProbs[(idx << 1) + LOG_PROBS_EMIT_IDX] =
         CAST_DTYPE(logits[idx * D + target]) - denominators[idx];
 
     if (!fusedLogSmax) {
       logProbs[(idx << 1) + LOG_PROBS_EMIT_IDX] =
-        CAST_DTYPE(logits[idx * D + target]);
+          CAST_DTYPE(logits[idx * D + target]);
     }
   }
-
-
 }
-
 
 template <typename DTYPE, typename CAST_DTYPE>
 __device__ void ComputeAlphas(
@@ -83,12 +79,11 @@ __device__ void ComputeAlphas(
     const int* tgtLengths,
     int* alpha_counters,
     volatile CAST_DTYPE* alphas,
-    int H=1) {
-
+    int H = 1) {
   const int& maxT = maxSrcLen;
   const int& maxU = maxTgtLen;
 
-  const int bTgt = blockIdx.z;  // 0 <= b < B
+  const int bTgt = blockIdx.z; // 0 <= b < B
   const int bSrc = bTgt / H;
   const int T = srcLengths[bSrc];
   const int U = tgtLengths[bTgt] + 1;
@@ -108,24 +103,25 @@ __device__ void ComputeAlphas(
     alphas[idxr(bTgt, 0, 0)] = 0;
   }
 
-  if (blockIdx.x > 0) {  // wait for previous warp (in t-axis) is ready.
-    while (atomicAdd(counter, 0) < blockIdx.x) {}
+  if (blockIdx.x > 0) { // wait for previous warp (in t-axis) is ready.
+    while (atomicAdd(counter, 0) < blockIdx.x) {
+    }
   }
 
-  if (blockIdx.y > 0) {  // wait for previous warp (in u-axis) is ready.
-    while (atomicAdd(counter - 1, 0) <= blockIdx.x) {}
+  if (blockIdx.y > 0) { // wait for previous warp (in u-axis) is ready.
+    while (atomicAdd(counter - 1, 0) <= blockIdx.x) {
+    }
   }
 
   if (t == 1 && u < U) {
-
     // alpha(0, u) = alpha(0, u - 1) + logProbs(0, u - 1).emit().
-    alphas[idxr(bTgt, 0, u)] =
-        alphas[idxr(bTgt, 0, u - 1)]
-        + logProbs[(idxr(bTgt, 0, u - 1) << 1) + LOG_PROBS_EMIT_IDX];
+    alphas[idxr(bTgt, 0, u)] = alphas[idxr(bTgt, 0, u - 1)] +
+        logProbs[(idxr(bTgt, 0, u - 1) << 1) + LOG_PROBS_EMIT_IDX];
   }
 
   if (blockIdx.y == 0 && t < T) {
-    CAST_DTYPE skip_prob = logProbs[(idxr(bTgt, t - 1, 0) << 1) + LOG_PROBS_SKIP_IDX];
+    CAST_DTYPE skip_prob =
+        logProbs[(idxr(bTgt, t - 1, 0) << 1) + LOG_PROBS_SKIP_IDX];
     CAST_DTYPE val;
 
 #pragma unroll
@@ -141,17 +137,19 @@ __device__ void ComputeAlphas(
   }
 
   if (t < T && u < U) {
+    CAST_DTYPE skip_prob =
+        logProbs[(idxr(bTgt, t - 1, u) << 1) + LOG_PROBS_SKIP_IDX];
+    CAST_DTYPE emit_prob =
+        logProbs[(idxr(bTgt, t, u - 1) << 1) + LOG_PROBS_EMIT_IDX];
 
-    CAST_DTYPE skip_prob = logProbs[(idxr(bTgt, t - 1, u) << 1) + LOG_PROBS_SKIP_IDX];
-    CAST_DTYPE emit_prob = logProbs[(idxr(bTgt, t, u - 1) << 1) + LOG_PROBS_EMIT_IDX];
-
-    CAST_DTYPE skip = alphas[idxr(bTgt, blockIdx.x * blockDim.x, u)] + skip_prob;
+    CAST_DTYPE skip =
+        alphas[idxr(bTgt, blockIdx.x * blockDim.x, u)] + skip_prob;
     CAST_DTYPE emit = alphas[idxr(bTgt, t, u - 1)] + emit_prob;
 
     CAST_DTYPE val = math::lse(skip, emit);
     CAST_DTYPE out = val;
 
-    for(int i = 1; i < warpSize; ++i) {
+    for (int i = 1; i < warpSize; ++i) {
       val = __shfl_up_sync(0xffffffff, val, 1);
       if (i == threadIdx.x) {
         val = math::lse(val + skip_prob, emit);
@@ -168,7 +166,6 @@ __device__ void ComputeAlphas(
   }
 }
 
-
 template <typename DTYPE, typename CAST_DTYPE>
 __device__ void ComputeBetasCosts(
     int maxSrcLen,
@@ -181,12 +178,11 @@ __device__ void ComputeBetasCosts(
     int* betaCounters,
     volatile CAST_DTYPE* betas,
     DTYPE* costs,
-    int H=1) {
-
+    int H = 1) {
   const int& maxT = maxSrcLen;
   const int& maxU = maxTgtLen;
 
-  const int bTgt = blockIdx.z;  // 0 <= b < B
+  const int bTgt = blockIdx.z; // 0 <= b < B
   const int bSrc = bTgt / H;
   const int T = srcLengths[bSrc];
   const int U = tgtLengths[bTgt] + 1;
@@ -207,27 +203,28 @@ __device__ void ComputeBetasCosts(
         logProbs[(idxr(bTgt, T - 1, U - 1) << 1) + LOG_PROBS_SKIP_IDX];
   }
 
-  if (blockIdx.x > 0) {  // wait for previous warp (in t-axis) is ready.
-    while (atomicAdd(counter, 0) < blockIdx.x) {}
+  if (blockIdx.x > 0) { // wait for previous warp (in t-axis) is ready.
+    while (atomicAdd(counter, 0) < blockIdx.x) {
+    }
   }
 
-  if (blockIdx.y > 0) {  // wait for previous warp (in u-axis) is ready.
-    while (atomicAdd(counter - 1, 0) <= blockIdx.x) {}
+  if (blockIdx.y > 0) { // wait for previous warp (in u-axis) is ready.
+    while (atomicAdd(counter - 1, 0) <= blockIdx.x) {
+    }
   }
 
   if (t == T - 2 && u >= 0) {
-
-    betas[idxr(bTgt, T - 1,  u)] =
-        betas[idxr(bTgt, T - 1, u + 1)]
-        + logProbs[(idxr(bTgt, T - 1, u) << 1) + LOG_PROBS_EMIT_IDX];
+    betas[idxr(bTgt, T - 1, u)] = betas[idxr(bTgt, T - 1, u + 1)] +
+        logProbs[(idxr(bTgt, T - 1, u) << 1) + LOG_PROBS_EMIT_IDX];
   }
 
   if (blockIdx.y == 0 && t >= 0) {
-    CAST_DTYPE skip_prob = logProbs[(idxr(bTgt, t, U - 1) << 1) + LOG_PROBS_SKIP_IDX];
+    CAST_DTYPE skip_prob =
+        logProbs[(idxr(bTgt, t, U - 1) << 1) + LOG_PROBS_SKIP_IDX];
     CAST_DTYPE val;
 
 #pragma unroll
-    for(int i = 1; i < warpSize; i <<= 1) {
+    for (int i = 1; i < warpSize; i <<= 1) {
       val = __shfl_up_sync(0xffffffff, skip_prob, i);
       if (i <= threadIdx.x) {
         skip_prob = skip_prob + val;
@@ -239,9 +236,10 @@ __device__ void ComputeBetasCosts(
   }
 
   if (t >= 0 && u >= 0) {
-
-    CAST_DTYPE skip_prob = logProbs[(idxr(bTgt, t, u) << 1) + LOG_PROBS_SKIP_IDX];
-    CAST_DTYPE emit_prob = logProbs[(idxr(bTgt, t, u) << 1) + LOG_PROBS_EMIT_IDX];
+    CAST_DTYPE skip_prob =
+        logProbs[(idxr(bTgt, t, u) << 1) + LOG_PROBS_SKIP_IDX];
+    CAST_DTYPE emit_prob =
+        logProbs[(idxr(bTgt, t, u) << 1) + LOG_PROBS_EMIT_IDX];
 
     CAST_DTYPE skip = betas[idxr(bTgt, t + threadIdx.x + 1, u)] + skip_prob;
     CAST_DTYPE emit = betas[idxr(bTgt, t, u + 1)] + emit_prob;
@@ -249,17 +247,17 @@ __device__ void ComputeBetasCosts(
     CAST_DTYPE val = math::lse(skip, emit);
     CAST_DTYPE out = val;
 
-    for(int i = 1; i < warpSize; ++i) {
+    for (int i = 1; i < warpSize; ++i) {
       val = __shfl_up_sync(0xffffffff, val, 1);
       if (i == threadIdx.x) {
-          val = math::lse(val + skip_prob, emit);
-          out = val;
+        val = math::lse(val + skip_prob, emit);
+        out = val;
       }
     }
 
     betas[idxr(bTgt, t, u)] = out;
 
-    if (t == 0 && u == 0) {  // use -beta(0, 0) as cost.
+    if (t == 0 && u == 0) { // use -beta(0, 0) as cost.
       costs[bTgt] = DTYPE(-out);
     }
   }
@@ -269,7 +267,6 @@ __device__ void ComputeBetasCosts(
     atomicAdd(counter, 1);
   }
 }
-
 
 template <typename DTYPE, typename CAST_DTYPE>
 __global__ void ComputeAlphasBetasCosts(
@@ -286,13 +283,11 @@ __global__ void ComputeAlphasBetasCosts(
     volatile CAST_DTYPE* betas,
     DTYPE* costs,
     int warpSize = 0,
-    int numWarps=0,
+    int numWarps = 0,
     int H = 1) {
-
   assert(threadIdx.y == 0 || threadIdx.y == 1);
 
   if (threadIdx.y == 0) {
-
     ComputeAlphas<DTYPE, CAST_DTYPE>(
         /*maxSrcLen=*/maxSrcLen,
         /*maxTgtLen=*/maxTgtLen,
@@ -304,7 +299,7 @@ __global__ void ComputeAlphasBetasCosts(
         /*alpha_counters=*/alpha_counters,
         /*alphas=*/alphas,
         H);
-  } else {  // threadIdx.y == 1
+  } else { // threadIdx.y == 1
     ComputeBetasCosts<DTYPE, CAST_DTYPE>(
         /*maxSrcLen=*/maxSrcLen,
         /*maxTgtLen=*/maxTgtLen,
@@ -319,7 +314,6 @@ __global__ void ComputeAlphasBetasCosts(
         H);
   }
 }
-
 
 template <typename DTYPE, typename CAST_DTYPE>
 __global__ void ComputeGradients(
@@ -338,8 +332,7 @@ __global__ void ComputeGradients(
     DTYPE* gradients,
     int H = 1,
     bool fusedLogSmax = true) {
-
-  const int bTgt = blockIdx.z;  // 0 <= b < B
+  const int bTgt = blockIdx.z; // 0 <= b < B
   const int t = blockIdx.x * blockDim.x + threadIdx.x;
   const int u = blockIdx.y;
 
@@ -364,7 +357,6 @@ __global__ void ComputeGradients(
       fusedLogSmax);
 }
 
-
 // This is a __global__ wrapper around ComputeAlphas
 // device kernel to enable unit testing
 template <typename DTYPE, typename CAST_DTYPE>
@@ -378,8 +370,8 @@ __global__ void ComputeAlphasWrapper(
     const int* tgtLengths,
     int* alpha_counters,
     volatile CAST_DTYPE* alphas,
-    int H=1) {
-    ComputeAlphas<DTYPE, CAST_DTYPE>(
+    int H = 1) {
+  ComputeAlphas<DTYPE, CAST_DTYPE>(
       maxSrcLen,
       maxTgtLen,
       numTargets,
@@ -406,8 +398,8 @@ __global__ void ComputeBetasWrapper(
     int* betaCounters,
     volatile CAST_DTYPE* betas,
     DTYPE* costs,
-    int H=1) {
-    ComputeBetasCosts<DTYPE, CAST_DTYPE>(
+    int H = 1) {
+  ComputeBetasCosts<DTYPE, CAST_DTYPE>(
       maxSrcLen,
       maxTgtLen,
       numTargets,
@@ -421,11 +413,10 @@ __global__ void ComputeBetasWrapper(
       H);
 }
 
-
 // #undef LOG_PROBS_SKIP_IDX
 // #undef LOG_PROBS_EMIT_IDX
 
-}  // namespace rnnt
-}  // namespace torchaudio
+} // namespace rnnt
+} // namespace torchaudio
 
-#endif  // USE_CUDA
+#endif // USE_CUDA

@@ -73,6 +73,6 @@ TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
   m.impl("rnnt_loss_betas", &compute_betas);
 }
 
-}  // namespace gpu
+} // namespace gpu
 } // namespace rnnt
 } // namespace torchaudio

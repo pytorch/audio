@@ -2,7 +2,7 @@
 
 #ifdef USE_C10_HALF
 #include "c10/util/Half.h"
-#endif  // USE_C10_HALF
+#endif // USE_C10_HALF
 
 #include <torchaudio/csrc/rnnt/macros.h>
 
@@ -17,7 +17,7 @@ struct alignas(sizeof(__half)) Half {
   FORCE_INLINE HOST_AND_DEVICE Half(float f) {
     x = __float2half_rn(f);
     if (isinf(__half2float(x))) {
-      x =  __float2half_rz(f); // round toward 0.
+      x = __float2half_rz(f); // round toward 0.
     }
   }
 
@@ -34,5 +34,5 @@ struct alignas(sizeof(__half)) Half {
   }
 };
 
-}  // namespace rnnt
-}  // namespace torchaudio
+} // namespace rnnt
+} // namespace torchaudio

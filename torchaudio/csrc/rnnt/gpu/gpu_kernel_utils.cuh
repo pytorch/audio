@@ -12,12 +12,11 @@ __global__ void ReduceMax2D(
     int dim,
     const DTYPE* inputs, // [N, dim]
     CAST_DTYPE* outputs) {
-
   __shared__ CAST_DTYPE shared[NUM_THREADS];
 
   // each thread reduces one matrix row
-  int offset = blockIdx.x * dim;  // [n, 0]
-  CAST_DTYPE val = inputs[offset];  // default = inputs(n, 0)
+  int offset = blockIdx.x * dim; // [n, 0]
+  CAST_DTYPE val = inputs[offset]; // default = inputs(n, 0)
   for (int d = threadIdx.x; d < dim; d += NUM_THREADS) {
     CAST_DTYPE next = inputs[offset + d];
     if (next > val) {
@@ -57,7 +56,7 @@ template <int NUM_THREADS, typename DTYPE, typename CAST_DTYPE>
 __global__ void ReduceLogSumExpGivenMax2D(
     int dim,
     const DTYPE* inputs, // [N, dim]
-    CAST_DTYPE* outputs) {  // in: max -> out: logsum
+    CAST_DTYPE* outputs) { // in: max -> out: logsum
 
   __shared__ CAST_DTYPE shared[NUM_THREADS];
 
@@ -93,7 +92,7 @@ __global__ void ReduceLogSumExpGivenMax2D(
   }
 }
 
-}  // namespace rnnt
-}  // namespace torchaudio
+} // namespace rnnt
+} // namespace torchaudio
 
-#endif  // USE_CUDA
+#endif // USE_CUDA
