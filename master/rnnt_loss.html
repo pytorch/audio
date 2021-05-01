@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.prototype.transducer &mdash; Torchaudio master documentation</title>
+  <title>torchaudio.prototype.rnnt_loss &mdash; Torchaudio master documentation</title>
   
 
   
@@ -229,7 +229,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.prototype.transducer</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.prototype.rnnt_loss</a></li>
 </ul>
 <p><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -280,13 +280,13 @@
       </li>
 
         
-      <li>torchaudio.prototype.transducer</li>
+      <li>torchaudio.prototype.rnnt_loss</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="_sources/transducer.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+            <a href="_sources/rnnt_loss.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -312,35 +312,33 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="torchaudio-prototype-transducer">
-<h1>torchaudio.prototype.transducer<a class="headerlink" href="#torchaudio-prototype-transducer" title="Permalink to this headline">¶</a></h1>
+  <section id="torchaudio-prototype-rnnt-loss">
+<h1>torchaudio.prototype.rnnt_loss<a class="headerlink" href="#torchaudio-prototype-rnnt-loss" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The RNN transducer loss is a prototype feature, see <a class="reference external" href="https://pytorch.org/audio">here</a> to learn more about the nomenclature. It is only available within the nightlies, and also needs to be imported explicitly using: <code class="code docutils literal notranslate"><span class="pre">from</span> <span class="pre">torchaudio.prototype.transducer</span> <span class="pre">import</span> <span class="pre">rnnt_loss,</span> <span class="pre">RNNTLoss</span></code>.</p>
+<p>The RNN transducer loss is a prototype feature, see <a class="reference external" href="https://pytorch.org/audio">here</a> to learn more about the nomenclature. It is only available within the nightlies, and also needs to be imported explicitly using: <code class="code docutils literal notranslate"><span class="pre">from</span> <span class="pre">torchaudio.prototype.rnnt_loss</span> <span class="pre">import</span> <span class="pre">rnnt_loss,</span> <span class="pre">RNNTLoss</span></code>.</p>
 </div>
 <section id="rnnt-loss">
 <h2>rnnt_loss<a class="headerlink" href="#rnnt-loss" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="torchaudio.prototype.transducer.rnnt_loss">
-<code class="sig-prename descclassname">torchaudio.prototype.transducer.</code><code class="sig-name descname">rnnt_loss</code><span class="sig-paren">(</span><em class="sig-param">acts</em>, <em class="sig-param">labels</em>, <em class="sig-param">act_lens</em>, <em class="sig-param">label_lens</em>, <em class="sig-param">blank=0</em>, <em class="sig-param">reduction='mean'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/transducer.html#rnnt_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.prototype.transducer.rnnt_loss" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.prototype.rnnt_loss.rnnt_loss">
+<code class="sig-prename descclassname">torchaudio.prototype.rnnt_loss.</code><code class="sig-name descname">rnnt_loss</code><span class="sig-paren">(</span><em class="sig-param">logits</em>, <em class="sig-param">targets</em>, <em class="sig-param">logit_lengths</em>, <em class="sig-param">target_lengths</em>, <em class="sig-param">blank=-1</em>, <em class="sig-param">clamp=-1</em>, <em class="sig-param">runtime_check=False</em>, <em class="sig-param">fused_log_softmax=True</em>, <em class="sig-param">reuse_logits_for_grads=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/rnnt_loss.html#rnnt_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.prototype.rnnt_loss.rnnt_loss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the RNN Transducer Loss.</p>
 <p>The RNN Transducer loss (<a class="reference external" href="https://arxiv.org/pdf/1211.3711.pdf">Graves 2012</a>) extends the CTC loss by defining
 a distribution over output sequences of all lengths, and by jointly modelling both input-output and output-output
 dependencies.</p>
-<p>The implementation uses <a class="reference external" href="https://github.com/HawkAaron/warp-transducer">warp-transducer</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>acts</strong> (<em>Tensor</em>) – Tensor of dimension (batch, time, label, class) containing output from network
-before applying <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.log_softmax</span></code>.</p></li>
-<li><p><strong>labels</strong> (<em>Tensor</em>) – Tensor of dimension (batch, max label length) containing the labels padded by zero</p></li>
-<li><p><strong>act_lens</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing the length of each output sequence</p></li>
-<li><p><strong>label_lens</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing the length of each output sequence</p></li>
-<li><p><strong>blank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – blank label. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
-<li><p><strong>reduction</strong> (<em>string</em>) – If <code class="docutils literal notranslate"><span class="pre">'sum'</span></code>, the output losses will be summed.
-If <code class="docutils literal notranslate"><span class="pre">'mean'</span></code>, the output losses will be divided by the target lengths and
-then the mean over the batch is taken. If <code class="docutils literal notranslate"><span class="pre">'none'</span></code>, no reduction will be applied.
-(Default: <code class="docutils literal notranslate"><span class="pre">'mean'</span></code>)</p></li>
+<li><p><strong>logits</strong> (<em>Tensor</em>) – Tensor of dimension (batch, time, target, class) containing output from joiner</p></li>
+<li><p><strong>targets</strong> (<em>Tensor</em>) – Tensor of dimension (batch, max target length) containing targets with zero padded</p></li>
+<li><p><strong>logit_lengths</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing lengths of each sequence from encoder</p></li>
+<li><p><strong>target_lengths</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing lengths of targets for each sequence</p></li>
+<li><p><strong>blank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>opt</em>) – blank label (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
+<li><p><strong>clamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – clamp for gradients (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
+<li><p><strong>runtime_check</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – whether to do sanity check during runtime. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>fused_log_softmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – set to False if calling log_softmax outside loss (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>reuse_logits_for_grads</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – whether to save memory by reusing logits memory for grads (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -349,35 +347,33 @@ then the mean over the batch is taken. If <code class="docutils literal notransl
 <section id="rnntloss">
 <h3><span class="hidden-section">RNNTLoss</span><a class="headerlink" href="#rnntloss" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
-<dt id="torchaudio.prototype.transducer.RNNTLoss">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.prototype.transducer.</code><code class="sig-name descname">RNNTLoss</code><span class="sig-paren">(</span><em class="sig-param">blank=0</em>, <em class="sig-param">reduction='mean'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/transducer.html#RNNTLoss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.prototype.transducer.RNNTLoss" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.prototype.rnnt_loss.RNNTLoss">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.prototype.rnnt_loss.</code><code class="sig-name descname">RNNTLoss</code><span class="sig-paren">(</span><em class="sig-param">blank=-1</em>, <em class="sig-param">clamp=-1</em>, <em class="sig-param">runtime_check=False</em>, <em class="sig-param">fused_log_softmax=True</em>, <em class="sig-param">reuse_logits_for_grads=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/rnnt_loss.html#RNNTLoss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.prototype.rnnt_loss.RNNTLoss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the RNN Transducer Loss.</p>
 <p>The RNN Transducer loss (<a class="reference external" href="https://arxiv.org/pdf/1211.3711.pdf">Graves 2012</a>) extends the CTC loss by defining
 a distribution over output sequences of all lengths, and by jointly modelling both input-output and output-output
 dependencies.</p>
-<p>The implementation uses <a class="reference external" href="https://github.com/HawkAaron/warp-transducer">warp-transducer</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>blank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – blank label. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
-<li><p><strong>reduction</strong> (<em>string</em>) – If <code class="docutils literal notranslate"><span class="pre">'sum'</span></code>, the output losses will be summed.
-If <code class="docutils literal notranslate"><span class="pre">'mean'</span></code>, the output losses will be divided by the target lengths and
-then the mean over the batch is taken. If <code class="docutils literal notranslate"><span class="pre">'none'</span></code>, no reduction will be applied.
-(Default: <code class="docutils literal notranslate"><span class="pre">'mean'</span></code>)</p></li>
+<li><p><strong>blank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>opt</em>) – blank label (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
+<li><p><strong>clamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – clamp for gradients (Default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
+<li><p><strong>runtime_check</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – whether to do sanity check during runtime. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><strong>fused_log_softmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – set to False if calling log_softmax outside loss (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
+<li><p><strong>reuse_logits_for_grads</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – whether to save memory by reusing logits memory for grads (Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="method">
-<dt id="torchaudio.prototype.transducer.RNNTLoss.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">acts</em>, <em class="sig-param">labels</em>, <em class="sig-param">act_lens</em>, <em class="sig-param">label_lens</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/transducer.html#RNNTLoss.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.prototype.transducer.RNNTLoss.forward" title="Permalink to this definition">¶</a></dt>
+<dt id="torchaudio.prototype.rnnt_loss.RNNTLoss.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">logits</em>, <em class="sig-param">targets</em>, <em class="sig-param">logit_lengths</em>, <em class="sig-param">target_lengths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/rnnt_loss.html#RNNTLoss.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.prototype.rnnt_loss.RNNTLoss.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>acts</strong> (<em>Tensor</em>) – Tensor of dimension (batch, time, label, class) containing output from network
-before applying <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.log_softmax</span></code>.</p></li>
-<li><p><strong>labels</strong> (<em>Tensor</em>) – Tensor of dimension (batch, max label length) containing the labels padded by zero</p></li>
-<li><p><strong>act_lens</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing the length of each output sequence</p></li>
-<li><p><strong>label_lens</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing the length of each output sequence</p></li>
+<li><p><strong>logits</strong> (<em>Tensor</em>) – Tensor of dimension (batch, time, target, class) containing output from joiner</p></li>
+<li><p><strong>targets</strong> (<em>Tensor</em>) – Tensor of dimension (batch, max target length) containing targets with zero padded</p></li>
+<li><p><strong>logit_lengths</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing lengths of each sequence from encoder</p></li>
+<li><p><strong>target_lengths</strong> (<em>Tensor</em>) – Tensor of dimension (batch) containing lengths of targets for each sequence</p></li>
 </ul>
 </dd>
 </dl>
@@ -430,7 +426,7 @@ before applying <code class="docutils literal notranslate"><span class="pre">tor
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">torchaudio.prototype.transducer</a><ul>
+<li><a class="reference internal" href="#">torchaudio.prototype.rnnt_loss</a><ul>
 <li><a class="reference internal" href="#rnnt-loss">rnnt_loss</a><ul>
 <li><a class="reference internal" href="#rnntloss"><span class="hidden-section">RNNTLoss</span></a></li>
 </ul>
