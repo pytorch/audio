@@ -190,4 +190,4 @@ class TestDeepSpeech(common_utils.TorchaudioTestCase):
         x = torch.rand(batch_size, num_channels, input_length, num_features)
         out = model(x)
 
-        assert out.size() == (input_length, batch_size, num_classes)
+        assert out.size() == (batch_size, input_length, num_classes)
