@@ -227,6 +227,38 @@ class Functional(TestBaseMixin):
         assert mask_specgrams.size() == specgrams.size()
         assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
 
+    @parameterized.expand(
+        list(itertools.product([(2, 1025, 400), (1, 201, 100)], [100], [0., 30.], [1, 2]))
+    )
+    def test_mask_along_axis_preserve(self, shape, mask_param, mask_value, axis):
+        """mask_along_axis should not alter original input Tensor
+
+        Test is run 5 times to bound the probability of no masking occurring to 1e-10
+        See https://github.com/pytorch/audio/issues/1478
+        """
+        torch.random.manual_seed(42)
+        for _ in range(5):
+            specgram = torch.randn(*shape, dtype=self.dtype, device=self.device)
+            specgram_copy = specgram.clone()
+            F.mask_along_axis(specgram, mask_param, mask_value, axis)
+
+            self.assertEqual(specgram, specgram_copy)
+
+    @parameterized.expand(list(itertools.product([100], [0., 30.], [2, 3])))
+    def test_mask_along_axis_iid_preserve(self, mask_param, mask_value, axis):
+        """mask_along_axis_iid should not alter original input Tensor
+
+        Test is run 5 times to bound the probability of no masking occurring to 1e-10
+        See https://github.com/pytorch/audio/issues/1478
+        """
+        torch.random.manual_seed(42)
+        for _ in range(5):
+            specgrams = torch.randn(4, 2, 1025, 400, dtype=self.dtype, device=self.device)
+            specgrams_copy = specgrams.clone()
+            F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
+
+            self.assertEqual(specgrams, specgrams_copy)
+
 
 class FunctionalComplex(TestBaseMixin):
     complex_dtype = None
