@@ -154,6 +154,67 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
   }
 };
 
+class DifferentiableFIR : public torch::autograd::Function<DifferentiableFIR> {
+ public:
+  static torch::Tensor forward(
+      torch::autograd::AutogradContext* ctx,
+      const torch::Tensor& waveform,
+      const torch::Tensor& b_coeffs) {
+    at::AutoNonVariableTypeMode g;
+    int64_t n_order = b_coeffs.size(0);
+
+    namespace F = torch::nn::functional;
+    auto b_coeff_flipped = b_coeffs.flip(0).contiguous();
+    auto padded_waveform =
+        F::pad(waveform, F::PadFuncOptions({n_order - 1, 0}));
+
+    auto output =
+        F::conv1d(
+            padded_waveform.unsqueeze(1), b_coeff_flipped.view({1, 1, n_order}))
+            .squeeze(1);
+
+    ctx->save_for_backward({waveform, b_coeffs, output});
+    return output;
+  }
+
+  static torch::autograd::tensor_list backward(
+      torch::autograd::AutogradContext* ctx,
+      torch::autograd::tensor_list grad_outputs) {
+    auto saved = ctx->get_saved_variables();
+    auto x = saved[0];
+    auto b_coeffs = saved[1];
+    auto y = saved[2];
+
+    int64_t n_channel = x.size(0);
+    int64_t n_order = b_coeffs.size(0);
+
+    auto dx = torch::Tensor();
+    auto db = torch::Tensor();
+    auto dy = grad_outputs[0];
+
+    namespace F = torch::nn::functional;
+
+    if (b_coeffs.requires_grad()) {
+      db = F::conv1d(
+               F::pad(x.unsqueeze(0), F::PadFuncOptions({n_order - 1, 0})),
+               dy.unsqueeze(1),
+               F::Conv1dFuncOptions().groups(n_channel))
+               .sum(1)
+               .squeeze(0)
+               .flip(0);
+    }
+
+    if (x.requires_grad()) {
+      dx = F::conv1d(
+               F::pad(dy.unsqueeze(1), F::PadFuncOptions({0, n_order - 1})),
+               b_coeffs.view({1, 1, n_order}))
+               .squeeze(1);
+    }
+
+    return {dx, db};
+  }
+};
+
 torch::Tensor lfilter_core(
     const torch::Tensor& waveform,
     const torch::Tensor& a_coeffs,
@@ -168,17 +229,8 @@ torch::Tensor lfilter_core(
 
   TORCH_INTERNAL_ASSERT(n_order > 0);
 
-  namespace F = torch::nn::functional;
-
-  auto padded_waveform = F::pad(waveform, F::PadFuncOptions({n_order - 1, 0}));
-  auto b_coeff_flipped = b_coeffs.flip(0).contiguous();
-
-  b_coeff_flipped.div_(a_coeffs[0]);
-
   auto filtered_waveform =
-      F::conv1d(
-          padded_waveform.unsqueeze(1), b_coeff_flipped.view({1, 1, n_order}))
-          .squeeze(1);
+      DifferentiableFIR::apply(waveform, b_coeffs / a_coeffs[0]);
 
   auto output =
       DifferentiableIIR::apply(filtered_waveform, a_coeffs / a_coeffs[0]);
