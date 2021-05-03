@@ -783,7 +783,7 @@ def mask_along_axis(
 
     mask_start = (min_value.long()).squeeze()
     mask_end = (min_value.long() + value.long()).squeeze()
-    mask = torch.arange(0, shape[axis], device=specgram.device, dtype=specgram.dtype)
+    mask = torch.arange(0, specgram.shape[axis], device=specgram.device, dtype=specgram.dtype)
     mask = (mask >= mask_start) & (mask < mask_end)
     if axis == 1:
         mask = mask.unsqueeze(-1)
