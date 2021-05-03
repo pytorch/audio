@@ -38,6 +38,7 @@ _BUILD_SOX = False if platform.system() == 'Windows' else _get_build("BUILD_SOX"
 _BUILD_KALDI = False if platform.system() == 'Windows' else _get_build("BUILD_KALDI", True)
 _BUILD_TRANSDUCER = _get_build("BUILD_TRANSDUCER")
 _USE_ROCM = _get_build("USE_ROCM")
+_USE_CUDA = torch.cuda.is_available()
 
 
 def get_ext_modules():
@@ -76,6 +77,7 @@ class CMakeBuild(build_ext):
             "-DBUILD_TORCHAUDIO_PYTHON_EXTENSION:BOOL=ON",
             "-DBUILD_LIBTORCHAUDIO:BOOL=OFF",
             f"-DUSE_ROCM:BOOL={'ON' if _USE_ROCM else 'OFF'}",
+            f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
         ]
         build_args = [
             '--target', 'install'
