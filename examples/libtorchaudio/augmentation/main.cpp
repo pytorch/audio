@@ -7,7 +7,7 @@ int main(int argc, char* argv[]) {
   }
 
   torch::jit::script::Module module;
-  std::cout << "Loading module from: " << argv[0] << std::endl;
+  std::cout << "Loading module from: " << argv[1] << std::endl;
   try {
     module = torch::jit::load(argv[1]);
   } catch (const c10::Error &error) {
