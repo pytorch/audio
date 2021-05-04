@@ -13,7 +13,7 @@ from torchaudio_unittest.common_utils import (
 
 
 class Functional(TempDirMixin, TestBaseMixin):
-    """Implements test for `functinoal` modul that are performed for different devices"""
+    """Implements test for `functional` module that are performed for different devices"""
     def _assert_consistency(self, func, tensor, shape_only=False):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
 
@@ -21,8 +21,12 @@ class Functional(TempDirMixin, TestBaseMixin):
         torch.jit.script(func).save(path)
         ts_func = torch.jit.load(path)
 
+        torch.random.manual_seed(40)
         output = func(tensor)
+
+        torch.random.manual_seed(40)
         ts_output = ts_func(tensor)
+
         if shape_only:
             ts_output = ts_output.shape
             output = output.shape
