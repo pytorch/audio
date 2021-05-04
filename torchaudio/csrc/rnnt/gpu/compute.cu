@@ -57,39 +57,38 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
 
   Workspace<float> workspace(
       /*options=*/options,
-      /*dtype_data=*/float_workspace.data<float>(),
+      /*dtype_data=*/float_workspace.data_ptr<float>(),
       /*dtype_size=*/float_workspace.numel(),
-      /*int_data=*/int_workspace.data<int>(),
+      /*int_data=*/int_workspace.data_ptr<int>(),
       /*int_size=*/int_workspace.numel());
 
-  switch (logits.type().scalarType()) {
+  switch (logits.scalar_type()) {
     case torch::ScalarType::Float: {
       Compute</*DTYPE=*/float, /*CAST_DTYPE=*/float>(
           /*workspace=*/workspace,
-          /*logits=*/logits.data<float>(),
-          /*targets=*/targets.data<int>(),
-          /*src_lengths=*/src_lengths.data<int>(),
-          /*tgt_lengths=*/tgt_lengths.data<int>(),
-          /*costs=*/costs.data<float>(),
+          /*logits=*/logits.data_ptr<float>(),
+          /*targets=*/targets.data_ptr<int>(),
+          /*src_lengths=*/src_lengths.data_ptr<int>(),
+          /*tgt_lengths=*/tgt_lengths.data_ptr<int>(),
+          /*costs=*/costs.data_ptr<float>(),
           /*gradients=*/
-          (gradients == c10::nullopt) ? nullptr : gradients->data<float>());
+          (gradients == c10::nullopt) ? nullptr : gradients->data_ptr<float>());
       break;
     }
     case torch::ScalarType::Half: {
       Compute</*DTYPE=*/c10::Half, /*CAST_DTYPE=*/float>(
           /*workspace=*/workspace,
-          /*logits=*/logits.data<c10::Half>(),
-          /*targets=*/targets.data<int>(),
-          /*src_lengths=*/src_lengths.data<int>(),
-          /*tgt_lengths=*/tgt_lengths.data<int>(),
-          /*costs=*/costs.data<c10::Half>(),
+          /*logits=*/logits.data_ptr<c10::Half>(),
+          /*targets=*/targets.data_ptr<int>(),
+          /*src_lengths=*/src_lengths.data_ptr<int>(),
+          /*tgt_lengths=*/tgt_lengths.data_ptr<int>(),
+          /*costs=*/costs.data_ptr<c10::Half>(),
           /*gradients=*/
-          (gradients == c10::nullopt) ? nullptr : gradients->data<c10::Half>());
+          (gradients == c10::nullopt) ? nullptr
+                                      : gradients->data_ptr<c10::Half>());
       break;
     }
     default: {
-      LOG(ERROR) << "unsupported logits.type().scalarType() = "
-                 << logits.type().scalarType();
       break;
     }
   };

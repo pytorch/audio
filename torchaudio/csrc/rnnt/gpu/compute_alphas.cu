@@ -47,20 +47,20 @@ torch::Tensor compute_alphas(
 
   Workspace<float> workspace(
       /*options=*/options,
-      /*dtype_data=*/float_workspace.data<float>(),
+      /*dtype_data=*/float_workspace.data_ptr<float>(),
       /*dtype_size=*/float_workspace.numel(),
-      /*int_data=*/int_workspace.data<int>(),
+      /*int_data=*/int_workspace.data_ptr<int>(),
       /*int_size=*/int_workspace.numel());
 
   // Only support float, this is mainly to enable easy
   // unit-testing
   ComputeAlphas</*DTYPE=*/float, /*CAST_DTYPE=*/float>(
       /*workspace=*/workspace,
-      /*logits=*/logits.data<float>(),
-      /*targets=*/targets.data<int>(),
-      /*src_lengths=*/src_lengths.data<int>(),
-      /*tgt_lengths=*/tgt_lengths.data<int>(),
-      /*alphas=*/alphas.data<float>());
+      /*logits=*/logits.data_ptr<float>(),
+      /*targets=*/targets.data_ptr<int>(),
+      /*src_lengths=*/src_lengths.data_ptr<int>(),
+      /*tgt_lengths=*/tgt_lengths.data_ptr<int>(),
+      /*alphas=*/alphas.data_ptr<float>());
   return alphas;
 }
 

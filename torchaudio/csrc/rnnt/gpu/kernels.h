@@ -56,12 +56,11 @@ HOST_AND_DEVICE void ComputeGradientsElement(
 
   Indexer2D idxr2(maxU - 1);
 
-  int idx_b_t_u, idx_b_t_up1, idx_b_tp1_u, idx_b_tp1_up1;
+  int idx_b_t_u, idx_b_t_up1, idx_b_tp1_u;
   Indexer3D idxr3(maxT, maxU);
   idx_b_t_u = idxr3(bTgt, t, u);
   idx_b_t_up1 = idxr3(bTgt, t, u + 1);
   idx_b_tp1_u = idxr3(bTgt, t + 1, u);
-  idx_b_tp1_up1 = idxr3(bTgt, t + 1, u + 1);
 
   if (idx_b_t_u == -1) {
     return;
