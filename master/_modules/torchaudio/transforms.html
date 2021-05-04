@@ -1115,7 +1115,7 @@
             <span class="n">fade</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">fade</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">fade</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_shape</span> <span class="o">==</span> <span class="s2">&quot;logarithmic&quot;</span><span class="p">:</span>
-            <span class="n">fade</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="o">.</span><span class="mi">1</span> <span class="o">+</span> <span class="n">fade</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">fade</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">.1</span> <span class="o">+</span> <span class="n">fade</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fade_shape</span> <span class="o">==</span> <span class="s2">&quot;quarter_sine&quot;</span><span class="p">:</span>
             <span class="n">fade</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">fade</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
@@ -1346,13 +1346,13 @@
                  <span class="n">search_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
                  <span class="n">allowed_gap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
                  <span class="n">pre_trigger_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-                 <span class="n">boot_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">35</span><span class="p">,</span>
-                 <span class="n">noise_up_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">1</span><span class="p">,</span>
-                 <span class="n">noise_down_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">01</span><span class="p">,</span>
+                 <span class="n">boot_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">.35</span><span class="p">,</span>
+                 <span class="n">noise_up_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">.1</span><span class="p">,</span>
+                 <span class="n">noise_down_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">.01</span><span class="p">,</span>
                  <span class="n">noise_reduction_amount</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.35</span><span class="p">,</span>
                  <span class="n">measure_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
                  <span class="n">measure_duration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">measure_smooth_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">.</span><span class="mi">4</span><span class="p">,</span>
+                 <span class="n">measure_smooth_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">.4</span><span class="p">,</span>
                  <span class="n">hp_filter_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">50.</span><span class="p">,</span>
                  <span class="n">lp_filter_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">6000.</span><span class="p">,</span>
                  <span class="n">hp_lifter_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">150.</span><span class="p">,</span>
