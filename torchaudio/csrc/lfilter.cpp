@@ -86,7 +86,6 @@ class DifferentiableIIR : public torch::autograd::Function<DifferentiableIIR> {
       torch::autograd::AutogradContext* ctx,
       const torch::Tensor& waveform,
       const torch::Tensor& a_coeffs_normalized) {
-    at::AutoNonVariableTypeMode g;
     auto device = waveform.device();
     auto dtype = waveform.dtype();
     int64_t n_channel = waveform.size(0);
@@ -160,7 +159,6 @@ class DifferentiableFIR : public torch::autograd::Function<DifferentiableFIR> {
       torch::autograd::AutogradContext* ctx,
       const torch::Tensor& waveform,
       const torch::Tensor& b_coeffs) {
-    at::AutoNonVariableTypeMode g;
     int64_t n_order = b_coeffs.size(0);
 
     namespace F = torch::nn::functional;
