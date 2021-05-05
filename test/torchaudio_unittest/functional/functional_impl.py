@@ -261,16 +261,17 @@ class Functional(TestBaseMixin):
 
     def test_resample_no_warning(self):
         sample_rate = 44100
-        waveform = get_whitenoise(sample_rate=sample_rate)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.1)
 
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            F.resample(waveform, sample_rate, sample_rate / 2)
+            F.resample(waveform, float(sample_rate), sample_rate / 2.)
         assert len(w) == 0
 
     def test_resample_warning(self):
+        """resample should throw a warning if an input frequency is not of an integer value"""
         sample_rate = 44100
-        waveform = get_whitenoise(sample_rate=sample_rate)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.1)
 
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
