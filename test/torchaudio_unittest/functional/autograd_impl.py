@@ -44,6 +44,14 @@ class Autograd(TestBaseMixin):
         a.requires_grad = True
         self.assert_grad(F.lfilter, (x, a, b), enable_all_grad=False)
 
+    def test_lfilter_b(self):
+        torch.random.manual_seed(2434)
+        x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
+        a = torch.tensor([0.7, 0.2, 0.6])
+        b = torch.tensor([0.4, 0.2, 0.9])
+        b.requires_grad = True
+        self.assert_grad(F.lfilter, (x, a, b), enable_all_grad=False)
+
     def test_lfilter_all_inputs(self):
         torch.random.manual_seed(2434)
         x = get_whitenoise(sample_rate=22050, duration=0.01, n_channels=2)
