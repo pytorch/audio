@@ -1387,6 +1387,16 @@ def resample(
 
     assert orig_freq > 0.0 and new_freq > 0.0
 
+    if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
+        warnings.warn(
+            "Non-integer frequencies are cast to integers and may result in poor resampling quality."
+            "The algorithm is dependent on the integer ratio between `orig_freq` and `new_freq`,"
+            "so please manually convert frequencies to integer values that maintain the ratio"
+            "prior to passing them into the function"
+            "Example: To downsample a 44100 hz waveform by a factor of 8, you can use"
+            "`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5`"
+        )
+
     orig_freq = int(orig_freq)
     new_freq = int(new_freq)
     gcd = math.gcd(orig_freq, new_freq)
