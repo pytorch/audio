@@ -1,4 +1,5 @@
 from typing import List
+import unittest
 
 from parameterized import parameterized
 import torch
@@ -8,7 +9,21 @@ import torchaudio.transforms as T
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     get_whitenoise,
+    get_spectrogram,
+    nested_params,
 )
+
+
+class _DeterministicWrapper(torch.nn.Module):
+    """Helper transform wrapper to make the given transform deterministic"""
+    def __init__(self, transform, seed=0):
+        super().__init__()
+        self.seed = seed
+        self.transform = transform
+
+    def forward(self, input: torch.Tensor):
+        torch.random.manual_seed(self.seed)
+        return self.transform(input)
 
 
 class AutogradTestMixin(TestBaseMixin):
@@ -21,10 +36,16 @@ class AutogradTestMixin(TestBaseMixin):
     ):
         transform = transform.to(dtype=torch.float64, device=self.device)
 
+        # gradcheck and gradgradcheck only pass if the input tensors are of dtype `torch.double` or
+        # `torch.cdouble`, when the default eps and tolerance values are used.
         inputs_ = []
         for i in inputs:
-            i.requires_grad = True
-            inputs_.append(i.to(dtype=torch.float64, device=self.device))
+            if torch.is_tensor(i):
+                i = i.to(
+                    dtype=torch.cdouble if i.is_complex() else torch.double,
+                    device=self.device)
+                i.requires_grad = True
+            inputs_.append(i)
         assert gradcheck(transform, inputs_)
         assert gradgradcheck(transform, inputs_, nondet_tol=nondet_tol)
 
@@ -65,14 +86,20 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
-    @parameterized.expand([(0, ), (0.99, )])
-    def test_griffinlim(self, momentum):
+    @nested_params(
+        [0, 0.99],
+        [False, True],
+    )
+    def test_griffinlim(self, momentum, rand_init):
         n_fft = 400
-        n_frames = 5
+        power = 1
         n_iter = 3
-        spec = torch.rand(n_fft // 2 + 1, n_frames) * n_fft
-        transform = T.GriffinLim(n_fft=n_fft, n_iter=n_iter, momentum=momentum, rand_init=False)
-        self.assert_grad(transform, [spec], nondet_tol=1e-10)
+        spec = get_spectrogram(
+            get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2),
+            n_fft=n_fft, power=power)
+        transform = _DeterministicWrapper(
+            T.GriffinLim(n_fft=n_fft, n_iter=n_iter, momentum=momentum, rand_init=rand_init, power=power))
+        self.assert_grad(transform, [spec])
 
     @parameterized.expand([(False, ), (True, )])
     def test_mfcc(self, log_mels):
@@ -103,3 +130,88 @@ class AutogradTestMixin(TestBaseMixin):
         transform = T.SpectralCentroid(sample_rate=sample_rate)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
+
+    def test_amplitude_to_db(self):
+        sample_rate = 8000
+        transform = T.AmplitudeToDB()
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform])
+
+    def test_melscale(self):
+        sample_rate = 8000
+        n_fft = 400
+        n_mels = n_fft // 2 + 1
+        transform = T.MelScale(sample_rate=sample_rate, n_mels=n_mels)
+        spec = get_spectrogram(
+            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2),
+            n_fft=n_fft, power=1)
+        self.assert_grad(transform, [spec])
+
+    @parameterized.expand([(1.5, "amplitude"), (2, "power"), (10, "db")])
+    def test_vol(self, gain, gain_type):
+        sample_rate = 8000
+        transform = T.Vol(gain=gain, gain_type=gain_type)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform])
+
+    @parameterized.expand([
+        ({'cmn_window': 100, 'min_cmn_window': 50, 'center': False, 'norm_vars': False}, ),
+        ({'cmn_window': 100, 'min_cmn_window': 50, 'center': True, 'norm_vars': False}, ),
+        ({'cmn_window': 100, 'min_cmn_window': 50, 'center': False, 'norm_vars': True}, ),
+        ({'cmn_window': 100, 'min_cmn_window': 50, 'center': True, 'norm_vars': True}, ),
+    ])
+    def test_sliding_window_cmn(self, kwargs):
+        n_fft = 10
+        power = 1
+        spec = get_spectrogram(
+            get_whitenoise(sample_rate=200, duration=0.05, n_channels=2),
+            n_fft=n_fft, power=power)
+        spec_reshaped = spec.transpose(-1, -2)
+
+        transform = T.SlidingWindowCmn(**kwargs)
+        self.assert_grad(transform, [spec_reshaped])
+
+    @unittest.expectedFailure
+    def test_timestretch_zeros_fail(self):
+        """Test that ``T.TimeStretch`` fails gradcheck at 0
+
+        This is because ``F.phase_vocoder`` converts data from cartesian to polar coordinate,
+        which performs ``atan2(img, real)``, and gradient is not defined at 0.
+        """
+        n_fft = 16
+        transform = T.TimeStretch(n_freq=n_fft // 2 + 1, fixed_rate=0.99)
+        waveform = torch.zeros(2, 40)
+        spectrogram = get_spectrogram(waveform, n_fft=n_fft, power=None)
+        self.assert_grad(transform, [spectrogram])
+
+    @nested_params(
+        [0.7, 0.8, 0.9, 1.0, 1.3],
+        [False, True],
+    )
+    def test_timestretch_non_zero(self, rate, test_pseudo_complex):
+        """Verify that ``T.TimeStretch`` does not fail if it's not close to 0
+
+        ``T.TimeStrech`` is not differentiable around 0, so this test checks the differentiability
+        for cases where input is not zero.
+
+        As tested above, when spectrogram contains values close to zero, the gradients are unstable
+        and gradcheck fails.
+
+        In this test, we generate spectrogram from random signal, then we push the points around
+        zero away from the origin.
+
+        This process does not reflect the real use-case, and it is not practical for users, but
+        this helps us understand to what degree the function is differentiable and when not.
+        """
+        n_fft = 16
+        transform = T.TimeStretch(n_freq=n_fft // 2 + 1, fixed_rate=rate)
+        waveform = get_whitenoise(sample_rate=40, duration=1, n_channels=2)
+        spectrogram = get_spectrogram(waveform, n_fft=n_fft, power=None)
+
+        # 1e-3 is too small (on CPU)
+        epsilon = 1e-2
+        too_close = spectrogram.abs() < epsilon
+        spectrogram[too_close] = epsilon * spectrogram[too_close] / spectrogram[too_close].abs()
+        if test_pseudo_complex:
+            spectrogram = torch.view_as_real(spectrogram)
+        self.assert_grad(transform, [spectrogram])

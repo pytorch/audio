@@ -16,7 +16,7 @@ executors:
   windows-gpu:
     machine:
       resource_class: windows.gpu.nvidia.medium
-      image: windows-server-2019-nvidia:stable
+      image: windows-server-2019-nvidia:previous
       shell: bash.exe
 
 commands:
@@ -42,7 +42,7 @@ commands:
     description: "installs tools required to build torchaudio"
     steps:
       - run:
-          name: Install pkg-config
+          name: Install build tools
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pkg-config wget
           # Disable brew auto update which is very slow
   load_conda_channel_flags:
@@ -162,7 +162,7 @@ jobs:
   binary_macos_wheel:
     <<: *binary_common
     macos:
-      xcode: "9.4.1"
+      xcode: "12.0"
     steps:
       - checkout
       - install_build_tools_macos
@@ -188,7 +188,7 @@ jobs:
   binary_macos_conda:
     <<: *binary_common
     macos:
-      xcode: "9.4.1"
+      xcode: "12.0"
     steps:
       - checkout
       - install_build_tools_macos
@@ -424,12 +424,10 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
-      - run:
-          name: Post process
-          command: .circleci/unittest/linux/scripts/post_process.sh
       - store_test_results:
           path: test-results
-
+      - store_artifacts:
+          path: test/htmlcov
   unittest_linux_gpu:
     <<: *binary_common
     machine:
@@ -456,11 +454,10 @@ jobs:
       - run:
           name: Run tests
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
-      - run:
-          name: Post Process
-          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/post_process.sh
       - store_test_results:
           path: test-results
+      - store_artifacts:
+          path: test/htmlcov
 
   unittest_windows_cpu:
     <<: *binary_common
@@ -479,11 +476,10 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
-      - run:
-          name: Post process
-          command: .circleci/unittest/windows/scripts/post_process.sh
       - store_test_results:
           path: test-results
+      - store_artifacts:
+          path: test/htmlcov
 
   unittest_windows_gpu:
     <<: *binary_common
@@ -505,16 +501,15 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/windows/scripts/run_test.sh
-      - run:
-          name: Post process
-          command: .circleci/unittest/windows/scripts/post_process.sh
       - store_test_results:
           path: test-results
+      - store_artifacts:
+          path: test/htmlcov
 
   unittest_macos_cpu:
     <<: *binary_common
     macos:
-      xcode: "9.4.1"
+      xcode: "12.0"
     resource_class: large
     steps:
       - checkout
@@ -532,11 +527,10 @@ jobs:
       - run:
           name: Run tests
           command: .circleci/unittest/linux/scripts/run_test.sh
-      - run:
-          name: Post process
-          command: .circleci/unittest/linux/scripts/post_process.sh
       - store_test_results:
           path: test-results
+      - store_artifacts:
+          path: test/htmlcov
 
   stylecheck:
     <<: *binary_common
