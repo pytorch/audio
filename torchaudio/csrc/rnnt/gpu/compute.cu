@@ -16,7 +16,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
     double clamp,
     bool fused_log_smax = true,
     bool reuse_logits_for_grads = true) {
-    TORCH_CHECK(
+  TORCH_CHECK(
       logits.device().type() == targets.device().type(),
       "logits and targets must be on the same device");
   TORCH_CHECK(
@@ -71,7 +71,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
   TORCH_CHECK(
       targets.size(1) == at::max(tgt_lengths).item().toInt(),
       "target length mismatch");
-      
+
   Options options;
   options.batchSize_ = src_lengths.size(0);
   options.nHypos_ = tgt_lengths.size(0) / src_lengths.size(0);
