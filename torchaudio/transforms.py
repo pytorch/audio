@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import math
+import warnings
 from typing import Callable, Optional
 
 import torch
@@ -673,6 +674,14 @@ class ComplexNorm(torch.nn.Module):
     __constants__ = ['power']
 
     def __init__(self, power: float = 1.0) -> None:
+        warnings.warn(
+            'torchaudio.transforms.ComplexNorm has been deprecated '
+            'and will be removed from future release.'
+            'Please convert the input Tensor to complex type with `torch.view_as_complex` then '
+            'use `torch.abs` and `torch.angle`. '
+            'Please refer to https://github.com/pytorch/audio/issues/1337 '
+            "for more details about torchaudio's plan to migrate to native complex type."
+        )
         super(ComplexNorm, self).__init__()
         self.power = power
 
