@@ -81,6 +81,14 @@ class TestBaseMixin:
         super().setUp()
         set_audio_backend(self.backend)
 
+    @property
+    def complex_dtype(self):
+        if self.dtype in ['float32', 'float', torch.float, torch.float32]:
+            return torch.cfloat
+        if self.dtype in ['float64', 'double', torch.double, torch.float64]:
+            return torch.cdouble
+        raise ValueError(f'No corresponding complex dtype for {self.dtype}')
+
 
 class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
     pass
