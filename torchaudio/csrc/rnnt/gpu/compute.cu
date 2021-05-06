@@ -1,4 +1,4 @@
-#include <THC/THC.h>
+#include <c10/cuda/CUDAStream.h>
 #include <torch/script.h>
 #include <torchaudio/csrc/rnnt/gpu/gpu_transducer.h>
 
