@@ -32,6 +32,25 @@ class Functional(TempDirMixin, TestBaseMixin):
             output = output.shape
         self.assertEqual(ts_output, output)
 
+    def _assert_consistency_complex(self, func, tensor, test_pseudo_complex=False):
+        assert tensor.is_complex()
+        tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
+
+        path = self.get_temp_path('func.zip')
+        torch.jit.script(func).save(path)
+        ts_func = torch.jit.load(path)
+
+        if test_pseudo_complex:
+            tensor = torch.view_as_real(tensor)
+
+        torch.random.manual_seed(40)
+        output = func(tensor)
+
+        torch.random.manual_seed(40)
+        ts_output = ts_func(tensor)
+
+        self.assertEqual(ts_output, output)
+
     def test_spectrogram(self):
         def func(tensor):
             n_fft = 400
@@ -572,26 +591,6 @@ class Functional(TempDirMixin, TestBaseMixin):
         tensor = common_utils.get_whitenoise(sample_rate=44100)
         self._assert_consistency(func, tensor)
 
-
-class FunctionalComplex(TempDirMixin, TestBaseMixin):
-    complex_dtype = None
-    real_dtype = None
-    device = None
-
-    def _assert_consistency(self, func, tensor, test_pseudo_complex=False):
-        assert tensor.is_complex()
-        tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
-
-        path = self.get_temp_path('func.zip')
-        torch.jit.script(func).save(path)
-        ts_func = torch.jit.load(path)
-
-        if test_pseudo_complex:
-            tensor = torch.view_as_real(tensor)
-        output = func(tensor)
-        ts_output = ts_func(tensor)
-        self.assertEqual(ts_output, output)
-
     @parameterized.expand([(True, ), (False, )])
     def test_phase_vocoder(self, test_paseudo_complex):
         def func(tensor):
@@ -610,4 +609,4 @@ class FunctionalComplex(TempDirMixin, TestBaseMixin):
             return F.phase_vocoder(tensor, rate, phase_advance)
 
         tensor = torch.view_as_complex(torch.randn(2, 1025, 400, 2))
-        self._assert_consistency(func, tensor, test_paseudo_complex)
+        self._assert_consistency_complex(func, tensor, test_paseudo_complex)

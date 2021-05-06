@@ -259,12 +259,6 @@ class Functional(TestBaseMixin):
 
             self.assertEqual(specgrams, specgrams_copy)
 
-
-class FunctionalComplex(TestBaseMixin):
-    complex_dtype = None
-    real_dtype = None
-    device = None
-
     @nested_params(
         [0.5, 1.01, 1.3],
         [True, False],
@@ -286,7 +280,7 @@ class FunctionalComplex(TestBaseMixin):
             0,
             np.pi * hop_length,
             num_freq,
-            dtype=self.real_dtype, device=self.device)[..., None]
+            dtype=self.dtype, device=self.device)[..., None]
 
         spec_stretch = F.phase_vocoder(spec, rate=rate, phase_advance=phase_advance)
 

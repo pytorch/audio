@@ -2,7 +2,7 @@ import torch
 import unittest
 
 from torchaudio_unittest.common_utils import PytorchTestCase, skipIfNoCuda
-from .functional_impl import Functional, FunctionalComplex
+from .functional_impl import Functional
 
 
 @skipIfNoCuda
@@ -18,18 +18,4 @@ class TestFunctionalFloat32(Functional, PytorchTestCase):
 @skipIfNoCuda
 class TestLFilterFloat64(Functional, PytorchTestCase):
     dtype = torch.float64
-    device = torch.device('cuda')
-
-
-@skipIfNoCuda
-class TestFunctionalComplex64(FunctionalComplex, PytorchTestCase):
-    complex_dtype = torch.complex64
-    real_dtype = torch.float32
-    device = torch.device('cuda')
-
-
-@skipIfNoCuda
-class TestFunctionalComplex128(FunctionalComplex, PytorchTestCase):
-    complex_dtype = torch.complex64
-    real_dtype = torch.float32
     device = torch.device('cuda')
