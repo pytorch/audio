@@ -3,7 +3,7 @@ import torch
 from parameterized import parameterized
 from torch import Tensor
 import torchaudio.functional as F
-from torch.autograd import gradcheck
+from torch.autograd import gradcheck, gradgradcheck
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     get_whitenoise,
@@ -26,6 +26,7 @@ class Autograd(TestBaseMixin):
                     i.requires_grad = True
             inputs_.append(i)
         assert gradcheck(transform, inputs_)
+        assert gradgradcheck(transform, inputs_)
 
     def test_lfilter_x(self):
         torch.random.manual_seed(2434)

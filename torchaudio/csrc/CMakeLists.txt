@@ -20,6 +20,17 @@ if(BUILD_TRANSDUCER)
     rnnt/compute_betas.cpp
     rnnt/compute.cpp
   )
+
+  if (USE_CUDA)
+    set(
+      CUDA_TRANSDUCER_SOURCES
+      rnnt/gpu/compute_alphas.cu
+      rnnt/gpu/compute_betas.cu
+      rnnt/gpu/compute.cu
+    )
+    list(APPEND TRANSDUCER_SOURCES ${CUDA_TRANSDUCER_SOURCES})
+  endif()
+
   list(APPEND LIBTORCHAUDIO_SOURCES ${TRANSDUCER_SOURCES})
 endif()
 
@@ -103,6 +114,10 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
 
   if (BUILD_KALDI)
     target_compile_definitions(_torchaudio PRIVATE INCLUDE_KALDI)
+  endif()
+
+  if (USE_CUDA)
+    target_compile_definitions(_torchaudio PRIVATE USE_CUDA)
   endif()
 
   target_include_directories(

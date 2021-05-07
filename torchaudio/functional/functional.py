@@ -578,6 +578,12 @@ def angle(
     return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
 
 
+@_mod_utils.deprecated(
+    "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
+    "use `torch.abs` and `torch.angle`. "
+    "Please refer to https://github.com/pytorch/audio/issues/1337 "
+    "for more details about torchaudio's plan to migrate to native complex type."
+)
 def magphase(
         complex_tensor: Tensor,
         power: float = 1.0
