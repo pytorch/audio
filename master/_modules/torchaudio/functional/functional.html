@@ -891,7 +891,13 @@
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">complex_tensor</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">complex_tensor</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="magphase"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.magphase">[docs]</a><span class="k">def</span> <span class="nf">magphase</span><span class="p">(</span>
+<div class="viewcode-block" id="magphase"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.magphase">[docs]</a><span class="nd">@_mod_utils</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span>
+    <span class="s2">&quot;Please convert the input Tensor to complex type with `torch.view_as_complex` then &quot;</span>
+    <span class="s2">&quot;use `torch.abs` and `torch.angle`. &quot;</span>
+    <span class="s2">&quot;Please refer to https://github.com/pytorch/audio/issues/1337 &quot;</span>
+    <span class="s2">&quot;for more details about torchaudio&#39;s plan to migrate to native complex type.&quot;</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">magphase</span><span class="p">(</span>
         <span class="n">complex_tensor</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">power</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>

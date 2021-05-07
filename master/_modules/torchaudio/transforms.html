@@ -314,6 +314,7 @@
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -986,6 +987,14 @@
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">power</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s1">&#39;torchaudio.transforms.ComplexNorm has been deprecated &#39;</span>
+            <span class="s1">&#39;and will be removed from future release.&#39;</span>
+            <span class="s1">&#39;Please convert the input Tensor to complex type with `torch.view_as_complex` then &#39;</span>
+            <span class="s1">&#39;use `torch.abs` and `torch.angle`. &#39;</span>
+            <span class="s1">&#39;Please refer to https://github.com/pytorch/audio/issues/1337 &#39;</span>
+            <span class="s2">&quot;for more details about torchaudio&#39;s plan to migrate to native complex type.&quot;</span>
+        <span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ComplexNorm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">power</span>
 

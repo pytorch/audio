@@ -393,7 +393,6 @@
         <span class="n">target_lengths</span><span class="p">,</span>
         <span class="n">blank</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">clamp</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">runtime_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">fused_log_softmax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">reuse_logits_for_grads</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
@@ -413,15 +412,6 @@
 
         <span class="k">if</span> <span class="n">blank</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># reinterpret blank index if blank &lt; 0.</span>
             <span class="n">blank</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">blank</span>
-
-        <span class="k">if</span> <span class="n">runtime_check</span><span class="p">:</span>
-            <span class="n">check_inputs</span><span class="p">(</span>
-                <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">,</span>
-                <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span>
-                <span class="n">logit_lengths</span><span class="o">=</span><span class="n">logit_lengths</span><span class="p">,</span>
-                <span class="n">target_lengths</span><span class="o">=</span><span class="n">target_lengths</span><span class="p">,</span>
-                <span class="n">blank</span><span class="o">=</span><span class="n">blank</span><span class="p">,</span>
-            <span class="p">)</span>
 
         <span class="n">costs</span><span class="p">,</span> <span class="n">gradients</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">rnnt_loss</span><span class="p">(</span>
             <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">,</span>
@@ -450,7 +440,6 @@
             <span class="kc">None</span><span class="p">,</span>  <span class="c1"># target_lengths</span>
             <span class="kc">None</span><span class="p">,</span>  <span class="c1"># blank</span>
             <span class="kc">None</span><span class="p">,</span>  <span class="c1"># clamp</span>
-            <span class="kc">None</span><span class="p">,</span>  <span class="c1"># runtime_check</span>
             <span class="kc">None</span><span class="p">,</span>  <span class="c1"># fused_log_softmax</span>
             <span class="kc">None</span><span class="p">,</span>  <span class="c1"># reuse_logits_for_grads</span>
         <span class="p">)</span>
@@ -463,7 +452,6 @@
     <span class="n">target_lengths</span><span class="p">,</span>
     <span class="n">blank</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">clamp</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">runtime_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">fused_log_softmax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">reuse_logits_for_grads</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
@@ -498,7 +486,6 @@
         <span class="n">target_lengths</span><span class="p">,</span>
         <span class="n">blank</span><span class="p">,</span>
         <span class="n">clamp</span><span class="p">,</span>
-        <span class="n">runtime_check</span><span class="p">,</span>
         <span class="n">fused_log_softmax</span><span class="p">,</span>
         <span class="n">reuse_logits_for_grads</span><span class="p">,</span>
     <span class="p">)</span>
@@ -516,7 +503,6 @@
 <span class="sd">    Args:</span>
 <span class="sd">        blank (int, opt): blank label (Default: ``-1``)</span>
 <span class="sd">        clamp (float): clamp for gradients (Default: ``-1``)</span>
-<span class="sd">        runtime_check (bool): whether to do sanity check during runtime. (Default: ``False``)</span>
 <span class="sd">        fused_log_softmax (bool): set to False if calling log_softmax outside loss (Default: ``True``)</span>
 <span class="sd">        reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -525,14 +511,12 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">blank</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">clamp</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">runtime_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">fused_log_softmax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">reuse_logits_for_grads</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blank</span> <span class="o">=</span> <span class="n">blank</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clamp</span> <span class="o">=</span> <span class="n">clamp</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">runtime_check</span> <span class="o">=</span> <span class="n">runtime_check</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fused_log_softmax</span> <span class="o">=</span> <span class="n">fused_log_softmax</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reuse_logits_for_grads</span> <span class="o">=</span> <span class="n">reuse_logits_for_grads</span>
 
@@ -557,97 +541,9 @@
             <span class="n">target_lengths</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">blank</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clamp</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">runtime_check</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fused_log_softmax</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">reuse_logits_for_grads</span><span class="p">,</span>
         <span class="p">)</span></div></div>
-
-
-<span class="k">def</span> <span class="nf">check_type</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">t</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> must be </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">check_contiguous</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> must be contiguous&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">check_dim</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="n">dim</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> must be </span><span class="si">{}</span><span class="s2">D&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
-
-
-<span class="k">def</span> <span class="nf">check_equal</span><span class="p">(</span><span class="n">var1</span><span class="p">,</span> <span class="n">name1</span><span class="p">,</span> <span class="n">var2</span><span class="p">,</span> <span class="n">name2</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">var1</span> <span class="o">!=</span> <span class="n">var2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;`</span><span class="si">{}</span><span class="s2">` (</span><span class="si">{}</span><span class="s2">) must equal to &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name1</span><span class="p">,</span> <span class="n">var1</span><span class="p">)</span>
-            <span class="o">+</span> <span class="s2">&quot;`</span><span class="si">{}</span><span class="s2">` (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name2</span><span class="p">,</span> <span class="n">var2</span><span class="p">)</span>
-        <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">check_device</span><span class="p">(</span><span class="n">var1</span><span class="p">,</span> <span class="n">name1</span><span class="p">,</span> <span class="n">var2</span><span class="p">,</span> <span class="n">name2</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">var1</span><span class="o">.</span><span class="n">device</span> <span class="o">!=</span> <span class="n">var2</span><span class="o">.</span><span class="n">device</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;`</span><span class="si">{}</span><span class="s2">` (</span><span class="si">{}</span><span class="s2">) must be on the same &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name1</span><span class="p">,</span> <span class="n">var1</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-            <span class="o">+</span> <span class="s2">&quot;device as `</span><span class="si">{}</span><span class="s2">` (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name2</span><span class="p">,</span> <span class="n">var2</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-        <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">check_inputs</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">logit_lengths</span><span class="p">,</span> <span class="n">target_lengths</span><span class="p">,</span> <span class="n">blank</span><span class="p">):</span>
-    <span class="n">check_device</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="s2">&quot;logits&quot;</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="s2">&quot;targets&quot;</span><span class="p">)</span>
-    <span class="n">check_device</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="s2">&quot;logits&quot;</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="s2">&quot;logit_lengths&quot;</span><span class="p">)</span>
-    <span class="n">check_device</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="s2">&quot;logits&quot;</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="s2">&quot;target_lengths&quot;</span><span class="p">)</span>
-
-    <span class="n">check_type</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="s2">&quot;logits&quot;</span><span class="p">)</span>
-    <span class="n">check_type</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="s2">&quot;targets&quot;</span><span class="p">)</span>
-    <span class="n">check_type</span><span class="p">(</span><span class="n">logit_lengths</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="s2">&quot;logit_lengths&quot;</span><span class="p">)</span>
-    <span class="n">check_type</span><span class="p">(</span><span class="n">target_lengths</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="s2">&quot;target_lengths&quot;</span><span class="p">)</span>
-
-    <span class="n">check_contiguous</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="s2">&quot;logits&quot;</span><span class="p">)</span>
-    <span class="n">check_contiguous</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="s2">&quot;targets&quot;</span><span class="p">)</span>
-    <span class="n">check_contiguous</span><span class="p">(</span><span class="n">target_lengths</span><span class="p">,</span> <span class="s2">&quot;target_lengths&quot;</span><span class="p">)</span>
-    <span class="n">check_contiguous</span><span class="p">(</span><span class="n">logit_lengths</span><span class="p">,</span> <span class="s2">&quot;logit_lengths&quot;</span><span class="p">)</span>
-
-    <span class="n">check_dim</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;logits&quot;</span><span class="p">)</span>
-    <span class="n">check_dim</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;targets&quot;</span><span class="p">)</span>
-    <span class="n">check_dim</span><span class="p">(</span><span class="n">logit_lengths</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;logit_lengths&quot;</span><span class="p">)</span>
-    <span class="n">check_dim</span><span class="p">(</span><span class="n">target_lengths</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;target_lengths&quot;</span><span class="p">)</span>
-
-    <span class="n">check_equal</span><span class="p">(</span>
-        <span class="n">logit_lengths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;logit_lengths.shape[0]&quot;</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;logits.shape[0]&quot;</span>
-    <span class="p">)</span>
-    <span class="n">check_equal</span><span class="p">(</span>
-        <span class="n">target_lengths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;target_lengths.shape[0]&quot;</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;logits.shape[0]&quot;</span>
-    <span class="p">)</span>
-    <span class="n">check_equal</span><span class="p">(</span>
-        <span class="n">targets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;targets.shape[0]&quot;</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;logits.shape[0]&quot;</span>
-    <span class="p">)</span>
-    <span class="n">check_equal</span><span class="p">(</span>
-        <span class="n">targets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-        <span class="s2">&quot;targets.shape[1]&quot;</span><span class="p">,</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">target_lengths</span><span class="p">),</span>
-        <span class="s2">&quot;torch.max(target_lengths)&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">check_equal</span><span class="p">(</span>
-        <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-        <span class="s2">&quot;logits.shape[1]&quot;</span><span class="p">,</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">logit_lengths</span><span class="p">),</span>
-        <span class="s2">&quot;torch.max(logit_lengths)&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">check_equal</span><span class="p">(</span>
-        <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-        <span class="s2">&quot;logits.shape[2]&quot;</span><span class="p">,</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">target_lengths</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;torch.max(target_lengths) + 1&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">blank</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">blank</span> <span class="o">&gt;=</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;blank (</span><span class="si">{}</span><span class="s2">) must be within [0, logits.shape[-1]=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">blank</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
 </pre></div>
 
              </article>
