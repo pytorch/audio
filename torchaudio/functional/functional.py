@@ -1298,8 +1298,13 @@ def compute_kaldi_pitch(
     return result
 
 
-def _get_sinc_resample_kernel(orig_freq: int, new_freq: int, lowpass_filter_width: int,
-                              device: torch.device, dtype: torch.dtype):
+def _get_sinc_resample_kernel(
+        orig_freq: int,
+        new_freq: int,
+        lowpass_filter_width: int,
+        rolloff: float,
+        device: torch.device,
+        dtype: torch.dtype):
     assert lowpass_filter_width > 0
     kernels = []
     base_freq = min(orig_freq, new_freq)
@@ -1307,7 +1312,7 @@ def _get_sinc_resample_kernel(orig_freq: int, new_freq: int, lowpass_filter_widt
     # At first I thought I only needed this when downsampling, but when upsampling
     # you will get edge artifacts without this, as the edge is equivalent to zero padding,
     # which will add high freq artifacts.
-    base_freq *= 0.99
+    base_freq *= rolloff
 
     # The key idea of the algorithm is that x(t) can be exactly reconstructed from x[i] (tensor)
     # using the sinc interpolation formula:
@@ -1352,7 +1357,8 @@ def resample(
         waveform: Tensor,
         orig_freq: float,
         new_freq: float,
-        lowpass_filter_width: int = 6
+        lowpass_filter_width: int = 6,
+        rolloff: float = 0.99,
 ) -> Tensor:
     r"""Resamples the waveform at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
@@ -1369,6 +1375,8 @@ def resample(
         new_freq (float): The desired frequency
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
             but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
+        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
+            Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
 
     Returns:
         Tensor: The waveform at the new frequency of dimension (..., time).
@@ -1386,7 +1394,7 @@ def resample(
     new_freq = new_freq // gcd
 
     kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, lowpass_filter_width,
-                                              waveform.device, waveform.dtype)
+                                              rolloff, waveform.device, waveform.dtype)
 
     num_wavs, length = waveform.shape
     waveform = torch.nn.functional.pad(waveform, (width, width + orig_freq))
