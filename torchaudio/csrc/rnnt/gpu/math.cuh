@@ -1,6 +1,12 @@
 #pragma once
 
-#include <torchaudio/csrc/rnnt/macros.h>
+#ifdef USE_CUDA
+
+#include <cmath>
+
+#endif // USE_CUDA
+
+#include <torchaudio/csrc/rnnt/gpu/half.cuh>
 
 namespace torchaudio {
 namespace rnnt {

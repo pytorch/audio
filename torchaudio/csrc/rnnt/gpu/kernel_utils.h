@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include <torchaudio/csrc/rnnt/cpu/math.h>
+#include <torchaudio/csrc/rnnt/gpu/math.cuh>
 
 namespace torchaudio {
 namespace rnnt {

@@ -325,8 +325,7 @@ void ComputeGradientsOneSequence(
       CAST_DTYPE c = alpha({t, u}) + cost - denom({t, u});
       for (int d = 0; d < D; ++d) {
         CAST_DTYPE g = CAST_DTYPE(logits({t, u, d})) + c;
-        if (d == blank && t == T - 1 &&
-            u == U - 1) { // last blank transition.
+        if (d == blank && t == T - 1 && u == U - 1) { // last blank transition.
           gradients({t, u, d}) = std::exp(g + beta({t, u})) - std::exp(g);
         } else if (d == blank && t < T - 1) {
           gradients({t, u, d}) =

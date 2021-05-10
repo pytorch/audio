@@ -1,8 +1,5 @@
 #include <torchaudio/csrc/rnnt/macros.h>
 
-#ifdef USE_GLOG
-#else
-
 const char* ToString(level_t level) {
   switch (level) {
     case INFO:
@@ -17,5 +14,3 @@ const char* ToString(level_t level) {
       return "UNKNOWN";
   }
 }
-
-#endif // USE_GLOG

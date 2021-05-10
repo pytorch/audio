@@ -578,6 +578,12 @@ def angle(
     return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
 
 
+@_mod_utils.deprecated(
+    "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
+    "use `torch.abs` and `torch.angle`. "
+    "Please refer to https://github.com/pytorch/audio/issues/1337 "
+    "for more details about torchaudio's plan to migrate to native complex type."
+)
 def magphase(
         complex_tensor: Tensor,
         power: float = 1.0
@@ -746,7 +752,7 @@ def mask_along_axis_iid(
 
     # Per batch example masking
     specgrams = specgrams.transpose(axis, -1)
-    specgrams.masked_fill_((mask >= mask_start) & (mask < mask_end), mask_value)
+    specgrams = specgrams.masked_fill((mask >= mask_start) & (mask < mask_end), mask_value)
     specgrams = specgrams.transpose(axis, -1)
 
     return specgrams
@@ -772,24 +778,25 @@ def mask_along_axis(
     Returns:
         Tensor: Masked spectrogram of dimensions (channel, freq, time)
     """
+    if axis != 1 and axis != 2:
+        raise ValueError('Only Frequency and Time masking are supported')
 
     # pack batch
     shape = specgram.size()
     specgram = specgram.reshape([-1] + list(shape[-2:]))
-
     value = torch.rand(1) * mask_param
     min_value = torch.rand(1) * (specgram.size(axis) - value)
 
     mask_start = (min_value.long()).squeeze()
     mask_end = (min_value.long() + value.long()).squeeze()
+    mask = torch.arange(0, specgram.shape[axis], device=specgram.device, dtype=specgram.dtype)
+    mask = (mask >= mask_start) & (mask < mask_end)
+    if axis == 1:
+        mask = mask.unsqueeze(-1)
 
     assert mask_end - mask_start < mask_param
-    if axis == 1:
-        specgram[:, mask_start:mask_end] = mask_value
-    elif axis == 2:
-        specgram[:, :, mask_start:mask_end] = mask_value
-    else:
-        raise ValueError('Only Frequency and Time masking are supported')
+
+    specgram = specgram.masked_fill(mask, mask_value)
 
     # unpack batch
     specgram = specgram.reshape(shape[:-2] + specgram.shape[-2:])

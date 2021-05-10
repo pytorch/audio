@@ -1,11 +1,12 @@
+#include <c10/cuda/CUDAStream.h>
 #include <torch/script.h>
-#include <torchaudio/csrc/rnnt/cpu/cpu_transducer.h>
+#include <torchaudio/csrc/rnnt/gpu/gpu_transducer.h>
 
 namespace torchaudio {
 namespace rnnt {
-namespace cpu {
+namespace gpu {
 
-torch::Tensor compute_betas(
+torch::Tensor compute_alphas(
     const torch::Tensor& logits,
     const torch::Tensor& targets,
     const torch::Tensor& src_lengths,
@@ -21,14 +22,12 @@ torch::Tensor compute_betas(
   options.blank_ = blank;
   options.clamp_ = clamp;
 
-  CHECK_EQ(logits.device().type(), torch::DeviceType::CPU);
-  options.device_ = CPU;
+  CHECK_EQ(logits.device().type(), torch::DeviceType::CUDA);
+  options.stream_ = at::cuda::getCurrentCUDAStream();
+  cudaSetDevice(logits.get_device());
+  options.device_ = GPU;
 
-  torch::Tensor costs = torch::empty(
-      tgt_lengths.size(0),
-      torch::TensorOptions().device(logits.device()).dtype(logits.dtype()));
-
-  torch::Tensor betas = torch::zeros(
+  torch::Tensor alphas = torch::zeros(
       {options.batchSize_ * options.nHypos_,
        options.maxSrcLen_,
        options.maxTgtLen_},
@@ -55,21 +54,20 @@ torch::Tensor compute_betas(
 
   // Only support float, this is mainly to enable easy
   // unit-testing
-  ComputeBetas</*DTYPE=*/float, /*CAST_DTYPE=*/float>(
+  ComputeAlphas</*DTYPE=*/float, /*CAST_DTYPE=*/float>(
       /*workspace=*/workspace,
       /*logits=*/logits.data_ptr<float>(),
       /*targets=*/targets.data_ptr<int>(),
       /*src_lengths=*/src_lengths.data_ptr<int>(),
       /*tgt_lengths=*/tgt_lengths.data_ptr<int>(),
-      /*costs=*/costs.data_ptr<float>(),
-      /*betas=*/betas.data_ptr<float>());
-  return betas;
+      /*alphas=*/alphas.data_ptr<float>());
+  return alphas;
 }
 
-TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
-  m.impl("rnnt_loss_betas", &compute_betas);
+TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
+  m.impl("rnnt_loss_alphas", &compute_alphas);
 }
 
-} // namespace cpu
+} // namespace gpu
 } // namespace rnnt
 } // namespace torchaudio

@@ -26,6 +26,22 @@ class Transforms(TempDirMixin, TestBaseMixin):
         ts_output = ts_transform(tensor)
         self.assertEqual(ts_output, output)
 
+    def _assert_consistency_complex(self, transform, tensor, test_pseudo_complex=False):
+        assert tensor.is_complex()
+        tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
+        transform = transform.to(device=self.device, dtype=self.dtype)
+
+        path = self.get_temp_path('transform.zip')
+        torch.jit.script(transform).save(path)
+        ts_transform = torch.jit.load(path)
+
+        if test_pseudo_complex:
+            tensor = torch.view_as_real(tensor)
+
+        output = transform(tensor)
+        ts_output = ts_transform(tensor)
+        self.assertEqual(ts_output, output)
+
     def test_Spectrogram(self):
         tensor = torch.rand((1, 1000))
         self._assert_consistency(T.Spectrogram(), tensor)
@@ -104,35 +120,13 @@ class Transforms(TempDirMixin, TestBaseMixin):
         waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
         self._assert_consistency(T.SpectralCentroid(sample_rate=sample_rate), waveform)
 
-
-class TransformsComplex(TempDirMixin, TestBaseMixin):
-    complex_dtype = None
-    real_dtype = None
-    device = None
-
-    def _assert_consistency(self, transform, tensor, test_pseudo_complex=False):
-        assert tensor.is_complex()
-        tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
-        transform = transform.to(device=self.device, dtype=self.real_dtype)
-
-        path = self.get_temp_path('transform.zip')
-        torch.jit.script(transform).save(path)
-        ts_transform = torch.jit.load(path)
-
-        if test_pseudo_complex:
-            tensor = torch.view_as_real(tensor)
-
-        output = transform(tensor)
-        ts_output = ts_transform(tensor)
-        self.assertEqual(ts_output, output)
-
     @parameterized.expand([(True, ), (False, )])
     def test_TimeStretch(self, test_pseudo_complex):
         n_freq = 400
         hop_length = 512
         fixed_rate = 1.3
         tensor = torch.view_as_complex(torch.rand((10, 2, n_freq, 10, 2)))
-        self._assert_consistency(
+        self._assert_consistency_complex(
             T.TimeStretch(n_freq=n_freq, hop_length=hop_length, fixed_rate=fixed_rate),
             tensor,
             test_pseudo_complex

@@ -1,9 +1,10 @@
+#include <c10/cuda/CUDAStream.h>
 #include <torch/script.h>
-#include <torchaudio/csrc/rnnt/cpu/cpu_transducer.h>
+#include <torchaudio/csrc/rnnt/gpu/gpu_transducer.h>
 
 namespace torchaudio {
 namespace rnnt {
-namespace cpu {
+namespace gpu {
 
 // Entry point into RNNT Loss
 std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
@@ -81,8 +82,10 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
   options.clamp_ = clamp;
   options.fusedLogSmax_ = fused_log_smax;
 
-  CHECK_EQ(logits.device().type(), torch::DeviceType::CPU);
-  options.device_ = CPU;
+  CHECK_EQ(logits.device().type(), torch::DeviceType::CUDA);
+  options.stream_ = at::cuda::getCurrentCUDAStream();
+  cudaSetDevice(logits.get_device());
+  options.device_ = GPU;
 
   torch::Tensor costs = torch::empty(
       options.batchSize_ * options.nHypos_,
@@ -149,10 +152,10 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
   return std::make_tuple(costs, gradients);
 }
 
-TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
+TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
   m.impl("rnnt_loss", &compute);
 }
 
-} // namespace cpu
+} // namespace gpu
 } // namespace rnnt
 } // namespace torchaudio

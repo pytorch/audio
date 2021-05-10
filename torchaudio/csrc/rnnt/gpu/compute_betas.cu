@@ -1,9 +1,10 @@
+#include <c10/cuda/CUDAStream.h>
 #include <torch/script.h>
-#include <torchaudio/csrc/rnnt/cpu/cpu_transducer.h>
+#include <torchaudio/csrc/rnnt/gpu/gpu_transducer.h>
 
 namespace torchaudio {
 namespace rnnt {
-namespace cpu {
+namespace gpu {
 
 torch::Tensor compute_betas(
     const torch::Tensor& logits,
@@ -21,8 +22,10 @@ torch::Tensor compute_betas(
   options.blank_ = blank;
   options.clamp_ = clamp;
 
-  CHECK_EQ(logits.device().type(), torch::DeviceType::CPU);
-  options.device_ = CPU;
+  CHECK_EQ(logits.device().type(), torch::DeviceType::CUDA);
+  options.stream_ = at::cuda::getCurrentCUDAStream();
+  cudaSetDevice(logits.get_device());
+  options.device_ = GPU;
 
   torch::Tensor costs = torch::empty(
       tgt_lengths.size(0),
@@ -66,10 +69,10 @@ torch::Tensor compute_betas(
   return betas;
 }
 
-TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
+TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
   m.impl("rnnt_loss_betas", &compute_betas);
 }
 
-} // namespace cpu
+} // namespace gpu
 } // namespace rnnt
 } // namespace torchaudio
