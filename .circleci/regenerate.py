@@ -79,7 +79,7 @@ def build_doc_job(filter_branch):
     job = {
         "name": "build_docs",
         "python_version": "3.8",
-        "requires": ["binary_linux_wheel_py3.8", ],
+        "requires": ["binary_linux_wheel_py3.8_cpu", ],
     }
 
     if filter_branch:
@@ -104,7 +104,7 @@ def docstring_parameters_sync_job(filter_branch):
     job = {
         "name": "docstring_parameters_sync",
         "python_version": "3.8",
-        "requires": ["binary_linux_wheel_py3.8", ],
+        "requires": ["binary_linux_wheel_py3.8_cpu", ],
     }
 
     if filter_branch:
@@ -194,6 +194,7 @@ def unittest_workflows(indentation=6):
                 job = {
                     "name": f"unittest_{os_type}_{device_type}_py{python_version}",
                     "python_version": python_version,
+                    "cuda_version": 'cpu' if device_type=="cpu" else "cu102",
                 }
 
                 if os_type != "windows":
@@ -206,6 +207,7 @@ def unittest_workflows(indentation=6):
                         "stylecheck": {
                             "name": f"stylecheck_py{python_version}",
                             "python_version": python_version,
+                            "cuda_version": 'cpu' if device_type=="cpu" else "cu102",
                         }
                     })
     return indent(indentation, jobs)
