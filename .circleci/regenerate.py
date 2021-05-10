@@ -21,6 +21,10 @@ import os.path
 
 
 PYTHON_VERSIONS = ["3.6", "3.7", "3.8", "3.9"]
+CU_VERSIONS_DICT = {"linux": ["cpu", "cu102", "cu111"],
+                    "windows": ["cpu", "cu102", "cu111"],
+                    "macos": ["cpu"]}
+
 
 DOC_VERSION = ('linux', '3.8')
 
@@ -31,7 +35,8 @@ def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
     for btype in ["wheel", "conda"]:
         for os_type in ["linux", "macos", "windows"]:
             for python_version in PYTHON_VERSIONS:
-                w += build_workflow_pair(btype, os_type, python_version, filter_branch, prefix, upload)
+                for cu_version in CU_VERSIONS_DICT[os_type]:
+                    w += build_workflow_pair(btype, os_type, python_version, cu_version, filter_branch, prefix, upload)
 
     if not filter_branch:
         # Build on every pull request, but upload only on nightly and tags
@@ -53,27 +58,19 @@ def build_download_job(filter_branch):
     return [{"download_third_parties_nix": job}]
 
 
-def build_workflow_pair(btype, os_type, python_version, filter_branch, prefix='', upload=False):
+def build_workflow_pair(btype, os_type, python_version, cu_version, filter_branch, prefix='', upload=False):
 
     w = []
-    base_workflow_name = "{prefix}binary_{os_type}_{btype}_py{python_version}".format(
-        prefix=prefix,
-        os_type=os_type,
-        btype=btype,
-        python_version=python_version,
-    )
-
-    w.append(generate_base_workflow(base_workflow_name, python_version, filter_branch, os_type, btype))
+    base_workflow_name = f"{prefix}binary_{os_type}_{btype}_py{python_version}_{cu_version}"
+    w.append(generate_base_workflow(base_workflow_name, python_version, cu_version, filter_branch, os_type, btype))
 
     if upload:
 
-        is_py3_linux = os_type in ['linux', "windows"] and not python_version.startswith("2.")
-
         w.append(generate_upload_workflow(base_workflow_name, filter_branch, btype))
 
-        if filter_branch == 'nightly' and is_py3_linux:
+        if filter_branch == 'nightly' and os_type != 'macos':
             pydistro = 'pip' if btype == 'wheel' else 'conda'
-            w.append(generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, python_version, os_type))
+            w.append(generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type))
 
     return w
 
@@ -115,15 +112,20 @@ def docstring_parameters_sync_job(filter_branch):
     return [{"docstring_parameters_sync": job}]
 
 
-def generate_base_workflow(base_workflow_name, python_version, filter_branch, os_type, btype):
+def generate_base_workflow(base_workflow_name, python_version, cu_version, filter_branch, os_type, btype):
 
     d = {
         "name": base_workflow_name,
         "python_version": python_version,
+        "cuda_version": cu_version,
     }
 
     if os_type in ['linux', 'macos']:
         d['requires'] = ['download_third_parties_nix']
+    if btype == 'conda':
+        d['conda_docker_image'] = f'pytorch/conda-builder:{cu_version.replace("cu1","cuda1")}'
+    elif cu_version != 'cpu':
+        d['wheel_docker_image'] = f'pytorch/manylinux-{cu_version.replace("cu1","cuda1")}'
 
     if filter_branch:
         d["filters"] = gen_filter_branch_tree(filter_branch)
@@ -157,23 +159,23 @@ def generate_upload_workflow(base_workflow_name, filter_branch, btype):
     return {"binary_{btype}_upload".format(btype=btype): d}
 
 
-def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, python_version, os_type):
+def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, python_version, cu_version, os_type):
 
     required_build_suffix = "_upload"
     required_build_name = base_workflow_name + required_build_suffix
 
-    smoke_suffix = "smoke_test_{pydistro}".format(pydistro=pydistro)
+    smoke_suffix = f"smoke_test_{pydistro}".format(pydistro=pydistro)
     d = {
-        "name": "{base_workflow_name}_{smoke_suffix}".format(
-            base_workflow_name=base_workflow_name, smoke_suffix=smoke_suffix),
+        "name": f"{base_workflow_name}_{smoke_suffix}",
         "requires": [required_build_name],
         "python_version": python_version,
+        "cuda_version": cu_version,
     }
 
     if filter_branch:
         d["filters"] = gen_filter_branch_tree(filter_branch)
 
-    return {"smoke_test_{os_type}_{pydistro}".format(os_type=os_type, pydistro=pydistro): d}
+    return {f"smoke_test_{os_type}_{pydistro}": d}
 
 
 def indent(indentation, data_list):
