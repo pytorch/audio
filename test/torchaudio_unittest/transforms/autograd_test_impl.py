@@ -125,14 +125,15 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
-    def test_time_masking(self):
+    @parameterized.expand([(T.TimeMasking,), (T.FrequencyMasking,)])
+    def test_masking(self, masking_transform):
         sample_rate = 8000
         n_fft = 400
         spectrogram = get_spectrogram(
             get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2),
             n_fft=n_fft, power=1)
-        transform = T.TimeMasking(400)
-        self.assert_grad(transform, [spectrogram])
+        deterministic_transform = _DeterministicWrapper(masking_transform(400))
+        self.assert_grad(deterministic_transform, [spectrogram])
 
     def test_spectral_centroid(self):
         sample_rate = 8000
