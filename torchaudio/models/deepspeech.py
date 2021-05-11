@@ -7,17 +7,17 @@ __all__ = ["DeepSpeech"]
 class FullyConnected(nn.Module):
     """
     Args:
-        in_features: Number of input features
-        hidden_size: Internal hidden unit size.
+        n_feature: Number of input features
+        n_hidden: Internal hidden unit size.
     """
 
     def __init__(self,
-                 in_features: int,
-                 hidden_size: int,
+                 n_feature: int,
+                 n_hidden: int,
                  dropout: float,
                  relu_max_clip: int = 20) -> None:
         super(FullyConnected, self).__init__()
-        self.fc = nn.Linear(in_features, hidden_size, bias=True)
+        self.fc = nn.Linear(n_feature, n_hidden, bias=True)
         self.relu_max_clip = relu_max_clip
         self.dropout = dropout
 
@@ -37,32 +37,32 @@ class DeepSpeech(nn.Module):
     <https://arxiv.org/abs/1412.5567> paper.
 
     Args:
-        in_features: Number of input features
-        hidden_size: Internal hidden unit size.
-        num_classes: Number of output classes
+        n_feature: Number of input features
+        n_hidden: Internal hidden unit size.
+        n_class: Number of output classes
     """
 
     def __init__(self,
-                 in_features: int,
-                 hidden_size: int = 2048,
-                 num_classes: int = 40,
+                 n_feature: int,
+                 n_hidden: int = 2048,
+                 n_class: int = 40,
                  dropout: float = 0.0) -> None:
         super(DeepSpeech, self).__init__()
-        self.hidden_size = hidden_size
-        self.fc1 = FullyConnected(in_features, hidden_size, dropout)
-        self.fc2 = FullyConnected(hidden_size, hidden_size, dropout)
-        self.fc3 = FullyConnected(hidden_size, hidden_size, dropout)
+        self.n_hidden = n_hidden
+        self.fc1 = FullyConnected(n_feature, n_hidden, dropout)
+        self.fc2 = FullyConnected(n_hidden, n_hidden, dropout)
+        self.fc3 = FullyConnected(n_hidden, n_hidden, dropout)
         self.bi_rnn = nn.RNN(
-            hidden_size, hidden_size, num_layers=1, nonlinearity='relu', bidirectional=True)
-        self.fc4 = FullyConnected(hidden_size, hidden_size, dropout)
-        self.out = nn.Linear(hidden_size, num_classes)
+            n_hidden, n_hidden, num_layers=1, nonlinearity='relu', bidirectional=True)
+        self.fc4 = FullyConnected(n_hidden, n_hidden, dropout)
+        self.out = nn.Linear(n_hidden, n_class)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            x (torch.Tensor): Tensor of dimension (batch_size, num_channels, input_length, num_features).
+            x (torch.Tensor): Tensor of dimension (batch, channel, time, feature).
         Returns:
-            Tensor: Predictor tensor of dimension (batch_size, input_length, number_of_classes).
+            Tensor: Predictor tensor of dimension (batch, time, class).
         """
         # N x C x T x F
         x = self.fc1(x)
@@ -77,14 +77,14 @@ class DeepSpeech(nn.Module):
         # T x N x H
         x, _ = self.bi_rnn(x)
         # The fifth (non-recurrent) layer takes both the forward and backward units as inputs
-        x = x[:, :, :self.hidden_size] + x[:, :, self.hidden_size:]
+        x = x[:, :, :self.n_hidden] + x[:, :, self.n_hidden:]
         # T x N x H
         x = self.fc4(x)
         # T x N x H
         x = self.out(x)
-        # T x N x num_classes
+        # T x N x n_class
         x = x.permute(1, 0, 2)
-        # N x T x num_classes
+        # N x T x n_class
         x = torch.nn.functional.log_softmax(x, dim=2)
-        # T x N x num_classes
+        # N x T x n_class
         return x

@@ -179,15 +179,15 @@ class TestConvTasNet(common_utils.TorchaudioTestCase):
 class TestDeepSpeech(common_utils.TorchaudioTestCase):
 
     def test_deepspeech(self):
-        batch_size = 2
-        num_features = 1
-        num_channels = 1
-        num_classes = 40
-        input_length = 320
+        n_batch = 2
+        n_feature = 1
+        n_channel = 1
+        n_class = 40
+        n_time = 320
 
-        model = DeepSpeech(in_features=1, num_classes=num_classes)
+        model = DeepSpeech(n_feature=n_feature, n_class=n_class)
 
-        x = torch.rand(batch_size, num_channels, input_length, num_features)
+        x = torch.rand(n_batch, n_channel, n_time, n_feature)
         out = model(x)
 
-        assert out.size() == (batch_size, input_length, num_classes)
+        assert out.size() == (n_batch, n_time, n_class)
