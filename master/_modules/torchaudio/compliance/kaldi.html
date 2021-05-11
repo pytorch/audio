@@ -166,7 +166,7 @@
           </li>
 
           <li>
-            <a href="https://github.com/pytorch/pytorch">Github</a>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
           </li>
         </ul>
       </div>
@@ -1068,7 +1068,8 @@
 <div class="viewcode-block" id="resample_waveform"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.resample_waveform">[docs]</a><span class="k">def</span> <span class="nf">resample_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
                       <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
                       <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                      <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+                      <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+                      <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency.</span>
 
 <span class="sd">    This is a wrapper around ``torchaudio.functional.resample``.</span>
@@ -1079,11 +1080,13 @@
 <span class="sd">        new_freq (float): The desired frequency</span>
 <span class="sd">        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper</span>
 <span class="sd">            but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)</span>
+<span class="sd">        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.</span>
+<span class="sd">            Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: The waveform at the new frequency</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">,</span> <span class="n">rolloff</span><span class="p">)</span></div>
 </pre></div>
 
              </article>

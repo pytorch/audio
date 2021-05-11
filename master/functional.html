@@ -169,7 +169,7 @@
           </li>
 
           <li>
-            <a href="https://github.com/pytorch/pytorch">Github</a>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
           </li>
         </ul>
       </div>
@@ -1647,7 +1647,7 @@ frequency values, weighted by their magnitude.</p>
 <h3><span class="hidden-section">resample</span><a class="headerlink" href="#resample" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.resample">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">resample</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">orig_freq: float</em>, <em class="sig-param">new_freq: float</em>, <em class="sig-param">lowpass_filter_width: int = 6</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.resample" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">resample</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">orig_freq: float</em>, <em class="sig-param">new_freq: float</em>, <em class="sig-param">lowpass_filter_width: int = 6</em>, <em class="sig-param">rolloff: float = 0.99</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.resample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resamples the waveform at the new frequency. This matches Kaldi’s OfflineFeatureTpl ResampleWaveform
 which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
 a signal). LinearResample (LR) means that the output signal is at linearly spaced intervals (i.e
@@ -1663,6 +1663,8 @@ upsample/downsample the signal.</p>
 <li><p><strong>new_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The desired frequency</p></li>
 <li><p><strong>lowpass_filter_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Controls the sharpness of the filter, more == sharper
 but less efficient. We suggest around 4 to 10 for normal use. (Default: <code class="docutils literal notranslate"><span class="pre">6</span></code>)</p></li>
+<li><p><strong>rolloff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The roll-off frequency of the filter, as a fraction of the Nyquist.
+Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: <code class="docutils literal notranslate"><span class="pre">0.99</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

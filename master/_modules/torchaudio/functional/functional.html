@@ -166,7 +166,7 @@
           </li>
 
           <li>
-            <a href="https://github.com/pytorch/pytorch">Github</a>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
           </li>
         </ul>
       </div>
@@ -1611,8 +1611,13 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_sinc_resample_kernel</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                              <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_sinc_resample_kernel</span><span class="p">(</span>
+        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">lowpass_filter_width</span> <span class="o">&gt;</span> <span class="mi">0</span>
     <span class="n">kernels</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">base_freq</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">)</span>
@@ -1620,7 +1625,7 @@
     <span class="c1"># At first I thought I only needed this when downsampling, but when upsampling</span>
     <span class="c1"># you will get edge artifacts without this, as the edge is equivalent to zero padding,</span>
     <span class="c1"># which will add high freq artifacts.</span>
-    <span class="n">base_freq</span> <span class="o">*=</span> <span class="mf">0.99</span>
+    <span class="n">base_freq</span> <span class="o">*=</span> <span class="n">rolloff</span>
 
     <span class="c1"># The key idea of the algorithm is that x(t) can be exactly reconstructed from x[i] (tensor)</span>
     <span class="c1"># using the sinc interpolation formula:</span>
@@ -1665,7 +1670,8 @@
         <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency. This matches Kaldi&#39;s OfflineFeatureTpl ResampleWaveform</span>
 <span class="sd">    which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample</span>
@@ -1682,6 +1688,8 @@
 <span class="sd">        new_freq (float): The desired frequency</span>
 <span class="sd">        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper</span>
 <span class="sd">            but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)</span>
+<span class="sd">        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.</span>
+<span class="sd">            Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: The waveform at the new frequency of dimension (..., time).</span>
@@ -1699,7 +1707,7 @@
     <span class="n">new_freq</span> <span class="o">=</span> <span class="n">new_freq</span> <span class="o">//</span> <span class="n">gcd</span>
 
     <span class="n">kernel</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">_get_sinc_resample_kernel</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">,</span>
-                                              <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                                              <span class="n">rolloff</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="n">num_wavs</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">width</span> <span class="o">+</span> <span class="n">orig_freq</span><span class="p">))</span>

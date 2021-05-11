@@ -169,7 +169,7 @@
           </li>
 
           <li>
-            <a href="https://github.com/pytorch/pytorch">Github</a>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
           </li>
         </ul>
       </div>
@@ -756,7 +756,7 @@ and returns a signal scaled between -1 and 1.</p>
 <h2><span class="hidden-section">Resample</span><a class="headerlink" href="#resample" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.Resample">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Resample</code><span class="sig-paren">(</span><em class="sig-param">orig_freq: int = 16000</em>, <em class="sig-param">new_freq: int = 16000</em>, <em class="sig-param">resampling_method: str = 'sinc_interpolation'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Resample" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Resample</code><span class="sig-paren">(</span><em class="sig-param">orig_freq: int = 16000</em>, <em class="sig-param">new_freq: int = 16000</em>, <em class="sig-param">resampling_method: str = 'sinc_interpolation'</em>, <em class="sig-param">lowpass_filter_width: int = 6</em>, <em class="sig-param">rolloff: float = 0.99</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Resample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resample a signal from one frequency to another. A resampling method can be given.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -764,6 +764,10 @@ and returns a signal scaled between -1 and 1.</p>
 <li><p><strong>orig_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The original frequency of the signal. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
 <li><p><strong>new_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The desired frequency. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
 <li><p><strong>resampling_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The resampling method. (Default: <code class="docutils literal notranslate"><span class="pre">'sinc_interpolation'</span></code>)</p></li>
+<li><p><strong>lowpass_filter_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Controls the sharpness of the filter, more == sharper
+but less efficient. We suggest around 4 to 10 for normal use. (Default: <code class="docutils literal notranslate"><span class="pre">6</span></code>)</p></li>
+<li><p><strong>rolloff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The roll-off frequency of the filter, as a fraction of the Nyquist.
+Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: <code class="docutils literal notranslate"><span class="pre">0.99</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
