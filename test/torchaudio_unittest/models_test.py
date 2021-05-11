@@ -3,7 +3,7 @@ from collections import namedtuple
 
 import torch
 from parameterized import parameterized
-from torchaudio.models import ConvTasNet, Wav2Letter, WaveRNN, DeepSpeech
+from torchaudio.models import ConvTasNet, DeepSpeech, Wav2Letter, WaveRNN
 from torchaudio.models.wavernn import MelResNet, UpsampleNetwork
 from torchaudio_unittest import common_utils
 

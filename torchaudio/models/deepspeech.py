@@ -1,10 +1,9 @@
 import torch
-import torch.nn as nn
 
 __all__ = ["DeepSpeech"]
 
 
-class FullyConnected(nn.Module):
+class FullyConnected(torch.nn.Module):
     """
     Args:
         n_feature: Number of input features
@@ -17,7 +16,7 @@ class FullyConnected(nn.Module):
                  dropout: float,
                  relu_max_clip: int = 20) -> None:
         super(FullyConnected, self).__init__()
-        self.fc = nn.Linear(n_feature, n_hidden, bias=True)
+        self.fc = torch.nn.Linear(n_feature, n_hidden, bias=True)
         self.relu_max_clip = relu_max_clip
         self.dropout = dropout
 
@@ -30,7 +29,7 @@ class FullyConnected(nn.Module):
         return x
 
 
-class DeepSpeech(nn.Module):
+class DeepSpeech(torch.nn.Module):
     """
     DeepSpeech model architecture from
     `"Deep Speech: Scaling up end-to-end speech recognition"`
@@ -42,20 +41,23 @@ class DeepSpeech(nn.Module):
         n_class: Number of output classes
     """
 
-    def __init__(self,
-                 n_feature: int,
-                 n_hidden: int = 2048,
-                 n_class: int = 40,
-                 dropout: float = 0.0) -> None:
+    def __init__(
+        self,
+        n_feature: int,
+        n_hidden: int = 2048,
+        n_class: int = 40,
+        dropout: float = 0.0,
+    ) -> None:
         super(DeepSpeech, self).__init__()
         self.n_hidden = n_hidden
         self.fc1 = FullyConnected(n_feature, n_hidden, dropout)
         self.fc2 = FullyConnected(n_hidden, n_hidden, dropout)
         self.fc3 = FullyConnected(n_hidden, n_hidden, dropout)
-        self.bi_rnn = nn.RNN(
-            n_hidden, n_hidden, num_layers=1, nonlinearity='relu', bidirectional=True)
+        self.bi_rnn = torch.nn.RNN(
+            n_hidden, n_hidden, num_layers=1, nonlinearity="relu", bidirectional=True
+        )
         self.fc4 = FullyConnected(n_hidden, n_hidden, dropout)
-        self.out = nn.Linear(n_hidden, n_class)
+        self.out = torch.nn.Linear(n_hidden, n_class)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
