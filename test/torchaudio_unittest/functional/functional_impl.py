@@ -9,7 +9,7 @@ import torchaudio.functional as F
 from parameterized import parameterized
 from scipy import signal
 
-from torchaudio_unittest.common_utils import TestBaseMixin, get_sinusoid, nested_params
+from torchaudio_unittest.common_utils import TestBaseMixin, get_sinusoid, nested_params, get_whitenoise
 
 
 class Functional(TestBaseMixin):
@@ -258,6 +258,31 @@ class Functional(TestBaseMixin):
             F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis)
 
             self.assertEqual(specgrams, specgrams_copy)
+
+    def test_resample_no_warning(self):
+        sample_rate = 44100
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.1)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            F.resample(waveform, float(sample_rate), sample_rate / 2.)
+        assert len(w) == 0
+
+    def test_resample_warning(self):
+        """resample should throw a warning if an input frequency is not of an integer value"""
+        sample_rate = 44100
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.1)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            F.resample(waveform, sample_rate, 5512.5)
+        assert len(w) == 1
+
+
+class FunctionalComplex(TestBaseMixin):
+    complex_dtype = None
+    real_dtype = None
+    device = None
 
     @nested_params(
         [0.5, 1.01, 1.3],
