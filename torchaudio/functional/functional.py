@@ -1299,10 +1299,28 @@ def compute_kaldi_pitch(
 
 
 def _get_sinc_resample_kernel(
-        orig_freq: int,
-        new_freq: int,
+        orig_freq: float,
+        new_freq: float,
+        gcd: int,
         lowpass_filter_width: int,
         rolloff: float):
+
+    if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
+        warnings.warn(
+            "Non-integer frequencies are being cast to ints and may result in poor resampling quality "
+            "because the underlying algorithm requires an integer ratio between `orig_freq` and `new_freq`. "
+            "Using non-integer valued frequencies will throw an error in the next release. "
+            "To work around this issue, manually convert both frequencies to integer values "
+            "that maintain their resampling rate ratio before passing them into the function "
+            "Example: To downsample a 44100 hz waveform by a factor of 8, use "
+            "`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5` "
+            "For more information or to leave feedback about this change, please refer to "
+            "https://github.com/pytorch/audio/issues/1487."
+        )
+
+    orig_freq = int(orig_freq) // gcd
+    new_freq = int(new_freq) // gcd
+
     assert lowpass_filter_width > 0
     kernels = []
     base_freq = min(orig_freq, new_freq)
@@ -1353,11 +1371,15 @@ def _get_sinc_resample_kernel(
 
 def _apply_sinc_resample_kernel(
         waveform: Tensor,
-        orig_freq: int,
-        new_freq: int,
+        orig_freq: float,
+        new_freq: float,
+        gcd: int,
         kernel: Tensor,
         width: int,
 ):
+    orig_freq = int(orig_freq) // gcd
+    new_freq = int(new_freq) // gcd
+
     # pack batch
     shape = waveform.size()
     waveform = waveform.view(-1, shape[-1])
@@ -1403,31 +1425,14 @@ def resample(
     Returns:
         Tensor: The waveform at the new frequency of dimension (..., time).
 
-    Note: ``transforms.Resample` precomputes and reuses the resampling kernel, so using it will result in
+    Note: ``transforms.Resample`` precomputes and reuses the resampling kernel, so using it will result in
     more efficient computation if resampling multiple waveforms with the same resampling parameters.
     """
 
     assert orig_freq > 0.0 and new_freq > 0.0
 
-    if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
-        warnings.warn(
-            "Non-integer frequencies are being cast to ints and may result in poor resampling quality "
-            "because the underlying algorithm requires an integer ratio between `orig_freq` and `new_freq`. "
-            "Using non-integer valued frequencies will throw an error in the next release. "
-            "To work around this issue, manually convert both frequencies to integer values "
-            "that maintain their resampling rate ratio before passing them into the function "
-            "Example: To downsample a 44100 hz waveform by a factor of 8, use "
-            "`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5` "
-            "For more information or to leave feedback about this change, please refer to "
-            "https://github.com/pytorch/audio/issues/1487."
-        )
+    gcd = math.gcd(int(orig_freq), int(new_freq))
 
-    orig_freq = int(orig_freq)
-    new_freq = int(new_freq)
-    gcd = math.gcd(orig_freq, new_freq)
-    orig_freq = orig_freq // gcd
-    new_freq = new_freq // gcd
-
-    kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, lowpass_filter_width, rolloff)
-    resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, kernel, width)
+    kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, gcd, lowpass_filter_width, rolloff)
+    resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, gcd, kernel, width)
     return resampled
