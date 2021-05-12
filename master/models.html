@@ -371,6 +371,42 @@
 </dd></dl>
 
 </section>
+<section id="deepspeech">
+<h2><span class="hidden-section">DeepSpeech</span><a class="headerlink" href="#deepspeech" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.models.DeepSpeech">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">DeepSpeech</code><span class="sig-paren">(</span><em class="sig-param">n_feature: int</em>, <em class="sig-param">n_hidden: int = 2048</em>, <em class="sig-param">n_class: int = 40</em>, <em class="sig-param">dropout: float = 0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/deepspeech.html#DeepSpeech"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.DeepSpeech" title="Permalink to this definition">¶</a></dt>
+<dd><p>DeepSpeech model architecture from
+<cite>“Deep Speech: Scaling up end-to-end speech recognition”</cite>
+&lt;<a class="reference external" href="https://arxiv.org/abs/1412.5567">https://arxiv.org/abs/1412.5567</a>&gt; paper.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_feature</strong> – Number of input features</p></li>
+<li><p><strong>n_hidden</strong> – Internal hidden unit size.</p></li>
+<li><p><strong>n_class</strong> – Number of output classes</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.models.DeepSpeech.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/models/deepspeech.html#DeepSpeech.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.DeepSpeech.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0a0+56b43f4)"><em>torch.Tensor</em></a>) – Tensor of dimension (batch, channel, time, feature).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Predictor tensor of dimension (batch, time, class).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="wav2letter">
 <h2><span class="hidden-section">Wav2Letter</span><a class="headerlink" href="#wav2letter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -516,6 +552,7 @@ The input channels of waveform and spectrogram have to be 1. The product of
               <ul>
 <li><a class="reference internal" href="#">torchaudio.models</a><ul>
 <li><a class="reference internal" href="#convtasnet"><span class="hidden-section">ConvTasNet</span></a></li>
+<li><a class="reference internal" href="#deepspeech"><span class="hidden-section">DeepSpeech</span></a></li>
 <li><a class="reference internal" href="#wav2letter"><span class="hidden-section">Wav2Letter</span></a></li>
 <li><a class="reference internal" href="#wavernn"><span class="hidden-section">WaveRNN</span></a></li>
 </ul>
