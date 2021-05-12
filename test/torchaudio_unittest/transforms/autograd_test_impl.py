@@ -132,15 +132,22 @@ class AutogradTestMixin(TestBaseMixin):
         spectrogram = get_spectrogram(
             get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2),
             n_fft=n_fft, power=1)
-        spectrogram2 = get_spectrogram(
-            # Add second white noise with another seed, so they are different
-            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2, seed=31),
-            n_fft=n_fft, power=1)
         deterministic_transform = _DeterministicWrapper(masking_transform(400))
-        deterministic_transform_iid = _DeterministicWrapper(masking_transform(400, True))
-
         self.assert_grad(deterministic_transform, [spectrogram])
-        self.assert_grad(deterministic_transform_iid, [spectrogram + spectrogram2])
+
+    @parameterized.expand([(T.TimeMasking,), (T.FrequencyMasking,)])
+    def test_masking_iid(self, masking_transform):
+        sample_rate = 8000
+        n_fft = 400
+        specs = [get_spectrogram(
+            get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2, seed=i),
+            n_fft=n_fft, power=1)
+            for i in range(3)
+        ]
+
+        batch = torch.cat(specs)
+        deterministic_transform = _DeterministicWrapper(masking_transform(400, True))
+        self.assert_grad(deterministic_transform, [batch])
 
     def test_spectral_centroid(self):
         sample_rate = 8000
