@@ -145,7 +145,8 @@ class AutogradTestMixin(TestBaseMixin):
             for i in range(3)
         ]
 
-        batch = torch.cat(specs)
+        batch = torch.stack(specs)
+        assert batch.ndim == 4
         deterministic_transform = _DeterministicWrapper(masking_transform(400, True))
         self.assert_grad(deterministic_transform, [batch])
 
