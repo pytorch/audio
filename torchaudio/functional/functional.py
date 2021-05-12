@@ -1302,9 +1302,7 @@ def _get_sinc_resample_kernel(
         orig_freq: int,
         new_freq: int,
         lowpass_filter_width: int,
-        rolloff: float,
-        device: torch.device,
-        dtype: torch.dtype):
+        rolloff: float):
     assert lowpass_filter_width > 0
     kernels = []
     base_freq = min(orig_freq, new_freq)
@@ -1336,7 +1334,7 @@ def _get_sinc_resample_kernel(
     # they will have a lot of almost zero values to the left or to the right...
     # There is probably a way to evaluate those filters more efficiently, but this is kept for
     # future work.
-    idx = torch.arange(-width, width + orig_freq, device=device, dtype=dtype)
+    idx = torch.arange(-width, width + orig_freq)
 
     for i in range(new_freq):
         t = (-i / new_freq + idx / orig_freq) * base_freq
@@ -1353,13 +1351,36 @@ def _get_sinc_resample_kernel(
     return torch.stack(kernels).view(new_freq, 1, -1).mul_(scale), width
 
 
+def _apply_sinc_resample_kernel(
+        waveform: Tensor,
+        orig_freq: int,
+        new_freq: int,
+        kernel: Tensor,
+        width: int,
+):
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.view(-1, shape[-1])
+    kernel = kernel.to(device=waveform.device, dtype=waveform.dtype)
+
+    num_wavs, length = waveform.shape
+    waveform = torch.nn.functional.pad(waveform, (width, width + orig_freq))
+    resampled = torch.nn.functional.conv1d(waveform[:, None], kernel, stride=orig_freq)
+    resampled = resampled.transpose(1, 2).reshape(num_wavs, -1)
+    target_length = int(math.ceil(new_freq * length / orig_freq))
+    resampled = resampled[..., :target_length]
+
+    # unpack batch
+    resampled = resampled.view(shape[:-1] + resampled.shape[-1:])
+    return resampled
+
+
 def resample(
         waveform: Tensor,
         orig_freq: float,
         new_freq: float,
         lowpass_filter_width: int = 6,
         rolloff: float = 0.99,
-        kernel: Tensor = None
 ) -> Tensor:
     r"""Resamples the waveform at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
@@ -1378,20 +1399,13 @@ def resample(
             but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
-        kernel (Tensor, optional): Tensor of dimension (f, 1, w) representing the windowed sinc function that is
-            used in convolution to calculate the resampled waveform. ``f = new_freq_gcd`` and ``w = 2 *
-            math.ceil(lowpass_filter_width * (orig_freq_gcd) / (rolloff * min(orig_freq_gcd, new_freq_gcd)) + orig_freq_gcd``,
-            where ``new_freq_gcd`` and ``orig_freq_gcd`` are equal to ``new_freq // gcd`` and ``old_freq // gcd``
 
     Returns:
         Tensor: The waveform at the new frequency of dimension (..., time).
 
-    Note: transforms.Resample passes in a precomputed kernel, which will result in more efficient computation if reusing
-          the same set of resampling parameters to resample multiple waveforms.
+    Note: ``transforms.Resample` precomputes and reuses the resampling kernel, so using it will result in
+    more efficient computation if resampling multiple waveforms with the same resampling parameters.
     """
-    # pack batch
-    shape = waveform.size()
-    waveform = waveform.view(-1, shape[-1])
 
     assert orig_freq > 0.0 and new_freq > 0.0
 
@@ -1414,22 +1428,6 @@ def resample(
     orig_freq = orig_freq // gcd
     new_freq = new_freq // gcd
 
-    if kernel == None:
-        kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, lowpass_filter_width,
-                                                  rolloff, waveform.device, waveform.dtype)
-    else:
-        base_freq = min(orig_freq, new_freq) * rolloff
-        width = math.ceil(lowpass_filter_width * orig_freq / base_freq)
-    assert kernel.shape[0] == new_freq
-    assert kernel.shape[2] == 2 * width + orig_freq
-
-    num_wavs, length = waveform.shape
-    waveform = torch.nn.functional.pad(waveform, (width, width + orig_freq))
-    resampled = torch.nn.functional.conv1d(waveform[:, None], kernel, stride=orig_freq)
-    resampled = resampled.transpose(1, 2).reshape(num_wavs, -1)
-    target_length = int(math.ceil(new_freq * length / orig_freq))
-    resampled = resampled[..., :target_length]
-
-    # unpack batch
-    resampled = resampled.view(shape[:-1] + resampled.shape[-1:])
+    kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, lowpass_filter_width, rolloff)
+    resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, kernel, width)
     return resampled

@@ -8,7 +8,10 @@ import torch
 from torch import Tensor
 from torchaudio import functional as F
 
-from .functional.functional import _get_sinc_resample_kernel
+from .functional.functional import (
+    _get_sinc_resample_kernel,
+    _apply_sinc_resample_kernel,
+)
 
 __all__ = [
     'Spectrogram',
@@ -654,12 +657,15 @@ class Resample(torch.nn.Module):
                  lowpass_filter_width: int = 6,
                  rolloff: float = 0.99) -> None:
         super(Resample, self).__init__()
-        self.orig_freq = orig_freq
-        self.new_freq = new_freq
+        self.orig_freq = int(orig_freq)
+        self.new_freq = int(new_freq)
+        self.gcd = math.gcd(self.orig_freq, self.new_freq)
         self.resampling_method = resampling_method
         self.lowpass_filter_width = lowpass_filter_width
         self.rolloff = rolloff
-        self.kernel = None
+
+        self.kernel, self.width = _get_sinc_resample_kernel(self.orig_freq // self.gcd, self.new_freq // self.gcd,
+                                                            self.lowpass_filter_width, self.rolloff)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -670,13 +676,8 @@ class Resample(torch.nn.Module):
             Tensor: Output signal of dimension (..., time).
         """
         if self.resampling_method == 'sinc_interpolation':
-            if self.kernel == None:
-                gcd = math.gcd(self.orig_freq, self.new_freq)
-                orig_freq = self.orig_freq // gcd
-                new_freq = self.new_freq // gcd
-                self.kernel, _ = _get_sinc_resample_kernel(orig_freq, new_freq, self.lowpass_filter_width,
-                                                           self.rolloff, waveform.device, waveform.dtype)
-            return F.resample(waveform, self.orig_freq, self.new_freq, self.lowpass_filter_width, self.rolloff, self.kernel)
+            return _apply_sinc_resample_kernel(waveform, self.orig_freq // self.gcd, self.new_freq // self.gcd,
+                                               self.kernel, self.width)
 
         raise ValueError('Invalid resampling method: {}'.format(self.resampling_method))
 
