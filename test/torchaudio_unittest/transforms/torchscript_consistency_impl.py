@@ -61,6 +61,7 @@ class Transforms(TempDirMixin, TestBaseMixin):
 
     def test_MelScale(self):
         spec_f = torch.rand((1, 201, 6))
+        self._assert_consistency(T.MelScale(), spec_f)
         self._assert_consistency(T.MelScale(n_stft=201), spec_f)
 
     def test_MelSpectrogram(self):
