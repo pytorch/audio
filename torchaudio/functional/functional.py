@@ -1383,7 +1383,7 @@ def _apply_sinc_resample_kernel(
     # pack batch
     shape = waveform.size()
     waveform = waveform.view(-1, shape[-1])
-    kernel = kernel.to(dtype=waveform.dtype)
+    kernel = kernel.to(device=waveform.device, dtype=waveform.dtype)
 
     num_wavs, length = waveform.shape
     waveform = torch.nn.functional.pad(waveform, (width, width + orig_freq))
@@ -1434,6 +1434,5 @@ def resample(
     gcd = math.gcd(int(orig_freq), int(new_freq))
 
     kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, gcd, lowpass_filter_width, rolloff)
-    kernel = kernel.to(device=waveform.device)
     resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, gcd, kernel, width)
     return resampled
