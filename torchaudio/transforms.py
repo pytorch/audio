@@ -284,6 +284,20 @@ class MelScale(torch.nn.Module):
             self.mel_scale)
         self.register_buffer('fb', fb)
 
+    def __prepare_scriptable__(self):
+        r"""If `self.fb` is empty, the `forward` method will try to resize the parameter,
+        which does not work once the transform is scripted. However, this error does not happen
+        until the transform is executed. This is inconvenient especially if the resulting
+        TorchScript object is executed in other environments. Therefore, we check the
+        validity of `self.fb` here and fail if the resulting TS does not work.
+
+        Returns:
+            MelScale: self
+        """
+        if self.fb.numel() == 0:
+            raise ValueError("n_stft must be provided at construction")
+        return self
+
     def forward(self, specgram: Tensor) -> Tensor:
         r"""
         Args:
