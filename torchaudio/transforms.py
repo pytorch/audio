@@ -276,22 +276,26 @@ class MelScale(torch.nn.Module):
         self.f_min = f_min
         self.norm = norm
         self.mel_scale = mel_scale
-        self.n_stft = n_stft
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
-        fb = torch.empty(0) if self.n_stft is None else F.create_fb_matrix(
+        fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm,
             self.mel_scale)
         self.register_buffer('fb', fb)
 
     def __prepare_scriptable__(self):
-        r"""
-        Prepare self to be scripted
+        r"""If `self.fb` is empty, the `forward` method will try to resize the parameter,
+        which does not work once the transform is scripted. However, this error does not happen
+        until the transform is executed. This is inconvenient especially if the resulting
+        TorchScript object is executed in other environments. Therefore, we check the
+        validity of `self.fb` here and fail if the resulting TS does not work.
+
         Returns:
             MelScale: self
         """
-        assert self.n_stft is not None, ValueError("n_stft must be provided at construction")
+        if self.fb.numel() == 0:
+            raise ValueError("n_stft must be provided at construction")
         return self
 
     def forward(self, specgram: Tensor) -> Tensor:
