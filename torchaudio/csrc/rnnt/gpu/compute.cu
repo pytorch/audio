@@ -16,6 +16,62 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
     double clamp,
     bool fused_log_smax = true,
     bool reuse_logits_for_grads = true) {
+  TORCH_CHECK(
+      logits.device().type() == targets.device().type(),
+      "logits and targets must be on the same device");
+  TORCH_CHECK(
+      logits.device().type() == src_lengths.device().type(),
+      "logits and logit_lengths must be on the same device");
+  TORCH_CHECK(
+      logits.device().type() == tgt_lengths.device().type(),
+      "logits and target_lengths must be on the same device");
+
+  TORCH_CHECK(
+      logits.dtype() == torch::kFloat32 || logits.dtype() == torch::kFloat16,
+      "logits must be float32 or float16 (half) type");
+  TORCH_CHECK(targets.dtype() == torch::kInt32, "targets must be int32 type");
+  TORCH_CHECK(
+      src_lengths.dtype() == torch::kInt32, "logit_lengths must be int32 type");
+  TORCH_CHECK(
+      tgt_lengths.dtype() == torch::kInt32,
+      "target_lengths must be int32 type");
+
+  TORCH_CHECK(logits.is_contiguous(), "logits must be contiguous");
+  TORCH_CHECK(targets.is_contiguous(), "targets must be contiguous");
+  TORCH_CHECK(src_lengths.is_contiguous(), "logit_lengths must be contiguous");
+  TORCH_CHECK(tgt_lengths.is_contiguous(), "target_lengths must be contiguous");
+
+  TORCH_CHECK(
+      logits.dim() == 4, "logits must be 4-D (batch, time, target, class)");
+  TORCH_CHECK(
+      targets.dim() == 2, "targets must be 2-D (batch, max target length)");
+  TORCH_CHECK(src_lengths.dim() == 1, "logit_lengths must be 1-D");
+  TORCH_CHECK(tgt_lengths.dim() == 1, "target_lengths must be 1-D");
+
+  TORCH_CHECK(
+      src_lengths.size(0) == logits.size(0),
+      "batch dimension mismatch between logits and logit_lengths");
+  TORCH_CHECK(
+      tgt_lengths.size(0) == logits.size(0),
+      "batch dimension mismatch between logits and target_lengths");
+  TORCH_CHECK(
+      targets.size(0) == logits.size(0),
+      "batch dimension mismatch between logits and targets");
+
+  TORCH_CHECK(
+      blank >= 0 && blank < logits.size(-1),
+      "blank must be within [0, logits.shape[-1])");
+
+  TORCH_CHECK(
+      logits.size(1) == at::max(src_lengths).item().toInt(),
+      "input length mismatch");
+  TORCH_CHECK(
+      logits.size(2) == at::max(tgt_lengths).item().toInt() + 1,
+      "output length mismatch");
+  TORCH_CHECK(
+      targets.size(1) == at::max(tgt_lengths).item().toInt(),
+      "target length mismatch");
+
   Options options;
   options.batchSize_ = src_lengths.size(0);
   options.nHypos_ = tgt_lengths.size(0) / src_lengths.size(0);

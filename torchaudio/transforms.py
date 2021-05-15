@@ -8,6 +8,10 @@ import torch
 from torch import Tensor
 from torchaudio import functional as F
 
+from .functional.functional import (
+    _get_sinc_resample_kernel,
+    _apply_sinc_resample_kernel,
+)
 
 __all__ = [
     'Spectrogram',
@@ -283,6 +287,20 @@ class MelScale(torch.nn.Module):
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm,
             self.mel_scale)
         self.register_buffer('fb', fb)
+
+    def __prepare_scriptable__(self):
+        r"""If `self.fb` is empty, the `forward` method will try to resize the parameter,
+        which does not work once the transform is scripted. However, this error does not happen
+        until the transform is executed. This is inconvenient especially if the resulting
+        TorchScript object is executed in other environments. Therefore, we check the
+        validity of `self.fb` here and fail if the resulting TS does not work.
+
+        Returns:
+            MelScale: self
+        """
+        if self.fb.numel() == 0:
+            raise ValueError("n_stft must be provided at construction")
+        return self
 
     def forward(self, specgram: Tensor) -> Tensor:
         r"""
@@ -640,16 +658,29 @@ class Resample(torch.nn.Module):
         orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)
         new_freq (float, optional): The desired frequency. (Default: ``16000``)
         resampling_method (str, optional): The resampling method. (Default: ``'sinc_interpolation'``)
+        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
+            but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
+        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
+            Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
     """
 
     def __init__(self,
-                 orig_freq: int = 16000,
-                 new_freq: int = 16000,
-                 resampling_method: str = 'sinc_interpolation') -> None:
+                 orig_freq: float = 16000,
+                 new_freq: float = 16000,
+                 resampling_method: str = 'sinc_interpolation',
+                 lowpass_filter_width: int = 6,
+                 rolloff: float = 0.99) -> None:
         super(Resample, self).__init__()
+
         self.orig_freq = orig_freq
         self.new_freq = new_freq
+        self.gcd = math.gcd(int(self.orig_freq), int(self.new_freq))
         self.resampling_method = resampling_method
+        self.lowpass_filter_width = lowpass_filter_width
+        self.rolloff = rolloff
+
+        self.kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
+                                                            self.lowpass_filter_width, self.rolloff)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -660,7 +691,8 @@ class Resample(torch.nn.Module):
             Tensor: Output signal of dimension (..., time).
         """
         if self.resampling_method == 'sinc_interpolation':
-            return F.resample(waveform, self.orig_freq, self.new_freq)
+            return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd,
+                                               self.kernel, self.width)
 
         raise ValueError('Invalid resampling method: {}'.format(self.resampling_method))
 

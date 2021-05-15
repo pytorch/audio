@@ -70,7 +70,6 @@ def _rnnt_loss_betas(
         clamp,
     )
 
-
 def rnnt_loss(
     logits: Tensor,
     targets: Tensor,
@@ -126,8 +125,7 @@ def rnnt_loss(
         blank=blank,
         clamp=clamp,
         fused_log_smax=fused_log_softmax,
-        reuse_logits_for_grads=reuse_logits_for_grads,
-    )
+        reuse_logits_for_grads=reuse_logits_for_grads,)
 
     return costs
 
