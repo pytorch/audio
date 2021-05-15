@@ -1674,6 +1674,8 @@ Lower values reduce anti-aliasing, but also reduce some of the highest frequenci
 <dd class="field-odd"><p>Tensor</p>
 </dd>
 </dl>
+<p>Note: <code class="docutils literal notranslate"><span class="pre">transforms.Resample</span></code> precomputes and reuses the resampling kernel, so using it will result in
+more efficient computation if resampling multiple waveforms with the same resampling parameters.</p>
 </dd></dl>
 
 </section>

@@ -321,6 +321,10 @@
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">torchaudio</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
+<span class="kn">from</span> <span class="nn">.functional.functional</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_get_sinc_resample_kernel</span><span class="p">,</span>
+    <span class="n">_apply_sinc_resample_kernel</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;Spectrogram&#39;</span><span class="p">,</span>
@@ -596,6 +600,20 @@
             <span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mel_scale</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s1">&#39;fb&#39;</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__prepare_scriptable__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;If `self.fb` is empty, the `forward` method will try to resize the parameter,</span>
+<span class="sd">        which does not work once the transform is scripted. However, this error does not happen</span>
+<span class="sd">        until the transform is executed. This is inconvenient especially if the resulting</span>
+<span class="sd">        TorchScript object is executed in other environments. Therefore, we check the</span>
+<span class="sd">        validity of `self.fb` here and fail if the resulting TS does not work.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            MelScale: self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;n_stft must be provided at construction&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
 <div class="viewcode-block" id="MelScale.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.MelScale.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -960,17 +978,22 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
-                 <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
+                 <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
+                 <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
                  <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;sinc_interpolation&#39;</span><span class="p">,</span>
                  <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
                  <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Resample</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">orig_freq</span> <span class="o">=</span> <span class="n">orig_freq</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">new_freq</span> <span class="o">=</span> <span class="n">new_freq</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gcd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orig_freq</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_freq</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resampling_method</span> <span class="o">=</span> <span class="n">resampling_method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lowpass_filter_width</span> <span class="o">=</span> <span class="n">lowpass_filter_width</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rolloff</span> <span class="o">=</span> <span class="n">rolloff</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">_get_sinc_resample_kernel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orig_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gcd</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">lowpass_filter_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rolloff</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Resample.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Resample.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -981,7 +1004,8 @@
 <span class="sd">            Tensor: Output signal of dimension (..., time).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resampling_method</span> <span class="o">==</span> <span class="s1">&#39;sinc_interpolation&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">orig_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowpass_filter_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rolloff</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_apply_sinc_resample_kernel</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">orig_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gcd</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
 
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid resampling method: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resampling_method</span><span class="p">))</span></div></div>
 

@@ -1612,12 +1612,28 @@
 
 
 <span class="k">def</span> <span class="nf">_get_sinc_resample_kernel</span><span class="p">(</span>
-        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">gcd</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-        <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+        <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">==</span> <span class="n">orig_freq</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">==</span> <span class="n">new_freq</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Non-integer frequencies are being cast to ints and may result in poor resampling quality &quot;</span>
+            <span class="s2">&quot;because the underlying algorithm requires an integer ratio between `orig_freq` and `new_freq`. &quot;</span>
+            <span class="s2">&quot;Using non-integer valued frequencies will throw an error in the next release. &quot;</span>
+            <span class="s2">&quot;To work around this issue, manually convert both frequencies to integer values &quot;</span>
+            <span class="s2">&quot;that maintain their resampling rate ratio before passing them into the function &quot;</span>
+            <span class="s2">&quot;Example: To downsample a 44100 hz waveform by a factor of 8, use &quot;</span>
+            <span class="s2">&quot;`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5` &quot;</span>
+            <span class="s2">&quot;For more information or to leave feedback about this change, please refer to &quot;</span>
+            <span class="s2">&quot;https://github.com/pytorch/audio/issues/1487.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">orig_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
+    <span class="n">new_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
+
     <span class="k">assert</span> <span class="n">lowpass_filter_width</span> <span class="o">&gt;</span> <span class="mi">0</span>
     <span class="n">kernels</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">base_freq</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">)</span>
@@ -1649,7 +1665,7 @@
     <span class="c1"># they will have a lot of almost zero values to the left or to the right...</span>
     <span class="c1"># There is probably a way to evaluate those filters more efficiently, but this is kept for</span>
     <span class="c1"># future work.</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">width</span><span class="p">,</span> <span class="n">width</span> <span class="o">+</span> <span class="n">orig_freq</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">width</span><span class="p">,</span> <span class="n">width</span> <span class="o">+</span> <span class="n">orig_freq</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">new_freq</span><span class="p">):</span>
         <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">i</span> <span class="o">/</span> <span class="n">new_freq</span> <span class="o">+</span> <span class="n">idx</span> <span class="o">/</span> <span class="n">orig_freq</span><span class="p">)</span> <span class="o">*</span> <span class="n">base_freq</span>
@@ -1664,6 +1680,34 @@
 
     <span class="n">scale</span> <span class="o">=</span> <span class="n">base_freq</span> <span class="o">/</span> <span class="n">orig_freq</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">kernels</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">new_freq</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">scale</span><span class="p">),</span> <span class="n">width</span>
+
+
+<span class="k">def</span> <span class="nf">_apply_sinc_resample_kernel</span><span class="p">(</span>
+        <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">gcd</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">kernel</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">orig_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
+    <span class="n">new_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
+
+    <span class="c1"># pack batch</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">num_wavs</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">width</span> <span class="o">+</span> <span class="n">orig_freq</span><span class="p">))</span>
+    <span class="n">resampled</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span><span class="n">waveform</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">orig_freq</span><span class="p">)</span>
+    <span class="n">resampled</span> <span class="o">=</span> <span class="n">resampled</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_wavs</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">target_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">new_freq</span> <span class="o">*</span> <span class="n">length</span> <span class="o">/</span> <span class="n">orig_freq</span><span class="p">))</span>
+    <span class="n">resampled</span> <span class="o">=</span> <span class="n">resampled</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">target_length</span><span class="p">]</span>
+
+    <span class="c1"># unpack batch</span>
+    <span class="n">resampled</span> <span class="o">=</span> <span class="n">resampled</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">resampled</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="k">return</span> <span class="n">resampled</span>
 
 
 <div class="viewcode-block" id="resample"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.resample">[docs]</a><span class="k">def</span> <span class="nf">resample</span><span class="p">(</span>
@@ -1693,44 +1737,17 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: The waveform at the new frequency of dimension (..., time).</span>
+
+<span class="sd">    Note: ``transforms.Resample`` precomputes and reuses the resampling kernel, so using it will result in</span>
+<span class="sd">    more efficient computation if resampling multiple waveforms with the same resampling parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># pack batch</span>
-    <span class="n">shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="k">assert</span> <span class="n">orig_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">new_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">==</span> <span class="n">orig_freq</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">==</span> <span class="n">new_freq</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Non-integer frequencies are being cast to ints and may result in poor resampling quality &quot;</span>
-            <span class="s2">&quot;because the underlying algorithm requires an integer ratio between `orig_freq` and `new_freq`. &quot;</span>
-            <span class="s2">&quot;Using non-integer valued frequencies will throw an error in the next release. &quot;</span>
-            <span class="s2">&quot;To work around this issue, manually convert both frequencies to integer values &quot;</span>
-            <span class="s2">&quot;that maintain their resampling rate ratio before passing them into the function &quot;</span>
-            <span class="s2">&quot;Example: To downsample a 44100 hz waveform by a factor of 8, use &quot;</span>
-            <span class="s2">&quot;`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5` &quot;</span>
-            <span class="s2">&quot;For more information or to leave feedback about this change, please refer to &quot;</span>
-            <span class="s2">&quot;https://github.com/pytorch/audio/issues/1487.&quot;</span>
-        <span class="p">)</span>
+    <span class="n">gcd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">))</span>
 
-    <span class="n">orig_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span>
-    <span class="n">new_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span>
-    <span class="n">gcd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">)</span>
-    <span class="n">orig_freq</span> <span class="o">=</span> <span class="n">orig_freq</span> <span class="o">//</span> <span class="n">gcd</span>
-    <span class="n">new_freq</span> <span class="o">=</span> <span class="n">new_freq</span> <span class="o">//</span> <span class="n">gcd</span>
-
-    <span class="n">kernel</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">_get_sinc_resample_kernel</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">,</span>
-                                              <span class="n">rolloff</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-
-    <span class="n">num_wavs</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">waveform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">width</span> <span class="o">+</span> <span class="n">orig_freq</span><span class="p">))</span>
-    <span class="n">resampled</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span><span class="n">waveform</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">orig_freq</span><span class="p">)</span>
-    <span class="n">resampled</span> <span class="o">=</span> <span class="n">resampled</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_wavs</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">target_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">new_freq</span> <span class="o">*</span> <span class="n">length</span> <span class="o">/</span> <span class="n">orig_freq</span><span class="p">))</span>
-    <span class="n">resampled</span> <span class="o">=</span> <span class="n">resampled</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">target_length</span><span class="p">]</span>
-
-    <span class="c1"># unpack batch</span>
-    <span class="n">resampled</span> <span class="o">=</span> <span class="n">resampled</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">resampled</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">kernel</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">_get_sinc_resample_kernel</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">gcd</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">,</span> <span class="n">rolloff</span><span class="p">)</span>
+    <span class="n">resampled</span> <span class="o">=</span> <span class="n">_apply_sinc_resample_kernel</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">gcd</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">resampled</span></div>
 </pre></div>
 
