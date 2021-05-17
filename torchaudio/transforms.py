@@ -657,7 +657,8 @@ class Resample(torch.nn.Module):
     Args:
         orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)
         new_freq (float, optional): The desired frequency. (Default: ``16000``)
-        resampling_method (str, optional): The resampling method. (Default: ``'sinc_interpolation'``)
+        resampling_method (str, optional): The resampling method.
+            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
             but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
@@ -669,7 +670,8 @@ class Resample(torch.nn.Module):
                  new_freq: float = 16000,
                  resampling_method: str = 'sinc_interpolation',
                  lowpass_filter_width: int = 6,
-                 rolloff: float = 0.99) -> None:
+                 rolloff: float = 0.99,
+                 **kwargs) -> None:
         super(Resample, self).__init__()
 
         self.orig_freq = orig_freq
@@ -679,8 +681,12 @@ class Resample(torch.nn.Module):
         self.lowpass_filter_width = lowpass_filter_width
         self.rolloff = rolloff
 
+        if self.resampling_method not in ['sinc_interpolation', 'kaiser_window']:
+            raise ValueError('Invalid resampling method: {}'.format(self.resampling_method))
+
         self.kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
-                                                            self.lowpass_filter_width, self.rolloff)
+                                                            self.lowpass_filter_width, self.rolloff,
+                                                            self.resampling_method, **kwargs)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -690,11 +696,8 @@ class Resample(torch.nn.Module):
         Returns:
             Tensor: Output signal of dimension (..., time).
         """
-        if self.resampling_method == 'sinc_interpolation':
-            return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd,
-                                               self.kernel, self.width)
-
-        raise ValueError('Invalid resampling method: {}'.format(self.resampling_method))
+        return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd,
+                                           self.kernel, self.width)
 
 
 class ComplexNorm(torch.nn.Module):

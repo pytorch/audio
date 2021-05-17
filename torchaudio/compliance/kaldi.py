@@ -756,7 +756,8 @@ def resample_waveform(waveform: Tensor,
                       orig_freq: float,
                       new_freq: float,
                       lowpass_filter_width: int = 6,
-                      rolloff: float = 0.99) -> Tensor:
+                      rolloff: float = 0.99,
+                      resampling_method: str = "sinc_interpolation") -> Tensor:
     r"""Resamples the waveform at the new frequency.
 
     This is a wrapper around ``torchaudio.functional.resample``.
@@ -773,4 +774,5 @@ def resample_waveform(waveform: Tensor,
     Returns:
         Tensor: The waveform at the new frequency
     """
-    return torchaudio.functional.resample(waveform, orig_freq, new_freq, lowpass_filter_width, rolloff)
+    return torchaudio.functional.resample(waveform, orig_freq, new_freq, lowpass_filter_width,
+                                          rolloff, resampling_method)
