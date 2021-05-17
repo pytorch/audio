@@ -70,6 +70,7 @@ def _rnnt_loss_betas(
         clamp,
     )
 
+
 def rnnt_loss(
     logits: Tensor,
     targets: Tensor,

@@ -1,9 +1,7 @@
 import torch
-from torch import Tensor
-from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import TempDirMixin, TestBaseMixin
 from torchaudio.prototype.rnnt_loss import RNNTLoss, rnnt_loss
-from .utils import get_B1_T10_U3_D4_data, numpy_to_torch
+
 
 class RNNTLossTorchscript(TempDirMixin, TestBaseMixin):
     """Implements test for RNNT Loss that are performed for different devices"""
@@ -24,7 +22,7 @@ class RNNTLossTorchscript(TempDirMixin, TestBaseMixin):
 
         self.assertEqual(ts_output, output)
 
-    def test_rnnt_loss(self):        
+    def test_rnnt_loss(self):
         def func(
             logits,
         ):
@@ -32,23 +30,23 @@ class RNNTLossTorchscript(TempDirMixin, TestBaseMixin):
             logit_lengths = torch.tensor([2], device=logits.device, dtype=torch.int32)
             target_lengths = torch.tensor([2], device=logits.device, dtype=torch.int32)
             return rnnt_loss(logits, targets, logit_lengths, target_lengths)
-        
+
         logits = torch.tensor([[[[0.1, 0.6, 0.1, 0.1, 0.1],
                                  [0.1, 0.1, 0.6, 0.1, 0.1],
                                  [0.1, 0.1, 0.2, 0.8, 0.1]],
-                                 [[0.1, 0.6, 0.1, 0.1, 0.1],
+                                [[0.1, 0.6, 0.1, 0.1, 0.1],
                                  [0.1, 0.1, 0.2, 0.1, 0.1],
                                  [0.7, 0.1, 0.2, 0.1, 0.1]]]])
 
         self._assert_consistency(func, logits)
 
-    def test_RNNTLoss(self):  
+    def test_RNNTLoss(self):
         func = RNNTLoss()
 
         logits = torch.tensor([[[[0.1, 0.6, 0.1, 0.1, 0.1],
                                  [0.1, 0.1, 0.6, 0.1, 0.1],
                                  [0.1, 0.1, 0.2, 0.8, 0.1]],
-                                 [[0.1, 0.6, 0.1, 0.1, 0.1],
+                                [[0.1, 0.6, 0.1, 0.1, 0.1],
                                  [0.1, 0.1, 0.2, 0.1, 0.1],
                                  [0.7, 0.1, 0.2, 0.1, 0.1]]]])
         targets = torch.tensor([[1, 2]], device=logits.device, dtype=torch.int32)
@@ -70,4 +68,3 @@ class RNNTLossTorchscript(TempDirMixin, TestBaseMixin):
         ts_output = ts_func(input_tensor, targets, logit_lengths, target_lengths)
 
         self.assertEqual(ts_output, output)
-        

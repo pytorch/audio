@@ -11,10 +11,17 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> rnnt_loss(
     bool fused_log_smax = true,
     bool reuse_logits_for_grads = true) {
   static auto op = torch::Dispatcher::singleton()
-    .findSchemaOrThrow("torchaudio::rnnt_loss", "")
-    .typed<decltype(rnnt_loss)>();
-  return op.call(logits, targets, src_lengths, tgt_lengths, blank, clamp,
-                 fused_log_smax, reuse_logits_for_grads);
+                       .findSchemaOrThrow("torchaudio::rnnt_loss", "")
+                       .typed<decltype(rnnt_loss)>();
+  return op.call(
+      logits,
+      targets,
+      src_lengths,
+      tgt_lengths,
+      blank,
+      clamp,
+      fused_log_smax,
+      reuse_logits_for_grads);
 }
 
 TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
