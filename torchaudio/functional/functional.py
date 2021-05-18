@@ -1305,7 +1305,7 @@ def _get_sinc_resample_kernel(
         lowpass_filter_width: int,
         rolloff: float,
         resampling_method: str,
-        beta: float = 6.):
+        beta: Optional[float]):
 
     if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
         warnings.warn(
@@ -1322,6 +1322,9 @@ def _get_sinc_resample_kernel(
 
     orig_freq = int(orig_freq) // gcd
     new_freq = int(new_freq) // gcd
+
+    if resampling_method == "kaiser_window" and beta is None:
+        beta = 6.
 
     assert lowpass_filter_width > 0
     kernels = []
@@ -1411,7 +1414,7 @@ def resample(
         lowpass_filter_width: int = 6,
         rolloff: float = 0.99,
         resampling_method: str = "sinc_interpolation",
-        **kwargs,
+        beta: Optional[float] = None,
 ) -> Tensor:
     r"""Resamples the waveform at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
@@ -1430,7 +1433,9 @@ def resample(
             but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
-        resampling_method (str, optional):
+        resampling_method (str, optional): The resampling method.
+            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
+        beta (float, optional): The shape parameter used for kaiser window.
 
     Returns:
         Tensor: The waveform at the new frequency of dimension (..., time).
@@ -1444,6 +1449,6 @@ def resample(
     gcd = math.gcd(int(orig_freq), int(new_freq))
 
     kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, gcd, lowpass_filter_width, rolloff,
-                                              resampling_method, **kwargs)
+                                              resampling_method, beta)
     resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, gcd, kernel, width)
     return resampled

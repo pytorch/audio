@@ -663,6 +663,7 @@ class Resample(torch.nn.Module):
             but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
+        beta (float, optional): The shape parameter used for kaiser window.
     """
 
     def __init__(self,
@@ -671,7 +672,7 @@ class Resample(torch.nn.Module):
                  resampling_method: str = 'sinc_interpolation',
                  lowpass_filter_width: int = 6,
                  rolloff: float = 0.99,
-                 **kwargs) -> None:
+                 beta: Optional[float] = None) -> None:
         super(Resample, self).__init__()
 
         self.orig_freq = orig_freq
@@ -686,7 +687,7 @@ class Resample(torch.nn.Module):
 
         self.kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
                                                             self.lowpass_filter_width, self.rolloff,
-                                                            self.resampling_method, **kwargs)
+                                                            self.resampling_method, beta)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
