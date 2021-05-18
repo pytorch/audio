@@ -1320,6 +1320,9 @@ def _get_sinc_resample_kernel(
             "https://github.com/pytorch/audio/issues/1487."
         )
 
+    if resampling_method not in ['sinc_interpolation', 'kaiser_window']:
+        raise ValueError('Invalid resampling method: {}'.format(resampling_method))
+
     orig_freq = int(orig_freq) // gcd
     new_freq = int(new_freq) // gcd
 

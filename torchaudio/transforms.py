@@ -682,9 +682,6 @@ class Resample(torch.nn.Module):
         self.lowpass_filter_width = lowpass_filter_width
         self.rolloff = rolloff
 
-        if self.resampling_method not in ['sinc_interpolation', 'kaiser_window']:
-            raise ValueError('Invalid resampling method: {}'.format(self.resampling_method))
-
         self.kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
                                                             self.lowpass_filter_width, self.rolloff,
                                                             self.resampling_method, beta)
