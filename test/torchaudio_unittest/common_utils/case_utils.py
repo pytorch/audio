@@ -52,7 +52,7 @@ class HttpServerMixin(TempDirMixin):
     The server is up through the execution of all the test suite defined under the subclass.
     """
     _proc = None
-    _port = 20576
+    _port = 8000
 
     @classmethod
     def setUpClass(cls):
@@ -61,7 +61,7 @@ class HttpServerMixin(TempDirMixin):
             ['python', '-m', 'http.server', f'{cls._port}'],
             cwd=cls.get_base_temp_dir(),
             stderr=subprocess.DEVNULL)  # Disable server-side error log because it is confusing
-        time.sleep(1.0)
+        time.sleep(2.0)
 
     @classmethod
     def tearDownClass(cls):
