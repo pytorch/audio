@@ -1,4 +1,5 @@
 import math
+import warnings
 from typing import Optional
 
 import torch
@@ -1374,7 +1375,10 @@ def vad(
     so in order to trim from the back, the reverse effect must also be used.
 
     Args:
-        waveform (Tensor): Tensor of audio of dimension `(..., time)`
+        waveform (Tensor): Tensor of audio of dimension `(channels, time)` or `(time)`
+            Tensor of shape `(channels, time)` is treated as a multi-channel recording
+            of the same event and the resulting output will be trimmed to the earliest
+            voice activity in any channel.
         sample_rate (int): Sample rate of audio signal.
         trigger_level (float, optional): The measurement level used to trigger activity detection.
             This may need to be cahnged depending on the noise level, signal level,
@@ -1478,6 +1482,16 @@ def vad(
 
     # pack batch
     shape = waveform.size()
+
+    if len(shape) > 2:
+        warnings.warn(
+            "Expected input tensor shape length of 1 for single channel"
+            f" or 2 for multi-channel. Got {len(shape)} instead.\n"
+            "Batch semantics is not supported yet.\n"
+            "Please refer to https://github.com/pytorch/audio/issues/1348"
+            " and https://github.com/pytorch/audio/issues/1468."
+        )
+
     waveform = waveform.view(-1, shape[-1])
 
     n_channels, ilen = waveform.size()

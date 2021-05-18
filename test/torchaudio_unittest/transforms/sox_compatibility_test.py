@@ -1,3 +1,6 @@
+import warnings
+
+import torch
 import torchaudio.transforms as T
 from parameterized import parameterized
 
@@ -61,3 +64,26 @@ class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase):
         data, sample_rate = load_wav(path)
         result = T.Vad(sample_rate)(data)
         self.assert_sox_effect(result, path, ['vad'])
+
+    def test_vad_warning(self):
+        sample_rate = 41100
+        data = torch.rand(5, 5, sample_rate)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            T.Vad(sample_rate)(data)
+        assert len(w) == 1
+
+    def test_vad_no_warning(self):
+        sample_rate = 41100
+
+        data = torch.rand(5, sample_rate)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            T.Vad(sample_rate)(data)
+        assert len(w) == 0
+
+        data = torch.rand(sample_rate)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            T.Vad(sample_rate)(data)
+        assert len(w) == 0
