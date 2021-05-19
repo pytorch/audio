@@ -49,9 +49,9 @@ class RNNTLossTorchscript(TempDirMixin, TestBaseMixin):
                                 [[0.1, 0.6, 0.1, 0.1, 0.1],
                                  [0.1, 0.1, 0.2, 0.1, 0.1],
                                  [0.7, 0.1, 0.2, 0.1, 0.1]]]])
-        targets = torch.tensor([[1, 2]], device=logits.device, dtype=torch.int32)
-        logit_lengths = torch.tensor([2], device=logits.device, dtype=torch.int32)
-        target_lengths = torch.tensor([2], device=logits.device, dtype=torch.int32)
+        targets = torch.tensor([[1, 2]], device=self.device, dtype=torch.int32)
+        logit_lengths = torch.tensor([2], device=self.device, dtype=torch.int32)
+        target_lengths = torch.tensor([2], device=self.device, dtype=torch.int32)
 
         tensor = logits.to(device=self.device, dtype=self.dtype)
 
