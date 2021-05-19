@@ -283,6 +283,15 @@ class MelScale(torch.nn.Module):
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
+        if n_stft is None or n_stft == 0:
+            warnings.warn(
+                'Initialization of torchaudio.transforms.MelScale with an unset weight '
+                '`n_stft=None` is deprecated and will be removed from a future release. '
+                'Please set a proper `n_stft` value. Typically this is `n_fft // 2 + 1`. '
+                'Refer to https://github.com/pytorch/audio/issues/1510 '
+                'for more details.'
+            )
+
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm,
             self.mel_scale)
