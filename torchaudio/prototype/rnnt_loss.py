@@ -7,52 +7,6 @@ __all__ = [
 ]
 
 
-def _rnnt_loss_alphas(
-    logits,
-    targets,
-    logit_lengths,
-    target_lengths,
-    blank=-1,
-    clamp=-1,
-):
-    """
-    Compute alphas for RNN transducer loss.
-
-    See documentation for RNNTLoss
-    """
-    return torch.ops.torchaudio.rnnt_loss_alphas(
-        logits,
-        targets,
-        logit_lengths,
-        target_lengths,
-        blank,
-        clamp,
-    )
-
-
-def _rnnt_loss_betas(
-    logits,
-    targets,
-    logit_lengths,
-    target_lengths,
-    blank=-1,
-    clamp=-1,
-):
-    """
-    Compute betas for RNN transducer loss
-
-    See documentation for RNNTLoss
-    """
-    return torch.ops.torchaudio.rnnt_loss_betas(
-        logits,
-        targets,
-        logit_lengths,
-        target_lengths,
-        blank,
-        clamp,
-    )
-
-
 def rnnt_loss(
     logits: Tensor,
     targets: Tensor,
