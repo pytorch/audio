@@ -1424,6 +1424,15 @@ def vad(
         http://sox.sourceforge.net/sox.html
     """
 
+    if waveform.ndim > 2:
+        warnings.warn(
+            "Expected input tensor dimension of 1 for single channel"
+            f" or 2 for multi-channel. Got {waveform.ndim} instead. "
+            "Batch semantics is not supported. "
+            "Please refer to https://github.com/pytorch/audio/issues/1348"
+            " and https://github.com/pytorch/audio/issues/1468."
+        )
+
     measure_duration: float = (
         2.0 / measure_freq if measure_duration is None else measure_duration
     )
@@ -1482,16 +1491,6 @@ def vad(
 
     # pack batch
     shape = waveform.size()
-
-    if len(shape) > 2:
-        warnings.warn(
-            "Expected input tensor shape length of 1 for single channel"
-            f" or 2 for multi-channel. Got {len(shape)} instead.\n"
-            "Batch semantics is not supported yet.\n"
-            "Please refer to https://github.com/pytorch/audio/issues/1348"
-            " and https://github.com/pytorch/audio/issues/1468."
-        )
-
     waveform = waveform.view(-1, shape[-1])
 
     n_channels, ilen = waveform.size()
