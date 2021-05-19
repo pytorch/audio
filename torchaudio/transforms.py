@@ -673,6 +673,11 @@ class Resample(torch.nn.Module):
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         beta (float, optional): The shape parameter used for kaiser window.
+
+        Note: If resampling on waveforms of higher precision than float32, there may be a small loss of precision
+        because the kernel is cached once as float32. If high precision resampling is important for your application,
+        the functional form will retain higher precision, but run slower because it does not cache the kernel.
+        Alternatively, you could rewrite a transform that caches a higher precision kernel.
     """
 
     def __init__(self,
@@ -691,9 +696,10 @@ class Resample(torch.nn.Module):
         self.lowpass_filter_width = lowpass_filter_width
         self.rolloff = rolloff
 
-        self.kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
-                                                            self.lowpass_filter_width, self.rolloff,
-                                                            self.resampling_method, beta)
+        kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
+                                                       self.lowpass_filter_width, self.rolloff,
+                                                       self.resampling_method, beta)
+        self.register_buffer('kernel', kernel)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
