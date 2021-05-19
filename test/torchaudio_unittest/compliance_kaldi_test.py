@@ -7,6 +7,7 @@ import torchaudio.compliance.kaldi as kaldi
 
 from torchaudio_unittest import common_utils
 from .compliance import utils as compliance_utils
+from parameterized import parameterized
 
 
 def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
@@ -182,20 +183,26 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
 
         self._compliance_test_helper(self.test2_filepath, 'resample', 32, 3, get_output_fn, atol=1e-2, rtol=1e-5)
 
-    def test_resample_waveform_upsample_size(self):
-        upsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr * 2)
+    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    def test_resample_waveform_upsample_size(self, resampling_method):
+        upsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr * 2,
+                                                 resampling_method=resampling_method)
         self.assertTrue(upsample_sound.size(-1) == self.test1_signal.size(-1) * 2)
 
-    def test_resample_waveform_downsample_size(self):
-        downsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr // 2)
+    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    def test_resample_waveform_downsample_size(self, resampling_method):
+        downsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr // 2,
+                                                   resampling_method=resampling_method)
         self.assertTrue(downsample_sound.size(-1) == self.test1_signal.size(-1) // 2)
 
-    def test_resample_waveform_identity_size(self):
-        downsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr)
+    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    def test_resample_waveform_identity_size(self, resampling_method):
+        downsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr,
+                                                   resampling_method=resampling_method)
         self.assertTrue(downsample_sound.size(-1) == self.test1_signal.size(-1))
 
     def _test_resample_waveform_accuracy(self, up_scale_factor=None, down_scale_factor=None,
-                                         atol=1e-1, rtol=1e-4):
+                                         resampling_method="sinc_interpolation", atol=1e-1, rtol=1e-4):
         # resample the signal and compare it to the ground truth
         n_to_trim = 20
         sample_rate = 1000
@@ -211,7 +218,8 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
         original_timestamps = torch.arange(0, duration, 1.0 / sample_rate)
 
         sound = 123 * torch.cos(2 * math.pi * 3 * original_timestamps).unsqueeze(0)
-        estimate = kaldi.resample_waveform(sound, sample_rate, new_sample_rate).squeeze()
+        estimate = kaldi.resample_waveform(sound, sample_rate, new_sample_rate,
+                                           resampling_method=resampling_method).squeeze()
 
         new_timestamps = torch.arange(0, duration, 1.0 / new_sample_rate)[:estimate.size(0)]
         ground_truth = 123 * torch.cos(2 * math.pi * 3 * new_timestamps)
@@ -222,15 +230,18 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
 
         self.assertEqual(estimate, ground_truth, atol=atol, rtol=rtol)
 
-    def test_resample_waveform_downsample_accuracy(self):
+    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    def test_resample_waveform_downsample_accuracy(self, resampling_method):
         for i in range(1, 20):
-            self._test_resample_waveform_accuracy(down_scale_factor=i * 2)
+            self._test_resample_waveform_accuracy(down_scale_factor=i * 2, resampling_method=resampling_method)
 
-    def test_resample_waveform_upsample_accuracy(self):
+    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    def test_resample_waveform_upsample_accuracy(self, resampling_method):
         for i in range(1, 20):
-            self._test_resample_waveform_accuracy(up_scale_factor=1.0 + i / 20.0)
+            self._test_resample_waveform_accuracy(up_scale_factor=1.0 + i / 20.0, resampling_method=resampling_method)
 
-    def test_resample_waveform_multi_channel(self):
+    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    def test_resample_waveform_multi_channel(self, resampling_method):
         num_channels = 3
 
         multi_sound = self.test1_signal.repeat(num_channels, 1)  # (num_channels, 8000 smp)
@@ -238,11 +249,13 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
         for i in range(num_channels):
             multi_sound[i, :] *= (i + 1) * 1.5
 
-        multi_sound_sampled = kaldi.resample_waveform(multi_sound, self.test1_signal_sr, self.test1_signal_sr // 2)
+        multi_sound_sampled = kaldi.resample_waveform(multi_sound, self.test1_signal_sr, self.test1_signal_sr // 2,
+                                                      resampling_method=resampling_method)
 
         # check that sampling is same whether using separately or in a tensor of size (c, n)
         for i in range(num_channels):
             single_channel = self.test1_signal * (i + 1) * 1.5
             single_channel_sampled = kaldi.resample_waveform(single_channel, self.test1_signal_sr,
-                                                             self.test1_signal_sr // 2)
+                                                             self.test1_signal_sr // 2,
+                                                             resampling_method=resampling_method)
             self.assertEqual(multi_sound_sampled[i, :], single_channel_sampled[0], rtol=1e-4, atol=1e-7)
