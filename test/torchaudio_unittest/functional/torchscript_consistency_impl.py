@@ -591,6 +591,14 @@ class Functional(TempDirMixin, TestBaseMixin):
         tensor = common_utils.get_whitenoise(sample_rate=44100)
         self._assert_consistency(func, tensor)
 
+    def test_resample(self):
+        def func(tensor):
+            sr1, sr2 = 16000., 8000.
+            return F.resample(tensor, sr1, sr2)
+
+        tensor = common_utils.get_whitenoise(sample_rate=16000)
+        self._assert_consistency(func, tensor)
+
     @parameterized.expand([(True, ), (False, )])
     def test_phase_vocoder(self, test_paseudo_complex):
         def func(tensor):
