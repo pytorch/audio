@@ -19,6 +19,7 @@ if(BUILD_TRANSDUCER)
     rnnt/compute_alphas.cpp
     rnnt/compute_betas.cpp
     rnnt/compute.cpp
+    rnnt/autograd.cpp
   )
 
   if (USE_CUDA)
