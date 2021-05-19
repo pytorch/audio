@@ -1327,7 +1327,7 @@ def _get_sinc_resample_kernel(
     new_freq = int(new_freq) // gcd
 
     if resampling_method == "kaiser_window" and beta is None:
-        beta = 6.
+        beta = 14.769656459379492
 
     assert lowpass_filter_width > 0
     kernels = []
