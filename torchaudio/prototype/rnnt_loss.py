@@ -20,15 +20,6 @@ def _rnnt_loss_alphas(
 
     See documentation for RNNTLoss
     """
-    targets = targets.to(device=logits.device)
-    logit_lengths = logit_lengths.to(device=logits.device)
-    target_lengths = target_lengths.to(device=logits.device)
-
-    # make sure all int tensors are of type int32.
-    targets = targets.int()
-    logit_lengths = logit_lengths.int()
-    target_lengths = target_lengths.int()
-
     return torch.ops.torchaudio.rnnt_loss_alphas(
         logits,
         targets,
@@ -52,15 +43,6 @@ def _rnnt_loss_betas(
 
     See documentation for RNNTLoss
     """
-    targets = targets.to(device=logits.device)
-    logit_lengths = logit_lengths.to(device=logits.device)
-    target_lengths = target_lengths.to(device=logits.device)
-
-    # make sure all int tensors are of type int32.
-    targets = targets.int()
-    logit_lengths = logit_lengths.int()
-    target_lengths = target_lengths.int()
-
     return torch.ops.torchaudio.rnnt_loss_betas(
         logits,
         targets,
@@ -104,16 +86,6 @@ def rnnt_loss(
         reuse_logits_for_grads = (
             False  # softmax needs the original logits value
         )
-
-    # move everything to the same device.
-    targets = targets.to(device=logits.device)
-    logit_lengths = logit_lengths.to(device=logits.device)
-    target_lengths = target_lengths.to(device=logits.device)
-
-    # make sure all int tensors are of type int32.
-    targets = targets.int()
-    logit_lengths = logit_lengths.int()
-    target_lengths = target_lengths.int()
 
     if blank < 0:  # reinterpret blank index if blank < 0.
         blank = logits.shape[-1] + blank
