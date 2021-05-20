@@ -1328,9 +1328,6 @@ def _get_sinc_resample_kernel(
     orig_freq = int(orig_freq) // gcd
     new_freq = int(new_freq) // gcd
 
-    if resampling_method == "kaiser_window" and beta is None:
-        beta = 14.769656459379492
-
     assert lowpass_filter_width > 0
     kernels = []
     base_freq = min(orig_freq, new_freq)
@@ -1373,9 +1370,12 @@ def _get_sinc_resample_kernel(
         # at specific positions, not over a regular grid.
         if resampling_method == "sinc_interpolation":
             window = torch.cos(t * math.pi / lowpass_filter_width / 2)**2
-        elif resampling_method == "kaiser_window":
-            beta = torch.tensor(beta, dtype=float)
-            window = torch.i0(beta * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta)
+        else:
+            # kaiser_window
+            if beta is None:
+                beta = 14.769656459379492
+            beta_tensor = torch.tensor(float(beta))
+            window = torch.i0(beta_tensor * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta_tensor)
         t *= math.pi
         kernel = torch.where(t == 0, torch.tensor(1.).to(t), torch.sin(t) / t)
         kernel.mul_(window)
