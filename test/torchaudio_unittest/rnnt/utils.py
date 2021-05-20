@@ -405,10 +405,10 @@ def get_numpy_random_data(
 
 
 def numpy_to_torch(data, device, requires_grad=True):
-    logits = torch.from_numpy(data["logits"])
-    targets = torch.from_numpy(data["targets"])
-    logit_lengths = torch.from_numpy(data["logit_lengths"])
-    target_lengths = torch.from_numpy(data["target_lengths"])
+    logits = torch.from_numpy(data["logits"]).to(device=device)
+    targets = torch.from_numpy(data["targets"]).to(device=device)
+    logit_lengths = torch.from_numpy(data["logit_lengths"]).to(device=device)
+    target_lengths = torch.from_numpy(data["target_lengths"]).to(device=device)
 
     if "nbest_wers" in data:
         data["nbest_wers"] = torch.from_numpy(data["nbest_wers"]).to(device=device)

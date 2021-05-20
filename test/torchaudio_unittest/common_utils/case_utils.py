@@ -59,8 +59,9 @@ class HttpServerMixin(TempDirMixin):
         super().setUpClass()
         cls._proc = subprocess.Popen(
             ['python', '-m', 'http.server', f'{cls._port}'],
-            cwd=cls.get_base_temp_dir())
-        time.sleep(1.0)
+            cwd=cls.get_base_temp_dir(),
+            stderr=subprocess.DEVNULL)  # Disable server-side error log because it is confusing
+        time.sleep(2.0)
 
     @classmethod
     def tearDownClass(cls):

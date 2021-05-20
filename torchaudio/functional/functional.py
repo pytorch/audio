@@ -1303,7 +1303,11 @@ def _get_sinc_resample_kernel(
         new_freq: float,
         gcd: int,
         lowpass_filter_width: int,
-        rolloff: float):
+        rolloff: float,
+        resampling_method: str,
+        beta: Optional[float],
+        device: torch.device = torch.device("cpu"),
+        dtype: Optional[torch.dtype] = None):
 
     if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
         warnings.warn(
@@ -1318,8 +1322,14 @@ def _get_sinc_resample_kernel(
             "https://github.com/pytorch/audio/issues/1487."
         )
 
+    if resampling_method not in ['sinc_interpolation', 'kaiser_window']:
+        raise ValueError('Invalid resampling method: {}'.format(resampling_method))
+
     orig_freq = int(orig_freq) // gcd
     new_freq = int(new_freq) // gcd
+
+    if resampling_method == "kaiser_window" and beta is None:
+        beta = 14.769656459379492
 
     assert lowpass_filter_width > 0
     kernels = []
@@ -1352,21 +1362,30 @@ def _get_sinc_resample_kernel(
     # they will have a lot of almost zero values to the left or to the right...
     # There is probably a way to evaluate those filters more efficiently, but this is kept for
     # future work.
-    idx = torch.arange(-width, width + orig_freq)
+    idx_dtype = dtype if dtype is not None else torch.float64
+    idx = torch.arange(-width, width + orig_freq, device=device, dtype=idx_dtype)
 
     for i in range(new_freq):
         t = (-i / new_freq + idx / orig_freq) * base_freq
         t = t.clamp_(-lowpass_filter_width, lowpass_filter_width)
-        t *= math.pi
-        # we do not use torch.hann_window here as we need to evaluate the window
+
+        # we do not use built in torch windows here as we need to evaluate the window
         # at specific positions, not over a regular grid.
-        window = torch.cos(t / lowpass_filter_width / 2)**2
+        if resampling_method == "sinc_interpolation":
+            window = torch.cos(t * math.pi / lowpass_filter_width / 2)**2
+        elif resampling_method == "kaiser_window":
+            beta = torch.tensor(beta, dtype=float)
+            window = torch.i0(beta * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta)
+        t *= math.pi
         kernel = torch.where(t == 0, torch.tensor(1.).to(t), torch.sin(t) / t)
         kernel.mul_(window)
         kernels.append(kernel)
 
     scale = base_freq / orig_freq
-    return torch.stack(kernels).view(new_freq, 1, -1).mul_(scale), width
+    kernels = torch.stack(kernels).view(new_freq, 1, -1).mul_(scale)
+    if dtype is None:
+        kernels = kernels.to(dtype=torch.float32)
+    return kernels, width
 
 
 def _apply_sinc_resample_kernel(
@@ -1383,7 +1402,6 @@ def _apply_sinc_resample_kernel(
     # pack batch
     shape = waveform.size()
     waveform = waveform.view(-1, shape[-1])
-    kernel = kernel.to(device=waveform.device, dtype=waveform.dtype)
 
     num_wavs, length = waveform.shape
     waveform = torch.nn.functional.pad(waveform, (width, width + orig_freq))
@@ -1403,6 +1421,8 @@ def resample(
         new_freq: float,
         lowpass_filter_width: int = 6,
         rolloff: float = 0.99,
+        resampling_method: str = "sinc_interpolation",
+        beta: Optional[float] = None,
 ) -> Tensor:
     r"""Resamples the waveform at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
@@ -1421,6 +1441,9 @@ def resample(
             but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
+        resampling_method (str, optional): The resampling method.
+            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
+        beta (float, optional): The shape parameter used for kaiser window.
 
     Returns:
         Tensor: The waveform at the new frequency of dimension (..., time).
@@ -1433,6 +1456,7 @@ def resample(
 
     gcd = math.gcd(int(orig_freq), int(new_freq))
 
-    kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, gcd, lowpass_filter_width, rolloff)
+    kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, gcd, lowpass_filter_width, rolloff,
+                                              resampling_method, beta, waveform.device, waveform.dtype)
     resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, gcd, kernel, width)
     return resampled

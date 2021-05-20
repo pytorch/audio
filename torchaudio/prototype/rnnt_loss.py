@@ -1,4 +1,5 @@
 import torch
+from torch import Tensor
 
 __all__ = [
     "RNNTLoss",
@@ -6,141 +7,15 @@ __all__ = [
 ]
 
 
-def _rnnt_loss_alphas(
-    logits,
-    targets,
-    logit_lengths,
-    target_lengths,
-    blank=-1,
-    clamp=-1,
-):
-    """
-    Compute alphas for RNN transducer loss.
-
-    See documentation for RNNTLoss
-    """
-    targets = targets.to(device=logits.device)
-    logit_lengths = logit_lengths.to(device=logits.device)
-    target_lengths = target_lengths.to(device=logits.device)
-
-    # make sure all int tensors are of type int32.
-    targets = targets.int()
-    logit_lengths = logit_lengths.int()
-    target_lengths = target_lengths.int()
-
-    return torch.ops.torchaudio.rnnt_loss_alphas(
-        logits,
-        targets,
-        logit_lengths,
-        target_lengths,
-        blank,
-        clamp,
-    )
-
-
-def _rnnt_loss_betas(
-    logits,
-    targets,
-    logit_lengths,
-    target_lengths,
-    blank=-1,
-    clamp=-1,
-):
-    """
-    Compute betas for RNN transducer loss
-
-    See documentation for RNNTLoss
-    """
-    targets = targets.to(device=logits.device)
-    logit_lengths = logit_lengths.to(device=logits.device)
-    target_lengths = target_lengths.to(device=logits.device)
-
-    # make sure all int tensors are of type int32.
-    targets = targets.int()
-    logit_lengths = logit_lengths.int()
-    target_lengths = target_lengths.int()
-
-    return torch.ops.torchaudio.rnnt_loss_betas(
-        logits,
-        targets,
-        logit_lengths,
-        target_lengths,
-        blank,
-        clamp,
-    )
-
-
-class _RNNT(torch.autograd.Function):
-    @staticmethod
-    def forward(
-        ctx,
-        logits,
-        targets,
-        logit_lengths,
-        target_lengths,
-        blank=-1,
-        clamp=-1,
-        fused_log_softmax=True,
-        reuse_logits_for_grads=True,
-    ):
-        """
-        See documentation for RNNTLoss
-        """
-
-        # move everything to the same device.
-        targets = targets.to(device=logits.device)
-        logit_lengths = logit_lengths.to(device=logits.device)
-        target_lengths = target_lengths.to(device=logits.device)
-
-        # make sure all int tensors are of type int32.
-        targets = targets.int()
-        logit_lengths = logit_lengths.int()
-        target_lengths = target_lengths.int()
-
-        if blank < 0:  # reinterpret blank index if blank < 0.
-            blank = logits.shape[-1] + blank
-
-        costs, gradients = torch.ops.torchaudio.rnnt_loss(
-            logits=logits,
-            targets=targets,
-            src_lengths=logit_lengths,
-            tgt_lengths=target_lengths,
-            blank=blank,
-            clamp=clamp,
-            fused_log_smax=fused_log_softmax,
-            reuse_logits_for_grads=reuse_logits_for_grads,
-        )
-
-        ctx.grads = gradients
-
-        return costs
-
-    @staticmethod
-    def backward(ctx, output_gradients):
-        output_gradients = output_gradients.view(-1, 1, 1, 1).to(ctx.grads)
-        ctx.grads.mul_(output_gradients).to(ctx.grads)
-
-        return (
-            ctx.grads,  # logits
-            None,  # targets
-            None,  # logit_lengths
-            None,  # target_lengths
-            None,  # blank
-            None,  # clamp
-            None,  # fused_log_softmax
-            None,  # reuse_logits_for_grads
-        )
-
-
 def rnnt_loss(
-    logits,
-    targets,
-    logit_lengths,
-    target_lengths,
-    blank=-1,
-    clamp=-1,
-    fused_log_softmax=True,
-    reuse_logits_for_grads=True,
+    logits: Tensor,
+    targets: Tensor,
+    logit_lengths: Tensor,
+    target_lengths: Tensor,
+    blank: int = -1,
+    clamp: float = -1,
+    fused_log_softmax: bool = True,
+    reuse_logits_for_grads: bool = True,
 ):
     """
     Compute the RNN Transducer Loss.
@@ -166,17 +41,20 @@ def rnnt_loss(
             False  # softmax needs the original logits value
         )
 
-    cost = _RNNT.apply(
-        logits,
-        targets,
-        logit_lengths,
-        target_lengths,
-        blank,
-        clamp,
-        fused_log_softmax,
-        reuse_logits_for_grads,
-    )
-    return cost
+    if blank < 0:  # reinterpret blank index if blank < 0.
+        blank = logits.shape[-1] + blank
+
+    costs, gradients = torch.ops.torchaudio.rnnt_loss(
+        logits=logits,
+        targets=targets,
+        src_lengths=logit_lengths,
+        tgt_lengths=target_lengths,
+        blank=blank,
+        clamp=clamp,
+        fused_log_smax=fused_log_softmax,
+        reuse_logits_for_grads=reuse_logits_for_grads,)
+
+    return costs
 
 
 class RNNTLoss(torch.nn.Module):
@@ -196,10 +74,10 @@ class RNNTLoss(torch.nn.Module):
 
     def __init__(
         self,
-        blank=-1,
-        clamp=-1,
-        fused_log_softmax=True,
-        reuse_logits_for_grads=True,
+        blank: int = -1,
+        clamp: float = -1.,
+        fused_log_softmax: bool = True,
+        reuse_logits_for_grads: bool = True,
     ):
         super().__init__()
         self.blank = blank

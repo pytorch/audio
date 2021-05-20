@@ -283,6 +283,15 @@ class MelScale(torch.nn.Module):
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
+        if n_stft is None or n_stft == 0:
+            warnings.warn(
+                'Initialization of torchaudio.transforms.MelScale with an unset weight '
+                '`n_stft=None` is deprecated and will be removed from a future release. '
+                'Please set a proper `n_stft` value. Typically this is `n_fft // 2 + 1`. '
+                'Refer to https://github.com/pytorch/audio/issues/1510 '
+                'for more details.'
+            )
+
         fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm,
             self.mel_scale)
@@ -657,11 +666,18 @@ class Resample(torch.nn.Module):
     Args:
         orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)
         new_freq (float, optional): The desired frequency. (Default: ``16000``)
-        resampling_method (str, optional): The resampling method. (Default: ``'sinc_interpolation'``)
+        resampling_method (str, optional): The resampling method.
+            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
             but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
+        beta (float, optional): The shape parameter used for kaiser window.
+
+        Note: If resampling on waveforms of higher precision than float32, there may be a small loss of precision
+        because the kernel is cached once as float32. If high precision resampling is important for your application,
+        the functional form will retain higher precision, but run slower because it does not cache the kernel.
+        Alternatively, you could rewrite a transform that caches a higher precision kernel.
     """
 
     def __init__(self,
@@ -669,7 +685,8 @@ class Resample(torch.nn.Module):
                  new_freq: float = 16000,
                  resampling_method: str = 'sinc_interpolation',
                  lowpass_filter_width: int = 6,
-                 rolloff: float = 0.99) -> None:
+                 rolloff: float = 0.99,
+                 beta: Optional[float] = None) -> None:
         super(Resample, self).__init__()
 
         self.orig_freq = orig_freq
@@ -679,8 +696,10 @@ class Resample(torch.nn.Module):
         self.lowpass_filter_width = lowpass_filter_width
         self.rolloff = rolloff
 
-        self.kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
-                                                            self.lowpass_filter_width, self.rolloff)
+        kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
+                                                       self.lowpass_filter_width, self.rolloff,
+                                                       self.resampling_method, beta)
+        self.register_buffer('kernel', kernel)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -690,11 +709,8 @@ class Resample(torch.nn.Module):
         Returns:
             Tensor: Output signal of dimension (..., time).
         """
-        if self.resampling_method == 'sinc_interpolation':
-            return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd,
-                                               self.kernel, self.width)
-
-        raise ValueError('Invalid resampling method: {}'.format(self.resampling_method))
+        return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd,
+                                           self.kernel, self.width)
 
 
 class ComplexNorm(torch.nn.Module):
