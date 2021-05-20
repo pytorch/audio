@@ -770,6 +770,8 @@ def resample_waveform(waveform: Tensor,
             but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
+        resampling_method (str, optional): The resampling method to use.
+            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
 
     Returns:
         Tensor: The waveform at the new frequency

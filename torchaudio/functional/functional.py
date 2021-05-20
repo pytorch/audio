@@ -1424,26 +1424,21 @@ def resample(
         resampling_method: str = "sinc_interpolation",
         beta: Optional[float] = None,
 ) -> Tensor:
-    r"""Resamples the waveform at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
-    which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
-    a signal). LinearResample (LR) means that the output signal is at linearly spaced intervals (i.e
-    the output signal has a frequency of ``new_freq``). It uses sinc/bandlimited interpolation to
-    upsample/downsample the signal.
+    r"""Resamples the waveform at the new frequency using bandlimited interpolation.
 
     https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html
-    https://github.com/kaldi-asr/kaldi/blob/master/src/feat/resample.h#L56
 
     Args:
         waveform (Tensor): The input signal of dimension (..., time)
         orig_freq (float): The original frequency of the signal
         new_freq (float): The desired frequency
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
-            but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
+            but less efficient. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
-        resampling_method (str, optional): The resampling method.
+        resampling_method (str, optional): The resampling method to use.
             Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
-        beta (float, optional): The shape parameter used for kaiser window.
+        beta (float or None): The shape parameter used for kaiser window.
 
     Returns:
         Tensor: The waveform at the new frequency of dimension (..., time).
