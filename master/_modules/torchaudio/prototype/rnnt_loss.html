@@ -312,6 +312,7 @@
               
   <h1>Source code for torchaudio.prototype.rnnt_loss</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;RNNTLoss&quot;</span><span class="p">,</span>
@@ -319,141 +320,15 @@
 <span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_rnnt_loss_alphas</span><span class="p">(</span>
-    <span class="n">logits</span><span class="p">,</span>
-    <span class="n">targets</span><span class="p">,</span>
-    <span class="n">logit_lengths</span><span class="p">,</span>
-    <span class="n">target_lengths</span><span class="p">,</span>
-    <span class="n">blank</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">clamp</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute alphas for RNN transducer loss.</span>
-
-<span class="sd">    See documentation for RNNTLoss</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">logits</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">logit_lengths</span> <span class="o">=</span> <span class="n">logit_lengths</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">logits</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">target_lengths</span> <span class="o">=</span> <span class="n">target_lengths</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">logits</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-
-    <span class="c1"># make sure all int tensors are of type int32.</span>
-    <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
-    <span class="n">logit_lengths</span> <span class="o">=</span> <span class="n">logit_lengths</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
-    <span class="n">target_lengths</span> <span class="o">=</span> <span class="n">target_lengths</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">rnnt_loss_alphas</span><span class="p">(</span>
-        <span class="n">logits</span><span class="p">,</span>
-        <span class="n">targets</span><span class="p">,</span>
-        <span class="n">logit_lengths</span><span class="p">,</span>
-        <span class="n">target_lengths</span><span class="p">,</span>
-        <span class="n">blank</span><span class="p">,</span>
-        <span class="n">clamp</span><span class="p">,</span>
-    <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_rnnt_loss_betas</span><span class="p">(</span>
-    <span class="n">logits</span><span class="p">,</span>
-    <span class="n">targets</span><span class="p">,</span>
-    <span class="n">logit_lengths</span><span class="p">,</span>
-    <span class="n">target_lengths</span><span class="p">,</span>
-    <span class="n">blank</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">clamp</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute betas for RNN transducer loss</span>
-
-<span class="sd">    See documentation for RNNTLoss</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">logits</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">logit_lengths</span> <span class="o">=</span> <span class="n">logit_lengths</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">logits</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">target_lengths</span> <span class="o">=</span> <span class="n">target_lengths</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">logits</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-
-    <span class="c1"># make sure all int tensors are of type int32.</span>
-    <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
-    <span class="n">logit_lengths</span> <span class="o">=</span> <span class="n">logit_lengths</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
-    <span class="n">target_lengths</span> <span class="o">=</span> <span class="n">target_lengths</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">rnnt_loss_betas</span><span class="p">(</span>
-        <span class="n">logits</span><span class="p">,</span>
-        <span class="n">targets</span><span class="p">,</span>
-        <span class="n">logit_lengths</span><span class="p">,</span>
-        <span class="n">target_lengths</span><span class="p">,</span>
-        <span class="n">blank</span><span class="p">,</span>
-        <span class="n">clamp</span><span class="p">,</span>
-    <span class="p">)</span>
-
-
-<span class="k">class</span> <span class="nc">_RNNT</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
-        <span class="n">ctx</span><span class="p">,</span>
-        <span class="n">logits</span><span class="p">,</span>
-        <span class="n">targets</span><span class="p">,</span>
-        <span class="n">logit_lengths</span><span class="p">,</span>
-        <span class="n">target_lengths</span><span class="p">,</span>
-        <span class="n">blank</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">clamp</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">fused_log_softmax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">reuse_logits_for_grads</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        See documentation for RNNTLoss</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># move everything to the same device.</span>
-        <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">logits</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">logit_lengths</span> <span class="o">=</span> <span class="n">logit_lengths</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">logits</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">target_lengths</span> <span class="o">=</span> <span class="n">target_lengths</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">logits</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-
-        <span class="c1"># make sure all int tensors are of type int32.</span>
-        <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
-        <span class="n">logit_lengths</span> <span class="o">=</span> <span class="n">logit_lengths</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
-        <span class="n">target_lengths</span> <span class="o">=</span> <span class="n">target_lengths</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">blank</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># reinterpret blank index if blank &lt; 0.</span>
-            <span class="n">blank</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">blank</span>
-
-        <span class="n">costs</span><span class="p">,</span> <span class="n">gradients</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">rnnt_loss</span><span class="p">(</span>
-            <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">,</span>
-            <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span>
-            <span class="n">src_lengths</span><span class="o">=</span><span class="n">logit_lengths</span><span class="p">,</span>
-            <span class="n">tgt_lengths</span><span class="o">=</span><span class="n">target_lengths</span><span class="p">,</span>
-            <span class="n">blank</span><span class="o">=</span><span class="n">blank</span><span class="p">,</span>
-            <span class="n">clamp</span><span class="o">=</span><span class="n">clamp</span><span class="p">,</span>
-            <span class="n">fused_log_smax</span><span class="o">=</span><span class="n">fused_log_softmax</span><span class="p">,</span>
-            <span class="n">reuse_logits_for_grads</span><span class="o">=</span><span class="n">reuse_logits_for_grads</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">ctx</span><span class="o">.</span><span class="n">grads</span> <span class="o">=</span> <span class="n">gradients</span>
-
-        <span class="k">return</span> <span class="n">costs</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">output_gradients</span><span class="p">):</span>
-        <span class="n">output_gradients</span> <span class="o">=</span> <span class="n">output_gradients</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">grads</span><span class="p">)</span>
-        <span class="n">ctx</span><span class="o">.</span><span class="n">grads</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">output_gradients</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">grads</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">ctx</span><span class="o">.</span><span class="n">grads</span><span class="p">,</span>  <span class="c1"># logits</span>
-            <span class="kc">None</span><span class="p">,</span>  <span class="c1"># targets</span>
-            <span class="kc">None</span><span class="p">,</span>  <span class="c1"># logit_lengths</span>
-            <span class="kc">None</span><span class="p">,</span>  <span class="c1"># target_lengths</span>
-            <span class="kc">None</span><span class="p">,</span>  <span class="c1"># blank</span>
-            <span class="kc">None</span><span class="p">,</span>  <span class="c1"># clamp</span>
-            <span class="kc">None</span><span class="p">,</span>  <span class="c1"># fused_log_softmax</span>
-            <span class="kc">None</span><span class="p">,</span>  <span class="c1"># reuse_logits_for_grads</span>
-        <span class="p">)</span>
-
-
 <div class="viewcode-block" id="rnnt_loss"><a class="viewcode-back" href="../../../rnnt_loss.html#torchaudio.prototype.rnnt_loss.rnnt_loss">[docs]</a><span class="k">def</span> <span class="nf">rnnt_loss</span><span class="p">(</span>
-    <span class="n">logits</span><span class="p">,</span>
-    <span class="n">targets</span><span class="p">,</span>
-    <span class="n">logit_lengths</span><span class="p">,</span>
-    <span class="n">target_lengths</span><span class="p">,</span>
-    <span class="n">blank</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">clamp</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">fused_log_softmax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">reuse_logits_for_grads</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">logits</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">logit_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">target_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">blank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">clamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">fused_log_softmax</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">reuse_logits_for_grads</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the RNN Transducer Loss.</span>
@@ -479,17 +354,20 @@
             <span class="kc">False</span>  <span class="c1"># softmax needs the original logits value</span>
         <span class="p">)</span>
 
-    <span class="n">cost</span> <span class="o">=</span> <span class="n">_RNNT</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-        <span class="n">logits</span><span class="p">,</span>
-        <span class="n">targets</span><span class="p">,</span>
-        <span class="n">logit_lengths</span><span class="p">,</span>
-        <span class="n">target_lengths</span><span class="p">,</span>
-        <span class="n">blank</span><span class="p">,</span>
-        <span class="n">clamp</span><span class="p">,</span>
-        <span class="n">fused_log_softmax</span><span class="p">,</span>
-        <span class="n">reuse_logits_for_grads</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">cost</span></div>
+    <span class="k">if</span> <span class="n">blank</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># reinterpret blank index if blank &lt; 0.</span>
+        <span class="n">blank</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">blank</span>
+
+    <span class="n">costs</span><span class="p">,</span> <span class="n">gradients</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">rnnt_loss</span><span class="p">(</span>
+        <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">,</span>
+        <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span>
+        <span class="n">src_lengths</span><span class="o">=</span><span class="n">logit_lengths</span><span class="p">,</span>
+        <span class="n">tgt_lengths</span><span class="o">=</span><span class="n">target_lengths</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="n">blank</span><span class="p">,</span>
+        <span class="n">clamp</span><span class="o">=</span><span class="n">clamp</span><span class="p">,</span>
+        <span class="n">fused_log_smax</span><span class="o">=</span><span class="n">fused_log_softmax</span><span class="p">,</span>
+        <span class="n">reuse_logits_for_grads</span><span class="o">=</span><span class="n">reuse_logits_for_grads</span><span class="p">,)</span>
+
+    <span class="k">return</span> <span class="n">costs</span></div>
 
 
 <div class="viewcode-block" id="RNNTLoss"><a class="viewcode-back" href="../../../rnnt_loss.html#torchaudio.prototype.rnnt_loss.RNNTLoss">[docs]</a><span class="k">class</span> <span class="nc">RNNTLoss</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -509,10 +387,10 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">blank</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">clamp</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">fused_log_softmax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">reuse_logits_for_grads</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">blank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">clamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.</span><span class="p">,</span>
+        <span class="n">fused_log_softmax</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">reuse_logits_for_grads</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blank</span> <span class="o">=</span> <span class="n">blank</span>

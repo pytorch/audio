@@ -596,6 +596,15 @@
 
         <span class="k">assert</span> <span class="n">f_min</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="s1">&#39;Require f_min: </span><span class="si">{}</span><span class="s1"> &lt; f_max: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">n_stft</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">n_stft</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s1">&#39;Initialization of torchaudio.transforms.MelScale with an unset weight &#39;</span>
+                <span class="s1">&#39;`n_stft=None` is deprecated and will be removed from a future release. &#39;</span>
+                <span class="s1">&#39;Please set a proper `n_stft` value. Typically this is `n_fft // 2 + 1`. &#39;</span>
+                <span class="s1">&#39;Refer to https://github.com/pytorch/audio/issues/1510 &#39;</span>
+                <span class="s1">&#39;for more details.&#39;</span>
+            <span class="p">)</span>
+
         <span class="n">fb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">n_stft</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">F</span><span class="o">.</span><span class="n">create_fb_matrix</span><span class="p">(</span>
             <span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mel_scale</span><span class="p">)</span>
@@ -970,11 +979,18 @@
 <span class="sd">    Args:</span>
 <span class="sd">        orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)</span>
 <span class="sd">        new_freq (float, optional): The desired frequency. (Default: ``16000``)</span>
-<span class="sd">        resampling_method (str, optional): The resampling method. (Default: ``&#39;sinc_interpolation&#39;``)</span>
+<span class="sd">        resampling_method (str, optional): The resampling method.</span>
+<span class="sd">            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``&#39;sinc_interpolation&#39;``)</span>
 <span class="sd">        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper</span>
 <span class="sd">            but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)</span>
 <span class="sd">        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.</span>
 <span class="sd">            Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)</span>
+<span class="sd">        beta (float, optional): The shape parameter used for kaiser window.</span>
+
+<span class="sd">        Note: If resampling on waveforms of higher precision than float32, there may be a small loss of precision</span>
+<span class="sd">        because the kernel is cached once as float32. If high precision resampling is important for your application,</span>
+<span class="sd">        the functional form will retain higher precision, but run slower because it does not cache the kernel.</span>
+<span class="sd">        Alternatively, you could rewrite a transform that caches a higher precision kernel.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
@@ -982,7 +998,8 @@
                  <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
                  <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;sinc_interpolation&#39;</span><span class="p">,</span>
                  <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
-                 <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                 <span class="n">rolloff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span><span class="p">,</span>
+                 <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Resample</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">orig_freq</span> <span class="o">=</span> <span class="n">orig_freq</span>
@@ -992,8 +1009,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lowpass_filter_width</span> <span class="o">=</span> <span class="n">lowpass_filter_width</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rolloff</span> <span class="o">=</span> <span class="n">rolloff</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">_get_sinc_resample_kernel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orig_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gcd</span><span class="p">,</span>
-                                                            <span class="bp">self</span><span class="o">.</span><span class="n">lowpass_filter_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rolloff</span><span class="p">)</span>
+        <span class="n">kernel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">_get_sinc_resample_kernel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orig_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gcd</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">lowpass_filter_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rolloff</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">resampling_method</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s1">&#39;kernel&#39;</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Resample.forward"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Resample.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -1003,11 +1022,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Tensor: Output signal of dimension (..., time).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resampling_method</span> <span class="o">==</span> <span class="s1">&#39;sinc_interpolation&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_apply_sinc_resample_kernel</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">orig_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gcd</span><span class="p">,</span>
-                                               <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
-
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid resampling method: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resampling_method</span><span class="p">))</span></div></div>
+        <span class="k">return</span> <span class="n">_apply_sinc_resample_kernel</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">orig_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gcd</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="ComplexNorm"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.ComplexNorm">[docs]</a><span class="k">class</span> <span class="nc">ComplexNorm</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
