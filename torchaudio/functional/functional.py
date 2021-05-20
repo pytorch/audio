@@ -1305,7 +1305,7 @@ def _get_sinc_resample_kernel(
         lowpass_filter_width: int,
         rolloff: float,
         resampling_method: str,
-        beta: float,
+        beta: Optional[float],
         device: torch.device = torch.device("cpu"),
         dtype: Optional[torch.dtype] = None):
 
@@ -1372,7 +1372,9 @@ def _get_sinc_resample_kernel(
             window = torch.cos(t * math.pi / lowpass_filter_width / 2)**2
         else:
             # kaiser_window
-            beta_tensor = torch.tensor(beta)
+            if beta is None:
+                beta = 14.769656459379492
+            beta_tensor = torch.tensor(float(beta))
             window = torch.i0(beta_tensor * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta_tensor)
         t *= math.pi
         kernel = torch.where(t == 0, torch.tensor(1.).to(t), torch.sin(t) / t)
@@ -1420,7 +1422,7 @@ def resample(
         lowpass_filter_width: int = 6,
         rolloff: float = 0.99,
         resampling_method: str = "sinc_interpolation",
-        beta: float = 14.769656459379492,
+        beta: Optional[float] = None,
 ) -> Tensor:
     r"""Resamples the waveform at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
