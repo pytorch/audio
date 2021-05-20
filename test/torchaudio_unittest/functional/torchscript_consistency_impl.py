@@ -592,12 +592,17 @@ class Functional(TempDirMixin, TestBaseMixin):
         self._assert_consistency(func, tensor)
 
     def test_resample(self):
-        def func(tensor):
+        def func_sinc(tensor):
             sr1, sr2 = 16000., 8000.
-            return F.resample(tensor, sr1, sr2)
+            return F.resample(tensor, sr1, sr2, resampling_method="sinc_interpolation")
+
+        def func_kaiser(tensor):
+            sr1, sr2 = 16000., 8000.
+            return F.resample(tensor, sr1, sr2, resampling_method="kaiser_window")
 
         tensor = common_utils.get_whitenoise(sample_rate=16000)
-        self._assert_consistency(func, tensor)
+        self._assert_consistency(func_sinc, tensor)
+        self._assert_consistency(func_kaiser, tensor)
 
     @parameterized.expand([(True, ), (False, )])
     def test_phase_vocoder(self, test_paseudo_complex):

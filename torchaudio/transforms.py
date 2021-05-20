@@ -686,7 +686,7 @@ class Resample(torch.nn.Module):
                  resampling_method: str = 'sinc_interpolation',
                  lowpass_filter_width: int = 6,
                  rolloff: float = 0.99,
-                 beta: Optional[float] = None) -> None:
+                 beta: float = 14.769656459379492) -> None:
         super(Resample, self).__init__()
 
         self.orig_freq = orig_freq

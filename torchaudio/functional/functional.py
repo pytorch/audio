@@ -1305,7 +1305,7 @@ def _get_sinc_resample_kernel(
         lowpass_filter_width: int,
         rolloff: float,
         resampling_method: str,
-        beta: Optional[float],
+        beta: float,
         device: torch.device = torch.device("cpu"),
         dtype: Optional[torch.dtype] = None):
 
@@ -1327,9 +1327,6 @@ def _get_sinc_resample_kernel(
 
     orig_freq = int(orig_freq) // gcd
     new_freq = int(new_freq) // gcd
-
-    if resampling_method == "kaiser_window" and beta is None:
-        beta = 14.769656459379492
 
     assert lowpass_filter_width > 0
     kernels = []
@@ -1373,9 +1370,10 @@ def _get_sinc_resample_kernel(
         # at specific positions, not over a regular grid.
         if resampling_method == "sinc_interpolation":
             window = torch.cos(t * math.pi / lowpass_filter_width / 2)**2
-        elif resampling_method == "kaiser_window":
-            beta = torch.tensor(beta, dtype=float)
-            window = torch.i0(beta * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta)
+        else:
+            # kaiser_window
+            beta_tensor = torch.tensor(beta)
+            window = torch.i0(beta_tensor * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta_tensor)
         t *= math.pi
         kernel = torch.where(t == 0, torch.tensor(1.).to(t), torch.sin(t) / t)
         kernel.mul_(window)
@@ -1422,7 +1420,7 @@ def resample(
         lowpass_filter_width: int = 6,
         rolloff: float = 0.99,
         resampling_method: str = "sinc_interpolation",
-        beta: Optional[float] = None,
+        beta: float = 14.769656459379492,
 ) -> Tensor:
     r"""Resamples the waveform at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
     which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
