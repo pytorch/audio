@@ -755,7 +755,9 @@ def mfcc(
 def resample_waveform(waveform: Tensor,
                       orig_freq: float,
                       new_freq: float,
-                      lowpass_filter_width: int = 6) -> Tensor:
+                      lowpass_filter_width: int = 6,
+                      rolloff: float = 0.99,
+                      resampling_method: str = "sinc_interpolation") -> Tensor:
     r"""Resamples the waveform at the new frequency.
 
     This is a wrapper around ``torchaudio.functional.resample``.
@@ -766,8 +768,13 @@ def resample_waveform(waveform: Tensor,
         new_freq (float): The desired frequency
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
             but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
+        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
+            Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
+        resampling_method (str, optional): The resampling method to use.
+            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
 
     Returns:
         Tensor: The waveform at the new frequency
     """
-    return torchaudio.functional.resample(waveform, orig_freq, new_freq, lowpass_filter_width)
+    return torchaudio.functional.resample(waveform, orig_freq, new_freq, lowpass_filter_width,
+                                          rolloff, resampling_method)

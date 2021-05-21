@@ -17,6 +17,14 @@ The models subpackage contains definitions of models for addressing common audio
   .. automethod:: forward
 
 
+:hidden:`DeepSpeech`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: DeepSpeech
+
+  .. automethod:: forward
+
+
 :hidden:`Wav2Letter`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

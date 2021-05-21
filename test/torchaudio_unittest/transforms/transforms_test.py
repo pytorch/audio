@@ -169,9 +169,11 @@ class Tester(common_utils.TorchaudioTestCase):
 
         upsample_rate = sample_rate * 2
         downsample_rate = sample_rate // 2
-        invalid_resample = torchaudio.transforms.Resample(sample_rate, upsample_rate, resampling_method='foo')
+        invalid_resampling_method = 'foo'
 
-        self.assertRaises(ValueError, invalid_resample, waveform)
+        with self.assertRaises(ValueError):
+            torchaudio.transforms.Resample(sample_rate, upsample_rate,
+                                           resampling_method=invalid_resampling_method)
 
         upsample_resample = torchaudio.transforms.Resample(
             sample_rate, upsample_rate, resampling_method='sinc_interpolation')
