@@ -1126,7 +1126,10 @@ class Vad(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension `(..., time)`
+            waveform (Tensor): Tensor of audio of dimension `(channels, time)` or `(time)`
+                Tensor of shape `(channels, time)` is treated as a multi-channel recording
+                of the same event and the resulting output will be trimmed to the earliest
+                voice activity in any channel.
         """
         return F.vad(
             waveform=waveform,
