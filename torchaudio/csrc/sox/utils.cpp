@@ -83,7 +83,8 @@ void SoxFormat::close() {
 
 void validate_input_file(const SoxFormat& sf, const std::string& path) {
   if (static_cast<sox_format_t*>(sf) == nullptr) {
-    throw std::runtime_error("Error loading audio file: failed to open file " + path);
+    throw std::runtime_error(
+        "Error loading audio file: failed to open file " + path);
   }
   if (sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
     throw std::runtime_error("Error loading audio file: unknown encoding.");
