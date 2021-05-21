@@ -395,7 +395,8 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
 class TestSaveErr(PytorchTestCase):
     def test_save_fail(self):
         """
+        Must fail to save into a non-existing directory/file with a very specific message
         """
         path = os.path.join("__No_SuCh_DiR__", "__No_SuCh_FiLe__.wav")
-        with self.assertRaisesRegex(RuntimeError, "^Error saving audio file: failed to open file.$"):
+        with self.assertRaisesRegex(RuntimeError, "^Error saving audio file: failed to open file {0}$".format(path)):
             sox_io_backend.save(path, zeros(1,1), 8000)

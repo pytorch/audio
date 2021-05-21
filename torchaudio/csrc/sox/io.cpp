@@ -19,9 +19,7 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_file(
       /*encoding=*/nullptr,
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
-  if (static_cast<sox_format_t*>(sf) == nullptr) {
-    throw std::runtime_error("Error opening audio file");
-  }
+  validate_input_file(sf, path);
 
   return std::make_tuple(
       static_cast<int64_t>(sf->signal.rate),
@@ -123,7 +121,7 @@ void save_audio_file(
       /*overwrite_permitted=*/nullptr));
 
   if (static_cast<sox_format_t*>(sf) == nullptr) {
-    throw std::runtime_error("Error saving audio file: failed to open file.");
+    throw std::runtime_error("Error saving audio file: failed to open file " + path);
   }
 
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
@@ -177,7 +175,7 @@ std::tuple<int64_t, int64_t, int64_t, int64_t, std::string> get_info_fileobj(
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
   // In case of streamed data, length can be 0
-  validate_input_file(sf);
+  validate_input_memfile(sf);
 
   return std::make_tuple(
       static_cast<int64_t>(sf->signal.rate),

@@ -101,7 +101,7 @@ std::tuple<torch::Tensor, int64_t> apply_effects_file(
       /*encoding=*/nullptr,
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
-  validate_input_file(sf);
+  validate_input_file(sf, path);
 
   const auto dtype = get_dtype(sf->encoding.encoding, sf->signal.precision);
 
@@ -204,7 +204,7 @@ std::tuple<torch::Tensor, int64_t> apply_effects_fileobj(
       /*filetype=*/format.has_value() ? format.value().c_str() : nullptr));
 
   // In case of streamed data, length can be 0
-  validate_input_file(sf);
+  validate_input_memfile(sf);
 
   // Prepare output buffer
   std::vector<sox_sample_t> out_buffer;

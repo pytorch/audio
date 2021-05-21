@@ -527,7 +527,8 @@ class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
 class TestLoadNoSuchFile(PytorchTestCase):
     def test_load_fail(self):
         """
+        Must fail to load a non-existing file with a very specific message
         """
         path = "__No_SuCh_FiLe__"
-        with self.assertRaisesRegex(RuntimeError, "^Error loading audio file: failed to open file.$"):
+        with self.assertRaisesRegex(RuntimeError, "^Error loading audio file: failed to open file {0}$".format(path)):
             sox_io_backend.load(path)
