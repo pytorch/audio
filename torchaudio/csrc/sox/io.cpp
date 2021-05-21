@@ -121,7 +121,8 @@ void save_audio_file(
       /*overwrite_permitted=*/nullptr));
 
   if (static_cast<sox_format_t*>(sf) == nullptr) {
-    throw std::runtime_error("Error saving audio file: failed to open file " + path);
+    throw std::runtime_error(
+        "Error saving audio file: failed to open file " + path);
   }
 
   torchaudio::sox_effects_chain::SoxEffectsChain chain(
