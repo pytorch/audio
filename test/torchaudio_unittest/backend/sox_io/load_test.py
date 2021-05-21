@@ -523,6 +523,7 @@ class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
         assert sr == sample_rate
         self.assertEqual(expected, found)
 
+
 @skipIfNoSox
 class TestLoadNoSuchFile(PytorchTestCase):
     def test_load_fail(self):
