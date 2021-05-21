@@ -509,6 +509,8 @@ where m is calculated in _get_strided</p>
 but less efficient. We suggest around 4 to 10 for normal use. (Default: <code class="docutils literal notranslate"><span class="pre">6</span></code>)</p></li>
 <li><p><strong>rolloff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The roll-off frequency of the filter, as a fraction of the Nyquist.
 Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: <code class="docutils literal notranslate"><span class="pre">0.99</span></code>)</p></li>
+<li><p><strong>resampling_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The resampling method to use.
+Options: [<code class="docutils literal notranslate"><span class="pre">sinc_interpolation</span></code>, <code class="docutils literal notranslate"><span class="pre">kaiser_window</span></code>] (Default: <code class="docutils literal notranslate"><span class="pre">'sinc_interpolation'</span></code>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

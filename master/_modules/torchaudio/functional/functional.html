@@ -1641,9 +1641,6 @@
     <span class="n">orig_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
     <span class="n">new_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span>
 
-    <span class="k">if</span> <span class="n">resampling_method</span> <span class="o">==</span> <span class="s2">&quot;kaiser_window&quot;</span> <span class="ow">and</span> <span class="n">beta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">beta</span> <span class="o">=</span> <span class="mf">14.769656459379492</span>
-
     <span class="k">assert</span> <span class="n">lowpass_filter_width</span> <span class="o">&gt;</span> <span class="mi">0</span>
     <span class="n">kernels</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">base_freq</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">)</span>
@@ -1686,9 +1683,12 @@
         <span class="c1"># at specific positions, not over a regular grid.</span>
         <span class="k">if</span> <span class="n">resampling_method</span> <span class="o">==</span> <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">:</span>
             <span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">lowpass_filter_width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
-        <span class="k">elif</span> <span class="n">resampling_method</span> <span class="o">==</span> <span class="s2">&quot;kaiser_window&quot;</span><span class="p">:</span>
-            <span class="n">beta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-            <span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">i0</span><span class="p">(</span><span class="n">beta</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">t</span> <span class="o">/</span> <span class="n">lowpass_filter_width</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">i0</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># kaiser_window</span>
+            <span class="k">if</span> <span class="n">beta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">beta</span> <span class="o">=</span> <span class="mf">14.769656459379492</span>
+            <span class="n">beta_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">beta</span><span class="p">))</span>
+            <span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">i0</span><span class="p">(</span><span class="n">beta_tensor</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">t</span> <span class="o">/</span> <span class="n">lowpass_filter_width</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">i0</span><span class="p">(</span><span class="n">beta_tensor</span><span class="p">)</span>
         <span class="n">t</span> <span class="o">*=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
         <span class="n">kernel</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">t</span><span class="p">)</span>
         <span class="n">kernel</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
@@ -1737,26 +1737,21 @@
         <span class="n">resampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sinc_interpolation&quot;</span><span class="p">,</span>
         <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency. This matches Kaldi&#39;s OfflineFeatureTpl ResampleWaveform</span>
-<span class="sd">    which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample</span>
-<span class="sd">    a signal). LinearResample (LR) means that the output signal is at linearly spaced intervals (i.e</span>
-<span class="sd">    the output signal has a frequency of ``new_freq``). It uses sinc/bandlimited interpolation to</span>
-<span class="sd">    upsample/downsample the signal.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resamples the waveform at the new frequency using bandlimited interpolation.</span>
 
 <span class="sd">    https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html</span>
-<span class="sd">    https://github.com/kaldi-asr/kaldi/blob/master/src/feat/resample.h#L56</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): The input signal of dimension (..., time)</span>
 <span class="sd">        orig_freq (float): The original frequency of the signal</span>
 <span class="sd">        new_freq (float): The desired frequency</span>
 <span class="sd">        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper</span>
-<span class="sd">            but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)</span>
+<span class="sd">            but less efficient. (Default: ``6``)</span>
 <span class="sd">        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.</span>
 <span class="sd">            Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)</span>
-<span class="sd">        resampling_method (str, optional): The resampling method.</span>
+<span class="sd">        resampling_method (str, optional): The resampling method to use.</span>
 <span class="sd">            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``&#39;sinc_interpolation&#39;``)</span>
-<span class="sd">        beta (float, optional): The shape parameter used for kaiser window.</span>
+<span class="sd">        beta (float or None): The shape parameter used for kaiser window.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: The waveform at the new frequency of dimension (..., time).</span>

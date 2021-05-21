@@ -1083,6 +1083,8 @@
 <span class="sd">            but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)</span>
 <span class="sd">        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.</span>
 <span class="sd">            Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)</span>
+<span class="sd">        resampling_method (str, optional): The resampling method to use.</span>
+<span class="sd">            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``&#39;sinc_interpolation&#39;``)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: The waveform at the new frequency</span>

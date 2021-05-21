@@ -312,6 +312,7 @@
               
   <h1>Source code for torchaudio.functional.filtering</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -1687,7 +1688,10 @@
 <span class="sd">    so in order to trim from the back, the reverse effect must also be used.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        waveform (Tensor): Tensor of audio of dimension `(..., time)`</span>
+<span class="sd">        waveform (Tensor): Tensor of audio of dimension `(channels, time)` or `(time)`</span>
+<span class="sd">            Tensor of shape `(channels, time)` is treated as a multi-channel recording</span>
+<span class="sd">            of the same event and the resulting output will be trimmed to the earliest</span>
+<span class="sd">            voice activity in any channel.</span>
 <span class="sd">        sample_rate (int): Sample rate of audio signal.</span>
 <span class="sd">        trigger_level (float, optional): The measurement level used to trigger activity detection.</span>
 <span class="sd">            This may need to be cahnged depending on the noise level, signal level,</span>
@@ -1732,6 +1736,15 @@
 <span class="sd">    References:</span>
 <span class="sd">        http://sox.sourceforge.net/sox.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Expected input tensor dimension of 1 for single channel&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; or 2 for multi-channel. Got </span><span class="si">{</span><span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> instead. &quot;</span>
+            <span class="s2">&quot;Batch semantics is not supported. &quot;</span>
+            <span class="s2">&quot;Please refer to https://github.com/pytorch/audio/issues/1348&quot;</span>
+            <span class="s2">&quot; and https://github.com/pytorch/audio/issues/1468.&quot;</span>
+        <span class="p">)</span>
 
     <span class="n">measure_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="p">(</span>
         <span class="mf">2.0</span> <span class="o">/</span> <span class="n">measure_freq</span> <span class="k">if</span> <span class="n">measure_duration</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">measure_duration</span>

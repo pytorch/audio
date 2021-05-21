@@ -763,13 +763,13 @@ and returns a signal scaled between -1 and 1.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>orig_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The original frequency of the signal. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
 <li><p><strong>new_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The desired frequency. (Default: <code class="docutils literal notranslate"><span class="pre">16000</span></code>)</p></li>
-<li><p><strong>resampling_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The resampling method.
+<li><p><strong>resampling_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The resampling method to use.
 Options: [<code class="docutils literal notranslate"><span class="pre">sinc_interpolation</span></code>, <code class="docutils literal notranslate"><span class="pre">kaiser_window</span></code>] (Default: <code class="docutils literal notranslate"><span class="pre">'sinc_interpolation'</span></code>)</p></li>
 <li><p><strong>lowpass_filter_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Controls the sharpness of the filter, more == sharper
-but less efficient. We suggest around 4 to 10 for normal use. (Default: <code class="docutils literal notranslate"><span class="pre">6</span></code>)</p></li>
+but less efficient. (Default: <code class="docutils literal notranslate"><span class="pre">6</span></code>)</p></li>
 <li><p><strong>rolloff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The roll-off frequency of the filter, as a fraction of the Nyquist.
 Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: <code class="docutils literal notranslate"><span class="pre">0.99</span></code>)</p></li>
-<li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The shape parameter used for kaiser window.</p></li>
+<li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – The shape parameter used for kaiser window.</p></li>
 <li><p><strong>Note</strong> – If resampling on waveforms of higher precision than float32, there may be a small loss of precision</p></li>
 <li><p><strong>the kernel is cached once as float32. If high precision resampling is important for your application,</strong> (<em>because</em>) – </p></li>
 <li><p><strong>functional form will retain higher precision, but run slower because it does not cache the kernel.</strong> (<em>the</em>) – </p></li>
@@ -1186,7 +1186,10 @@ This option sets the time for the initial noise estimate. (Default: 0.35)</p></l
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/transforms.html#Vad.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Vad.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(…, time)</cite></p>
+<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension <cite>(channels, time)</cite> or <cite>(time)</cite>
+Tensor of shape <cite>(channels, time)</cite> is treated as a multi-channel recording
+of the same event and the resulting output will be trimmed to the earliest
+voice activity in any channel.</p>
 </dd>
 </dl>
 </dd></dl>
