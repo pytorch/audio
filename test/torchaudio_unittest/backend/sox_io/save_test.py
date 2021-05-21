@@ -1,4 +1,5 @@
 import io
+import os
 import unittest
 
 from torchaudio.backend import sox_io_backend
@@ -20,7 +21,9 @@ from .common import (
     name_func,
     get_enc_params,
 )
-
+from torch import (
+    zeros,
+)
 
 def _get_sox_encoding(encoding):
     encodings = {
@@ -387,3 +390,12 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
         sox_io_backend.save(path, data, 8000)
 
         self.assertEqual(data, expected)
+
+@skipIfNoSox
+class TestSaveErr(PytorchTestCase):
+    def test_save_fail(self):
+        """
+        """
+        path = os.path.join("__No_SuCh_DiR__", "__No_SuCh_FiLe__.wav")
+        with self.assertRaisesRegex(RuntimeError, "^Error saving audio file: failed to open file.$"):
+            sox_io_backend.save(path, zeros(1,1), 8000)

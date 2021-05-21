@@ -522,3 +522,12 @@ class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
 
         assert sr == sample_rate
         self.assertEqual(expected, found)
+
+@skipIfNoSox
+class TestLoadNoSuchFile(PytorchTestCase):
+    def test_load_fail(self):
+        """
+        """
+        path = "__No_SuCh_FiLe__"
+        with self.assertRaisesRegex(RuntimeError, "^Error loading audio file: failed to open file.$"):
+            sox_io_backend.load(path)
