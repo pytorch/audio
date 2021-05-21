@@ -666,13 +666,13 @@ class Resample(torch.nn.Module):
     Args:
         orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)
         new_freq (float, optional): The desired frequency. (Default: ``16000``)
-        resampling_method (str, optional): The resampling method.
+        resampling_method (str, optional): The resampling method to use.
             Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
         lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
-            but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
+            but less efficient. (Default: ``6``)
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
-        beta (float, optional): The shape parameter used for kaiser window.
+        beta (float or None): The shape parameter used for kaiser window.
 
         Note: If resampling on waveforms of higher precision than float32, there may be a small loss of precision
         because the kernel is cached once as float32. If high precision resampling is important for your application,
@@ -1126,7 +1126,10 @@ class Vad(torch.nn.Module):
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:
-            waveform (Tensor): Tensor of audio of dimension `(..., time)`
+            waveform (Tensor): Tensor of audio of dimension `(channels, time)` or `(time)`
+                Tensor of shape `(channels, time)` is treated as a multi-channel recording
+                of the same event and the resulting output will be trimmed to the earliest
+                voice activity in any channel.
         """
         return F.vad(
             waveform=waveform,
