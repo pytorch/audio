@@ -278,12 +278,6 @@ class Functional(TestBaseMixin):
             F.resample(waveform, sample_rate, 5512.5)
         assert len(w) == 1
 
-
-class FunctionalComplex(TestBaseMixin):
-    complex_dtype = None
-    real_dtype = None
-    device = None
-
     @nested_params(
         [0.5, 1.01, 1.3],
         [True, False],
