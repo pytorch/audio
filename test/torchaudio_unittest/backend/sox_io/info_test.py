@@ -476,3 +476,14 @@ class TestFileObjectHttp(HttpServerMixin, FileObjTestBase, PytorchTestCase):
         assert sinfo.num_frames == num_frames
         assert sinfo.bits_per_sample == bits_per_sample
         assert sinfo.encoding == get_encoding(ext, dtype)
+
+
+@skipIfNoSox
+class TestInfoNoSuchFile(PytorchTestCase):
+    def test_info_fail(self):
+        """
+        When attempted to get info on a non-existing file, error message must contain the file path.
+        """
+        path = "non_existing_audio.wav"
+        with self.assertRaisesRegex(RuntimeError, "^Error loading audio file: failed to open file {0}$".format(path)):
+            sox_io_backend.info(path)

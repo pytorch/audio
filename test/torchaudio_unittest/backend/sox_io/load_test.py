@@ -522,3 +522,14 @@ class TestFileObjectHttp(HttpServerMixin, PytorchTestCase):
 
         assert sr == sample_rate
         self.assertEqual(expected, found)
+
+
+@skipIfNoSox
+class TestLoadNoSuchFile(PytorchTestCase):
+    def test_load_fail(self):
+        """
+        When attempted to load a non-existing file, error message must contain the file path.
+        """
+        path = "non_existing_audio.wav"
+        with self.assertRaisesRegex(RuntimeError, "^Error loading audio file: failed to open file {0}$".format(path)):
+            sox_io_backend.load(path)
