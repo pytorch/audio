@@ -52,17 +52,60 @@ setup_cuda() {
 
   # Now work out the CUDA settings
   case "$CU_VERSION" in
+    cu112)
+      if [[ "$OSTYPE" == "msys" ]]; then
+        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.2"
+      else
+        export CUDA_HOME=/usr/local/cuda-11.2/
+      fi
+      export FORCE_CUDA=1
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
+      ;;
+    cu111)
+      if [[ "$OSTYPE" == "msys" ]]; then
+        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.1"
+      else
+        export CUDA_HOME=/usr/local/cuda-11.1/
+      fi
+      export FORCE_CUDA=1
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0;8.6"
+      ;;
+    cu110)
+      if [[ "$OSTYPE" == "msys" ]]; then
+        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.0"
+      else
+        export CUDA_HOME=/usr/local/cuda-11.0/
+      fi
+      export FORCE_CUDA=1
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5;8.0"
+      ;;
+    cu102)
+      if [[ "$OSTYPE" == "msys" ]]; then
+        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.2"
+      else
+        export CUDA_HOME=/usr/local/cuda-10.2/
+      fi
+      export FORCE_CUDA=1
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
+      ;;
+    cu101)
+      if [[ "$OSTYPE" == "msys" ]]; then
+        export CUDA_HOME="C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.1"
+      else
+        export CUDA_HOME=/usr/local/cuda-10.1/
+      fi
+      export FORCE_CUDA=1
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
+      ;;
     cu100)
       export CUDA_HOME=/usr/local/cuda-10.0/
       export FORCE_CUDA=1
-      # Hard-coding gencode flags is temporary situation until
-      # https://github.com/pytorch/pytorch/pull/23408 lands
-      export NVCC_FLAGS="-gencode=arch=compute_35,code=sm_35 -gencode=arch=compute_50,code=sm_50 -gencode=arch=compute_60,code=sm_60 -gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_75,code=sm_75 -gencode=arch=compute_50,code=compute_50"
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0;7.5"
       ;;
     cu92)
       export CUDA_HOME=/usr/local/cuda-9.2/
       export FORCE_CUDA=1
-      export NVCC_FLAGS="-gencode=arch=compute_35,code=sm_35 -gencode=arch=compute_50,code=sm_50 -gencode=arch=compute_60,code=sm_60 -gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_50,code=compute_50"
+      export TORCH_CUDA_ARCH_LIST="3.5;5.0+PTX;6.0;7.0"
       ;;
     cpu)
       ;;

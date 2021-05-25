@@ -71,11 +71,23 @@ binary_common: &binary_common
     python_version:
       description: "Python version to build against (e.g., 3.8)"
       type: string
+    cuda_version:
+      description: "CUDA version to build against (e.g., cpu, cu101)"
+      type: string
+      default: "cpu"
+    wheel_docker_image:
+      description: "Wheel only: what docker image to use"
+      type: string
+      default: "pytorch/manylinux-cuda102"
+    conda_docker_image:
+      description: "Conda only: what docker image to use"
+      type: string
+      default: "pytorch/conda-builder:cuda102"
   environment: &environment
     PYTHON_VERSION: << parameters.python_version >>
     BUILD_VERSION: << parameters.build_version >>
     PYTORCH_VERSION: << parameters.pytorch_version >>
-    CU_VERSION: cpu
+    CU_VERSION: << parameters.cuda_version >>
 
 smoke_test_common: &smoke_test_common
   <<: *binary_common
@@ -127,7 +139,7 @@ jobs:
   binary_linux_wheel:
     <<: *binary_common
     docker:
-      - image: "pytorch/manylinux-cuda102"
+      - image: << parameters.wheel_docker_image >>
     resource_class: 2xlarge+
     steps:
       - checkout
@@ -144,7 +156,7 @@ jobs:
   binary_linux_conda:
     <<: *binary_common
     docker:
-      - image: "pytorch/conda-cuda"
+      - image: "<< parameters.conda_docker_image >>"
     resource_class: 2xlarge+
     steps:
       - checkout
