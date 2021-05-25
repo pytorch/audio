@@ -74,8 +74,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(computed, expected)
 
     def test_batch_mulaw(self):
-        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
 
         # Single then transform then batch
         waveform_encoded = torchaudio.transforms.MuLawEncoding()(waveform)
@@ -99,8 +98,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(computed, expected)
 
     def test_batch_spectrogram(self):
-        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
 
         # Single then transform then batch
         expected = torchaudio.transforms.Spectrogram()(waveform).repeat(3, 1, 1, 1)
@@ -110,8 +108,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(computed, expected)
 
     def test_batch_melspectrogram(self):
-        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
 
         # Single then transform then batch
         expected = torchaudio.transforms.MelSpectrogram()(waveform).repeat(3, 1, 1, 1)
@@ -121,8 +118,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(computed, expected)
 
     def test_batch_mfcc(self):
-        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, _ = torchaudio.load(test_filepath)
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
 
         # Single then transform then batch
         expected = torchaudio.transforms.MFCC()(waveform).repeat(3, 1, 1, 1)
@@ -160,8 +156,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(computed, expected, atol=1e-5, rtol=1e-5)
 
     def test_batch_Fade(self):
-        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
         fade_in_len = 3000
         fade_out_len = 3000
 
@@ -173,8 +168,7 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         self.assertEqual(computed, expected)
 
     def test_batch_Vol(self):
-        test_filepath = common_utils.get_asset_path('steam-train-whistle-daniel_simon.wav')
-        waveform, _ = torchaudio.load(test_filepath)  # (2, 278756), 44100
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
 
         # Single then transform then batch
         expected = torchaudio.transforms.Vol(gain=1.1)(waveform).repeat(3, 1, 1)

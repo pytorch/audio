@@ -81,13 +81,18 @@ void SoxFormat::close() {
   }
 }
 
-void validate_input_file(const SoxFormat& sf) {
+void validate_input_file(const SoxFormat& sf, const std::string& path) {
   if (static_cast<sox_format_t*>(sf) == nullptr) {
-    throw std::runtime_error("Error loading audio file: failed to open file.");
+    throw std::runtime_error(
+        "Error loading audio file: failed to open file " + path);
   }
   if (sf->encoding.encoding == SOX_ENCODING_UNKNOWN) {
     throw std::runtime_error("Error loading audio file: unknown encoding.");
   }
+}
+
+void validate_input_memfile(const SoxFormat& sf) {
+  return validate_input_file(sf, "<in memory buffer>");
 }
 
 void validate_input_tensor(const torch::Tensor tensor) {
