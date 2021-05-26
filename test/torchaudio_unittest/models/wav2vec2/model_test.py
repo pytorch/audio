@@ -9,6 +9,7 @@ from torchaudio.models.wav2vec2 import (
 )
 from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
+    skipIfNoQengine,
 )
 from parameterized import parameterized
 
@@ -100,6 +101,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         self.assertEqual(hyp_len, ref_len)
 
     @factory_funcs
+    @skipIfNoQengine
     def test_quantize(self, factory_func):
         """Wav2Vec2Model should support basic quantization"""
         batch_size, num_frames = 3, 1024
@@ -121,6 +123,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         _, _ = quantized(waveforms, lengths)
 
     @factory_funcs
+    @skipIfNoQengine
     def test_quantize_torchscript(self, factory_func):
         """Quantized Wav2Vec2Model should be scriptable"""
         batch_size, num_frames = 3, 1024

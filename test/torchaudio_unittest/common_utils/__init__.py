@@ -19,6 +19,7 @@ from .case_utils import (
     skipIfNoKaldi,
     skipIfNoSox,
     skipIfRocm,
+    skipIfNoQengine,
 )
 from .wav_utils import (
     get_wav_data,
