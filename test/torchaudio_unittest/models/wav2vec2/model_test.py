@@ -10,6 +10,7 @@ from torchaudio.models.wav2vec2 import (
 from torchaudio_unittest.common_utils import (
     TorchaudioTestCase,
     skipIfNoQengine,
+    skipIfNoCuda,
 )
 from parameterized import parameterized
 
@@ -21,6 +22,30 @@ factory_funcs = parameterized.expand([
 
 
 class TestWav2Vec2Model(TorchaudioTestCase):
+    def _smoke_test(self, device, dtype):
+        model = wav2vec2_base(num_out=32)
+        model = model.to(device=device, dtype=dtype)
+        model = model.eval()
+
+        torch.manual_seed(0)
+        batch_size, num_frames = 3, 1024
+
+        waveforms = torch.randn(
+            batch_size, num_frames, device=device, dtype=dtype)
+        lengths = torch.randint(
+            low=0, high=num_frames, size=[batch_size, ], device=device, dtype=dtype)
+
+        model(waveforms, lengths)
+
+    @parameterized.expand([(torch.float32, ), (torch.float64, )])
+    def test_cpu_smoke_test(self, dtype):
+        self._smoke_test(torch.device('cpu'), dtype)
+
+    @parameterized.expand([(torch.float32, ), (torch.float64, )])
+    @skipIfNoCuda
+    def test_cuda_smoke_test(self, dtype):
+        self._smoke_test(torch.device('cuda'), dtype)
+
     @factory_funcs
     def test_feature_extractor_smoke_test(self, factory_func):
         """`extract_features` method does not fail"""

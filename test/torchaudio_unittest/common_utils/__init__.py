@@ -50,6 +50,7 @@ __all__ = [
     'skipIfNoSox',
     'skipIfNoSoxBackend',
     'skipIfRocm',
+    'skipIfNoQengine',
     'get_wav_data',
     'normalize_wav',
     'load_wav',
