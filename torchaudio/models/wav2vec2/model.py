@@ -75,8 +75,8 @@ class Wav2Vec2Model(Module):
 
         Returns:
             Tensor:
-                The sequences of probability distribution (in negative log-likelihood) over labels.
-                Shape: ``(batch, frames)``.
+                The sequences of probability distribution (in logit) over labels.
+                Shape: ``(batch, frames, num labels)``.
             Tensor, optional:
                 Indicates the valid length of each feature in the batch, computed
                 based on the given ``lengths`` argument.

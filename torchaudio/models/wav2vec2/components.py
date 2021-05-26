@@ -106,7 +106,7 @@ class FeatureExtractor(Module):
 
         x = x.unsqueeze(1)  # (batch, channel==1, frame)
         for layer in self.conv_layers:
-            x, length = layer(x, length)  # (batch, feathre, frame)
+            x, length = layer(x, length)  # (batch, feature, frame)
         x = x.transpose(1, 2)  # (batch, frame, feature)
         return x, length
 
@@ -170,7 +170,7 @@ class ConvolutionalPositionalEmbedding(Module):
             groups=groups,
         )
         self.conv = nn.utils.weight_norm(self.conv, name="weight", dim=2)
-        self.num_remove: int = 1 if kernel_size % 2 == 0 else 1
+        self.num_remove: int = 1 if kernel_size % 2 == 0 else 0
 
     def __prepare_scriptable__(self):
         for hook in self.conv._forward_pre_hooks.values():
@@ -391,7 +391,7 @@ class Transformer(Module):
         for layer in self.layers:
             # It is more readable if the following condition is flipped and we use `continue`,
             # but TorchScript does not support `continue`.
-            if not self.training or torch.rand(1).item() > self.layer_drop:
+            if not (self.training and torch.rand(1).item() <= self.layer_drop):
                 x = layer(x, attention_mask)
 
         if not self.layer_norm_first:
