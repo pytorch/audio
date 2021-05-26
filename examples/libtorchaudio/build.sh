@@ -8,6 +8,7 @@ build_dir="${this_dir}/build"
 mkdir -p "${build_dir}"
 cd "${build_dir}"
 
+git submodule update
 cmake -GNinja \
       -DCMAKE_PREFIX_PATH="$(python -c 'import torch;print(torch.utils.cmake_prefix_path)')" \
       -DBUILD_SOX=ON \
