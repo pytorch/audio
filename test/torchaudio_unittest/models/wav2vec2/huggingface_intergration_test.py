@@ -104,10 +104,8 @@ class TestHFIntegration(TorchaudioTestCase):
             hyp = imported_(x, mask)
             self.assertEqual(ref, hyp)
         # The whole Encoder Transformer
-        # TODO: Add mask pattern. Expected mask shapes and values are different.
         b, l, e = 16, 3, config["hidden_size"]
         x = torch.randn(b, l, e)
-        mask = torch.randn(b, 1, l, l)
         ref = original.wav2vec2.encoder(x).last_hidden_state
         hyp = imported.encoder.transformer(x)
         self.assertEqual(ref, hyp)
@@ -116,11 +114,29 @@ class TestHFIntegration(TorchaudioTestCase):
         ref = original.lm_head(x)
         hyp = imported.encoder.readout(x)
         self.assertEqual(ref, hyp)
-        # The whole model
+        # The whole model without mask
         x = torch.randn(3, 1024)
         ref = original(x).logits
         hyp, _ = imported(x)
         self.assertEqual(ref, hyp)
+        # The whole model without mask
+        batch_size, num_frames = 3, 1024
+        x = torch.randn(batch_size, num_frames)
+        ref = original(x).logits
+        hyp, _ = imported(x)
+        self.assertEqual(ref, hyp)
+
+        # The whole model with mask
+        batch_size, num_frames = 3, 1024
+        x = torch.randn(batch_size, num_frames)
+        lengths = torch.randint(low=0, high=num_frames, size=[batch_size, ])
+        mask = torch.arange(num_frames).expand(batch_size, num_frames) < lengths[:, None]
+
+        ref = original(x, attention_mask=mask).logits
+        hyp, output_lengths = imported(x, lengths)
+
+        for i, l in enumerate(output_lengths):
+            self.assertEqual(ref[i, :l, ...], hyp[i, :l, ...])
 
     @parameterized.expand(HF_CONFIGS)
     def test_recreate(self, config, factory_func):
