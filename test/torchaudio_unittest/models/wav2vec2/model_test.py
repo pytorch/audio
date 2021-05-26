@@ -33,7 +33,7 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         waveforms = torch.randn(
             batch_size, num_frames, device=device, dtype=dtype)
         lengths = torch.randint(
-            low=0, high=num_frames, size=[batch_size, ], device=device, dtype=dtype)
+            low=0, high=num_frames, size=[batch_size, ], device=device)
 
         model(waveforms, lengths)
 

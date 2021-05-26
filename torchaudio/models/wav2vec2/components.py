@@ -423,7 +423,7 @@ class Encoder(Module):
         if lengths is not None:
             batch_size, max_len, _ = x.shape
             # create mask for padded elements and zero-out them
-            mask = torch.arange(max_len).expand(batch_size, max_len) >= lengths[:, None]
+            mask = torch.arange(max_len, device=lengths.device).expand(batch_size, max_len) >= lengths[:, None]
             x[mask] = 0.0
             # extend the mask to attention shape and set weight
             mask = -10000.0 * mask[:, None, None, :].to(dtype=features.dtype)
