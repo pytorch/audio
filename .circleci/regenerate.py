@@ -36,7 +36,10 @@ def build_workflows(prefix='', upload=False, filter_branch=None, indentation=6):
         for os_type in ["linux", "macos", "windows"]:
             for python_version in PYTHON_VERSIONS:
                 for cu_version in CU_VERSIONS_DICT[os_type]:
-                    w += build_workflow_pair(btype, os_type, python_version, cu_version, filter_branch, prefix, upload)
+                    if cu_version.startswith("rocm") and btype=="conda":
+                        pass
+                    else:
+                        w += build_workflow_pair(btype, os_type, python_version, cu_version, filter_branch, prefix, upload)
 
     if not filter_branch:
         # Build on every pull request, but upload only on nightly and tags
