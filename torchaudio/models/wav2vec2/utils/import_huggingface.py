@@ -58,10 +58,12 @@ def import_huggingface_model(original: Module) -> Wav2Vec2Model:
 
     .. _Transformers: https://huggingface.co/transformers/
     """
-    assert original.__class__.__name__ == 'Wav2Vec2ForCTC'
-    _LG.info('- Loading model configuration')
+    _LG.info('Importing model.')
+    if original.__class__.__name__ != 'Wav2Vec2ForCTC':
+        _LG.warning('The model is not an instance of Wav2Vec2ForCTC')
+    _LG.info('Loading model configuration.')
     config = _get_config(original.config)
     _LG.debug('  - config: %s', config)
-    _LG.info('- Building model')
+    _LG.info('Building model.')
     imported = _build(config, original)
     return imported
