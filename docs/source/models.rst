@@ -55,6 +55,14 @@ Factory Functions
 
 .. autofunction:: wav2vec2_large_lv60k
 
+.. currentmodule:: torchaudio.models.wav2vec2.utils
+
+Utility Functions
+-----------------
+
+.. autofunction:: import_huggingface_model
+
+.. currentmodule:: torchaudio.models
 
 :hidden:`WaveRNN`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
