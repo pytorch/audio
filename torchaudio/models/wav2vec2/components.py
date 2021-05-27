@@ -389,8 +389,6 @@ class Transformer(Module):
 
         x = self.dropout(x)
         for layer in self.layers:
-            # It is more readable if the following condition is flipped and we use `continue`,
-            # but TorchScript does not support `continue`.
             if not (self.training and torch.rand(1).item() <= self.layer_drop):
                 x = layer(x, attention_mask)
 
