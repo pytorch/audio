@@ -110,6 +110,6 @@ skipIfNoKaldi = unittest.skipIf(not is_kaldi_available(), reason='Kaldi not avai
 skipIfRocm = unittest.skipIf(os.getenv('TORCHAUDIO_TEST_WITH_ROCM', '0') == '1',
                              reason="test doesn't currently work on the ROCm stack")
 skipIfNoQengine = unittest.skipIf(
-    all(e not in torch.backends.quantized.supported_engines for e in ['fbgemm', 'qnnpack']),
-    reason="Neither `fbgemm` or `qnnpack` are available."
+    'fbgemm' not in torch.backends.quantized.supported_engines,
+    reason="`fbgemm` is not available."
 )

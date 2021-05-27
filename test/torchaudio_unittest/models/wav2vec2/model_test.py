@@ -151,7 +151,6 @@ class TestWav2Vec2Model(TorchaudioTestCase):
     @skipIfNoQengine
     def test_quantize_torchscript(self, factory_func):
         """Quantized Wav2Vec2Model should be scriptable"""
-        print(torch.backends.quantized.supported_engines)
         batch_size, num_frames = 3, 1024
 
         model = factory_func(num_out=32).eval()
