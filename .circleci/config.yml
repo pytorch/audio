@@ -651,6 +651,13 @@ workflows:
           - download_third_parties_nix
           wheel_docker_image: pytorch/manylinux-cuda111
       - binary_linux_wheel:
+          cuda_version: rocm4.1
+          name: binary_linux_wheel_py3.6_rocm4.1
+          python_version: '3.6'
+          requires:
+          - download_third_parties_nix
+          wheel_docker_image: pytorch/manylinux-rocm:4.1
+      - binary_linux_wheel:
           cuda_version: cpu
           name: binary_linux_wheel_py3.7_cpu
           python_version: '3.7'
@@ -670,6 +677,13 @@ workflows:
           requires:
           - download_third_parties_nix
           wheel_docker_image: pytorch/manylinux-cuda111
+      - binary_linux_wheel:
+          cuda_version: rocm4.1
+          name: binary_linux_wheel_py3.7_rocm4.1
+          python_version: '3.7'
+          requires:
+          - download_third_parties_nix
+          wheel_docker_image: pytorch/manylinux-rocm:4.1
       - binary_linux_wheel:
           cuda_version: cpu
           name: binary_linux_wheel_py3.8_cpu
@@ -691,6 +705,13 @@ workflows:
           - download_third_parties_nix
           wheel_docker_image: pytorch/manylinux-cuda111
       - binary_linux_wheel:
+          cuda_version: rocm4.1
+          name: binary_linux_wheel_py3.8_rocm4.1
+          python_version: '3.8'
+          requires:
+          - download_third_parties_nix
+          wheel_docker_image: pytorch/manylinux-rocm:4.1
+      - binary_linux_wheel:
           cuda_version: cpu
           name: binary_linux_wheel_py3.9_cpu
           python_version: '3.9'
@@ -710,6 +731,13 @@ workflows:
           requires:
           - download_third_parties_nix
           wheel_docker_image: pytorch/manylinux-cuda111
+      - binary_linux_wheel:
+          cuda_version: rocm4.1
+          name: binary_linux_wheel_py3.9_rocm4.1
+          python_version: '3.9'
+          requires:
+          - download_third_parties_nix
+          wheel_docker_image: pytorch/manylinux-rocm:4.1
       - binary_macos_wheel:
           cuda_version: cpu
           name: binary_macos_wheel_py3.6_cpu
@@ -1218,6 +1246,42 @@ workflows:
           requires:
           - nightly_binary_linux_wheel_py3.6_cu111_upload
       - binary_linux_wheel:
+          cuda_version: rocm4.1
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.6_rocm4.1
+          python_version: '3.6'
+          requires:
+          - download_third_parties_nix
+          wheel_docker_image: pytorch/manylinux-rocm:4.1
+      - binary_wheel_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.6_rocm4.1_upload
+          requires:
+          - nightly_binary_linux_wheel_py3.6_rocm4.1
+      - smoke_test_linux_pip:
+          cuda_version: rocm4.1
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.6_rocm4.1_smoke_test_pip
+          python_version: '3.6'
+          requires:
+          - nightly_binary_linux_wheel_py3.6_rocm4.1_upload
+      - binary_linux_wheel:
           cuda_version: cpu
           filters:
             branches:
@@ -1324,6 +1388,42 @@ workflows:
           python_version: '3.7'
           requires:
           - nightly_binary_linux_wheel_py3.7_cu111_upload
+      - binary_linux_wheel:
+          cuda_version: rocm4.1
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.7_rocm4.1
+          python_version: '3.7'
+          requires:
+          - download_third_parties_nix
+          wheel_docker_image: pytorch/manylinux-rocm:4.1
+      - binary_wheel_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.7_rocm4.1_upload
+          requires:
+          - nightly_binary_linux_wheel_py3.7_rocm4.1
+      - smoke_test_linux_pip:
+          cuda_version: rocm4.1
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.7_rocm4.1_smoke_test_pip
+          python_version: '3.7'
+          requires:
+          - nightly_binary_linux_wheel_py3.7_rocm4.1_upload
       - binary_linux_wheel:
           cuda_version: cpu
           filters:
@@ -1432,6 +1532,42 @@ workflows:
           requires:
           - nightly_binary_linux_wheel_py3.8_cu111_upload
       - binary_linux_wheel:
+          cuda_version: rocm4.1
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.8_rocm4.1
+          python_version: '3.8'
+          requires:
+          - download_third_parties_nix
+          wheel_docker_image: pytorch/manylinux-rocm:4.1
+      - binary_wheel_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.8_rocm4.1_upload
+          requires:
+          - nightly_binary_linux_wheel_py3.8_rocm4.1
+      - smoke_test_linux_pip:
+          cuda_version: rocm4.1
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.8_rocm4.1_smoke_test_pip
+          python_version: '3.8'
+          requires:
+          - nightly_binary_linux_wheel_py3.8_rocm4.1_upload
+      - binary_linux_wheel:
           cuda_version: cpu
           filters:
             branches:
@@ -1538,6 +1674,42 @@ workflows:
           python_version: '3.9'
           requires:
           - nightly_binary_linux_wheel_py3.9_cu111_upload
+      - binary_linux_wheel:
+          cuda_version: rocm4.1
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.9_rocm4.1
+          python_version: '3.9'
+          requires:
+          - download_third_parties_nix
+          wheel_docker_image: pytorch/manylinux-rocm:4.1
+      - binary_wheel_upload:
+          context: org-member
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.9_rocm4.1_upload
+          requires:
+          - nightly_binary_linux_wheel_py3.9_rocm4.1
+      - smoke_test_linux_pip:
+          cuda_version: rocm4.1
+          filters:
+            branches:
+              only:
+              - nightly
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
+          name: nightly_binary_linux_wheel_py3.9_rocm4.1_smoke_test_pip
+          python_version: '3.9'
+          requires:
+          - nightly_binary_linux_wheel_py3.9_rocm4.1_upload
       - binary_macos_wheel:
           cuda_version: cpu
           filters:

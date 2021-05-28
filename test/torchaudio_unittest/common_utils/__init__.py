@@ -19,6 +19,7 @@ from .case_utils import (
     skipIfNoKaldi,
     skipIfNoSox,
     skipIfRocm,
+    skipIfNoQengine,
 )
 from .wav_utils import (
     get_wav_data,
@@ -49,6 +50,7 @@ __all__ = [
     'skipIfNoSox',
     'skipIfNoSoxBackend',
     'skipIfRocm',
+    'skipIfNoQengine',
     'get_wav_data',
     'normalize_wav',
     'load_wav',
