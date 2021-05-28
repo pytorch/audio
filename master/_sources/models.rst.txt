@@ -33,6 +33,37 @@ The models subpackage contains definitions of models for addressing common audio
   .. automethod:: forward
 
 
+
+:hidden:`Wav2Vec2.0`
+~~~~~~~~~~~~~~~~~~~~
+
+Model
+-----
+
+.. autoclass:: Wav2Vec2Model
+
+  .. automethod:: extract_features
+
+  .. automethod:: forward
+
+Factory Functions
+-----------------
+
+.. autofunction:: wav2vec2_base
+
+.. autofunction:: wav2vec2_large
+
+.. autofunction:: wav2vec2_large_lv60k
+
+.. currentmodule:: torchaudio.models.wav2vec2.utils
+
+Utility Functions
+-----------------
+
+.. autofunction:: import_huggingface_model
+
+.. currentmodule:: torchaudio.models
+
 :hidden:`WaveRNN`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
