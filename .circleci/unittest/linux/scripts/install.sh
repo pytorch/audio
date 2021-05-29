@@ -58,3 +58,7 @@ fi
     conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa>=0.8.0' parameterized 'requests>=2.20'
     pip install kaldi-io SoundFile coverage pytest pytest-cov scipy transformers
 )
+# Install fairseq
+git clone https://github.com/pytorch/fairseq
+cd fairseq
+pip install .
