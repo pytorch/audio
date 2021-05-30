@@ -59,24 +59,22 @@ def _load(model_file, dict_dir):
     import fairseq
 
     overrides = {'data': dict_dir}
-    model, args, task = fairseq.checkpoint_utils.load_model_ensemble_and_task(
+    _, args, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task(
         [model_file], arg_overrides=overrides
     )
-    model = model[0]
-    return model, _to_json(args), _to_json(task.cfg)
+    return _to_json(args)
 
 
 def _main():
     args = _parse_args()
-    _, args, task_cfg = _load(args.model_file, args.dict_dir)
+    args_ = _load(args.model_file, args.dict_dir)
 
     conf = {
-        'model': args['model'],
-        'task': task_cfg,
+        'model': args_['model'],
     }
 
-    for key in ['model', 'task']:
-        conf[key]['data'] = '<PATH_TO_ASSET_DIRECTORY_WHICH_HAS_TO_BE_UPDATED_AT_RUNTIME>'
+    del conf['model']['data']
+    del conf['model']['w2v_args']['task']['data']
 
     print(json.dumps(conf, indent=4, sort_keys=True))
 
