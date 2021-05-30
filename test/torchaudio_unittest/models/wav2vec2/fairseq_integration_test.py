@@ -52,11 +52,9 @@ class TestFairseqIntegration(TorchaudioTestCase):
             Wav2Vec2CtcConfig,
         )
 
-        config = copy.deepcopy(config)
-        config['model']['w2v_args'] = OmegaConf.create(config['model']['w2v_args'])
-        cfg = Wav2Vec2CtcConfig(**config['model'])
-        w2v_encoder = Wav2VecEncoder(cfg, num_out)
-        return Wav2VecCtc(cfg, w2v_encoder)
+        config = copy.deepcopy(config['model'])
+        config['w2v_args'] = OmegaConf.create(config['w2v_args'])
+        return Wav2VecEncoder(Wav2Vec2CtcConfig(**config), num_out)
 
     @parameterized.expand([conf[:1] for conf in FAIRSEQ_CONFIGS])
     def test_import(self, config):
@@ -65,18 +63,18 @@ class TestFairseqIntegration(TorchaudioTestCase):
         batch_size, num_frames = 3, 1024
 
         original = self._get_model(config, num_out).eval()
-        imported = import_fairseq_finetuned_model(original, config).eval()
+        imported = import_fairseq_finetuned_model(original).eval()
 
         # Without mask
         x = torch.randn(batch_size, num_frames)
-        ref = original.w2v_encoder(x, torch.zeros_like(x))['encoder_out'].transpose(0, 1)
+        ref = original(x, torch.zeros_like(x))['encoder_out'].transpose(0, 1)
         hyp, _ = imported(x)
         self.assertEqual(ref, hyp)
 
         # With mask
         lengths = torch.randint(low=0, high=num_frames, size=[batch_size, ])
         mask = torch.arange(num_frames).expand(batch_size, num_frames) >= lengths[:, None]
-        ref = original.w2v_encoder(x, mask)['encoder_out'].transpose(0, 1)
+        ref = original(x, mask)['encoder_out'].transpose(0, 1)
         hyp, output_lengths = imported(x, lengths)
         for i, l in enumerate(output_lengths):
             self.assertEqual(ref[i, :l, ...], hyp[i, :l, ...])
@@ -88,7 +86,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         batch_size, num_frames = 3, 1024
 
         original = self._get_model(config, num_out).eval()
-        imported = import_fairseq_finetuned_model(original, config).eval()
+        imported = import_fairseq_finetuned_model(original).eval()
 
         reloaded = factory_func(num_out=num_out)
         reloaded.load_state_dict(imported.state_dict())
