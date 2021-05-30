@@ -4,7 +4,6 @@ For this module to work, you need `fairseq`.
 """
 import re
 
-import torch
 from torch.nn import Module
 
 from ..model import Wav2Vec2Model, _get_model
@@ -74,8 +73,7 @@ def _copy(src, dst):
     dst.load_state_dict(src.state_dict())
 
 
-def _build(config, original):
-    imported = _get_model(**config)
+def _import_state_dict(imported, config, original):
     # Feature Extractor
     imported.feature_extractor.load_state_dict(
         _map_feature_extractor_state_dict(
@@ -107,15 +105,6 @@ def _build(config, original):
     return imported
 
 
-# TODO: move this to unittest
-def _debug(original, imported):
-    torch.manual_seed(1)
-    x = torch.randn(3, 8000)
-    ref = original(x, torch.zeros_like(x))['encoder_out'].transpose(0, 1)
-    hyp, _ = imported(x)
-    torch.testing.assert_allclose(ref, hyp)
-
-
 def import_fairseq_finetuned_model(original: Module, args: dict) -> Wav2Vec2Model:
     """Import finetuned wav2vec2 mdoel from `fairseq`_.
 
@@ -136,6 +125,6 @@ def import_fairseq_finetuned_model(original: Module, args: dict) -> Wav2Vec2Mode
     .. _fairseq: https://github.com/pytorch/fairseq
     """
     config = _parse_args(original.w2v_encoder, args)
-    imported = _build(config, original.w2v_encoder)
-    _debug(original.w2v_encoder.eval(), imported.eval())
-    return imported
+    model = _get_model(**config)
+    _import_state_dict(model, config, original.w2v_encoder)
+    return model
