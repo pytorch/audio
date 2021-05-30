@@ -10,8 +10,6 @@ from ..model import Wav2Vec2Model, _get_model
 
 
 def _parse_config(original):
-    print(original)
-
     w2v_model = original.w2v_model
     encoder = w2v_model.encoder
     conv_layers = w2v_model.feature_extractor.conv_layers
@@ -53,78 +51,97 @@ def _parse_config(original):
     return config
 
 
-def _map_feature_extractor_state_dict(state_dict, mode):
-    def _map_group(key):
-        # - "conv_layers.X.0.weight" -> "conv_layers.X.conv.weight"
-        # - "conv_layers.0.2.weight" -> "conv_layers.0.layer_norm.weight"
-        # - "conv_layers.0.2.bias"   -> "conv_layers.0.layer_norm.bias"
-        p0 = r"conv_layers\.0\.2\.(weight|bias)"
-        p1 = r"conv_layers\.(\d+)\.0\.weight"
-        match = re.match(p0, key)
-        if match:
-            return f"conv_layers.0.layer_norm.{match.group(1)}"
-        match = re.match(p1, key)
-        if match:
-            return f"conv_layers.{match.group(1)}.conv.weight"
-        raise ValueError(f'Unexpected key: {key}')
+def _map_group(k):
+    # "conv_layers.X.0.weight" -> "conv_layers.X.conv.weight"
+    # "conv_layers.0.2.weight" -> "conv_layers.0.layer_norm.weight"
+    # "conv_layers.0.2.bias"   -> "conv_layers.0.layer_norm.bias"
+    p0 = r"conv_layers\.0\.2\.(weight|bias)"
+    p1 = r"conv_layers\.(\d+)\.0\.weight"
+    match = re.match(p0, k)
+    if match:
+        return f"conv_layers.0.layer_norm.{match.group(1)}"
+    match = re.match(p1, k)
+    if match:
+        return f"conv_layers.{match.group(1)}.conv.weight"
+    raise ValueError(f'Unexpected key: {k}')
 
-    def _map_layer(key):
-        p0 = r"conv_layers\.(\d+)\.0\.(weight|bias)"
-        p1 = r"conv_layers\.(\d+)\.2\.1\.(weight|bias)"
-        match = re.match(p0, key)
-        if match:
-            return f"conv_layers.{match.group(1)}.conv.{match.group(2)}"
-        match = re.match(p1, key)
-        if match:
-            return f"conv_layers.{match.group(1)}.layer_norm.{match.group(2)}"
-        raise ValueError(f'Unexpected key: {key}')
 
+def _map_layer(k):
+    # "conv_layers.X.0.weight"   -> "conv_layers.X.conv.weight"
+    # "conv_layers.X.0.bias"     -> "conv_layers.X.conv.bias"
+    # "conv_layers.X.2.1.weight" -> "conv_layers.X.layer_norm.weight"
+    # "conv_layers.X.2.1.bias"   -> "conv_layers.X.layer_norm.bias"
+    p0 = r"conv_layers\.(\d+)\.0\.(weight|bias)"
+    p1 = r"conv_layers\.(\d+)\.2\.1\.(weight|bias)"
+    match = re.match(p0, k)
+    if match:
+        return f"conv_layers.{match.group(1)}.conv.{match.group(2)}"
+    match = re.match(p1, k)
+    if match:
+        return f"conv_layers.{match.group(1)}.layer_norm.{match.group(2)}"
+    raise ValueError(f'Unexpected key: {k}')
+
+
+def _map_extractor_key(key, mode):
     _map = _map_group if mode == "group_norm" else _map_layer
-    return {_map(k): v for k, v in state_dict.items()}
+    return _map(key)
 
 
-def _copy(src, dst):
-    dst.load_state_dict(src.state_dict())
-
-
-def _build(config, original):
-    imported = _get_model(**config)
-    # Feature Extractor
-    imported.feature_extractor.load_state_dict(
-        _map_feature_extractor_state_dict(
-            original.w2v_model.feature_extractor.state_dict(),
-            config['extractor_mode'])
-    )
-    # Feature projection
-    _copy(
-        original.w2v_model.layer_norm,
-        imported.encoder.feature_projection.layer_norm)
-    _copy(
-        original.w2v_model.post_extract_proj,
-        imported.encoder.feature_projection.projection)
-    # Transformer
-    _copy(
-        original.w2v_model.encoder.pos_conv[0],
-        imported.encoder.transformer.pos_conv_embed.conv)
-    _copy(
-        original.w2v_model.encoder.layer_norm,
-        imported.encoder.transformer.layer_norm)
-    for imported_, original_ in zip(imported.encoder.transformer.layers, original.w2v_model.encoder.layers):
-        _copy(original_.self_attn, imported_.attention)
-        _copy(original_.self_attn_layer_norm, imported_.layer_norm)
-        _copy(original_.fc1, imported_.feed_forward.intermediate_dense)
-        _copy(original_.fc2, imported_.feed_forward.output_dense)
-        _copy(original_.final_layer_norm, imported_.final_layer_norm)
-    # Readout
-    _copy(original.proj, imported.encoder.readout)
-    return imported
+def _map_keys(state_dict, extractor_mode):
+    mapped = {}
+    # feature Extractor
+    extractor = 'w2v_model.feature_extractor.'
+    # feature projection
+    proj = 'w2v_model.post_extract_proj.'
+    proj_layer = 'w2v_model.layer_norm.'
+    # positional embedding
+    pos_conv = 'w2v_model.encoder.pos_conv.0.'
+    pos_conv_norm = 'w2v_model.encoder.layer_norm.'
+    # encoder layer
+    enc_layers = 'w2v_model.encoder.layers.'
+    for k, v in state_dict.items():
+        _k = k
+        if k == 'w2v_model.mask_emb':
+            continue
+        if k.startswith(extractor):
+            k = f"feature_extractor.{_map_extractor_key(k.replace(extractor, ''), extractor_mode)}"
+        elif k.startswith(proj_layer):
+            k = f"encoder.feature_projection.layer_norm.{k.replace(proj_layer, '')}"
+        elif k.startswith(proj):
+            k = f"encoder.feature_projection.projection.{k.replace(proj, '')}"
+        elif k.startswith(pos_conv):
+            k = f"encoder.transformer.pos_conv_embed.conv.{k.replace(pos_conv, '')}"
+        elif k.startswith(pos_conv_norm):
+            k = f"encoder.transformer.layer_norm.{k.replace(pos_conv_norm, '')}"
+        elif k.startswith(enc_layers):
+            k = f"{k.replace(enc_layers, '')}"
+            i, k = k.split('.', 1)
+            if k.startswith('self_attn_layer_norm.'):
+                k = f"encoder.transformer.layers.{i}.layer_norm.{k.replace('self_attn_layer_norm.', '')}"
+            elif k.startswith('self_attn.'):
+                k = f"encoder.transformer.layers.{i}.attention.{k.replace('self_attn.', '')}"
+            elif k.startswith('fc1.'):
+                k = f"encoder.transformer.layers.{i}.feed_forward.intermediate_dense.{k.replace('fc1.', '')}"
+            elif k.startswith('fc2.'):
+                k = f"encoder.transformer.layers.{i}.feed_forward.output_dense.{k.replace('fc2.', '')}"
+            elif k.startswith('final_layer_norm.'):
+                k = f"encoder.transformer.layers.{i}.final_layer_norm.{k.replace('final_layer_norm.', '')}"
+            else:
+                raise ValueError(f'Unexpected key: {_k}')
+        elif k.startswith('proj.'):
+            k = f"encoder.readout.{k.replace('proj.', '')}"
+        else:
+            raise ValueError(f'Unexpected key: {_k}')
+        mapped[k] = v
+    return mapped
 
 
 def import_fairseq_finetuned_model(original: Module) -> Wav2Vec2Model:
     """Import finetuned wav2vec2 mdoel from `fairseq`_.
 
     Args:
-        model (Wav2VecEncoder): An instance of ``fairseq.models.wav2vec.wav2vec2_asr.Wav2VecEncoder``.
+        model (Wav2VecEncoder):
+            An instance of ``fairseq.models.wav2vec.wav2vec2_asr.Wav2VecEncoder``.
     Returns:
         Wav2Vec2Model:
             An instance of the corresponding model class.
@@ -137,5 +154,6 @@ def import_fairseq_finetuned_model(original: Module) -> Wav2Vec2Model:
     .. _fairseq: https://github.com/pytorch/fairseq
     """
     config = _parse_config(original)
-    imported = _build(config, original)
-    return imported
+    model = _get_model(**config)
+    model.load_state_dict(_map_keys(original.state_dict(), config['extractor_mode']))
+    return model
