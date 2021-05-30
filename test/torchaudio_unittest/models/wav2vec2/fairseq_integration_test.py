@@ -48,11 +48,10 @@ class TestFairseqIntegration(TorchaudioTestCase):
         from omegaconf import OmegaConf
         from fairseq.models.wav2vec.wav2vec2_asr import (
             Wav2VecEncoder,
-            Wav2VecCtc,
             Wav2Vec2CtcConfig,
         )
 
-        config = copy.deepcopy(config['model'])
+        config = copy.deepcopy(config)
         config['w2v_args'] = OmegaConf.create(config['w2v_args'])
         return Wav2VecEncoder(Wav2Vec2CtcConfig(**config), num_out)
 

@@ -27,8 +27,6 @@ import argparse
 
 
 def _parse_args():
-    _this_dir = os.path.dirname(os.path.abspath(__file__))
-
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawTextHelpFormatter,
@@ -43,10 +41,15 @@ def _parse_args():
     )
     parser.add_argument(
         '--dict-dir',
-        default=_this_dir,
-        help='Directory where `dict.ltr.txt` file is found.'
+        help=(
+            'Directory where `dict.ltr.txt` file is found. '
+            'Default: the directory of the given model.'
+        )
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.dict_dir is None:
+        args.dict_dir = os.path.dirname(args.model_file)
+    return args
 
 
 def _to_json(conf):
@@ -67,16 +70,12 @@ def _load(model_file, dict_dir):
 
 def _main():
     args = _parse_args()
-    args_ = _load(args.model_file, args.dict_dir)
-
-    conf = {
-        'model': args_['model'],
-    }
+    conf = _load(args.model_file, args.dict_dir)
 
     del conf['model']['data']
     del conf['model']['w2v_args']['task']['data']
 
-    print(json.dumps(conf, indent=4, sort_keys=True))
+    print(json.dumps(conf['model'], indent=4, sort_keys=True))
 
 
 if __name__ == '__main__':
