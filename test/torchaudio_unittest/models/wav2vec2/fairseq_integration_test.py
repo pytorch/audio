@@ -62,11 +62,11 @@ class TestFairseqIntegration(TorchaudioTestCase):
     def test_import(self, config):
         """wav2vec2 models from fairseq can be imported and yields the same results"""
         num_out = 28
+        batch_size, num_frames = 3, 1024
 
         original = self._get_model(config, num_out).eval()
         imported = import_fairseq_finetuned_model(original, config).eval()
 
-        batch_size, num_frames = 3, 1024
         # Without mask
         x = torch.randn(batch_size, num_frames)
         ref = original.w2v_encoder(x, torch.zeros_like(x))['encoder_out'].transpose(0, 1)
@@ -85,6 +85,8 @@ class TestFairseqIntegration(TorchaudioTestCase):
     def test_recreate(self, config, factory_func):
         """Imported models can be recreated via a factory function without fairseq."""
         num_out = 28
+        batch_size, num_frames = 3, 1024
+
         original = self._get_model(config, num_out).eval()
         imported = import_fairseq_finetuned_model(original, config).eval()
 
@@ -92,8 +94,16 @@ class TestFairseqIntegration(TorchaudioTestCase):
         reloaded.load_state_dict(imported.state_dict())
         reloaded.eval()
 
+        # Without mask
         torch.manual_seed(0)
-        x = torch.randn(3, 1024)
+        x = torch.randn(batch_size, num_frames)
         ref, _ = imported(x)
         hyp, _ = reloaded(x)
         self.assertEqual(ref, hyp)
+
+        # With mask
+        lengths = torch.randint(low=0, high=num_frames, size=[batch_size, ])
+        ref, ref_lengths = imported(x, lengths)
+        hyp, hyp_lengths = reloaded(x, lengths)
+        self.assertEqual(ref, hyp)
+        self.assertEqual(ref_lengths, hyp_lengths)
