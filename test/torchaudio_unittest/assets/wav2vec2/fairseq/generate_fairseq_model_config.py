@@ -55,7 +55,7 @@ def _parse_args():
         '--model-file',
         required=True,
         help=(
-            'Fine-tuned Model check point file available from '
+            'A point file from '
             'https://github.com/pytorch/fairseq/tree/master/examples/wav2vec'
         )
     )
