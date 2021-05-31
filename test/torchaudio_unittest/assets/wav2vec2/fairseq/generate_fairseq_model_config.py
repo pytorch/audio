@@ -19,6 +19,18 @@ python generate_fairseq_model_config.py \
 python generate_fairseq_model_config.py \
     --model-file wav2vec_vox_960h_pl.pt \
     > wav2vec_large_lv60_self_960h.json
+
+python generate_fairseq_model_config.py \
+    --model-file wav2vec_small.pt \
+    > wav2vec_small.json
+
+python generate_fairseq_model_config.py \
+    --model-file libri960_big.pt \
+    > libri960_big.json
+
+python generate_fairseq_model_config.py \
+    --model-file wav2vec_vox_new.pt \
+    > wav2vec_vox_new.json
 ```
 """
 import os
@@ -72,8 +84,9 @@ def _main():
     args = _parse_args()
     conf = _load(args.model_file, args.dict_dir)
 
-    del conf['model']['data']
-    del conf['model']['w2v_args']['task']['data']
+    if conf['model']['_name'] == 'wav2vec_ctc':
+        del conf['model']['data']
+        del conf['model']['w2v_args']['task']['data']
 
     print(json.dumps(conf['model'], indent=4, sort_keys=True))
 

@@ -9,8 +9,7 @@ from torch.nn import Module
 from ..model import Wav2Vec2Model, _get_model
 
 
-def _parse_config(original):
-    w2v_model = original.w2v_model
+def _parse_config(w2v_model, num_out):
     encoder = w2v_model.encoder
     conv_layers = w2v_model.feature_extractor.conv_layers
 
@@ -46,7 +45,7 @@ def _parse_config(original):
         'encoder_dropout': encoder.layers[0].dropout3.p,
         'encoder_layer_norm_first': encoder.layer_norm_first,
         'encoder_layer_drop': encoder.layerdrop,
-        'encoder_num_out': original.proj.out_features,
+        'encoder_num_out': num_out,
     }
     return config
 
@@ -90,18 +89,19 @@ def _map_extractor_key(key, mode):
 def _map_keys(state_dict, extractor_mode):
     mapped = {}
     # feature Extractor
-    extractor = 'w2v_model.feature_extractor.'
+    extractor = 'feature_extractor.'
     # feature projection
-    proj = 'w2v_model.post_extract_proj.'
-    proj_layer = 'w2v_model.layer_norm.'
+    proj = 'post_extract_proj.'
+    proj_layer = 'layer_norm.'
     # positional embedding
-    pos_conv = 'w2v_model.encoder.pos_conv.0.'
-    pos_conv_norm = 'w2v_model.encoder.layer_norm.'
+    pos_conv = 'encoder.pos_conv.0.'
+    pos_conv_norm = 'encoder.layer_norm.'
     # encoder layer
-    enc_layers = 'w2v_model.encoder.layers.'
+    enc_layers = 'encoder.layers.'
     for k, v in state_dict.items():
         _k = k
-        if k == 'w2v_model.mask_emb':
+        k = k.replace('w2v_model.', '')
+        if k == 'mask_emb' or k.startswith('quantizer') or k.startswith('project_q') or k.startswith('final_proj'):
             continue
         if k.startswith(extractor):
             k = f"feature_extractor.{_map_extractor_key(k.replace(extractor, ''), extractor_mode)}"
@@ -149,11 +149,31 @@ def import_fairseq_finetuned_model(original: Module) -> Wav2Vec2Model:
     Example:
         >>> model, args, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task(
         ...     [checkpoint_path], arg_overrides={'data': data_dir})
-        >>> imported = import_fairseq_model(model[0].w2v_encoder)
+        >>> imported = import_fairseq_finetuned_model(model[0].w2v_encoder)
+        >>> waveform, _ = torchaudio.load('audio.wav')
+        >>> emission, _ = imported(waveform)
 
     .. _fairseq: https://github.com/pytorch/fairseq
     """
-    config = _parse_config(original)
+    config = _parse_config(original.w2v_model, original.proj.out_features)
     model = _get_model(**config)
     model.load_state_dict(_map_keys(original.state_dict(), config['extractor_mode']))
+    return model
+
+
+def import_fairseq_pretrained_model(original: Module, num_out: int) -> Wav2Vec2Model:
+    """Import pretrained (not-finetuned wav2vec2model from `fairse`_.
+
+    Example:
+        >>> model, args, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task(
+        ...     [checkpoint_path])
+        >>> imported = import_fairseq_pretrained_model(model[0].feature_extractor)
+        >>> waveform, _ = torchaudio.load('audio.wav')
+        >>> features, _ = imported.extract_feature(waveform)
+
+    .. _fairseq: https://github.com/pytorch/fairseq
+    """
+    config = _parse_config(original, num_out)
+    model = _get_model(**config)
+    model.load_state_dict(_map_keys(original.state_dict(), config['extractor_mode']), strict=False)
     return model
