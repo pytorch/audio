@@ -1,9 +1,29 @@
 #!/usr/bin/env python3
 """Generate the conf JSON from fairseq pretrained weight file, that is consumed by unit tests
 
-Example usage:
+Usage:
+1. Download pretrained parameters from https://github.com/pytorch/fairseq/tree/master/examples/wav2vec
+2. Download the dict from https://dl.fbaipublicfiles.com/fairseq/wav2vec/dict.ltr.txt
+   and put it in the same directory as parameter files.
+3. Run this script and save the resulting JSON configuration in assets directory.
+
+Example:
 
 ```
+# Pretrained
+python generate_fairseq_model_config.py \
+    --model-file wav2vec_small.pt \
+    > wav2vec_small.json
+
+python generate_fairseq_model_config.py \
+    --model-file libri960_big.pt \
+    > libri960_big.json
+
+python generate_fairseq_model_config.py \
+    --model-file wav2vec_vox_new.pt \
+    > wav2vec_vox_new.json
+
+# Fine-tuned
 python generate_fairseq_model_config.py \
     --model-file wav2vec_small_960h.pt \
     > wav2vec_small_960h.json
@@ -19,18 +39,6 @@ python generate_fairseq_model_config.py \
 python generate_fairseq_model_config.py \
     --model-file wav2vec_vox_960h_pl.pt \
     > wav2vec_large_lv60_self_960h.json
-
-python generate_fairseq_model_config.py \
-    --model-file wav2vec_small.pt \
-    > wav2vec_small.json
-
-python generate_fairseq_model_config.py \
-    --model-file libri960_big.pt \
-    > libri960_big.json
-
-python generate_fairseq_model_config.py \
-    --model-file wav2vec_vox_new.pt \
-    > wav2vec_vox_new.json
 ```
 """
 import os
@@ -77,18 +85,18 @@ def _load(model_file, dict_dir):
     _, args, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task(
         [model_file], arg_overrides=overrides
     )
-    return _to_json(args)
+    return _to_json(args['model'])
 
 
 def _main():
     args = _parse_args()
     conf = _load(args.model_file, args.dict_dir)
 
-    if conf['model']['_name'] == 'wav2vec_ctc':
-        del conf['model']['data']
-        del conf['model']['w2v_args']['task']['data']
+    if conf['_name'] == 'wav2vec_ctc':
+        del conf['data']
+        del conf['w2v_args']['task']['data']
 
-    print(json.dumps(conf['model'], indent=4, sort_keys=True))
+    print(json.dumps(conf, indent=4, sort_keys=True))
 
 
 if __name__ == '__main__':

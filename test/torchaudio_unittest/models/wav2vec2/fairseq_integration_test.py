@@ -28,6 +28,7 @@ def _load_config(*paths):
 BASE = _load_config('wav2vec_small')
 LARGE = _load_config('libri960_big')
 LARGE_LV60K = _load_config('wav2vec_vox_new')
+XLSR_53_56K = _load_config('xlsr_53_56k')
 # Fine-tuned models
 BASE_960H = _load_config('wav2vec_small_960h')
 LARGE_960H = _load_config('wav2vec_large_960h')
@@ -38,7 +39,8 @@ LARGE_LV60K_SELF_960H = _load_config('wav2vec_large_lv60k_self_960h')
 PRETRAINED_CONFIGS = [
     (BASE, wav2vec2_base),
     (LARGE, wav2vec2_large),
-    (LARGE_LV60K, wav2vec2_large_lv60k)
+    (LARGE_LV60K, wav2vec2_large_lv60k),
+    (XLSR_53_56K, wav2vec2_large_lv60k),
 ]
 FINETUNED_CONFIGS = [
     (BASE_960H, wav2vec2_base),
