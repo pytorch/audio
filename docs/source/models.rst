@@ -62,7 +62,7 @@ Utility Functions
 
 .. autofunction:: import_huggingface_model
 
-.. autofunction:: import_fairseq_finetuned_model
+.. autofunction:: import_fairseq_model
 
 .. currentmodule:: torchaudio.models
 

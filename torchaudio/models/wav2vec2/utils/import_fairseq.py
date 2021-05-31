@@ -129,14 +129,15 @@ def import_fairseq_model(
     """Build Wav2Vec2Model from pretrained parameters published by `fairseq`_.
 
     Args:
-        original (Wav2Vec2Model or Wav2VecEncoder):
+        original (torch.nn.Module):
             An instance of fairseq's Wav2Vec2.0 model class.
             Either ``fairseq.models.wav2vec.wav2vec2_asr.Wav2VecEncoder`` or
             ``fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model``.
         num_out (int, optional):
             The number of output labels. Required only when the original model is
             an instance of ``fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model``.
-    Returns
+
+    Returns:
         Wav2Vec2Model: Imported model.
 
     Example - Loading pretrain-only model
