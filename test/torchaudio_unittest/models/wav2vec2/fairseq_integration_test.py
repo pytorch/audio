@@ -7,8 +7,7 @@ from torchaudio.models.wav2vec2 import (
     wav2vec2_large_lv60k,
 )
 from torchaudio.models.wav2vec2.utils import (
-    import_fairseq_pretrained_model,
-    import_fairseq_finetuned_model,
+    import_fairseq_model,
 )
 from parameterized import parameterized
 
@@ -84,7 +83,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         batch_size, num_frames = 3, 1024
 
         original = self._get_model(config, num_out).eval()
-        imported = import_fairseq_pretrained_model(original, 28).eval()
+        imported = import_fairseq_model(original, 28).eval()
 
         x = torch.randn(batch_size, num_frames)
         ref = original.feature_extractor(x).transpose(1, 2)
@@ -98,7 +97,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         batch_size, num_frames = 3, 1024
 
         original = self._get_model(config, num_out).eval()
-        imported = import_fairseq_pretrained_model(original, 28).eval()
+        imported = import_fairseq_model(original, 28).eval()
 
         reloaded = factory_func(num_out=num_out)
         reloaded.load_state_dict(imported.state_dict())
@@ -124,7 +123,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         batch_size, num_frames = 3, 1024
 
         original = self._get_model(config, num_out).eval()
-        imported = import_fairseq_finetuned_model(original).eval()
+        imported = import_fairseq_model(original).eval()
 
         # Without mask
         x = torch.randn(batch_size, num_frames)
@@ -147,7 +146,7 @@ class TestFairseqIntegration(TorchaudioTestCase):
         batch_size, num_frames = 3, 1024
 
         original = self._get_model(config, num_out).eval()
-        imported = import_fairseq_finetuned_model(original).eval()
+        imported = import_fairseq_model(original).eval()
 
         reloaded = factory_func(num_out=num_out)
         reloaded.load_state_dict(imported.state_dict())

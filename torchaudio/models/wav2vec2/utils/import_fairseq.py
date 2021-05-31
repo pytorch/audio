@@ -3,6 +3,7 @@
 For this module to work, you need `fairseq`.
 """
 import re
+from typing import Optional
 
 from torch.nn import Module
 
@@ -136,43 +137,77 @@ def _map_keys(state_dict, extractor_mode):
     return mapped
 
 
-def import_fairseq_finetuned_model(original: Module) -> Wav2Vec2Model:
-    """Import finetuned wav2vec2 mdoel from `fairseq`_.
+def import_fairseq_model(
+        original: Module,
+        num_out: Optional[int] = None) -> Wav2Vec2Model:
+    """Import pretrained wav2vec2.0 model from `fairseq`_.
 
     Args:
-        model (Wav2VecEncoder):
-            An instance of ``fairseq.models.wav2vec.wav2vec2_asr.Wav2VecEncoder``.
-    Returns:
-        Wav2Vec2Model:
-            An instance of the corresponding model class.
+        original (Wav2Vec2Model or Wav2VecEncoder):
+            An instance of fairseq's Wav2Vec2.0 model class.
+            Either ``fairseq.models.wav2vec.wav2vec2_asr.Wav2VecEncoder`` or
+            ``fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model``.
+        num_out (int, optional):
+            The number of output labels. Required only when the original model is
+            an instance of ``fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model``.
+    Returns
+        Wav2Vec2Model: Imported model.
 
-    Example:
-        >>> model, args, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task(
-        ...     [checkpoint_path], arg_overrides={'data': data_dir})
-        >>> imported = import_fairseq_finetuned_model(model[0].w2v_encoder)
+    Example - Loading pretrain-only model
+        >>> # Load model using fairseq
+        >>> model_file = 'wav2vec_small.pt'
+        >>> model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([model_file])
+        >>> original = model[0]
+        >>> imported = import_fairseq_model(original, num_out=28)
+        >>>
+        >>> # Perform feature extraction
+        >>> waveform, _ = torchaudio.load('audio.wav')
+        >>> features, _ = imported.extract_features(waveform)
+        >>>
+        >>> # Compare result with the original model from fairseq
+        >>> reference = original.feature_extractor(waveform).transpose(1, 2)
+        >>> torch.testing.assert_allclose(features, reference)
+
+    Example - Fine-tuned model
+        >>> # Load model using fairseq
+        >>> model_file = 'wav2vec_small_960h.pt'
+        >>> model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([model_file])
+        >>> original = model[0]
+        >>> imported = import_fairseq_model(original.w2v_encoder)
+        >>>
+        >>> # Perform encoding
         >>> waveform, _ = torchaudio.load('audio.wav')
         >>> emission, _ = imported(waveform)
+        >>>
+        >>> # Compare result with the original model from fairseq
+        >>> mask = torch.zeros_like(waveform)
+        >>> reference = original(waveform, mask)['encoder_out'].transpose(0, 1)
+        >>> torch.testing.assert_allclose(emission, reference)
 
     .. _fairseq: https://github.com/pytorch/fairseq
     """
+    class_ = original.__class__.__name__
+    if class_ == 'Wav2Vec2Model':
+        if num_out is None:
+            raise ValueError(
+                'When importing prtrained model without readout layer, '
+                '`num_out` argument must be given.'
+            )
+        return _import_pretrained(original, num_out)
+    if class_ == 'Wav2VecEncoder':
+        return _import_finetuned(original)
+    raise ValueError(
+        f'Expected an instance of `Wav2Vec2Model` or `Wav2VecEncoder`. Found: {class_}')
+
+
+def _import_finetuned(original: Module) -> Wav2Vec2Model:
     config = _parse_config(original.w2v_model, original.proj.out_features)
     model = _get_model(**config)
     model.load_state_dict(_map_keys(original.state_dict(), config['extractor_mode']))
     return model
 
 
-def import_fairseq_pretrained_model(original: Module, num_out: int) -> Wav2Vec2Model:
-    """Import pretrained (not-finetuned wav2vec2model from `fairse`_.
-
-    Example:
-        >>> model, args, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task(
-        ...     [checkpoint_path])
-        >>> imported = import_fairseq_pretrained_model(model[0].feature_extractor)
-        >>> waveform, _ = torchaudio.load('audio.wav')
-        >>> features, _ = imported.extract_feature(waveform)
-
-    .. _fairseq: https://github.com/pytorch/fairseq
-    """
+def _import_pretrained(original: Module, num_out: int) -> Wav2Vec2Model:
     config = _parse_config(original, num_out)
     model = _get_model(**config)
     model.load_state_dict(_map_keys(original.state_dict(), config['extractor_mode']), strict=False)
