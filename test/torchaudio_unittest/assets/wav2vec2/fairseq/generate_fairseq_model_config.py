@@ -95,6 +95,9 @@ def _main():
     if conf['_name'] == 'wav2vec_ctc':
         del conf['data']
         del conf['w2v_args']['task']['data']
+        conf['w2v_args'] = {
+            key: conf['w2v_args'][key] for key in ['model', 'task']
+        }
 
     print(json.dumps(conf, indent=4, sort_keys=True))
 
