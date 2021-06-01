@@ -202,12 +202,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         num_channels = 3
         sr = 16000
         new_sr = sr // 2
-        waveform = common_utils.get_whitenoise(sample_rate=sr, duration=0.5,)
-
-        multi_sound = waveform.repeat(num_channels, 1)  # (num_channels, 8000 smp)
-
-        for i in range(num_channels):
-            multi_sound[i, :] *= (i + 1) * 1.5
+        multi_sound = common_utils.get_whitenoise(sample_rate=sr, n_channels=num_channels, duration=0.5,)
 
         self.assert_batch_consistency(
             F.resample, multi_sound, orig_freq=sr, new_freq=new_sr,
