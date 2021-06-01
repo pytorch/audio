@@ -6,6 +6,7 @@ from torch import Tensor
 
 import torchaudio
 import torchaudio._internal.fft
+from torchaudio._internal.module_utils import deprecated
 
 __all__ = [
     'get_mel_banks',
@@ -752,6 +753,7 @@ def mfcc(
     return feature
 
 
+@deprecated("Please use `torchaudio.functional.resample`.", "0.10")
 def resample_waveform(waveform: Tensor,
                       orig_freq: float,
                       new_freq: float,

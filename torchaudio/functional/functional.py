@@ -1313,7 +1313,7 @@ def _get_sinc_resample_kernel(
         warnings.warn(
             "Non-integer frequencies are being cast to ints and may result in poor resampling quality "
             "because the underlying algorithm requires an integer ratio between `orig_freq` and `new_freq`. "
-            "Using non-integer valued frequencies will throw an error in the next release. "
+            "Using non-integer valued frequencies will throw an error in release 0.10. "
             "To work around this issue, manually convert both frequencies to integer values "
             "that maintain their resampling rate ratio before passing them into the function "
             "Example: To downsample a 44100 hz waveform by a factor of 8, use "

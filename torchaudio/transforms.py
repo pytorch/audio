@@ -286,7 +286,7 @@ class MelScale(torch.nn.Module):
         if n_stft is None or n_stft == 0:
             warnings.warn(
                 'Initialization of torchaudio.transforms.MelScale with an unset weight '
-                '`n_stft=None` is deprecated and will be removed from a future release. '
+                '`n_stft=None` is deprecated and will be removed in release 0.10. '
                 'Please set a proper `n_stft` value. Typically this is `n_fft // 2 + 1`. '
                 'Refer to https://github.com/pytorch/audio/issues/1510 '
                 'for more details.'
