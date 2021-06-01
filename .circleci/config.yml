@@ -137,6 +137,7 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - designate_upload_channel
       - attach_workspace:
           at: third_party
       - run: packaging/build_wheel.sh
@@ -172,6 +173,7 @@ jobs:
     steps:
       - checkout
       - install_build_tools_macos
+      - designate_upload_channel
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
@@ -198,6 +200,7 @@ jobs:
     steps:
       - checkout
       - install_build_tools_macos
+      - designate_upload_channel
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
@@ -221,6 +224,7 @@ jobs:
       name: windows-cpu
     steps:
       - checkout
+      - designate_upload_channel
       - load_conda_channel_flags
       - run:
           name: build
@@ -241,6 +245,7 @@ jobs:
       name: windows-cpu
     steps:
       - checkout
+      - designate_upload_channel
       - load_conda_channel_flags
       - run:
           name: build
@@ -563,6 +568,7 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - checkout
+      - designate_upload_channel
       - load_conda_channel_flags
       - run:
           name: Install pytorch-audio
