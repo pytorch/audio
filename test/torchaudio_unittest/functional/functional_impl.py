@@ -259,6 +259,16 @@ class Functional(TestBaseMixin):
 
             self.assertEqual(specgrams, specgrams_copy)
 
+    @parameterized.expand(list(itertools.product(
+        ["sinc_interpolation", "kaiser_window"],
+        [16000, 44100],
+    )))
+    def test_resample_identity(self, resampling_method, sample_rate):
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=1)
+
+        resampled = F.resample(waveform, sample_rate, sample_rate)
+        self.assertEqual(waveform, resampled)
+
     def test_resample_no_warning(self):
         sample_rate = 44100
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.1)
