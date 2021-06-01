@@ -64,7 +64,7 @@ Please refer to [the top level README.md](../README.md)
 
 ## 3. Run the application
 
-Now we run the C++ applicaiton [`transcribe`](./transcribe.cpp), with the TorchScript object we created in Step.1.1. and an input audio file.
+Now we run the C++ application [`transcribe`](./transcribe.cpp), with the TorchScript object we created in Step.1.1. and an input audio file.
 
 ```bash
 ../build/speech_recognition/transcribe ./pipeline-fairseq ../data/input.wav
@@ -176,7 +176,7 @@ Then
 sclite -r ref.trn -h hyp.trn -i wsj -o pralign -o sum
 ```
 
-You can find the defailt of evalauation result in PRA.
+You can find the detail of evalauation result in PRA.
 
 ```
 id: (guenter-20140214-afn/mfc/de5-012)
