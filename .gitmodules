@@ -2,3 +2,6 @@
 	path = third_party/kaldi/submodule
 	url = https://github.com/kaldi-asr/kaldi
 	ignore = dirty
+[submodule "examples/libtorchaudio/simplectc"]
+	path = examples/libtorchaudio/simplectc
+	url = https://github.com/mthrok/ctcdecode
