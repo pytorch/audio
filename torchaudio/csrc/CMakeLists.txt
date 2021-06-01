@@ -10,31 +10,6 @@ set(
   utils.cpp
   )
 
-if(BUILD_TRANSDUCER)
-  set(
-    TRANSDUCER_SOURCES
-    rnnt/cpu/compute_alphas.cpp
-    rnnt/cpu/compute_betas.cpp
-    rnnt/cpu/compute.cpp
-    rnnt/compute_alphas.cpp
-    rnnt/compute_betas.cpp
-    rnnt/compute.cpp
-    rnnt/autograd.cpp
-  )
-
-  if (USE_CUDA)
-    set(
-      CUDA_TRANSDUCER_SOURCES
-      rnnt/gpu/compute_alphas.cu
-      rnnt/gpu/compute_betas.cu
-      rnnt/gpu/compute.cu
-    )
-    list(APPEND TRANSDUCER_SOURCES ${CUDA_TRANSDUCER_SOURCES})
-  endif()
-
-  list(APPEND LIBTORCHAUDIO_SOURCES ${TRANSDUCER_SOURCES})
-endif()
-
 if(BUILD_KALDI)
   list(APPEND LIBTORCHAUDIO_SOURCES kaldi.cpp)
 endif()
