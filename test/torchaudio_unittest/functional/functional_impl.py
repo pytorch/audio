@@ -319,36 +319,19 @@ class Functional(TestBaseMixin):
         resampled = F.resample(waveform, sr, sr, resampling_method=resampling_method)
         assert resampled.size(-1) == waveform.size(-1)
 
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
-    def test_resample_waveform_downsample_accuracy(self, resampling_method):
-        for i in range(1, 20):
-            self._test_resample_waveform_accuracy(down_scale_factor=i * 2, resampling_method=resampling_method)
+    @parameterized.expand(list(itertools.product(
+        ["sinc_interpolation", "kaiser_window"],
+        list(range(1, 20)),
+    )))
+    def test_resample_waveform_downsample_accuracy(self, resampling_method, i):
+        self._test_resample_waveform_accuracy(down_scale_factor=i * 2, resampling_method=resampling_method)
 
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
-    def test_resample_waveform_upsample_accuracy(self, resampling_method):
-        for i in range(1, 20):
-            self._test_resample_waveform_accuracy(up_scale_factor=1.0 + i / 20.0, resampling_method=resampling_method)
-
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
-    def test_resample_waveform_multi_channel(self, resampling_method):
-        num_channels = 3
-        sr = 16000
-        waveform = get_whitenoise(sample_rate=sr, duration=0.5,)
-
-        multi_sound = waveform.repeat(num_channels, 1)  # (num_channels, 8000 smp)
-
-        for i in range(num_channels):
-            multi_sound[i, :] *= (i + 1) * 1.5
-
-        multi_sound_sampled = F.resample(multi_sound, sr, sr // 2,
-                                         resampling_method=resampling_method)
-
-        # check that sampling is same whether using separately or in a tensor of size (c, n)
-        for i in range(num_channels):
-            single_channel = waveform * (i + 1) * 1.5
-            single_channel_sampled = F.resample(single_channel, sr, sr // 2,
-                                                resampling_method=resampling_method)
-            self.assertEqual(multi_sound_sampled[i, :], single_channel_sampled[0], rtol=1e-4, atol=1e-7)
+    @parameterized.expand(list(itertools.product(
+        ["sinc_interpolation", "kaiser_window"],
+        list(range(1, 20)),
+    )))
+    def test_resample_waveform_upsample_accuracy(self, resampling_method, i):
+        self._test_resample_waveform_accuracy(up_scale_factor=1.0 + i / 20.0, resampling_method=resampling_method)
 
     def test_resample_no_warning(self):
         sample_rate = 44100
