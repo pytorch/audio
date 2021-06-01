@@ -319,6 +319,7 @@
 
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">import</span> <span class="nn">torchaudio._internal.fft</span>
+<span class="kn">from</span> <span class="nn">torchaudio._internal.module_utils</span> <span class="kn">import</span> <span class="n">deprecated</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;get_mel_banks&#39;</span><span class="p">,</span>
@@ -1065,7 +1066,8 @@
     <span class="k">return</span> <span class="n">feature</span></div>
 
 
-<div class="viewcode-block" id="resample_waveform"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.resample_waveform">[docs]</a><span class="k">def</span> <span class="nf">resample_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+<div class="viewcode-block" id="resample_waveform"><a class="viewcode-back" href="../../../compliance.kaldi.html#torchaudio.compliance.kaldi.resample_waveform">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;Please use `torchaudio.functional.resample`.&quot;</span><span class="p">,</span> <span class="s2">&quot;0.10&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">resample_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
                       <span class="n">orig_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
                       <span class="n">new_freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
                       <span class="n">lowpass_filter_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
