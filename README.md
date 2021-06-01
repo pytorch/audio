@@ -15,16 +15,13 @@ having all the computations be through PyTorch operations which makes it easy
 to use and feel like a natural extension.
 
 - [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/stable/)
-  - Load the following formats into a torch Tensor using SoX
-    - mp3, wav, aac, ogg, flac, avr, cdda, cvs/vms,
-    - aiff, au, amr, mp2, mp4, ac3, avi, wmv,
-    - mpeg, ircam and any other format supported by libsox.
-    - [Kaldi (ark/scp)](http://pytorch.org/audio/stable/kaldi_io.html)
-- [Dataloaders for common audio datasets (VCTK, YesNo)](http://pytorch.org/audio/stable/datasets.html)
+  - Load a variety of audio formats, such as `wav`, `mp3`, `ogg`, `flac`, `opus`, `sphere`, into a torch Tensor using SoX
+  - [Kaldi (ark/scp)](http://pytorch.org/audio/stable/kaldi_io.html)
+- [Dataloaders for common audio datasets](http://pytorch.org/audio/stable/datasets.html)
 - Common audio transforms
     - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/stable/transforms.html)
 - Compliance interfaces: Run code using PyTorch that align with other libraries
-    - [Kaldi: spectrogram, fbank, mfcc, resample_waveform](https://pytorch.org/audio/stable/compliance.kaldi.html)
+    - [Kaldi: spectrogram, fbank, mfcc](https://pytorch.org/audio/stable/compliance.kaldi.html)
 
 Dependencies
 ------------
@@ -36,6 +33,7 @@ The following are the corresponding ``torchaudio`` versions and supported Python
 | ``torch``                | ``torchaudio``           | ``python``                      |
 | ------------------------ | ------------------------ | ------------------------------- |
 | ``master`` / ``nightly`` | ``master`` / ``nightly`` | ``>=3.6``, ``<=3.9``            |
+| ``1.9.0``                | ``0.9.0``                | ``>=3.6``, ``<=3.9``            |
 | ``1.8.0``                | ``0.8.0``                | ``>=3.6``, ``<=3.9``            |
 | ``1.7.1``                | ``0.7.2``                | ``>=3.6``, ``<=3.9``            |
 | ``1.7.0``                | ``0.7.0``                | ``>=3.6``, ``<=3.8``            |
@@ -107,34 +105,6 @@ call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary
 This is known to work on linux and unix distributions such as Ubuntu and CentOS 7 and macOS.
 If you try this on a new system and find a solution to make it work, feel free to share it by opening an issue.
 
-#### Troubleshooting
-
-<Details><Summary>checking build system type... ./config.guess: unable to guess system type</Summary>
-
-Since the configuration file for codecs are old, they cannot correctly detect the new environments, such as Jetson Aarch. You need to replace the `config.guess` file in `./third_party/tmp/lame-3.99.5/config.guess` and/or `./third_party/tmp/libmad-0.15.1b/config.guess` with [the latest one](https://github.com/gcc-mirror/gcc/blob/master/config.guess).
-
-See also: [#658](https://github.com/pytorch/audio/issues/658)
-
-</Details>
-
-<Details><Summary>Undefined reference to `tgetnum' when using `BUILD_SOX`</Summary>
-
-If while building from within an anaconda environment you come across errors similar to the following:
-
-```
-../bin/ld: console.c:(.text+0xc1): undefined reference to `tgetnum'
-```
-
-Install `ncurses` from `conda-forge` before running `python setup.py install`:
-
-```
-# Install ncurses from conda-forge
-conda install -c conda-forge ncurses
-```
-
-</Details>
-
-
 Quick Usage
 -----------
 
@@ -161,7 +131,9 @@ waveform, sample_rate = torchaudio.load('foo.wav')  # load tensor from file, as 
 torchaudio.save('foo_save.wav', waveform, sample_rate)  # save tensor to file, as usual
 ```
 
-Unlike SoX, SoundFile does not currently support mp3.
+**Note**
+- SoundFile currently does not support mp3.
+- "soundfile" backend is not supported by TorchScript.
 
 API Reference
 -------------
@@ -205,7 +177,7 @@ Transforms expect and return the following dimensions.
 * `Fade`: (channel, time) -> (channel, time)
 * `Vol`: (channel, time) -> (channel, time)
 
-Complex numbers are supported via tensors of dimension (..., 2), and torchaudio provides `complex_norm` and `angle` to convert such a tensor into its magnitude and phase. Here, and in the documentation, we use an ellipsis "..." as a placeholder for the rest of the dimensions of a tensor, e.g. optional batching and channel dimensions.
+Here, and in the documentation, we use an ellipsis "..." as a placeholder for the rest of the dimensions of a tensor, e.g. optional batching and channel dimensions.
 
 Contributing Guidelines
 -----------------------
