@@ -62,6 +62,8 @@ Utility Functions
 
 .. autofunction:: import_huggingface_model
 
+.. autofunction:: import_fairseq_model
+
 .. currentmodule:: torchaudio.models
 
 :hidden:`WaveRNN`
