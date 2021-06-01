@@ -696,10 +696,11 @@ class Resample(torch.nn.Module):
         self.lowpass_filter_width = lowpass_filter_width
         self.rolloff = rolloff
 
-        kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
-                                                       self.lowpass_filter_width, self.rolloff,
-                                                       self.resampling_method, beta)
-        self.register_buffer('kernel', kernel)
+        if self.orig_freq != self.new_freq:
+            kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
+                                                           self.lowpass_filter_width, self.rolloff,
+                                                           self.resampling_method, beta)
+            self.register_buffer('kernel', kernel)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -709,6 +710,8 @@ class Resample(torch.nn.Module):
         Returns:
             Tensor: Output signal of dimension (..., time).
         """
+        if self.orig_freq == self.new_freq:
+            return waveform
         return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd,
                                            self.kernel, self.width)
 
