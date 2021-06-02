@@ -2,7 +2,7 @@
     :class: hidden-section
 
 torchaudio.models
-======================
+=================
 
 .. currentmodule:: torchaudio.models
 
@@ -10,7 +10,7 @@ The models subpackage contains definitions of models for addressing common audio
 
 
 :hidden:`ConvTasNet`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: ConvTasNet
 
@@ -18,7 +18,7 @@ The models subpackage contains definitions of models for addressing common audio
 
 
 :hidden:`DeepSpeech`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: DeepSpeech
 
@@ -26,7 +26,7 @@ The models subpackage contains definitions of models for addressing common audio
 
 
 :hidden:`Wav2Letter`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Wav2Letter
 
@@ -46,6 +46,9 @@ Wav2Vec2Model
 
   .. automethod:: forward
 
+Factory Functions
+-----------------
+
 wav2vec2_base
 -------------
 
@@ -63,6 +66,9 @@ wav2vec2_large_lv60k
 
 .. currentmodule:: torchaudio.models.wav2vec2.utils
 
+Utility Functions
+-----------------
+
 import_huggingface_model
 ------------------------
 		   
@@ -76,7 +82,7 @@ import_fairseq_model
 .. currentmodule:: torchaudio.models
 
 :hidden:`WaveRNN`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 .. autoclass:: WaveRNN
 
