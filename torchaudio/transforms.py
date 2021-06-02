@@ -663,6 +663,12 @@ class MuLawDecoding(torch.nn.Module):
 class Resample(torch.nn.Module):
     r"""Resample a signal from one frequency to another. A resampling method can be given.
 
+    Note:
+        If resampling on waveforms of higher precision than float32, there may be a small loss of precision
+        because the kernel is cached once as float32. If high precision resampling is important for your application,
+        the functional form will retain higher precision, but run slower because it does not cache the kernel.
+        Alternatively, you could rewrite a transform that caches a higher precision kernel.
+
     Args:
         orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)
         new_freq (float, optional): The desired frequency. (Default: ``16000``)
@@ -673,11 +679,6 @@ class Resample(torch.nn.Module):
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         beta (float or None): The shape parameter used for kaiser window.
-
-        Note: If resampling on waveforms of higher precision than float32, there may be a small loss of precision
-        because the kernel is cached once as float32. If high precision resampling is important for your application,
-        the functional form will retain higher precision, but run slower because it does not cache the kernel.
-        Alternatively, you could rewrite a transform that caches a higher precision kernel.
     """
 
     def __init__(self,

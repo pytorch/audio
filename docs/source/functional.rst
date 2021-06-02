@@ -56,6 +56,11 @@ apply_codec
 
 .. autofunction:: apply_codec
 
+resample
+--------
+
+.. autofunction:: resample
+
 :hidden:`Complex Utility`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -230,8 +235,3 @@ vad
 ---------------------------
 
 .. autofunction:: spectral_centroid
-
-:hidden:`resample`
----------------------------
-
-.. autofunction:: resample
