@@ -139,6 +139,7 @@ html_logo = '_static/img/pytorch-logo-dark.svg'
 html_static_path = ['_static']
 html_css_files = ['css/override.css']
 
+
 def setup(app):
     # NOTE: in Sphinx 1.8+ `html_css_files` is an official configuration value
     # and can be moved outside of this function (and the setup(app) function
