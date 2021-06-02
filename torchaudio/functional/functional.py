@@ -1428,6 +1428,10 @@ def resample(
 
     https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html
 
+    Note:
+        ``transforms.Resample`` precomputes and reuses the resampling kernel, so using it will result in
+        more efficient computation if resampling multiple waveforms with the same resampling parameters.
+
     Args:
         waveform (Tensor): The input signal of dimension (..., time)
         orig_freq (float): The original frequency of the signal
@@ -1442,9 +1446,6 @@ def resample(
 
     Returns:
         Tensor: The waveform at the new frequency of dimension (..., time).
-
-    Note: ``transforms.Resample`` precomputes and reuses the resampling kernel, so using it will result in
-    more efficient computation if resampling multiple waveforms with the same resampling parameters.
     """
 
     assert orig_freq > 0.0 and new_freq > 0.0
