@@ -7,7 +7,7 @@ from . import components
 
 
 class Wav2Vec2Model(Module):
-    """Model used in wav2vec2.0 paper. [1]
+    """Encoder model used in [:footcite:`baevski2020wav2vec`].
 
     Note:
         To build the model, please use one of the factory functions.
@@ -20,12 +20,8 @@ class Wav2Vec2Model(Module):
             Encoder that converts the audio features into the sequence of probability
             distribution (in negative log-likelihood) over labels.
 
-    Reference:
-        - wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations
+    .. footbibliography::
 
-          Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, Michael Auli
-
-          https://arxiv.org/abs/2006.11477
     """
     def __init__(
             self,
@@ -129,7 +125,7 @@ def _get_model(
 
 
 def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with **Base** configuration. [1]
+    """Build wav2vec2.0 model with "Base" configuration.
 
     Args:
         num_out: int
@@ -137,13 +133,6 @@ def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
 
     Returns:
         Wav2Vec2Model: The resulting model.
-
-    Reference:
-        - wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations
-
-          Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, Michael Auli
-
-          https://arxiv.org/abs/2006.11477
     """
     return _get_model(
         extractor_mode="group_norm",
@@ -166,7 +155,7 @@ def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
 
 
 def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with **Large** configuration. [1]
+    """Build wav2vec2.0 model with "Large" configuration.
 
     Args:
         num_out: int
@@ -174,13 +163,6 @@ def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
 
     Returns:
         Wav2Vec2Model: The resulting model.
-
-    Reference:
-        - wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations
-
-          Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, Michael Auli
-
-          https://arxiv.org/abs/2006.11477
     """
     return _get_model(
         extractor_mode="group_norm",
@@ -203,7 +185,7 @@ def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
 
 
 def wav2vec2_large_lv60k(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with **Large LV-60k** configuration. [1]
+    """Build wav2vec2.0 model with "Large LV-60k" configuration.
 
     Args:
         num_out: int
@@ -211,13 +193,6 @@ def wav2vec2_large_lv60k(num_out: int) -> Wav2Vec2Model:
 
     Returns:
         Wav2Vec2Model: The resulting model.
-
-    Reference:
-        - wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations
-
-          Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, Michael Auli
-
-          https://arxiv.org/abs/2006.11477
     """
     return _get_model(
         extractor_mode="layer_norm",

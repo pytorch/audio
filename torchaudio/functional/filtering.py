@@ -80,9 +80,9 @@ def allpass_biquad(
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
-        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    Reference:
+        - http://sox.sourceforge.net/sox.html
+        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
     dtype = waveform.dtype
     device = waveform.device
@@ -123,9 +123,9 @@ def band_biquad(
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
-        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    Reference:
+        - http://sox.sourceforge.net/sox.html
+        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
     dtype = waveform.dtype
     device = waveform.device
@@ -171,9 +171,9 @@ def bandpass_biquad(
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
-        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    Reference:
+        - http://sox.sourceforge.net/sox.html
+        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
     dtype = waveform.dtype
     device = waveform.device
@@ -207,9 +207,9 @@ def bandreject_biquad(
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
-        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    Reference:
+        - http://sox.sourceforge.net/sox.html
+        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
     dtype = waveform.dtype
     device = waveform.device
@@ -247,9 +247,9 @@ def bass_biquad(
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
-        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    Reference:
+        - http://sox.sourceforge.net/sox.html
+        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
     dtype = waveform.dtype
     device = waveform.device
@@ -325,8 +325,8 @@ def contrast(waveform: Tensor, enhancement_amount: float = 75.0) -> Tensor:
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
+    Reference:
+        - http://sox.sourceforge.net/sox.html
     """
 
     if not 0 <= enhancement_amount <= 100:
@@ -358,8 +358,8 @@ def dcshift(
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
+    Reference:
+        - http://sox.sourceforge.net/sox.html
     """
     output_waveform = waveform
     limiter_threshold = 0.0
@@ -405,9 +405,9 @@ def deemph_biquad(waveform: Tensor, sample_rate: int) -> Tensor:
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
-        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    Reference:
+        - http://sox.sourceforge.net/sox.html
+        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
 
     if sample_rate == 44100:
@@ -680,10 +680,12 @@ def flanger(
     Returns:
         Tensor: Waveform of dimension of `(..., channel, time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
+    Reference:
+        - http://sox.sourceforge.net/sox.html
 
-        Scott Lehman, Effects Explained,
+        - Scott Lehman, `Effects Explained`_,
+
+    .. _Effects Explained:
         https://web.archive.org/web/20051125072557/http://www.harmony-central.com/Effects/effects-explained.html
     """
 
@@ -1027,8 +1029,8 @@ def overdrive(waveform: Tensor, gain: float = 20, colour: float = 20) -> Tensor:
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
+    Reference:
+        - http://sox.sourceforge.net/sox.html
     """
     actual_shape = waveform.shape
     device, dtype = waveform.device, waveform.dtype
@@ -1096,9 +1098,11 @@ def phaser(
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
-        Scott Lehman, Effects Explained,
+    Reference:
+        - http://sox.sourceforge.net/sox.html
+        - Scott Lehman, `Effects Explained`_.
+
+    .. _Effects Explained:
         https://web.archive.org/web/20051125072557/http://www.harmony-central.com/Effects/effects-explained.html
     """
     actual_shape = waveform.shape
@@ -1166,9 +1170,9 @@ def riaa_biquad(waveform: Tensor, sample_rate: int) -> Tensor:
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
-        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    Reference:
+        - http://sox.sourceforge.net/sox.html
+        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
 
     if sample_rate == 44100:
@@ -1234,9 +1238,9 @@ def treble_biquad(
     Returns:
         Tensor: Waveform of dimension of `(..., time)`
 
-    References:
-        http://sox.sourceforge.net/sox.html
-        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
+    Reference:
+        - http://sox.sourceforge.net/sox.html
+        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF
     """
     dtype = waveform.dtype
     device = waveform.device
@@ -1420,8 +1424,8 @@ def vad(
     Returns:
         Tensor: Tensor of audio of dimension (..., time).
 
-    References:
-        http://sox.sourceforge.net/sox.html
+    Reference:
+        - http://sox.sourceforge.net/sox.html
     """
 
     if waveform.ndim > 2:

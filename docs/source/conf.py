@@ -41,6 +41,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinxcontrib.katex',
+    'sphinxcontrib.bibtex',
 ]
 
 # katex options
@@ -54,6 +55,8 @@ delimiters : [
    {left: "\\[", right: "\\]", display: true}
 ]
 '''
+
+bibtex_bibfiles = ['refs.bib']
 
 napoleon_use_ivar = True
 napoleon_numpy_docstring = False

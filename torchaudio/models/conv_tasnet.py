@@ -9,7 +9,7 @@ import torch
 
 
 class ConvBlock(torch.nn.Module):
-    """1D Convolutional block.
+    """1D Convolutional block used in [:footcite:`Luo_2019`].
 
     Args:
         io_channels (int): The number of input/output channels, <B, Sc>
@@ -22,12 +22,7 @@ class ConvBlock(torch.nn.Module):
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
 
-    Reference:
-        - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
-
-          Luo, Yi and Mesgarani, Nima
-
-          https://arxiv.org/abs/1809.07454
+    .. footbibliography::
     """
 
     def __init__(
@@ -83,7 +78,7 @@ class ConvBlock(torch.nn.Module):
 
 
 class MaskGenerator(torch.nn.Module):
-    """TCN (Temporal Convolution Network) Separation Module
+    """TCN (Temporal Convolution Network) Separation Module used in [:footcite:`Luo_2019`]
 
     Generates masks for separation.
 
@@ -99,10 +94,8 @@ class MaskGenerator(torch.nn.Module):
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
 
-    References:
-        - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
-          Luo, Yi and Mesgarani, Nima
-          https://arxiv.org/abs/1809.07454
+    .. footbibliography::
+
     """
 
     def __init__(
@@ -176,7 +169,7 @@ class MaskGenerator(torch.nn.Module):
 
 
 class ConvTasNet(torch.nn.Module):
-    """Conv-TasNet: a fully-convolutional time-domain audio separation network
+    """Conv-TasNet: a fully-convolutional time-domain audio separation network [:footcite:`Luo_2019`].
 
     Args:
         num_sources (int): The number of sources to split.
@@ -191,12 +184,7 @@ class ConvTasNet(torch.nn.Module):
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
 
-    Reference:
-        - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation
-
-          Luo, Yi and Mesgarani, Nima
-
-          https://arxiv.org/abs/1809.07454
+    .. footbibliography::
     """
 
     def __init__(
