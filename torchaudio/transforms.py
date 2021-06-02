@@ -126,7 +126,8 @@ class Spectrogram(torch.nn.Module):
 class GriffinLim(torch.nn.Module):
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
 
-    Implementation ported from [:footcite:`brian_mcfee-proc-scipy-2015`], [:footcite:`6701851`], [:footcite:`1172092`].
+    Implementation ported from
+    [:footcite:`brian_mcfee-proc-scipy-2015`], [:footcite:`6701851`] and [:footcite:`1172092`].
 
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)

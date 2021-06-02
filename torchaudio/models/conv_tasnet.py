@@ -9,7 +9,7 @@ import torch
 
 
 class ConvBlock(torch.nn.Module):
-    """1D Convolutional block used in [:footcite:`Luo_2019`].
+    """1D Convolutional block.
 
     Args:
         io_channels (int): The number of input/output channels, <B, Sc>
@@ -21,8 +21,6 @@ class ConvBlock(torch.nn.Module):
 
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
-
-    .. footbibliography::
     """
 
     def __init__(
@@ -78,7 +76,7 @@ class ConvBlock(torch.nn.Module):
 
 
 class MaskGenerator(torch.nn.Module):
-    """TCN (Temporal Convolution Network) Separation Module used in [:footcite:`Luo_2019`]
+    """TCN (Temporal Convolution Network) Separation Module
 
     Generates masks for separation.
 
@@ -93,9 +91,6 @@ class MaskGenerator(torch.nn.Module):
 
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
-
-    .. footbibliography::
-
     """
 
     def __init__(
@@ -185,6 +180,7 @@ class ConvTasNet(torch.nn.Module):
         This implementation corresponds to the "non-causal" setting in the paper.
 
     .. footbibliography::
+
     """
 
     def __init__(

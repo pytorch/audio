@@ -2,7 +2,7 @@
     :class: hidden-section
 
 torchaudio.prototype.rnnt_loss
-===============================
+==============================
 
 .. currentmodule:: torchaudio.prototype.rnnt_loss
 
@@ -15,8 +15,8 @@ rnnt_loss
 
 .. autofunction:: rnnt_loss
 
-:hidden:`RNNTLoss`
-~~~~~~~~~~~~~~~~~~
+RNNTLoss
+--------
 
 .. autoclass:: RNNTLoss
 
