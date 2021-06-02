@@ -23,14 +23,14 @@ eval "$("${conda_dir}/bin/conda" shell.bash hook)"
 conda activate "${env_dir}"
 
 # 1. Install PyTorch
-if [ -z "${CUDA_VERSION:-}" ] ; then
+if [ -z "${CU_VERSION:-}" ] ; then
     if [ "${os}" == MacOSX ] ; then
         cudatoolkit=''
     else
         cudatoolkit="cpuonly"
     fi
 else
-    version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
+    version="$(python -c "print('.'.join(\"${CU_VERSION}\".split('.')[:2]))")"
     cudatoolkit="cudatoolkit=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"

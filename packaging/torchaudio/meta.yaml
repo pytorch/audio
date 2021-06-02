@@ -13,19 +13,27 @@ requirements:
   host:
     - python
     - setuptools
-    - cpuonly
     - cmake
     - ninja
     - defaults::numpy >=1.11
+    {{ environ.get('CONDA_CPUONLY_FEATURE') }}
     {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT') }}
 
   run:
     - python
     - defaults::numpy >=1.11
     {{ environ.get('CONDA_PYTORCH_CONSTRAINT') }}
+    {{ environ.get('CONDA_CUDATOOLKIT_CONSTRAINT') }}
 
 build:
   string: py{{py}}
+  script_env:
+    - CUDA_HOME
+    - FORCE_CUDA
+    - BUILD_VERSION
+    - TORCH_CUDA_ARCH_LIST
+  features:
+    {{ environ.get('CONDA_CPUONLY_FEATURE') }}
 
 test:
   imports:
@@ -43,7 +51,7 @@ test:
     # Ideally we would test this, but conda doesn't provide librosa
     # - librosa >=0.4.3
     - scipy
-    - cpuonly
+    {{ environ.get('CONDA_CPUONLY_FEATURE') }}
 
 about:
   home: https://github.com/pytorch/audio

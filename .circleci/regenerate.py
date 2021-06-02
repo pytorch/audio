@@ -126,7 +126,7 @@ def generate_base_workflow(base_workflow_name, python_version, cu_version, filte
     d = {
         "name": base_workflow_name,
         "python_version": python_version,
-        "cuda_version": cu_version,
+        "cu_version": cu_version,
     }
 
     if os_type in ['linux', 'macos']:
@@ -180,7 +180,7 @@ def generate_smoketest_workflow(pydistro, base_workflow_name, filter_branch, pyt
         "name": f"{base_workflow_name}_{smoke_suffix}",
         "requires": [required_build_name],
         "python_version": python_version,
-        "cuda_version": cu_version,
+        "cu_version": cu_version,
     }
 
     if filter_branch:
@@ -205,7 +205,7 @@ def unittest_workflows(indentation=6):
                 job = {
                     "name": f"unittest_{os_type}_{device_type}_py{python_version}",
                     "python_version": python_version,
-                    "cuda_version": 'cpu' if device_type=="cpu" else "cu102",
+                    "cu_version": 'cpu' if device_type=="cpu" else "cu102",
                 }
 
                 if os_type != "windows":
@@ -218,7 +218,7 @@ def unittest_workflows(indentation=6):
                         "stylecheck": {
                             "name": f"stylecheck_py{python_version}",
                             "python_version": python_version,
-                            "cuda_version": 'cpu' if device_type=="cpu" else "cu102",
+                            "cu_version": 'cpu' if device_type=="cpu" else "cu102",
                         }
                     })
     return indent(indentation, jobs)

@@ -71,7 +71,7 @@ binary_common: &binary_common
     python_version:
       description: "Python version to build against (e.g., 3.8)"
       type: string
-    cuda_version:
+    cu_version:
       description: "CUDA version to build against (e.g., cpu, cu101)"
       type: string
       default: "cpu"
@@ -87,7 +87,7 @@ binary_common: &binary_common
     PYTHON_VERSION: << parameters.python_version >>
     BUILD_VERSION: << parameters.build_version >>
     PYTORCH_VERSION: << parameters.pytorch_version >>
-    CU_VERSION: << parameters.cuda_version >>
+    CU_VERSION: << parameters.cu_version >>
 
 smoke_test_common: &smoke_test_common
   <<: *binary_common
@@ -143,6 +143,7 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - designate_upload_channel
       - attach_workspace:
           at: third_party
       - run: packaging/build_wheel.sh
@@ -160,6 +161,7 @@ jobs:
     resource_class: 2xlarge+
     steps:
       - checkout
+      - designate_upload_channel
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
@@ -178,6 +180,7 @@ jobs:
     steps:
       - checkout
       - install_build_tools_macos
+      - designate_upload_channel
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
@@ -204,6 +207,7 @@ jobs:
     steps:
       - checkout
       - install_build_tools_macos
+      - designate_upload_channel
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
@@ -227,6 +231,7 @@ jobs:
       name: windows-cpu
     steps:
       - checkout
+      - designate_upload_channel
       - load_conda_channel_flags
       - run:
           name: build
@@ -247,6 +252,7 @@ jobs:
       name: windows-cpu
     steps:
       - checkout
+      - designate_upload_channel
       - load_conda_channel_flags
       - run:
           name: build
@@ -462,7 +468,7 @@ jobs:
           command: docker run -t --gpus all -e PYTHON_VERSION -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/setup_env.sh
       - run:
           name: Install torchaudio
-          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
+          command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -e CU_VERSION -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
       - run:
           name: Run tests
           command: docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "TORCHAUDIO_TEST_FORCE_CUDA=1" "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
@@ -499,7 +505,7 @@ jobs:
       name: windows-gpu
     environment:
       <<: *environment
-      CUDA_VERSION: "10.2"
+      CU_VERSION: "10.2"
     steps:
       - checkout
       - designate_upload_channel
@@ -526,10 +532,10 @@ jobs:
     steps:
       - checkout
       - install_build_tools_macos
+      - designate_upload_channel
       - load_conda_channel_flags
       - attach_workspace:
           at: third_party
-      - designate_upload_channel
       - run:
           name: Setup
           command: .circleci/unittest/linux/scripts/setup_env.sh
@@ -569,6 +575,7 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - checkout
+      - designate_upload_channel
       - load_conda_channel_flags
       - run:
           name: Install pytorch-audio

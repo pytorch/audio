@@ -3,7 +3,7 @@
 set -euo pipefail
 
 if [ $# -ne 1 ]; then
-    printf "Usage %s <CUDA_VERSION>\n\n" "$0"
+    printf "Usage %s <CU_VERSION>\n\n" "$0"
     exit 1
 fi
 
