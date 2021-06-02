@@ -1762,6 +1762,9 @@
 
     <span class="k">assert</span> <span class="n">orig_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">new_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
 
+    <span class="k">if</span> <span class="n">orig_freq</span> <span class="o">==</span> <span class="n">new_freq</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">waveform</span>
+
     <span class="n">gcd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_freq</span><span class="p">))</span>
 
     <span class="n">kernel</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">_get_sinc_resample_kernel</span><span class="p">(</span><span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">gcd</span><span class="p">,</span> <span class="n">lowpass_filter_width</span><span class="p">,</span> <span class="n">rolloff</span><span class="p">,</span>
