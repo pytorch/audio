@@ -1071,8 +1071,8 @@ class Vad(torch.nn.Module):
         lp_lifter_freq (float, optional) "Brick-wall" frequency of low-pass lifter used
             in the detector algorithm. (Default: 2000.0)
 
-    References:
-        http://sox.sourceforge.net/sox.html
+    Reference:
+        - http://sox.sourceforge.net/sox.html
     """
 
     def __init__(self,
