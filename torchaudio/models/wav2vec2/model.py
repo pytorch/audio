@@ -125,7 +125,7 @@ def _get_model(
 
 
 def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with "Base" configuration.
+    """Build wav2vec2.0 model with "Base" configuration from [:footcite:`baevski2020wav2vec`].
 
     Args:
         num_out: int
@@ -133,6 +133,8 @@ def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
 
     Returns:
         Wav2Vec2Model: The resulting model.
+
+    .. footbibliography::
     """
     return _get_model(
         extractor_mode="group_norm",
@@ -155,7 +157,7 @@ def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
 
 
 def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with "Large" configuration.
+    """Build wav2vec2.0 model with "Large" configuration from [:footcite:`baevski2020wav2vec`].
 
     Args:
         num_out: int
@@ -163,6 +165,8 @@ def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
 
     Returns:
         Wav2Vec2Model: The resulting model.
+
+    .. footbibliography::
     """
     return _get_model(
         extractor_mode="group_norm",
@@ -185,7 +189,7 @@ def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
 
 
 def wav2vec2_large_lv60k(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with "Large LV-60k" configuration.
+    """Build wav2vec2.0 model with "Large LV-60k" configuration from [:footcite:`baevski2020wav2vec`].
 
     Args:
         num_out: int
@@ -193,6 +197,8 @@ def wav2vec2_large_lv60k(num_out: int) -> Wav2Vec2Model:
 
     Returns:
         Wav2Vec2Model: The resulting model.
+
+    .. footbibliography::
     """
     return _get_model(
         extractor_mode="layer_norm",
