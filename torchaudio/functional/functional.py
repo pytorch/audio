@@ -1449,6 +1449,9 @@ def resample(
 
     assert orig_freq > 0.0 and new_freq > 0.0
 
+    if orig_freq == new_freq:
+        return waveform
+
     gcd = math.gcd(int(orig_freq), int(new_freq))
 
     kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, gcd, lowpass_filter_width, rolloff,
