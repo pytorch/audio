@@ -1,0 +1,4 @@
+/* Fix for bibtex back reference */
+dl.footnote.brackets > dt.label > span.fn-backref > a {
+    position: inherit
+}

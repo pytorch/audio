@@ -57,6 +57,7 @@ delimiters : [
 '''
 
 bibtex_bibfiles = ['refs.bib']
+bibtex_default_style = 'unsrtalpha'
 
 napoleon_use_ivar = True
 napoleon_numpy_docstring = False
@@ -136,7 +137,7 @@ html_logo = '_static/img/pytorch-logo-dark.svg'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
-
+html_css_files = ['css/override.css']
 
 def setup(app):
     # NOTE: in Sphinx 1.8+ `html_css_files` is an official configuration value

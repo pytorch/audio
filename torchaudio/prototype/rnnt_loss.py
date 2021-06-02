@@ -19,7 +19,7 @@ def rnnt_loss(
 ):
     """Compute the RNN Transducer loss. [:footcite:`graves2012sequence`]
 
-    The RNN Transducer loss  extends the CTC loss by defining a distribution over output
+    The RNN Transducer loss extends the CTC loss by defining a distribution over output
     sequences of all lengths, and by jointly modelling both input-output and output-output
     dependencies.
 
