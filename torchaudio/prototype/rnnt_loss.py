@@ -17,7 +17,7 @@ def rnnt_loss(
     fused_log_softmax: bool = True,
     reuse_logits_for_grads: bool = True,
 ):
-    """Compute the RNN Transducer loss. [:footcite:`graves2012sequence`]
+    """Compute the RNN Transducer loss from :footcite:`graves2012sequence`.
 
     The RNN Transducer loss extends the CTC loss by defining a distribution over output
     sequences of all lengths, and by jointly modelling both input-output and output-output
@@ -33,9 +33,6 @@ def rnnt_loss(
         runtime_check (bool): whether to do sanity check during runtime. (Default: ``False``)
         fused_log_softmax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
         reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)
-
-    .. footbibliography::
-
     """
     if not fused_log_softmax:
         logits = torch.nn.functional.log_softmax(logits, dim=-1)
@@ -60,7 +57,7 @@ def rnnt_loss(
 
 
 class RNNTLoss(torch.nn.Module):
-    """Compute the RNN Transducer Loss. [:footcite:`graves2012sequence`]
+    """Compute the RNN Transducer loss from :footcite:`graves2012sequence`.
 
     The RNN Transducer loss extends the CTC loss by defining a distribution over output
     sequences of all lengths, and by jointly modelling both input-output and output-output

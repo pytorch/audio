@@ -9,24 +9,24 @@ torchaudio.models
 The models subpackage contains definitions of models for addressing common audio tasks.
 
 
-:hidden:`ConvTasNet`
-~~~~~~~~~~~~~~~~~~~~
+ConvTasNet
+~~~~~~~~~~
 
 .. autoclass:: ConvTasNet
 
   .. automethod:: forward
 
 
-:hidden:`DeepSpeech`
-~~~~~~~~~~~~~~~~~~~~
+DeepSpeech
+~~~~~~~~~~
 
 .. autoclass:: DeepSpeech
 
   .. automethod:: forward
 
 
-:hidden:`Wav2Letter`
-~~~~~~~~~~~~~~~~~~~~
+Wav2Letter
+~~~~~~~~~~
 
 .. autoclass:: Wav2Letter
 
@@ -34,8 +34,8 @@ The models subpackage contains definitions of models for addressing common audio
 
 
 
-:hidden:`Wav2Vec2.0`
-~~~~~~~~~~~~~~~~~~~~
+Wav2Vec2.0
+~~~~~~~~~~
 
 Wav2Vec2Model
 -------------
@@ -81,9 +81,15 @@ import_fairseq_model
 
 .. currentmodule:: torchaudio.models
 
-:hidden:`WaveRNN`
-~~~~~~~~~~~~~~~~~
+WaveRNN
+~~~~~~~
 
 .. autoclass:: WaveRNN
 
   .. automethod:: forward
+
+References
+~~~~~~~~~~
+
+.. footbibliography::
+

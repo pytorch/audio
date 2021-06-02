@@ -158,7 +158,7 @@ def griffinlim(
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
 
     Implementation ported from
-    [:footcite:`brian_mcfee-proc-scipy-2015`], [:footcite:`6701851`] and [:footcite:`1172092`].
+    :footcite:`brian_mcfee-proc-scipy-2015`, :footcite:`6701851` and :footcite:`1172092`.
 
     Args:
         specgram (Tensor): A magnitude-only STFT spectrogram of dimension (..., freq, frames)
@@ -179,8 +179,6 @@ def griffinlim(
 
     Returns:
         torch.Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.
-
-    .. footbibliography::
     """
     assert momentum < 1, 'momentum={} > 1 can be unstable'.format(momentum)
     assert momentum >= 0, 'momentum={} < 0'.format(momentum)
@@ -1208,7 +1206,7 @@ def compute_kaldi_pitch(
         recompute_frame: int = 500,
         snip_edges: bool = True,
 ) -> torch.Tensor:
-    """Extract pitch based on method described in [:footcite:`6854049`].
+    """Extract pitch based on method described in :footcite:`6854049`.
 
     This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.
 
@@ -1267,8 +1265,6 @@ def compute_kaldi_pitch(
     Returns:
        Tensor: Pitch feature. Shape: ``(batch, frames 2)`` where the last dimension
        corresponds to pitch and NCCF.
-
-    .. footbibliography::
     """
     shape = waveform.shape
     waveform = waveform.reshape(-1, shape[-1])

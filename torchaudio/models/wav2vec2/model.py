@@ -19,9 +19,6 @@ class Wav2Vec2Model(Module):
         encoder (torch.nn.Module):
             Encoder that converts the audio features into the sequence of probability
             distribution (in negative log-likelihood) over labels.
-
-    .. footbibliography::
-
     """
     def __init__(
             self,
@@ -145,8 +142,6 @@ def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
         >>> # Session 2 - Load model and the parameters
         >>> model = wav2vec2_base(num_out=32)
         >>> model.load_state_dict(torch.load("wav2vec2-base-960h.pt"))
-
-    .. footbibliography::
     """
     return _get_model(
         extractor_mode="group_norm",
@@ -189,8 +184,6 @@ def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
         >>> # Session 2 - Load model and the parameters
         >>> model = wav2vec2_large(num_out=32)
         >>> model.load_state_dict(torch.load("wav2vec2-base-960h.pt"))
-
-    .. footbibliography::
     """
     return _get_model(
         extractor_mode="group_norm",
@@ -233,8 +226,6 @@ def wav2vec2_large_lv60k(num_out: int) -> Wav2Vec2Model:
         >>> # Session 2 - Load model and the parameters
         >>> model = wav2vec2_large_lv60k(num_out=32)
         >>> model.load_state_dict(torch.load("wav2vec2-base-960h.pt"))
-
-    .. footbibliography::
     """
     return _get_model(
         extractor_mode="layer_norm",

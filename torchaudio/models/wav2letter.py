@@ -7,7 +7,7 @@ __all__ = [
 
 
 class Wav2Letter(nn.Module):
-    r"""Wav2Letter model architecture from the [:footcite:`collobert2016wav2letter`].
+    r"""Wav2Letter model architecture from the :footcite:`collobert2016wav2letter`.
 
      :math:`\text{padding} = \frac{\text{ceil}(\text{kernel} - \text{stride})}{2}`
 
@@ -16,8 +16,6 @@ class Wav2Letter(nn.Module):
         input_type (str, optional): Wav2Letter can use as input: ``waveform``, ``power_spectrum``
          or ``mfcc`` (Default: ``waveform``).
         num_features (int, optional): Number of input features that the network will receive (Default: ``1``).
-
-    .. footbibliography::
     """
 
     def __init__(self, num_classes: int = 40,

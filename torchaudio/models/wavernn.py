@@ -14,7 +14,7 @@ __all__ = [
 
 
 class ResBlock(nn.Module):
-    r"""ResNet block based on [:footcite:`kalchbrenner2018efficient`].
+    r"""ResNet block based on :footcite:`kalchbrenner2018efficient`.
 
     Args:
         n_freq: the number of bins in a spectrogram. (Default: ``128``)
@@ -202,7 +202,7 @@ class UpsampleNetwork(nn.Module):
 class WaveRNN(nn.Module):
     r"""WaveRNN model based on the implementation from `fatchord <https://github.com/fatchord/WaveRNN>`_.
 
-    The original implementation was introduced in [:footcite:`kalchbrenner2018efficient`].
+    The original implementation was introduced in :footcite:`kalchbrenner2018efficient`.
     The input channels of waveform and spectrogram have to be 1. The product of
     `upsample_scales` must equal `hop_length`.
 
@@ -225,8 +225,6 @@ class WaveRNN(nn.Module):
         >>> specgram = MelSpectrogram(sample_rate)(waveform)  # shape: (n_batch, n_channel, n_freq, n_time)
         >>> output = wavernn(waveform, specgram)
         >>> # output shape: (n_batch, n_channel, (n_time - kernel_size + 1) * hop_length, n_classes)
-
-    .. footbibliography::
     """
 
     def __init__(self,

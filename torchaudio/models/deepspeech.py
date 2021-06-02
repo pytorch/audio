@@ -31,14 +31,12 @@ class FullyConnected(torch.nn.Module):
 
 class DeepSpeech(torch.nn.Module):
     """
-    DeepSpeech model architecture from [:footcite:`hannun2014deep`].
+    DeepSpeech model architecture from :footcite:`hannun2014deep`.
 
     Args:
         n_feature: Number of input features
         n_hidden: Internal hidden unit size.
         n_class: Number of output classes
-
-    .. footbibliography::
     """
 
     def __init__(

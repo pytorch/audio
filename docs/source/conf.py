@@ -57,7 +57,6 @@ delimiters : [
 '''
 
 bibtex_bibfiles = ['refs.bib']
-bibtex_default_style = 'unsrtalpha'
 
 napoleon_use_ivar = True
 napoleon_numpy_docstring = False

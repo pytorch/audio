@@ -164,7 +164,7 @@ class MaskGenerator(torch.nn.Module):
 
 
 class ConvTasNet(torch.nn.Module):
-    """Conv-TasNet: a fully-convolutional time-domain audio separation network [:footcite:`Luo_2019`].
+    """Conv-TasNet: a fully-convolutional time-domain audio separation network :footcite:`Luo_2019`.
 
     Args:
         num_sources (int): The number of sources to split.
@@ -178,9 +178,6 @@ class ConvTasNet(torch.nn.Module):
 
     Note:
         This implementation corresponds to the "non-causal" setting in the paper.
-
-    .. footbibliography::
-
     """
 
     def __init__(
