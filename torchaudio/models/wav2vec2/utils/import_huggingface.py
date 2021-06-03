@@ -50,6 +50,8 @@ def import_huggingface_model(original: Module) -> Wav2Vec2Model:
         Wav2Vec2Model: Imported model.
 
     Example
+        >>> from torchaudio.models.wav2vec2.utils import import_huggingface_model
+        >>>
         >>> original = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
         >>> model = import_huggingface_model(original)
         >>>

@@ -126,7 +126,8 @@ class Spectrogram(torch.nn.Module):
 class GriffinLim(torch.nn.Module):
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
 
-    Implementation ported from ``librosa`` [1]_, [2]_, [3]_.
+    Implementation ported from
+    :footcite:`brian_mcfee-proc-scipy-2015`, :footcite:`6701851` and :footcite:`1172092`.
 
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
@@ -143,24 +144,6 @@ class GriffinLim(torch.nn.Module):
             Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: ``0.99``)
         length (int, optional): Array length of the expected output. (Default: ``None``)
         rand_init (bool, optional): Initializes phase randomly if True and to zero otherwise. (Default: ``True``)
-
-    References:
-        .. [1]
-           | McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg,
-             and Oriol Nieto.
-           | "librosa: Audio and music signal analysis in python."
-           | In Proceedings of the 14th python in science conference, pp. 18-25. 2015.
-
-        .. [2]
-           | Perraudin, N., Balazs, P., & Søndergaard, P. L.
-           | "A fast Griffin-Lim algorithm,"
-           | IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (pp. 1-4),
-           | Oct. 2013.
-
-        .. [3]
-           | D. W. Griffin and J. S. Lim,
-           | "Signal estimation from modified short-time Fourier transform,"
-           | IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
     """
     __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power',
                      'length', 'momentum', 'rand_init']
@@ -1085,8 +1068,8 @@ class Vad(torch.nn.Module):
         lp_lifter_freq (float, optional) "Brick-wall" frequency of low-pass lifter used
             in the detector algorithm. (Default: 2000.0)
 
-    References:
-        http://sox.sourceforge.net/sox.html
+    Reference:
+        - http://sox.sourceforge.net/sox.html
     """
 
     def __init__(self,
