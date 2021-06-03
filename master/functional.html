@@ -572,6 +572,43 @@ If <code class="docutils literal notranslate"><span class="pre">channels_first=T
 </dd></dl>
 
 </section>
+<section id="resample">
+<h3>resample<a class="headerlink" href="#resample" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="torchaudio.functional.resample">
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">resample</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">orig_freq: float</em>, <em class="sig-param">new_freq: float</em>, <em class="sig-param">lowpass_filter_width: int = 6</em>, <em class="sig-param">rolloff: float = 0.99</em>, <em class="sig-param">resampling_method: str = 'sinc_interpolation'</em>, <em class="sig-param">beta: Optional[float] = None</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.resample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resamples the waveform at the new frequency using bandlimited interpolation.</p>
+<p><a class="reference external" href="https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html">https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">transforms.Resample</span></code> precomputes and reuses the resampling kernel, so using it will result in
+more efficient computation if resampling multiple waveforms with the same resampling parameters.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>waveform</strong> (<em>Tensor</em>) – The input signal of dimension (…, time)</p></li>
+<li><p><strong>orig_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The original frequency of the signal</p></li>
+<li><p><strong>new_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The desired frequency</p></li>
+<li><p><strong>lowpass_filter_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Controls the sharpness of the filter, more == sharper
+but less efficient. (Default: <code class="docutils literal notranslate"><span class="pre">6</span></code>)</p></li>
+<li><p><strong>rolloff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The roll-off frequency of the filter, as a fraction of the Nyquist.
+Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: <code class="docutils literal notranslate"><span class="pre">0.99</span></code>)</p></li>
+<li><p><strong>resampling_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The resampling method to use.
+Options: [<code class="docutils literal notranslate"><span class="pre">sinc_interpolation</span></code>, <code class="docutils literal notranslate"><span class="pre">kaiser_window</span></code>] (Default: <code class="docutils literal notranslate"><span class="pre">'sinc_interpolation'</span></code>)</p></li>
+<li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – The shape parameter used for kaiser window.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The waveform at the new frequency of dimension (…, time).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 <section id="complex-utility">
 <h2><span class="hidden-section">Complex Utility</span><a class="headerlink" href="#complex-utility" title="Permalink to this headline">¶</a></h2>
@@ -1646,40 +1683,6 @@ frequency values, weighted by their magnitude.</p>
 </dd></dl>
 
 </section>
-<section id="resample">
-<h3><span class="hidden-section">resample</span><a class="headerlink" href="#resample" title="Permalink to this headline">¶</a></h3>
-<dl class="function">
-<dt id="torchaudio.functional.resample">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">resample</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">orig_freq: float</em>, <em class="sig-param">new_freq: float</em>, <em class="sig-param">lowpass_filter_width: int = 6</em>, <em class="sig-param">rolloff: float = 0.99</em>, <em class="sig-param">resampling_method: str = 'sinc_interpolation'</em>, <em class="sig-param">beta: Optional[float] = None</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.resample" title="Permalink to this definition">¶</a></dt>
-<dd><p>Resamples the waveform at the new frequency using bandlimited interpolation.</p>
-<p><a class="reference external" href="https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html">https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html</a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>waveform</strong> (<em>Tensor</em>) – The input signal of dimension (…, time)</p></li>
-<li><p><strong>orig_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The original frequency of the signal</p></li>
-<li><p><strong>new_freq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The desired frequency</p></li>
-<li><p><strong>lowpass_filter_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Controls the sharpness of the filter, more == sharper
-but less efficient. (Default: <code class="docutils literal notranslate"><span class="pre">6</span></code>)</p></li>
-<li><p><strong>rolloff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The roll-off frequency of the filter, as a fraction of the Nyquist.
-Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: <code class="docutils literal notranslate"><span class="pre">0.99</span></code>)</p></li>
-<li><p><strong>resampling_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The resampling method to use.
-Options: [<code class="docutils literal notranslate"><span class="pre">sinc_interpolation</span></code>, <code class="docutils literal notranslate"><span class="pre">kaiser_window</span></code>] (Default: <code class="docutils literal notranslate"><span class="pre">'sinc_interpolation'</span></code>)</p></li>
-<li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – The shape parameter used for kaiser window.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The waveform at the new frequency of dimension (…, time).</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Tensor</p>
-</dd>
-</dl>
-<p>Note: <code class="docutils literal notranslate"><span class="pre">transforms.Resample</span></code> precomputes and reuses the resampling kernel, so using it will result in
-more efficient computation if resampling multiple waveforms with the same resampling parameters.</p>
-</dd></dl>
-
-</section>
 </section>
 </section>
 
@@ -1737,6 +1740,7 @@ more efficient computation if resampling multiple waveforms with the same resamp
 <li><a class="reference internal" href="#mu-law-encoding">mu_law_encoding</a></li>
 <li><a class="reference internal" href="#mu-law-decoding">mu_law_decoding</a></li>
 <li><a class="reference internal" href="#apply-codec">apply_codec</a></li>
+<li><a class="reference internal" href="#resample">resample</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#complex-utility"><span class="hidden-section">Complex Utility</span></a><ul>
@@ -1778,7 +1782,6 @@ more efficient computation if resampling multiple waveforms with the same resamp
 <li><a class="reference internal" href="#sliding-window-cmn"><span class="hidden-section">sliding_window_cmn</span></a></li>
 <li><a class="reference internal" href="#compute-kaldi-pitch"><span class="hidden-section">compute_kaldi_pitch</span></a></li>
 <li><a class="reference internal" href="#spectral-centroid"><span class="hidden-section">spectral_centroid</span></a></li>
-<li><a class="reference internal" href="#resample"><span class="hidden-section">resample</span></a></li>
 </ul>
 </li>
 </ul>

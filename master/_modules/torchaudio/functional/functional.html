@@ -1741,6 +1741,10 @@
 
 <span class="sd">    https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html</span>
 
+<span class="sd">    Note:</span>
+<span class="sd">        ``transforms.Resample`` precomputes and reuses the resampling kernel, so using it will result in</span>
+<span class="sd">        more efficient computation if resampling multiple waveforms with the same resampling parameters.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        waveform (Tensor): The input signal of dimension (..., time)</span>
 <span class="sd">        orig_freq (float): The original frequency of the signal</span>
@@ -1755,9 +1759,6 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: The waveform at the new frequency of dimension (..., time).</span>
-
-<span class="sd">    Note: ``transforms.Resample`` precomputes and reuses the resampling kernel, so using it will result in</span>
-<span class="sd">    more efficient computation if resampling multiple waveforms with the same resampling parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">assert</span> <span class="n">orig_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">new_freq</span> <span class="o">&gt;</span> <span class="mf">0.0</span>

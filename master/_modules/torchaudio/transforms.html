@@ -976,6 +976,12 @@
 <div class="viewcode-block" id="Resample"><a class="viewcode-back" href="../../transforms.html#torchaudio.transforms.Resample">[docs]</a><span class="k">class</span> <span class="nc">Resample</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resample a signal from one frequency to another. A resampling method can be given.</span>
 
+<span class="sd">    Note:</span>
+<span class="sd">        If resampling on waveforms of higher precision than float32, there may be a small loss of precision</span>
+<span class="sd">        because the kernel is cached once as float32. If high precision resampling is important for your application,</span>
+<span class="sd">        the functional form will retain higher precision, but run slower because it does not cache the kernel.</span>
+<span class="sd">        Alternatively, you could rewrite a transform that caches a higher precision kernel.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)</span>
 <span class="sd">        new_freq (float, optional): The desired frequency. (Default: ``16000``)</span>
@@ -986,11 +992,6 @@
 <span class="sd">        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.</span>
 <span class="sd">            Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)</span>
 <span class="sd">        beta (float or None): The shape parameter used for kaiser window.</span>
-
-<span class="sd">        Note: If resampling on waveforms of higher precision than float32, there may be a small loss of precision</span>
-<span class="sd">        because the kernel is cached once as float32. If high precision resampling is important for your application,</span>
-<span class="sd">        the functional form will retain higher precision, but run slower because it does not cache the kernel.</span>
-<span class="sd">        Alternatively, you could rewrite a transform that caches a higher precision kernel.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
