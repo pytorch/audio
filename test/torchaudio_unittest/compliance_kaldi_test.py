@@ -52,12 +52,6 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
     test_filepath = common_utils.get_asset_path('kaldi_file.wav')
     test_filepaths = {prefix: [] for prefix in compliance_utils.TEST_PREFIX}
 
-    def setUp(self):
-        super().setUp()
-
-        # test audio file corresponding to saved kaldi ark files
-        self.test_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
-
     # separating test files by their types (e.g 'spec', 'fbank', etc.)
     for f in os.listdir(kaldi_output_dir):
         dash_idx = f.find('-')
