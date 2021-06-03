@@ -27,6 +27,7 @@
 
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../_static/css/override.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
@@ -334,13 +335,6 @@
 
 <span class="sd">    Note:</span>
 <span class="sd">        This implementation corresponds to the &quot;non-causal&quot; setting in the paper.</span>
-
-<span class="sd">    Reference:</span>
-<span class="sd">        - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation</span>
-
-<span class="sd">          Luo, Yi and Mesgarani, Nima</span>
-
-<span class="sd">          https://arxiv.org/abs/1809.07454</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -411,11 +405,6 @@
 
 <span class="sd">    Note:</span>
 <span class="sd">        This implementation corresponds to the &quot;non-causal&quot; setting in the paper.</span>
-
-<span class="sd">    References:</span>
-<span class="sd">        - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation</span>
-<span class="sd">          Luo, Yi and Mesgarani, Nima</span>
-<span class="sd">          https://arxiv.org/abs/1809.07454</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -489,7 +478,7 @@
 
 
 <div class="viewcode-block" id="ConvTasNet"><a class="viewcode-back" href="../../../models.html#torchaudio.models.ConvTasNet">[docs]</a><span class="k">class</span> <span class="nc">ConvTasNet</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Conv-TasNet: a fully-convolutional time-domain audio separation network</span>
+    <span class="sd">&quot;&quot;&quot;Conv-TasNet: a fully-convolutional time-domain audio separation network :footcite:`Luo_2019`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_sources (int): The number of sources to split.</span>
@@ -503,13 +492,6 @@
 
 <span class="sd">    Note:</span>
 <span class="sd">        This implementation corresponds to the &quot;non-causal&quot; setting in the paper.</span>
-
-<span class="sd">    Reference:</span>
-<span class="sd">        - Conv-TasNet: Surpassing Ideal Time--Frequency Magnitude Masking for Speech Separation</span>
-
-<span class="sd">          Luo, Yi and Mesgarani, Nima</span>
-
-<span class="sd">          https://arxiv.org/abs/1809.07454</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>

@@ -235,3 +235,8 @@ vad
 ---------------------------
 
 .. autofunction:: spectral_centroid
+
+References
+~~~~~~~~~~
+
+.. footbibliography::

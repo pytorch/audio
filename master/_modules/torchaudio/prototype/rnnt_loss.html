@@ -27,6 +27,7 @@
 
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../_static/css/override.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
@@ -330,11 +331,10 @@
     <span class="n">fused_log_softmax</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">reuse_logits_for_grads</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the RNN Transducer Loss.</span>
+    <span class="sd">&quot;&quot;&quot;Compute the RNN Transducer loss from :footcite:`graves2012sequence`.</span>
 
-<span class="sd">    The RNN Transducer loss (`Graves 2012 &lt;https://arxiv.org/pdf/1211.3711.pdf&gt;`__) extends the CTC loss by defining</span>
-<span class="sd">    a distribution over output sequences of all lengths, and by jointly modelling both input-output and output-output</span>
+<span class="sd">    The RNN Transducer loss extends the CTC loss by defining a distribution over output</span>
+<span class="sd">    sequences of all lengths, and by jointly modelling both input-output and output-output</span>
 <span class="sd">    dependencies.</span>
 
 <span class="sd">    Args:</span>
@@ -371,11 +371,10 @@
 
 
 <div class="viewcode-block" id="RNNTLoss"><a class="viewcode-back" href="../../../rnnt_loss.html#torchaudio.prototype.rnnt_loss.RNNTLoss">[docs]</a><span class="k">class</span> <span class="nc">RNNTLoss</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the RNN Transducer Loss.</span>
+    <span class="sd">&quot;&quot;&quot;Compute the RNN Transducer loss from :footcite:`graves2012sequence`.</span>
 
-<span class="sd">    The RNN Transducer loss (`Graves 2012 &lt;https://arxiv.org/pdf/1211.3711.pdf&gt;`__) extends the CTC loss by defining</span>
-<span class="sd">    a distribution over output sequences of all lengths, and by jointly modelling both input-output and output-output</span>
+<span class="sd">    The RNN Transducer loss extends the CTC loss by defining a distribution over output</span>
+<span class="sd">    sequences of all lengths, and by jointly modelling both input-output and output-output</span>
 <span class="sd">    dependencies.</span>
 
 <span class="sd">    Args:</span>

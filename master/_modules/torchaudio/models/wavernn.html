@@ -27,6 +27,7 @@
 
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../_static/css/override.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
@@ -327,9 +328,7 @@
 
 
 <span class="k">class</span> <span class="nc">ResBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;ResNet block based on &quot;Deep Residual Learning for Image Recognition&quot;</span>
-
-<span class="sd">    The paper link is https://arxiv.org/pdf/1512.03385.pdf.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;ResNet block based on :footcite:`kalchbrenner2018efficient`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n_freq: the number of bins in a spectrogram. (Default: ``128``)</span>
@@ -517,8 +516,7 @@
 <div class="viewcode-block" id="WaveRNN"><a class="viewcode-back" href="../../../models.html#torchaudio.models.WaveRNN">[docs]</a><span class="k">class</span> <span class="nc">WaveRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;WaveRNN model based on the implementation from `fatchord &lt;https://github.com/fatchord/WaveRNN&gt;`_.</span>
 
-<span class="sd">    The original implementation was introduced in</span>
-<span class="sd">    `&quot;Efficient Neural Audio Synthesis&quot; &lt;https://arxiv.org/pdf/1802.08435.pdf&gt;`_.</span>
+<span class="sd">    The original implementation was introduced in :footcite:`kalchbrenner2018efficient`.</span>
 <span class="sd">    The input channels of waveform and spectrogram have to be 1. The product of</span>
 <span class="sd">    `upsample_scales` must equal `hop_length`.</span>
 

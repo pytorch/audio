@@ -27,6 +27,7 @@
 
   <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../../../_static/css/override.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../../../_static/katex-math.css" type="text/css" />
@@ -454,6 +455,8 @@
 <span class="sd">        Wav2Vec2Model: Imported model.</span>
 
 <span class="sd">    Example - Loading pretrain-only model</span>
+<span class="sd">        &gt;&gt;&gt; from torchaudio.models.wav2vec2.utils import import_fairseq_model</span>
+<span class="sd">        &gt;&gt;&gt;</span>
 <span class="sd">        &gt;&gt;&gt; # Load model using fairseq</span>
 <span class="sd">        &gt;&gt;&gt; model_file = &#39;wav2vec_small.pt&#39;</span>
 <span class="sd">        &gt;&gt;&gt; model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([model_file])</span>
@@ -469,6 +472,8 @@
 <span class="sd">        &gt;&gt;&gt; torch.testing.assert_allclose(features, reference)</span>
 
 <span class="sd">    Example - Fine-tuned model</span>
+<span class="sd">        &gt;&gt;&gt; from torchaudio.models.wav2vec2.utils import import_fairseq_model</span>
+<span class="sd">        &gt;&gt;&gt;</span>
 <span class="sd">        &gt;&gt;&gt; # Load model using fairseq</span>
 <span class="sd">        &gt;&gt;&gt; model_file = &#39;wav2vec_small_960h.pt&#39;</span>
 <span class="sd">        &gt;&gt;&gt; model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([model_file])</span>

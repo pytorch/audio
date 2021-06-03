@@ -27,6 +27,7 @@
 
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../_static/css/override.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
@@ -398,18 +399,20 @@
 <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AudioMetaData</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Get signal information of an audio file.</span>
 
+<span class="sd">    Note:</span>
+<span class="sd">        ``filepath`` argument is intentionally annotated as ``str`` only, even though it accepts</span>
+<span class="sd">        ``pathlib.Path`` object as well. This is for the consistency with ``&quot;sox_io&quot;`` backend,</span>
+<span class="sd">        which has a restriction on type annotation due to TorchScript compiler compatiblity.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        filepath (path-like object or file-like object):</span>
 <span class="sd">            Source of audio data.</span>
-<span class="sd">            Note:</span>
-<span class="sd">                  * This argument is intentionally annotated as ``str`` only,</span>
-<span class="sd">                    for the consistency with &quot;sox_io&quot; backend, which has a restriction</span>
-<span class="sd">                    on type annotation due to TorchScript compiler compatiblity.</span>
 <span class="sd">        format (str, optional):</span>
 <span class="sd">            Not used. PySoundFile does not accept format hint.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        AudioMetaData: meta data of the given audio.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sinfo</span> <span class="o">=</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">AudioMetaData</span><span class="p">(</span>
@@ -472,13 +475,14 @@
 <span class="sd">    For these formats, this function always returns ``float32`` Tensor with values normalized to</span>
 <span class="sd">    ``[-1.0, 1.0]``.</span>
 
+<span class="sd">    Note:</span>
+<span class="sd">        ``filepath`` argument is intentionally annotated as ``str`` only, even though it accepts</span>
+<span class="sd">        ``pathlib.Path`` object as well. This is for the consistency with ``&quot;sox_io&quot;`` backend,</span>
+<span class="sd">        which has a restriction on type annotation due to TorchScript compiler compatiblity.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        filepath (path-like object or file-like object):</span>
 <span class="sd">            Source of audio data.</span>
-<span class="sd">            Note:</span>
-<span class="sd">                  * This argument is intentionally annotated as ``str`` only,</span>
-<span class="sd">                    for the consistency with &quot;sox_io&quot; backend, which has a restriction</span>
-<span class="sd">                    on type annotation due to TorchScript compiler compatiblity.</span>
 <span class="sd">        frame_offset (int):</span>
 <span class="sd">            Number of frames to skip before start reading data.</span>
 <span class="sd">        num_frames (int):</span>
@@ -637,11 +641,13 @@
 <span class="sd">        * OGG/VORBIS</span>
 <span class="sd">        * SPHERE</span>
 
+<span class="sd">    Note:</span>
+<span class="sd">        ``filepath`` argument is intentionally annotated as ``str`` only, even though it accepts</span>
+<span class="sd">        ``pathlib.Path`` object as well. This is for the consistency with ``&quot;sox_io&quot;`` backend,</span>
+<span class="sd">        which has a restriction on type annotation due to TorchScript compiler compatiblity.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        filepath (str or pathlib.Path): Path to audio file.</span>
-<span class="sd">            This functionalso handles ``pathlib.Path`` objects, but is annotated as ``str``</span>
-<span class="sd">            for the consistency with &quot;sox_io&quot; backend, which has a restriction on type annotation</span>
-<span class="sd">            for TorchScript compiler compatiblity.</span>
 <span class="sd">        src (torch.Tensor): Audio data to save. must be 2D tensor.</span>
 <span class="sd">        sample_rate (int): sampling rate</span>
 <span class="sd">        channels_first (bool): If ``True``, the given tensor is interpreted as ``[channel, time]``,</span>
