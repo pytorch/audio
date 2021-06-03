@@ -206,7 +206,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
 
         self.assert_batch_consistency(
             F.resample, multi_sound, orig_freq=sr, new_freq=new_sr,
-            resampling_method=resampling_method)
+            resampling_method=resampling_method, rtol=1e-4, atol=1e-7)
 
     @common_utils.skipIfNoKaldi
     def test_compute_kaldi_pitch(self):
