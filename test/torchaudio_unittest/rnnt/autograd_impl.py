@@ -41,7 +41,8 @@ class Autograd(TestBaseMixin):
                 if enable_all_grad:
                     i.requires_grad = True
             inputs_.append(i)
-        assert gradcheck(loss, inputs, eps=1e-03, atol=1e-03, rtol=1e-03, nondet_tol=0.)
+        # gradcheck with float32 requires higher atol and epsilon
+        assert gradcheck(loss, inputs, eps=1e-3, atol=1e-3, nondet_tol=0.)
 
     @parameterized.expand([
         (get_B1_T10_U3_D4_data, ),
