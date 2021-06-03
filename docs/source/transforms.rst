@@ -53,99 +53,105 @@ Transforms are common audio transforms. They can be chained together using :clas
   .. automethod:: forward
 
 :hidden:`MFCC`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. autoclass:: MFCC
 
   .. automethod:: forward
 
 :hidden:`MuLawEncoding`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: MuLawEncoding
 
   .. automethod:: forward
 
 :hidden:`MuLawDecoding`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: MuLawDecoding
 
   .. automethod:: forward
 
 :hidden:`Resample`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Resample
 
   .. automethod:: forward
 
 :hidden:`ComplexNorm`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: ComplexNorm
 
   .. automethod:: forward
 
 :hidden:`ComputeDeltas`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: ComputeDeltas
 
   .. automethod:: forward
 
 :hidden:`TimeStretch`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: TimeStretch
 
   .. automethod:: forward
 
 :hidden:`Fade`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. autoclass:: Fade
 
   .. automethod:: forward
 
 :hidden:`FrequencyMasking`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: FrequencyMasking
 
   .. automethod:: forward
 
 :hidden:`TimeMasking`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: TimeMasking
 
   .. automethod:: forward
 
 :hidden:`Vol`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. autoclass:: Vol
 
   .. automethod:: forward
 
 :hidden:`SlidingWindowCmn`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: SlidingWindowCmn
 
   .. automethod:: forward
 
 :hidden:`SpectralCentroid`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: SpectralCentroid
 
   .. automethod:: forward
 
 :hidden:`Vad`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. autoclass:: Vad
 
   .. automethod:: forward
+
+
+References
+~~~~~~~~~~
+
+.. footbibliography::

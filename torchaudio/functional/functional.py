@@ -156,18 +156,9 @@ def griffinlim(
         rand_init: bool
 ) -> Tensor:
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
-        Implementation ported from `librosa`.
 
-    *  [1] McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto.
-        "librosa: Audio and music signal analysis in python."
-        In Proceedings of the 14th python in science conference, pp. 18-25. 2015.
-    *  [2] Perraudin, N., Balazs, P., & Søndergaard, P. L.
-        "A fast Griffin-Lim algorithm,"
-        IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (pp. 1-4),
-        Oct. 2013.
-    *  [3] D. W. Griffin and J. S. Lim,
-        "Signal estimation from modified short-time Fourier transform,"
-        IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
+    Implementation ported from
+    :footcite:`brian_mcfee-proc-scipy-2015`, :footcite:`6701851` and :footcite:`1172092`.
 
     Args:
         specgram (Tensor): A magnitude-only STFT spectrogram of dimension (..., freq, frames)
@@ -1215,7 +1206,7 @@ def compute_kaldi_pitch(
         recompute_frame: int = 500,
         snip_edges: bool = True,
 ) -> torch.Tensor:
-    """Extract pitch based on method described in [1].
+    """Extract pitch based on method described in :footcite:`6854049`.
 
     This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.
 
@@ -1274,15 +1265,6 @@ def compute_kaldi_pitch(
     Returns:
        Tensor: Pitch feature. Shape: ``(batch, frames 2)`` where the last dimension
        corresponds to pitch and NCCF.
-
-    Reference:
-        - A pitch extraction algorithm tuned for automatic speech recognition
-
-          P. Ghahremani, B. BabaAli, D. Povey, K. Riedhammer, J. Trmal and S. Khudanpur
-
-          2014 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP),
-
-          Florence, 2014, pp. 2494-2498, doi: 10.1109/ICASSP.2014.6854049.
     """
     shape = waveform.shape
     waveform = waveform.reshape(-1, shape[-1])

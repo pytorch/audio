@@ -7,7 +7,7 @@ from . import components
 
 
 class Wav2Vec2Model(Module):
-    """Model used in wav2vec2.0 paper. [1]
+    """Encoder model used in [:footcite:`baevski2020wav2vec`].
 
     Note:
         To build the model, please use one of the factory functions.
@@ -19,13 +19,6 @@ class Wav2Vec2Model(Module):
         encoder (torch.nn.Module):
             Encoder that converts the audio features into the sequence of probability
             distribution (in negative log-likelihood) over labels.
-
-    Reference:
-        - wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations
-
-          Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, Michael Auli
-
-          https://arxiv.org/abs/2006.11477
     """
     def __init__(
             self,
@@ -129,7 +122,7 @@ def _get_model(
 
 
 def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with **Base** configuration. [1]
+    """Build wav2vec2.0 model with "Base" configuration from [:footcite:`baevski2020wav2vec`].
 
     Args:
         num_out: int
@@ -138,12 +131,17 @@ def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
     Returns:
         Wav2Vec2Model: The resulting model.
 
-    Reference:
-        - wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations
-
-          Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, Michael Auli
-
-          https://arxiv.org/abs/2006.11477
+    Example - Reload fine-tuned model from Hugging Face:
+        >>> # Session 1 - Convert pretrained model from Hugging Face and save the parameters.
+        >>> from torchaudio.models.wav2vec2.utils import import_huggingface_model
+        >>>
+        >>> original = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
+        >>> model = import_huggingface_model(original)
+        >>> torch.save(model.state_dict(), "wav2vec2-base-960h.pt")
+        >>>
+        >>> # Session 2 - Load model and the parameters
+        >>> model = wav2vec2_base(num_out=32)
+        >>> model.load_state_dict(torch.load("wav2vec2-base-960h.pt"))
     """
     return _get_model(
         extractor_mode="group_norm",
@@ -166,7 +164,7 @@ def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
 
 
 def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with **Large** configuration. [1]
+    """Build wav2vec2.0 model with "Large" configuration from [:footcite:`baevski2020wav2vec`].
 
     Args:
         num_out: int
@@ -175,12 +173,17 @@ def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
     Returns:
         Wav2Vec2Model: The resulting model.
 
-    Reference:
-        - wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations
-
-          Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, Michael Auli
-
-          https://arxiv.org/abs/2006.11477
+    Example - Reload fine-tuned model from Hugging Face:
+        >>> # Session 1 - Convert pretrained model from Hugging Face and save the parameters.
+        >>> from torchaudio.models.wav2vec2.utils import import_huggingface_model
+        >>>
+        >>> original = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-960h")
+        >>> model = import_huggingface_model(original)
+        >>> torch.save(model.state_dict(), "wav2vec2-base-960h.pt")
+        >>>
+        >>> # Session 2 - Load model and the parameters
+        >>> model = wav2vec2_large(num_out=32)
+        >>> model.load_state_dict(torch.load("wav2vec2-base-960h.pt"))
     """
     return _get_model(
         extractor_mode="group_norm",
@@ -203,7 +206,7 @@ def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
 
 
 def wav2vec2_large_lv60k(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with **Large LV-60k** configuration. [1]
+    """Build wav2vec2.0 model with "Large LV-60k" configuration from [:footcite:`baevski2020wav2vec`].
 
     Args:
         num_out: int
@@ -212,12 +215,17 @@ def wav2vec2_large_lv60k(num_out: int) -> Wav2Vec2Model:
     Returns:
         Wav2Vec2Model: The resulting model.
 
-    Reference:
-        - wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations
-
-          Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, Michael Auli
-
-          https://arxiv.org/abs/2006.11477
+    Example - Reload fine-tuned model from Hugging Face:
+        >>> # Session 1 - Convert pretrained model from Hugging Face and save the parameters.
+        >>> from torchaudio.models.wav2vec2.utils import import_huggingface_model
+        >>>
+        >>> original = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-large-960h-lv60-self")
+        >>> model = import_huggingface_model(original)
+        >>> torch.save(model.state_dict(), "wav2vec2-base-960h.pt")
+        >>>
+        >>> # Session 2 - Load model and the parameters
+        >>> model = wav2vec2_large_lv60k(num_out=32)
+        >>> model.load_state_dict(torch.load("wav2vec2-base-960h.pt"))
     """
     return _get_model(
         extractor_mode="layer_norm",
