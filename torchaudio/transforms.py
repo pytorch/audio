@@ -60,11 +60,11 @@ class Spectrogram(torch.nn.Module):
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy Default: ``True``
         return_complex (bool, optional):
-            ``return_complex = True``, this function returns the resulting Tensor in
-            complex dtype, otherwise it returns the resulting Tensor in real dtype with extra
-            dimension for real and imaginary parts. (see ``torch.view_as_real``).
-            When ``power`` is provided, the value must be False, as the resulting
-            Tensor represents real-valued power.
+            Indicates whether the resulting complex-valued Tensor should be represented with
+            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
+            mimicing complex value with an extra dimension for real and imaginary parts.
+            This argument has is only effective when ``power=None``.
+            See also ``torch.view_as_real``.
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
