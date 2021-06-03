@@ -5,7 +5,7 @@ from torch.autograd import gradcheck
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
 )
-from torchaudio.prototype.rnnt_loss import RNNTLoss
+from torchaudio.prototype.rnnt_loss import RNNTLoss, rnnt_loss
 from parameterized import parameterized
 from .utils import (
     numpy_to_torch,
@@ -59,6 +59,26 @@ class Autograd(TestBaseMixin):
         loss = RNNTLoss(blank=data["blank"], reuse_logits_for_grads=False)
 
         self.assert_grad(loss, inputs, enable_all_grad=False)
+
+    @parameterized.expand([
+        (get_B1_T10_U3_D4_data, ),
+        (get_numpy_data_B2_T4_U3_D3, ),
+        (get_numpy_data_B1_T2_U3_D5, ),
+    ])
+    def test_rnnt_loss_gradcheck(self, data_func):
+        data = self.get_data(data_func, self.device)
+        inputs = (
+            data["logits"].to(self.dtype),  # logits
+            data["targets"],                # targets
+            data["logit_lengths"],          # logit_lengths
+            data["target_lengths"],         # target_lengths
+            data["blank"],                  # blank
+            -1,                             # clamp
+            True,                           # fused_log_softmax
+            False,                          # reuse_logits_for_grads
+        )
+
+        self.assert_grad(rnnt_loss, inputs, enable_all_grad=False)
 
     @parameterized.expand([
         (get_B1_T10_U3_D4_data, ),
