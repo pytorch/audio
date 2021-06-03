@@ -141,6 +141,8 @@ def import_fairseq_model(
         Wav2Vec2Model: Imported model.
 
     Example - Loading pretrain-only model
+        >>> from torchaudio.models.wav2vec2.utils import import_fairseq_model
+        >>>
         >>> # Load model using fairseq
         >>> model_file = 'wav2vec_small.pt'
         >>> model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([model_file])
@@ -156,6 +158,8 @@ def import_fairseq_model(
         >>> torch.testing.assert_allclose(features, reference)
 
     Example - Fine-tuned model
+        >>> from torchaudio.models.wav2vec2.utils import import_fairseq_model
+        >>>
         >>> # Load model using fairseq
         >>> model_file = 'wav2vec_small_960h.pt'
         >>> model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([model_file])
