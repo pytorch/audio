@@ -197,6 +197,17 @@ class TestFunctional(common_utils.TorchaudioTestCase):
             F.sliding_window_cmn, spectrogram, center=center,
             norm_vars=norm_vars)
 
+    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    def test_resample_waveform(self, resampling_method):
+        num_channels = 3
+        sr = 16000
+        new_sr = sr // 2
+        multi_sound = common_utils.get_whitenoise(sample_rate=sr, n_channels=num_channels, duration=0.5,)
+
+        self.assert_batch_consistency(
+            F.resample, multi_sound, orig_freq=sr, new_freq=new_sr,
+            resampling_method=resampling_method, rtol=1e-4, atol=1e-7)
+
     @common_utils.skipIfNoKaldi
     def test_compute_kaldi_pitch(self):
         sample_rate = 44100
