@@ -137,7 +137,6 @@ html_logo = '_static/img/pytorch-logo-dark.svg'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 html_css_files = [
-    'css/override.css',
     'https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css'
 ]
 
