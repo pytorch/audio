@@ -27,11 +27,25 @@
 
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../_static/css/override.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" />
+  <!-- Google Analytics -->
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-117752657-2');
+    </script>
+  
+  <!-- End Google Analytics -->
+  
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
@@ -153,7 +167,7 @@
           </li>
 
           <li>
-            <a href="https://github.com/pytorch/pytorch">Github</a>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
           </li>
         </ul>
       </div>
@@ -180,7 +194,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>0.9.0-RC1 &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>0.9.0  &#x25BC</a>
     </div>
     
 
@@ -379,9 +393,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
-<span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
+<span class="sd">        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
@@ -422,9 +436,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
-<span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
+<span class="sd">        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
@@ -470,9 +484,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
-<span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
+<span class="sd">        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
@@ -506,9 +520,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
-<span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
+<span class="sd">        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
@@ -546,9 +560,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
-<span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
+<span class="sd">        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
@@ -624,8 +638,8 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">enhancement_amount</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">:</span>
@@ -657,8 +671,8 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">output_waveform</span> <span class="o">=</span> <span class="n">waveform</span>
     <span class="n">limiter_threshold</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -704,9 +718,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
-<span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
+<span class="sd">        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">sample_rate</span> <span class="o">==</span> <span class="mi">44100</span><span class="p">:</span>
@@ -979,10 +993,12 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., channel, time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
 
-<span class="sd">        Scott Lehman, Effects Explained,</span>
+<span class="sd">        - Scott Lehman, `Effects Explained`_,</span>
+
+<span class="sd">    .. _Effects Explained:</span>
 <span class="sd">        https://web.archive.org/web/20051125072557/http://www.harmony-central.com/Effects/effects-explained.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1326,8 +1342,8 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">actual_shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">device</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
@@ -1395,9 +1411,11 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
-<span class="sd">        Scott Lehman, Effects Explained,</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
+<span class="sd">        - Scott Lehman, `Effects Explained`_.</span>
+
+<span class="sd">    .. _Effects Explained:</span>
 <span class="sd">        https://web.archive.org/web/20051125072557/http://www.harmony-central.com/Effects/effects-explained.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">actual_shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
@@ -1465,9 +1483,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
-<span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
+<span class="sd">        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">sample_rate</span> <span class="o">==</span> <span class="mi">44100</span><span class="p">:</span>
@@ -1533,9 +1551,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Waveform of dimension of `(..., time)`</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
-<span class="sd">        https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
+<span class="sd">        - https://www.w3.org/2011/audio/audio-eq-cookbook.html#APF</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dtype</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span>
@@ -1719,8 +1737,8 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Tensor of audio of dimension (..., time).</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        http://sox.sourceforge.net/sox.html</span>
+<span class="sd">    Reference:</span>
+<span class="sd">        - http://sox.sourceforge.net/sox.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">waveform</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
@@ -1929,8 +1947,8 @@
          <script src="../../../_static/underscore.js"></script>
          <script src="../../../_static/doctools.js"></script>
          <script src="../../../_static/language_data.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../../../_static/katex_autorenderer.js"></script>
      
 

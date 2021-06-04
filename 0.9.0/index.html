@@ -27,12 +27,26 @@
 
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="_static/css/override.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="torchaudio" href="torchaudio.html" /> 
+    <link rel="next" title="torchaudio" href="torchaudio.html" />
+  <!-- Google Analytics -->
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-117752657-2');
+    </script>
+  
+  <!-- End Google Analytics -->
+  
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -154,7 +168,7 @@
           </li>
 
           <li>
-            <a href="https://github.com/pytorch/pytorch">Github</a>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
           </li>
         </ul>
       </div>
@@ -181,7 +195,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>0.9.0-RC1 &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>0.9.0  &#x25BC</a>
     </div>
     
 
@@ -340,6 +354,7 @@ flags, and are at an early stage for feedback and testing.</p>
 <li class="toctree-l2"><a class="reference internal" href="functional.html#complex-utility"><span class="hidden-section">Complex Utility</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="functional.html#filtering"><span class="hidden-section">Filtering</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="functional.html#feature-extractions"><span class="hidden-section">Feature Extractions</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functional.html#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a><ul>
@@ -363,6 +378,7 @@ flags, and are at an early stage for feedback and testing.</p>
 <li class="toctree-l2"><a class="reference internal" href="transforms.html#slidingwindowcmn"><span class="hidden-section">SlidingWindowCmn</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="transforms.html#spectralcentroid"><span class="hidden-section">SpectralCentroid</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="transforms.html#vad"><span class="hidden-section">Vad</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="transforms.html#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a><ul>
@@ -380,11 +396,12 @@ flags, and are at an early stage for feedback and testing.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="models.html#convtasnet"><span class="hidden-section">ConvTasNet</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#deepspeech"><span class="hidden-section">DeepSpeech</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#wav2letter"><span class="hidden-section">Wav2Letter</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#wav2vec2-0"><span class="hidden-section">Wav2Vec2.0</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#wavernn"><span class="hidden-section">WaveRNN</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#convtasnet">ConvTasNet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#deepspeech">DeepSpeech</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#wav2letter">Wav2Letter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#wav2vec2-0">Wav2Vec2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#wavernn">WaveRNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a><ul>
@@ -485,8 +502,8 @@ flags, and are at an early stage for feedback and testing.</p>
          <script src="_static/underscore.js"></script>
          <script src="_static/doctools.js"></script>
          <script src="_static/language_data.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="_static/katex_autorenderer.js"></script>
      
 

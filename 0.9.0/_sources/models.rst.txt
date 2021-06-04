@@ -2,31 +2,31 @@
     :class: hidden-section
 
 torchaudio.models
-======================
+=================
 
 .. currentmodule:: torchaudio.models
 
 The models subpackage contains definitions of models for addressing common audio tasks.
 
 
-:hidden:`ConvTasNet`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ConvTasNet
+~~~~~~~~~~
 
 .. autoclass:: ConvTasNet
 
   .. automethod:: forward
 
 
-:hidden:`DeepSpeech`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DeepSpeech
+~~~~~~~~~~
 
 .. autoclass:: DeepSpeech
 
   .. automethod:: forward
 
 
-:hidden:`Wav2Letter`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Wav2Letter
+~~~~~~~~~~
 
 .. autoclass:: Wav2Letter
 
@@ -34,11 +34,11 @@ The models subpackage contains definitions of models for addressing common audio
 
 
 
-:hidden:`Wav2Vec2.0`
-~~~~~~~~~~~~~~~~~~~~
+Wav2Vec2.0
+~~~~~~~~~~
 
-Model
------
+Wav2Vec2Model
+-------------
 
 .. autoclass:: Wav2Vec2Model
 
@@ -49,9 +49,18 @@ Model
 Factory Functions
 -----------------
 
+wav2vec2_base
+-------------
+
 .. autofunction:: wav2vec2_base
 
+wav2vec2_large
+--------------
+
 .. autofunction:: wav2vec2_large
+
+wav2vec2_large_lv60k
+--------------------
 
 .. autofunction:: wav2vec2_large_lv60k
 
@@ -60,15 +69,27 @@ Factory Functions
 Utility Functions
 -----------------
 
+import_huggingface_model
+------------------------
+		   
 .. autofunction:: import_huggingface_model
 
+import_fairseq_model
+--------------------
+		   
 .. autofunction:: import_fairseq_model
 
 .. currentmodule:: torchaudio.models
 
-:hidden:`WaveRNN`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+WaveRNN
+~~~~~~~
 
 .. autoclass:: WaveRNN
 
   .. automethod:: forward
+
+References
+~~~~~~~~~~
+
+.. footbibliography::
+

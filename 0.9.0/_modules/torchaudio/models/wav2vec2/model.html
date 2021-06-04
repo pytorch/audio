@@ -27,11 +27,25 @@
 
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../../_static/css/override.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <!-- Google Analytics -->
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117752657-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-117752657-2');
+    </script>
+  
+  <!-- End Google Analytics -->
+  
 
   
   <script src="../../../../_static/js/modernizr.min.js"></script>
@@ -153,7 +167,7 @@
           </li>
 
           <li>
-            <a href="https://github.com/pytorch/pytorch">Github</a>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
           </li>
         </ul>
       </div>
@@ -180,7 +194,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href='https://pytorch.org/audio/versions.html'>0.9.0-RC1 &#x25BC</a>
+      <a href='https://pytorch.org/audio/versions.html'>0.9.0  &#x25BC</a>
     </div>
     
 
@@ -306,7 +320,7 @@
 
 
 <div class="viewcode-block" id="Wav2Vec2Model"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.Wav2Vec2Model">[docs]</a><span class="k">class</span> <span class="nc">Wav2Vec2Model</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Model used in wav2vec2.0 paper. [1]</span>
+    <span class="sd">&quot;&quot;&quot;Encoder model used in [:footcite:`baevski2020wav2vec`].</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        To build the model, please use one of the factory functions.</span>
@@ -318,13 +332,6 @@
 <span class="sd">        encoder (torch.nn.Module):</span>
 <span class="sd">            Encoder that converts the audio features into the sequence of probability</span>
 <span class="sd">            distribution (in negative log-likelihood) over labels.</span>
-
-<span class="sd">    Reference:</span>
-<span class="sd">        - wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations</span>
-
-<span class="sd">          Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, Michael Auli</span>
-
-<span class="sd">          https://arxiv.org/abs/2006.11477</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -428,7 +435,7 @@
 
 
 <div class="viewcode-block" id="wav2vec2_base"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_base">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_base</span><span class="p">(</span><span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build wav2vec2.0 model with **Base** configuration. [1]</span>
+    <span class="sd">&quot;&quot;&quot;Build wav2vec2.0 model with &quot;Base&quot; configuration from [:footcite:`baevski2020wav2vec`].</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_out: int</span>
@@ -437,12 +444,17 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model: The resulting model.</span>
 
-<span class="sd">    Reference:</span>
-<span class="sd">        - wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations</span>
-
-<span class="sd">          Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, Michael Auli</span>
-
-<span class="sd">          https://arxiv.org/abs/2006.11477</span>
+<span class="sd">    Example - Reload fine-tuned model from Hugging Face:</span>
+<span class="sd">        &gt;&gt;&gt; # Session 1 - Convert pretrained model from Hugging Face and save the parameters.</span>
+<span class="sd">        &gt;&gt;&gt; from torchaudio.models.wav2vec2.utils import import_huggingface_model</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; original = Wav2Vec2ForCTC.from_pretrained(&quot;facebook/wav2vec2-base-960h&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; model = import_huggingface_model(original)</span>
+<span class="sd">        &gt;&gt;&gt; torch.save(model.state_dict(), &quot;wav2vec2-base-960h.pt&quot;)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Session 2 - Load model and the parameters</span>
+<span class="sd">        &gt;&gt;&gt; model = wav2vec2_base(num_out=32)</span>
+<span class="sd">        &gt;&gt;&gt; model.load_state_dict(torch.load(&quot;wav2vec2-base-960h.pt&quot;))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
@@ -465,7 +477,7 @@
 
 
 <div class="viewcode-block" id="wav2vec2_large"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large</span><span class="p">(</span><span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build wav2vec2.0 model with **Large** configuration. [1]</span>
+    <span class="sd">&quot;&quot;&quot;Build wav2vec2.0 model with &quot;Large&quot; configuration from [:footcite:`baevski2020wav2vec`].</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_out: int</span>
@@ -474,12 +486,17 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model: The resulting model.</span>
 
-<span class="sd">    Reference:</span>
-<span class="sd">        - wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations</span>
-
-<span class="sd">          Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, Michael Auli</span>
-
-<span class="sd">          https://arxiv.org/abs/2006.11477</span>
+<span class="sd">    Example - Reload fine-tuned model from Hugging Face:</span>
+<span class="sd">        &gt;&gt;&gt; # Session 1 - Convert pretrained model from Hugging Face and save the parameters.</span>
+<span class="sd">        &gt;&gt;&gt; from torchaudio.models.wav2vec2.utils import import_huggingface_model</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; original = Wav2Vec2ForCTC.from_pretrained(&quot;facebook/wav2vec2-large-960h&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; model = import_huggingface_model(original)</span>
+<span class="sd">        &gt;&gt;&gt; torch.save(model.state_dict(), &quot;wav2vec2-base-960h.pt&quot;)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Session 2 - Load model and the parameters</span>
+<span class="sd">        &gt;&gt;&gt; model = wav2vec2_large(num_out=32)</span>
+<span class="sd">        &gt;&gt;&gt; model.load_state_dict(torch.load(&quot;wav2vec2-base-960h.pt&quot;))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;group_norm&quot;</span><span class="p">,</span>
@@ -502,7 +519,7 @@
 
 
 <div class="viewcode-block" id="wav2vec2_large_lv60k"><a class="viewcode-back" href="../../../../models.html#torchaudio.models.wav2vec2_large_lv60k">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large_lv60k</span><span class="p">(</span><span class="n">num_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Wav2Vec2Model</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Build wav2vec2.0 model with **Large LV-60k** configuration. [1]</span>
+    <span class="sd">&quot;&quot;&quot;Build wav2vec2.0 model with &quot;Large LV-60k&quot; configuration from [:footcite:`baevski2020wav2vec`].</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_out: int</span>
@@ -511,12 +528,17 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Wav2Vec2Model: The resulting model.</span>
 
-<span class="sd">    Reference:</span>
-<span class="sd">        - wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations</span>
-
-<span class="sd">          Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, Michael Auli</span>
-
-<span class="sd">          https://arxiv.org/abs/2006.11477</span>
+<span class="sd">    Example - Reload fine-tuned model from Hugging Face:</span>
+<span class="sd">        &gt;&gt;&gt; # Session 1 - Convert pretrained model from Hugging Face and save the parameters.</span>
+<span class="sd">        &gt;&gt;&gt; from torchaudio.models.wav2vec2.utils import import_huggingface_model</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; original = Wav2Vec2ForCTC.from_pretrained(&quot;facebook/wav2vec2-large-960h-lv60-self&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; model = import_huggingface_model(original)</span>
+<span class="sd">        &gt;&gt;&gt; torch.save(model.state_dict(), &quot;wav2vec2-base-960h.pt&quot;)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; # Session 2 - Load model and the parameters</span>
+<span class="sd">        &gt;&gt;&gt; model = wav2vec2_large_lv60k(num_out=32)</span>
+<span class="sd">        &gt;&gt;&gt; model.load_state_dict(torch.load(&quot;wav2vec2-base-960h.pt&quot;))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_get_model</span><span class="p">(</span>
         <span class="n">extractor_mode</span><span class="o">=</span><span class="s2">&quot;layer_norm&quot;</span><span class="p">,</span>
@@ -588,8 +610,8 @@
          <script src="../../../../_static/underscore.js"></script>
          <script src="../../../../_static/doctools.js"></script>
          <script src="../../../../_static/language_data.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../../../../_static/katex_autorenderer.js"></script>
      
 
