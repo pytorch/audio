@@ -76,8 +76,10 @@ def spectrogram(
             Indicates whether the resulting complex-valued Tensor should be represented with
             native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
             mimicking complex value with an extra dimension for real and imaginary parts.
-            This argument is only effective when ``power=None``.
-            See also ``torch.view_as_real``.
+            (See also ``torch.view_as_real``.)
+            This argument is only effective when ``power=None``. It is ignored for
+            cases where ``power`` is a number as in those cases, the returned tensor is
+            power spectrogram, which is real-valued tensors.
 
     Returns:
         Tensor: Dimension (..., freq, time), freq is
