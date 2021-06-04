@@ -79,7 +79,7 @@ def spectrogram(
             (See also ``torch.view_as_real``.)
             This argument is only effective when ``power=None``. It is ignored for
             cases where ``power`` is a number as in those cases, the returned tensor is
-            power spectrogram, which is real-valued tensors.
+            power spectrogram, which is a real-valued tensor.
 
     Returns:
         Tensor: Dimension (..., freq, time), freq is
