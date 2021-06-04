@@ -1415,11 +1415,11 @@ Default: <code class="docutils literal notranslate"><span class="pre">True</span
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. Default: <code class="docutils literal notranslate"><span class="pre">&quot;reflect&quot;</span></code></p></li>
 <li><p><strong>onesided</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – controls whether to return half of results to
 avoid redundancy. Default: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
-<li><p><strong>return_complex</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – <code class="docutils literal notranslate"><span class="pre">return_complex</span> <span class="pre">=</span> <span class="pre">True</span></code>, this function returns the resulting Tensor in
-complex dtype, otherwise it returns the resulting Tensor in real dtype with extra
-dimension for real and imaginary parts. (see <code class="docutils literal notranslate"><span class="pre">torch.view_as_real</span></code>).
-When <code class="docutils literal notranslate"><span class="pre">power</span></code> is provided, the value must be False, as the resulting
-Tensor represents real-valued power.</p></li>
+<li><p><strong>return_complex</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether the resulting complex-valued Tensor should be represented with
+native complex dtype, such as <cite>torch.cfloat</cite> and <cite>torch.cdouble</cite>, or real dtype
+mimicking complex value with an extra dimension for real and imaginary parts.
+This argument is only effective when <code class="docutils literal notranslate"><span class="pre">power=None</span></code>.
+See also <code class="docutils literal notranslate"><span class="pre">torch.view_as_real</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

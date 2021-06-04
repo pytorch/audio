@@ -374,11 +374,11 @@
 <span class="sd">        onesided (bool, optional): controls whether to return half of results to</span>
 <span class="sd">            avoid redundancy Default: ``True``</span>
 <span class="sd">        return_complex (bool, optional):</span>
-<span class="sd">            ``return_complex = True``, this function returns the resulting Tensor in</span>
-<span class="sd">            complex dtype, otherwise it returns the resulting Tensor in real dtype with extra</span>
-<span class="sd">            dimension for real and imaginary parts. (see ``torch.view_as_real``).</span>
-<span class="sd">            When ``power`` is provided, the value must be False, as the resulting</span>
-<span class="sd">            Tensor represents real-valued power.</span>
+<span class="sd">            Indicates whether the resulting complex-valued Tensor should be represented with</span>
+<span class="sd">            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype</span>
+<span class="sd">            mimicking complex value with an extra dimension for real and imaginary parts.</span>
+<span class="sd">            This argument is only effective when ``power=None``.</span>
+<span class="sd">            See also ``torch.view_as_real``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_fft&#39;</span><span class="p">,</span> <span class="s1">&#39;win_length&#39;</span><span class="p">,</span> <span class="s1">&#39;hop_length&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">,</span> <span class="s1">&#39;power&#39;</span><span class="p">,</span> <span class="s1">&#39;normalized&#39;</span><span class="p">]</span>
 
