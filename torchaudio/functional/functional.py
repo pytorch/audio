@@ -49,7 +49,7 @@ def spectrogram(
         center: bool = True,
         pad_mode: str = "reflect",
         onesided: bool = True,
-        return_complex: bool = False,
+        return_complex: bool = True,
 ) -> Tensor:
     r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
@@ -76,8 +76,10 @@ def spectrogram(
             Indicates whether the resulting complex-valued Tensor should be represented with
             native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
             mimicking complex value with an extra dimension for real and imaginary parts.
-            This argument is only effective when ``power=None``.
-            See also ``torch.view_as_real``.
+            (See also ``torch.view_as_real``.)
+            This argument is only effective when ``power=None``. It is ignored for
+            cases where ``power`` is a number as in those cases, the returned tensor is
+            power spectrogram, which is a real-valued tensor.
 
     Returns:
         Tensor: Dimension (..., freq, time), freq is

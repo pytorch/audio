@@ -63,8 +63,10 @@ class Spectrogram(torch.nn.Module):
             Indicates whether the resulting complex-valued Tensor should be represented with
             native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
             mimicking complex value with an extra dimension for real and imaginary parts.
-            This argument is only effective when ``power=None``.
-            See also ``torch.view_as_real``.
+            (See also ``torch.view_as_real``.)
+            This argument is only effective when ``power=None``. It is ignored for
+            cases where ``power`` is a number as in those cases, the returned tensor is
+            power spectrogram, which is a real-valued tensor.
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -80,7 +82,7 @@ class Spectrogram(torch.nn.Module):
                  center: bool = True,
                  pad_mode: str = "reflect",
                  onesided: bool = True,
-                 return_complex: bool = False) -> None:
+                 return_complex: bool = True) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
