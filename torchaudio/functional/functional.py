@@ -49,7 +49,7 @@ def spectrogram(
         center: bool = True,
         pad_mode: str = "reflect",
         onesided: bool = True,
-        return_complex: bool = False,
+        return_complex: bool = True,
 ) -> Tensor:
     r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
@@ -76,8 +76,10 @@ def spectrogram(
             Indicates whether the resulting complex-valued Tensor should be represented with
             native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
             mimicking complex value with an extra dimension for real and imaginary parts.
-            This argument is only effective when ``power=None``.
-            See also ``torch.view_as_real``.
+            (See also ``torch.view_as_real``.)
+            This argument is only effective when ``power=None``. It is ignored for
+            cases where ``power`` is a number as in those cases, the returned tensor is
+            power spectrogram, which is a real-valued tensor.
 
     Returns:
         Tensor: Dimension (..., freq, time), freq is
@@ -523,7 +525,8 @@ def mu_law_decoding(
     "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
     "use `torch.abs`. "
     "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type."
+    "for more details about torchaudio's plan to migrate to native complex type.",
+    version="0.11",
 )
 def complex_norm(
         complex_tensor: Tensor,
@@ -548,7 +551,8 @@ def complex_norm(
     "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
     "use `torch.angle`. "
     "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type."
+    "for more details about torchaudio's plan to migrate to native complex type.",
+    version="0.11",
 )
 def angle(
         complex_tensor: Tensor
@@ -568,7 +572,8 @@ def angle(
     "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
     "use `torch.abs` and `torch.angle`. "
     "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type."
+    "for more details about torchaudio's plan to migrate to native complex type.",
+    version="0.11",
 )
 def magphase(
         complex_tensor: Tensor,
@@ -635,8 +640,9 @@ def phase_vocoder(
 
     if not complex_specgrams.is_complex():
         warnings.warn(
-            "The use of pseudo complex type in `torchaudio.functional.phase_vocoder` and "
-            "`torchaudio.transforms.TimeStretch` is now deprecated."
+            "The support for pseudo complex type in `torchaudio.functional.phase_vocoder` and "
+            "`torchaudio.transforms.TimeStretch` is now deprecated and will be removed "
+            "from 0.11 release."
             "Please migrate to native complex type by converting the input tensor with "
             "`torch.view_as_complex`. "
             "Please refer to https://github.com/pytorch/audio/issues/1337 "
