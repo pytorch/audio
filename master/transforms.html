@@ -28,7 +28,6 @@
 
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
-  <link rel="stylesheet" href="_static/css/override.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
@@ -323,7 +322,7 @@
 <h2><span class="hidden-section">Spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.Spectrogram">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Spectrogram</code><span class="sig-paren">(</span><em class="sig-param">n_fft: int = 400, win_length: Optional[int] = None, hop_length: Optional[int] = None, pad: int = 0, window_fn: Callable[[...], torch.Tensor] = &lt;built-in method hann_window of type object&gt;, power: Optional[float] = 2.0, normalized: bool = False, wkwargs: Optional[dict] = None, center: bool = True, pad_mode: str = 'reflect', onesided: bool = True, return_complex: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Spectrogram" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Spectrogram</code><span class="sig-paren">(</span><em class="sig-param">n_fft: int = 400, win_length: Optional[int] = None, hop_length: Optional[int] = None, pad: int = 0, window_fn: Callable[[...], torch.Tensor] = &lt;built-in method hann_window of type object&gt;, power: Optional[float] = 2.0, normalized: bool = False, wkwargs: Optional[dict] = None, center: bool = True, pad_mode: str = 'reflect', onesided: bool = True, return_complex: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Spectrogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a spectrogram from a audio signal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -349,8 +348,10 @@ avoid redundancy Default: <code class="docutils literal notranslate"><span class
 <li><p><strong>return_complex</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether the resulting complex-valued Tensor should be represented with
 native complex dtype, such as <cite>torch.cfloat</cite> and <cite>torch.cdouble</cite>, or real dtype
 mimicking complex value with an extra dimension for real and imaginary parts.
-This argument is only effective when <code class="docutils literal notranslate"><span class="pre">power=None</span></code>.
-See also <code class="docutils literal notranslate"><span class="pre">torch.view_as_real</span></code>.</p></li>
+(See also <code class="docutils literal notranslate"><span class="pre">torch.view_as_real</span></code>.)
+This argument is only effective when <code class="docutils literal notranslate"><span class="pre">power=None</span></code>. It is ignored for
+cases where <code class="docutils literal notranslate"><span class="pre">power</span></code> is a number as in those cases, the returned tensor is
+power spectrogram, which is a real-valued tensor.</p></li>
 </ul>
 </dd>
 </dl>

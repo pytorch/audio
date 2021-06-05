@@ -27,7 +27,6 @@
 
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
-  <link rel="stylesheet" href="../../../_static/css/override.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
@@ -363,7 +362,7 @@
         <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span>
         <span class="n">onesided</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">return_complex</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">return_complex</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a spectrogram or a batch of spectrograms from a raw audio signal.</span>
 <span class="sd">    The spectrogram can be either magnitude-only or complex.</span>
@@ -390,8 +389,10 @@
 <span class="sd">            Indicates whether the resulting complex-valued Tensor should be represented with</span>
 <span class="sd">            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype</span>
 <span class="sd">            mimicking complex value with an extra dimension for real and imaginary parts.</span>
-<span class="sd">            This argument is only effective when ``power=None``.</span>
-<span class="sd">            See also ``torch.view_as_real``.</span>
+<span class="sd">            (See also ``torch.view_as_real``.)</span>
+<span class="sd">            This argument is only effective when ``power=None``. It is ignored for</span>
+<span class="sd">            cases where ``power`` is a number as in those cases, the returned tensor is</span>
+<span class="sd">            power spectrogram, which is a real-valued tensor.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tensor: Dimension (..., freq, time), freq is</span>
@@ -837,7 +838,8 @@
     <span class="s2">&quot;Please convert the input Tensor to complex type with `torch.view_as_complex` then &quot;</span>
     <span class="s2">&quot;use `torch.abs`. &quot;</span>
     <span class="s2">&quot;Please refer to https://github.com/pytorch/audio/issues/1337 &quot;</span>
-    <span class="s2">&quot;for more details about torchaudio&#39;s plan to migrate to native complex type.&quot;</span>
+    <span class="s2">&quot;for more details about torchaudio&#39;s plan to migrate to native complex type.&quot;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.11&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">complex_norm</span><span class="p">(</span>
         <span class="n">complex_tensor</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -862,7 +864,8 @@
     <span class="s2">&quot;Please convert the input Tensor to complex type with `torch.view_as_complex` then &quot;</span>
     <span class="s2">&quot;use `torch.angle`. &quot;</span>
     <span class="s2">&quot;Please refer to https://github.com/pytorch/audio/issues/1337 &quot;</span>
-    <span class="s2">&quot;for more details about torchaudio&#39;s plan to migrate to native complex type.&quot;</span>
+    <span class="s2">&quot;for more details about torchaudio&#39;s plan to migrate to native complex type.&quot;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.11&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">angle</span><span class="p">(</span>
         <span class="n">complex_tensor</span><span class="p">:</span> <span class="n">Tensor</span>
@@ -882,7 +885,8 @@
     <span class="s2">&quot;Please convert the input Tensor to complex type with `torch.view_as_complex` then &quot;</span>
     <span class="s2">&quot;use `torch.abs` and `torch.angle`. &quot;</span>
     <span class="s2">&quot;Please refer to https://github.com/pytorch/audio/issues/1337 &quot;</span>
-    <span class="s2">&quot;for more details about torchaudio&#39;s plan to migrate to native complex type.&quot;</span>
+    <span class="s2">&quot;for more details about torchaudio&#39;s plan to migrate to native complex type.&quot;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.11&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="nf">magphase</span><span class="p">(</span>
         <span class="n">complex_tensor</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -949,8 +953,9 @@
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">complex_specgrams</span><span class="o">.</span><span class="n">is_complex</span><span class="p">():</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;The use of pseudo complex type in `torchaudio.functional.phase_vocoder` and &quot;</span>
-            <span class="s2">&quot;`torchaudio.transforms.TimeStretch` is now deprecated.&quot;</span>
+            <span class="s2">&quot;The support for pseudo complex type in `torchaudio.functional.phase_vocoder` and &quot;</span>
+            <span class="s2">&quot;`torchaudio.transforms.TimeStretch` is now deprecated and will be removed &quot;</span>
+            <span class="s2">&quot;from 0.11 release.&quot;</span>
             <span class="s2">&quot;Please migrate to native complex type by converting the input tensor with &quot;</span>
             <span class="s2">&quot;`torch.view_as_complex`. &quot;</span>
             <span class="s2">&quot;Please refer to https://github.com/pytorch/audio/issues/1337 &quot;</span>

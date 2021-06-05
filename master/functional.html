@@ -28,7 +28,6 @@
 
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
-  <link rel="stylesheet" href="_static/css/override.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
@@ -1392,7 +1391,7 @@ This option sets the time for the initial noise estimate. (Default: 0.35)</p></l
 <h3><span class="hidden-section">spectrogram</span><a class="headerlink" href="#spectrogram" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="torchaudio.functional.spectrogram">
-<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">spectrogram</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor, pad: int, window: torch.Tensor, n_fft: int, hop_length: int, win_length: int, power: Optional[float], normalized: bool, center: bool = True, pad_mode: str = 'reflect', onesided: bool = True, return_complex: bool = False</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.spectrogram" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">spectrogram</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor, pad: int, window: torch.Tensor, n_fft: int, hop_length: int, win_length: int, power: Optional[float], normalized: bool, center: bool = True, pad_mode: str = 'reflect', onesided: bool = True, return_complex: bool = True</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#spectrogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.spectrogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a spectrogram or a batch of spectrograms from a raw audio signal.
 The spectrogram can be either magnitude-only or complex.</p>
 <dl class="field-list simple">
@@ -1418,8 +1417,10 @@ avoid redundancy. Default: <code class="docutils literal notranslate"><span clas
 <li><p><strong>return_complex</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Indicates whether the resulting complex-valued Tensor should be represented with
 native complex dtype, such as <cite>torch.cfloat</cite> and <cite>torch.cdouble</cite>, or real dtype
 mimicking complex value with an extra dimension for real and imaginary parts.
-This argument is only effective when <code class="docutils literal notranslate"><span class="pre">power=None</span></code>.
-See also <code class="docutils literal notranslate"><span class="pre">torch.view_as_real</span></code>.</p></li>
+(See also <code class="docutils literal notranslate"><span class="pre">torch.view_as_real</span></code>.)
+This argument is only effective when <code class="docutils literal notranslate"><span class="pre">power=None</span></code>. It is ignored for
+cases where <code class="docutils literal notranslate"><span class="pre">power</span></code> is a number as in those cases, the returned tensor is
+power spectrogram, which is a real-valued tensor.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
