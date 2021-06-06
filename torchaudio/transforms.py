@@ -709,6 +709,7 @@ class _Resample(torch.nn.Module):
 
 class Resample(torch.nn.modules.lazy.LazyModuleMixin, _Resample):
     kernel: UninitializedBuffer
+
     def __init__(
             self,
             orig_freq: float = 16000,
