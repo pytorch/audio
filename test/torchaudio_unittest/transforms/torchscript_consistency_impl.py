@@ -18,6 +18,9 @@ class Transforms(TempDirMixin, TestBaseMixin):
         tensor = tensor.to(device=self.device, dtype=self.dtype)
         transform = transform.to(device=self.device, dtype=self.dtype)
 
+        # Perform dry-run so that UninitializedBuffer/Parameter are materialized
+        transform(tensor)
+
         path = self.get_temp_path('transform.zip')
         torch.jit.script(transform).save(path)
         ts_transform = torch.jit.load(path)

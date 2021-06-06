@@ -7,6 +7,7 @@ from typing import Callable, Optional
 import torch
 from torch import Tensor
 from torchaudio import functional as F
+from torch.nn.parameter import UninitializedBuffer
 
 from .functional.functional import (
     _get_sinc_resample_kernel,
@@ -645,7 +646,7 @@ class MuLawDecoding(torch.nn.Module):
         return F.mu_law_decoding(x_mu, self.quantization_channels)
 
 
-class Resample(torch.nn.Module):
+class _Resample(torch.nn.Module):
     r"""Resample a signal from one frequency to another. A resampling method can be given.
 
     Note:
@@ -666,14 +667,15 @@ class Resample(torch.nn.Module):
         beta (float or None): The shape parameter used for kaiser window.
     """
 
-    def __init__(self,
-                 orig_freq: float = 16000,
-                 new_freq: float = 16000,
-                 resampling_method: str = 'sinc_interpolation',
-                 lowpass_filter_width: int = 6,
-                 rolloff: float = 0.99,
-                 beta: Optional[float] = None) -> None:
-        super(Resample, self).__init__()
+    def __init__(
+            self,
+            orig_freq: float = 16000,
+            new_freq: float = 16000,
+            resampling_method: str = 'sinc_interpolation',
+            lowpass_filter_width: int = 6,
+            rolloff: float = 0.99,
+            beta: Optional[float] = None) -> None:
+        super().__init__()
 
         self.orig_freq = orig_freq
         self.new_freq = new_freq
@@ -681,11 +683,13 @@ class Resample(torch.nn.Module):
         self.resampling_method = resampling_method
         self.lowpass_filter_width = lowpass_filter_width
         self.rolloff = rolloff
+        self.beta = beta
 
         if self.orig_freq != self.new_freq:
-            kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
-                                                           self.lowpass_filter_width, self.rolloff,
-                                                           self.resampling_method, beta)
+            kernel, self.width = _get_sinc_resample_kernel(
+                self.orig_freq, self.new_freq, self.gcd,
+                self.lowpass_filter_width, self.rolloff,
+                self.resampling_method, beta)
             self.register_buffer('kernel', kernel)
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -698,8 +702,44 @@ class Resample(torch.nn.Module):
         """
         if self.orig_freq == self.new_freq:
             return waveform
-        return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd,
-                                           self.kernel, self.width)
+        return _apply_sinc_resample_kernel(
+            waveform, self.orig_freq, self.new_freq, self.gcd,
+            self.kernel, self.width)
+
+
+class Resample(torch.nn.modules.lazy.LazyModuleMixin, _Resample):
+    kernel: UninitializedBuffer
+    def __init__(
+            self,
+            orig_freq: float = 16000,
+            new_freq: float = 16000,
+            resampling_method: str = 'sinc_interpolation',
+            lowpass_filter_width: int = 6,
+            rolloff: float = 0.99,
+            beta: Optional[float] = None) -> None:
+
+        super().__init__(
+            orig_freq,
+            new_freq,
+            resampling_method=resampling_method,
+            lowpass_filter_width=lowpass_filter_width,
+            rolloff=rolloff,
+            beta=beta,)
+
+        self.kernel = UninitializedBuffer()
+        self.width = -1
+
+    def initialize_parameters(self, _) -> None:
+        if self.has_uninitialized_params():
+            kernel, self.width = _get_sinc_resample_kernel(
+                self.orig_freq, self.new_freq, self.gcd,
+                self.lowpass_filter_width, self.rolloff,
+                self.resampling_method, self.beta,
+                device=self.kernel.data.device,
+                dtype=self.kernel.data.dtype,
+            )
+            self.kernel.materialize(kernel.shape)
+            self.kernel.copy_(kernel)
 
 
 class ComplexNorm(torch.nn.Module):
