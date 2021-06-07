@@ -54,10 +54,11 @@ void cpu_lfilter_core_loop(
        padded_output_waveform.dtype() == torch::kFloat64));
 
   TORCH_CHECK(input_signal_windows.size(0) == padded_output_waveform.size(0));
+  TORCH_CHECK(input_signal_windows.size(1) == padded_output_waveform.size(1));
 
   TORCH_CHECK(
-      input_signal_windows.size(1) + a_coeff_flipped.size(0) - 1 ==
-      padded_output_waveform.size(1));
+      input_signal_windows.size(2) + a_coeff_flipped.size(1) - 1 ==
+      padded_output_waveform.size(2));
 
   AT_DISPATCH_FLOATING_TYPES(
       input_signal_windows.scalar_type(), "lfilter_core_loop", [&] {
@@ -70,16 +71,26 @@ void lfilter_core_generic_loop(
     const torch::Tensor& input_signal_windows,
     const torch::Tensor& a_coeff_flipped,
     torch::Tensor& padded_output_waveform) {
-  int64_t n_samples_input = input_signal_windows.size(1);
-  int64_t n_order = a_coeff_flipped.size(0);
+  int64_t n_samples_input = input_signal_windows.size(2);
+  int64_t n_order = a_coeff_flipped.size(1);
+  auto coeff = a_coeff_flipped.unsqueeze(2);
   for (int64_t i_sample = 0; i_sample < n_samples_input; i_sample++) {
-    auto windowed_output_signal = padded_output_waveform.index(
-        {torch::indexing::Slice(),
-         torch::indexing::Slice(i_sample, i_sample + n_order)});
-    auto o0 = input_signal_windows.index({torch::indexing::Slice(), i_sample})
-                  .addmv(windowed_output_signal, a_coeff_flipped, 1, -1);
+    auto windowed_output_signal =
+        padded_output_waveform
+            .index(
+                {torch::indexing::Slice(),
+                 torch::indexing::Slice(),
+                 torch::indexing::Slice(i_sample, i_sample + n_order)})
+            .transpose(0, 1);
+    auto o0 =
+        input_signal_windows.index(
+            {torch::indexing::Slice(), torch::indexing::Slice(), i_sample}) -
+        torch.matmul(windowed_output_signal, coeff).squeeze(2).transpose(0, 1);
     padded_output_waveform.index_put_(
-        {torch::indexing::Slice(), i_sample + n_order - 1}, o0);
+        {torch::indexing::Slice(),
+         torch::indexing::Slice(),
+         i_sample + n_order - 1},
+        o0);
   }
 }
 
