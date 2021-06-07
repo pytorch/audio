@@ -1,3 +1,6 @@
+import itertools
+import warnings
+
 import torch
 import torchaudio.transforms as T
 
@@ -6,6 +9,7 @@ from torchaudio_unittest.common_utils import (
     get_whitenoise,
     get_spectrogram,
 )
+from parameterized import parameterized
 
 
 def _get_ratio(mat):
@@ -39,7 +43,7 @@ class TransformsTestBase(TestBaseMixin):
             get_whitenoise(sample_rate=sample_rate, duration=1, n_channels=2),
             n_fft=n_fft, power=power).to(self.device, self.dtype)
         input = T.MelScale(
-            n_mels=n_mels, sample_rate=sample_rate
+            n_mels=n_mels, sample_rate=sample_rate, n_stft=n_stft
         ).to(self.device, self.dtype)(expected)
 
         # Run transform
@@ -59,3 +63,30 @@ class TransformsTestBase(TestBaseMixin):
         assert _get_ratio(relative_diff < 1e-1) > 0.2
         assert _get_ratio(relative_diff < 1e-3) > 5e-3
         assert _get_ratio(relative_diff < 1e-5) > 1e-5
+
+    def test_melscale_unset_weight_warning(self):
+        """Issue a warning if MelScale initialized without a weight
+
+        As part of the deprecation of lazy intialization behavior (#1510),
+        issue a warning if `n_stft` is not set.
+        """
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            warnings.simplefilter("always")
+            T.MelScale(n_mels=64, sample_rate=8000)
+        assert len(caught_warnings) == 1
+
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            warnings.simplefilter("always")
+            T.MelScale(n_mels=64, sample_rate=8000, n_stft=201)
+        assert len(caught_warnings) == 0
+
+    @parameterized.expand(list(itertools.product(
+        ["sinc_interpolation", "kaiser_window"],
+        [16000, 44100],
+    )))
+    def test_resample_identity(self, resampling_method, sample_rate):
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=1)
+
+        resampler = T.Resample(sample_rate, sample_rate)
+        resampled = resampler(waveform)
+        self.assertEqual(waveform, resampled)

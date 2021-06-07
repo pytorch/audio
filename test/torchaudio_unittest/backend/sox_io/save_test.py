@@ -1,6 +1,8 @@
 import io
+import os
 import unittest
 
+import torch
 from torchaudio.backend import sox_io_backend
 from parameterized import parameterized
 
@@ -387,3 +389,14 @@ class TestSaveParams(TempDirMixin, PytorchTestCase):
         sox_io_backend.save(path, data, 8000)
 
         self.assertEqual(data, expected)
+
+
+@skipIfNoSox
+class TestSaveNonExistingDirectory(PytorchTestCase):
+    def test_save_fail(self):
+        """
+        When attempted to save into a non-existing dir, error message must contain the file path.
+        """
+        path = os.path.join("non_existing_directory", "foo.wav")
+        with self.assertRaisesRegex(RuntimeError, "^Error saving audio file: failed to open file {0}$".format(path)):
+            sox_io_backend.save(path, torch.zeros(1, 1), 8000)

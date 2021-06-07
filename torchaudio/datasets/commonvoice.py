@@ -1,8 +1,7 @@
 import csv
 import os
-import warnings
 from pathlib import Path
-from typing import List, Dict, Tuple, Union, Optional
+from typing import List, Dict, Tuple, Union
 
 from torch import Tensor
 from torch.utils.data import Dataset
@@ -40,10 +39,6 @@ class COMMONVOICE(Dataset):
             The name of the tsv file used to construct the metadata, such as
             ``"train.tsv"``, ``"test.tsv"``, ``"dev.tsv"``, ``"invalidated.tsv"``,
             ``"validated.tsv"`` and ``"other.tsv"``. (default: ``"train.tsv"``)
-        url (str, optional): Deprecated, not used.
-        folder_in_archive (str, optional): Deprecated, not used.
-        version (str): Deprecated, not used.
-        download (bool, optional): Deprecated, not used.
     """
 
     _ext_txt = ".txt"
@@ -52,29 +47,7 @@ class COMMONVOICE(Dataset):
 
     def __init__(self,
                  root: Union[str, Path],
-                 tsv: str = "train.tsv",
-                 url: Optional[str] = None,
-                 folder_in_archive: Optional[str] = None,
-                 version: Optional[str] = None,
-                 download: Optional[bool] = None) -> None:
-        if download:
-            raise RuntimeError(
-                "Common Voice dataset requires user agreement on the usage term, "
-                "and torchaudio no longer provides the download feature. "
-                "Please download the dataset and extract it manually.")
-
-        deprecated = [
-            ('url', url),
-            ('folder_in_archive', folder_in_archive),
-            ('version', version),
-            ('download', download)
-        ]
-        for name, val in deprecated:
-            if val is not None:
-                warnings.warn(
-                    f"`{name}` argument is no longer used and deprecated. "
-                    "It will be removed in 0.9.0 releaase. "
-                    "Please remove it from the function call")
+                 tsv: str = "train.tsv") -> None:
 
         # Get string representation of 'root' in case Path object is passed
         self._path = os.fspath(root)

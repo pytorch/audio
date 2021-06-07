@@ -33,8 +33,9 @@ class _NumpyTransducer(torch.autograd.Function):
         return costs
 
     @staticmethod
-    def backward(ctx, output_gradients):
-        return ctx.grads, None, None, None, None, None, None, None, None
+    def backward(ctx, grad_output):
+        grad_output = grad_output.view(-1, 1, 1, 1).to(ctx.grads)
+        return ctx.grads.mul(grad_output), None, None, None, None, None, None, None, None
 
     @staticmethod
     def compute_alpha_one_sequence(log_probs, targets, blank=-1):

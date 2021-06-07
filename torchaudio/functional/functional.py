@@ -49,7 +49,7 @@ def spectrogram(
         center: bool = True,
         pad_mode: str = "reflect",
         onesided: bool = True,
-        return_complex: bool = False,
+        return_complex: bool = True,
 ) -> Tensor:
     r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
@@ -73,11 +73,13 @@ def spectrogram(
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy. Default: ``True``
         return_complex (bool, optional):
-            ``return_complex = True``, this function returns the resulting Tensor in
-            complex dtype, otherwise it returns the resulting Tensor in real dtype with extra
-            dimension for real and imaginary parts. (see ``torch.view_as_real``).
-            When ``power`` is provided, the value must be False, as the resulting
-            Tensor represents real-valued power.
+            Indicates whether the resulting complex-valued Tensor should be represented with
+            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
+            mimicking complex value with an extra dimension for real and imaginary parts.
+            (See also ``torch.view_as_real``.)
+            This argument is only effective when ``power=None``. It is ignored for
+            cases where ``power`` is a number as in those cases, the returned tensor is
+            power spectrogram, which is a real-valued tensor.
 
     Returns:
         Tensor: Dimension (..., freq, time), freq is
@@ -91,11 +93,6 @@ def spectrogram(
             "Please refer to https://github.com/pytorch/audio/issues/1337 "
             "for more details about torchaudio's plan to migrate to native complex type."
         )
-
-    if power is not None and return_complex:
-        raise ValueError(
-            'When `power` is provided, the return value is real-valued. '
-            'Therefore, `return_complex` must be False.')
 
     if pad > 0:
         # TODO add "with torch.no_grad():" back when JIT supports it
@@ -156,18 +153,9 @@ def griffinlim(
         rand_init: bool
 ) -> Tensor:
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
-        Implementation ported from `librosa`.
 
-    *  [1] McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto.
-        "librosa: Audio and music signal analysis in python."
-        In Proceedings of the 14th python in science conference, pp. 18-25. 2015.
-    *  [2] Perraudin, N., Balazs, P., & Søndergaard, P. L.
-        "A fast Griffin-Lim algorithm,"
-        IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (pp. 1-4),
-        Oct. 2013.
-    *  [3] D. W. Griffin and J. S. Lim,
-        "Signal estimation from modified short-time Fourier transform,"
-        IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
+    Implementation ported from
+    :footcite:`brian_mcfee-proc-scipy-2015`, :footcite:`6701851` and :footcite:`1172092`.
 
     Args:
         specgram (Tensor): A magnitude-only STFT spectrogram of dimension (..., freq, frames)
@@ -537,7 +525,8 @@ def mu_law_decoding(
     "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
     "use `torch.abs`. "
     "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type."
+    "for more details about torchaudio's plan to migrate to native complex type.",
+    version="0.11",
 )
 def complex_norm(
         complex_tensor: Tensor,
@@ -562,7 +551,8 @@ def complex_norm(
     "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
     "use `torch.angle`. "
     "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type."
+    "for more details about torchaudio's plan to migrate to native complex type.",
+    version="0.11",
 )
 def angle(
         complex_tensor: Tensor
@@ -578,6 +568,13 @@ def angle(
     return torch.atan2(complex_tensor[..., 1], complex_tensor[..., 0])
 
 
+@_mod_utils.deprecated(
+    "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
+    "use `torch.abs` and `torch.angle`. "
+    "Please refer to https://github.com/pytorch/audio/issues/1337 "
+    "for more details about torchaudio's plan to migrate to native complex type.",
+    version="0.11",
+)
 def magphase(
         complex_tensor: Tensor,
         power: float = 1.0
@@ -643,8 +640,9 @@ def phase_vocoder(
 
     if not complex_specgrams.is_complex():
         warnings.warn(
-            "The use of pseudo complex type in `torchaudio.functional.phase_vocoder` and "
-            "`torchaudio.transforms.TimeStretch` is now deprecated."
+            "The support for pseudo complex type in `torchaudio.functional.phase_vocoder` and "
+            "`torchaudio.transforms.TimeStretch` is now deprecated and will be removed "
+            "from 0.11 release."
             "Please migrate to native complex type by converting the input tensor with "
             "`torch.view_as_complex`. "
             "Please refer to https://github.com/pytorch/audio/issues/1337 "
@@ -746,7 +744,7 @@ def mask_along_axis_iid(
 
     # Per batch example masking
     specgrams = specgrams.transpose(axis, -1)
-    specgrams.masked_fill_((mask >= mask_start) & (mask < mask_end), mask_value)
+    specgrams = specgrams.masked_fill((mask >= mask_start) & (mask < mask_end), mask_value)
     specgrams = specgrams.transpose(axis, -1)
 
     return specgrams
@@ -772,24 +770,25 @@ def mask_along_axis(
     Returns:
         Tensor: Masked spectrogram of dimensions (channel, freq, time)
     """
+    if axis != 1 and axis != 2:
+        raise ValueError('Only Frequency and Time masking are supported')
 
     # pack batch
     shape = specgram.size()
     specgram = specgram.reshape([-1] + list(shape[-2:]))
-
     value = torch.rand(1) * mask_param
     min_value = torch.rand(1) * (specgram.size(axis) - value)
 
     mask_start = (min_value.long()).squeeze()
     mask_end = (min_value.long() + value.long()).squeeze()
+    mask = torch.arange(0, specgram.shape[axis], device=specgram.device, dtype=specgram.dtype)
+    mask = (mask >= mask_start) & (mask < mask_end)
+    if axis == 1:
+        mask = mask.unsqueeze(-1)
 
     assert mask_end - mask_start < mask_param
-    if axis == 1:
-        specgram[:, mask_start:mask_end] = mask_value
-    elif axis == 2:
-        specgram[:, :, mask_start:mask_end] = mask_value
-    else:
-        raise ValueError('Only Frequency and Time masking are supported')
+
+    specgram = specgram.masked_fill(mask, mask_value)
 
     # unpack batch
     specgram = specgram.reshape(shape[:-2] + specgram.shape[-2:])
@@ -1208,7 +1207,7 @@ def compute_kaldi_pitch(
         recompute_frame: int = 500,
         snip_edges: bool = True,
 ) -> torch.Tensor:
-    """Extract pitch based on method described in [1].
+    """Extract pitch based on method described in :footcite:`6854049`.
 
     This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.
 
@@ -1267,15 +1266,6 @@ def compute_kaldi_pitch(
     Returns:
        Tensor: Pitch feature. Shape: ``(batch, frames 2)`` where the last dimension
        corresponds to pitch and NCCF.
-
-    Reference:
-        - A pitch extraction algorithm tuned for automatic speech recognition
-
-          P. Ghahremani, B. BabaAli, D. Povey, K. Riedhammer, J. Trmal and S. Khudanpur
-
-          2014 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP),
-
-          Florence, 2014, pp. 2494-2498, doi: 10.1109/ICASSP.2014.6854049.
     """
     shape = waveform.shape
     waveform = waveform.reshape(-1, shape[-1])
@@ -1291,8 +1281,36 @@ def compute_kaldi_pitch(
     return result
 
 
-def _get_sinc_resample_kernel(orig_freq: int, new_freq: int, lowpass_filter_width: int,
-                              device: torch.device, dtype: torch.dtype):
+def _get_sinc_resample_kernel(
+        orig_freq: float,
+        new_freq: float,
+        gcd: int,
+        lowpass_filter_width: int,
+        rolloff: float,
+        resampling_method: str,
+        beta: Optional[float],
+        device: torch.device = torch.device("cpu"),
+        dtype: Optional[torch.dtype] = None):
+
+    if not (int(orig_freq) == orig_freq and int(new_freq) == new_freq):
+        warnings.warn(
+            "Non-integer frequencies are being cast to ints and may result in poor resampling quality "
+            "because the underlying algorithm requires an integer ratio between `orig_freq` and `new_freq`. "
+            "Using non-integer valued frequencies will throw an error in release 0.10. "
+            "To work around this issue, manually convert both frequencies to integer values "
+            "that maintain their resampling rate ratio before passing them into the function "
+            "Example: To downsample a 44100 hz waveform by a factor of 8, use "
+            "`orig_freq=8` and `new_freq=1` instead of `orig_freq=44100` and `new_freq=5512.5` "
+            "For more information or to leave feedback about this change, please refer to "
+            "https://github.com/pytorch/audio/issues/1487."
+        )
+
+    if resampling_method not in ['sinc_interpolation', 'kaiser_window']:
+        raise ValueError('Invalid resampling method: {}'.format(resampling_method))
+
+    orig_freq = int(orig_freq) // gcd
+    new_freq = int(new_freq) // gcd
+
     assert lowpass_filter_width > 0
     kernels = []
     base_freq = min(orig_freq, new_freq)
@@ -1300,7 +1318,7 @@ def _get_sinc_resample_kernel(orig_freq: int, new_freq: int, lowpass_filter_widt
     # At first I thought I only needed this when downsampling, but when upsampling
     # you will get edge artifacts without this, as the edge is equivalent to zero padding,
     # which will add high freq artifacts.
-    base_freq *= 0.99
+    base_freq *= rolloff
 
     # The key idea of the algorithm is that x(t) can be exactly reconstructed from x[i] (tensor)
     # using the sinc interpolation formula:
@@ -1324,62 +1342,49 @@ def _get_sinc_resample_kernel(orig_freq: int, new_freq: int, lowpass_filter_widt
     # they will have a lot of almost zero values to the left or to the right...
     # There is probably a way to evaluate those filters more efficiently, but this is kept for
     # future work.
-    idx = torch.arange(-width, width + orig_freq, device=device, dtype=dtype)
+    idx_dtype = dtype if dtype is not None else torch.float64
+    idx = torch.arange(-width, width + orig_freq, device=device, dtype=idx_dtype)
 
     for i in range(new_freq):
         t = (-i / new_freq + idx / orig_freq) * base_freq
         t = t.clamp_(-lowpass_filter_width, lowpass_filter_width)
-        t *= math.pi
-        # we do not use torch.hann_window here as we need to evaluate the window
+
+        # we do not use built in torch windows here as we need to evaluate the window
         # at specific positions, not over a regular grid.
-        window = torch.cos(t / lowpass_filter_width / 2)**2
+        if resampling_method == "sinc_interpolation":
+            window = torch.cos(t * math.pi / lowpass_filter_width / 2)**2
+        else:
+            # kaiser_window
+            if beta is None:
+                beta = 14.769656459379492
+            beta_tensor = torch.tensor(float(beta))
+            window = torch.i0(beta_tensor * torch.sqrt(1 - (t / lowpass_filter_width) ** 2)) / torch.i0(beta_tensor)
+        t *= math.pi
         kernel = torch.where(t == 0, torch.tensor(1.).to(t), torch.sin(t) / t)
         kernel.mul_(window)
         kernels.append(kernel)
 
     scale = base_freq / orig_freq
-    return torch.stack(kernels).view(new_freq, 1, -1).mul_(scale), width
+    kernels = torch.stack(kernels).view(new_freq, 1, -1).mul_(scale)
+    if dtype is None:
+        kernels = kernels.to(dtype=torch.float32)
+    return kernels, width
 
 
-def resample(
+def _apply_sinc_resample_kernel(
         waveform: Tensor,
         orig_freq: float,
         new_freq: float,
-        lowpass_filter_width: int = 6
-) -> Tensor:
-    r"""Resamples the waveform at the new frequency. This matches Kaldi's OfflineFeatureTpl ResampleWaveform
-    which uses a LinearResample (resample a signal at linearly spaced intervals to upsample/downsample
-    a signal). LinearResample (LR) means that the output signal is at linearly spaced intervals (i.e
-    the output signal has a frequency of ``new_freq``). It uses sinc/bandlimited interpolation to
-    upsample/downsample the signal.
+        gcd: int,
+        kernel: Tensor,
+        width: int,
+):
+    orig_freq = int(orig_freq) // gcd
+    new_freq = int(new_freq) // gcd
 
-    https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html
-    https://github.com/kaldi-asr/kaldi/blob/master/src/feat/resample.h#L56
-
-    Args:
-        waveform (Tensor): The input signal of dimension (..., time)
-        orig_freq (float): The original frequency of the signal
-        new_freq (float): The desired frequency
-        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
-            but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
-
-    Returns:
-        Tensor: The waveform at the new frequency of dimension (..., time).
-    """
     # pack batch
     shape = waveform.size()
     waveform = waveform.view(-1, shape[-1])
-
-    assert orig_freq > 0.0 and new_freq > 0.0
-
-    orig_freq = int(orig_freq)
-    new_freq = int(new_freq)
-    gcd = math.gcd(orig_freq, new_freq)
-    orig_freq = orig_freq // gcd
-    new_freq = new_freq // gcd
-
-    kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, lowpass_filter_width,
-                                              waveform.device, waveform.dtype)
 
     num_wavs, length = waveform.shape
     waveform = torch.nn.functional.pad(waveform, (width, width + orig_freq))
@@ -1390,4 +1395,50 @@ def resample(
 
     # unpack batch
     resampled = resampled.view(shape[:-1] + resampled.shape[-1:])
+    return resampled
+
+
+def resample(
+        waveform: Tensor,
+        orig_freq: float,
+        new_freq: float,
+        lowpass_filter_width: int = 6,
+        rolloff: float = 0.99,
+        resampling_method: str = "sinc_interpolation",
+        beta: Optional[float] = None,
+) -> Tensor:
+    r"""Resamples the waveform at the new frequency using bandlimited interpolation.
+
+    https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html
+
+    Note:
+        ``transforms.Resample`` precomputes and reuses the resampling kernel, so using it will result in
+        more efficient computation if resampling multiple waveforms with the same resampling parameters.
+
+    Args:
+        waveform (Tensor): The input signal of dimension (..., time)
+        orig_freq (float): The original frequency of the signal
+        new_freq (float): The desired frequency
+        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
+            but less efficient. (Default: ``6``)
+        rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
+            Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
+        resampling_method (str, optional): The resampling method to use.
+            Options: [``sinc_interpolation``, ``kaiser_window``] (Default: ``'sinc_interpolation'``)
+        beta (float or None): The shape parameter used for kaiser window.
+
+    Returns:
+        Tensor: The waveform at the new frequency of dimension (..., time).
+    """
+
+    assert orig_freq > 0.0 and new_freq > 0.0
+
+    if orig_freq == new_freq:
+        return waveform
+
+    gcd = math.gcd(int(orig_freq), int(new_freq))
+
+    kernel, width = _get_sinc_resample_kernel(orig_freq, new_freq, gcd, lowpass_filter_width, rolloff,
+                                              resampling_method, beta, waveform.device, waveform.dtype)
+    resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, gcd, kernel, width)
     return resampled
