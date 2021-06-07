@@ -8,23 +8,26 @@ void host_lfilter_core_loop(
     const torch::Tensor& input_signal_windows,
     const torch::Tensor& a_coeff_flipped,
     torch::Tensor& padded_output_waveform) {
-  int64_t n_channel = input_signal_windows.size(0);
-  int64_t n_samples_input = input_signal_windows.size(1);
-  int64_t n_samples_output = padded_output_waveform.size(1);
-  int64_t n_order = a_coeff_flipped.size(0);
+  int64_t n_batch = input_signal_windows.size(0);
+  int64_t n_channel = input_signal_windows.size(1);
+  int64_t n_samples_input = input_signal_windows.size(2);
+  int64_t n_samples_output = padded_output_waveform.size(2);
+  int64_t n_order = a_coeff_flipped.size(1);
   scalar_t* output_data = padded_output_waveform.data_ptr<scalar_t>();
   const scalar_t* input_data = input_signal_windows.data_ptr<scalar_t>();
   const scalar_t* a_coeff_flipped_data = a_coeff_flipped.data_ptr<scalar_t>();
-  for (int64_t i_channel = 0; i_channel < n_channel; i_channel++) {
-    for (int64_t i_sample = 0; i_sample < n_samples_input; i_sample++) {
-      int64_t offset_input = i_channel * n_samples_input;
-      int64_t offset_output = i_channel * n_samples_output;
-      scalar_t a0 = input_data[offset_input + i_sample];
-      for (int64_t i_coeff = 0; i_coeff < n_order; i_coeff++) {
-        a0 -= output_data[offset_output + i_sample + i_coeff] *
-            a_coeff_flipped_data[i_coeff];
+  for (int64_t i_batch = 0; i_batch < n_batch; i_batch++) {
+    for (int64_t i_channel = 0; i_channel < n_channel; i_channel++) {
+      for (int64_t i_sample = 0; i_sample < n_samples_input; i_sample++) {
+        int64_t offset_input = i_batch * i_channel * n_samples_input;
+        int64_t offset_output = i_batch * i_channel * n_samples_output;
+        scalar_t a0 = input_data[offset_input + i_sample];
+        for (int64_t i_coeff = 0; i_coeff < n_order; i_coeff++) {
+          a0 -= output_data[offset_output + i_sample + i_coeff] *
+              a_coeff_flipped_data[i_coeff + i_channel * n_order];
+        }
+        output_data[offset_output + i_sample + n_order - 1] = a0;
       }
-      output_data[offset_output + i_sample + n_order - 1] = a0;
     }
   }
 }
@@ -219,19 +222,20 @@ torch::Tensor lfilter_core(
     const torch::Tensor& b_coeffs) {
   TORCH_CHECK(waveform.device() == a_coeffs.device());
   TORCH_CHECK(b_coeffs.device() == a_coeffs.device());
-  TORCH_CHECK(a_coeffs.size(0) == b_coeffs.size(0));
+  TORCH_CHECK(a_coeffs.sizes() == b_coeffs.sizes());
 
-  TORCH_INTERNAL_ASSERT(waveform.sizes().size() == 2);
+  TORCH_INTERNAL_ASSERT(waveform.sizes().size() == 3);
+  TORCH_INTERNAL_ASSERT(a_coeffs.sizes().size() == 2);
 
-  int64_t n_order = b_coeffs.size(0);
+  int64_t n_order = b_coeffs.size(1);
 
   TORCH_INTERNAL_ASSERT(n_order > 0);
 
   auto filtered_waveform =
-      DifferentiableFIR::apply(waveform, b_coeffs / a_coeffs[0]);
+      DifferentiableFIR::apply(waveform, b_coeffs / a_coeffs[:, :1]);
 
   auto output =
-      DifferentiableIIR::apply(filtered_waveform, a_coeffs / a_coeffs[0]);
+      DifferentiableIIR::apply(filtered_waveform, a_coeffs / a_coeffs[:, :1]);
   return output;
 }
 

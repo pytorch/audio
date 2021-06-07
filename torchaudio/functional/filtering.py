@@ -951,7 +951,18 @@ def lfilter(
     """
     # pack batch
     shape = waveform.size()
-    waveform = waveform.reshape(-1, shape[-1])
+    assert a_coeffs.size() == b_coeffs.size()
+    assert a_coeffs.ndim <= 2
+    assert waveform.ndim >= a_coeffs.ndim
+
+    if a_coeffs.ndim > 1:
+        shape = shape[:-2] + (a_coeffs.shape[0], shape[-1])
+        waveform = torch.broadcast_to(waveform, shape)
+        waveform = waveform.reshape(-1, shape[-2], shape[-1])
+    else:
+        waveform = waveform.reshape(-1, 1, shape[-1])
+        a_coeffs = a_coeffs.unsqueeze(0)
+        b_coeffs = b_coeffs.unsqueeze(0)
 
     output = _lfilter(waveform, a_coeffs, b_coeffs)
 
