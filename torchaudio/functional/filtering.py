@@ -953,7 +953,8 @@ def lfilter(
     shape = waveform.size()
     assert a_coeffs.size() == b_coeffs.size()
     assert a_coeffs.ndim <= 2
-    assert waveform.ndim >= a_coeffs.ndim
+
+    a_coeffs, b_coeffs = a_coeffs.squeeze(), b_coeffs.squeeze()
 
     if a_coeffs.ndim > 1:
         shape = shape[:-2] + (a_coeffs.shape[0], shape[-1])
