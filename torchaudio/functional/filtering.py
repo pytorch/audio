@@ -941,12 +941,12 @@ def lfilter(
     Args:
         waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
         a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(*, n_order + 1)``.
-                                Where * is the optional number of filter banks, 
+                                Where * is the optional number of filter banks,
                                 and must be broadcastable to ``waveform`` except time dimension.
                                 Lower delays coefficients are first, e.g. ``[a0, a1, a2, ...]``.
                                 Must be same size as b_coeffs (pad with 0's as necessary).
         b_coeffs (Tensor): numerator coefficients of difference equation of dimension of ``(*, n_order + 1)``.
-                                 Where * is the optional number of filter banks, 
+                                 Where * is the optional number of filter banks,
                                  and must be broadcastable to ``waveform`` except time dimension.
                                  Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.
                                  Must be same size as a_coeffs (pad with 0's as necessary).
