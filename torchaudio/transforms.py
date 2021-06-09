@@ -60,11 +60,13 @@ class Spectrogram(torch.nn.Module):
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy Default: ``True``
         return_complex (bool, optional):
-            ``return_complex = True``, this function returns the resulting Tensor in
-            complex dtype, otherwise it returns the resulting Tensor in real dtype with extra
-            dimension for real and imaginary parts. (see ``torch.view_as_real``).
-            When ``power`` is provided, the value must be False, as the resulting
-            Tensor represents real-valued power.
+            Indicates whether the resulting complex-valued Tensor should be represented with
+            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
+            mimicking complex value with an extra dimension for real and imaginary parts.
+            (See also ``torch.view_as_real``.)
+            This argument is only effective when ``power=None``. It is ignored for
+            cases where ``power`` is a number as in those cases, the returned tensor is
+            power spectrogram, which is a real-valued tensor.
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
@@ -80,7 +82,7 @@ class Spectrogram(torch.nn.Module):
                  center: bool = True,
                  pad_mode: str = "reflect",
                  onesided: bool = True,
-                 return_complex: bool = False) -> None:
+                 return_complex: bool = True) -> None:
         super(Spectrogram, self).__init__()
         self.n_fft = n_fft
         # number of FFT bins. the returned STFT result will have n_fft // 2 + 1
@@ -126,7 +128,8 @@ class Spectrogram(torch.nn.Module):
 class GriffinLim(torch.nn.Module):
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
 
-    Implementation ported from ``librosa`` [1]_, [2]_, [3]_.
+    Implementation ported from
+    :footcite:`brian_mcfee-proc-scipy-2015`, :footcite:`6701851` and :footcite:`1172092`.
 
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
@@ -143,24 +146,6 @@ class GriffinLim(torch.nn.Module):
             Values near 1 can lead to faster convergence, but above 1 may not converge. (Default: ``0.99``)
         length (int, optional): Array length of the expected output. (Default: ``None``)
         rand_init (bool, optional): Initializes phase randomly if True and to zero otherwise. (Default: ``True``)
-
-    References:
-        .. [1]
-           | McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg,
-             and Oriol Nieto.
-           | "librosa: Audio and music signal analysis in python."
-           | In Proceedings of the 14th python in science conference, pp. 18-25. 2015.
-
-        .. [2]
-           | Perraudin, N., Balazs, P., & Søndergaard, P. L.
-           | "A fast Griffin-Lim algorithm,"
-           | IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (pp. 1-4),
-           | Oct. 2013.
-
-        .. [3]
-           | D. W. Griffin and J. S. Lim,
-           | "Signal estimation from modified short-time Fourier transform,"
-           | IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
     """
     __constants__ = ['n_fft', 'n_iter', 'win_length', 'hop_length', 'power',
                      'length', 'momentum', 'rand_init']
@@ -286,7 +271,7 @@ class MelScale(torch.nn.Module):
         if n_stft is None or n_stft == 0:
             warnings.warn(
                 'Initialization of torchaudio.transforms.MelScale with an unset weight '
-                '`n_stft=None` is deprecated and will be removed from a future release. '
+                '`n_stft=None` is deprecated and will be removed in release 0.10. '
                 'Please set a proper `n_stft` value. Typically this is `n_fft // 2 + 1`. '
                 'Refer to https://github.com/pytorch/audio/issues/1510 '
                 'for more details.'
@@ -663,6 +648,12 @@ class MuLawDecoding(torch.nn.Module):
 class Resample(torch.nn.Module):
     r"""Resample a signal from one frequency to another. A resampling method can be given.
 
+    Note:
+        If resampling on waveforms of higher precision than float32, there may be a small loss of precision
+        because the kernel is cached once as float32. If high precision resampling is important for your application,
+        the functional form will retain higher precision, but run slower because it does not cache the kernel.
+        Alternatively, you could rewrite a transform that caches a higher precision kernel.
+
     Args:
         orig_freq (float, optional): The original frequency of the signal. (Default: ``16000``)
         new_freq (float, optional): The desired frequency. (Default: ``16000``)
@@ -673,11 +664,6 @@ class Resample(torch.nn.Module):
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         beta (float or None): The shape parameter used for kaiser window.
-
-        Note: If resampling on waveforms of higher precision than float32, there may be a small loss of precision
-        because the kernel is cached once as float32. If high precision resampling is important for your application,
-        the functional form will retain higher precision, but run slower because it does not cache the kernel.
-        Alternatively, you could rewrite a transform that caches a higher precision kernel.
     """
 
     def __init__(self,
@@ -696,10 +682,11 @@ class Resample(torch.nn.Module):
         self.lowpass_filter_width = lowpass_filter_width
         self.rolloff = rolloff
 
-        kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
-                                                       self.lowpass_filter_width, self.rolloff,
-                                                       self.resampling_method, beta)
-        self.register_buffer('kernel', kernel)
+        if self.orig_freq != self.new_freq:
+            kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
+                                                           self.lowpass_filter_width, self.rolloff,
+                                                           self.resampling_method, beta)
+            self.register_buffer('kernel', kernel)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
@@ -709,6 +696,8 @@ class Resample(torch.nn.Module):
         Returns:
             Tensor: Output signal of dimension (..., time).
         """
+        if self.orig_freq == self.new_freq:
+            return waveform
         return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd,
                                            self.kernel, self.width)
 
@@ -1081,8 +1070,8 @@ class Vad(torch.nn.Module):
         lp_lifter_freq (float, optional) "Brick-wall" frequency of low-pass lifter used
             in the detector algorithm. (Default: 2000.0)
 
-    References:
-        http://sox.sourceforge.net/sox.html
+    Reference:
+        - http://sox.sourceforge.net/sox.html
     """
 
     def __init__(self,

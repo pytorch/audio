@@ -1,6 +1,7 @@
 # Libtorchaudio Examples
 
 * [Augmentation](./augmentation)
+* [Speech Recognition with wav2vec2.0](./speech_recognition)
 
 ## Build
 
@@ -14,6 +15,7 @@ It is currently not distributed, and it will be built alongside with the applica
 The following commands will build `libtorchaudio` and applications.
 
 ```bash
+git submodule update
 mkdir build
 cd build
 cmake -GNinja \

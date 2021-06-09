@@ -31,9 +31,7 @@ class FullyConnected(torch.nn.Module):
 
 class DeepSpeech(torch.nn.Module):
     """
-    DeepSpeech model architecture from
-    `"Deep Speech: Scaling up end-to-end speech recognition"`
-    <https://arxiv.org/abs/1412.5567> paper.
+    DeepSpeech model architecture from :footcite:`hannun2014deep`.
 
     Args:
         n_feature: Number of input features

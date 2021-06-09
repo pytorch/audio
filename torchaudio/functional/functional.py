@@ -49,7 +49,7 @@ def spectrogram(
         center: bool = True,
         pad_mode: str = "reflect",
         onesided: bool = True,
-        return_complex: bool = False,
+        return_complex: bool = True,
 ) -> Tensor:
     r"""Create a spectrogram or a batch of spectrograms from a raw audio signal.
     The spectrogram can be either magnitude-only or complex.
@@ -73,11 +73,13 @@ def spectrogram(
         onesided (bool, optional): controls whether to return half of results to
             avoid redundancy. Default: ``True``
         return_complex (bool, optional):
-            ``return_complex = True``, this function returns the resulting Tensor in
-            complex dtype, otherwise it returns the resulting Tensor in real dtype with extra
-            dimension for real and imaginary parts. (see ``torch.view_as_real``).
-            When ``power`` is provided, the value must be False, as the resulting
-            Tensor represents real-valued power.
+            Indicates whether the resulting complex-valued Tensor should be represented with
+            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
+            mimicking complex value with an extra dimension for real and imaginary parts.
+            (See also ``torch.view_as_real``.)
+            This argument is only effective when ``power=None``. It is ignored for
+            cases where ``power`` is a number as in those cases, the returned tensor is
+            power spectrogram, which is a real-valued tensor.
 
     Returns:
         Tensor: Dimension (..., freq, time), freq is
@@ -91,11 +93,6 @@ def spectrogram(
             "Please refer to https://github.com/pytorch/audio/issues/1337 "
             "for more details about torchaudio's plan to migrate to native complex type."
         )
-
-    if power is not None and return_complex:
-        raise ValueError(
-            'When `power` is provided, the return value is real-valued. '
-            'Therefore, `return_complex` must be False.')
 
     if pad > 0:
         # TODO add "with torch.no_grad():" back when JIT supports it
@@ -156,18 +153,9 @@ def griffinlim(
         rand_init: bool
 ) -> Tensor:
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
-        Implementation ported from `librosa`.
 
-    *  [1] McFee, Brian, Colin Raffel, Dawen Liang, Daniel PW Ellis, Matt McVicar, Eric Battenberg, and Oriol Nieto.
-        "librosa: Audio and music signal analysis in python."
-        In Proceedings of the 14th python in science conference, pp. 18-25. 2015.
-    *  [2] Perraudin, N., Balazs, P., & Søndergaard, P. L.
-        "A fast Griffin-Lim algorithm,"
-        IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (pp. 1-4),
-        Oct. 2013.
-    *  [3] D. W. Griffin and J. S. Lim,
-        "Signal estimation from modified short-time Fourier transform,"
-        IEEE Trans. ASSP, vol.32, no.2, pp.236–243, Apr. 1984.
+    Implementation ported from
+    :footcite:`brian_mcfee-proc-scipy-2015`, :footcite:`6701851` and :footcite:`1172092`.
 
     Args:
         specgram (Tensor): A magnitude-only STFT spectrogram of dimension (..., freq, frames)
@@ -537,7 +525,8 @@ def mu_law_decoding(
     "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
     "use `torch.abs`. "
     "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type."
+    "for more details about torchaudio's plan to migrate to native complex type.",
+    version="0.11",
 )
 def complex_norm(
         complex_tensor: Tensor,
@@ -562,7 +551,8 @@ def complex_norm(
     "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
     "use `torch.angle`. "
     "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type."
+    "for more details about torchaudio's plan to migrate to native complex type.",
+    version="0.11",
 )
 def angle(
         complex_tensor: Tensor
@@ -582,7 +572,8 @@ def angle(
     "Please convert the input Tensor to complex type with `torch.view_as_complex` then "
     "use `torch.abs` and `torch.angle`. "
     "Please refer to https://github.com/pytorch/audio/issues/1337 "
-    "for more details about torchaudio's plan to migrate to native complex type."
+    "for more details about torchaudio's plan to migrate to native complex type.",
+    version="0.11",
 )
 def magphase(
         complex_tensor: Tensor,
@@ -649,8 +640,9 @@ def phase_vocoder(
 
     if not complex_specgrams.is_complex():
         warnings.warn(
-            "The use of pseudo complex type in `torchaudio.functional.phase_vocoder` and "
-            "`torchaudio.transforms.TimeStretch` is now deprecated."
+            "The support for pseudo complex type in `torchaudio.functional.phase_vocoder` and "
+            "`torchaudio.transforms.TimeStretch` is now deprecated and will be removed "
+            "from 0.11 release."
             "Please migrate to native complex type by converting the input tensor with "
             "`torch.view_as_complex`. "
             "Please refer to https://github.com/pytorch/audio/issues/1337 "
@@ -1215,7 +1207,7 @@ def compute_kaldi_pitch(
         recompute_frame: int = 500,
         snip_edges: bool = True,
 ) -> torch.Tensor:
-    """Extract pitch based on method described in [1].
+    """Extract pitch based on method described in :footcite:`6854049`.
 
     This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.
 
@@ -1274,15 +1266,6 @@ def compute_kaldi_pitch(
     Returns:
        Tensor: Pitch feature. Shape: ``(batch, frames 2)`` where the last dimension
        corresponds to pitch and NCCF.
-
-    Reference:
-        - A pitch extraction algorithm tuned for automatic speech recognition
-
-          P. Ghahremani, B. BabaAli, D. Povey, K. Riedhammer, J. Trmal and S. Khudanpur
-
-          2014 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP),
-
-          Florence, 2014, pp. 2494-2498, doi: 10.1109/ICASSP.2014.6854049.
     """
     shape = waveform.shape
     waveform = waveform.reshape(-1, shape[-1])
@@ -1313,7 +1296,7 @@ def _get_sinc_resample_kernel(
         warnings.warn(
             "Non-integer frequencies are being cast to ints and may result in poor resampling quality "
             "because the underlying algorithm requires an integer ratio between `orig_freq` and `new_freq`. "
-            "Using non-integer valued frequencies will throw an error in the next release. "
+            "Using non-integer valued frequencies will throw an error in release 0.10. "
             "To work around this issue, manually convert both frequencies to integer values "
             "that maintain their resampling rate ratio before passing them into the function "
             "Example: To downsample a 44100 hz waveform by a factor of 8, use "
@@ -1428,6 +1411,10 @@ def resample(
 
     https://ccrma.stanford.edu/~jos/resample/Theory_Ideal_Bandlimited_Interpolation.html
 
+    Note:
+        ``transforms.Resample`` precomputes and reuses the resampling kernel, so using it will result in
+        more efficient computation if resampling multiple waveforms with the same resampling parameters.
+
     Args:
         waveform (Tensor): The input signal of dimension (..., time)
         orig_freq (float): The original frequency of the signal
@@ -1442,12 +1429,12 @@ def resample(
 
     Returns:
         Tensor: The waveform at the new frequency of dimension (..., time).
-
-    Note: ``transforms.Resample`` precomputes and reuses the resampling kernel, so using it will result in
-    more efficient computation if resampling multiple waveforms with the same resampling parameters.
     """
 
     assert orig_freq > 0.0 and new_freq > 0.0
+
+    if orig_freq == new_freq:
+        return waveform
 
     gcd = math.gcd(int(orig_freq), int(new_freq))
 

@@ -1,13 +1,7 @@
-import os
-import math
-
 import torch
-import torchaudio
 import torchaudio.compliance.kaldi as kaldi
 
 from torchaudio_unittest import common_utils
-from .compliance import utils as compliance_utils
-from parameterized import parameterized
 
 
 def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
@@ -46,32 +40,7 @@ def extract_window(window, wave, f, frame_length, frame_shift, snip_edges):
             window[f, s] = wave[s_in_wave]
 
 
-@common_utils.skipIfNoSox
 class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
-
-    kaldi_output_dir = common_utils.get_asset_path('kaldi')
-    test_filepath = common_utils.get_asset_path('kaldi_file.wav')
-    test_filepaths = {prefix: [] for prefix in compliance_utils.TEST_PREFIX}
-
-    def setUp(self):
-        super().setUp()
-
-        # 1. test signal for testing resampling
-        self.test1_signal_sr = 16000
-        self.test1_signal = common_utils.get_whitenoise(
-            sample_rate=self.test1_signal_sr, duration=0.5,
-        )
-
-        # 2. test audio file corresponding to saved kaldi ark files
-        self.test2_filepath = common_utils.get_asset_path('kaldi_file_8000.wav')
-
-    # separating test files by their types (e.g 'spec', 'fbank', etc.)
-    for f in os.listdir(kaldi_output_dir):
-        dash_idx = f.find('-')
-        assert f.endswith('.ark') and dash_idx != -1
-        key = f[:dash_idx]
-        assert key in test_filepaths
-        test_filepaths[key].append(f)
 
     def _test_get_strided_helper(self, num_samples, window_size, window_shift, snip_edges):
         waveform = torch.arange(num_samples).float()
@@ -102,160 +71,6 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
                     for snip_edges in range(0, 2):
                         self._test_get_strided_helper(num_samples, window_size, window_shift, snip_edges)
 
-    def _create_data_set(self):
-        # used to generate the dataset to test on. this is not used in testing (offline procedure)
-        sr = 16000
-        x = torch.arange(0, 20).float()
-        # between [-6,6]
-        y = torch.cos(2 * math.pi * x) + 3 * torch.sin(math.pi * x) + 2 * torch.cos(x)
-        # between [-2^30, 2^30]
-        y = (y / 6 * (1 << 30)).long()
-        # clear the last 16 bits because they aren't used anyways
-        y = ((y >> 16) << 16).float()
-        torchaudio.save(self.test_filepath, y, sr)
-        sound, sample_rate = common_utils.load_wav(self.test_filepath, normalize=False)
-        print(y >> 16)
-        self.assertTrue(sample_rate == sr)
-        self.assertEqual(y, sound)
-
-    def _print_diagnostic(self, output, expect_output):
-        # given an output and expected output, it will print the absolute/relative errors (max and mean squared)
-        abs_error = output - expect_output
-        abs_mse = abs_error.pow(2).sum() / output.numel()
-        abs_max_error = torch.max(abs_error.abs())
-
-        relative_error = abs_error / expect_output
-        relative_mse = relative_error.pow(2).sum() / output.numel()
-        relative_max_error = torch.max(relative_error.abs())
-
-        print('abs_mse:', abs_mse.item(), 'abs_max_error:', abs_max_error.item())
-        print('relative_mse:', relative_mse.item(), 'relative_max_error:', relative_max_error.item())
-
-    def _compliance_test_helper(self, sound_filepath, filepath_key, expected_num_files,
-                                expected_num_args, get_output_fn, atol=1e-5, rtol=1e-7):
-        """
-        Inputs:
-            sound_filepath (str): The location of the sound file
-            filepath_key (str): A key to `test_filepaths` which matches which files to use
-            expected_num_files (int): The expected number of kaldi files to read
-            expected_num_args (int): The expected number of arguments used in a kaldi configuration
-            get_output_fn (Callable[[Tensor, List], Tensor]): A function that takes in a sound signal
-                and a configuration and returns an output
-            atol (float): absolute tolerance
-            rtol (float): relative tolerance
-        """
-        sound, sr = common_utils.load_wav(sound_filepath, normalize=False)
-        files = self.test_filepaths[filepath_key]
-
-        assert len(files) == expected_num_files, \
-            ('number of kaldi {} file changed to {}'.format(
-                filepath_key, len(files)))
-
-        for f in files:
-            print(f)
-
-            # Read kaldi's output from file
-            kaldi_output_path = os.path.join(self.kaldi_output_dir, f)
-            kaldi_output_dict = dict(torchaudio.kaldi_io.read_mat_ark(kaldi_output_path))
-
-            assert len(kaldi_output_dict) == 1 and 'my_id' in kaldi_output_dict, 'invalid test kaldi ark file'
-            kaldi_output = kaldi_output_dict['my_id']
-
-            # Construct the same configuration used by kaldi
-            args = f.split('-')
-            args[-1] = os.path.splitext(args[-1])[0]
-            assert len(args) == expected_num_args, 'invalid test kaldi file name'
-            args = [compliance_utils.parse(arg) for arg in args]
-
-            output = get_output_fn(sound, args)
-
-            self._print_diagnostic(output, kaldi_output)
-            self.assertEqual(output, kaldi_output, atol=atol, rtol=rtol)
-
     def test_mfcc_empty(self):
         # Passing in an empty tensor should result in an error
         self.assertRaises(AssertionError, kaldi.mfcc, torch.empty(0))
-
-    def test_resample_waveform(self):
-        def get_output_fn(sound, args):
-            output = kaldi.resample_waveform(sound.to(torch.float32), args[1], args[2])
-            return output
-
-        self._compliance_test_helper(self.test2_filepath, 'resample', 32, 3, get_output_fn, atol=1e-2, rtol=1e-5)
-
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
-    def test_resample_waveform_upsample_size(self, resampling_method):
-        upsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr * 2,
-                                                 resampling_method=resampling_method)
-        self.assertTrue(upsample_sound.size(-1) == self.test1_signal.size(-1) * 2)
-
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
-    def test_resample_waveform_downsample_size(self, resampling_method):
-        downsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr // 2,
-                                                   resampling_method=resampling_method)
-        self.assertTrue(downsample_sound.size(-1) == self.test1_signal.size(-1) // 2)
-
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
-    def test_resample_waveform_identity_size(self, resampling_method):
-        downsample_sound = kaldi.resample_waveform(self.test1_signal, self.test1_signal_sr, self.test1_signal_sr,
-                                                   resampling_method=resampling_method)
-        self.assertTrue(downsample_sound.size(-1) == self.test1_signal.size(-1))
-
-    def _test_resample_waveform_accuracy(self, up_scale_factor=None, down_scale_factor=None,
-                                         resampling_method="sinc_interpolation", atol=1e-1, rtol=1e-4):
-        # resample the signal and compare it to the ground truth
-        n_to_trim = 20
-        sample_rate = 1000
-        new_sample_rate = sample_rate
-
-        if up_scale_factor is not None:
-            new_sample_rate *= up_scale_factor
-
-        if down_scale_factor is not None:
-            new_sample_rate //= down_scale_factor
-
-        duration = 5  # seconds
-        original_timestamps = torch.arange(0, duration, 1.0 / sample_rate)
-
-        sound = 123 * torch.cos(2 * math.pi * 3 * original_timestamps).unsqueeze(0)
-        estimate = kaldi.resample_waveform(sound, sample_rate, new_sample_rate,
-                                           resampling_method=resampling_method).squeeze()
-
-        new_timestamps = torch.arange(0, duration, 1.0 / new_sample_rate)[:estimate.size(0)]
-        ground_truth = 123 * torch.cos(2 * math.pi * 3 * new_timestamps)
-
-        # trim the first/last n samples as these points have boundary effects
-        ground_truth = ground_truth[..., n_to_trim:-n_to_trim]
-        estimate = estimate[..., n_to_trim:-n_to_trim]
-
-        self.assertEqual(estimate, ground_truth, atol=atol, rtol=rtol)
-
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
-    def test_resample_waveform_downsample_accuracy(self, resampling_method):
-        for i in range(1, 20):
-            self._test_resample_waveform_accuracy(down_scale_factor=i * 2, resampling_method=resampling_method)
-
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
-    def test_resample_waveform_upsample_accuracy(self, resampling_method):
-        for i in range(1, 20):
-            self._test_resample_waveform_accuracy(up_scale_factor=1.0 + i / 20.0, resampling_method=resampling_method)
-
-    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
-    def test_resample_waveform_multi_channel(self, resampling_method):
-        num_channels = 3
-
-        multi_sound = self.test1_signal.repeat(num_channels, 1)  # (num_channels, 8000 smp)
-
-        for i in range(num_channels):
-            multi_sound[i, :] *= (i + 1) * 1.5
-
-        multi_sound_sampled = kaldi.resample_waveform(multi_sound, self.test1_signal_sr, self.test1_signal_sr // 2,
-                                                      resampling_method=resampling_method)
-
-        # check that sampling is same whether using separately or in a tensor of size (c, n)
-        for i in range(num_channels):
-            single_channel = self.test1_signal * (i + 1) * 1.5
-            single_channel_sampled = kaldi.resample_waveform(single_channel, self.test1_signal_sr,
-                                                             self.test1_signal_sr // 2,
-                                                             resampling_method=resampling_method)
-            self.assertEqual(multi_sound_sampled[i, :], single_channel_sampled[0], rtol=1e-4, atol=1e-7)

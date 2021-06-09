@@ -1,0 +1,6 @@
+add_executable(transcribe transcribe.cpp)
+add_executable(transcribe_list transcribe_list.cpp)
+target_link_libraries(transcribe "${TORCH_LIBRARIES}" "${TORCHAUDIO_LIBRARY}" "${CTCDECODE_LIBRARY}")
+target_link_libraries(transcribe_list "${TORCH_LIBRARIES}" "${TORCHAUDIO_LIBRARY}" "${CTCDECODE_LIBRARY}")
+set_property(TARGET transcribe PROPERTY CXX_STANDARD 14)
+set_property(TARGET transcribe_list PROPERTY CXX_STANDARD 14)

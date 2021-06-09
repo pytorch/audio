@@ -14,4 +14,6 @@ message("libtorchaudio CMakeLists: ${TORCH_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 add_subdirectory(../.. libtorchaudio)
+add_subdirectory(simplectc)
 add_subdirectory(augmentation)
+add_subdirectory(speech_recognition)
