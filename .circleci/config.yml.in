@@ -500,7 +500,6 @@ jobs:
     environment:
       <<: *environment
       CUDA_VERSION: "10.2"
-      TORCHAUDIO_TEST_FORCE_CUDA: "1"
     steps:
       - checkout
       - designate_upload_channel
