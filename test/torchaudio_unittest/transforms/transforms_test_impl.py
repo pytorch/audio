@@ -1,4 +1,3 @@
-import itertools
 import warnings
 
 import torch
@@ -10,7 +9,6 @@ from torchaudio_unittest.common_utils import (
     get_spectrogram,
     nested_params,
 )
-from parameterized import parameterized
 
 
 def _get_ratio(mat):

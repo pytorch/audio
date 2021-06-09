@@ -7,7 +7,6 @@ from typing import Callable, Optional
 import torch
 from torch import Tensor
 from torchaudio import functional as F
-from torch.nn.parameter import UninitializedBuffer
 
 from .functional.functional import (
     _get_sinc_resample_kernel,
