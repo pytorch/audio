@@ -646,7 +646,7 @@ class MuLawDecoding(torch.nn.Module):
         return F.mu_law_decoding(x_mu, self.quantization_channels)
 
 
-class _Resample(torch.nn.Module):
+class Resample(torch.nn.Module):
     r"""Resample a signal from one frequency to another. A resampling method can be given.
 
     Note:
@@ -665,6 +665,13 @@ class _Resample(torch.nn.Module):
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         beta (float or None): The shape parameter used for kaiser window.
+        dtype (torch.device, optional):
+            Determnines the precision that resampling kernel is pre-computed and cached. If not provided,
+            kernel is computed with ``torch.float64`` then cached as ``torch.float32``.
+            If you need higher precision, provide ``torch.float64``, and the pre-computed kernel is computed and
+            cached as ``torch.float64``. If you use resample with lower precision, then instead of providing this
+            providing this argument, please use ``Resample.to(dtype)``, so that the kernel generation is still
+            carried out on ``torch.float64``.
     """
 
     def __init__(
@@ -674,7 +681,10 @@ class _Resample(torch.nn.Module):
             resampling_method: str = 'sinc_interpolation',
             lowpass_filter_width: int = 6,
             rolloff: float = 0.99,
-            beta: Optional[float] = None) -> None:
+            beta: Optional[float] = None,
+            *,
+            dtype: Optional[torch.dtype] = None,
+    ) -> None:
         super().__init__()
 
         self.orig_freq = orig_freq
@@ -689,7 +699,7 @@ class _Resample(torch.nn.Module):
             kernel, self.width = _get_sinc_resample_kernel(
                 self.orig_freq, self.new_freq, self.gcd,
                 self.lowpass_filter_width, self.rolloff,
-                self.resampling_method, beta)
+                self.resampling_method, beta, dtype=dtype)
             self.register_buffer('kernel', kernel)
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -705,42 +715,6 @@ class _Resample(torch.nn.Module):
         return _apply_sinc_resample_kernel(
             waveform, self.orig_freq, self.new_freq, self.gcd,
             self.kernel, self.width)
-
-
-class Resample(torch.nn.modules.lazy.LazyModuleMixin, _Resample):
-    kernel: UninitializedBuffer
-
-    def __init__(
-            self,
-            orig_freq: float = 16000,
-            new_freq: float = 16000,
-            resampling_method: str = 'sinc_interpolation',
-            lowpass_filter_width: int = 6,
-            rolloff: float = 0.99,
-            beta: Optional[float] = None) -> None:
-
-        super().__init__(
-            orig_freq,
-            new_freq,
-            resampling_method=resampling_method,
-            lowpass_filter_width=lowpass_filter_width,
-            rolloff=rolloff,
-            beta=beta,)
-
-        self.kernel = UninitializedBuffer()
-        self.width = -1
-
-    def initialize_parameters(self, _) -> None:
-        if self.has_uninitialized_params():
-            kernel, self.width = _get_sinc_resample_kernel(
-                self.orig_freq, self.new_freq, self.gcd,
-                self.lowpass_filter_width, self.rolloff,
-                self.resampling_method, self.beta,
-                device=self.kernel.data.device,
-                dtype=self.kernel.data.dtype,
-            )
-            self.kernel.materialize(kernel.shape)
-            self.kernel.copy_(kernel)
 
 
 class ComplexNorm(torch.nn.Module):
