@@ -218,7 +218,7 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         self.assert_batch_consistency(
             F.compute_kaldi_pitch, batch, sample_rate=sample_rate)
 
-    def test_lfilter(self):
+    def test_lfilter_separated_filters(self):
         signal_length = 2048
         torch.manual_seed(2434)
         x = torch.randn(self.batch_size, signal_length)
@@ -232,3 +232,12 @@ class TestFunctional(common_utils.TorchaudioTestCase):
         ])
 
         self.assertEqual(batchwise_output, itemwise_output)
+
+    def test_lfilter(self):
+        signal_length = 2048
+        torch.manual_seed(2434)
+        x = torch.randn(self.batch_size, 1, signal_length)
+        a = torch.rand(4, 3)
+        b = torch.rand(4, 3)
+
+        self.assert_batch_consistency(F.lfilter, x, a, b)
