@@ -1,4 +1,3 @@
-import itertools
 import warnings
 
 import torch
@@ -8,8 +7,8 @@ from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     get_whitenoise,
     get_spectrogram,
+    nested_params,
 )
-from parameterized import parameterized
 
 
 def _get_ratio(mat):
@@ -80,13 +79,24 @@ class TransformsTestBase(TestBaseMixin):
             T.MelScale(n_mels=64, sample_rate=8000, n_stft=201)
         assert len(caught_warnings) == 0
 
-    @parameterized.expand(list(itertools.product(
+    @nested_params(
         ["sinc_interpolation", "kaiser_window"],
         [16000, 44100],
-    )))
+    )
     def test_resample_identity(self, resampling_method, sample_rate):
+        """When sampling rate is not changed, the transform returns an identical Tensor"""
         waveform = get_whitenoise(sample_rate=sample_rate, duration=1)
 
-        resampler = T.Resample(sample_rate, sample_rate)
+        resampler = T.Resample(sample_rate, sample_rate, resampling_method)
         resampled = resampler(waveform)
         self.assertEqual(waveform, resampled)
+
+    @nested_params(
+        ["sinc_interpolation", "kaiser_window"],
+        [None, torch.float64],
+    )
+    def test_resample_cache_dtype(self, resampling_method, dtype):
+        """Providing dtype changes the kernel cache dtype"""
+        transform = T.Resample(16000, 44100, resampling_method, dtype=dtype)
+
+        assert transform.kernel.dtype == dtype if dtype is not None else torch.float32

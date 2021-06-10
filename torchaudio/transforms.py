@@ -664,16 +664,27 @@ class Resample(torch.nn.Module):
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         beta (float or None): The shape parameter used for kaiser window.
+        dtype (torch.device, optional):
+            Determnines the precision that resampling kernel is pre-computed and cached. If not provided,
+            kernel is computed with ``torch.float64`` then cached as ``torch.float32``.
+            If you need higher precision, provide ``torch.float64``, and the pre-computed kernel is computed and
+            cached as ``torch.float64``. If you use resample with lower precision, then instead of providing this
+            providing this argument, please use ``Resample.to(dtype)``, so that the kernel generation is still
+            carried out on ``torch.float64``.
     """
 
-    def __init__(self,
-                 orig_freq: float = 16000,
-                 new_freq: float = 16000,
-                 resampling_method: str = 'sinc_interpolation',
-                 lowpass_filter_width: int = 6,
-                 rolloff: float = 0.99,
-                 beta: Optional[float] = None) -> None:
-        super(Resample, self).__init__()
+    def __init__(
+            self,
+            orig_freq: float = 16000,
+            new_freq: float = 16000,
+            resampling_method: str = 'sinc_interpolation',
+            lowpass_filter_width: int = 6,
+            rolloff: float = 0.99,
+            beta: Optional[float] = None,
+            *,
+            dtype: Optional[torch.dtype] = None,
+    ) -> None:
+        super().__init__()
 
         self.orig_freq = orig_freq
         self.new_freq = new_freq
@@ -681,11 +692,13 @@ class Resample(torch.nn.Module):
         self.resampling_method = resampling_method
         self.lowpass_filter_width = lowpass_filter_width
         self.rolloff = rolloff
+        self.beta = beta
 
         if self.orig_freq != self.new_freq:
-            kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
-                                                           self.lowpass_filter_width, self.rolloff,
-                                                           self.resampling_method, beta)
+            kernel, self.width = _get_sinc_resample_kernel(
+                self.orig_freq, self.new_freq, self.gcd,
+                self.lowpass_filter_width, self.rolloff,
+                self.resampling_method, beta, dtype=dtype)
             self.register_buffer('kernel', kernel)
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -698,8 +711,9 @@ class Resample(torch.nn.Module):
         """
         if self.orig_freq == self.new_freq:
             return waveform
-        return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd,
-                                           self.kernel, self.width)
+        return _apply_sinc_resample_kernel(
+            waveform, self.orig_freq, self.new_freq, self.gcd,
+            self.kernel, self.width)
 
 
 class ComplexNorm(torch.nn.Module):
