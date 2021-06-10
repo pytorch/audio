@@ -60,6 +60,20 @@ class Spectrogram(torch.nn.Module):
             dimension for real and imaginary parts. (see ``torch.view_as_real``).
             When ``power`` is provided, the value must be False, as the resulting
             Tensor represents real-valued power.
+
+         Example:-
+
+         >>> import torchaudio
+         >>> filename = "example.wav"
+         >>> waveform, sample_rate = torchaudio.load(filename)
+         >>> print("Shape of waveform: {}".format(waveform.size()))
+         Shape of waveform: torch.Size([2, 268237])
+         >>> print("Sample rate of waveform: {}".format(sample_rate))
+         Sample rate of waveform: 8000
+         >>> specgram = torchaudio.transforms.Spectrogram()(waveform)
+         >>> print("Shape of spectrogram: {}".format(specgram.size()))
+         Shape of spectrogram: torch.Size([2, 201, 1342])
+
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
