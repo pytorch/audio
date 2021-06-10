@@ -733,7 +733,7 @@ and returns a signal scaled between -1 and 1.</p>
 <h2><span class="hidden-section">Resample</span><a class="headerlink" href="#resample" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="torchaudio.transforms.Resample">
-<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Resample</code><span class="sig-paren">(</span><em class="sig-param">orig_freq: float = 16000</em>, <em class="sig-param">new_freq: float = 16000</em>, <em class="sig-param">resampling_method: str = 'sinc_interpolation'</em>, <em class="sig-param">lowpass_filter_width: int = 6</em>, <em class="sig-param">rolloff: float = 0.99</em>, <em class="sig-param">beta: Optional[float] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Resample" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">Resample</code><span class="sig-paren">(</span><em class="sig-param">orig_freq: float = 16000</em>, <em class="sig-param">new_freq: float = 16000</em>, <em class="sig-param">resampling_method: str = 'sinc_interpolation'</em>, <em class="sig-param">lowpass_filter_width: int = 6</em>, <em class="sig-param">rolloff: float = 0.99</em>, <em class="sig-param">beta: Optional[float] = None</em>, <em class="sig-param">*</em>, <em class="sig-param">dtype: Optional[torch.dtype] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#Resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.Resample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resample a signal from one frequency to another. A resampling method can be given.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -754,6 +754,12 @@ but less efficient. (Default: <code class="docutils literal notranslate"><span c
 <li><p><strong>rolloff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – The roll-off frequency of the filter, as a fraction of the Nyquist.
 Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: <code class="docutils literal notranslate"><span class="pre">0.99</span></code>)</p></li>
 <li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – The shape parameter used for kaiser window.</p></li>
+<li><p><strong>dtype</strong> (<em>torch.device</em><em>, </em><em>optional</em>) – Determnines the precision that resampling kernel is pre-computed and cached. If not provided,
+kernel is computed with <code class="docutils literal notranslate"><span class="pre">torch.float64</span></code> then cached as <code class="docutils literal notranslate"><span class="pre">torch.float32</span></code>.
+If you need higher precision, provide <code class="docutils literal notranslate"><span class="pre">torch.float64</span></code>, and the pre-computed kernel is computed and
+cached as <code class="docutils literal notranslate"><span class="pre">torch.float64</span></code>. If you use resample with lower precision, then instead of providing this
+providing this argument, please use <code class="docutils literal notranslate"><span class="pre">Resample.to(dtype)</span></code>, so that the kernel generation is still
+carried out on <code class="docutils literal notranslate"><span class="pre">torch.float64</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
