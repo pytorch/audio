@@ -236,8 +236,12 @@ class TestFunctional(common_utils.TorchaudioTestCase):
     def test_lfilter(self):
         signal_length = 2048
         torch.manual_seed(2434)
-        x = torch.randn(self.batch_size, 1, signal_length)
+        x = torch.randn(signal_length)
         a = torch.rand(4, 3)
         b = torch.rand(4, 3)
 
-        self.assert_batch_consistency(F.lfilter, x, a, b)
+        def filter_wrapper(ab_coeffs, waveform):
+            a, b = ab_coeffs[..., 0, :], ab_coeffs[..., 1, :]
+            return F.lfilter(waveform, a, b)
+
+        self.assert_batch_consistency(filter_wrapper, torch.stack([a, b], 1), x)
