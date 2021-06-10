@@ -54,11 +54,11 @@ class Spectrogram(torch.nn.Module):
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
-            Default: ``True``
+            (Default: ``True``)
         pad_mode (string, optional): controls the padding method used when
-            :attr:`center` is ``True``. Default: ``"reflect"``
+            :attr:`center` is ``True``. (Default: ``"reflect"``)
         onesided (bool, optional): controls whether to return half of results to
-            avoid redundancy Default: ``True``
+            avoid redundancy (Default: ``True``)
         return_complex (bool, optional):
             Indicates whether the resulting complex-valued Tensor should be represented with
             native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
@@ -451,11 +451,11 @@ class MelSpectrogram(torch.nn.Module):
         wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
-            Default: ``True``
+            (Default: ``True``)
         pad_mode (string, optional): controls the padding method used when
-            :attr:`center` is ``True``. Default: ``"reflect"``
+            :attr:`center` is ``True``. (Default: ``"reflect"``)
         onesided (bool, optional): controls whether to return half of results to
-            avoid redundancy. Default: ``True``
+            avoid redundancy. (Default: ``True``)
         norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
