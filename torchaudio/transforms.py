@@ -257,7 +257,7 @@ class MelScale(torch.nn.Module):
                  sample_rate: int = 16000,
                  f_min: float = 0.,
                  f_max: Optional[float] = None,
-                 n_stft: Optional[int] = None,
+                 n_stft: int = 201,
                  norm: Optional[str] = None,
                  mel_scale: str = "htk") -> None:
         super(MelScale, self).__init__()
@@ -270,33 +270,8 @@ class MelScale(torch.nn.Module):
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
 
-        if n_stft is None or n_stft == 0:
-            warnings.warn(
-                'Initialization of torchaudio.transforms.MelScale with an unset weight '
-                '`n_stft=None` is deprecated and will be removed in release 0.10. '
-                'Please set a proper `n_stft` value. Typically this is `n_fft // 2 + 1`. '
-                'Refer to https://github.com/pytorch/audio/issues/1510 '
-                'for more details.'
-            )
-
-        fb = torch.empty(0) if n_stft is None else F.create_fb_matrix(
-            n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm,
-            self.mel_scale)
         self.register_buffer('fb', fb)
 
-    def __prepare_scriptable__(self):
-        r"""If `self.fb` is empty, the `forward` method will try to resize the parameter,
-        which does not work once the transform is scripted. However, this error does not happen
-        until the transform is executed. This is inconvenient especially if the resulting
-        TorchScript object is executed in other environments. Therefore, we check the
-        validity of `self.fb` here and fail if the resulting TS does not work.
-
-        Returns:
-            MelScale: self
-        """
-        if self.fb.numel() == 0:
-            raise ValueError("n_stft must be provided at construction")
-        return self
 
     def forward(self, specgram: Tensor) -> Tensor:
         r"""
@@ -311,13 +286,6 @@ class MelScale(torch.nn.Module):
         shape = specgram.size()
         specgram = specgram.reshape(-1, shape[-2], shape[-1])
 
-        if self.fb.numel() == 0:
-            tmp_fb = F.create_fb_matrix(specgram.size(1), self.f_min, self.f_max,
-                                        self.n_mels, self.sample_rate, self.norm,
-                                        self.mel_scale)
-            # Attributes cannot be reassigned outside __init__ so workaround
-            self.fb.resize_(tmp_fb.size())
-            self.fb.copy_(tmp_fb)
 
         # (channel, frequency, time).transpose(...) dot (frequency, n_mels)
         # -> (channel, time, n_mels).transpose(...)
