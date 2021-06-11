@@ -4,7 +4,7 @@ import unittest
 from parameterized import parameterized
 
 from torchaudio_unittest.common_utils import PytorchTestCase, TorchaudioTestCase, skipIfNoSox
-from .functional_impl import Functional, FunctionalComplex, FunctionalCPUOnly
+from .functional_impl import Functional, FunctionalCPUOnly
 
 
 class TestFunctionalFloat32(Functional, FunctionalCPUOnly, PytorchTestCase):
@@ -18,18 +18,6 @@ class TestFunctionalFloat32(Functional, FunctionalCPUOnly, PytorchTestCase):
 
 class TestFunctionalFloat64(Functional, PytorchTestCase):
     dtype = torch.float64
-    device = torch.device('cpu')
-
-
-class TestFunctionalComplex64(FunctionalComplex, PytorchTestCase):
-    complex_dtype = torch.complex64
-    real_dtype = torch.float32
-    device = torch.device('cpu')
-
-
-class TestFunctionalComplex128(FunctionalComplex, PytorchTestCase):
-    complex_dtype = torch.complex128
-    real_dtype = torch.float64
     device = torch.device('cpu')
 
 

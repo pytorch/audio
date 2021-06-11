@@ -1,11 +1,29 @@
-# Example usage: libtorchaudio
+# Libtorchaudio Examples
 
-This example demonstrates how you can use torchaudio's I/O features in C++ application, in addition to PyTorch's operations.
+* [Augmentation](./augmentation)
+* [Speech Recognition with wav2vec2.0](./speech_recognition)
 
-To try this example, simply run `./run.sh`. This script will
+## Build
 
-1. Create an audio preprocessing pipeline with TorchScript and dump it to a file.
-2. Build the application using `libtorch` and `libtorchaudio`.
-3. Execute the preprocessing pipeline on an example audio.
+The example applications in this directory depend on `libtorch` and `libtorchaudio`.
+If you have a working `PyTorch`, you already have `libtorch`.
+Please refer to [this tutorial](https://pytorch.org/tutorials/advanced/torch_script_custom_classes.html) for the use of `libtorch` and TorchScript.
 
-The detail of the preprocessing pipeline can be found in [`create_jittable_pipeline.py`](./create_jittable_pipeline.py).
+`libtorchaudio` is the library of torchaudio's C++ components without Python component.
+It is currently not distributed, and it will be built alongside with the applications.
+
+The following commands will build `libtorchaudio` and applications.
+
+```bash
+git submodule update
+mkdir build
+cd build
+cmake -GNinja \
+      -DCMAKE_PREFIX_PATH="$(python -c 'import torch;print(torch.utils.cmake_prefix_path)')" \
+      -DBUILD_SOX=ON \
+      -DBUILD_KALDI=OFF \
+      ..
+cmake --build .
+```
+
+For the usages of each application, refer to the corresponding application directory.

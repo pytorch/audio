@@ -9,10 +9,39 @@ import torchaudio.functional as F
 from parameterized import parameterized
 from scipy import signal
 
-from torchaudio_unittest.common_utils import TestBaseMixin, get_sinusoid, nested_params
+from torchaudio_unittest.common_utils import TestBaseMixin, get_sinusoid, nested_params, get_whitenoise
 
 
 class Functional(TestBaseMixin):
+    def _test_resample_waveform_accuracy(self, up_scale_factor=None, down_scale_factor=None,
+                                         resampling_method="sinc_interpolation", atol=1e-1, rtol=1e-4):
+        # resample the signal and compare it to the ground truth
+        n_to_trim = 20
+        sample_rate = 1000
+        new_sample_rate = sample_rate
+
+        if up_scale_factor is not None:
+            new_sample_rate *= up_scale_factor
+
+        if down_scale_factor is not None:
+            new_sample_rate //= down_scale_factor
+
+        duration = 5  # seconds
+        original_timestamps = torch.arange(0, duration, 1.0 / sample_rate)
+
+        sound = 123 * torch.cos(2 * math.pi * 3 * original_timestamps).unsqueeze(0)
+        estimate = F.resample(sound, sample_rate, new_sample_rate,
+                              resampling_method=resampling_method).squeeze()
+
+        new_timestamps = torch.arange(0, duration, 1.0 / new_sample_rate)[:estimate.size(0)]
+        ground_truth = 123 * torch.cos(2 * math.pi * 3 * new_timestamps)
+
+        # trim the first/last n samples as these points have boundary effects
+        ground_truth = ground_truth[..., n_to_trim:-n_to_trim]
+        estimate = estimate[..., n_to_trim:-n_to_trim]
+
+        self.assertEqual(estimate, ground_truth, atol=atol, rtol=rtol)
+
     def test_lfilter_simple(self):
         """
         Create a very basic signal,
@@ -259,11 +288,69 @@ class Functional(TestBaseMixin):
 
             self.assertEqual(specgrams, specgrams_copy)
 
+    @parameterized.expand(list(itertools.product(
+        ["sinc_interpolation", "kaiser_window"],
+        [16000, 44100],
+    )))
+    def test_resample_identity(self, resampling_method, sample_rate):
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=1)
 
-class FunctionalComplex(TestBaseMixin):
-    complex_dtype = None
-    real_dtype = None
-    device = None
+        resampled = F.resample(waveform, sample_rate, sample_rate)
+        self.assertEqual(waveform, resampled)
+
+    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    def test_resample_waveform_upsample_size(self, resampling_method):
+        sr = 16000
+        waveform = get_whitenoise(sample_rate=sr, duration=0.5,)
+        upsampled = F.resample(waveform, sr, sr * 2, resampling_method=resampling_method)
+        assert upsampled.size(-1) == waveform.size(-1) * 2
+
+    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    def test_resample_waveform_downsample_size(self, resampling_method):
+        sr = 16000
+        waveform = get_whitenoise(sample_rate=sr, duration=0.5,)
+        downsampled = F.resample(waveform, sr, sr // 2, resampling_method=resampling_method)
+        assert downsampled.size(-1) == waveform.size(-1) // 2
+
+    @parameterized.expand([("sinc_interpolation"), ("kaiser_window")])
+    def test_resample_waveform_identity_size(self, resampling_method):
+        sr = 16000
+        waveform = get_whitenoise(sample_rate=sr, duration=0.5,)
+        resampled = F.resample(waveform, sr, sr, resampling_method=resampling_method)
+        assert resampled.size(-1) == waveform.size(-1)
+
+    @parameterized.expand(list(itertools.product(
+        ["sinc_interpolation", "kaiser_window"],
+        list(range(1, 20)),
+    )))
+    def test_resample_waveform_downsample_accuracy(self, resampling_method, i):
+        self._test_resample_waveform_accuracy(down_scale_factor=i * 2, resampling_method=resampling_method)
+
+    @parameterized.expand(list(itertools.product(
+        ["sinc_interpolation", "kaiser_window"],
+        list(range(1, 20)),
+    )))
+    def test_resample_waveform_upsample_accuracy(self, resampling_method, i):
+        self._test_resample_waveform_accuracy(up_scale_factor=1.0 + i / 20.0, resampling_method=resampling_method)
+
+    def test_resample_no_warning(self):
+        sample_rate = 44100
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.1)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            F.resample(waveform, float(sample_rate), sample_rate / 2.)
+        assert len(w) == 0
+
+    def test_resample_warning(self):
+        """resample should throw a warning if an input frequency is not of an integer value"""
+        sample_rate = 44100
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.1)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            F.resample(waveform, sample_rate, 5512.5)
+        assert len(w) == 1
 
     @nested_params(
         [0.5, 1.01, 1.3],
@@ -286,7 +373,7 @@ class FunctionalComplex(TestBaseMixin):
             0,
             np.pi * hop_length,
             num_freq,
-            dtype=self.real_dtype, device=self.device)[..., None]
+            dtype=self.dtype, device=self.device)[..., None]
 
         spec_stretch = F.phase_vocoder(spec, rate=rate, phase_advance=phase_advance)
 

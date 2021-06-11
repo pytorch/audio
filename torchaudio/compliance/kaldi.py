@@ -18,7 +18,6 @@ __all__ = [
     'mfcc',
     'vtln_warp_freq',
     'vtln_warp_mel_freq',
-    'resample_waveform',
 ]
 
 # numeric_limits<float>::epsilon() 1.1920928955078125e-07
@@ -750,24 +749,3 @@ def mfcc(
 
     feature = _subtract_column_mean(feature, subtract_mean)
     return feature
-
-
-def resample_waveform(waveform: Tensor,
-                      orig_freq: float,
-                      new_freq: float,
-                      lowpass_filter_width: int = 6) -> Tensor:
-    r"""Resamples the waveform at the new frequency.
-
-    This is a wrapper around ``torchaudio.functional.resample``.
-
-    Args:
-        waveform (Tensor): The input signal of size (..., time)
-        orig_freq (float): The original frequency of the signal
-        new_freq (float): The desired frequency
-        lowpass_filter_width (int, optional): Controls the sharpness of the filter, more == sharper
-            but less efficient. We suggest around 4 to 10 for normal use. (Default: ``6``)
-
-    Returns:
-        Tensor: The waveform at the new frequency
-    """
-    return torchaudio.functional.resample(waveform, orig_freq, new_freq, lowpass_filter_width)

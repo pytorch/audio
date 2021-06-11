@@ -32,7 +32,40 @@ class Functional(TempDirMixin, TestBaseMixin):
             output = output.shape
         self.assertEqual(ts_output, output)
 
-    def test_spectrogram(self):
+    def _assert_consistency_complex(self, func, tensor, test_pseudo_complex=False):
+        assert tensor.is_complex()
+        tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
+
+        path = self.get_temp_path('func.zip')
+        torch.jit.script(func).save(path)
+        ts_func = torch.jit.load(path)
+
+        if test_pseudo_complex:
+            tensor = torch.view_as_real(tensor)
+
+        torch.random.manual_seed(40)
+        output = func(tensor)
+
+        torch.random.manual_seed(40)
+        ts_output = ts_func(tensor)
+
+        self.assertEqual(ts_output, output)
+
+    def test_spectrogram_complex(self):
+        def func(tensor):
+            n_fft = 400
+            ws = 400
+            hop = 200
+            pad = 0
+            window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
+            power = None
+            normalize = False
+            return F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
+
+        tensor = common_utils.get_whitenoise()
+        self._assert_consistency(func, tensor)
+
+    def test_spectrogram_real(self):
         def func(tensor):
             n_fft = 400
             ws = 400
@@ -41,7 +74,7 @@ class Functional(TempDirMixin, TestBaseMixin):
             window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
             power = 2.
             normalize = False
-            return F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
+            return F.spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize, return_complex=False)
 
         tensor = common_utils.get_whitenoise()
         self._assert_consistency(func, tensor)
@@ -572,25 +605,27 @@ class Functional(TempDirMixin, TestBaseMixin):
         tensor = common_utils.get_whitenoise(sample_rate=44100)
         self._assert_consistency(func, tensor)
 
+    def test_resample_sinc(self):
+        def func(tensor):
+            sr1, sr2 = 16000., 8000.
+            return F.resample(tensor, sr1, sr2, resampling_method="sinc_interpolation")
 
-class FunctionalComplex(TempDirMixin, TestBaseMixin):
-    complex_dtype = None
-    real_dtype = None
-    device = None
+        tensor = common_utils.get_whitenoise(sample_rate=16000)
+        self._assert_consistency(func, tensor)
 
-    def _assert_consistency(self, func, tensor, test_pseudo_complex=False):
-        assert tensor.is_complex()
-        tensor = tensor.to(device=self.device, dtype=self.complex_dtype)
+    def test_resample_kaiser(self):
+        def func(tensor):
+            sr1, sr2 = 16000., 8000.
+            return F.resample(tensor, sr1, sr2, resampling_method="kaiser_window")
 
-        path = self.get_temp_path('func.zip')
-        torch.jit.script(func).save(path)
-        ts_func = torch.jit.load(path)
+        def func_beta(tensor):
+            sr1, sr2 = 16000., 8000.
+            beta = 6.
+            return F.resample(tensor, sr1, sr2, resampling_method="kaiser_window", beta=beta)
 
-        if test_pseudo_complex:
-            tensor = torch.view_as_real(tensor)
-        output = func(tensor)
-        ts_output = ts_func(tensor)
-        self.assertEqual(ts_output, output)
+        tensor = common_utils.get_whitenoise(sample_rate=16000)
+        self._assert_consistency(func, tensor)
+        self._assert_consistency(func_beta, tensor)
 
     @parameterized.expand([(True, ), (False, )])
     def test_phase_vocoder(self, test_paseudo_complex):
@@ -610,4 +645,4 @@ class FunctionalComplex(TempDirMixin, TestBaseMixin):
             return F.phase_vocoder(tensor, rate, phase_advance)
 
         tensor = torch.view_as_complex(torch.randn(2, 1025, 400, 2))
-        self._assert_consistency(func, tensor, test_paseudo_complex)
+        self._assert_consistency_complex(func, tensor, test_paseudo_complex)

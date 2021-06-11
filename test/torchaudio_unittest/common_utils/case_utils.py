@@ -59,8 +59,9 @@ class HttpServerMixin(TempDirMixin):
         super().setUpClass()
         cls._proc = subprocess.Popen(
             ['python', '-m', 'http.server', f'{cls._port}'],
-            cwd=cls.get_base_temp_dir())
-        time.sleep(1.0)
+            cwd=cls.get_base_temp_dir(),
+            stderr=subprocess.DEVNULL)  # Disable server-side error log because it is confusing
+        time.sleep(2.0)
 
     @classmethod
     def tearDownClass(cls):
@@ -81,6 +82,14 @@ class TestBaseMixin:
         super().setUp()
         set_audio_backend(self.backend)
 
+    @property
+    def complex_dtype(self):
+        if self.dtype in ['float32', 'float', torch.float, torch.float32]:
+            return torch.cfloat
+        if self.dtype in ['float64', 'double', torch.double, torch.float64]:
+            return torch.cdouble
+        raise ValueError(f'No corresponding complex dtype for {self.dtype}')
+
 
 class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
     pass
@@ -95,8 +104,20 @@ def skipIfNoModule(module, display_name=None):
     return unittest.skipIf(not is_module_available(module), f'"{display_name}" is not available')
 
 
-skipIfNoCuda = unittest.skipIf(not torch.cuda.is_available(), reason='CUDA not available')
+def skipIfNoCuda(test_item):
+    if torch.cuda.is_available():
+        return test_item
+    force_cuda_test = os.environ.get('TORCHAUDIO_TEST_FORCE_CUDA', '0')
+    if force_cuda_test not in ['0', '1']:
+        raise ValueError('"TORCHAUDIO_TEST_FORCE_CUDA" must be either "0" or "1".')
+    if force_cuda_test == '1':
+        raise RuntimeError('"TORCHAUDIO_TEST_FORCE_CUDA" is set but CUDA is not available.')
+    return unittest.skip('CUDA is not available.')(test_item)
 skipIfNoSox = unittest.skipIf(not is_sox_available(), reason='Sox not available')
 skipIfNoKaldi = unittest.skipIf(not is_kaldi_available(), reason='Kaldi not available')
 skipIfRocm = unittest.skipIf(os.getenv('TORCHAUDIO_TEST_WITH_ROCM', '0') == '1',
                              reason="test doesn't currently work on the ROCm stack")
+skipIfNoQengine = unittest.skipIf(
+    'fbgemm' not in torch.backends.quantized.supported_engines,
+    reason="`fbgemm` is not available."
+)

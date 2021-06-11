@@ -1,3 +1,6 @@
+import warnings
+
+import torch
 import torchaudio.transforms as T
 from parameterized import parameterized
 
@@ -61,3 +64,25 @@ class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase):
         data, sample_rate = load_wav(path)
         result = T.Vad(sample_rate)(data)
         self.assert_sox_effect(result, path, ['vad'])
+
+    def test_vad_warning(self):
+        """vad should throw a warning if input dimension is greater than 2"""
+        sample_rate = 41100
+
+        data = torch.rand(5, 5, sample_rate)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            T.Vad(sample_rate)(data)
+        assert len(w) == 1
+
+        data = torch.rand(5, sample_rate)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            T.Vad(sample_rate)(data)
+        assert len(w) == 0
+
+        data = torch.rand(sample_rate)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            T.Vad(sample_rate)(data)
+        assert len(w) == 0
