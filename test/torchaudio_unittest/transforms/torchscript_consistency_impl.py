@@ -59,10 +59,6 @@ class Transforms(TempDirMixin, TestBaseMixin):
         spec = torch.rand((6, 201))
         self._assert_consistency(T.AmplitudeToDB(), spec)
 
-    def test_MelScale_invalid(self):
-        with self.assertRaises(ValueError):
-            torch.jit.script(T.MelScale())
-
     def test_MelScale(self):
         spec_f = torch.rand((1, 201, 6))
         self._assert_consistency(T.MelScale(n_stft=201), spec_f)
