@@ -67,6 +67,13 @@ class Spectrogram(torch.nn.Module):
             This argument is only effective when ``power=None``. It is ignored for
             cases where ``power`` is a number as in those cases, the returned tensor is
             power spectrogram, which is a real-valued tensor.
+
+            Example
+
+                    >>> specgram = torch.randn(1, 40, 1000)
+                    >>> specgram = torchaudio.transforms.Spectrogram()(specgram)
+                    >>> specgram.shape
+                        torch.Size([1, 40, 201, 6])
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
