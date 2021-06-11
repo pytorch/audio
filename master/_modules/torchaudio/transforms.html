@@ -367,11 +367,11 @@
 <span class="sd">        wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)</span>
 <span class="sd">        center (bool, optional): whether to pad :attr:`waveform` on both sides so</span>
 <span class="sd">            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.</span>
-<span class="sd">            Default: ``True``</span>
+<span class="sd">            (Default: ``True``)</span>
 <span class="sd">        pad_mode (string, optional): controls the padding method used when</span>
-<span class="sd">            :attr:`center` is ``True``. Default: ``&quot;reflect&quot;``</span>
+<span class="sd">            :attr:`center` is ``True``. (Default: ``&quot;reflect&quot;``)</span>
 <span class="sd">        onesided (bool, optional): controls whether to return half of results to</span>
-<span class="sd">            avoid redundancy Default: ``True``</span>
+<span class="sd">            avoid redundancy (Default: ``True``)</span>
 <span class="sd">        return_complex (bool, optional):</span>
 <span class="sd">            Indicates whether the resulting complex-valued Tensor should be represented with</span>
 <span class="sd">            native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype</span>
@@ -658,7 +658,7 @@
 <span class="sd">        tolerance_change (float, optional): Difference in losses to stop optimization at. (Default: ``1e-8``)</span>
 <span class="sd">        sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)</span>
 <span class="sd">        norm (Optional[str]): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
-<span class="sd">        (area normalization). (Default: ``None``)</span>
+<span class="sd">            (area normalization). (Default: ``None``)</span>
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n_stft&#39;</span><span class="p">,</span> <span class="s1">&#39;n_mels&#39;</span><span class="p">,</span> <span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;f_min&#39;</span><span class="p">,</span> <span class="s1">&#39;f_max&#39;</span><span class="p">,</span> <span class="s1">&#39;max_iter&#39;</span><span class="p">,</span> <span class="s1">&#39;tolerance_loss&#39;</span><span class="p">,</span>
@@ -749,25 +749,28 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)</span>
+<span class="sd">        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)</span>
 <span class="sd">        win_length (int or None, optional): Window size. (Default: ``n_fft``)</span>
 <span class="sd">        hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)</span>
-<span class="sd">        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)</span>
 <span class="sd">        f_min (float, optional): Minimum frequency. (Default: ``0.``)</span>
 <span class="sd">        f_max (float or None, optional): Maximum frequency. (Default: ``None``)</span>
 <span class="sd">        pad (int, optional): Two sided padding of signal. (Default: ``0``)</span>
 <span class="sd">        n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)</span>
 <span class="sd">        window_fn (Callable[..., Tensor], optional): A function to create a window tensor</span>
 <span class="sd">            that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)</span>
+<span class="sd">        power (float, optional): Exponent for the magnitude spectrogram,</span>
+<span class="sd">            (must be &gt; 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)</span>
+<span class="sd">        normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)</span>
 <span class="sd">        wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)</span>
 <span class="sd">        center (bool, optional): whether to pad :attr:`waveform` on both sides so</span>
 <span class="sd">            that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.</span>
-<span class="sd">            Default: ``True``</span>
+<span class="sd">            (Default: ``True``)</span>
 <span class="sd">        pad_mode (string, optional): controls the padding method used when</span>
-<span class="sd">            :attr:`center` is ``True``. Default: ``&quot;reflect&quot;``</span>
+<span class="sd">            :attr:`center` is ``True``. (Default: ``&quot;reflect&quot;``)</span>
 <span class="sd">        onesided (bool, optional): controls whether to return half of results to</span>
-<span class="sd">            avoid redundancy. Default: ``True``</span>
+<span class="sd">            avoid redundancy. (Default: ``True``)</span>
 <span class="sd">        norm (Optional[str]): If &#39;slaney&#39;, divide the triangular mel weights by the width of the mel band</span>
-<span class="sd">        (area normalization). (Default: ``None``)</span>
+<span class="sd">            (area normalization). (Default: ``None``)</span>
 <span class="sd">        mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)</span>
 
 <span class="sd">    Example</span>
