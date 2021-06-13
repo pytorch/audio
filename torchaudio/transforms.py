@@ -445,7 +445,7 @@ class MelSpectrogram(torch.nn.Module):
         n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
-        power (float, optional): Exponent for the magnitude spectrogram,
+        power (float): Exponent for the magnitude spectrogram,
             (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
         normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
@@ -476,7 +476,7 @@ class MelSpectrogram(torch.nn.Module):
                  pad: int = 0,
                  n_mels: int = 128,
                  window_fn: Callable[..., Tensor] = torch.hann_window,
-                 power: Optional[float] = 2.,
+                 power: float = 2.,
                  normalized: bool = False,
                  wkwargs: Optional[dict] = None,
                  center: bool = True,
