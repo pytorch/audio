@@ -476,7 +476,7 @@ class MelSpectrogram(torch.nn.Module):
                  pad: int = 0,
                  n_mels: int = 128,
                  window_fn: Callable[..., Tensor] = torch.hann_window,
-                 power: Optional[float] = 2.,
+                 power: float = 2.,
                  normalized: bool = False,
                  wkwargs: Optional[dict] = None,
                  center: bool = True,
