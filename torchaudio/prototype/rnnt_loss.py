@@ -17,7 +17,8 @@ def rnnt_loss(
     fused_log_softmax: bool = True,
     reuse_logits_for_grads: bool = True,
 ):
-    """Compute the RNN Transducer loss from :footcite:`graves2012sequence`.
+    """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
+    [:footcite:`graves2012sequence`].
 
     The RNN Transducer loss extends the CTC loss by defining a distribution over output
     sequences of all lengths, and by jointly modelling both input-output and output-output
@@ -57,7 +58,8 @@ def rnnt_loss(
 
 
 class RNNTLoss(torch.nn.Module):
-    """Compute the RNN Transducer loss from :footcite:`graves2012sequence`.
+    """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
+    [:footcite:`graves2012sequence`].
 
     The RNN Transducer loss extends the CTC loss by defining a distribution over output
     sequences of all lengths, and by jointly modelling both input-output and output-output
