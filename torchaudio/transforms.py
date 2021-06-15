@@ -54,11 +54,11 @@ class Spectrogram(torch.nn.Module):
         wkwargs (dict or None, optional): Arguments for window function. (Default: ``None``)
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
-            Default: ``True``
+            (Default: ``True``)
         pad_mode (string, optional): controls the padding method used when
-            :attr:`center` is ``True``. Default: ``"reflect"``
+            :attr:`center` is ``True``. (Default: ``"reflect"``)
         onesided (bool, optional): controls whether to return half of results to
-            avoid redundancy Default: ``True``
+            avoid redundancy (Default: ``True``)
         return_complex (bool, optional):
             Indicates whether the resulting complex-valued Tensor should be represented with
             native complex dtype, such as `torch.cfloat` and `torch.cdouble`, or real dtype
@@ -129,7 +129,8 @@ class GriffinLim(torch.nn.Module):
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
 
     Implementation ported from
-    :footcite:`brian_mcfee-proc-scipy-2015`, :footcite:`6701851` and :footcite:`1172092`.
+    *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]
+    and *Signal estimation from modified short-time Fourier transform* [:footcite:`1172092`].
 
     Args:
         n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
@@ -345,7 +346,7 @@ class InverseMelScale(torch.nn.Module):
         tolerance_change (float, optional): Difference in losses to stop optimization at. (Default: ``1e-8``)
         sgdargs (dict or None, optional): Arguments for the SGD optimizer. (Default: ``None``)
         norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
-        (area normalization). (Default: ``None``)
+            (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
     """
     __constants__ = ['n_stft', 'n_mels', 'sample_rate', 'f_min', 'f_max', 'max_iter', 'tolerance_loss',
@@ -436,25 +437,28 @@ class MelSpectrogram(torch.nn.Module):
 
     Args:
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
         win_length (int or None, optional): Window size. (Default: ``n_fft``)
         hop_length (int or None, optional): Length of hop between STFT windows. (Default: ``win_length // 2``)
-        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins. (Default: ``400``)
         f_min (float, optional): Minimum frequency. (Default: ``0.``)
         f_max (float or None, optional): Maximum frequency. (Default: ``None``)
         pad (int, optional): Two sided padding of signal. (Default: ``0``)
         n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)
         window_fn (Callable[..., Tensor], optional): A function to create a window tensor
             that is applied/multiplied to each frame/window. (Default: ``torch.hann_window``)
+        power (float, optional): Exponent for the magnitude spectrogram,
+            (must be > 0) e.g., 1 for energy, 2 for power, etc. (Default: ``2``)
+        normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: ``False``)
         wkwargs (Dict[..., ...] or None, optional): Arguments for window function. (Default: ``None``)
         center (bool, optional): whether to pad :attr:`waveform` on both sides so
             that the :math:`t`-th frame is centered at time :math:`t \times \text{hop\_length}`.
-            Default: ``True``
+            (Default: ``True``)
         pad_mode (string, optional): controls the padding method used when
-            :attr:`center` is ``True``. Default: ``"reflect"``
+            :attr:`center` is ``True``. (Default: ``"reflect"``)
         onesided (bool, optional): controls whether to return half of results to
-            avoid redundancy. Default: ``True``
+            avoid redundancy. (Default: ``True``)
         norm (Optional[str]): If 'slaney', divide the triangular mel weights by the width of the mel band
-        (area normalization). (Default: ``None``)
+            (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
 
     Example
@@ -473,7 +477,7 @@ class MelSpectrogram(torch.nn.Module):
                  pad: int = 0,
                  n_mels: int = 128,
                  window_fn: Callable[..., Tensor] = torch.hann_window,
-                 power: Optional[float] = 2.,
+                 power: float = 2.,
                  normalized: bool = False,
                  wkwargs: Optional[dict] = None,
                  center: bool = True,
@@ -664,16 +668,27 @@ class Resample(torch.nn.Module):
         rolloff (float, optional): The roll-off frequency of the filter, as a fraction of the Nyquist.
             Lower values reduce anti-aliasing, but also reduce some of the highest frequencies. (Default: ``0.99``)
         beta (float or None): The shape parameter used for kaiser window.
+        dtype (torch.device, optional):
+            Determnines the precision that resampling kernel is pre-computed and cached. If not provided,
+            kernel is computed with ``torch.float64`` then cached as ``torch.float32``.
+            If you need higher precision, provide ``torch.float64``, and the pre-computed kernel is computed and
+            cached as ``torch.float64``. If you use resample with lower precision, then instead of providing this
+            providing this argument, please use ``Resample.to(dtype)``, so that the kernel generation is still
+            carried out on ``torch.float64``.
     """
 
-    def __init__(self,
-                 orig_freq: float = 16000,
-                 new_freq: float = 16000,
-                 resampling_method: str = 'sinc_interpolation',
-                 lowpass_filter_width: int = 6,
-                 rolloff: float = 0.99,
-                 beta: Optional[float] = None) -> None:
-        super(Resample, self).__init__()
+    def __init__(
+            self,
+            orig_freq: float = 16000,
+            new_freq: float = 16000,
+            resampling_method: str = 'sinc_interpolation',
+            lowpass_filter_width: int = 6,
+            rolloff: float = 0.99,
+            beta: Optional[float] = None,
+            *,
+            dtype: Optional[torch.dtype] = None,
+    ) -> None:
+        super().__init__()
 
         self.orig_freq = orig_freq
         self.new_freq = new_freq
@@ -681,11 +696,13 @@ class Resample(torch.nn.Module):
         self.resampling_method = resampling_method
         self.lowpass_filter_width = lowpass_filter_width
         self.rolloff = rolloff
+        self.beta = beta
 
         if self.orig_freq != self.new_freq:
-            kernel, self.width = _get_sinc_resample_kernel(self.orig_freq, self.new_freq, self.gcd,
-                                                           self.lowpass_filter_width, self.rolloff,
-                                                           self.resampling_method, beta)
+            kernel, self.width = _get_sinc_resample_kernel(
+                self.orig_freq, self.new_freq, self.gcd,
+                self.lowpass_filter_width, self.rolloff,
+                self.resampling_method, beta, dtype=dtype)
             self.register_buffer('kernel', kernel)
 
     def forward(self, waveform: Tensor) -> Tensor:
@@ -698,8 +715,9 @@ class Resample(torch.nn.Module):
         """
         if self.orig_freq == self.new_freq:
             return waveform
-        return _apply_sinc_resample_kernel(waveform, self.orig_freq, self.new_freq, self.gcd,
-                                           self.kernel, self.width)
+        return _apply_sinc_resample_kernel(
+            waveform, self.orig_freq, self.new_freq, self.gcd,
+            self.kernel, self.width)
 
 
 class ComplexNorm(torch.nn.Module):

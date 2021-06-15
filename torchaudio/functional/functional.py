@@ -155,7 +155,8 @@ def griffinlim(
     r"""Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.
 
     Implementation ported from
-    :footcite:`brian_mcfee-proc-scipy-2015`, :footcite:`6701851` and :footcite:`1172092`.
+    *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]
+    and *Signal estimation from modified short-time Fourier transform* [:footcite:`1172092`].
 
     Args:
         specgram (Tensor): A magnitude-only STFT spectrogram of dimension (..., freq, frames)
@@ -1207,7 +1208,8 @@ def compute_kaldi_pitch(
         recompute_frame: int = 500,
         snip_edges: bool = True,
 ) -> torch.Tensor:
-    """Extract pitch based on method described in :footcite:`6854049`.
+    """Extract pitch based on method described in *A pitch extraction algorithm tuned
+    for automatic speech recognition* [:footcite:`6854049`].
 
     This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.
 
