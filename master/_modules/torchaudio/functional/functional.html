@@ -468,7 +468,8 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.</span>
 
 <span class="sd">    Implementation ported from</span>
-<span class="sd">    :footcite:`brian_mcfee-proc-scipy-2015`, :footcite:`6701851` and :footcite:`1172092`.</span>
+<span class="sd">    *librosa* [:footcite:`brian_mcfee-proc-scipy-2015`], *A fast Griffin-Lim algorithm* [:footcite:`6701851`]</span>
+<span class="sd">    and *Signal estimation from modified short-time Fourier transform* [:footcite:`1172092`].</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        specgram (Tensor): A magnitude-only STFT spectrogram of dimension (..., freq, frames)</span>
@@ -1520,7 +1521,8 @@
         <span class="n">recompute_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
         <span class="n">snip_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Extract pitch based on method described in :footcite:`6854049`.</span>
+    <span class="sd">&quot;&quot;&quot;Extract pitch based on method described in *A pitch extraction algorithm tuned</span>
+<span class="sd">    for automatic speech recognition* [:footcite:`6854049`].</span>
 
 <span class="sd">    This function computes the equivalent of `compute-kaldi-pitch-feats` from Kaldi.</span>
 

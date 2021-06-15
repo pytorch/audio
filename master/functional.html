@@ -1442,7 +1442,8 @@ Fourier bins, and time is the number of window hops (n_frame).</p>
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">griffinlim</code><span class="sig-paren">(</span><em class="sig-param">specgram: torch.Tensor, window: torch.Tensor, n_fft: int, hop_length: int, win_length: int, power: float, n_iter: int, momentum: float, length: Optional[int], rand_init: bool</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#griffinlim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.griffinlim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.</p>
 <p>Implementation ported from
-<a class="footnote-reference brackets" href="#brian-mcfee-proc-scipy-2015" id="id3">1</a>, <a class="footnote-reference brackets" href="#id4" id="id5">2</a> and <a class="footnote-reference brackets" href="#id6" id="id7">3</a>.</p>
+<em>librosa</em> [<a class="footnote-reference brackets" href="#brian-mcfee-proc-scipy-2015" id="id3">1</a>], <em>A fast Griffin-Lim algorithm</em> [<a class="footnote-reference brackets" href="#id4" id="id5">2</a>]
+and <em>Signal estimation from modified short-time Fourier transform</em> [<a class="footnote-reference brackets" href="#id6" id="id7">3</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1626,7 +1627,8 @@ Only applicable if center == false, ignored if center==true (int, default = 100)
 <dl class="function">
 <dt id="torchaudio.functional.compute_kaldi_pitch">
 <code class="sig-prename descclassname">torchaudio.functional.</code><code class="sig-name descname">compute_kaldi_pitch</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em>, <em class="sig-param">sample_rate: float</em>, <em class="sig-param">frame_length: float = 25.0</em>, <em class="sig-param">frame_shift: float = 10.0</em>, <em class="sig-param">min_f0: float = 50</em>, <em class="sig-param">max_f0: float = 400</em>, <em class="sig-param">soft_min_f0: float = 10.0</em>, <em class="sig-param">penalty_factor: float = 0.1</em>, <em class="sig-param">lowpass_cutoff: float = 1000</em>, <em class="sig-param">resample_frequency: float = 4000</em>, <em class="sig-param">delta_pitch: float = 0.005</em>, <em class="sig-param">nccf_ballast: float = 7000</em>, <em class="sig-param">lowpass_filter_width: int = 1</em>, <em class="sig-param">upsample_filter_width: int = 5</em>, <em class="sig-param">max_frames_latency: int = 0</em>, <em class="sig-param">frames_per_chunk: int = 0</em>, <em class="sig-param">simulate_first_pass_online: bool = False</em>, <em class="sig-param">recompute_frame: int = 500</em>, <em class="sig-param">snip_edges: bool = True</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/functional/functional.html#compute_kaldi_pitch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.functional.compute_kaldi_pitch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract pitch based on method described in <a class="footnote-reference brackets" href="#id8" id="id9">4</a>.</p>
+<dd><p>Extract pitch based on method described in <em>A pitch extraction algorithm tuned
+for automatic speech recognition</em> [<a class="footnote-reference brackets" href="#id8" id="id9">4</a>].</p>
 <p>This function computes the equivalent of <cite>compute-kaldi-pitch-feats</cite> from Kaldi.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

@@ -323,7 +323,9 @@
 <dl class="class">
 <dt id="torchaudio.models.ConvTasNet">
 <em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">ConvTasNet</code><span class="sig-paren">(</span><em class="sig-param">num_sources: int = 2</em>, <em class="sig-param">enc_kernel_size: int = 16</em>, <em class="sig-param">enc_num_feats: int = 512</em>, <em class="sig-param">msk_kernel_size: int = 3</em>, <em class="sig-param">msk_num_feats: int = 128</em>, <em class="sig-param">msk_num_hidden_feats: int = 512</em>, <em class="sig-param">msk_num_layers: int = 8</em>, <em class="sig-param">msk_num_stacks: int = 3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/conv_tasnet.html#ConvTasNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.ConvTasNet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Conv-TasNet: a fully-convolutional time-domain audio separation network <a class="footnote-reference brackets" href="#luo-2019" id="id1">1</a>.</p>
+<dd><p>Conv-TasNet: a fully-convolutional time-domain audio separation network
+<em>Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation</em>
+[<a class="footnote-reference brackets" href="#luo-2019" id="id1">1</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -367,7 +369,8 @@
 <dl class="class">
 <dt id="torchaudio.models.DeepSpeech">
 <em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">DeepSpeech</code><span class="sig-paren">(</span><em class="sig-param">n_feature: int</em>, <em class="sig-param">n_hidden: int = 2048</em>, <em class="sig-param">n_class: int = 40</em>, <em class="sig-param">dropout: float = 0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/deepspeech.html#DeepSpeech"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.DeepSpeech" title="Permalink to this definition">¶</a></dt>
-<dd><p>DeepSpeech model architecture from <a class="footnote-reference brackets" href="#hannun2014deep" id="id2">2</a>.</p>
+<dd><p>DeepSpeech model architecture from <em>Deep Speech: Scaling up end-to-end speech recognition</em>
+[<a class="footnote-reference brackets" href="#hannun2014deep" id="id2">2</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -401,7 +404,8 @@
 <dl class="class">
 <dt id="torchaudio.models.Wav2Letter">
 <em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">Wav2Letter</code><span class="sig-paren">(</span><em class="sig-param">num_classes: int = 40</em>, <em class="sig-param">input_type: str = 'waveform'</em>, <em class="sig-param">num_features: int = 1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wav2letter.html#Wav2Letter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Wav2Letter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wav2Letter model architecture from <a class="footnote-reference brackets" href="#collobert2016wav2letter" id="id3">3</a>.</p>
+<dd><p>Wav2Letter model architecture from <em>Wav2Letter: an End-to-End ConvNet-based Speech
+Recognition System</em> [<a class="footnote-reference brackets" href="#collobert2016wav2letter" id="id3">3</a>].</p>
 <blockquote>
 <div><p><span class="math">\(\text{padding} = \frac{\text{ceil}(\text{kernel} - \text{stride})}{2}\)</span></p>
 </div></blockquote>
@@ -441,7 +445,7 @@ or <code class="docutils literal notranslate"><span class="pre">mfcc</span></cod
 <dl class="class">
 <dt id="torchaudio.models.Wav2Vec2Model">
 <em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">Wav2Vec2Model</code><span class="sig-paren">(</span><em class="sig-param">feature_extractor: torch.nn.modules.module.Module</em>, <em class="sig-param">encoder: torch.nn.modules.module.Module</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#Wav2Vec2Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Wav2Vec2Model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Encoder model used in [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id4">4</a>].</p>
+<dd><p>Encoder model used in <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id4">4</a>].</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To build the model, please use one of the factory functions.</p>
@@ -524,7 +528,7 @@ Shape: <code class="docutils literal notranslate"><span class="pre">(batch,</spa
 <dl class="function">
 <dt id="torchaudio.models.wav2vec2_base">
 <code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">wav2vec2_base</code><span class="sig-paren">(</span><em class="sig-param">num_out: int</em><span class="sig-paren">)</span> &#x2192; torchaudio.models.wav2vec2.model.Wav2Vec2Model<a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_base" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build wav2vec2.0 model with “Base” configuration from [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id5">4</a>].</p>
+<dd><p>Build wav2vec2.0 model with “Base” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id5">4</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>num_out</strong> – int
@@ -560,7 +564,7 @@ The number of output labels.</p>
 <dl class="function">
 <dt id="torchaudio.models.wav2vec2_large">
 <code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">wav2vec2_large</code><span class="sig-paren">(</span><em class="sig-param">num_out: int</em><span class="sig-paren">)</span> &#x2192; torchaudio.models.wav2vec2.model.Wav2Vec2Model<a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build wav2vec2.0 model with “Large” configuration from [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id6">4</a>].</p>
+<dd><p>Build wav2vec2.0 model with “Large” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id6">4</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>num_out</strong> – int
@@ -596,7 +600,7 @@ The number of output labels.</p>
 <dl class="function">
 <dt id="torchaudio.models.wav2vec2_large_lv60k">
 <code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">wav2vec2_large_lv60k</code><span class="sig-paren">(</span><em class="sig-param">num_out: int</em><span class="sig-paren">)</span> &#x2192; torchaudio.models.wav2vec2.model.Wav2Vec2Model<a class="reference internal" href="_modules/torchaudio/models/wav2vec2/model.html#wav2vec2_large_lv60k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.wav2vec2_large_lv60k" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build wav2vec2.0 model with “Large LV-60k” configuration from [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id7">4</a>].</p>
+<dd><p>Build wav2vec2.0 model with “Large LV-60k” configuration from <em>wav2vec 2.0</em> [<a class="footnote-reference brackets" href="#baevski2020wav2vec" id="id7">4</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>num_out</strong> – int
@@ -734,9 +738,9 @@ an instance of <code class="docutils literal notranslate"><span class="pre">fair
 <dt id="torchaudio.models.WaveRNN">
 <em class="property">class </em><code class="sig-prename descclassname">torchaudio.models.</code><code class="sig-name descname">WaveRNN</code><span class="sig-paren">(</span><em class="sig-param">upsample_scales: List[int], n_classes: int, hop_length: int, n_res_block: int = 10, n_rnn: int = 512, n_fc: int = 512, kernel_size: int = 5, n_freq: int = 128, n_hidden: int = 128, n_output: int = 128</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/models/wavernn.html#WaveRNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.WaveRNN" title="Permalink to this definition">¶</a></dt>
 <dd><p>WaveRNN model based on the implementation from <a class="reference external" href="https://github.com/fatchord/WaveRNN">fatchord</a>.</p>
-<p>The original implementation was introduced in <a class="footnote-reference brackets" href="#kalchbrenner2018efficient" id="id8">5</a>.
-The input channels of waveform and spectrogram have to be 1. The product of
-<cite>upsample_scales</cite> must equal <cite>hop_length</cite>.</p>
+<p>The original implementation was introduced in <em>Efficient Neural Audio Synthesis</em>
+[<a class="footnote-reference brackets" href="#kalchbrenner2018efficient" id="id8">5</a>]. The input channels of waveform and spectrogram have to be 1.
+The product of <cite>upsample_scales</cite> must equal <cite>hop_length</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

@@ -383,7 +383,8 @@ Fourier bins, and time is the number of window hops (n_frame).</p>
 <em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">GriffinLim</code><span class="sig-paren">(</span><em class="sig-param">n_fft: int = 400, n_iter: int = 32, win_length: Optional[int] = None, hop_length: Optional[int] = None, window_fn: Callable[[...], torch.Tensor] = &lt;built-in method hann_window of type object&gt;, power: float = 2.0, wkwargs: Optional[dict] = None, momentum: float = 0.99, length: Optional[int] = None, rand_init: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#GriffinLim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.GriffinLim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute waveform from a linear scale magnitude spectrogram using the Griffin-Lim transformation.</p>
 <p>Implementation ported from
-<a class="footnote-reference brackets" href="#brian-mcfee-proc-scipy-2015" id="id1">1</a>, <a class="footnote-reference brackets" href="#id2" id="id3">2</a> and <a class="footnote-reference brackets" href="#id4" id="id5">3</a>.</p>
+<em>librosa</em> [<a class="footnote-reference brackets" href="#brian-mcfee-proc-scipy-2015" id="id1">1</a>], <em>A fast Griffin-Lim algorithm</em> [<a class="footnote-reference brackets" href="#id2" id="id3">2</a>]
+and <em>Signal estimation from modified short-time Fourier transform</em> [<a class="footnote-reference brackets" href="#id4" id="id5">3</a>].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

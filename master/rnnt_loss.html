@@ -325,7 +325,8 @@
 <dl class="function">
 <dt id="torchaudio.prototype.rnnt_loss.rnnt_loss">
 <code class="sig-prename descclassname">torchaudio.prototype.rnnt_loss.</code><code class="sig-name descname">rnnt_loss</code><span class="sig-paren">(</span><em class="sig-param">logits: torch.Tensor</em>, <em class="sig-param">targets: torch.Tensor</em>, <em class="sig-param">logit_lengths: torch.Tensor</em>, <em class="sig-param">target_lengths: torch.Tensor</em>, <em class="sig-param">blank: int = -1</em>, <em class="sig-param">clamp: float = -1</em>, <em class="sig-param">fused_log_softmax: bool = True</em>, <em class="sig-param">reuse_logits_for_grads: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/rnnt_loss.html#rnnt_loss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.prototype.rnnt_loss.rnnt_loss" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the RNN Transducer loss from <a class="footnote-reference brackets" href="#graves2012sequence" id="id1">1</a>.</p>
+<dd><p>Compute the RNN Transducer loss from <em>Sequence Transduction with Recurrent Neural Networks</em>
+[<a class="footnote-reference brackets" href="#graves2012sequence" id="id1">1</a>].</p>
 <p>The RNN Transducer loss extends the CTC loss by defining a distribution over output
 sequences of all lengths, and by jointly modelling both input-output and output-output
 dependencies.</p>
@@ -352,7 +353,8 @@ dependencies.</p>
 <dl class="class">
 <dt id="torchaudio.prototype.rnnt_loss.RNNTLoss">
 <em class="property">class </em><code class="sig-prename descclassname">torchaudio.prototype.rnnt_loss.</code><code class="sig-name descname">RNNTLoss</code><span class="sig-paren">(</span><em class="sig-param">blank: int = -1</em>, <em class="sig-param">clamp: float = -1.0</em>, <em class="sig-param">fused_log_softmax: bool = True</em>, <em class="sig-param">reuse_logits_for_grads: bool = True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/prototype/rnnt_loss.html#RNNTLoss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.prototype.rnnt_loss.RNNTLoss" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the RNN Transducer loss from <a class="footnote-reference brackets" href="#graves2012sequence" id="id2">1</a>.</p>
+<dd><p>Compute the RNN Transducer loss from <em>Sequence Transduction with Recurrent Neural Networks</em>
+[<a class="footnote-reference brackets" href="#graves2012sequence" id="id2">1</a>].</p>
 <p>The RNN Transducer loss extends the CTC loss by defining a distribution over output
 sequences of all lengths, and by jointly modelling both input-output and output-output
 dependencies.</p>
