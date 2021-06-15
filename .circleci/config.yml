@@ -644,6 +644,12 @@ workflows:
           - download_third_parties_nix
       - binary_linux_wheel:
           cuda_version: cpu
+          filters:
+            branches:
+              only:
+              - /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: binary_linux_wheel_py3.8_cpu
           python_version: '3.8'
           requires:
@@ -771,6 +777,12 @@ workflows:
           name: binary_windows_conda_py3.9_cpu
           python_version: '3.9'
       - build_docs:
+          filters:
+            branches:
+              only:
+              - /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: build_docs
           python_version: '3.8'
           requires:
