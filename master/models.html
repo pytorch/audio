@@ -350,13 +350,13 @@
 <dd><p>Perform source separation. Generate audio source waveforms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>input</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0a0+56b43f4)"><em>torch.Tensor</em></a>) – 3D Tensor with shape [batch, channel==1, frames]</p>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.Tensor</em></a>) – 3D Tensor with shape [batch, channel==1, frames]</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>3D Tensor with shape [batch, channel==num_sources, frames]</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0a0+56b43f4)">torch.Tensor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -385,7 +385,7 @@
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/models/deepspeech.html#DeepSpeech.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.DeepSpeech.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0a0+56b43f4)"><em>torch.Tensor</em></a>) – Tensor of dimension (batch, channel, time, feature).</p>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.Tensor</em></a>) – Tensor of dimension (batch, channel, time, feature).</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Predictor tensor of dimension (batch, time, class).</p>
@@ -424,7 +424,7 @@ or <code class="docutils literal notranslate"><span class="pre">mfcc</span></cod
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/models/wav2letter.html#Wav2Letter.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.models.Wav2Letter.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.8.0a0+56b43f4)"><em>torch.Tensor</em></a>) – Tensor of dimension (batch_size, num_features, input_length).</p>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.Tensor</em></a>) – Tensor of dimension (batch_size, num_features, input_length).</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Predictor tensor of dimension (batch_size, number_of_classes, input_length).</p>
@@ -453,8 +453,8 @@ or <code class="docutils literal notranslate"><span class="pre">mfcc</span></cod
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>feature_extractor</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v1.8.0a0+56b43f4)"><em>torch.nn.Module</em></a>) – Feature extractor that extracts feature vectors from raw audio Tensor.</p></li>
-<li><p><strong>encoder</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v1.8.0a0+56b43f4)"><em>torch.nn.Module</em></a>) – Encoder that converts the audio features into the sequence of probability
+<li><p><strong>feature_extractor</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.nn.Module</em></a>) – Feature extractor that extracts feature vectors from raw audio Tensor.</p></li>
+<li><p><strong>encoder</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.nn.Module</em></a>) – Encoder that converts the audio features into the sequence of probability
 distribution (in negative log-likelihood) over labels.</p></li>
 </ul>
 </dd>
@@ -642,7 +642,7 @@ The number of output labels.</p>
 <dd><p>Import wav2vec2 model from Hugging Face’s <a class="reference external" href="https://huggingface.co/transformers/">Transformers</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>original</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v1.8.0a0+56b43f4)"><em>torch.nn.Module</em></a>) – An instance of <code class="docutils literal notranslate"><span class="pre">Wav2Vec2ForCTC</span></code> from <code class="docutils literal notranslate"><span class="pre">transformers</span></code>.</p>
+<dd class="field-odd"><p><strong>original</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.nn.Module</em></a>) – An instance of <code class="docutils literal notranslate"><span class="pre">Wav2Vec2ForCTC</span></code> from <code class="docutils literal notranslate"><span class="pre">transformers</span></code>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Imported model.</p>
@@ -675,7 +675,7 @@ The number of output labels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>original</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v1.8.0a0+56b43f4)"><em>torch.nn.Module</em></a>) – An instance of fairseq’s Wav2Vec2.0 model class.
+<li><p><strong>original</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v1.9.0a0+gitd69c22d)"><em>torch.nn.Module</em></a>) – An instance of fairseq’s Wav2Vec2.0 model class.
 Either <code class="docutils literal notranslate"><span class="pre">fairseq.models.wav2vec.wav2vec2_asr.Wav2VecEncoder</span></code> or
 <code class="docutils literal notranslate"><span class="pre">fairseq.models.wav2vec.wav2vec2.Wav2Vec2Model</span></code>.</p></li>
 <li><p><strong>num_out</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The number of output labels. Required only when the original model is
