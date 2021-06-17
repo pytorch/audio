@@ -69,7 +69,6 @@ Note that nightly build is build on PyTorch's nightly build. Therefore, you need
 **pip**
 
 ```
-pip install numpy
 pip install --pre torchaudio -f https://download.pytorch.org/whl/nightly/torch_nightly.html
 ```
 
