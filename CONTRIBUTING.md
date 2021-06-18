@@ -55,9 +55,12 @@ conda install pytorch -c pytorch-nightly
 pip install cmake ninja
 ```
 
+### Install other requirements
+
 ```bash
 git clone https://github.com/pytorch/audio.git
 cd audio
+git submodule sync
 git submodule update --init --recursive
 BUILD_SOX=1 python setup.py develop
 # or, for OSX
@@ -66,7 +69,7 @@ BUILD_SOX=1 python setup.py develop
 # DEBUG=1 python setup.py develop
 ```
 
-If you built sox, set the `PATH` variable so that the tests properly use the newly built `sox` binary:
+If you built sox, set the `PATH` variable so that the tests properly use the newly built `SoX` binary:
 
 ```bash
 export PATH="<path_to_torchaudio>/third_party/install/bin:${PATH}"
@@ -75,7 +78,13 @@ export PATH="<path_to_torchaudio>/third_party/install/bin:${PATH}"
 The following dependencies are also needed for testing:
 
 ```bash
-pip install typing pytest scipy numpy parameterized
+pip install typing pytest scipy numpy parameterized pyyaml
+```
+
+Optional packages to install if you want to run related tests:
+
+```bash
+pip install librosa requests soundfile kaldi_io transformers fariseq
 ```
 
 ## Development Process
