@@ -11,7 +11,7 @@ from torch.optim import SGD, Adadelta, Adam, AdamW
 from torch.optim.lr_scheduler import ExponentialLR, ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torchaudio.datasets.utils import bg_iterator
-from torchaudio.functional import levenshtein_distance
+from torchaudio.functional import character_edit_distance, word_edit_distance
 from torchaudio.models.wav2letter import Wav2Letter
 
 from ctc_decoders import GreedyDecoder
@@ -148,7 +148,11 @@ def parse_args():
     parser.add_argument("--eps", metavar="EPS", type=float, default=1e-8)
     parser.add_argument("--rho", metavar="RHO", type=float, default=0.95)
     parser.add_argument("--clip-grad", metavar="NORM", type=float, default=0.0)
-    parser.add_argument("--dataset-root", type=str, help="specify dataset root folder")
+    parser.add_argument(
+        "--dataset-root",
+        type=str,
+        help="specify dataset root folder",
+    )
     parser.add_argument(
         "--dataset-folder-in-archive",
         type=str,
@@ -213,7 +217,7 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
         target_print = target[i].ljust(print_length)[:print_length]
         logging.info("Target: %s    Output: %s", target_print, output_print)
 
-    cers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
+    cers = [character_edit_distance(t, o) for t, o in zip(target, output)]
     cers = sum(cers)
     n = sum(len(t) for t in target)
     metric["batch char error"] = cers
@@ -228,7 +232,7 @@ def compute_error_rates(outputs, targets, decoder, language_model, metric):
     output = [o.split(language_model.char_space) for o in output]
     target = [t.split(language_model.char_space) for t in target]
 
-    wers = [levenshtein_distance(t, o) for t, o in zip(target, output)]
+    wers = [word_edit_distance(t, o) for t, o in zip(target, output)]
     wers = sum(wers)
     n = sum(len(t) for t in target)
     metric["batch word error"] = wers
@@ -400,7 +404,7 @@ def main(rank, args):
                 sample_rate=sample_rate_original,
                 n_mfcc=args.n_bins,
                 melkwargs=melkwargs,
-            )
+            ),
         )
         num_features = args.n_bins
     elif args.type == "waveform":

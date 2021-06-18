@@ -1,5 +1,5 @@
 from parameterized import parameterized
-from torchaudio.functional import levenshtein_distance
+from torchaudio.functional import character_edit_distance, word_edit_distance
 from torchaudio_unittest import common_utils
 
 
@@ -14,10 +14,17 @@ class TestLevenshteinDistance(common_utils.TorchaudioTestCase):
             ["aa", "aaa", 1],
             ["aaa", "aa", 1],
             ["abc", "bcd", 2],
+        ]
+    )
+    def test_simple_case_character_edit_distance(self, ref, hyp, distance):
+        assert character_edit_distance(ref, hyp) == distance
+
+    @parameterized.expand(
+        [
             [["hello", "world"], ["hello", "world", "!"], 1],
             [["hello", "world"], ["world", "hello", "!"], 2],
             [["hello", "world"], "world", 5],
         ]
     )
-    def test_simple_case(self, ref, hyp, distance):
-        assert levenshtein_distance(ref, hyp) == distance
+    def test_simple_case_word_edit_distance(self, ref, hyp, distance):
+        assert word_edit_distance(ref, hyp) == distance
