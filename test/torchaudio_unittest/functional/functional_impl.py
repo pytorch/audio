@@ -80,6 +80,19 @@ class Functional(TestBaseMixin):
         output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
         assert shape == waveform.size() == output_waveform.size()
 
+    @parameterized.expand([
+        ((44100,), (2, 3), (2, 44100)),
+        ((3, 44100), (1, 3), (3, 1, 44100)),
+        ((1, 2, 44100), (3, 3), (1, 2, 3, 44100))
+    ])
+    def test_lfilter_filterbanks_shape(self, input_shape, coeff_shape, target_shape):
+        torch.random.manual_seed(42)
+        waveform = torch.rand(*input_shape, dtype=self.dtype, device=self.device)
+        b_coeffs = torch.rand(*coeff_shape, dtype=self.dtype, device=self.device)
+        a_coeffs = torch.rand(*coeff_shape, dtype=self.dtype, device=self.device)
+        output_waveform = F.lfilter(waveform, a_coeffs, b_coeffs)
+        assert target_shape == output_waveform.size()
+
     def test_lfilter_9th_order_filter_stability(self):
         """
         Validate the precision of lfilter against reference scipy implementation when using high order filter.
