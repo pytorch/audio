@@ -465,7 +465,7 @@ jobs:
           command: docker run -t --gpus all -e UPLOAD_CHANNEL -e CONDA_CHANNEL_FLAGS -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/install.sh
       - run:
           name: Run tests
-          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
+          command: docker run -t --gpus all -v $PWD:$PWD -w $PWD -e "TORCHAUDIO_TEST_FORCE_CUDA=1" "${image_name}" .circleci/unittest/linux/scripts/run_test.sh
       - store_test_results:
           path: test-results
       - store_artifacts:
@@ -686,6 +686,12 @@ workflows:
           wheel_docker_image: pytorch/manylinux-rocm:4.1
       - binary_linux_wheel:
           cuda_version: cpu
+          filters:
+            branches:
+              only:
+              - /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: binary_linux_wheel_py3.8_cpu
           python_version: '3.8'
           requires:
@@ -991,6 +997,12 @@ workflows:
           name: binary_windows_conda_py3.9_cu111
           python_version: '3.9'
       - build_docs:
+          filters:
+            branches:
+              only:
+              - /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: build_docs
           python_version: '3.8'
           requires:

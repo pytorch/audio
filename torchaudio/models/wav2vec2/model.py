@@ -7,7 +7,7 @@ from . import components
 
 
 class Wav2Vec2Model(Module):
-    """Encoder model used in [:footcite:`baevski2020wav2vec`].
+    """Encoder model used in *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
 
     Note:
         To build the model, please use one of the factory functions.
@@ -122,7 +122,7 @@ def _get_model(
 
 
 def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with "Base" configuration from [:footcite:`baevski2020wav2vec`].
+    """Build wav2vec2.0 model with "Base" configuration from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
 
     Args:
         num_out: int
@@ -164,7 +164,7 @@ def wav2vec2_base(num_out: int) -> Wav2Vec2Model:
 
 
 def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with "Large" configuration from [:footcite:`baevski2020wav2vec`].
+    """Build wav2vec2.0 model with "Large" configuration from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
 
     Args:
         num_out: int
@@ -206,7 +206,7 @@ def wav2vec2_large(num_out: int) -> Wav2Vec2Model:
 
 
 def wav2vec2_large_lv60k(num_out: int) -> Wav2Vec2Model:
-    """Build wav2vec2.0 model with "Large LV-60k" configuration from [:footcite:`baevski2020wav2vec`].
+    """Build wav2vec2.0 model with "Large LV-60k" configuration from *wav2vec 2.0* [:footcite:`baevski2020wav2vec`].
 
     Args:
         num_out: int
