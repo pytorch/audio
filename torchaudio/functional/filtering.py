@@ -962,7 +962,7 @@ def lfilter(
     waveform = waveform.reshape(-1, 1, shape[-1])
     if a_coeffs.ndim > 1:
         shape = shape[:-1] + (a_coeffs.shape[0], shape[-1])
-        waveform = torch.broadcast_to(waveform, a_coeffs)
+        waveform = waveform.repeat(1, a_coeffs.shape[0], 1)
     else:
         a_coeffs = a_coeffs.unsqueeze(0)
         b_coeffs = b_coeffs.unsqueeze(0)
