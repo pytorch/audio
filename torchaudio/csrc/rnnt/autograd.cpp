@@ -16,7 +16,6 @@ class RNNTLossFunction : public torch::autograd::Function<RNNTLossFunction> {
       double clamp,
       bool fused_log_smax = true,
       bool reuse_logits_for_grads = true) {
-    at::AutoDispatchBelowADInplaceOrView g;
     torch::Tensor undef;
     auto result = rnnt_loss(
         logits,
