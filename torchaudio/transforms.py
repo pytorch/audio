@@ -69,10 +69,10 @@ class Spectrogram(torch.nn.Module):
             power spectrogram, which is a real-valued tensor.
 
             Example
-                    >>> specgram = torch.randn(1, 40, 1000)
-                    >>> specgram = torchaudio.transforms.Spectrogram()(specgram)
-                    >>> specgram.shape
-                    torch.Size([1, 40, 201, 6])
+
+            >>> waveform = torch.randn(1, 40, 1000)
+            >>> trans = torchaudio.transforms.Spectrogram(n_fft=800)(waveform)
+            >>> trans.shape
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
