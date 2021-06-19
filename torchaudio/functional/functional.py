@@ -197,7 +197,7 @@ def inverse_spectrogram(
         spectrogram = torch.view_as_complex(spectrogram)
 
     if normalized:
-        spectrogram *= window.pow(2.).sum().sqrt()
+        spectrogram = spectrogram * window.pow(2.).sum().sqrt()
 
     # pack batch
     shape = spectrogram.size()

@@ -15,7 +15,7 @@ from .functional.functional import (
 
 __all__ = [
     'Spectrogram',
-    'InverseSpectrogram'
+    'InverseSpectrogram',
     'GriffinLim',
     'AmplitudeToDB',
     'MelScale',
