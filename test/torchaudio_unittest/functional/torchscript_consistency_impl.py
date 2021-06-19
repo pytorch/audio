@@ -79,6 +79,39 @@ class Functional(TempDirMixin, TestBaseMixin):
         tensor = common_utils.get_whitenoise()
         self._assert_consistency(func, tensor)
 
+    def test_inverse_spectrogram_complex(self):
+        def func(tensor):
+            n_fft = 400
+            ws = 400
+            hop = 200
+            pad = 0
+            window = torch.hann_window(ws, device=tensor.device, dtype=torch.view_as_real(tensor).dtype)
+            power = None
+            normalize = False
+            return F.inverse_spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
+
+        wave = common_utils.get_whitenoise()
+        tensor = F.spectrogram(wave, window=torch.hann_window(400, device=wave.device, dtype=wave.dtype),
+                               n_fft=400, hop_length=200, win_length=400, pad=0, normalized=False, power=None)
+        self._assert_consistency_complex(func, tensor)
+
+    def test_inverse_spectrogram_real(self):
+        def func(tensor):
+            n_fft = 400
+            ws = 400
+            hop = 200
+            pad = 0
+            window = torch.hann_window(ws, device=tensor.device, dtype=tensor.dtype)
+            power = None
+            normalize = False
+            return F.inverse_spectrogram(tensor, pad, window, n_fft, hop, ws, power, normalize)
+
+        wave = common_utils.get_whitenoise()
+        tensor = F.spectrogram(wave, window=torch.hann_window(400, device=wave.device, dtype=wave.dtype),
+                               n_fft=400, hop_length=200, win_length=400, pad=0, normalized=False, power=None,
+                               return_complex=False)
+        self._assert_consistency(func, tensor)
+
     @skipIfRocm
     def test_griffinlim(self):
         def func(tensor):
