@@ -76,6 +76,26 @@ class AutogradTestMixin(TestBaseMixin):
         waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform], nondet_tol=1e-10)
 
+    @parameterized.expand([
+        ({'pad': 0, 'normalized': False, 'power': None, 'return_complex': True}, ),
+        ({'pad': 3, 'normalized': False, 'power': None, 'return_complex': True}, ),
+        ({'pad': 0, 'normalized': True, 'power': None, 'return_complex': True}, ),
+        ({'pad': 3, 'normalized': True, 'power': None, 'return_complex': True}, ),
+        ({'pad': 0, 'normalized': False, 'power': None}, ),
+        ({'pad': 3, 'normalized': False, 'power': None}, ),
+        ({'pad': 0, 'normalized': True, 'power': None}, ),
+        ({'pad': 3, 'normalized': True, 'power': None}, ),
+    ])
+    def test_inverse_spectrogram(self, kwargs):
+        # create a realistic input:
+        transform = T.Spectrogram(**kwargs)
+        waveform = get_whitenoise(sample_rate=8000, duration=0.05, n_channels=2)
+        spectrogram = transform(waveform)
+
+        # test
+        inv_transform = T.InverseSpectrogram(**kwargs)
+        self.assert_grad(inv_transform, [spectrogram])
+
     def test_melspectrogram(self):
         # replication_pad1d_backward_cuda is not deteministic and
         # gives very small (~2.7756e-17) difference.
