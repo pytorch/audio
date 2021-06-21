@@ -40,7 +40,7 @@ conda activate "${env_dir}"
 # )
 
 
-if [ "${os}" == MacOSX ] | [ -z "${CUDA_VERSION:-}" ] ; then
+if [ "${os}" == MacOSX ] || [ -z "${CUDA_VERSION:-}" ] ; then
     device="cpu"
 else
     version="$(python -c "print(''.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
