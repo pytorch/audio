@@ -41,6 +41,9 @@ def rnnt_loss(
         Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
             otherwise scalar.
     """
+    if reduction not in ['none', 'mean', 'sum']:
+        raise ValueError("reduction should be one of 'none', 'mean', or 'sum'")
+
     if not fused_log_softmax:
         logits = torch.nn.functional.log_softmax(logits, dim=-1)
         reuse_logits_for_grads = (
@@ -64,7 +67,7 @@ def rnnt_loss(
         return costs.mean()
     elif reduction == 'sum':
         return costs.sum()
-    
+
     return costs
 
 
