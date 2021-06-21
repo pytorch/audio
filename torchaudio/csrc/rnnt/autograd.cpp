@@ -53,6 +53,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> rnnt_loss_autograd(
     double clamp,
     bool fused_log_smax = true,
     bool reuse_logits_for_grads = true) {
+  at::AutoDispatchBelowADInplaceOrView guard;
   auto results = RNNTLossFunction::apply(
       logits,
       targets,
