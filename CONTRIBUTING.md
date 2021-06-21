@@ -58,7 +58,6 @@ pip install cmake ninja
 ```bash
 git clone https://github.com/pytorch/audio.git
 cd audio
-git submodule sync
 git submodule update --init --recursive
 BUILD_SOX=1 python setup.py develop
 # or, for OSX
