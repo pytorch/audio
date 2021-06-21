@@ -80,9 +80,13 @@ pip install typing pytest scipy numpy parameterized
 
 Optional packages to install if you want to run related tests:
 
-```bash
-pip install librosa requests soundfile kaldi_io transformers
-```
+- `librosa`
+- `requests`
+- `soundfile`
+- `kaldi_io`
+- `transformers`
+- `fairseq` (it has to be newer than `0.10.2`, so you will need to install from
+  source. Commit `e6eddd80` is known to work.)
 
 ## Development Process
 
