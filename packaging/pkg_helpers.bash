@@ -1,6 +1,6 @@
 # A set of useful bash functions for common functionality we need to do in
 # many build scripts
-
+export PYTORCH_VERSION=1.10.0.dev20210618
 
 # Setup CUDA environment variables, based on CU_VERSION
 #
