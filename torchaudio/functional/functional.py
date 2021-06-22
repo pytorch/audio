@@ -1448,39 +1448,7 @@ def resample(
     return resampled
 
 
-def character_edit_distance(reference: str, hypothesis: str) -> int:
-    """
-    Calculate the character level edit (Levenshtein) distance between two strings.
-
-    The function computes an edit distance allowing deletion, insertion and substitution.
-    The result is an integer. Users may want to normalize by the length of the reference.
-
-    Args:
-        reference (str): the reference string to compare.
-        hypothesis (str): the hypothesis string (e.g. the predicted string) to compare.
-    Returns:
-        int: The distance between the reference and the hypothesis.
-    """
-    dold = [i for i in range(len(hypothesis)+1)]
-    dnew = [0 for _ in range(len(hypothesis)+1)]
-
-    for i in range(1, len(reference) + 1):
-        dnew[0] = i
-        for j in range(1, len(hypothesis) + 1):
-            if reference[i - 1] == hypothesis[j - 1]:
-                dnew[j] = dold[j - 1]
-            else:
-                substitution = dold[j - 1] + 1
-                insertion = dnew[j - 1] + 1
-                deletion = dold[j] + 1
-                dnew[j] = min(substitution, insertion, deletion)
-
-        dnew, dold = dold, dnew
-
-    return int(dold[-1])
-
-
-def word_edit_distance(reference: List[str], hypothesis: List[str]) -> int:
+def word_edit_distance(sentence1: List[str], sentence2: List[str]) -> int:
     """
     Calculate the word level edit (Levenshtein) distance between two sentences.
     The sentences should be represented in a list of strings.
@@ -1489,18 +1457,19 @@ def word_edit_distance(reference: List[str], hypothesis: List[str]) -> int:
     The result is an integer. Users may want to normalize by the length of the reference.
 
     Args:
-        reference (list of str): the reference sentence to compare.
-        hypothesis (list of str): the hypothesis sentence (e.g. the predicted string) to compare.
+        sentence1 (list of str): the first sentence to compare.
+        sentence2 (list of str): the second sentence to compare.
     Returns:
-        int: The distance between the reference and the hypothesis.
+        int: The distance between the first and second sentences.
     """
-    dold = [i for i in range(len(hypothesis)+1)]
-    dnew = [0 for _ in range(len(hypothesis)+1)]
+    len_sent2 = len(sentence2)
+    dold = [i for i in range(len_sent2 + 1)]
+    dnew = [0 for _ in range(len_sent2 + 1)]
 
-    for i in range(1, len(reference) + 1):
+    for i in range(1, len(sentence1) + 1):
         dnew[0] = i
-        for j in range(1, len(hypothesis) + 1):
-            if reference[i - 1] == hypothesis[j - 1]:
+        for j in range(1, len_sent2 + 1):
+            if sentence1[i - 1] == sentence2[j - 1]:
                 dnew[j] = dold[j - 1]
             else:
                 substitution = dold[j - 1] + 1
@@ -1511,3 +1480,21 @@ def word_edit_distance(reference: List[str], hypothesis: List[str]) -> int:
         dnew, dold = dold, dnew
 
     return int(dold[-1])
+
+
+def character_edit_distance(string1: str, string2: str) -> int:
+    """
+    Calculate the character level edit (Levenshtein) distance between two strings.
+
+    The function computes an edit distance allowing deletion, insertion and substitution.
+    The result is an integer. Users may want to normalize by the length of the reference.
+
+    Args:
+        string1 (str): the first string to compare.
+        string2 (str): the second string to compare.
+    Returns:
+        int: The distance between the first and second strings.
+    """
+    sentence1 = [s for s in string1]
+    sentence2 = [s for s in string2]
+    return word_edit_distance(sentence1, sentence2)

@@ -595,41 +595,55 @@ class Functional(TempDirMixin, TestBaseMixin):
 
     @parameterized.expand(
         [
-            ["abc", ""],
-            ["", ""],
+            ["", ""], # equal
             ["abc", "abc"],
-            ["aaa", "aba"],
-            ["aba", "aaa"],
+            ["ᑌᑎIᑕO", "ᑌᑎIᑕO"],
+
+            ["abc", ""], # deletion
             ["aa", "aaa"],
             ["aaa", "aa"],
-            ["abc", "bcd"],
+            ["ᑌᑎI", "ᑌᑎIᑕO"],
+
+            ["aaa", "aba"], # substitution
+            ["aba", "aaa"],
+            ["aba", "   "],
+
+            ["abc", "bcd"], # mix deletion and substitution
+            ["0ᑌᑎI", "ᑌᑎIᑕO"],
         ]
     )
-    def test_character_edit_distance(self, ref, hyp):
-
+    def test_character_edit_distance(self, string1, string2):
         path = self.get_temp_path('func.zip')
         torch.jit.script(F.character_edit_distance).save(path)
         ts_func = torch.jit.load(path)
 
-        output = F.character_edit_distance(ref, hyp)
-        ts_output = ts_func(ref, hyp)
+        output = F.character_edit_distance(string1, string2)
+        ts_output = ts_func(string1, string2)
         self.assertEqual(ts_output, output)
 
     @parameterized.expand(
         [
-            [["hello", "world"], ["hello", "world", "!"]],
-            [["hello", "world"], ["world", "hello", "!"]],
+            [["hello", "", "Tᕮ᙭T"], ["hello", "", "Tᕮ᙭T"]], # equal
+
+            [["hello", "world"], ["hello", "world", "!"]], # deletion
             [["hello", "world"], ["world"]],
+
+            [["Tᕮ᙭T", ], ["world"]], # substitution
+            [["Tᕮ᙭T", "XD"], ["world", "hello"]],
+            [["", "XD"], ["world", ""]],
+            ["aba", "   "],
+
+            [["hello", "world"], ["world", "hello", "!"]], # mix deletion and substitution
+            [["Tᕮ᙭T", "world", "LOL", "XD"], ["world", "hello", "ʕ•́ᴥ•̀ʔっ"]],
         ]
     )
-    def test_word_edit_distance(self, ref, hyp):
-
+    def test_word_edit_distance(self, sentence1, sentence2):
         path = self.get_temp_path('func.zip')
         torch.jit.script(F.word_edit_distance).save(path)
         ts_func = torch.jit.load(path)
 
-        output = F.word_edit_distance(ref, hyp)
-        ts_output = ts_func(ref, hyp)
+        output = F.word_edit_distance(sentence1, sentence2)
+        ts_output = ts_func(sentence1, sentence2)
         self.assertEqual(ts_output, output)
 
     @common_utils.skipIfNoKaldi

@@ -384,28 +384,44 @@ class Functional(TestBaseMixin):
 
     @parameterized.expand(
         [
-            ["abc", "", 3],
-            ["", "", 0],
+            ["", "", 0], # equal
             ["abc", "abc", 0],
-            ["aaa", "aba", 1],
-            ["aba", "aaa", 1],
+            ["ᑌᑎIᑕO", "ᑌᑎIᑕO", 0],
+
+            ["abc", "", 3], # deletion
             ["aa", "aaa", 1],
             ["aaa", "aa", 1],
-            ["abc", "bcd", 2],
+            ["ᑌᑎI", "ᑌᑎIᑕO", 2],
+
+            ["aaa", "aba", 1], # substitution
+            ["aba", "aaa", 1],
+            ["aba", "   ", 3],
+
+            ["abc", "bcd", 2], # mix deletion and substitution
+            ["0ᑌᑎI", "ᑌᑎIᑕO", 3],
         ]
     )
     def test_simple_case_character_edit_distance(self, ref, hyp, distance):
-        assert character_edit_distance(ref, hyp) == distance
+        assert F.character_edit_distance(ref, hyp) == distance
 
     @parameterized.expand(
         [
-            [["hello", "world"], ["hello", "world", "!"], 1],
-            [["hello", "world"], ["world", "hello", "!"], 2],
+            [["hello", "", "Tᕮ᙭T"], ["hello", "", "Tᕮ᙭T"], 0], # equal
+
+            [["hello", "world"], ["hello", "world", "!"], 1], # deletion
             [["hello", "world"], ["world"], 1],
+
+            [["Tᕮ᙭T", ], ["world"], 1], # substitution
+            [["Tᕮ᙭T", "XD"], ["world", "hello"], 2],
+            [["", "XD"], ["world", ""], 2],
+            ["aba", "   ", 3],
+
+            [["hello", "world"], ["world", "hello", "!"], 2], # mix deletion and substitution
+            [["Tᕮ᙭T", "world", "LOL", "XD"], ["world", "hello", "ʕ•́ᴥ•̀ʔっ"], 3],
         ]
     )
     def test_simple_case_word_edit_distance(self, ref, hyp, distance):
-        assert word_edit_distance(ref, hyp) == distance
+        assert F.word_edit_distance(ref, hyp) == distance
 
 
 class FunctionalCPUOnly(TestBaseMixin):
