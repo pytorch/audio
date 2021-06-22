@@ -31,15 +31,18 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
       "logits must be float32 or float16 (half) type");
   TORCH_CHECK(targets.dtype() == torch::kInt32, "targets must be int32 type");
   TORCH_CHECK(
-      logit_lengths.dtype() == torch::kInt32, "logit_lengths must be int32 type");
+      logit_lengths.dtype() == torch::kInt32,
+      "logit_lengths must be int32 type");
   TORCH_CHECK(
       target_lengths.dtype() == torch::kInt32,
       "target_lengths must be int32 type");
 
   TORCH_CHECK(logits.is_contiguous(), "logits must be contiguous");
   TORCH_CHECK(targets.is_contiguous(), "targets must be contiguous");
-  TORCH_CHECK(logit_lengths.is_contiguous(), "logit_lengths must be contiguous");
-  TORCH_CHECK(target_lengths.is_contiguous(), "target_lengths must be contiguous");
+  TORCH_CHECK(
+      logit_lengths.is_contiguous(), "logit_lengths must be contiguous");
+  TORCH_CHECK(
+      target_lengths.is_contiguous(), "target_lengths must be contiguous");
 
   TORCH_CHECK(
       logits.dim() == 4, "logits must be 4-D (batch, time, target, class)");
