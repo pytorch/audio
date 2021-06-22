@@ -382,6 +382,31 @@ class Functional(TestBaseMixin):
         output_shape = (torch.view_as_complex(spec_stretch) if test_pseudo_complex else spec_stretch).shape
         assert output_shape == expected_shape
 
+    @parameterized.expand(
+        [
+            ["abc", "", 3],
+            ["", "", 0],
+            ["abc", "abc", 0],
+            ["aaa", "aba", 1],
+            ["aba", "aaa", 1],
+            ["aa", "aaa", 1],
+            ["aaa", "aa", 1],
+            ["abc", "bcd", 2],
+        ]
+    )
+    def test_simple_case_character_edit_distance(self, ref, hyp, distance):
+        assert character_edit_distance(ref, hyp) == distance
+
+    @parameterized.expand(
+        [
+            [["hello", "world"], ["hello", "world", "!"], 1],
+            [["hello", "world"], ["world", "hello", "!"], 2],
+            [["hello", "world"], ["world"], 1],
+        ]
+    )
+    def test_simple_case_word_edit_distance(self, ref, hyp, distance):
+        assert word_edit_distance(ref, hyp) == distance
+
 
 class FunctionalCPUOnly(TestBaseMixin):
     def test_create_fb_matrix_no_warning_high_n_freq(self):
