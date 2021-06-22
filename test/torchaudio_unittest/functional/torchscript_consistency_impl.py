@@ -593,25 +593,44 @@ class Functional(TempDirMixin, TestBaseMixin):
         tensor = common_utils.get_whitenoise(sample_rate=44100)
         self._assert_consistency(func, tensor)
 
-    def test_character_edit_distance(self):
+    @parameterized.expand(
+        [
+            ["abc", ""],
+            ["", ""],
+            ["abc", "abc"],
+            ["aaa", "aba"],
+            ["aba", "aaa"],
+            ["aa", "aaa"],
+            ["aaa", "aa"],
+            ["abc", "bcd"],
+        ]
+    )
+    def test_character_edit_distance(self, ref, hyp):
 
-        def func(tensor):
-            ref = "abc"
-            hyp = "bcd"
-            return F.character_edit_distance(ref, hyp)
+        path = self.get_temp_path('func.zip')
+        torch.jit.script(F.character_edit_distance).save(path)
+        ts_func = torch.jit.load(path)
 
-        dummy = torch.zeros(1, 1)
-        self._assert_consistency(func, dummy)
+        output = F.character_edit_distance(ref, hyp)
+        ts_output = ts_func(ref, hyp)
+        self.assertEqual(ts_output, output)
 
-    def test_word_edit_distance(self):
+    @parameterized.expand(
+        [
+            [["hello", "world"], ["hello", "world", "!"]],
+            [["hello", "world"], ["world", "hello", "!"]],
+            [["hello", "world"], ["world"]],
+        ]
+    )
+    def test_word_edit_distance(self, ref, hyp):
 
-        def func(tensor):
-            ref = ["hello", "world"]
-            hyp = ["hello", "planet"]
-            return F.word_edit_distance(ref, hyp)
+        path = self.get_temp_path('func.zip')
+        torch.jit.script(F.word_edit_distance).save(path)
+        ts_func = torch.jit.load(path)
 
-        dummy = torch.zeros(1, 1)
-        self._assert_consistency(func, dummy)
+        output = F.word_edit_distance(ref, hyp)
+        ts_output = ts_func(ref, hyp)
+        self.assertEqual(ts_output, output)
 
     @common_utils.skipIfNoKaldi
     def test_compute_kaldi_pitch(self):
