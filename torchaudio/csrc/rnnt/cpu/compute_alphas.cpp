@@ -8,13 +8,13 @@ namespace cpu {
 torch::Tensor compute_alphas(
     const torch::Tensor& logits,
     const torch::Tensor& targets,
-    const torch::Tensor& src_lengths,
-    const torch::Tensor& tgt_lengths,
+    const torch::Tensor& logit_lengths,
+    const torch::Tensor& target_lengths,
     int64_t blank,
     double clamp) {
   Options options;
-  options.batchSize_ = src_lengths.size(0);
-  options.nHypos_ = tgt_lengths.size(0) / src_lengths.size(0);
+  options.batchSize_ = logit_lengths.size(0);
+  options.nHypos_ = target_lengths.size(0) / logit_lengths.size(0);
   options.maxSrcLen_ = logits.size(1);
   options.maxTgtLen_ = logits.size(2);
   options.numTargets_ = logits.size(3);
@@ -55,8 +55,8 @@ torch::Tensor compute_alphas(
       /*workspace=*/workspace,
       /*logits=*/logits.data_ptr<float>(),
       /*targets=*/targets.data_ptr<int>(),
-      /*src_lengths=*/src_lengths.data_ptr<int>(),
-      /*tgt_lengths=*/tgt_lengths.data_ptr<int>(),
+      /*logit_lengths=*/logit_lengths.data_ptr<int>(),
+      /*target_lengths=*/target_lengths.data_ptr<int>(),
       /*alphas=*/alphas.data_ptr<float>());
   return alphas;
 }
