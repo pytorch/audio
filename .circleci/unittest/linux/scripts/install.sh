@@ -45,7 +45,7 @@ conda activate "${env_dir}"
 if [ "${os}" == MacOSX ] || [ -z "${CUDA_VERSION:-}" ] ; then
     device="cpu"
 else
-    device="$(python -c "print(''.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
+    device=cu"$(python -c "print(''.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
 fi
 printf "Installing PyTorch with %s\n" "${device}"
 (
