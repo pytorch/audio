@@ -47,7 +47,7 @@ if [ "${os}" == MacOSX ] || [ -z "${CUDA_VERSION:-}" ] ; then
 else
     device="$(python -c "print(''.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
 fi
-printf "Installing PyTorch with %s\n" "$device}"
+printf "Installing PyTorch with %s\n" "${device}"
 (
     set -x
     pip install --pre torch==1.10.0.dev20210618 -f "https://download.pytorch.org/whl/nightly/${device}/torch_nightly.html"
