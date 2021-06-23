@@ -27,6 +27,7 @@ conda activate "${env_dir}"
 # printf "Installing PyTorch with %s\n" "${cudatoolkit}"
 # conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
 
+conda install -y nomkl
 if [ -z "${CUDA_VERSION:-}" ] ; then
     device="cpu"
 else
