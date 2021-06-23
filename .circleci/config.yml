@@ -447,7 +447,7 @@ jobs:
     resource_class: gpu.small
     environment:
       <<: *environment
-      image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.1-cudnn7-20210121
+      image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.2-cudnn8-20210623
     steps:
       - checkout
       - attach_workspace:
