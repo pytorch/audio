@@ -384,44 +384,43 @@ class Functional(TestBaseMixin):
 
     @parameterized.expand(
         [
-            ["", "", 0], # equal
+            # words
+            ["", "", 0],  # equal
             ["abc", "abc", 0],
             ["ᑌᑎIᑕO", "ᑌᑎIᑕO", 0],
 
-            ["abc", "", 3], # deletion
+            ["abc", "", 3],  # deletion
             ["aa", "aaa", 1],
             ["aaa", "aa", 1],
             ["ᑌᑎI", "ᑌᑎIᑕO", 2],
 
-            ["aaa", "aba", 1], # substitution
+            ["aaa", "aba", 1],  # substitution
             ["aba", "aaa", 1],
             ["aba", "   ", 3],
 
-            ["abc", "bcd", 2], # mix deletion and substitution
+            ["abc", "bcd", 2],  # mix deletion and substitution
             ["0ᑌᑎI", "ᑌᑎIᑕO", 3],
-        ]
-    )
-    def test_simple_case_character_edit_distance(self, ref, hyp, distance):
-        assert F.character_edit_distance(ref, hyp) == distance
 
-    @parameterized.expand(
-        [
-            [["hello", "", "Tᕮ᙭T"], ["hello", "", "Tᕮ᙭T"], 0], # equal
+            # sentences
+            [["hello", "", "Tᕮ᙭T"], ["hello", "", "Tᕮ᙭T"], 0],  # equal
+            [[], [], 0],
 
-            [["hello", "world"], ["hello", "world", "!"], 1], # deletion
+            [["hello", "world"], ["hello", "world", "!"], 1],  # deletion
             [["hello", "world"], ["world"], 1],
+            [["hello", "world"], [], 2],
 
-            [["Tᕮ᙭T", ], ["world"], 1], # substitution
+            [["Tᕮ᙭T", ], ["world"], 1],  # substitution
             [["Tᕮ᙭T", "XD"], ["world", "hello"], 2],
             [["", "XD"], ["world", ""], 2],
             ["aba", "   ", 3],
 
-            [["hello", "world"], ["world", "hello", "!"], 2], # mix deletion and substitution
+            [["hello", "world"], ["world", "hello", "!"], 2],  # mix deletion and substitution
             [["Tᕮ᙭T", "world", "LOL", "XD"], ["world", "hello", "ʕ•́ᴥ•̀ʔっ"], 3],
         ]
     )
-    def test_simple_case_word_edit_distance(self, ref, hyp, distance):
-        assert F.word_edit_distance(ref, hyp) == distance
+    def test_simple_case_edit_distance(self, seq1, seq2, distance):
+        assert F.edit_distance(seq1, seq2) == distance
+        assert F.edit_distance(seq2, seq1) == distance
 
 
 class FunctionalCPUOnly(TestBaseMixin):

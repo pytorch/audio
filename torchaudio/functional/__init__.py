@@ -20,8 +20,7 @@ from .functional import (
     spectral_centroid,
     apply_codec,
     resample,
-    character_edit_distance,
-    word_edit_distance,
+    edit_distance,
 )
 from .filtering import (
     allpass_biquad,
@@ -90,6 +89,5 @@ __all__ = [
     'vad',
     'apply_codec',
     'resample',
-    "character_edit_distance",
-    "word_edit_distance",
+    'edit_distance',
 ]

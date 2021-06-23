@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from collections.abc import Sequence
 import io
 import math
 import warnings
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
@@ -34,8 +35,7 @@ __all__ = [
     "spectral_centroid",
     "apply_codec",
     "resample",
-    "character_edit_distance",
-    "word_edit_distance",
+    "edit_distance",
 ]
 
 
@@ -1448,28 +1448,36 @@ def resample(
     return resampled
 
 
-def word_edit_distance(sentence1: List[str], sentence2: List[str]) -> int:
+@torch.jit.unused
+def edit_distance(seq1: Sequence, seq2: Sequence) -> int:
     """
-    Calculate the word level edit (Levenshtein) distance between two sentences.
-    The sentences should be represented in a list of strings.
+    Calculate the word level edit (Levenshtein) distance between two sequences.
 
-    The function computes an edit distance allowing deletion, insertion and substitution.
-    The result is an integer. Users may want to normalize by the length of the reference.
+    The function computes an edit distance allowing deletion, insertion and
+    substitution. The result is an integer.
+
+    For most applications, the two input sequences should be the same type. If
+    two strings are given, the output is the edit distance between the two
+    strings (character edit distance). If two lists of strings are given, the
+    output is the edit distance between sentences (word edit distance). Users
+    may want to normalize the output by the length of the reference sequence.
+
+    torchscipt is not supported for this function.
 
     Args:
-        sentence1 (list of str): the first sentence to compare.
-        sentence2 (list of str): the second sentence to compare.
+        seq1 (Sequence): the first sequence to compare.
+        seq2 (Sequence): the second sequence to compare.
     Returns:
-        int: The distance between the first and second sentences.
+        int: The distance between the first and second sequences.
     """
-    len_sent2 = len(sentence2)
-    dold = [i for i in range(len_sent2 + 1)]
+    len_sent2 = len(seq2)
+    dold = list(range(len_sent2 + 1))
     dnew = [0 for _ in range(len_sent2 + 1)]
 
-    for i in range(1, len(sentence1) + 1):
+    for i in range(1, len(seq1) + 1):
         dnew[0] = i
         for j in range(1, len_sent2 + 1):
-            if sentence1[i - 1] == sentence2[j - 1]:
+            if seq1[i - 1] == seq2[j - 1]:
                 dnew[j] = dold[j - 1]
             else:
                 substitution = dold[j - 1] + 1
@@ -1480,21 +1488,3 @@ def word_edit_distance(sentence1: List[str], sentence2: List[str]) -> int:
         dnew, dold = dold, dnew
 
     return int(dold[-1])
-
-
-def character_edit_distance(string1: str, string2: str) -> int:
-    """
-    Calculate the character level edit (Levenshtein) distance between two strings.
-
-    The function computes an edit distance allowing deletion, insertion and substitution.
-    The result is an integer. Users may want to normalize by the length of the reference.
-
-    Args:
-        string1 (str): the first string to compare.
-        string2 (str): the second string to compare.
-    Returns:
-        int: The distance between the first and second strings.
-    """
-    sentence1 = [s for s in string1]
-    sentence2 = [s for s in string2]
-    return word_edit_distance(sentence1, sentence2)
