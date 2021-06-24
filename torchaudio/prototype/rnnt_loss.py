@@ -51,11 +51,11 @@ def rnnt_loss(
     costs, gradients = torch.ops.torchaudio.rnnt_loss(
         logits=logits,
         targets=targets,
-        src_lengths=logit_lengths,
-        tgt_lengths=target_lengths,
+        logit_lengths=logit_lengths,
+        target_lengths=target_lengths,
         blank=blank,
         clamp=clamp,
-        fused_log_smax=fused_log_softmax,
+        fused_log_softmax=fused_log_softmax,
         reuse_logits_for_grads=reuse_logits_for_grads,)
 
     return costs
