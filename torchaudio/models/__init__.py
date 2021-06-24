@@ -1,5 +1,5 @@
 from .wav2letter import Wav2Letter
-from .wavernn import WaveRNN
+from .wavernn import WaveRNN, wavernn_10k_epochs_8bits_ljspeech
 from .conv_tasnet import ConvTasNet
 from .deepspeech import DeepSpeech
 from .wav2vec2 import (
@@ -13,6 +13,7 @@ from .wav2vec2 import (
 __all__ = [
     'Wav2Letter',
     'WaveRNN',
+    'wavernn_10k_epochs_8bits_ljspeech',
     'ConvTasNet',
     'DeepSpeech',
     'Wav2Vec2Model',
