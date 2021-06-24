@@ -78,6 +78,16 @@ The following dependencies are also needed for testing:
 pip install typing pytest scipy numpy parameterized
 ```
 
+Optional packages to install if you want to run related tests:
+
+- `librosa`
+- `requests`
+- `soundfile`
+- `kaldi_io`
+- `transformers`
+- `fairseq` (it has to be newer than `0.10.2`, so you will need to install from
+  source. Commit `e6eddd80` is known to work.)
+
 ## Development Process
 
 If you plan to modify the code or documentation, please follow the steps below:

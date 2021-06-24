@@ -44,20 +44,14 @@ conda activate "${env_dir}"
 
 if [ "${os}" == MacOSX ] || [ -z "${CUDA_VERSION:-}" ] ; then
     device="cpu"
-    printf "Installing PyTorch with %s\n" "$device}"
-    (
-        set -x
-        pip install --pre torch==1.10.0.dev20210618 -f "https://download.pytorch.org/whl/nightly/${device}/torch_nightly.html"
-    )
 else
-    version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
-    cudatoolkit="cudatoolkit=${version}"
-    printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-    (
-        set -x
-        conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
-    )
+    device=cu"$(python -c "print(''.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
 fi
+printf "Installing PyTorch with %s\n" "${device}"
+(
+    set -x
+    pip install --pre torch==1.10.0.dev20210618 -f "https://download.pytorch.org/whl/nightly/${device}/torch_nightly.html"
+)
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
