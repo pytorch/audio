@@ -16,6 +16,7 @@ def rnnt_loss(
     clamp: float = -1,
     fused_log_softmax: bool = True,
     reuse_logits_for_grads: bool = True,
+    reduction: str = "mean",
 ):
     """Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*
     [:footcite:`graves2012sequence`].
@@ -31,10 +32,18 @@ def rnnt_loss(
         target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
         blank (int, opt): blank label (Default: ``-1``)
         clamp (float): clamp for gradients (Default: ``-1``)
-        runtime_check (bool): whether to do sanity check during runtime. (Default: ``False``)
         fused_log_softmax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
         reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)
+        reduction (string, optional): Specifies the reduction to apply to the output:
+            ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
+
+    Returns:
+        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
+            otherwise scalar.
     """
+    if reduction not in ['none', 'mean', 'sum']:
+        raise ValueError("reduction should be one of 'none', 'mean', or 'sum'")
+
     if not fused_log_softmax:
         logits = torch.nn.functional.log_softmax(logits, dim=-1)
         reuse_logits_for_grads = (
@@ -47,12 +56,17 @@ def rnnt_loss(
     costs, gradients = torch.ops.torchaudio.rnnt_loss(
         logits=logits,
         targets=targets,
-        src_lengths=logit_lengths,
-        tgt_lengths=target_lengths,
+        logit_lengths=logit_lengths,
+        target_lengths=target_lengths,
         blank=blank,
         clamp=clamp,
-        fused_log_smax=fused_log_softmax,
+        fused_log_softmax=fused_log_softmax,
         reuse_logits_for_grads=reuse_logits_for_grads,)
+
+    if reduction == 'mean':
+        return costs.mean()
+    elif reduction == 'sum':
+        return costs.sum()
 
     return costs
 
@@ -70,6 +84,8 @@ class RNNTLoss(torch.nn.Module):
         clamp (float): clamp for gradients (Default: ``-1``)
         fused_log_softmax (bool): set to False if calling log_softmax outside loss (Default: ``True``)
         reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)
+        reduction (string, optional): Specifies the reduction to apply to the output:
+            ``'none'`` | ``'mean'`` | ``'sum'``. (Default: ``'mean'``)
     """
 
     def __init__(
@@ -78,12 +94,14 @@ class RNNTLoss(torch.nn.Module):
         clamp: float = -1.,
         fused_log_softmax: bool = True,
         reuse_logits_for_grads: bool = True,
+        reduction: str = "mean",
     ):
         super().__init__()
         self.blank = blank
         self.clamp = clamp
         self.fused_log_softmax = fused_log_softmax
         self.reuse_logits_for_grads = reuse_logits_for_grads
+        self.reduction = reduction
 
     def forward(
         self,
@@ -98,6 +116,10 @@ class RNNTLoss(torch.nn.Module):
             targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded
             logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder
             target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence
+
+        Returns:
+            Tensor: Loss with the reduction option applied. If ``reduction`` is  ``'none'``, then size (batch),
+                otherwise scalar.
         """
         return rnnt_loss(
             logits,
@@ -108,4 +130,5 @@ class RNNTLoss(torch.nn.Module):
             self.clamp,
             self.fused_log_softmax,
             self.reuse_logits_for_grads,
+            self.reduction
         )
