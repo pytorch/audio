@@ -447,7 +447,7 @@ jobs:
     resource_class: gpu.small
     environment:
       <<: *environment
-      image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.1-cudnn7-20210121
+      image_name: pytorch/torchaudio_unittest_base:manylinux-cuda10.2-cudnn8-20210623
     steps:
       - checkout
       - attach_workspace:
@@ -686,6 +686,12 @@ workflows:
           wheel_docker_image: pytorch/manylinux-rocm:4.1
       - binary_linux_wheel:
           cuda_version: cpu
+          filters:
+            branches:
+              only:
+              - /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: binary_linux_wheel_py3.8_cpu
           python_version: '3.8'
           requires:
@@ -991,6 +997,12 @@ workflows:
           name: binary_windows_conda_py3.9_cu111
           python_version: '3.9'
       - build_docs:
+          filters:
+            branches:
+              only:
+              - /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*-rc[0-9]+/
           name: build_docs
           python_version: '3.8'
           requires:

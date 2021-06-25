@@ -86,7 +86,7 @@ class TestHFIntegration(TorchaudioTestCase):
         self.assertEqual(ref, hyp)
         # Feature projection
         x = torch.randn(3, 10, config['conv_dim'][-1])
-        ref = original.wav2vec2.feature_projection(x)
+        ref = original.wav2vec2.feature_projection(x)[0]
         hyp = imported.encoder.feature_projection(x)
         self.assertEqual(ref, hyp)
         # Convolutional Positional Encoder
