@@ -180,6 +180,46 @@ class Tester(common_utils.TorchaudioTestCase):
 
         self.assertEqual(torch_mfcc_norm_none, norm_check)
 
+    def test_lfcc(self):
+        audio_orig = self.waveform.clone()
+        audio_scaled = self.scale(audio_orig)  # (1, 16000)
+
+        sample_rate = 16000
+        n_lfcc = 40
+        n_filter = 128
+        lfcc_transform = torchaudio.transforms.LFCC(sample_rate=sample_rate,
+                                                    n_filter=n_filter,
+                                                    n_lfcc=n_lfcc,
+                                                    norm='ortho')
+        # check defaults
+        torch_lfcc = lfcc_transform(audio_scaled)  # (1, 40, 321)
+        self.assertTrue(torch_lfcc.dim() == 3)
+        self.assertTrue(torch_lfcc.shape[1] == n_lfcc)
+        self.assertTrue(torch_lfcc.shape[2] == 321)
+        # check speckwargs are passed through
+        speckwargs = {'win_length': 200}
+        lfcc_transform2 = torchaudio.transforms.LFCC(sample_rate=sample_rate,
+                                                     n_filter=n_filter,
+                                                     n_lfcc=n_lfcc,
+                                                     norm='ortho',
+                                                     speckwargs=speckwargs)
+        torch_lfcc2 = lfcc_transform2(audio_scaled)  # (1, 40, 641)
+        self.assertTrue(torch_lfcc2.shape[2] == 641)
+
+        # check norms work correctly
+        lfcc_transform_norm_none = torchaudio.transforms.LFCC(sample_rate=sample_rate,
+                                                              n_filter=n_filter,
+                                                              n_lfcc=n_lfcc,
+                                                              norm=None)
+        torch_lfcc_norm_none = lfcc_transform_norm_none(audio_scaled)  # (1, 40, 321)
+
+        norm_check = torch_lfcc.clone()
+        norm_check[:, 0, :] *= math.sqrt(n_filter) * 2
+        norm_check[:, 1:, :] *= math.sqrt(n_filter / 2) * 2
+
+        self.assertTrue(torch_lfcc_norm_none.allclose(norm_check))
+
+
     def test_resample_size(self):
         input_path = common_utils.get_asset_path('sinewave.wav')
         waveform, sample_rate = common_utils.load_wav(input_path)

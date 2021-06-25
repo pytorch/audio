@@ -127,6 +127,16 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         computed = torchaudio.transforms.MFCC()(waveform.repeat(3, 1, 1))
         self.assertEqual(computed, expected, atol=1e-4, rtol=1e-5)
 
+    def test_batch_lfcc(self):
+        waveform = common_utils.get_whitenoise(sample_rate=8000, duration=1, n_channels=2)
+
+        # Single then transform then batch
+        expected = torchaudio.transforms.LFCC()(waveform).repeat(3, 1, 1, 1)
+
+        # Batch then transform
+        computed = torchaudio.transforms.LFCC()(waveform.repeat(3, 1, 1))
+        self.assertEqual(computed, expected, atol=1e-4, rtol=1e-5)
+
     @parameterized.expand([(True, ), (False, )])
     def test_batch_TimeStretch(self, test_pseudo_complex):
         rate = 2
