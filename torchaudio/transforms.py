@@ -633,8 +633,6 @@ class LFCC(torch.nn.Module):
         self.register_buffer('dct_mat', dct_mat)
         self.log_lf = log_lf
 
-
-
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
         Args:

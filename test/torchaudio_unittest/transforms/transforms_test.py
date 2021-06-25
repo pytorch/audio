@@ -219,7 +219,6 @@ class Tester(common_utils.TorchaudioTestCase):
 
         self.assertTrue(torch_lfcc_norm_none.allclose(norm_check))
 
-
     def test_resample_size(self):
         input_path = common_utils.get_asset_path('sinewave.wav')
         waveform, sample_rate = common_utils.load_wav(input_path)
