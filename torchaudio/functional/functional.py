@@ -7,9 +7,9 @@ import warnings
 from typing import Optional, Tuple
 
 import torch
-import torchaudio
 from torch import Tensor
 from torchaudio._internal import module_utils as _mod_utils
+import torchaudio
 
 __all__ = [
     "spectrogram",
