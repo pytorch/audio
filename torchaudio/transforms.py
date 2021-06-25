@@ -21,6 +21,7 @@ __all__ = [
     'InverseMelScale',
     'MelSpectrogram',
     'MFCC',
+    'LFCC',
     'MuLawEncoding',
     'MuLawDecoding',
     'Resample',
