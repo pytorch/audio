@@ -59,6 +59,13 @@ Transforms are common audio transforms. They can be chained together using :clas
 
   .. automethod:: forward
 
+:hidden:`LFCC`
+~~~~~~~~~~~~~~
+
+.. autoclass:: LFCC
+
+  .. automethod:: forward
+
 :hidden:`MuLawEncoding`
 ~~~~~~~~~~~~~~~~~~~~~~~
 
