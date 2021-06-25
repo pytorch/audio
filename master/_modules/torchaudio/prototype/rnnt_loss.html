@@ -329,6 +329,7 @@
     <span class="n">clamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">fused_log_softmax</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">reuse_logits_for_grads</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute the RNN Transducer loss from *Sequence Transduction with Recurrent Neural Networks*</span>
 <span class="sd">    [:footcite:`graves2012sequence`].</span>
@@ -344,10 +345,18 @@
 <span class="sd">        target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence</span>
 <span class="sd">        blank (int, opt): blank label (Default: ``-1``)</span>
 <span class="sd">        clamp (float): clamp for gradients (Default: ``-1``)</span>
-<span class="sd">        runtime_check (bool): whether to do sanity check during runtime. (Default: ``False``)</span>
 <span class="sd">        fused_log_softmax (bool): set to False if calling log_softmax outside loss (Default: ``True``)</span>
 <span class="sd">        reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)</span>
+<span class="sd">        reduction (string, optional): Specifies the reduction to apply to the output:</span>
+<span class="sd">            ``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``. (Default: ``&#39;mean&#39;``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: Loss with the reduction option applied. If ``reduction`` is  ``&#39;none&#39;``, then size (batch),</span>
+<span class="sd">            otherwise scalar.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">reduction</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;sum&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;reduction should be one of &#39;none&#39;, &#39;mean&#39;, or &#39;sum&#39;&quot;</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="n">fused_log_softmax</span><span class="p">:</span>
         <span class="n">logits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">reuse_logits_for_grads</span> <span class="o">=</span> <span class="p">(</span>
@@ -360,12 +369,17 @@
     <span class="n">costs</span><span class="p">,</span> <span class="n">gradients</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">rnnt_loss</span><span class="p">(</span>
         <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">,</span>
         <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span>
-        <span class="n">src_lengths</span><span class="o">=</span><span class="n">logit_lengths</span><span class="p">,</span>
-        <span class="n">tgt_lengths</span><span class="o">=</span><span class="n">target_lengths</span><span class="p">,</span>
+        <span class="n">logit_lengths</span><span class="o">=</span><span class="n">logit_lengths</span><span class="p">,</span>
+        <span class="n">target_lengths</span><span class="o">=</span><span class="n">target_lengths</span><span class="p">,</span>
         <span class="n">blank</span><span class="o">=</span><span class="n">blank</span><span class="p">,</span>
         <span class="n">clamp</span><span class="o">=</span><span class="n">clamp</span><span class="p">,</span>
-        <span class="n">fused_log_smax</span><span class="o">=</span><span class="n">fused_log_softmax</span><span class="p">,</span>
+        <span class="n">fused_log_softmax</span><span class="o">=</span><span class="n">fused_log_softmax</span><span class="p">,</span>
         <span class="n">reuse_logits_for_grads</span><span class="o">=</span><span class="n">reuse_logits_for_grads</span><span class="p">,)</span>
+
+    <span class="k">if</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">costs</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s1">&#39;sum&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">costs</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">costs</span></div>
 
@@ -383,6 +397,8 @@
 <span class="sd">        clamp (float): clamp for gradients (Default: ``-1``)</span>
 <span class="sd">        fused_log_softmax (bool): set to False if calling log_softmax outside loss (Default: ``True``)</span>
 <span class="sd">        reuse_logits_for_grads (bool): whether to save memory by reusing logits memory for grads (Default: ``True``)</span>
+<span class="sd">        reduction (string, optional): Specifies the reduction to apply to the output:</span>
+<span class="sd">            ``&#39;none&#39;`` | ``&#39;mean&#39;`` | ``&#39;sum&#39;``. (Default: ``&#39;mean&#39;``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -391,12 +407,14 @@
         <span class="n">clamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.</span><span class="p">,</span>
         <span class="n">fused_log_softmax</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">reuse_logits_for_grads</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">reduction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blank</span> <span class="o">=</span> <span class="n">blank</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clamp</span> <span class="o">=</span> <span class="n">clamp</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fused_log_softmax</span> <span class="o">=</span> <span class="n">fused_log_softmax</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reuse_logits_for_grads</span> <span class="o">=</span> <span class="n">reuse_logits_for_grads</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">=</span> <span class="n">reduction</span>
 
 <div class="viewcode-block" id="RNNTLoss.forward"><a class="viewcode-back" href="../../../rnnt_loss.html#torchaudio.prototype.rnnt_loss.RNNTLoss.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -411,6 +429,10 @@
 <span class="sd">            targets (Tensor): Tensor of dimension (batch, max target length) containing targets with zero padded</span>
 <span class="sd">            logit_lengths (Tensor): Tensor of dimension (batch) containing lengths of each sequence from encoder</span>
 <span class="sd">            target_lengths (Tensor): Tensor of dimension (batch) containing lengths of targets for each sequence</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: Loss with the reduction option applied. If ``reduction`` is  ``&#39;none&#39;``, then size (batch),</span>
+<span class="sd">                otherwise scalar.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">rnnt_loss</span><span class="p">(</span>
             <span class="n">logits</span><span class="p">,</span>
@@ -421,6 +443,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">clamp</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fused_log_softmax</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">reuse_logits_for_grads</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span>
         <span class="p">)</span></div></div>
 </pre></div>
 
