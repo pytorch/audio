@@ -19,6 +19,7 @@ __all__ = [
     "compute_deltas",
     "compute_kaldi_pitch",
     "create_fb_matrix",
+    "linear_fbanks",
     "create_dct",
     "compute_deltas",
     "detect_pitch_frequency",
@@ -494,13 +495,6 @@ def linear_fbanks(
 
     # create filterbank
     fb = _create_triangular_filterbank(all_freqs, f_pts)
-
-    if (fb.max(dim=0).values == 0.).any():
-        warnings.warn(
-            "At least one linear filterbank has all zero values. "
-            f"The value for `n_filter` ({n_filter}) may be set too high. "
-            f"Or, the value for `n_freqs` ({n_freqs}) may be set too low."
-        )
 
     return fb
 
