@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from collections.abc import Sequence
 import io
 import math
 import warnings
@@ -34,6 +35,7 @@ __all__ = [
     "spectral_centroid",
     "apply_codec",
     "resample",
+    "edit_distance",
 ]
 
 
@@ -1444,3 +1446,45 @@ def resample(
                                               resampling_method, beta, waveform.device, waveform.dtype)
     resampled = _apply_sinc_resample_kernel(waveform, orig_freq, new_freq, gcd, kernel, width)
     return resampled
+
+
+@torch.jit.unused
+def edit_distance(seq1: Sequence, seq2: Sequence) -> int:
+    """
+    Calculate the word level edit (Levenshtein) distance between two sequences.
+
+    The function computes an edit distance allowing deletion, insertion and
+    substitution. The result is an integer.
+
+    For most applications, the two input sequences should be the same type. If
+    two strings are given, the output is the edit distance between the two
+    strings (character edit distance). If two lists of strings are given, the
+    output is the edit distance between sentences (word edit distance). Users
+    may want to normalize the output by the length of the reference sequence.
+
+    torchscipt is not supported for this function.
+
+    Args:
+        seq1 (Sequence): the first sequence to compare.
+        seq2 (Sequence): the second sequence to compare.
+    Returns:
+        int: The distance between the first and second sequences.
+    """
+    len_sent2 = len(seq2)
+    dold = list(range(len_sent2 + 1))
+    dnew = [0 for _ in range(len_sent2 + 1)]
+
+    for i in range(1, len(seq1) + 1):
+        dnew[0] = i
+        for j in range(1, len_sent2 + 1):
+            if seq1[i - 1] == seq2[j - 1]:
+                dnew[j] = dold[j - 1]
+            else:
+                substitution = dold[j - 1] + 1
+                insertion = dnew[j - 1] + 1
+                deletion = dold[j] + 1
+                dnew[j] = min(substitution, insertion, deletion)
+
+        dnew, dold = dold, dnew
+
+    return int(dold[-1])
