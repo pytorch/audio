@@ -23,41 +23,21 @@ eval "$("${conda_dir}/bin/conda" shell.bash hook)"
 conda activate "${env_dir}"
 
 # 1. Install PyTorch
-# [2021/06/22 Temporary workaround] Disabling the original installation
-# The orignal, conda-based instartion is working for GPUs, but not for CPUs
-# For CPUs we use pip-based installation
-# if [ -z "${CUDA_VERSION:-}" ] ; then
-#     if [ "${os}" == MacOSX ] ; then
-#         cudatoolkit=''
-#     else
-#         cudatoolkit="cpuonly"
-#     fi
-# else
-#     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
-#     cudatoolkit="cudatoolkit=${version}"
-# fi
-# printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-# (
-#     set -x
-#     conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
-# )
-
-if [ "${os}" == MacOSX ] || [ -z "${CUDA_VERSION:-}" ] ; then
-    device="cpu"
-    printf "Installing PyTorch with %s\n" "$device}"
-    (
-        set -x
-        pip install --pre torch==1.10.0.dev20210618 -f "https://download.pytorch.org/whl/nightly/${device}/torch_nightly.html"
-    )
+if [ -z "${CUDA_VERSION:-}" ] ; then
+    if [ "${os}" == MacOSX ] ; then
+        cudatoolkit=''
+    else
+        cudatoolkit="cpuonly"
+    fi
 else
     version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
     cudatoolkit="cudatoolkit=${version}"
-    printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-    (
-        set -x
-        conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
-    )
 fi
+printf "Installing PyTorch with %s\n" "${cudatoolkit}"
+(
+    set -x
+    conda install ${CONDA_CHANNEL_FLAGS:-} -y -c "pytorch-${UPLOAD_CHANNEL}" "pytorch-${UPLOAD_CHANNEL}::pytorch" ${cudatoolkit}
+)
 
 # 2. Install torchaudio
 printf "* Installing torchaudio\n"
