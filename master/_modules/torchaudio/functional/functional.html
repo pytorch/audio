@@ -313,6 +313,7 @@
   <h1>Source code for torchaudio.functional.functional</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -347,6 +348,7 @@
     <span class="s2">&quot;spectral_centroid&quot;</span><span class="p">,</span>
     <span class="s2">&quot;apply_codec&quot;</span><span class="p">,</span>
     <span class="s2">&quot;resample&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;edit_distance&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 
@@ -1757,6 +1759,48 @@
                                               <span class="n">resampling_method</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="n">resampled</span> <span class="o">=</span> <span class="n">_apply_sinc_resample_kernel</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">orig_freq</span><span class="p">,</span> <span class="n">new_freq</span><span class="p">,</span> <span class="n">gcd</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">resampled</span></div>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">unused</span>
+<span class="k">def</span> <span class="nf">edit_distance</span><span class="p">(</span><span class="n">seq1</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">seq2</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the word level edit (Levenshtein) distance between two sequences.</span>
+
+<span class="sd">    The function computes an edit distance allowing deletion, insertion and</span>
+<span class="sd">    substitution. The result is an integer.</span>
+
+<span class="sd">    For most applications, the two input sequences should be the same type. If</span>
+<span class="sd">    two strings are given, the output is the edit distance between the two</span>
+<span class="sd">    strings (character edit distance). If two lists of strings are given, the</span>
+<span class="sd">    output is the edit distance between sentences (word edit distance). Users</span>
+<span class="sd">    may want to normalize the output by the length of the reference sequence.</span>
+
+<span class="sd">    torchscipt is not supported for this function.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        seq1 (Sequence): the first sequence to compare.</span>
+<span class="sd">        seq2 (Sequence): the second sequence to compare.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The distance between the first and second sequences.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">len_sent2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq2</span><span class="p">)</span>
+    <span class="n">dold</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">len_sent2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">dnew</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">len_sent2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">dnew</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">len_sent2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">seq1</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">seq2</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="n">dnew</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">dold</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">substitution</span> <span class="o">=</span> <span class="n">dold</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">insertion</span> <span class="o">=</span> <span class="n">dnew</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">deletion</span> <span class="o">=</span> <span class="n">dold</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">dnew</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">substitution</span><span class="p">,</span> <span class="n">insertion</span><span class="p">,</span> <span class="n">deletion</span><span class="p">)</span>
+
+        <span class="n">dnew</span><span class="p">,</span> <span class="n">dold</span> <span class="o">=</span> <span class="n">dold</span><span class="p">,</span> <span class="n">dnew</span>
+
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">dold</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 
              </article>
