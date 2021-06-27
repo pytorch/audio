@@ -941,18 +941,19 @@ def lfilter(
 
     Args:
         waveform (Tensor): audio waveform of dimension of ``(..., time)``.  Must be normalized to -1 to 1.
-        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of ``(*, n_order + 1)``.
-                                Where * is the optional number of filter banks.
+        a_coeffs (Tensor): denominator coefficients of difference equation of dimension of either 
+                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
                                 Lower delays coefficients are first, e.g. ``[a0, a1, a2, ...]``.
                                 Must be same size as b_coeffs (pad with 0's as necessary).
-        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of ``(*, n_order + 1)``.
-                                Where * is the optional number of filter banks.
+        b_coeffs (Tensor): numerator coefficients of difference equation of dimension of either 
+                                1D with shape ``(num_order + 1)`` or 2D with shape ``(num_filters, num_order + 1)``.
                                 Lower delays coefficients are first, e.g. ``[b0, b1, b2, ...]``.
                                 Must be same size as a_coeffs (pad with 0's as necessary).
         clamp (bool, optional): If ``True``, clamp the output signal to be in the range [-1, 1] (Default: ``True``)
 
     Returns:
-        Tensor: Waveform with dimension of ``(..., *, time)``.
+        Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs`` are 2D Tensors, 
+                or ``(..., time)`` otherwise.
     """
     # pack batch
     shape = waveform.size()
