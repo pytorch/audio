@@ -955,19 +955,18 @@ def lfilter(
         Tensor: Waveform with dimension of either ``(..., num_filters, time)`` if ``a_coeffs`` and ``b_coeffs`` are 2D Tensors, 
                 or ``(..., time)`` otherwise.
     """
-    # pack batch
-    shape = waveform.size()
     assert a_coeffs.size() == b_coeffs.size()
     assert a_coeffs.ndim <= 2
 
-    waveform = waveform.reshape(-1, 1, shape[-1])
     if a_coeffs.ndim > 1:
-        shape = shape[:-1] + (a_coeffs.shape[0], shape[-1])
-        waveform = waveform.repeat(1, a_coeffs.shape[0], 1)
+        waveform = torch.stack([waveform] * a_coeffs.shape[0], -2)
     else:
         a_coeffs = a_coeffs.unsqueeze(0)
         b_coeffs = b_coeffs.unsqueeze(0)
 
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.reshape(-1, a_coeffs.shape[0], shape[-1])
     output = _lfilter(waveform, a_coeffs, b_coeffs)
 
     if clamp:
