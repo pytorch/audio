@@ -1,5 +1,4 @@
 channels:
-  - conda-forge
   - defaults
 dependencies:
   - flake8
