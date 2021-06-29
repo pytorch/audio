@@ -443,7 +443,7 @@ def numpy_to_torch(data, device, requires_grad=True):
     return data
 
 
-def skipIfNoTransducer(test_item):
+def skipIfNoRNNT(test_item):
     try:
         torch.ops.torchaudio.rnnt_loss
         return test_item
