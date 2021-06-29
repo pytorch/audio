@@ -134,7 +134,6 @@ class Tester(common_utils.TorchaudioTestCase):
         audio = common_utils.get_whitenoise(sample_rate=sample_rate)
 
         n_mfcc = 40
-        n_mels = 128
         mfcc_transform = torchaudio.transforms.MFCC(sample_rate=sample_rate,
                                                     n_mfcc=n_mfcc,
                                                     norm='ortho')
@@ -150,7 +149,6 @@ class Tester(common_utils.TorchaudioTestCase):
         audio = common_utils.get_whitenoise(sample_rate=sample_rate)
 
         n_mfcc = 40
-        n_mels = 128
         melkwargs = {'win_length': 200}
         mfcc_transform = torchaudio.transforms.MFCC(sample_rate=sample_rate,
                                                      n_mfcc=n_mfcc,
