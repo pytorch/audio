@@ -191,7 +191,7 @@ class Tester(common_utils.TorchaudioTestCase):
                                                     n_lfcc=n_lfcc,
                                                     norm='ortho')
         # check defaults
-        torch_lfcc = lfcc_transform(audio)  # (1, 40, 321)
+        torch_lfcc = lfcc_transform(audio)  # (1, 40, 81)
         self.assertEqual(torch_lfcc.dim(), 3)
         self.assertEqual(torch_lfcc.shape[1], n_lfcc)
         self.assertEqual(torch_lfcc.shape[2], 81, torch_lfcc.shape[2])
@@ -209,7 +209,7 @@ class Tester(common_utils.TorchaudioTestCase):
                                                     n_lfcc=n_lfcc,
                                                     norm='ortho',
                                                     speckwargs=speckwargs)
-        torch_lfcc = lfcc_transform(audio)  # (1, 40, 641)
+        torch_lfcc = lfcc_transform(audio)  # (1, 40, 161)
         self.assertEqual(torch_lfcc.shape[2], 161)
 
     def test_lfcc_norms(self):
@@ -228,9 +228,9 @@ class Tester(common_utils.TorchaudioTestCase):
                                                               n_filter=n_filter,
                                                               n_lfcc=n_lfcc,
                                                               norm=None)
-        torch_lfcc_norm_none = lfcc_transform_norm_none(audio)  # (1, 40, 321)
+        torch_lfcc_norm_none = lfcc_transform_norm_none(audio)  # (1, 40, 161)
 
-        norm_check = lfcc_transform(audio)  # (1, 40, 321)
+        norm_check = lfcc_transform(audio)  # (1, 40, 161)
         norm_check[:, 0, :] *= math.sqrt(n_filter) * 2
         norm_check[:, 1:, :] *= math.sqrt(n_filter / 2) * 2
 
