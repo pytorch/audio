@@ -181,9 +181,9 @@ class Tester(common_utils.TorchaudioTestCase):
         self.assertEqual(torch_mfcc_norm_none, norm_check)
 
     def test_lfcc_defaults(self):
-        audio = common_utils.get_whitenoise(sample_rate=16_000)
-
         sample_rate = 16000
+        audio = common_utils.get_whitenoise(sample_rate=sample_rate)
+
         n_lfcc = 40
         n_filter = 128
         lfcc_transform = torchaudio.transforms.LFCC(sample_rate=sample_rate,
@@ -197,9 +197,9 @@ class Tester(common_utils.TorchaudioTestCase):
         self.assertEqual(torch_lfcc.shape[2], 81, torch_lfcc.shape[2])
 
     def test_lfcc_arg_passthrough(self):
-        audio = common_utils.get_whitenoise(sample_rate=16_000)
-
         sample_rate = 16000
+        audio = common_utils.get_whitenoise(sample_rate=sample_rate)
+
         n_lfcc = 40
         n_filter = 128
         # check speckwargs are passed through
@@ -213,9 +213,9 @@ class Tester(common_utils.TorchaudioTestCase):
         self.assertEqual(torch_lfcc.shape[2], 161)
 
     def test_lfcc_norms(self):
-        audio = common_utils.get_whitenoise(sample_rate=16_000)
-
         sample_rate = 16000
+        audio = common_utils.get_whitenoise(sample_rate=sample_rate)
+
         n_lfcc = 40
         n_filter = 128
         lfcc_transform = torchaudio.transforms.LFCC(sample_rate=sample_rate,
