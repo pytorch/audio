@@ -31,6 +31,7 @@ def compute_with_pytorch_transducer(data, reuse_logits_for_grads=False):
         blank=data["blank"],
         fused_log_softmax=data.get("fused_log_softmax", True),
         reuse_logits_for_grads=reuse_logits_for_grads,
+        reduction="none",
     )(
         logits=data["logits"],
         logit_lengths=data["logit_lengths"],
@@ -442,7 +443,7 @@ def numpy_to_torch(data, device, requires_grad=True):
     return data
 
 
-def skipIfNoTransducer(test_item):
+def skipIfNoRNNT(test_item):
     try:
         torch.ops.torchaudio.rnnt_loss
         return test_item

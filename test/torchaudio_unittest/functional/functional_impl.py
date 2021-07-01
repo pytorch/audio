@@ -382,6 +382,46 @@ class Functional(TestBaseMixin):
         output_shape = (torch.view_as_complex(spec_stretch) if test_pseudo_complex else spec_stretch).shape
         assert output_shape == expected_shape
 
+    @parameterized.expand(
+        [
+            # words
+            ["", "", 0],  # equal
+            ["abc", "abc", 0],
+            ["ᑌᑎIᑕO", "ᑌᑎIᑕO", 0],
+
+            ["abc", "", 3],  # deletion
+            ["aa", "aaa", 1],
+            ["aaa", "aa", 1],
+            ["ᑌᑎI", "ᑌᑎIᑕO", 2],
+
+            ["aaa", "aba", 1],  # substitution
+            ["aba", "aaa", 1],
+            ["aba", "   ", 3],
+
+            ["abc", "bcd", 2],  # mix deletion and substitution
+            ["0ᑌᑎI", "ᑌᑎIᑕO", 3],
+
+            # sentences
+            [["hello", "", "Tᕮ᙭T"], ["hello", "", "Tᕮ᙭T"], 0],  # equal
+            [[], [], 0],
+
+            [["hello", "world"], ["hello", "world", "!"], 1],  # deletion
+            [["hello", "world"], ["world"], 1],
+            [["hello", "world"], [], 2],
+
+            [["Tᕮ᙭T", ], ["world"], 1],  # substitution
+            [["Tᕮ᙭T", "XD"], ["world", "hello"], 2],
+            [["", "XD"], ["world", ""], 2],
+            ["aba", "   ", 3],
+
+            [["hello", "world"], ["world", "hello", "!"], 2],  # mix deletion and substitution
+            [["Tᕮ᙭T", "world", "LOL", "XD"], ["world", "hello", "ʕ•́ᴥ•̀ʔっ"], 3],
+        ]
+    )
+    def test_simple_case_edit_distance(self, seq1, seq2, distance):
+        assert F.edit_distance(seq1, seq2) == distance
+        assert F.edit_distance(seq2, seq1) == distance
+
 
 class FunctionalCPUOnly(TestBaseMixin):
     def test_create_fb_matrix_no_warning_high_n_freq(self):
