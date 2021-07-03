@@ -68,10 +68,11 @@ class Spectrogram(torch.nn.Module):
             cases where ``power`` is a number as in those cases, the returned tensor is
             power spectrogram, which is a real-valued tensor.
 
-            Example
+    Example
 
-            >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
-            >>> trans = torchaudio.transforms.Spectrogram(n_fft = 800)(waveform)
+        >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
+        >>> transformed_spectrogram = torchaudio.transforms.Spectrogram(n_fft = 800)(waveform)
+
     """
     __constants__ = ['n_fft', 'win_length', 'hop_length', 'pad', 'power', 'normalized']
 
