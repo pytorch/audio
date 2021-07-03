@@ -151,9 +151,9 @@ class Tester(common_utils.TorchaudioTestCase):
         n_mfcc = 40
         melkwargs = {'win_length': 200}
         mfcc_transform = torchaudio.transforms.MFCC(sample_rate=sample_rate,
-                                                     n_mfcc=n_mfcc,
-                                                     norm='ortho',
-                                                     melkwargs=melkwargs)
+                                                    n_mfcc=n_mfcc,
+                                                    norm='ortho',
+                                                    melkwargs=melkwargs)
         torch_mfcc = mfcc_transform(audio)  # (1, 40, 161)
         self.assertEqual(torch_mfcc.shape[2], 161)
 
