@@ -416,6 +416,9 @@ def save(
 
     if bits_per_sample not in (None, 8, 16, 24, 32, 64):
         raise ValueError("Invalid bits_per_sample.")
+    if bits_per_sample == 24:
+        warnings.warn("Saving audio with 24 bits per sample might warp samples near -1. "
+                      "Using 16 bits per sample might be able to avoid this.")
     subtype = _get_subtype(src.dtype, ext, encoding, bits_per_sample)
 
     # sph is a extension used in TED-LIUM but soundfile does not recognize it as NIST format,
