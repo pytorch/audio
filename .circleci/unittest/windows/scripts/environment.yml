@@ -13,3 +13,4 @@ dependencies:
     - future
     - parameterized
     - dataclasses
+    - expecttest
