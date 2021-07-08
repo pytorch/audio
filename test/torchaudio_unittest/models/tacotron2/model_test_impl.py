@@ -1,5 +1,5 @@
 import torch
-from torchaudio.models.tacotron2 import _Tacotron2, _Encoder, _Decoder
+from torchaudio.prototype.tacotron2 import Tacotron2, _Encoder, _Decoder
 from torchaudio_unittest.common_utils import (
     TestBaseMixin,
     TempDirMixin,
@@ -23,7 +23,7 @@ class TorchscriptConsistencyMixin(TempDirMixin):
         self.assertEqual(ts_output, output)
 
 
-class Tacotron2Encoder(TestBaseMixin, TorchscriptConsistencyMixin):
+class Tacotron2EncoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
 
     def test_encoder_output_shape(self):
         """Feed tensors with specific shape to Tacotron2 Decoder and validate
@@ -43,7 +43,7 @@ class Tacotron2Encoder(TestBaseMixin, TorchscriptConsistencyMixin):
         assert out.size() == (n_batch, n_seq, encoder_embedding_dim)
 
 
-class Tacotron2Decoder(TestBaseMixin, TorchscriptConsistencyMixin):
+class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
 
     def _get_model(self, n_mels=80, encoder_embedding_dim=512):
         model = _Decoder(n_mels=n_mels,
@@ -92,7 +92,7 @@ class Tacotron2Decoder(TestBaseMixin, TorchscriptConsistencyMixin):
         assert alignments.size() == (n_batch, n_time_steps, n_seq)
 
 
-class Tacotron2(TestBaseMixin, TorchscriptConsistencyMixin):
+class Tacotron2Tests(TestBaseMixin, TorchscriptConsistencyMixin):
 
     def test_tacotron2_output_shape(self):
         """Feed tensors with specific shape to Tacotron2 and validate
@@ -100,7 +100,7 @@ class Tacotron2(TestBaseMixin, TorchscriptConsistencyMixin):
         """
 
         n_batch, n_mels = 32, 80
-        model = _Tacotron2(
+        model = Tacotron2(
             mask_padding=False,
             n_mels=n_mels,
             n_symbols=148,

@@ -35,7 +35,7 @@ from torch.nn import functional as F
 
 
 __all__ = [
-    "_Tacotron2",
+    "Tacotron2",
 ]
 
 
@@ -713,7 +713,7 @@ class _Decoder(nn.Module):
         return mel_specgram, gate_outputs, alignments
 
 
-class _Tacotron2(nn.Module):
+class Tacotron2(nn.Module):
     r"""
     Tacotron2 model based on the implementation from `Nvidia <https://github.com/NVIDIA/DeepLearningExamples/>`_.
 
