@@ -1,4 +1,4 @@
-from typing import List, Tuple, Any
+from typing import List, Tuple, Dict, Any
 
 import torch
 from torch import Tensor
@@ -13,13 +13,26 @@ __all__ = [
     "Stretch2d",
     "UpsampleNetwork",
     "WaveRNN",
-    "wavernn_10k_epochs_8bits_ljspeech",
+    "get_pretrained_wavernn",
 ]
 
 
-model_urls = {
-    'wavernn_10k_epochs_8bits_ljspeech': 'https://download.pytorch.org/models/'
-                                         'audio/wavernn_10k_epochs_8bits_ljspeech.pth',
+model_config_and_urls: Dict[str, Tuple[str, Dict[str, Any]]] = {
+    'wavernn_10k_epochs_8bits_ljspeech': (
+        'https://download.pytorch.org/models/audio/wavernn_10k_epochs_8bits_ljspeech.pth',
+        {
+            'upsample_scales': [5, 5, 11],
+            'n_classes': 2 ** 8,  # n_bits = 8
+            'hop_length': 275,
+            'n_res_block': 10,
+            'n_rnn': 512,
+            'n_fc': 512,
+            'kernel_size': 5,
+            'n_freq': 80,
+            'n_hidden': 128,
+            'n_output': 128
+        }
+    )
 }
 
 
@@ -336,35 +349,25 @@ class WaveRNN(nn.Module):
         return x.unsqueeze(1)
 
 
-def _wavernn(arch: str, pretrained: bool, progress: bool, **kwargs: Any) -> WaveRNN:
-    model = WaveRNN(**kwargs)
-    if pretrained:
-        state_dict = load_state_dict_from_url(model_urls['wavernn'],
-                                              progress=progress)
-        model.load_state_dict(state_dict)
-    return model
+def get_pretrained_wavernn(checkpoint_name: str, progress: bool = True) -> WaveRNN:
+    r"""Get pretrained WaveRNN model.
 
+    Here are the available checkpoints:
 
-def wavernn_10k_epochs_8bits_ljspeech(pretrained: bool = True, progress: bool = True, **kwargs: Any) -> WaveRNN:
-    r"""WaveRNN model trained with 10k epochs and 8 bits depth waveform on the LJSpeech dataset.
-    The model is trained using the default parameters and code of the examples/pipeline_wavernn/main.py.
+    - wavernn_10k_epochs_8bits_ljspeech
+
+        WaveRNN model trained with 10k epochs and 8 bits depth waveform on the LJSpeech dataset.
+        The model is trained using the default parameters and code of the examples/pipeline_wavernn/main.py.
 
     Args:
-        pretrained (bool): If True, returns a model pre-trained on LJSpeech
-        progress (bool): If True, displays a progress bar of the download to stderr
+        checkpoint_name (str): The name of the checkpoint to load.
+        progress (bool): If True, displays a progress bar of the download to stderr.
     """
-    n_bits = 8
-    configs = {
-        'upsample_scales': [5, 5, 11],
-        'n_classes': 2 ** n_bits,
-        'hop_length': 275,
-        'n_res_block': 10,
-        'n_rnn': 512,
-        'n_fc': 512,
-        'kernel_size': 5,
-        'n_freq': 80,
-        'n_hidden': 128,
-        'n_output': 128
-    }
-    configs.update(kwargs)
-    return _wavernn("wavernn_10k_epochs_8bits_ljspeech", pretrained=pretrained, progress=progress, **configs)
+    if checkpoint_name in model_config_and_urls:
+        url, configs = model_config_and_urls[checkpoint_name]
+        model = WaveRNN(**configs)
+        state_dict = load_state_dict_from_url(url, progress=progress)
+        model.load_state_dict(state_dict)
+        return model
+    else:
+        raise ValueError("The model_name `{}` is not supported.".format(checkpoint_name))
