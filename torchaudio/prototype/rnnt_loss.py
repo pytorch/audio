@@ -53,7 +53,7 @@ def rnnt_loss(
     if blank < 0:  # reinterpret blank index if blank < 0.
         blank = logits.shape[-1] + blank
 
-    costs, gradients = torch.ops.torchaudio.rnnt_loss(
+    costs, _ = torch.ops.torchaudio.rnnt_loss(
         logits=logits,
         targets=targets,
         logit_lengths=logit_lengths,
