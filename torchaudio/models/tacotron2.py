@@ -51,7 +51,7 @@ class _LinearNorm(torch.nn.Module):
     """
     def __init__(self, in_dim: int, out_dim: int, bias: bool = True,
                  w_init_gain: str = 'linear') -> None:
-        super(_LinearNorm, self).__init__()
+        super().__init__()
         self.linear_layer = torch.nn.Linear(in_dim, out_dim, bias=bias)
 
         torch.nn.init.xavier_uniform_(
@@ -79,7 +79,7 @@ class _ConvNorm(torch.nn.Module):
     def __init__(self, in_channels: int, out_channels: int, kernel_size: int = 1, stride: int = 1,
                  padding: Optional[Union[str, int, Tuple[int]]] = None, dilation: int = 1,
                  bias: bool = True, w_init_gain: str = 'linear') -> None:
-        super(_ConvNorm, self).__init__()
+        super().__init__()
         if padding is None:
             assert (kernel_size % 2 == 1)
             padding = int(dilation * (kernel_size - 1) / 2)
@@ -123,7 +123,7 @@ class _LocationLayer(nn.Module):
         attention_kernel_size (int): Kernel size for attention model.
     """
     def __init__(self, attention_n_filters: int, attention_kernel_size: int, attention_dim: int):
-        super(_LocationLayer, self).__init__()
+        super().__init__()
         padding = int((attention_kernel_size - 1) / 2)
         self.location_conv = _ConvNorm(2, attention_n_filters,
                                        kernel_size=attention_kernel_size,
@@ -165,7 +165,7 @@ class _Attention(nn.Module):
     def __init__(self, attention_rnn_dim: int, encoder_embedding_dim: int,
                  attention_dim: int, attention_location_n_filters: int,
                  attention_location_kernel_size: int) -> None:
-        super(_Attention, self).__init__()
+        super().__init__()
         self.query_layer = _LinearNorm(attention_rnn_dim, attention_dim,
                                        bias=False, w_init_gain='tanh')
         self.memory_layer = _LinearNorm(encoder_embedding_dim, attention_dim, bias=False,
@@ -237,7 +237,7 @@ class _Prenet(nn.Module):
     """
 
     def __init__(self, in_dim: int, out_sizes: List[int]) -> None:
-        super(_Prenet, self).__init__()
+        super().__init__()
         in_sizes = [in_dim] + out_sizes[:-1]
         self.layers = nn.ModuleList(
             [_LinearNorm(in_size, out_size, bias=False)
@@ -270,7 +270,7 @@ class _Postnet(nn.Module):
 
     def __init__(self, n_mels: int, postnet_embedding_dim: int,
                  postnet_kernel_size: int, postnet_n_convolutions: int):
-        super(_Postnet, self).__init__()
+        super().__init__()
         self.convolutions = nn.ModuleList()
 
         self.convolutions.append(
@@ -343,7 +343,7 @@ class _Encoder(nn.Module):
                  encoder_embedding_dim: int,
                  encoder_kernel_size: int,
                  ) -> None:
-        super(_Encoder, self).__init__()
+        super().__init__()
 
         convolutions = []
         for _ in range(encoder_n_convolutions):
@@ -425,7 +425,7 @@ class _Decoder(nn.Module):
                  p_decoder_dropout: float,
                  early_stopping: bool):
 
-        super(_Decoder, self).__init__()
+        super().__init__()
         self.n_mels = n_mels
         self.n_frames_per_step = n_frames_per_step
         self.encoder_embedding_dim = encoder_embedding_dim
@@ -768,7 +768,7 @@ class _Tacotron2(nn.Module):
                  postnet_kernel_size: int = 5,
                  postnet_n_convolutions: int = 5,
                  decoder_no_early_stopping: bool = False) -> None:
-        super(_Tacotron2, self).__init__()
+        super().__init__()
 
         self.mask_padding = mask_padding
         self.n_mels = n_mels
@@ -825,7 +825,7 @@ class _Tacotron2(nn.Module):
             mel_specgram (Tensor): The target mel spectrogram with shape (n_batch, n_mels, mel_specgram_lengths.max()).
             mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape (n_batch).
 
-        Return:
+        Returns:
             mel_specgram (Tensor): Mel spectrogram before Postnet
                 with shape (n_batch, n_mels, mel_specgram_lengths.max()).
             mel_specgram_postnet (Tensor): Mel spectrogram after Postnet
