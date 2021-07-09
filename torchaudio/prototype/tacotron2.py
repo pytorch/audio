@@ -118,18 +118,18 @@ class _LocationLayer(nn.Module):
     r"""Location layer used in the Attention model.
 
     Args:
-        attention_dim (int): Dimension of attention hidden representation.
-        attention_n_filters (int): Number of filters for attention model.
+        attention_hidden_dim (int): Dimension of attention hidden representation.
+        attention_n_filter (int): Number of filters for attention model.
         attention_kernel_size (int): Kernel size for attention model.
     """
-    def __init__(self, attention_n_filters: int, attention_kernel_size: int, attention_dim: int):
+    def __init__(self, attention_n_filter: int, attention_kernel_size: int, attention_hidden_dim: int):
         super().__init__()
         padding = int((attention_kernel_size - 1) / 2)
-        self.location_conv = _ConvNorm(2, attention_n_filters,
+        self.location_conv = _ConvNorm(2, attention_n_filter,
                                        kernel_size=attention_kernel_size,
                                        padding=padding, bias=False, stride=1,
                                        dilation=1)
-        self.location_dense = _LinearNorm(attention_n_filters, attention_dim,
+        self.location_dense = _LinearNorm(attention_n_filter, attention_hidden_dim,
                                           bias=False, w_init_gain='tanh')
 
     def forward(self, attention_weights_cat: Tensor) -> Tensor:
@@ -141,12 +141,12 @@ class _LocationLayer(nn.Module):
 
         Returns:
             processed_attention (Tensor): Cumulative and previous attention weights
-                with shape (n_batch, attention_dim).
+                with shape (n_batch, attention_hidden_dim).
         """
-        # (n_batch, attention_n_filters, text_lengths.max())
+        # (n_batch, attention_n_filter, text_lengths.max())
         processed_attention = self.location_conv(attention_weights_cat)
         processed_attention = processed_attention.transpose(1, 2)
-        # (n_batch, text_lengths.max(), attention_dim)
+        # (n_batch, text_lengths.max(), attention_hidden_dim)
         processed_attention = self.location_dense(processed_attention)
         return processed_attention
 
@@ -157,23 +157,23 @@ class _Attention(nn.Module):
     Args:
         attention_rnn_dim (int): Number of hidden units for RNN.
         encoder_embedding_dim (int): Number of embedding dimensions in the Encoder.
-        attention_dim (int): Dimension of attention hidden representation.
-        attention_location_n_filters (int): Number of filters for Attention model.
+        attention_hidden_dim (int): Dimension of attention hidden representation.
+        attention_location_n_filter (int): Number of filters for Attention model.
         attention_location_kernel_size (int): Kernel size for Attention model.
     """
 
     def __init__(self, attention_rnn_dim: int, encoder_embedding_dim: int,
-                 attention_dim: int, attention_location_n_filters: int,
+                 attention_hidden_dim: int, attention_location_n_filter: int,
                  attention_location_kernel_size: int) -> None:
         super().__init__()
-        self.query_layer = _LinearNorm(attention_rnn_dim, attention_dim,
+        self.query_layer = _LinearNorm(attention_rnn_dim, attention_hidden_dim,
                                        bias=False, w_init_gain='tanh')
-        self.memory_layer = _LinearNorm(encoder_embedding_dim, attention_dim, bias=False,
+        self.memory_layer = _LinearNorm(encoder_embedding_dim, attention_hidden_dim, bias=False,
                                         w_init_gain='tanh')
-        self.v = _LinearNorm(attention_dim, 1, bias=False)
-        self.location_layer = _LocationLayer(attention_location_n_filters,
+        self.v = _LinearNorm(attention_hidden_dim, 1, bias=False)
+        self.location_layer = _LocationLayer(attention_location_n_filter,
                                              attention_location_kernel_size,
-                                             attention_dim)
+                                             attention_hidden_dim)
         self.score_mask_value = -float("inf")
 
     def _get_alignment_energies(self, query: Tensor, processed_memory: Tensor,
@@ -181,9 +181,9 @@ class _Attention(nn.Module):
         r"""Get the alignment vector.
 
         Args:
-            query (Tensor): Decoder output with shape (n_batch, n_mels * n_frames_per_step).
+            query (Tensor): Decoder output with shape (n_batch, n_mel * n_frames_per_step).
             processed_memory (Tensor): Processed Encoder outputs
-                with shape (n_batch, text_lengths.max(), attention_dim).
+                with shape (n_batch, text_lengths.max(), attention_hidden_dim).
             attention_weights_cat (Tensor): Cumulative and previous attention weights
                 with shape (n_batch, 2, text_lengths.max()).
 
@@ -207,7 +207,7 @@ class _Attention(nn.Module):
             attention_hidden_state (Tensor): Attention rnn last output with shape (n_batch, attention_rnn_dim).
             memory (Tensor): Encoder outputs with shape (n_batch, text_lengths.max(), encoder_embedding_dim).
             processed_memory (Tensor): Processed Encoder outputs
-                with shape (n_batch, text_lengths.max(), attention_dim).
+                with shape (n_batch, text_lengths.max(), attention_hidden_dim).
             attention_weights_cat (Tensor): Previous and cumulative attention weights
                 with shape (n_batch, current_num_frames * 2, text_lengths.max()).
             mask (Tensor): Binary mask for padded data with shape (n_batch, current_num_frames).
@@ -262,27 +262,27 @@ class _Postnet(nn.Module):
     r"""Postnet Module.
 
     Args:
-        n_mels (int): Number of mel bins.
+        n_mel (int): Number of mel bins.
         postnet_embedding_dim (int): Postnet embedding dimension.
         postnet_kernel_size (int): Postnet kernel size.
-        postnet_n_convolutions (int): Number of postnet convolutions.
+        postnet_n_convolution (int): Number of postnet convolutions.
     """
 
-    def __init__(self, n_mels: int, postnet_embedding_dim: int,
-                 postnet_kernel_size: int, postnet_n_convolutions: int):
+    def __init__(self, n_mel: int, postnet_embedding_dim: int,
+                 postnet_kernel_size: int, postnet_n_convolution: int):
         super().__init__()
         self.convolutions = nn.ModuleList()
 
         self.convolutions.append(
             nn.Sequential(
-                _ConvNorm(n_mels, postnet_embedding_dim,
+                _ConvNorm(n_mel, postnet_embedding_dim,
                           kernel_size=postnet_kernel_size, stride=1,
                           padding=int((postnet_kernel_size - 1) / 2),
                           dilation=1, w_init_gain='tanh'),
                 nn.BatchNorm1d(postnet_embedding_dim))
         )
 
-        for _ in range(1, postnet_n_convolutions - 1):
+        for _ in range(1, postnet_n_convolution - 1):
             self.convolutions.append(
                 nn.Sequential(
                     _ConvNorm(postnet_embedding_dim,
@@ -295,11 +295,11 @@ class _Postnet(nn.Module):
 
         self.convolutions.append(
             nn.Sequential(
-                _ConvNorm(postnet_embedding_dim, n_mels,
+                _ConvNorm(postnet_embedding_dim, n_mel,
                           kernel_size=postnet_kernel_size, stride=1,
                           padding=int((postnet_kernel_size - 1) / 2),
                           dilation=1, w_init_gain='linear'),
-                nn.BatchNorm1d(n_mels))
+                nn.BatchNorm1d(n_mel))
         )
         self.n_convs = len(self.convolutions)
 
@@ -307,10 +307,10 @@ class _Postnet(nn.Module):
         r"""Pass the input through Postnet.
 
         Args:
-            x (Tensor): The input sequence with shape (n_batch, n_mels, mel_specgram_lengths.max()).
+            x (Tensor): The input sequence with shape (n_batch, n_mel, mel_specgram_lengths.max()).
 
         Return:
-            x (Tensor): Tensor with shape (n_batch, n_mels, mel_specgram_lengths.max()).
+            x (Tensor): Tensor with shape (n_batch, n_mel, mel_specgram_lengths.max()).
         """
 
         i = 0
@@ -328,8 +328,8 @@ class _Encoder(nn.Module):
     r"""Encoder Module.
 
     Args:
-        encoder_n_convolutions (int): Number of convolution layers in the encoder.
         encoder_embedding_dim (int): Number of embedding dimensions in the encoder.
+        encoder_n_convolution (int): Number of convolution layers in the encoder.
         encoder_kernel_size (int): The kernel size in the encoder.
 
     Examples
@@ -339,14 +339,14 @@ class _Encoder(nn.Module):
     """
 
     def __init__(self,
-                 encoder_n_convolutions: int,
                  encoder_embedding_dim: int,
+                 encoder_n_convolution: int,
                  encoder_kernel_size: int,
                  ) -> None:
         super().__init__()
 
         convolutions = []
-        for _ in range(encoder_n_convolutions):
+        for _ in range(encoder_n_convolution):
             conv_layer = nn.Sequential(
                 _ConvNorm(encoder_embedding_dim,
                           encoder_embedding_dim,
@@ -393,53 +393,53 @@ class _Decoder(nn.Module):
     r"""Decoder with Attention model.
 
     Args:
-        n_mels (int): number of mel bins
+        n_mel (int): number of mel bins
         n_frames_per_step (int): number of frames processed per step, only 1 is supported
         encoder_embedding_dim (int): the number of embedding dimensions in the encoder.
-        attention_dim (int): dimension of attention hidden representation
-        attention_location_n_filters (int): number of filters for attention model
-        attention_location_kernel_size (int): kernel size for attention model
-        attention_rnn_dim (int): number of units in attention LSTM
         decoder_rnn_dim (int): number of units in decoder LSTM
+        decoder_max_step (int): maximum number of output mel spectrograms
+        decoder_dropout (float): dropout probability for decoder LSTM
+        decoder_early_stopping (bool): stop decoding when all samples are finished
+        attention_rnn_dim (int): number of units in attention LSTM
+        attention_hidden_dim (int): dimension of attention hidden representation
+        attention_location_n_filter (int): number of filters for attention model
+        attention_location_kernel_size (int): kernel size for attention model
+        attention_dropout (float): dropout probability for attention LSTM
         prenet_dim (int): number of ReLU units in prenet layers
-        max_decoder_steps (int): maximum number of output mel spectrograms
         gate_threshold (float): probability threshold for stop token
-        p_attention_dropout (float): dropout probability for attention LSTM
-        p_decoder_dropout (float): dropout probability for decoder LSTM
-        early_stopping (bool): stop decoding when all samples are finished
     """
 
     def __init__(self,
-                 n_mels: int,
+                 n_mel: int,
                  n_frames_per_step: int,
                  encoder_embedding_dim: int,
-                 attention_dim: int,
-                 attention_location_n_filters: int,
-                 attention_location_kernel_size: int,
-                 attention_rnn_dim: int,
                  decoder_rnn_dim: int,
+                 decoder_max_step: int,
+                 decoder_dropout: float,
+                 decoder_early_stopping: bool,
+                 attention_rnn_dim: int,
+                 attention_hidden_dim: int,
+                 attention_location_n_filter: int,
+                 attention_location_kernel_size: int,
+                 attention_dropout: float,
                  prenet_dim: int,
-                 max_decoder_steps: int,
-                 gate_threshold: float,
-                 p_attention_dropout: float,
-                 p_decoder_dropout: float,
-                 early_stopping: bool):
+                 gate_threshold: float) -> None:
 
         super().__init__()
-        self.n_mels = n_mels
+        self.n_mel = n_mel
         self.n_frames_per_step = n_frames_per_step
         self.encoder_embedding_dim = encoder_embedding_dim
         self.attention_rnn_dim = attention_rnn_dim
         self.decoder_rnn_dim = decoder_rnn_dim
         self.prenet_dim = prenet_dim
-        self.max_decoder_steps = max_decoder_steps
+        self.decoder_max_step = decoder_max_step
         self.gate_threshold = gate_threshold
-        self.p_attention_dropout = p_attention_dropout
-        self.p_decoder_dropout = p_decoder_dropout
-        self.early_stopping = early_stopping
+        self.attention_dropout = attention_dropout
+        self.decoder_dropout = decoder_dropout
+        self.decoder_early_stopping = decoder_early_stopping
 
         self.prenet = _Prenet(
-            n_mels * n_frames_per_step,
+            n_mel * n_frames_per_step,
             [prenet_dim, prenet_dim])
 
         self.attention_rnn = nn.LSTMCell(
@@ -448,16 +448,16 @@ class _Decoder(nn.Module):
 
         self.attention_layer = _Attention(
             attention_rnn_dim, encoder_embedding_dim,
-            attention_dim, attention_location_n_filters,
+            attention_hidden_dim, attention_location_n_filter,
             attention_location_kernel_size)
 
         self.decoder_rnn = nn.LSTMCell(
             attention_rnn_dim + encoder_embedding_dim,
-            decoder_rnn_dim, 1)
+            decoder_rnn_dim, True)
 
         self.linear_projection = _LinearNorm(
             decoder_rnn_dim + encoder_embedding_dim,
-            n_mels * n_frames_per_step)
+            n_mel * n_frames_per_step)
 
         self.gate_layer = _LinearNorm(
             decoder_rnn_dim + encoder_embedding_dim, 1,
@@ -470,14 +470,14 @@ class _Decoder(nn.Module):
             memory (Tensor): Encoder outputs (n_batch, text_lengths.max(), encoder_embedding_dim)
 
         Returns:
-            decoder_input (Tensor): all zeros frames (n_batch, text_lengths.max(), n_mels * n_frames_per_step)
+            decoder_input (Tensor): all zeros frames (n_batch, text_lengths.max(), n_mel * n_frames_per_step)
         """
 
         B = memory.size(0)
         dtype = memory.dtype
         device = memory.device
         decoder_input = torch.zeros(
-            B, self.n_mels * self.n_frames_per_step, dtype=dtype, device=device)
+            B, self.n_mel * self.n_frames_per_step, dtype=dtype, device=device)
         return decoder_input
 
     def _initialize_decoder_states(self,
@@ -499,7 +499,7 @@ class _Decoder(nn.Module):
             attention_weights_cum (Tensor): Cumulated attention weights with shape (n_batch, text_lengths.max()).
             attention_context (Tensor): Context vector with shape (n_batch, encoder_embedding_dim).
             processed_memory (Tensor): Processed encoder outputs
-                with shape (n_batch, text_lengths.max(), attention_dim).
+                with shape (n_batch, text_lengths.max(), attention_hidden_dim).
         """
         B = memory.size(0)
         MAX_TIME = memory.size(1)
@@ -534,34 +534,33 @@ class _Decoder(nn.Module):
 
         Args:
             decoder_inputs (Tensor): Inputs used for teacher-forced training, i.e. mel-specs,
-                with shape (n_batch, n_mels, mel_specgram_lengths.max())
+                with shape (n_batch, n_mel, mel_specgram_lengths.max())
 
         Returns:
-            inputs (Tensor): Processed decoder inputs with shape (mel_specgram_lengths.max(), n_batch, n_mels).
+            inputs (Tensor): Processed decoder inputs with shape (mel_specgram_lengths.max(), n_batch, n_mel).
         """
-        # (n_batch, n_mels, mel_specgram_lengths.max()) -> (n_batch, mel_specgram_lengths.max(), n_mels)
+        # (n_batch, n_mel, mel_specgram_lengths.max()) -> (n_batch, mel_specgram_lengths.max(), n_mel)
         decoder_inputs = decoder_inputs.transpose(1, 2)
         decoder_inputs = decoder_inputs.view(
             decoder_inputs.size(0), int(decoder_inputs.size(1) / self.n_frames_per_step), -1)
-        # (n_batch, mel_specgram_lengths.max(), n_mels) -> (mel_specgram_lengths.max(), n_batch, n_mels)
+        # (n_batch, mel_specgram_lengths.max(), n_mel) -> (mel_specgram_lengths.max(), n_batch, n_mel)
         decoder_inputs = decoder_inputs.transpose(0, 1)
         return decoder_inputs
 
     def _parse_decoder_outputs(self,
                                mel_outputs: Tensor,
                                gate_outputs: Tensor,
-                               alignments: Tensor
-                               ) -> Tuple[Tensor, Tensor, Tensor]:
+                               alignments: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
         r"""Prepares decoder outputs for output
 
         Args:
-            mel_outputs (Tensor): mel spectrogram with shape (mel_specgram_lengths.max(), n_batch, n_mels)
+            mel_outputs (Tensor): mel spectrogram with shape (mel_specgram_lengths.max(), n_batch, n_mel)
             gate_outputs (Tensor): predicted stop token with shape (mel_specgram_lengths.max(), n_batch)
             alignments (Tensor): sequence of attention weights from the decoder
                 with shape (mel_specgram_lengths.max(), n_batch, text_lengths.max())
 
         Returns:
-            mel_specgram (Tensor): mel spectrogram with shape (n_batch, n_mels, mel_specgram_lengths.max())
+            mel_specgram (Tensor): mel spectrogram with shape (n_batch, n_mel, mel_specgram_lengths.max())
             gate_outputs (Tensor): predicted stop token with shape (n_batch, mel_specgram_lengths.max())
             alignments (Tensor): sequence of attention weights from the decoder
                 with shape (n_batch, mel_specgram_lengths.max(), text_lengths.max())
@@ -571,12 +570,12 @@ class _Decoder(nn.Module):
         alignments = alignments.transpose(0, 1).contiguous()
         # (mel_specgram_lengths.max(), n_batch) -> (n_batch, mel_specgram_lengths.max())
         gate_outputs = gate_outputs.transpose(0, 1).contiguous()
-        # (mel_specgram_lengths.max(), n_batch, n_mels) -> (n_batch, mel_specgram_lengths.max(), n_mels)
+        # (mel_specgram_lengths.max(), n_batch, n_mel) -> (n_batch, mel_specgram_lengths.max(), n_mel)
         mel_specgram = mel_outputs.transpose(0, 1).contiguous()
         # decouple frames per step
-        shape = (mel_specgram.shape[0], -1, self.n_mels)
+        shape = (mel_specgram.shape[0], -1, self.n_mel)
         mel_specgram = mel_specgram.view(*shape)
-        # (n_batch, mel_specgram_lengths.max(), n_mels) -> (n_batch, n_mels, T_out)
+        # (n_batch, mel_specgram_lengths.max(), n_mel) -> (n_batch, n_mel, T_out)
         mel_specgram = mel_specgram.transpose(1, 2)
 
         return mel_specgram, gate_outputs, alignments
@@ -584,7 +583,8 @@ class _Decoder(nn.Module):
     def decode(self, decoder_input: Tensor, attention_hidden: Tensor, attention_cell: Tensor,
                decoder_hidden: Tensor, decoder_cell: Tensor, attention_weights: Tensor,
                attention_weights_cum: Tensor, attention_context: Tensor, memory: Tensor,
-               processed_memory: Tensor, mask: Tensor):
+               processed_memory: Tensor, mask: Tensor
+               ) -> Tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
         r"""Decoder step using stored states, attention and memory
 
         Args:
@@ -598,11 +598,11 @@ class _Decoder(nn.Module):
             attention_context (Tensor): Context vector with shape (n_batch, encoder_embedding_dim).
             memory (Tensor): Encoder output with shape (n_batch, text_lengths.max(), encoder_embedding_dim).
             processed_memory (Tensor): Processed Encoder outputs
-                with shape (n_batch, text_lengths.max(), attention_dim).
+                with shape (n_batch, text_lengths.max(), attention_hidden_dim).
             mask (Tensor): Binary mask for padded data with shape (n_batch, current_num_frames).
 
         Returns:
-            decoder_output: Predicted mel spectrogram for the current frame with shape (n_batch, n_mels).
+            decoder_output: Predicted mel spectrogram for the current frame with shape (n_batch, n_mel).
             gate_prediction (Tensor): Prediction of the stop token with shape (n_batch, 1).
             attention_hidden (Tensor): Hidden state of the attention LSTM with shape (n_batch, attention_rnn_dim).
             attention_cell (Tensor): Hidden state of the attention LSTM with shape (n_batch, attention_rnn_dim).
@@ -617,7 +617,7 @@ class _Decoder(nn.Module):
         attention_hidden, attention_cell = self.attention_rnn(
             cell_input, (attention_hidden, attention_cell))
         attention_hidden = F.dropout(
-            attention_hidden, self.p_attention_dropout, self.training)
+            attention_hidden, self.attention_dropout, self.training)
 
         attention_weights_cat = torch.cat(
             (attention_weights.unsqueeze(1),
@@ -633,7 +633,7 @@ class _Decoder(nn.Module):
         decoder_hidden, decoder_cell = self.decoder_rnn(
             decoder_input, (decoder_hidden, decoder_cell))
         decoder_hidden = F.dropout(
-            decoder_hidden, self.p_decoder_dropout, self.training)
+            decoder_hidden, self.decoder_dropout, self.training)
 
         decoder_hidden_attention_context = torch.cat(
             (decoder_hidden, attention_context), dim=1)
@@ -653,12 +653,12 @@ class _Decoder(nn.Module):
         Args:
             memory (Tensor): Encoder outputs with shape (n_batch, text_lengths.max(), encoder_embedding_dim).
             mel_specgram_truth (Tensor): Decoder ground-truth mel-specs for teacher forcing
-                with shape (n_batch, n_mels, mel_specgram_lengths.max()).
+                with shape (n_batch, n_mel, mel_specgram_lengths.max()).
             memory_lengths (Tensor): Encoder output lengths for attention masking (the same as text_lengths)
                 with shape (n_batch, ).
 
         Returns:
-            mel_specgram (Tensor): Predicted mel spectrogram (n_batch, n_mels, T_out).
+            mel_specgram (Tensor): Predicted mel spectrogram (n_batch, n_mel, T_out).
             gate_outputs (Tensor): Predicted stop token for each timestep (n_batch, T_out).
             alignments (Tensor): Sequence of attention weights from the decoder (n_batch, T_out, text_lengths.max()).
         """
@@ -714,8 +714,8 @@ class _Decoder(nn.Module):
 
 
 class Tacotron2(nn.Module):
-    r"""
-    Tacotron2 model based on the implementation from `Nvidia <https://github.com/NVIDIA/DeepLearningExamples/>`_.
+    r"""Tacotron2 model based on the implementation from
+    `Nvidia <https://github.com/NVIDIA/DeepLearningExamples/>`_.
 
     The original implementation was introduced in
     *Natural TTS Synthesis by Conditioning WaveNet on Mel Spectrogram Predictions*
@@ -723,90 +723,80 @@ class Tacotron2(nn.Module):
 
     Args:
         mask_padding (bool, optional): Use mask padding (Default: ``False``).
-        n_mels (int, optional): Number of mel bins (Default: ``80``).
-        n_symbols (int, optional): Number of symbols for the input text (Default: ``148``).
-        symbols_embedding_dim (int, optional): Input embedding dimension (Default: ``512``).
-        encoder_kernel_size (int, optional): Encoder kernel size (Default: ``5``).
-        encoder_n_convolutions (int, optional): Number of encoder convolutions (Default: ``3``).
-        encoder_embedding_dim (int, optional): Encoder embedding dimension (Default: ``512``).
-        attention_rnn_dim (int, optional): Number of units in attention LSTM (Default: ``1024``).
-        attention_dim (int, optional): Dimension of attention hidden representation (Default: ``128``).
-        attention_location_n_filters (int, optional): Number of filters for attention model (Default: ``32``).
-        attention_location_kernel_size (int, optional): Kernel size for attention model (Default: ``31``).
+        n_mel (int, optional): Number of mel bins (Default: ``80``).
+        n_symbol (int, optional): Number of symbols for the input text (Default: ``148``).
         n_frames_per_step (int, optional): Number of frames processed per step, only 1 is supported (Default: ``1``).
+        symbol_embedding_dim (int, optional): Input embedding dimension (Default: ``512``).
+        encoder_n_convolution (int, optional): Number of encoder convolutions (Default: ``3``).
+        encoder_kernel_size (int, optional): Encoder kernel size (Default: ``5``).
+        encoder_embedding_dim (int, optional): Encoder embedding dimension (Default: ``512``).
         decoder_rnn_dim (int, optional): Number of units in decoder LSTM (Default: ``1024``).
+        decoder_max_step (int, optional): Maximum number of output mel spectrograms (Default: ``2000``).
+        decoder_dropout (float, optional): Dropout probability for decoder LSTM (Default: ``0.1``).
+        decoder_early_stopping (bool, optional): Continue decoding after all samples are finished (Default: ``True``).
+        attention_rnn_dim (int, optional): Number of units in attention LSTM (Default: ``1024``).
+        attention_hidden_dim (int, optional): Dimension of attention hidden representation (Default: ``128``).
+        attention_location_n_filter (int, optional): Number of filters for attention model (Default: ``32``).
+        attention_location_kernel_size (int, optional): Kernel size for attention model (Default: ``31``).
+        attention_dropout (float, optional): Dropout probability for attention LSTM (Default: ``0.1``).
         prenet_dim (int, optional): Number of ReLU units in prenet layers (Default: ``256``).
-        max_decoder_steps (int, optional): Maximum number of output mel spectrograms (Default: ``2000``).
-        gate_threshold (float, optional): Probability threshold for stop token (Default: ``0.5``).
-        p_attention_dropout (float, optional): Dropout probability for attention LSTM (Default: ``0.1``).
-        p_decoder_dropout (float, optional): Dropout probability for decoder LSTM (Default: ``0.1``).
-        postnet_embedding_dim (int, optional): Postnet embedding dimension (Default: ``512``).
+        postnet_n_convolution (int, optional): Number of postnet convolutions (Default: ``5``).
         postnet_kernel_size (int, optional): Postnet kernel size (Default: ``5``).
-        postnet_n_convolutions (int, optional): Number of postnet convolutions (Default: ``5``).
-        decoder_no_early_stopping (bool, optional): Stop decoding when all samples are finished (Default: ``False``).
+        postnet_embedding_dim (int, optional): Postnet embedding dimension (Default: ``512``).
+        gate_threshold (float, optional): Probability threshold for stop token (Default: ``0.5``).
     """
     def __init__(self,
                  mask_padding: bool = False,
-                 n_mels: int = 80,
-                 n_symbols: int = 148,
-                 symbols_embedding_dim: int = 512,
-                 encoder_kernel_size: int = 5,
-                 encoder_n_convolutions: int = 3,
-                 encoder_embedding_dim: int = 512,
-                 attention_rnn_dim: int = 1024,
-                 attention_dim: int = 128,
-                 attention_location_n_filters: int = 32,
-                 attention_location_kernel_size: int = 31,
+                 n_mel: int = 80,
+                 n_symbol: int = 148,
                  n_frames_per_step: int = 1,
+                 symbol_embedding_dim: int = 512,
+                 encoder_embedding_dim: int = 512,
+                 encoder_n_convolution: int = 3,
+                 encoder_kernel_size: int = 5,
                  decoder_rnn_dim: int = 1024,
+                 decoder_max_step: int = 2000,
+                 decoder_dropout: float = 0.1,
+                 decoder_early_stopping: bool = True,
+                 attention_rnn_dim: int = 1024,
+                 attention_hidden_dim: int = 128,
+                 attention_location_n_filter: int = 32,
+                 attention_location_kernel_size: int = 31,
+                 attention_dropout: float = 0.1,
                  prenet_dim: int = 256,
-                 max_decoder_steps: int = 2000,
-                 gate_threshold: float = 0.5,
-                 p_attention_dropout: float = 0.1,
-                 p_decoder_dropout: float = 0.1,
-                 postnet_embedding_dim: int = 512,
+                 postnet_n_convolution: int = 5,
                  postnet_kernel_size: int = 5,
-                 postnet_n_convolutions: int = 5,
-                 decoder_no_early_stopping: bool = False) -> None:
+                 postnet_embedding_dim: int = 512,
+                 gate_threshold: float = 0.5,) -> None:
         super().__init__()
 
         self.mask_padding = mask_padding
-        self.n_mels = n_mels
+        self.n_mel = n_mel
         self.n_frames_per_step = n_frames_per_step
-        self.embedding = nn.Embedding(n_symbols, symbols_embedding_dim)
-        std = sqrt(2.0 / (n_symbols + symbols_embedding_dim))
+        self.embedding = nn.Embedding(n_symbol, symbol_embedding_dim)
+        std = sqrt(2.0 / (n_symbol + symbol_embedding_dim))
         val = sqrt(3.0) * std
         self.embedding.weight.data.uniform_(-val, val)
-        self.encoder = _Encoder(encoder_n_convolutions,
-                                encoder_embedding_dim,
+        self.encoder = _Encoder(encoder_embedding_dim,
+                                encoder_n_convolution,
                                 encoder_kernel_size)
-        self.decoder = _Decoder(n_mels, n_frames_per_step,
-                                encoder_embedding_dim, attention_dim,
-                                attention_location_n_filters,
+        self.decoder = _Decoder(n_mel,
+                                n_frames_per_step,
+                                encoder_embedding_dim,
+                                decoder_rnn_dim,
+                                decoder_max_step,
+                                decoder_dropout,
+                                decoder_early_stopping,
+                                attention_rnn_dim, 
+                                attention_hidden_dim,
+                                attention_location_n_filter,
                                 attention_location_kernel_size,
-                                attention_rnn_dim, decoder_rnn_dim,
-                                prenet_dim, max_decoder_steps,
-                                gate_threshold, p_attention_dropout,
-                                p_decoder_dropout,
-                                not decoder_no_early_stopping)
-        self.postnet = _Postnet(n_mels, postnet_embedding_dim,
+                                attention_dropout,
+                                prenet_dim,
+                                gate_threshold)
+        self.postnet = _Postnet(n_mel, postnet_embedding_dim,
                                 postnet_kernel_size,
-                                postnet_n_convolutions)
-
-    def _parse_output(self,
-                      outputs: Tuple[Tensor, Tensor, Tensor, Tensor],
-                      output_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
-
-        if self.mask_padding and output_lengths is not None:
-            mask = get_mask_from_lengths(output_lengths)
-            mask = mask.expand(self.n_mels, mask.size(0), mask.size(1))
-            mask = mask.permute(1, 0, 2)
-
-            outputs[0].masked_fill_(mask, 0.0)
-            outputs[1].masked_fill_(mask, 0.0)
-            outputs[2].masked_fill_(mask[:, 0, :], 1e3)  # gate energies
-
-        return outputs
+                                postnet_n_convolution)
 
     def forward(self,
                 text: Tensor,
@@ -822,21 +812,19 @@ class Tacotron2(nn.Module):
         Args:
             text (Tensor): The input text to Tacotron2 with shape (n_batch, text_lengths.max()).
             text_lengths (Tensor): The length of each text with shape (n_batch).
-            mel_specgram (Tensor): The target mel spectrogram with shape (n_batch, n_mels, mel_specgram_lengths.max()).
+            mel_specgram (Tensor): The target mel spectrogram with shape (n_batch, n_mel, mel_specgram_lengths.max()).
             mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape (n_batch).
 
         Returns:
             mel_specgram (Tensor): Mel spectrogram before Postnet
-                with shape (n_batch, n_mels, mel_specgram_lengths.max()).
+                with shape (n_batch, n_mel, mel_specgram_lengths.max()).
             mel_specgram_postnet (Tensor): Mel spectrogram after Postnet
-                with shape (n_batch, n_mels, mel_specgram_lengths.max()).
+                with shape (n_batch, n_mel, mel_specgram_lengths.max()).
             stop_token (Tensor): The output for stop token at each time step
                 with shape (n_batch, mel_specgram_lengths.max()).
             alignment (Tensor): Sequence of attention weights from the decoder.
                 with shape (n_batch, mel_specgram_lengths.max(), text_lengths.max()).
         """
-
-        text_lengths, mel_specgram_lengths = text_lengths.data, mel_specgram_lengths.data
 
         embedded_inputs = self.embedding(text).transpose(1, 2)
 
@@ -847,5 +835,13 @@ class Tacotron2(nn.Module):
         mel_specgram_postnet = self.postnet(mel_specgram)
         mel_specgram_postnet = mel_specgram + mel_specgram_postnet
 
-        return self._parse_output((mel_specgram, mel_specgram_postnet, gate_outputs, alignments),
-                                  mel_specgram_lengths)
+        if self.mask_padding:
+            mask = get_mask_from_lengths(mel_specgram_lengths)
+            mask = mask.expand(self.n_mel, mask.size(0), mask.size(1))
+            mask = mask.permute(1, 0, 2)
+
+            mel_specgram.masked_fill_(mask, 0.0)
+            mel_specgram_postnet.masked_fill_(mask, 0.0)
+            gate_outputs.masked_fill_(mask[:, 0, :], 1e3)
+
+        return mel_specgram, mel_specgram_postnet, gate_outputs, alignments
