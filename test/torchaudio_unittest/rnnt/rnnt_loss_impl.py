@@ -17,9 +17,7 @@ class RNNTLossTest:
         self, data, ref_costs, ref_gradients, atol=1e-6, rtol=1e-2
     ):
         logits_shape = data["logits"].shape
-        costs, gradients = compute_with_pytorch_transducer(
-            data=data, reuse_logits_for_grads=reuse_logits_for_grads
-        )
+        costs, gradients = compute_with_pytorch_transducer(data=data)
         self.assertEqual(costs, ref_costs, atol=atol, rtol=rtol)
         self.assertEqual(logits_shape, gradients.shape)
         self.assertEqual(gradients, ref_gradients, atol=atol, rtol=rtol)
