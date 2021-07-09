@@ -362,6 +362,7 @@ class _Encoder(nn.Module):
         self.lstm = nn.LSTM(encoder_embedding_dim,
                             int(encoder_embedding_dim / 2), 1,
                             batch_first=True, bidirectional=True)
+        self.lstm.flatten_parameters()
 
     def forward(self, x: Tensor, input_lengths: Tensor) -> Tensor:
         r"""Pass the input through the Encoder.
@@ -382,7 +383,6 @@ class _Encoder(nn.Module):
         input_lengths = input_lengths.cpu()
         x = nn.utils.rnn.pack_padded_sequence(x, input_lengths, batch_first=True)
 
-        self.lstm.flatten_parameters()
         outputs, _ = self.lstm(x)
         outputs, _ = nn.utils.rnn.pad_packed_sequence(outputs, batch_first=True)
 
@@ -787,7 +787,7 @@ class Tacotron2(nn.Module):
                                 decoder_max_step,
                                 decoder_dropout,
                                 decoder_early_stopping,
-                                attention_rnn_dim, 
+                                attention_rnn_dim,
                                 attention_hidden_dim,
                                 attention_location_n_filter,
                                 attention_location_kernel_size,

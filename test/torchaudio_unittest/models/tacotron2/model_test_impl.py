@@ -25,16 +25,29 @@ class TorchscriptConsistencyMixin(TempDirMixin):
 
 class Tacotron2EncoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
 
+    def _get_model(self, encoder_embedding_dim):
+        return _Encoder(
+            encoder_embedding_dim=encoder_embedding_dim,
+            encoder_n_convolution=3,
+            encoder_kernel_size=5)
+
+    def test_tacotron2_torchscript_consistency(self):
+        """Validate the torchscript consistency of a Encoder.
+        """
+        n_batch, n_seq, encoder_embedding_dim = 16, 64, 512
+        model = self._get_model(encoder_embedding_dim).to(self.device).eval()
+
+        x = torch.rand(n_batch, encoder_embedding_dim, n_seq, device=self.device, dtype=self.dtype)
+        input_lengths = torch.ones(n_batch, device=self.device, dtype=torch.int32) * n_seq
+
+        self._assert_torchscript_consistency(model, (x, input_lengths))
+
     def test_encoder_output_shape(self):
         """Feed tensors with specific shape to Tacotron2 Decoder and validate
         that it outputs with a tensor with expected shape.
         """
         n_batch, n_seq, encoder_embedding_dim = 16, 64, 512
-        model = _Encoder(
-            encoder_embedding_dim=encoder_embedding_dim,
-            encoder_n_convolution=3,
-            encoder_kernel_size=5
-        ).to(self.device).eval()
+        model = self._get_model(encoder_embedding_dim).to(self.device).eval()
 
         x = torch.rand(n_batch, encoder_embedding_dim, n_seq, device=self.device, dtype=self.dtype)
         input_lengths = torch.ones(n_batch, device=self.device, dtype=torch.int32) * n_seq
@@ -62,7 +75,7 @@ class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
                          gate_threshold=0.5)
         return model
 
-    def test_torchscript_consistency(self):
+    def test_decoder_torchscript_consistency(self):
         """Validate the torchscript consistency of a Decoder.
         """
         n_batch, n_mel, n_seq, encoder_embedding_dim, n_time_steps = 16, 80, 200, 256, 150
@@ -94,13 +107,8 @@ class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
 
 class Tacotron2Tests(TestBaseMixin, TorchscriptConsistencyMixin):
 
-    def test_tacotron2_output_shape(self):
-        """Feed tensors with specific shape to Tacotron2 and validate
-        that it outputs with a tensor with expected shape.
-        """
-
-        n_batch, n_mel = 16, 80
-        model = Tacotron2(
+    def _get_model(self, n_mel):
+        return Tacotron2(
             mask_padding=False,
             n_mel=n_mel,
             n_symbol=148,
@@ -122,18 +130,40 @@ class Tacotron2Tests(TestBaseMixin, TorchscriptConsistencyMixin):
             postnet_n_convolution=5,
             postnet_kernel_size=5,
             postnet_embedding_dim=512,
-            gate_threshold=0.5).to(self.device).eval()
+            gate_threshold=0.5)
 
-        max_mel_specgram_length = 300
-        max_text_length = 100
-
+    def _get_inputs(self, n_mel, n_batch: int, max_mel_specgram_length: int, max_text_length: int):
         text = torch.randint(0, 148, (n_batch, max_text_length), dtype=torch.int32, device=self.device)
         text_lengths = max_text_length * torch.ones((n_batch, ), dtype=torch.int32, device=self.device)
         mel_specgram = torch.rand(n_batch, n_mel, max_mel_specgram_length, dtype=self.dtype, device=self.device)
         mel_specgram_lengths = max_mel_specgram_length * torch.ones((n_batch, ), dtype=torch.int32, device=self.device)
+        return text, text_lengths, mel_specgram, mel_specgram_lengths
 
-        mel_out, mel_out_postnet, gate_outputs, alignments = model(
-            text, text_lengths, mel_specgram, mel_specgram_lengths)
+    def test_tacotron2_torchscript_consistency(self):
+        """Validate the torchscript consistency of a Tacotron2.
+        """
+        n_batch = 16
+        n_mel = 80
+        max_mel_specgram_length = 300
+        max_text_length = 100
+
+        model = self._get_model(n_mel).to(self.device).eval()
+        inputs = self._get_inputs(n_mel, n_batch, max_mel_specgram_length, max_text_length)
+
+        self._assert_torchscript_consistency(model, inputs)
+
+    def test_tacotron2_output_shape(self):
+        """Feed tensors with specific shape to Tacotron2 and validate
+        that it outputs with a tensor with expected shape.
+        """
+        n_batch = 16
+        n_mel = 80
+        max_mel_specgram_length = 300
+        max_text_length = 100
+
+        model = self._get_model(n_mel).to(self.device).eval()
+        inputs = self._get_inputs(n_mel, n_batch, max_mel_specgram_length, max_text_length)
+        mel_out, mel_out_postnet, gate_outputs, alignments = model(*inputs)
 
         assert mel_out.size() == (n_batch, n_mel, max_mel_specgram_length)
         assert mel_out_postnet.size() == (n_batch, n_mel, max_mel_specgram_length)
