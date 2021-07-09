@@ -366,7 +366,7 @@
     <span class="k">if</span> <span class="n">blank</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># reinterpret blank index if blank &lt; 0.</span>
         <span class="n">blank</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">blank</span>
 
-    <span class="n">costs</span><span class="p">,</span> <span class="n">gradients</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">rnnt_loss</span><span class="p">(</span>
+    <span class="n">costs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">rnnt_loss</span><span class="p">(</span>
         <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">,</span>
         <span class="n">targets</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span>
         <span class="n">logit_lengths</span><span class="o">=</span><span class="n">logit_lengths</span><span class="p">,</span>
