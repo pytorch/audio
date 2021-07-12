@@ -3,10 +3,7 @@ from typing import List, Tuple, Dict, Any
 import torch
 from torch import Tensor
 from torch import nn
-try:
-    from torch.hub import load_state_dict_from_url
-except ImportError:
-    from torch.utils.model_zoo import load_url as load_state_dict_from_url
+from torch.hub import load_state_dict_from_url
 
 
 __all__ = [
@@ -15,7 +12,7 @@ __all__ = [
     "Stretch2d",
     "UpsampleNetwork",
     "WaveRNN",
-    "get_pretrained_wavernn",
+    "wavernn",
 ]
 
 
@@ -351,25 +348,24 @@ class WaveRNN(nn.Module):
         return x.unsqueeze(1)
 
 
-def get_pretrained_wavernn(checkpoint_name: str, progress: bool = True) -> WaveRNN:
+def wavernn(checkpoint_name: str) -> WaveRNN:
     r"""Get pretrained WaveRNN model.
 
-    Here are the available checkpoints:
-
-    - wavernn_10k_epochs_8bits_ljspeech
-
-        WaveRNN model trained with 10k epochs and 8 bits depth waveform on the LJSpeech dataset.
-        The model is trained using the default parameters and code of the examples/pipeline_wavernn/main.py.
-
     Args:
-        checkpoint_name (str): The name of the checkpoint to load.
-        progress (bool): If True, displays a progress bar of the download to stderr.
+        checkpoint_name (str): The name of the checkpoint to load. Available checkpoints:
+
+            - ``"wavernn_10k_epochs_8bits_ljspeech"``:
+
+                WaveRNN model trained with 10k epochs and 8 bits depth waveform on the LJSpeech dataset.
+                The model is trained using the default parameters and code of the examples/pipeline_wavernn/main.py.
     """
     if checkpoint_name not in _MODEL_CONFIG_AND_URLS:
-        raise ValueError("The checkpoint_name `{}` is not supported.".format(checkpoint_name))
+        raise ValueError(
+            f"Unexpected checkpoint_name: '{checkpoint_name}'. "
+            f"Valid choices are; {list(_MODEL_CONFIG_AND_URLS.keys())}")
 
     url, configs = _MODEL_CONFIG_AND_URLS[checkpoint_name]
     model = WaveRNN(**configs)
-    state_dict = load_state_dict_from_url(url, progress=progress)
+    state_dict = load_state_dict_from_url(url, progress=False)
     model.load_state_dict(state_dict)
     return model
