@@ -33,6 +33,14 @@ CMUARCTIC
   :special-members: __getitem__
 
 
+CMUDICT
+~~~~~~~~~
+
+.. autoclass:: CMUDICT
+  :members:
+  :special-members: __getitem__
+
+
 COMMONVOICE
 ~~~~~~~~~~~
 
