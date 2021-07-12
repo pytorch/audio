@@ -39,8 +39,9 @@ __all__ = [
 ]
 
 
-class _LinearNorm(torch.nn.Module):
-    r"""Linear layer with xavier uniform initialization
+def _get_linear_layer(in_dim: int, out_dim: int, bias: bool = True,
+                      w_init_gain: str = 'linear') -> torch.nn.Linear:
+    r"""Linear layer with xavier uniform initialization.
 
     Args:
         in_dim (int): Size of each input sample.
@@ -48,18 +49,14 @@ class _LinearNorm(torch.nn.Module):
         bias (bool, optional): If set to ``False``, the layer will not learn an additive bias. (Default: ``True``)
         w_init_gain (str, optional): Parameter passed to ``torch.nn.init.calculate_gain``
             for setting the gain parameter of ``xavier_uniform_``. (Default: ``linear``)
+
+    Returns:
+        (torch.nn.Linear): The corresponding linear layer.
     """
-    def __init__(self, in_dim: int, out_dim: int, bias: bool = True,
-                 w_init_gain: str = 'linear') -> None:
-        super().__init__()
-        self.linear_layer = torch.nn.Linear(in_dim, out_dim, bias=bias)
-
-        torch.nn.init.xavier_uniform_(
-            self.linear_layer.weight,
-            gain=torch.nn.init.calculate_gain(w_init_gain))
-
-    def forward(self, x: Tensor) -> Tensor:
-        return self.linear_layer(x)
+    linear = torch.nn.Linear(in_dim, out_dim, bias=bias)
+    torch.nn.init.xavier_uniform_(linear.weight,
+                                  gain=torch.nn.init.calculate_gain(w_init_gain))
+    return linear
 
 
 class _ConvNorm(torch.nn.Module):
@@ -97,7 +94,7 @@ class _ConvNorm(torch.nn.Module):
         return self.conv(signal)
 
 
-def get_mask_from_lengths(lengths: Tensor) -> Tensor:
+def _get_mask_from_lengths(lengths: Tensor) -> Tensor:
     r"""Returns a binary mask based on ``lengths``. The ``i``-th row and ``j``-th column of the mask
     is ``1`` if ``j`` is smaller than ``i``-th element of ``lengths.
 
@@ -129,8 +126,8 @@ class _LocationLayer(nn.Module):
                                        kernel_size=attention_kernel_size,
                                        padding=padding, bias=False, stride=1,
                                        dilation=1)
-        self.location_dense = _LinearNorm(attention_n_filter, attention_hidden_dim,
-                                          bias=False, w_init_gain='tanh')
+        self.location_dense = _get_linear_layer(attention_n_filter, attention_hidden_dim,
+                                                bias=False, w_init_gain='tanh')
 
     def forward(self, attention_weights_cat: Tensor) -> Tensor:
         r"""Location layer used in the Attention model.
@@ -166,11 +163,11 @@ class _Attention(nn.Module):
                  attention_hidden_dim: int, attention_location_n_filter: int,
                  attention_location_kernel_size: int) -> None:
         super().__init__()
-        self.query_layer = _LinearNorm(attention_rnn_dim, attention_hidden_dim,
-                                       bias=False, w_init_gain='tanh')
-        self.memory_layer = _LinearNorm(encoder_embedding_dim, attention_hidden_dim, bias=False,
-                                        w_init_gain='tanh')
-        self.v = _LinearNorm(attention_hidden_dim, 1, bias=False)
+        self.query_layer = _get_linear_layer(attention_rnn_dim, attention_hidden_dim,
+                                             bias=False, w_init_gain='tanh')
+        self.memory_layer = _get_linear_layer(encoder_embedding_dim, attention_hidden_dim, bias=False,
+                                              w_init_gain='tanh')
+        self.v = _get_linear_layer(attention_hidden_dim, 1, bias=False)
         self.location_layer = _LocationLayer(attention_location_n_filter,
                                              attention_location_kernel_size,
                                              attention_hidden_dim)
@@ -240,7 +237,7 @@ class _Prenet(nn.Module):
         super().__init__()
         in_sizes = [in_dim] + out_sizes[:-1]
         self.layers = nn.ModuleList(
-            [_LinearNorm(in_size, out_size, bias=False)
+            [_get_linear_layer(in_size, out_size, bias=False)
              for (in_size, out_size) in zip(in_sizes, out_sizes)])
 
     def forward(self, x: Tensor) -> Tensor:
@@ -455,11 +452,11 @@ class _Decoder(nn.Module):
             attention_rnn_dim + encoder_embedding_dim,
             decoder_rnn_dim, True)
 
-        self.linear_projection = _LinearNorm(
+        self.linear_projection = _get_linear_layer(
             decoder_rnn_dim + encoder_embedding_dim,
             n_mel * n_frames_per_step)
 
-        self.gate_layer = _LinearNorm(
+        self.gate_layer = _get_linear_layer(
             decoder_rnn_dim + encoder_embedding_dim, 1,
             bias=True, w_init_gain='sigmoid')
 
@@ -501,27 +498,27 @@ class _Decoder(nn.Module):
             processed_memory (Tensor): Processed encoder outputs
                 with shape (n_batch, text_lengths.max(), attention_hidden_dim).
         """
-        B = memory.size(0)
-        MAX_TIME = memory.size(1)
+        n_batch = memory.size(0)
+        max_time = memory.size(1)
         dtype = memory.dtype
         device = memory.device
 
         attention_hidden = torch.zeros(
-            B, self.attention_rnn_dim, dtype=dtype, device=device)
+            n_batch, self.attention_rnn_dim, dtype=dtype, device=device)
         attention_cell = torch.zeros(
-            B, self.attention_rnn_dim, dtype=dtype, device=device)
+            n_batch, self.attention_rnn_dim, dtype=dtype, device=device)
 
         decoder_hidden = torch.zeros(
-            B, self.decoder_rnn_dim, dtype=dtype, device=device)
+            n_batch, self.decoder_rnn_dim, dtype=dtype, device=device)
         decoder_cell = torch.zeros(
-            B, self.decoder_rnn_dim, dtype=dtype, device=device)
+            n_batch, self.decoder_rnn_dim, dtype=dtype, device=device)
 
         attention_weights = torch.zeros(
-            B, MAX_TIME, dtype=dtype, device=device)
+            n_batch, max_time, dtype=dtype, device=device)
         attention_weights_cum = torch.zeros(
-            B, MAX_TIME, dtype=dtype, device=device)
+            n_batch, max_time, dtype=dtype, device=device)
         attention_context = torch.zeros(
-            B, self.encoder_embedding_dim, dtype=dtype, device=device)
+            n_batch, self.encoder_embedding_dim, dtype=dtype, device=device)
 
         processed_memory = self.attention_layer.memory_layer(memory)
 
@@ -668,7 +665,7 @@ class _Decoder(nn.Module):
         decoder_inputs = torch.cat((decoder_input, decoder_inputs), dim=0)
         decoder_inputs = self.prenet(decoder_inputs)
 
-        mask = get_mask_from_lengths(memory_lengths)
+        mask = _get_mask_from_lengths(memory_lengths)
         (attention_hidden,
          attention_cell,
          decoder_hidden,
@@ -836,7 +833,7 @@ class Tacotron2(nn.Module):
         mel_specgram_postnet = mel_specgram + mel_specgram_postnet
 
         if self.mask_padding:
-            mask = get_mask_from_lengths(mel_specgram_lengths)
+            mask = _get_mask_from_lengths(mel_specgram_lengths)
             mask = mask.expand(self.n_mel, mask.size(0), mask.size(1))
             mask = mask.permute(1, 0, 2)
 
