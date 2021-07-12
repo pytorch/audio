@@ -3,8 +3,10 @@ from typing import List, Tuple, Dict, Any
 import torch
 from torch import Tensor
 from torch import nn
-
-from ._utils import load_state_dict_from_url
+try:
+    from torch.hub import load_state_dict_from_url
+except ImportError:
+    from torch.utils.model_zoo import load_url as load_state_dict_from_url
 
 
 __all__ = [
@@ -17,7 +19,7 @@ __all__ = [
 ]
 
 
-model_config_and_urls: Dict[str, Tuple[str, Dict[str, Any]]] = {
+_MODEL_CONFIG_AND_URLS: Dict[str, Tuple[str, Dict[str, Any]]] = {
     'wavernn_10k_epochs_8bits_ljspeech': (
         'https://download.pytorch.org/models/audio/wavernn_10k_epochs_8bits_ljspeech.pth',
         {
@@ -363,11 +365,11 @@ def get_pretrained_wavernn(checkpoint_name: str, progress: bool = True) -> WaveR
         checkpoint_name (str): The name of the checkpoint to load.
         progress (bool): If True, displays a progress bar of the download to stderr.
     """
-    if checkpoint_name in model_config_and_urls:
-        url, configs = model_config_and_urls[checkpoint_name]
-        model = WaveRNN(**configs)
-        state_dict = load_state_dict_from_url(url, progress=progress)
-        model.load_state_dict(state_dict)
-        return model
-    else:
-        raise ValueError("The model_name `{}` is not supported.".format(checkpoint_name))
+    if checkpoint_name not in _MODEL_CONFIG_AND_URLS:
+        raise ValueError("The checkpoint_name `{}` is not supported.".format(checkpoint_name))
+
+    url, configs = _MODEL_CONFIG_AND_URLS[checkpoint_name]
+    model = WaveRNN(**configs)
+    state_dict = load_state_dict_from_url(url, progress=progress)
+    model.load_state_dict(state_dict)
+    return model
