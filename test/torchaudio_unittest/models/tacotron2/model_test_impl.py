@@ -95,13 +95,12 @@ def _get_decoder_model(n_mel=80, encoder_embedding_dim=512):
 class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
     def test_decoder_torchscript_consistency(self):
         r"""Validate the torchscript consistency of a Decoder."""
-        n_batch, n_mel, n_seq, encoder_embedding_dim, n_time_steps = (
-            16,
-            80,
-            200,
-            256,
-            150,
-        )
+        n_batch = 16
+        n_mel = 80
+        n_seq = 200
+        encoder_embedding_dim = 256
+        n_time_steps = 150
+
         model = (
             _get_decoder_model(n_mel=n_mel, encoder_embedding_dim=encoder_embedding_dim)
             .to(self.device)
@@ -124,13 +123,12 @@ class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
         r"""Feed tensors with specific shape to Tacotron2 Decoder and validate
         that it outputs with a tensor with expected shape.
         """
-        n_batch, n_mel, n_seq, encoder_embedding_dim, n_time_steps = (
-            16,
-            80,
-            200,
-            256,
-            150,
-        )
+        n_batch = 16
+        n_mel = 80
+        n_seq = 200
+        encoder_embedding_dim = 256
+        n_time_steps = 150
+
         model = (
             _get_decoder_model(n_mel=n_mel, encoder_embedding_dim=encoder_embedding_dim)
             .to(self.device)
@@ -252,6 +250,6 @@ class Tacotron2Tests(TestBaseMixin, TorchscriptConsistencyMixin):
         )
         mel_out, mel_out_postnet, gate_outputs, _ = model(*inputs)
 
-        mel_out.sum().backward()
-        mel_out_postnet.sum().backward()
+        mel_out.sum().backward(retain_graph=True)
+        mel_out_postnet.sum().backward(retain_graph=True)
         gate_outputs.sum().backward()
