@@ -27,15 +27,9 @@ class Tacotron2EncoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
     def test_tacotron2_torchscript_consistency(self):
         r"""Validate the torchscript consistency of a Encoder."""
         n_batch, n_seq, encoder_embedding_dim = 16, 64, 512
-        model = (
-            _Encoder(
-                encoder_embedding_dim=encoder_embedding_dim,
-                encoder_n_convolution=3,
-                encoder_kernel_size=5,
-            )
-            .to(self.device)
-            .eval()
-        )
+        model = _Encoder(encoder_embedding_dim=encoder_embedding_dim,
+                         encoder_n_convolution=3,
+                         encoder_kernel_size=5).to(self.device).eval()
 
         x = torch.rand(
             n_batch, encoder_embedding_dim, n_seq, device=self.device, dtype=self.dtype
@@ -51,15 +45,9 @@ class Tacotron2EncoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
         that it outputs with a tensor with expected shape.
         """
         n_batch, n_seq, encoder_embedding_dim = 16, 64, 512
-        model = (
-            _Encoder(
-                encoder_embedding_dim=encoder_embedding_dim,
-                encoder_n_convolution=3,
-                encoder_kernel_size=5,
-            )
-            .to(self.device)
-            .eval()
-        )
+        model = _Encoder(encoder_embedding_dim=encoder_embedding_dim,
+                         encoder_n_convolution=3,
+                         encoder_kernel_size=5).to(self.device).eval()
 
         x = torch.rand(
             n_batch, encoder_embedding_dim, n_seq, device=self.device, dtype=self.dtype
@@ -101,11 +89,8 @@ class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
         encoder_embedding_dim = 256
         n_time_steps = 150
 
-        model = (
-            _get_decoder_model(n_mel=n_mel, encoder_embedding_dim=encoder_embedding_dim)
-            .to(self.device)
-            .eval()
-        )
+        model = _get_decoder_model(n_mel=n_mel, encoder_embedding_dim=encoder_embedding_dim)
+        model = model.to(self.device).eval()
 
         memory = torch.rand(
             n_batch, n_seq, encoder_embedding_dim, dtype=self.dtype, device=self.device
@@ -129,11 +114,8 @@ class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
         encoder_embedding_dim = 256
         n_time_steps = 150
 
-        model = (
-            _get_decoder_model(n_mel=n_mel, encoder_embedding_dim=encoder_embedding_dim)
-            .to(self.device)
-            .eval()
-        )
+        model = _get_decoder_model(n_mel=n_mel, encoder_embedding_dim=encoder_embedding_dim)
+        model = model.to(self.device).eval()
 
         memory = torch.rand(
             n_batch, n_seq, encoder_embedding_dim, dtype=self.dtype, device=self.device
@@ -237,7 +219,8 @@ class Tacotron2Tests(TestBaseMixin, TorchscriptConsistencyMixin):
 
     def test_tacotron2_backward(self):
         r"""Make sure calling the backward function on Tacotron2's outputs does
-        not error out. Following: https://github.com/pytorch/vision/blob/23b8760374a5aaed53c6e5fc83a7e83dbe3b85df/test/test_models.py#L255
+        not error out. Following:
+        https://github.com/pytorch/vision/blob/23b8760374a5aaed53c6e5fc83a7e83dbe3b85df/test/test_models.py#L255
         """
         n_batch = 16
         n_mel = 80

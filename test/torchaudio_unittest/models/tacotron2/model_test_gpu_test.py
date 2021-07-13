@@ -9,18 +9,18 @@ from .model_test_impl import (
 
 
 @skipIfNoCuda
-class TestTacotron2EncoderFloat32(Tacotron2EncoderTests, PytorchTestCase):
+class TestTacotron2EncoderFloat32CUDA(Tacotron2EncoderTests, PytorchTestCase):
     dtype = torch.float32
     device = torch.device("cuda")
 
 
 @skipIfNoCuda
-class TestTacotron2DecoderFloat32(Tacotron2DecoderTests, PytorchTestCase):
+class TestTacotron2DecoderFloat32CUDA(Tacotron2DecoderTests, PytorchTestCase):
     dtype = torch.float32
     device = torch.device("cuda")
 
 
 @skipIfNoCuda
-class TestTacotron2Float32(Tacotron2Tests, PytorchTestCase):
+class TestTacotron2Float32CUDA(Tacotron2Tests, PytorchTestCase):
     dtype = torch.float32
     device = torch.device("cuda")

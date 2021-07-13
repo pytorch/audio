@@ -116,7 +116,7 @@ def _get_mask_from_lengths(lengths: Tensor) -> Tensor:
         lengths (Tensor): The length of each element in the batch, with shape (n_batch, ).
 
     Returns:
-        mask (Tensor): The binary mask, with shape (n_batch, lengths.max()).
+        mask (Tensor): The binary mask, with shape (n_batch, max of ``lengths``).
     """
     max_len = torch.max(lengths).item()
     ids = torch.arange(0, max_len, device=lengths.device, dtype=lengths.dtype)
@@ -160,11 +160,11 @@ class _LocationLayer(nn.Module):
 
         Args:
             attention_weights_cat (Tensor): Cumulative and previous attention weights
-                with shape (n_batch, 2, text_lengths.max()).
+                with shape (n_batch, 2, max of ``text_lengths``).
 
         Returns:
             processed_attention (Tensor): Cumulative and previous attention weights
-                with shape (n_batch, attention_hidden_dim).
+                with shape (n_batch, ``attention_hidden_dim``).
         """
         # (n_batch, attention_n_filter, text_lengths.max())
         processed_attention = self.location_conv(attention_weights_cat)
@@ -216,12 +216,12 @@ class _Attention(nn.Module):
         Args:
             query (Tensor): Decoder output with shape (n_batch, n_mel * n_frames_per_step).
             processed_memory (Tensor): Processed Encoder outputs
-                with shape (n_batch, text_lengths.max(), attention_hidden_dim).
+                with shape (n_batch, max of ``text_lengths``, attention_hidden_dim).
             attention_weights_cat (Tensor): Cumulative and previous attention weights
-                with shape (n_batch, 2, text_lengths.max()).
+                with shape (n_batch, 2, max of ``text_lengths``).
 
         Returns:
-            alignment (Tensor): attention weights, it is a tensor with shape (batch, text_lengths.max()).
+            alignment (Tensor): attention weights, it is a tensor with shape (batch, max of ``text_lengths``).
         """
 
         processed_query = self.query_layer(query.unsqueeze(1))
@@ -244,17 +244,17 @@ class _Attention(nn.Module):
         r"""Pass the input through the Attention model.
 
         Args:
-            attention_hidden_state (Tensor): Attention rnn last output with shape (n_batch, attention_rnn_dim).
-            memory (Tensor): Encoder outputs with shape (n_batch, text_lengths.max(), encoder_embedding_dim).
+            attention_hidden_state (Tensor): Attention rnn last output with shape (n_batch, ``attention_rnn_dim``).
+            memory (Tensor): Encoder outputs with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).
             processed_memory (Tensor): Processed Encoder outputs
-                with shape (n_batch, text_lengths.max(), attention_hidden_dim).
+                with shape (n_batch, max of ``text_lengths``, ``attention_hidden_dim``).
             attention_weights_cat (Tensor): Previous and cumulative attention weights
-                with shape (n_batch, current_num_frames * 2, text_lengths.max()).
+                with shape (n_batch, current_num_frames * 2, max of ``text_lengths``).
             mask (Tensor): Binary mask for padded data with shape (n_batch, current_num_frames).
 
         Returns:
-            attention_context (Tensor): Context vector with shape (n_batch, encoder_embedding_dim).
-            attention_weights (Tensor): Attention weights with shape (n_batch, text_lengths.max()).
+            attention_context (Tensor): Context vector with shape (n_batch, ``encoder_embedding_dim``).
+            attention_weights (Tensor): Attention weights with shape (n_batch, max of ``text_lengths``).
         """
         alignment = self._get_alignment_energies(
             attention_hidden_state, processed_memory, attention_weights_cat
@@ -324,10 +324,9 @@ class _Postnet(nn.Module):
 
         for i in range(postnet_n_convolution):
             in_channels = n_mel if i == 0 else postnet_embedding_dim
-            out_channels = (
-                n_mel if (i == postnet_n_convolution - 1) else postnet_embedding_dim
-            )
-            init_gain = "linear" if (i == postnet_n_convolution - 1) else "tanh"
+            out_channels = n_mel if i == (postnet_n_convolution - 1) else postnet_embedding_dim
+            init_gain = "linear" if i == (postnet_n_convolution - 1) else "tanh"
+            num_features = postnet_embedding_dim if i != (postnet_n_convolution - 1) else n_mel
             self.convolutions.append(
                 nn.Sequential(
                     _get_conv1d_layer(
@@ -339,7 +338,7 @@ class _Postnet(nn.Module):
                         dilation=1,
                         w_init_gain=init_gain,
                     ),
-                    nn.BatchNorm1d(n_mel),
+                    nn.BatchNorm1d(num_features),
                 )
             )
 
@@ -349,10 +348,10 @@ class _Postnet(nn.Module):
         r"""Pass the input through Postnet.
 
         Args:
-            x (Tensor): The input sequence with shape (n_batch, n_mel, mel_specgram_lengths.max()).
+            x (Tensor): The input sequence with shape (n_batch, ``n_mel``, max of ``mel_specgram_lengths``).
 
         Return:
-            x (Tensor): Tensor with shape (n_batch, n_mel, mel_specgram_lengths.max()).
+            x (Tensor): Tensor with shape (n_batch, ``n_mel``, max of ``mel_specgram_lengths``).
         """
 
         i = 0
@@ -519,10 +518,11 @@ class _Decoder(nn.Module):
         r"""Gets all zeros frames to use as the first decoder input.
 
         Args:
-            memory (Tensor): Encoder outputs (n_batch, text_lengths.max(), encoder_embedding_dim)
+            memory (Tensor): Encoder outputs with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).
 
         Returns:
-            decoder_input (Tensor): all zeros frames (n_batch, text_lengths.max(), n_mel * n_frames_per_step)
+            decoder_input (Tensor): all zeros frames with shape
+                (n_batch, max of ``text_lengths``, ``n_mel * n_frames_per_step``).
         """
 
         n_batch = memory.size(0)
@@ -541,18 +541,18 @@ class _Decoder(nn.Module):
         and stores processed memory.
 
         Args:
-            memory (Tensor): Encoder outputs with shape (n_batch, text_lengths.max(), encoder_embedding_dim).
+            memory (Tensor): Encoder outputs with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).
 
         Returns:
-            attention_hidden (Tensor): Hidden state of the attention LSTM with shape (n_batch, attention_rnn_dim).
-            attention_cell (Tensor): Hidden state of the attention LSTM with shape (n_batch, attention_rnn_dim).
-            decoder_hidden (Tensor): Hidden state of the decoder LSTM with shape (n_batch, decoder_rnn_dim).
-            decoder_cell (Tensor): Hidden state of the decoder LSTM with shape (n_batch, decoder_rnn_dim).
-            attention_weights (Tensor): Attention weights with shape (n_batch, text_lengths.max()).
-            attention_weights_cum (Tensor): Cumulated attention weights with shape (n_batch, text_lengths.max()).
-            attention_context (Tensor): Context vector with shape (n_batch, encoder_embedding_dim).
+            attention_hidden (Tensor): Hidden state of the attention LSTM with shape (n_batch, ``attention_rnn_dim``).
+            attention_cell (Tensor): Hidden state of the attention LSTM with shape (n_batch, ``attention_rnn_dim``).
+            decoder_hidden (Tensor): Hidden state of the decoder LSTM with shape (n_batch, ``decoder_rnn_dim``).
+            decoder_cell (Tensor): Hidden state of the decoder LSTM with shape (n_batch, ``decoder_rnn_dim``).
+            attention_weights (Tensor): Attention weights with shape (n_batch, max of ``text_lengths``).
+            attention_weights_cum (Tensor): Cumulated attention weights with shape (n_batch, max of ``text_lengths``).
+            attention_context (Tensor): Context vector with shape (n_batch, ``encoder_embedding_dim``).
             processed_memory (Tensor): Processed encoder outputs
-                with shape (n_batch, text_lengths.max(), attention_hidden_dim).
+                with shape (n_batch, max of ``text_lengths``, ``attention_hidden_dim``).
         """
         n_batch = memory.size(0)
         max_time = memory.size(1)
@@ -599,10 +599,10 @@ class _Decoder(nn.Module):
 
         Args:
             decoder_inputs (Tensor): Inputs used for teacher-forced training, i.e. mel-specs,
-                with shape (n_batch, n_mel, mel_specgram_lengths.max())
+                with shape (n_batch, ``n_mel``, max of ``mel_specgram_lengths``)
 
         Returns:
-            inputs (Tensor): Processed decoder inputs with shape (mel_specgram_lengths.max(), n_batch, n_mel).
+            inputs (Tensor): Processed decoder inputs with shape (max of ``mel_specgram_lengths``, n_batch, ``n_mel``).
         """
         # (n_batch, n_mel, mel_specgram_lengths.max()) -> (n_batch, mel_specgram_lengths.max(), n_mel)
         decoder_inputs = decoder_inputs.transpose(1, 2)
@@ -621,16 +621,16 @@ class _Decoder(nn.Module):
         r"""Prepares decoder outputs for output
 
         Args:
-            mel_outputs (Tensor): mel spectrogram with shape (mel_specgram_lengths.max(), n_batch, n_mel)
-            gate_outputs (Tensor): predicted stop token with shape (mel_specgram_lengths.max(), n_batch)
+            mel_outputs (Tensor): mel spectrogram with shape (max of ``mel_specgram_lengths``, n_batch, ``n_mel``)
+            gate_outputs (Tensor): predicted stop token with shape (max of ``mel_specgram_lengths``, n_batch)
             alignments (Tensor): sequence of attention weights from the decoder
-                with shape (mel_specgram_lengths.max(), n_batch, text_lengths.max())
+                with shape (max of ``mel_specgram_lengths``, n_batch, max of ``text_lengths``)
 
         Returns:
-            mel_specgram (Tensor): mel spectrogram with shape (n_batch, n_mel, mel_specgram_lengths.max())
-            gate_outputs (Tensor): predicted stop token with shape (n_batch, mel_specgram_lengths.max())
+            mel_specgram (Tensor): mel spectrogram with shape (n_batch, ``n_mel``, max of ``mel_specgram_lengths``)
+            gate_outputs (Tensor): predicted stop token with shape (n_batch, max of ``mel_specgram_lengths``)
             alignments (Tensor): sequence of attention weights from the decoder
-                with shape (n_batch, mel_specgram_lengths.max(), text_lengths.max())
+                with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``)
         """
         # (mel_specgram_lengths.max(), n_batch, text_lengths.max())
         # -> (n_batch, mel_specgram_lengths.max(), text_lengths.max())
@@ -664,29 +664,29 @@ class _Decoder(nn.Module):
         r"""Decoder step using stored states, attention and memory
 
         Args:
-            decoder_input (Tensor): Output of the Prenet with shape (n_batch, prenet_dim).
-            attention_hidden (Tensor): Hidden state of the attention LSTM with shape (n_batch, attention_rnn_dim).
-            attention_cell (Tensor): Hidden state of the attention LSTM with shape (n_batch, attention_rnn_dim).
-            decoder_hidden (Tensor): Hidden state of the decoder LSTM with shape (n_batch, decoder_rnn_dim).
-            decoder_cell (Tensor): Hidden state of the decoder LSTM with shape (n_batch, decoder_rnn_dim).
-            attention_weights (Tensor): Attention weights with shape (n_batch, text_lengths.max()).
-            attention_weights_cum (Tensor): Cumulated attention weights with shape (n_batch, text_lengths.max()).
-            attention_context (Tensor): Context vector with shape (n_batch, encoder_embedding_dim).
-            memory (Tensor): Encoder output with shape (n_batch, text_lengths.max(), encoder_embedding_dim).
+            decoder_input (Tensor): Output of the Prenet with shape (n_batch, ``prenet_dim``).
+            attention_hidden (Tensor): Hidden state of the attention LSTM with shape (n_batch, ``attention_rnn_dim``).
+            attention_cell (Tensor): Hidden state of the attention LSTM with shape (n_batch, ``attention_rnn_dim``).
+            decoder_hidden (Tensor): Hidden state of the decoder LSTM with shape (n_batch, ``decoder_rnn_dim``).
+            decoder_cell (Tensor): Hidden state of the decoder LSTM with shape (n_batch, ``decoder_rnn_dim``).
+            attention_weights (Tensor): Attention weights with shape (n_batch, max of ``text_lengths``).
+            attention_weights_cum (Tensor): Cumulated attention weights with shape (n_batch, max of ``text_lengths``).
+            attention_context (Tensor): Context vector with shape (n_batch, ``encoder_embedding_dim``).
+            memory (Tensor): Encoder output with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).
             processed_memory (Tensor): Processed Encoder outputs
-                with shape (n_batch, text_lengths.max(), attention_hidden_dim).
+                with shape (n_batch, max of ``text_lengths``, ``attention_hidden_dim``).
             mask (Tensor): Binary mask for padded data with shape (n_batch, current_num_frames).
 
         Returns:
-            decoder_output: Predicted mel spectrogram for the current frame with shape (n_batch, n_mel).
-            gate_prediction (Tensor): Prediction of the stop token with shape (n_batch, 1).
-            attention_hidden (Tensor): Hidden state of the attention LSTM with shape (n_batch, attention_rnn_dim).
-            attention_cell (Tensor): Hidden state of the attention LSTM with shape (n_batch, attention_rnn_dim).
-            decoder_hidden (Tensor): Hidden state of the decoder LSTM with shape (n_batch, decoder_rnn_dim).
-            decoder_cell (Tensor): Hidden state of the decoder LSTM with shape (n_batch, decoder_rnn_dim).
-            attention_weights (Tensor): Attention weights with shape (n_batch, text_lengths.max()).
-            attention_weights_cum (Tensor): Cumulated attention weights with shape (n_batch, text_lengths.max()).
-            attention_context (Tensor): Context vector with shape (n_batch, encoder_embedding_dim).
+            decoder_output: Predicted mel spectrogram for the current frame with shape (n_batch, ``n_mel``).
+            gate_prediction (Tensor): Prediction of the stop token with shape (n_batch, ``1``).
+            attention_hidden (Tensor): Hidden state of the attention LSTM with shape (n_batch, ``attention_rnn_dim``).
+            attention_cell (Tensor): Hidden state of the attention LSTM with shape (n_batch, ``attention_rnn_dim``).
+            decoder_hidden (Tensor): Hidden state of the decoder LSTM with shape (n_batch, ``decoder_rnn_dim``).
+            decoder_cell (Tensor): Hidden state of the decoder LSTM with shape (n_batch, ``decoder_rnn_dim``).
+            attention_weights (Tensor): Attention weights with shape (n_batch, max of ``text_lengths``).
+            attention_weights_cum (Tensor): Cumulated attention weights with shape (n_batch, max of ``text_lengths``).
+            attention_context (Tensor): Context vector with shape (n_batch, ``encoder_embedding_dim``).
         """
         cell_input = torch.cat((decoder_input, attention_context), -1)
 
@@ -737,16 +737,20 @@ class _Decoder(nn.Module):
         r"""Decoder forward pass for training.
 
         Args:
-            memory (Tensor): Encoder outputs with shape (n_batch, text_lengths.max(), encoder_embedding_dim).
+            memory (Tensor): Encoder outputs
+                with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).
             mel_specgram_truth (Tensor): Decoder ground-truth mel-specs for teacher forcing
-                with shape (n_batch, n_mel, mel_specgram_lengths.max()).
-            memory_lengths (Tensor): Encoder output lengths for attention masking (the same as text_lengths)
-                with shape (n_batch, ).
+                with shape (n_batch, ``n_mel``, max of ``mel_specgram_lengths``).
+            memory_lengths (Tensor): Encoder output lengths for attention masking
+                (the same as ``text_lengths``) with shape (n_batch, ).
 
         Returns:
-            mel_specgram (Tensor): Predicted mel spectrogram (n_batch, n_mel, T_out).
-            gate_outputs (Tensor): Predicted stop token for each timestep (n_batch, T_out).
-            alignments (Tensor): Sequence of attention weights from the decoder (n_batch, T_out, text_lengths.max()).
+            mel_specgram (Tensor): Predicted mel spectrogram
+                with shape (n_batch, ``n_mel``, max of ``mel_specgram_lengths``).
+            gate_outputs (Tensor): Predicted stop token for each timestep
+                with shape (n_batch,  max of ``mel_specgram_lengths``).
+            alignments (Tensor): Sequence of attention weights from the decoder
+                with shape (n_batch,  max of ``mel_specgram_lengths``, max of ``text_lengths``).
         """
 
         decoder_input = self._get_initial_frame(memory).unsqueeze(0)
@@ -904,24 +908,25 @@ class Tacotron2(nn.Module):
         r"""Pass the input through the Tacotron2 model. This is in teacher
         forcing mode, which is generally used for training.
 
-        The input ``text`` should be padded with zeros to length text_lengths.max().
-        The input ``mel_specgram`` should be padded with zeros to length mel_specgram_lengths.max().
+        The input ``text`` should be padded with zeros to length max of ``text_lengths``.
+        The input ``mel_specgram`` should be padded with zeros to length max of ``mel_specgram_lengths``.
 
         Args:
-            text (Tensor): The input text to Tacotron2 with shape (n_batch, text_lengths.max()).
+            text (Tensor): The input text to Tacotron2 with shape (n_batch, max of ``text_lengths``).
             text_lengths (Tensor): The length of each text with shape (n_batch).
-            mel_specgram (Tensor): The target mel spectrogram with shape (n_batch, n_mel, mel_specgram_lengths.max()).
+            mel_specgram (Tensor): The target mel spectrogram
+                with shape (n_batch, n_mel, max of ``mel_specgram_lengths``).
             mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape (n_batch).
 
         Returns:
             mel_specgram (Tensor): Mel spectrogram before Postnet
-                with shape (n_batch, n_mel, mel_specgram_lengths.max()).
+                with shape (n_batch, n_mel, max of ``mel_specgram_lengths``).
             mel_specgram_postnet (Tensor): Mel spectrogram after Postnet
-                with shape (n_batch, n_mel, mel_specgram_lengths.max()).
+                with shape (n_batch, n_mel, max of ``mel_specgram_lengths``).
             stop_token (Tensor): The output for stop token at each time step
-                with shape (n_batch, mel_specgram_lengths.max()).
+                with shape (n_batch, max of ``mel_specgram_lengths``).
             alignment (Tensor): Sequence of attention weights from the decoder.
-                with shape (n_batch, mel_specgram_lengths.max(), text_lengths.max()).
+                with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``).
         """
 
         embedded_inputs = self.embedding(text).transpose(1, 2)
