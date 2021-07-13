@@ -39,8 +39,9 @@ __all__ = [
 ]
 
 
-def _get_linear_layer(in_dim: int, out_dim: int, bias: bool = True,
-                      w_init_gain: str = 'linear') -> torch.nn.Linear:
+def _get_linear_layer(
+    in_dim: int, out_dim: int, bias: bool = True, w_init_gain: str = "linear"
+) -> torch.nn.Linear:
     r"""Linear layer with xavier uniform initialization.
 
     Args:
@@ -54,14 +55,22 @@ def _get_linear_layer(in_dim: int, out_dim: int, bias: bool = True,
         (torch.nn.Linear): The corresponding linear layer.
     """
     linear = torch.nn.Linear(in_dim, out_dim, bias=bias)
-    torch.nn.init.xavier_uniform_(linear.weight,
-                                  gain=torch.nn.init.calculate_gain(w_init_gain))
+    torch.nn.init.xavier_uniform_(
+        linear.weight, gain=torch.nn.init.calculate_gain(w_init_gain)
+    )
     return linear
 
 
-def _get_conv1d_layer(in_channels: int, out_channels: int, kernel_size: int = 1, stride: int = 1,
-                      padding: Optional[Union[str, int, Tuple[int]]] = None, dilation: int = 1,
-                      bias: bool = True, w_init_gain: str = 'linear') -> torch.nn.Conv1d:
+def _get_conv1d_layer(
+    in_channels: int,
+    out_channels: int,
+    kernel_size: int = 1,
+    stride: int = 1,
+    padding: Optional[Union[str, int, Tuple[int]]] = None,
+    dilation: int = 1,
+    bias: bool = True,
+    w_init_gain: str = "linear",
+) -> torch.nn.Conv1d:
     r"""1D convolution with xavier uniform initialization.
 
     Args:
@@ -79,16 +88,22 @@ def _get_conv1d_layer(in_channels: int, out_channels: int, kernel_size: int = 1,
         (torch.nn.Conv1d): The corresponding Conv1D layer.
     """
     if padding is None:
-        assert (kernel_size % 2 == 1)
+        assert kernel_size % 2 == 1
         padding = int(dilation * (kernel_size - 1) / 2)
 
-    conv1d = torch.nn.Conv1d(in_channels, out_channels,
-                             kernel_size=kernel_size, stride=stride,
-                             padding=padding, dilation=dilation,
-                             bias=bias)
+    conv1d = torch.nn.Conv1d(
+        in_channels,
+        out_channels,
+        kernel_size=kernel_size,
+        stride=stride,
+        padding=padding,
+        dilation=dilation,
+        bias=bias,
+    )
 
-    torch.nn.init.xavier_uniform_(conv1d.weight,
-                                  gain=torch.nn.init.calculate_gain(w_init_gain))
+    torch.nn.init.xavier_uniform_(
+        conv1d.weight, gain=torch.nn.init.calculate_gain(w_init_gain)
+    )
 
     return conv1d
 
@@ -118,15 +133,27 @@ class _LocationLayer(nn.Module):
         attention_n_filter (int): Number of filters for attention model.
         attention_kernel_size (int): Kernel size for attention model.
     """
-    def __init__(self, attention_n_filter: int, attention_kernel_size: int, attention_hidden_dim: int):
+
+    def __init__(
+        self,
+        attention_n_filter: int,
+        attention_kernel_size: int,
+        attention_hidden_dim: int,
+    ):
         super().__init__()
         padding = int((attention_kernel_size - 1) / 2)
-        self.location_conv = _get_conv1d_layer(2, attention_n_filter,
-                                               kernel_size=attention_kernel_size,
-                                               padding=padding, bias=False, stride=1,
-                                               dilation=1)
-        self.location_dense = _get_linear_layer(attention_n_filter, attention_hidden_dim,
-                                                bias=False, w_init_gain='tanh')
+        self.location_conv = _get_conv1d_layer(
+            2,
+            attention_n_filter,
+            kernel_size=attention_kernel_size,
+            padding=padding,
+            bias=False,
+            stride=1,
+            dilation=1,
+        )
+        self.location_dense = _get_linear_layer(
+            attention_n_filter, attention_hidden_dim, bias=False, w_init_gain="tanh"
+        )
 
     def forward(self, attention_weights_cat: Tensor) -> Tensor:
         r"""Location layer used in the Attention model.
@@ -158,22 +185,32 @@ class _Attention(nn.Module):
         attention_location_kernel_size (int): Kernel size for Attention model.
     """
 
-    def __init__(self, attention_rnn_dim: int, encoder_embedding_dim: int,
-                 attention_hidden_dim: int, attention_location_n_filter: int,
-                 attention_location_kernel_size: int) -> None:
+    def __init__(
+        self,
+        attention_rnn_dim: int,
+        encoder_embedding_dim: int,
+        attention_hidden_dim: int,
+        attention_location_n_filter: int,
+        attention_location_kernel_size: int,
+    ) -> None:
         super().__init__()
-        self.query_layer = _get_linear_layer(attention_rnn_dim, attention_hidden_dim,
-                                             bias=False, w_init_gain='tanh')
-        self.memory_layer = _get_linear_layer(encoder_embedding_dim, attention_hidden_dim, bias=False,
-                                              w_init_gain='tanh')
+        self.query_layer = _get_linear_layer(
+            attention_rnn_dim, attention_hidden_dim, bias=False, w_init_gain="tanh"
+        )
+        self.memory_layer = _get_linear_layer(
+            encoder_embedding_dim, attention_hidden_dim, bias=False, w_init_gain="tanh"
+        )
         self.v = _get_linear_layer(attention_hidden_dim, 1, bias=False)
-        self.location_layer = _LocationLayer(attention_location_n_filter,
-                                             attention_location_kernel_size,
-                                             attention_hidden_dim)
+        self.location_layer = _LocationLayer(
+            attention_location_n_filter,
+            attention_location_kernel_size,
+            attention_hidden_dim,
+        )
         self.score_mask_value = -float("inf")
 
-    def _get_alignment_energies(self, query: Tensor, processed_memory: Tensor,
-                                attention_weights_cat: Tensor) -> Tensor:
+    def _get_alignment_energies(
+        self, query: Tensor, processed_memory: Tensor, attention_weights_cat: Tensor
+    ) -> Tensor:
         r"""Get the alignment vector.
 
         Args:
@@ -189,14 +226,21 @@ class _Attention(nn.Module):
 
         processed_query = self.query_layer(query.unsqueeze(1))
         processed_attention_weights = self.location_layer(attention_weights_cat)
-        energies = self.v(torch.tanh(
-            processed_query + processed_attention_weights + processed_memory))
+        energies = self.v(
+            torch.tanh(processed_query + processed_attention_weights + processed_memory)
+        )
 
         alignment = energies.squeeze(2)
         return alignment
 
-    def forward(self, attention_hidden_state: Tensor, memory: Tensor, processed_memory: Tensor,
-                attention_weights_cat: Tensor, mask: Tensor) -> Tuple[Tensor, Tensor]:
+    def forward(
+        self,
+        attention_hidden_state: Tensor,
+        memory: Tensor,
+        processed_memory: Tensor,
+        attention_weights_cat: Tensor,
+        mask: Tensor,
+    ) -> Tuple[Tensor, Tensor]:
         r"""Pass the input through the Attention model.
 
         Args:
@@ -213,7 +257,8 @@ class _Attention(nn.Module):
             attention_weights (Tensor): Attention weights with shape (n_batch, text_lengths.max()).
         """
         alignment = self._get_alignment_energies(
-            attention_hidden_state, processed_memory, attention_weights_cat)
+            attention_hidden_state, processed_memory, attention_weights_cat
+        )
 
         alignment = alignment.masked_fill(mask, self.score_mask_value)
 
@@ -236,8 +281,11 @@ class _Prenet(nn.Module):
         super().__init__()
         in_sizes = [in_dim] + out_sizes[:-1]
         self.layers = nn.ModuleList(
-            [_get_linear_layer(in_size, out_size, bias=False)
-             for (in_size, out_size) in zip(in_sizes, out_sizes)])
+            [
+                _get_linear_layer(in_size, out_size, bias=False)
+                for (in_size, out_size) in zip(in_sizes, out_sizes)
+            ]
+        )
 
     def forward(self, x: Tensor) -> Tensor:
         r"""Pass the input through Prenet.
@@ -264,22 +312,34 @@ class _Postnet(nn.Module):
         postnet_n_convolution (int): Number of postnet convolutions.
     """
 
-    def __init__(self, n_mel: int, postnet_embedding_dim: int,
-                 postnet_kernel_size: int, postnet_n_convolution: int):
+    def __init__(
+        self,
+        n_mel: int,
+        postnet_embedding_dim: int,
+        postnet_kernel_size: int,
+        postnet_n_convolution: int,
+    ):
         super().__init__()
         self.convolutions = nn.ModuleList()
 
         for i in range(postnet_n_convolution):
             in_channels = n_mel if i == 0 else postnet_embedding_dim
-            out_channels = n_mel if (i == postnet_n_convolution - 1) else postnet_embedding_dim
-            init_gain = 'linear' if (i == postnet_n_convolution - 1) else 'tanh'
+            out_channels = (
+                n_mel if (i == postnet_n_convolution - 1) else postnet_embedding_dim
+            )
+            init_gain = "linear" if (i == postnet_n_convolution - 1) else "tanh"
             self.convolutions.append(
                 nn.Sequential(
-                    _get_conv1d_layer(in_channels, out_channels,
-                                      kernel_size=postnet_kernel_size, stride=1,
-                                      padding=int((postnet_kernel_size - 1) / 2),
-                                      dilation=1, w_init_gain=init_gain),
-                    nn.BatchNorm1d(n_mel)
+                    _get_conv1d_layer(
+                        in_channels,
+                        out_channels,
+                        kernel_size=postnet_kernel_size,
+                        stride=1,
+                        padding=int((postnet_kernel_size - 1) / 2),
+                        dilation=1,
+                        w_init_gain=init_gain,
+                    ),
+                    nn.BatchNorm1d(n_mel),
                 )
             )
 
@@ -320,29 +380,37 @@ class _Encoder(nn.Module):
         >>> output = encoder(input)  # shape: (10, 30, 512)
     """
 
-    def __init__(self,
-                 encoder_embedding_dim: int,
-                 encoder_n_convolution: int,
-                 encoder_kernel_size: int,
-                 ) -> None:
+    def __init__(
+        self,
+        encoder_embedding_dim: int,
+        encoder_n_convolution: int,
+        encoder_kernel_size: int,
+    ) -> None:
         super().__init__()
 
         self.convolutions = nn.ModuleList()
         for _ in range(encoder_n_convolution):
             conv_layer = nn.Sequential(
-                _get_conv1d_layer(encoder_embedding_dim,
-                                  encoder_embedding_dim,
-                                  kernel_size=encoder_kernel_size,
-                                  stride=1,
-                                  padding=int((encoder_kernel_size - 1) / 2),
-                                  dilation=1,
-                                  w_init_gain='relu'),
-                nn.BatchNorm1d(encoder_embedding_dim))
+                _get_conv1d_layer(
+                    encoder_embedding_dim,
+                    encoder_embedding_dim,
+                    kernel_size=encoder_kernel_size,
+                    stride=1,
+                    padding=int((encoder_kernel_size - 1) / 2),
+                    dilation=1,
+                    w_init_gain="relu",
+                ),
+                nn.BatchNorm1d(encoder_embedding_dim),
+            )
             self.convolutions.append(conv_layer)
 
-        self.lstm = nn.LSTM(encoder_embedding_dim,
-                            int(encoder_embedding_dim / 2), 1,
-                            batch_first=True, bidirectional=True)
+        self.lstm = nn.LSTM(
+            encoder_embedding_dim,
+            int(encoder_embedding_dim / 2),
+            1,
+            batch_first=True,
+            bidirectional=True,
+        )
         self.lstm.flatten_parameters()
 
     def forward(self, x: Tensor, input_lengths: Tensor) -> Tensor:
@@ -390,21 +458,23 @@ class _Decoder(nn.Module):
         gate_threshold (float): probability threshold for stop token
     """
 
-    def __init__(self,
-                 n_mel: int,
-                 n_frames_per_step: int,
-                 encoder_embedding_dim: int,
-                 decoder_rnn_dim: int,
-                 decoder_max_step: int,
-                 decoder_dropout: float,
-                 decoder_early_stopping: bool,
-                 attention_rnn_dim: int,
-                 attention_hidden_dim: int,
-                 attention_location_n_filter: int,
-                 attention_location_kernel_size: int,
-                 attention_dropout: float,
-                 prenet_dim: int,
-                 gate_threshold: float) -> None:
+    def __init__(
+        self,
+        n_mel: int,
+        n_frames_per_step: int,
+        encoder_embedding_dim: int,
+        decoder_rnn_dim: int,
+        decoder_max_step: int,
+        decoder_dropout: float,
+        decoder_early_stopping: bool,
+        attention_rnn_dim: int,
+        attention_hidden_dim: int,
+        attention_location_n_filter: int,
+        attention_location_kernel_size: int,
+        attention_dropout: float,
+        prenet_dim: int,
+        gate_threshold: float,
+    ) -> None:
 
         super().__init__()
         self.n_mel = n_mel
@@ -419,30 +489,31 @@ class _Decoder(nn.Module):
         self.decoder_dropout = decoder_dropout
         self.decoder_early_stopping = decoder_early_stopping
 
-        self.prenet = _Prenet(
-            n_mel * n_frames_per_step,
-            [prenet_dim, prenet_dim])
+        self.prenet = _Prenet(n_mel * n_frames_per_step, [prenet_dim, prenet_dim])
 
         self.attention_rnn = nn.LSTMCell(
-            prenet_dim + encoder_embedding_dim,
-            attention_rnn_dim)
+            prenet_dim + encoder_embedding_dim, attention_rnn_dim
+        )
 
         self.attention_layer = _Attention(
-            attention_rnn_dim, encoder_embedding_dim,
-            attention_hidden_dim, attention_location_n_filter,
-            attention_location_kernel_size)
+            attention_rnn_dim,
+            encoder_embedding_dim,
+            attention_hidden_dim,
+            attention_location_n_filter,
+            attention_location_kernel_size,
+        )
 
         self.decoder_rnn = nn.LSTMCell(
-            attention_rnn_dim + encoder_embedding_dim,
-            decoder_rnn_dim, True)
+            attention_rnn_dim + encoder_embedding_dim, decoder_rnn_dim, True
+        )
 
         self.linear_projection = _get_linear_layer(
-            decoder_rnn_dim + encoder_embedding_dim,
-            n_mel * n_frames_per_step)
+            decoder_rnn_dim + encoder_embedding_dim, n_mel * n_frames_per_step
+        )
 
         self.gate_layer = _get_linear_layer(
-            decoder_rnn_dim + encoder_embedding_dim, 1,
-            bias=True, w_init_gain='sigmoid')
+            decoder_rnn_dim + encoder_embedding_dim, 1, bias=True, w_init_gain="sigmoid"
+        )
 
     def _get_initial_frame(self, memory: Tensor) -> Tensor:
         r"""Gets all zeros frames to use as the first decoder input.
@@ -458,12 +529,13 @@ class _Decoder(nn.Module):
         dtype = memory.dtype
         device = memory.device
         decoder_input = torch.zeros(
-            n_batch, self.n_mel * self.n_frames_per_step, dtype=dtype, device=device)
+            n_batch, self.n_mel * self.n_frames_per_step, dtype=dtype, device=device
+        )
         return decoder_input
 
-    def _initialize_decoder_states(self,
-                                   memory: Tensor
-                                   ) -> Tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
+    def _initialize_decoder_states(
+        self, memory: Tensor
+    ) -> Tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
         r"""Initializes attention rnn states, decoder rnn states, attention
         weights, attention cumulative weights, attention context, stores memory
         and stores processed memory.
@@ -488,27 +560,39 @@ class _Decoder(nn.Module):
         device = memory.device
 
         attention_hidden = torch.zeros(
-            n_batch, self.attention_rnn_dim, dtype=dtype, device=device)
+            n_batch, self.attention_rnn_dim, dtype=dtype, device=device
+        )
         attention_cell = torch.zeros(
-            n_batch, self.attention_rnn_dim, dtype=dtype, device=device)
+            n_batch, self.attention_rnn_dim, dtype=dtype, device=device
+        )
 
         decoder_hidden = torch.zeros(
-            n_batch, self.decoder_rnn_dim, dtype=dtype, device=device)
+            n_batch, self.decoder_rnn_dim, dtype=dtype, device=device
+        )
         decoder_cell = torch.zeros(
-            n_batch, self.decoder_rnn_dim, dtype=dtype, device=device)
+            n_batch, self.decoder_rnn_dim, dtype=dtype, device=device
+        )
 
-        attention_weights = torch.zeros(
-            n_batch, max_time, dtype=dtype, device=device)
+        attention_weights = torch.zeros(n_batch, max_time, dtype=dtype, device=device)
         attention_weights_cum = torch.zeros(
-            n_batch, max_time, dtype=dtype, device=device)
+            n_batch, max_time, dtype=dtype, device=device
+        )
         attention_context = torch.zeros(
-            n_batch, self.encoder_embedding_dim, dtype=dtype, device=device)
+            n_batch, self.encoder_embedding_dim, dtype=dtype, device=device
+        )
 
         processed_memory = self.attention_layer.memory_layer(memory)
 
-        return (attention_hidden, attention_cell, decoder_hidden,
-                decoder_cell, attention_weights, attention_weights_cum,
-                attention_context, processed_memory)
+        return (
+            attention_hidden,
+            attention_cell,
+            decoder_hidden,
+            decoder_cell,
+            attention_weights,
+            attention_weights_cum,
+            attention_context,
+            processed_memory,
+        )
 
     def _parse_decoder_inputs(self, decoder_inputs: Tensor) -> Tensor:
         r"""Prepares decoder inputs.
@@ -523,15 +607,17 @@ class _Decoder(nn.Module):
         # (n_batch, n_mel, mel_specgram_lengths.max()) -> (n_batch, mel_specgram_lengths.max(), n_mel)
         decoder_inputs = decoder_inputs.transpose(1, 2)
         decoder_inputs = decoder_inputs.view(
-            decoder_inputs.size(0), int(decoder_inputs.size(1) / self.n_frames_per_step), -1)
+            decoder_inputs.size(0),
+            int(decoder_inputs.size(1) / self.n_frames_per_step),
+            -1,
+        )
         # (n_batch, mel_specgram_lengths.max(), n_mel) -> (mel_specgram_lengths.max(), n_batch, n_mel)
         decoder_inputs = decoder_inputs.transpose(0, 1)
         return decoder_inputs
 
-    def _parse_decoder_outputs(self,
-                               mel_outputs: Tensor,
-                               gate_outputs: Tensor,
-                               alignments: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
+    def _parse_decoder_outputs(
+        self, mel_outputs: Tensor, gate_outputs: Tensor, alignments: Tensor
+    ) -> Tuple[Tensor, Tensor, Tensor]:
         r"""Prepares decoder outputs for output
 
         Args:
@@ -561,11 +647,20 @@ class _Decoder(nn.Module):
 
         return mel_specgram, gate_outputs, alignments
 
-    def decode(self, decoder_input: Tensor, attention_hidden: Tensor, attention_cell: Tensor,
-               decoder_hidden: Tensor, decoder_cell: Tensor, attention_weights: Tensor,
-               attention_weights_cum: Tensor, attention_context: Tensor, memory: Tensor,
-               processed_memory: Tensor, mask: Tensor
-               ) -> Tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
+    def decode(
+        self,
+        decoder_input: Tensor,
+        attention_hidden: Tensor,
+        attention_cell: Tensor,
+        decoder_hidden: Tensor,
+        decoder_cell: Tensor,
+        attention_weights: Tensor,
+        attention_weights_cum: Tensor,
+        attention_context: Tensor,
+        memory: Tensor,
+        processed_memory: Tensor,
+        mask: Tensor,
+    ) -> Tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
         r"""Decoder step using stored states, attention and memory
 
         Args:
@@ -596,39 +691,49 @@ class _Decoder(nn.Module):
         cell_input = torch.cat((decoder_input, attention_context), -1)
 
         attention_hidden, attention_cell = self.attention_rnn(
-            cell_input, (attention_hidden, attention_cell))
+            cell_input, (attention_hidden, attention_cell)
+        )
         attention_hidden = F.dropout(
-            attention_hidden, self.attention_dropout, self.training)
+            attention_hidden, self.attention_dropout, self.training
+        )
 
         attention_weights_cat = torch.cat(
-            (attention_weights.unsqueeze(1),
-             attention_weights_cum.unsqueeze(1)), dim=1)
+            (attention_weights.unsqueeze(1), attention_weights_cum.unsqueeze(1)), dim=1
+        )
         attention_context, attention_weights = self.attention_layer(
-            attention_hidden, memory, processed_memory,
-            attention_weights_cat, mask)
+            attention_hidden, memory, processed_memory, attention_weights_cat, mask
+        )
 
         attention_weights_cum += attention_weights
-        decoder_input = torch.cat(
-            (attention_hidden, attention_context), -1)
+        decoder_input = torch.cat((attention_hidden, attention_context), -1)
 
         decoder_hidden, decoder_cell = self.decoder_rnn(
-            decoder_input, (decoder_hidden, decoder_cell))
-        decoder_hidden = F.dropout(
-            decoder_hidden, self.decoder_dropout, self.training)
+            decoder_input, (decoder_hidden, decoder_cell)
+        )
+        decoder_hidden = F.dropout(decoder_hidden, self.decoder_dropout, self.training)
 
         decoder_hidden_attention_context = torch.cat(
-            (decoder_hidden, attention_context), dim=1)
-        decoder_output = self.linear_projection(
-            decoder_hidden_attention_context)
+            (decoder_hidden, attention_context), dim=1
+        )
+        decoder_output = self.linear_projection(decoder_hidden_attention_context)
 
         gate_prediction = self.gate_layer(decoder_hidden_attention_context)
 
-        return (decoder_output, gate_prediction, attention_hidden,
-                attention_cell, decoder_hidden, decoder_cell, attention_weights,
-                attention_weights_cum, attention_context)
+        return (
+            decoder_output,
+            gate_prediction,
+            attention_hidden,
+            attention_cell,
+            decoder_hidden,
+            decoder_cell,
+            attention_weights,
+            attention_weights_cum,
+            attention_context,
+        )
 
-    def forward(self, memory: Tensor, mel_specgram_truth: Tensor,
-                memory_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
+    def forward(
+        self, memory: Tensor, mel_specgram_truth: Tensor, memory_lengths: Tensor
+    ) -> Tuple[Tensor, Tensor, Tensor]:
         r"""Decoder forward pass for training.
 
         Args:
@@ -650,46 +755,51 @@ class _Decoder(nn.Module):
         decoder_inputs = self.prenet(decoder_inputs)
 
         mask = _get_mask_from_lengths(memory_lengths)
-        (attention_hidden,
-         attention_cell,
-         decoder_hidden,
-         decoder_cell,
-         attention_weights,
-         attention_weights_cum,
-         attention_context,
-         processed_memory) = self._initialize_decoder_states(memory)
+        (
+            attention_hidden,
+            attention_cell,
+            decoder_hidden,
+            decoder_cell,
+            attention_weights,
+            attention_weights_cum,
+            attention_context,
+            processed_memory,
+        ) = self._initialize_decoder_states(memory)
 
         mel_outputs, gate_outputs, alignments = [], [], []
         while len(mel_outputs) < decoder_inputs.size(0) - 1:
             decoder_input = decoder_inputs[len(mel_outputs)]
-            (mel_output,
-             gate_output,
-             attention_hidden,
-             attention_cell,
-             decoder_hidden,
-             decoder_cell,
-             attention_weights,
-             attention_weights_cum,
-             attention_context) = self.decode(decoder_input,
-                                              attention_hidden,
-                                              attention_cell,
-                                              decoder_hidden,
-                                              decoder_cell,
-                                              attention_weights,
-                                              attention_weights_cum,
-                                              attention_context,
-                                              memory,
-                                              processed_memory,
-                                              mask)
+            (
+                mel_output,
+                gate_output,
+                attention_hidden,
+                attention_cell,
+                decoder_hidden,
+                decoder_cell,
+                attention_weights,
+                attention_weights_cum,
+                attention_context,
+            ) = self.decode(
+                decoder_input,
+                attention_hidden,
+                attention_cell,
+                decoder_hidden,
+                decoder_cell,
+                attention_weights,
+                attention_weights_cum,
+                attention_context,
+                memory,
+                processed_memory,
+                mask,
+            )
 
             mel_outputs += [mel_output.squeeze(1)]
             gate_outputs += [gate_output.squeeze()]
             alignments += [attention_weights]
 
         mel_specgram, gate_outputs, alignments = self._parse_decoder_outputs(
-            torch.stack(mel_outputs),
-            torch.stack(gate_outputs),
-            torch.stack(alignments))
+            torch.stack(mel_outputs), torch.stack(gate_outputs), torch.stack(alignments)
+        )
 
         return mel_specgram, gate_outputs, alignments
 
@@ -726,29 +836,32 @@ class Tacotron2(nn.Module):
         postnet_embedding_dim (int, optional): Postnet embedding dimension (Default: ``512``).
         gate_threshold (float, optional): Probability threshold for stop token (Default: ``0.5``).
     """
-    def __init__(self,
-                 mask_padding: bool = False,
-                 n_mel: int = 80,
-                 n_symbol: int = 148,
-                 n_frames_per_step: int = 1,
-                 symbol_embedding_dim: int = 512,
-                 encoder_embedding_dim: int = 512,
-                 encoder_n_convolution: int = 3,
-                 encoder_kernel_size: int = 5,
-                 decoder_rnn_dim: int = 1024,
-                 decoder_max_step: int = 2000,
-                 decoder_dropout: float = 0.1,
-                 decoder_early_stopping: bool = True,
-                 attention_rnn_dim: int = 1024,
-                 attention_hidden_dim: int = 128,
-                 attention_location_n_filter: int = 32,
-                 attention_location_kernel_size: int = 31,
-                 attention_dropout: float = 0.1,
-                 prenet_dim: int = 256,
-                 postnet_n_convolution: int = 5,
-                 postnet_kernel_size: int = 5,
-                 postnet_embedding_dim: int = 512,
-                 gate_threshold: float = 0.5,) -> None:
+
+    def __init__(
+        self,
+        mask_padding: bool = False,
+        n_mel: int = 80,
+        n_symbol: int = 148,
+        n_frames_per_step: int = 1,
+        symbol_embedding_dim: int = 512,
+        encoder_embedding_dim: int = 512,
+        encoder_n_convolution: int = 3,
+        encoder_kernel_size: int = 5,
+        decoder_rnn_dim: int = 1024,
+        decoder_max_step: int = 2000,
+        decoder_dropout: float = 0.1,
+        decoder_early_stopping: bool = True,
+        attention_rnn_dim: int = 1024,
+        attention_hidden_dim: int = 128,
+        attention_location_n_filter: int = 32,
+        attention_location_kernel_size: int = 31,
+        attention_dropout: float = 0.1,
+        prenet_dim: int = 256,
+        postnet_n_convolution: int = 5,
+        postnet_kernel_size: int = 5,
+        postnet_embedding_dim: int = 512,
+        gate_threshold: float = 0.5,
+    ) -> None:
         super().__init__()
 
         self.mask_padding = mask_padding
@@ -758,32 +871,36 @@ class Tacotron2(nn.Module):
         std = sqrt(2.0 / (n_symbol + symbol_embedding_dim))
         val = sqrt(3.0) * std
         self.embedding.weight.data.uniform_(-val, val)
-        self.encoder = _Encoder(encoder_embedding_dim,
-                                encoder_n_convolution,
-                                encoder_kernel_size)
-        self.decoder = _Decoder(n_mel,
-                                n_frames_per_step,
-                                encoder_embedding_dim,
-                                decoder_rnn_dim,
-                                decoder_max_step,
-                                decoder_dropout,
-                                decoder_early_stopping,
-                                attention_rnn_dim,
-                                attention_hidden_dim,
-                                attention_location_n_filter,
-                                attention_location_kernel_size,
-                                attention_dropout,
-                                prenet_dim,
-                                gate_threshold)
-        self.postnet = _Postnet(n_mel, postnet_embedding_dim,
-                                postnet_kernel_size,
-                                postnet_n_convolution)
+        self.encoder = _Encoder(
+            encoder_embedding_dim, encoder_n_convolution, encoder_kernel_size
+        )
+        self.decoder = _Decoder(
+            n_mel,
+            n_frames_per_step,
+            encoder_embedding_dim,
+            decoder_rnn_dim,
+            decoder_max_step,
+            decoder_dropout,
+            decoder_early_stopping,
+            attention_rnn_dim,
+            attention_hidden_dim,
+            attention_location_n_filter,
+            attention_location_kernel_size,
+            attention_dropout,
+            prenet_dim,
+            gate_threshold,
+        )
+        self.postnet = _Postnet(
+            n_mel, postnet_embedding_dim, postnet_kernel_size, postnet_n_convolution
+        )
 
-    def forward(self,
-                text: Tensor,
-                text_lengths: Tensor,
-                mel_specgram: Tensor,
-                mel_specgram_lengths: Tensor) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
+    def forward(
+        self,
+        text: Tensor,
+        text_lengths: Tensor,
+        mel_specgram: Tensor,
+        mel_specgram_lengths: Tensor,
+    ) -> Tuple[Tensor, Tensor, Tensor, Tensor]:
         r"""Pass the input through the Tacotron2 model. This is in teacher
         forcing mode, which is generally used for training.
 
@@ -811,7 +928,8 @@ class Tacotron2(nn.Module):
 
         encoder_outputs = self.encoder(embedded_inputs, text_lengths)
         mel_specgram, gate_outputs, alignments = self.decoder(
-            encoder_outputs, mel_specgram, memory_lengths=text_lengths)
+            encoder_outputs, mel_specgram, memory_lengths=text_lengths
+        )
 
         mel_specgram_postnet = self.postnet(mel_specgram)
         mel_specgram_postnet = mel_specgram + mel_specgram_postnet
