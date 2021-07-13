@@ -240,3 +240,13 @@ class AutogradTestMixin(TestBaseMixin):
         if test_pseudo_complex:
             spectrogram = torch.view_as_real(spectrogram)
         self.assert_grad(transform, [spectrogram])
+
+    @nested_params(
+        [-4, -2, 0, 2, 4],
+        [1024, 512, 256],
+    )
+    def test_pitch_shift(self, n_steps, n_fft):
+        sample_rate = 8000
+        transform = T.PitchShift(sample_rate=sample_rate, n_steps=n_steps, n_fft=n_fft)
+        waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
+        self.assert_grad(transform, [waveform])

@@ -422,6 +422,17 @@ class Functional(TestBaseMixin):
         assert F.edit_distance(seq1, seq2) == distance
         assert F.edit_distance(seq2, seq1) == distance
 
+    @nested_params(
+        [-4, -2, 0, 2, 4],
+    )
+    def test_pitch_shift_reversible(self, n_steps):
+        sample_rate = 16000
+        torch.random.manual_seed(42)
+        waveform = torch.rand(2, 44100 * 1, dtype=self.dtype, device=self.device)
+        waveform_shift = F.pitch_shift(waveform, sample_rate, n_steps)
+        waveform_reverse = F.pitch_shift(waveform_shift, sample_rate, -n_steps)
+        self.assertEqual(waveform, waveform_reverse, atol=1e-4, rtol=1e-5)
+
 
 class FunctionalCPUOnly(TestBaseMixin):
     def test_create_fb_matrix_no_warning_high_n_freq(self):
