@@ -59,8 +59,10 @@ def _get_linear_layer(in_dim: int, out_dim: int, bias: bool = True,
     return linear
 
 
-class _ConvNorm(torch.nn.Module):
-    r"""1D convolution with xavier uniform initialization
+def _get_conv1d_layer(in_channels: int, out_channels: int, kernel_size: int = 1, stride: int = 1,
+                      padding: Optional[Union[str, int, Tuple[int]]] = None, dilation: int = 1,
+                      bias: bool = True, w_init_gain: str = 'linear') -> torch.nn.Conv1d:
+    r"""1D convolution with xavier uniform initialization.
 
     Args:
         in_channels (int): Number of channels in the input image.
@@ -72,26 +74,23 @@ class _ConvNorm(torch.nn.Module):
         dilation (int, optional): Number of channels in the input image. (Default: ``1``)
         w_init_gain (str, optional): Parameter passed to ``torch.nn.init.calculate_gain``
             for setting the gain parameter of ``xavier_uniform_``. (Default: ``linear``)
+
+    Returns:
+        (torch.nn.Conv1d): The corresponding Conv1D layer.
     """
-    def __init__(self, in_channels: int, out_channels: int, kernel_size: int = 1, stride: int = 1,
-                 padding: Optional[Union[str, int, Tuple[int]]] = None, dilation: int = 1,
-                 bias: bool = True, w_init_gain: str = 'linear') -> None:
-        super().__init__()
-        if padding is None:
-            assert (kernel_size % 2 == 1)
-            padding = int(dilation * (kernel_size - 1) / 2)
+    if padding is None:
+        assert (kernel_size % 2 == 1)
+        padding = int(dilation * (kernel_size - 1) / 2)
 
-        self.conv = torch.nn.Conv1d(in_channels, out_channels,
-                                    kernel_size=kernel_size, stride=stride,
-                                    padding=padding, dilation=dilation,
-                                    bias=bias)
+    conv1d = torch.nn.Conv1d(in_channels, out_channels,
+                             kernel_size=kernel_size, stride=stride,
+                             padding=padding, dilation=dilation,
+                             bias=bias)
 
-        torch.nn.init.xavier_uniform_(
-            self.conv.weight,
-            gain=torch.nn.init.calculate_gain(w_init_gain))
+    torch.nn.init.xavier_uniform_(conv1d.weight,
+                                  gain=torch.nn.init.calculate_gain(w_init_gain))
 
-    def forward(self, signal):
-        return self.conv(signal)
+    return conv1d
 
 
 def _get_mask_from_lengths(lengths: Tensor) -> Tensor:
@@ -122,10 +121,10 @@ class _LocationLayer(nn.Module):
     def __init__(self, attention_n_filter: int, attention_kernel_size: int, attention_hidden_dim: int):
         super().__init__()
         padding = int((attention_kernel_size - 1) / 2)
-        self.location_conv = _ConvNorm(2, attention_n_filter,
-                                       kernel_size=attention_kernel_size,
-                                       padding=padding, bias=False, stride=1,
-                                       dilation=1)
+        self.location_conv = _get_conv1d_layer(2, attention_n_filter,
+                                               kernel_size=attention_kernel_size,
+                                               padding=padding, bias=False, stride=1,
+                                               dilation=1)
         self.location_dense = _get_linear_layer(attention_n_filter, attention_hidden_dim,
                                                 bias=False, w_init_gain='tanh')
 
@@ -270,34 +269,20 @@ class _Postnet(nn.Module):
         super().__init__()
         self.convolutions = nn.ModuleList()
 
-        self.convolutions.append(
-            nn.Sequential(
-                _ConvNorm(n_mel, postnet_embedding_dim,
-                          kernel_size=postnet_kernel_size, stride=1,
-                          padding=int((postnet_kernel_size - 1) / 2),
-                          dilation=1, w_init_gain='tanh'),
-                nn.BatchNorm1d(postnet_embedding_dim))
-        )
-
-        for _ in range(1, postnet_n_convolution - 1):
+        for i in range(postnet_n_convolution):
+            in_channels = n_mel if i == 0 else postnet_embedding_dim
+            out_channels = n_mel if (i == postnet_n_convolution - 1) else postnet_embedding_dim
+            init_gain = 'linear' if (i == postnet_n_convolution - 1) else 'tanh'
             self.convolutions.append(
                 nn.Sequential(
-                    _ConvNorm(postnet_embedding_dim,
-                              postnet_embedding_dim,
-                              kernel_size=postnet_kernel_size, stride=1,
-                              padding=int((postnet_kernel_size - 1) / 2),
-                              dilation=1, w_init_gain='tanh'),
-                    nn.BatchNorm1d(postnet_embedding_dim))
+                    _get_conv1d_layer(in_channels, out_channels,
+                                      kernel_size=postnet_kernel_size, stride=1,
+                                      padding=int((postnet_kernel_size - 1) / 2),
+                                      dilation=1, w_init_gain=init_gain),
+                    nn.BatchNorm1d(n_mel)
+                )
             )
 
-        self.convolutions.append(
-            nn.Sequential(
-                _ConvNorm(postnet_embedding_dim, n_mel,
-                          kernel_size=postnet_kernel_size, stride=1,
-                          padding=int((postnet_kernel_size - 1) / 2),
-                          dilation=1, w_init_gain='linear'),
-                nn.BatchNorm1d(n_mel))
-        )
         self.n_convs = len(self.convolutions)
 
     def forward(self, x: Tensor) -> Tensor:
@@ -316,7 +301,7 @@ class _Postnet(nn.Module):
                 x = F.dropout(torch.tanh(conv(x)), 0.5, training=self.training)
             else:
                 x = F.dropout(conv(x), 0.5, training=self.training)
-            i += 1
+        i += 1
 
         return x
 
@@ -342,19 +327,18 @@ class _Encoder(nn.Module):
                  ) -> None:
         super().__init__()
 
-        convolutions = []
+        self.convolutions = nn.ModuleList()
         for _ in range(encoder_n_convolution):
             conv_layer = nn.Sequential(
-                _ConvNorm(encoder_embedding_dim,
-                          encoder_embedding_dim,
-                          kernel_size=encoder_kernel_size,
-                          stride=1,
-                          padding=int((encoder_kernel_size - 1) / 2),
-                          dilation=1,
-                          w_init_gain='relu'),
+                _get_conv1d_layer(encoder_embedding_dim,
+                                  encoder_embedding_dim,
+                                  kernel_size=encoder_kernel_size,
+                                  stride=1,
+                                  padding=int((encoder_kernel_size - 1) / 2),
+                                  dilation=1,
+                                  w_init_gain='relu'),
                 nn.BatchNorm1d(encoder_embedding_dim))
-            convolutions.append(conv_layer)
-        self.convolutions = nn.ModuleList(convolutions)
+            self.convolutions.append(conv_layer)
 
         self.lstm = nn.LSTM(encoder_embedding_dim,
                             int(encoder_embedding_dim / 2), 1,
@@ -470,11 +454,11 @@ class _Decoder(nn.Module):
             decoder_input (Tensor): all zeros frames (n_batch, text_lengths.max(), n_mel * n_frames_per_step)
         """
 
-        B = memory.size(0)
+        n_batch = memory.size(0)
         dtype = memory.dtype
         device = memory.device
         decoder_input = torch.zeros(
-            B, self.n_mel * self.n_frames_per_step, dtype=dtype, device=device)
+            n_batch, self.n_mel * self.n_frames_per_step, dtype=dtype, device=device)
         return decoder_input
 
     def _initialize_decoder_states(self,

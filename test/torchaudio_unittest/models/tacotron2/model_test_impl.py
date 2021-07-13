@@ -7,7 +7,7 @@ from torchaudio_unittest.common_utils import (
 
 
 class TorchscriptConsistencyMixin(TempDirMixin):
-    """Mixin to provide easy access assert torchscript consistency"""
+    r"""Mixin to provide easy access assert torchscript consistency"""
 
     def _assert_torchscript_consistency(self, model, tensors):
         path = self.get_temp_path('func.zip')
@@ -26,7 +26,7 @@ class TorchscriptConsistencyMixin(TempDirMixin):
 class Tacotron2EncoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
 
     def test_tacotron2_torchscript_consistency(self):
-        """Validate the torchscript consistency of a Encoder.
+        r"""Validate the torchscript consistency of a Encoder.
         """
         n_batch, n_seq, encoder_embedding_dim = 16, 64, 512
         model = _Encoder(
@@ -40,7 +40,7 @@ class Tacotron2EncoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
         self._assert_torchscript_consistency(model, (x, input_lengths))
 
     def test_encoder_output_shape(self):
-        """Feed tensors with specific shape to Tacotron2 Decoder and validate
+        r"""Feed tensors with specific shape to Tacotron2 Decoder and validate
         that it outputs with a tensor with expected shape.
         """
         n_batch, n_seq, encoder_embedding_dim = 16, 64, 512
@@ -77,7 +77,7 @@ def _get_decoder_model(n_mel=80, encoder_embedding_dim=512):
 class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
 
     def test_decoder_torchscript_consistency(self):
-        """Validate the torchscript consistency of a Decoder.
+        r"""Validate the torchscript consistency of a Decoder.
         """
         n_batch, n_mel, n_seq, encoder_embedding_dim, n_time_steps = 16, 80, 200, 256, 150
         model = _get_decoder_model(n_mel=n_mel, encoder_embedding_dim=encoder_embedding_dim).to(self.device).eval()
@@ -89,7 +89,7 @@ class Tacotron2DecoderTests(TestBaseMixin, TorchscriptConsistencyMixin):
         self._assert_torchscript_consistency(model, (memory, decoder_inputs, memory_lengths))
 
     def test_decoder_output_shape(self):
-        """Feed tensors with specific shape to Tacotron2 Decoder and validate
+        r"""Feed tensors with specific shape to Tacotron2 Decoder and validate
         that it outputs with a tensor with expected shape.
         """
         n_batch, n_mel, n_seq, encoder_embedding_dim, n_time_steps = 16, 80, 200, 256, 150
@@ -141,7 +141,7 @@ class Tacotron2Tests(TestBaseMixin, TorchscriptConsistencyMixin):
         return text, text_lengths, mel_specgram, mel_specgram_lengths
 
     def test_tacotron2_torchscript_consistency(self):
-        """Validate the torchscript consistency of a Tacotron2.
+        r"""Validate the torchscript consistency of a Tacotron2.
         """
         n_batch = 16
         n_mel = 80
@@ -154,7 +154,7 @@ class Tacotron2Tests(TestBaseMixin, TorchscriptConsistencyMixin):
         self._assert_torchscript_consistency(model, inputs)
 
     def test_tacotron2_output_shape(self):
-        """Feed tensors with specific shape to Tacotron2 and validate
+        r"""Feed tensors with specific shape to Tacotron2 and validate
         that it outputs with a tensor with expected shape.
         """
         n_batch = 16
@@ -170,3 +170,21 @@ class Tacotron2Tests(TestBaseMixin, TorchscriptConsistencyMixin):
         assert mel_out_postnet.size() == (n_batch, n_mel, max_mel_specgram_length)
         assert gate_outputs.size() == (n_batch, max_mel_specgram_length)
         assert alignments.size() == (n_batch, max_mel_specgram_length, max_text_length)
+
+
+    def test_tacotron2_backward(self):
+        r"""Make sure calling the backward function on Tacotron2's outputs does
+        not error out. Following: https://github.com/pytorch/vision/blob/23b8760374a5aaed53c6e5fc83a7e83dbe3b85df/test/test_models.py#L255
+        """
+        n_batch = 16
+        n_mel = 80
+        max_mel_specgram_length = 300
+        max_text_length = 100
+
+        model = _get_tacotron2_model(n_mel).to(self.device)
+        inputs = self._get_inputs(n_mel, n_batch, max_mel_specgram_length, max_text_length)
+        mel_out, mel_out_postnet, gate_outputs, _ = model(*inputs)
+
+        mel_out.sum().backward()
+        mel_out_postnet.sum().backward()
+        gate_outputs.sum().backward()
