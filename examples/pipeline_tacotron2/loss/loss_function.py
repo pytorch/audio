@@ -38,27 +38,34 @@ class Tacotron2Loss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self,
-                model_outputs: Tuple[Tensor, Tensor, Tensor],
-                targets: Tuple[Tensor, Tensor]) -> Tuple[Tensor, Tensor, Tensor]:
+    def forward(
+        self,
+        model_outputs: Tuple[Tensor, Tensor, Tensor],
+        targets: Tuple[Tensor, Tensor],
+    ) -> Tuple[Tensor, Tensor, Tensor]:
         r"""Pass the input through the Tacotron2 loss.
+
+        The original implementation was introduced in
+        *Natural TTS Synthesis by Conditioning WaveNet on Mel Spectrogram Predictions*
+        [:footcite:`shen2018natural`].
 
         Args:
             model_outputs (tuple of three Tensors): The outputs of the
                 Tacotron2. These outputs should include three items:
-                (1) the predicted mel spectrogram before the postnet (mel_specgram) with shape (n_batch, n_mel, n_time),
-                (2) predicted mel spectrogram after the postnet (mel_specgram_postnet)
-                    with shape (n_batch, n_mel, n_time), and
-                (3) the stop token prediction (gate_out) with shape (n_batch).
-            targets (tuple of two Tensors): The ground truth mel spectrogram (n_batch, n_mel, n_time) and
-                stop token with shape (n_batch).
+                (1) the predicted mel spectrogram before the postnet (``mel_specgram``)
+                    with shape (batch, mel, time).
+                (2) predicted mel spectrogram after the postnet (``mel_specgram_postnet``)
+                    with shape (batch, mel, time), and
+                (3) the stop token prediction (``gate_out``) with shape (batch).
+            targets (tuple of two Tensors): The ground truth mel spectrogram (batch, mel, time) and
+                stop token with shape (batch).
 
         Returns:
-            mel_loss (Tensor): The mean MSE of the mel_specgram and ground truth mel spectrogram with shape (n_batch, ).
+            mel_loss (Tensor): The mean MSE of the mel_specgram and ground truth mel spectrogram with shape (batch, ).
             mel_postnet_loss (Tensor): The mean MSE of the mel_specgram_postnet and
-                ground truth mel spectrogram with shape (n_batch, ).
+                ground truth mel spectrogram with shape (batch, ).
             gate_loss (Tensor): The mean binary cross entropy loss of
-                the prediction on the stop token with shape (n_batch, ).
+                the prediction on the stop token with shape (batch, ).
         """
         mel_target, gate_target = targets[0], targets[1]
         mel_target.requires_grad = False
@@ -68,6 +75,8 @@ class Tacotron2Loss(nn.Module):
         mel_specgram, mel_specgram_postnet, gate_out = model_outputs
         gate_out = gate_out.view(-1, 1)
         mel_loss = nn.MSELoss(reduction="mean")(mel_specgram, mel_target)
-        mel_postnet_loss = nn.MSELoss(reduction="mean")(mel_specgram_postnet, mel_target)
+        mel_postnet_loss = nn.MSELoss(reduction="mean")(
+            mel_specgram_postnet, mel_target
+        )
         gate_loss = nn.BCEWithLogitsLoss(reduction="mean")(gate_out, gate_target)
         return mel_loss, mel_postnet_loss, gate_loss
