@@ -38,6 +38,9 @@ class Tacotron2Loss(nn.Module):
     def __init__(self):
         super().__init__()
 
+        self.mse_loss = nn.MSELoss(reduction="mean")
+        self.bce_loss = nn.BCEWithLogitsLoss(reduction="mean")
+
     def forward(
         self,
         model_outputs: Tuple[Tensor, Tensor, Tensor],
@@ -56,27 +59,24 @@ class Tacotron2Loss(nn.Module):
                     with shape (batch, mel, time).
                 (2) predicted mel spectrogram after the postnet (``mel_specgram_postnet``)
                     with shape (batch, mel, time), and
-                (3) the stop token prediction (``gate_out``) with shape (batch).
+                (3) the stop token prediction (``gate_out``) with shape (batch, ).
             targets (tuple of two Tensors): The ground truth mel spectrogram (batch, mel, time) and
-                stop token with shape (batch).
+                stop token with shape (batch, ).
 
         Returns:
-            mel_loss (Tensor): The mean MSE of the mel_specgram and ground truth mel spectrogram with shape (batch, ).
+            mel_loss (Tensor): The mean MSE of the mel_specgram and ground truth mel spectrogram
+                with shape ``torch.Size([])``.
             mel_postnet_loss (Tensor): The mean MSE of the mel_specgram_postnet and
-                ground truth mel spectrogram with shape (batch, ).
+                ground truth mel spectrogram with shape ``torch.Size([])``.
             gate_loss (Tensor): The mean binary cross entropy loss of
-                the prediction on the stop token with shape (batch, ).
+                the prediction on the stop token with shape ``torch.Size([])``.
         """
         mel_target, gate_target = targets[0], targets[1]
-        mel_target.requires_grad = False
-        gate_target.requires_grad = False
         gate_target = gate_target.view(-1, 1)
 
         mel_specgram, mel_specgram_postnet, gate_out = model_outputs
         gate_out = gate_out.view(-1, 1)
-        mel_loss = nn.MSELoss(reduction="mean")(mel_specgram, mel_target)
-        mel_postnet_loss = nn.MSELoss(reduction="mean")(
-            mel_specgram_postnet, mel_target
-        )
-        gate_loss = nn.BCEWithLogitsLoss(reduction="mean")(gate_out, gate_target)
+        mel_loss = self.mse_loss(mel_specgram, mel_target)
+        mel_postnet_loss = self.mse_loss(mel_specgram_postnet, mel_target)
+        gate_loss = self.bce_loss(gate_out, gate_target)
         return mel_loss, mel_postnet_loss, gate_loss
