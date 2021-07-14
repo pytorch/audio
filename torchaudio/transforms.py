@@ -269,7 +269,7 @@ class MelScale(torch.nn.Module):
         self.mel_scale = mel_scale
 
         assert f_min <= self.f_max, 'Require f_min: {} < f_max: {}'.format(f_min, self.f_max)
-        F.create_fb_matrix(
+        fb = F.create_fb_matrix(
             n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm,
             self.mel_scale)
         self.register_buffer('fb', fb)
