@@ -1526,7 +1526,10 @@ def pitch_shift(
     if window is None:
         window = torch.hann_window(window_length=win_length)
 
+    # pack batch
     shape = waveform.size()
+    waveform = waveform.reshape([-1] + list(shape[-1:]))
+
     ori_len = shape[-1]
     rate = 2.0 ** (-float(n_steps) / bins_per_octave)
     spec_f = torch.stft(input=waveform,
@@ -1548,9 +1551,13 @@ def pitch_shift(
                                    win_length=win_length,
                                    window=window,
                                    length=len_stretch)
-    waveform_shift = resample(waveform_stretch, sample_rate // rate, sample_rate)
+    waveform_shift = resample(waveform_stretch, sample_rate / rate, float(sample_rate))
     shift_len = waveform_shift.size()[-1]
     if shift_len > ori_len:
-        return waveform_shift[..., :ori_len]
+        waveform_shift = waveform_shift[..., :ori_len]
     else:
-        return torch.nn.functional.pad(waveform_shift, [0, ori_len - shift_len])
+        waveform_shift = torch.nn.functional.pad(waveform_shift, [0, ori_len - shift_len])
+
+    # unpack batch
+    waveform_shift = waveform_shift.view(shape[:-1] + waveform_shift.shape[-1:])
+    return waveform_shift
