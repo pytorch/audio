@@ -1219,14 +1219,14 @@ class PitchShift(torch.nn.Module):
     Args:
         waveform (Tensor): The input waveform of shape `(..., time)`.
         sample_rate (float): Sample rate of `waveform`.
-        n_steps (int): The (fractional) steps to shift ``waveform``.
-        bins_per_octave (int, optional): The number of steps per octave.
-        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins
+        n_steps (int): The (fractional) steps to shift `waveform`.
+        bins_per_octave (int, optional): The number of steps per octave (Default : ``12``).
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).
         win_length (int or None, optional): Window size. If None, then ``n_fft`` is used. (Default: ``None``).
         hop_length (int or None, optional): Length of hop between STFT windows. If None, then ``win_length // 4``
-            is used (Default: None).
+            is used (Default: ``None``).
         window (Tensor or None, optional): Window tensor that is applied/multiplied to each frame/window.
-            If None, then ``torch.hann_window(win_length)`` is used (Default: None).
+            If None, then ``torch.hann_window(win_length)`` is used (Default: ``None``).
 
     Example
         >>> waveform, sample_rate = torchaudio.load('test.wav', normalization=True)
@@ -1238,7 +1238,7 @@ class PitchShift(torch.nn.Module):
                  sample_rate: int,
                  n_steps: int,
                  bins_per_octave: int = 12,
-                 n_fft: int = 2048,
+                 n_fft: int = 512,
                  win_length: Optional[int] = None,
                  hop_length: Optional[int] = None,
                  window_fn: Callable[..., Tensor] = torch.hann_window,
