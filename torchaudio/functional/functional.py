@@ -1508,12 +1508,13 @@ def pitch_shift(
         waveform (Tensor): The input waveform of shape `(..., time)`.
         sample_rate (float): Sample rate of `waveform`.
         n_steps (int): The (fractional) steps to shift ``waveform``.
-        bins_per_octave (int): The number of steps per octave.
-        n_fft (int): Size of FFT, creates ``n_fft // 2 + 1`` bins
-        hop_length (int): Length of hop between STFT windows. (
-            Default: ``win_length // 4``)
-        win_length (int): Window size. (Default: ``n_fft``)
-        window (Tensor): Window tensor that is applied/multiplied to each frame/window
+        bins_per_octave (int, optional): The number of steps per octave.
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins.
+        win_length (int or None, optional): Window size. If None, then ``n_fft`` is used. (Default: ``None``).
+        hop_length (int or None, optional): Length of hop between STFT windows. If None, then ``win_length // 4``
+            is used (Default: None).
+        window (Tensor or None, optional): Window tensor that is applied/multiplied to each frame/window.
+            If None, then ``torch.hann_window(win_length)`` is used (Default: None).
 
 
     Returns:
@@ -1542,7 +1543,7 @@ def pitch_shift(
                         normalized=False,
                         onesided=True,
                         return_complex=True)
-    phase_advance = torch.linspace(0, math.pi * hop_length, spec_f.shape[-2])[..., None]
+    phase_advance = torch.linspace(0, math.pi * hop_length, spec_f.shape[-2], device=spec_f.device)[..., None]
     spec_stretch = phase_vocoder(spec_f, rate, phase_advance)
     len_stretch = int(round(ori_len / rate))
     waveform_stretch = torch.istft(spec_stretch,
