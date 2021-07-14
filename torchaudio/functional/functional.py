@@ -1551,7 +1551,7 @@ def pitch_shift(
                                    win_length=win_length,
                                    window=window,
                                    length=len_stretch)
-    waveform_shift = resample(waveform_stretch, sample_rate // rate, sample_rate)
+    waveform_shift = resample(waveform_stretch, sample_rate / rate, float(sample_rate))
     shift_len = waveform_shift.size()[-1]
     if shift_len > ori_len:
         waveform_shift = waveform_shift[..., :ori_len]
@@ -1560,5 +1560,4 @@ def pitch_shift(
 
     # unpack batch
     waveform_shift = waveform_shift.view(shape[:-1] + waveform_shift.shape[-1:])
-
     return waveform_shift

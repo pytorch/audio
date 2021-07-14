@@ -241,12 +241,14 @@ class AutogradTestMixin(TestBaseMixin):
             spectrogram = torch.view_as_real(spectrogram)
         self.assert_grad(transform, [spectrogram])
 
-    @nested_params(
-        [-4, -2, 0, 2, 4],
-        [1024, 512, 256],
-    )
-    def test_pitch_shift(self, n_steps, n_fft):
+    @unittest.expectedFailure
+    def test_pitch_shift(self):
+        """Test that ``T.PitchShift`` fails gradcheck
+
+        This is because ``T.PitchShift`` uses ``F.phase_vocoder`` that could potentially fail gradcheck.
+        """
         sample_rate = 8000
-        transform = T.PitchShift(sample_rate=sample_rate, n_steps=n_steps, n_fft=n_fft)
+        n_steps = 4
+        transform = T.PitchShift(sample_rate=sample_rate, n_steps=n_steps)
         waveform = get_whitenoise(sample_rate=sample_rate, duration=0.05, n_channels=2)
         self.assert_grad(transform, [waveform])
