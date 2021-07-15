@@ -397,6 +397,7 @@ def get_random_data(
     if blank != -1:
         raise ValueError("blank != -1 is not supported yet.")
 
+    random.seed(0)
     B = random.randint(1, max_B - 1)
     T = random.randint(5, max_T - 1)
     U = random.randint(5, max_U - 1)
