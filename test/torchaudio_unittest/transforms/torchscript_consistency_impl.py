@@ -137,7 +137,7 @@ class Transforms(TempDirMixin, TestBaseMixin):
         )
 
     def test_PitchShift(self):
-        sample_rate = 44100
+        sample_rate = 8000
         n_steps = 4
         waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
         self._assert_consistency(
