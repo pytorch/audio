@@ -21,6 +21,7 @@ from .functional import (
     apply_codec,
     resample,
     edit_distance,
+    pitch_shift,
 )
 from .filtering import (
     allpass_biquad,
@@ -90,4 +91,5 @@ __all__ = [
     'apply_codec',
     'resample',
     'edit_distance',
+    'pitch_shift',
 ]

@@ -187,3 +187,15 @@ class TestTransforms(common_utils.TorchaudioTestCase):
         # Batch then transform
         computed = torchaudio.transforms.SpectralCentroid(sample_rate)(waveform.repeat(3, 1, 1))
         self.assertEqual(computed, expected)
+
+    def test_batch_pitch_shift(self):
+        sample_rate = 44100
+        n_steps = 4
+        waveform = common_utils.get_whitenoise(sample_rate=sample_rate)
+
+        # Single then transform then batch
+        expected = torchaudio.transforms.PitchShift(sample_rate, n_steps)(waveform).repeat(3, 1, 1)
+
+        # Batch then transform
+        computed = torchaudio.transforms.PitchShift(sample_rate, n_steps)(waveform.repeat(3, 1, 1))
+        self.assertEqual(computed, expected)
