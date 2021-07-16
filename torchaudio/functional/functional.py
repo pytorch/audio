@@ -1525,7 +1525,7 @@ def pitch_shift(
     if win_length is None:
         win_length = n_fft
     if window is None:
-        window = torch.hann_window(window_length=win_length)
+        window = torch.hann_window(window_length=win_length, device=waveform.device)
 
     # pack batch
     shape = waveform.size()
