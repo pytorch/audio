@@ -5,7 +5,6 @@ import torch
 from torch import Tensor
 
 import torchaudio
-import torchaudio._internal.fft
 
 __all__ = [
     'get_mel_banks',
@@ -290,7 +289,7 @@ def spectrogram(waveform: Tensor,
         snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient)
 
     # size (m, padded_window_size // 2 + 1, 2)
-    fft = torchaudio._internal.fft.rfft(strided_input)
+    fft = torch.fft.rfft(strided_input)
 
     # Convert the FFT into a power spectrum
     power_spectrum = torch.max(fft.abs().pow(2.), epsilon).log()  # size (m, padded_window_size // 2 + 1)
@@ -572,7 +571,7 @@ def fbank(waveform: Tensor,
         snip_edges, raw_energy, energy_floor, dither, remove_dc_offset, preemphasis_coefficient)
 
     # size (m, padded_window_size // 2 + 1)
-    spectrum = torchaudio._internal.fft.rfft(strided_input).abs()
+    spectrum = torch.fft.rfft(strided_input).abs()
     if use_power:
         spectrum = spectrum.pow(2.)
 

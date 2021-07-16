@@ -5,8 +5,6 @@ from typing import Optional
 import torch
 from torch import Tensor
 
-import torchaudio._internal.fft
-
 
 def _dB2Linear(x: float) -> float:
     return math.exp(x * math.log(10) / 20.0)
@@ -1301,7 +1299,7 @@ def _measure(
     dftBuf[measure_len_ws:dft_len_ws].zero_()
 
     # lsx_safe_rdft((int)p->dft_len_ws, 1, c->dftBuf);
-    _dftBuf = torchaudio._internal.fft.rfft(dftBuf)
+    _dftBuf = torch.fft.rfft(dftBuf)
 
     # memset(c->dftBuf, 0, p->spectrum_start * sizeof(*c->dftBuf));
     _dftBuf[:spectrum_start].zero_()
@@ -1338,7 +1336,7 @@ def _measure(
     _cepstrum_Buf[spectrum_end:dft_len_ws >> 1].zero_()
 
     # lsx_safe_rdft((int)p->dft_len_ws >> 1, 1, c->dftBuf);
-    _cepstrum_Buf = torchaudio._internal.fft.rfft(_cepstrum_Buf)
+    _cepstrum_Buf = torch.fft.rfft(_cepstrum_Buf)
 
     result: float = float(
         torch.sum(_cepstrum_Buf[cepstrum_start:cepstrum_end].abs().pow(2))
