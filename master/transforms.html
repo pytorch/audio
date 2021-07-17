@@ -891,6 +891,54 @@ spectrogram, but the number of frames is changed to <code class="docutils litera
 </dd></dl>
 
 </section>
+<section id="pitchshift">
+<h2><span class="hidden-section">PitchShift</span><a class="headerlink" href="#pitchshift" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="torchaudio.transforms.PitchShift">
+<em class="property">class </em><code class="sig-prename descclassname">torchaudio.transforms.</code><code class="sig-name descname">PitchShift</code><span class="sig-paren">(</span><em class="sig-param">sample_rate: int, n_steps: int, bins_per_octave: int = 12, n_fft: int = 512, win_length: Optional[int] = None, hop_length: Optional[int] = None, window_fn: Callable[[...], torch.Tensor] = &lt;built-in method hann_window of type object&gt;, wkwargs: Optional[dict] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/torchaudio/transforms.html#PitchShift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.PitchShift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shift the pitch of a waveform by <code class="docutils literal notranslate"><span class="pre">n_steps</span></code> steps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>waveform</strong> (<em>Tensor</em>) – The input waveform of shape <cite>(…, time)</cite>.</p></li>
+<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Sample rate of <cite>waveform</cite>.</p></li>
+<li><p><strong>n_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The (fractional) steps to shift <cite>waveform</cite>.</p></li>
+<li><p><strong>bins_per_octave</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The number of steps per octave (Default : <code class="docutils literal notranslate"><span class="pre">12</span></code>).</p></li>
+<li><p><strong>n_fft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Size of FFT, creates <code class="docutils literal notranslate"><span class="pre">n_fft</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code> bins (Default: <code class="docutils literal notranslate"><span class="pre">512</span></code>).</p></li>
+<li><p><strong>win_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Window size. If None, then <code class="docutils literal notranslate"><span class="pre">n_fft</span></code> is used. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>).</p></li>
+<li><p><strong>hop_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Length of hop between STFT windows. If None, then <code class="docutils literal notranslate"><span class="pre">win_length</span> <span class="pre">//</span> <span class="pre">4</span></code>
+is used (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>).</p></li>
+<li><p><strong>window</strong> (<em>Tensor</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Window tensor that is applied/multiplied to each frame/window.
+If None, then <code class="docutils literal notranslate"><span class="pre">torch.hann_window(win_length)</span></code> is used (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test.wav&#39;</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">PitchShift</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">,</span> <span class="mi">4</span><span class="p">)(</span><span class="n">waveform</span><span class="p">)</span>  <span class="c1"># (channel, time)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="torchaudio.transforms.PitchShift.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">waveform: torch.Tensor</em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="reference internal" href="_modules/torchaudio/transforms.html#PitchShift.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#torchaudio.transforms.PitchShift.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The pitch-shifted audio of shape <cite>(…, time)</cite>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="fade">
 <h2><span class="hidden-section">Fade</span><a class="headerlink" href="#fade" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -1265,6 +1313,7 @@ voice activity in any channel.</p>
 <li><a class="reference internal" href="#complexnorm"><span class="hidden-section">ComplexNorm</span></a></li>
 <li><a class="reference internal" href="#computedeltas"><span class="hidden-section">ComputeDeltas</span></a></li>
 <li><a class="reference internal" href="#timestretch"><span class="hidden-section">TimeStretch</span></a></li>
+<li><a class="reference internal" href="#pitchshift"><span class="hidden-section">PitchShift</span></a></li>
 <li><a class="reference internal" href="#fade"><span class="hidden-section">Fade</span></a></li>
 <li><a class="reference internal" href="#frequencymasking"><span class="hidden-section">FrequencyMasking</span></a></li>
 <li><a class="reference internal" href="#timemasking"><span class="hidden-section">TimeMasking</span></a></li>

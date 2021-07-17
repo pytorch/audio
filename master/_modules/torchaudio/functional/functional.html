@@ -349,6 +349,7 @@
     <span class="s2">&quot;apply_codec&quot;</span><span class="p">,</span>
     <span class="s2">&quot;resample&quot;</span><span class="p">,</span>
     <span class="s2">&quot;edit_distance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pitch_shift&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 
@@ -1801,6 +1802,79 @@
         <span class="n">dnew</span><span class="p">,</span> <span class="n">dold</span> <span class="o">=</span> <span class="n">dold</span><span class="p">,</span> <span class="n">dnew</span>
 
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">dold</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="pitch_shift"><a class="viewcode-back" href="../../../functional.html#torchaudio.functional.pitch_shift">[docs]</a><span class="k">def</span> <span class="nf">pitch_shift</span><span class="p">(</span>
+    <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">bins_per_octave</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+    <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
+    <span class="n">win_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hop_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">window</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shift the pitch of a waveform by ``n_steps`` steps.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        waveform (Tensor): The input waveform of shape `(..., time)`.</span>
+<span class="sd">        sample_rate (float): Sample rate of `waveform`.</span>
+<span class="sd">        n_steps (int): The (fractional) steps to shift `waveform`.</span>
+<span class="sd">        bins_per_octave (int, optional): The number of steps per octave (Default: ``12``).</span>
+<span class="sd">        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).</span>
+<span class="sd">        win_length (int or None, optional): Window size. If None, then ``n_fft`` is used. (Default: ``None``).</span>
+<span class="sd">        hop_length (int or None, optional): Length of hop between STFT windows. If None, then</span>
+<span class="sd">            ``win_length // 4`` is used (Default: ``None``).</span>
+<span class="sd">        window (Tensor or None, optional): Window tensor that is applied/multiplied to each frame/window.</span>
+<span class="sd">            If None, then ``torch.hann_window(win_length)`` is used (Default: ``None``).</span>
+
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tensor: The pitch-shifted audio waveform of shape `(..., time)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">hop_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">hop_length</span> <span class="o">=</span> <span class="n">n_fft</span> <span class="o">//</span> <span class="mi">4</span>
+    <span class="k">if</span> <span class="n">win_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">win_length</span> <span class="o">=</span> <span class="n">n_fft</span>
+    <span class="k">if</span> <span class="n">window</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">window</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">hann_window</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="c1"># pack batch</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">ori_len</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">rate</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">n_steps</span><span class="p">)</span> <span class="o">/</span> <span class="n">bins_per_octave</span><span class="p">)</span>
+    <span class="n">spec_f</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">waveform</span><span class="p">,</span>
+                        <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+                        <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
+                        <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
+                        <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+                        <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">pad_mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">,</span>
+                        <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">return_complex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">phase_advance</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">hop_length</span><span class="p">,</span> <span class="n">spec_f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">spec_f</span><span class="o">.</span><span class="n">device</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">spec_stretch</span> <span class="o">=</span> <span class="n">phase_vocoder</span><span class="p">(</span><span class="n">spec_f</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">phase_advance</span><span class="p">)</span>
+    <span class="n">len_stretch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">ori_len</span> <span class="o">/</span> <span class="n">rate</span><span class="p">))</span>
+    <span class="n">waveform_stretch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span><span class="n">spec_stretch</span><span class="p">,</span>
+                                   <span class="n">n_fft</span><span class="o">=</span><span class="n">n_fft</span><span class="p">,</span>
+                                   <span class="n">hop_length</span><span class="o">=</span><span class="n">hop_length</span><span class="p">,</span>
+                                   <span class="n">win_length</span><span class="o">=</span><span class="n">win_length</span><span class="p">,</span>
+                                   <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span>
+                                   <span class="n">length</span><span class="o">=</span><span class="n">len_stretch</span><span class="p">)</span>
+    <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span><span class="n">waveform_stretch</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">/</span> <span class="n">rate</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">sample_rate</span><span class="p">))</span>
+    <span class="n">shift_len</span> <span class="o">=</span> <span class="n">waveform_shift</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">shift_len</span> <span class="o">&gt;</span> <span class="n">ori_len</span><span class="p">:</span>
+        <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">waveform_shift</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">ori_len</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">waveform_shift</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">ori_len</span> <span class="o">-</span> <span class="n">shift_len</span><span class="p">])</span>
+
+    <span class="c1"># unpack batch</span>
+    <span class="n">waveform_shift</span> <span class="o">=</span> <span class="n">waveform_shift</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">waveform_shift</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="k">return</span> <span class="n">waveform_shift</span></div>
 </pre></div>
 
              </article>

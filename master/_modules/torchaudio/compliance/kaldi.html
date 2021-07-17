@@ -318,7 +318,6 @@
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
 <span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">import</span> <span class="nn">torchaudio._internal.fft</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;get_mel_banks&#39;</span><span class="p">,</span>
@@ -603,7 +602,7 @@
         <span class="n">snip_edges</span><span class="p">,</span> <span class="n">raw_energy</span><span class="p">,</span> <span class="n">energy_floor</span><span class="p">,</span> <span class="n">dither</span><span class="p">,</span> <span class="n">remove_dc_offset</span><span class="p">,</span> <span class="n">preemphasis_coefficient</span><span class="p">)</span>
 
     <span class="c1"># size (m, padded_window_size // 2 + 1, 2)</span>
-    <span class="n">fft</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_internal</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">strided_input</span><span class="p">)</span>
+    <span class="n">fft</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">strided_input</span><span class="p">)</span>
 
     <span class="c1"># Convert the FFT into a power spectrum</span>
     <span class="n">power_spectrum</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fft</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">2.</span><span class="p">),</span> <span class="n">epsilon</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>  <span class="c1"># size (m, padded_window_size // 2 + 1)</span>
@@ -885,7 +884,7 @@
         <span class="n">snip_edges</span><span class="p">,</span> <span class="n">raw_energy</span><span class="p">,</span> <span class="n">energy_floor</span><span class="p">,</span> <span class="n">dither</span><span class="p">,</span> <span class="n">remove_dc_offset</span><span class="p">,</span> <span class="n">preemphasis_coefficient</span><span class="p">)</span>
 
     <span class="c1"># size (m, padded_window_size // 2 + 1)</span>
-    <span class="n">spectrum</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_internal</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">strided_input</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
+    <span class="n">spectrum</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">strided_input</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">use_power</span><span class="p">:</span>
         <span class="n">spectrum</span> <span class="o">=</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span>
 
