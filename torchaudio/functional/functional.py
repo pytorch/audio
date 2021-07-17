@@ -36,6 +36,7 @@ __all__ = [
     "apply_codec",
     "resample",
     "edit_distance",
+    "pitch_shift",
 ]
 
 
@@ -1488,3 +1489,76 @@ def edit_distance(seq1: Sequence, seq2: Sequence) -> int:
         dnew, dold = dold, dnew
 
     return int(dold[-1])
+
+
+def pitch_shift(
+    waveform: Tensor,
+    sample_rate: int,
+    n_steps: int,
+    bins_per_octave: int = 12,
+    n_fft: int = 512,
+    win_length: Optional[int] = None,
+    hop_length: Optional[int] = None,
+    window: Optional[Tensor] = None,
+) -> Tensor:
+    """
+    Shift the pitch of a waveform by ``n_steps`` steps.
+
+    Args:
+        waveform (Tensor): The input waveform of shape `(..., time)`.
+        sample_rate (float): Sample rate of `waveform`.
+        n_steps (int): The (fractional) steps to shift `waveform`.
+        bins_per_octave (int, optional): The number of steps per octave (Default: ``12``).
+        n_fft (int, optional): Size of FFT, creates ``n_fft // 2 + 1`` bins (Default: ``512``).
+        win_length (int or None, optional): Window size. If None, then ``n_fft`` is used. (Default: ``None``).
+        hop_length (int or None, optional): Length of hop between STFT windows. If None, then
+            ``win_length // 4`` is used (Default: ``None``).
+        window (Tensor or None, optional): Window tensor that is applied/multiplied to each frame/window.
+            If None, then ``torch.hann_window(win_length)`` is used (Default: ``None``).
+
+
+    Returns:
+        Tensor: The pitch-shifted audio waveform of shape `(..., time)`.
+    """
+    if hop_length is None:
+        hop_length = n_fft // 4
+    if win_length is None:
+        win_length = n_fft
+    if window is None:
+        window = torch.hann_window(window_length=win_length, device=waveform.device)
+
+    # pack batch
+    shape = waveform.size()
+    waveform = waveform.reshape(-1, shape[-1])
+
+    ori_len = shape[-1]
+    rate = 2.0 ** (-float(n_steps) / bins_per_octave)
+    spec_f = torch.stft(input=waveform,
+                        n_fft=n_fft,
+                        hop_length=hop_length,
+                        win_length=win_length,
+                        window=window,
+                        center=True,
+                        pad_mode='reflect',
+                        normalized=False,
+                        onesided=True,
+                        return_complex=True)
+    phase_advance = torch.linspace(0, math.pi * hop_length, spec_f.shape[-2], device=spec_f.device)[..., None]
+    spec_stretch = phase_vocoder(spec_f, rate, phase_advance)
+    len_stretch = int(round(ori_len / rate))
+    waveform_stretch = torch.istft(spec_stretch,
+                                   n_fft=n_fft,
+                                   hop_length=hop_length,
+                                   win_length=win_length,
+                                   window=window,
+                                   length=len_stretch)
+    waveform_shift = resample(waveform_stretch, sample_rate / rate, float(sample_rate))
+    shift_len = waveform_shift.size()[-1]
+    if shift_len > ori_len:
+        waveform_shift = waveform_shift[..., :ori_len]
+    else:
+        waveform_shift = torch.nn.functional.pad(waveform_shift, [0, ori_len - shift_len])
+
+    # unpack batch
+    waveform_shift = waveform_shift.view(shape[:-1] + waveform_shift.shape[-1:])
+    return waveform_shift
