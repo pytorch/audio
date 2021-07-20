@@ -357,7 +357,9 @@ def wavernn(checkpoint_name: str) -> WaveRNN:
             - ``"wavernn_10k_epochs_8bits_ljspeech"``:
 
                 WaveRNN model trained with 10k epochs and 8 bits depth waveform on the LJSpeech dataset.
-                The model is trained using the default parameters and code of the examples/pipeline_wavernn/main.py.
+                The model is trained using the default parameters and code of the
+                `examples/pipeline_wavernn/main.py
+                <https://github.com/pytorch/audio/tree/master/examples/pipeline_wavernn>`_.
     """
     if checkpoint_name not in _MODEL_CONFIG_AND_URLS:
         raise ValueError(
